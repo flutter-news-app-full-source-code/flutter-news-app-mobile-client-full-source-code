@@ -22,7 +22,7 @@ class AppScaffold extends StatelessWidget {
             smallSecondaryBody: AdaptiveScaffold.emptyBuilder,
             secondaryBody: AdaptiveScaffold.emptyBuilder,
             largeSecondaryBody: AdaptiveScaffold.emptyBuilder,
-            selectedIndex: state.selectedIndex,
+            selectedIndex: state.selectedBottomNavigationIndex,
             onSelectedIndexChange: (index) {
               context
                   .read<AppBloc>()

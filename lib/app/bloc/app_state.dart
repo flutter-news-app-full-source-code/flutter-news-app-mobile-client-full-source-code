@@ -1,13 +1,16 @@
 part of 'app_bloc.dart';
 
-@immutable
-class AppState {
-  const AppState({this.selectedIndex = 0});
-  final int selectedIndex;
+class AppState extends Equatable {
+  const AppState({this.selectedBottomNavigationIndex = 0});
+  final int selectedBottomNavigationIndex;
 
-  AppState copyWith({int? selectedIndex}) {
+  AppState copyWith({int? selectedBottomNavigationIndex}) {
     return AppState(
-      selectedIndex: selectedIndex ?? this.selectedIndex,
+      selectedBottomNavigationIndex:
+          selectedBottomNavigationIndex ?? this.selectedBottomNavigationIndex,
     );
   }
+
+  @override
+  List<Object?> get props => [selectedBottomNavigationIndex];
 }

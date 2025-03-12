@@ -8,6 +8,7 @@ environment:
 
 dependencies:
   bloc: ^9.0.0
+  equatable: ^2.0.7
   flex_color_scheme: ^8.1.1
   flutter:
     sdk: flutter

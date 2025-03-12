@@ -8,3 +8,5 @@ final class AppNavigationIndexChanged extends AppEvent {
 
   final int index;
 }
+
+final class AppThemeChanged extends AppEvent {}

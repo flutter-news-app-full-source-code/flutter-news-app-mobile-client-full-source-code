@@ -19,7 +19,7 @@ class AppScaffold extends StatelessWidget {
           label: 'Search',
         ),
       ],
-            // MAIN BODY
+      // MAIN BODY
       smallBody: (context) => const Placeholder(),
       body: (context) => const Placeholder(),
       largeBody: (context) => const Placeholder(),
@@ -28,7 +28,6 @@ class AppScaffold extends StatelessWidget {
       smallSecondaryBody: AdaptiveScaffold.emptyBuilder,
       secondaryBody: AdaptiveScaffold.emptyBuilder,
       largeSecondaryBody: AdaptiveScaffold.emptyBuilder,
-
     );
   }
 }

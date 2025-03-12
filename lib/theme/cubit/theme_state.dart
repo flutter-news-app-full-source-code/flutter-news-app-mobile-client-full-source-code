@@ -1,9 +1,8 @@
 part of 'theme_cubit.dart';
 
 abstract class ThemeState {
-  final ThemeData themeData;
-
   const ThemeState({required this.themeData});
+  final ThemeData themeData;
 }
 
 class LightThemeState extends ThemeState {

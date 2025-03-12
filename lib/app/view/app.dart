@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/router.dart';
 import 'package:ht_main/theme/cubit/theme_cubit.dart';
 
@@ -15,6 +16,8 @@ class App extends StatelessWidget {
           return MaterialApp.router(
             theme: state.themeData,
             routerConfig: appRouter,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
           );
         },
       ),

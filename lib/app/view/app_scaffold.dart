@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
-import 'package:go_router/go_router.dart';
-import 'package:ht_main/router/routes.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ht_main/app/bloc/app_bloc.dart';
 
 class AppScaffold extends StatelessWidget {
   const AppScaffold({required this.child, super.key});
@@ -10,33 +10,44 @@ class AppScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AdaptiveScaffold(
-      useDrawer: false,
-      destinations: const [
-        NavigationDestination(
-          icon: Icon(Icons.view_headline),
-          label: 'Headlines',
-          selectedIcon: Icon(Icons.view_headline),
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.search),
-          label: 'Search',
-          selectedIcon: Icon(Icons.search),
-        ),
-      ],
-      smallBody: (_) => child,
-      body: (_) => child,
-      largeBody: (_) => child,
-      smallSecondaryBody: AdaptiveScaffold.emptyBuilder,
-      secondaryBody: AdaptiveScaffold.emptyBuilder,
-      largeSecondaryBody: AdaptiveScaffold.emptyBuilder,
-      onSelectedIndexChange: (index) {
-        if (index == 0) {
-          context.go(Routes.headlines);
-        } else if (index == 1) {
-          context.go(Routes.search);
-        }
-      },
+    return BlocProvider(
+      create: (context) => AppBloc(),
+      child: BlocBuilder<AppBloc, AppState>(
+        builder: (context, state) {
+          return AdaptiveScaffold(
+            useDrawer: false,
+            smallBody: (_) => child,
+            body: (_) => child,
+            largeBody: (_) => child,
+            smallSecondaryBody: AdaptiveScaffold.emptyBuilder,
+            secondaryBody: AdaptiveScaffold.emptyBuilder,
+            largeSecondaryBody: AdaptiveScaffold.emptyBuilder,
+            selectedIndex: state.selectedIndex,
+            onSelectedIndexChange: (index) {
+              context
+                  .read<AppBloc>()
+                  .add(AppNavigationIndexChanged(index: index));
+            },
+            destinations: const [
+              NavigationDestination(
+                icon: Icon(Icons.view_headline_outlined),
+                selectedIcon: Icon(Icons.view_headline),
+                label: 'Headlines',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.search_outlined),
+                selectedIcon: Icon(Icons.search),
+                label: 'Search',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.account_circle_outlined),
+                selectedIcon: Icon(Icons.account_circle),
+                label: 'Account',
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }

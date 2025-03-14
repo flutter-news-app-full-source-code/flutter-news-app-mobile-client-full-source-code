@@ -145,7 +145,7 @@ class _HeadlinesFilterBottomSheetState
   String? selectedSource;
   String? selectedEventCountry;
 
-    @override
+  @override
   void initState() {
     super.initState();
     final state = widget.bloc.state;
@@ -162,78 +162,109 @@ class _HeadlinesFilterBottomSheetState
       value: widget.bloc,
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Filter Headlines',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 16),
-            // Category Dropdown
-            DropdownButtonFormField<String>(
-              decoration: const InputDecoration(labelText: 'Category'),
-              value: selectedCategory,
-              items: const [
-                // Placeholder items
-                DropdownMenuItem(value: 'technology', child: Text('Technology')),
-                DropdownMenuItem(value: 'business', child: Text('Business')),
-                DropdownMenuItem(value: 'Politics', child: Text('Sports')),
-              ],
-              onChanged: (value) {
-                setState(() {
-                  selectedCategory = value;
-                });
-              },
-            ),
-            const SizedBox(height: 16),
-            // Source Dropdown
-            DropdownButtonFormField<String>(
-              decoration: const InputDecoration(labelText: 'Source'),
-              value: selectedSource,
-              items: const [
-                // Placeholder items
-                DropdownMenuItem(value: 'cnn', child: Text('CNN')),
-                DropdownMenuItem(value: 'reuters', child: Text('Reuters')),
-              ],
-              onChanged: (value) {
-                setState(() {
-                  selectedSource = value;
-                });
-              },
-            ),
-            const SizedBox(height: 16),
-            // Event Country Dropdown
-            DropdownButtonFormField<String>(
-              decoration: const InputDecoration(labelText: 'Event Country'),
-              value: selectedEventCountry,
-              items: const [
-                // Placeholder items
-                DropdownMenuItem(value: 'US', child: Text('United States')),
-                DropdownMenuItem(value: 'UK', child: Text('United Kingdom')),
-                DropdownMenuItem(value: 'CA', child: Text('Canada')),
-              ],
-              onChanged: (value) {
-                setState(() {
-                  selectedEventCountry = value;
-                });
-              },
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                widget.bloc.add(
-                  HeadlinesFeedFilterChanged(
-                    category: selectedCategory,
-                    source: selectedSource,
-                    eventCountry: selectedEventCountry,
-                  ),
-                );
-                Navigator.pop(context);
-              },
-              child: const Text('Apply Filters'),
-            ),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Text(
+              //   'Filter Headlines',
+              //   style: Theme.of(context).textTheme.titleLarge,
+              // ),
+              const SizedBox(height: 16),
+              // Category Dropdown
+              DropdownButtonFormField<String>(
+                decoration: const InputDecoration(labelText: 'Category'),
+                value: selectedCategory,
+                items: const [
+                  // Placeholder items
+                  const DropdownMenuItem<String>(
+                      value: null, child: Text('All')),
+                  DropdownMenuItem(
+                      value: 'technology', child: Text('Technology')),
+                  DropdownMenuItem(value: 'business', child: Text('Business')),
+                  DropdownMenuItem(value: 'Politics', child: Text('Sports')),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    selectedCategory = value;
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
+              // Source Dropdown
+              DropdownButtonFormField<String>(
+                decoration: const InputDecoration(labelText: 'Source'),
+                value: selectedSource,
+                items: const [
+                  // Placeholder items
+                  const DropdownMenuItem<String>(
+                      value: null, child: Text('All')),
+                  DropdownMenuItem(value: 'cnn', child: Text('CNN')),
+                  DropdownMenuItem(value: 'reuters', child: Text('Reuters')),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    selectedSource = value;
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
+              // Event Country Dropdown
+              DropdownButtonFormField<String>(
+                decoration: const InputDecoration(labelText: 'Event Country'),
+                value: selectedEventCountry,
+                items: const [
+                  // Placeholder items
+                  const DropdownMenuItem<String>(
+                      value: null, child: Text('All')),
+                  DropdownMenuItem(value: 'US', child: Text('United States')),
+                  DropdownMenuItem(value: 'UK', child: Text('United Kingdom')),
+                  DropdownMenuItem(value: 'CA', child: Text('Canada')),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    selectedEventCountry = value;
+                  });
+                },
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () {
+                  widget.bloc.add(
+                    HeadlinesFeedFilterChanged(
+                      category: selectedCategory,
+                      source: selectedSource,
+                      eventCountry: selectedEventCountry,
+                    ),
+                  );
+                  Navigator.pop(context);
+                },
+                child: const Text('Apply Filters'),
+              ),
+              const SizedBox(height: 8),
+              TextButton(
+                style: TextButton.styleFrom(
+                  foregroundColor: Theme.of(context).colorScheme.error,
+                ),
+                onPressed: () {
+                  setState(() {
+                    selectedCategory = null;
+                    selectedSource = null;
+                    selectedEventCountry = null;
+                  });
+                  widget.bloc.add(
+                    const HeadlinesFeedFilterChanged(
+                      category: null,
+                      source: null,
+                      eventCountry: null,
+                    ),
+                  );
+                  Navigator.pop(context);
+                },
+                child: const Text('Reset Filters'),
+              ),
+            ],
+          ),
         ),
       ),
     );

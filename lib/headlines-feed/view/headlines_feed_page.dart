@@ -69,17 +69,44 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
       appBar: AppBar(
         title: const Text('Headlines Feed'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list),
-            onPressed: () {
-              final bloc = context.read<HeadlinesFeedBloc>();
-              showModalBottomSheet<void>(
-                context: context,
-                builder: (BuildContext context) {
-                  return _HeadlinesFilterBottomSheet(
-                    bloc: bloc,
-                  );
-                },
+          BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
+            builder: (context, state) {
+              bool isFilterApplied = false;
+              if (state is HeadlinesFeedLoaded) {
+                isFilterApplied = state.filter.category != null ||
+                    state.filter.source != null ||
+                    state.filter.eventCountry != null;
+              }
+              return Stack(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.filter_list),
+                    onPressed: () {
+                      final bloc = context.read<HeadlinesFeedBloc>();
+                      showModalBottomSheet<void>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return _HeadlinesFilterBottomSheet(
+                            bloc: bloc,
+                          );
+                        },
+                      );
+                    },
+                  ),
+                  if (isFilterApplied)
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                ],
               );
             },
           ),

@@ -1,13 +1,14 @@
 name: ht_main
 description: main headlines toolkit mobile app.
-version: 0.5.5
+version: 0.6.5
 publish_to: none
-repository: https://github.com/Headlines-Toolkit/ht-main
+repository: https://github.com/headlines-toolkit/ht-main
 environment:
   sdk: ^3.5.0
 
 dependencies:
   bloc: ^9.0.0
+  bloc_concurrency: ^0.3.0
   equatable: ^2.0.7
   flex_color_scheme: ^8.1.1
   flutter:

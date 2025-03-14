@@ -14,22 +14,45 @@ class HeadlineItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
+      child: Card(
+        child: ListTile(
+          leading: Image.network(
+            headline.imageUrl ??
+                'https://via.placeholder.com/50x50', // Placeholder image
+            width: 50,
+            height: 50,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) =>
+                const Icon(Icons.error),
+          ),
+          title: Text(
             headline.title,
             style: Theme.of(context).textTheme.titleMedium,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
-          if (headline.description != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: Text(
-                headline.description!,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Row(
+              children: [
+                Icon(Icons.source,
+                    color: Theme.of(context)
+                        .iconTheme
+                        .color,), // Placeholder for source icon
+                const SizedBox(width: 16),
+                Icon(Icons.category,
+                    color: Theme.of(context)
+                        .iconTheme
+                        .color,), // Placeholder for category icon
+                const SizedBox(width: 16),
+                Icon(Icons.location_on,
+                    color: Theme.of(context)
+                        .iconTheme
+                        .color,), // Placeholder for country icon
+              ],
             ),
-        ],
+          ),
+        ),
       ),
     );
   }

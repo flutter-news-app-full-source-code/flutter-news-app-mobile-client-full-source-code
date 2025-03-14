@@ -5,8 +5,8 @@ class FailureStateWidget extends StatelessWidget {
   /// Creates a [FailureStateWidget].
   ///
   /// The [message] is the error message to display.
-  /// 
-  /// The [onRetry] is an optional callback to be called 
+  ///
+  /// The [onRetry] is an optional callback to be called
   /// when the retry button is pressed.
   const FailureStateWidget({
     required this.message,

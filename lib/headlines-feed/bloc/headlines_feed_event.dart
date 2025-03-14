@@ -14,7 +14,16 @@ sealed class HeadlinesFeedEvent extends Equatable {
 /// {@template headlines_feed_fetch_requested}
 /// Event triggered when the headlines feed needs to be fetched.
 /// {@endtemplate}
-final class HeadlinesFeedFetchRequested extends HeadlinesFeedEvent {}
+final class HeadlinesFeedFetchRequested extends HeadlinesFeedEvent {
+  /// {@macro headlines_feed_fetch_requested}
+  const HeadlinesFeedFetchRequested({this.cursor});
+
+  /// The cursor for pagination.
+  final String? cursor;
+
+  @override
+  List<Object> get props => [cursor ?? ''];
+}
 
 /// {@template headlines_feed_refresh_requested}
 /// Event triggered when the headlines feed needs to be refreshed.

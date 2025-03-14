@@ -1,25 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ht_headlines_repository/ht_headlines_repository.dart';
 import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:ht_main/headlines-feed/widgets/headline_item_widget.dart';
 import 'package:ht_main/shared/widgets/failure_state_widget.dart';
 import 'package:ht_main/shared/widgets/initial_state_widget.dart';
 import 'package:ht_main/shared/widgets/loading_state_widget.dart';
 
-class HeadlinesFeedPage extends StatefulWidget {
+class HeadlinesFeedPage extends StatelessWidget {
   const HeadlinesFeedPage({super.key});
 
   @override
-  State<HeadlinesFeedPage> createState() => _HeadlinesFeedPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => HeadlinesFeedBloc(
+        headlinesRepository: context.read<HtHeadlinesRepository>(),
+      )..add(const HeadlinesFeedFetchRequested()),
+      child: const _HeadlinesFeedView(),
+    );
+  }
 }
 
-class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
+class _HeadlinesFeedView extends StatefulWidget {
+  const _HeadlinesFeedView();
+
+  @override
+  State<_HeadlinesFeedView> createState() => _HeadlinesFeedViewState();
+}
+
+class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
   final _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    context.read<HeadlinesFeedBloc>().add(HeadlinesFeedRefreshRequested());
   }
 
   @override
@@ -32,7 +48,12 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
 
   void _onScroll() {
     if (_isBottom) {
-      context.read<HeadlinesFeedBloc>().add(HeadlinesFeedFetchRequested());
+      final state = context.read<HeadlinesFeedBloc>().state;
+      if (state is HeadlinesFeedLoaded) {
+        context
+            .read<HeadlinesFeedBloc>()
+            .add(HeadlinesFeedFetchRequested(cursor: state.cursor));
+      }
     }
   }
 

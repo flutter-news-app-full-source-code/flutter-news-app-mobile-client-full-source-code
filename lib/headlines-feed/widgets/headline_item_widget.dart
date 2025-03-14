@@ -18,7 +18,7 @@ class HeadlineItemWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            headline.title ?? 'No Title',
+            headline.title,
             style: Theme.of(context).textTheme.titleMedium,
           ),
           if (headline.description != null)

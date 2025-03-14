@@ -21,10 +21,10 @@ packages:
     dependency: transitive
     description:
       name: args
-      sha256: bf9f5caeea8d8fe6721a9c358dd8a5c1947b27f1cfaa18b39c301273594919e6
+      sha256: d0481093c50b1da8910eb0bb301626d4d8eb7284aa739614d2b394ee09e3ea04
       url: "https://pub.dev"
     source: hosted
-    version: "2.6.0"
+    version: "2.7.0"
   async:
     dependency: transitive
     description:
@@ -229,6 +229,42 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.2.1"
+  ht_headlines_client:
+    dependency: transitive
+    description:
+      path: "."
+      ref: main
+      resolved-ref: "825cc8641c5e6190f130684173b64f3c102fb0c1"
+      url: "https://github.com/headlines-toolkit/ht-headlines-client.git"
+    source: git
+    version: "0.0.0"
+  ht_headlines_inmemory:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: main
+      resolved-ref: fc055f560e6e68cc6f61847fd2e7ade250174454
+      url: "https://github.com/headlines-toolkit/ht-headlines-inmemory.git"
+    source: git
+    version: "0.0.0"
+  ht_headlines_repository:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: main
+      resolved-ref: c85b5dd9fa57067449418ccc32f20bcd8a7684d9
+      url: "https://github.com/headlines-toolkit/ht-headlines-repository.git"
+    source: git
+    version: "0.0.0"
+  ht_shared:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: main
+      resolved-ref: "3f58c8396942bf85a91da3471c495aa7e78d05ea"
+      url: "https://github.com/headlines-toolkit/ht-shared.git"
+    source: git
+    version: "0.0.0"
   http:
     dependency: transitive
     description:
@@ -277,6 +313,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.2"
+  json_annotation:
+    dependency: transitive
+    description:
+      name: json_annotation
+      sha256: "1ce844379ca14835a50d2f019a3099f419082cfdd231cd86a142af94dd5c6bb1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.9.0"
   leak_tracker:
     dependency: transitive
     description:
@@ -369,10 +413,10 @@ packages:
     dependency: transitive
     description:
       name: package_config
-      sha256: "92d4488434b520a62570293fbd33bb556c7d49230791c1b4bbd973baf6d2dc67"
+      sha256: f096c55ebb7deb7e384101542bfba8c52696c1b56fca2eb62827989ef2353bbc
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.1"
+    version: "2.2.0"
   path:
     dependency: transitive
     description:
@@ -469,6 +513,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.0"
+  rxdart:
+    dependency: transitive
+    description:
+      name: rxdart
+      sha256: "5c3004a4a8dbb94bd4bf5412a4def4acdaa12e12f269737a5751369e12d1a962"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.28.0"
   shelf:
     dependency: transitive
     description:

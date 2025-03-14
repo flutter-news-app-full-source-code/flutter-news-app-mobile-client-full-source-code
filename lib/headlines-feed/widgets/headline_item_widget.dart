@@ -35,20 +35,20 @@ class HeadlineItemWidget extends StatelessWidget {
             padding: const EdgeInsets.only(top: 8),
             child: Row(
               children: [
-                Icon(Icons.source,
-                    color: Theme.of(context)
-                        .iconTheme
-                        .color,), // Placeholder for source icon
+                Icon(
+                  Icons.source,
+                  color: Theme.of(context).iconTheme.color,
+                ), // Placeholder for source icon
                 const SizedBox(width: 16),
-                Icon(Icons.category,
-                    color: Theme.of(context)
-                        .iconTheme
-                        .color,), // Placeholder for category icon
+                Icon(
+                  Icons.category,
+                  color: Theme.of(context).iconTheme.color,
+                ), // Placeholder for category icon
                 const SizedBox(width: 16),
-                Icon(Icons.location_on,
-                    color: Theme.of(context)
-                        .iconTheme
-                        .color,), // Placeholder for country icon
+                Icon(
+                  Icons.location_on,
+                  color: Theme.of(context).iconTheme.color,
+                ), // Placeholder for country icon
               ],
             ),
           ),

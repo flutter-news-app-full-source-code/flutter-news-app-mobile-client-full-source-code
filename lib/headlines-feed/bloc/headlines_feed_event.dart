@@ -8,7 +8,7 @@ sealed class HeadlinesFeedEvent extends Equatable {
   const HeadlinesFeedEvent();
 
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
 /// {@template headlines_feed_fetch_requested}
@@ -22,10 +22,34 @@ final class HeadlinesFeedFetchRequested extends HeadlinesFeedEvent {
   final String? cursor;
 
   @override
-  List<Object> get props => [cursor ?? ''];
+  List<Object?> get props => [cursor];
 }
 
 /// {@template headlines_feed_refresh_requested}
 /// Event triggered when the headlines feed needs to be refreshed.
 /// {@endtemplate}
 final class HeadlinesFeedRefreshRequested extends HeadlinesFeedEvent {}
+
+/// {@template headlines_feed_filter_changed}
+/// Event triggered when the filter parameters for the headlines feed change.
+/// {@endtemplate}
+final class HeadlinesFeedFilterChanged extends HeadlinesFeedEvent {
+  /// {@macro headlines_feed_filter_changed}
+  const HeadlinesFeedFilterChanged({
+    this.category,
+    this.source,
+    this.eventCountry,
+  });
+
+  /// The selected category filter.
+  final String? category;
+
+  /// The selected source filter.
+  final String? source;
+
+  /// The selected event country filter.
+  final String? eventCountry;
+
+  @override
+  List<Object?> get props => [category, source, eventCountry];
+}

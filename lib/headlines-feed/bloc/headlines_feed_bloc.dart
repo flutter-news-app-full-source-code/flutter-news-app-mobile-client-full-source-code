@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ht_headlines_repository/ht_headlines_repository.dart';
+import 'package:ht_main/headlines-feed/models/headline_filter.dart';
 
 part 'headlines_feed_event.dart';
 part 'headlines_feed_state.dart';
@@ -16,7 +17,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   /// {@macro headlines_feed_bloc}
   HeadlinesFeedBloc({required HtHeadlinesRepository headlinesRepository})
       : _headlinesRepository = headlinesRepository,
-        super(HeadlinesFeedInitial()) {
+        super(HeadlinesFeedLoading()) {
     on<HeadlinesFeedFetchRequested>(
       _onHeadlinesFeedFetchRequested,
       transformer: sequential(),
@@ -25,9 +26,50 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       _onHeadlinesFeedRefreshRequested,
       transformer: restartable(),
     );
+    on<HeadlinesFeedFilterChanged>(
+      _onHeadlinesFeedFilterChanged,
+    );
   }
 
   final HtHeadlinesRepository _headlinesRepository;
+
+  Future<void> _onHeadlinesFeedFilterChanged(
+    HeadlinesFeedFilterChanged event,
+    Emitter<HeadlinesFeedState> emit,
+  ) async {
+    emit(HeadlinesFeedLoading());
+    try {
+      final response = await _headlinesRepository.getHeadlines(
+        limit: 20,
+        category: event.category, // Pass category directly
+        source: event.source, // Pass source directly
+        eventCountry: event.eventCountry, // Pass eventCountry directly
+      );
+      final newFilter = (state is HeadlinesFeedLoaded)
+          ? (state as HeadlinesFeedLoaded).filter.copyWith(
+                category: event.category,
+                source: event.source,
+                eventCountry: event.eventCountry,
+              )
+          : HeadlineFilter(
+              category: event.category,
+              source: event.source,
+              eventCountry: event.eventCountry,
+            );
+      emit(
+        HeadlinesFeedLoaded(
+          headlines: response.items,
+          hasMore: response.hasMore,
+          cursor: response.cursor,
+          filter: newFilter,
+        ),
+      );
+    } on HeadlinesFetchException catch (e) {
+      emit(HeadlinesFeedError(message: e.message));
+    } catch (_) {
+      emit(const HeadlinesFeedError(message: 'An unexpected error occurred'));
+    }
+  }
 
   /// Handles [HeadlinesFeedFetchRequested] events.
   ///
@@ -46,12 +88,16 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         final response = await _headlinesRepository.getHeadlines(
           limit: 20,
           startAfterId: currentState.cursor,
+          category: currentState.filter.category, // Use existing filter
+          source: currentState.filter.source, // Use existing filter
+          eventCountry: currentState.filter.eventCountry, // Use existing filter
         );
         emit(
           HeadlinesFeedLoaded(
             headlines: currentState.headlines + response.items,
             hasMore: response.hasMore,
             cursor: response.cursor,
+            filter: currentState.filter,
           ),
         );
       } on HeadlinesFetchException catch (e) {
@@ -62,12 +108,26 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     } else {
       emit(HeadlinesFeedLoading());
       try {
-        final response = await _headlinesRepository.getHeadlines(limit: 20);
+        final response = await _headlinesRepository.getHeadlines(
+          limit: 20,
+          category: state is HeadlinesFeedLoaded
+              ? (state as HeadlinesFeedLoaded).filter.category
+              : null,
+          source: state is HeadlinesFeedLoaded
+              ? (state as HeadlinesFeedLoaded).filter.source
+              : null,
+          eventCountry: state is HeadlinesFeedLoaded
+              ? (state as HeadlinesFeedLoaded).filter.eventCountry
+              : null,
+        );
         emit(
           HeadlinesFeedLoaded(
             headlines: response.items,
             hasMore: response.hasMore,
             cursor: response.cursor,
+            filter: state is HeadlinesFeedLoaded
+                ? (state as HeadlinesFeedLoaded).filter
+                : const HeadlineFilter(),
           ),
         );
       } on HeadlinesFetchException catch (e) {
@@ -92,12 +152,26 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   ) async {
     emit(HeadlinesFeedLoading());
     try {
-      final response = await _headlinesRepository.getHeadlines(limit: 20);
+      final response = await _headlinesRepository.getHeadlines(
+        limit: 20,
+        category: state is HeadlinesFeedLoaded
+            ? (state as HeadlinesFeedLoaded).filter.category
+            : null,
+        source: state is HeadlinesFeedLoaded
+            ? (state as HeadlinesFeedLoaded).filter.source
+            : null,
+        eventCountry: state is HeadlinesFeedLoaded
+            ? (state as HeadlinesFeedLoaded).filter.eventCountry
+            : null,
+      );
       emit(
         HeadlinesFeedLoaded(
           headlines: response.items,
           hasMore: response.hasMore,
           cursor: response.cursor,
+          filter: state is HeadlinesFeedLoaded
+              ? (state as HeadlinesFeedLoaded).filter
+              : const HeadlineFilter(),
         ),
       );
     } on HeadlinesFetchException catch (e) {

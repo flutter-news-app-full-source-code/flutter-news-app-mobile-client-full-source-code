@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_headlines_repository/ht_headlines_repository.dart';
 import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
+import 'package:ht_main/headlines-feed/view/headline_filter_bottom_sheet.dart';
 import 'package:ht_main/headlines-feed/widgets/headline_item_widget.dart';
 import 'package:ht_main/shared/widgets/failure_state_widget.dart';
-import 'package:ht_main/shared/widgets/initial_state_widget.dart';
 import 'package:ht_main/shared/widgets/loading_state_widget.dart';
 
 class HeadlinesFeedPage extends StatelessWidget {
@@ -52,7 +52,7 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
       if (state is HeadlinesFeedLoaded) {
         context
             .read<HeadlinesFeedBloc>()
-            .add(HeadlinesFeedFetchRequested(cursor: state.cursor));
+            .add(const HeadlinesFeedFetchRequested());
       }
     }
   }
@@ -67,12 +67,40 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Headlines Feed')),
+      appBar: AppBar(
+        title: const Text('Headlines Feed'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.filter_list),
+            onPressed: () {
+              showModalBottomSheet<void>(
+                context: context,
+                builder: (BuildContext context) {
+                  final bloc = context.read<HeadlinesFeedBloc>();
+                  return BlocProvider.value(
+                    value: bloc,
+                    child: HeadlineFilterBottomSheet(
+                      bloc: bloc,
+                      onApplyFilters: (category, source, eventCountry) {
+                        bloc.add(
+                          HeadlinesFeedFilterChanged(
+                            category: category,
+                            source: source,
+                            eventCountry: eventCountry,
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ],
+      ),
       body: BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
         builder: (context, state) {
           switch (state) {
-            case HeadlinesFeedInitial():
-              return const InitialStateWidget();
             case HeadlinesFeedLoading():
               return const LoadingStateWidget();
             case HeadlinesFeedLoaded():

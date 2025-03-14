@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_headlines_repository/ht_headlines_repository.dart';
 import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
-import 'package:ht_main/headlines-feed/view/headline_filter_bottom_sheet.dart';
 import 'package:ht_main/headlines-feed/widgets/headline_item_widget.dart';
 import 'package:ht_main/shared/widgets/failure_state_widget.dart';
 import 'package:ht_main/shared/widgets/loading_state_widget.dart';
@@ -73,24 +72,12 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
           IconButton(
             icon: const Icon(Icons.filter_list),
             onPressed: () {
+              final bloc = context.read<HeadlinesFeedBloc>();
               showModalBottomSheet<void>(
                 context: context,
                 builder: (BuildContext context) {
-                  final bloc = context.read<HeadlinesFeedBloc>();
-                  return BlocProvider.value(
-                    value: bloc,
-                    child: HeadlineFilterBottomSheet(
-                      bloc: bloc,
-                      onApplyFilters: (category, source, eventCountry) {
-                        bloc.add(
-                          HeadlinesFeedFilterChanged(
-                            category: category,
-                            source: source,
-                            eventCountry: eventCountry,
-                          ),
-                        );
-                      },
-                    ),
+                  return _HeadlinesFilterBottomSheet(
+                    bloc: bloc,
                   );
                 },
               );
@@ -135,6 +122,119 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
               );
           }
         },
+      ),
+    );
+  }
+}
+
+class _HeadlinesFilterBottomSheet extends StatefulWidget {
+  const _HeadlinesFilterBottomSheet({
+    required this.bloc,
+  });
+
+  final HeadlinesFeedBloc bloc;
+
+  @override
+  State<_HeadlinesFilterBottomSheet> createState() =>
+      _HeadlinesFilterBottomSheetState();
+}
+
+class _HeadlinesFilterBottomSheetState
+    extends State<_HeadlinesFilterBottomSheet> {
+  String? selectedCategory;
+  String? selectedSource;
+  String? selectedEventCountry;
+
+    @override
+  void initState() {
+    super.initState();
+    final state = widget.bloc.state;
+    if (state is HeadlinesFeedLoaded) {
+      selectedCategory = state.filter.category;
+      selectedSource = state.filter.source;
+      selectedEventCountry = state.filter.eventCountry;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider.value(
+      value: widget.bloc,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Filter Headlines',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 16),
+            // Category Dropdown
+            DropdownButtonFormField<String>(
+              decoration: const InputDecoration(labelText: 'Category'),
+              value: selectedCategory,
+              items: const [
+                // Placeholder items
+                DropdownMenuItem(value: 'technology', child: Text('Technology')),
+                DropdownMenuItem(value: 'business', child: Text('Business')),
+                DropdownMenuItem(value: 'Politics', child: Text('Sports')),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  selectedCategory = value;
+                });
+              },
+            ),
+            const SizedBox(height: 16),
+            // Source Dropdown
+            DropdownButtonFormField<String>(
+              decoration: const InputDecoration(labelText: 'Source'),
+              value: selectedSource,
+              items: const [
+                // Placeholder items
+                DropdownMenuItem(value: 'cnn', child: Text('CNN')),
+                DropdownMenuItem(value: 'reuters', child: Text('Reuters')),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  selectedSource = value;
+                });
+              },
+            ),
+            const SizedBox(height: 16),
+            // Event Country Dropdown
+            DropdownButtonFormField<String>(
+              decoration: const InputDecoration(labelText: 'Event Country'),
+              value: selectedEventCountry,
+              items: const [
+                // Placeholder items
+                DropdownMenuItem(value: 'US', child: Text('United States')),
+                DropdownMenuItem(value: 'UK', child: Text('United Kingdom')),
+                DropdownMenuItem(value: 'CA', child: Text('Canada')),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  selectedEventCountry = value;
+                });
+              },
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () {
+                widget.bloc.add(
+                  HeadlinesFeedFilterChanged(
+                    category: selectedCategory,
+                    source: selectedSource,
+                    eventCountry: selectedEventCountry,
+                  ),
+                );
+                Navigator.pop(context);
+              },
+              child: const Text('Apply Filters'),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ht_main/app/view/app_scaffold.dart';
-import 'package:ht_main/headlines/view/headlines_page.dart';
+import 'package:ht_main/headlines-feed/view/headlines_feed_page.dart';
 import 'package:ht_main/router/routes.dart';
 
 final appRouter = GoRouter(
-  initialLocation: Routes.headlines,
+  initialLocation: Routes.headlinesFeed,
   routes: [
     ShellRoute(
       builder: (context, state, child) {
@@ -13,9 +13,9 @@ final appRouter = GoRouter(
       },
       routes: [
         GoRoute(
-          path: Routes.headlines,
+          path: Routes.headlinesFeed,
           builder: (BuildContext context, GoRouterState state) {
-            return const HeadlinesPage();
+            return const HeadlinesFeedPage();
           },
         ),
         GoRoute(

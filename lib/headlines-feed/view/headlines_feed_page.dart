@@ -71,7 +71,7 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
         actions: [
           BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
             builder: (context, state) {
-              bool isFilterApplied = false;
+              var isFilterApplied = false;
               if (state is HeadlinesFeedLoaded) {
                 isFilterApplied = state.filter.category != null ||
                     state.filter.source != null ||
@@ -204,10 +204,13 @@ class _HeadlinesFilterBottomSheetState
                 value: selectedCategory,
                 items: const [
                   // Placeholder items
-                  const DropdownMenuItem<String>(
-                      value: null, child: Text('All')),
+                  DropdownMenuItem<String>(
+                    child: Text('All'),
+                  ),
                   DropdownMenuItem(
-                      value: 'technology', child: Text('Technology')),
+                    value: 'technology',
+                    child: Text('Technology'),
+                  ),
                   DropdownMenuItem(value: 'business', child: Text('Business')),
                   DropdownMenuItem(value: 'Politics', child: Text('Sports')),
                 ],
@@ -224,8 +227,9 @@ class _HeadlinesFilterBottomSheetState
                 value: selectedSource,
                 items: const [
                   // Placeholder items
-                  const DropdownMenuItem<String>(
-                      value: null, child: Text('All')),
+                  DropdownMenuItem<String>(
+                    child: Text('All'),
+                  ),
                   DropdownMenuItem(value: 'cnn', child: Text('CNN')),
                   DropdownMenuItem(value: 'reuters', child: Text('Reuters')),
                 ],
@@ -242,8 +246,9 @@ class _HeadlinesFilterBottomSheetState
                 value: selectedEventCountry,
                 items: const [
                   // Placeholder items
-                  const DropdownMenuItem<String>(
-                      value: null, child: Text('All')),
+                  DropdownMenuItem<String>(
+                    child: Text('All'),
+                  ),
                   DropdownMenuItem(value: 'US', child: Text('United States')),
                   DropdownMenuItem(value: 'UK', child: Text('United Kingdom')),
                   DropdownMenuItem(value: 'CA', child: Text('Canada')),
@@ -280,11 +285,7 @@ class _HeadlinesFilterBottomSheetState
                     selectedEventCountry = null;
                   });
                   widget.bloc.add(
-                    const HeadlinesFeedFilterChanged(
-                      category: null,
-                      source: null,
-                      eventCountry: null,
-                    ),
+                    const HeadlinesFeedFilterChanged(),
                   );
                   Navigator.pop(context);
                 },

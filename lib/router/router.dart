@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ht_main/app/view/app_scaffold.dart';
 import 'package:ht_main/headlines-feed/view/headlines_feed_page.dart';
+import 'package:ht_main/headlines-search/view/headlines_search_page.dart';
 import 'package:ht_main/router/routes.dart';
 
 final appRouter = GoRouter(
@@ -33,11 +34,7 @@ final appRouter = GoRouter(
           path: Routes.search,
           name: Routes.searchName,
           builder: (BuildContext context, GoRouterState state) {
-            return const Placeholder(
-              child: Center(
-                child: Text('SEARCH PAGE'),
-              ),
-            );
+            return const HeadlinesSearchPage();
           },
         ),
         GoRoute(

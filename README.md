@@ -2,7 +2,7 @@
 
 ## 📖 Overview
 
-**Headlines Toolkit** is a source-available, full-stack Flutter application designed to provide a foundation for building news apps. It offers a streamlined, user-friendly experience for browsing news headlines and is built with a clean, maintainable architecture. Developers can freely evaluate the source code and run the app locally for a 32-day trial period. A commercial license is required for any use beyond this trial, including continued local use, modification, production use, or distribution.
+**Headlines Toolkit** is a source-available, full-stack Flutter application designed as a robust foundation for building modern news applications. This toolkit offers a streamlined, user-friendly experience for browsing news headlines and is built upon a clean, maintainable architecture. Developers can freely evaluate the source code and run the app locally for a 32-day trial period. A commercial license is required for any use beyond this trial, including continued local use, modification, production use, or distribution.
 
 ## ✨ Features
 
@@ -36,45 +36,7 @@
 
 This project is source-available under the [PolyForm Free Trial License 1.0.0](LICENSE). This license allows for free evaluation of the Headlines Toolkit source code and local execution of the application for up to 32 consecutive days. Any use beyond this trial period, including continued local use, modification, production use, or distribution, requires a commercial license.
 
+
 ## 💰 Commercial License
 
-A commercial license covers all repositories within the Headlines Toolkit organization, including the backend and any related packages. This provides licensees with a complete, full-stack solution for building their news applications. The commercial license grants developers the rights to use the source code in production, customize it to their needs, and distribute their derived applications.
-
-## 🚀 Getting Started
-
-1.  **Clone the repository:**
-
-    ```bash
-    git clone https://github.com/headlines-toolkit/ht-main
-    ```
-2.  **Navigate to the project directory:**
-
-    ```bash
-    cd ht-main
-    ```
-3.  **Get dependencies:**
-
-    ```bash
-    flutter pub get
-    ```
-4.  **Run the app (development flavor):**
-
-    ```bash
-    flutter run -t lib/main_development.dart
-    ```
-
-    This will run the app using the in-memory data client.
-
-## 🗂️ Project Structure
-
-The project is organized using a feature-based directory structure within the `lib` folder:
-
-```
-lib/
-├── app/          # Main application widget, app-level BLoCs, and views
-├── headlines-feed/ # Headlines feed feature
-├── headlines-search/ # Headlines search feature
-├── l10n/         # Localization files
-├── router/       # Routing configuration
-└── shared/       # Reusable widgets and utilities
-```
+A commercial license covers all repositories within the Headlines Toolkit organization. This provides licensees with a complete, full-stack solution for building and managing their news applications. The Headlines Toolkit organization includes two source-available applications: this Flutter mobile app and a Flutter web dashboard for managing the app's content. The commercial license grants developers the rights to use the source code of both applications in production, customize them to their needs, and distribute their derived applications. **Purchase a commercial license online: [INSERT LINK HERE]**.

@@ -13,5 +13,6 @@ This project is a Flutter application, likely a news headlines app, based on the
 ## Key Features (Inferred)
 
 -   Displaying a feed of headlines.
+-   Searching headlines.
 -   Potentially filtering headlines (based on `headline_filter.dart`).
 -   Navigation between different screens/sections (based on `router/`).

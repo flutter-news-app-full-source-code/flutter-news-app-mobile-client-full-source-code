@@ -2,29 +2,18 @@
 
 ## Current Focus
 
-Initializing the memory bank. This involves creating the core files and populating them with information gathered from the existing project structure and code.
+Updating the memory bank to reflect the addition of the headlines search feature and associated route updates.
 
 ## Recent Changes
 
--   Created `projectbrief.md`, `productContext.md`, and `systemPatterns.md`.
--   Corrected the description of the directory structure in `systemPatterns.md` to reflect feature-based organization.
--   Analyzed the `headlines-feed` feature and identified the page/view pattern.
--   Updated `systemPatterns.md` to document the page/view pattern.
-
-## Recent Changes
-- Updated the memory bank with information about the layered architecture.
-- Updated the memory bank with information about barrel files.
-- Updated `.clinerules` with the convention to document no-op operations.
-- Updated `.clinerules` with error handling best practices.
-
-## Recent Changes
-- Refactored the router (`lib/router/router.dart` and `lib/router/routes.dart`):
-  - Added `name` parameters to `GoRoute` definitions for named navigation.
-  - Added an example sub-route (`article/:id`) to demonstrate detail page routing.
-  - Updated the `Routes` class to include name constants.
+- Added the `headlines-search` feature:
+    - Created `headlines-search/bloc/headlines_search_bloc.dart`, `headlines_search_event.dart`, and `headlines_search_state.dart`.
+    - Created `headlines-search/view/headlines_search_page.dart` and `headlines_search_view.dart`.
+- Updated the router (`lib/router/router.dart` and `lib/router/routes.dart`) to include the search route.
 
 ## Next Steps
-- Update `progress.md`.
+
+-   Continue updating the memory bank.
 
 ## Active Decisions
 

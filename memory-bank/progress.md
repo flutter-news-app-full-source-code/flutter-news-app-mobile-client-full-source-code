@@ -13,6 +13,10 @@
     -   `_HeadlinesFilterBottomSheet` for applying filters.
     - Infinite scroll functionality.
     - Refresh functionality.
+-   `headlines-search` feature:
+    -   `HeadlinesSearchBloc` for managing headlines search.
+    -   `HeadlinesSearchPage` and `HeadlinesSearchView` for displaying search results.
+    -   Routing for the search feature.
 
 ## What's Left to Build
 
@@ -24,7 +28,7 @@
 
 ## Current Status
 
--   Early development stage. Core architecture and the main `headlines-feed` feature have basic implementations, but many features and refinements are still needed. The memory bank has been updated with information about the layered architecture, barrel files, the convention to document no-op operations, and error handling best practices.
+-   Early development stage. Core architecture and the main `headlines-feed` and `headlines-search` features have basic implementations, but many features and refinements are still needed. The memory bank has been updated with information about the layered architecture, barrel files, the convention to document no-op operations, and error handling best practices.
 
 ## Known Issues
 

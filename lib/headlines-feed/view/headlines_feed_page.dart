@@ -116,13 +116,17 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
         builder: (context, state) {
           switch (state) {
             case HeadlinesFeedLoading():
-              return const LoadingStateWidget();
+              return const LoadingStateWidget(
+                icon: Icons.hourglass_empty,
+                headline: 'Loading...',
+                subheadline: 'Fetching headlines',
+              );
             case HeadlinesFeedLoaded():
               return RefreshIndicator(
                 onRefresh: () async {
-                  context
-                      .read<HeadlinesFeedBloc>()
-                      .add(HeadlinesFeedRefreshRequested());
+                  context.read<HeadlinesFeedBloc>().add(
+                        HeadlinesFeedRefreshRequested(),
+                      );
                 },
                 child: ListView.builder(
                   controller: _scrollController,
@@ -131,7 +135,11 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
                       : state.headlines.length,
                   itemBuilder: (context, index) {
                     if (index >= state.headlines.length) {
-                      return const LoadingStateWidget();
+                      return const LoadingStateWidget(
+                        icon: Icons.hourglass_empty,
+                        headline: 'Loading...',
+                        subheadline: 'Fetching more headlines',
+                      );
                     }
                     final headline = state.headlines[index];
                     return HeadlineItemWidget(headline: headline);

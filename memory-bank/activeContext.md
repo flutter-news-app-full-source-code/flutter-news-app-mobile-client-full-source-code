@@ -2,11 +2,13 @@
 
 ## Current Focus
 
-Creating the project README.
+Implementing remaining features.
 
 ## Recent Changes
 
-- Updated the memory bank to reflect the full product vision and licensing details.
+- Updated the search page to use shared widgets for initial, loading, and error states.
+- Simplified the search bar by integrating it directly into the AppBar.
+- Added a search button to the AppBar to trigger the search.
 
 ## Next Steps
 

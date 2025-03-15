@@ -22,6 +22,9 @@
     -   `HeadlinesSearchBloc` for managing headlines search.
     -   `HeadlinesSearchPage` and `HeadlinesSearchView` for displaying search results.
     -   Debounced search term input.
+    -   Uses shared widgets for initial, loading, and error states.
+    -   Integrated search bar directly into the AppBar.
+    -   Search button in the AppBar to trigger the search.
 -   Error handling within BLoCs, with specific error states.
 -   Page/View pattern for UI components.
 
@@ -43,7 +46,7 @@
 
 ## Current Status
 
--   Early development stage. Core architecture, basic headline feed and search functionality, and initial memory bank documentation are complete. The focus is now on creating the README and then implementing the remaining features and backend integration.
+-   Implementing remaining features and backend integration.
 
 ## Known Issues
 

@@ -1,0 +1,30 @@
+# Progress
+
+## What Works
+
+-   Multiple environment configurations (development, staging, production) using `main_*.dart` files.
+-   BLoC pattern implementation for state management.
+-   Repository pattern for data access.
+-   Initial Memory Bank setup.
+-   `headlines-feed` feature:
+    -   `HeadlinesFeedBloc` for managing headlines data and filtering.
+    -   `HeadlinesFeedPage` and `_HeadlinesFeedView` for displaying headlines.
+    -   `_HeadlinesFilterBottomSheet` for applying filters.
+    - Infinite scroll functionality.
+    - Refresh functionality.
+
+## What's Left to Build
+
+-   Integration with a real headlines API (currently using an in-memory client).
+-   Full implementation of filtering functionality (UI is present, but API integration may be needed).
+-   Navigation and routing (basic setup exists, but likely needs more work for navigating to article details, etc.).
+-   Error handling and potentially loading states (basic widgets exist, but more robust handling may be needed).
+-   Testing.
+
+## Current Status
+
+-   Early development stage. Core architecture and the main `headlines-feed` feature have basic implementations, but many features and refinements are still needed. The memory bank has been updated with information about the layered architecture, barrel files, the convention to document no-op operations, and error handling best practices.
+
+## Known Issues
+
+-   None identified yet, based on the limited code provided.

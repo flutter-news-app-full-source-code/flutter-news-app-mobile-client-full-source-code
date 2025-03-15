@@ -1,0 +1,24 @@
+# Project Intelligence (.clinerules)
+
+## User Preferences
+
+-   The user prefers a feature-based directory structure.
+-   The user emphasizes that there's "nothing basic" in the project, indicating a focus on production-ready code from the start.
+-   The user values accurate documentation and careful attention to detail.
+-   The user prefers direct communication and corrections rather than assumptions.
+- The user does not use a basic `main.dart` file, instead opting for flavor-specific `main_*.dart` files.
+
+## Project Patterns
+
+-   Layered architecture with BLoC and Repository patterns.
+-   Multiple environment configurations (development, staging, production).
+-   Manual dependency injection.
+- Data and repository layers are external packages hosted on separate GitHub repositories.
+- Use barrel files to export public-facing files within features and packages. One barrel file per folder, plus a top-level barrel file for packages.
+
+## Tool Usage
+- Do not assume. Ask clarifying question if needed.
+- Read files and folder structures carefully before making assumptions.
+- Explicitly document no-op operations with a comment explaining the reason.
+- Document exceptions associated with calling a function in its documentation comments.
+- Define descriptive exceptions by implementing `Exception` with descriptive names, rather than throwing generic `Exception`.

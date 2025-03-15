@@ -2,18 +2,15 @@
 
 ## Current Focus
 
-Updating the memory bank to reflect the addition of the headlines search feature and associated route updates.
+Creating the project README.
 
 ## Recent Changes
 
-- Added the `headlines-search` feature:
-    - Created `headlines-search/bloc/headlines_search_bloc.dart`, `headlines_search_event.dart`, and `headlines_search_state.dart`.
-    - Created `headlines-search/view/headlines_search_page.dart` and `headlines_search_view.dart`.
-- Updated the router (`lib/router/router.dart` and `lib/router/routes.dart`) to include the search route.
+- Updated the memory bank to reflect the full product vision and licensing details.
 
 ## Next Steps
 
--   Continue updating the memory bank.
+-   Implement the planned features and integrate the backend (Firebase, with future Supabase support).
 
 ## Active Decisions
 

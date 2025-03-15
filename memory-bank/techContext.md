@@ -8,8 +8,14 @@
 -   **Dependency Injection:** Manual
 -   **Routing:** GoRouter (for declarative routing and navigation)
 
+## Backend
+
+-   **Current:** Firebase
+-   **Future:** Supabase
+
 ## Development Setup
 
+-   The project is a full-stack application with a Flutter frontend and a Firebase backend.
 -   The project uses flavor-specific entry points (`main_development.dart`, `main_staging.dart`, `main_production.dart`).
 -   Dependencies are managed using `pubspec.yaml`.
 

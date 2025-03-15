@@ -2,17 +2,27 @@
 
 ## Overview
 
-This project is a Flutter application, likely a news headlines app, based on the directory structure and file names (e.g., `headlines-feed`). It utilizes the BLoC pattern for state management and has different entry points for development, staging, and production environments.
+This project, **Headlines Toolkit**, is a source-available Flutter application designed to provide a foundation for building news apps. It utilizes the BLoC pattern for state management and has different entry points for development, staging, and production environments.
 
 ## Goals
 
 -   Provide a functional and user-friendly application for displaying news headlines.
--   Implement a clean and maintainable architecture using Flutter and BLoC. The project uses a layered architecture as described in `memory-bank/systemPatterns.md`.
+-   Implement a clean and maintainable architecture using Flutter and BLoC.
 -   Support multiple environments (development, staging, production).
 
-## Key Features (Inferred)
+## Key Features
 
--   Displaying a feed of headlines.
--   Searching headlines.
--   Potentially filtering headlines (based on `headline_filter.dart`).
--   Navigation between different screens/sections (based on `router/`).
+-   Headlines Feed (title-only, with source/category/country icons).
+-   Headline Details Page (title, image, source, category, date, "Continue Reading" button).
+-   Search.
+-   Filtering (by category, source, and event country).
+-   User accounts/profiles.
+-   Personalized recommendations.
+-   Saving articles.
+-   Offline reading.
+-   Push notifications.
+-   News categories/topics.
+-   Social sharing.
+-   Comments/discussion features.
+-   Dark Mode.
+-   Navigation between different screens/sections.

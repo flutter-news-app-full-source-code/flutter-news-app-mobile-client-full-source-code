@@ -6,6 +6,7 @@
 -   BLoC pattern implementation for state management.
 -   Repository pattern for data access.
 -   Initial Memory Bank setup.
+- Router refactoring with named navigation and example sub-route.
 -   `headlines-feed` feature:
     -   `HeadlinesFeedBloc` for managing headlines data and filtering.
     -   `HeadlinesFeedPage` and `_HeadlinesFeedView` for displaying headlines.
@@ -17,7 +18,7 @@
 
 -   Integration with a real headlines API (currently using an in-memory client).
 -   Full implementation of filtering functionality (UI is present, but API integration may be needed).
--   Navigation and routing (basic setup exists, but likely needs more work for navigating to article details, etc.).
+-   Navigation and routing (basic setup exists, named navigation implemented, sub-routes need further implementation based on application needs).
 -   Error handling and potentially loading states (basic widgets exist, but more robust handling may be needed).
 -   Testing.
 

@@ -14,12 +14,24 @@ final appRouter = GoRouter(
       routes: [
         GoRoute(
           path: Routes.headlinesFeed,
+          name: Routes.headlinesFeedName,
           builder: (BuildContext context, GoRouterState state) {
             return const HeadlinesFeedPage();
           },
+          routes: [
+            GoRoute(
+              path: 'article/:id',
+              name: Routes.articleDetailsName,
+              builder: (BuildContext context, GoRouterState state) {
+                final id = state.pathParameters['id']!;
+                return Placeholder(child: Text('Article ID: $id'));
+              },
+            ),
+          ],
         ),
         GoRoute(
           path: Routes.search,
+          name: Routes.searchName,
           builder: (BuildContext context, GoRouterState state) {
             return const Placeholder(
               child: Center(
@@ -30,6 +42,7 @@ final appRouter = GoRouter(
         ),
         GoRoute(
           path: Routes.account,
+          name: Routes.accountName,
           builder: (BuildContext context, GoRouterState state) {
             return const Placeholder(
               child: Center(

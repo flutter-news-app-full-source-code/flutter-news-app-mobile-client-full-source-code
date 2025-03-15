@@ -17,8 +17,14 @@ Initializing the memory bank. This involves creating the core files and populati
 - Updated `.clinerules` with the convention to document no-op operations.
 - Updated `.clinerules` with error handling best practices.
 
+## Recent Changes
+- Refactored the router (`lib/router/router.dart` and `lib/router/routes.dart`):
+  - Added `name` parameters to `GoRoute` definitions for named navigation.
+  - Added an example sub-route (`article/:id`) to demonstrate detail page routing.
+  - Updated the `Routes` class to include name constants.
+
 ## Next Steps
-- Update `progress.md`
+- Update `progress.md`.
 
 ## Active Decisions
 

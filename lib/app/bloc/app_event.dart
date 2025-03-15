@@ -4,9 +4,10 @@ part of 'app_bloc.dart';
 sealed class AppEvent {}
 
 final class AppNavigationIndexChanged extends AppEvent {
-  AppNavigationIndexChanged({required this.index});
+  AppNavigationIndexChanged({required this.index, required this.context});
 
   final int index;
+  final BuildContext context;
 }
 
 final class AppThemeChanged extends AppEvent {}

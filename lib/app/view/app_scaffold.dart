@@ -24,9 +24,9 @@ class AppScaffold extends StatelessWidget {
             largeSecondaryBody: AdaptiveScaffold.emptyBuilder,
             selectedIndex: state.selectedBottomNavigationIndex,
             onSelectedIndexChange: (index) {
-              context
-                  .read<AppBloc>()
-                  .add(AppNavigationIndexChanged(index: index));
+              context.read<AppBloc>().add(
+                    AppNavigationIndexChanged(index: index, context: context),
+                  );
             },
             destinations: const [
               NavigationDestination(

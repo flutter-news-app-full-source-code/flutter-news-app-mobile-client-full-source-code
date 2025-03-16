@@ -1,48 +1,49 @@
 part of 'headlines_search_bloc.dart';
 
-sealed class HeadlinesSearchState extends Equatable {
+abstract class HeadlinesSearchState extends Equatable {
   const HeadlinesSearchState();
-
+  abstract final String? lastSearchTerm;
   @override
   List<Object?> get props => [];
 }
 
-final class HeadlinesSearchInitial extends HeadlinesSearchState {}
+class HeadlinesSearchLoading extends HeadlinesSearchState {
+  @override
+  final String? lastSearchTerm = null;
+  @override
+  List<Object?> get props => [];
+}
 
-final class HeadlinesSearchLoading extends HeadlinesSearchState {}
-
-final class HeadlinesSearchLoaded extends HeadlinesSearchState {
-  const HeadlinesSearchLoaded({
+class HeadlinesSearchSuccess extends HeadlinesSearchState {
+  const HeadlinesSearchSuccess({
     required this.headlines,
-    this.hasReachedMax = false,
-    this.cursor,
+    required this.hasMore,
+    required this.lastSearchTerm, this.cursor,
+    this.errorMessage,
   });
 
   final List<Headline> headlines;
-  final bool hasReachedMax;
+  final bool hasMore;
   final String? cursor;
+  final String? errorMessage;
+  @override
+  final String? lastSearchTerm;
 
-  HeadlinesSearchLoaded copyWith({
-    List<Headline>? headlines,
-    bool? hasReachedMax,
-    String? cursor,
-  }) {
-    return HeadlinesSearchLoaded(
-      headlines: headlines ?? this.headlines,
-      hasReachedMax: hasReachedMax ?? this.hasReachedMax,
-      cursor: cursor ?? this.cursor,
-    );
+  HeadlinesSearchSuccess copyWith(
+      {List<Headline>? headlines,
+      bool? hasMore,
+      String? cursor,
+      String? errorMessage,
+      String? lastSearchTerm,}) {
+    return HeadlinesSearchSuccess(
+        headlines: headlines ?? this.headlines,
+        hasMore: hasMore ?? this.hasMore,
+        cursor: cursor ?? this.cursor,
+        errorMessage: errorMessage ?? this.errorMessage,
+        lastSearchTerm: lastSearchTerm ?? this.lastSearchTerm,);
   }
 
   @override
-  List<Object?> get props => [headlines, hasReachedMax, cursor];
-}
-
-final class HeadlinesSearchError extends HeadlinesSearchState {
-  const HeadlinesSearchError({required this.message});
-
-  final String message;
-
-  @override
-  List<Object> get props => [message];
+  List<Object?> get props =>
+      [headlines, hasMore, cursor, errorMessage, lastSearchTerm];
 }

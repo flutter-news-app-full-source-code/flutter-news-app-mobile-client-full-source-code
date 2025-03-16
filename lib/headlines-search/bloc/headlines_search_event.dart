@@ -7,15 +7,11 @@ sealed class HeadlinesSearchEvent extends Equatable {
   List<Object> get props => [];
 }
 
-final class HeadlinesSearchTermChanged extends HeadlinesSearchEvent {
-  const HeadlinesSearchTermChanged({required this.searchTerm});
+final class HeadlinesSearchFetchRequested extends HeadlinesSearchEvent {
+  const HeadlinesSearchFetchRequested({required this.searchTerm});
 
   final String searchTerm;
 
   @override
   List<Object> get props => [searchTerm];
 }
-
-final class HeadlinesSearchRequested extends HeadlinesSearchEvent {}
-
-final class HeadlinesSearchLoadMore extends HeadlinesSearchEvent {}

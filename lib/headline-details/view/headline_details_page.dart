@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_headlines_repository/ht_headlines_repository.dart';
-import 'package:ht_main/headline-details/view/bloc/headline_details_bloc.dart';
+import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart';
 import 'package:ht_main/shared/widgets/failure_state_widget.dart';
 import 'package:ht_main/shared/widgets/initial_state_widget.dart';
 import 'package:ht_main/shared/widgets/loading_state_widget.dart';

@@ -23,6 +23,3 @@
 - Document exceptions associated with calling a function in its documentation comments.
 - Define descriptive exceptions by implementing `Exception` with descriptive names, rather than throwing generic `Exception`.
 - When using `go_router` for navigation, `BuildContext` is required for methods like `context.goNamed()`. Since BLoCs don't have inherent access to `BuildContext`, it needs to be passed through the event triggering the navigation.
-
-## Repository
-- The `searchHeadlines` method in `HtHeadlinesRepository` does not support pagination. Pagination-like behavior is handled in the `HeadlinesSearchBloc`.

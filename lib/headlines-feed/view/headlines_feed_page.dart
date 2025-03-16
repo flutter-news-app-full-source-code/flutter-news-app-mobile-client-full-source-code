@@ -34,7 +34,6 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    // context.read<HeadlinesFeedBloc>().add(HeadlinesFeedRefreshRequested());
   }
 
   @override
@@ -60,14 +59,14 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
     if (!_scrollController.hasClients) return false;
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.offset;
-    return currentScroll >= (maxScroll * 0.9);
+    return currentScroll >= (maxScroll * 0.98);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Headlines Feed'),
+        title: const Text('HT'),
         actions: [
           BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
             builder: (context, state) {
@@ -135,10 +134,8 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
                       : state.headlines.length,
                   itemBuilder: (context, index) {
                     if (index >= state.headlines.length) {
-                      return const LoadingStateWidget(
-                        icon: Icons.hourglass_empty,
-                        headline: 'Loading...',
-                        subheadline: 'Fetching more headlines',
+                      return const Center(
+                        child: CircularProgressIndicator(),
                       );
                     }
                     final headline = state.headlines[index];

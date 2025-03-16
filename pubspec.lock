@@ -165,10 +165,10 @@ packages:
     dependency: transitive
     description:
       name: flex_seed_scheme
-      sha256: d3ba3c5c92d2d79d45e94b4c6c71d01fac3c15017da1545880c53864da5dfeb0
+      sha256: b06d8b367b84cbf7ca5c5603c858fa5edae88486c4e4da79ac1044d73b6c62ec
       url: "https://pub.dev"
     source: hosted
-    version: "3.5.0"
+    version: "3.5.1"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -242,7 +242,7 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: "825cc8641c5e6190f130684173b64f3c102fb0c1"
+      resolved-ref: e8f593445383cb02d948d88370cddfc722c769be
       url: "https://github.com/headlines-toolkit/ht-headlines-client.git"
     source: git
     version: "0.0.0"
@@ -251,7 +251,7 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: fc055f560e6e68cc6f61847fd2e7ade250174454
+      resolved-ref: eaf98cb0379c1661f3137b88121b79630bf11069
       url: "https://github.com/headlines-toolkit/ht-headlines-inmemory.git"
     source: git
     version: "0.0.0"
@@ -260,7 +260,7 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: c85b5dd9fa57067449418ccc32f20bcd8a7684d9
+      resolved-ref: "2de02a4f69b4f0a9e867eb61f88e84ee239dcbb2"
       url: "https://github.com/headlines-toolkit/ht-headlines-repository.git"
     source: git
     version: "0.0.0"

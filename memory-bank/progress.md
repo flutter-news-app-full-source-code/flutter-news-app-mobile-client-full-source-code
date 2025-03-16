@@ -25,6 +25,7 @@
     -   Uses shared widgets for initial, loading, and error states.
     -   Integrated search bar directly into the AppBar.
     -   Search button in the AppBar to trigger the search.
+    -   Infinite scrolling.
 -   Error handling within BLoCs, with specific error states.
 -   Page/View pattern for UI components.
 

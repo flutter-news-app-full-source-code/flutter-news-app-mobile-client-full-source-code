@@ -9,6 +9,7 @@ Implementing remaining features.
 - Updated the search page to use shared widgets for initial, loading, and error states.
 - Simplified the search bar by integrating it directly into the AppBar.
 - Added a search button to the AppBar to trigger the search.
+- Refactored the headlines search feature to support infinite scrolling.
 
 ## Next Steps
 

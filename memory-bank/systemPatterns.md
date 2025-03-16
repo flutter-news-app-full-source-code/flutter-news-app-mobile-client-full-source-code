@@ -59,19 +59,10 @@ my_feature/
     feature_state.dart
   view/
     feature_page.dart
-    feature_view.dart
-    view.dart
   my_feature.dart
 ```
 
-The `view.dart` barrel file would contain:
-
-```dart
-export 'feature_page.dart';
-export 'feature_view.dart';
-```
-
-**Caution:** Not all files should be exported. Files used internally within the same folder, but not intended for public use, should not be in the barrel file.
+**Caution:** Not all files should be exported. Files used internally within the same folder, but not intended for public use, should not be in the barrel file.  In the structure above, `feature_page.dart` already includes the view, so a separate `view.dart` barrel file is not needed.
 
 By convention, BLoCs are typically broken into separate files for events, states, and the BLoC itself:
 
@@ -100,7 +91,6 @@ my_app/
         login_state.dart
       view/
         login_page.dart
-        view.dart
   test/
     login/
       bloc/
@@ -111,7 +101,7 @@ my_app/
         login_page_test.dart
 ```
 
-Each layer abstracts the underlying layers' implementation details. Avoid indirect dependencies. The Repository Layer shouldn't know *how* the Data Layer fetches data, and the Presentation Layer shouldn't directly access values from Shared Preferences. Implementation details should not leak between layers.
+Each layer abstracts the underlying layers’ implementation details. Avoid indirect dependencies. The Repository Layer shouldn't know *how* the Data Layer fetches data, and the Presentation Layer shouldn't directly access values from Shared Preferences. Implementation details should not leak between layers. The `view` folder contains the combined Page/View file (e.g., `login_page.dart`), and the `bloc` folder contains the BLoC-related files.
 
 Data should flow from the bottom up, and a layer can only access the layer directly beneath it.  The `LoginPage` should never directly access the `ApiClient`, and the `ApiClient` should not depend on the `UserRepository`. This ensures each layer has a specific responsibility and can be tested in isolation.
 
@@ -430,24 +420,27 @@ if (email.isValid) {
 
 ## Page/View Pattern
 
-Each feature typically has a "page" widget and a "view" widget. This promotes separation of concerns, testability, and maintainability.
+Each feature combines the "page" and "view" widgets into a single file. This promotes separation of concerns and testability while reducing file count.
 
 -   **Page Widget** (e.g., `HeadlinesFeedPage`): A `StatelessWidget` responsible for:
     -   Providing necessary BLoCs and repositories using `BlocProvider` or `MultiBlocProvider`.
     -   Adding initial events to the BLoC (e.g., fetching initial data).
     -   Defining the route for the page.
-    -   Gathering dependencies from the context (e.g., using `context.read`).
-    -   Providing these dependencies to the `View` (typically via a `BlocProvider`).
 
--   **View Widget** (e.g., `_HeadlinesFeedView`): A `StatelessWidget` responsible for:
+-   **View Widget** (e.g., `_HeadlinesFeedView`): A private `StatelessWidget` within the same file, responsible for:
     -   Building the UI based on the current state of the BLoC.
     -   Handling user interactions and dispatching events to the BLoC.
-    -   Receiving dependencies from the `Page`.
 
 **Example:**
 
 ```dart
-// headlines_feed_page.dart
+// headlines_feed_page.dart (Combined)
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
+import 'package:ht_main/headlines-feed/bloc/headlines_feed_event.dart';
+import 'package:ht_main/headlines-feed/bloc/headlines_feed_state.dart';
+
 class HeadlinesFeedPage extends StatelessWidget {
   const HeadlinesFeedPage({super.key});
 
@@ -466,7 +459,6 @@ class HeadlinesFeedPage extends StatelessWidget {
   }
 }
 
-// headlines_feed_view.dart
 class _HeadlinesFeedView extends StatelessWidget {
   const _HeadlinesFeedView();
 
@@ -477,14 +469,34 @@ class _HeadlinesFeedView extends StatelessWidget {
       body: BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
         builder: (context, state) {
           // ... build UI based on state ...
+          return switch (state) {
+            HeadlinesFeedInitial _ => const Center(child: Text('Initial State')),
+            HeadlinesFeedLoading _ => const Center(child: CircularProgressIndicator()),
+            HeadlinesFeedLoaded state => ListView.builder(
+                itemCount: state.headlines.length,
+                itemBuilder: (context, index) {
+                  final headline = state.headlines[index];
+                  return ListTile(
+                    title: Text(headline.title),
+                    subtitle: Text(headline.description ?? ''),
+                  );
+                },
+              ),
+            HeadlinesFeedFailure state => Center(child: Text(state.message)),
+          };
         },
       ),
     );
   }
 }
-
 ```
-The `View` constructor should be annotated with `@visibleForTesting` to prevent its direct use outside of the `Page`.
+
+This approach:
+
+1.  Combines both widgets in `headlines_feed_page.dart`.
+2.  Keeps `HeadlinesFeedPage` as the entry point and route provider.
+3.  Maintains `_HeadlinesFeedView` as a separate widget for UI construction.
+4.  Uses a private name (`_HeadlinesFeedView`) to indicate it's internal to this file.
 
 ## Use Standalone Widgets over Helper Methods
 

@@ -34,6 +34,6 @@ All repositories under the headlines toolkit [organization](https://github.com/h
 
 ## 💼 Commercial License - Organization-Wide Access
 
-All repositories under the headlines toolkit [organization](https://github.com/headlines-toolkit) can be **unlocked** by a **single Commercial License**, enabling you to **unlock its full potential**.  Gain the rights to **deploy**, **customize**, and **distribute** your news application built upon this powerful foundation.
+All repositories under the headlines toolkit [organization](https://github.com/headlines-toolkit) can be **unlocked** by a **single Commercial License**, enabling you to **leverage its full potential**.  Gain the rights to **deploy**, **customize**, and **distribute** your news application built upon this powerful foundation.
 
 **Acquire your Commercial License [here]()**

@@ -34,7 +34,7 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    context.read<HeadlinesFeedBloc>().add(HeadlinesFeedRefreshRequested());
+    // context.read<HeadlinesFeedBloc>().add(HeadlinesFeedRefreshRequested());
   }
 
   @override
@@ -46,9 +46,9 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
   }
 
   void _onScroll() {
-    if (_isBottom) {
-      final state = context.read<HeadlinesFeedBloc>().state;
-      if (state is HeadlinesFeedLoaded) {
+    final state = context.read<HeadlinesFeedBloc>().state;
+    if (_isBottom && state is HeadlinesFeedLoaded) {
+      if (state.hasMore) {
         context
             .read<HeadlinesFeedBloc>()
             .add(const HeadlinesFeedFetchRequested());

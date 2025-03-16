@@ -251,7 +251,7 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: eaf98cb0379c1661f3137b88121b79630bf11069
+      resolved-ref: "1129f48c9af0b3b297e8f6717d88363b3d166890"
       url: "https://github.com/headlines-toolkit/ht-headlines-inmemory.git"
     source: git
     version: "0.0.0"

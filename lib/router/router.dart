@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ht_main/app/view/app_scaffold.dart';
+import 'package:ht_main/headline-details/view/headline_details_page.dart';
 import 'package:ht_main/headlines-feed/view/headlines_feed_page.dart';
 import 'package:ht_main/headlines-search/view/headlines_search_page.dart';
 import 'package:ht_main/router/routes.dart';
@@ -25,7 +26,7 @@ final appRouter = GoRouter(
               name: Routes.articleDetailsName,
               builder: (BuildContext context, GoRouterState state) {
                 final id = state.pathParameters['id']!;
-                return Placeholder(child: Text('Article ID: $id'));
+                return HeadlineDetailsPage(headlineId: id);
               },
             ),
           ],
@@ -42,9 +43,7 @@ final appRouter = GoRouter(
           name: Routes.accountName,
           builder: (BuildContext context, GoRouterState state) {
             return const Placeholder(
-              child: Center(
-                child: Text('ACCOUNT PAGE'),
-              ),
+              child: Center(child: Text('ACCOUNT PAGE')),
             );
           },
         ),

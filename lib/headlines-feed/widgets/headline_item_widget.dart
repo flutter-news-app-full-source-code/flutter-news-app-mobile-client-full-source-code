@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ht_headlines_repository/ht_headlines_repository.dart'
     show Headline;
+import 'package:ht_main/router/routes.dart';
 
 /// A widget that displays a single headline.
 class HeadlineItemWidget extends StatelessWidget {
@@ -16,15 +18,12 @@ class HeadlineItemWidget extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: Card(
         child: ListTile(
-          leading: Image.network(
-            headline.imageUrl ??
-                'https://via.placeholder.com/50x50', // Placeholder image
-            width: 50,
-            height: 50,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) =>
-                const Icon(Icons.error),
-          ),
+          onTap: () {
+            context.goNamed(
+              Routes.articleDetailsName,
+              pathParameters: {'id': headline.id},
+            );
+          },
           title: Text(
             headline.title,
             style: Theme.of(context).textTheme.titleMedium,
@@ -51,6 +50,15 @@ class HeadlineItemWidget extends StatelessWidget {
                 ), // Placeholder for country icon
               ],
             ),
+          ),
+          trailing: Image.network(
+            headline.imageUrl ??
+                'https://via.placeholder.com/50x50', // Placeholder image
+            width: 75,
+            height: 75,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) =>
+                const Icon(Icons.error),
           ),
         ),
       ),

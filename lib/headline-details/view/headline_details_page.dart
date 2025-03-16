@@ -5,8 +5,8 @@ import 'package:ht_main/headline-details/view/bloc/headline_details_bloc.dart';
 import 'package:ht_main/shared/widgets/failure_state_widget.dart';
 import 'package:ht_main/shared/widgets/initial_state_widget.dart';
 import 'package:ht_main/shared/widgets/loading_state_widget.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class HeadlineDetailsPage extends StatelessWidget {
   const HeadlineDetailsPage({required this.headlineId, super.key});
@@ -37,7 +37,6 @@ class _HeadlineDetailsView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Headline Details'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
@@ -127,7 +126,8 @@ class _HeadlineDetailsView extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(
-                      height: 8), // Add spacing between metadata items
+                    height: 8,
+                  ), // Add spacing between metadata items
                 ],
                 if (headline.categories != null &&
                     headline.categories!.isNotEmpty) ...[

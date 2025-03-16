@@ -17,3 +17,5 @@ final class HeadlinesSearchTermChanged extends HeadlinesSearchEvent {
 }
 
 final class HeadlinesSearchRequested extends HeadlinesSearchEvent {}
+
+final class HeadlinesSearchLoadMore extends HeadlinesSearchEvent {}

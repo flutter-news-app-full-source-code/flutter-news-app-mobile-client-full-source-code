@@ -7,8 +7,21 @@ import 'package:ht_main/shared/widgets/failure_state_widget.dart';
 import 'package:ht_main/shared/widgets/initial_state_widget.dart';
 import 'package:ht_main/shared/widgets/loading_state_widget.dart';
 
-class HeadlinesSearchView extends StatelessWidget {
+class HeadlinesSearchView extends StatefulWidget {
   const HeadlinesSearchView({super.key});
+
+  @override
+  State<HeadlinesSearchView> createState() => _HeadlinesSearchViewState();
+}
+
+class _HeadlinesSearchViewState extends State<HeadlinesSearchView> {
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,8 +61,14 @@ class HeadlinesSearchView extends StatelessWidget {
                 headline: 'Loading...',
                 subheadline: 'Fetching headlines',
               ),
-            HeadlinesSearchLoaded(:final headlines) =>
-              _HeadlinesSearchLoadedView(headlines: headlines),
+            HeadlinesSearchLoaded(
+              :final headlines,
+              :final hasReachedMax
+            ) =>
+              _HeadlinesSearchLoadedView(
+                headlines: headlines,
+                hasReachedMax: hasReachedMax,
+              ),
             HeadlinesSearchError(:final message) => FailureStateWidget(
                 message: message,
                 onRetry: () {
@@ -63,18 +82,48 @@ class HeadlinesSearchView extends StatelessWidget {
       ),
     );
   }
+
+  @override
+  void dispose() {
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_isBottom) {
+      context.read<HeadlinesSearchBloc>().add(HeadlinesSearchLoadMore());
+    }
+  }
+
+  bool get _isBottom {
+    if (!_scrollController.hasClients) return false;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.offset;
+    return currentScroll >= (maxScroll * 0.9);
+  }
 }
 
 class _HeadlinesSearchLoadedView extends StatelessWidget {
-  const _HeadlinesSearchLoadedView({required this.headlines});
+  const _HeadlinesSearchLoadedView({
+    required this.headlines,
+    required this.hasReachedMax,
+  });
 
   final List<Headline> headlines;
+  final bool hasReachedMax;
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: headlines.length,
+      itemCount: hasReachedMax ? headlines.length : headlines.length + 1,
       itemBuilder: (context, index) {
+        if (index >= headlines.length) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
         return HeadlineItemWidget(headline: headlines[index]);
       },
     );

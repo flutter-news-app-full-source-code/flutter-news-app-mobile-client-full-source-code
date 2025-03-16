@@ -21,8 +21,13 @@ class HeadlinesSearchBloc
     Emitter<HeadlinesSearchState> emit,
   ) async {
     if (event.searchTerm.isEmpty) {
-      emit(const HeadlinesSearchSuccess(
-          headlines: [], hasMore: false, lastSearchTerm: '',),);
+      emit(
+        const HeadlinesSearchSuccess(
+          headlines: [],
+          hasMore: false,
+          lastSearchTerm: '',
+        ),
+      );
       return;
     }
 

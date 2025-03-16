@@ -18,7 +18,8 @@ class HeadlinesSearchSuccess extends HeadlinesSearchState {
   const HeadlinesSearchSuccess({
     required this.headlines,
     required this.hasMore,
-    required this.lastSearchTerm, this.cursor,
+    required this.lastSearchTerm,
+    this.cursor,
     this.errorMessage,
   });
 
@@ -29,18 +30,20 @@ class HeadlinesSearchSuccess extends HeadlinesSearchState {
   @override
   final String? lastSearchTerm;
 
-  HeadlinesSearchSuccess copyWith(
-      {List<Headline>? headlines,
-      bool? hasMore,
-      String? cursor,
-      String? errorMessage,
-      String? lastSearchTerm,}) {
+  HeadlinesSearchSuccess copyWith({
+    List<Headline>? headlines,
+    bool? hasMore,
+    String? cursor,
+    String? errorMessage,
+    String? lastSearchTerm,
+  }) {
     return HeadlinesSearchSuccess(
-        headlines: headlines ?? this.headlines,
-        hasMore: hasMore ?? this.hasMore,
-        cursor: cursor ?? this.cursor,
-        errorMessage: errorMessage ?? this.errorMessage,
-        lastSearchTerm: lastSearchTerm ?? this.lastSearchTerm,);
+      headlines: headlines ?? this.headlines,
+      hasMore: hasMore ?? this.hasMore,
+      cursor: cursor ?? this.cursor,
+      errorMessage: errorMessage ?? this.errorMessage,
+      lastSearchTerm: lastSearchTerm ?? this.lastSearchTerm,
+    );
   }
 
   @override

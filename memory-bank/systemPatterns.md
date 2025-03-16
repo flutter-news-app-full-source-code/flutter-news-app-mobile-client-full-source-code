@@ -47,7 +47,7 @@ import 'package:my_package/lib/src/widgets/widget_1';
 import 'package:my_package/lib/src/widgets/widget_2';
 ```
 
-Barrel files solve this inefficiency. They export public-facing files, making them available to the rest of the app. It's recommended to create one barrel file per folder, exporting all files required elsewhere. A top-level barrel file should also export the package as a whole.
+Barrel files solve this inefficiency. They export public-facing files, making them available to the rest of the app. Create one barrel file per folder, exporting all files required elsewhere. A top-level barrel file should also export the package as a whole.
 
 With barrel files, the feature structure becomes:
 
@@ -205,6 +205,89 @@ In this example, the API implementation details are now leaked and made known to
 
 BLoC (Business Logic Component) is used to manage the application's state and handle user interactions. Each feature typically has its own BLoC (e.g., `HeadlinesFeedBloc`). BLoCs expose streams of states and receive events as input. The `AppBlocObserver` (not detailed here, but mentioned in the original document) provides centralized logging for BLoC changes and errors.
 
+The following naming conventions are strongly recommended.
+
+### Event Conventions
+
+Events should be named in the **past tense** because events are things that have already occurred from the bloc's perspective.
+
+#### Anatomy
+
+`BlocSubject` + `Noun (optional)` + `Verb (event)`
+
+Initial load events should follow the convention: `BlocSubject` + `Started`
+
+The base event class should be named: `BlocSubject` + `Event`.
+
+#### Examples
+
+✅ **Good**
+
+*   `CounterIncremented`
+*   `HeadlinesFeedLoaded`
+*   `UserLoginSubmitted`
+
+❌ **Bad**
+
+*   `IncrementCounter`
+*   `LoadHeadlines`
+*   `SubmitLogin`
+
+### State Conventions
+
+States should be nouns because a state is just a snapshot at a particular point in time. There are two common ways to represent state: using subclasses or using a single class.
+
+#### Anatomy
+
+##### Subclasses
+
+`BlocSubject` + `Verb (action)` + `State`
+
+When representing the state as multiple subclasses `State` should be one of the following:
+
+`Initial` | `Success` | `Failure` | `InProgress`
+
+Initial states should follow the convention: `BlocSubject` + `Initial`.
+
+##### Single Class
+
+`BlocSubject` + `State`
+
+When representing the state as a single base class an enum named `BlocSubject` + `Status` should be used to represent the status of the state:
+
+`initial` | `success` | `failure` | `loading`.
+
+The base state class should always be named: `BlocSubject` + `State`.
+
+#### Examples
+
+✅ **Good**
+
+##### Subclasses
+
+*   `CounterInitial`
+*   `CounterIncrementedSuccess`
+*   `HeadlinesFeedLoadFailure`
+*   `UserLoginSuccess`
+
+##### Single Class
+
+*   `CounterState` (with `CounterStatus` enum)
+*   `HeadlinesFeedState` (with `HeadlinesFeedStatus` enum)
+*  `UserState` (with `UserStatus` enum)
+
+❌ **Bad**
+
+##### Subclasses
+*   `CounterIncrementing`
+*   `HeadlinesFeedLoad`
+*    `LoginUser`
+
+##### Single Class
+*   `Counter`
+*   `Headlines`
+*   `Login`
+
 There are two main approaches to handling states emitted from BLoCs:
 
 1.  **Enum for Status within a Single State Class:** Useful for persisting previous data while updating specific fields. Common in scenarios like forms or incremental loading.
@@ -326,7 +409,7 @@ if (email.isValid) {
   // ...
 }
 ```
-- Consider using dedicated data models instead of record types for complex scenarios or when values are used across multiple files.
+- Use dedicated data models instead of record types for complex scenarios or when values are used across multiple files.
 
 ## Repository Pattern
 
@@ -356,7 +439,7 @@ Each feature typically has a "page" widget and a "view" widget. This promotes se
     -   Gathering dependencies from the context (e.g., using `context.read`).
     -   Providing these dependencies to the `View` (typically via a `BlocProvider`).
 
--   **View Widget** (e.g., `_HeadlinesFeedView`): A `StatefulWidget` or `StatelessWidget` responsible for:
+-   **View Widget** (e.g., `_HeadlinesFeedView`): A `StatelessWidget` responsible for:
     -   Building the UI based on the current state of the BLoC.
     -   Handling user interactions and dispatching events to the BLoC.
     -   Receiving dependencies from the `Page`.
@@ -405,7 +488,7 @@ The `View` constructor should be annotated with `@visibleForTesting` to prevent 
 
 ## Use Standalone Widgets over Helper Methods
 
-When a widget's build method becomes complex, prefer creating new standalone widgets instead of helper methods that return widgets.
+When a widget's build method becomes complex, always prefer creating new standalone widgets instead of helper methods that return widgets.
 
 -   **Benefits:**
     -   **Testability:** Each widget can be tested independently.
@@ -484,7 +567,7 @@ Proper error handling is crucial. Follow these practices:
 
 ## Testing
 
-- Aim for 100% test coverage.
+- Strive for 100% test coverage.
 - Organize test files to mirror the project structure (e.g., `test/models/model_a_test.dart` for `lib/models/model_a.dart`).
 - Assert test results using `expect` or `verify`.
 - Use matchers with expectations (e.g., `expect(value, equals(expectedValue))`).

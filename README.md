@@ -2,8 +2,7 @@
 
 ## 📖 Overview
 
-**Headlines Toolkit** is a source-available, full-stack Flutter application designed as a robust foundation for building modern news applications. This toolkit offers a streamlined, user-friendly experience for browsing news headlines and is built upon a clean, maintainable architecture. Developers can freely evaluate the source code and run the app locally for a 32-day trial period. A commercial license is required for any use beyond this trial, including continued local use, modification, production use, or distribution.
-
+**Headlines Toolkit** is a source-available, full-stack Flutter application designed as a robust foundation for building modern news applications. This toolkit offers a streamlined, user-friendly experience for browsing news headlines and is built upon a clean, maintainable architecture.
 ## ✨ Features
 
 -   🗞️ **Headlines Feed:** Displays a minimalist list of news headlines (title only, with source, category, and country represented as icons).

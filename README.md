@@ -16,7 +16,6 @@
     -   💾 Saving articles
     -   📵 Offline Reading
     -   🔔 Push notifications
-    -   📰 News categories/topics
     -   🚀 Social sharing
     -   💬 Comments/discussion features
 

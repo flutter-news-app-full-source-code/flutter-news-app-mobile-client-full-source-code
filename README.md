@@ -33,10 +33,10 @@
 -   ⚖️ **Licensing:** Source-available under the PolyForm Free Trial License for evaluation. Commercial license required for production use, distribution, or continued use beyond 32 days.
 
 ## ⚖️ License
-
-This project is source-available under the [PolyForm Free Trial License 1.0.0](LICENSE). This license allows for free evaluation of the Headlines Toolkit source code and local execution of the application for up to 32 consecutive days. Any use beyond this trial period, including continued local use, modification, production use, or distribution, requires a commercial license.
+All repositories under headlines toolkit [organization](https://github.com/headlines-toolkit) are **source available** governed a [Free Trial License](https://polyformproject.org/licenses/free-trial/1.0.0/). you can freely explore the source codes and evaluate them locally for up to 32 consecutive days. A commercial license is required for any use beyond this evaluation period, including production deployment, distribution, or modification for commercial purposes.
 
 
 ## 💰 Commercial License
+All repositories under the headlines toolkit [organization](https://github.com/headlines-toolkit) can be unlocked by a **single commercial license** enabling you to Unlock its full potential by Gaining the rights to **deploy**, **customize**, and **distribute** your news application built upon this powerful foundation.
 
-A commercial license covers all repositories within the Headlines Toolkit organization. This provides licensees with a complete, full-stack solution for building and managing their news applications. The Headlines Toolkit organization includes two source-available applications: this Flutter mobile app and a Flutter web dashboard for managing the app's content. The commercial license grants developers the rights to use the source code of both applications in production, customize them to their needs, and distribute their derived applications. **Purchase a commercial license online: [INSERT LINK HERE]**.
+Acquire your commercial license [here]()

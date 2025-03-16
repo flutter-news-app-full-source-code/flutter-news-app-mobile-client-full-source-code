@@ -28,8 +28,6 @@
 -   🔀 **Routing:** go_router
 -   ⚙️ **Backend:** Firebase (current), Supabase (future)
 -   🏛️ **Architecture:** Layered architecture (Data, Repository, Business Logic, Presentation)
--   💉 **Dependency Injection:** Manual
--   ⚖️ **Licensing:** Source-available under the PolyForm Free Trial License for evaluation. Commercial license required for production use, distribution, or continued use beyond 32 days.
 
 ## ⚖️ License - Organization-Wide Free Trial
 

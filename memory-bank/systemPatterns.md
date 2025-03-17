@@ -169,25 +169,53 @@ Prefer standalone widgets over helper methods for complex build methods.
 -   Use constants for test tags.
 -   No shared state between tests.
 -   Use random test ordering (`flutter test --test-randomize-ordering-seed random`).
+-   Include accessibility testing.
+
+## Code Commenting and Documentation
+
+- Add documentation comments (///) to all public functions, classes, and significant code elements.
+- Add inline comments (//) to explain any complex logic or non-obvious code blocks.
+
+## Accessibility
+
+- Ensure the UI is accessible to users with disabilities.
+- Provide sufficient color contrast and use readable font sizes.
+- Adhere to accessibility guidelines, including semantic structure (`Semantics`, `MergeSemantics`).
+- Implement proper focus management for keyboard users.
+- Provide clear visual cues for the currently focused element.
 
 ## Theming
 
 -   Use `ThemeData`.
--   Access theme values with `Theme.of(context)`.
+-   Access theme values **exclusively** with `Theme.of(context)` (e.g., `Theme.of(context).primaryColor`). **Do not introduce hardcoded color values.**
+-   Emphasize a minimalist approach, avoiding excessive use of colors and gradients.
+- The UI must adapt to both light and dark themes.
 -   Typography:
     -   Import fonts, declare in `pubspec.yaml`.
     -   Use `flutter_gen` for type-safe access.
     -   Create custom text styles (`AppTextStyle`).
     -   Use `TextTheme`.
+    -   Establish a clear visual hierarchy using font sizes, weights, line height, letter spacing, and text alignment. Optimize for readability.
 -   Colors:
     -   Create custom colors (`AppColors`).
-    -   Use `ColorScheme`.
+    -   Use `ColorScheme` to define component colors, using theme-based colors.
+    - Use the `accentColor` sparingly for key interactive elements or important information.
 -   Use component themes (e.g., `FilledButtonThemeData`).
 -   Define spacing constants (`AppSpacing`).
+
+## Localization
+
+- All hardcoded text in the UI must be localized using the `l10n` feature.
+- Reference the `lib/l10n/` directory for localization files.
+- UI code should only include localized variables, not hardcoded strings.
 
 ## Layouts
 
 -   Constraints flow down, sizes go up, parent sets position.
+
+### Whitespace
+
+- Utilize whitespace (padding, margin, spacing) as a key design element to create visual balance, improve readability, and group related content.
 
 ### Rows and Columns
 
@@ -213,4 +241,18 @@ Prefer standalone widgets over helper methods for complex build methods.
     -   `shrinkWrap`: `ListView` takes only needed space.
 
 -   `SingleChildScrollView`: Makes a single widget scrollable. Prefer `ListView` for lists.
+
+### Responsive and Adaptive Design
+
+- Design the UI to be responsive and adapt to different screen sizes and orientations.
+- Use `LayoutBuilder` to get the constraints of the current widget and build different UIs based on those constraints.
+- Consider using `TwoPane` for large screens (e.g., tablets, foldables) to display two views side-by-side.
+- Use `AdaptiveGridView` for creating grids that adapt to different screen sizes.
+- Support both RTL (right-to-left) and LTR (left-to-right) layouts.
+    - Use the `Directionality` widget to specify the text direction.
+    - Use logical properties (e.g., `EdgeInsetsDirectional` instead of `EdgeInsets.only(left:...)`).
+    - Prefer widgets that use `start` and `end` instead of `left` and `right`.
+    - Consider mirroring icons or images when appropriate.
+    - Ensure correct text alignment.
+
 - Avoid using `Expanded` inside `Wrap`, `ListView`, and `SingleChildScrollView` unless the nested widget has a fixed size.

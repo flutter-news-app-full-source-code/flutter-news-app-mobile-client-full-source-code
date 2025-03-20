@@ -7,8 +7,8 @@ import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/router.dart';
 
-class AppPage extends StatelessWidget {
-  const AppPage({
+class App extends StatelessWidget {
+  const App({
     required HtHeadlinesRepository htHeadlinesRepository,
     super.key,
   }) : _htHeadlinesRepository = htHeadlinesRepository;

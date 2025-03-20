@@ -1,8 +1,6 @@
-import 'dart:async';
 import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
-import 'package:flutter/widgets.dart';
 
 class AppBlocObserver extends BlocObserver {
   const AppBlocObserver();
@@ -18,16 +16,4 @@ class AppBlocObserver extends BlocObserver {
     log('onError(${bloc.runtimeType}, $error, $stackTrace)');
     super.onError(bloc, error, stackTrace);
   }
-}
-
-Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
-  FlutterError.onError = (details) {
-    log(details.exceptionAsString(), stackTrace: details.stack);
-  };
-
-  Bloc.observer = const AppBlocObserver();
-
-  // Add cross-flavor configuration here
-
-  runApp(await builder());
 }

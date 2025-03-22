@@ -123,7 +123,8 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
                 subheadline: 'Fetching headlines',
               );
             // this silentcase will never be reached
-            // it here just to fullfill the switch comprehensive check
+            // it here just to fullfill the Exhaustiveness 
+            // Checking os the sealed state.
             case HeadlinesFeedLoadingSilently():
               return const Placeholder();
             case HeadlinesFeedLoaded():

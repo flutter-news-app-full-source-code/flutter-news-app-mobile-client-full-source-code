@@ -112,6 +112,8 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
         ],
       ),
       body: BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
+        buildWhen: (previous, current) =>
+            current is! HeadlinesFeedLoadingSilently,
         builder: (context, state) {
           switch (state) {
             case HeadlinesFeedLoading():
@@ -120,6 +122,10 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
                 headline: 'Loading...',
                 subheadline: 'Fetching headlines',
               );
+            // this silentcase will never be reached
+            // it here just to fullfill the switch comprehensive check
+            case HeadlinesFeedLoadingSilently():
+              return const Placeholder();
             case HeadlinesFeedLoaded():
               return RefreshIndicator(
                 onRefresh: () async {

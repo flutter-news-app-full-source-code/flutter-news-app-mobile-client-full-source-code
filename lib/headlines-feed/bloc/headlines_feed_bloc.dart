@@ -86,7 +86,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     if (state is HeadlinesFeedLoaded &&
         (state as HeadlinesFeedLoaded).hasMore) {
       final currentState = state as HeadlinesFeedLoaded;
-      emit(HeadlinesFeedLoading());
+      emit(HeadlinesFeedLoadingSilently());
       try {
         final response = await _headlinesRepository.getHeadlines(
           limit: _headlinesFetchLimit,

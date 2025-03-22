@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
+
 import 'package:ht_headlines_repository/ht_headlines_repository.dart';
 import 'package:ht_main/headlines-feed/models/headline_filter.dart';
 
@@ -33,6 +34,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
   final HtHeadlinesRepository _headlinesRepository;
 
+  static const _headlinesFetchLimit = 20;
+  
   Future<void> _onHeadlinesFeedFilterChanged(
     HeadlinesFeedFilterChanged event,
     Emitter<HeadlinesFeedState> emit,
@@ -40,7 +43,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     emit(HeadlinesFeedLoading());
     try {
       final response = await _headlinesRepository.getHeadlines(
-        limit: 20,
+        limit: _headlinesFetchLimit,
         category: event.category, // Pass category directly
         source: event.source, // Pass source directly
         eventCountry: event.eventCountry, // Pass eventCountry directly
@@ -86,7 +89,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       emit(HeadlinesFeedLoading());
       try {
         final response = await _headlinesRepository.getHeadlines(
-          limit: 20,
+          limit: _headlinesFetchLimit,
           startAfterId: currentState.cursor,
           category: currentState.filter.category, // Use existing filter
           source: currentState.filter.source, // Use existing filter
@@ -109,7 +112,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       emit(HeadlinesFeedLoading());
       try {
         final response = await _headlinesRepository.getHeadlines(
-          limit: 20,
+          limit: _headlinesFetchLimit,
           category: state is HeadlinesFeedLoaded
               ? (state as HeadlinesFeedLoaded).filter.category
               : null,

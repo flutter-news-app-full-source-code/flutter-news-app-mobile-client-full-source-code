@@ -34,8 +34,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
   final HtHeadlinesRepository _headlinesRepository;
 
-  static const _headlinesFetchLimit = 20;
-  
+  static const _headlinesFetchLimit = 10;
+
   Future<void> _onHeadlinesFeedFilterChanged(
     HeadlinesFeedFilterChanged event,
     Emitter<HeadlinesFeedState> emit,

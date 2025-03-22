@@ -19,11 +19,10 @@ final class HeadlinesFeedLoading extends HeadlinesFeedState {}
 /// {@template headlines_feed_loading}
 /// State indicating that the headlines feed is being loaded
 /// without a full screen loading widget being showed.
-/// 
+///
 /// usefull for inifinity scrolling fetches beyonf the first one
 /// {@endtemplate}
 final class HeadlinesFeedLoadingSilently extends HeadlinesFeedState {}
-
 
 /// {@template headlines_feed_loaded}
 /// State indicating that the headlines feed has been loaded successfully,

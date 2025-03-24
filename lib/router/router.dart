@@ -39,11 +39,11 @@ final appRouter = GoRouter(
           },
         ),
         GoRoute(
-          path: Routes.account,
-          name: Routes.accountName,
+          path: Routes.settings,
+          name: Routes.settingsName,
           builder: (BuildContext context, GoRouterState state) {
             return const Placeholder(
-              child: Center(child: Text('ACCOUNT PAGE')),
+              child: Center(child: Text('SETTINGS PAGE')),
             );
           },
         ),

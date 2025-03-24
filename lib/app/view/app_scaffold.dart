@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ht_main/app/bloc/app_bloc.dart';
+import 'package:ht_main/router/routes.dart';
 
 class AppScaffold extends StatelessWidget {
   const AppScaffold({required this.child, super.key});
@@ -27,6 +29,11 @@ class AppScaffold extends StatelessWidget {
               context.read<AppBloc>().add(
                     AppNavigationIndexChanged(index: index, context: context),
                   );
+              if (index == 0) {
+                context.goNamed(Routes.headlinesFeedName);
+              } else if (index == 1) {
+                context.goNamed(Routes.settingsName);
+              }
             },
             destinations: const [
               NavigationDestination(
@@ -35,14 +42,9 @@ class AppScaffold extends StatelessWidget {
                 label: 'Headlines',
               ),
               NavigationDestination(
-                icon: Icon(Icons.search_outlined),
-                selectedIcon: Icon(Icons.search),
-                label: 'Search',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.account_circle_outlined),
-                selectedIcon: Icon(Icons.account_circle),
-                label: 'Account',
+                icon: Icon(Icons.settings_outlined),
+                selectedIcon: Icon(Icons.settings),
+                label: 'Settings',
               ),
             ],
           );

@@ -5,8 +5,8 @@ abstract final class Routes {
   static const headlinesFeedName = 'headlinesFeed';
   static const search = '/search';
   static const searchName = 'search';
-  static const account = '/account';
-  static const accountName = 'account';
+  static const settings = '/settings';
+  static const settingsName = 'settings';
   static const articleDetailsName = 'articleDetails'; // For the sub-route
 
   static String getRouteNameByIndex(int index) {
@@ -14,9 +14,7 @@ abstract final class Routes {
       case 0:
         return headlinesFeedName;
       case 1:
-        return searchName;
-      case 2:
-        return accountName;
+        return settingsName;
       default:
         throw ArgumentError('Invalid index: $index');
     }

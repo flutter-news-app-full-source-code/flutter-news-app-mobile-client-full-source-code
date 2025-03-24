@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ht_headlines_repository/ht_headlines_repository.dart';
 import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:ht_main/headlines-feed/widgets/headline_item_widget.dart';
+import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/widgets/failure_state_widget.dart';
 import 'package:ht_main/shared/widgets/loading_state_widget.dart';
 
@@ -68,6 +70,16 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
       appBar: AppBar(
         title: const Text('HT'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              context.pushNamed(Routes.searchName);
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.bookmark_border),
+            onPressed: () {},
+          ),
           BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
             builder: (context, state) {
               var isFilterApplied = false;

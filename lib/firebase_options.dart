@@ -66,4 +66,5 @@ class DefaultFirebaseOptions {
     projectId: 'headlines-toolkit',
     storageBucket: 'headlines-toolkit.firebasestorage.app',
   );
+
 }

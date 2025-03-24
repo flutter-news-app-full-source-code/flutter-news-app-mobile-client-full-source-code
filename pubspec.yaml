@@ -21,6 +21,14 @@ dependencies:
     sdk: flutter
   go_router: ^14.8.1
   google_fonts: ^6.2.1
+  ht_authentication_firebase:
+    git:
+      url: https://github.com/headlines-toolkit/ht-authentication-firebase.git
+      ref: main
+  ht_authentication_repository:
+    git:
+      url: https://github.com/headlines-toolkit/ht-authentication-repository.git
+      ref: main
   ht_headlines_firestore:
     git:
       url: https://github.com/headlines-toolkit/ht-headlines-firestore.git

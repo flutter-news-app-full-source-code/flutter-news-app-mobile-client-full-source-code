@@ -16,6 +16,8 @@ abstract final class Routes {
   static const resetPasswordName = 'resetPassword';
   static const confirmEmail = 'confirm-email';
   static const confirmEmailName = 'confirmEmail';
+  static const testRoute = '/test-route';
+  static const testRouteName = 'testRoute';
 
   static String getRouteNameByIndex(int index) {
     switch (index) {

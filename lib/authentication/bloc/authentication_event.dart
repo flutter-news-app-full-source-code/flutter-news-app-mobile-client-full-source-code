@@ -11,20 +11,6 @@ sealed class AuthenticationEvent extends Equatable {
   List<Object> get props => [];
 }
 
-/// {@template authentication_user_changed}
-/// Event triggered when the user's authentication state changes.
-/// {@endtemplate}
-final class AuthenticationUserChanged extends AuthenticationEvent {
-  /// {@macro authentication_user_changed}
-  const AuthenticationUserChanged(this.user);
-
-  /// The updated [User] object.
-  final User user;
-
-  @override
-  List<Object> get props => [user];
-}
-
 /// {@template authentication_email_sign_in_requested}
 /// Event triggered when the user requests to sign in with email and password.
 /// {@endtemplate}

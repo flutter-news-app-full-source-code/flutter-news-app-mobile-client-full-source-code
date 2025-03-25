@@ -31,14 +31,9 @@ class AuthenticationBloc
     on<AuthenticationDeleteAccountRequested>(
       _onAuthenticationDeleteAccountRequested,
     );
-
-    _userSubscription = _authenticationRepository.user.listen(
-      (user) => add(AuthenticationUserChanged(user)),
-    );
   }
 
   final HtAuthenticationRepository _authenticationRepository;
-  late final StreamSubscription<User> _userSubscription;
 
   /// Handles [AuthenticationEmailSignInRequested] events.
   Future<void> _onAuthenticationEmailSignInRequested(
@@ -51,6 +46,7 @@ class AuthenticationBloc
         email: event.email,
         password: event.password,
       );
+      emit(AuthenticationInitial());
     } on EmailSignInException catch (e) {
       emit(AuthenticationFailure(e.toString()));
     } catch (e) {
@@ -66,6 +62,7 @@ class AuthenticationBloc
     emit(AuthenticationLoading());
     try {
       await _authenticationRepository.signInWithGoogle();
+      emit(AuthenticationInitial());
     } on GoogleSignInException catch (e) {
       emit(AuthenticationFailure(e.toString()));
     } catch (e) {
@@ -81,6 +78,7 @@ class AuthenticationBloc
     emit(AuthenticationLoading());
     try {
       await _authenticationRepository.signInAnonymously();
+      emit(AuthenticationInitial());
     } on AnonymousLoginException catch (e) {
       emit(AuthenticationFailure(e.toString()));
     } catch (e) {
@@ -96,6 +94,7 @@ class AuthenticationBloc
     emit(AuthenticationLoading());
     try {
       await _authenticationRepository.signOut();
+      emit(AuthenticationInitial());
     } on LogoutException catch (e) {
       emit(AuthenticationFailure(e.toString()));
     } catch (e) {
@@ -110,16 +109,11 @@ class AuthenticationBloc
     emit(AuthenticationLoading());
     try {
       await _authenticationRepository.deleteAccount();
+      emit(AuthenticationInitial());
     } on DeleteAccountException catch (e) {
       emit(AuthenticationFailure(e.toString()));
     } catch (e) {
       emit(AuthenticationFailure(e.toString()));
     }
-  }
-
-  @override
-  Future<void> close() {
-    _userSubscription.cancel();
-    return super.close();
   }
 }

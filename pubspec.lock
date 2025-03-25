@@ -451,7 +451,7 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: "2c711c1ac23f4f3c866bea9d1152b83c188cf7fa"
+      resolved-ref: "96250f7f8f57063915a593f5911ce0d6849a8280"
       url: "https://github.com/headlines-toolkit/ht-authentication-firebase.git"
     source: git
     version: "0.0.0"

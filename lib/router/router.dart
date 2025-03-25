@@ -20,7 +20,7 @@ final appRouter = GoRouter(
     if (appStatus == AppStatus.authenticated ||
         appStatus == AppStatus.anonymous) {
       if (!state.matchedLocation.startsWith(headlinesFeedPath)) {
-        return headlinesFeedPath;
+        return Routes.headlinesFeed;
       }
     }
     // If the user is not authenticated, redirect to the authentication page
@@ -96,6 +96,15 @@ final appRouter = GoRouter(
           },
         ),
       ],
+    ),
+    GoRoute(
+      path: '/test-route',
+      name: 'testRoute',
+      builder: (BuildContext context, GoRouterState state) {
+        return const Placeholder(
+          child: Center(child: Text('Test Route')),
+        );
+      },
     ),
   ],
 );

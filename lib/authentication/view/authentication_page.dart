@@ -42,66 +42,68 @@ class _AuthenticationView extends StatelessWidget {
             }
             return Padding(
               padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Sign In',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 32),
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      border: OutlineInputBorder(),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Sign In',
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _passwordController,
-                    decoration: const InputDecoration(
-                      labelText: 'Password',
-                      border: OutlineInputBorder(),
+                    const SizedBox(height: 32),
+                    TextFormField(
+                      controller: _emailController,
+                      decoration: const InputDecoration(
+                        labelText: 'Email',
+                        border: OutlineInputBorder(),
+                      ),
+                      keyboardType: TextInputType.emailAddress,
                     ),
-                    obscureText: true,
-                  ),
-                  const SizedBox(height: 32),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.read<AuthenticationBloc>().add(
-                            AuthenticationEmailSignInRequested(
-                              email: _emailController.text,
-                              password: _passwordController.text,
-                            ),
-                          );
-                    },
-                    child: const Text('Sign In with Email'),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      context
-                          .read<AuthenticationBloc>()
-                          .add(const AuthenticationGoogleSignInRequested());
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.black,
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _passwordController,
+                      decoration: const InputDecoration(
+                        labelText: 'Password',
+                        border: OutlineInputBorder(),
+                      ),
+                      obscureText: true,
                     ),
-                    child: const Text('Sign In with Google'),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      context
-                          .read<AuthenticationBloc>()
-                          .add(const AuthenticationAnonymousSignInRequested());
-                    },
-                    child: const Text('Sign In Anonymously'),
-                  ),
-                ],
+                    const SizedBox(height: 32),
+                    ElevatedButton(
+                      onPressed: () {
+                        context.read<AuthenticationBloc>().add(
+                              AuthenticationEmailSignInRequested(
+                                email: _emailController.text,
+                                password: _passwordController.text,
+                              ),
+                            );
+                      },
+                      child: const Text('Sign In with Email'),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        context
+                            .read<AuthenticationBloc>()
+                            .add(const AuthenticationGoogleSignInRequested());
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                      ),
+                      child: const Text('Sign In with Google'),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        context
+                            .read<AuthenticationBloc>()
+                            .add(const AuthenticationAnonymousSignInRequested());
+                      },
+                      child: const Text('Sign In Anonymously'),
+                    ),
+                  ],
+                ),
               ),
             );
           },

@@ -18,7 +18,6 @@ class AuthenticationBloc
     required HtAuthenticationRepository authenticationRepository,
   })  : _authenticationRepository = authenticationRepository,
         super(AuthenticationInitial()) {
-    on<AuthenticationUserChanged>(_onAuthenticationUserChanged);
     on<AuthenticationEmailSignInRequested>(
       _onAuthenticationEmailSignInRequested,
     );
@@ -40,18 +39,6 @@ class AuthenticationBloc
 
   final HtAuthenticationRepository _authenticationRepository;
   late final StreamSubscription<User> _userSubscription;
-
-  /// Handles [AuthenticationUserChanged] events.
-  void _onAuthenticationUserChanged(
-    AuthenticationUserChanged event,
-    Emitter<AuthenticationState> emit,
-  ) {
-    if (event.user.isAnonymous) {
-      emit(AuthenticationUnauthenticated());
-    } else {
-      emit(AuthenticationAuthenticated(event.user));
-    }
-  }
 
   /// Handles [AuthenticationEmailSignInRequested] events.
   Future<void> _onAuthenticationEmailSignInRequested(

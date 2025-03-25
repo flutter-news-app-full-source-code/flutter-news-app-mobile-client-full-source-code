@@ -1,6 +1,16 @@
 part of 'app_bloc.dart';
 
-enum AppStatus { authenticated, unauthenticated }
+/// Represents the application's authentication status.
+enum AppStatus {
+  /// The user is authenticated.
+  authenticated,
+
+  /// The user is not authenticated.
+  unauthenticated,
+
+  /// The user is anonymous (signed in using an anonymous provider).
+  anonymous,
+}
 
 class AppState extends Equatable {
   const AppState({

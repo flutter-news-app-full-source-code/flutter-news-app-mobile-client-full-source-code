@@ -15,16 +15,17 @@ final appRouter = GoRouter(
     const authenticationPath = Routes.authentication;
     const headlinesFeedPath = Routes.headlinesFeed;
 
-    // If the user is authenticated, redirect to the headlines feed
+    // If the user is authenticated or anonymous, redirect to the headlines feed
     // unless they are already on a route within the headlines feed.
-    if (appStatus == AppStatus.authenticated) {
+    if (appStatus == AppStatus.authenticated ||
+        appStatus == AppStatus.anonymous) {
       if (!state.matchedLocation.startsWith(headlinesFeedPath)) {
         return headlinesFeedPath;
       }
     }
     // If the user is not authenticated, redirect to the authentication page
     // unless they are already on a route within the authentication section.
-    else {
+    else if (appStatus == AppStatus.unauthenticated) {
       if (!state.matchedLocation.startsWith(authenticationPath)) {
         return authenticationPath;
       }

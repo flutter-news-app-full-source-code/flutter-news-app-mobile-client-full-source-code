@@ -50,10 +50,16 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     AppUserChanged event,
     Emitter<AppState> emit,
   ) {
-    if (event.user.isAnonymous) {
-      emit(state.copyWith(status: AppStatus.unauthenticated));
-    } else {
-      emit(state.copyWith(status: AppStatus.authenticated));
+    switch (event.user.authenticationStatus) {
+      case AuthenticationStatus.unauthenticated:
+        emit(state.copyWith(status: AppStatus.unauthenticated));
+        break;
+      case AuthenticationStatus.anonymous:
+        emit(state.copyWith(status: AppStatus.anonymous));
+        break;
+      case AuthenticationStatus.authenticated:
+        emit(state.copyWith(status: AppStatus.authenticated));
+        break;
     }
   }
 

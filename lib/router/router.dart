@@ -12,11 +12,25 @@ final appRouter = GoRouter(
   initialLocation: Routes.headlinesFeed,
   redirect: (BuildContext context, GoRouterState state) {
     final appStatus = context.read<AppBloc>().state.status;
+    const authenticationPath = Routes.authentication;
+    const headlinesFeedPath = Routes.headlinesFeed;
+
+    // If the user is not authenticated, redirect to the headlines feed
+    // unless they are already on a route within the headlines feed.
     if (appStatus != AppStatus.authenticated) {
-      return Routes.headlinesFeed;
-    } else {
-      return Routes.authentication;
+      if (!state.matchedLocation.startsWith(headlinesFeedPath)) {
+        return headlinesFeedPath;
+      }
     }
+    // If the user is authenticated, redirect to the authentication page
+    // unless they are already on a route within the authentication section.
+    else {
+      if (!state.matchedLocation.startsWith(authenticationPath)) {
+        return authenticationPath;
+      }
+    }
+    // Otherwise, allow the navigation to proceed.
+    return null;
   },
   routes: [
     GoRoute(

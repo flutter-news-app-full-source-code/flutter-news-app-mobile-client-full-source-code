@@ -20,7 +20,8 @@ class AuthenticationBloc
         super(AuthenticationInitial()) {
     on<AuthenticationUserChanged>(_onAuthenticationUserChanged);
     on<AuthenticationEmailSignInRequested>(
-        _onAuthenticationEmailSignInRequested,);
+      _onAuthenticationEmailSignInRequested,
+    );
     on<AuthenticationGoogleSignInRequested>(
       _onAuthenticationGoogleSignInRequested,
     );

@@ -22,6 +22,8 @@ class _AuthenticationView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder(child: Text('AUTHENTICATION PAGE'),);
+    return const Placeholder(
+      child: Text('AUTHENTICATION PAGE'),
+    );
   }
 }

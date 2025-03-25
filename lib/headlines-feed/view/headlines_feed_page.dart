@@ -88,7 +88,7 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              context.pushNamed(Routes.searchName);
+              context.goNamed(Routes.searchName);
             },
           ),
           BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(

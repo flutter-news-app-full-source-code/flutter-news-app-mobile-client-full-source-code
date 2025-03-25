@@ -8,10 +8,11 @@ import 'package:ht_headlines_firestore/ht_headlines_firestore.dart';
 import 'package:ht_headlines_repository/ht_headlines_repository.dart';
 import 'package:ht_main/app/app.dart';
 import 'package:ht_main/bloc_observer.dart';
+import 'package:ht_main/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   Bloc.observer = const AppBlocObserver();
   final firestore = FirebaseFirestore.instance;
   final headlinesClient = HtHeadlinesFirestore(firestore: firestore);

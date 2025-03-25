@@ -68,17 +68,28 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leadingWidth: 100,
+        leading: Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () {},
+            ),
+            IconButton(
+              icon: const Icon(Icons.bookmark_border_outlined),
+              selectedIcon: const Icon(Icons.bookmark_border),
+              onPressed: () {},
+            ),
+          ],
+        ),
         title: const Text('HT'),
+        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
               context.pushNamed(Routes.searchName);
             },
-          ),
-          IconButton(
-            icon: const Icon(Icons.bookmark_border),
-            onPressed: () {},
           ),
           BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
             builder: (context, state) {

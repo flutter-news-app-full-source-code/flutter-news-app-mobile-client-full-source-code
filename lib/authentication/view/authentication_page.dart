@@ -12,7 +12,7 @@ class AuthenticationPage extends StatelessWidget {
       create: (context) => AuthenticationBloc(
         authenticationRepository: context.read<HtAuthenticationRepository>(),
       ),
-      child:  _AuthenticationView(),
+      child: _AuthenticationView(),
     );
   }
 }
@@ -20,12 +20,11 @@ class AuthenticationPage extends StatelessWidget {
 class _AuthenticationView extends StatelessWidget {
   _AuthenticationView();
 
-    final _emailController = TextEditingController();
-    final _passwordController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: SafeArea(
         child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
@@ -48,7 +47,8 @@ class _AuthenticationView extends StatelessWidget {
                   children: [
                     const Text(
                       'Sign In',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 32),
                     TextFormField(
@@ -96,9 +96,9 @@ class _AuthenticationView extends StatelessWidget {
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () {
-                        context
-                            .read<AuthenticationBloc>()
-                            .add(const AuthenticationAnonymousSignInRequested());
+                        context.read<AuthenticationBloc>().add(
+                              const AuthenticationAnonymousSignInRequested(),
+                            );
                       },
                       child: const Text('Sign In Anonymously'),
                     ),

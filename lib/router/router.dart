@@ -11,15 +11,13 @@ import 'package:ht_main/headlines-feed/view/headlines_feed_page.dart';
 import 'package:ht_main/headlines-search/view/headlines_search_page.dart';
 import 'package:ht_main/router/routes.dart'; // Keep Routes
 
-// No longer defining a global router instance here.
-
 /// Creates and configures the GoRouter instance for the application.
 ///
-/// Requires a [refreshListenable] (typically based on AppBloc's stream)
-/// to trigger route re-evaluation when authentication state changes.
-GoRouter createRouter({required Listenable refreshListenable}) {
+/// Requires an [authStatusNotifier] to trigger route re-evaluation when
+/// authentication state changes.
+GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
   return GoRouter(
-    refreshListenable: refreshListenable,
+    refreshListenable: authStatusNotifier, 
     initialLocation: Routes.headlinesFeed,
     debugLogDiagnostics: true, // Enable verbose logging for debugging redirects
     // --- Redirect Logic ---
@@ -27,7 +25,6 @@ GoRouter createRouter({required Listenable refreshListenable}) {
       // Use context.read<AppBloc>() here. It's safe because refreshListenable
       // ensures this runs within a valid context after AppBloc state changes.
       final appStatus = context.read<AppBloc>().state.status;
-      // final user = context.read<AppBloc>().state.user; // AppState does not have user
       final currentLocation = state.matchedLocation;
 
       print(

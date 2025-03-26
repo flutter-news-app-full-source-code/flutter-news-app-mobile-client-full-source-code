@@ -34,7 +34,6 @@ void main() async {
     App(
       htAuthenticationRepository: authenticationRepository,
       htHeadlinesRepository: headlinesRepository,
-      // AppBloc instance is no longer created or passed here
     ),
   );
 }

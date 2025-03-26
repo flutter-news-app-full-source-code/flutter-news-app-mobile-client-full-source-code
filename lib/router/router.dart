@@ -17,7 +17,7 @@ import 'package:ht_main/router/routes.dart'; // Keep Routes
 /// authentication state changes.
 GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
   return GoRouter(
-    refreshListenable: authStatusNotifier, 
+    refreshListenable: authStatusNotifier,
     initialLocation: Routes.headlinesFeed,
     debugLogDiagnostics: true, // Enable verbose logging for debugging redirects
     // --- Redirect Logic ---

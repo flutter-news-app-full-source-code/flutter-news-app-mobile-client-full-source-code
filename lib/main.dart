@@ -30,7 +30,6 @@ void main() async {
   // --- End Instantiation ---
 
   runApp(
-    // Pass only repositories to the App widget
     App(
       htAuthenticationRepository: authenticationRepository,
       htHeadlinesRepository: headlinesRepository,

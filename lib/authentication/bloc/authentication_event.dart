@@ -12,7 +12,8 @@ sealed class AuthenticationEvent extends Equatable {
 }
 
 /// {@template authentication_send_sign_in_link_requested}
-/// Event triggered when the user requests a sign-in link to be sent to their email.
+/// Event triggered when the user requests a sign-in link to be sent
+/// to their email.
 /// {@endtemplate}
 final class AuthenticationSendSignInLinkRequested extends AuthenticationEvent {
   /// {@macro authentication_send_sign_in_link_requested}
@@ -32,18 +33,17 @@ final class AuthenticationSendSignInLinkRequested extends AuthenticationEvent {
 final class AuthenticationSignInWithLinkAttempted extends AuthenticationEvent {
   /// {@macro authentication_sign_in_with_link_attempted}
   const AuthenticationSignInWithLinkAttempted({
-    required this.email,
+    // Remove email parameter
     required this.emailLink,
   });
 
-  /// The email associated with the sign-in attempt.
-  final String email;
+  // Remove email field
 
   /// The sign-in link received by the app.
   final String emailLink;
 
   @override
-  List<Object> get props => [email, emailLink];
+  List<Object> get props => [emailLink]; // Remove email from props
 }
 
 /// {@template authentication_google_sign_in_requested}
@@ -75,5 +75,6 @@ final class AuthenticationSignOutRequested extends AuthenticationEvent {
 /// {@endtemplate}
 final class AuthenticationDeleteAccountRequested extends AuthenticationEvent {
   /// {@macro authentication_delete_account_requested}
+  const AuthenticationDeleteAccountRequested();
   const AuthenticationDeleteAccountRequested();
 }

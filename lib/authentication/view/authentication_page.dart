@@ -1,3 +1,6 @@
+//
+// ignore_for_file: lines_longer_than_80_chars
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_authentication_repository/ht_authentication_repository.dart';
@@ -9,9 +12,11 @@ class AuthenticationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => AuthenticationBloc(
-        authenticationRepository: context.read<HtAuthenticationRepository>(),
-      ),
+      create:
+          (context) => AuthenticationBloc(
+            authenticationRepository:
+                context.read<HtAuthenticationRepository>(),
+          ),
       child: _AuthenticationView(),
     );
   }
@@ -62,7 +67,8 @@ class __AuthenticationViewState extends State<_AuthenticationView> {
           },
           builder: (context, state) {
             // Determine if loading indicator should be shown
-            final isLoading = state is AuthenticationLoading ||
+            final isLoading =
+                state is AuthenticationLoading ||
                 state is AuthenticationLinkSending;
 
             return Padding(
@@ -77,9 +83,10 @@ class __AuthenticationViewState extends State<_AuthenticationView> {
                     children: [
                       Text(
                         'Sign In / Register', // Updated title
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineMedium, // Use theme typography
+                        style:
+                            Theme.of(
+                              context,
+                            ).textTheme.headlineMedium, // Use theme typography
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 32), // Use AppSpacing later
@@ -99,26 +106,31 @@ class __AuthenticationViewState extends State<_AuthenticationView> {
                       const SizedBox(height: 32), // Use AppSpacing later
                       // Show loading indicator within the button if sending link
                       ElevatedButton(
-                        onPressed: isLoading // Disable button when loading
-                            ? null
-                            : () {
-                                context.read<AuthenticationBloc>().add(
-                                      AuthenticationSendSignInLinkRequested(
-                                        email: _emailController.text
-                                            .trim(), // Trim whitespace
-                                      ),
-                                    );
-                              },
-                        child: state is AuthenticationLinkSending
-                            ? const SizedBox(
-                                // Consistent height loading indicator
-                                height: 24,
-                                width: 24,
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2),
-                              )
-                            : const Text(
-                                'Send Sign-In Link'), // Needs localization
+                        onPressed:
+                            isLoading // Disable button when loading
+                                ? null
+                                : () {
+                                  context.read<AuthenticationBloc>().add(
+                                    AuthenticationSendSignInLinkRequested(
+                                      email:
+                                          _emailController.text
+                                              .trim(), // Trim whitespace
+                                    ),
+                                  );
+                                },
+                        child:
+                            state is AuthenticationLinkSending
+                                ? const SizedBox(
+                                  // Consistent height loading indicator
+                                  height: 24,
+                                  width: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                                : const Text(
+                                  'Send Sign-In Link',
+                                ), // Needs localization
                       ),
                       const SizedBox(height: 16), // Use AppSpacing later
                       // Add divider for clarity
@@ -136,28 +148,33 @@ class __AuthenticationViewState extends State<_AuthenticationView> {
                       ElevatedButton(
                         // Removed duplicate onPressed here
                         // Style adjustments for Google button might be needed via Theme
-                        onPressed: isLoading // Disable button when loading
-                            ? null
-                            : () {
-                                context.read<AuthenticationBloc>().add(
-                                    const AuthenticationGoogleSignInRequested());
-                              },
+                        onPressed:
+                            isLoading // Disable button when loading
+                                ? null
+                                : () {
+                                  context.read<AuthenticationBloc>().add(
+                                    const AuthenticationGoogleSignInRequested(),
+                                  );
+                                },
                         // Consider adding Google icon
                         child: const Text(
-                            'Sign In with Google'), // Needs localization
+                          'Sign In with Google',
+                        ), // Needs localization
                       ),
                       const SizedBox(height: 16), // Use AppSpacing later
                       OutlinedButton(
                         // Use OutlinedButton for less emphasis
-                        onPressed: isLoading // Disable button when loading
-                            ? null
-                            : () {
-                                context.read<AuthenticationBloc>().add(
-                                      const AuthenticationAnonymousSignInRequested(),
-                                    );
-                              },
+                        onPressed:
+                            isLoading // Disable button when loading
+                                ? null
+                                : () {
+                                  context.read<AuthenticationBloc>().add(
+                                    const AuthenticationAnonymousSignInRequested(),
+                                  );
+                                },
                         child: const Text(
-                            'Continue Anonymously'), // Needs localization
+                          'Continue Anonymously',
+                        ), // Needs localization
                       ),
                     ],
                   ), // Column

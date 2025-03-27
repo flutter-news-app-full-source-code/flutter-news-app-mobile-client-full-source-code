@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:ht_authentication_client/ht_authentication_client.dart'; // Import client for User/Status
 import 'package:ht_authentication_repository/ht_authentication_repository.dart';
 
 part 'app_event.dart';
@@ -10,8 +11,8 @@ part 'app_state.dart';
 
 class AppBloc extends Bloc<AppEvent, AppState> {
   AppBloc({required HtAuthenticationRepository authenticationRepository})
-      : _authenticationRepository = authenticationRepository,
-        super(const AppState()) {
+    : _authenticationRepository = authenticationRepository,
+      super(const AppState()) {
     on<AppNavigationIndexChanged>(_onAppNavigationIndexChanged);
     on<AppThemeChanged>(_onAppThemeChanged);
     on<AppUserChanged>(_onAppUserChanged);
@@ -31,25 +32,20 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     emit(state.copyWith(selectedBottomNavigationIndex: event.index));
   }
 
-  void _onAppThemeChanged(
-    AppThemeChanged event,
-    Emitter<AppState> emit,
-  ) {
+  void _onAppThemeChanged(AppThemeChanged event, Emitter<AppState> emit) {
     emit(
       state.copyWith(
-        themeMode: state.themeMode == ThemeMode.system
-            ? ThemeMode.system
-            : state.themeMode == ThemeMode.dark
+        themeMode:
+            state.themeMode == ThemeMode.system
+                ? ThemeMode.system
+                : state.themeMode == ThemeMode.dark
                 ? ThemeMode.dark
                 : ThemeMode.light,
       ),
     );
   }
 
-  void _onAppUserChanged(
-    AppUserChanged event,
-    Emitter<AppState> emit,
-  ) {
+  void _onAppUserChanged(AppUserChanged event, Emitter<AppState> emit) {
     switch (event.user.authenticationStatus) {
       case AuthenticationStatus.unauthenticated:
         emit(state.copyWith(status: AppStatus.unauthenticated));

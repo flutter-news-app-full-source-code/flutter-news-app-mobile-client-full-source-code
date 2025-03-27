@@ -37,9 +37,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   ) {
     emit(
       state.copyWith(
-        themeMode: state.themeMode == ThemeMode.light
-            ? ThemeMode.dark
-            : ThemeMode.light,
+        themeMode: state.themeMode == ThemeMode.system
+            ? ThemeMode.system
+            : state.themeMode == ThemeMode.dark
+                ? ThemeMode.dark
+                : ThemeMode.light,
       ),
     );
   }

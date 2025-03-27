@@ -1,7 +1,9 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
-
+import 'package:ht_headlines_client/ht_headlines_client.dart'; // Import for Headline and Exceptions
 import 'package:ht_headlines_repository/ht_headlines_repository.dart';
 import 'package:ht_main/headlines-feed/models/headline_filter.dart';
 
@@ -17,8 +19,8 @@ part 'headlines_feed_state.dart';
 class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   /// {@macro headlines_feed_bloc}
   HeadlinesFeedBloc({required HtHeadlinesRepository headlinesRepository})
-      : _headlinesRepository = headlinesRepository,
-        super(HeadlinesFeedLoading()) {
+    : _headlinesRepository = headlinesRepository,
+      super(HeadlinesFeedLoading()) {
     on<HeadlinesFeedFetchRequested>(
       _onHeadlinesFeedFetchRequested,
       transformer: sequential(),
@@ -27,9 +29,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       _onHeadlinesFeedRefreshRequested,
       transformer: restartable(),
     );
-    on<HeadlinesFeedFilterChanged>(
-      _onHeadlinesFeedFilterChanged,
-    );
+    on<HeadlinesFeedFilterChanged>(_onHeadlinesFeedFilterChanged);
   }
 
   final HtHeadlinesRepository _headlinesRepository;
@@ -48,17 +48,18 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         source: event.source, // Pass source directly
         eventCountry: event.eventCountry, // Pass eventCountry directly
       );
-      final newFilter = (state is HeadlinesFeedLoaded)
-          ? (state as HeadlinesFeedLoaded).filter.copyWith(
+      final newFilter =
+          (state is HeadlinesFeedLoaded)
+              ? (state as HeadlinesFeedLoaded).filter.copyWith(
                 category: event.category,
                 source: event.source,
                 eventCountry: event.eventCountry,
               )
-          : HeadlineFilter(
-              category: event.category,
-              source: event.source,
-              eventCountry: event.eventCountry,
-            );
+              : HeadlineFilter(
+                category: event.category,
+                source: event.source,
+                eventCountry: event.eventCountry,
+              );
       emit(
         HeadlinesFeedLoaded(
           headlines: response.items,
@@ -113,24 +114,28 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       try {
         final response = await _headlinesRepository.getHeadlines(
           limit: _headlinesFetchLimit,
-          category: state is HeadlinesFeedLoaded
-              ? (state as HeadlinesFeedLoaded).filter.category
-              : null,
-          source: state is HeadlinesFeedLoaded
-              ? (state as HeadlinesFeedLoaded).filter.source
-              : null,
-          eventCountry: state is HeadlinesFeedLoaded
-              ? (state as HeadlinesFeedLoaded).filter.eventCountry
-              : null,
+          category:
+              state is HeadlinesFeedLoaded
+                  ? (state as HeadlinesFeedLoaded).filter.category
+                  : null,
+          source:
+              state is HeadlinesFeedLoaded
+                  ? (state as HeadlinesFeedLoaded).filter.source
+                  : null,
+          eventCountry:
+              state is HeadlinesFeedLoaded
+                  ? (state as HeadlinesFeedLoaded).filter.eventCountry
+                  : null,
         );
         emit(
           HeadlinesFeedLoaded(
             headlines: response.items,
             hasMore: response.hasMore,
             cursor: response.cursor,
-            filter: state is HeadlinesFeedLoaded
-                ? (state as HeadlinesFeedLoaded).filter
-                : const HeadlineFilter(),
+            filter:
+                state is HeadlinesFeedLoaded
+                    ? (state as HeadlinesFeedLoaded).filter
+                    : const HeadlineFilter(),
           ),
         );
       } on HeadlinesFetchException catch (e) {
@@ -157,24 +162,28 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     try {
       final response = await _headlinesRepository.getHeadlines(
         limit: 20,
-        category: state is HeadlinesFeedLoaded
-            ? (state as HeadlinesFeedLoaded).filter.category
-            : null,
-        source: state is HeadlinesFeedLoaded
-            ? (state as HeadlinesFeedLoaded).filter.source
-            : null,
-        eventCountry: state is HeadlinesFeedLoaded
-            ? (state as HeadlinesFeedLoaded).filter.eventCountry
-            : null,
+        category:
+            state is HeadlinesFeedLoaded
+                ? (state as HeadlinesFeedLoaded).filter.category
+                : null,
+        source:
+            state is HeadlinesFeedLoaded
+                ? (state as HeadlinesFeedLoaded).filter.source
+                : null,
+        eventCountry:
+            state is HeadlinesFeedLoaded
+                ? (state as HeadlinesFeedLoaded).filter.eventCountry
+                : null,
       );
       emit(
         HeadlinesFeedLoaded(
           headlines: response.items,
           hasMore: response.hasMore,
           cursor: response.cursor,
-          filter: state is HeadlinesFeedLoaded
-              ? (state as HeadlinesFeedLoaded).filter
-              : const HeadlineFilter(),
+          filter:
+              state is HeadlinesFeedLoaded
+                  ? (state as HeadlinesFeedLoaded).filter
+                  : const HeadlineFilter(),
         ),
       );
     } on HeadlinesFetchException catch (e) {

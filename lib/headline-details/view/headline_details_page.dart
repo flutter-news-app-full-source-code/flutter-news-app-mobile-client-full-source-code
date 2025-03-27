@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ht_headlines_client/ht_headlines_client.dart'; // Import for Headline
 import 'package:ht_headlines_repository/ht_headlines_repository.dart';
 import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart';
 import 'package:ht_main/shared/widgets/failure_state_widget.dart';
@@ -22,9 +23,10 @@ class HeadlineDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => HeadlineDetailsBloc(
-        headlinesRepository: context.read<HtHeadlinesRepository>(),
-      )..add(HeadlineDetailsRequested(headlineId: headlineId)),
+      create:
+          (context) => HeadlineDetailsBloc(
+            headlinesRepository: context.read<HtHeadlinesRepository>(),
+          )..add(HeadlineDetailsRequested(headlineId: headlineId)),
       child: const _HeadlineDetailsView(),
     );
   }
@@ -56,25 +58,27 @@ class _HeadlineDetailsView extends StatelessWidget {
         builder: (context, state) {
           return switch (state) {
             HeadlineDetailsInitial _ => const InitialStateWidget(
-                icon: Icons.article,
-                headline: 'Waiting for Headline',
-                subheadline: 'Please wait...',
-              ),
+              icon: Icons.article,
+              headline: 'Waiting for Headline',
+              subheadline: 'Please wait...',
+            ),
             HeadlineDetailsLoading _ => const LoadingStateWidget(
-                icon: Icons.downloading,
-                headline: 'Loading Headline',
-                subheadline: 'Fetching data...',
-              ),
+              icon: Icons.downloading,
+              headline: 'Loading Headline',
+              subheadline: 'Fetching data...',
+            ),
             final HeadlineDetailsFailure state => FailureStateWidget(
-                message: state.message,
-                onRetry: () {
-                  context
-                      .read<HeadlineDetailsBloc>()
-                      .add(HeadlineDetailsRequested(headlineId: '1'));
-                },
-              ),
-            final HeadlineDetailsLoaded state =>
-              _buildLoaded(context, state.headline),
+              message: state.message,
+              onRetry: () {
+                context.read<HeadlineDetailsBloc>().add(
+                  HeadlineDetailsRequested(headlineId: '1'),
+                );
+              },
+            ),
+            final HeadlineDetailsLoaded state => _buildLoaded(
+              context,
+              state.headline,
+            ),
             _ => const SizedBox.shrink(),
           };
         },
@@ -103,14 +107,11 @@ class _HeadlineDetailsView extends StatelessWidget {
                     color: Colors.grey[300],
                   );
                 },
-                errorBuilder: (context, error, stackTrace) =>
-                    const Icon(Icons.error),
+                errorBuilder:
+                    (context, error, stackTrace) => const Icon(Icons.error),
               ),
             const SizedBox(height: 16), // Keep this
-            Text(
-              headline.title,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
+            Text(headline.title, style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 8),
             Column(
               children: [
@@ -162,8 +163,9 @@ class _HeadlineDetailsView extends StatelessWidget {
                       const Icon(Icons.date_range),
                       const SizedBox(width: 4),
                       Text(
-                        DateFormat('MMMM dd, yyyy')
-                            .format(headline.publishedAt!),
+                        DateFormat(
+                          'MMMM dd, yyyy',
+                        ).format(headline.publishedAt!),
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ],

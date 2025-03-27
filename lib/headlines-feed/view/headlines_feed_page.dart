@@ -14,9 +14,10 @@ class HeadlinesFeedPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => HeadlinesFeedBloc(
-        headlinesRepository: context.read<HtHeadlinesRepository>(),
-      )..add(const HeadlinesFeedFetchRequested()),
+      create:
+          (context) => HeadlinesFeedBloc(
+            headlinesRepository: context.read<HtHeadlinesRepository>(),
+          )..add(const HeadlinesFeedFetchRequested()),
       child: const _HeadlinesFeedView(),
     );
   }
@@ -50,9 +51,9 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
     final state = context.read<HeadlinesFeedBloc>().state;
     if (_isBottom && state is HeadlinesFeedLoaded) {
       if (state.hasMore) {
-        context
-            .read<HeadlinesFeedBloc>()
-            .add(const HeadlinesFeedFetchRequested());
+        context.read<HeadlinesFeedBloc>().add(
+          const HeadlinesFeedFetchRequested(),
+        );
       }
     }
   }
@@ -96,7 +97,8 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
             builder: (context, state) {
               var isFilterApplied = false;
               if (state is HeadlinesFeedLoaded) {
-                isFilterApplied = state.filter.category != null ||
+                isFilterApplied =
+                    state.filter.category != null ||
                     state.filter.source != null ||
                     state.filter.eventCountry != null;
               }
@@ -109,9 +111,7 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
                       showModalBottomSheet<void>(
                         context: context,
                         builder: (BuildContext context) {
-                          return _HeadlinesFilterBottomSheet(
-                            bloc: bloc,
-                          );
+                          return _HeadlinesFilterBottomSheet(bloc: bloc);
                         },
                       );
                     },
@@ -136,8 +136,8 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
         ],
       ),
       body: BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
-        buildWhen: (previous, current) =>
-            current is! HeadlinesFeedLoadingSilently,
+        buildWhen:
+            (previous, current) => current is! HeadlinesFeedLoadingSilently,
         builder: (context, state) {
           switch (state) {
             case HeadlinesFeedLoading():
@@ -155,19 +155,18 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
               return RefreshIndicator(
                 onRefresh: () async {
                   context.read<HeadlinesFeedBloc>().add(
-                        HeadlinesFeedRefreshRequested(),
-                      );
+                    HeadlinesFeedRefreshRequested(),
+                  );
                 },
                 child: ListView.builder(
                   controller: _scrollController,
-                  itemCount: state.hasMore
-                      ? state.headlines.length + 1
-                      : state.headlines.length,
+                  itemCount:
+                      state.hasMore
+                          ? state.headlines.length + 1
+                          : state.headlines.length,
                   itemBuilder: (context, index) {
                     if (index >= state.headlines.length) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
+                      return const Center(child: CircularProgressIndicator());
                     }
                     final headline = state.headlines[index];
                     return HeadlineItemWidget(headline: headline);
@@ -178,9 +177,9 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
               return FailureStateWidget(
                 message: state.message,
                 onRetry: () {
-                  context
-                      .read<HeadlinesFeedBloc>()
-                      .add(HeadlinesFeedRefreshRequested());
+                  context.read<HeadlinesFeedBloc>().add(
+                    HeadlinesFeedRefreshRequested(),
+                  );
                 },
               );
           }
@@ -191,9 +190,7 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
 }
 
 class _HeadlinesFilterBottomSheet extends StatefulWidget {
-  const _HeadlinesFilterBottomSheet({
-    required this.bloc,
-  });
+  const _HeadlinesFilterBottomSheet({required this.bloc});
 
   final HeadlinesFeedBloc bloc;
 
@@ -240,9 +237,7 @@ class _HeadlinesFilterBottomSheetState
                 value: selectedCategory,
                 items: const [
                   // Placeholder items
-                  DropdownMenuItem<String>(
-                    child: Text('All'),
-                  ),
+                  DropdownMenuItem<String>(child: Text('All')),
                   DropdownMenuItem(
                     value: 'technology',
                     child: Text('Technology'),
@@ -263,9 +258,7 @@ class _HeadlinesFilterBottomSheetState
                 value: selectedSource,
                 items: const [
                   // Placeholder items
-                  DropdownMenuItem<String>(
-                    child: Text('All'),
-                  ),
+                  DropdownMenuItem<String>(child: Text('All')),
                   DropdownMenuItem(value: 'cnn', child: Text('CNN')),
                   DropdownMenuItem(value: 'reuters', child: Text('Reuters')),
                 ],
@@ -282,9 +275,7 @@ class _HeadlinesFilterBottomSheetState
                 value: selectedEventCountry,
                 items: const [
                   // Placeholder items
-                  DropdownMenuItem<String>(
-                    child: Text('All'),
-                  ),
+                  DropdownMenuItem<String>(child: Text('All')),
                   DropdownMenuItem(value: 'US', child: Text('United States')),
                   DropdownMenuItem(value: 'UK', child: Text('United Kingdom')),
                   DropdownMenuItem(value: 'CA', child: Text('Canada')),
@@ -320,9 +311,7 @@ class _HeadlinesFilterBottomSheetState
                     selectedSource = null;
                     selectedEventCountry = null;
                   });
-                  widget.bloc.add(
-                    const HeadlinesFeedFilterChanged(),
-                  );
+                  widget.bloc.add(const HeadlinesFeedFilterChanged());
                   Navigator.pop(context);
                 },
                 child: const Text('Reset Filters'),

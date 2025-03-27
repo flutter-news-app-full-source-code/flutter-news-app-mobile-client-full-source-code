@@ -5,11 +5,7 @@ import 'package:equatable/equatable.dart';
 /// {@endtemplate}
 class HeadlineFilter extends Equatable {
   /// {@macro headline_filter}
-  const HeadlineFilter({
-    this.category,
-    this.source,
-    this.eventCountry,
-  });
+  const HeadlineFilter({this.category, this.source, this.eventCountry});
 
   /// The selected category filter.
   final String? category;

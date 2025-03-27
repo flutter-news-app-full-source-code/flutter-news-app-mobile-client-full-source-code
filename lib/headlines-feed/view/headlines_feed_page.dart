@@ -72,12 +72,13 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
         leading: Row(
           children: [
             IconButton(
-              icon: const Icon(Icons.settings),
+              icon: const Icon(Icons.account_circle_outlined),
+              selectedIcon: const Icon(Icons.account_circle_rounded),
               onPressed: () {},
             ),
             IconButton(
-              icon: const Icon(Icons.bookmark_border_outlined),
-              selectedIcon: const Icon(Icons.bookmark_border),
+              icon: const Icon(Icons.notifications_none),
+              selectedIcon: const Icon(Icons.notifications_rounded),
               onPressed: () {},
             ),
           ],

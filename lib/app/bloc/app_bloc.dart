@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:ht_authentication_firebase/ht_authentication_firebase.dart';
 import 'package:ht_authentication_repository/ht_authentication_repository.dart';
 
 part 'app_event.dart';
@@ -30,7 +29,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     Emitter<AppState> emit,
   ) {
     emit(state.copyWith(selectedBottomNavigationIndex: event.index));
-    // event.context.goNamed(Routes.getRouteNameByIndex(event.index)); // Removed direct navigation
   }
 
   void _onAppThemeChanged(

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_authentication_firebase/ht_authentication_firebase.dart';
 import 'package:ht_authentication_repository/ht_authentication_repository.dart';
 
 part 'authentication_event.dart';
@@ -18,9 +17,14 @@ class AuthenticationBloc
     required HtAuthenticationRepository authenticationRepository,
   })  : _authenticationRepository = authenticationRepository,
         super(AuthenticationInitial()) {
-    on<AuthenticationEmailSignInRequested>(
-      _onAuthenticationEmailSignInRequested,
+    // Register new event handlers
+    on<AuthenticationSendSignInLinkRequested>(
+      _onAuthenticationSendSignInLinkRequested,
     );
+    on<AuthenticationSignInWithLinkAttempted>(
+      _onAuthenticationSignInWithLinkAttempted,
+    );
+    // Keep existing handlers
     on<AuthenticationGoogleSignInRequested>(
       _onAuthenticationGoogleSignInRequested,
     );
@@ -35,22 +39,62 @@ class AuthenticationBloc
 
   final HtAuthenticationRepository _authenticationRepository;
 
-  /// Handles [AuthenticationEmailSignInRequested] events.
-  Future<void> _onAuthenticationEmailSignInRequested(
-    AuthenticationEmailSignInRequested event,
+  /// Handles [AuthenticationSendSignInLinkRequested] events.
+  Future<void> _onAuthenticationSendSignInLinkRequested(
+    AuthenticationSendSignInLinkRequested event,
     Emitter<AuthenticationState> emit,
   ) async {
-    emit(AuthenticationLoading());
+    // Validate email format (basic check)
+    if (event.email.isEmpty || !event.email.contains('@')) {
+      emit(const AuthenticationFailure('Please enter a valid email address.'));
+      return;
+    }
+    emit(AuthenticationLinkSending()); // Indicate link sending
     try {
-      await _authenticationRepository.signInWithEmailAndPassword(
-        email: event.email,
-        password: event.password,
-      );
-      emit(AuthenticationInitial());
-    } on EmailSignInException catch (e) {
-      emit(AuthenticationFailure(e.toString()));
+      await _authenticationRepository.sendSignInLinkToEmail(email: event.email);
+      emit(AuthenticationLinkSentSuccess()); // Confirm link sent
+    } on SendSignInLinkException catch (e) {
+      emit(AuthenticationFailure('Failed to send link: ${e.error}'));
     } catch (e) {
-      emit(AuthenticationFailure(e.toString()));
+      // Catch any other unexpected errors
+      emit(
+        AuthenticationFailure(
+          'An unexpected error occurred: $e',
+        ),
+      );
+      // Optionally log the stackTrace here
+    }
+  }
+
+  /// Handles [AuthenticationSignInWithLinkAttempted] events.
+  /// This assumes the event is dispatched after the app receives the deep link.
+  Future<void> _onAuthenticationSignInWithLinkAttempted(
+    AuthenticationSignInWithLinkAttempted event,
+    Emitter<AuthenticationState> emit,
+  ) async {
+    emit(AuthenticationLoading()); // General loading for sign-in attempt
+    try {
+      await _authenticationRepository.signInWithEmailLink(
+        email: event.email,
+        emailLink: event.emailLink,
+      );
+      // On success, AppBloc should react to the user stream change from the repo.
+      // Resetting to Initial state here.
+      emit(AuthenticationInitial());
+    } on InvalidSignInLinkException catch (e) {
+      emit(
+        AuthenticationFailure(
+          'Sign in failed: Invalid or expired link. ${e.error}',
+        ),
+      );
+    } catch (e) {
+      // Catch any other unexpected errors
+      emit(
+        AuthenticationFailure(
+          'An unexpected error occurred during sign in: $e',
+        ),
+      );
+      // Optionally log the stackTrace here
     }
   }
 

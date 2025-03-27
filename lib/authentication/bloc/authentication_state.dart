@@ -40,6 +40,16 @@ final class AuthenticationAuthenticated extends AuthenticationState {
 /// {@endtemplate}
 final class AuthenticationUnauthenticated extends AuthenticationState {}
 
+/// {@template authentication_link_sending}
+/// State indicating that the sign-in link is being sent.
+/// {@endtemplate}
+final class AuthenticationLinkSending extends AuthenticationState {}
+
+/// {@template authentication_link_sent_success}
+/// State indicating that the sign-in link was sent successfully.
+/// {@endtemplate}
+final class AuthenticationLinkSentSuccess extends AuthenticationState {}
+
 /// {@template authentication_failure}
 /// Represents an authentication failure.
 /// {@endtemplate}

@@ -6,6 +6,7 @@ import 'package:ht_authentication_firebase/ht_authentication_firebase.dart';
 import 'package:ht_authentication_repository/ht_authentication_repository.dart';
 import 'package:ht_headlines_firestore/ht_headlines_firestore.dart';
 import 'package:ht_headlines_repository/ht_headlines_repository.dart';
+import 'package:ht_kv_storage_shared_preferences/ht_kv_storage_shared_preferences.dart';
 import 'package:ht_main/app/app.dart';
 import 'package:ht_main/bloc_observer.dart';
 import 'package:ht_main/firebase_options.dart';
@@ -14,6 +15,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   Bloc.observer = const AppBlocObserver();
+
+  final kvStorage = await HtKvStorageSharedPreferences.getInstance();
 
   // --- Instantiate Repositories ---
   // 1. Authentication Repository
@@ -34,6 +37,7 @@ void main() async {
   );
   final authenticationRepository = HtAuthenticationRepository(
     authenticationClient: authenticationClient,
+    storageService: kvStorage, // Pass the storage service
   );
 
   // 2. Headlines Repository
@@ -46,6 +50,7 @@ void main() async {
     App(
       htAuthenticationRepository: authenticationRepository,
       htHeadlinesRepository: headlinesRepository,
+      kvStorageService: kvStorage, // Pass storage service to App
     ),
   );
 }

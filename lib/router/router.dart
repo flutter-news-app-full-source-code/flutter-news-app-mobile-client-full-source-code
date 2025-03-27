@@ -160,9 +160,7 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
         path: '/test-route',
         name: 'testRoute',
         builder: (BuildContext context, GoRouterState state) {
-          return const Placeholder(
-            child: Center(child: Text('Test Route')),
-          );
+          return const Placeholder(child: Center(child: Text('Test Route')));
         },
       ),
     ],

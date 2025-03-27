@@ -47,6 +47,11 @@ class HeadlinesSearchSuccess extends HeadlinesSearchState {
   }
 
   @override
-  List<Object?> get props =>
-      [headlines, hasMore, cursor, errorMessage, lastSearchTerm];
+  List<Object?> get props => [
+    headlines,
+    hasMore,
+    cursor,
+    errorMessage,
+    lastSearchTerm,
+  ];
 }

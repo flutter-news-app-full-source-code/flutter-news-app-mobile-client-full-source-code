@@ -14,9 +14,10 @@ class HeadlinesSearchPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => HeadlinesSearchBloc(
-        headlinesRepository: context.read<HtHeadlinesRepository>(),
-      ),
+      create:
+          (_) => HeadlinesSearchBloc(
+            headlinesRepository: context.read<HtHeadlinesRepository>(),
+          ),
       child: const HeadlinesSearchView(),
     );
   }

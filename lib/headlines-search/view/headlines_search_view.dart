@@ -35,9 +35,9 @@ class _HeadlinesSearchViewState extends State<HeadlinesSearchView> {
     if (_isBottom && state is HeadlinesSearchSuccess) {
       final searchTerm = state.lastSearchTerm;
       if (state.hasMore) {
-        context
-            .read<HeadlinesSearchBloc>()
-            .add(HeadlinesSearchFetchRequested(searchTerm: searchTerm!));
+        context.read<HeadlinesSearchBloc>().add(
+          HeadlinesSearchFetchRequested(searchTerm: searchTerm!),
+        );
       }
     }
   }
@@ -54,9 +54,7 @@ class _HeadlinesSearchViewState extends State<HeadlinesSearchView> {
     return Scaffold(
       appBar: AppBar(
         title: TextField(
-          decoration: const InputDecoration(
-            hintText: 'Search Headlines...',
-          ),
+          decoration: const InputDecoration(hintText: 'Search Headlines...'),
           onChanged: (value) {
             searchTerm = value;
           },
@@ -66,8 +64,8 @@ class _HeadlinesSearchViewState extends State<HeadlinesSearchView> {
             icon: const Icon(Icons.search),
             onPressed: () {
               context.read<HeadlinesSearchBloc>().add(
-                    HeadlinesSearchFetchRequested(searchTerm: searchTerm ?? ''),
-                  );
+                HeadlinesSearchFetchRequested(searchTerm: searchTerm ?? ''),
+              );
             },
           ),
         ],
@@ -76,47 +74,43 @@ class _HeadlinesSearchViewState extends State<HeadlinesSearchView> {
         builder: (context, state) {
           return switch (state) {
             HeadlinesSearchLoading() => const InitialStateWidget(
-                icon: Icons.search,
-                headline: 'Search Headlines',
-                subheadline: 'Enter keywords to find articles',
-              ),
+              icon: Icons.search,
+              headline: 'Search Headlines',
+              subheadline: 'Enter keywords to find articles',
+            ),
             HeadlinesSearchSuccess(
               :final headlines,
               :final hasMore,
-              :final errorMessage
+              :final errorMessage,
             ) =>
               errorMessage != null
                   ? FailureStateWidget(
-                      message: errorMessage,
-                      onRetry: () {
-                        context.read<HeadlinesSearchBloc>().add(
-                              HeadlinesSearchFetchRequested(
-                                searchTerm: searchTerm ?? '',
-                              ),
-                            );
-                      },
-                    )
-                  : headlines.isEmpty
-                      ? const InitialStateWidget(
-                          icon: Icons.search_off,
-                          headline: 'No results',
-                          subheadline: 'Try a different search term',
-                        )
-                      : ListView.builder(
-                          controller: _scrollController,
-                          itemCount:
-                              hasMore ? headlines.length + 1 : headlines.length,
-                          itemBuilder: (context, index) {
-                            if (index >= headlines.length) {
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            }
-                            return HeadlineItemWidget(
-                              headline: headlines[index],
-                            );
-                          },
+                    message: errorMessage,
+                    onRetry: () {
+                      context.read<HeadlinesSearchBloc>().add(
+                        HeadlinesSearchFetchRequested(
+                          searchTerm: searchTerm ?? '',
                         ),
+                      );
+                    },
+                  )
+                  : headlines.isEmpty
+                  ? const InitialStateWidget(
+                    icon: Icons.search_off,
+                    headline: 'No results',
+                    subheadline: 'Try a different search term',
+                  )
+                  : ListView.builder(
+                    controller: _scrollController,
+                    itemCount:
+                        hasMore ? headlines.length + 1 : headlines.length,
+                    itemBuilder: (context, index) {
+                      if (index >= headlines.length) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      return HeadlineItemWidget(headline: headlines[index]);
+                    },
+                  ),
             _ => const SizedBox.shrink(),
           };
         },

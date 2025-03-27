@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:ht_headlines_client/ht_headlines_client.dart';
 import 'package:ht_headlines_repository/ht_headlines_repository.dart';
 
 part 'headlines_search_event.dart';
@@ -8,8 +9,8 @@ part 'headlines_search_state.dart';
 class HeadlinesSearchBloc
     extends Bloc<HeadlinesSearchEvent, HeadlinesSearchState> {
   HeadlinesSearchBloc({required HtHeadlinesRepository headlinesRepository})
-      : _headlinesRepository = headlinesRepository,
-        super(HeadlinesSearchLoading()) {
+    : _headlinesRepository = headlinesRepository,
+      super(HeadlinesSearchLoading()) {
     on<HeadlinesSearchFetchRequested>(_onSearchFetchRequested);
   }
 
@@ -46,11 +47,11 @@ class HeadlinesSearchBloc
           response.items.isEmpty
               ? currentState.copyWith(hasMore: false)
               : currentState.copyWith(
-                  headlines: List.of(currentState.headlines)
-                    ..addAll(response.items),
-                  hasMore: response.hasMore,
-                  cursor: response.cursor,
-                ),
+                headlines: List.of(currentState.headlines)
+                  ..addAll(response.items),
+                hasMore: response.hasMore,
+                cursor: response.cursor,
+              ),
         );
       } catch (e) {
         emit(currentState.copyWith(errorMessage: e.toString()));

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ht_headlines_repository/ht_headlines_repository.dart'
-    show Headline;
+import 'package:ht_headlines_client/ht_headlines_client.dart' show Headline;
 import 'package:ht_main/router/routes.dart';
 
 /// A widget that displays a single headline.
@@ -57,8 +56,8 @@ class HeadlineItemWidget extends StatelessWidget {
             width: 75,
             height: 75,
             fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) =>
-                const Icon(Icons.error),
+            errorBuilder:
+                (context, error, stackTrace) => const Icon(Icons.error),
           ),
         ),
       ),

@@ -1,8 +1,7 @@
 //
 // ignore_for_file: deprecated_member_use
 
-import 'dart:async'; // For StreamSubscription
-
+import 'dart:async';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart'; // For dynamic links
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
@@ -21,15 +20,15 @@ class App extends StatelessWidget {
   const App({
     required HtHeadlinesRepository htHeadlinesRepository,
     required HtAuthenticationRepository htAuthenticationRepository,
-    required HtKVStorageService kvStorageService, // Add storage service
+    required HtKVStorageService kvStorageService,
     super.key,
   }) : _htHeadlinesRepository = htHeadlinesRepository,
        _htAuthenticationRepository = htAuthenticationRepository,
-       _kvStorageService = kvStorageService; // Assign storage service
+       _kvStorageService = kvStorageService;
 
   final HtHeadlinesRepository _htHeadlinesRepository;
   final HtAuthenticationRepository _htAuthenticationRepository;
-  final HtKVStorageService _kvStorageService; // Add storage service field
+  final HtKVStorageService _kvStorageService;
 
   @override
   Widget build(BuildContext context) {
@@ -37,9 +36,7 @@ class App extends StatelessWidget {
       providers: [
         RepositoryProvider.value(value: _htHeadlinesRepository),
         RepositoryProvider.value(value: _htAuthenticationRepository),
-        RepositoryProvider.value(
-          value: _kvStorageService,
-        ), // Provide storage service
+        RepositoryProvider.value(value: _kvStorageService),
       ],
       // Use MultiBlocProvider to provide both AppBloc and AuthenticationBloc
       child: MultiBlocProvider(
@@ -56,7 +53,6 @@ class App extends StatelessWidget {
                 (context) => AuthenticationBloc(
                   authenticationRepository:
                       context.read<HtAuthenticationRepository>(),
-                  // No storage service needed here anymore
                 ),
           ),
         ],
@@ -98,7 +94,7 @@ class _AppViewState extends State<_AppView> {
 
   @override
   void dispose() {
-    _linkSubscription?.cancel(); // Cancel listener
+    _linkSubscription?.cancel();
     _statusNotifier.dispose();
     super.dispose();
   }
@@ -111,7 +107,7 @@ class _AppViewState extends State<_AppView> {
         // Handle link data
         _handleDynamicLink(pendingDynamicLinkData.link);
       },
-      onError: (error) {
+      onError: (Object error) {
         // Handle errors (e.g., log them)
         debugPrint('Dynamic Link Listener Error: $error');
       },
@@ -121,7 +117,6 @@ class _AppViewState extends State<_AppView> {
     try {
       final initialLink = await FirebaseDynamicLinks.instance.getInitialLink();
       if (initialLink != null) {
-        // Add await here
         await _handleDynamicLink(initialLink.link);
       }
     } catch (e) {

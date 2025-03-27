@@ -37,7 +37,7 @@ void main() async {
   );
   final authenticationRepository = HtAuthenticationRepository(
     authenticationClient: authenticationClient,
-    storageService: kvStorage, // Pass the storage service
+    storageService: kvStorage,
   );
 
   // 2. Headlines Repository
@@ -50,7 +50,7 @@ void main() async {
     App(
       htAuthenticationRepository: authenticationRepository,
       htHeadlinesRepository: headlinesRepository,
-      kvStorageService: kvStorage, // Pass storage service to App
+      kvStorageService: kvStorage,
     ),
   );
 }

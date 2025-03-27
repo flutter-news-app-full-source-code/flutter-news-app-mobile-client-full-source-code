@@ -76,5 +76,4 @@ final class AuthenticationSignOutRequested extends AuthenticationEvent {
 final class AuthenticationDeleteAccountRequested extends AuthenticationEvent {
   /// {@macro authentication_delete_account_requested}
   const AuthenticationDeleteAccountRequested();
-  const AuthenticationDeleteAccountRequested();
 }

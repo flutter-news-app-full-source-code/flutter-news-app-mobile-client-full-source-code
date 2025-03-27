@@ -1,11 +1,12 @@
+//
+// ignore_for_file: lines_longer_than_80_chars
+
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_authentication_client/ht_authentication_client.dart'; // Import client for Exceptions/User
+import 'package:ht_authentication_client/ht_authentication_client.dart';
 import 'package:ht_authentication_repository/ht_authentication_repository.dart';
-// No longer need storage service import
-// import 'package:ht_kv_storage_service/ht_kv_storage_service.dart';
 
 part 'authentication_event.dart';
 part 'authentication_state.dart';
@@ -21,14 +22,12 @@ class AuthenticationBloc
     // Remove kvStorageService from constructor
   }) : _authenticationRepository = authenticationRepository,
        super(AuthenticationInitial()) {
-    // Register new event handlers
     on<AuthenticationSendSignInLinkRequested>(
       _onAuthenticationSendSignInLinkRequested,
     );
     on<AuthenticationSignInWithLinkAttempted>(
       _onAuthenticationSignInWithLinkAttempted,
     );
-    // Keep existing handlers
     on<AuthenticationGoogleSignInRequested>(
       _onAuthenticationGoogleSignInRequested,
     );
@@ -42,7 +41,6 @@ class AuthenticationBloc
   }
 
   final HtAuthenticationRepository _authenticationRepository;
-  // Remove _kvStorageService field
 
   /// Handles [AuthenticationSendSignInLinkRequested] events.
   Future<void> _onAuthenticationSendSignInLinkRequested(
@@ -56,7 +54,8 @@ class AuthenticationBloc
     }
     emit(AuthenticationLinkSending()); // Indicate link sending
     try {
-      // Simply call the repository method, storage is handled internally
+      // Simply call the repository method, email temprary storage storage
+      // is handled internally
       await _authenticationRepository.sendSignInLinkToEmail(email: event.email);
       emit(AuthenticationLinkSentSuccess()); // Confirm link sent
     } on SendSignInLinkException catch (e) {

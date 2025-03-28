@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_headlines_client/ht_headlines_client.dart'; // Import for Headline
 import 'package:ht_headlines_repository/ht_headlines_repository.dart';
 import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart';
+import 'package:ht_main/l10n/l10n.dart'; // Added import
 import 'package:ht_main/shared/widgets/failure_state_widget.dart';
 import 'package:ht_main/shared/widgets/initial_state_widget.dart';
 import 'package:ht_main/shared/widgets/loading_state_widget.dart';
@@ -37,6 +38,7 @@ class _HeadlineDetailsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -57,15 +59,15 @@ class _HeadlineDetailsView extends StatelessWidget {
       body: BlocBuilder<HeadlineDetailsBloc, HeadlineDetailsState>(
         builder: (context, state) {
           return switch (state) {
-            HeadlineDetailsInitial _ => const InitialStateWidget(
+            HeadlineDetailsInitial _ => InitialStateWidget(
               icon: Icons.article,
-              headline: 'Waiting for Headline',
-              subheadline: 'Please wait...',
+              headline: l10n.headlineDetailsInitialHeadline,
+              subheadline: l10n.headlineDetailsInitialSubheadline,
             ),
-            HeadlineDetailsLoading _ => const LoadingStateWidget(
+            HeadlineDetailsLoading _ => LoadingStateWidget(
               icon: Icons.downloading,
-              headline: 'Loading Headline',
-              subheadline: 'Fetching data...',
+              headline: l10n.headlineDetailsLoadingHeadline,
+              subheadline: l10n.headlineDetailsLoadingSubheadline,
             ),
             final HeadlineDetailsFailure state => FailureStateWidget(
               message: state.message,
@@ -87,6 +89,7 @@ class _HeadlineDetailsView extends StatelessWidget {
   }
 
   Widget _buildLoaded(BuildContext context, Headline headline) {
+    final l10n = context.l10n;
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -110,7 +113,7 @@ class _HeadlineDetailsView extends StatelessWidget {
                 errorBuilder:
                     (context, error, stackTrace) => const Icon(Icons.error),
               ),
-            const SizedBox(height: 16), // Keep this
+            const SizedBox(height: 16),
             Text(headline.title, style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 8),
             Column(
@@ -126,9 +129,7 @@ class _HeadlineDetailsView extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(
-                    height: 8,
-                  ), // Add spacing between metadata items
+                  const SizedBox(height: 8),
                 ],
                 if (headline.categories != null &&
                     headline.categories!.isNotEmpty) ...[
@@ -190,7 +191,7 @@ class _HeadlineDetailsView extends StatelessWidget {
                 // Removed custom padding
               ),
               child: Text(
-                'Continue Reading',
+                l10n.headlineDetailsContinueReadingButton,
                 style: Theme.of(context).textTheme.labelLarge,
               ),
             ),

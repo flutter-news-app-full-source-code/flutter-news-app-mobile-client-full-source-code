@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_authentication_repository/ht_authentication_repository.dart';
 import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
+import 'package:ht_main/l10n/l10n.dart'; // Added import
 
 class AuthenticationPage extends StatelessWidget {
   const AuthenticationPage({super.key});
@@ -58,8 +59,8 @@ class __AuthenticationViewState extends State<_AuthenticationView> {
               ScaffoldMessenger.of(context)
                 ..hideCurrentSnackBar()
                 ..showSnackBar(
-                  const SnackBar(
-                    content: Text('Check your email for the sign-in link.'),
+                  SnackBar(
+                    content: Text(context.l10n.authenticationEmailSentSuccess),
                   ),
                 );
               // Optionally clear email field or navigate
@@ -70,6 +71,7 @@ class __AuthenticationViewState extends State<_AuthenticationView> {
             final isLoading =
                 state is AuthenticationLoading ||
                 state is AuthenticationLinkSending;
+            final l10n = context.l10n; // Added l10n variable
 
             return Padding(
               padding: const EdgeInsets.all(16), // Use AppSpacing later
@@ -82,7 +84,7 @@ class __AuthenticationViewState extends State<_AuthenticationView> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
-                        'Sign In / Register', // Updated title
+                        l10n.authenticationPageTitle,
                         style:
                             Theme.of(
                               context,
@@ -92,9 +94,9 @@ class __AuthenticationViewState extends State<_AuthenticationView> {
                       const SizedBox(height: 32), // Use AppSpacing later
                       TextFormField(
                         controller: _emailController,
-                        decoration: const InputDecoration(
-                          labelText: 'Email', // Needs localization
-                          border: OutlineInputBorder(),
+                        decoration: InputDecoration(
+                          labelText: l10n.authenticationEmailLabel,
+                          border: const OutlineInputBorder(),
                         ),
                         keyboardType: TextInputType.emailAddress,
                         autocorrect: false,
@@ -128,20 +130,21 @@ class __AuthenticationViewState extends State<_AuthenticationView> {
                                     strokeWidth: 2,
                                   ),
                                 )
-                                : const Text(
-                                  'Send Sign-In Link',
-                                ), // Needs localization
+                                : Text(l10n.authenticationSendLinkButton),
                       ),
                       const SizedBox(height: 16), // Use AppSpacing later
                       // Add divider for clarity
-                      const Row(
+                      Row(
+                        // Removed const
                         children: [
-                          Expanded(child: Divider()),
+                          const Expanded(
+                            child: Divider(),
+                          ), // Added const back here
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 8),
-                            child: Text('OR'), // Needs localization
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Text(l10n.authenticationOrDivider),
                           ),
-                          Expanded(child: Divider()),
+                          const Expanded(child: Divider()),
                         ],
                       ),
                       const SizedBox(height: 16), // Use AppSpacing later
@@ -157,9 +160,7 @@ class __AuthenticationViewState extends State<_AuthenticationView> {
                                   );
                                 },
                         // Consider adding Google icon
-                        child: const Text(
-                          'Sign In with Google',
-                        ), // Needs localization
+                        child: Text(l10n.authenticationGoogleSignInButton),
                       ),
                       const SizedBox(height: 16), // Use AppSpacing later
                       OutlinedButton(
@@ -172,9 +173,7 @@ class __AuthenticationViewState extends State<_AuthenticationView> {
                                     const AuthenticationAnonymousSignInRequested(),
                                   );
                                 },
-                        child: const Text(
-                          'Continue Anonymously',
-                        ), // Needs localization
+                        child: Text(l10n.authenticationAnonymousSignInButton),
                       ),
                     ],
                   ), // Column

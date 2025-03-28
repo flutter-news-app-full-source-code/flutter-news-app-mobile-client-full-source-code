@@ -7,6 +7,7 @@ import 'package:ht_authentication_repository/ht_authentication_repository.dart';
 import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/app/bloc/app_bloc.dart'; // Needed for AppBloc and AppState access
 // Remove direct import of app_state.dart when using part of
+import 'package:ht_main/l10n/l10n.dart'; // Added import
 import 'package:ht_main/router/routes.dart'; // Needed for route names
 
 /// {@template account_page}
@@ -43,6 +44,7 @@ class _AccountView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     // Watch AppBloc for user details and authentication status
     final user = context.watch<AppBloc>().state.user;
     final status = user.authenticationStatus; // Use status from User model
@@ -51,7 +53,7 @@ class _AccountView extends StatelessWidget {
     final isAnonymous = status == AuthenticationStatus.anonymous;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Account')),
+      appBar: AppBar(title: Text(l10n.accountPageTitle)),
       body: ListView(
         // Use ListView for potential scrolling if content grows
         padding: const EdgeInsets.all(16),
@@ -75,6 +77,7 @@ class _AccountView extends StatelessWidget {
 
   /// Builds the header section displaying user avatar, name, and status.
   Widget _buildUserHeader(BuildContext context, User user, bool isAnonymous) {
+    final l10n = context.l10n;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
 
@@ -100,14 +103,19 @@ class _AccountView extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Text(
-          isAnonymous ? '(Anonymous)' : user.displayName ?? 'No Name',
+          isAnonymous
+              ? l10n.accountAnonymousUser
+              : user.displayName ?? l10n.accountNoNameUser,
           style: textTheme.titleLarge,
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 4),
         Text(
           // Convert enum to user-friendly string
-          _authenticationStatusToString(user.authenticationStatus),
+          _authenticationStatusToString(
+            context,
+            user.authenticationStatus,
+          ), // Pass context
           style: textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.secondary,
           ),
@@ -119,9 +127,10 @@ class _AccountView extends StatelessWidget {
 
   /// Builds the ListTile for navigating to Settings.
   Widget _buildSettingsTile(BuildContext context) {
+    final l10n = context.l10n;
     return ListTile(
       leading: const Icon(Icons.settings_outlined),
-      title: const Text('Settings'),
+      title: Text(l10n.accountSettingsTile),
       trailing: const Icon(Icons.chevron_right),
       onTap: () {
         // Navigate to the existing settings route
@@ -132,10 +141,11 @@ class _AccountView extends StatelessWidget {
 
   /// Builds the ListTile for logging out (for authenticated users).
   Widget _buildLogoutTile(BuildContext context) {
+    final l10n = context.l10n;
     return ListTile(
       leading: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
       title: Text(
-        'Sign Out',
+        l10n.accountSignOutTile,
         style: TextStyle(color: Theme.of(context).colorScheme.error),
       ),
       onTap: () {
@@ -148,11 +158,12 @@ class _AccountView extends StatelessWidget {
 
   /// Builds the ListTile for navigating to Backup/Account Linking (for anonymous users).
   Widget _buildBackupTile(BuildContext context) {
+    final l10n = context.l10n;
     return ListTile(
       leading: const Icon(
         Icons.cloud_upload_outlined,
       ), // Or Icons.link, Icons.save
-      title: const Text('Create Account to Save Data'),
+      title: Text(l10n.accountBackupTile),
       trailing: const Icon(Icons.chevron_right),
       onTap: () {
         // Navigate to the account linking page
@@ -162,14 +173,18 @@ class _AccountView extends StatelessWidget {
   }
 
   /// Helper to convert AuthenticationStatus enum to a display string.
-  String _authenticationStatusToString(AuthenticationStatus status) {
+  String _authenticationStatusToString(
+    BuildContext context,
+    AuthenticationStatus status,
+  ) {
+    final l10n = context.l10n;
     switch (status) {
       case AuthenticationStatus.authenticated:
-        return 'Authenticated';
+        return l10n.accountStatusAuthenticated;
       case AuthenticationStatus.anonymous:
-        return 'Anonymous Session';
+        return l10n.accountStatusAnonymous;
       case AuthenticationStatus.unauthenticated:
-        return 'Not Signed In';
+        return l10n.accountStatusUnauthenticated;
     }
   }
 }

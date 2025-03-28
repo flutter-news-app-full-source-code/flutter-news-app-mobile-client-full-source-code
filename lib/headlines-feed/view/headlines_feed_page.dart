@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ht_headlines_repository/ht_headlines_repository.dart'; // Keep one
-import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart'; // Keep one
-// Removed duplicate imports
+import 'package:ht_headlines_repository/ht_headlines_repository.dart';
+import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:ht_main/headlines-feed/widgets/headline_item_widget.dart';
+import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/constants/constants.dart';
 import 'package:ht_main/shared/widgets/failure_state_widget.dart';
@@ -69,12 +69,12 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
-        // Adjust leading width if needed, or let it size naturally
         leadingWidth: 100,
         leading: Row(
           mainAxisSize: MainAxisSize.min, // Keep icons close together
@@ -98,13 +98,10 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
         ),
         title: Text(
           'HT', // Consider localizing this if needed
-          style: textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold, // Example: Make title bolder
-          ),
+          style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         actions: [
-          // Add consistent spacing before actions
           const SizedBox(width: AppSpacing.sm),
           IconButton(
             icon: const Icon(Icons.search),
@@ -137,12 +134,11 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
                   ),
                   if (isFilterApplied)
                     Positioned(
-                      // Removed duplicate top: 8
-                      top: AppSpacing.sm, // Use constant
-                      right: AppSpacing.sm, // Use constant
+                      top: AppSpacing.sm,
+                      right: AppSpacing.sm,
                       child: Container(
-                        width: AppSpacing.sm, // Use constant
-                        height: AppSpacing.sm, // Use constant
+                        width: AppSpacing.sm,
+                        height: AppSpacing.sm,
                         decoration: BoxDecoration(
                           color: colorScheme.primary, // Use variable
                           shape: BoxShape.circle,
@@ -161,10 +157,10 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
         builder: (context, state) {
           switch (state) {
             case HeadlinesFeedLoading():
-              return const LoadingStateWidget(
+              return LoadingStateWidget(
                 icon: Icons.hourglass_empty,
-                headline: 'Loading...',
-                subheadline: 'Fetching headlines',
+                headline: l10n.headlinesFeedLoadingHeadline,
+                subheadline: l10n.headlinesFeedLoadingSubheadline,
               );
             // this silentcase will never be reached
             // it here just to fullfill the Exhaustiveness
@@ -191,9 +187,7 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
                           ? state.headlines.length + 1
                           : state.headlines.length,
                   separatorBuilder:
-                      (context, index) => const SizedBox(
-                        height: AppSpacing.lg,
-                      ), // Consistent spacing
+                      (context, index) => const SizedBox(height: AppSpacing.lg),
                   itemBuilder: (context, index) {
                     if (index >= state.headlines.length) {
                       // Improved loading indicator
@@ -224,10 +218,6 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
   } // End of build method
 } // End of _HeadlinesFeedViewState class
 
-// Removed the entire duplicated body: Padding(...) block below this line
-
-// Removed import from here, moved to top
-
 class _HeadlinesFilterBottomSheet extends StatefulWidget {
   const _HeadlinesFilterBottomSheet({required this.bloc});
 
@@ -257,6 +247,7 @@ class _HeadlinesFilterBottomSheetState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return BlocProvider.value(
       value: widget.bloc,
       // Add symmetric padding for consistency
@@ -271,32 +262,33 @@ class _HeadlinesFilterBottomSheetState
             crossAxisAlignment: CrossAxisAlignment.stretch, // Stretch buttons
             children: [
               Text(
-                'Filter Headlines', // TODO(fulleni): Localize
+                l10n.headlinesFeedFilterTitle,
                 style: Theme.of(context).textTheme.titleLarge,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.xl), // Increased spacing
               // Category Dropdown
               DropdownButtonFormField<String>(
-                // TODO(fulleni): Localize labelText
-                decoration: const InputDecoration(labelText: 'Category'),
+                decoration: InputDecoration(
+                  labelText: l10n.headlinesFeedFilterCategoryLabel,
+                ),
                 value: selectedCategory,
                 // TODO(fulleni): Populate items dynamically from repository/config
-                items: const [
+                items: [
                   DropdownMenuItem<String>(
-                    child: Text('All'),
-                  ), // Use null value for 'All'
+                    child: Text(l10n.headlinesFeedFilterAllOption),
+                  ),
                   DropdownMenuItem(
                     value: 'technology',
-                    child: Text('Technology'), // TODO(fulleni): Localize
+                    child: Text(l10n.headlinesFeedFilterCategoryTechnology),
                   ),
                   DropdownMenuItem(
                     value: 'business',
-                    child: Text('Business'), // TODO(fulleni): Localize
+                    child: Text(l10n.headlinesFeedFilterCategoryBusiness),
                   ),
                   DropdownMenuItem(
                     value: 'sports', // Corrected value
-                    child: Text('Sports'), // TODO(fulleni): Localize
+                    child: Text(l10n.headlinesFeedFilterCategorySports),
                   ),
                 ],
                 onChanged: (value) {
@@ -305,24 +297,25 @@ class _HeadlinesFilterBottomSheetState
                   });
                 },
               ),
-              const SizedBox(height: AppSpacing.lg), // Use constant
+              const SizedBox(height: AppSpacing.lg),
               // Source Dropdown
               DropdownButtonFormField<String>(
-                // TODO(fulleni): Localize labelText
-                decoration: const InputDecoration(labelText: 'Source'),
+                decoration: InputDecoration(
+                  labelText: l10n.headlinesFeedFilterSourceLabel,
+                ),
                 value: selectedSource,
                 // TODO(fulleni): Populate items dynamically
-                items: const [
+                items: [
                   DropdownMenuItem<String>(
-                    child: Text('All'),
-                  ), // Use null value
+                    child: Text(l10n.headlinesFeedFilterAllOption),
+                  ),
                   DropdownMenuItem(
                     value: 'cnn',
-                    child: Text('CNN'), // TODO(fulleni): Localize
+                    child: Text(l10n.headlinesFeedFilterSourceCNN),
                   ),
                   DropdownMenuItem(
                     value: 'reuters',
-                    child: Text('Reuters'), // TODO(fulleni): Localize
+                    child: Text(l10n.headlinesFeedFilterSourceReuters),
                   ),
                 ],
                 onChanged: (value) {
@@ -331,28 +324,29 @@ class _HeadlinesFilterBottomSheetState
                   });
                 },
               ),
-              const SizedBox(height: AppSpacing.lg), // Use constant
+              const SizedBox(height: AppSpacing.lg),
               // Event Country Dropdown
               DropdownButtonFormField<String>(
-                // TODO(fulleni): Localize labelText
-                decoration: const InputDecoration(labelText: 'Event Country'),
+                decoration: InputDecoration(
+                  labelText: l10n.headlinesFeedFilterEventCountryLabel,
+                ),
                 value: selectedEventCountry,
                 // TODO(fulleni): Populate items dynamically
-                items: const [
+                items: [
                   DropdownMenuItem<String>(
-                    child: Text('All'),
-                  ), // Use null value
+                    child: Text(l10n.headlinesFeedFilterAllOption),
+                  ),
                   DropdownMenuItem(
                     value: 'US',
-                    child: Text('United States'), // TODO(fulleni): Localize
+                    child: Text(l10n.headlinesFeedFilterCountryUS),
                   ),
                   DropdownMenuItem(
                     value: 'UK',
-                    child: Text('United Kingdom'), // TODO(fulleni): Localize
+                    child: Text(l10n.headlinesFeedFilterCountryUK),
                   ),
                   DropdownMenuItem(
                     value: 'CA',
-                    child: Text('Canada'), // TODO(fulleni): Localize
+                    child: Text(l10n.headlinesFeedFilterCountryCA),
                   ),
                 ],
                 onChanged: (value) {
@@ -361,30 +355,24 @@ class _HeadlinesFilterBottomSheetState
                   });
                 },
               ),
-              const SizedBox(height: AppSpacing.xl), // Use constant
+              const SizedBox(height: AppSpacing.xl),
               // Use FilledButton for primary action
               FilledButton(
                 onPressed: () {
                   widget.bloc.add(
                     HeadlinesFeedFilterChanged(
-                      // Pass null if 'All' was selected
-                      category:
-                          selectedCategory == 'All' ? null : selectedCategory,
-                      source: selectedSource == 'All' ? null : selectedSource,
-                      eventCountry:
-                          selectedEventCountry == 'All'
-                              ? null
-                              : selectedEventCountry,
+                      // Pass null if 'All' was selected (value is null now)
+                      category: selectedCategory,
+                      source: selectedSource,
+                      eventCountry: selectedEventCountry,
                     ),
                   );
                   Navigator.pop(context);
                 },
-                // TODO(fulleni): Localize text
-                child: const Text('Apply Filters'),
+                child: Text(l10n.headlinesFeedFilterApplyButton),
               ),
-              const SizedBox(height: AppSpacing.sm), // Use constant
+              const SizedBox(height: AppSpacing.sm),
               TextButton(
-                // Style is correctly using theme error color
                 onPressed: () {
                   setState(() {
                     selectedCategory = null;
@@ -394,8 +382,7 @@ class _HeadlinesFilterBottomSheetState
                   widget.bloc.add(const HeadlinesFeedFilterChanged());
                   Navigator.pop(context);
                 },
-                // TODO(fulleni): Localize text
-                child: const Text('Reset Filters'),
+                child: Text(l10n.headlinesFeedFilterResetButton),
               ),
             ],
           ),

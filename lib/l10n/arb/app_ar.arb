@@ -1,34 +1,34 @@
 {
-    "@@locale": "en",
-    "counterAppBarTitle": "Counter",
+    "@@locale": "ar",
+    "counterAppBarTitle": "[AR] Counter",
     "@counterAppBarTitle": {
         "description": "Text shown in the AppBar of the Counter Page"
     },
-    "accountLinkingPageTitle": "Link Your Account",
+    "accountLinkingPageTitle": "ربط حسابك",
     "@accountLinkingPageTitle": {
         "description": "Title for the account linking page"
     },
-    "accountLinkingGenericError": "An error occurred",
+    "accountLinkingGenericError": "حدث خطأ",
     "@accountLinkingGenericError": {
         "description": "Generic error message shown during account linking"
     },
-    "accountLinkingEmailSentSuccess": "Check your email for the sign-in link!",
+    "accountLinkingEmailSentSuccess": "تحقق من بريدك الإلكتروني للحصول على رابط تسجيل الدخول!",
     "@accountLinkingEmailSentSuccess": {
         "description": "Success message shown after sending an email sign-in link"
     },
-    "accountLinkingHeadline": "Create or Link Account to Save Progress",
+    "accountLinkingHeadline": "أنشئ حسابًا أو اربطه لحفظ تقدمك",
     "@accountLinkingHeadline": {
         "description": "Headline text on the account linking page"
     },
-    "accountLinkingBody": "Signing up or linking allows you to access your information across multiple devices and ensures your progress isn't lost.",
+    "accountLinkingBody": "يتيح لك التسجيل أو الربط الوصول إلى معلوماتك عبر أجهزة متعددة ويضمن عدم فقدان تقدمك.",
     "@accountLinkingBody": {
         "description": "Body text explaining the benefits of linking an account"
     },
-    "accountLinkingContinueWithGoogleButton": "Continue with Google",
+    "accountLinkingContinueWithGoogleButton": "المتابعة باستخدام جوجل",
     "@accountLinkingContinueWithGoogleButton": {
         "description": "Text for the Google sign-in button"
     },
-    "accountLinkingEmailInputLabel": "Enter your email",
+    "accountLinkingEmailInputLabel": "أدخل بريدك الإلكتروني",
     "@accountLinkingEmailInputLabel": {
         "description": "Label for the email input field"
     },
@@ -36,131 +36,131 @@
     "@accountLinkingEmailInputHint": {
         "description": "Hint text for the email input field"
     },
-    "accountLinkingEmailValidationError": "Please enter a valid email address",
+    "accountLinkingEmailValidationError": "الرجاء إدخال عنوان بريد إلكتروني صالح",
     "@accountLinkingEmailValidationError": {
         "description": "Validation error message for the email input field"
     },
-    "accountLinkingSendLinkButton": "Send Sign-In Link",
+    "accountLinkingSendLinkButton": "إرسال رابط تسجيل الدخول",
     "@accountLinkingSendLinkButton": {
         "description": "Text for the button that sends an email sign-in link"
     },
-    "accountPageTitle": "Account",
+    "accountPageTitle": "الحساب",
     "@accountPageTitle": {
         "description": "Title for the account page"
     },
-    "accountAnonymousUser": "(Anonymous)",
+    "accountAnonymousUser": "(مجهول)",
     "@accountAnonymousUser": {
         "description": "Display name shown for an anonymous user"
     },
-    "accountNoNameUser": "No Name",
+    "accountNoNameUser": "لا يوجد اسم",
     "@accountNoNameUser": {
         "description": "Default display name shown when user has no name set"
     },
-    "accountStatusAuthenticated": "Authenticated",
+    "accountStatusAuthenticated": "مصادق عليه",
     "@accountStatusAuthenticated": {
         "description": "Text indicating the user is fully authenticated"
     },
-    "accountStatusAnonymous": "Anonymous Session",
+    "accountStatusAnonymous": "جلسة مجهولة",
     "@accountStatusAnonymous": {
         "description": "Text indicating the user is in an anonymous session"
     },
-    "accountStatusUnauthenticated": "Not Signed In",
+    "accountStatusUnauthenticated": "لم يتم تسجيل الدخول",
     "@accountStatusUnauthenticated": {
         "description": "Text indicating the user is not signed in"
     },
-    "accountSettingsTile": "Settings",
+    "accountSettingsTile": "الإعدادات",
     "@accountSettingsTile": {
         "description": "Title for the settings navigation tile"
     },
-    "accountSignOutTile": "Sign Out",
+    "accountSignOutTile": "تسجيل الخروج",
     "@accountSignOutTile": {
         "description": "Title for the sign out action tile"
     },
-    "accountBackupTile": "Create Account to Save Data",
+    "accountBackupTile": "أنشئ حسابًا لحفظ البيانات",
     "@accountBackupTile": {
         "description": "Title for the tile prompting anonymous users to create an account"
     },
-    "authenticationEmailSentSuccess": "Check your email for the sign-in link.",
+    "authenticationEmailSentSuccess": "تحقق من بريدك الإلكتروني للحصول على رابط تسجيل الدخول.",
     "@authenticationEmailSentSuccess": {
         "description": "Success message shown after sending an email sign-in link on the authentication page"
     },
-    "authenticationPageTitle": "Sign In / Register",
+    "authenticationPageTitle": "تسجيل الدخول / التسجيل",
     "@authenticationPageTitle": {
         "description": "Title for the main authentication page"
     },
-    "authenticationEmailLabel": "Email",
+    "authenticationEmailLabel": "البريد الإلكتروني",
     "@authenticationEmailLabel": {
         "description": "Label for the email input field on the authentication page"
     },
-    "authenticationSendLinkButton": "Send Sign-In Link",
+    "authenticationSendLinkButton": "إرسال رابط تسجيل الدخول",
     "@authenticationSendLinkButton": {
         "description": "Text for the button that sends an email sign-in link on the authentication page"
     },
-    "authenticationOrDivider": "OR",
+    "authenticationOrDivider": "أو",
     "@authenticationOrDivider": {
         "description": "Text used as a separator between sign-in methods"
     },
-    "authenticationGoogleSignInButton": "Sign In with Google",
+    "authenticationGoogleSignInButton": "تسجيل الدخول باستخدام جوجل",
     "@authenticationGoogleSignInButton": {
         "description": "Text for the Google sign-in button on the authentication page"
     },
-    "authenticationAnonymousSignInButton": "Continue Anonymously",
+    "authenticationAnonymousSignInButton": "المتابعة كمجهول",
     "@authenticationAnonymousSignInButton": {
         "description": "Text for the button to continue without signing in"
     },
-    "headlineDetailsInitialHeadline": "Waiting for Headline",
+    "headlineDetailsInitialHeadline": "في انتظار العنوان",
     "@headlineDetailsInitialHeadline": {
         "description": "Headline text shown in the initial state widget on the details page"
     },
-    "headlineDetailsInitialSubheadline": "Please wait...",
+    "headlineDetailsInitialSubheadline": "يرجى الانتظار...",
     "@headlineDetailsInitialSubheadline": {
         "description": "Subheadline text shown in the initial state widget on the details page"
     },
-    "headlineDetailsLoadingHeadline": "Loading Headline",
+    "headlineDetailsLoadingHeadline": "جارٍ تحميل العنوان",
     "@headlineDetailsLoadingHeadline": {
         "description": "Headline text shown in the loading state widget on the details page"
     },
-    "headlineDetailsLoadingSubheadline": "Fetching data...",
+    "headlineDetailsLoadingSubheadline": "جارٍ جلب البيانات...",
     "@headlineDetailsLoadingSubheadline": {
         "description": "Subheadline text shown in the loading state widget on the details page"
     },
-    "headlineDetailsContinueReadingButton": "Continue Reading",
+    "headlineDetailsContinueReadingButton": "متابعة القراءة",
     "@headlineDetailsContinueReadingButton": {
         "description": "Text for the button to open the full article"
     },
-    "headlinesFeedLoadingHeadline": "Loading...",
+    "headlinesFeedLoadingHeadline": "جارٍ التحميل...",
     "@headlinesFeedLoadingHeadline": {
         "description": "Headline text shown in the loading state widget on the feed page"
     },
-    "headlinesFeedLoadingSubheadline": "Fetching headlines",
+    "headlinesFeedLoadingSubheadline": "جارٍ جلب العناوين",
     "@headlinesFeedLoadingSubheadline": {
         "description": "Subheadline text shown in the loading state widget on the feed page"
     },
-    "headlinesFeedFilterTitle": "Filter Headlines",
+    "headlinesFeedFilterTitle": "تصفية العناوين",
     "@headlinesFeedFilterTitle": {
         "description": "Title for the filter bottom sheet"
     },
-    "headlinesFeedFilterCategoryLabel": "Category",
+    "headlinesFeedFilterCategoryLabel": "الفئة",
     "@headlinesFeedFilterCategoryLabel": {
         "description": "Label for the category filter dropdown"
     },
-    "headlinesFeedFilterAllOption": "All",
+    "headlinesFeedFilterAllOption": "الكل",
     "@headlinesFeedFilterAllOption": {
         "description": "Text for the 'All' option in filter dropdowns"
     },
-    "headlinesFeedFilterCategoryTechnology": "Technology",
+    "headlinesFeedFilterCategoryTechnology": "تكنولوجيا",
     "@headlinesFeedFilterCategoryTechnology": {
         "description": "Filter option for Technology category"
     },
-    "headlinesFeedFilterCategoryBusiness": "Business",
+    "headlinesFeedFilterCategoryBusiness": "أعمال",
     "@headlinesFeedFilterCategoryBusiness": {
         "description": "Filter option for Business category"
     },
-    "headlinesFeedFilterCategorySports": "Sports",
+    "headlinesFeedFilterCategorySports": "رياضة",
     "@headlinesFeedFilterCategorySports": {
         "description": "Filter option for Sports category"
     },
-    "headlinesFeedFilterSourceLabel": "Source",
+    "headlinesFeedFilterSourceLabel": "المصدر",
     "@headlinesFeedFilterSourceLabel": {
         "description": "Label for the source filter dropdown"
     },
@@ -172,47 +172,47 @@
     "@headlinesFeedFilterSourceReuters": {
         "description": "Filter option for Reuters source"
     },
-    "headlinesFeedFilterEventCountryLabel": "Event Country",
+    "headlinesFeedFilterEventCountryLabel": "بلد الحدث",
     "@headlinesFeedFilterEventCountryLabel": {
         "description": "Label for the event country filter dropdown"
     },
-    "headlinesFeedFilterCountryUS": "United States",
+    "headlinesFeedFilterCountryUS": "الولايات المتحدة",
     "@headlinesFeedFilterCountryUS": {
         "description": "Filter option for United States"
     },
-    "headlinesFeedFilterCountryUK": "United Kingdom",
+    "headlinesFeedFilterCountryUK": "المملكة المتحدة",
     "@headlinesFeedFilterCountryUK": {
         "description": "Filter option for United Kingdom"
     },
-    "headlinesFeedFilterCountryCA": "Canada",
+    "headlinesFeedFilterCountryCA": "كندا",
     "@headlinesFeedFilterCountryCA": {
         "description": "Filter option for Canada"
     },
-    "headlinesFeedFilterApplyButton": "Apply Filters",
+    "headlinesFeedFilterApplyButton": "تطبيق الفلاتر",
     "@headlinesFeedFilterApplyButton": {
         "description": "Text for the button to apply selected filters"
     },
-    "headlinesFeedFilterResetButton": "Reset Filters",
+    "headlinesFeedFilterResetButton": "إعادة تعيين الفلاتر",
     "@headlinesFeedFilterResetButton": {
         "description": "Text for the button to reset all filters"
     },
-    "headlinesSearchHintText": "Search Headlines...",
+    "headlinesSearchHintText": "ابحث في العناوين...",
     "@headlinesSearchHintText": {
         "description": "Hint text for the search input field"
     },
-    "headlinesSearchInitialHeadline": "Search Headlines",
+    "headlinesSearchInitialHeadline": "ابحث في العناوين",
     "@headlinesSearchInitialHeadline": {
         "description": "Headline text shown in the initial state widget on the search page"
     },
-    "headlinesSearchInitialSubheadline": "Enter keywords to find articles",
+    "headlinesSearchInitialSubheadline": "أدخل كلمات رئيسية للعثور على المقالات",
     "@headlinesSearchInitialSubheadline": {
         "description": "Subheadline text shown in the initial state widget on the search page"
     },
-    "headlinesSearchNoResultsHeadline": "No results",
+    "headlinesSearchNoResultsHeadline": "لا توجد نتائج",
     "@headlinesSearchNoResultsHeadline": {
         "description": "Headline text shown when a search yields no results"
     },
-    "headlinesSearchNoResultsSubheadline": "Try a different search term",
+    "headlinesSearchNoResultsSubheadline": "جرب مصطلح بحث مختلف",
     "@headlinesSearchNoResultsSubheadline": {
         "description": "Subheadline text shown when a search yields no results"
     }

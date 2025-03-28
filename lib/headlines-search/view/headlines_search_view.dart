@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_main/headlines-feed/widgets/headline_item_widget.dart';
 import 'package:ht_main/headlines-search/bloc/headlines_search_bloc.dart';
+import 'package:ht_main/l10n/l10n.dart'; // Added import
 import 'package:ht_main/shared/widgets/failure_state_widget.dart';
 import 'package:ht_main/shared/widgets/initial_state_widget.dart';
 
@@ -51,10 +52,11 @@ class _HeadlinesSearchViewState extends State<HeadlinesSearchView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       appBar: AppBar(
         title: TextField(
-          decoration: const InputDecoration(hintText: 'Search Headlines...'),
+          decoration: InputDecoration(hintText: l10n.headlinesSearchHintText),
           onChanged: (value) {
             searchTerm = value;
           },
@@ -73,10 +75,10 @@ class _HeadlinesSearchViewState extends State<HeadlinesSearchView> {
       body: BlocBuilder<HeadlinesSearchBloc, HeadlinesSearchState>(
         builder: (context, state) {
           return switch (state) {
-            HeadlinesSearchLoading() => const InitialStateWidget(
+            HeadlinesSearchLoading() => InitialStateWidget(
               icon: Icons.search,
-              headline: 'Search Headlines',
-              subheadline: 'Enter keywords to find articles',
+              headline: l10n.headlinesSearchInitialHeadline,
+              subheadline: l10n.headlinesSearchInitialSubheadline,
             ),
             HeadlinesSearchSuccess(
               :final headlines,
@@ -95,10 +97,10 @@ class _HeadlinesSearchViewState extends State<HeadlinesSearchView> {
                     },
                   )
                   : headlines.isEmpty
-                  ? const InitialStateWidget(
+                  ? InitialStateWidget(
                     icon: Icons.search_off,
-                    headline: 'No results',
-                    subheadline: 'Try a different search term',
+                    headline: l10n.headlinesSearchNoResultsHeadline,
+                    subheadline: l10n.headlinesSearchNoResultsSubheadline,
                   )
                   : ListView.builder(
                     controller: _scrollController,

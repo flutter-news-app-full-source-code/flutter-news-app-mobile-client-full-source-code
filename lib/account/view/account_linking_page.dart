@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_authentication_repository/ht_authentication_repository.dart';
 import 'package:ht_main/account/bloc/account_linking_bloc.dart';
+import 'package:ht_main/l10n/l10n.dart'; // Added import
 
 /// {@template account_linking_page} // Renamed template
 /// Page widget for the Account Linking feature.
@@ -50,20 +51,21 @@ class _AccountLinkingViewState extends State<_AccountLinkingView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Link Your Account')),
+      appBar: AppBar(title: Text(l10n.accountLinkingPageTitle)),
       body: BlocConsumer<AccountLinkingBloc, AccountLinkingState>(
-        // Renamed Bloc and State
         listener: (context, state) {
           if (state.status == AccountLinkingStatus.failure) {
-            // Renamed Status enum
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(
                 SnackBar(
-                  content: Text(state.errorMessage ?? 'An error occurred'),
+                  content: Text(
+                    state.errorMessage ?? l10n.accountLinkingGenericError,
+                  ),
                   backgroundColor: Theme.of(context).colorScheme.error,
                 ),
               );
@@ -72,9 +74,7 @@ class _AccountLinkingViewState extends State<_AccountLinkingView> {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(
-                const SnackBar(
-                  content: Text('Check your email for the sign-in link!'),
-                ),
+                SnackBar(content: Text(l10n.accountLinkingEmailSentSuccess)),
               );
             // Optionally clear email field or navigate away
             _emailController.clear();
@@ -92,16 +92,13 @@ class _AccountLinkingViewState extends State<_AccountLinkingView> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'Create or Link Account to Save Progress',
+                    l10n.accountLinkingHeadline,
                     style: textTheme.headlineSmall,
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    """
-                      Signing up or linking allows you to access your information 
-                      across multiple devices and ensures your progress isn't lost.
-                    """, // Updated text
+                    l10n.accountLinkingBody,
                     style: textTheme.bodyMedium,
                     textAlign: TextAlign.center,
                   ),
@@ -112,7 +109,7 @@ class _AccountLinkingViewState extends State<_AccountLinkingView> {
                     icon: const Icon(
                       Icons.g_mobiledata,
                     ), // Placeholder, use a Google icon asset
-                    label: const Text('Continue with Google'),
+                    label: Text(l10n.accountLinkingContinueWithGoogleButton),
                     onPressed:
                         isLoading
                             ? null
@@ -126,9 +123,9 @@ class _AccountLinkingViewState extends State<_AccountLinkingView> {
                   // --- Email Link Sign-In ---
                   TextFormField(
                     controller: _emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'Enter your email',
-                      hintText: 'you@example.com',
+                    decoration: InputDecoration(
+                      labelText: l10n.accountLinkingEmailInputLabel,
+                      hintText: l10n.accountLinkingEmailInputHint,
                     ),
                     keyboardType: TextInputType.emailAddress,
                     autocorrect: false,
@@ -136,7 +133,7 @@ class _AccountLinkingViewState extends State<_AccountLinkingView> {
                       if (value == null ||
                           value.isEmpty ||
                           !value.contains('@')) {
-                        return 'Please enter a valid email address';
+                        return l10n.accountLinkingEmailValidationError;
                       }
                       return null;
                     },
@@ -156,7 +153,7 @@ class _AccountLinkingViewState extends State<_AccountLinkingView> {
                                 );
                               }
                             },
-                    child: const Text('Send Sign-In Link'),
+                    child: Text(l10n.accountLinkingSendLinkButton),
                   ),
 
                   // --- Loading Indicator ---

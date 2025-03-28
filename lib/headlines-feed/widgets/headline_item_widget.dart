@@ -27,7 +27,7 @@ class HeadlineItemWidget extends StatelessWidget {
             ? (cardTheme.shape! as RoundedRectangleBorder).borderRadius
             : BorderRadius.circular(
               cardTheme.clipBehavior != Clip.none ? AppSpacing.xs : 0.0,
-            ); // Use AppSpacing.xs
+            );
 
     // Use InkWell for tap effect on the Card
     return Card(
@@ -59,7 +59,6 @@ class HeadlineItemWidget extends StatelessWidget {
                     width: 80, // Consistent size
                     height: 80,
                     fit: BoxFit.cover,
-                    // Add loading/error builders for better UX
                     loadingBuilder: (context, child, loadingProgress) {
                       if (loadingProgress == null) return child;
                       return Container(
@@ -117,7 +116,6 @@ class HeadlineItemWidget extends StatelessWidget {
                     const SizedBox(
                       height: AppSpacing.sm,
                     ), // Spacing between title and metadata
-                    // Simplified Metadata Row/Wrap
                     Wrap(
                       spacing: AppSpacing.md, // Horizontal space between items
                       runSpacing: AppSpacing.xs, // Vertical space if wraps
@@ -127,7 +125,6 @@ class HeadlineItemWidget extends StatelessWidget {
                             icon: Icons.source_outlined,
                             text: headline.source!,
                           ),
-                        // Removed category and country
                         if (headline.publishedAt != null)
                           _MetadataItem(
                             icon: Icons.access_time_outlined,

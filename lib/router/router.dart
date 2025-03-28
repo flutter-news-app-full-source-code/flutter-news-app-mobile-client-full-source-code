@@ -4,12 +4,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ht_main/app/bloc/app_bloc.dart'; // Needed for context.read in redirect
+import 'package:ht_main/account/view/account_linking_page.dart';
+import 'package:ht_main/account/view/account_page.dart';
+import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/authentication/view/authentication_page.dart';
 import 'package:ht_main/headline-details/view/headline_details_page.dart';
 import 'package:ht_main/headlines-feed/view/headlines_feed_page.dart';
 import 'package:ht_main/headlines-search/view/headlines_search_page.dart';
-import 'package:ht_main/router/routes.dart'; // Keep Routes
+import 'package:ht_main/router/routes.dart';
 
 /// Creates and configures the GoRouter instance for the application.
 ///
@@ -31,8 +33,10 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
         'GoRouter Redirect: Current Location: $currentLocation, AppStatus: $appStatus',
       ); // Debug print (Removed user)
 
+      // Define core paths
       const authenticationPath = Routes.authentication;
       const headlinesFeedPath = Routes.headlinesFeed;
+      // No longer need accountPath/backupDataPath here as they become sub-routes
 
       final isGoingToAuth = currentLocation.startsWith(authenticationPath);
       final isGoingToFeed = currentLocation.startsWith(headlinesFeedPath);
@@ -48,18 +52,17 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
           );
           return headlinesFeedPath;
         }
-        // If they are somehow not on a feed path (e.g., initial load might hit '/'),
-        // redirect them to the feed. Add exceptions if needed.
+        // If they are somehow not on the feed path or its sub-routes...
+        // (e.g., initial load might hit '/', or an invalid top-level path)
+        // Note: This assumes feed is the primary destination after login.
         if (!isGoingToFeed) {
           print(
             'GoRouter Redirect: Not on feed path, redirecting to $headlinesFeedPath',
           );
-          // Allow specific non-feed routes if needed, otherwise redirect
-          // Example: if (currentLocation == Routes.someOtherAllowedPath) return null;
           return headlinesFeedPath;
         }
         print(
-          'GoRouter Redirect: Authenticated user staying on feed path or sub-route.',
+          'GoRouter Redirect: Authenticated/anonymous user staying on feed path or sub-route.',
         );
       }
       // If the user is not authenticated...
@@ -98,21 +101,21 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
         },
         routes: [
           GoRoute(
-            path: Routes.forgotPassword, // Relative path
+            path: Routes.forgotPassword,
             name: Routes.forgotPasswordName,
             builder: (BuildContext context, GoRouterState state) {
               return const Placeholder(child: Text('Forgot Password Page'));
             },
           ),
           GoRoute(
-            path: Routes.resetPassword, // Relative path
+            path: Routes.resetPassword,
             name: Routes.resetPasswordName,
             builder: (BuildContext context, GoRouterState state) {
               return const Placeholder(child: Text('Reset Password Page'));
             },
           ),
           GoRoute(
-            path: Routes.confirmEmail, // Relative path
+            path: Routes.confirmEmail,
             name: Routes.confirmEmailName,
             builder: (BuildContext context, GoRouterState state) {
               return const Placeholder(child: Text('Confirm Email Page'));
@@ -128,7 +131,7 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
         },
         routes: [
           GoRoute(
-            path: 'article/:id', // Relative path
+            path: 'article/:id',
             name: Routes.articleDetailsName,
             builder: (BuildContext context, GoRouterState state) {
               final id = state.pathParameters['id']!;
@@ -136,7 +139,6 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
             },
           ),
           GoRoute(
-            // Use relative path 'search' from '/headlines-feed'
             path: 'search',
             name: Routes.searchName,
             builder: (BuildContext context, GoRouterState state) {
@@ -144,7 +146,6 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
             },
           ),
           GoRoute(
-            // Use relative path 'settings' from '/headlines-feed'
             path: 'settings',
             name: Routes.settingsName,
             builder: (BuildContext context, GoRouterState state) {
@@ -153,15 +154,20 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
               );
             },
           ),
+          // --- Account Sub-Route ---
+          GoRoute(
+            path: Routes.account,
+            name: Routes.accountName,
+            builder: (context, state) => const AccountPage(),
+            routes: [
+              GoRoute(
+                path: Routes.accountLinking,
+                name: Routes.accountLinkingName,
+                builder: (context, state) => const AccountLinkingPage(),
+              ),
+            ],
+          ),
         ],
-      ),
-      // Keep test route if needed, ensure path starts with '/'
-      GoRoute(
-        path: '/test-route',
-        name: 'testRoute',
-        builder: (BuildContext context, GoRouterState state) {
-          return const Placeholder(child: Center(child: Text('Test Route')));
-        },
       ),
     ],
   );

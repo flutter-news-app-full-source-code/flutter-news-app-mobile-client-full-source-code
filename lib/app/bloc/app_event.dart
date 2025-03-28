@@ -7,16 +7,9 @@ sealed class AppEvent extends Equatable {
   List<Object> get props => [];
 }
 
-final class AppNavigationIndexChanged extends AppEvent {
-  const AppNavigationIndexChanged(this.context, this.index);
-
-  final BuildContext context;
-  final int index;
-
-  @override
-  List<Object> get props => [index];
-}
-
+/// {@template app_user_changed}
+/// Event triggered when the app theme changes.
+/// {@endtemplate}
 final class AppThemeChanged extends AppEvent {
   const AppThemeChanged();
 }

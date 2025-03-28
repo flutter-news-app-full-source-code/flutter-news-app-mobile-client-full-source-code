@@ -75,7 +75,10 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
             IconButton(
               icon: const Icon(Icons.account_circle_outlined),
               selectedIcon: const Icon(Icons.account_circle_rounded),
-              onPressed: () {},
+              onPressed: () {
+                // Navigate to the Account page
+                context.goNamed(Routes.accountName);
+              },
             ),
             IconButton(
               icon: const Icon(Icons.notifications_none),

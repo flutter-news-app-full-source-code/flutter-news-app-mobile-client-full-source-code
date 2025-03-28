@@ -3,11 +3,11 @@
 
 import 'dart:async';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart'; // For dynamic links
-import 'package:flex_color_scheme/flex_color_scheme.dart';
+// Removed: import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+// Removed: import 'package:google_fonts/google_fonts.dart';
 import 'package:ht_authentication_repository/ht_authentication_repository.dart';
 import 'package:ht_headlines_repository/ht_headlines_repository.dart';
 import 'package:ht_kv_storage_service/ht_kv_storage_service.dart'; // Import storage service
@@ -15,6 +15,7 @@ import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/authentication/bloc/authentication_bloc.dart'; // Import AuthBloc
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/router.dart';
+import 'package:ht_main/shared/theme/app_theme.dart'; // Import the new theme file
 
 class App extends StatelessWidget {
   const App({
@@ -203,18 +204,4 @@ class _AppViewState extends State<_AppView> {
       ),
     );
   }
-}
-
-ThemeData lightTheme() {
-  return FlexThemeData.light(
-    scheme: FlexScheme.material,
-    fontFamily: GoogleFonts.notoSans().fontFamily,
-  );
-}
-
-ThemeData darkTheme() {
-  return FlexThemeData.dark(
-    scheme: FlexScheme.material,
-    fontFamily: GoogleFonts.notoSans().fontFamily,
-  );
 }

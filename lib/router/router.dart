@@ -76,7 +76,9 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
       // Let the initial navigation attempt proceed. The refreshListenable
       // will trigger a redirect check again once the status is known.
       if (appStatus == AppStatus.initial) {
-        print('  Redirect Decision: AppStatus is INITIAL. Allowing navigation.');
+        print(
+          '  Redirect Decision: AppStatus is INITIAL. Allowing navigation.',
+        );
         return null; // Do not redirect during initial phase
       }
 
@@ -261,6 +263,17 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
                       return HeadlineDetailsPage(headlineId: id);
                     },
                   ),
+                  // Sub-route for notifications (placeholder) - MOVED HERE
+                  GoRoute(
+                    path: Routes.notifications, // Relative path 'notifications'
+                    name: Routes.notificationsName,
+                    builder: (context, state) {
+                      // TODO(fulleni): Replace with actual NotificationsPage
+                      return const Placeholder(
+                        child: Center(child: Text('NOTIFICATIONS PAGE')),
+                      );
+                    },
+                  ),
                 ],
               ),
             ],
@@ -291,17 +304,6 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
                       // TODO(fulleni): Replace with actual SettingsPage
                       return const Placeholder(
                         child: Center(child: Text('SETTINGS PAGE')),
-                      );
-                    },
-                  ),
-                  // Sub-route for notifications (placeholder)
-                  GoRoute(
-                    path: Routes.notifications, // Relative path 'notifications'
-                    name: Routes.notificationsName,
-                    builder: (context, state) {
-                      // TODO(fulleni): Replace with actual NotificationsPage
-                      return const Placeholder(
-                        child: Center(child: Text('NOTIFICATIONS PAGE')),
                       );
                     },
                   ),

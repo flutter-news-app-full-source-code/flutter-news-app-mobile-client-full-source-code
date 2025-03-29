@@ -75,20 +75,20 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
 
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true, // Center the title
-        leading: IconButton( // Add leading icon button
-          icon: const Icon(Icons.notifications_outlined),
-          tooltip: l10n.notificationsTooltip, // Add tooltip for accessibility
-          onPressed: () {
-            context.goNamed(Routes.notificationsName);
-          },
-        ),
         title: Text(
           'HT', // TODO(fulleni): Localize this title
           style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         actions: [
-          // Removed Search IconButton
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined),
+            tooltip: l10n.notificationsTooltip, // Add tooltip for accessibility
+            onPressed: () {
+              context.goNamed(
+                Routes.notificationsName,
+              ); // Ensure correct route name
+            },
+          ),
           BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
             builder: (context, state) {
               var isFilterApplied = false;

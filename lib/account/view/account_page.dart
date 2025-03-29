@@ -110,10 +110,7 @@ class _AccountView extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           // Convert enum to user-friendly string
-          _authenticationStatusToString(
-            context,
-            user.authenticationStatus,
-          ),
+          _authenticationStatusToString(context, user.authenticationStatus),
           style: textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.secondary,
           ),

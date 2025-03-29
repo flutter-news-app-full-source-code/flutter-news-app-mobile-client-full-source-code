@@ -47,10 +47,12 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
       // --- Define Key Paths ---
       // Base paths for major sections.
       const authenticationPath = Routes.authentication; // '/authentication'
-      const headlinesFeedPath = Routes.headlinesFeed;   // '/headlines-feed'
+      const headlinesFeedPath = Routes.headlinesFeed; // '/headlines-feed'
       // Specific authentication sub-routes crucial for the email linking flow.
-      const emailSignInPath = '$authenticationPath/${Routes.emailSignIn}'; // '/authentication/email-sign-in'
-      const emailLinkSentPath = '$authenticationPath/${Routes.emailLinkSent}'; // '/authentication/email-link-sent'
+      const emailSignInPath =
+          '$authenticationPath/${Routes.emailSignIn}'; // '/authentication/email-sign-in'
+      const emailLinkSentPath =
+          '$authenticationPath/${Routes.emailLinkSent}'; // '/authentication/email-link-sent'
 
       // --- Helper Booleans ---
       // Check if the navigation target is within the authentication section.
@@ -78,7 +80,6 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
         print('    Action: Allowing navigation within authentication section.');
         return null; // Allow access
       }
-
       // --- Case 2: Anonymous User ---
       else if (appStatus == AppStatus.anonymous) {
         print('  Redirect Decision: User is ANONYMOUS.');
@@ -88,60 +89,72 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
           // Allow access ONLY if they are explicitly starting the linking flow
           // (indicated by the 'context=linking' query parameter).
           if (isLinkingContext) {
-            print('    Action: Allowing navigation to BASE auth for account linking.');
+            print(
+              '    Action: Allowing navigation to BASE auth for account linking.',
+            );
             return null; // Allow access
           } else {
             // Prevent anonymous users from accessing the initial sign-in screen again.
             // Redirect them to the main content (headlines feed).
-            print('    Action: Preventing access to initial sign-in, redirecting to $headlinesFeedPath');
+            print(
+              '    Action: Preventing access to initial sign-in, redirecting to $headlinesFeedPath',
+            );
             return headlinesFeedPath; // Redirect to feed
           }
         }
-
         // **Sub-Case 2.2: Navigating to Specific Email Linking Sub-Routes**
         // Explicitly allow access to the necessary pages for the email linking process,
         // even if the 'context=linking' parameter is lost during navigation between these pages.
-        else if (currentLocation == emailSignInPath || currentLocation == emailLinkSentPath) {
-           print('    Action: Allowing navigation to email linking sub-route ($currentLocation).');
-           return null; // Allow access
+        else if (currentLocation == emailSignInPath ||
+            currentLocation == emailLinkSentPath) {
+          print(
+            '    Action: Allowing navigation to email linking sub-route ($currentLocation).',
+          );
+          return null; // Allow access
         }
-
         // **Sub-Case 2.3: Navigating Within the Headlines Feed Section**
         // Allow anonymous users to access the main content feed and its sub-routes (like account).
         else if (isGoingToFeed) {
-          print('    Action: Allowing navigation within feed section ($currentLocation).');
+          print(
+            '    Action: Allowing navigation within feed section ($currentLocation).',
+          );
           return null; // Allow access
         }
-
         // **Sub-Case 2.4: Fallback for Unexpected Paths**
         // If an anonymous user tries to navigate anywhere else unexpected,
         // redirect them to the main content feed as a safe default.
         else {
-          print('    Action: Unexpected path ($currentLocation), redirecting to $headlinesFeedPath');
+          print(
+            '    Action: Unexpected path ($currentLocation), redirecting to $headlinesFeedPath',
+          );
           return headlinesFeedPath; // Redirect to feed
         }
       }
-
       // --- Case 3: Authenticated User ---
       else if (appStatus == AppStatus.authenticated) {
         print('  Redirect Decision: User is AUTHENTICATED.');
         // If an authenticated user tries to access any part of the authentication flow...
         if (isGoingToAuth) {
           // ...redirect them away to the main content feed. They don't need to authenticate again.
-          print('    Action: Preventing access to authentication section, redirecting to $headlinesFeedPath');
+          print(
+            '    Action: Preventing access to authentication section, redirecting to $headlinesFeedPath',
+          );
           return headlinesFeedPath; // Redirect to feed
         }
         // Otherwise, allow authenticated users to access any other part of the app (feed, account, settings, etc.).
-        print('    Action: Allowing navigation to non-auth section ($currentLocation).');
+        print(
+          '    Action: Allowing navigation to non-auth section ($currentLocation).',
+        );
         return null; // Allow access
       }
-
       // --- Case 4: Initial/Unknown Status ---
       // This might occur briefly during app startup before the status is determined.
       // Generally, allow navigation during this phase. If specific routes need
       // protection even during startup, add checks here.
       else {
-        print('  Redirect Decision: AppStatus is initial/unknown. Allowing navigation.');
+        print(
+          '  Redirect Decision: AppStatus is initial/unknown. Allowing navigation.',
+        );
         return null; // Allow access
       }
 
@@ -191,7 +204,9 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
             builder: (context, state) {
               // Extract the linking context flag from 'extra', default to false.
               final isLinking = (state.extra as bool?) ?? false;
-              return EmailSignInPage(isLinkingContext: isLinking); // Pass to widget
+              return EmailSignInPage(
+                isLinkingContext: isLinking,
+              ); // Pass to widget
             },
           ),
           GoRoute(
@@ -234,7 +249,7 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
           ),
           // --- Account Sub-Route ---
           GoRoute(
-            path: Routes.account, 
+            path: Routes.account,
             name: Routes.accountName,
             builder: (context, state) => const AccountPage(),
           ),

@@ -1,3 +1,4 @@
+//
 // ignore_for_file: avoid_redundant_argument_values
 
 import 'package:flutter/material.dart';
@@ -6,9 +7,7 @@ import 'package:ht_headlines_client/ht_headlines_client.dart';
 import 'package:ht_headlines_repository/ht_headlines_repository.dart';
 import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_main/shared/widgets/failure_state_widget.dart';
-import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_main/shared/shared.dart'; 
+import 'package:ht_main/shared/shared.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -42,7 +41,7 @@ class _HeadlineDetailsView extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return Scaffold(
-      // Body contains the BlocBuilder which returns either state widgets 
+      // Body contains the BlocBuilder which returns either state widgets
       // or the scroll view
       body: BlocBuilder<HeadlineDetailsBloc, HeadlineDetailsState>(
         builder: (context, state) {
@@ -67,8 +66,10 @@ class _HeadlineDetailsView extends StatelessWidget {
                 );
               },
             ),
-            final HeadlineDetailsLoaded state =>
-              _buildLoadedContent(context, state.headline),
+            final HeadlineDetailsLoaded state => _buildLoadedContent(
+              context,
+              state.headline,
+            ),
             _ => const SizedBox.shrink(), // Should not happen in practice
           };
         },
@@ -126,10 +127,7 @@ class _HeadlineDetailsView extends StatelessWidget {
         SliverPadding(
           padding: horizontalPadding.copyWith(top: AppSpacing.lg),
           sliver: SliverToBoxAdapter(
-            child: Text(
-              headline.title,
-              style: textTheme.headlineMedium,
-            ),
+            child: Text(headline.title, style: textTheme.headlineMedium),
           ),
         ),
 
@@ -154,20 +152,21 @@ class _HeadlineDetailsView extends StatelessWidget {
                     return Container(
                       width: double.infinity,
                       height: 200,
-                      color: colorScheme.surfaceVariant,
+                      color: colorScheme.surfaceContainerHighest,
                       child: const Center(child: CircularProgressIndicator()),
                     );
                   },
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    width: double.infinity,
-                    height: 200,
-                    color: colorScheme.surfaceVariant,
-                    child: Icon(
-                      Icons.broken_image,
-                      color: colorScheme.onSurfaceVariant,
-                      size: AppSpacing.xxl,
-                    ),
-                  ),
+                  errorBuilder:
+                      (context, error, stackTrace) => Container(
+                        width: double.infinity,
+                        height: 200,
+                        color: colorScheme.surfaceContainerHighest,
+                        child: Icon(
+                          Icons.broken_image,
+                          color: colorScheme.onSurfaceVariant,
+                          size: AppSpacing.xxl,
+                        ),
+                      ),
                 ),
               ),
             ),
@@ -190,10 +189,7 @@ class _HeadlineDetailsView extends StatelessWidget {
           SliverPadding(
             padding: horizontalPadding.copyWith(top: AppSpacing.lg),
             sliver: SliverToBoxAdapter(
-              child: Text(
-                headline.description!,
-                style: textTheme.bodyLarge,
-              ),
+              child: Text(headline.description!, style: textTheme.bodyLarge),
             ),
           ),
 
@@ -221,9 +217,9 @@ class _HeadlineDetailsView extends StatelessWidget {
 
         // Add some bottom space if no button exists
         if (headline.url == null)
-           SliverPadding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.paddingLarge),
-            sliver: const SliverToBoxAdapter(child: SizedBox.shrink()),
+          const SliverPadding(
+            padding: EdgeInsets.only(bottom: AppSpacing.paddingLarge),
+            sliver: SliverToBoxAdapter(child: SizedBox.shrink()),
           ),
       ],
     );
@@ -233,8 +229,8 @@ class _HeadlineDetailsView extends StatelessWidget {
   List<Widget> _buildMetadataChips(BuildContext context, Headline headline) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-    final chipLabelStyle = textTheme.labelSmall; 
-    final chipBackgroundColor = theme.colorScheme.surfaceVariant;
+    final chipLabelStyle = textTheme.labelSmall;
+    final chipBackgroundColor = theme.colorScheme.surfaceContainerHighest;
     final chipAvatarColor = theme.colorScheme.onSurfaceVariant;
     const chipAvatarSize = 14.0;
     const chipPadding = EdgeInsets.symmetric(
@@ -268,7 +264,9 @@ class _HeadlineDetailsView extends StatelessWidget {
 
     // Date Chip
     if (headline.publishedAt != null) {
-      final formattedDate = DateFormat('MMM d, yyyy').format(headline.publishedAt!);
+      final formattedDate = DateFormat(
+        'MMM d, yyyy',
+      ).format(headline.publishedAt!);
       chips.add(
         Chip(
           avatar: Icon(
@@ -324,4 +322,4 @@ class _HeadlineDetailsView extends StatelessWidget {
 
     return chips;
   }
-} 
+}

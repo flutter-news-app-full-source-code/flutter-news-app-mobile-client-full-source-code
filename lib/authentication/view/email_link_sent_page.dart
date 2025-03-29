@@ -3,8 +3,8 @@ import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/shared/constants/app_spacing.dart';
 
 /// {@template email_link_sent_page}
-/// Confirmation page shown after a sign-in link has been sent to the user's email.
-/// Instructs the user to check their inbox.
+/// Confirmation page shown after a sign-in link has been sent to
+/// the user's email. Instructs the user to check their inbox.
 /// {@endtemplate}
 class EmailLinkSentPage extends StatelessWidget {
   /// {@macro email_link_sent_page}
@@ -25,7 +25,6 @@ class EmailLinkSentPage extends StatelessWidget {
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const Icon(
                   Icons.mark_email_read_outlined, // Suggestive icon

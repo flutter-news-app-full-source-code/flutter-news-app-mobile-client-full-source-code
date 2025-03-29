@@ -32,9 +32,7 @@ final class AuthenticationSendSignInLinkRequested extends AuthenticationEvent {
 /// {@endtemplate}
 final class AuthenticationSignInWithLinkAttempted extends AuthenticationEvent {
   /// {@macro authentication_sign_in_with_link_attempted}
-  const AuthenticationSignInWithLinkAttempted({
-    required this.emailLink,
-  });
+  const AuthenticationSignInWithLinkAttempted({required this.emailLink});
 
   /// The sign-in link received by the app.
   final String emailLink;

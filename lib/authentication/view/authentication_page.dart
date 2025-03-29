@@ -1,3 +1,4 @@
+//
 // ignore_for_file: lines_longer_than_80_chars
 
 import 'package:flutter/material.dart';
@@ -7,7 +8,7 @@ import 'package:ht_authentication_repository/ht_authentication_repository.dart';
 import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
-import 'package:ht_main/shared/constants/app_spacing.dart'; 
+import 'package:ht_main/shared/constants/app_spacing.dart';
 
 /// {@template authentication_page}
 /// Displays authentication options (Google, Email, Anonymous) based on context.
@@ -83,16 +84,20 @@ class _AuthenticationView extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         // Conditionally add the leading close button only in linking context
-        leading: isLinkingContext
-            ? IconButton(
-                icon: const Icon(Icons.close),
-                tooltip: MaterialLocalizations.of(context).closeButtonTooltip, // Accessibility
-                onPressed: () {
-                  // Navigate back to the account page when close is pressed
-                  context.goNamed(Routes.accountName);
-                },
-              )
-            : null, // No leading button if not linking (relies on system back if pushed)
+        leading:
+            isLinkingContext
+                ? IconButton(
+                  icon: const Icon(Icons.close),
+                  tooltip:
+                      MaterialLocalizations.of(
+                        context,
+                      ).closeButtonTooltip, // Accessibility
+                  onPressed: () {
+                    // Navigate back to the account page when close is pressed
+                    context.goNamed(Routes.accountName);
+                  },
+                )
+                : null, // No leading button if not linking (relies on system back if pushed)
       ),
       body: SafeArea(
         child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
@@ -120,9 +125,7 @@ class _AuthenticationView extends StatelessWidget {
                 state is AuthenticationLoading; // Simplified loading check
 
             return Padding(
-              padding: const EdgeInsets.all(
-                AppSpacing.paddingLarge,
-              ), 
+              padding: const EdgeInsets.all(AppSpacing.paddingLarge),
               child: Center(
                 child: SingleChildScrollView(
                   child: Column(
@@ -137,27 +140,29 @@ class _AuthenticationView extends StatelessWidget {
                         ), // Spacing below icon
                         child: Icon(
                           Icons.security, // Hardcode the icon
-                          size: (Theme.of(context).iconTheme.size ?? AppSpacing.xl) *
-                              3.0, 
-                          color: Theme.of(context)
-                              .colorScheme
-                              .primary, 
+                          size:
+                              (Theme.of(context).iconTheme.size ??
+                                  AppSpacing.xl) *
+                              3.0,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.lg), // Space between icon and headline
+                      const SizedBox(
+                        height: AppSpacing.lg,
+                      ), // Space between icon and headline
                       // --- Headline and Subheadline ---
                       Text(
                         headline,
                         style: textTheme.headlineMedium,
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: AppSpacing.sm), 
+                      const SizedBox(height: AppSpacing.sm),
                       Text(
                         subHeadline,
                         style: textTheme.bodyLarge,
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: AppSpacing.xxl), 
+                      const SizedBox(height: AppSpacing.xxl),
                       // --- Google Sign-In Button ---
                       ElevatedButton.icon(
                         icon: const Icon(
@@ -172,14 +177,11 @@ class _AuthenticationView extends StatelessWidget {
                                 ),
                         // Style adjustments can be made via ElevatedButtonThemeData
                       ),
-                      const SizedBox(height: AppSpacing.lg), 
+                      const SizedBox(height: AppSpacing.lg),
                       // --- Email Sign-In Button ---
                       ElevatedButton(
                         // Consider an email icon
                         // icon: const Icon(Icons.email_outlined),
-                        child: Text(
-                          l10n.authenticationEmailSignInButton,
-                        ),
                         onPressed:
                             isLoading
                                 ? null
@@ -191,19 +193,22 @@ class _AuthenticationView extends StatelessWidget {
                                     extra: isLinkingContext,
                                   );
                                 },
+                        // Consider an email icon
+                        // icon: const Icon(Icons.email_outlined),
+                        child: Text(l10n.authenticationEmailSignInButton),
                       ),
 
                       // --- Anonymous Sign-In Button (Conditional) ---
                       if (showAnonymousButton) ...[
-                        const SizedBox(height: AppSpacing.lg), 
+                        const SizedBox(height: AppSpacing.lg),
                         OutlinedButton(
-                          child: Text(l10n.authenticationAnonymousSignInButton),
                           onPressed:
                               isLoading
                                   ? null
                                   : () => context.read<AuthenticationBloc>().add(
                                     const AuthenticationAnonymousSignInRequested(),
                                   ),
+                          child: Text(l10n.authenticationAnonymousSignInButton),
                         ),
                       ],
 

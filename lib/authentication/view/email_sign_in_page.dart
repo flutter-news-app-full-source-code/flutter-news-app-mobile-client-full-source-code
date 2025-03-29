@@ -1,3 +1,6 @@
+//
+// ignore_for_file: lines_longer_than_80_chars
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -42,7 +45,7 @@ class _EmailSignInView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.emailSignInPageTitle), 
+        title: Text(l10n.emailSignInPageTitle),
         // Add a custom leading back button to control navigation based on context.
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -110,11 +113,8 @@ class _EmailSignInView extends StatelessWidget {
                           size:
                               (Theme.of(context).iconTheme.size ??
                                   AppSpacing.xl) *
-                              3.0, 
-                          color:
-                              Theme.of(
-                                context,
-                              ).colorScheme.primary, 
+                              3.0,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
                       const SizedBox(
@@ -122,7 +122,7 @@ class _EmailSignInView extends StatelessWidget {
                       ), // Space between icon and text
                       // --- Explanation Text ---
                       Text(
-                        l10n.emailSignInExplanation, 
+                        l10n.emailSignInExplanation,
                         style: Theme.of(context).textTheme.bodyLarge,
                         textAlign: TextAlign.center,
                       ),
@@ -183,7 +183,7 @@ class _EmailLinkFormState extends State<_EmailLinkForm> {
           TextFormField(
             controller: _emailController,
             decoration: InputDecoration(
-              labelText: l10n.authenticationEmailLabel, 
+              labelText: l10n.authenticationEmailLabel,
               border: const OutlineInputBorder(),
               // Consider adding hint text if needed
             ),
@@ -193,8 +193,7 @@ class _EmailLinkFormState extends State<_EmailLinkForm> {
             enabled: !widget.isLoading,
             validator: (value) {
               if (value == null || value.isEmpty || !value.contains('@')) {
-                return l10n
-                    .accountLinkingEmailValidationError;
+                return l10n.accountLinkingEmailValidationError;
               }
               return null;
             },
@@ -211,9 +210,7 @@ class _EmailLinkFormState extends State<_EmailLinkForm> {
                       width: 24,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                    : Text(
-                      l10n.authenticationSendLinkButton,
-                    ),
+                    : Text(l10n.authenticationSendLinkButton),
           ),
         ],
       ),

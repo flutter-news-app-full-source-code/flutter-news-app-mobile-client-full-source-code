@@ -42,7 +42,7 @@ class _EmailSignInView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.emailSignInPageTitle), // New l10n key needed
+        title: Text(l10n.emailSignInPageTitle), 
         // Add a custom leading back button to control navigation based on context.
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -107,12 +107,14 @@ class _EmailSignInView extends StatelessWidget {
                         ), // Spacing below icon
                         child: Icon(
                           Icons.email_outlined, // Hardcoded icon
-                          size: (Theme.of(context).iconTheme.size ?? AppSpacing.xl) *
-                              3.0, // Use ?? with AppSpacing constant
+                          size:
+                              (Theme.of(context).iconTheme.size ??
+                                  AppSpacing.xl) *
+                              3.0, 
                           color:
                               Theme.of(
                                 context,
-                              ).colorScheme.primary, // Use theme color
+                              ).colorScheme.primary, 
                         ),
                       ),
                       const SizedBox(
@@ -120,7 +122,7 @@ class _EmailSignInView extends StatelessWidget {
                       ), // Space between icon and text
                       // --- Explanation Text ---
                       Text(
-                        l10n.emailSignInExplanation, // New l10n key needed
+                        l10n.emailSignInExplanation, 
                         style: Theme.of(context).textTheme.bodyLarge,
                         textAlign: TextAlign.center,
                       ),
@@ -181,7 +183,7 @@ class _EmailLinkFormState extends State<_EmailLinkForm> {
           TextFormField(
             controller: _emailController,
             decoration: InputDecoration(
-              labelText: l10n.authenticationEmailLabel, // Re-use existing key
+              labelText: l10n.authenticationEmailLabel, 
               border: const OutlineInputBorder(),
               // Consider adding hint text if needed
             ),
@@ -191,9 +193,8 @@ class _EmailLinkFormState extends State<_EmailLinkForm> {
             enabled: !widget.isLoading,
             validator: (value) {
               if (value == null || value.isEmpty || !value.contains('@')) {
-                // Add a specific validation error message key if needed
                 return l10n
-                    .accountLinkingEmailValidationError; // Re-use for now
+                    .accountLinkingEmailValidationError;
               }
               return null;
             },
@@ -206,13 +207,13 @@ class _EmailLinkFormState extends State<_EmailLinkForm> {
             child:
                 widget.isLoading
                     ? const SizedBox(
-                      height: 24, // Consistent height
+                      height: 24,
                       width: 24,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                     : Text(
                       l10n.authenticationSendLinkButton,
-                    ), // Re-use existing key
+                    ),
           ),
         ],
       ),

@@ -79,7 +79,6 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
         leading: Row(
           mainAxisSize: MainAxisSize.min, // Keep icons close together
           children: [
-            // const SizedBox(width: AppSpacing.sm), // Add some leading space
             IconButton(
               icon: const Icon(Icons.account_circle_outlined),
               selectedIcon: const Icon(Icons.account_circle_rounded),
@@ -93,7 +92,6 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
               selectedIcon: const Icon(Icons.notifications_rounded),
               onPressed: () {},
             ),
-            // Removed SizedBox between icons for tighter grouping
           ],
         ),
         title: Text(
@@ -166,7 +164,9 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
             // it here just to fullfill the Exhaustiveness
             // Checking os the sealed state.
             case HeadlinesFeedLoadingSilently():
-              return const Placeholder();
+              // This case is technically unreachable due to buildWhen,
+              // but required for exhaustive switch.
+              return const SizedBox.shrink();
             case HeadlinesFeedLoaded():
               return RefreshIndicator(
                 onRefresh: () async {
@@ -211,12 +211,12 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
                   );
                 },
               );
-          } // End of switch
-        }, // End of builder
-      ), // End of Padding (body)
-    ); // End of Scaffold
-  } // End of build method
-} // End of _HeadlinesFeedViewState class
+          }
+        },
+      ),
+    );
+  }
+}
 
 class _HeadlinesFilterBottomSheet extends StatefulWidget {
   const _HeadlinesFilterBottomSheet({required this.bloc});
@@ -287,7 +287,7 @@ class _HeadlinesFilterBottomSheetState
                     child: Text(l10n.headlinesFeedFilterCategoryBusiness),
                   ),
                   DropdownMenuItem(
-                    value: 'sports', // Corrected value
+                    value: 'sports',
                     child: Text(l10n.headlinesFeedFilterCategorySports),
                   ),
                 ],

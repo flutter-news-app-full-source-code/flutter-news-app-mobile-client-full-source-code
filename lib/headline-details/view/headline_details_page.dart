@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_headlines_client/ht_headlines_client.dart'; // Import for Headline
 import 'package:ht_headlines_repository/ht_headlines_repository.dart';
 import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart';
-import 'package:ht_main/l10n/l10n.dart'; // Added import
+import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/shared/widgets/failure_state_widget.dart';
 import 'package:ht_main/shared/widgets/initial_state_widget.dart';
 import 'package:ht_main/shared/widgets/loading_state_widget.dart';
@@ -48,11 +48,11 @@ class _HeadlineDetailsView extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.bookmark_border),
-            onPressed: () {}, // Placeholder
+            onPressed: () {},
           ),
           IconButton(
             icon: const Icon(Icons.share),
-            onPressed: () {}, // Placeholder
+            onPressed: () {},
           ),
         ],
       ),
@@ -188,7 +188,6 @@ class _HeadlineDetailsView extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.primary,
-                // Removed custom padding
               ),
               child: Text(
                 l10n.headlineDetailsContinueReadingButton,

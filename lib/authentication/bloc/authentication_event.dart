@@ -33,17 +33,14 @@ final class AuthenticationSendSignInLinkRequested extends AuthenticationEvent {
 final class AuthenticationSignInWithLinkAttempted extends AuthenticationEvent {
   /// {@macro authentication_sign_in_with_link_attempted}
   const AuthenticationSignInWithLinkAttempted({
-    // Remove email parameter
     required this.emailLink,
   });
-
-  // Remove email field
 
   /// The sign-in link received by the app.
   final String emailLink;
 
   @override
-  List<Object> get props => [emailLink]; // Remove email from props
+  List<Object> get props => [emailLink];
 }
 
 /// {@template authentication_google_sign_in_requested}

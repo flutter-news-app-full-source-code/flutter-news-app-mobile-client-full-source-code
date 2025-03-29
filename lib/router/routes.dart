@@ -18,8 +18,8 @@ abstract final class Routes {
   static const confirmEmailName = 'confirmEmail';
   static const account = 'account';
   static const accountName = 'account';
-  static const accountLinking = 'linking'; // Will be removed later
-  static const accountLinkingName = 'accountLinking'; // Will be removed later
+  static const accountLinking = 'linking';
+  static const accountLinkingName = 'accountLinking';
 
   // New routes for email sign-in flow
   static const emailSignIn = 'email-sign-in';

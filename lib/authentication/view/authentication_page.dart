@@ -7,7 +7,7 @@ import 'package:ht_authentication_repository/ht_authentication_repository.dart';
 import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
-import 'package:ht_main/shared/constants/app_spacing.dart'; // Use shared constants
+import 'package:ht_main/shared/constants/app_spacing.dart'; 
 
 /// {@template authentication_page}
 /// Displays authentication options (Google, Email, Anonymous) based on context.
@@ -21,8 +21,7 @@ class AuthenticationPage extends StatelessWidget {
     required this.headline,
     required this.subHeadline,
     required this.showAnonymousButton,
-    required this.isLinkingContext, // Add this parameter
-    // this.iconData, // REMOVE optional icon data
+    required this.isLinkingContext,
     super.key,
   });
 
@@ -36,10 +35,7 @@ class AuthenticationPage extends StatelessWidget {
   final bool showAnonymousButton;
 
   /// Whether this page is being shown in the account linking context.
-  final bool isLinkingContext; // Add this field
-
-  /// Optional icon to display at the top of the page.
-  // final IconData? iconData; // REMOVE this field
+  final bool isLinkingContext;
 
   @override
   Widget build(BuildContext context) {
@@ -57,28 +53,24 @@ class AuthenticationPage extends StatelessWidget {
         headline: headline,
         subHeadline: subHeadline,
         showAnonymousButton: showAnonymousButton,
-        isLinkingContext: isLinkingContext, // Pass down the flag
-        // iconData: iconData, // REMOVE passing down icon data
+        isLinkingContext: isLinkingContext,
       ),
     );
   }
 }
 
-// Renamed from _AuthenticationView to follow convention
 class _AuthenticationView extends StatelessWidget {
   const _AuthenticationView({
     required this.headline,
     required this.subHeadline,
     required this.showAnonymousButton,
-    required this.isLinkingContext, // Add this parameter
-    // this.iconData, // REMOVE optional icon data
+    required this.isLinkingContext,
   });
 
   final String headline;
   final String subHeadline;
   final bool showAnonymousButton;
-  final bool isLinkingContext; // Add this field
-  // final IconData? iconData; // REMOVE this field
+  final bool isLinkingContext;
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +122,7 @@ class _AuthenticationView extends StatelessWidget {
             return Padding(
               padding: const EdgeInsets.all(
                 AppSpacing.paddingLarge,
-              ), // Use constant
+              ), 
               child: Center(
                 child: SingleChildScrollView(
                   child: Column(
@@ -139,7 +131,6 @@ class _AuthenticationView extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       // --- Hardcoded Icon ---
-                      // REMOVE if check: if (iconData != null) ...[
                       Padding(
                         padding: const EdgeInsets.only(
                           bottom: AppSpacing.xl,
@@ -147,27 +138,26 @@ class _AuthenticationView extends StatelessWidget {
                         child: Icon(
                           Icons.security, // Hardcode the icon
                           size: (Theme.of(context).iconTheme.size ?? AppSpacing.xl) *
-                              3.0, // Use ?? with AppSpacing constant
+                              3.0, 
                           color: Theme.of(context)
                               .colorScheme
-                              .primary, // Use theme color
+                              .primary, 
                         ),
                       ),
                       const SizedBox(height: AppSpacing.lg), // Space between icon and headline
-                      // REMOVE closing bracket for if: ],
                       // --- Headline and Subheadline ---
                       Text(
                         headline,
                         style: textTheme.headlineMedium,
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: AppSpacing.sm), // Use constant
+                      const SizedBox(height: AppSpacing.sm), 
                       Text(
                         subHeadline,
                         style: textTheme.bodyLarge,
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: AppSpacing.xxl), // Use constant
+                      const SizedBox(height: AppSpacing.xxl), 
                       // --- Google Sign-In Button ---
                       ElevatedButton.icon(
                         icon: const Icon(
@@ -182,14 +172,14 @@ class _AuthenticationView extends StatelessWidget {
                                 ),
                         // Style adjustments can be made via ElevatedButtonThemeData
                       ),
-                      const SizedBox(height: AppSpacing.lg), // Use constant
+                      const SizedBox(height: AppSpacing.lg), 
                       // --- Email Sign-In Button ---
                       ElevatedButton(
                         // Consider an email icon
                         // icon: const Icon(Icons.email_outlined),
                         child: Text(
                           l10n.authenticationEmailSignInButton,
-                        ), // New l10n key needed
+                        ),
                         onPressed:
                             isLoading
                                 ? null
@@ -198,14 +188,14 @@ class _AuthenticationView extends StatelessWidget {
                                   // passing the linking context via 'extra'.
                                   context.goNamed(
                                     Routes.emailSignInName,
-                                    extra: isLinkingContext, // Pass the flag
+                                    extra: isLinkingContext,
                                   );
                                 },
                       ),
 
                       // --- Anonymous Sign-In Button (Conditional) ---
                       if (showAnonymousButton) ...[
-                        const SizedBox(height: AppSpacing.lg), // Use constant
+                        const SizedBox(height: AppSpacing.lg), 
                         OutlinedButton(
                           child: Text(l10n.authenticationAnonymousSignInButton),
                           onPressed:

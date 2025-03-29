@@ -19,7 +19,6 @@ class AuthenticationBloc
   /// {@macro authentication_bloc}
   AuthenticationBloc({
     required HtAuthenticationRepository authenticationRepository,
-    // Remove kvStorageService from constructor
   }) : _authenticationRepository = authenticationRepository,
        super(AuthenticationInitial()) {
     on<AuthenticationSendSignInLinkRequested>(
@@ -70,7 +69,7 @@ class AuthenticationBloc
   /// Handles [AuthenticationSignInWithLinkAttempted] events.
   /// This assumes the event is dispatched after the app receives the deep link.
   Future<void> _onAuthenticationSignInWithLinkAttempted(
-    AuthenticationSignInWithLinkAttempted event, // Event no longer has email
+    AuthenticationSignInWithLinkAttempted event,
     Emitter<AuthenticationState> emit,
   ) async {
     emit(AuthenticationLoading()); // General loading for sign-in attempt

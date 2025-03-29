@@ -112,7 +112,6 @@ class HeadlineItemWidget extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    // Removed description
                     const SizedBox(
                       height: AppSpacing.sm,
                     ), // Spacing between title and metadata

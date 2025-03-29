@@ -66,7 +66,6 @@ TextTheme _customizeTextTheme(TextTheme baseTextTheme) {
       fontWeight: FontWeight.normal,
       // Consider a slightly muted color via ColorScheme if needed
     ),
-    // caption: baseTextTheme.caption?.copyWith(...), // Removed: caption is deprecated, use labelSmall
 
     // --- Button Style (Usually default is fine) ---
     // labelLarge: baseTextTheme.labelLarge?.copyWith(fontSize: 14, fontWeight: FontWeight.bold),

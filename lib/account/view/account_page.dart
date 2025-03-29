@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-// Import the User model and AuthenticationStatus enum
 import 'package:ht_authentication_client/ht_authentication_client.dart';
 import 'package:ht_authentication_repository/ht_authentication_repository.dart';
 import 'package:ht_main/account/bloc/account_bloc.dart';
-import 'package:ht_main/app/bloc/app_bloc.dart'; // Needed for AppBloc and AppState access
-// Remove direct import of app_state.dart when using part of
-import 'package:ht_main/l10n/l10n.dart'; // Added import
-import 'package:ht_main/router/routes.dart'; // Needed for route names
+import 'package:ht_main/app/bloc/app_bloc.dart';
+import 'package:ht_main/l10n/l10n.dart';
+import 'package:ht_main/router/routes.dart';
 
 /// {@template account_page}
 /// Page widget for the Account feature.
@@ -115,7 +113,7 @@ class _AccountView extends StatelessWidget {
           _authenticationStatusToString(
             context,
             user.authenticationStatus,
-          ), // Pass context
+          ),
           style: textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.secondary,
           ),
@@ -161,8 +159,8 @@ class _AccountView extends StatelessWidget {
     final l10n = context.l10n;
     return ListTile(
       leading: const Icon(Icons.link), // Icon suggesting connection/linking
-      title: Text(l10n.accountConnectPrompt), // New l10n key needed
-      subtitle: Text(l10n.accountConnectBenefit), // New l10n key needed
+      title: Text(l10n.accountConnectPrompt),
+      subtitle: Text(l10n.accountConnectBenefit),
       isThreeLine: true, // Allow more space for subtitle
       trailing: const Icon(Icons.chevron_right),
       onTap: () {

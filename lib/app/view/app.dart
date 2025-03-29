@@ -3,11 +3,9 @@
 
 import 'dart:async';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart'; // For dynamic links
-// Removed: import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-// Removed: import 'package:google_fonts/google_fonts.dart';
 import 'package:ht_authentication_repository/ht_authentication_repository.dart';
 import 'package:ht_headlines_repository/ht_headlines_repository.dart';
 import 'package:ht_kv_storage_service/ht_kv_storage_service.dart'; // Import storage service
@@ -71,7 +69,6 @@ class _AppView extends StatefulWidget {
 }
 
 class _AppViewState extends State<_AppView> {
-  // Store the router and the status notifier
   late final GoRouter _router;
   late final ValueNotifier<AppStatus> _statusNotifier;
   StreamSubscription<PendingDynamicLinkData>? _linkSubscription;
@@ -79,13 +76,8 @@ class _AppViewState extends State<_AppView> {
   @override
   void initState() {
     super.initState();
-    // Get the AppBloc instance from the BlocProvider above
     final appBloc = context.read<AppBloc>();
-
-    // Create the ValueNotifier, initialized with the current status
     _statusNotifier = ValueNotifier<AppStatus>(appBloc.state.status);
-
-    // Create the router instance, passing the ValueNotifier as the listenable
     _router = createRouter(authStatusNotifier: _statusNotifier);
 
     // --- Initialize Deep Link Handling ---
@@ -105,11 +97,9 @@ class _AppViewState extends State<_AppView> {
     // Handle links received while the app is running
     _linkSubscription = FirebaseDynamicLinks.instance.onLink.listen(
       (pendingDynamicLinkData) {
-        // Handle link data
         _handleDynamicLink(pendingDynamicLinkData.link);
       },
       onError: (Object error) {
-        // Handle errors (e.g., log them)
         debugPrint('Dynamic Link Listener Error: $error');
       },
     );
@@ -122,7 +112,6 @@ class _AppViewState extends State<_AppView> {
       }
     } catch (e) {
       debugPrint('Error getting initial dynamic link: $e');
-      // Handle potential errors during initial link retrieval
     }
   }
 
@@ -136,14 +125,14 @@ class _AppViewState extends State<_AppView> {
     final authBloc = context.read<AuthenticationBloc>();
     final linkString = deepLink.toString();
 
-    debugPrint('Handling dynamic link: $linkString'); // Log received link
+    debugPrint('Handling dynamic link: $linkString');
 
     try {
       // The async gap happens here
       final isSignInLink = await authRepo.isSignInWithEmailLink(
         emailLink: linkString,
       );
-      debugPrint('Is sign-in link: $isSignInLink'); // Log validation result
+      debugPrint('Is sign-in link: $isSignInLink');
 
       // Check mounted again *after* the await before using BLoC/state
       if (!mounted) return;
@@ -153,9 +142,7 @@ class _AppViewState extends State<_AppView> {
         authBloc.add(
           AuthenticationSignInWithLinkAttempted(emailLink: linkString),
         );
-        debugPrint(
-          'Dispatched AuthenticationSignInWithLinkAttempted',
-        ); // Log dispatch
+        debugPrint('Dispatched AuthenticationSignInWithLinkAttempted');
       } else {
         // Handle other types of deep links if necessary
         debugPrint(

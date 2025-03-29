@@ -15,7 +15,6 @@ import 'package:ht_main/headlines-feed/view/headlines_feed_page.dart';
 import 'package:ht_main/headlines-search/view/headlines_search_page.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
-import 'package:ht_main/splash/view/splash_page.dart';
 
 /// Creates and configures the GoRouter instance for the application.
 ///
@@ -24,7 +23,7 @@ import 'package:ht_main/splash/view/splash_page.dart';
 GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
   return GoRouter(
     refreshListenable: authStatusNotifier,
-    initialLocation: Routes.splash, // Set initial location to splash
+    initialLocation: Routes.feed, // Set initial location back to feed
     debugLogDiagnostics: true, // Enable verbose logging for debugging redirects
     // --- Redirect Logic ---
     redirect: (BuildContext context, GoRouterState state) {
@@ -68,47 +67,21 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
       // Check if the 'context=linking' query parameter is present in the URI.
       final isLinkingContext =
           currentUri.queryParameters['context'] == 'linking';
-      // Check if the current location is the splash screen path.
-      final isGoingToSplash = currentLocation == Routes.splash;
+      // Removed isGoingToSplash check
 
       // --- Redirect Logic based on AppStatus ---
 
       // --- Case 0: Initial Loading State ---
-      // While the app is initializing, force the user to the splash screen.
+      // While the app is initializing (status is initial), don't redirect.
+      // Let the initial navigation attempt proceed. The refreshListenable
+      // will trigger a redirect check again once the status is known.
       if (appStatus == AppStatus.initial) {
-        print('  Redirect Decision: AppStatus is INITIAL.');
-        // If already on splash, stay there.
-        if (isGoingToSplash) {
-          print('    Action: Already on splash screen. Allowing navigation.');
-          return null;
-        }
-        // If trying to go anywhere else during initial load, force to splash.
-        print('    Action: Forcing navigation to splash screen.');
-        return Routes.splash;
-      }
-
-      // --- Transitioning Away from Splash Screen ---
-      // Once the status is determined (not initial), if the user is currently
-      // on the splash screen, redirect them to the appropriate main screen.
-      if (currentLocation == Routes.splash) {
-        print('  Redirect Decision: Transitioning AWAY from Splash Screen.');
-        if (appStatus == AppStatus.unauthenticated) {
-          print('    Action: Redirecting to $authenticationPath');
-          return authenticationPath;
-        } else if (appStatus == AppStatus.authenticated ||
-            appStatus == AppStatus.anonymous) {
-          print('    Action: Redirecting to $feedPath');
-          return feedPath;
-        }
-        // Fallback: Should not happen if status is known, but stay on splash if needed.
-        print(
-          '    Action: Unknown status after initial, staying on splash (fallback).',
-        );
-        return null;
+        print('  Redirect Decision: AppStatus is INITIAL. Allowing navigation.');
+        return null; // Do not redirect during initial phase
       }
 
       // --- Case 1: Unauthenticated User (After Initial Load) ---
-      // If the user is unauthenticated and NOT on the splash screen...
+      // If the user is unauthenticated...
       if (appStatus == AppStatus.unauthenticated) {
         print('  Redirect Decision: User is UNauthenticated (post-initial).');
         // If the user is NOT already going to an authentication path...
@@ -215,12 +188,6 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
     },
     // --- Routes ---
     routes: [
-      // --- Splash Screen Route ---
-      GoRoute(
-        path: Routes.splash,
-        name: Routes.splashName,
-        builder: (context, state) => const SplashPage(),
-      ),
       // --- Authentication Routes ---
       GoRoute(
         path: Routes.authentication,

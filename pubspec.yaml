@@ -20,6 +20,7 @@ dependencies:
   flutter_bloc: ^9.1.0
   flutter_localizations:
     sdk: flutter
+  flutter_native_splash: ^2.4.5
   go_router: ^14.8.1
   google_fonts: ^6.2.1
   ht_authentication_client:
@@ -73,3 +74,20 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
+
+# flutter_native_splash configuration
+# https://pub.dev/packages/flutter_native_splash
+flutter_native_splash:
+  # Background color for light theme (Android/iOS)
+  color: "#FFFFFF"
+  # Background color for dark theme (Android/iOS)
+  color_dark: "#212121"
+
+  # Optional: Specify an image asset for the splash screen
+  # image: assets/splash_logo_light.png
+  # image_dark: assets/splash_logo_dark.png
+
+  # Ensure configuration is applied to both platforms
+  android: true
+  ios: true
+  # web: false # Optional: Disable for web if not needed

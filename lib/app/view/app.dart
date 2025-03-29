@@ -2,18 +2,18 @@
 // ignore_for_file: deprecated_member_use
 
 import 'dart:async';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart'; // For dynamic links
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart'; 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ht_authentication_repository/ht_authentication_repository.dart';
 import 'package:ht_headlines_repository/ht_headlines_repository.dart';
-import 'package:ht_kv_storage_service/ht_kv_storage_service.dart'; // Import storage service
+import 'package:ht_kv_storage_service/ht_kv_storage_service.dart'; 
 import 'package:ht_main/app/bloc/app_bloc.dart';
-import 'package:ht_main/authentication/bloc/authentication_bloc.dart'; // Import AuthBloc
+import 'package:ht_main/authentication/bloc/authentication_bloc.dart'; 
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/router.dart';
-import 'package:ht_main/shared/theme/app_theme.dart'; // Import the new theme file
+import 'package:ht_main/shared/theme/app_theme.dart'; 
 
 class App extends StatelessWidget {
   const App({
@@ -70,67 +70,30 @@ class _AppView extends StatefulWidget {
 
 class _AppViewState extends State<_AppView> {
   late final GoRouter _router;
-  // Notifier that GoRouter listens to. We control its value.
-  late final ValueNotifier<AppStatus> _routerNotifier;
+  // Standard notifier that GoRouter listens to.
+  late final ValueNotifier<AppStatus> _statusNotifier;
   StreamSubscription<PendingDynamicLinkData>? _linkSubscription;
-
-  // Flags to manage splash screen duration
-  bool _isAuthStatusKnown = false;
-  bool _isMinTimeElapsed = false;
-  // Store the actual latest status from AppBloc
-  AppStatus _currentAppStatus = AppStatus.initial;
-
-  // Minimum splash duration
-  static const _minSplashDuration = Duration(seconds: 3);
 
   @override
   void initState() {
     super.initState();
     final appBloc = context.read<AppBloc>();
-    _currentAppStatus = appBloc.state.status; // Store initial status
-    // Initialize the router notifier with the initial status
-    _routerNotifier = ValueNotifier<AppStatus>(_currentAppStatus);
-    _router = createRouter(authStatusNotifier: _routerNotifier);
-
-    // Start the minimum time timer
-    Future.delayed(_minSplashDuration, () {
-      if (mounted) {
-        setState(() {
-          _isMinTimeElapsed = true;
-        });
-        _updateRouterNotifier(); // Check if we can navigate away
-      }
-    });
+    // Initialize the notifier with the BLoC's current state
+    _statusNotifier = ValueNotifier<AppStatus>(appBloc.state.status);
+    _router = createRouter(authStatusNotifier: _statusNotifier);
 
     // --- Initialize Deep Link Handling ---
     _initDynamicLinks();
-    // ------------------------------------
-
-    // Initial check in case status is already known *at the end of initState*
-    if (_currentAppStatus != AppStatus.initial) {
-      _isAuthStatusKnown = true;
-      _updateRouterNotifier();
-    }
+    // -------------------------------------
   }
 
   @override
   void dispose() {
     _linkSubscription?.cancel();
-    _routerNotifier.dispose(); // Dispose the correct notifier
+    _statusNotifier.dispose(); // Dispose the correct notifier
     super.dispose();
   }
 
-  /// Checks conditions and updates the router notifier if ready.
-  void _updateRouterNotifier() {
-    // Only update the router notifier (triggering redirect) if both
-    // minimum time has passed AND the auth status is known.
-    if (_isMinTimeElapsed && _isAuthStatusKnown) {
-      // Update with the *actual* current status
-      _routerNotifier.value = _currentAppStatus;
-    }
-    // Otherwise, the router notifier remains AppStatus.initial, keeping
-    // the user on the splash screen.
-  }
 
   /// Initializes Firebase Dynamic Links listeners.
   Future<void> _initDynamicLinks() async {
@@ -208,29 +171,11 @@ class _AppViewState extends State<_AppView> {
     // The BlocBuilder remains for theme changes.
     return BlocListener<AppBloc, AppState>(
       // Only listen when the status actually changes
-      // Listen to all status changes from AppBloc
+      listenWhen: (previous, current) => previous.status != current.status,
       listener: (context, state) {
-        // Store the latest actual status
-        _currentAppStatus = state.status;
-
-        // If the status is no longer initial, mark it as known
-        if (state.status != AppStatus.initial) {
-          if (!_isAuthStatusKnown) {
-            // Only update state if it changes
-            setState(() {
-              _isAuthStatusKnown = true;
-            });
-          }
-          _updateRouterNotifier(); // Check if we can navigate away
-        }
-        // If the status somehow reverts to initial (unlikely), reset flag
-        else if (_isAuthStatusKnown) {
-          setState(() {
-            _isAuthStatusKnown = false;
-          });
-          // Ensure router notifier reflects initial state again
-          _routerNotifier.value = AppStatus.initial;
-        }
+        // Directly update the ValueNotifier when the AppBloc status changes.
+        // This triggers the GoRouter's refreshListenable.
+        _statusNotifier.value = state.status;
       },
       child: BlocBuilder<AppBloc, AppState>(
         // Build only for theme changes, listener handles status

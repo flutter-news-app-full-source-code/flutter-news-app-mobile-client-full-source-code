@@ -15,6 +15,7 @@ import 'package:ht_main/headlines-feed/view/headlines_feed_page.dart';
 import 'package:ht_main/headlines-search/view/headlines_search_page.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
+import 'package:ht_main/splash/view/splash_page.dart'; // Import SplashPage
 
 /// Creates and configures the GoRouter instance for the application.
 ///
@@ -23,7 +24,7 @@ import 'package:ht_main/router/routes.dart';
 GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
   return GoRouter(
     refreshListenable: authStatusNotifier,
-    initialLocation: Routes.feed,
+    initialLocation: Routes.splash, // Set initial location to splash
     debugLogDiagnostics: true, // Enable verbose logging for debugging redirects
     // --- Redirect Logic ---
     redirect: (BuildContext context, GoRouterState state) {
@@ -67,12 +68,48 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
       // Check if the 'context=linking' query parameter is present in the URI.
       final isLinkingContext =
           currentUri.queryParameters['context'] == 'linking';
+      // Check if the current location is the splash screen path.
+      final isGoingToSplash = currentLocation == Routes.splash;
 
       // --- Redirect Logic based on AppStatus ---
 
-      // --- Case 1: Unauthenticated User ---
+      // --- Case 0: Initial Loading State ---
+      // While the app is initializing, force the user to the splash screen.
+      if (appStatus == AppStatus.initial) {
+        print('  Redirect Decision: AppStatus is INITIAL.');
+        // If already on splash, stay there.
+        if (isGoingToSplash) {
+          print('    Action: Already on splash screen. Allowing navigation.');
+          return null;
+        }
+        // If trying to go anywhere else during initial load, force to splash.
+        print('    Action: Forcing navigation to splash screen.');
+        return Routes.splash;
+      }
+
+      // --- Transitioning Away from Splash Screen ---
+      // Once the status is determined (not initial), if the user is currently
+      // on the splash screen, redirect them to the appropriate main screen.
+      if (currentLocation == Routes.splash) {
+        print('  Redirect Decision: Transitioning AWAY from Splash Screen.');
+        if (appStatus == AppStatus.unauthenticated) {
+          print('    Action: Redirecting to $authenticationPath');
+          return authenticationPath;
+        } else if (appStatus == AppStatus.authenticated ||
+                   appStatus == AppStatus.anonymous) {
+          print('    Action: Redirecting to $feedPath');
+          return feedPath;
+        }
+        // Fallback: Should not happen if status is known, but stay on splash if needed.
+        print('    Action: Unknown status after initial, staying on splash (fallback).');
+        return null;
+      }
+
+
+      // --- Case 1: Unauthenticated User (After Initial Load) ---
+      // If the user is unauthenticated and NOT on the splash screen...
       if (appStatus == AppStatus.unauthenticated) {
-        print('  Redirect Decision: User is UNauthenticated.');
+        print('  Redirect Decision: User is UNauthenticated (post-initial).');
         // If the user is NOT already going to an authentication path...
         if (!isGoingToAuth) {
           // ...redirect them to the main authentication page to sign in or sign up.
@@ -159,18 +196,17 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
         );
         return null; // Allow access
       }
-      // --- Case 4: Initial/Unknown Status ---
-      // This might occur briefly during app startup before the status is determined.
-      // Generally, allow navigation during this phase. If specific routes need
-      // protection even during startup, add checks here.
+      // --- Case 4: Fallback (Should not be reached with initial handling) ---
+      // This case is less likely now with explicit initial handling.
+      // If somehow the status is unknown after the initial phase, allow navigation.
       else {
-        print(
-          '  Redirect Decision: AppStatus is initial/unknown. Allowing navigation.',
-        );
-        return null; // Allow access
+         print(
+           '  Redirect Decision: AppStatus is UNEXPECTED ($appStatus). Allowing navigation (fallback).',
+         );
+         return null; // Allow access as a safe default
       }
 
-      // --- Default: No Redirect ---
+      // --- Default: No Redirect (Should not be reached if logic is exhaustive) ---
       // If none of the above conditions triggered an explicit redirect, allow navigation.
       // This line should theoretically not be reached if the logic above is exhaustive.
       // print('  Redirect Decision: No specific redirect condition met. Allowing navigation.');
@@ -178,6 +214,13 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
     },
     // --- Routes ---
     routes: [
+      // --- Splash Screen Route ---
+      GoRoute(
+        path: Routes.splash,
+        name: Routes.splashName,
+        builder: (context, state) => const SplashPage(),
+      ),
+      // --- Authentication Routes ---
       GoRoute(
         path: Routes.authentication,
         name: Routes.authenticationName,

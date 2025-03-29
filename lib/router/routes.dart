@@ -1,4 +1,8 @@
 abstract final class Routes {
+  // --- Splash Screen ---
+  static const splash = '/splash';
+  static const splashName = 'splash';
+
   // --- Core App Routes ---
   static const feed = '/feed';
   static const feedName = 'feed';

@@ -2,6 +2,9 @@ part of 'app_bloc.dart';
 
 /// Represents the application's authentication status.
 enum AppStatus {
+  /// The application is initializing and the status is unknown.
+  initial,
+
   /// The user is authenticated.
   authenticated,
 
@@ -16,7 +19,7 @@ class AppState extends Equatable {
   AppState({
     this.selectedBottomNavigationIndex = 0,
     this.themeMode = ThemeMode.system,
-    this.status = AppStatus.unauthenticated,
+    this.status = AppStatus.initial, // Default to initial
     User? user,
   }) : user = user ?? User();
 

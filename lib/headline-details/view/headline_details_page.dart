@@ -5,8 +5,8 @@ import 'package:ht_headlines_repository/ht_headlines_repository.dart';
 import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/shared/widgets/failure_state_widget.dart';
-import 'package:ht_main/shared/widgets/initial_state_widget.dart';
-import 'package:ht_main/shared/widgets/loading_state_widget.dart';
+import 'package:ht_main/l10n/l10n.dart';
+import 'package:ht_main/shared/shared.dart'; // Import shared barrel file
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -90,14 +90,21 @@ class _HeadlineDetailsView extends StatelessWidget {
 
   Widget _buildLoaded(BuildContext context, Headline headline) {
     final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final colorScheme = theme.colorScheme;
+
     return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (headline.imageUrl != null)
-              Image.network(
+      // Use shared padding constant
+      padding: const EdgeInsets.all(AppSpacing.paddingLarge),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // --- Image ---
+          if (headline.imageUrl != null) ...[
+            ClipRRect( // Add rounded corners to the image
+              borderRadius: BorderRadius.circular(AppSpacing.md),
+              child: Image.network(
                 headline.imageUrl!,
                 width: double.infinity,
                 height: 200,
@@ -107,96 +114,134 @@ class _HeadlineDetailsView extends StatelessWidget {
                   return Container(
                     width: double.infinity,
                     height: 200,
-                    color: Colors.grey[300],
+                    // Use theme color for placeholder
+                    color: colorScheme.surfaceVariant,
+                    child: const Center(child: CircularProgressIndicator()),
                   );
                 },
-                errorBuilder:
-                    (context, error, stackTrace) => const Icon(Icons.error),
+                errorBuilder: (context, error, stackTrace) => Container(
+                  width: double.infinity,
+                  height: 200,
+                  color: colorScheme.surfaceVariant,
+                  child: Icon(
+                    Icons.broken_image,
+                    color: colorScheme.onSurfaceVariant,
+                    size: AppSpacing.xxl,
+                  ),
+                ),
               ),
-            const SizedBox(height: 16),
-            Text(headline.title, style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 8),
-            Column(
-              children: [
-                if (headline.source != null) ...[
-                  Row(
-                    children: [
-                      const Icon(Icons.source),
-                      const SizedBox(width: 4),
-                      Text(
-                        headline.source!,
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                ],
-                if (headline.categories != null &&
-                    headline.categories!.isNotEmpty) ...[
-                  Row(
-                    children: [
-                      const Icon(Icons.category),
-                      const SizedBox(width: 4),
-                      Text(
-                        headline.categories!.join(', '),
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                ],
-                if (headline.eventCountry != null) ...[
-                  Row(
-                    children: [
-                      const Icon(Icons.location_on),
-                      const SizedBox(width: 4),
-                      Text(
-                        headline.eventCountry!,
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                ],
-                if (headline.publishedAt != null)
-                  Row(
-                    children: [
-                      const Icon(Icons.date_range),
-                      const SizedBox(width: 4),
-                      Text(
-                        DateFormat(
-                          'MMMM dd, yyyy',
-                        ).format(headline.publishedAt!),
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ],
-                  ),
-              ],
             ),
-            const SizedBox(height: 16),
-            if (headline.description != null)
-              Text(
-                headline.description!,
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () async {
-                if (headline.url != null) {
+            // Use shared spacing constant
+            const SizedBox(height: AppSpacing.lg),
+          ],
+
+          // --- Title ---
+          Text(headline.title, style: textTheme.titleLarge),
+          // Use shared spacing constant
+          const SizedBox(height: AppSpacing.md), // Increased spacing before metadata
+
+          // --- Metadata Section ---
+          _buildMetadataSection(context, headline),
+          // Use shared spacing constant
+          const SizedBox(height: AppSpacing.lg),
+
+          // --- Description ---
+          if (headline.description != null) ...[
+            Text(
+              headline.description!,
+              style: textTheme.bodyLarge,
+            ),
+            // Use shared spacing constant
+            const SizedBox(height: AppSpacing.xl), // Increased spacing before button
+          ],
+
+          // --- Continue Reading Button ---
+          if (headline.url != null)
+            SizedBox( // Make button full width
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () async {
                   await launchUrlString(headline.url!);
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-              ),
-              child: Text(
-                l10n.headlineDetailsContinueReadingButton,
-                style: Theme.of(context).textTheme.labelLarge,
+                },
+                // Style is often handled by ElevatedButtonThemeData in AppTheme
+                // but explicitly setting background for clarity if needed.
+                // style: ElevatedButton.styleFrom(
+                //   backgroundColor: colorScheme.primary,
+                //   foregroundColor: colorScheme.onPrimary,
+                // ),
+                child: Text(
+                  l10n.headlineDetailsContinueReadingButton,
+                  // Ensure labelLarge has contrast if theme doesn't handle it
+                  // style: textTheme.labelLarge?.copyWith(color: colorScheme.onPrimary),
+                ),
               ),
             ),
+        ],
+      ),
+    );
+  }
+
+  /// Builds the metadata section (Source, Date, Categories, Country).
+  Widget _buildMetadataSection(BuildContext context, Headline headline) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final metadataStyle = textTheme.bodyMedium; // Or textTheme.caption
+
+    // Helper to create consistent metadata rows
+    Widget buildMetadataRow(IconData icon, String text) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+        child: Row(
+          children: [
+            Icon(icon, size: 16, color: theme.colorScheme.onSurfaceVariant),
+            const SizedBox(width: AppSpacing.xs),
+            Expanded(child: Text(text, style: metadataStyle)),
           ],
         ),
-      ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (headline.source != null)
+          buildMetadataRow(Icons.source, headline.source!),
+        if (headline.publishedAt != null)
+          buildMetadataRow(
+            Icons.date_range,
+            DateFormat('MMMM dd, yyyy').format(headline.publishedAt!),
+          ),
+        if (headline.eventCountry != null)
+          buildMetadataRow(Icons.location_on, headline.eventCountry!),
+        if (headline.categories != null && headline.categories!.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start, // Align icon top
+              children: [
+                Icon(Icons.category, size: 16, color: theme.colorScheme.onSurfaceVariant),
+                const SizedBox(width: AppSpacing.xs),
+                Expanded(
+                  child: Wrap(
+                    spacing: AppSpacing.xs, // Horizontal spacing between chips
+                    runSpacing: AppSpacing.xs, // Vertical spacing if wraps
+                    children: headline.categories!
+                        .map((category) => Chip(
+                              label: Text(category),
+                              labelStyle: textTheme.labelSmall,
+                              padding: EdgeInsets.zero,
+                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              visualDensity: VisualDensity.compact,
+                              backgroundColor: theme.colorScheme.secondaryContainer,
+                              labelPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+                            ))
+                        .toList(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 }

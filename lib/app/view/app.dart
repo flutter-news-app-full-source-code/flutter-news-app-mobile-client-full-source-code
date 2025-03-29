@@ -70,26 +70,66 @@ class _AppView extends StatefulWidget {
 
 class _AppViewState extends State<_AppView> {
   late final GoRouter _router;
-  late final ValueNotifier<AppStatus> _statusNotifier;
+  // Notifier that GoRouter listens to. We control its value.
+  late final ValueNotifier<AppStatus> _routerNotifier;
   StreamSubscription<PendingDynamicLinkData>? _linkSubscription;
+
+  // Flags to manage splash screen duration
+  bool _isAuthStatusKnown = false;
+  bool _isMinTimeElapsed = false;
+  // Store the actual latest status from AppBloc
+  AppStatus _currentAppStatus = AppStatus.initial;
+
+  // Minimum splash duration
+  static const _minSplashDuration = Duration(seconds: 2);
 
   @override
   void initState() {
     super.initState();
     final appBloc = context.read<AppBloc>();
-    _statusNotifier = ValueNotifier<AppStatus>(appBloc.state.status);
-    _router = createRouter(authStatusNotifier: _statusNotifier);
+    _currentAppStatus = appBloc.state.status; // Store initial status
+    // Initialize the router notifier with the initial status
+    _routerNotifier = ValueNotifier<AppStatus>(_currentAppStatus);
+    _router = createRouter(authStatusNotifier: _routerNotifier);
+
+    // Start the minimum time timer
+    Future.delayed(_minSplashDuration, () {
+      if (mounted) {
+        setState(() {
+          _isMinTimeElapsed = true;
+        });
+        _updateRouterNotifier(); // Check if we can navigate away
+      }
+    });
 
     // --- Initialize Deep Link Handling ---
     _initDynamicLinks();
     // ------------------------------------
+
+    // Initial check in case status is already known *at the end of initState*
+    if (_currentAppStatus != AppStatus.initial) {
+       _isAuthStatusKnown = true;
+       _updateRouterNotifier();
+    }
   }
 
   @override
   void dispose() {
     _linkSubscription?.cancel();
-    _statusNotifier.dispose();
+    _routerNotifier.dispose(); // Dispose the correct notifier
     super.dispose();
+  }
+
+  /// Checks conditions and updates the router notifier if ready.
+  void _updateRouterNotifier() {
+    // Only update the router notifier (triggering redirect) if both
+    // minimum time has passed AND the auth status is known.
+    if (_isMinTimeElapsed && _isAuthStatusKnown) {
+      // Update with the *actual* current status
+      _routerNotifier.value = _currentAppStatus;
+    }
+    // Otherwise, the router notifier remains AppStatus.initial, keeping
+    // the user on the splash screen.
   }
 
   /// Initializes Firebase Dynamic Links listeners.
@@ -168,13 +208,31 @@ class _AppViewState extends State<_AppView> {
     // The BlocBuilder remains for theme changes.
     return BlocListener<AppBloc, AppState>(
       // Only listen when the status actually changes
-      listenWhen: (previous, current) => previous.status != current.status,
+      // Listen to all status changes from AppBloc
       listener: (context, state) {
-        // Update the ValueNotifier when the AppBloc status changes.
-        // This triggers the GoRouter's refreshListenable.
-        _statusNotifier.value = state.status;
+        // Store the latest actual status
+        _currentAppStatus = state.status;
+
+        // If the status is no longer initial, mark it as known
+        if (state.status != AppStatus.initial) {
+          if (!_isAuthStatusKnown) { // Only update state if it changes
+             setState(() {
+               _isAuthStatusKnown = true;
+             });
+          }
+          _updateRouterNotifier(); // Check if we can navigate away
+        }
+        // If the status somehow reverts to initial (unlikely), reset flag
+        else if (_isAuthStatusKnown) {
+           setState(() {
+             _isAuthStatusKnown = false;
+           });
+           // Ensure router notifier reflects initial state again
+           _routerNotifier.value = AppStatus.initial;
+        }
       },
       child: BlocBuilder<AppBloc, AppState>(
+        // Build only for theme changes, listener handles status
         buildWhen:
             (previous, current) => previous.themeMode != current.themeMode,
         builder: (context, state) {

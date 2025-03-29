@@ -1,3 +1,6 @@
+//
+// ignore_for_file: lines_longer_than_80_chars
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_headlines_repository/ht_headlines_repository.dart';
@@ -20,9 +23,10 @@ class HeadlinesSearchPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => HeadlinesSearchBloc(
-        headlinesRepository: context.read<HtHeadlinesRepository>(),
-      ),
+      create:
+          (_) => HeadlinesSearchBloc(
+            headlinesRepository: context.read<HtHeadlinesRepository>(),
+          ),
       // The actual UI is built by the private _HeadlinesSearchView widget.
       child: const _HeadlinesSearchView(),
     );
@@ -40,7 +44,8 @@ class _HeadlinesSearchView extends StatefulWidget {
 
 class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
   final _scrollController = ScrollController();
-  final _textController = TextEditingController(); // Controller for the TextField
+  final _textController =
+      TextEditingController(); // Controller for the TextField
   bool _showClearButton = false; // State to control clear button visibility
 
   @override
@@ -68,11 +73,11 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
   void _onScroll() {
     final state = context.read<HeadlinesSearchBloc>().state;
     if (_isBottom && state is HeadlinesSearchSuccess) {
-      final searchTerm = state.lastSearchTerm; // Use lastSearchTerm from state
+      final searchTerm = state.lastSearchTerm;
       if (state.hasMore) {
         context.read<HeadlinesSearchBloc>().add(
-              HeadlinesSearchFetchRequested(searchTerm: searchTerm!),
-            );
+          HeadlinesSearchFetchRequested(searchTerm: searchTerm!),
+        );
       }
     }
   }
@@ -89,8 +94,8 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
   /// Triggers a search request based on the current text input.
   void _performSearch() {
     context.read<HeadlinesSearchBloc>().add(
-          HeadlinesSearchFetchRequested(searchTerm: _textController.text),
-        );
+      HeadlinesSearchFetchRequested(searchTerm: _textController.text),
+    );
   }
 
   @override
@@ -105,12 +110,13 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
         // Enhanced TextField integrated into the AppBar title
         title: TextField(
           controller: _textController,
-          // Use text style that contrasts well with AppBar background
+
           style: appBarTheme.titleTextStyle ?? theme.textTheme.titleLarge,
           decoration: InputDecoration(
             hintText: l10n.headlinesSearchHintText,
-            // Use hint style that contrasts well
-            hintStyle: appBarTheme.titleTextStyle?.copyWith(
+
+            hintStyle:
+                appBarTheme.titleTextStyle?.copyWith(
                   color: (appBarTheme.titleTextStyle?.color ??
                           colorScheme.onSurface)
                       .withOpacity(0.6),
@@ -126,28 +132,28 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
             enabledBorder: InputBorder.none,
             // Add a subtle background fill
             filled: true,
-            // Use a subtle color from the theme for the fill
+
             fillColor: colorScheme.surface.withOpacity(0.1),
             // Apply consistent padding using AppSpacing
             contentPadding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.paddingMedium,
-              vertical: AppSpacing.paddingSmall, // Adjust vertical padding as needed
+              vertical:
+                  AppSpacing.paddingSmall, // Adjust vertical padding as needed
             ),
             // Add a clear button that appears when text is entered
-            suffixIcon: _showClearButton
-                ? IconButton(
-                    icon: Icon(
-                      Icons.clear,
-                      // Use icon color appropriate for AppBar
-                      color: appBarTheme.iconTheme?.color ?? colorScheme.onSurface,
-                    ),
-                    onPressed: () {
-                      _textController.clear();
-                      // Optionally trigger an empty search or reset state
-                      // _performSearch(); // Uncomment if clearing should trigger search
-                    },
-                  )
-                : null, // No icon when text field is empty
+            suffixIcon:
+                _showClearButton
+                    ? IconButton(
+                      icon: Icon(
+                        Icons.clear,
+
+                        color:
+                            appBarTheme.iconTheme?.color ??
+                            colorScheme.onSurface,
+                      ),
+                      onPressed: _textController.clear,
+                    )
+                    : null, // No icon when text field is empty
           ),
           // Trigger search on submit (e.g., pressing Enter on keyboard)
           onSubmitted: (_) => _performSearch(),
@@ -157,7 +163,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
           IconButton(
             icon: const Icon(Icons.search),
             tooltip: l10n.headlinesSearchActionTooltip, // Re-added tooltip
-            onPressed: _performSearch, // Use the dedicated search method
+            onPressed: _performSearch,
           ),
         ],
       ),
@@ -167,57 +173,57 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
           return switch (state) {
             // Loading state
             HeadlinesSearchLoading() => InitialStateWidget(
-                icon: Icons.manage_search, // Changed icon
-                headline: l10n.headlinesSearchInitialHeadline, // Keep initial text for loading phase
-                subheadline: l10n.headlinesSearchInitialSubheadline,
-              ),
+              icon: Icons.manage_search, // Changed icon
+              headline:
+                  l10n.headlinesSearchInitialHeadline, // Keep initial text for loading phase
+              subheadline: l10n.headlinesSearchInitialSubheadline,
+            ),
             // Success state with results
             HeadlinesSearchSuccess(
               :final headlines,
               :final hasMore,
               :final errorMessage, // Check for specific error message within success
-              :final lastSearchTerm, // Use lastSearchTerm for retries
+              :final lastSearchTerm,
             ) =>
               errorMessage != null
                   // Display error if present within success state
                   ? FailureStateWidget(
-                      message: errorMessage,
-                      onRetry: () {
-                        // Retry with the last successful search term
-                        context.read<HeadlinesSearchBloc>().add(
-                              HeadlinesSearchFetchRequested(
-                                searchTerm: lastSearchTerm ?? '',
-                              ),
-                            );
-                      },
-                    )
+                    message: errorMessage,
+                    onRetry: () {
+                      // Retry with the last successful search term
+                      context.read<HeadlinesSearchBloc>().add(
+                        HeadlinesSearchFetchRequested(
+                          searchTerm: lastSearchTerm ?? '',
+                        ),
+                      );
+                    },
+                  )
                   // Display "no results" if list is empty
                   : headlines.isEmpty
-                      ? InitialStateWidget(
-                          icon: Icons.search_off,
-                          headline: l10n.headlinesSearchNoResultsHeadline,
-                          subheadline:
-                              l10n.headlinesSearchNoResultsSubheadline,
-                        )
-                      // Display the list of headlines
-                      : ListView.builder(
-                          controller: _scrollController,
-                          // Add 1 for loading indicator if more items exist
-                          itemCount:
-                              hasMore ? headlines.length + 1 : headlines.length,
-                          itemBuilder: (context, index) {
-                            // Show loading indicator at the end if hasMore
-                            if (index >= headlines.length) {
-                              // Ensure loading indicator is visible
-                              return const Padding(
-                                padding: EdgeInsets.all(AppSpacing.paddingLarge),
-                                child: Center(child: CircularProgressIndicator()),
-                              );
-                            }
-                            // Display headline item
-                            return HeadlineItemWidget(headline: headlines[index]);
-                          },
-                        ),
+                  ? InitialStateWidget(
+                    icon: Icons.search_off,
+                    headline: l10n.headlinesSearchNoResultsHeadline,
+                    subheadline: l10n.headlinesSearchNoResultsSubheadline,
+                  )
+                  // Display the list of headlines
+                  : ListView.builder(
+                    controller: _scrollController,
+                    // Add 1 for loading indicator if more items exist
+                    itemCount:
+                        hasMore ? headlines.length + 1 : headlines.length,
+                    itemBuilder: (context, index) {
+                      // Show loading indicator at the end if hasMore
+                      if (index >= headlines.length) {
+                        // Ensure loading indicator is visible
+                        return const Padding(
+                          padding: EdgeInsets.all(AppSpacing.paddingLarge),
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      }
+                      // Display headline item
+                      return HeadlineItemWidget(headline: headlines[index]);
+                    },
+                  ),
             // Default case (should ideally not be reached if states are handled)
             _ => const SizedBox.shrink(),
           };

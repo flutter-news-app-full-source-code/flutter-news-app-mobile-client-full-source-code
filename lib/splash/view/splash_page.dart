@@ -16,18 +16,19 @@ class SplashPage extends StatelessWidget {
       body: Center(
         child: Padding(
           // Add horizontal padding for content safety
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg), // Corrected constant
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+          ), // Corrected constant
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Icon representing news/articles
               Icon(
                 Icons.article_outlined,
-                size: 64.0,
+                size: 64,
                 color: colorScheme.primary, // Use primary theme color
               ),
               const SizedBox(height: AppSpacing.xl), // Use defined spacing
-
               // App Title
               Text(
                 'Headlines Toolkit', // App Name
@@ -35,7 +36,6 @@ class SplashPage extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.md), // Use defined spacing
-
               // Subheadline/Tagline
               Text(
                 'Develop News Headlines Apps Rapidly & Reliably.', // Tagline

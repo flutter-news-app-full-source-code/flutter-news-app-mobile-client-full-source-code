@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ht_main/account/view/account_page.dart';
 import 'package:ht_main/app/bloc/app_bloc.dart';
-import 'package:ht_main/app/view/app_shell.dart'; // Import the AppShell
+import 'package:ht_main/app/view/app_shell.dart';
 import 'package:ht_main/authentication/view/authentication_page.dart';
 import 'package:ht_main/authentication/view/email_link_sent_page.dart';
 import 'package:ht_main/authentication/view/email_sign_in_page.dart';
@@ -15,7 +15,7 @@ import 'package:ht_main/headlines-feed/view/headlines_feed_page.dart';
 import 'package:ht_main/headlines-search/view/headlines_search_page.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
-import 'package:ht_main/splash/view/splash_page.dart'; // Import SplashPage
+import 'package:ht_main/splash/view/splash_page.dart';
 
 /// Creates and configures the GoRouter instance for the application.
 ///
@@ -96,15 +96,16 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
           print('    Action: Redirecting to $authenticationPath');
           return authenticationPath;
         } else if (appStatus == AppStatus.authenticated ||
-                   appStatus == AppStatus.anonymous) {
+            appStatus == AppStatus.anonymous) {
           print('    Action: Redirecting to $feedPath');
           return feedPath;
         }
         // Fallback: Should not happen if status is known, but stay on splash if needed.
-        print('    Action: Unknown status after initial, staying on splash (fallback).');
+        print(
+          '    Action: Unknown status after initial, staying on splash (fallback).',
+        );
         return null;
       }
-
 
       // --- Case 1: Unauthenticated User (After Initial Load) ---
       // If the user is unauthenticated and NOT on the splash screen...
@@ -131,7 +132,6 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
         // Helper booleans for search and account sections
         final isGoingToSearch = currentLocation.startsWith(searchPath);
         final isGoingToAccount = currentLocation.startsWith(accountPath);
-
 
         // **Sub-Case 2.1: Navigating to the BASE Authentication Path (`/authentication`)**
         if (isGoingToBaseAuthPath) {
@@ -163,7 +163,8 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
         }
         // **Sub-Case 2.3: Navigating Within the Main App Sections (Feed, Search, Account)**
         // Allow anonymous users to access the main content sections and their sub-routes.
-        else if (isGoingToFeed || isGoingToSearch || isGoingToAccount) { // Added checks for search and account
+        else if (isGoingToFeed || isGoingToSearch || isGoingToAccount) {
+          // Added checks for search and account
           print(
             '    Action: Allowing navigation within main app section ($currentLocation).', // Updated log message
           );
@@ -200,10 +201,10 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
       // This case is less likely now with explicit initial handling.
       // If somehow the status is unknown after the initial phase, allow navigation.
       else {
-         print(
-           '  Redirect Decision: AppStatus is UNEXPECTED ($appStatus). Allowing navigation (fallback).',
-         );
-         return null; // Allow access as a safe default
+        print(
+          '  Redirect Decision: AppStatus is UNEXPECTED ($appStatus). Allowing navigation (fallback).',
+        );
+        return null; // Allow access as a safe default
       }
 
       // --- Default: No Redirect (Should not be reached if logic is exhaustive) ---

@@ -108,8 +108,8 @@ class _AppViewState extends State<_AppView> {
 
     // Initial check in case status is already known *at the end of initState*
     if (_currentAppStatus != AppStatus.initial) {
-       _isAuthStatusKnown = true;
-       _updateRouterNotifier();
+      _isAuthStatusKnown = true;
+      _updateRouterNotifier();
     }
   }
 
@@ -215,20 +215,21 @@ class _AppViewState extends State<_AppView> {
 
         // If the status is no longer initial, mark it as known
         if (state.status != AppStatus.initial) {
-          if (!_isAuthStatusKnown) { // Only update state if it changes
-             setState(() {
-               _isAuthStatusKnown = true;
-             });
+          if (!_isAuthStatusKnown) {
+            // Only update state if it changes
+            setState(() {
+              _isAuthStatusKnown = true;
+            });
           }
           _updateRouterNotifier(); // Check if we can navigate away
         }
         // If the status somehow reverts to initial (unlikely), reset flag
         else if (_isAuthStatusKnown) {
-           setState(() {
-             _isAuthStatusKnown = false;
-           });
-           // Ensure router notifier reflects initial state again
-           _routerNotifier.value = AppStatus.initial;
+          setState(() {
+            _isAuthStatusKnown = false;
+          });
+          // Ensure router notifier reflects initial state again
+          _routerNotifier.value = AppStatus.initial;
         }
       },
       child: BlocBuilder<AppBloc, AppState>(

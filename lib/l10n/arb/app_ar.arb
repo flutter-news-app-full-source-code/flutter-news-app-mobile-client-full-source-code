@@ -259,5 +259,21 @@
     "accountConnectBenefit": "لحفظ تفضيلاتك وسجل القراءة عبر الأجهزة.",
     "@accountConnectBenefit": {
         "description": "عنوان فرعي يشرح فائدة ربط حساب مجهول"
+    },
+    "bottomNavFeedLabel": "الموجز",
+    "@bottomNavFeedLabel": {
+        "description": "Label for the Feed item in the bottom navigation bar"
+    },
+    "bottomNavSearchLabel": "بحث",
+    "@bottomNavSearchLabel": {
+        "description": "Label for the Search item in the bottom navigation bar"
+    },
+    "bottomNavAccountLabel": "الحساب",
+    "@bottomNavAccountLabel": {
+        "description": "Label for the Account item in the bottom navigation bar"
+    },
+    "accountNotificationsTile": "الإشعارات",
+    "@accountNotificationsTile": {
+        "description": "Title for the notifications navigation tile in the account page"
     }
 }

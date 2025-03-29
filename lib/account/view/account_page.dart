@@ -45,7 +45,7 @@ class _AccountView extends StatelessWidget {
     final l10n = context.l10n;
     // Watch AppBloc for user details and authentication status
     final user = context.watch<AppBloc>().state.user;
-    final status = user.authenticationStatus; // Use status from User model
+    final status = user.authenticationStatus;
 
     // Determine if the user is anonymous
     final isAnonymous = status == AuthenticationStatus.anonymous;
@@ -61,8 +61,10 @@ class _AccountView extends StatelessWidget {
           const SizedBox(height: 24),
 
           // --- Action Tiles ---
+          _buildNotificationsTile(context),
+          const Divider(),
           _buildSettingsTile(context),
-          const Divider(), // Visual separator
+          const Divider(),
           if (isAnonymous)
             _buildBackupTile(context) // Show Backup CTA for anonymous
           else
@@ -144,7 +146,6 @@ class _AccountView extends StatelessWidget {
         style: TextStyle(color: Theme.of(context).colorScheme.error),
       ),
       onTap: () {
-        // Add the logout event to the AccountBloc
         context.read<AccountBloc>().add(const AccountLogoutRequested());
         // Global redirect will be handled by AppBloc/GoRouter
       },
@@ -155,7 +156,7 @@ class _AccountView extends StatelessWidget {
   Widget _buildBackupTile(BuildContext context) {
     final l10n = context.l10n;
     return ListTile(
-      leading: const Icon(Icons.link), // Icon suggesting connection/linking
+      leading: const Icon(Icons.link),
       title: Text(l10n.accountConnectPrompt),
       subtitle: Text(l10n.accountConnectBenefit),
       isThreeLine: true, // Allow more space for subtitle
@@ -166,6 +167,20 @@ class _AccountView extends StatelessWidget {
           Routes.authenticationName,
           queryParameters: {'context': 'linking'},
         );
+      },
+    );
+  }
+
+  /// Builds the ListTile for navigating to Notifications.
+  Widget _buildNotificationsTile(BuildContext context) {
+    final l10n = context.l10n;
+    return ListTile(
+      leading: const Icon(Icons.notifications_outlined),
+      title: Text(l10n.accountNotificationsTile),
+      trailing: const Icon(Icons.chevron_right), // Suggests navigation
+      onTap: () {
+        // Navigate to the new notifications route (placeholder)
+        context.goNamed(Routes.notificationsName);
       },
     );
   }

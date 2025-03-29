@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:ht_headlines_repository/ht_headlines_repository.dart';
 import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:ht_main/headlines-feed/widgets/headline_item_widget.dart';
 import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/constants/constants.dart';
 import 'package:ht_main/shared/widgets/failure_state_widget.dart';
 import 'package:ht_main/shared/widgets/loading_state_widget.dart';
@@ -75,38 +73,14 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
 
     return Scaffold(
       appBar: AppBar(
-        leadingWidth: 100,
-        leading: Row(
-          mainAxisSize: MainAxisSize.min, // Keep icons close together
-          children: [
-            IconButton(
-              icon: const Icon(Icons.account_circle_outlined),
-              selectedIcon: const Icon(Icons.account_circle_rounded),
-              onPressed: () {
-                // Navigate to the Account page
-                context.goNamed(Routes.accountName);
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.notifications_none),
-              selectedIcon: const Icon(Icons.notifications_rounded),
-              onPressed: () {},
-            ),
-          ],
-        ),
+        // Removed leadingWidth and leading Row
         title: Text(
-          'HT', // Consider localizing this if needed
+          'HT', // TODO(fulleni): Localize this title
           style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         actions: [
-          const SizedBox(width: AppSpacing.sm),
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              context.goNamed(Routes.searchName);
-            },
-          ),
+          // Removed Search IconButton
           BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
             builder: (context, state) {
               var isFilterApplied = false;
@@ -138,7 +112,7 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
                         width: AppSpacing.sm,
                         height: AppSpacing.sm,
                         decoration: BoxDecoration(
-                          color: colorScheme.primary, // Use variable
+                          color: colorScheme.primary,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -160,9 +134,7 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
                 headline: l10n.headlinesFeedLoadingHeadline,
                 subheadline: l10n.headlinesFeedLoadingSubheadline,
               );
-            // this silentcase will never be reached
-            // it here just to fullfill the Exhaustiveness
-            // Checking os the sealed state.
+
             case HeadlinesFeedLoadingSilently():
               // This case is technically unreachable due to buildWhen,
               // but required for exhaustive switch.
@@ -177,7 +149,7 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
                 // Use ListView.separated for consistent spacing
                 child: ListView.separated(
                   controller: _scrollController,
-                  // Add vertical padding within the list
+
                   padding: const EdgeInsets.only(
                     top: AppSpacing.md,
                     bottom: AppSpacing.xxl,
@@ -259,14 +231,14 @@ class _HeadlinesFilterBottomSheetState
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch, // Stretch buttons
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
                 l10n.headlinesFeedFilterTitle,
                 style: Theme.of(context).textTheme.titleLarge,
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: AppSpacing.xl), // Increased spacing
+              const SizedBox(height: AppSpacing.xl),
               // Category Dropdown
               DropdownButtonFormField<String>(
                 decoration: InputDecoration(

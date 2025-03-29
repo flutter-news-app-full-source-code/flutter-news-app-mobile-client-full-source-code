@@ -1,13 +1,23 @@
 abstract final class Routes {
-  static const home = '/';
-  static const homeName = 'home';
-  static const headlinesFeed = '/headlines-feed';
-  static const headlinesFeedName = 'headlinesFeed';
+  // --- Core App Routes ---
+  static const feed = '/feed';
+  static const feedName = 'feed';
   static const search = '/search';
   static const searchName = 'search';
-  static const settings = '/settings';
-  static const settingsName = 'settings';
+  static const account = '/account';
+  static const accountName = 'account';
+
+  // --- Sub Routes ---
+  // Article details is now relative to feed
   static const articleDetailsName = 'articleDetails';
+  // Settings is now relative to account
+  static const settings = 'settings'; // Relative path
+  static const settingsName = 'settings';
+  // Notifications is now relative to account
+  static const notifications = 'notifications'; // Relative path
+  static const notificationsName = 'notifications';
+
+  // --- Authentication Routes ---
   static const authentication = '/authentication';
   static const authenticationName = 'authentication';
   static const forgotPassword = 'forgot-password';
@@ -16,12 +26,10 @@ abstract final class Routes {
   static const resetPasswordName = 'resetPassword';
   static const confirmEmail = 'confirm-email';
   static const confirmEmailName = 'confirmEmail';
-  static const account = 'account';
-  static const accountName = 'account';
-  static const accountLinking = 'linking';
-  static const accountLinkingName = 'accountLinking';
+  static const accountLinking = 'linking'; // Query param context, not a path
+  static const accountLinkingName = 'accountLinking'; // Name for context
 
-  // New routes for email sign-in flow
+  // routes for email sign-in flow
   static const emailSignIn = 'email-sign-in';
   static const emailSignInName = 'emailSignIn';
   static const emailLinkSent = 'email-link-sent';

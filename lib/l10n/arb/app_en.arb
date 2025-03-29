@@ -259,5 +259,21 @@
     "accountConnectBenefit": "Save your preferences and reading history across devices.",
     "@accountConnectBenefit": {
         "description": "Subtitle explaining the benefit of connecting an anonymous account"
+    },
+    "bottomNavFeedLabel": "Feed",
+    "@bottomNavFeedLabel": {
+        "description": "Label for the Feed item in the bottom navigation bar"
+    },
+    "bottomNavSearchLabel": "Search",
+    "@bottomNavSearchLabel": {
+        "description": "Label for the Search item in the bottom navigation bar"
+    },
+    "bottomNavAccountLabel": "Account",
+    "@bottomNavAccountLabel": {
+        "description": "Label for the Account item in the bottom navigation bar"
+    },
+    "accountNotificationsTile": "Notifications",
+    "@accountNotificationsTile": {
+        "description": "Title for the notifications navigation tile in the account page"
     }
 }

@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ht_main/account/view/account_page.dart';
 import 'package:ht_main/app/bloc/app_bloc.dart';
+import 'package:ht_main/app/view/app_shell.dart'; // Import the AppShell
 import 'package:ht_main/authentication/view/authentication_page.dart';
 import 'package:ht_main/authentication/view/email_link_sent_page.dart';
 import 'package:ht_main/authentication/view/email_sign_in_page.dart';
@@ -22,7 +23,7 @@ import 'package:ht_main/router/routes.dart';
 GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
   return GoRouter(
     refreshListenable: authStatusNotifier,
-    initialLocation: Routes.headlinesFeed,
+    initialLocation: Routes.feed,
     debugLogDiagnostics: true, // Enable verbose logging for debugging redirects
     // --- Redirect Logic ---
     redirect: (BuildContext context, GoRouterState state) {
@@ -47,7 +48,7 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
       // --- Define Key Paths ---
       // Base paths for major sections.
       const authenticationPath = Routes.authentication; // '/authentication'
-      const headlinesFeedPath = Routes.headlinesFeed; // '/headlines-feed'
+      const feedPath = Routes.feed; // Updated path constant
       // Specific authentication sub-routes crucial for the email linking flow.
       const emailSignInPath =
           '$authenticationPath/${Routes.emailSignIn}'; // '/authentication/email-sign-in'
@@ -57,8 +58,10 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
       // --- Helper Booleans ---
       // Check if the navigation target is within the authentication section.
       final isGoingToAuth = currentLocation.startsWith(authenticationPath);
-      // Check if the navigation target is within the headlines feed section.
-      final isGoingToFeed = currentLocation.startsWith(headlinesFeedPath);
+      // Check if the navigation target is within the feed section.
+      final isGoingToFeed = currentLocation.startsWith(
+        feedPath,
+      ); // Updated path constant
       // Check if the navigation target is the *exact* base authentication path.
       final isGoingToBaseAuthPath = currentLocation == authenticationPath;
       // Check if the 'context=linking' query parameter is present in the URI.
@@ -95,11 +98,11 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
             return null; // Allow access
           } else {
             // Prevent anonymous users from accessing the initial sign-in screen again.
-            // Redirect them to the main content (headlines feed).
+            // Redirect them to the main content (feed).
             print(
-              '    Action: Preventing access to initial sign-in, redirecting to $headlinesFeedPath',
+              '    Action: Preventing access to initial sign-in, redirecting to $feedPath', // Updated path constant
             );
-            return headlinesFeedPath; // Redirect to feed
+            return feedPath; // Redirect to feed
           }
         }
         // **Sub-Case 2.2: Navigating to Specific Email Linking Sub-Routes**
@@ -125,9 +128,9 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
         // redirect them to the main content feed as a safe default.
         else {
           print(
-            '    Action: Unexpected path ($currentLocation), redirecting to $headlinesFeedPath',
+            '    Action: Unexpected path ($currentLocation), redirecting to $feedPath', // Updated path constant
           );
-          return headlinesFeedPath; // Redirect to feed
+          return feedPath; // Redirect to feed
         }
       }
       // --- Case 3: Authenticated User ---
@@ -137,9 +140,9 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
         if (isGoingToAuth) {
           // ...redirect them away to the main content feed. They don't need to authenticate again.
           print(
-            '    Action: Preventing access to authentication section, redirecting to $headlinesFeedPath',
+            '    Action: Preventing access to authentication section, redirecting to $feedPath', // Updated path constant
           );
-          return headlinesFeedPath; // Redirect to feed
+          return feedPath; // Redirect to feed
         }
         // Otherwise, allow authenticated users to access any other part of the app (feed, account, settings, etc.).
         print(
@@ -194,7 +197,7 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
             headline: headline,
             subHeadline: subHeadline,
             showAnonymousButton: showAnonymousButton,
-            isLinkingContext: isLinkingContext, // Pass the flag
+            isLinkingContext: isLinkingContext,
           );
         },
         routes: [
@@ -204,9 +207,7 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
             builder: (context, state) {
               // Extract the linking context flag from 'extra', default to false.
               final isLinking = (state.extra as bool?) ?? false;
-              return EmailSignInPage(
-                isLinkingContext: isLinking,
-              ); // Pass to widget
+              return EmailSignInPage(isLinkingContext: isLinking);
             },
           ),
           GoRoute(
@@ -216,42 +217,77 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
           ),
         ],
       ),
-      GoRoute(
-        path: Routes.headlinesFeed,
-        name: Routes.headlinesFeedName,
-        builder: (BuildContext context, GoRouterState state) {
-          return const HeadlinesFeedPage();
+      // --- Main App Shell ---
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          // Return the shell widget which contains the AdaptiveScaffold
+          return AppShell(navigationShell: navigationShell);
         },
-        routes: [
-          GoRoute(
-            path: 'article/:id',
-            name: Routes.articleDetailsName,
-            builder: (BuildContext context, GoRouterState state) {
-              final id = state.pathParameters['id']!;
-              return HeadlineDetailsPage(headlineId: id);
-            },
+        branches: [
+          // --- Branch 1: Feed ---
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.feed, // '/feed'
+                name: Routes.feedName,
+                builder: (context, state) => const HeadlinesFeedPage(),
+                routes: [
+                  // Sub-route for article details
+                  GoRoute(
+                    path: 'article/:id', // Relative path
+                    name: Routes.articleDetailsName,
+                    builder: (context, state) {
+                      final id = state.pathParameters['id']!;
+                      return HeadlineDetailsPage(headlineId: id);
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
-          GoRoute(
-            path: 'search',
-            name: Routes.searchName,
-            builder: (BuildContext context, GoRouterState state) {
-              return const HeadlinesSearchPage();
-            },
+          // --- Branch 2: Search ---
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.search, // '/search'
+                name: Routes.searchName,
+                builder: (context, state) => const HeadlinesSearchPage(),
+              ),
+            ],
           ),
-          GoRoute(
-            path: 'settings',
-            name: Routes.settingsName,
-            builder: (BuildContext context, GoRouterState state) {
-              return const Placeholder(
-                child: Center(child: Text('SETTINGS PAGE')),
-              );
-            },
-          ),
-          // --- Account Sub-Route ---
-          GoRoute(
-            path: Routes.account,
-            name: Routes.accountName,
-            builder: (context, state) => const AccountPage(),
+          // --- Branch 3: Account ---
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.account, // '/account'
+                name: Routes.accountName,
+                builder: (context, state) => const AccountPage(),
+                routes: [
+                  // Sub-route for settings
+                  GoRoute(
+                    path: Routes.settings, // Relative path 'settings'
+                    name: Routes.settingsName,
+                    builder: (context, state) {
+                      // TODO(fulleni): Replace with actual SettingsPage
+                      return const Placeholder(
+                        child: Center(child: Text('SETTINGS PAGE')),
+                      );
+                    },
+                  ),
+                  // Sub-route for notifications (placeholder)
+                  GoRoute(
+                    path: Routes.notifications, // Relative path 'notifications'
+                    name: Routes.notificationsName,
+                    builder: (context, state) {
+                      // TODO(fulleni): Replace with actual NotificationsPage
+                      return const Placeholder(
+                        child: Center(child: Text('NOTIFICATIONS PAGE')),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
         ],
       ),

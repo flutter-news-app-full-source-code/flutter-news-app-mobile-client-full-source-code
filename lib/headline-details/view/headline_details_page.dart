@@ -1,12 +1,14 @@
+// ignore_for_file: avoid_redundant_argument_values
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ht_headlines_client/ht_headlines_client.dart'; // Import for Headline
+import 'package:ht_headlines_client/ht_headlines_client.dart';
 import 'package:ht_headlines_repository/ht_headlines_repository.dart';
 import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/shared/widgets/failure_state_widget.dart';
 import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_main/shared/shared.dart'; // Import shared barrel file
+import 'package:ht_main/shared/shared.dart'; 
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -40,24 +42,12 @@ class _HeadlineDetailsView extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.bookmark_border),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.share),
-            onPressed: () {},
-          ),
-        ],
-      ),
+      // Body contains the BlocBuilder which returns either state widgets 
+      // or the scroll view
       body: BlocBuilder<HeadlineDetailsBloc, HeadlineDetailsState>(
         builder: (context, state) {
+          // Handle Loading/Initial/Failure states outside the scroll view
+          // for better user experience.
           return switch (state) {
             HeadlineDetailsInitial _ => InitialStateWidget(
               icon: Icons.article,
@@ -77,171 +67,261 @@ class _HeadlineDetailsView extends StatelessWidget {
                 );
               },
             ),
-            final HeadlineDetailsLoaded state => _buildLoaded(
-              context,
-              state.headline,
-            ),
-            _ => const SizedBox.shrink(),
+            final HeadlineDetailsLoaded state =>
+              _buildLoadedContent(context, state.headline),
+            _ => const SizedBox.shrink(), // Should not happen in practice
           };
         },
       ),
     );
   }
 
-  Widget _buildLoaded(BuildContext context, Headline headline) {
+  /// Builds the main content area using CustomScrollView and Slivers.
+  Widget _buildLoadedContent(BuildContext context, Headline headline) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
 
-    return SingleChildScrollView(
-      // Use shared padding constant
-      padding: const EdgeInsets.all(AppSpacing.paddingLarge),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // --- Image ---
-          if (headline.imageUrl != null) ...[
-            ClipRRect( // Add rounded corners to the image
-              borderRadius: BorderRadius.circular(AppSpacing.md),
-              child: Image.network(
-                headline.imageUrl!,
-                width: double.infinity,
-                height: 200,
-                fit: BoxFit.cover,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Container(
+    // Define horizontal padding once
+    const horizontalPadding = EdgeInsets.symmetric(
+      horizontal: AppSpacing.paddingLarge,
+    );
+
+    // Return CustomScrollView instead of SingleChildScrollView
+    return CustomScrollView(
+      slivers: [
+        // --- App Bar ---
+        SliverAppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.bookmark_border),
+              onPressed: () {
+                // TODO(fulleni): Implement bookmark functionality
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.share),
+              onPressed: () {
+                // TODO(fulleni): Implement share functionality
+              },
+            ),
+          ],
+          // Pinned=false, floating=true, snap=true is common for news apps
+          pinned: false,
+          floating: true,
+          snap: true,
+          // Transparent background to let content scroll behind if needed
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          // Ensure icons use appropriate theme color
+          foregroundColor: theme.colorScheme.onSurface,
+        ),
+
+        // --- Title ---
+        SliverPadding(
+          padding: horizontalPadding.copyWith(top: AppSpacing.lg),
+          sliver: SliverToBoxAdapter(
+            child: Text(
+              headline.title,
+              style: textTheme.headlineMedium,
+            ),
+          ),
+        ),
+
+        // --- Image ---
+        if (headline.imageUrl != null)
+          SliverPadding(
+            padding: const EdgeInsets.only(
+              top: AppSpacing.lg,
+              left: AppSpacing.paddingLarge,
+              right: AppSpacing.paddingLarge,
+            ),
+            sliver: SliverToBoxAdapter(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(AppSpacing.md),
+                child: Image.network(
+                  headline.imageUrl!,
+                  width: double.infinity,
+                  height: 200, // Keep fixed height or make adaptive
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      width: double.infinity,
+                      height: 200,
+                      color: colorScheme.surfaceVariant,
+                      child: const Center(child: CircularProgressIndicator()),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) => Container(
                     width: double.infinity,
                     height: 200,
-                    // Use theme color for placeholder
                     color: colorScheme.surfaceVariant,
-                    child: const Center(child: CircularProgressIndicator()),
-                  );
-                },
-                errorBuilder: (context, error, stackTrace) => Container(
-                  width: double.infinity,
-                  height: 200,
-                  color: colorScheme.surfaceVariant,
-                  child: Icon(
-                    Icons.broken_image,
-                    color: colorScheme.onSurfaceVariant,
-                    size: AppSpacing.xxl,
+                    child: Icon(
+                      Icons.broken_image,
+                      color: colorScheme.onSurfaceVariant,
+                      size: AppSpacing.xxl,
+                    ),
                   ),
                 ),
               ),
             ),
-            // Use shared spacing constant
-            const SizedBox(height: AppSpacing.lg),
-          ],
-
-          // --- Title ---
-          Text(headline.title, style: textTheme.titleLarge),
-          // Use shared spacing constant
-          const SizedBox(height: AppSpacing.md), // Increased spacing before metadata
-
-          // --- Metadata Section ---
-          _buildMetadataSection(context, headline),
-          // Use shared spacing constant
-          const SizedBox(height: AppSpacing.lg),
-
-          // --- Description ---
-          if (headline.description != null) ...[
-            Text(
-              headline.description!,
-              style: textTheme.bodyLarge,
-            ),
-            // Use shared spacing constant
-            const SizedBox(height: AppSpacing.xl), // Increased spacing before button
-          ],
-
-          // --- Continue Reading Button ---
-          if (headline.url != null)
-            SizedBox( // Make button full width
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () async {
-                  await launchUrlString(headline.url!);
-                },
-                // Style is often handled by ElevatedButtonThemeData in AppTheme
-                // but explicitly setting background for clarity if needed.
-                // style: ElevatedButton.styleFrom(
-                //   backgroundColor: colorScheme.primary,
-                //   foregroundColor: colorScheme.onPrimary,
-                // ),
-                child: Text(
-                  l10n.headlineDetailsContinueReadingButton,
-                  // Ensure labelLarge has contrast if theme doesn't handle it
-                  // style: textTheme.labelLarge?.copyWith(color: colorScheme.onPrimary),
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
-  /// Builds the metadata section (Source, Date, Categories, Country).
-  Widget _buildMetadataSection(BuildContext context, Headline headline) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-    final metadataStyle = textTheme.bodyMedium; // Or textTheme.caption
-
-    // Helper to create consistent metadata rows
-    Widget buildMetadataRow(IconData icon, String text) {
-      return Padding(
-        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-        child: Row(
-          children: [
-            Icon(icon, size: 16, color: theme.colorScheme.onSurfaceVariant),
-            const SizedBox(width: AppSpacing.xs),
-            Expanded(child: Text(text, style: metadataStyle)),
-          ],
-        ),
-      );
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (headline.source != null)
-          buildMetadataRow(Icons.source, headline.source!),
-        if (headline.publishedAt != null)
-          buildMetadataRow(
-            Icons.date_range,
-            DateFormat('MMMM dd, yyyy').format(headline.publishedAt!),
           ),
-        if (headline.eventCountry != null)
-          buildMetadataRow(Icons.location_on, headline.eventCountry!),
-        if (headline.categories != null && headline.categories!.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start, // Align icon top
-              children: [
-                Icon(Icons.category, size: 16, color: theme.colorScheme.onSurfaceVariant),
-                const SizedBox(width: AppSpacing.xs),
-                Expanded(
-                  child: Wrap(
-                    spacing: AppSpacing.xs, // Horizontal spacing between chips
-                    runSpacing: AppSpacing.xs, // Vertical spacing if wraps
-                    children: headline.categories!
-                        .map((category) => Chip(
-                              label: Text(category),
-                              labelStyle: textTheme.labelSmall,
-                              padding: EdgeInsets.zero,
-                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              visualDensity: VisualDensity.compact,
-                              backgroundColor: theme.colorScheme.secondaryContainer,
-                              labelPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-                            ))
-                        .toList(),
-                  ),
-                ),
-              ],
+
+        // --- Metadata Section (Wrap based) ---
+        SliverPadding(
+          padding: horizontalPadding.copyWith(top: AppSpacing.lg),
+          sliver: SliverToBoxAdapter(
+            child: Wrap(
+              spacing: AppSpacing.sm, // Horizontal space between chips
+              runSpacing: AppSpacing.sm, // Vertical space between lines
+              children: _buildMetadataChips(context, headline),
             ),
+          ),
+        ),
+
+        // --- Description ---
+        if (headline.description != null)
+          SliverPadding(
+            padding: horizontalPadding.copyWith(top: AppSpacing.lg),
+            sliver: SliverToBoxAdapter(
+              child: Text(
+                headline.description!,
+                style: textTheme.bodyLarge,
+              ),
+            ),
+          ),
+
+        // --- Continue Reading Button ---
+        if (headline.url != null)
+          SliverPadding(
+            // Add extra space before the button and bottom padding
+            padding: horizontalPadding.copyWith(
+              top: AppSpacing.xl,
+              bottom: AppSpacing.paddingLarge,
+            ),
+            sliver: SliverToBoxAdapter(
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    // Consider adding error handling for launchUrlString
+                    await launchUrlString(headline.url!);
+                  },
+                  child: Text(l10n.headlineDetailsContinueReadingButton),
+                ),
+              ),
+            ),
+          ),
+
+        // Add some bottom space if no button exists
+        if (headline.url == null)
+           SliverPadding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.paddingLarge),
+            sliver: const SliverToBoxAdapter(child: SizedBox.shrink()),
           ),
       ],
     );
   }
-}
+
+  /// Helper function to generate the list of metadata Chips for the Wrap.
+  List<Widget> _buildMetadataChips(BuildContext context, Headline headline) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final chipLabelStyle = textTheme.labelSmall; 
+    final chipBackgroundColor = theme.colorScheme.surfaceVariant;
+    final chipAvatarColor = theme.colorScheme.onSurfaceVariant;
+    const chipAvatarSize = 14.0;
+    const chipPadding = EdgeInsets.symmetric(
+      horizontal: AppSpacing.xs,
+      vertical: AppSpacing.xs / 2,
+    );
+    const chipVisualDensity = VisualDensity.compact;
+    const chipMaterialTapTargetSize = MaterialTapTargetSize.shrinkWrap;
+
+    final chips = <Widget>[];
+
+    // Source Chip
+    if (headline.source != null) {
+      // TODO(fulleni): Replace Icon with Image.network when source.logoUrl is available
+      chips.add(
+        Chip(
+          avatar: Icon(
+            Icons.source,
+            size: chipAvatarSize,
+            color: chipAvatarColor,
+          ),
+          label: Text(headline.source!),
+          labelStyle: chipLabelStyle,
+          backgroundColor: chipBackgroundColor,
+          padding: chipPadding,
+          visualDensity: chipVisualDensity,
+          materialTapTargetSize: chipMaterialTapTargetSize,
+        ),
+      );
+    }
+
+    // Date Chip
+    if (headline.publishedAt != null) {
+      final formattedDate = DateFormat('MMM d, yyyy').format(headline.publishedAt!);
+      chips.add(
+        Chip(
+          avatar: Icon(
+            Icons.date_range,
+            size: chipAvatarSize,
+            color: chipAvatarColor,
+          ),
+          label: Text(formattedDate),
+          labelStyle: chipLabelStyle,
+          backgroundColor: chipBackgroundColor,
+          padding: chipPadding,
+          visualDensity: chipVisualDensity,
+          materialTapTargetSize: chipMaterialTapTargetSize,
+        ),
+      );
+    }
+
+    // Country Chip
+    if (headline.eventCountry != null) {
+      // TODO(fulleni): Replace Icon with Image.network when country.flagUrl is available
+      chips.add(
+        Chip(
+          avatar: Icon(
+            Icons.location_on,
+            size: chipAvatarSize,
+            color: chipAvatarColor,
+          ),
+          label: Text(headline.eventCountry!),
+          labelStyle: chipLabelStyle,
+          backgroundColor: chipBackgroundColor,
+          padding: chipPadding,
+          visualDensity: chipVisualDensity,
+          materialTapTargetSize: chipMaterialTapTargetSize,
+        ),
+      );
+    }
+
+    // Category Chips (No avatar for individual categories)
+    if (headline.categories != null) {
+      for (final category in headline.categories!) {
+        chips.add(
+          Chip(
+            label: Text(category),
+            labelStyle: chipLabelStyle,
+            backgroundColor: chipBackgroundColor,
+            padding: chipPadding,
+            visualDensity: chipVisualDensity,
+            materialTapTargetSize: chipMaterialTapTargetSize,
+          ),
+        );
+      }
+    }
+
+    return chips;
+  }
+} 

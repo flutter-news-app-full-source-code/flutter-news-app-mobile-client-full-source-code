@@ -182,6 +182,7 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
             subHeadline: subHeadline,
             showAnonymousButton: showAnonymousButton,
             isLinkingContext: isLinkingContext, // Pass the flag
+            // iconData: Icons.security, // REMOVE: Parameter no longer exists
           );
         },
         routes: [

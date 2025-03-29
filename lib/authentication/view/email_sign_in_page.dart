@@ -46,7 +46,10 @@ class _EmailSignInView extends StatelessWidget {
         // Add a custom leading back button to control navigation based on context.
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          tooltip: MaterialLocalizations.of(context).backButtonTooltip, // Accessibility
+          tooltip:
+              MaterialLocalizations.of(
+                context,
+              ).backButtonTooltip, // Accessibility
           onPressed: () {
             // Navigate back differently based on the context.
             if (isLinkingContext) {
@@ -97,6 +100,25 @@ class _EmailSignInView extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      // --- Hardcoded Icon ---
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: AppSpacing.xl,
+                        ), // Spacing below icon
+                        child: Icon(
+                          Icons.email_outlined, // Hardcoded icon
+                          size: (Theme.of(context).iconTheme.size ?? AppSpacing.xl) *
+                              3.0, // Use ?? with AppSpacing constant
+                          color:
+                              Theme.of(
+                                context,
+                              ).colorScheme.primary, // Use theme color
+                        ),
+                      ),
+                      const SizedBox(
+                        height: AppSpacing.lg,
+                      ), // Space between icon and text
+                      // --- Explanation Text ---
                       Text(
                         l10n.emailSignInExplanation, // New l10n key needed
                         style: Theme.of(context).textTheme.bodyLarge,

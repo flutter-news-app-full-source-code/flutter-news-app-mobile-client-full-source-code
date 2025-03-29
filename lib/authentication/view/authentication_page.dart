@@ -22,6 +22,7 @@ class AuthenticationPage extends StatelessWidget {
     required this.subHeadline,
     required this.showAnonymousButton,
     required this.isLinkingContext, // Add this parameter
+    // this.iconData, // REMOVE optional icon data
     super.key,
   });
 
@@ -36,6 +37,9 @@ class AuthenticationPage extends StatelessWidget {
 
   /// Whether this page is being shown in the account linking context.
   final bool isLinkingContext; // Add this field
+
+  /// Optional icon to display at the top of the page.
+  // final IconData? iconData; // REMOVE this field
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +58,7 @@ class AuthenticationPage extends StatelessWidget {
         subHeadline: subHeadline,
         showAnonymousButton: showAnonymousButton,
         isLinkingContext: isLinkingContext, // Pass down the flag
+        // iconData: iconData, // REMOVE passing down icon data
       ),
     );
   }
@@ -66,12 +71,14 @@ class _AuthenticationView extends StatelessWidget {
     required this.subHeadline,
     required this.showAnonymousButton,
     required this.isLinkingContext, // Add this parameter
+    // this.iconData, // REMOVE optional icon data
   });
 
   final String headline;
   final String subHeadline;
   final bool showAnonymousButton;
   final bool isLinkingContext; // Add this field
+  // final IconData? iconData; // REMOVE this field
 
   @override
   Widget build(BuildContext context) {
@@ -131,6 +138,23 @@ class _AuthenticationView extends StatelessWidget {
                         MainAxisAlignment.center, // Center vertically
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      // --- Hardcoded Icon ---
+                      // REMOVE if check: if (iconData != null) ...[
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: AppSpacing.xl,
+                        ), // Spacing below icon
+                        child: Icon(
+                          Icons.security, // Hardcode the icon
+                          size: (Theme.of(context).iconTheme.size ?? AppSpacing.xl) *
+                              3.0, // Use ?? with AppSpacing constant
+                          color: Theme.of(context)
+                              .colorScheme
+                              .primary, // Use theme color
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.lg), // Space between icon and headline
+                      // REMOVE closing bracket for if: ],
                       // --- Headline and Subheadline ---
                       Text(
                         headline,

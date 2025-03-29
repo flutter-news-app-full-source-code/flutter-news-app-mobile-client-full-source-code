@@ -119,10 +119,12 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                 appBarTheme.titleTextStyle?.copyWith(
                   color: (appBarTheme.titleTextStyle?.color ??
                           colorScheme.onSurface)
-                      .withOpacity(0.6),
+                      .withAlpha(153), // Replaced withOpacity(0.6)
                 ) ??
                 theme.textTheme.titleLarge?.copyWith(
-                  color: colorScheme.onSurface.withOpacity(0.6),
+                  color: colorScheme.onSurface.withAlpha(
+                    153,
+                  ), // Replaced withOpacity(0.6)
                 ),
             // Remove the default border
             border: InputBorder.none,
@@ -133,7 +135,9 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
             // Add a subtle background fill
             filled: true,
 
-            fillColor: colorScheme.surface.withOpacity(0.1),
+            fillColor: colorScheme.surface.withAlpha(
+              26,
+            ), // Replaced withOpacity(0.1)
             // Apply consistent padding using AppSpacing
             contentPadding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.paddingMedium,

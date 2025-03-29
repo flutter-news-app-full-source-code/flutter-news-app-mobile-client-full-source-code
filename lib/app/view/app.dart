@@ -81,7 +81,7 @@ class _AppViewState extends State<_AppView> {
   AppStatus _currentAppStatus = AppStatus.initial;
 
   // Minimum splash duration
-  static const _minSplashDuration = Duration(seconds: 2);
+  static const _minSplashDuration = Duration(seconds: 3);
 
   @override
   void initState() {

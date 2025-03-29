@@ -40,39 +40,41 @@ class _HeadlineDetailsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    return Scaffold(
-      // Body contains the BlocBuilder which returns either state widgets
-      // or the scroll view
-      body: BlocBuilder<HeadlineDetailsBloc, HeadlineDetailsState>(
-        builder: (context, state) {
-          // Handle Loading/Initial/Failure states outside the scroll view
-          // for better user experience.
-          return switch (state) {
-            HeadlineDetailsInitial _ => InitialStateWidget(
-              icon: Icons.article,
-              headline: l10n.headlineDetailsInitialHeadline,
-              subheadline: l10n.headlineDetailsInitialSubheadline,
-            ),
-            HeadlineDetailsLoading _ => LoadingStateWidget(
-              icon: Icons.downloading,
-              headline: l10n.headlineDetailsLoadingHeadline,
-              subheadline: l10n.headlineDetailsLoadingSubheadline,
-            ),
-            final HeadlineDetailsFailure state => FailureStateWidget(
-              message: state.message,
-              onRetry: () {
-                context.read<HeadlineDetailsBloc>().add(
-                  HeadlineDetailsRequested(headlineId: '1'),
-                );
-              },
-            ),
-            final HeadlineDetailsLoaded state => _buildLoadedContent(
-              context,
-              state.headline,
-            ),
-            _ => const SizedBox.shrink(), // Should not happen in practice
-          };
-        },
+    return SafeArea(
+      child: Scaffold(
+        // Body contains the BlocBuilder which returns either state widgets
+        // or the scroll view
+        body: BlocBuilder<HeadlineDetailsBloc, HeadlineDetailsState>(
+          builder: (context, state) {
+            // Handle Loading/Initial/Failure states outside the scroll view
+            // for better user experience.
+            return switch (state) {
+              HeadlineDetailsInitial _ => InitialStateWidget(
+                icon: Icons.article,
+                headline: l10n.headlineDetailsInitialHeadline,
+                subheadline: l10n.headlineDetailsInitialSubheadline,
+              ),
+              HeadlineDetailsLoading _ => LoadingStateWidget(
+                icon: Icons.downloading,
+                headline: l10n.headlineDetailsLoadingHeadline,
+                subheadline: l10n.headlineDetailsLoadingSubheadline,
+              ),
+              final HeadlineDetailsFailure state => FailureStateWidget(
+                message: state.message,
+                onRetry: () {
+                  context.read<HeadlineDetailsBloc>().add(
+                    HeadlineDetailsRequested(headlineId: '1'),
+                  );
+                },
+              ),
+              final HeadlineDetailsLoaded state => _buildLoadedContent(
+                context,
+                state.headline,
+              ),
+              _ => const SizedBox.shrink(), // Should not happen in practice
+            };
+          },
+        ),
       ),
     );
   }

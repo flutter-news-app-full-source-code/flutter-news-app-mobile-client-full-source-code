@@ -78,7 +78,6 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
           'HT', // TODO(fulleni): Localize this title
           style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
-        centerTitle: true,
         actions: [
           // Removed Search IconButton
           BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(

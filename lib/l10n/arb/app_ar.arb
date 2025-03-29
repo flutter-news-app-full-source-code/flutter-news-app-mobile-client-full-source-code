@@ -215,5 +215,49 @@
     "headlinesSearchNoResultsSubheadline": "جرب مصطلح بحث مختلف",
     "@headlinesSearchNoResultsSubheadline": {
         "description": "Subheadline text shown when a search yields no results"
+    },
+    "authenticationEmailSignInButton": "متابعة بالبريد الإلكتروني",
+    "@authenticationEmailSignInButton": {
+        "description": "نص زر بدء تدفق تسجيل الدخول بالبريد الإلكتروني"
+    },
+    "authenticationLinkingHeadline": "ربط حسابك",
+    "@authenticationLinkingHeadline": {
+        "description": "عنوان صفحة المصادقة عند ربط حساب مجهول"
+    },
+    "authenticationLinkingSubheadline": "سجل الدخول باستخدام جوجل أو البريد الإلكتروني لحفظ تفضيلاتك وسجل القراءة عبر الأجهزة.",
+    "@authenticationLinkingSubheadline": {
+        "description": "عنوان فرعي يشرح فائدة ربط حساب مجهول"
+    },
+    "authenticationSignInHeadline": "تسجيل الدخول",
+    "@authenticationSignInHeadline": {
+        "description": "عنوان صفحة المصادقة أثناء تسجيل الدخول القياسي"
+    },
+    "authenticationSignInSubheadline": "سجل الدخول أو تابع كمجهول لتخصيص موجز الأخبار الخاص بك.",
+    "@authenticationSignInSubheadline": {
+        "description": "عنوان فرعي لصفحة المصادقة أثناء تسجيل الدخول القياسي"
+    },
+    "emailSignInPageTitle": "تسجيل الدخول بالبريد الإلكتروني",
+    "@emailSignInPageTitle": {
+        "description": "عنوان شريط التطبيق لصفحة تسجيل الدخول بالبريد الإلكتروني"
+    },
+    "emailSignInExplanation": "أدخل بريدك الإلكتروني أدناه. سنرسل لك رابطًا آمنًا لتسجيل الدخول فورًا. لا حاجة لكلمة مرور!",
+    "@emailSignInExplanation": {
+        "description": "نص توضيحي في صفحة تسجيل الدخول بالبريد الإلكتروني"
+    },
+    "emailLinkSentPageTitle": "تحقق من بريدك الإلكتروني",
+    "@emailLinkSentPageTitle": {
+        "description": "عنوان شريط التطبيق لصفحة تأكيد إرسال رابط البريد الإلكتروني"
+    },
+    "emailLinkSentConfirmation": "تم إرسال الرابط! تحقق من صندوق الوارد في بريدك الإلكتروني (ومجلد الرسائل غير المرغوب فيها) بحثًا عن رسالة منا. انقر على الرابط الموجود بالداخل لإكمال تسجيل الدخول.",
+    "@emailLinkSentConfirmation": {
+        "description": "رسالة تأكيد تظهر بعد إرسال رابط البريد الإلكتروني"
+    },
+    "accountConnectPrompt": "ربط الحساب",
+    "@accountConnectPrompt": {
+        "description": "عنوان المربع الذي يطالب المستخدمين المجهولين بتسجيل الدخول/الربط"
+    },
+    "accountConnectBenefit": "لحفظ تفضيلاتك وسجل القراءة عبر الأجهزة.",
+    "@accountConnectBenefit": {
+        "description": "عنوان فرعي يشرح فائدة ربط حساب مجهول"
     }
 }

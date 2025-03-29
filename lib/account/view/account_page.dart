@@ -156,18 +156,21 @@ class _AccountView extends StatelessWidget {
     );
   }
 
-  /// Builds the ListTile for navigating to Backup/Account Linking (for anonymous users).
+  /// Builds the ListTile prompting anonymous users to sign in/connect.
   Widget _buildBackupTile(BuildContext context) {
     final l10n = context.l10n;
     return ListTile(
-      leading: const Icon(
-        Icons.cloud_upload_outlined,
-      ), // Or Icons.link, Icons.save
-      title: Text(l10n.accountBackupTile),
+      leading: const Icon(Icons.link), // Icon suggesting connection/linking
+      title: Text(l10n.accountConnectPrompt), // New l10n key needed
+      subtitle: Text(l10n.accountConnectBenefit), // New l10n key needed
+      isThreeLine: true, // Allow more space for subtitle
       trailing: const Icon(Icons.chevron_right),
       onTap: () {
-        // Navigate to the account linking page
-        context.goNamed(Routes.accountLinkingName); // Updated route name
+        // Navigate to the authentication page in linking mode
+        context.goNamed(
+          Routes.authenticationName,
+          queryParameters: {'context': 'linking'},
+        );
       },
     );
   }

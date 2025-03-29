@@ -1,188 +1,176 @@
-//
 // ignore_for_file: lines_longer_than_80_chars
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ht_authentication_repository/ht_authentication_repository.dart';
 import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
-import 'package:ht_main/l10n/l10n.dart'; // Added import
+import 'package:ht_main/l10n/l10n.dart';
+import 'package:ht_main/router/routes.dart';
+import 'package:ht_main/shared/constants/app_spacing.dart'; // Use shared constants
 
+/// {@template authentication_page}
+/// Displays authentication options (Google, Email, Anonymous) based on context.
+///
+/// This page can be used for both initial sign-in and for connecting an
+/// existing anonymous account.
+/// {@endtemplate}
 class AuthenticationPage extends StatelessWidget {
-  const AuthenticationPage({super.key});
+  /// {@macro authentication_page}
+  const AuthenticationPage({
+    required this.headline,
+    required this.subHeadline,
+    required this.showAnonymousButton,
+    super.key,
+  });
+
+  /// The main title displayed on the page.
+  final String headline;
+
+  /// The descriptive text displayed below the headline.
+  final String subHeadline;
+
+  /// Whether to show the "Continue Anonymously" button.
+  final bool showAnonymousButton;
 
   @override
   Widget build(BuildContext context) {
+    // Provide the BLoC here if it's not already provided higher up
+    // For this refactor, assuming it's provided by the route or App setup
     return BlocProvider(
-      create:
-          (context) => AuthenticationBloc(
-            authenticationRepository:
-                context.read<HtAuthenticationRepository>(),
-          ),
-      child: _AuthenticationView(),
+      // Ensure BLoC is created only once per instance of this page if needed
+      // If BLoC needs to persist across navigations, provide it higher up.
+      create: (context) => AuthenticationBloc(
+        authenticationRepository: context.read<HtAuthenticationRepository>(),
+      ),
+      child: _AuthenticationView(
+        headline: headline,
+        subHeadline: subHeadline,
+        showAnonymousButton: showAnonymousButton,
+      ),
     );
   }
 }
 
-class _AuthenticationView extends StatefulWidget {
-  @override
-  __AuthenticationViewState createState() => __AuthenticationViewState();
-}
+// Renamed from _AuthenticationView to follow convention
+class _AuthenticationView extends StatelessWidget {
+  const _AuthenticationView({
+    required this.headline,
+    required this.subHeadline,
+    required this.showAnonymousButton,
+  });
 
-class __AuthenticationViewState extends State<_AuthenticationView> {
-  final _emailController = TextEditingController();
-  // Removed password controller
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    // Removed password controller disposal
-    super.dispose();
-  }
+  final String headline;
+  final String subHeadline;
+  final bool showAnonymousButton;
 
   @override
   Widget build(BuildContext context) {
-    // Use BlocConsumer to listen for state changes for side effects (SnackBar)
+    final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
+      // Consider adding an AppBar if needed for context/navigation
       body: SafeArea(
         child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
+          // Listener remains crucial for feedback (errors)
           listener: (context, state) {
             if (state is AuthenticationFailure) {
               ScaffoldMessenger.of(context)
                 ..hideCurrentSnackBar()
                 ..showSnackBar(
                   SnackBar(
-                    content: Text(state.errorMessage),
-                    backgroundColor: Theme.of(context).colorScheme.error,
+                    content: Text(
+                      // Provide a more user-friendly error message if possible
+                      state.errorMessage, // Or map specific errors
+                    ),
+                    backgroundColor: colorScheme.error,
                   ),
                 );
-            } else if (state is AuthenticationLinkSentSuccess) {
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(
-                    content: Text(context.l10n.authenticationEmailSentSuccess),
-                  ),
-                );
-              // Optionally clear email field or navigate
             }
+            // Success states (Google/Anonymous) are typically handled by
+            // the AppBloc listening to repository changes and triggering redirects.
+            // Email link success is handled in the dedicated email flow pages.
           },
           builder: (context, state) {
-            // Determine if loading indicator should be shown
-            final isLoading =
-                state is AuthenticationLoading ||
-                state is AuthenticationLinkSending;
-            final l10n = context.l10n; // Added l10n variable
+            final isLoading = state is AuthenticationLoading; // Simplified loading check
 
             return Padding(
-              padding: const EdgeInsets.all(16), // Use AppSpacing later
+              padding: const EdgeInsets.all(AppSpacing.paddingLarge), // Use constant
               child: Center(
-                // Center content vertically
                 child: SingleChildScrollView(
-                  // Allow scrolling if needed
                   child: Column(
-                    // Use CrossAxisAlignment.stretch for full-width buttons
+                    mainAxisAlignment: MainAxisAlignment.center, // Center vertically
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      // --- Headline and Subheadline ---
                       Text(
-                        l10n.authenticationPageTitle,
-                        style:
-                            Theme.of(
-                              context,
-                            ).textTheme.headlineMedium, // Use theme typography
+                        headline,
+                        style: textTheme.headlineMedium,
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 32), // Use AppSpacing later
-                      TextFormField(
-                        controller: _emailController,
-                        decoration: InputDecoration(
-                          labelText: l10n.authenticationEmailLabel,
-                          border: const OutlineInputBorder(),
-                        ),
-                        keyboardType: TextInputType.emailAddress,
-                        autocorrect: false,
-                        textInputAction:
-                            TextInputAction.done, // Improve keyboard action
-                        enabled: !isLoading, // Disable field when loading
+                      const SizedBox(height: AppSpacing.sm), // Use constant
+                      Text(
+                        subHeadline,
+                        style: textTheme.bodyLarge,
+                        textAlign: TextAlign.center,
                       ),
-                      // Removed Password Field
-                      const SizedBox(height: 32), // Use AppSpacing later
-                      // Show loading indicator within the button if sending link
+                      const SizedBox(height: AppSpacing.xxl), // Use constant
+
+                      // --- Google Sign-In Button ---
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.g_mobiledata), // Placeholder icon
+                        label: Text(l10n.authenticationGoogleSignInButton),
+                        onPressed: isLoading
+                            ? null
+                            : () => context.read<AuthenticationBloc>().add(
+                                  const AuthenticationGoogleSignInRequested(),
+                                ),
+                        // Style adjustments can be made via ElevatedButtonThemeData
+                      ),
+                      const SizedBox(height: AppSpacing.lg), // Use constant
+
+                      // --- Email Sign-In Button ---
                       ElevatedButton(
-                        onPressed:
-                            isLoading // Disable button when loading
-                                ? null
-                                : () {
-                                  context.read<AuthenticationBloc>().add(
-                                    AuthenticationSendSignInLinkRequested(
-                                      email:
-                                          _emailController.text
-                                              .trim(), // Trim whitespace
-                                    ),
-                                  );
-                                },
-                        child:
-                            state is AuthenticationLinkSending
-                                ? const SizedBox(
-                                  // Consistent height loading indicator
-                                  height: 24,
-                                  width: 24,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                                : Text(l10n.authenticationSendLinkButton),
+                        // Consider an email icon
+                        // icon: const Icon(Icons.email_outlined),
+                        child: Text(l10n.authenticationEmailSignInButton), // New l10n key needed
+                        onPressed: isLoading
+                            ? null
+                            : () {
+                                // Navigate to the dedicated email sign-in page
+                                context.goNamed(Routes.emailSignInName);
+                              },
                       ),
-                      const SizedBox(height: 16), // Use AppSpacing later
-                      // Add divider for clarity
-                      Row(
-                        // Removed const
-                        children: [
-                          const Expanded(
-                            child: Divider(),
-                          ), // Added const back here
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            child: Text(l10n.authenticationOrDivider),
-                          ),
-                          const Expanded(child: Divider()),
-                        ],
-                      ),
-                      const SizedBox(height: 16), // Use AppSpacing later
-                      ElevatedButton(
-                        // Removed duplicate onPressed here
-                        // Style adjustments for Google button might be needed via Theme
-                        onPressed:
-                            isLoading // Disable button when loading
-                                ? null
-                                : () {
-                                  context.read<AuthenticationBloc>().add(
-                                    const AuthenticationGoogleSignInRequested(),
-                                  );
-                                },
-                        // Consider adding Google icon
-                        child: Text(l10n.authenticationGoogleSignInButton),
-                      ),
-                      const SizedBox(height: 16), // Use AppSpacing later
-                      OutlinedButton(
-                        // Use OutlinedButton for less emphasis
-                        onPressed:
-                            isLoading // Disable button when loading
-                                ? null
-                                : () {
-                                  context.read<AuthenticationBloc>().add(
+
+                      // --- Anonymous Sign-In Button (Conditional) ---
+                      if (showAnonymousButton) ...[
+                        const SizedBox(height: AppSpacing.lg), // Use constant
+                        OutlinedButton(
+                          child: Text(l10n.authenticationAnonymousSignInButton),
+                          onPressed: isLoading
+                              ? null
+                              : () => context.read<AuthenticationBloc>().add(
                                     const AuthenticationAnonymousSignInRequested(),
-                                  );
-                                },
-                        child: Text(l10n.authenticationAnonymousSignInButton),
-                      ),
+                                  ),
+                        ),
+                      ],
+
+                      // --- Loading Indicator (Optional, for general loading state) ---
+                      // If needed, show a general loading indicator when state is AuthenticationLoading
+                      if (isLoading && state is! AuthenticationLinkSending) ...[
+                         const SizedBox(height: AppSpacing.xl),
+                         const Center(child: CircularProgressIndicator()),
+                      ]
                     ],
-                  ), // Column
-                ), // SingleChildScrollView
-              ), // Center
-            ); // Padding
+                  ),
+                ),
+              ),
+            );
           },
-        ), // BlocConsumer
-      ), // SafeArea
-    ); // Scaffold
+        ),
+      ),
+    );
   }
 }

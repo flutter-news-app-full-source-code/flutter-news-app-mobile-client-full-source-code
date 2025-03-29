@@ -87,6 +87,15 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
       else if (appStatus == AppStatus.anonymous) {
         print('  Redirect Decision: User is ANONYMOUS.');
 
+        // Define search and account paths for clarity
+        const searchPath = Routes.search; // '/search'
+        const accountPath = Routes.account; // '/account'
+
+        // Helper booleans for search and account sections
+        final isGoingToSearch = currentLocation.startsWith(searchPath);
+        final isGoingToAccount = currentLocation.startsWith(accountPath);
+
+
         // **Sub-Case 2.1: Navigating to the BASE Authentication Path (`/authentication`)**
         if (isGoingToBaseAuthPath) {
           // Allow access ONLY if they are explicitly starting the linking flow
@@ -115,15 +124,15 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
           );
           return null; // Allow access
         }
-        // **Sub-Case 2.3: Navigating Within the Headlines Feed Section**
-        // Allow anonymous users to access the main content feed and its sub-routes (like account).
-        else if (isGoingToFeed) {
+        // **Sub-Case 2.3: Navigating Within the Main App Sections (Feed, Search, Account)**
+        // Allow anonymous users to access the main content sections and their sub-routes.
+        else if (isGoingToFeed || isGoingToSearch || isGoingToAccount) { // Added checks for search and account
           print(
-            '    Action: Allowing navigation within feed section ($currentLocation).',
+            '    Action: Allowing navigation within main app section ($currentLocation).', // Updated log message
           );
           return null; // Allow access
         }
-        // **Sub-Case 2.4: Fallback for Unexpected Paths**
+        // **Sub-Case 2.4: Fallback for Unexpected Paths** // Now correctly handles only truly unexpected paths
         // If an anonymous user tries to navigate anywhere else unexpected,
         // redirect them to the main content feed as a safe default.
         else {

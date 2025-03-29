@@ -200,11 +200,11 @@
     "@headlinesSearchHintText": {
         "description": "Hint text for the search input field"
     },
-    "headlinesSearchInitialHeadline": "Search Headlines",
+    "headlinesSearchInitialHeadline": "Find Headlines Instantly",
     "@headlinesSearchInitialHeadline": {
         "description": "Headline text shown in the initial state widget on the search page"
     },
-    "headlinesSearchInitialSubheadline": "Enter keywords to find articles",
+    "headlinesSearchInitialSubheadline": "Type keywords above to discover news articles.",
     "@headlinesSearchInitialSubheadline": {
         "description": "Subheadline text shown in the initial state widget on the search page"
     },
@@ -275,5 +275,9 @@
     "accountNotificationsTile": "Notifications",
     "@accountNotificationsTile": {
         "description": "Title for the notifications navigation tile in the account page"
+    },
+    "headlinesSearchActionTooltip": "Search",
+    "@headlinesSearchActionTooltip": {
+        "description": "Tooltip text for the search icon button in the search page AppBar"
     }
 }

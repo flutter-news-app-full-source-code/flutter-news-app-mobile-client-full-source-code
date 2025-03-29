@@ -181,10 +181,10 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
             headline: headline,
             subHeadline: subHeadline,
             showAnonymousButton: showAnonymousButton,
+            isLinkingContext: isLinkingContext, // Pass the flag
           );
         },
         routes: [
-          // --- New Email Flow Sub-routes ---
           GoRoute(
             path: Routes.emailSignIn,
             name: Routes.emailSignInName,
@@ -194,31 +194,6 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
             path: Routes.emailLinkSent,
             name: Routes.emailLinkSentName,
             builder: (context, state) => const EmailLinkSentPage(),
-          ),
-          // --- Existing Placeholder Sub-routes (Keep or remove as needed) ---
-          GoRoute(
-            path: Routes.forgotPassword, // Keep if feature is planned
-            name: Routes.forgotPasswordName,
-            builder: (BuildContext context, GoRouterState state) {
-              // Replace with actual implementation when ready
-              return const Placeholder(child: Text('Forgot Password Page'));
-            },
-          ),
-          GoRoute(
-            path: Routes.resetPassword, // Keep if feature is planned
-            name: Routes.resetPasswordName,
-            builder: (BuildContext context, GoRouterState state) {
-              // Replace with actual implementation when ready
-              return const Placeholder(child: Text('Reset Password Page'));
-            },
-          ),
-          GoRoute(
-            path: Routes.confirmEmail, // Keep if feature is planned
-            name: Routes.confirmEmailName,
-            builder: (BuildContext context, GoRouterState state) {
-              // Replace with actual implementation when ready
-              return const Placeholder(child: Text('Confirm Email Page'));
-            },
           ),
         ],
       ),
@@ -255,13 +230,9 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
           ),
           // --- Account Sub-Route ---
           GoRoute(
-            path: Routes.account, // Keep account page route
+            path: Routes.account, 
             name: Routes.accountName,
             builder: (context, state) => const AccountPage(),
-            // No sub-routes needed here anymore for linking
-            // routes: [
-            //   // Removed AccountLinkingPage route
-            // ],
           ),
         ],
       ),

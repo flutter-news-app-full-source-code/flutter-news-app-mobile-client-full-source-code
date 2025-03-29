@@ -21,6 +21,7 @@ class AuthenticationPage extends StatelessWidget {
     required this.headline,
     required this.subHeadline,
     required this.showAnonymousButton,
+    required this.isLinkingContext, // Add this parameter
     super.key,
   });
 
@@ -33,6 +34,9 @@ class AuthenticationPage extends StatelessWidget {
   /// Whether to show the "Continue Anonymously" button.
   final bool showAnonymousButton;
 
+  /// Whether this page is being shown in the account linking context.
+  final bool isLinkingContext; // Add this field
+
   @override
   Widget build(BuildContext context) {
     // Provide the BLoC here if it's not already provided higher up
@@ -40,13 +44,16 @@ class AuthenticationPage extends StatelessWidget {
     return BlocProvider(
       // Ensure BLoC is created only once per instance of this page if needed
       // If BLoC needs to persist across navigations, provide it higher up.
-      create: (context) => AuthenticationBloc(
-        authenticationRepository: context.read<HtAuthenticationRepository>(),
-      ),
+      create:
+          (context) => AuthenticationBloc(
+            authenticationRepository:
+                context.read<HtAuthenticationRepository>(),
+          ),
       child: _AuthenticationView(
         headline: headline,
         subHeadline: subHeadline,
         showAnonymousButton: showAnonymousButton,
+        isLinkingContext: isLinkingContext, // Pass down the flag
       ),
     );
   }
@@ -58,11 +65,13 @@ class _AuthenticationView extends StatelessWidget {
     required this.headline,
     required this.subHeadline,
     required this.showAnonymousButton,
+    required this.isLinkingContext, // Add this parameter
   });
 
   final String headline;
   final String subHeadline;
   final bool showAnonymousButton;
+  final bool isLinkingContext; // Add this field
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +80,21 @@ class _AuthenticationView extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      // Consider adding an AppBar if needed for context/navigation
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        // Conditionally add the leading close button only in linking context
+        leading: isLinkingContext
+            ? IconButton(
+                icon: const Icon(Icons.close),
+                tooltip: MaterialLocalizations.of(context).closeButtonTooltip, // Accessibility
+                onPressed: () {
+                  // Navigate back to the account page when close is pressed
+                  context.goNamed(Routes.accountName);
+                },
+              )
+            : null, // No leading button if not linking (relies on system back if pushed)
+      ),
       body: SafeArea(
         child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
           // Listener remains crucial for feedback (errors)
@@ -94,14 +117,18 @@ class _AuthenticationView extends StatelessWidget {
             // Email link success is handled in the dedicated email flow pages.
           },
           builder: (context, state) {
-            final isLoading = state is AuthenticationLoading; // Simplified loading check
+            final isLoading =
+                state is AuthenticationLoading; // Simplified loading check
 
             return Padding(
-              padding: const EdgeInsets.all(AppSpacing.paddingLarge), // Use constant
+              padding: const EdgeInsets.all(
+                AppSpacing.paddingLarge,
+              ), // Use constant
               child: Center(
                 child: SingleChildScrollView(
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center, // Center vertically
+                    mainAxisAlignment:
+                        MainAxisAlignment.center, // Center vertically
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       // --- Headline and Subheadline ---
@@ -117,31 +144,35 @@ class _AuthenticationView extends StatelessWidget {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: AppSpacing.xxl), // Use constant
-
                       // --- Google Sign-In Button ---
                       ElevatedButton.icon(
-                        icon: const Icon(Icons.g_mobiledata), // Placeholder icon
+                        icon: const Icon(
+                          Icons.g_mobiledata,
+                        ), // Placeholder icon
                         label: Text(l10n.authenticationGoogleSignInButton),
-                        onPressed: isLoading
-                            ? null
-                            : () => context.read<AuthenticationBloc>().add(
+                        onPressed:
+                            isLoading
+                                ? null
+                                : () => context.read<AuthenticationBloc>().add(
                                   const AuthenticationGoogleSignInRequested(),
                                 ),
                         // Style adjustments can be made via ElevatedButtonThemeData
                       ),
                       const SizedBox(height: AppSpacing.lg), // Use constant
-
                       // --- Email Sign-In Button ---
                       ElevatedButton(
                         // Consider an email icon
                         // icon: const Icon(Icons.email_outlined),
-                        child: Text(l10n.authenticationEmailSignInButton), // New l10n key needed
-                        onPressed: isLoading
-                            ? null
-                            : () {
-                                // Navigate to the dedicated email sign-in page
-                                context.goNamed(Routes.emailSignInName);
-                              },
+                        child: Text(
+                          l10n.authenticationEmailSignInButton,
+                        ), // New l10n key needed
+                        onPressed:
+                            isLoading
+                                ? null
+                                : () {
+                                  // Navigate to the dedicated email sign-in page
+                                  context.goNamed(Routes.emailSignInName);
+                                },
                       ),
 
                       // --- Anonymous Sign-In Button (Conditional) ---
@@ -149,9 +180,10 @@ class _AuthenticationView extends StatelessWidget {
                         const SizedBox(height: AppSpacing.lg), // Use constant
                         OutlinedButton(
                           child: Text(l10n.authenticationAnonymousSignInButton),
-                          onPressed: isLoading
-                              ? null
-                              : () => context.read<AuthenticationBloc>().add(
+                          onPressed:
+                              isLoading
+                                  ? null
+                                  : () => context.read<AuthenticationBloc>().add(
                                     const AuthenticationAnonymousSignInRequested(),
                                   ),
                         ),
@@ -160,9 +192,9 @@ class _AuthenticationView extends StatelessWidget {
                       // --- Loading Indicator (Optional, for general loading state) ---
                       // If needed, show a general loading indicator when state is AuthenticationLoading
                       if (isLoading && state is! AuthenticationLinkSending) ...[
-                         const SizedBox(height: AppSpacing.xl),
-                         const Center(child: CircularProgressIndicator()),
-                      ]
+                        const SizedBox(height: AppSpacing.xl),
+                        const Center(child: CircularProgressIndicator()),
+                      ],
                     ],
                   ),
                 ),

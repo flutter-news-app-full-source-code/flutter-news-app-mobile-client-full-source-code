@@ -49,23 +49,23 @@ class AppShell extends StatelessWidget {
       onSelectedIndexChange: _goBranch,
       // Define the navigation destinations.
       destinations: [
-        const NavigationDestination(
+        NavigationDestination(
           // Make const
-          icon: Icon(Icons.article_outlined),
-          selectedIcon: Icon(Icons.article),
-          label: l10n.bottomNavFeedLabel, // Placeholder until generated
+          icon: const Icon(Icons.article_outlined),
+          selectedIcon: const Icon(Icons.article),
+          label: l10n.bottomNavFeedLabel,
         ),
-        const NavigationDestination(
+        NavigationDestination(
           // Make const
-          icon: Icon(Icons.search_outlined),
-          selectedIcon: Icon(Icons.search),
-          label: l10n.bottomNavSearchLabel, // Placeholder until generated
+          icon: const Icon(Icons.search_outlined),
+          selectedIcon: const Icon(Icons.search),
+          label: l10n.bottomNavSearchLabel,
         ),
-        const NavigationDestination(
+        NavigationDestination(
           // Make const
-          icon: Icon(Icons.account_circle_outlined),
-          selectedIcon: Icon(Icons.account_circle),
-          label: l10n.bottomNavAccountLabel, // Placeholder until generated
+          icon: const Icon(Icons.account_circle_outlined),
+          selectedIcon: const Icon(Icons.account_circle),
+          label: l10n.bottomNavAccountLabel,
         ),
       ],
       // The body displays the widget tree for the currently selected branch.

@@ -22,12 +22,10 @@ void main() async {
   // 1. Authentication Repository
   // Define ActionCodeSettings for email link sign-in
   final actionCodeSettings = ActionCodeSettings(
-    // IMPORTANT: Replace with your actual Firebase Dynamic Link domain/setup
     url: 'https://htmain.page.link/finishLogin',
     handleCodeInApp: true,
-    // IMPORTANT: Replace with your actual bundle/package IDs
-    iOSBundleId: 'com.example.htMain', // Example ID
-    androidPackageName: 'com.example.ht_main', // Example ID
+    iOSBundleId: 'com.example.htMain',
+    androidPackageName: 'com.example.ht_main',
     androidInstallApp: true,
     androidMinimumVersion: '12', // Optional: Specify minimum Android version
   );

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ht_headlines_repository/ht_headlines_repository.dart';
 import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:ht_main/headlines-feed/widgets/headline_item_widget.dart';
 import 'package:ht_main/l10n/l10n.dart';
+import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/constants/constants.dart';
 import 'package:ht_main/shared/widgets/failure_state_widget.dart';
 import 'package:ht_main/shared/widgets/loading_state_widget.dart';
@@ -73,7 +75,14 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
 
     return Scaffold(
       appBar: AppBar(
-        // Removed leadingWidth and leading Row
+        centerTitle: true, // Center the title
+        leading: IconButton( // Add leading icon button
+          icon: const Icon(Icons.notifications_outlined),
+          tooltip: l10n.notificationsTooltip, // Add tooltip for accessibility
+          onPressed: () {
+            context.goNamed(Routes.notificationsName);
+          },
+        ),
         title: Text(
           'HT', // TODO(fulleni): Localize this title
           style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),

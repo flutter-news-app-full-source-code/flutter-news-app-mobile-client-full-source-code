@@ -279,5 +279,9 @@
     "headlinesSearchActionTooltip": "Search",
     "@headlinesSearchActionTooltip": {
         "description": "Tooltip text for the search icon button in the search page AppBar"
+    },
+    "notificationsTooltip": "View notifications",
+    "@notificationsTooltip": {
+        "description": "Tooltip text for the notifications icon button in the feed page AppBar"
     }
 }

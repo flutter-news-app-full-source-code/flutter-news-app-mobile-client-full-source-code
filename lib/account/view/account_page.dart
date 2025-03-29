@@ -61,8 +61,6 @@ class _AccountView extends StatelessWidget {
           const SizedBox(height: 24),
 
           // --- Action Tiles ---
-          _buildNotificationsTile(context),
-          const Divider(),
           _buildSettingsTile(context),
           const Divider(),
           if (isAnonymous)
@@ -167,20 +165,6 @@ class _AccountView extends StatelessWidget {
           Routes.authenticationName,
           queryParameters: {'context': 'linking'},
         );
-      },
-    );
-  }
-
-  /// Builds the ListTile for navigating to Notifications.
-  Widget _buildNotificationsTile(BuildContext context) {
-    final l10n = context.l10n;
-    return ListTile(
-      leading: const Icon(Icons.notifications_outlined),
-      title: Text(l10n.accountNotificationsTile),
-      trailing: const Icon(Icons.chevron_right), // Suggests navigation
-      onTap: () {
-        // Navigate to the new notifications route (placeholder)
-        context.goNamed(Routes.notificationsName);
       },
     );
   }

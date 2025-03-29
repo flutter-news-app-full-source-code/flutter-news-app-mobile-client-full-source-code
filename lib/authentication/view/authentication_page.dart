@@ -170,8 +170,12 @@ class _AuthenticationView extends StatelessWidget {
                             isLoading
                                 ? null
                                 : () {
-                                  // Navigate to the dedicated email sign-in page
-                                  context.goNamed(Routes.emailSignInName);
+                                  // Navigate to the dedicated email sign-in page,
+                                  // passing the linking context via 'extra'.
+                                  context.goNamed(
+                                    Routes.emailSignInName,
+                                    extra: isLinkingContext, // Pass the flag
+                                  );
                                 },
                       ),
 

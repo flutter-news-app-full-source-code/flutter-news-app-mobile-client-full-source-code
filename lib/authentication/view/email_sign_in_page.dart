@@ -12,18 +12,28 @@ import 'package:ht_main/shared/constants/app_spacing.dart';
 /// {@endtemplate}
 class EmailSignInPage extends StatelessWidget {
   /// {@macro email_sign_in_page}
-  const EmailSignInPage({super.key});
+  const EmailSignInPage({
+    required this.isLinkingContext, // Accept the flag
+    super.key,
+  });
+
+  /// Whether this page is being shown in the account linking context.
+  final bool isLinkingContext;
 
   @override
   Widget build(BuildContext context) {
     // Assuming AuthenticationBloc is provided by the parent route (AuthenticationPage)
     // If not, it needs to be provided here or higher up.
-    return const _EmailSignInView();
+    // Pass the flag down to the view.
+    return _EmailSignInView(isLinkingContext: isLinkingContext);
   }
 }
 
 class _EmailSignInView extends StatelessWidget {
-  const _EmailSignInView();
+  // Accept the flag from the parent page.
+  const _EmailSignInView({required this.isLinkingContext});
+
+  final bool isLinkingContext;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +43,24 @@ class _EmailSignInView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.emailSignInPageTitle), // New l10n key needed
+        // Add a custom leading back button to control navigation based on context.
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip, // Accessibility
+          onPressed: () {
+            // Navigate back differently based on the context.
+            if (isLinkingContext) {
+              // If linking, go back to Auth page preserving the linking query param.
+              context.goNamed(
+                Routes.authenticationName,
+                queryParameters: {'context': 'linking'},
+              );
+            } else {
+              // If normal sign-in, just go back to the Auth page.
+              context.goNamed(Routes.authenticationName);
+            }
+          },
+        ),
       ),
       body: SafeArea(
         child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
@@ -52,10 +80,12 @@ class _EmailSignInView extends StatelessWidget {
             }
           },
           // BuildWhen prevents unnecessary rebuilds if only listening
-          buildWhen: (previous, current) =>
-              current is AuthenticationInitial ||
-              current is AuthenticationLinkSending ||
-              current is AuthenticationFailure, // Rebuild on failure to re-enable form
+          buildWhen:
+              (previous, current) =>
+                  current is AuthenticationInitial ||
+                  current is AuthenticationLinkSending ||
+                  current
+                      is AuthenticationFailure, // Rebuild on failure to re-enable form
           builder: (context, state) {
             final isLoading = state is AuthenticationLinkSending;
 
@@ -110,10 +140,10 @@ class _EmailLinkFormState extends State<_EmailLinkForm> {
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       context.read<AuthenticationBloc>().add(
-            AuthenticationSendSignInLinkRequested(
-              email: _emailController.text.trim(),
-            ),
-          );
+        AuthenticationSendSignInLinkRequested(
+          email: _emailController.text.trim(),
+        ),
+      );
     }
   }
 
@@ -140,22 +170,27 @@ class _EmailLinkFormState extends State<_EmailLinkForm> {
             validator: (value) {
               if (value == null || value.isEmpty || !value.contains('@')) {
                 // Add a specific validation error message key if needed
-                return l10n.accountLinkingEmailValidationError; // Re-use for now
+                return l10n
+                    .accountLinkingEmailValidationError; // Re-use for now
               }
               return null;
             },
-            onFieldSubmitted: (_) => _submitForm(), // Allow submitting from keyboard
+            onFieldSubmitted:
+                (_) => _submitForm(), // Allow submitting from keyboard
           ),
           const SizedBox(height: AppSpacing.lg),
           ElevatedButton(
             onPressed: widget.isLoading ? null : _submitForm,
-            child: widget.isLoading
-                ? const SizedBox(
-                    height: 24, // Consistent height
-                    width: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : Text(l10n.authenticationSendLinkButton), // Re-use existing key
+            child:
+                widget.isLoading
+                    ? const SizedBox(
+                      height: 24, // Consistent height
+                      width: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                    : Text(
+                      l10n.authenticationSendLinkButton,
+                    ), // Re-use existing key
           ),
         ],
       ),

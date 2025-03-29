@@ -188,7 +188,11 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
           GoRoute(
             path: Routes.emailSignIn,
             name: Routes.emailSignInName,
-            builder: (context, state) => const EmailSignInPage(),
+            builder: (context, state) {
+              // Extract the linking context flag from 'extra', default to false.
+              final isLinking = (state.extra as bool?) ?? false;
+              return EmailSignInPage(isLinkingContext: isLinking); // Pass to widget
+            },
           ),
           GoRoute(
             path: Routes.emailLinkSent,

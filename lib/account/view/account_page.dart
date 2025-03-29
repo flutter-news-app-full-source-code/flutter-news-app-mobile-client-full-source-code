@@ -7,6 +7,7 @@ import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
+import 'package:ht_main/shared/constants/app_spacing.dart';
 
 /// {@template account_page}
 /// Page widget for the Account feature.
@@ -54,20 +55,15 @@ class _AccountView extends StatelessWidget {
       appBar: AppBar(title: Text(l10n.accountPageTitle)),
       body: ListView(
         // Use ListView for potential scrolling if content grows
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.lg), // Use AppSpacing
         children: [
           // --- User Header ---
           _buildUserHeader(context, user, isAnonymous),
-          const SizedBox(height: 24),
-
+          const SizedBox(height: AppSpacing.xl), // Use AppSpacing
           // --- Action Tiles ---
+          // Settings Tile is now the first actionable item below the header
           _buildSettingsTile(context),
-          const Divider(),
-          if (isAnonymous)
-            _buildBackupTile(context) // Show Backup CTA for anonymous
-          else
-            _buildLogoutTile(context), // Show Logout for authenticated
-          const Divider(),
+          const Divider(), // Divider after settings
         ],
       ),
     );
@@ -99,7 +95,7 @@ class _AccountView extends StatelessWidget {
                   )
                   : null,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.lg), // Use AppSpacing
         Text(
           isAnonymous
               ? l10n.accountAnonymousUser
@@ -107,16 +103,52 @@ class _AccountView extends StatelessWidget {
           style: textTheme.titleLarge,
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 4),
-        Text(
-          // Convert enum to user-friendly string
-          _authenticationStatusToString(context, user.authenticationStatus),
-          style: textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.secondary,
-          ),
-          textAlign: TextAlign.center,
-        ),
+        // Conditionally display Sign In or Logout button
+        if (isAnonymous)
+          _buildSignInButton(context)
+        else
+          _buildLogoutButton(context),
       ],
+    );
+  }
+
+  /// Builds the sign-in button for anonymous users.
+  Widget _buildSignInButton(BuildContext context) {
+    final l10n = context.l10n;
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.sm),
+      child: TextButton(
+        onPressed: () {
+          // Navigate to the authentication page in linking mode
+          context.goNamed(
+            Routes.authenticationName,
+            queryParameters: {'context': 'linking'},
+          );
+        },
+        child: Text(l10n.accountSignInPromptButton),
+      ),
+    );
+  }
+
+  /// Builds the logout button for authenticated users.
+  Widget _buildLogoutButton(BuildContext context) {
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.sm),
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: theme.colorScheme.error,
+          side: BorderSide(color: theme.colorScheme.error),
+        ),
+        onPressed: () {
+          context.read<AccountBloc>().add(const AccountLogoutRequested());
+          // Global redirect will be handled by AppBloc/GoRouter
+        },
+        // Assuming l10n.accountSignOutButton exists or will be added
+        // Reusing existing tile text for now as button text might differ
+        child: Text(l10n.accountSignOutTile),
+      ),
     );
   }
 
@@ -132,56 +164,5 @@ class _AccountView extends StatelessWidget {
         context.goNamed(Routes.settingsName);
       },
     );
-  }
-
-  /// Builds the ListTile for logging out (for authenticated users).
-  Widget _buildLogoutTile(BuildContext context) {
-    final l10n = context.l10n;
-    return ListTile(
-      leading: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
-      title: Text(
-        l10n.accountSignOutTile,
-        style: TextStyle(color: Theme.of(context).colorScheme.error),
-      ),
-      onTap: () {
-        context.read<AccountBloc>().add(const AccountLogoutRequested());
-        // Global redirect will be handled by AppBloc/GoRouter
-      },
-    );
-  }
-
-  /// Builds the ListTile prompting anonymous users to sign in/connect.
-  Widget _buildBackupTile(BuildContext context) {
-    final l10n = context.l10n;
-    return ListTile(
-      leading: const Icon(Icons.link),
-      title: Text(l10n.accountConnectPrompt),
-      subtitle: Text(l10n.accountConnectBenefit),
-      isThreeLine: true, // Allow more space for subtitle
-      trailing: const Icon(Icons.chevron_right),
-      onTap: () {
-        // Navigate to the authentication page in linking mode
-        context.goNamed(
-          Routes.authenticationName,
-          queryParameters: {'context': 'linking'},
-        );
-      },
-    );
-  }
-
-  /// Helper to convert AuthenticationStatus enum to a display string.
-  String _authenticationStatusToString(
-    BuildContext context,
-    AuthenticationStatus status,
-  ) {
-    final l10n = context.l10n;
-    switch (status) {
-      case AuthenticationStatus.authenticated:
-        return l10n.accountStatusAuthenticated;
-      case AuthenticationStatus.anonymous:
-        return l10n.accountStatusAnonymous;
-      case AuthenticationStatus.unauthenticated:
-        return l10n.accountStatusUnauthenticated;
-    }
   }
 }

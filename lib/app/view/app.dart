@@ -2,18 +2,18 @@
 // ignore_for_file: deprecated_member_use
 
 import 'dart:async';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart'; 
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ht_authentication_repository/ht_authentication_repository.dart';
 import 'package:ht_headlines_repository/ht_headlines_repository.dart';
-import 'package:ht_kv_storage_service/ht_kv_storage_service.dart'; 
+import 'package:ht_kv_storage_service/ht_kv_storage_service.dart';
 import 'package:ht_main/app/bloc/app_bloc.dart';
-import 'package:ht_main/authentication/bloc/authentication_bloc.dart'; 
+import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/router.dart';
-import 'package:ht_main/shared/theme/app_theme.dart'; 
+import 'package:ht_main/shared/theme/app_theme.dart';
 
 class App extends StatelessWidget {
   const App({
@@ -93,7 +93,6 @@ class _AppViewState extends State<_AppView> {
     _statusNotifier.dispose(); // Dispose the correct notifier
     super.dispose();
   }
-
 
   /// Initializes Firebase Dynamic Links listeners.
   Future<void> _initDynamicLinks() async {

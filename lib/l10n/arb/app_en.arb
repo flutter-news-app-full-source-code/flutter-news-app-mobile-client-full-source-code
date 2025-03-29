@@ -283,5 +283,9 @@
     "notificationsTooltip": "View notifications",
     "@notificationsTooltip": {
         "description": "Tooltip text for the notifications icon button in the feed page AppBar"
+    },
+    "accountSignInPromptButton": "Sign Up / Sign In",
+    "@accountSignInPromptButton": {
+        "description": "Button text shown in the user header for anonymous users to initiate sign-in/sign-up"
     }
 }

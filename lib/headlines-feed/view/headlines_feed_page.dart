@@ -7,8 +7,11 @@ import 'package:ht_main/headlines-feed/widgets/headline_item_widget.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/constants/constants.dart';
+import 'package:ht_categories_client/ht_categories_client.dart'; // Import Category
+import 'package:ht_countries_client/ht_countries_client.dart'; // Import Country
 import 'package:ht_main/shared/widgets/failure_state_widget.dart';
 import 'package:ht_main/shared/widgets/loading_state_widget.dart';
+import 'package:ht_sources_client/ht_sources_client.dart'; // Import Source
 
 class HeadlinesFeedPage extends StatelessWidget {
   const HeadlinesFeedPage({super.key});
@@ -93,10 +96,11 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
             builder: (context, state) {
               var isFilterApplied = false;
               if (state is HeadlinesFeedLoaded) {
+                // Check if any filter list is non-null and not empty
                 isFilterApplied =
-                    state.filter.category != null ||
-                    state.filter.source != null ||
-                    state.filter.eventCountry != null;
+                    (state.filter.categories?.isNotEmpty ?? false) ||
+                    (state.filter.sources?.isNotEmpty ?? false) ||
+                    (state.filter.eventCountries?.isNotEmpty ?? false);
               }
               return Stack(
                 children: [
@@ -210,18 +214,20 @@ class _HeadlinesFilterBottomSheet extends StatefulWidget {
 
 class _HeadlinesFilterBottomSheetState
     extends State<_HeadlinesFilterBottomSheet> {
-  String? selectedCategory;
-  String? selectedSource;
-  String? selectedEventCountry;
+  // Use lists to store selected filters
+  List<Category> selectedCategories = [];
+  List<Source> selectedSources = [];
+  List<Country> selectedEventCountries = [];
 
   @override
   void initState() {
     super.initState();
     final state = widget.bloc.state;
     if (state is HeadlinesFeedLoaded) {
-      selectedCategory = state.filter.category;
-      selectedSource = state.filter.source;
-      selectedEventCountry = state.filter.eventCountry;
+      // Initialize lists from the current filter state, handle nulls
+      selectedCategories = List.from(state.filter.categories ?? []);
+      selectedSources = List.from(state.filter.sources ?? []);
+      selectedEventCountries = List.from(state.filter.eventCountries ?? []);
     }
   }
 
@@ -247,104 +253,92 @@ class _HeadlinesFilterBottomSheetState
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.xl),
-              // Category Dropdown
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  labelText: l10n.headlinesFeedFilterCategoryLabel,
+
+              // --- Category Filters ---
+              Text(
+                l10n.headlinesFeedFilterCategoryLabel,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              // TODO(cline): Implement multi-select UI for categories
+              // Fetch available categories from a repository
+              // Use Wrap + FilterChip to display options
+              // Update selectedCategories list in setState when chips are toggled
+              // Example placeholder:
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+                  borderRadius: BorderRadius.circular(AppSpacing.sm),
                 ),
-                value: selectedCategory,
-                // TODO(fulleni): Populate items dynamically from repository/config
-                items: [
-                  DropdownMenuItem<String>(
-                    child: Text(l10n.headlinesFeedFilterAllOption),
-                  ),
-                  DropdownMenuItem(
-                    value: 'technology',
-                    child: Text(l10n.headlinesFeedFilterCategoryTechnology),
-                  ),
-                  DropdownMenuItem(
-                    value: 'business',
-                    child: Text(l10n.headlinesFeedFilterCategoryBusiness),
-                  ),
-                  DropdownMenuItem(
-                    value: 'sports',
-                    child: Text(l10n.headlinesFeedFilterCategorySports),
-                  ),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    selectedCategory = value;
-                  });
-                },
+                child: const Text('Category FilterChip UI Placeholder'),
               ),
               const SizedBox(height: AppSpacing.lg),
-              // Source Dropdown
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  labelText: l10n.headlinesFeedFilterSourceLabel,
+
+              // --- Source Filters ---
+              Text(
+                l10n.headlinesFeedFilterSourceLabel,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              // TODO(cline): Implement multi-select UI for sources
+              // Fetch available sources from a repository
+              // Use Wrap + FilterChip to display options
+              // Update selectedSources list in setState when chips are toggled
+              // Example placeholder:
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+                  borderRadius: BorderRadius.circular(AppSpacing.sm),
                 ),
-                value: selectedSource,
-                // TODO(fulleni): Populate items dynamically
-                items: [
-                  DropdownMenuItem<String>(
-                    child: Text(l10n.headlinesFeedFilterAllOption),
-                  ),
-                  DropdownMenuItem(
-                    value: 'cnn',
-                    child: Text(l10n.headlinesFeedFilterSourceCNN),
-                  ),
-                  DropdownMenuItem(
-                    value: 'reuters',
-                    child: Text(l10n.headlinesFeedFilterSourceReuters),
-                  ),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    selectedSource = value;
-                  });
-                },
+                child: const Text('Source FilterChip UI Placeholder'),
               ),
               const SizedBox(height: AppSpacing.lg),
-              // Event Country Dropdown
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  labelText: l10n.headlinesFeedFilterEventCountryLabel,
+
+              // --- Event Country Filters ---
+              Text(
+                l10n.headlinesFeedFilterEventCountryLabel,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              // TODO(cline): Implement multi-select UI for event countries
+              // Fetch available countries from a repository
+              // Use Wrap + FilterChip to display options
+              // Update selectedEventCountries list in setState when chips are toggled
+              // Example placeholder:
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+                  borderRadius: BorderRadius.circular(AppSpacing.sm),
                 ),
-                value: selectedEventCountry,
-                // TODO(fulleni): Populate items dynamically
-                items: [
-                  DropdownMenuItem<String>(
-                    child: Text(l10n.headlinesFeedFilterAllOption),
-                  ),
-                  DropdownMenuItem(
-                    value: 'US',
-                    child: Text(l10n.headlinesFeedFilterCountryUS),
-                  ),
-                  DropdownMenuItem(
-                    value: 'UK',
-                    child: Text(l10n.headlinesFeedFilterCountryUK),
-                  ),
-                  DropdownMenuItem(
-                    value: 'CA',
-                    child: Text(l10n.headlinesFeedFilterCountryCA),
-                  ),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    selectedEventCountry = value;
-                  });
-                },
+                child: const Text('Country FilterChip UI Placeholder'),
               ),
               const SizedBox(height: AppSpacing.xl),
-              // Use FilledButton for primary action
+
+              // --- Action Buttons ---
               FilledButton(
                 onPressed: () {
                   widget.bloc.add(
                     HeadlinesFeedFilterChanged(
-                      // Pass null if 'All' was selected (value is null now)
-                      category: selectedCategory,
-                      source: selectedSource,
-                      eventCountry: selectedEventCountry,
+                      // Pass the selected lists
+                      categories:
+                          selectedCategories.isNotEmpty
+                              ? selectedCategories
+                              : null,
+                      sources:
+                          selectedSources.isNotEmpty ? selectedSources : null,
+                      eventCountries:
+                          selectedEventCountries.isNotEmpty
+                              ? selectedEventCountries
+                              : null,
                     ),
                   );
                   Navigator.pop(context);
@@ -354,12 +348,20 @@ class _HeadlinesFilterBottomSheetState
               const SizedBox(height: AppSpacing.sm),
               TextButton(
                 onPressed: () {
+                  // Clear local state lists
                   setState(() {
-                    selectedCategory = null;
-                    selectedSource = null;
-                    selectedEventCountry = null;
+                    selectedCategories.clear();
+                    selectedSources.clear();
+                    selectedEventCountries.clear();
                   });
-                  widget.bloc.add(const HeadlinesFeedFilterChanged());
+                  // Dispatch event with null lists to clear filters in BLoC
+                  widget.bloc.add(
+                    const HeadlinesFeedFilterChanged(
+                      categories: null,
+                      sources: null,
+                      eventCountries: null,
+                    ),
+                  );
                   Navigator.pop(context);
                 },
                 child: Text(l10n.headlinesFeedFilterResetButton),

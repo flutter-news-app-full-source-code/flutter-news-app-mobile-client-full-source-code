@@ -292,7 +292,8 @@ class _HeadlineDetailsView extends StatelessWidget {
       // Use country.flagUrl for the avatar
       chips.add(
         Chip(
-          avatar: CircleAvatar( // Use CircleAvatar for better image display
+          avatar: CircleAvatar(
+            // Use CircleAvatar for better image display
             radius: chipAvatarSize / 2, // Adjust radius as needed
             backgroundColor: Colors.transparent, // Avoid background color clash
             backgroundImage: NetworkImage(headline.eventCountry!.flagUrl),

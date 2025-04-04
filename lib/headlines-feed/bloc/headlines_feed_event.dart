@@ -37,7 +37,7 @@ final class HeadlinesFeedFilterChanged extends HeadlinesFeedEvent {
   /// {@macro headlines_feed_filter_changed}
   const HeadlinesFeedFilterChanged({
     this.categories, // Changed from category
-    this.sources,    // Changed from source
+    this.sources, // Changed from source
     this.eventCountries, // Changed from eventCountry
   });
 

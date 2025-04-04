@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ht_categories_client/ht_categories_client.dart'; // Import Category
+import 'package:ht_countries_client/ht_countries_client.dart'; // Import Country
 import 'package:ht_headlines_repository/ht_headlines_repository.dart';
 import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:ht_main/headlines-feed/widgets/headline_item_widget.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/constants/constants.dart';
-import 'package:ht_categories_client/ht_categories_client.dart'; // Import Category
-import 'package:ht_countries_client/ht_countries_client.dart'; // Import Country
 import 'package:ht_main/shared/widgets/failure_state_widget.dart';
 import 'package:ht_main/shared/widgets/loading_state_widget.dart';
 import 'package:ht_sources_client/ht_sources_client.dart'; // Import Source
@@ -260,7 +260,7 @@ class _HeadlinesFilterBottomSheetState
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: AppSpacing.md),
-              // TODO(cline): Implement multi-select UI for categories
+              // TODO(fulleni): Implement multi-select UI for categories
               // Fetch available categories from a repository
               // Use Wrap + FilterChip to display options
               // Update selectedCategories list in setState when chips are toggled
@@ -283,7 +283,7 @@ class _HeadlinesFilterBottomSheetState
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: AppSpacing.md),
-              // TODO(cline): Implement multi-select UI for sources
+              // TODO(fulleni): Implement multi-select UI for sources
               // Fetch available sources from a repository
               // Use Wrap + FilterChip to display options
               // Update selectedSources list in setState when chips are toggled
@@ -306,7 +306,7 @@ class _HeadlinesFilterBottomSheetState
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: AppSpacing.md),
-              // TODO(cline): Implement multi-select UI for event countries
+              // TODO(fulleni): Implement multi-select UI for event countries
               // Fetch available countries from a repository
               // Use Wrap + FilterChip to display options
               // Update selectedEventCountries list in setState when chips are toggled
@@ -355,13 +355,7 @@ class _HeadlinesFilterBottomSheetState
                     selectedEventCountries.clear();
                   });
                   // Dispatch event with null lists to clear filters in BLoC
-                  widget.bloc.add(
-                    const HeadlinesFeedFilterChanged(
-                      categories: null,
-                      sources: null,
-                      eventCountries: null,
-                    ),
-                  );
+                  widget.bloc.add(const HeadlinesFeedFilterChanged());
                   Navigator.pop(context);
                 },
                 child: Text(l10n.headlinesFeedFilterResetButton),

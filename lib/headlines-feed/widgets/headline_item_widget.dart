@@ -122,7 +122,7 @@ class HeadlineItemWidget extends StatelessWidget {
                         if (headline.source != null)
                           _MetadataItem(
                             icon: Icons.source_outlined,
-                            text: headline.source!,
+                            text: headline.source!.name, // Use source.name
                           ),
                         if (headline.publishedAt != null)
                           _MetadataItem(

@@ -1,6 +1,6 @@
 name: ht_main
 description: main headlines toolkit mobile app.
-version: 0.44.4
+version: 0.44.5
 publish_to: none
 repository: https://github.com/headlines-toolkit/ht-main
 environment:
@@ -26,39 +26,30 @@ dependencies:
   ht_authentication_client:
     git:
       url: https://github.com/headlines-toolkit/ht-authentication-client.git
-      ref: main
   ht_authentication_firebase:
     git:
       url: https://github.com/headlines-toolkit/ht-authentication-firebase.git
-      ref: main
   ht_authentication_repository:
     git:
       url: https://github.com/headlines-toolkit/ht-authentication-repository.git
-      ref: main
   ht_headlines_client:
     git:
       url: https://github.com/headlines-toolkit/ht-headlines-client.git
-      ref: main
   ht_headlines_firestore:
     git:
       url: https://github.com/headlines-toolkit/ht-headlines-firestore.git
-      ref: main
   ht_headlines_repository:
     git:
       url: https://github.com/headlines-toolkit/ht-headlines-repository.git
-      ref: main
   ht_kv_storage_service:
     git:
       url: https://github.com/headlines-toolkit/ht-kv-storage-service.git
-      ref: main
   ht_kv_storage_shared_preferences:
     git:
       url: https://github.com/headlines-toolkit/ht-kv-storage-shared-preferences.git
-      ref: main
   ht_shared:
     git:
       url: https://github.com/headlines-toolkit/ht-shared.git
-      ref: main
   intl: ^0.19.0
   meta: ^1.16.0
   stream_transform: ^2.1.1

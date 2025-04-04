@@ -36,20 +36,20 @@ final class HeadlinesFeedRefreshRequested extends HeadlinesFeedEvent {}
 final class HeadlinesFeedFilterChanged extends HeadlinesFeedEvent {
   /// {@macro headlines_feed_filter_changed}
   const HeadlinesFeedFilterChanged({
-    this.category,
-    this.source,
-    this.eventCountry,
+    this.categories, // Changed from category
+    this.sources,    // Changed from source
+    this.eventCountries, // Changed from eventCountry
   });
 
-  /// The selected category filter.
-  final String? category;
+  /// The list of selected category filters.
+  final List<Category>? categories;
 
-  /// The selected source filter.
-  final String? source;
+  /// The list of selected source filters.
+  final List<Source>? sources;
 
-  /// The selected event country filter.
-  final String? eventCountry;
+  /// The list of selected event country filters.
+  final List<Country>? eventCountries;
 
   @override
-  List<Object?> get props => [category, source, eventCountry];
+  List<Object?> get props => [categories, sources, eventCountries];
 }

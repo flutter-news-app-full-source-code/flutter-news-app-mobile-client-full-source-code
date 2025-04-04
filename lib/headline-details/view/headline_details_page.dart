@@ -246,15 +246,16 @@ class _HeadlineDetailsView extends StatelessWidget {
 
     // Source Chip
     if (headline.source != null) {
-      // TODO(fulleni): Replace Icon with Image.network when source.logoUrl is available
+      // Source model doesn't have a logoUrl, using a generic icon.
       chips.add(
         Chip(
           avatar: Icon(
-            Icons.source,
+            Icons.source, // Generic source icon
             size: chipAvatarSize,
             color: chipAvatarColor,
           ),
-          label: Text(headline.source!),
+          // Use source.name
+          label: Text(headline.source!.name),
           labelStyle: chipLabelStyle,
           backgroundColor: chipBackgroundColor,
           padding: chipPadding,
@@ -288,15 +289,19 @@ class _HeadlineDetailsView extends StatelessWidget {
 
     // Country Chip
     if (headline.eventCountry != null) {
-      // TODO(fulleni): Replace Icon with Image.network when country.flagUrl is available
+      // Use country.flagUrl for the avatar
       chips.add(
         Chip(
-          avatar: Icon(
-            Icons.location_on,
-            size: chipAvatarSize,
-            color: chipAvatarColor,
+          avatar: CircleAvatar( // Use CircleAvatar for better image display
+            radius: chipAvatarSize / 2, // Adjust radius as needed
+            backgroundColor: Colors.transparent, // Avoid background color clash
+            backgroundImage: NetworkImage(headline.eventCountry!.flagUrl),
+            onBackgroundImageError: (exception, stackTrace) {
+              // Optional: Handle image loading errors, e.g., show placeholder
+            },
           ),
-          label: Text(headline.eventCountry!),
+          // Use eventCountry.name
+          label: Text(headline.eventCountry!.name),
           labelStyle: chipLabelStyle,
           backgroundColor: chipBackgroundColor,
           padding: chipPadding,
@@ -306,20 +311,19 @@ class _HeadlineDetailsView extends StatelessWidget {
       );
     }
 
-    // Category Chips (No avatar for individual categories)
-    if (headline.categories != null) {
-      for (final category in headline.categories!) {
-        chips.add(
-          Chip(
-            label: Text(category),
-            labelStyle: chipLabelStyle,
-            backgroundColor: chipBackgroundColor,
-            padding: chipPadding,
-            visualDensity: chipVisualDensity,
-            materialTapTargetSize: chipMaterialTapTargetSize,
-          ),
-        );
-      }
+    // Category Chip (No avatar for individual category)
+    if (headline.category != null) {
+      chips.add(
+        Chip(
+          // Use category.name
+          label: Text(headline.category!.name),
+          labelStyle: chipLabelStyle,
+          backgroundColor: chipBackgroundColor,
+          padding: chipPadding,
+          visualDensity: chipVisualDensity,
+          materialTapTargetSize: chipMaterialTapTargetSize,
+        ),
+      );
     }
 
     return chips;

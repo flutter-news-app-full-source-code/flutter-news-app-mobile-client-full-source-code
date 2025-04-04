@@ -449,7 +449,7 @@ packages:
     source: git
     version: "0.0.0"
   ht_categories_client:
-    dependency: transitive
+    dependency: "direct main"
     description:
       path: "."
       ref: HEAD
@@ -458,7 +458,7 @@ packages:
     source: git
     version: "0.0.0"
   ht_countries_client:
-    dependency: transitive
+    dependency: "direct main"
     description:
       path: "."
       ref: HEAD
@@ -521,7 +521,7 @@ packages:
     source: git
     version: "0.0.0"
   ht_sources_client:
-    dependency: transitive
+    dependency: "direct main"
     description:
       path: "."
       ref: HEAD

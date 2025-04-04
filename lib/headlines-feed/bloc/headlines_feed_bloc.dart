@@ -3,9 +3,12 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
+import 'package:ht_categories_client/ht_categories_client.dart';
+import 'package:ht_countries_client/ht_countries_client.dart';
 import 'package:ht_headlines_client/ht_headlines_client.dart'; // Import for Headline and Exceptions
 import 'package:ht_headlines_repository/ht_headlines_repository.dart';
 import 'package:ht_main/headlines-feed/models/headline_filter.dart';
+import 'package:ht_sources_client/ht_sources_client.dart';
 
 part 'headlines_feed_event.dart';
 part 'headlines_feed_state.dart';
@@ -42,23 +45,26 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   ) async {
     emit(HeadlinesFeedLoading());
     try {
+      // Use list-based filters from the event
       final response = await _headlinesRepository.getHeadlines(
         limit: _headlinesFetchLimit,
-        category: event.category, // Pass category directly
-        source: event.source, // Pass source directly
-        eventCountry: event.eventCountry, // Pass eventCountry directly
+        categories: event.categories,
+        sources: event.sources,
+        eventCountries: event.eventCountries,
       );
       final newFilter =
           (state is HeadlinesFeedLoaded)
               ? (state as HeadlinesFeedLoaded).filter.copyWith(
-                category: event.category,
-                source: event.source,
-                eventCountry: event.eventCountry,
+                // Update copyWith call
+                categories: event.categories,
+                sources: event.sources,
+                eventCountries: event.eventCountries,
               )
               : HeadlineFilter(
-                category: event.category,
-                source: event.source,
-                eventCountry: event.eventCountry,
+                // Update constructor call
+                categories: event.categories,
+                sources: event.sources,
+                eventCountries: event.eventCountries,
               );
       emit(
         HeadlinesFeedLoaded(
@@ -89,12 +95,13 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       final currentState = state as HeadlinesFeedLoaded;
       emit(HeadlinesFeedLoadingSilently());
       try {
+        // Use list-based filters from the current state's filter
         final response = await _headlinesRepository.getHeadlines(
           limit: _headlinesFetchLimit,
           startAfterId: currentState.cursor,
-          category: currentState.filter.category, // Use existing filter
-          source: currentState.filter.source, // Use existing filter
-          eventCountry: currentState.filter.eventCountry, // Use existing filter
+          categories: currentState.filter.categories,
+          sources: currentState.filter.sources,
+          eventCountries: currentState.filter.eventCountries,
         );
         emit(
           HeadlinesFeedLoaded(
@@ -112,19 +119,20 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     } else {
       emit(HeadlinesFeedLoading());
       try {
+        // Use list-based filters from the current state's filter (if loaded)
         final response = await _headlinesRepository.getHeadlines(
           limit: _headlinesFetchLimit,
-          category:
+          categories:
               state is HeadlinesFeedLoaded
-                  ? (state as HeadlinesFeedLoaded).filter.category
+                  ? (state as HeadlinesFeedLoaded).filter.categories
                   : null,
-          source:
+          sources:
               state is HeadlinesFeedLoaded
-                  ? (state as HeadlinesFeedLoaded).filter.source
+                  ? (state as HeadlinesFeedLoaded).filter.sources
                   : null,
-          eventCountry:
+          eventCountries:
               state is HeadlinesFeedLoaded
-                  ? (state as HeadlinesFeedLoaded).filter.eventCountry
+                  ? (state as HeadlinesFeedLoaded).filter.eventCountries
                   : null,
         );
         emit(
@@ -160,19 +168,20 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   ) async {
     emit(HeadlinesFeedLoading());
     try {
+      // Use list-based filters from the current state's filter (if loaded)
       final response = await _headlinesRepository.getHeadlines(
-        limit: 20,
-        category:
+        limit: 20, // Consider using _headlinesFetchLimit here too?
+        categories:
             state is HeadlinesFeedLoaded
-                ? (state as HeadlinesFeedLoaded).filter.category
+                ? (state as HeadlinesFeedLoaded).filter.categories
                 : null,
-        source:
+        sources:
             state is HeadlinesFeedLoaded
-                ? (state as HeadlinesFeedLoaded).filter.source
+                ? (state as HeadlinesFeedLoaded).filter.sources
                 : null,
-        eventCountry:
+        eventCountries:
             state is HeadlinesFeedLoaded
-                ? (state as HeadlinesFeedLoaded).filter.eventCountry
+                ? (state as HeadlinesFeedLoaded).filter.eventCountries
                 : null,
       );
       emit(

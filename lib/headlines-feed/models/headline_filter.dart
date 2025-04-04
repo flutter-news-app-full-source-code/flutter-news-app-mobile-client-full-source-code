@@ -1,35 +1,41 @@
 import 'package:equatable/equatable.dart';
+import 'package:ht_categories_client/ht_categories_client.dart';
+import 'package:ht_countries_client/ht_countries_client.dart';
+import 'package:ht_sources_client/ht_sources_client.dart';
 
 /// {@template headline_filter}
 /// A model representing the filter parameters for headlines.
 /// {@endtemplate}
 class HeadlineFilter extends Equatable {
   /// {@macro headline_filter}
-  const HeadlineFilter({this.category, this.source, this.eventCountry});
+  const HeadlineFilter({this.categories, this.sources, this.eventCountries});
 
-  /// The selected category filter.
-  final String? category;
+  /// The list of selected category filters.
+  /// Headlines matching *any* of these categories will be included (OR logic).
+  final List<Category>? categories;
 
-  /// The selected source filter.
-  final String? source;
+  /// The list of selected source filters.
+  /// Headlines matching *any* of these sources will be included (OR logic).
+  final List<Source>? sources;
 
-  /// The selected event country filter.
-  final String? eventCountry;
+  /// The list of selected event country filters.
+  /// Headlines matching *any* of these countries will be included (OR logic).
+  final List<Country>? eventCountries;
 
   @override
-  List<Object?> get props => [category, source, eventCountry];
+  List<Object?> get props => [categories, sources, eventCountries];
 
   /// Creates a copy of this [HeadlineFilter] with the given fields
   /// replaced with the new values.
   HeadlineFilter copyWith({
-    String? category,
-    String? source,
-    String? eventCountry,
+    List<Category>? categories,
+    List<Source>? sources,
+    List<Country>? eventCountries,
   }) {
     return HeadlineFilter(
-      category: category ?? this.category,
-      source: source ?? this.source,
-      eventCountry: eventCountry ?? this.eventCountry,
+      categories: categories ?? this.categories,
+      sources: sources ?? this.sources,
+      eventCountries: eventCountries ?? this.eventCountries,
     );
   }
 }

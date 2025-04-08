@@ -283,5 +283,79 @@
     "notificationsTooltip": "عرض الإشعارات",
     "@notificationsTooltip": {
         "description": "Tooltip text for the notifications icon button in the feed page AppBar"
+    },
+    "categoryFilterLoadingHeadline": "جارٍ تحميل الفئات...",
+    "@categoryFilterLoadingHeadline": {
+        "description": "Headline for loading state on category filter page"
+    },
+    "categoryFilterLoadingSubheadline": "يرجى الانتظار بينما نقوم بجلب الفئات المتاحة.",
+    "@categoryFilterLoadingSubheadline": {
+        "description": "Subheadline for loading state on category filter page"
+    },
+    "categoryFilterEmptyHeadline": "لم يتم العثور على فئات",
+    "@categoryFilterEmptyHeadline": {
+        "description": "Headline for empty state on category filter page"
+    },
+    "categoryFilterEmptySubheadline": "لا توجد فئات متاحة في الوقت الحالي.",
+    "@categoryFilterEmptySubheadline": {
+        "description": "Subheadline for empty state on category filter page"
+    },
+    "countryFilterLoadingHeadline": "جارٍ تحميل البلدان...",
+    "@countryFilterLoadingHeadline": {
+        "description": "Headline for loading state on country filter page"
+    },
+    "countryFilterLoadingSubheadline": "يرجى الانتظار بينما نقوم بجلب البلدان المتاحة.",
+    "@countryFilterLoadingSubheadline": {
+        "description": "Subheadline for loading state on country filter page"
+    },
+    "countryFilterEmptyHeadline": "لم يتم العثور على بلدان",
+    "@countryFilterEmptyHeadline": {
+        "description": "Headline for empty state on country filter page"
+    },
+    "countryFilterEmptySubheadline": "لا توجد بلدان متاحة في الوقت الحالي.",
+    "@countryFilterEmptySubheadline": {
+        "description": "Subheadline for empty state on country filter page"
+    },
+    "headlinesFeedAppBarTitle": "HT",
+    "@headlinesFeedAppBarTitle": {
+        "description": "Title displayed in the AppBar of the main headlines feed"
+    },
+    "headlinesFeedFilterTooltip": "تصفية العناوين",
+    "@headlinesFeedFilterTooltip": {
+        "description": "Tooltip for the filter icon button in the feed AppBar"
+    },
+    "headlinesFeedFilterAllLabel": "الكل",
+    "@headlinesFeedFilterAllLabel": {
+        "description": "Label indicating 'All' items are selected in a filter tile"
+    },
+    "headlinesFeedFilterSelectedCountLabel": "تم تحديد {count}",
+    "@headlinesFeedFilterSelectedCountLabel": {
+        "description": "Label showing the number of selected filters (e.g., \"5 selected\")",
+        "placeholders": {
+            "count": {
+                "type": "int",
+                "example": "5"
+            }
+        }
+    },
+    "sourceFilterLoadingHeadline": "جارٍ تحميل المصادر...",
+    "@sourceFilterLoadingHeadline": {
+        "description": "Headline for loading state on source filter page"
+    },
+    "sourceFilterLoadingSubheadline": "يرجى الانتظار بينما نقوم بجلب المصادر المتاحة.",
+    "@sourceFilterLoadingSubheadline": {
+        "description": "Subheadline for loading state on source filter page"
+    },
+    "sourceFilterEmptyHeadline": "لم يتم العثور على مصادر",
+    "@sourceFilterEmptyHeadline": {
+        "description": "Headline for empty state on source filter page"
+    },
+    "sourceFilterEmptySubheadline": "لا توجد مصادر متاحة في الوقت الحالي.",
+    "@sourceFilterEmptySubheadline": {
+        "description": "Subheadline for empty state on source filter page"
+    },
+    "accountSignInPromptButton": "تسجيل / تسجيل الدخول",
+    "@accountSignInPromptButton": {
+        "description": "Button text shown in the user header for anonymous users to initiate sign-in/sign-up"
     }
 }

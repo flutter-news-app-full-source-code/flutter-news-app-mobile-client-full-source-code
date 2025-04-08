@@ -1,7 +1,26 @@
+/// Defines named constants for route paths and names used throughout the application.
+///
+/// Using constants helps prevent typos and makes route management easier.
 abstract final class Routes {
-  // --- Core App Routes ---
+  // --- Core App Routes (Bottom Navigation) ---
   static const feed = '/feed';
   static const feedName = 'feed';
+
+  // --- Filter Sub-Routes (relative to /feed) ---
+  static const feedFilter = 'filter'; // Path: /feed/filter
+  static const feedFilterName = 'feedFilter';
+
+  static const feedFilterCategories =
+      'categories'; // Path: /feed/filter/categories
+  static const feedFilterCategoriesName = 'feedFilterCategories';
+
+  static const feedFilterSources = 'sources'; // Path: /feed/filter/sources
+  static const feedFilterSourcesName = 'feedFilterSources';
+
+  static const feedFilterCountries =
+      'countries'; // Path: /feed/filter/countries
+  static const feedFilterCountriesName = 'feedFilterCountries';
+
   static const search = '/search';
   static const searchName = 'search';
   static const account = '/account';

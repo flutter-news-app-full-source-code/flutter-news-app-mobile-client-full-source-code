@@ -1,7 +1,7 @@
 part of 'headlines_feed_bloc.dart';
 
 /// {@template headlines_feed_state}
-/// Base class for all states related to the headlines feed.
+/// Represents the possible states of the headlines feed feature.
 /// {@endtemplate}
 sealed class HeadlinesFeedState extends Equatable {
   /// {@macro headlines_feed_state}
@@ -12,21 +12,24 @@ sealed class HeadlinesFeedState extends Equatable {
 }
 
 /// {@template headlines_feed_loading}
-/// State indicating that the headlines feed is being loaded.
+/// State indicating that the headlines feed is currently being fetched,
+/// typically shown with a full-screen loading indicator. This is used for
+/// initial loads, refreshes, or when applying/clearing filters.
 /// {@endtemplate}
 final class HeadlinesFeedLoading extends HeadlinesFeedState {}
 
-/// {@template headlines_feed_loading}
-/// State indicating that the headlines feed is being loaded
-/// without a full screen loading widget being showed.
-///
-/// usefull for inifinity scrolling fetches beyonf the first one
+/// {@template headlines_feed_loading_silently}
+/// State indicating that more headlines are being fetched for pagination
+/// (infinity scrolling). This state usually doesn't trigger a full-screen
+/// loading indicator, allowing the existing list to remain visible while
+/// a smaller indicator might be shown at the bottom.
 /// {@endtemplate}
 final class HeadlinesFeedLoadingSilently extends HeadlinesFeedState {}
 
 /// {@template headlines_feed_loaded}
-/// State indicating that the headlines feed has been loaded successfully,
-/// potentially with applied filters.
+/// State indicating that a batch of headlines has been successfully loaded.
+/// Contains the list of headlines, pagination information, and the currently
+/// active filter configuration.
 /// {@endtemplate}
 final class HeadlinesFeedLoaded extends HeadlinesFeedState {
   /// {@macro headlines_feed_loaded}
@@ -37,20 +40,23 @@ final class HeadlinesFeedLoaded extends HeadlinesFeedState {
     this.filter = const HeadlineFilter(),
   });
 
-  /// The headlines data.
+  /// The list of [Headline] objects currently loaded.
   final List<Headline> headlines;
 
-  /// Indicates if there are more headlines.
+  /// Flag indicating if there are more headlines available to fetch
+  /// via pagination. `true` if more might exist, `false` otherwise.
   final bool hasMore;
 
-  /// The cursor for the next page.
+  /// The cursor string to be used to fetch the next page of headlines.
+  /// Null if there are no more pages or if pagination is not applicable.
   final String? cursor;
 
-  /// The filter applied to the headlines.
+  /// The [HeadlineFilter] currently applied to the feed. An empty filter
+  /// indicates that no filters are active.
   final HeadlineFilter filter;
 
-  /// Creates a copy of this [HeadlinesFeedLoaded] with the given fields
-  /// replaced with the new values.
+  /// Creates a copy of this [HeadlinesFeedLoaded] state with the given fields
+  /// replaced with new values.
   HeadlinesFeedLoaded copyWith({
     List<Headline>? headlines,
     bool? hasMore,
@@ -70,13 +76,14 @@ final class HeadlinesFeedLoaded extends HeadlinesFeedState {
 }
 
 /// {@template headlines_feed_error}
-/// State indicating that an error occurred while loading the headlines feed.
+/// State indicating that an error occurred while fetching headlines.
+/// Contains an error [message] describing the failure.
 /// {@endtemplate}
 final class HeadlinesFeedError extends HeadlinesFeedState {
   /// {@macro headlines_feed_error}
   const HeadlinesFeedError({required this.message});
 
-  /// The error message.
+  /// A message describing the error that occurred.
   final String message;
 
   @override

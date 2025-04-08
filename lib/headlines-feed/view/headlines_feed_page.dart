@@ -4,8 +4,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ht_categories_client/ht_categories_client.dart'; // Import Category
-import 'package:ht_countries_client/ht_countries_client.dart'; // Import Country
+// Import Category
+// Import Country
 import 'package:ht_headlines_repository/ht_headlines_repository.dart';
 import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:ht_main/headlines-feed/widgets/headline_item_widget.dart';
@@ -14,9 +14,16 @@ import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/constants/constants.dart';
 import 'package:ht_main/shared/widgets/failure_state_widget.dart';
 import 'package:ht_main/shared/widgets/loading_state_widget.dart';
-import 'package:ht_sources_client/ht_sources_client.dart'; // Import Source
+// Import Source
 
+/// {@template headlines_feed_page}
+/// The main page displaying the feed of news headlines.
+///
+/// Provides the [HeadlinesFeedBloc] and renders the [_HeadlinesFeedView]
+/// which handles the UI based on the BLoC state.
+/// {@endtemplate}
 class HeadlinesFeedPage extends StatelessWidget {
+  /// {@macro headlines_feed_page}
   const HeadlinesFeedPage({super.key});
 
   @override
@@ -31,45 +38,68 @@ class HeadlinesFeedPage extends StatelessWidget {
   }
 }
 
+/// {@template headlines_feed_view}
+/// The core view widget for the headlines feed.
+///
+/// Handles displaying the list of headlines, loading states, error states,
+/// pagination (infinity scroll), and pull-to-refresh functionality. It also
+/// includes the AppBar with actions for notifications and filtering.
+/// {@endtemplate}
 class _HeadlinesFeedView extends StatefulWidget {
+  /// {@macro headlines_feed_view}
   const _HeadlinesFeedView();
 
   @override
   State<_HeadlinesFeedView> createState() => _HeadlinesFeedViewState();
 }
 
+/// State for the [_HeadlinesFeedView]. Manages the [ScrollController] for
+/// pagination and listens to scroll events.
 class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
   final _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
+    // Add listener to trigger pagination when scrolling near the bottom.
     _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+    // Remove listener and dispose the controller to prevent memory leaks.
     _scrollController
       ..removeListener(_onScroll)
       ..dispose();
     super.dispose();
   }
 
+  /// Callback function for scroll events.
+  ///
+  /// Checks if the user has scrolled near the bottom of the list and if there
+  /// are more headlines to fetch. If so, dispatches a
+  /// [HeadlinesFeedFetchRequested] event to the BLoC.
   void _onScroll() {
     final state = context.read<HeadlinesFeedBloc>().state;
     if (_isBottom && state is HeadlinesFeedLoaded) {
       if (state.hasMore) {
+        // Request the next page of headlines
         context.read<HeadlinesFeedBloc>().add(
-          const HeadlinesFeedFetchRequested(),
+          HeadlinesFeedFetchRequested(cursor: state.cursor), // Pass cursor
         );
       }
     }
   }
 
+  /// Checks if the current scroll position is near the bottom of the list.
+  ///
+  /// Returns `true` if the scroll offset is within 98% of the maximum scroll
+  /// extent, `false` otherwise.
   bool get _isBottom {
     if (!_scrollController.hasClients) return false;
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.offset;
+    // Trigger slightly before reaching the absolute end for smoother loading.
     return currentScroll >= (maxScroll * 0.98);
   }
 
@@ -82,7 +112,7 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'HT', // TODO(fulleni): Localize this title
+          l10n.headlinesFeedAppBarTitle,
           style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         actions: [
@@ -109,14 +139,10 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.filter_list),
+                    tooltip: l10n.headlinesFeedFilterTooltip,
                     onPressed: () {
-                      final bloc = context.read<HeadlinesFeedBloc>();
-                      showModalBottomSheet<void>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return _HeadlinesFilterBottomSheet(bloc: bloc);
-                        },
-                      );
+                      // Navigate to the filter page route
+                      context.goNamed(Routes.feedFilterName);
                     },
                   ),
                   if (isFilterApplied)
@@ -144,55 +170,66 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
         builder: (context, state) {
           switch (state) {
             case HeadlinesFeedLoading():
+              // Display full-screen loading indicator
               return LoadingStateWidget(
-                icon: Icons.hourglass_empty,
+                icon: Icons.newspaper, // Use a relevant icon
                 headline: l10n.headlinesFeedLoadingHeadline,
                 subheadline: l10n.headlinesFeedLoadingSubheadline,
               );
 
             case HeadlinesFeedLoadingSilently():
-              // This case is technically unreachable due to buildWhen,
-              // but required for exhaustive switch.
+              // This state is handled by buildWhen, should not be reached here.
+              // Return an empty container as a fallback.
               return const SizedBox.shrink();
+
             case HeadlinesFeedLoaded():
+              // Display the list of headlines with pull-to-refresh
               return RefreshIndicator(
                 onRefresh: () async {
+                  // Dispatch refresh event to the BLoC
                   context.read<HeadlinesFeedBloc>().add(
                     HeadlinesFeedRefreshRequested(),
                   );
+                  // Note: BLoC handles emitting loading state during refresh
                 },
-                // Use ListView.separated for consistent spacing
                 child: ListView.separated(
                   controller: _scrollController,
-
                   padding: const EdgeInsets.only(
                     top: AppSpacing.md,
-                    bottom: AppSpacing.xxl,
+                    bottom:
+                        AppSpacing.xxl, // Ensure space below last item/loader
                   ),
                   itemCount:
                       state.hasMore
-                          ? state.headlines.length + 1
+                          ? state.headlines.length +
+                              1 // +1 for loading indicator
                           : state.headlines.length,
                   separatorBuilder:
-                      (context, index) => const SizedBox(height: AppSpacing.lg),
+                      (context, index) => const SizedBox(
+                        height: AppSpacing.lg,
+                      ), // Consistent spacing
                   itemBuilder: (context, index) {
+                    // Check if it's the loading indicator item
                     if (index >= state.headlines.length) {
-                      // Improved loading indicator
+                      // Show loading indicator at the bottom if more items exist
                       return const Padding(
                         padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
                         child: Center(child: CircularProgressIndicator()),
                       );
                     }
+                    // Otherwise, build the headline item
                     final headline = state.headlines[index];
-                    // HeadlineItemWidget now handles its own internal padding
                     return HeadlineItemWidget(headline: headline);
                   },
                 ),
               );
+
             case HeadlinesFeedError():
+              // Display error message with a retry button
               return FailureStateWidget(
                 message: state.message,
                 onRetry: () {
+                  // Dispatch refresh event on retry
                   context.read<HeadlinesFeedBloc>().add(
                     HeadlinesFeedRefreshRequested(),
                   );
@@ -200,172 +237,6 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
               );
           }
         },
-      ),
-    );
-  }
-}
-
-class _HeadlinesFilterBottomSheet extends StatefulWidget {
-  const _HeadlinesFilterBottomSheet({required this.bloc});
-
-  final HeadlinesFeedBloc bloc;
-
-  @override
-  State<_HeadlinesFilterBottomSheet> createState() =>
-      _HeadlinesFilterBottomSheetState();
-}
-
-class _HeadlinesFilterBottomSheetState
-    extends State<_HeadlinesFilterBottomSheet> {
-  // Use lists to store selected filters
-  List<Category> selectedCategories = [];
-  List<Source> selectedSources = [];
-  List<Country> selectedEventCountries = [];
-
-  @override
-  void initState() {
-    super.initState();
-    final state = widget.bloc.state;
-    if (state is HeadlinesFeedLoaded) {
-      // Initialize lists from the current filter state, handle nulls
-      selectedCategories = List.from(state.filter.categories ?? []);
-      selectedSources = List.from(state.filter.sources ?? []);
-      selectedEventCountries = List.from(state.filter.eventCountries ?? []);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    return BlocProvider.value(
-      value: widget.bloc,
-      // Add symmetric padding for consistency
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg,
-          vertical: AppSpacing.xl,
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                l10n.headlinesFeedFilterTitle,
-                style: Theme.of(context).textTheme.titleLarge,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.xl),
-
-              // --- Category Filters ---
-              Text(
-                l10n.headlinesFeedFilterCategoryLabel,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              // TODO(fulleni): Implement multi-select UI for categories
-              // Fetch available categories from a repository
-              // Use Wrap + FilterChip to display options
-              // Update selectedCategories list in setState when chips are toggled
-              // Example placeholder:
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.outline,
-                  ),
-                  borderRadius: BorderRadius.circular(AppSpacing.sm),
-                ),
-                child: const Text('Category FilterChip UI Placeholder'),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-
-              // --- Source Filters ---
-              Text(
-                l10n.headlinesFeedFilterSourceLabel,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              // TODO(fulleni): Implement multi-select UI for sources
-              // Fetch available sources from a repository
-              // Use Wrap + FilterChip to display options
-              // Update selectedSources list in setState when chips are toggled
-              // Example placeholder:
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.outline,
-                  ),
-                  borderRadius: BorderRadius.circular(AppSpacing.sm),
-                ),
-                child: const Text('Source FilterChip UI Placeholder'),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-
-              // --- Event Country Filters ---
-              Text(
-                l10n.headlinesFeedFilterEventCountryLabel,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              // TODO(fulleni): Implement multi-select UI for event countries
-              // Fetch available countries from a repository
-              // Use Wrap + FilterChip to display options
-              // Update selectedEventCountries list in setState when chips are toggled
-              // Example placeholder:
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.outline,
-                  ),
-                  borderRadius: BorderRadius.circular(AppSpacing.sm),
-                ),
-                child: const Text('Country FilterChip UI Placeholder'),
-              ),
-              const SizedBox(height: AppSpacing.xl),
-
-              // --- Action Buttons ---
-              FilledButton(
-                onPressed: () {
-                  widget.bloc.add(
-                    HeadlinesFeedFilterChanged(
-                      // Pass the selected lists
-                      categories:
-                          selectedCategories.isNotEmpty
-                              ? selectedCategories
-                              : null,
-                      sources:
-                          selectedSources.isNotEmpty ? selectedSources : null,
-                      eventCountries:
-                          selectedEventCountries.isNotEmpty
-                              ? selectedEventCountries
-                              : null,
-                    ),
-                  );
-                  Navigator.pop(context);
-                },
-                child: Text(l10n.headlinesFeedFilterApplyButton),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              TextButton(
-                onPressed: () {
-                  // Clear local state lists
-                  setState(() {
-                    selectedCategories.clear();
-                    selectedSources.clear();
-                    selectedEventCountries.clear();
-                  });
-                  // Dispatch event with null lists to clear filters in BLoC
-                  widget.bloc.add(const HeadlinesFeedFilterChanged());
-                  Navigator.pop(context);
-                },
-                child: Text(l10n.headlinesFeedFilterResetButton),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

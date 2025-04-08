@@ -287,5 +287,75 @@
     "accountSignInPromptButton": "Sign Up / Sign In",
     "@accountSignInPromptButton": {
         "description": "Button text shown in the user header for anonymous users to initiate sign-in/sign-up"
+    },
+    "categoryFilterLoadingHeadline": "Loading Categories...",
+    "@categoryFilterLoadingHeadline": {
+        "description": "Headline for loading state on category filter page"
+    },
+    "categoryFilterLoadingSubheadline": "Please wait while we fetch the available categories.",
+    "@categoryFilterLoadingSubheadline": {
+        "description": "Subheadline for loading state on category filter page"
+    },
+    "categoryFilterEmptyHeadline": "No Categories Found",
+    "@categoryFilterEmptyHeadline": {
+        "description": "Headline for empty state on category filter page"
+    },
+    "categoryFilterEmptySubheadline": "There are no categories available at the moment.",
+    "@categoryFilterEmptySubheadline": {
+        "description": "Subheadline for empty state on category filter page"
+    },
+    "countryFilterLoadingHeadline": "Loading Countries...",
+    "@countryFilterLoadingHeadline": {
+        "description": "Headline for loading state on country filter page"
+    },
+    "countryFilterLoadingSubheadline": "Please wait while we fetch the available countries.",
+    "@countryFilterLoadingSubheadline": {
+        "description": "Subheadline for loading state on country filter page"
+    },
+    "countryFilterEmptyHeadline": "No Countries Found",
+    "@countryFilterEmptyHeadline": {
+        "description": "Headline for empty state on country filter page"
+    },
+    "countryFilterEmptySubheadline": "There are no countries available at the moment.",
+    "@countryFilterEmptySubheadline": {
+        "description": "Subheadline for empty state on country filter page"
+    },
+    "headlinesFeedAppBarTitle": "HT",
+    "@headlinesFeedAppBarTitle": {
+        "description": "Title displayed in the AppBar of the main headlines feed"
+    },
+    "headlinesFeedFilterTooltip": "Filter Headlines",
+    "@headlinesFeedFilterTooltip": {
+        "description": "Tooltip for the filter icon button in the feed AppBar"
+    },
+    "headlinesFeedFilterAllLabel": "All",
+    "@headlinesFeedFilterAllLabel": {
+        "description": "Label indicating 'All' items are selected in a filter tile"
+    },
+    "headlinesFeedFilterSelectedCountLabel": "{count} selected",
+    "@headlinesFeedFilterSelectedCountLabel": {
+        "description": "Label showing the number of selected filters (e.g., \"5 selected\")",
+        "placeholders": {
+            "count": {
+                "type": "int",
+                "example": "5"
+            }
+        }
+    },
+    "sourceFilterLoadingHeadline": "Loading Sources...",
+    "@sourceFilterLoadingHeadline": {
+        "description": "Headline for loading state on source filter page"
+    },
+    "sourceFilterLoadingSubheadline": "Please wait while we fetch the available sources.",
+    "@sourceFilterLoadingSubheadline": {
+        "description": "Subheadline for loading state on source filter page"
+    },
+    "sourceFilterEmptyHeadline": "No Sources Found",
+    "@sourceFilterEmptyHeadline": {
+        "description": "Headline for empty state on source filter page"
+    },
+    "sourceFilterEmptySubheadline": "There are no sources available at the moment.",
+    "@sourceFilterEmptySubheadline": {
+        "description": "Subheadline for empty state on source filter page"
     }
 }

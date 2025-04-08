@@ -11,7 +11,11 @@ import 'package:ht_main/authentication/view/authentication_page.dart';
 import 'package:ht_main/authentication/view/email_link_sent_page.dart';
 import 'package:ht_main/authentication/view/email_sign_in_page.dart';
 import 'package:ht_main/headline-details/view/headline_details_page.dart';
+import 'package:ht_main/headlines-feed/view/category_filter_page.dart'; // Import new page
+import 'package:ht_main/headlines-feed/view/country_filter_page.dart'; // Import new page
 import 'package:ht_main/headlines-feed/view/headlines_feed_page.dart';
+import 'package:ht_main/headlines-feed/view/headlines_filter_page.dart'; // Import new page
+import 'package:ht_main/headlines-feed/view/source_filter_page.dart'; // Import new page
 import 'package:ht_main/headlines-search/view/headlines_search_page.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
@@ -274,6 +278,56 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
                       );
                     },
                   ),
+                  // Sub-route for notifications (placeholder) - MOVED HERE
+                  GoRoute(
+                    path: Routes.notifications, // Relative path 'notifications'
+                    name: Routes.notificationsName,
+                    builder: (context, state) {
+                      // TODO(fulleni): Replace with actual NotificationsPage
+                      return const Placeholder(
+                        child: Center(child: Text('NOTIFICATIONS PAGE')),
+                      );
+                    },
+                  ),
+
+                  // --- Filter Routes (Nested under Feed) ---
+                  GoRoute(
+                    path: Routes.feedFilter, // Relative path: 'filter'
+                    name: Routes.feedFilterName,
+                    // Use MaterialPage with fullscreenDialog for modal presentation
+                    pageBuilder:
+                        (context, state) => const MaterialPage(
+                          fullscreenDialog: true,
+                          child:
+                              HeadlinesFilterPage(), // Main filter selection page
+                        ),
+                    routes: [
+                      // Sub-route for category selection
+                      GoRoute(
+                        path:
+                            Routes
+                                .feedFilterCategories, // Relative path: 'categories'
+                        name: Routes.feedFilterCategoriesName,
+                        builder: (context, state) => const CategoryFilterPage(),
+                      ),
+                      // Sub-route for source selection
+                      GoRoute(
+                        path:
+                            Routes
+                                .feedFilterSources, // Relative path: 'sources'
+                        name: Routes.feedFilterSourcesName,
+                        builder: (context, state) => const SourceFilterPage(),
+                      ),
+                      // Sub-route for country selection
+                      GoRoute(
+                        path:
+                            Routes
+                                .feedFilterCountries, // Relative path: 'countries'
+                        name: Routes.feedFilterCountriesName,
+                        builder: (context, state) => const CountryFilterPage(),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ],
@@ -316,3 +370,9 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
     ],
   );
 }
+
+// Placeholder pages were moved to their respective files:
+// - lib/headlines-feed/view/headlines_filter_page.dart
+// - lib/headlines-feed/view/category_filter_page.dart
+// - lib/headlines-feed/view/source_filter_page.dart
+// - lib/headlines-feed/view/country_filter_page.dart

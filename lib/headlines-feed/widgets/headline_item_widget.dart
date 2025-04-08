@@ -129,6 +129,16 @@ class HeadlineItemWidget extends StatelessWidget {
                             icon: Icons.access_time_outlined,
                             text: _dateFormatter.format(headline.publishedAt!),
                           ),
+                        if (headline.category != null)
+                          _MetadataItem(
+                            icon: Icons.category_outlined,
+                            text: headline.category!.name,
+                          ),
+                        if (headline.eventCountry != null)
+                          _CountryMetadataItem(
+                            flagUrl: headline.eventCountry!.flagUrl,
+                            countryName: headline.eventCountry!.name,
+                          ),
                       ],
                     ),
                   ],
@@ -138,6 +148,55 @@ class HeadlineItemWidget extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Small helper widget for displaying country metadata with a flag avatar.
+class _CountryMetadataItem extends StatelessWidget {
+  const _CountryMetadataItem({
+    required this.flagUrl,
+    required this.countryName,
+  });
+
+  final String flagUrl;
+  final String countryName;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+    const avatarRadius = 7.0; // Small radius for the flag
+
+    return Row(
+      mainAxisSize: MainAxisSize.min, // Take only needed space
+      children: [
+        CircleAvatar(
+          radius: avatarRadius,
+          backgroundColor: Colors.transparent, // Avoid background color clash
+          backgroundImage: NetworkImage(flagUrl),
+          // Optional: Add error handling for the image
+          onBackgroundImageError: (exception, stackTrace) {
+            // Log error or display placeholder
+            debugPrint('Error loading flag image: $exception');
+          },
+          // Placeholder in case of error or while loading
+          child: Icon(
+            Icons.flag_circle_outlined,
+            size: avatarRadius * 2,
+            color: colorScheme.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(width: AppSpacing.xs),
+        Text(
+          countryName,
+          style: textTheme.labelSmall?.copyWith(
+            color: colorScheme.onSurfaceVariant, // Subtle color
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
     );
   }
 }

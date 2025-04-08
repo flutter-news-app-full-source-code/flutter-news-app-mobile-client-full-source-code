@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ht_authentication_repository/ht_authentication_repository.dart';
+import 'package:ht_categories_repository/ht_categories_repository.dart';
+import 'package:ht_countries_repository/ht_countries_repository.dart';
 import 'package:ht_headlines_repository/ht_headlines_repository.dart';
 import 'package:ht_kv_storage_service/ht_kv_storage_service.dart';
 import 'package:ht_main/app/bloc/app_bloc.dart';
@@ -14,19 +16,29 @@ import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/router.dart';
 import 'package:ht_main/shared/theme/app_theme.dart';
+import 'package:ht_sources_repository/ht_sources_repository.dart';
 
 class App extends StatelessWidget {
   const App({
     required HtHeadlinesRepository htHeadlinesRepository,
     required HtAuthenticationRepository htAuthenticationRepository,
+    required HtCategoriesRepository htCategoriesRepository,
+    required HtCountriesRepository htCountriesRepository,
+    required HtSourcesRepository htSourcesRepository,
     required HtKVStorageService kvStorageService,
     super.key,
   }) : _htHeadlinesRepository = htHeadlinesRepository,
        _htAuthenticationRepository = htAuthenticationRepository,
+       _htCategoriesRepository = htCategoriesRepository,
+       _htCountriesRepository = htCountriesRepository,
+       _htSourcesRepository = htSourcesRepository,
        _kvStorageService = kvStorageService;
 
   final HtHeadlinesRepository _htHeadlinesRepository;
   final HtAuthenticationRepository _htAuthenticationRepository;
+  final HtCategoriesRepository _htCategoriesRepository;
+  final HtCountriesRepository _htCountriesRepository;
+  final HtSourcesRepository _htSourcesRepository;
   final HtKVStorageService _kvStorageService;
 
   @override
@@ -35,6 +47,9 @@ class App extends StatelessWidget {
       providers: [
         RepositoryProvider.value(value: _htHeadlinesRepository),
         RepositoryProvider.value(value: _htAuthenticationRepository),
+        RepositoryProvider.value(value: _htCategoriesRepository),
+        RepositoryProvider.value(value: _htCountriesRepository),
+        RepositoryProvider.value(value: _htSourcesRepository),
         RepositoryProvider.value(value: _kvStorageService),
       ],
       // Use MultiBlocProvider to provide both AppBloc and AuthenticationBloc

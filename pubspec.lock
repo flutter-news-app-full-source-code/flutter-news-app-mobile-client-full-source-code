@@ -327,10 +327,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_native_splash
-      sha256: edb09c35ee9230c4b03f13dd45bb3a276d0801865f0a4650b7e2a3bba61a803a
+      sha256: "8321a6d11a8d13977fa780c89de8d257cce3d841eecfb7a4cadffcc4f12d82dc"
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.5"
+    version: "2.4.6"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -457,6 +457,24 @@ packages:
       url: "https://github.com/headlines-toolkit/ht-categories-client.git"
     source: git
     version: "0.0.0"
+  ht_categories_firestore:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: b1a214947fc81126f3cc9ede3b8f21442b9eb937
+      url: "https://github.com/headlines-toolkit/ht-categories-firestore.git"
+    source: git
+    version: "0.0.0"
+  ht_categories_repository:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "312d8b4690c71b628c08a79834b07e72e2f42041"
+      url: "https://github.com/headlines-toolkit/ht-categories-repository.git"
+    source: git
+    version: "0.0.0"
   ht_countries_client:
     dependency: "direct main"
     description:
@@ -464,6 +482,24 @@ packages:
       ref: HEAD
       resolved-ref: f55b6c8bbcdc192a65f529c509d86b9f15d41072
       url: "https://github.com/headlines-toolkit/ht-countries-client.git"
+    source: git
+    version: "0.0.0"
+  ht_countries_firestore:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "5d464c940e064114e2d1c8d5e48a8d389d8dd214"
+      url: "https://github.com/headlines-toolkit/ht-countries-firestore.git"
+    source: git
+    version: "0.0.0"
+  ht_countries_repository:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: c37a6f98a71c931ada5ed02feb0e8de73bddeab0
+      url: "https://github.com/headlines-toolkit/ht-countries-repository.git"
     source: git
     version: "0.0.0"
   ht_headlines_client:
@@ -489,7 +525,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "7b3da9bc294763dc16973c5d860364a343b67bc4"
+      resolved-ref: "35047bb8fd77c5b01d04eb921da749681b4d3f9e"
       url: "https://github.com/headlines-toolkit/ht-headlines-repository.git"
     source: git
     version: "0.0.0"
@@ -516,7 +552,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "3f58c8396942bf85a91da3471c495aa7e78d05ea"
+      resolved-ref: fd1d1c173cf4376f0db080909441e53ff0884870
       url: "https://github.com/headlines-toolkit/ht-shared.git"
     source: git
     version: "0.0.0"
@@ -525,8 +561,26 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "891461f5ef14a5bbd326f848b1d2bb304cf8a7a6"
+      resolved-ref: "9eaad425bcba5035b99e26d65a5a0368a3aa8184"
       url: "https://github.com/headlines-toolkit/ht-sources-client.git"
+    source: git
+    version: "0.0.0"
+  ht_sources_firestore:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: c3363584c3e3048ce34089f75e758fd9b38d4ced
+      url: "https://github.com/headlines-toolkit/ht-sources-firestore.git"
+    source: git
+    version: "0.0.0"
+  ht_sources_repository:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "4a646512c947a967a04c5dd48546f08b8bd606a0"
+      url: "https://github.com/headlines-toolkit/ht-sources-repository.git"
     source: git
     version: "0.0.0"
   html:

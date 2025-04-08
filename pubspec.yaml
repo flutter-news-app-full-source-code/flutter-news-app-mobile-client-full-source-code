@@ -35,9 +35,21 @@ dependencies:
   ht_categories_client:
     git:
       url: https://github.com/headlines-toolkit/ht-categories-client.git
+  ht_categories_firestore:
+    git:
+      url: https://github.com/headlines-toolkit/ht-categories-firestore.git
+  ht_categories_repository:
+    git:
+      url: https://github.com/headlines-toolkit/ht-categories-repository.git
   ht_countries_client:
     git:
-      url: https://github.com/headlines-toolkit/ht-countries-client.git  
+      url: https://github.com/headlines-toolkit/ht-countries-client.git
+  ht_countries_firestore:
+    git:
+      url: https://github.com/headlines-toolkit/ht-countries-firestore.git
+  ht_countries_repository:
+    git:
+      url: https://github.com/headlines-toolkit/ht-countries-repository.git  
   ht_headlines_client:
     git:
       url: https://github.com/headlines-toolkit/ht-headlines-client.git
@@ -59,6 +71,12 @@ dependencies:
   ht_sources_client:
     git:
       url: https://github.com/headlines-toolkit/ht-sources-client.git
+  ht_sources_firestore:
+    git:
+      url: https://github.com/headlines-toolkit/ht-sources-firestore.git
+  ht_sources_repository:
+    git:
+      url: https://github.com/headlines-toolkit/ht-sources-repository.git
   intl: ^0.19.0
   meta: ^1.16.0
   stream_transform: ^2.1.1
@@ -75,12 +93,8 @@ flutter:
   uses-material-design: true
   generate: true
 
-# flutter_native_splash configuration
-# https://pub.dev/packages/flutter_native_splash
 flutter_native_splash:
-  # Background color for light theme (Android/iOS)
   color: "#FFFFFF"
-  # Background color for dark theme (Android/iOS)
   color_dark: "#212121"
 
   # Optional: Specify an image asset for the splash screen

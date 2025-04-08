@@ -278,17 +278,6 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
                       );
                     },
                   ),
-                  // Sub-route for notifications (placeholder) - MOVED HERE
-                  GoRoute(
-                    path: Routes.notifications, // Relative path 'notifications'
-                    name: Routes.notificationsName,
-                    builder: (context, state) {
-                      // TODO(fulleni): Replace with actual NotificationsPage
-                      return const Placeholder(
-                        child: Center(child: Text('NOTIFICATIONS PAGE')),
-                      );
-                    },
-                  ),
 
                   // --- Filter Routes (Nested under Feed) ---
                   GoRoute(

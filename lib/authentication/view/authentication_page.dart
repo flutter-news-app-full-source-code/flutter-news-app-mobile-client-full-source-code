@@ -4,7 +4,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ht_authentication_repository/ht_authentication_repository.dart';
 import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
@@ -36,41 +35,6 @@ class AuthenticationPage extends StatelessWidget {
   final bool showAnonymousButton;
 
   /// Whether this page is being shown in the account linking context.
-  final bool isLinkingContext;
-
-  @override
-  Widget build(BuildContext context) {
-    // Provide the BLoC here if it's not already provided higher up
-    // For this refactor, assuming it's provided by the route or App setup
-    return BlocProvider(
-      // Ensure BLoC is created only once per instance of this page if needed
-      // If BLoC needs to persist across navigations, provide it higher up.
-      create:
-          (context) => AuthenticationBloc(
-            authenticationRepository:
-                context.read<HtAuthenticationRepository>(),
-          ),
-      child: _AuthenticationView(
-        headline: headline,
-        subHeadline: subHeadline,
-        showAnonymousButton: showAnonymousButton,
-        isLinkingContext: isLinkingContext,
-      ),
-    );
-  }
-}
-
-class _AuthenticationView extends StatelessWidget {
-  const _AuthenticationView({
-    required this.headline,
-    required this.subHeadline,
-    required this.showAnonymousButton,
-    required this.isLinkingContext,
-  });
-
-  final String headline;
-  final String subHeadline;
-  final bool showAnonymousButton;
   final bool isLinkingContext;
 
   @override

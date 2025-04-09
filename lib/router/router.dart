@@ -1,5 +1,3 @@
-//
-// ignore_for_file: avoid_print, lines_longer_than_80_chars
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,9 +10,11 @@ import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/account/view/account_page.dart';
 import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/app/view/app_shell.dart';
+import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/authentication/view/authentication_page.dart';
 import 'package:ht_main/authentication/view/email_link_sent_page.dart';
 import 'package:ht_main/authentication/view/email_sign_in_page.dart';
+import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart';
 import 'package:ht_main/headline-details/view/headline_details_page.dart';
 import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:ht_main/headlines-feed/view/category_filter_page.dart'; // Import new page
@@ -234,11 +234,17 @@ GoRouter createRouter({
             showAnonymousButton = true; // Show anon button for initial sign-in
           }
 
-          return AuthenticationPage(
-            headline: headline,
-            subHeadline: subHeadline,
-            showAnonymousButton: showAnonymousButton,
-            isLinkingContext: isLinkingContext,
+          return BlocProvider(
+            create:
+                (context) => AuthenticationBloc(
+                  authenticationRepository: htAuthenticationRepository,
+                ),
+            child: AuthenticationPage(
+              headline: headline,
+              subHeadline: subHeadline,
+              showAnonymousButton: showAnonymousButton,
+              isLinkingContext: isLinkingContext,
+            ),
           );
         },
         routes: [
@@ -301,7 +307,13 @@ GoRouter createRouter({
                     name: Routes.articleDetailsName,
                     builder: (context, state) {
                       final id = state.pathParameters['id']!;
-                      return HeadlineDetailsPage(headlineId: id);
+                      return BlocProvider(
+                        create:
+                            (context) => HeadlineDetailsBloc(
+                              headlinesRepository: htHeadlinesRepository,
+                            )..add(HeadlineDetailsRequested(headlineId: id)),
+                        child: HeadlineDetailsPage(headlineId: id),
+                      );
                     },
                   ),
                   // Sub-route for notifications (placeholder) - MOVED HERE

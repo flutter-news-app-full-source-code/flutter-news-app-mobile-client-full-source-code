@@ -15,22 +15,6 @@ import 'package:ht_main/shared/widgets/failure_state_widget.dart';
 import 'package:ht_main/shared/widgets/loading_state_widget.dart';
 // Import Source
 
-/// {@template headlines_feed_page}
-/// The main page displaying the feed of news headlines.
-///
-/// Provides the [HeadlinesFeedBloc] and renders the [_HeadlinesFeedView]
-/// which handles the UI based on the BLoC state.
-/// {@endtemplate}
-class HeadlinesFeedPage extends StatelessWidget {
-  /// {@macro headlines_feed_page}
-  const HeadlinesFeedPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const _HeadlinesFeedView();
-  }
-}
-
 /// {@template headlines_feed_view}
 /// The core view widget for the headlines feed.
 ///
@@ -38,17 +22,17 @@ class HeadlinesFeedPage extends StatelessWidget {
 /// pagination (infinity scroll), and pull-to-refresh functionality. It also
 /// includes the AppBar with actions for notifications and filtering.
 /// {@endtemplate}
-class _HeadlinesFeedView extends StatefulWidget {
+class HeadlinesFeedPage extends StatefulWidget {
   /// {@macro headlines_feed_view}
-  const _HeadlinesFeedView();
+  const HeadlinesFeedPage({super.key});
 
   @override
-  State<_HeadlinesFeedView> createState() => _HeadlinesFeedViewState();
+  State<HeadlinesFeedPage> createState() => _HeadlinesFeedPageState();
 }
 
-/// State for the [_HeadlinesFeedView]. Manages the [ScrollController] for
+/// State for the [HeadlinesFeedPage]. Manages the [ScrollController] for
 /// pagination and listens to scroll events.
-class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
+class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
   final _scrollController = ScrollController();
 
   @override

@@ -1,10 +1,9 @@
 //
-// ignore_for_file: avoid_redundant_argument_values, lines_longer_than_80_chars
+// ignore_for_file: avoid_redundant_argument_values
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_headlines_client/ht_headlines_client.dart';
-import 'package:ht_headlines_repository/ht_headlines_repository.dart';
 import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/shared/shared.dart';
@@ -15,27 +14,6 @@ class HeadlineDetailsPage extends StatelessWidget {
   const HeadlineDetailsPage({required this.headlineId, super.key});
 
   final String headlineId;
-
-  static Route<void> route({required String headlineId}) {
-    return MaterialPageRoute<void>(
-      builder: (_) => HeadlineDetailsPage(headlineId: headlineId),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create:
-          (context) => HeadlineDetailsBloc(
-            headlinesRepository: context.read<HtHeadlinesRepository>(),
-          )..add(HeadlineDetailsRequested(headlineId: headlineId)),
-      child: const _HeadlineDetailsView(),
-    );
-  }
-}
-
-class _HeadlineDetailsView extends StatelessWidget {
-  const _HeadlineDetailsView();
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +41,7 @@ class _HeadlineDetailsView extends StatelessWidget {
                 message: state.message,
                 onRetry: () {
                   context.read<HeadlineDetailsBloc>().add(
-                    HeadlineDetailsRequested(headlineId: '1'),
+                    HeadlineDetailsRequested(headlineId: headlineId),
                   );
                 },
               ),

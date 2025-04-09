@@ -3,7 +3,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ht_headlines_repository/ht_headlines_repository.dart';
 import 'package:ht_main/headlines-feed/widgets/headline_item_widget.dart';
 import 'package:ht_main/headlines-search/bloc/headlines_search_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
@@ -22,14 +21,7 @@ class HeadlinesSearchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create:
-          (_) => HeadlinesSearchBloc(
-            headlinesRepository: context.read<HtHeadlinesRepository>(),
-          ),
-      // The actual UI is built by the private _HeadlinesSearchView widget.
-      child: const _HeadlinesSearchView(),
-    );
+    return const _HeadlinesSearchView();
   }
 }
 

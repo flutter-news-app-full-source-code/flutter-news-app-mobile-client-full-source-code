@@ -22,9 +22,7 @@ import 'package:ht_sources_client/ht_sources_client.dart';
 /// {@endtemplate}
 class HeadlinesFilterPage extends StatefulWidget {
   /// {@macro headlines_filter_page}
-  const HeadlinesFilterPage({required this.headlinesFeedBloc, super.key});
-
-  final HeadlinesFeedBloc headlinesFeedBloc;
+  const HeadlinesFilterPage({super.key});
 
   @override
   State<HeadlinesFilterPage> createState() => _HeadlinesFilterPageState();
@@ -40,7 +38,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
   void initState() {
     super.initState();
     // Initialize temporary state from the currently active filters in the BLoC
-    final currentState = widget.headlinesFeedBloc.state;
+    final currentState = BlocProvider.of<HeadlinesFeedBloc>(context).state;
     if (currentState is HeadlinesFeedLoaded) {
       _tempSelectedCategories = List.from(currentState.filter.categories ?? []);
       _tempSelectedSources = List.from(currentState.filter.sources ?? []);
@@ -99,102 +97,100 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
-    return BlocProvider.value(
-      value: widget.headlinesFeedBloc,
-      child: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.close),
-            tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-            onPressed: () => context.pop(), // Discard changes
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+          onPressed: () => context.pop(), // Discard changes
+        ),
+        title: Text(l10n.headlinesFeedFilterTitle),
+        actions: [
+          // Clear Button
+          IconButton(
+            icon: const Icon(Icons.clear_all),
+            tooltip: l10n.headlinesFeedFilterResetButton,
+            onPressed: () {
+              // Dispatch clear event immediately and pop
+              context.read<HeadlinesFeedBloc>().add(
+                HeadlinesFeedFiltersCleared(),
+              );
+              context.pop();
+            },
           ),
-          title: Text(l10n.headlinesFeedFilterTitle),
-          actions: [
-            // Clear Button
-            IconButton(
-              icon: const Icon(Icons.clear_all),
-              tooltip: l10n.headlinesFeedFilterResetButton,
-              onPressed: () {
-                // Dispatch clear event immediately and pop
-                context.read<HeadlinesFeedBloc>().add(
-                  HeadlinesFeedFiltersCleared(),
-                );
-                context.pop();
-              },
-            ),
-            // Apply Button
-            IconButton(
-              icon: const Icon(Icons.check),
-              tooltip: l10n.headlinesFeedFilterApplyButton,
-              onPressed: () {
-                // Apply the temporary filters to the BLoC
-                context.read<HeadlinesFeedBloc>().add(
-                  HeadlinesFeedFiltersApplied(
-                    filter: HeadlineFilter(
-                      categories:
-                          _tempSelectedCategories.isNotEmpty
-                              ? _tempSelectedCategories
-                              : null,
-                      sources:
-                          _tempSelectedSources.isNotEmpty
-                              ? _tempSelectedSources
-                              : null,
-                      eventCountries:
-                          _tempSelectedCountries.isNotEmpty
-                              ? _tempSelectedCountries
-                              : null,
-                    ),
+          // Apply Button
+          IconButton(
+            icon: const Icon(Icons.check),
+            tooltip: l10n.headlinesFeedFilterApplyButton,
+            onPressed: () {
+              // Apply the temporary filters to the BLoC
+              context.read<HeadlinesFeedBloc>().add(
+                HeadlinesFeedFiltersApplied(
+                  filter: HeadlineFilter(
+                    categories:
+                        _tempSelectedCategories.isNotEmpty
+                            ? _tempSelectedCategories
+                            : null,
+                    sources:
+                        _tempSelectedSources.isNotEmpty
+                            ? _tempSelectedSources
+                            : null,
+                    eventCountries:
+                        _tempSelectedCountries.isNotEmpty
+                            ? _tempSelectedCountries
+                            : null,
                   ),
-                );
-                context.pop(); // Close the filter page
-              },
-            ),
-          ],
-        ),
-        body: ListView(
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-          children: [
-            _buildFilterTile(
-              context: context,
-              title: l10n.headlinesFeedFilterCategoryLabel,
-              selectedCount: _tempSelectedCategories.length,
-              routeName: Routes.feedFilterCategoriesName,
-              currentSelection: _tempSelectedCategories,
-              onResult: (result) {
-                if (result is List<Category>) {
-                  setState(() => _tempSelectedCategories = result);
-                }
-              },
-            ),
-            _buildFilterTile(
-              context: context,
-              title: l10n.headlinesFeedFilterSourceLabel,
-              selectedCount: _tempSelectedSources.length,
-              routeName: Routes.feedFilterSourcesName,
-              currentSelection: _tempSelectedSources,
-              onResult: (result) {
-                if (result is List<Source>) {
-                  setState(() => _tempSelectedSources = result);
-                }
-              },
-            ),
-            _buildFilterTile(
-              context: context,
-              title: l10n.headlinesFeedFilterEventCountryLabel,
-              selectedCount: _tempSelectedCountries.length,
-              routeName: Routes.feedFilterCountriesName,
-              currentSelection: _tempSelectedCountries,
-              onResult: (result) {
-                if (result is List<Country>) {
-                  setState(() => _tempSelectedCountries = result);
-                }
-              },
-            ),
-          ],
-        ),
+                ),
+              );
+              context.pop(); // Close the filter page
+            },
+          ),
+        ],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+        children: [
+          _buildFilterTile(
+            context: context,
+            title: l10n.headlinesFeedFilterCategoryLabel,
+            selectedCount: _tempSelectedCategories.length,
+            routeName: Routes.feedFilterCategoriesName,
+            currentSelection: _tempSelectedCategories,
+            onResult: (result) {
+              if (result is List<Category>) {
+                setState(() => _tempSelectedCategories = result);
+              }
+            },
+          ),
+          _buildFilterTile(
+            context: context,
+            title: l10n.headlinesFeedFilterSourceLabel,
+            selectedCount: _tempSelectedSources.length,
+            routeName: Routes.feedFilterSourcesName,
+            currentSelection: _tempSelectedSources,
+            onResult: (result) {
+              if (result is List<Source>) {
+                setState(() => _tempSelectedSources = result);
+              }
+            },
+          ),
+          _buildFilterTile(
+            context: context,
+            title: l10n.headlinesFeedFilterEventCountryLabel,
+            selectedCount: _tempSelectedCountries.length,
+            routeName: Routes.feedFilterCountriesName,
+            currentSelection: _tempSelectedCountries,
+            onResult: (result) {
+              if (result is List<Country>) {
+                setState(() => _tempSelectedCountries = result);
+              }
+            },
+          ),
+        ],
       ),
     );
   }

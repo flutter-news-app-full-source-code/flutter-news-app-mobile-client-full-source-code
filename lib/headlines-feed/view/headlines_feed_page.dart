@@ -6,7 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 // Import Category
 // Import Country
-import 'package:ht_headlines_repository/ht_headlines_repository.dart';
 import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:ht_main/headlines-feed/widgets/headline_item_widget.dart';
 import 'package:ht_main/l10n/l10n.dart';
@@ -28,13 +27,7 @@ class HeadlinesFeedPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create:
-          (context) => HeadlinesFeedBloc(
-            headlinesRepository: context.read<HtHeadlinesRepository>(),
-          )..add(const HeadlinesFeedFetchRequested()),
-      child: const _HeadlinesFeedView(),
-    );
+    return const _HeadlinesFeedView();
   }
 }
 
@@ -142,7 +135,8 @@ class _HeadlinesFeedViewState extends State<_HeadlinesFeedView> {
                     tooltip: l10n.headlinesFeedFilterTooltip,
                     onPressed: () {
                       // Navigate to the filter page route
-                      final headlinesFeedBloc = context.read<HeadlinesFeedBloc>();
+                      final headlinesFeedBloc =
+                          context.read<HeadlinesFeedBloc>();
                       context.goNamed(
                         Routes.feedFilterName,
                         extra: headlinesFeedBloc,

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ht_authentication_client/ht_authentication_client.dart';
-import 'package:ht_authentication_repository/ht_authentication_repository.dart';
 import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
@@ -19,17 +18,7 @@ class AccountPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create:
-          (context) => AccountBloc(
-            authenticationRepository:
-                context.read<HtAuthenticationRepository>(),
-          ),
-      // Use BlocListener if specific feedback (like snackbars for errors)
-      // is needed from AccountBloc actions, though redirects are handled
-      // globally.
-      child: const _AccountView(),
-    );
+    return const _AccountView();
   }
 }
 

@@ -2,6 +2,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'dart:async';
+
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,22 +21,22 @@ import 'package:ht_sources_repository/ht_sources_repository.dart';
 
 class App extends StatelessWidget {
   const App({
-    required HtHeadlinesRepository htHeadlinesRepository,
     required HtAuthenticationRepository htAuthenticationRepository,
+    required HtHeadlinesRepository htHeadlinesRepository,
     required HtCategoriesRepository htCategoriesRepository,
     required HtCountriesRepository htCountriesRepository,
     required HtSourcesRepository htSourcesRepository,
     required HtKVStorageService kvStorageService,
     super.key,
-  }) : _htHeadlinesRepository = htHeadlinesRepository,
-       _htAuthenticationRepository = htAuthenticationRepository,
+  }) : _htAuthenticationRepository = htAuthenticationRepository,
+       _htHeadlinesRepository = htHeadlinesRepository,
        _htCategoriesRepository = htCategoriesRepository,
        _htCountriesRepository = htCountriesRepository,
        _htSourcesRepository = htSourcesRepository,
        _kvStorageService = kvStorageService;
 
-  final HtHeadlinesRepository _htHeadlinesRepository;
   final HtAuthenticationRepository _htAuthenticationRepository;
+  final HtHeadlinesRepository _htHeadlinesRepository;
   final HtCategoriesRepository _htCategoriesRepository;
   final HtCountriesRepository _htCountriesRepository;
   final HtSourcesRepository _htSourcesRepository;
@@ -45,8 +46,8 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-        RepositoryProvider.value(value: _htHeadlinesRepository),
         RepositoryProvider.value(value: _htAuthenticationRepository),
+        RepositoryProvider.value(value: _htHeadlinesRepository),
         RepositoryProvider.value(value: _htCategoriesRepository),
         RepositoryProvider.value(value: _htCountriesRepository),
         RepositoryProvider.value(value: _htSourcesRepository),
@@ -70,14 +71,32 @@ class App extends StatelessWidget {
                 ),
           ),
         ],
-        child: const _AppView(),
+        child: _AppView(
+          htAuthenticationRepository: _htAuthenticationRepository,
+          htHeadlinesRepository: _htHeadlinesRepository,
+          htCategoriesRepository: _htCategoriesRepository,
+          htCountriesRepository: _htCountriesRepository,
+          htSourcesRepository: _htSourcesRepository,
+        ),
       ),
     );
   }
 }
 
 class _AppView extends StatefulWidget {
-  const _AppView();
+  const _AppView({
+    required this.htAuthenticationRepository,
+    required this.htHeadlinesRepository,
+    required this.htCategoriesRepository,
+    required this.htCountriesRepository,
+    required this.htSourcesRepository,
+  });
+
+  final HtAuthenticationRepository htAuthenticationRepository;
+  final HtHeadlinesRepository htHeadlinesRepository;
+  final HtCategoriesRepository htCategoriesRepository;
+  final HtCountriesRepository htCountriesRepository;
+  final HtSourcesRepository htSourcesRepository;
 
   @override
   State<_AppView> createState() => _AppViewState();
@@ -95,7 +114,14 @@ class _AppViewState extends State<_AppView> {
     final appBloc = context.read<AppBloc>();
     // Initialize the notifier with the BLoC's current state
     _statusNotifier = ValueNotifier<AppStatus>(appBloc.state.status);
-    _router = createRouter(authStatusNotifier: _statusNotifier);
+    _router = createRouter(
+      authStatusNotifier: _statusNotifier,
+      htAuthenticationRepository: widget.htAuthenticationRepository,
+      htHeadlinesRepository: widget.htHeadlinesRepository,
+      htCategoriesRepository: widget.htCategoriesRepository,
+      htCountriesRepository: widget.htCountriesRepository,
+      htSourcesRepository: widget.htSourcesRepository,
+    );
 
     // --- Initialize Deep Link Handling ---
     _initDynamicLinks();

@@ -4,6 +4,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ht_authentication_repository/ht_authentication_repository.dart';
+import 'package:ht_categories_repository/ht_categories_repository.dart';
+import 'package:ht_countries_repository/ht_countries_repository.dart';
+import 'package:ht_headlines_repository/ht_headlines_repository.dart';
+import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/account/view/account_page.dart';
 import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/app/view/app_shell.dart';
@@ -17,18 +22,27 @@ import 'package:ht_main/headlines-feed/view/country_filter_page.dart'; // Import
 import 'package:ht_main/headlines-feed/view/headlines_feed_page.dart';
 import 'package:ht_main/headlines-feed/view/headlines_filter_page.dart'; // Import new page
 import 'package:ht_main/headlines-feed/view/source_filter_page.dart'; // Import new page
+import 'package:ht_main/headlines-search/bloc/headlines_search_bloc.dart';
 import 'package:ht_main/headlines-search/view/headlines_search_page.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
+import 'package:ht_sources_repository/ht_sources_repository.dart';
 
 /// Creates and configures the GoRouter instance for the application.
 ///
 /// Requires an [authStatusNotifier] to trigger route re-evaluation when
 /// authentication state changes.
-GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
+GoRouter createRouter({
+  required ValueNotifier<AppStatus> authStatusNotifier,
+  required HtAuthenticationRepository htAuthenticationRepository,
+  required HtHeadlinesRepository htHeadlinesRepository,
+  required HtCategoriesRepository htCategoriesRepository,
+  required HtCountriesRepository htCountriesRepository,
+  required HtSourcesRepository htSourcesRepository,
+}) {
   return GoRouter(
     refreshListenable: authStatusNotifier,
-    initialLocation: Routes.feed, // Set initial location back to feed
+    initialLocation: Routes.feed,
     debugLogDiagnostics: true, // Enable verbose logging for debugging redirects
     // --- Redirect Logic ---
     redirect: (BuildContext context, GoRouterState state) {
@@ -248,7 +262,29 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           // Return the shell widget which contains the AdaptiveScaffold
-          return AppShell(navigationShell: navigationShell);
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create:
+                    (context) => HeadlinesFeedBloc(
+                      headlinesRepository: htHeadlinesRepository,
+                    )..add(const HeadlinesFeedFetchRequested()),
+              ),
+              BlocProvider(
+                create:
+                    (context) => HeadlinesSearchBloc(
+                      headlinesRepository: htHeadlinesRepository,
+                    ),
+              ),
+              BlocProvider(
+                create:
+                    (context) => AccountBloc(
+                      authenticationRepository: htAuthenticationRepository,
+                    ),
+              ),
+            ],
+            child: AppShell(navigationShell: navigationShell),
+          );
         },
         branches: [
           // --- Branch 1: Feed ---
@@ -286,12 +322,11 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
                     name: Routes.feedFilterName,
                     // Use MaterialPage with fullscreenDialog for modal presentation
                     pageBuilder: (context, state) {
-                      final headlinesFeedBloc = state.extra as HeadlinesFeedBloc;
-                      return MaterialPage(
+                      // Access the HeadlinesFeedBloc from the context
+                      BlocProvider.of<HeadlinesFeedBloc>(context);
+                      return const MaterialPage(
                         fullscreenDialog: true,
-                        child: HeadlinesFilterPage(
-                          headlinesFeedBloc: headlinesFeedBloc,
-                        ), // Main filter selection page
+                        child: HeadlinesFilterPage(), // Pass the BLoC instance
                       );
                     },
                     routes: [

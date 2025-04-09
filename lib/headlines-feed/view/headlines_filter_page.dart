@@ -21,7 +21,9 @@ import 'package:ht_sources_client/ht_sources_client.dart';
 /// {@endtemplate}
 class HeadlinesFilterPage extends StatefulWidget {
   /// {@macro headlines_filter_page}
-  const HeadlinesFilterPage({super.key});
+  const HeadlinesFilterPage({required this.headlinesFeedBloc, super.key});
+
+  final HeadlinesFeedBloc headlinesFeedBloc;
 
   @override
   State<HeadlinesFilterPage> createState() => _HeadlinesFilterPageState();
@@ -37,7 +39,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
   void initState() {
     super.initState();
     // Initialize temporary state from the currently active filters in the BLoC
-    final currentState = context.read<HeadlinesFeedBloc>().state;
+    final currentState = widget.headlinesFeedBloc.state;
     if (currentState is HeadlinesFeedLoaded) {
       _tempSelectedCategories = List.from(currentState.filter.categories ?? []);
       _tempSelectedSources = List.from(currentState.filter.sources ?? []);

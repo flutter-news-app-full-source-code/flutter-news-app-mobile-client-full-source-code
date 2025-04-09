@@ -11,6 +11,7 @@ import 'package:ht_main/authentication/view/authentication_page.dart';
 import 'package:ht_main/authentication/view/email_link_sent_page.dart';
 import 'package:ht_main/authentication/view/email_sign_in_page.dart';
 import 'package:ht_main/headline-details/view/headline_details_page.dart';
+import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:ht_main/headlines-feed/view/category_filter_page.dart'; // Import new page
 import 'package:ht_main/headlines-feed/view/country_filter_page.dart'; // Import new page
 import 'package:ht_main/headlines-feed/view/headlines_feed_page.dart';
@@ -284,12 +285,15 @@ GoRouter createRouter({required ValueNotifier<AppStatus> authStatusNotifier}) {
                     path: Routes.feedFilter, // Relative path: 'filter'
                     name: Routes.feedFilterName,
                     // Use MaterialPage with fullscreenDialog for modal presentation
-                    pageBuilder:
-                        (context, state) => const MaterialPage(
-                          fullscreenDialog: true,
-                          child:
-                              HeadlinesFilterPage(), // Main filter selection page
-                        ),
+                    pageBuilder: (context, state) {
+                      final headlinesFeedBloc = state.extra as HeadlinesFeedBloc;
+                      return MaterialPage(
+                        fullscreenDialog: true,
+                        child: HeadlinesFilterPage(
+                          headlinesFeedBloc: headlinesFeedBloc,
+                        ), // Main filter selection page
+                      );
+                    },
                     routes: [
                       // Sub-route for category selection
                       GoRoute(

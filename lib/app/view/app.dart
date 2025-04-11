@@ -17,6 +17,7 @@ import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/router.dart';
 import 'package:ht_main/shared/theme/app_theme.dart';
+import 'package:ht_preferences_repository/ht_preferences_repository.dart'; // Added
 import 'package:ht_sources_repository/ht_sources_repository.dart';
 
 class App extends StatelessWidget {
@@ -26,20 +27,23 @@ class App extends StatelessWidget {
     required HtCategoriesRepository htCategoriesRepository,
     required HtCountriesRepository htCountriesRepository,
     required HtSourcesRepository htSourcesRepository,
+    required HtPreferencesRepository htPreferencesRepository, // Added
     required HtKVStorageService kvStorageService,
     super.key,
-  }) : _htAuthenticationRepository = htAuthenticationRepository,
-       _htHeadlinesRepository = htHeadlinesRepository,
-       _htCategoriesRepository = htCategoriesRepository,
-       _htCountriesRepository = htCountriesRepository,
-       _htSourcesRepository = htSourcesRepository,
-       _kvStorageService = kvStorageService;
+  })  : _htAuthenticationRepository = htAuthenticationRepository,
+        _htHeadlinesRepository = htHeadlinesRepository,
+        _htCategoriesRepository = htCategoriesRepository,
+        _htCountriesRepository = htCountriesRepository,
+        _htSourcesRepository = htSourcesRepository,
+        _htPreferencesRepository = htPreferencesRepository, // Added
+        _kvStorageService = kvStorageService;
 
   final HtAuthenticationRepository _htAuthenticationRepository;
   final HtHeadlinesRepository _htHeadlinesRepository;
   final HtCategoriesRepository _htCategoriesRepository;
   final HtCountriesRepository _htCountriesRepository;
   final HtSourcesRepository _htSourcesRepository;
+  final HtPreferencesRepository _htPreferencesRepository; // Added
   final HtKVStorageService _kvStorageService;
 
   @override
@@ -51,17 +55,18 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _htCategoriesRepository),
         RepositoryProvider.value(value: _htCountriesRepository),
         RepositoryProvider.value(value: _htSourcesRepository),
+        RepositoryProvider.value(value: _htPreferencesRepository), // Added
         RepositoryProvider.value(value: _kvStorageService),
       ],
-      // Use MultiBlocProvider to provide both AppBloc and AuthenticationBloc
+      // Use MultiBlocProvider to provide global BLoCs
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create:
-                (context) => AppBloc(
-                  authenticationRepository:
-                      context.read<HtAuthenticationRepository>(),
-                ),
+            create: (context) => AppBloc(
+              authenticationRepository:
+                  context.read<HtAuthenticationRepository>(),
+              preferencesRepository: context.read<HtPreferencesRepository>(), // Added
+            ),
           ),
           BlocProvider(
             create:
@@ -77,6 +82,7 @@ class App extends StatelessWidget {
           htCategoriesRepository: _htCategoriesRepository,
           htCountriesRepository: _htCountriesRepository,
           htSourcesRepository: _htSourcesRepository,
+          htPreferencesRepository: _htPreferencesRepository, // Pass down
         ),
       ),
     );
@@ -90,6 +96,7 @@ class _AppView extends StatefulWidget {
     required this.htCategoriesRepository,
     required this.htCountriesRepository,
     required this.htSourcesRepository,
+    required this.htPreferencesRepository, // Added
   });
 
   final HtAuthenticationRepository htAuthenticationRepository;
@@ -97,6 +104,7 @@ class _AppView extends StatefulWidget {
   final HtCategoriesRepository htCategoriesRepository;
   final HtCountriesRepository htCountriesRepository;
   final HtSourcesRepository htSourcesRepository;
+  final HtPreferencesRepository htPreferencesRepository; // Added
 
   @override
   State<_AppView> createState() => _AppViewState();
@@ -121,6 +129,7 @@ class _AppViewState extends State<_AppView> {
       htCategoriesRepository: widget.htCategoriesRepository,
       htCountriesRepository: widget.htCountriesRepository,
       htSourcesRepository: widget.htSourcesRepository,
+      htPreferencesRepository: widget.htPreferencesRepository, // Pass to router
     );
 
     // --- Initialize Deep Link Handling ---
@@ -218,15 +227,24 @@ class _AppViewState extends State<_AppView> {
         _statusNotifier.value = state.status;
       },
       child: BlocBuilder<AppBloc, AppState>(
-        // Build only for theme changes, listener handles status
-        buildWhen:
-            (previous, current) => previous.themeMode != current.themeMode,
+        // Build when theme-related properties change
+        buildWhen: (previous, current) =>
+            previous.themeMode != current.themeMode ||
+            previous.flexScheme != current.flexScheme ||
+            previous.fontFamily != current.fontFamily,
         builder: (context, state) {
           return MaterialApp.router(
             debugShowCheckedModeBanner: false,
             themeMode: state.themeMode,
-            theme: lightTheme(),
-            darkTheme: darkTheme(),
+            // Pass scheme and font family from state to theme functions
+            theme: lightTheme(
+              scheme: state.flexScheme,
+              fontFamily: state.fontFamily,
+            ),
+            darkTheme: darkTheme(
+              scheme: state.flexScheme,
+              fontFamily: state.fontFamily,
+            ),
             routerConfig: _router,
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,

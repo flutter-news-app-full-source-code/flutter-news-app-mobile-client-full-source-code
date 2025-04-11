@@ -573,6 +573,15 @@ packages:
       url: "https://github.com/headlines-toolkit/ht-preferences-firestore.git"
     source: git
     version: "0.0.0"
+  ht_preferences_repository:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: f485f4ea9bf92da437c74539b89d9b7cd93a3197
+      url: "https://github.com/headlines-toolkit/ht-preferences-repository.git"
+    source: git
+    version: "0.0.0"
   ht_shared:
     dependency: "direct main"
     description:

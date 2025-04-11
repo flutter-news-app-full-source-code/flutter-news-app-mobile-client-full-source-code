@@ -3,6 +3,7 @@
 
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; // Import needed for ThemeData, TextTheme etc.
 import 'package:google_fonts/google_fonts.dart';
 
 // --- Common Sub-theme Settings ---
@@ -72,35 +73,72 @@ TextTheme _customizeTextTheme(TextTheme baseTextTheme) {
   );
 }
 
+// Helper function to get the appropriate GoogleFonts text theme function
+// based on the provided font family name.
+// Corrected return type to match GoogleFonts functions (positional optional)
+TextTheme Function([TextTheme?]) _getGoogleFontTextTheme(String? fontFamily) {
+  // Map font family names (as used in AppBloc mapping) to GoogleFonts functions
+  if (fontFamily == GoogleFonts.roboto().fontFamily) {
+    return GoogleFonts.robotoTextTheme;
+  }
+  if (fontFamily == GoogleFonts.openSans().fontFamily) {
+    return GoogleFonts.openSansTextTheme;
+  }
+  if (fontFamily == GoogleFonts.lato().fontFamily) {
+    return GoogleFonts.latoTextTheme;
+  }
+  if (fontFamily == GoogleFonts.montserrat().fontFamily) {
+    return GoogleFonts.montserratTextTheme;
+  }
+  if (fontFamily == GoogleFonts.merriweather().fontFamily) {
+    return GoogleFonts.merriweatherTextTheme;
+  }
+  // Add mappings for other AppFontType values if needed
+
+  // Default fallback if fontFamily is null or not recognized
+  return GoogleFonts.notoSansTextTheme;
+}
+
+
 /// Defines the application's light theme using FlexColorScheme.
-ThemeData lightTheme() {
-  // Generate base text theme using GoogleFonts
-  final baseTextTheme = GoogleFonts.notoSansTextTheme();
+///
+/// Takes the active [scheme] and optional [fontFamily] to allow dynamic theming.
+ThemeData lightTheme({
+  required FlexScheme scheme,
+  String? fontFamily,
+}) {
+  // Get the appropriate GoogleFonts text theme function
+  final textThemeGetter = _getGoogleFontTextTheme(fontFamily);
+  // Generate base text theme using the selected Google Font
+  final baseTextTheme = textThemeGetter();
 
   return FlexThemeData.light(
-    scheme: FlexScheme.material,
-    // Use Noto Sans font from Google Fonts.
-    fontFamily:
-        baseTextTheme.bodyLarge?.fontFamily, // Use font family from base
-    textTheme: _customizeTextTheme(baseTextTheme), // Use helper function
-    subThemesData: _commonSubThemesData, // Use the common sub-theme data
+    scheme: scheme, // Use the provided scheme
+    fontFamily: fontFamily, // Use provided font family (FlexColorScheme handles null)
+    textTheme: _customizeTextTheme(baseTextTheme), // Apply custom sizes/weights
+    subThemesData: _commonSubThemesData,
   );
 }
 
 /// Defines the application's dark theme using FlexColorScheme.
-ThemeData darkTheme() {
-  // Generate base text theme using GoogleFonts
-  final baseTextTheme = GoogleFonts.notoSansTextTheme(
-    // Ensure dark theme uses appropriate brightness for text colors
+///
+/// Takes the active [scheme] and optional [fontFamily] to allow dynamic theming.
+ThemeData darkTheme({
+  required FlexScheme scheme,
+  String? fontFamily,
+}) {
+  // Get the appropriate GoogleFonts text theme function
+  final textThemeGetter = _getGoogleFontTextTheme(fontFamily);
+  // Generate base text theme for dark mode, passing the base dark theme
+  // as a positional argument.
+  final baseTextTheme = textThemeGetter(
     ThemeData(brightness: Brightness.dark).textTheme,
   );
 
   return FlexThemeData.dark(
-    scheme: FlexScheme.material,
-    // Use Noto Sans font from Google Fonts.
-    fontFamily:
-        baseTextTheme.bodyLarge?.fontFamily, // Use font family from base
-    textTheme: _customizeTextTheme(baseTextTheme), // Use helper function
-    subThemesData: _commonSubThemesData, // Use the common sub-theme data
+    scheme: scheme, // Use the provided scheme
+    fontFamily: fontFamily, // Use provided font family
+    textTheme: _customizeTextTheme(baseTextTheme), // Apply custom sizes/weights
+    subThemesData: _commonSubThemesData,
   );
 }

@@ -53,4 +53,17 @@ abstract final class Routes {
   static const emailSignInName = 'emailSignIn';
   static const emailLinkSent = 'email-link-sent';
   static const emailLinkSentName = 'emailLinkSent';
+
+  // --- Settings Sub-Routes (relative to /account/settings) ---
+  static const settingsAppearance = 'appearance';
+  static const settingsAppearanceName = 'settingsAppearance';
+  static const settingsFeed = 'feed';
+  static const settingsFeedName = 'settingsFeed';
+  static const settingsArticle = 'article';
+  static const settingsArticleName = 'settingsArticle';
+  static const settingsNotifications = 'notifications';
+  static const settingsNotificationsName = 'settingsNotifications';
+  // Add names for notification sub-selection routes if needed later
+  // static const settingsNotificationCategories = 'categories';
+  // static const settingsNotificationCategoriesName = 'settingsNotificationCategories';
 }

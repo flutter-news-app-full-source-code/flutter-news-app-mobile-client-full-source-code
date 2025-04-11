@@ -26,6 +26,13 @@ import 'package:ht_main/headlines-search/bloc/headlines_search_bloc.dart';
 import 'package:ht_main/headlines-search/view/headlines_search_page.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
+import 'package:ht_main/settings/bloc/settings_bloc.dart'; // Added
+import 'package:ht_main/settings/view/appearance_settings_page.dart'; // Added
+import 'package:ht_main/settings/view/article_settings_page.dart'; // Added
+import 'package:ht_main/settings/view/feed_settings_page.dart'; // Added
+import 'package:ht_main/settings/view/notification_settings_page.dart'; // Added
+import 'package:ht_main/settings/view/settings_page.dart'; // Added
+import 'package:ht_preferences_repository/ht_preferences_repository.dart'; // Added
 import 'package:ht_sources_repository/ht_sources_repository.dart';
 
 /// Creates and configures the GoRouter instance for the application.
@@ -39,6 +46,7 @@ GoRouter createRouter({
   required HtCategoriesRepository htCategoriesRepository,
   required HtCountriesRepository htCountriesRepository,
   required HtSourcesRepository htSourcesRepository,
+  required HtPreferencesRepository htPreferencesRepository, // Added
 }) {
   return GoRouter(
     refreshListenable: authStatusNotifier,
@@ -395,11 +403,42 @@ GoRouter createRouter({
                     path: Routes.settings, // Relative path 'settings'
                     name: Routes.settingsName,
                     builder: (context, state) {
-                      // TODO(fulleni): Replace with actual SettingsPage
-                      return const Placeholder(
-                        child: Center(child: Text('SETTINGS PAGE')),
+                      // Provide SettingsBloc here for SettingsPage and its children
+                      return BlocProvider(
+                        create: (context) => SettingsBloc(
+                          preferencesRepository:
+                              context.read<HtPreferencesRepository>(),
+                        )..add(const SettingsLoadRequested()), // Load on entry
+                        child: const SettingsPage(), // Use the actual page
                       );
                     },
+                    // --- Settings Sub-Routes ---
+                    routes: [
+                      GoRoute(
+                        path: Routes.settingsAppearance, // 'appearance'
+                        name: Routes.settingsAppearanceName,
+                        builder: (context, state) =>
+                            const AppearanceSettingsPage(),
+                        // SettingsBloc is inherited from parent route
+                      ),
+                      GoRoute(
+                        path: Routes.settingsFeed, // 'feed'
+                        name: Routes.settingsFeedName,
+                        builder: (context, state) => const FeedSettingsPage(),
+                      ),
+                      GoRoute(
+                        path: Routes.settingsArticle, // 'article'
+                        name: Routes.settingsArticleName,
+                        builder: (context, state) =>
+                            const ArticleSettingsPage(),
+                      ),
+                      GoRoute(
+                        path: Routes.settingsNotifications, // 'notifications'
+                        name: Routes.settingsNotificationsName,
+                        builder: (context, state) =>
+                            const NotificationSettingsPage(),
+                      ),
+                    ],
                   ),
                 ],
               ),

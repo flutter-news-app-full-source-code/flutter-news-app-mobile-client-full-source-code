@@ -6,11 +6,12 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart'; // Added
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart'; // Added for font mapping
+import 'package:google_fonts/google_fonts.dart';
 import 'package:ht_authentication_client/ht_authentication_client.dart';
 import 'package:ht_authentication_repository/ht_authentication_repository.dart';
-import 'package:ht_preferences_client/ht_preferences_client.dart'; // Added
-import 'package:ht_preferences_repository/ht_preferences_repository.dart'; // Added
+// Ensure full import for FontSize enum access
+import 'package:ht_preferences_client/ht_preferences_client.dart';
+import 'package:ht_preferences_repository/ht_preferences_repository.dart';
 
 part 'app_event.dart';
 part 'app_state.dart';
@@ -91,13 +92,16 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         themeSettings?.themeName ?? AppThemeName.grey, // Default
       );
       final newFontFamily = _mapAppFontType(
-        appSettings?.appFontType, // Nullable, default handled in theme
+        appSettings?.appFontType,
       );
+      // Extract App Font Size
+      final newAppFontSize = appSettings?.appFontSize ?? FontSize.medium; // Default
 
       emit(
         state.copyWith(
           themeMode: newThemeMode,
           flexScheme: newFlexScheme,
+          appFontSize: newAppFontSize, // Pass font size
           fontFamily: newFontFamily,
           // Use clearFontFamily flag if appSettings was null and we want to reset
           clearFontFamily: appSettings == null,

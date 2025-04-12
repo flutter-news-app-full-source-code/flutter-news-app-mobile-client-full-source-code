@@ -227,11 +227,12 @@ class _AppViewState extends State<_AppView> {
         _statusNotifier.value = state.status;
       },
       child: BlocBuilder<AppBloc, AppState>(
-        // Build when theme-related properties change
+        // Build when theme-related properties change (including font size)
         buildWhen: (previous, current) =>
             previous.themeMode != current.themeMode ||
             previous.flexScheme != current.flexScheme ||
-            previous.fontFamily != current.fontFamily,
+            previous.fontFamily != current.fontFamily ||
+            previous.appFontSize != current.appFontSize, // Added condition
         builder: (context, state) {
           return MaterialApp.router(
             debugShowCheckedModeBanner: false,
@@ -240,10 +241,12 @@ class _AppViewState extends State<_AppView> {
             theme: lightTheme(
               scheme: state.flexScheme,
               fontFamily: state.fontFamily,
+              appFontSize: state.appFontSize, // Pass font size
             ),
             darkTheme: darkTheme(
               scheme: state.flexScheme,
               fontFamily: state.fontFamily,
+              appFontSize: state.appFontSize, // Pass font size
             ),
             routerConfig: _router,
             localizationsDelegates: AppLocalizations.localizationsDelegates,

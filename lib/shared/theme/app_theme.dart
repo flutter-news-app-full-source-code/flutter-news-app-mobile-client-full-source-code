@@ -1,10 +1,12 @@
 //
 // ignore_for_file: lines_longer_than_80_chars
 
+// ignore_for_file: lines_longer_than_80_chars
+
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart'; // Import needed for ThemeData, TextTheme etc.
 import 'package:google_fonts/google_fonts.dart';
+import 'package:ht_preferences_client/ht_preferences_client.dart'; // Added for FontSize
 
 // --- Common Sub-theme Settings ---
 // Defines customizations for various components, shared between light/dark themes.
@@ -31,41 +33,61 @@ const FlexSubThemesData _commonSubThemesData = FlexSubThemesData(
 );
 
 // Helper function to apply common text theme customizations
-TextTheme _customizeTextTheme(TextTheme baseTextTheme) {
+TextTheme _customizeTextTheme(
+  TextTheme baseTextTheme, {
+  required FontSize appFontSize, // Added parameter
+}) {
+  // Define font size factors
+  double factor;
+  switch (appFontSize) {
+    case FontSize.small:
+      factor = 0.85;
+      break;
+    case FontSize.large:
+      factor = 1.15;
+      break;
+    case FontSize.medium:
+    default:
+      factor = 1.0;
+  }
+
+  // Helper to apply factor safely
+  double? _applyFactor(double? baseSize) =>
+      baseSize != null ? (baseSize * factor).roundToDouble() : null;
+
   return baseTextTheme.copyWith(
     // --- Headline/Title Styles ---
     headlineLarge: baseTextTheme.headlineLarge?.copyWith(
-      fontSize: 28, // Example size for main article title on details page
+      fontSize: _applyFactor(28), // Apply factor
       fontWeight: FontWeight.bold,
     ),
     headlineMedium: baseTextTheme.headlineMedium?.copyWith(
-      fontSize: 24, // Slightly smaller alternative for details page title
+      fontSize: _applyFactor(24), // Apply factor
       fontWeight: FontWeight.bold,
     ),
     titleLarge: baseTextTheme.titleLarge?.copyWith(
-      fontSize: 18, // For Headline.title in lists (Feed, Search)
-      fontWeight: FontWeight.w600, // Semi-bold
+      fontSize: _applyFactor(18), // Apply factor
+      fontWeight: FontWeight.w600,
     ),
     titleMedium: baseTextTheme.titleMedium?.copyWith(
-      fontSize: 16, // Alternative for list titles
+      fontSize: _applyFactor(16), // Apply factor
       fontWeight: FontWeight.w600,
     ),
 
     // --- Body/Content Styles ---
     bodyLarge: baseTextTheme.bodyLarge?.copyWith(
-      fontSize: 16, // For main article content paragraphs
-      height: 1.5, // Improve readability with line height
+      fontSize: _applyFactor(16), // Apply factor
+      height: 1.5,
     ),
     bodyMedium: baseTextTheme.bodyMedium?.copyWith(
-      fontSize: 14, // For Headline.description in lists
+      fontSize: _applyFactor(14), // Apply factor
       height: 1.4,
     ),
 
     // --- Metadata/Caption Styles ---
     labelSmall: baseTextTheme.labelSmall?.copyWith(
-      fontSize: 12, // For metadata (date, source, category)
+      fontSize: _applyFactor(12), // Apply factor
       fontWeight: FontWeight.normal,
-      // Consider a slightly muted color via ColorScheme if needed
     ),
 
     // --- Button Style (Usually default is fine) ---
@@ -102,43 +124,42 @@ TextTheme Function([TextTheme?]) _getGoogleFontTextTheme(String? fontFamily) {
 
 /// Defines the application's light theme using FlexColorScheme.
 ///
-/// Takes the active [scheme] and optional [fontFamily] to allow dynamic theming.
+/// Takes the active [scheme], [appFontSize], and optional [fontFamily].
 ThemeData lightTheme({
   required FlexScheme scheme,
+  required FontSize appFontSize, // Added parameter
   String? fontFamily,
 }) {
-  // Get the appropriate GoogleFonts text theme function
   final textThemeGetter = _getGoogleFontTextTheme(fontFamily);
-  // Generate base text theme using the selected Google Font
   final baseTextTheme = textThemeGetter();
 
   return FlexThemeData.light(
-    scheme: scheme, // Use the provided scheme
-    fontFamily: fontFamily, // Use provided font family (FlexColorScheme handles null)
-    textTheme: _customizeTextTheme(baseTextTheme), // Apply custom sizes/weights
+    scheme: scheme,
+    fontFamily: fontFamily,
+    // Pass appFontSize to customizeTextTheme
+    textTheme: _customizeTextTheme(baseTextTheme, appFontSize: appFontSize),
     subThemesData: _commonSubThemesData,
   );
 }
 
 /// Defines the application's dark theme using FlexColorScheme.
 ///
-/// Takes the active [scheme] and optional [fontFamily] to allow dynamic theming.
+/// Takes the active [scheme], [appFontSize], and optional [fontFamily].
 ThemeData darkTheme({
   required FlexScheme scheme,
+  required FontSize appFontSize, // Added parameter
   String? fontFamily,
 }) {
-  // Get the appropriate GoogleFonts text theme function
   final textThemeGetter = _getGoogleFontTextTheme(fontFamily);
-  // Generate base text theme for dark mode, passing the base dark theme
-  // as a positional argument.
   final baseTextTheme = textThemeGetter(
     ThemeData(brightness: Brightness.dark).textTheme,
   );
 
   return FlexThemeData.dark(
-    scheme: scheme, // Use the provided scheme
-    fontFamily: fontFamily, // Use provided font family
-    textTheme: _customizeTextTheme(baseTextTheme), // Apply custom sizes/weights
+    scheme: scheme,
+    fontFamily: fontFamily,
+    // Pass appFontSize to customizeTextTheme
+    textTheme: _customizeTextTheme(baseTextTheme, appFontSize: appFontSize),
     subThemesData: _commonSubThemesData,
   );
 }

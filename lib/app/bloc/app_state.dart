@@ -20,17 +20,21 @@ class AppState extends Equatable {
   AppState({
     this.selectedBottomNavigationIndex = 0,
     this.themeMode = ThemeMode.system,
-    this.flexScheme = FlexScheme.material, // Default scheme
-    this.fontFamily, // Default font family (null means use FlexColorScheme default)
-    this.status = AppStatus.initial, // Default to initial
+    this.appFontSize = FontSize.medium, // Default font size
+    this.flexScheme = FlexScheme.material,
+    this.fontFamily,
+    this.status = AppStatus.initial,
     User? user,
-  }) : user = user ?? User(); // Use default constructor
+  }) : user = user ?? User();
 
   /// The index of the currently selected item in the bottom navigation bar.
   final int selectedBottomNavigationIndex;
 
   /// The overall theme mode (light, dark, system).
   final ThemeMode themeMode;
+
+  /// The font size for the app's UI.
+  final FontSize appFontSize;
 
   /// The active color scheme defined by FlexColorScheme.
   final FlexScheme flexScheme;
@@ -51,9 +55,10 @@ class AppState extends Equatable {
     ThemeMode? themeMode,
     FlexScheme? flexScheme,
     String? fontFamily,
+    FontSize? appFontSize, // Added
     AppStatus? status,
     User? user,
-    bool clearFontFamily = false, // Flag to explicitly clear font family
+    bool clearFontFamily = false,
   }) {
     return AppState(
       selectedBottomNavigationIndex:
@@ -61,6 +66,7 @@ class AppState extends Equatable {
       themeMode: themeMode ?? this.themeMode,
       flexScheme: flexScheme ?? this.flexScheme,
       fontFamily: clearFontFamily ? null : fontFamily ?? this.fontFamily,
+      appFontSize: appFontSize ?? this.appFontSize, // Added
       status: status ?? this.status,
       user: user ?? this.user,
     );
@@ -72,6 +78,7 @@ class AppState extends Equatable {
         themeMode,
         flexScheme,
         fontFamily,
+        appFontSize, // Added
         status,
         user,
       ];

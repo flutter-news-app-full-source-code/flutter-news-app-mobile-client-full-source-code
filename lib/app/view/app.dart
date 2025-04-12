@@ -30,13 +30,13 @@ class App extends StatelessWidget {
     required HtPreferencesRepository htPreferencesRepository, // Added
     required HtKVStorageService kvStorageService,
     super.key,
-  })  : _htAuthenticationRepository = htAuthenticationRepository,
-        _htHeadlinesRepository = htHeadlinesRepository,
-        _htCategoriesRepository = htCategoriesRepository,
-        _htCountriesRepository = htCountriesRepository,
-        _htSourcesRepository = htSourcesRepository,
-        _htPreferencesRepository = htPreferencesRepository, // Added
-        _kvStorageService = kvStorageService;
+  }) : _htAuthenticationRepository = htAuthenticationRepository,
+       _htHeadlinesRepository = htHeadlinesRepository,
+       _htCategoriesRepository = htCategoriesRepository,
+       _htCountriesRepository = htCountriesRepository,
+       _htSourcesRepository = htSourcesRepository,
+       _htPreferencesRepository = htPreferencesRepository, // Added
+       _kvStorageService = kvStorageService;
 
   final HtAuthenticationRepository _htAuthenticationRepository;
   final HtHeadlinesRepository _htHeadlinesRepository;
@@ -62,11 +62,13 @@ class App extends StatelessWidget {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) => AppBloc(
-              authenticationRepository:
-                  context.read<HtAuthenticationRepository>(),
-              preferencesRepository: context.read<HtPreferencesRepository>(), // Added
-            ),
+            create:
+                (context) => AppBloc(
+                  authenticationRepository:
+                      context.read<HtAuthenticationRepository>(),
+                  preferencesRepository:
+                      context.read<HtPreferencesRepository>(), // Added
+                ),
           ),
           BlocProvider(
             create:
@@ -228,11 +230,12 @@ class _AppViewState extends State<_AppView> {
       },
       child: BlocBuilder<AppBloc, AppState>(
         // Build when theme-related properties change (including font size)
-        buildWhen: (previous, current) =>
-            previous.themeMode != current.themeMode ||
-            previous.flexScheme != current.flexScheme ||
-            previous.fontFamily != current.fontFamily ||
-            previous.appFontSize != current.appFontSize, // Added condition
+        buildWhen:
+            (previous, current) =>
+                previous.themeMode != current.themeMode ||
+                previous.flexScheme != current.flexScheme ||
+                previous.fontFamily != current.fontFamily ||
+                previous.appFontSize != current.appFontSize, // Added condition
         builder: (context, state) {
           return MaterialApp.router(
             debugShowCheckedModeBanner: false,

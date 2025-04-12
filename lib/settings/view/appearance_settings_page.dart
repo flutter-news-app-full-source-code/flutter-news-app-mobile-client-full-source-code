@@ -30,7 +30,6 @@ class _AppearanceSettingsView extends StatelessWidget {
       case AppThemeMode.dark:
         return l10n.settingsAppearanceThemeModeDark; // Add l10n key
       case AppThemeMode.system:
-      default:
         return l10n.settingsAppearanceThemeModeSystem; // Add l10n key
     }
   }
@@ -43,7 +42,6 @@ class _AppearanceSettingsView extends StatelessWidget {
       case AppThemeName.blue:
         return l10n.settingsAppearanceThemeNameBlue; // Add l10n key
       case AppThemeName.grey:
-      default:
         return l10n.settingsAppearanceThemeNameGrey; // Add l10n key
     }
   }
@@ -56,7 +54,6 @@ class _AppearanceSettingsView extends StatelessWidget {
       case FontSize.large:
         return l10n.settingsAppearanceFontSizeLarge; // Add l10n key
       case FontSize.medium:
-      default:
         return l10n.settingsAppearanceFontSizeMedium; // Add l10n key
     }
   }
@@ -67,7 +64,6 @@ class _AppearanceSettingsView extends StatelessWidget {
     // Consider adding specific l10n keys if needed, e.g., l10n.fontRoboto
     return type.name; // Example: 'roboto', 'openSans'
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +76,9 @@ class _AppearanceSettingsView extends StatelessWidget {
       // Can show a minimal loading/error or rely on parent page handling
       return Scaffold(
         appBar: AppBar(title: Text(l10n.settingsAppearanceTitle)),
-        body: const Center(child: CircularProgressIndicator()), // Simple loading
+        body: const Center(
+          child: CircularProgressIndicator(),
+        ), // Simple loading
       );
     }
 
@@ -171,12 +169,13 @@ class _AppearanceSettingsView extends StatelessWidget {
         const SizedBox(height: AppSpacing.sm),
         DropdownButtonFormField<T>(
           value: currentValue,
-          items: items.map((T value) {
-            return DropdownMenuItem<T>(
-              value: value,
-              child: Text(itemToString(value)),
-            );
-          }).toList(),
+          items:
+              items.map((T value) {
+                return DropdownMenuItem<T>(
+                  value: value,
+                  child: Text(itemToString(value)),
+                );
+              }).toList(),
           onChanged: onChanged,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),

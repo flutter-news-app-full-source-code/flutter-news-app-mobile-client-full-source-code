@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart'; // Added
@@ -20,10 +18,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   AppBloc({
     required HtAuthenticationRepository authenticationRepository,
     required HtPreferencesRepository preferencesRepository, // Added
-  })  : _authenticationRepository = authenticationRepository,
-        _preferencesRepository = preferencesRepository, // Added
-        // Initialize with default state, load settings after user is known
-        super(AppState()) {
+  }) : _authenticationRepository = authenticationRepository,
+       _preferencesRepository = preferencesRepository, // Added
+       // Initialize with default state, load settings after user is known
+       super(AppState()) {
     on<AppUserChanged>(_onAppUserChanged);
     // Add handler for explicitly refreshing settings if needed later
     on<AppSettingsRefreshed>(_onAppSettingsRefreshed);
@@ -55,10 +53,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return; // Don't load settings for unauthenticated users
       case AuthenticationStatus.anonymous:
         status = AppStatus.anonymous;
-        break; // Continue to load settings for anonymous
+      // Continue to load settings for anonymous
       case AuthenticationStatus.authenticated:
         status = AppStatus.authenticated;
-        break; // Continue to load settings for authenticated
+      // Continue to load settings for authenticated
     }
 
     // Emit user and status update first
@@ -79,10 +77,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     try {
       // Fetch relevant settings
-      final themeSettings =
-          await _tryFetch(_preferencesRepository.getThemeSettings);
-      final appSettings =
-          await _tryFetch(_preferencesRepository.getAppSettings);
+      final themeSettings = await _tryFetch(
+        _preferencesRepository.getThemeSettings,
+      );
+      final appSettings = await _tryFetch(
+        _preferencesRepository.getAppSettings,
+      );
 
       // Map settings to AppState properties
       final newThemeMode = _mapAppThemeMode(
@@ -91,11 +91,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       final newFlexScheme = _mapAppThemeName(
         themeSettings?.themeName ?? AppThemeName.grey, // Default
       );
-      final newFontFamily = _mapAppFontType(
-        appSettings?.appFontType,
-      );
+      final newFontFamily = _mapAppFontType(appSettings?.appFontType);
       // Extract App Font Size
-      final newAppFontSize = appSettings?.appFontSize ?? FontSize.medium; // Default
+      final newAppFontSize =
+          appSettings?.appFontSize ?? FontSize.medium; // Default
 
       emit(
         state.copyWith(
@@ -136,7 +135,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       case AppThemeMode.dark:
         return ThemeMode.dark;
       case AppThemeMode.system:
-      default:
         return ThemeMode.system;
     }
   }
@@ -148,7 +146,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       case AppThemeName.blue:
         return FlexScheme.blue;
       case AppThemeName.grey:
-      default:
         return FlexScheme.material; // Default grey maps to material
     }
   }
@@ -167,9 +164,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return GoogleFonts.montserrat().fontFamily;
       case AppFontType.merriweather:
         return GoogleFonts.merriweather().fontFamily;
-      // Add other fonts if necessary
-      default:
-        return null; // Fallback to theme default
     }
   }
 

@@ -23,21 +23,27 @@ class SettingsState extends Equatable {
   /// {@macro settings_state}
   const SettingsState({
     this.status = SettingsStatus.initial,
-    this.appSettings = const AppSettings( // Default value
+    this.appSettings = const AppSettings(
+      // Default value
       appFontSize: FontSize.medium,
       appFontType: AppFontType.roboto,
     ),
-    this.articleSettings = const ArticleSettings( // Default value
+    this.articleSettings = const ArticleSettings(
+      // Default value
       articleFontSize: FontSize.medium,
     ),
-    this.themeSettings = const ThemeSettings( // Default value
+    this.themeSettings = const ThemeSettings(
+      // Default value
       themeMode: AppThemeMode.system,
       themeName: AppThemeName.grey,
     ),
-    this.feedSettings = const FeedSettings( // Default value
+    this.feedSettings = const FeedSettings(
+      // Default value
       feedListTileType: FeedListTileType.imageStart,
     ),
-    this.notificationSettings = const NotificationSettings(enabled: false), // Default
+    this.notificationSettings = const NotificationSettings(
+      enabled: false,
+    ), // Default
     this.error,
   });
 
@@ -86,12 +92,12 @@ class SettingsState extends Equatable {
 
   @override
   List<Object?> get props => [
-        status,
-        appSettings,
-        articleSettings,
-        themeSettings,
-        feedSettings,
-        notificationSettings,
-        error,
-      ];
+    status,
+    appSettings,
+    articleSettings,
+    themeSettings,
+    feedSettings,
+    notificationSettings,
+    error,
+  ];
 }

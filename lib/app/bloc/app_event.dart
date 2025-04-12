@@ -9,6 +9,8 @@ abstract class AppEvent extends Equatable {
 
 @Deprecated('Use SettingsBloc events instead')
 class AppThemeChanged extends AppEvent {
+  //
+  // ignore: deprecated_consistency
   const AppThemeChanged();
 }
 

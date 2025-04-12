@@ -43,7 +43,9 @@ class _FeedSettingsView extends StatelessWidget {
     // Ensure we have loaded state before building controls
     if (state.status != SettingsStatus.success) {
       return Scaffold(
-        appBar: AppBar(title: Text(l10n.settingsFeedDisplayTitle)), // Reuse title
+        appBar: AppBar(
+          title: Text(l10n.settingsFeedDisplayTitle),
+        ), // Reuse title
         body: const Center(child: CircularProgressIndicator()),
       );
     }
@@ -90,12 +92,13 @@ class _FeedSettingsView extends StatelessWidget {
         const SizedBox(height: AppSpacing.sm),
         DropdownButtonFormField<T>(
           value: currentValue,
-          items: items.map((T value) {
-            return DropdownMenuItem<T>(
-              value: value,
-              child: Text(itemToString(value)),
-            );
-          }).toList(),
+          items:
+              items.map((T value) {
+                return DropdownMenuItem<T>(
+                  value: value,
+                  child: Text(itemToString(value)),
+                );
+              }).toList(),
           onChanged: onChanged,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),

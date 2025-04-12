@@ -55,10 +55,13 @@ class _SettingsView extends StatelessWidget {
           // Handle error state
           if (state.status == SettingsStatus.failure) {
             return FailureStateWidget(
-              message: state.error?.toString() ?? l10n.settingsErrorDefault, // Add l10n key
-              onRetry: () => context
-                  .read<SettingsBloc>()
-                  .add(const SettingsLoadRequested()),
+              message:
+                  state.error?.toString() ??
+                  l10n.settingsErrorDefault, // Add l10n key
+              onRetry:
+                  () => context.read<SettingsBloc>().add(
+                    const SettingsLoadRequested(),
+                  ),
             );
           }
 

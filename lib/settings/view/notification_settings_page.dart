@@ -31,12 +31,14 @@ class _NotificationSettingsView extends StatelessWidget {
     // Ensure we have loaded state before building controls
     if (state.status != SettingsStatus.success) {
       return Scaffold(
-        appBar: AppBar(title: Text(l10n.settingsNotificationsTitle)), // Reuse title
+        appBar: AppBar(
+          title: Text(l10n.settingsNotificationsTitle),
+        ), // Reuse title
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
-    final bool notificationsEnabled = state.notificationSettings.enabled;
+    final notificationsEnabled = state.notificationSettings.enabled;
 
     return Scaffold(
       appBar: AppBar(
@@ -61,7 +63,9 @@ class _NotificationSettingsView extends StatelessWidget {
           if (notificationsEnabled) ...[
             ListTile(
               leading: const Icon(Icons.category_outlined),
-              title: Text(l10n.settingsNotificationsCategoriesLabel), // Add l10n key
+              title: Text(
+                l10n.settingsNotificationsCategoriesLabel,
+              ), // Add l10n key
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
                 // TODO(cline): Implement navigation to category selection page
@@ -73,24 +77,28 @@ class _NotificationSettingsView extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.source_outlined),
-              title: Text(l10n.settingsNotificationsSourcesLabel), // Add l10n key
+              title: Text(
+                l10n.settingsNotificationsSourcesLabel,
+              ), // Add l10n key
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
                 // TODO(cline): Implement navigation to source selection page
                 // Example: context.goNamed(Routes.settingsNotificationSourcesName);
-                 ScaffoldMessenger.of(context).showSnackBar(
+                ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Source selection TBD')),
                 );
-             },
+              },
             ),
             ListTile(
               leading: const Icon(Icons.public_outlined),
-              title: Text(l10n.settingsNotificationsCountriesLabel), // Add l10n key
+              title: Text(
+                l10n.settingsNotificationsCountriesLabel,
+              ), // Add l10n key
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
                 // TODO(cline): Implement navigation to country selection page
                 // Example: context.goNamed(Routes.settingsNotificationCountriesName);
-                 ScaffoldMessenger.of(context).showSnackBar(
+                ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Country selection TBD')),
                 );
               },

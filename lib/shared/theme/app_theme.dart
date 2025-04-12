@@ -1,8 +1,6 @@
 //
 // ignore_for_file: lines_longer_than_80_chars
 
-// ignore_for_file: lines_longer_than_80_chars
-
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -42,51 +40,48 @@ TextTheme _customizeTextTheme(
   switch (appFontSize) {
     case FontSize.small:
       factor = 0.85;
-      break;
     case FontSize.large:
       factor = 1.15;
-      break;
     case FontSize.medium:
-    default:
       factor = 1.0;
   }
 
   // Helper to apply factor safely
-  double? _applyFactor(double? baseSize) =>
+  double? applyFactor(double? baseSize) =>
       baseSize != null ? (baseSize * factor).roundToDouble() : null;
 
   return baseTextTheme.copyWith(
     // --- Headline/Title Styles ---
     headlineLarge: baseTextTheme.headlineLarge?.copyWith(
-      fontSize: _applyFactor(28), // Apply factor
+      fontSize: applyFactor(28), // Apply factor
       fontWeight: FontWeight.bold,
     ),
     headlineMedium: baseTextTheme.headlineMedium?.copyWith(
-      fontSize: _applyFactor(24), // Apply factor
+      fontSize: applyFactor(24), // Apply factor
       fontWeight: FontWeight.bold,
     ),
     titleLarge: baseTextTheme.titleLarge?.copyWith(
-      fontSize: _applyFactor(18), // Apply factor
+      fontSize: applyFactor(18), // Apply factor
       fontWeight: FontWeight.w600,
     ),
     titleMedium: baseTextTheme.titleMedium?.copyWith(
-      fontSize: _applyFactor(16), // Apply factor
+      fontSize: applyFactor(16), // Apply factor
       fontWeight: FontWeight.w600,
     ),
 
     // --- Body/Content Styles ---
     bodyLarge: baseTextTheme.bodyLarge?.copyWith(
-      fontSize: _applyFactor(16), // Apply factor
+      fontSize: applyFactor(16), // Apply factor
       height: 1.5,
     ),
     bodyMedium: baseTextTheme.bodyMedium?.copyWith(
-      fontSize: _applyFactor(14), // Apply factor
+      fontSize: applyFactor(14), // Apply factor
       height: 1.4,
     ),
 
     // --- Metadata/Caption Styles ---
     labelSmall: baseTextTheme.labelSmall?.copyWith(
-      fontSize: _applyFactor(12), // Apply factor
+      fontSize: applyFactor(12), // Apply factor
       fontWeight: FontWeight.normal,
     ),
 
@@ -120,7 +115,6 @@ TextTheme Function([TextTheme?]) _getGoogleFontTextTheme(String? fontFamily) {
   // Default fallback if fontFamily is null or not recognized
   return GoogleFonts.notoSansTextTheme;
 }
-
 
 /// Defines the application's light theme using FlexColorScheme.
 ///

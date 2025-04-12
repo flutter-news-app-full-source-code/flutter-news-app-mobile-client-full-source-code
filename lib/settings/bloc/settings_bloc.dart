@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
@@ -20,8 +18,8 @@ part 'settings_state.dart';
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   /// {@macro settings_bloc}
   SettingsBloc({required HtPreferencesRepository preferencesRepository})
-      : _preferencesRepository = preferencesRepository,
-        super(const SettingsState()) {
+    : _preferencesRepository = preferencesRepository,
+      super(const SettingsState()) {
     // Register event handlers
     on<SettingsLoadRequested>(_onLoadRequested);
     on<SettingsAppThemeModeChanged>(
@@ -81,8 +79,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
               results[1] as ArticleSettings? ?? state.articleSettings,
           themeSettings: results[2] as ThemeSettings? ?? state.themeSettings,
           feedSettings: results[3] as FeedSettings? ?? state.feedSettings,
-          notificationSettings: results[4] as NotificationSettings? ??
-              state.notificationSettings,
+          notificationSettings:
+              results[4] as NotificationSettings? ?? state.notificationSettings,
           clearError: true,
         ),
       );
@@ -119,21 +117,25 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       themeName: state.themeSettings.themeName, // Keep existing value
     );
     // Optimistically update UI
-    emit(state.copyWith(
-      status: SettingsStatus.success, // Keep success state
-      themeSettings: newThemeSettings,
-    )); // Removed trailing comma
+    emit(
+      state.copyWith(
+        status: SettingsStatus.success, // Keep success state
+        themeSettings: newThemeSettings,
+      ),
+    ); // Removed trailing comma
 
     try {
       await _preferencesRepository.setThemeSettings(newThemeSettings);
       // No need to emit again on success, UI already updated
     } catch (e) {
       // Revert optimistic update on failure and show error
-      emit(state.copyWith(
-        status: SettingsStatus.failure,
-        themeSettings: state.themeSettings, // Revert to previous
-        error: e,
-      )); // Removed trailing comma
+      emit(
+        state.copyWith(
+          status: SettingsStatus.failure,
+          themeSettings: state.themeSettings, // Revert to previous
+          error: e,
+        ),
+      ); // Removed trailing comma
     }
   }
 
@@ -151,11 +153,13 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     try {
       await _preferencesRepository.setThemeSettings(newThemeSettings);
     } catch (e) {
-      emit(state.copyWith(
-        status: SettingsStatus.failure,
-        themeSettings: state.themeSettings,
-        error: e,
-      )); // Removed trailing comma
+      emit(
+        state.copyWith(
+          status: SettingsStatus.failure,
+          themeSettings: state.themeSettings,
+          error: e,
+        ),
+      ); // Removed trailing comma
     }
   }
 
@@ -173,11 +177,13 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     try {
       await _preferencesRepository.setAppSettings(newAppSettings);
     } catch (e) {
-      emit(state.copyWith(
-        status: SettingsStatus.failure,
-        appSettings: state.appSettings,
-        error: e,
-      )); // Removed trailing comma
+      emit(
+        state.copyWith(
+          status: SettingsStatus.failure,
+          appSettings: state.appSettings,
+          error: e,
+        ),
+      ); // Removed trailing comma
     }
   }
 
@@ -195,11 +201,13 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     try {
       await _preferencesRepository.setAppSettings(newAppSettings);
     } catch (e) {
-      emit(state.copyWith(
-        status: SettingsStatus.failure,
-        appSettings: state.appSettings,
-        error: e,
-      )); // Removed trailing comma
+      emit(
+        state.copyWith(
+          status: SettingsStatus.failure,
+          appSettings: state.appSettings,
+          error: e,
+        ),
+      ); // Removed trailing comma
     }
   }
 
@@ -209,18 +217,18 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     Emitter<SettingsState> emit,
   ) async {
     // Manually create new instance
-    final newFeedSettings = FeedSettings(
-      feedListTileType: event.tileType,
-    );
+    final newFeedSettings = FeedSettings(feedListTileType: event.tileType);
     emit(state.copyWith(feedSettings: newFeedSettings));
     try {
       await _preferencesRepository.setFeedSettings(newFeedSettings);
     } catch (e) {
-      emit(state.copyWith(
-        status: SettingsStatus.failure,
-        feedSettings: state.feedSettings,
-        error: e,
-      )); // Removed trailing comma
+      emit(
+        state.copyWith(
+          status: SettingsStatus.failure,
+          feedSettings: state.feedSettings,
+          error: e,
+        ),
+      ); // Removed trailing comma
     }
   }
 
@@ -230,18 +238,18 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     Emitter<SettingsState> emit,
   ) async {
     // Manually create new instance
-    final newArticleSettings = ArticleSettings(
-      articleFontSize: event.fontSize,
-    );
+    final newArticleSettings = ArticleSettings(articleFontSize: event.fontSize);
     emit(state.copyWith(articleSettings: newArticleSettings));
     try {
       await _preferencesRepository.setArticleSettings(newArticleSettings);
     } catch (e) {
-      emit(state.copyWith(
-        status: SettingsStatus.failure,
-        articleSettings: state.articleSettings,
-        error: e,
-      )); // Removed trailing comma
+      emit(
+        state.copyWith(
+          status: SettingsStatus.failure,
+          articleSettings: state.articleSettings,
+          error: e,
+        ),
+      ); // Removed trailing comma
     }
   }
 
@@ -257,18 +265,22 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       enabled: event.enabled,
       categoryNotifications: state.notificationSettings.categoryNotifications,
       sourceNotifications: state.notificationSettings.sourceNotifications,
-      followedEventCountryIds: state.notificationSettings.followedEventCountryIds,
+      followedEventCountryIds:
+          state.notificationSettings.followedEventCountryIds,
     );
     emit(state.copyWith(notificationSettings: newNotificationSettings));
     try {
-      await _preferencesRepository
-          .setNotificationSettings(newNotificationSettings);
+      await _preferencesRepository.setNotificationSettings(
+        newNotificationSettings,
+      );
     } catch (e) {
-      emit(state.copyWith(
-        status: SettingsStatus.failure,
-        notificationSettings: state.notificationSettings,
-        error: e,
-      )); // Removed trailing comma
+      emit(
+        state.copyWith(
+          status: SettingsStatus.failure,
+          notificationSettings: state.notificationSettings,
+          error: e,
+        ),
+      ); // Removed trailing comma
     }
   }
 } // Added closing brace

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -405,10 +404,13 @@ GoRouter createRouter({
                     builder: (context, state) {
                       // Provide SettingsBloc here for SettingsPage and its children
                       return BlocProvider(
-                        create: (context) => SettingsBloc(
-                          preferencesRepository:
-                              context.read<HtPreferencesRepository>(),
-                        )..add(const SettingsLoadRequested()), // Load on entry
+                        create:
+                            (context) => SettingsBloc(
+                              preferencesRepository:
+                                  context.read<HtPreferencesRepository>(),
+                            )..add(
+                              const SettingsLoadRequested(),
+                            ), // Load on entry
                         child: const SettingsPage(), // Use the actual page
                       );
                     },
@@ -417,8 +419,8 @@ GoRouter createRouter({
                       GoRoute(
                         path: Routes.settingsAppearance, // 'appearance'
                         name: Routes.settingsAppearanceName,
-                        builder: (context, state) =>
-                            const AppearanceSettingsPage(),
+                        builder:
+                            (context, state) => const AppearanceSettingsPage(),
                         // SettingsBloc is inherited from parent route
                       ),
                       GoRoute(
@@ -429,14 +431,15 @@ GoRouter createRouter({
                       GoRoute(
                         path: Routes.settingsArticle, // 'article'
                         name: Routes.settingsArticleName,
-                        builder: (context, state) =>
-                            const ArticleSettingsPage(),
+                        builder:
+                            (context, state) => const ArticleSettingsPage(),
                       ),
                       GoRoute(
                         path: Routes.settingsNotifications, // 'notifications'
                         name: Routes.settingsNotificationsName,
-                        builder: (context, state) =>
-                            const NotificationSettingsPage(),
+                        builder:
+                            (context, state) =>
+                                const NotificationSettingsPage(),
                       ),
                     ],
                   ),

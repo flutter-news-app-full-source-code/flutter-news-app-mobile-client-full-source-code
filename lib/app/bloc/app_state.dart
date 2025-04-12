@@ -74,12 +74,12 @@ class AppState extends Equatable {
 
   @override
   List<Object?> get props => [
-        selectedBottomNavigationIndex,
-        themeMode,
-        flexScheme,
-        fontFamily,
-        appFontSize, // Added
-        status,
-        user,
-      ];
+    selectedBottomNavigationIndex,
+    themeMode,
+    flexScheme,
+    fontFamily,
+    appFontSize, // Added
+    status,
+    user,
+  ];
 }

@@ -70,7 +70,8 @@ void main() async {
   // 6. Preferences Repository (Added)
   // IMPORTANT: This assumes currentUser is immediately available after auth repo init.
   // If not, initialization might need to be deferred or handled differently.
-  final currentUserId = authenticationRepository.currentUser.uid; // Assuming 'uid' property
+  final currentUserId =
+      authenticationRepository.currentUser.uid; // Assuming 'uid' property
   // Firestore typically requires non-empty document IDs.
   // Handle cases where the user might be anonymous or ID is empty.
   if (currentUserId.isEmpty) {

@@ -12,16 +12,6 @@ class ArticleSettingsPage extends StatelessWidget {
   /// {@macro article_settings_page}
   const ArticleSettingsPage({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    // SettingsBloc is provided by the parent route.
-    return const _ArticleSettingsView();
-  }
-}
-
-class _ArticleSettingsView extends StatelessWidget {
-  const _ArticleSettingsView();
-
   // Helper to map FontSize enum to user-friendly strings
   String _fontSizeToString(FontSize size, AppLocalizations l10n) {
     switch (size) {

@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/settings/bloc/settings_bloc.dart';
 import 'package:ht_main/shared/constants/constants.dart';
-// import 'package:ht_main/router/routes.dart'; // For future navigation
 
 /// {@template notification_settings_page}
 /// A page for configuring notification settings.
@@ -11,16 +10,6 @@ import 'package:ht_main/shared/constants/constants.dart';
 class NotificationSettingsPage extends StatelessWidget {
   /// {@macro notification_settings_page}
   const NotificationSettingsPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    // SettingsBloc is provided by the parent route.
-    return const _NotificationSettingsView();
-  }
-}
-
-class _NotificationSettingsView extends StatelessWidget {
-  const _NotificationSettingsView();
 
   @override
   Widget build(BuildContext context) {

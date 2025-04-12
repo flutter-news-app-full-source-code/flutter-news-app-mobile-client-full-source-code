@@ -12,16 +12,6 @@ class FeedSettingsPage extends StatelessWidget {
   /// {@macro feed_settings_page}
   const FeedSettingsPage({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    // SettingsBloc is provided by the parent route.
-    return const _FeedSettingsView();
-  }
-}
-
-class _FeedSettingsView extends StatelessWidget {
-  const _FeedSettingsView();
-
   // Helper to map FeedListTileType enum to user-friendly strings
   String _tileTypeToString(FeedListTileType type, AppLocalizations l10n) {
     switch (type) {

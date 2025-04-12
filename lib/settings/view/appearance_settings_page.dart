@@ -12,16 +12,6 @@ class AppearanceSettingsPage extends StatelessWidget {
   /// {@macro appearance_settings_page}
   const AppearanceSettingsPage({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    // SettingsBloc is provided by the parent route.
-    return const _AppearanceSettingsView();
-  }
-}
-
-class _AppearanceSettingsView extends StatelessWidget {
-  const _AppearanceSettingsView();
-
   // Helper to map AppThemeMode enum to user-friendly strings
   String _themeModeToString(AppThemeMode mode, AppLocalizations l10n) {
     switch (mode) {

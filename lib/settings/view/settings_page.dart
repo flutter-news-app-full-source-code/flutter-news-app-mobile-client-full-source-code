@@ -19,18 +19,6 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // The SettingsBloc is expected to be provided by the GoRouter route definition.
-    // No need to provide it here again.
-    return const _SettingsView();
-  }
-}
-
-/// The actual view widget for the main settings page.
-class _SettingsView extends StatelessWidget {
-  const _SettingsView();
-
-  @override
-  Widget build(BuildContext context) {
     final l10n = context.l10n;
 
     return Scaffold(

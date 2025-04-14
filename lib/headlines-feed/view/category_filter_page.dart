@@ -30,8 +30,12 @@ class CategoryFilterPage extends StatefulWidget {
 /// Manages the local selection state ([_pageSelectedCategories]) and interacts
 /// with [CategoriesFilterBloc] for data fetching and pagination.
 class _CategoryFilterPageState extends State<CategoryFilterPage> {
-  /// Stores the categories selected by the user on this page.
-  /// Initialized from the `extra` parameter passed during navigation.
+  /// Stores the categories selected by the user *on this specific page*.
+  /// This state is local to the `CategoryFilterPage` lifecycle.
+  /// It's initialized in `initState` using the list of previously selected
+  /// categories passed via the `extra` parameter during navigation from
+  /// `HeadlinesFilterPage`. This ensures the checkboxes reflect the state
+  /// from the main filter page when this page loads.
   late Set<Category> _pageSelectedCategories;
 
   /// Scroll controller to detect when the user reaches the end of the list
@@ -41,15 +45,28 @@ class _CategoryFilterPageState extends State<CategoryFilterPage> {
   @override
   void initState() {
     super.initState();
-    // Initialize local selections from the data passed via 'extra'
-    // Need to access GoRouterState *after* the first frame
+    // Initialization needs to happen after the first frame to safely access
+    // GoRouterState.of(context).
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // 1. Retrieve the list of categories that were already selected on the
+      //    previous page (HeadlinesFilterPage). This list is passed dynamically
+      //    via the `extra` parameter in the `context.pushNamed` call.
       final initialSelection =
           GoRouterState.of(context).extra as List<Category>?;
+
+      // 2. Initialize the local selection state (`_pageSelectedCategories`) for this
+      //    page. Use a Set for efficient add/remove/contains operations.
+      //    This ensures the checkboxes on this page are initially checked
+      //    correctly based on the selections made previously.
       _pageSelectedCategories = Set.from(initialSelection ?? []);
-      // Request initial categories from the BLoC
+
+      // 3. Trigger the page-specific BLoC (CategoriesFilterBloc) to start
+      //    fetching the list of *all available* categories that the user can
+      //    potentially select from. The BLoC handles fetching, pagination,
+      //    loading states, and errors for the *list of options*.
       context.read<CategoriesFilterBloc>().add(CategoriesFilterRequested());
     });
+    // Add listener for pagination logic.
     _scrollController.addListener(_onScroll);
   }
 
@@ -92,7 +109,10 @@ class _CategoryFilterPageState extends State<CategoryFilterPage> {
             icon: const Icon(Icons.check),
             tooltip: l10n.headlinesFeedFilterApplyButton,
             onPressed: () {
-              // Pop with the final selection from this page
+              // When the user taps 'Apply' (checkmark), pop the current route
+              // and return the final list of selected categories (`_pageSelectedCategories`)
+              // from this page back to the previous page (`HeadlinesFilterPage`).
+              // `HeadlinesFilterPage` receives this list in its `onResult` callback.
               context.pop(_pageSelectedCategories.toList());
             },
           ),
@@ -205,10 +225,14 @@ class _CategoryFilterPageState extends State<CategoryFilterPage> {
               : null,
           value: isSelected,
           onChanged: (bool? value) {
+            // When a checkbox state changes, update the local selection set
+            // (`_pageSelectedCategories`) for this page.
             setState(() {
               if (value == true) {
+                // Add the category if checked.
                 _pageSelectedCategories.add(category);
               } else {
+                // Remove the category if unchecked.
                 _pageSelectedCategories.remove(category);
               }
             });

@@ -1,3 +1,4 @@
+//
 // ignore_for_file: lines_longer_than_80_chars
 
 import 'package:flutter/material.dart';
@@ -120,9 +121,7 @@ class _CategoryFilterPageState extends State<CategoryFilterPage> {
       ),
       // Use BlocBuilder to react to state changes from CategoriesFilterBloc
       body: BlocBuilder<CategoriesFilterBloc, CategoriesFilterState>(
-        builder: (context, state) {
-          return _buildBody(context, state);
-        },
+        builder: _buildBody,
       ),
     );
   }
@@ -146,9 +145,10 @@ class _CategoryFilterPageState extends State<CategoryFilterPage> {
         state.categories.isEmpty) {
       return FailureStateWidget(
         message: state.error?.toString() ?? l10n.unknownError,
-        onRetry: () => context
-            .read<CategoriesFilterBloc>()
-            .add(CategoriesFilterRequested()),
+        onRetry:
+            () => context.read<CategoriesFilterBloc>().add(
+              CategoriesFilterRequested(),
+            ),
       );
     }
 
@@ -170,7 +170,8 @@ class _CategoryFilterPageState extends State<CategoryFilterPage> {
         bottom: AppSpacing.xxl, // Padding at the bottom for loader/content
       ),
       // Add 1 to item count if loading more or if failed during load more
-      itemCount: state.categories.length +
+      itemCount:
+          state.categories.length +
           ((state.status == CategoriesFilterStatus.loadingMore ||
                   (state.status == CategoriesFilterStatus.failure &&
                       state.categories.isNotEmpty))
@@ -195,8 +196,8 @@ class _CategoryFilterPageState extends State<CategoryFilterPage> {
                 child: Text(
                   l10n.loadMoreError,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.error,
-                      ),
+                    color: Theme.of(context).colorScheme.error,
+                  ),
                 ),
               ),
             );
@@ -211,18 +212,20 @@ class _CategoryFilterPageState extends State<CategoryFilterPage> {
 
         return CheckboxListTile(
           title: Text(category.name),
-          secondary: category.iconUrl != null
-              ? SizedBox(
-                  width: 40,
-                  height: 40,
-                  child: Image.network(
-                    category.iconUrl!,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const Icon(Icons.category), // Placeholder icon
-                  ),
-                )
-              : null,
+          secondary:
+              category.iconUrl != null
+                  ? SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: Image.network(
+                      category.iconUrl!,
+                      fit: BoxFit.contain,
+                      errorBuilder:
+                          (context, error, stackTrace) =>
+                              const Icon(Icons.category), // Placeholder icon
+                    ),
+                  )
+                  : null,
           value: isSelected,
           onChanged: (bool? value) {
             // When a checkbox state changes, update the local selection set

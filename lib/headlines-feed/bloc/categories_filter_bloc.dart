@@ -5,7 +5,7 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ht_categories_client/ht_categories_client.dart';
 import 'package:ht_categories_repository/ht_categories_repository.dart';
-import 'package:ht_shared/ht_shared.dart'; // For PaginatedResponse
+// For PaginatedResponse
 
 part 'categories_filter_event.dart';
 part 'categories_filter_state.dart';
@@ -22,8 +22,8 @@ class CategoriesFilterBloc
   ///
   /// Requires a [HtCategoriesRepository] to interact with the data layer.
   CategoriesFilterBloc({required HtCategoriesRepository categoriesRepository})
-      : _categoriesRepository = categoriesRepository,
-        super(const CategoriesFilterState()) {
+    : _categoriesRepository = categoriesRepository,
+      super(const CategoriesFilterState()) {
     on<CategoriesFilterRequested>(
       _onCategoriesFilterRequested,
       transformer: restartable(), // Only process the latest request
@@ -67,20 +67,10 @@ class CategoriesFilterBloc
         ),
       );
     } on GetCategoriesFailure catch (e) {
-      emit(
-        state.copyWith(
-          status: CategoriesFilterStatus.failure,
-          error: e,
-        ),
-      );
+      emit(state.copyWith(status: CategoriesFilterStatus.failure, error: e));
     } catch (e) {
       // Catch unexpected errors
-      emit(
-        state.copyWith(
-          status: CategoriesFilterStatus.failure,
-          error: e,
-        ),
-      );
+      emit(state.copyWith(status: CategoriesFilterStatus.failure, error: e));
     }
   }
 
@@ -114,18 +104,15 @@ class CategoriesFilterBloc
       // Keep existing data but indicate failure
       emit(
         state.copyWith(
-          status: CategoriesFilterStatus.failure, // Or a specific 'loadMoreFailure' status?
+          status:
+              CategoriesFilterStatus
+                  .failure, // Or a specific 'loadMoreFailure' status?
           error: e,
         ),
       );
     } catch (e) {
       // Catch unexpected errors
-      emit(
-        state.copyWith(
-          status: CategoriesFilterStatus.failure,
-          error: e,
-        ),
-      );
+      emit(state.copyWith(status: CategoriesFilterStatus.failure, error: e));
     }
   }
 }

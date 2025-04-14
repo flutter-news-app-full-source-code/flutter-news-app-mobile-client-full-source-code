@@ -354,42 +354,54 @@ GoRouter createRouter({
                     routes: [
                       // Sub-route for category selection
                       GoRoute(
-                        path: Routes.feedFilterCategories, // Relative path: 'categories'
+                        path:
+                            Routes
+                                .feedFilterCategories, // Relative path: 'categories'
                         name: Routes.feedFilterCategoriesName,
                         // Wrap with BlocProvider
-                        builder: (context, state) => BlocProvider(
-                          create: (context) => CategoriesFilterBloc(
-                            categoriesRepository:
-                                context.read<HtCategoriesRepository>(),
-                          ),
-                          child: const CategoryFilterPage(),
-                        ),
+                        builder:
+                            (context, state) => BlocProvider(
+                              create:
+                                  (context) => CategoriesFilterBloc(
+                                    categoriesRepository:
+                                        context.read<HtCategoriesRepository>(),
+                                  ),
+                              child: const CategoryFilterPage(),
+                            ),
                       ),
                       // Sub-route for source selection
                       GoRoute(
-                        path: Routes.feedFilterSources, // Relative path: 'sources'
+                        path:
+                            Routes
+                                .feedFilterSources, // Relative path: 'sources'
                         name: Routes.feedFilterSourcesName,
                         // Wrap with BlocProvider
-                        builder: (context, state) => BlocProvider(
-                          create: (context) => SourcesFilterBloc(
-                            sourcesRepository:
-                                context.read<HtSourcesRepository>(),
-                          ),
-                          child: const SourceFilterPage(),
-                        ),
+                        builder:
+                            (context, state) => BlocProvider(
+                              create:
+                                  (context) => SourcesFilterBloc(
+                                    sourcesRepository:
+                                        context.read<HtSourcesRepository>(),
+                                  ),
+                              child: const SourceFilterPage(),
+                            ),
                       ),
                       // Sub-route for country selection
                       GoRoute(
-                        path: Routes.feedFilterCountries, // Relative path: 'countries'
+                        path:
+                            Routes
+                                .feedFilterCountries, // Relative path: 'countries'
                         name: Routes.feedFilterCountriesName,
                         // Wrap with BlocProvider
-                        builder: (context, state) => BlocProvider(
-                          create: (context) => CountriesFilterBloc(
-                            countriesRepository:
-                                context.read<HtCountriesRepository>(),
-                          ),
-                          child: const CountryFilterPage(),
-                        ),
+                        builder:
+                            (context, state) => BlocProvider(
+                              create:
+                                  (context) => CountriesFilterBloc(
+                                    countriesRepository:
+                                        context.read<HtCountriesRepository>(),
+                                  ),
+                              child: const CountryFilterPage(),
+                            ),
                       ),
                     ],
                   ),

@@ -5,7 +5,7 @@ import 'package:bloc_concurrency/bloc_concurrency.dart'; // For transformers
 import 'package:equatable/equatable.dart';
 import 'package:ht_countries_client/ht_countries_client.dart'; // For Country model and exceptions
 import 'package:ht_countries_repository/ht_countries_repository.dart';
-import 'package:ht_shared/ht_shared.dart'; // For PaginatedResponse
+// For PaginatedResponse
 
 part 'countries_filter_event.dart';
 part 'countries_filter_state.dart';
@@ -16,13 +16,14 @@ part 'countries_filter_state.dart';
 /// Handles initial fetching and pagination of countries using the
 /// provided [HtCountriesRepository].
 /// {@endtemplate}
-class CountriesFilterBloc extends Bloc<CountriesFilterEvent, CountriesFilterState> {
+class CountriesFilterBloc
+    extends Bloc<CountriesFilterEvent, CountriesFilterState> {
   /// {@macro countries_filter_bloc}
   ///
   /// Requires a [HtCountriesRepository] to interact with the data layer.
   CountriesFilterBloc({required HtCountriesRepository countriesRepository})
-      : _countriesRepository = countriesRepository,
-        super(const CountriesFilterState()) {
+    : _countriesRepository = countriesRepository,
+      super(const CountriesFilterState()) {
     on<CountriesFilterRequested>(
       _onCountriesFilterRequested,
       transformer: restartable(), // Only process the latest request
@@ -55,7 +56,6 @@ class CountriesFilterBloc extends Bloc<CountriesFilterEvent, CountriesFilterStat
       // Note: Repository uses 'cursor' parameter name here
       final response = await _countriesRepository.fetchCountries(
         limit: _countriesLimit,
-        cursor: null, // Explicitly null for initial fetch
       );
       emit(
         state.copyWith(
@@ -67,20 +67,10 @@ class CountriesFilterBloc extends Bloc<CountriesFilterEvent, CountriesFilterStat
         ),
       );
     } on CountryFetchFailure catch (e) {
-      emit(
-        state.copyWith(
-          status: CountriesFilterStatus.failure,
-          error: e,
-        ),
-      );
+      emit(state.copyWith(status: CountriesFilterStatus.failure, error: e));
     } catch (e) {
       // Catch unexpected errors
-      emit(
-        state.copyWith(
-          status: CountriesFilterStatus.failure,
-          error: e,
-        ),
-      );
+      emit(state.copyWith(status: CountriesFilterStatus.failure, error: e));
     }
   }
 
@@ -113,20 +103,10 @@ class CountriesFilterBloc extends Bloc<CountriesFilterEvent, CountriesFilterStat
       );
     } on CountryFetchFailure catch (e) {
       // Keep existing data but indicate failure
-      emit(
-        state.copyWith(
-          status: CountriesFilterStatus.failure,
-          error: e,
-        ),
-      );
+      emit(state.copyWith(status: CountriesFilterStatus.failure, error: e));
     } catch (e) {
       // Catch unexpected errors
-      emit(
-        state.copyWith(
-          status: CountriesFilterStatus.failure,
-          error: e,
-        ),
-      );
+      emit(state.copyWith(status: CountriesFilterStatus.failure, error: e));
     }
   }
 }

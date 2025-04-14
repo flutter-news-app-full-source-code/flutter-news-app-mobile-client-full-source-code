@@ -1,3 +1,4 @@
+//
 // ignore_for_file: lines_longer_than_80_chars
 
 import 'package:flutter/material.dart';
@@ -118,9 +119,7 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
       ),
       // Use BlocBuilder to react to state changes from CountriesFilterBloc
       body: BlocBuilder<CountriesFilterBloc, CountriesFilterState>(
-        builder: (context, state) {
-          return _buildBody(context, state);
-        },
+        builder: _buildBody,
       ),
     );
   }
@@ -134,7 +133,8 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
       return LoadingStateWidget(
         icon: Icons.public_outlined, // Changed icon
         headline: l10n.countryFilterLoadingHeadline, // Assumes this exists
-        subheadline: l10n.countryFilterLoadingSubheadline, // Assumes this exists
+        subheadline:
+            l10n.countryFilterLoadingSubheadline, // Assumes this exists
       );
     }
 
@@ -142,9 +142,12 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
     if (state.status == CountriesFilterStatus.failure &&
         state.countries.isEmpty) {
       return FailureStateWidget(
-        message: state.error?.toString() ?? l10n.unknownError, // Assumes this exists
-        onRetry: () =>
-            context.read<CountriesFilterBloc>().add(CountriesFilterRequested()),
+        message:
+            state.error?.toString() ?? l10n.unknownError, // Assumes this exists
+        onRetry:
+            () => context.read<CountriesFilterBloc>().add(
+              CountriesFilterRequested(),
+            ),
       );
     }
 
@@ -162,7 +165,8 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
     return ListView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.only(bottom: AppSpacing.xxl),
-      itemCount: state.countries.length +
+      itemCount:
+          state.countries.length +
           ((state.status == CountriesFilterStatus.loadingMore ||
                   (state.status == CountriesFilterStatus.failure &&
                       state.countries.isNotEmpty))
@@ -185,8 +189,8 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
                 child: Text(
                   l10n.loadMoreError, // Assumes this exists
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.error,
-                      ),
+                    color: Theme.of(context).colorScheme.error,
+                  ),
                 ),
               ),
             );
@@ -200,14 +204,16 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
 
         return CheckboxListTile(
           title: Text(country.name),
-          secondary: SizedBox( // Use SizedBox for consistent flag size
+          secondary: SizedBox(
+            // Use SizedBox for consistent flag size
             width: 40,
             height: 30, // Adjust height for flag aspect ratio if needed
             child: Image.network(
               country.flagUrl,
               fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) =>
-                  const Icon(Icons.flag_outlined), // Placeholder icon
+              errorBuilder:
+                  (context, error, stackTrace) =>
+                      const Icon(Icons.flag_outlined), // Placeholder icon
             ),
           ),
           value: isSelected,

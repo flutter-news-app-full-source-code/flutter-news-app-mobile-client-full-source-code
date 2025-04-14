@@ -1,3 +1,6 @@
+//
+// ignore_for_file: avoid_positional_boolean_parameters
+
 part of 'settings_bloc.dart';
 
 /// {@template settings_event}

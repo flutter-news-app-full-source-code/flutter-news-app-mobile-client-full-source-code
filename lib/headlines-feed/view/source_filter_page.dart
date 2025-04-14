@@ -1,3 +1,4 @@
+//
 // ignore_for_file: lines_longer_than_80_chars
 
 import 'package:flutter/material.dart';
@@ -117,9 +118,7 @@ class _SourceFilterPageState extends State<SourceFilterPage> {
       ),
       // Use BlocBuilder to react to state changes from SourcesFilterBloc
       body: BlocBuilder<SourcesFilterBloc, SourcesFilterState>(
-        builder: (context, state) {
-          return _buildBody(context, state);
-        },
+        builder: _buildBody,
       ),
     );
   }
@@ -140,9 +139,12 @@ class _SourceFilterPageState extends State<SourceFilterPage> {
     // Handle failure state (show error and retry button)
     if (state.status == SourcesFilterStatus.failure && state.sources.isEmpty) {
       return FailureStateWidget(
-        message: state.error?.toString() ?? l10n.unknownError, // Assumes unknownError exists
-        onRetry: () =>
-            context.read<SourcesFilterBloc>().add(SourcesFilterRequested()),
+        message:
+            state.error?.toString() ??
+            l10n.unknownError, // Assumes unknownError exists
+        onRetry:
+            () =>
+                context.read<SourcesFilterBloc>().add(SourcesFilterRequested()),
       );
     }
 
@@ -159,7 +161,8 @@ class _SourceFilterPageState extends State<SourceFilterPage> {
     return ListView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.only(bottom: AppSpacing.xxl),
-      itemCount: state.sources.length +
+      itemCount:
+          state.sources.length +
           ((state.status == SourcesFilterStatus.loadingMore ||
                   (state.status == SourcesFilterStatus.failure &&
                       state.sources.isNotEmpty))
@@ -182,8 +185,8 @@ class _SourceFilterPageState extends State<SourceFilterPage> {
                 child: Text(
                   l10n.loadMoreError, // Assumes loadMoreError exists
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.error,
-                      ),
+                    color: Theme.of(context).colorScheme.error,
+                  ),
                 ),
               ),
             );
@@ -200,10 +203,10 @@ class _SourceFilterPageState extends State<SourceFilterPage> {
           subtitle:
               source.description != null && source.description!.isNotEmpty
                   ? Text(
-                      source.description!,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    )
+                    source.description!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  )
                   : null,
           value: isSelected,
           onChanged: (bool? value) {

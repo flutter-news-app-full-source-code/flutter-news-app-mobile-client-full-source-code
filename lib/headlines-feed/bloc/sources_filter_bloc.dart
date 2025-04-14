@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart'; // For transformers
 import 'package:equatable/equatable.dart';
-import 'package:ht_shared/ht_shared.dart'; // For PaginatedResponse
+// For PaginatedResponse
 import 'package:ht_sources_client/ht_sources_client.dart'; // Keep existing, also for Source model
 import 'package:ht_sources_repository/ht_sources_repository.dart';
 
@@ -21,8 +21,8 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
   ///
   /// Requires a [HtSourcesRepository] to interact with the data layer.
   SourcesFilterBloc({required HtSourcesRepository sourcesRepository})
-      : _sourcesRepository = sourcesRepository,
-        super(const SourcesFilterState()) {
+    : _sourcesRepository = sourcesRepository,
+      super(const SourcesFilterState()) {
     on<SourcesFilterRequested>(
       _onSourcesFilterRequested,
       transformer: restartable(), // Only process the latest request
@@ -65,20 +65,10 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
         ),
       );
     } on SourceFetchFailure catch (e) {
-      emit(
-        state.copyWith(
-          status: SourcesFilterStatus.failure,
-          error: e,
-        ),
-      );
+      emit(state.copyWith(status: SourcesFilterStatus.failure, error: e));
     } catch (e) {
       // Catch unexpected errors
-      emit(
-        state.copyWith(
-          status: SourcesFilterStatus.failure,
-          error: e,
-        ),
-      );
+      emit(state.copyWith(status: SourcesFilterStatus.failure, error: e));
     }
   }
 
@@ -110,20 +100,10 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
       );
     } on SourceFetchFailure catch (e) {
       // Keep existing data but indicate failure
-      emit(
-        state.copyWith(
-          status: SourcesFilterStatus.failure,
-          error: e,
-        ),
-      );
+      emit(state.copyWith(status: SourcesFilterStatus.failure, error: e));
     } catch (e) {
       // Catch unexpected errors
-      emit(
-        state.copyWith(
-          status: SourcesFilterStatus.failure,
-          error: e,
-        ),
-      );
+      emit(state.copyWith(status: SourcesFilterStatus.failure, error: e));
     }
   }
 }

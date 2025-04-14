@@ -417,5 +417,14 @@
     "settingsNotificationsSourcesLabel": "Followed Sources",
     "@settingsNotificationsSourcesLabel": { "description": "Label for the section to select notification sources" },
     "settingsNotificationsCountriesLabel": "Followed Countries",
-    "@settingsNotificationsCountriesLabel": { "description": "Label for the section to select notification countries" }
+    "@settingsNotificationsCountriesLabel": { "description": "Label for the section to select notification countries" },
+
+    "unknownError": "An unknown error occurred.",
+    "@unknownError": {
+        "description": "Generic error message shown when an operation fails unexpectedly"
+    },
+    "loadMoreError": "Failed to load more items.",
+    "@loadMoreError": {
+        "description": "Error message shown when pagination fails to load the next set of items"
+    }
 }

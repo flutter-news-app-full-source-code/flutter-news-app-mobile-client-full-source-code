@@ -417,5 +417,14 @@
     "settingsNotificationsSourcesLabel": "المصادر المتابعة",
     "@settingsNotificationsSourcesLabel": { "description": "Label for the section to select notification sources" },
     "settingsNotificationsCountriesLabel": "البلدان المتابعة",
-    "@settingsNotificationsCountriesLabel": { "description": "Label for the section to select notification countries" }
+    "@settingsNotificationsCountriesLabel": { "description": "Label for the section to select notification countries" },
+
+    "unknownError": "حدث خطأ غير معروف.",
+    "@unknownError": {
+        "description": "Generic error message shown when an operation fails unexpectedly"
+    },
+    "loadMoreError": "فشل تحميل المزيد من العناصر.",
+    "@loadMoreError": {
+        "description": "Error message shown when pagination fails to load the next set of items"
+    }
 }

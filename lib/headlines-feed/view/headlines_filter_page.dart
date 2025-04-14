@@ -29,7 +29,11 @@ class HeadlinesFilterPage extends StatefulWidget {
 }
 
 class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
-  // Temporary state for filter selections within this modal flow
+  /// Temporary state for filter selections within this modal flow.
+  /// These hold the selections made by the user *while* this filter page
+  /// and its sub-pages (Category, Source, Country) are open.
+  /// They are initialized from the main [HeadlinesFeedBloc]'s current filter
+  /// and are only applied back to the BLoC when the user taps 'Apply'.
   late List<Category> _tempSelectedCategories;
   late List<Source> _tempSelectedSources;
   late List<Country> _tempSelectedCountries;
@@ -37,16 +41,20 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
   @override
   void initState() {
     super.initState();
-    // Initialize temporary state from the currently active filters in the BLoC
+    // Initialize the temporary selection state based on the currently
+    // active filters held within the HeadlinesFeedBloc. This ensures that
+    // when the filter page opens, it reflects the filters already applied.
     final currentState = BlocProvider.of<HeadlinesFeedBloc>(context).state;
     if (currentState is HeadlinesFeedLoaded) {
+      // Create copies of the lists to avoid modifying the BLoC state directly.
       _tempSelectedCategories = List.from(currentState.filter.categories ?? []);
       _tempSelectedSources = List.from(currentState.filter.sources ?? []);
       _tempSelectedCountries = List.from(
         currentState.filter.eventCountries ?? [],
       );
     } else {
-      // Default to empty lists if the feed isn't loaded yet (should be rare)
+      // Default to empty lists if the feed isn't loaded yet. This might happen
+      // if the filter page is accessed before the initial feed load completes.
       _tempSelectedCategories = [];
       _tempSelectedSources = [];
       _tempSelectedCountries = [];
@@ -59,9 +67,11 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
   /// ([selectedCount]), and navigates to the corresponding selection page
   /// specified by [routeName] when tapped.
   ///
-  /// Uses [currentSelection] to pass the temporary selection state to the
-  /// criterion page and updates the state via the [onResult] callback when
-  /// the criterion page pops with a result.
+  /// Uses [currentSelection] to pass the current temporary selection state
+  /// (e.g., `_tempSelectedSources`) to the corresponding criterion selection page
+  /// (e.g., `SourceFilterPage`) via the `extra` parameter of `context.pushNamed`.
+  /// Updates the temporary state via the [onResult] callback when the
+  /// criterion page pops with a result (the user tapped 'Apply' on that page).
   Widget _buildFilterTile({
     required BuildContext context,
     required String title,
@@ -83,14 +93,21 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       subtitle: Text(subtitle),
       trailing: const Icon(Icons.chevron_right),
       onTap: () async {
-        // Use pushNamed to navigate and wait for a result
+        // Navigate to the specific filter selection page (e.g., SourceFilterPage).
+        // Use pushNamed to wait for a result when the page is popped.
         final result = await context.pushNamed<List<dynamic>>(
-          routeName,
-          extra: currentSelection, // Pass current temp selection
+          routeName, // The route name for the specific filter page.
+          // Pass the current temporary selection for this filter type
+          // (e.g., _tempSelectedSources) to the next page. This allows
+          // the next page to initialize its UI reflecting the current state.
+          extra: currentSelection,
         );
-        // Update temp state if result is not null (user applied changes)
+        // When the filter selection page pops (usually via its 'Apply' button),
+        // it returns the potentially modified list of selected items.
+        // If the result is not null (meaning the user didn't just cancel/go back),
+        // update the corresponding temporary state list on *this* page.
         if (result != null) {
-          onResult(result);
+          onResult(result); // Calls setState to update the UI here.
         }
       },
     );
@@ -127,24 +144,28 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
             icon: const Icon(Icons.check),
             tooltip: l10n.headlinesFeedFilterApplyButton,
             onPressed: () {
-              // Apply the temporary filters to the BLoC
+              // When the user confirms their filter choices on this page,
+              // create a new HeadlineFilter object using the final temporary
+              // selections gathered from the sub-pages.
+              final newFilter = HeadlineFilter(
+                categories:
+                    _tempSelectedCategories.isNotEmpty
+                        ? _tempSelectedCategories
+                        : null, // Use null if empty
+                sources:
+                    _tempSelectedSources.isNotEmpty
+                        ? _tempSelectedSources
+                        : null, // Use null if empty
+                eventCountries:
+                    _tempSelectedCountries.isNotEmpty
+                        ? _tempSelectedCountries
+                        : null, // Use null if empty
+              );
+
+              // Add an event to the main HeadlinesFeedBloc to apply the
+              // newly constructed filter and trigger a data refresh.
               context.read<HeadlinesFeedBloc>().add(
-                HeadlinesFeedFiltersApplied(
-                  filter: HeadlineFilter(
-                    categories:
-                        _tempSelectedCategories.isNotEmpty
-                            ? _tempSelectedCategories
-                            : null,
-                    sources:
-                        _tempSelectedSources.isNotEmpty
-                            ? _tempSelectedSources
-                            : null,
-                    eventCountries:
-                        _tempSelectedCountries.isNotEmpty
-                            ? _tempSelectedCountries
-                            : null,
-                  ),
-                ),
+                HeadlinesFeedFiltersApplied(filter: newFilter),
               );
               context.pop(); // Close the filter page
             },

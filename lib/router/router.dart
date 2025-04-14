@@ -15,12 +15,15 @@ import 'package:ht_main/authentication/view/email_link_sent_page.dart';
 import 'package:ht_main/authentication/view/email_sign_in_page.dart';
 import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart';
 import 'package:ht_main/headline-details/view/headline_details_page.dart';
+import 'package:ht_main/headlines-feed/bloc/categories_filter_bloc.dart'; // Import new BLoC
+import 'package:ht_main/headlines-feed/bloc/countries_filter_bloc.dart'; // Import new BLoC
 import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
-import 'package:ht_main/headlines-feed/view/category_filter_page.dart'; // Import new page
-import 'package:ht_main/headlines-feed/view/country_filter_page.dart'; // Import new page
+import 'package:ht_main/headlines-feed/bloc/sources_filter_bloc.dart'; // Import new BLoC
+import 'package:ht_main/headlines-feed/view/category_filter_page.dart';
+import 'package:ht_main/headlines-feed/view/country_filter_page.dart';
 import 'package:ht_main/headlines-feed/view/headlines_feed_page.dart';
-import 'package:ht_main/headlines-feed/view/headlines_filter_page.dart'; // Import new page
-import 'package:ht_main/headlines-feed/view/source_filter_page.dart'; // Import new page
+import 'package:ht_main/headlines-feed/view/headlines_filter_page.dart';
+import 'package:ht_main/headlines-feed/view/source_filter_page.dart';
 import 'package:ht_main/headlines-search/bloc/headlines_search_bloc.dart';
 import 'package:ht_main/headlines-search/view/headlines_search_page.dart';
 import 'package:ht_main/l10n/l10n.dart';
@@ -351,27 +354,42 @@ GoRouter createRouter({
                     routes: [
                       // Sub-route for category selection
                       GoRoute(
-                        path:
-                            Routes
-                                .feedFilterCategories, // Relative path: 'categories'
+                        path: Routes.feedFilterCategories, // Relative path: 'categories'
                         name: Routes.feedFilterCategoriesName,
-                        builder: (context, state) => const CategoryFilterPage(),
+                        // Wrap with BlocProvider
+                        builder: (context, state) => BlocProvider(
+                          create: (context) => CategoriesFilterBloc(
+                            categoriesRepository:
+                                context.read<HtCategoriesRepository>(),
+                          ),
+                          child: const CategoryFilterPage(),
+                        ),
                       ),
                       // Sub-route for source selection
                       GoRoute(
-                        path:
-                            Routes
-                                .feedFilterSources, // Relative path: 'sources'
+                        path: Routes.feedFilterSources, // Relative path: 'sources'
                         name: Routes.feedFilterSourcesName,
-                        builder: (context, state) => const SourceFilterPage(),
+                        // Wrap with BlocProvider
+                        builder: (context, state) => BlocProvider(
+                          create: (context) => SourcesFilterBloc(
+                            sourcesRepository:
+                                context.read<HtSourcesRepository>(),
+                          ),
+                          child: const SourceFilterPage(),
+                        ),
                       ),
                       // Sub-route for country selection
                       GoRoute(
-                        path:
-                            Routes
-                                .feedFilterCountries, // Relative path: 'countries'
+                        path: Routes.feedFilterCountries, // Relative path: 'countries'
                         name: Routes.feedFilterCountriesName,
-                        builder: (context, state) => const CountryFilterPage(),
+                        // Wrap with BlocProvider
+                        builder: (context, state) => BlocProvider(
+                          create: (context) => CountriesFilterBloc(
+                            countriesRepository:
+                                context.read<HtCountriesRepository>(),
+                          ),
+                          child: const CountryFilterPage(),
+                        ),
                       ),
                     ],
                   ),

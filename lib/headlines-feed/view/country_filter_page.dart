@@ -30,8 +30,12 @@ class CountryFilterPage extends StatefulWidget {
 /// Manages the local selection state ([_pageSelectedCountries]) and interacts
 /// with [CountriesFilterBloc] for data fetching and pagination.
 class _CountryFilterPageState extends State<CountryFilterPage> {
-  /// Stores the countries selected by the user on this page.
-  /// Initialized from the `extra` parameter passed during navigation.
+  /// Stores the countries selected by the user *on this specific page*.
+  /// This state is local to the `CountryFilterPage` lifecycle.
+  /// It's initialized in `initState` using the list of previously selected
+  /// countries passed via the `extra` parameter during navigation from
+  /// `HeadlinesFilterPage`. This ensures the checkboxes reflect the state
+  /// from the main filter page when this page loads.
   late Set<Country> _pageSelectedCountries;
 
   /// Scroll controller to detect when the user reaches the end of the list
@@ -41,14 +45,28 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
   @override
   void initState() {
     super.initState();
-    // Initialize local selections from the data passed via 'extra'
+    // Initialization needs to happen after the first frame to safely access
+    // GoRouterState.of(context).
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // 1. Retrieve the list of countries that were already selected on the
+      //    previous page (HeadlinesFilterPage). This list is passed dynamically
+      //    via the `extra` parameter in the `context.pushNamed` call.
       final initialSelection =
           GoRouterState.of(context).extra as List<Country>?;
+
+      // 2. Initialize the local selection state (`_pageSelectedCountries`) for this
+      //    page. Use a Set for efficient add/remove/contains operations.
+      //    This ensures the checkboxes on this page are initially checked
+      //    correctly based on the selections made previously.
       _pageSelectedCountries = Set.from(initialSelection ?? []);
-      // Request initial countries from the BLoC
+
+      // 3. Trigger the page-specific BLoC (CountriesFilterBloc) to start
+      //    fetching the list of *all available* countries that the user can
+      //    potentially select from. The BLoC handles fetching, pagination,
+      //    loading states, and errors for the *list of options*.
       context.read<CountriesFilterBloc>().add(CountriesFilterRequested());
     });
+    // Add listener for pagination logic.
     _scrollController.addListener(_onScroll);
   }
 
@@ -89,6 +107,10 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
             icon: const Icon(Icons.check),
             tooltip: l10n.headlinesFeedFilterApplyButton,
             onPressed: () {
+              // When the user taps 'Apply' (checkmark), pop the current route
+              // and return the final list of selected countries (`_pageSelectedCountries`)
+              // from this page back to the previous page (`HeadlinesFilterPage`).
+              // `HeadlinesFilterPage` receives this list in its `onResult` callback.
               context.pop(_pageSelectedCountries.toList());
             },
           ),
@@ -190,10 +212,14 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
           ),
           value: isSelected,
           onChanged: (bool? value) {
+            // When a checkbox state changes, update the local selection set
+            // (`_pageSelectedCountries`) for this page.
             setState(() {
               if (value == true) {
+                // Add the country if checked.
                 _pageSelectedCountries.add(country);
               } else {
+                // Remove the country if unchecked.
                 _pageSelectedCountries.remove(country);
               }
             });

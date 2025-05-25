@@ -80,6 +80,24 @@
     "@accountBackupTile": {
         "description": "Title for the tile prompting anonymous users to create an account"
     },
+    "accountContentPreferencesTile": "تفضيلات المحتوى",
+    "@accountContentPreferencesTile": {
+        "description": "Title for the content preferences navigation tile in the account page"
+    },
+    "accountSavedHeadlinesTile": "العناوين المحفوظة",
+    "@accountSavedHeadlinesTile": {
+        "description": "Title for the saved headlines navigation tile in the account page"
+    },
+    "accountRoleLabel": "الدور: {role}",
+    "@accountRoleLabel": {
+        "description": "Label displaying the user's role in the account header",
+        "placeholders": {
+            "role": {
+                "type": "String",
+                "example": "admin"
+            }
+        }
+    },
     "authenticationEmailSentSuccess": "تحقق من بريدك الإلكتروني للحصول على رابط تسجيل الدخول.",
     "@authenticationEmailSentSuccess": {
         "description": "Success message shown after sending an email sign-in link on the authentication page"
@@ -359,66 +377,129 @@
         "description": "Button text shown in the user header for anonymous users to initiate sign-in/sign-up"
     },
     "settingsTitle": "الإعدادات",
-    "@settingsTitle": { "description": "Title for the main settings page" },
+    "@settingsTitle": {
+        "description": "Title for the main settings page"
+    },
     "settingsLoadingHeadline": "جارٍ تحميل الإعدادات...",
-    "@settingsLoadingHeadline": { "description": "Headline shown while settings are loading" },
+    "@settingsLoadingHeadline": {
+        "description": "Headline shown while settings are loading"
+    },
     "settingsLoadingSubheadline": "يرجى الانتظار بينما نقوم بجلب تفضيلاتك.",
-    "@settingsLoadingSubheadline": { "description": "Subheadline shown while settings are loading" },
+    "@settingsLoadingSubheadline": {
+        "description": "Subheadline shown while settings are loading"
+    },
     "settingsErrorDefault": "تعذر تحميل الإعدادات.",
-    "@settingsErrorDefault": { "description": "Default error message when settings fail to load" },
+    "@settingsErrorDefault": {
+        "description": "Default error message when settings fail to load"
+    },
     "settingsAppearanceTitle": "المظهر",
-    "@settingsAppearanceTitle": { "description": "Title for the appearance settings section/page" },
+    "@settingsAppearanceTitle": {
+        "description": "Title for the appearance settings section/page"
+    },
     "settingsFeedDisplayTitle": "عرض الموجز",
-    "@settingsFeedDisplayTitle": { "description": "Title for the feed display settings section/page" },
+    "@settingsFeedDisplayTitle": {
+        "description": "Title for the feed display settings section/page"
+    },
     "settingsArticleDisplayTitle": "عرض المقال",
-    "@settingsArticleDisplayTitle": { "description": "Title for the article display settings section/page" },
+    "@settingsArticleDisplayTitle": {
+        "description": "Title for the article display settings section/page"
+    },
     "settingsNotificationsTitle": "الإشعارات",
-    "@settingsNotificationsTitle": { "description": "Title for the notification settings section/page" },
+    "@settingsNotificationsTitle": {
+        "description": "Title for the notification settings section/page"
+    },
     "settingsAppearanceThemeModeLight": "فاتح",
-    "@settingsAppearanceThemeModeLight": { "description": "Label for the light theme mode option" },
+    "@settingsAppearanceThemeModeLight": {
+        "description": "Label for the light theme mode option"
+    },
     "settingsAppearanceThemeModeDark": "داكن",
-    "@settingsAppearanceThemeModeDark": { "description": "Label for the dark theme mode option" },
+    "@settingsAppearanceThemeModeDark": {
+        "description": "Label for the dark theme mode option"
+    },
     "settingsAppearanceThemeModeSystem": "النظام",
-    "@settingsAppearanceThemeModeSystem": { "description": "Label for the system theme mode option" },
+    "@settingsAppearanceThemeModeSystem": {
+        "description": "Label for the system theme mode option"
+    },
     "settingsAppearanceThemeNameRed": "أحمر",
-    "@settingsAppearanceThemeNameRed": { "description": "Label for the red color scheme option" },
+    "@settingsAppearanceThemeNameRed": {
+        "description": "Label for the red color scheme option"
+    },
     "settingsAppearanceThemeNameBlue": "أزرق",
-    "@settingsAppearanceThemeNameBlue": { "description": "Label for the blue color scheme option" },
+    "@settingsAppearanceThemeNameBlue": {
+        "description": "Label for the blue color scheme option"
+    },
     "settingsAppearanceThemeNameGrey": "رمادي",
-    "@settingsAppearanceThemeNameGrey": { "description": "Label for the grey color scheme option" },
+    "@settingsAppearanceThemeNameGrey": {
+        "description": "Label for the grey color scheme option"
+    },
     "settingsAppearanceFontSizeSmall": "صغير",
-    "@settingsAppearanceFontSizeSmall": { "description": "Label for the small font size option" },
+    "@settingsAppearanceFontSizeSmall": {
+        "description": "Label for the small font size option"
+    },
     "settingsAppearanceFontSizeLarge": "كبير",
-    "@settingsAppearanceFontSizeLarge": { "description": "Label for the large font size option" },
+    "@settingsAppearanceFontSizeLarge": {
+        "description": "Label for the large font size option"
+    },
     "settingsAppearanceFontSizeMedium": "متوسط",
-    "@settingsAppearanceFontSizeMedium": { "description": "Label for the medium font size option" },
+    "@settingsAppearanceFontSizeMedium": {
+        "description": "Label for the medium font size option"
+    },
     "settingsAppearanceThemeModeLabel": "وضع المظهر",
-    "@settingsAppearanceThemeModeLabel": { "description": "Label for the theme mode selection dropdown" },
+    "@settingsAppearanceThemeModeLabel": {
+        "description": "Label for the theme mode selection dropdown"
+    },
     "settingsAppearanceThemeNameLabel": "نظام الألوان",
-    "@settingsAppearanceThemeNameLabel": { "description": "Label for the color scheme selection dropdown" },
+    "@settingsAppearanceThemeNameLabel": {
+        "description": "Label for the color scheme selection dropdown"
+    },
     "settingsAppearanceAppFontSizeLabel": "حجم خط التطبيق",
-    "@settingsAppearanceAppFontSizeLabel": { "description": "Label for the app font size selection dropdown" },
+    "@settingsAppearanceAppFontSizeLabel": {
+        "description": "Label for the app font size selection dropdown"
+    },
     "settingsAppearanceAppFontTypeLabel": "خط التطبيق",
-    "@settingsAppearanceAppFontTypeLabel": { "description": "Label for the app font selection dropdown" },
+    "@settingsAppearanceAppFontTypeLabel": {
+        "description": "Label for the app font selection dropdown"
+    },
+    "settingsAppearanceFontWeightLabel": "وزن الخط",
+    "@settingsAppearanceFontWeightLabel": {
+        "description": "Label for the font weight setting."
+    },
     "settingsFeedTileTypeImageTop": "صورة في الأعلى",
-    "@settingsFeedTileTypeImageTop": { "description": "Label for the feed tile type with image on top" },
+    "@settingsFeedTileTypeImageTop": {
+        "description": "Label for the feed tile type with image on top"
+    },
     "settingsFeedTileTypeImageStart": "صورة في البداية",
-    "@settingsFeedTileTypeImageStart": { "description": "Label for the feed tile type with image at the start" },
+    "@settingsFeedTileTypeImageStart": {
+        "description": "Label for the feed tile type with image at the start"
+    },
     "settingsFeedTileTypeTextOnly": "نص فقط",
-    "@settingsFeedTileTypeTextOnly": { "description": "Label for the feed tile type with text only" },
+    "@settingsFeedTileTypeTextOnly": {
+        "description": "Label for the feed tile type with text only"
+    },
     "settingsFeedTileTypeLabel": "تخطيط عنصر الموجز",
-    "@settingsFeedTileTypeLabel": { "description": "Label for the feed tile layout selection dropdown" },
+    "@settingsFeedTileTypeLabel": {
+        "description": "Label for the feed tile layout selection dropdown"
+    },
     "settingsArticleFontSizeLabel": "حجم خط المقال",
-    "@settingsArticleFontSizeLabel": { "description": "Label for the article font size selection dropdown" },
+    "@settingsArticleFontSizeLabel": {
+        "description": "Label for the article font size selection dropdown"
+    },
     "settingsNotificationsEnableLabel": "تفعيل الإشعارات",
-    "@settingsNotificationsEnableLabel": { "description": "Label for the switch to enable/disable notifications" },
+    "@settingsNotificationsEnableLabel": {
+        "description": "Label for the switch to enable/disable notifications"
+    },
     "settingsNotificationsCategoriesLabel": "الفئات المتابعة",
-    "@settingsNotificationsCategoriesLabel": { "description": "Label for the section to select notification categories" },
+    "@settingsNotificationsCategoriesLabel": {
+        "description": "Label for the section to select notification categories"
+    },
     "settingsNotificationsSourcesLabel": "المصادر المتابعة",
-    "@settingsNotificationsSourcesLabel": { "description": "Label for the section to select notification sources" },
+    "@settingsNotificationsSourcesLabel": {
+        "description": "Label for the section to select notification sources"
+    },
     "settingsNotificationsCountriesLabel": "البلدان المتابعة",
-    "@settingsNotificationsCountriesLabel": { "description": "Label for the section to select notification countries" },
-
+    "@settingsNotificationsCountriesLabel": {
+        "description": "Label for the section to select notification countries"
+    },
     "unknownError": "حدث خطأ غير معروف.",
     "@unknownError": {
         "description": "Generic error message shown when an operation fails unexpectedly"
@@ -426,5 +507,39 @@
     "loadMoreError": "فشل تحميل المزيد من العناصر.",
     "@loadMoreError": {
         "description": "Error message shown when pagination fails to load the next set of items"
+    },
+    "settingsAppearanceFontSizeExtraLarge": "كبير جداً",
+    "@settingsAppearanceFontSizeExtraLarge": {
+        "description": "Label for the extra large font size option"
+    },
+    "settingsAppearanceFontFamilySystemDefault": "افتراضي النظام",
+    "@settingsAppearanceFontFamilySystemDefault": {
+        "description": "Label for the system default font family option"
+    },
+    "emailCodeSentPageTitle": "أدخل الرمز",
+    "@emailCodeSentPageTitle": {
+        "description": "AppBar title for the email code verification page"
+    },
+    "emailCodeSentConfirmation": "تم إرسال رمز التحقق إلى {email}. يرجى إدخاله أدناه.",
+    "@emailCodeSentConfirmation": {
+        "description": "Confirmation message shown after the email code has been sent",
+        "placeholders": {
+            "email": {
+                "type": "String",
+                "example": "user@example.com"
+            }
+        }
+    },
+    "emailCodeSentInstructions": "أدخل الرمز المكون من 6 أرقام الذي تلقيته.",
+    "@emailCodeSentInstructions": {
+        "description": "Instructions for the user to enter the verification code"
+    },
+    "emailCodeVerificationHint": "رمز مكون من 6 أرقام",
+    "@emailCodeVerificationHint": {
+        "description": "Hint text for the email code input field"
+    },
+    "emailCodeVerificationButtonLabel": "تحقق من الرمز",
+    "@emailCodeVerificationButtonLabel": {
+        "description": "Label for the button to verify the email code"
     }
 }

@@ -3,10 +3,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ht_headlines_client/ht_headlines_client.dart';
 import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/shared/shared.dart';
+import 'package:ht_shared/ht_shared.dart'
+    show Headline; // Import Headline model
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -265,22 +266,20 @@ class HeadlineDetailsPage extends StatelessWidget {
       );
     }
 
-    // Country Chip
-    if (headline.eventCountry != null) {
-      // Use country.flagUrl for the avatar
+    // Country Chip (from Source Headquarters)
+    if (headline.source?.headquarters != null) {
+      final country = headline.source!.headquarters!;
       chips.add(
         Chip(
           avatar: CircleAvatar(
-            // Use CircleAvatar for better image display
-            radius: chipAvatarSize / 2, // Adjust radius as needed
-            backgroundColor: Colors.transparent, // Avoid background color clash
-            backgroundImage: NetworkImage(headline.eventCountry!.flagUrl),
+            radius: chipAvatarSize / 2,
+            backgroundColor: Colors.transparent,
+            backgroundImage: NetworkImage(country.flagUrl),
             onBackgroundImageError: (exception, stackTrace) {
               // Optional: Handle image loading errors, e.g., show placeholder
             },
           ),
-          // Use eventCountry.name
-          label: Text(headline.eventCountry!.name),
+          label: Text(country.name),
           labelStyle: chipLabelStyle,
           backgroundColor: chipBackgroundColor,
           padding: chipPadding,

@@ -47,15 +47,6 @@ dependencies:
   ht_kv_storage_shared_preferences:
     git:
       url: https://github.com/headlines-toolkit/ht-kv-storage-shared-preferences.git
-  ht_preferences_client:
-    git:
-      url: https://github.com/headlines-toolkit/ht-preferences-client.git
-  ht_preferences_firestore:
-    git:
-      url: https://github.com/headlines-toolkit/ht-preferences-firestore.git
-  ht_preferences_repository:
-    git:
-      url: https://github.com/headlines-toolkit/ht-preferences-repository.git
   ht_shared:
     git:
       url: https://github.com/headlines-toolkit/ht-shared.git

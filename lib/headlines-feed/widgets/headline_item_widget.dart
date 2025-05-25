@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ht_headlines_client/ht_headlines_client.dart' show Headline;
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/constants/constants.dart'; // Import AppSpacing
+import 'package:ht_shared/ht_shared.dart'; // Import models from ht_shared
 import 'package:intl/intl.dart'; // For date formatting
 
 /// A widget that displays a single headline with enhanced styling.
@@ -134,10 +134,19 @@ class HeadlineItemWidget extends StatelessWidget {
                             icon: Icons.category_outlined,
                             text: headline.category!.name,
                           ),
-                        if (headline.eventCountry != null)
+                        if (headline.source?.headquarters !=
+                            null) // Use source?.headquarters
                           _CountryMetadataItem(
-                            flagUrl: headline.eventCountry!.flagUrl,
-                            countryName: headline.eventCountry!.name,
+                            flagUrl:
+                                headline
+                                    .source!
+                                    .headquarters!
+                                    .flagUrl, // Access flagUrl from headquarters
+                            countryName:
+                                headline
+                                    .source!
+                                    .headquarters!
+                                    .name, // Access name from headquarters
                           ),
                       ],
                     ),

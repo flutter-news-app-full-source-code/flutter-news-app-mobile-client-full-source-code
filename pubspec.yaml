@@ -20,12 +20,12 @@ dependencies:
   flutter_native_splash: ^2.4.5
   go_router: ^15.0.0
   google_fonts: ^6.2.1
+    ht_auth_api:
+    git:
+      url: https://github.com/headlines-toolkit/ht-auth-api.git
   ht_auth_client:
     git:
       url: https://github.com/headlines-toolkit/ht-auth-client.git
-  ht_auth_api:
-    git:
-      url: https://github.com/headlines-toolkit/ht-auth-api.git
   ht_auth_repository:
     git:
       url: https://github.com/headlines-toolkit/ht-auth-repository.git

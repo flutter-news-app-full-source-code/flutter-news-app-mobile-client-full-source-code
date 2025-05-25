@@ -8,8 +8,7 @@ import 'package:ht_main/headlines-feed/bloc/sources_filter_bloc.dart'; // Import
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/shared/constants/constants.dart';
 import 'package:ht_main/shared/widgets/widgets.dart'; // For loading/error widgets
-import 'package:ht_sources_client/ht_sources_client.dart';
-// Removed repository import: import 'package:ht_sources_repository/ht_sources_repository.dart';
+import 'package:ht_shared/ht_shared.dart' show Source; // Import Source model
 
 /// {@template source_filter_page}
 /// A page dedicated to selecting news sources for filtering headlines.

@@ -48,11 +48,11 @@ abstract final class Routes {
   static const accountLinking = 'linking'; // Query param context, not a path
   static const accountLinkingName = 'accountLinking'; // Name for context
 
-  // routes for email sign-in flow
-  static const emailSignIn = 'email-sign-in';
-  static const emailSignInName = 'emailSignIn';
-  static const emailLinkSent = 'email-link-sent';
-  static const emailLinkSentName = 'emailLinkSent';
+  // routes for email code verification flow
+  static const requestCode = 'request-code';
+  static const requestCodeName = 'requestCode';
+  static const verifyCode = 'verify-code';
+  static const verifyCodeName = 'verifyCode';
 
   // --- Settings Sub-Routes (relative to /account/settings) ---
   static const settingsAppearance = 'appearance';
@@ -66,4 +66,10 @@ abstract final class Routes {
   // Add names for notification sub-selection routes if needed later
   // static const settingsNotificationCategories = 'categories';
   // static const settingsNotificationCategoriesName = 'settingsNotificationCategories';
+
+  // --- Account Sub-Routes (relative to /account) ---
+  static const accountContentPreferences = 'content-preferences';
+  static const accountContentPreferencesName = 'accountContentPreferences';
+  static const accountSavedHeadlines = 'saved-headlines';
+  static const accountSavedHeadlinesName = 'accountSavedHeadlines';
 }

@@ -1,33 +1,30 @@
 //
 // ignore_for_file: deprecated_member_use
 
-import 'dart:async';
-
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ht_authentication_repository/ht_authentication_repository.dart';
-import 'package:ht_categories_repository/ht_categories_repository.dart';
-import 'package:ht_countries_repository/ht_countries_repository.dart';
-import 'package:ht_headlines_repository/ht_headlines_repository.dart';
-import 'package:ht_kv_storage_service/ht_kv_storage_service.dart';
+import 'package:ht_auth_repository/ht_auth_repository.dart'; // Auth Repository
+import 'package:ht_data_repository/ht_data_repository.dart'; // Generic Data Repository
+import 'package:ht_kv_storage_service/ht_kv_storage_service.dart'; // KV Storage Interface
 import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/router.dart';
 import 'package:ht_main/shared/theme/app_theme.dart';
-import 'package:ht_preferences_repository/ht_preferences_repository.dart'; // Added
-import 'package:ht_sources_repository/ht_sources_repository.dart';
+import 'package:ht_shared/ht_shared.dart'; // Shared models, FromJson, ToJson, etc.
 
 class App extends StatelessWidget {
   const App({
-    required HtAuthenticationRepository htAuthenticationRepository,
-    required HtHeadlinesRepository htHeadlinesRepository,
-    required HtCategoriesRepository htCategoriesRepository,
-    required HtCountriesRepository htCountriesRepository,
-    required HtSourcesRepository htSourcesRepository,
-    required HtPreferencesRepository htPreferencesRepository, // Added
+    required HtAuthRepository htAuthenticationRepository,
+    required HtDataRepository<Headline> htHeadlinesRepository,
+    required HtDataRepository<Category> htCategoriesRepository,
+    required HtDataRepository<Country> htCountriesRepository,
+    required HtDataRepository<Source> htSourcesRepository,
+    required HtDataRepository<UserAppSettings> htUserAppSettingsRepository,
+    required HtDataRepository<UserContentPreferences>
+    htUserContentPreferencesRepository,
+    required HtDataRepository<AppConfig> htAppConfigRepository,
     required HtKVStorageService kvStorageService,
     super.key,
   }) : _htAuthenticationRepository = htAuthenticationRepository,
@@ -35,15 +32,20 @@ class App extends StatelessWidget {
        _htCategoriesRepository = htCategoriesRepository,
        _htCountriesRepository = htCountriesRepository,
        _htSourcesRepository = htSourcesRepository,
-       _htPreferencesRepository = htPreferencesRepository, // Added
+       _htUserAppSettingsRepository = htUserAppSettingsRepository,
+       _htUserContentPreferencesRepository = htUserContentPreferencesRepository,
+       _htAppConfigRepository = htAppConfigRepository,
        _kvStorageService = kvStorageService;
 
-  final HtAuthenticationRepository _htAuthenticationRepository;
-  final HtHeadlinesRepository _htHeadlinesRepository;
-  final HtCategoriesRepository _htCategoriesRepository;
-  final HtCountriesRepository _htCountriesRepository;
-  final HtSourcesRepository _htSourcesRepository;
-  final HtPreferencesRepository _htPreferencesRepository; // Added
+  final HtAuthRepository _htAuthenticationRepository;
+  final HtDataRepository<Headline> _htHeadlinesRepository;
+  final HtDataRepository<Category> _htCategoriesRepository;
+  final HtDataRepository<Country> _htCountriesRepository;
+  final HtDataRepository<Source> _htSourcesRepository;
+  final HtDataRepository<UserAppSettings> _htUserAppSettingsRepository;
+  final HtDataRepository<UserContentPreferences>
+  _htUserContentPreferencesRepository;
+  final HtDataRepository<AppConfig> _htAppConfigRepository;
   final HtKVStorageService _kvStorageService;
 
   @override
@@ -55,26 +57,28 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _htCategoriesRepository),
         RepositoryProvider.value(value: _htCountriesRepository),
         RepositoryProvider.value(value: _htSourcesRepository),
-        RepositoryProvider.value(value: _htPreferencesRepository), // Added
+        RepositoryProvider.value(value: _htUserAppSettingsRepository),
+        RepositoryProvider.value(value: _htUserContentPreferencesRepository),
+        RepositoryProvider.value(value: _htAppConfigRepository),
         RepositoryProvider.value(value: _kvStorageService),
       ],
       // Use MultiBlocProvider to provide global BLoCs
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
+            // AppBloc constructor needs refactoring in Step 4
             create:
                 (context) => AppBloc(
-                  authenticationRepository:
-                      context.read<HtAuthenticationRepository>(),
-                  preferencesRepository:
-                      context.read<HtPreferencesRepository>(), // Added
+                  authenticationRepository: context.read<HtAuthRepository>(),
+                  // Pass generic data repositories for preferences
+                  userAppSettingsRepository:
+                      context.read<HtDataRepository<UserAppSettings>>(),
                 ),
           ),
           BlocProvider(
             create:
                 (context) => AuthenticationBloc(
-                  authenticationRepository:
-                      context.read<HtAuthenticationRepository>(),
+                  authenticationRepository: context.read<HtAuthRepository>(),
                 ),
           ),
         ],
@@ -84,7 +88,10 @@ class App extends StatelessWidget {
           htCategoriesRepository: _htCategoriesRepository,
           htCountriesRepository: _htCountriesRepository,
           htSourcesRepository: _htSourcesRepository,
-          htPreferencesRepository: _htPreferencesRepository, // Pass down
+          htUserAppSettingsRepository: _htUserAppSettingsRepository,
+          htUserContentPreferencesRepository:
+              _htUserContentPreferencesRepository,
+          htAppConfigRepository: _htAppConfigRepository,
         ),
       ),
     );
@@ -98,15 +105,20 @@ class _AppView extends StatefulWidget {
     required this.htCategoriesRepository,
     required this.htCountriesRepository,
     required this.htSourcesRepository,
-    required this.htPreferencesRepository, // Added
+    required this.htUserAppSettingsRepository,
+    required this.htUserContentPreferencesRepository,
+    required this.htAppConfigRepository,
   });
 
-  final HtAuthenticationRepository htAuthenticationRepository;
-  final HtHeadlinesRepository htHeadlinesRepository;
-  final HtCategoriesRepository htCategoriesRepository;
-  final HtCountriesRepository htCountriesRepository;
-  final HtSourcesRepository htSourcesRepository;
-  final HtPreferencesRepository htPreferencesRepository; // Added
+  final HtAuthRepository htAuthenticationRepository;
+  final HtDataRepository<Headline> htHeadlinesRepository;
+  final HtDataRepository<Category> htCategoriesRepository;
+  final HtDataRepository<Country> htCountriesRepository;
+  final HtDataRepository<Source> htSourcesRepository;
+  final HtDataRepository<UserAppSettings> htUserAppSettingsRepository;
+  final HtDataRepository<UserContentPreferences>
+  htUserContentPreferencesRepository;
+  final HtDataRepository<AppConfig> htAppConfigRepository;
 
   @override
   State<_AppView> createState() => _AppViewState();
@@ -116,7 +128,7 @@ class _AppViewState extends State<_AppView> {
   late final GoRouter _router;
   // Standard notifier that GoRouter listens to.
   late final ValueNotifier<AppStatus> _statusNotifier;
-  StreamSubscription<PendingDynamicLinkData>? _linkSubscription;
+  // Removed Dynamic Links subscription
 
   @override
   void initState() {
@@ -131,89 +143,23 @@ class _AppViewState extends State<_AppView> {
       htCategoriesRepository: widget.htCategoriesRepository,
       htCountriesRepository: widget.htCountriesRepository,
       htSourcesRepository: widget.htSourcesRepository,
-      htPreferencesRepository: widget.htPreferencesRepository, // Pass to router
+      htUserAppSettingsRepository: widget.htUserAppSettingsRepository,
+      htUserContentPreferencesRepository:
+          widget.htUserContentPreferencesRepository,
+      htAppConfigRepository: widget.htAppConfigRepository,
     );
 
-    // --- Initialize Deep Link Handling ---
-    _initDynamicLinks();
-    // -------------------------------------
+    // Removed Dynamic Link Initialization
   }
 
   @override
   void dispose() {
-    _linkSubscription?.cancel();
     _statusNotifier.dispose(); // Dispose the correct notifier
+    // Removed Dynamic Links subscription cancellation
     super.dispose();
   }
 
-  /// Initializes Firebase Dynamic Links listeners.
-  Future<void> _initDynamicLinks() async {
-    // Handle links received while the app is running
-    _linkSubscription = FirebaseDynamicLinks.instance.onLink.listen(
-      (pendingDynamicLinkData) {
-        _handleDynamicLink(pendingDynamicLinkData.link);
-      },
-      onError: (Object error) {
-        debugPrint('Dynamic Link Listener Error: $error');
-      },
-    );
-
-    // Handle initial link that opened the app
-    try {
-      final initialLink = await FirebaseDynamicLinks.instance.getInitialLink();
-      if (initialLink != null) {
-        await _handleDynamicLink(initialLink.link);
-      }
-    } catch (e) {
-      debugPrint('Error getting initial dynamic link: $e');
-    }
-  }
-
-  /// Processes a received dynamic link URI.
-  Future<void> _handleDynamicLink(Uri deepLink) async {
-    // Read BLoC and Repo before the first await.
-    // The mounted check should ideally happen *before* accessing context.
-    if (!mounted) return;
-    final authRepo = context.read<HtAuthenticationRepository>();
-    // Store the BLoC instance in a local variable BEFORE the await
-    final authBloc = context.read<AuthenticationBloc>();
-    final linkString = deepLink.toString();
-
-    debugPrint('Handling dynamic link: $linkString');
-
-    try {
-      // The async gap happens here
-      final isSignInLink = await authRepo.isSignInWithEmailLink(
-        emailLink: linkString,
-      );
-      debugPrint('Is sign-in link: $isSignInLink');
-
-      // Check mounted again *after* the await before using BLoC/state
-      if (!mounted) return;
-
-      if (isSignInLink) {
-        // Use the local variable 'authBloc' instead of context.read again
-        authBloc.add(
-          AuthenticationSignInWithLinkAttempted(emailLink: linkString),
-        );
-        debugPrint('Dispatched AuthenticationSignInWithLinkAttempted');
-      } else {
-        // Handle other types of deep links if necessary
-        debugPrint(
-          'Received deep link is not an email sign-in link: $linkString',
-        );
-      }
-    } catch (e, st) {
-      // Catch potential errors during validation/dispatch
-      debugPrint('Error handling dynamic link: $e\n$st');
-      // Optionally show a generic error message to the user via
-      // a SnackBar or Dialog:
-      //
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(content: Text('Error processing link: $e')),
-      // );
-    }
-  }
+  // Removed _initDynamicLinks and _handleDynamicLink methods
 
   @override
   Widget build(BuildContext context) {
@@ -229,13 +175,14 @@ class _AppViewState extends State<_AppView> {
         _statusNotifier.value = state.status;
       },
       child: BlocBuilder<AppBloc, AppState>(
-        // Build when theme-related properties change (including font size)
+        // Build when theme-related properties change (including text scale factor)
         buildWhen:
             (previous, current) =>
                 previous.themeMode != current.themeMode ||
                 previous.flexScheme != current.flexScheme ||
                 previous.fontFamily != current.fontFamily ||
-                previous.appFontSize != current.appFontSize, // Added condition
+                previous.appTextScaleFactor !=
+                    current.appTextScaleFactor, // Use text scale factor
         builder: (context, state) {
           return MaterialApp.router(
             debugShowCheckedModeBanner: false,
@@ -243,13 +190,15 @@ class _AppViewState extends State<_AppView> {
             // Pass scheme and font family from state to theme functions
             theme: lightTheme(
               scheme: state.flexScheme,
-              fontFamily: state.fontFamily,
-              appFontSize: state.appFontSize, // Pass font size
+              appTextScaleFactor:
+                  state.settings.displaySettings.textScaleFactor,
+              fontFamily: state.settings.displaySettings.fontFamily,
             ),
             darkTheme: darkTheme(
               scheme: state.flexScheme,
-              fontFamily: state.fontFamily,
-              appFontSize: state.appFontSize, // Pass font size
+              appTextScaleFactor:
+                  state.settings.displaySettings.textScaleFactor,
+              fontFamily: state.settings.displaySettings.fontFamily,
             ),
             routerConfig: _router,
             localizationsDelegates: AppLocalizations.localizationsDelegates,

@@ -4,14 +4,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ht_categories_client/ht_categories_client.dart';
-import 'package:ht_countries_client/ht_countries_client.dart';
 import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:ht_main/headlines-feed/models/headline_filter.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/constants/constants.dart';
-import 'package:ht_sources_client/ht_sources_client.dart';
+import 'package:ht_shared/ht_shared.dart'
+    show Category, Country, Source; // Import models from ht_shared
 
 /// {@template headlines_filter_page}
 /// A full-screen dialog page for selecting headline filters.

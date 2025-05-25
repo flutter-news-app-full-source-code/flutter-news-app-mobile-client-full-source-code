@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart'; // For transformers
 import 'package:equatable/equatable.dart';
-import 'package:ht_countries_client/ht_countries_client.dart'; // For Country model and exceptions
-import 'package:ht_countries_repository/ht_countries_repository.dart';
-// For PaginatedResponse
+import 'package:ht_data_repository/ht_data_repository.dart'; // Generic Data Repository
+import 'package:ht_shared/ht_shared.dart'
+    show
+        Country,
+        HtHttpException; // Shared models, including Country and standardized exceptions
 
 part 'countries_filter_event.dart';
 part 'countries_filter_state.dart';
@@ -14,14 +16,14 @@ part 'countries_filter_state.dart';
 /// Manages the state for fetching and displaying countries for filtering.
 ///
 /// Handles initial fetching and pagination of countries using the
-/// provided [HtCountriesRepository].
+/// provided [HtDataRepository].
 /// {@endtemplate}
 class CountriesFilterBloc
     extends Bloc<CountriesFilterEvent, CountriesFilterState> {
   /// {@macro countries_filter_bloc}
   ///
-  /// Requires a [HtCountriesRepository] to interact with the data layer.
-  CountriesFilterBloc({required HtCountriesRepository countriesRepository})
+  /// Requires a [HtDataRepository<Country>] to interact with the data layer.
+  CountriesFilterBloc({required HtDataRepository<Country> countriesRepository})
     : _countriesRepository = countriesRepository,
       super(const CountriesFilterState()) {
     on<CountriesFilterRequested>(
@@ -34,7 +36,7 @@ class CountriesFilterBloc
     );
   }
 
-  final HtCountriesRepository _countriesRepository;
+  final HtDataRepository<Country> _countriesRepository;
 
   /// Number of countries to fetch per page.
   static const _countriesLimit = 20;
@@ -53,8 +55,7 @@ class CountriesFilterBloc
     emit(state.copyWith(status: CountriesFilterStatus.loading));
 
     try {
-      // Note: Repository uses 'cursor' parameter name here
-      final response = await _countriesRepository.fetchCountries(
+      final response = await _countriesRepository.readAll(
         limit: _countriesLimit,
       );
       emit(
@@ -66,7 +67,7 @@ class CountriesFilterBloc
           clearError: true, // Clear any previous error
         ),
       );
-    } on CountryFetchFailure catch (e) {
+    } on HtHttpException catch (e) {
       emit(state.copyWith(status: CountriesFilterStatus.failure, error: e));
     } catch (e) {
       // Catch unexpected errors
@@ -87,10 +88,9 @@ class CountriesFilterBloc
     emit(state.copyWith(status: CountriesFilterStatus.loadingMore));
 
     try {
-      // Note: Repository uses 'cursor' parameter name here
-      final response = await _countriesRepository.fetchCountries(
+      final response = await _countriesRepository.readAll(
         limit: _countriesLimit,
-        cursor: state.cursor, // Use the cursor from the current state
+        startAfterId: state.cursor, // Use the cursor from the current state
       );
       emit(
         state.copyWith(
@@ -101,7 +101,7 @@ class CountriesFilterBloc
           cursor: response.cursor,
         ),
       );
-    } on CountryFetchFailure catch (e) {
+    } on HtHttpException catch (e) {
       // Keep existing data but indicate failure
       emit(state.copyWith(status: CountriesFilterStatus.failure, error: e));
     } catch (e) {

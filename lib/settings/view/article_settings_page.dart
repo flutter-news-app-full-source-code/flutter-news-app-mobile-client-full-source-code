@@ -3,7 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/settings/bloc/settings_bloc.dart';
 import 'package:ht_main/shared/constants/constants.dart';
-import 'package:ht_preferences_client/ht_preferences_client.dart';
+import 'package:ht_shared/ht_shared.dart'
+    show AppTextScaleFactor; // Import new enum
 
 /// {@template article_settings_page}
 /// A page for configuring article display settings.
@@ -12,15 +13,21 @@ class ArticleSettingsPage extends StatelessWidget {
   /// {@macro article_settings_page}
   const ArticleSettingsPage({super.key});
 
-  // Helper to map FontSize enum to user-friendly strings
-  String _fontSizeToString(FontSize size, AppLocalizations l10n) {
-    switch (size) {
-      case FontSize.small:
+  // Helper to map AppTextScaleFactor enum to user-friendly strings
+  String _textScaleFactorToString(
+    AppTextScaleFactor factor,
+    AppLocalizations l10n,
+  ) {
+    switch (factor) {
+      case AppTextScaleFactor.small:
         return l10n.settingsAppearanceFontSizeSmall; // Reuse key
-      case FontSize.large:
-        return l10n.settingsAppearanceFontSizeLarge; // Reuse key
-      case FontSize.medium:
+      case AppTextScaleFactor.medium:
         return l10n.settingsAppearanceFontSizeMedium; // Reuse key
+      case AppTextScaleFactor.large:
+        return l10n.settingsAppearanceFontSizeLarge; // Reuse key
+      case AppTextScaleFactor.extraLarge:
+        return l10n
+            .settingsAppearanceFontSizeExtraLarge; // Add l10n key if needed
     }
   }
 
@@ -48,15 +55,21 @@ class ArticleSettingsPage extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.lg),
         children: [
           // --- Article Font Size ---
-          _buildDropdownSetting<FontSize>(
+          _buildDropdownSetting<AppTextScaleFactor>(
             context: context,
             title: l10n.settingsArticleFontSizeLabel, // Add l10n key
-            currentValue: state.articleSettings.articleFontSize,
-            items: FontSize.values,
-            itemToString: (size) => _fontSizeToString(size, l10n),
+            currentValue:
+                state
+                    .userAppSettings
+                    .displaySettings
+                    .textScaleFactor, // Use new model field
+            items: AppTextScaleFactor.values,
+            itemToString: (factor) => _textScaleFactorToString(factor, l10n),
             onChanged: (value) {
               if (value != null) {
-                settingsBloc.add(SettingsArticleFontSizeChanged(value));
+                settingsBloc.add(
+                  SettingsAppFontSizeChanged(value),
+                ); // Use new event
               }
             },
           ),

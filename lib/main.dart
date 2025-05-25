@@ -5,11 +5,10 @@ import 'package:ht_auth_repository/ht_auth_repository.dart'; // Auth Repository
 import 'package:ht_data_api/ht_data_api.dart'; // Concrete Data Client Impl
 import 'package:ht_data_repository/ht_data_repository.dart'; // Data Repository
 import 'package:ht_http_client/ht_http_client.dart'; // HTTP Client
-import 'package:ht_kv_storage_service/ht_kv_storage_service.dart'; // KV Storage Interface
 import 'package:ht_kv_storage_shared_preferences/ht_kv_storage_shared_preferences.dart'; // KV Storage Impl
-import 'package:ht_shared/ht_shared.dart'; // Shared models, FromJson, ToJson, etc.
 import 'package:ht_main/app/app.dart'; // The App widget
 import 'package:ht_main/bloc_observer.dart'; // App Bloc Observer
+import 'package:ht_shared/ht_shared.dart'; // Shared models, FromJson, ToJson, etc.
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -94,9 +93,7 @@ void main() async {
     fromJson: Source.fromJson,
     toJson: (source) => source.toJson(),
   );
-  final sourcesRepository = HtDataRepository<Source>(
-    dataClient: sourcesClient,
-  );
+  final sourcesRepository = HtDataRepository<Source>(dataClient: sourcesClient);
 
   final userContentPreferencesClient = HtDataApi<UserContentPreferences>(
     httpClient: httpClient,
@@ -106,8 +103,8 @@ void main() async {
   );
   final userContentPreferencesRepository =
       HtDataRepository<UserContentPreferences>(
-    dataClient: userContentPreferencesClient,
-  );
+        dataClient: userContentPreferencesClient,
+      );
 
   final userAppSettingsClient = HtDataApi<UserAppSettings>(
     httpClient: httpClient,
@@ -137,17 +134,14 @@ void main() async {
   runApp(
     App(
       htAuthenticationRepository: authenticationRepository,
-      // Passing generic repositories where specific types were expected.
-      // This will be fixed in the next step.
-      htHeadlinesRepository: headlinesRepository as dynamic, // Temporary cast
-      htCategoriesRepository: categoriesRepository as dynamic, // Temporary cast
-      htCountriesRepository: countriesRepository as dynamic, // Temporary cast
-      htSourcesRepository: sourcesRepository as dynamic, // Temporary cast
-      // Pass UserAppSettings and UserContentPreferences repositories directly
-      htUserAppSettingsRepository: userAppSettingsRepository as dynamic, // Temporary cast
-      htUserContentPreferencesRepository: userContentPreferencesRepository as dynamic, // Temporary cast
-      // htAppConfigRepository: appConfigRepository, // App widget constructor doesn't accept this yet
-      kvStorageService: kvStorage, // Keep as per existing constructor
+      htHeadlinesRepository: headlinesRepository,
+      htCategoriesRepository: categoriesRepository,
+      htCountriesRepository: countriesRepository,
+      htSourcesRepository: sourcesRepository,
+      htUserAppSettingsRepository: userAppSettingsRepository,
+      htUserContentPreferencesRepository: userContentPreferencesRepository,
+      htAppConfigRepository: appConfigRepository,
+      kvStorageService: kvStorage,
     ),
   );
 }

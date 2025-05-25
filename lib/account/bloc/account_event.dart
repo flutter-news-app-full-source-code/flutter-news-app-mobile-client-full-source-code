@@ -1,24 +1,40 @@
 part of 'account_bloc.dart';
 
-/// Base class for all events related to the Account feature.
-abstract class AccountEvent extends Equatable {
+/// {@template account_event}
+/// Base class for Account events.
+/// {@endtemplate}
+sealed class AccountEvent extends Equatable {
+  /// {@macro account_event}
   const AccountEvent();
 
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
-/// Event triggered when the user requests to navigate to the settings page.
-class AccountSettingsNavigationRequested extends AccountEvent {
-  const AccountSettingsNavigationRequested();
+/// {@template _account_user_changed}
+/// Internal event triggered when the authenticated user changes.
+/// {@endtemplate}
+final class _AccountUserChanged extends AccountEvent {
+  /// {@macro _account_user_changed}
+  const _AccountUserChanged({required this.user});
+
+  /// The current authenticated user, or null if unauthenticated.
+  final User? user;
+
+  @override
+  List<Object?> get props => [user];
 }
 
-/// Event triggered when the user requests to log out.
-class AccountLogoutRequested extends AccountEvent {
-  const AccountLogoutRequested();
-}
+/// {@template account_load_content_preferences_requested}
+/// Event triggered when the user's content preferences need to be loaded.
+/// {@endtemplate}
+final class AccountLoadContentPreferencesRequested extends AccountEvent {
+  /// {@macro account_load_content_preferences_requested}
+  const AccountLoadContentPreferencesRequested({required this.userId});
 
-/// Event triggered when the user (anonymous) requests to backup/link account.
-class AccountBackupNavigationRequested extends AccountEvent {
-  const AccountBackupNavigationRequested();
+  /// The ID of the user whose content preferences should be loaded.
+  final String userId;
+
+  @override
+  List<Object> get props => [userId];
 }

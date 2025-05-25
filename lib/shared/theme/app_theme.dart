@@ -4,7 +4,7 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:ht_preferences_client/ht_preferences_client.dart'; // Added for FontSize
+import 'package:ht_shared/ht_shared.dart';
 
 // --- Common Sub-theme Settings ---
 // Defines customizations for various components, shared between light/dark themes.
@@ -33,17 +33,19 @@ const FlexSubThemesData _commonSubThemesData = FlexSubThemesData(
 // Helper function to apply common text theme customizations
 TextTheme _customizeTextTheme(
   TextTheme baseTextTheme, {
-  required FontSize appFontSize, // Added parameter
+  required AppTextScaleFactor appTextScaleFactor, // Added parameter
 }) {
   // Define font size factors
   double factor;
-  switch (appFontSize) {
-    case FontSize.small:
+  switch (appTextScaleFactor) {
+    case AppTextScaleFactor.small:
       factor = 0.85;
-    case FontSize.large:
+    case AppTextScaleFactor.large:
       factor = 1.15;
-    case FontSize.medium:
+    case AppTextScaleFactor.medium:
       factor = 1.0;
+    case AppTextScaleFactor.extraLarge:
+      factor = 1.3; // Define factor for extraLarge
   }
 
   // Helper to apply factor safely
@@ -118,10 +120,10 @@ TextTheme Function([TextTheme?]) _getGoogleFontTextTheme(String? fontFamily) {
 
 /// Defines the application's light theme using FlexColorScheme.
 ///
-/// Takes the active [scheme], [appFontSize], and optional [fontFamily].
+/// Takes the active [scheme], [appTextScaleFactor], and optional [fontFamily].
 ThemeData lightTheme({
   required FlexScheme scheme,
-  required FontSize appFontSize, // Added parameter
+  required AppTextScaleFactor appTextScaleFactor, // Added parameter
   String? fontFamily,
 }) {
   final textThemeGetter = _getGoogleFontTextTheme(fontFamily);
@@ -130,18 +132,21 @@ ThemeData lightTheme({
   return FlexThemeData.light(
     scheme: scheme,
     fontFamily: fontFamily,
-    // Pass appFontSize to customizeTextTheme
-    textTheme: _customizeTextTheme(baseTextTheme, appFontSize: appFontSize),
+    // Pass appTextScaleFactor to customizeTextTheme
+    textTheme: _customizeTextTheme(
+      baseTextTheme,
+      appTextScaleFactor: appTextScaleFactor,
+    ),
     subThemesData: _commonSubThemesData,
   );
 }
 
 /// Defines the application's dark theme using FlexColorScheme.
 ///
-/// Takes the active [scheme], [appFontSize], and optional [fontFamily].
+/// Takes the active [scheme], [appTextScaleFactor], and optional [fontFamily].
 ThemeData darkTheme({
   required FlexScheme scheme,
-  required FontSize appFontSize, // Added parameter
+  required AppTextScaleFactor appTextScaleFactor, // Added parameter
   String? fontFamily,
 }) {
   final textThemeGetter = _getGoogleFontTextTheme(fontFamily);
@@ -152,8 +157,11 @@ ThemeData darkTheme({
   return FlexThemeData.dark(
     scheme: scheme,
     fontFamily: fontFamily,
-    // Pass appFontSize to customizeTextTheme
-    textTheme: _customizeTextTheme(baseTextTheme, appFontSize: appFontSize),
+    // Pass appTextScaleFactor to customizeTextTheme
+    textTheme: _customizeTextTheme(
+      baseTextTheme,
+      appTextScaleFactor: appTextScaleFactor,
+    ),
     subThemesData: _commonSubThemesData,
   );
 }

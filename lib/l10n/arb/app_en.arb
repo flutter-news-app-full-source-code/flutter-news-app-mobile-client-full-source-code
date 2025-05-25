@@ -80,6 +80,24 @@
     "@accountBackupTile": {
         "description": "Title for the tile prompting anonymous users to create an account"
     },
+    "accountContentPreferencesTile": "Content Preferences",
+    "@accountContentPreferencesTile": {
+        "description": "Title for the content preferences navigation tile in the account page"
+    },
+    "accountSavedHeadlinesTile": "Saved Headlines",
+    "@accountSavedHeadlinesTile": {
+        "description": "Title for the saved headlines navigation tile in the account page"
+    },
+    "accountRoleLabel": "Role: {role}",
+    "@accountRoleLabel": {
+        "description": "Label displaying the user's role in the account header",
+        "placeholders": {
+            "role": {
+                "type": "String",
+                "example": "admin"
+            }
+        }
+    },
     "authenticationEmailSentSuccess": "Check your email for the sign-in link.",
     "@authenticationEmailSentSuccess": {
         "description": "Success message shown after sending an email sign-in link on the authentication page"
@@ -359,66 +377,129 @@
         "description": "Subheadline for empty state on source filter page"
     },
     "settingsTitle": "Settings",
-    "@settingsTitle": { "description": "Title for the main settings page" },
+    "@settingsTitle": {
+        "description": "Title for the main settings page"
+    },
     "settingsLoadingHeadline": "Loading Settings...",
-    "@settingsLoadingHeadline": { "description": "Headline shown while settings are loading" },
+    "@settingsLoadingHeadline": {
+        "description": "Headline shown while settings are loading"
+    },
     "settingsLoadingSubheadline": "Please wait while we fetch your preferences.",
-    "@settingsLoadingSubheadline": { "description": "Subheadline shown while settings are loading" },
+    "@settingsLoadingSubheadline": {
+        "description": "Subheadline shown while settings are loading"
+    },
     "settingsErrorDefault": "Could not load settings.",
-    "@settingsErrorDefault": { "description": "Default error message when settings fail to load" },
+    "@settingsErrorDefault": {
+        "description": "Default error message when settings fail to load"
+    },
     "settingsAppearanceTitle": "Appearance",
-    "@settingsAppearanceTitle": { "description": "Title for the appearance settings section/page" },
+    "@settingsAppearanceTitle": {
+        "description": "Title for the appearance settings section/page"
+    },
     "settingsFeedDisplayTitle": "Feed Display",
-    "@settingsFeedDisplayTitle": { "description": "Title for the feed display settings section/page" },
+    "@settingsFeedDisplayTitle": {
+        "description": "Title for the feed display settings section/page"
+    },
     "settingsArticleDisplayTitle": "Article Display",
-    "@settingsArticleDisplayTitle": { "description": "Title for the article display settings section/page" },
+    "@settingsArticleDisplayTitle": {
+        "description": "Title for the article display settings section/page"
+    },
     "settingsNotificationsTitle": "Notifications",
-    "@settingsNotificationsTitle": { "description": "Title for the notification settings section/page" },
+    "@settingsNotificationsTitle": {
+        "description": "Title for the notification settings section/page"
+    },
     "settingsAppearanceThemeModeLight": "Light",
-    "@settingsAppearanceThemeModeLight": { "description": "Label for the light theme mode option" },
+    "@settingsAppearanceThemeModeLight": {
+        "description": "Label for the light theme mode option"
+    },
     "settingsAppearanceThemeModeDark": "Dark",
-    "@settingsAppearanceThemeModeDark": { "description": "Label for the dark theme mode option" },
+    "@settingsAppearanceThemeModeDark": {
+        "description": "Label for the dark theme mode option"
+    },
     "settingsAppearanceThemeModeSystem": "System",
-    "@settingsAppearanceThemeModeSystem": { "description": "Label for the system theme mode option" },
+    "@settingsAppearanceThemeModeSystem": {
+        "description": "Label for the system theme mode option"
+    },
     "settingsAppearanceThemeNameRed": "Red",
-    "@settingsAppearanceThemeNameRed": { "description": "Label for the red color scheme option" },
+    "@settingsAppearanceThemeNameRed": {
+        "description": "Label for the red color scheme option"
+    },
     "settingsAppearanceThemeNameBlue": "Blue",
-    "@settingsAppearanceThemeNameBlue": { "description": "Label for the blue color scheme option" },
+    "@settingsAppearanceThemeNameBlue": {
+        "description": "Label for the blue color scheme option"
+    },
     "settingsAppearanceThemeNameGrey": "Grey",
-    "@settingsAppearanceThemeNameGrey": { "description": "Label for the grey color scheme option" },
+    "@settingsAppearanceThemeNameGrey": {
+        "description": "Label for the grey color scheme option"
+    },
     "settingsAppearanceFontSizeSmall": "Small",
-    "@settingsAppearanceFontSizeSmall": { "description": "Label for the small font size option" },
+    "@settingsAppearanceFontSizeSmall": {
+        "description": "Label for the small font size option"
+    },
     "settingsAppearanceFontSizeLarge": "Large",
-    "@settingsAppearanceFontSizeLarge": { "description": "Label for the large font size option" },
+    "@settingsAppearanceFontSizeLarge": {
+        "description": "Label for the large font size option"
+    },
     "settingsAppearanceFontSizeMedium": "Medium",
-    "@settingsAppearanceFontSizeMedium": { "description": "Label for the medium font size option" },
+    "@settingsAppearanceFontSizeMedium": {
+        "description": "Label for the medium font size option"
+    },
     "settingsAppearanceThemeModeLabel": "Theme Mode",
-    "@settingsAppearanceThemeModeLabel": { "description": "Label for the theme mode selection dropdown" },
+    "@settingsAppearanceThemeModeLabel": {
+        "description": "Label for the theme mode selection dropdown"
+    },
     "settingsAppearanceThemeNameLabel": "Color Scheme",
-    "@settingsAppearanceThemeNameLabel": { "description": "Label for the color scheme selection dropdown" },
+    "@settingsAppearanceThemeNameLabel": {
+        "description": "Label for the color scheme selection dropdown"
+    },
     "settingsAppearanceAppFontSizeLabel": "App Font Size",
-    "@settingsAppearanceAppFontSizeLabel": { "description": "Label for the app font size selection dropdown" },
+    "@settingsAppearanceAppFontSizeLabel": {
+        "description": "Label for the app font size selection dropdown"
+    },
     "settingsAppearanceAppFontTypeLabel": "App Font",
-    "@settingsAppearanceAppFontTypeLabel": { "description": "Label for the app font selection dropdown" },
+    "@settingsAppearanceAppFontTypeLabel": {
+        "description": "Label for the app font selection dropdown"
+    },
+    "settingsAppearanceFontWeightLabel": "Font Weight",
+    "@settingsAppearanceFontWeightLabel": {
+        "description": "Label for the font weight setting."
+    },
     "settingsFeedTileTypeImageTop": "Image Top",
-    "@settingsFeedTileTypeImageTop": { "description": "Label for the feed tile type with image on top" },
+    "@settingsFeedTileTypeImageTop": {
+        "description": "Label for the feed tile type with image on top"
+    },
     "settingsFeedTileTypeImageStart": "Image Start",
-    "@settingsFeedTileTypeImageStart": { "description": "Label for the feed tile type with image at the start" },
+    "@settingsFeedTileTypeImageStart": {
+        "description": "Label for the feed tile type with image at the start"
+    },
     "settingsFeedTileTypeTextOnly": "Text Only",
-    "@settingsFeedTileTypeTextOnly": { "description": "Label for the feed tile type with text only" },
+    "@settingsFeedTileTypeTextOnly": {
+        "description": "Label for the feed tile type with text only"
+    },
     "settingsFeedTileTypeLabel": "Feed Tile Layout",
-    "@settingsFeedTileTypeLabel": { "description": "Label for the feed tile layout selection dropdown" },
+    "@settingsFeedTileTypeLabel": {
+        "description": "Label for the feed tile layout selection dropdown"
+    },
     "settingsArticleFontSizeLabel": "Article Font Size",
-    "@settingsArticleFontSizeLabel": { "description": "Label for the article font size selection dropdown" },
+    "@settingsArticleFontSizeLabel": {
+        "description": "Label for the article font size selection dropdown"
+    },
     "settingsNotificationsEnableLabel": "Enable Notifications",
-    "@settingsNotificationsEnableLabel": { "description": "Label for the switch to enable/disable notifications" },
+    "@settingsNotificationsEnableLabel": {
+        "description": "Label for the switch to enable/disable notifications"
+    },
     "settingsNotificationsCategoriesLabel": "Followed Categories",
-    "@settingsNotificationsCategoriesLabel": { "description": "Label for the section to select notification categories" },
+    "@settingsNotificationsCategoriesLabel": {
+        "description": "Label for the section to select notification categories"
+    },
     "settingsNotificationsSourcesLabel": "Followed Sources",
-    "@settingsNotificationsSourcesLabel": { "description": "Label for the section to select notification sources" },
+    "@settingsNotificationsSourcesLabel": {
+        "description": "Label for the section to select notification sources"
+    },
     "settingsNotificationsCountriesLabel": "Followed Countries",
-    "@settingsNotificationsCountriesLabel": { "description": "Label for the section to select notification countries" },
-
+    "@settingsNotificationsCountriesLabel": {
+        "description": "Label for the section to select notification countries"
+    },
     "unknownError": "An unknown error occurred.",
     "@unknownError": {
         "description": "Generic error message shown when an operation fails unexpectedly"
@@ -426,5 +507,39 @@
     "loadMoreError": "Failed to load more items.",
     "@loadMoreError": {
         "description": "Error message shown when pagination fails to load the next set of items"
+    },
+    "settingsAppearanceFontSizeExtraLarge": "Extra Large",
+    "@settingsAppearanceFontSizeExtraLarge": {
+        "description": "Label for the extra large font size option"
+    },
+    "settingsAppearanceFontFamilySystemDefault": "System Default",
+    "@settingsAppearanceFontFamilySystemDefault": {
+        "description": "Label for the system default font family option"
+    },
+    "emailCodeSentPageTitle": "Enter Code",
+    "@emailCodeSentPageTitle": {
+        "description": "AppBar title for the email code verification page"
+    },
+    "emailCodeSentConfirmation": "A verification code has been sent to {email}. Please enter it below.",
+    "@emailCodeSentConfirmation": {
+        "description": "Confirmation message shown after the email code has been sent",
+        "placeholders": {
+            "email": {
+                "type": "String",
+                "example": "user@example.com"
+            }
+        }
+    },
+    "emailCodeSentInstructions": "Enter the 6-digit code you received.",
+    "@emailCodeSentInstructions": {
+        "description": "Instructions for the user to enter the verification code"
+    },
+    "emailCodeVerificationHint": "6-digit code",
+    "@emailCodeVerificationHint": {
+        "description": "Hint text for the email code verification input field"
+    },
+    "emailCodeVerificationButtonLabel": "Verify Code",
+    "@emailCodeVerificationButtonLabel": {
+        "description": "Button text for verifying the email code"
     }
 }

@@ -8,16 +8,17 @@ sealed class AuthenticationEvent extends Equatable {
   const AuthenticationEvent();
 
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
-/// {@template authentication_send_sign_in_link_requested}
-/// Event triggered when the user requests a sign-in link to be sent
+/// {@template authentication_request_sign_in_code_requested}
+/// Event triggered when the user requests a sign-in code to be sent
 /// to their email.
 /// {@endtemplate}
-final class AuthenticationSendSignInLinkRequested extends AuthenticationEvent {
-  /// {@macro authentication_send_sign_in_link_requested}
-  const AuthenticationSendSignInLinkRequested({required this.email});
+final class AuthenticationRequestSignInCodeRequested
+    extends AuthenticationEvent {
+  /// {@macro authentication_request_sign_in_code_requested}
+  const AuthenticationRequestSignInCodeRequested({required this.email});
 
   /// The user's email address.
   final String email;
@@ -26,27 +27,24 @@ final class AuthenticationSendSignInLinkRequested extends AuthenticationEvent {
   List<Object> get props => [email];
 }
 
-/// {@template authentication_sign_in_with_link_attempted}
-/// Event triggered when the app attempts to sign in using an email link.
-/// This is typically triggered by a deep link handler.
+/// {@template authentication_verify_code_requested}
+/// Event triggered when the user attempts to sign in using an email and code.
 /// {@endtemplate}
-final class AuthenticationSignInWithLinkAttempted extends AuthenticationEvent {
-  /// {@macro authentication_sign_in_with_link_attempted}
-  const AuthenticationSignInWithLinkAttempted({required this.emailLink});
+final class AuthenticationVerifyCodeRequested extends AuthenticationEvent {
+  /// {@macro authentication_verify_code_requested}
+  const AuthenticationVerifyCodeRequested({
+    required this.email,
+    required this.code,
+  });
 
-  /// The sign-in link received by the app.
-  final String emailLink;
+  /// The user's email address.
+  final String email;
+
+  /// The verification code received by the user.
+  final String code;
 
   @override
-  List<Object> get props => [emailLink];
-}
-
-/// {@template authentication_google_sign_in_requested}
-/// Event triggered when the user requests to sign in with Google.
-/// {@endtemplate}
-final class AuthenticationGoogleSignInRequested extends AuthenticationEvent {
-  /// {@macro authentication_google_sign_in_requested}
-  const AuthenticationGoogleSignInRequested();
+  List<Object> get props => [email, code];
 }
 
 /// {@template authentication_anonymous_sign_in_requested}
@@ -65,10 +63,16 @@ final class AuthenticationSignOutRequested extends AuthenticationEvent {
   const AuthenticationSignOutRequested();
 }
 
-/// {@template authentication_delete_account_requested}
-/// Event triggered when the user requests to delete their account.
+/// {@template _authentication_user_changed}
+/// Internal event triggered when the authentication state changes.
 /// {@endtemplate}
-final class AuthenticationDeleteAccountRequested extends AuthenticationEvent {
-  /// {@macro authentication_delete_account_requested}
-  const AuthenticationDeleteAccountRequested();
+final class _AuthenticationUserChanged extends AuthenticationEvent {
+  /// {@macro _authentication_user_changed}
+  const _AuthenticationUserChanged({required this.user});
+
+  /// The current authenticated user, or null if unauthenticated.
+  final User? user;
+
+  @override
+  List<Object?> get props => [user];
 }

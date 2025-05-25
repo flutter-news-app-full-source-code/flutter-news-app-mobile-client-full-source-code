@@ -9,10 +9,7 @@ environment:
 dependencies:
   bloc: ^9.0.0
   bloc_concurrency: ^0.3.0
-  cloud_firestore: ^5.6.5
   equatable: ^2.0.7
-  firebase_core: ^3.12.1
-  firebase_dynamic_links: ^6.1.4
   flex_color_scheme: ^8.1.1
   flutter:
     sdk: flutter
@@ -23,15 +20,15 @@ dependencies:
   flutter_native_splash: ^2.4.5
   go_router: ^15.0.0
   google_fonts: ^6.2.1
-  ht_authentication_client:
+    ht_auth_api:
     git:
-      url: https://github.com/headlines-toolkit/ht-authentication-client.git
-  ht_authentication_firebase:
+      url: https://github.com/headlines-toolkit/ht-auth-api.git
+  ht_auth_client:
     git:
-      url: https://github.com/headlines-toolkit/ht-authentication-firebase.git
-  ht_authentication_repository:
+      url: https://github.com/headlines-toolkit/ht-auth-client.git
+  ht_auth_repository:
     git:
-      url: https://github.com/headlines-toolkit/ht-authentication-repository.git
+      url: https://github.com/headlines-toolkit/ht-auth-repository.git
   ht_data_api:
     git:
       url: https://github.com/headlines-toolkit/ht-data-api.git
@@ -50,15 +47,6 @@ dependencies:
   ht_kv_storage_shared_preferences:
     git:
       url: https://github.com/headlines-toolkit/ht-kv-storage-shared-preferences.git
-  ht_preferences_client:
-    git:
-      url: https://github.com/headlines-toolkit/ht-preferences-client.git
-  ht_preferences_firestore:
-    git:
-      url: https://github.com/headlines-toolkit/ht-preferences-firestore.git
-  ht_preferences_repository:
-    git:
-      url: https://github.com/headlines-toolkit/ht-preferences-repository.git
   ht_shared:
     git:
       url: https://github.com/headlines-toolkit/ht-shared.git

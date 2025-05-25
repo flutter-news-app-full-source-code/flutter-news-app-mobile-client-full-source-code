@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart'; // For transformers
 import 'package:equatable/equatable.dart';
-// For PaginatedResponse
-import 'package:ht_sources_client/ht_sources_client.dart'; // Keep existing, also for Source model
-import 'package:ht_sources_repository/ht_sources_repository.dart';
+import 'package:ht_data_repository/ht_data_repository.dart'; // Generic Data Repository
+import 'package:ht_shared/ht_shared.dart'
+    show
+        HtHttpException,
+        Source; // Shared models, including Source and standardized exceptions
 
 part 'sources_filter_event.dart';
 part 'sources_filter_state.dart';
@@ -14,13 +16,13 @@ part 'sources_filter_state.dart';
 /// Manages the state for fetching and displaying sources for filtering.
 ///
 /// Handles initial fetching and pagination of sources using the
-/// provided [HtSourcesRepository].
+/// provided [HtDataRepository].
 /// {@endtemplate}
 class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
   /// {@macro sources_filter_bloc}
   ///
-  /// Requires a [HtSourcesRepository] to interact with the data layer.
-  SourcesFilterBloc({required HtSourcesRepository sourcesRepository})
+  /// Requires a [HtDataRepository<Source>] to interact with the data layer.
+  SourcesFilterBloc({required HtDataRepository<Source> sourcesRepository})
     : _sourcesRepository = sourcesRepository,
       super(const SourcesFilterState()) {
     on<SourcesFilterRequested>(
@@ -33,7 +35,7 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
     );
   }
 
-  final HtSourcesRepository _sourcesRepository;
+  final HtDataRepository<Source> _sourcesRepository;
 
   /// Number of sources to fetch per page.
   static const _sourcesLimit = 20;
@@ -52,9 +54,7 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
     emit(state.copyWith(status: SourcesFilterStatus.loading));
 
     try {
-      final response = await _sourcesRepository.getSources(
-        limit: _sourcesLimit,
-      );
+      final response = await _sourcesRepository.readAll(limit: _sourcesLimit);
       emit(
         state.copyWith(
           status: SourcesFilterStatus.success,
@@ -64,7 +64,7 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
           clearError: true, // Clear any previous error
         ),
       );
-    } on SourceFetchFailure catch (e) {
+    } on HtHttpException catch (e) {
       emit(state.copyWith(status: SourcesFilterStatus.failure, error: e));
     } catch (e) {
       // Catch unexpected errors
@@ -85,7 +85,7 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
     emit(state.copyWith(status: SourcesFilterStatus.loadingMore));
 
     try {
-      final response = await _sourcesRepository.getSources(
+      final response = await _sourcesRepository.readAll(
         limit: _sourcesLimit,
         startAfterId: state.cursor, // Use the cursor from the current state
       );
@@ -98,7 +98,7 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
           cursor: response.cursor,
         ),
       );
-    } on SourceFetchFailure catch (e) {
+    } on HtHttpException catch (e) {
       // Keep existing data but indicate failure
       emit(state.copyWith(status: SourcesFilterStatus.failure, error: e));
     } catch (e) {

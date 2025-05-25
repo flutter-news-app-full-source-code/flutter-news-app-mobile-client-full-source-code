@@ -4,12 +4,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ht_countries_client/ht_countries_client.dart';
-// Removed repository import: import 'package:ht_countries_repository/ht_countries_repository.dart';
 import 'package:ht_main/headlines-feed/bloc/countries_filter_bloc.dart'; // Import the BLoC
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/shared/constants/constants.dart';
 import 'package:ht_main/shared/widgets/widgets.dart'; // For loading/error widgets
+import 'package:ht_shared/ht_shared.dart' show Country; // Import Country model
 
 /// {@template country_filter_page}
 /// A page dedicated to selecting event countries for filtering headlines.

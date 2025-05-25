@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ht_authentication_client/ht_authentication_client.dart';
-import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/app/bloc/app_bloc.dart';
+import 'package:ht_main/authentication/bloc/authentication_bloc.dart'; // Import AuthenticationBloc
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/constants/app_spacing.dart';
+import 'package:ht_shared/ht_shared.dart'; // Import User and AppStatus
 
 /// {@template account_view}
 /// Displays the user's account information and actions.
@@ -20,11 +20,13 @@ class AccountPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     // Watch AppBloc for user details and authentication status
-    final user = context.watch<AppBloc>().state.user;
-    final status = user.authenticationStatus;
+    final appState = context.watch<AppBloc>().state;
+    final user = appState.user;
+    final status = appState.status; // Use AppStatus from AppBloc state
 
     // Determine if the user is anonymous
-    final isAnonymous = status == AuthenticationStatus.anonymous;
+    final isAnonymous =
+        status == AppStatus.anonymous; // Use AppStatus.anonymous
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.accountPageTitle)),
@@ -36,7 +38,27 @@ class AccountPage extends StatelessWidget {
           _buildUserHeader(context, user, isAnonymous),
           const SizedBox(height: AppSpacing.xl), // Use AppSpacing
           // --- Action Tiles ---
-          // Settings Tile is now the first actionable item below the header
+          // Content Preferences Tile
+          ListTile(
+            leading: const Icon(Icons.tune_outlined),
+            title: Text(l10n.accountContentPreferencesTile),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              context.goNamed(Routes.accountContentPreferencesName);
+            },
+          ),
+          const Divider(), // Divider after Content Preferences
+          // Saved Headlines Tile
+          ListTile(
+            leading: const Icon(Icons.bookmark_outline),
+            title: Text(l10n.accountSavedHeadlinesTile),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              context.goNamed(Routes.accountSavedHeadlinesName);
+            },
+          ),
+          const Divider(), // Divider after Saved Headlines
+          // Settings Tile
           _buildSettingsTile(context),
           const Divider(), // Divider after settings
         ],
@@ -45,85 +67,80 @@ class AccountPage extends StatelessWidget {
   }
 
   /// Builds the header section displaying user avatar, name, and status.
-  Widget _buildUserHeader(BuildContext context, User user, bool isAnonymous) {
+  Widget _buildUserHeader(BuildContext context, User? user, bool isAnonymous) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
 
-    // Use placeholder if photoUrl is null or empty
-    final photoUrl = user.photoUrl;
-    final hasPhoto = photoUrl != null && photoUrl.isNotEmpty;
+    // Use a generic icon for the avatar
+    const avatarIcon = Icon(Icons.person, size: 40);
+
+    // Determine display name and status text
+    final String displayName;
+    final Widget statusWidget;
+
+    if (isAnonymous) {
+      displayName = l10n.accountAnonymousUser;
+      statusWidget = Padding(
+        padding: const EdgeInsets.only(top: AppSpacing.sm),
+        child: TextButton(
+          onPressed: () {
+            // Navigate to the authentication page in linking mode
+            context.goNamed(
+              Routes.authenticationName,
+              queryParameters: {'context': 'linking'},
+            );
+          },
+          child: Text(l10n.accountSignInPromptButton),
+        ),
+      );
+    } else {
+      // For authenticated users, display email and role
+      displayName = user?.email ?? l10n.accountNoNameUser;
+      statusWidget = Column(
+        children: [
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            l10n.accountRoleLabel(user?.role.name ?? 'unknown'), // Display role
+            style: textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          OutlinedButton(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: theme.colorScheme.error,
+              side: BorderSide(color: theme.colorScheme.error),
+            ),
+            onPressed: () {
+              // Dispatch AuthenticationSignOutRequested from Auth Bloc
+              context.read<AuthenticationBloc>().add(
+                const AuthenticationSignOutRequested(),
+              );
+              // Global redirect will be handled by AppBloc/GoRouter
+            },
+            child: Text(l10n.accountSignOutTile),
+          ),
+        ],
+      );
+    }
 
     return Column(
       children: [
         CircleAvatar(
           radius: 40,
-          backgroundImage: hasPhoto ? NetworkImage(photoUrl) : null,
           backgroundColor: theme.colorScheme.primaryContainer,
-          // Show initials or icon if no photo
-          child:
-              !hasPhoto
-                  ? Icon(
-                    Icons.person,
-                    size: 40,
-                    color: theme.colorScheme.onPrimaryContainer,
-                  )
-                  : null,
+          child: avatarIcon,
         ),
         const SizedBox(height: AppSpacing.lg), // Use AppSpacing
         Text(
-          isAnonymous
-              ? l10n.accountAnonymousUser
-              : user.displayName ?? l10n.accountNoNameUser,
+          displayName,
           style: textTheme.titleLarge,
           textAlign: TextAlign.center,
         ),
-        // Conditionally display Sign In or Logout button
-        if (isAnonymous)
-          _buildSignInButton(context)
-        else
-          _buildLogoutButton(context),
+        statusWidget, // Display sign-in button or role/logout button
       ],
-    );
-  }
-
-  /// Builds the sign-in button for anonymous users.
-  Widget _buildSignInButton(BuildContext context) {
-    final l10n = context.l10n;
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSpacing.sm),
-      child: TextButton(
-        onPressed: () {
-          // Navigate to the authentication page in linking mode
-          context.goNamed(
-            Routes.authenticationName,
-            queryParameters: {'context': 'linking'},
-          );
-        },
-        child: Text(l10n.accountSignInPromptButton),
-      ),
-    );
-  }
-
-  /// Builds the logout button for authenticated users.
-  Widget _buildLogoutButton(BuildContext context) {
-    final l10n = context.l10n;
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSpacing.sm),
-      child: OutlinedButton(
-        style: OutlinedButton.styleFrom(
-          foregroundColor: theme.colorScheme.error,
-          side: BorderSide(color: theme.colorScheme.error),
-        ),
-        onPressed: () {
-          context.read<AccountBloc>().add(const AccountLogoutRequested());
-          // Global redirect will be handled by AppBloc/GoRouter
-        },
-        // Assuming l10n.accountSignOutButton exists or will be added
-        // Reusing existing tile text for now as button text might differ
-        child: Text(l10n.accountSignOutTile),
-      ),
     );
   }
 

@@ -80,20 +80,23 @@ class _EmailSignInView extends StatelessWidget {
                     backgroundColor: colorScheme.error,
                   ),
                 );
-            } else if (state is AuthenticationLinkSentSuccess) {
-              // Navigate to the confirmation page on success
-              context.goNamed(Routes.emailLinkSentName);
+            } else if (state is AuthenticationCodeSentSuccess) {
+              // Navigate to the code verification page on success, passing the email
+              context.goNamed(
+                Routes.verifyCodeName,
+                pathParameters: {'email': state.email},
+              );
             }
           },
           // BuildWhen prevents unnecessary rebuilds if only listening
           buildWhen:
               (previous, current) =>
                   current is AuthenticationInitial ||
-                  current is AuthenticationLinkSending ||
+                  current is AuthenticationRequestCodeLoading ||
                   current
                       is AuthenticationFailure, // Rebuild on failure to re-enable form
           builder: (context, state) {
-            final isLoading = state is AuthenticationLinkSending;
+            final isLoading = state is AuthenticationRequestCodeLoading;
 
             return Padding(
               padding: const EdgeInsets.all(AppSpacing.paddingLarge),
@@ -164,7 +167,7 @@ class _EmailLinkFormState extends State<_EmailLinkForm> {
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       context.read<AuthenticationBloc>().add(
-        AuthenticationSendSignInLinkRequested(
+        AuthenticationRequestSignInCodeRequested(
           email: _emailController.text.trim(),
         ),
       );

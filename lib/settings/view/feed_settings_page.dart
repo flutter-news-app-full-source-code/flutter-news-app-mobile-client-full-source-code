@@ -3,7 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/settings/bloc/settings_bloc.dart';
 import 'package:ht_main/shared/constants/constants.dart';
-import 'package:ht_preferences_client/ht_preferences_client.dart';
+import 'package:ht_shared/ht_shared.dart'
+    show HeadlineImageStyle; // Import new enum
 
 /// {@template feed_settings_page}
 /// A page for configuring feed display settings.
@@ -12,15 +13,15 @@ class FeedSettingsPage extends StatelessWidget {
   /// {@macro feed_settings_page}
   const FeedSettingsPage({super.key});
 
-  // Helper to map FeedListTileType enum to user-friendly strings
-  String _tileTypeToString(FeedListTileType type, AppLocalizations l10n) {
-    switch (type) {
-      case FeedListTileType.imageTop:
-        return l10n.settingsFeedTileTypeImageTop; // Add l10n key
-      case FeedListTileType.imageStart:
-        return l10n.settingsFeedTileTypeImageStart; // Add l10n key
-      case FeedListTileType.textOnly:
-        return l10n.settingsFeedTileTypeTextOnly; // Add l10n key
+  // Helper to map HeadlineImageStyle enum to user-friendly strings
+  String _imageStyleToString(HeadlineImageStyle style, AppLocalizations l10n) {
+    switch (style) {
+      case HeadlineImageStyle.hidden:
+        return l10n.settingsFeedTileTypeTextOnly; // Closest match
+      case HeadlineImageStyle.smallThumbnail:
+        return l10n.settingsFeedTileTypeImageStart; // Closest match
+      case HeadlineImageStyle.largeThumbnail:
+        return l10n.settingsFeedTileTypeImageTop; // Closest match
     }
   }
 
@@ -48,15 +49,21 @@ class FeedSettingsPage extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.lg),
         children: [
           // --- Feed Tile Type ---
-          _buildDropdownSetting<FeedListTileType>(
+          _buildDropdownSetting<HeadlineImageStyle>(
             context: context,
             title: l10n.settingsFeedTileTypeLabel, // Add l10n key
-            currentValue: state.feedSettings.feedListTileType,
-            items: FeedListTileType.values,
-            itemToString: (type) => _tileTypeToString(type, l10n),
+            currentValue:
+                state
+                    .userAppSettings
+                    .feedPreferences
+                    .headlineImageStyle, // Use new model field
+            items: HeadlineImageStyle.values,
+            itemToString: (style) => _imageStyleToString(style, l10n),
             onChanged: (value) {
               if (value != null) {
-                settingsBloc.add(SettingsFeedTileTypeChanged(value));
+                settingsBloc.add(
+                  SettingsFeedTileTypeChanged(value),
+                ); // Use new event
               }
             },
           ),

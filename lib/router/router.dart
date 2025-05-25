@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ht_authentication_repository/ht_authentication_repository.dart';
-import 'package:ht_categories_repository/ht_categories_repository.dart';
-import 'package:ht_countries_repository/ht_countries_repository.dart';
-import 'package:ht_headlines_repository/ht_headlines_repository.dart';
+import 'package:ht_auth_repository/ht_auth_repository.dart'; // Auth Repository
+import 'package:ht_data_repository/ht_data_repository.dart'; // Generic Data Repository
 import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/account/view/account_page.dart';
 import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/app/view/app_shell.dart';
 import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/authentication/view/authentication_page.dart';
-import 'package:ht_main/authentication/view/email_link_sent_page.dart';
-import 'package:ht_main/authentication/view/email_sign_in_page.dart';
+import 'package:ht_main/authentication/view/email_code_verification_page.dart';
+import 'package:ht_main/authentication/view/request_code_page.dart'; // Will be renamed to request_code_page.dart later
 import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart';
 import 'package:ht_main/headline-details/view/headline_details_page.dart';
 import 'package:ht_main/headlines-feed/bloc/categories_filter_bloc.dart'; // Import new BLoC
@@ -34,8 +32,7 @@ import 'package:ht_main/settings/view/article_settings_page.dart'; // Added
 import 'package:ht_main/settings/view/feed_settings_page.dart'; // Added
 import 'package:ht_main/settings/view/notification_settings_page.dart'; // Added
 import 'package:ht_main/settings/view/settings_page.dart'; // Added
-import 'package:ht_preferences_repository/ht_preferences_repository.dart'; // Added
-import 'package:ht_sources_repository/ht_sources_repository.dart';
+import 'package:ht_shared/ht_shared.dart'; // Shared models, FromJson, ToJson, etc.
 
 /// Creates and configures the GoRouter instance for the application.
 ///
@@ -43,12 +40,15 @@ import 'package:ht_sources_repository/ht_sources_repository.dart';
 /// authentication state changes.
 GoRouter createRouter({
   required ValueNotifier<AppStatus> authStatusNotifier,
-  required HtAuthenticationRepository htAuthenticationRepository,
-  required HtHeadlinesRepository htHeadlinesRepository,
-  required HtCategoriesRepository htCategoriesRepository,
-  required HtCountriesRepository htCountriesRepository,
-  required HtSourcesRepository htSourcesRepository,
-  required HtPreferencesRepository htPreferencesRepository, // Added
+  required HtAuthRepository htAuthenticationRepository,
+  required HtDataRepository<Headline> htHeadlinesRepository,
+  required HtDataRepository<Category> htCategoriesRepository,
+  required HtDataRepository<Country> htCountriesRepository,
+  required HtDataRepository<Source> htSourcesRepository,
+  required HtDataRepository<UserAppSettings> htUserAppSettingsRepository,
+  required HtDataRepository<UserContentPreferences>
+  htUserContentPreferencesRepository,
+  required HtDataRepository<AppConfig> htAppConfigRepository,
 }) {
   return GoRouter(
     refreshListenable: authStatusNotifier,
@@ -78,11 +78,11 @@ GoRouter createRouter({
       // Base paths for major sections.
       const authenticationPath = Routes.authentication; // '/authentication'
       const feedPath = Routes.feed; // Updated path constant
-      // Specific authentication sub-routes crucial for the email linking flow.
-      const emailSignInPath =
-          '$authenticationPath/${Routes.emailSignIn}'; // '/authentication/email-sign-in'
-      const emailLinkSentPath =
-          '$authenticationPath/${Routes.emailLinkSent}'; // '/authentication/email-link-sent'
+      // Specific authentication sub-routes crucial for the email code verification flow.
+      const requestCodePath =
+          '$authenticationPath/${Routes.requestCode}'; // '/authentication/request-code'
+      const verifyCodePath =
+          '$authenticationPath/${Routes.verifyCode}'; // '/authentication/verify-code'
 
       // --- Helper Booleans ---
       // Check if the navigation target is within the authentication section.
@@ -155,13 +155,14 @@ GoRouter createRouter({
             return feedPath; // Redirect to feed
           }
         }
-        // **Sub-Case 2.2: Navigating to Specific Email Linking Sub-Routes**
-        // Explicitly allow access to the necessary pages for the email linking process,
+        // **Sub-Case 2.2: Navigating to Specific Email Code Verification Sub-Routes**
+        // Explicitly allow access to the necessary pages for the email code verification process,
         // even if the 'context=linking' parameter is lost during navigation between these pages.
-        else if (currentLocation == emailSignInPath ||
-            currentLocation == emailLinkSentPath) {
+        else if (currentLocation == requestCodePath ||
+            currentLocation.startsWith(verifyCodePath)) {
+          // Use startsWith for parameterized path
           print(
-            '    Action: Allowing navigation to email linking sub-route ($currentLocation).',
+            '    Action: Allowing navigation to email code verification sub-route ($currentLocation).',
           );
           return null; // Allow access
         }
@@ -217,9 +218,8 @@ GoRouter createRouter({
       // print('  Redirect Decision: No specific redirect condition met. Allowing navigation.');
       // return null; // Allow access (already covered by the final return null below)
     },
-    // --- Routes ---
+    // --- Authentication Routes ---
     routes: [
-      // --- Authentication Routes ---
       GoRoute(
         path: Routes.authentication,
         name: Routes.authenticationName,
@@ -247,7 +247,7 @@ GoRouter createRouter({
           return BlocProvider(
             create:
                 (context) => AuthenticationBloc(
-                  authenticationRepository: htAuthenticationRepository,
+                  authenticationRepository: context.read<HtAuthRepository>(),
                 ),
             child: AuthenticationPage(
               headline: headline,
@@ -259,18 +259,26 @@ GoRouter createRouter({
         },
         routes: [
           GoRoute(
-            path: Routes.emailSignIn,
-            name: Routes.emailSignInName,
+            path: Routes.requestCode, // Use new path
+            name: Routes.requestCodeName, // Use new name
             builder: (context, state) {
               // Extract the linking context flag from 'extra', default to false.
               final isLinking = (state.extra as bool?) ?? false;
-              return EmailSignInPage(isLinkingContext: isLinking);
+              return EmailSignInPage(
+                isLinkingContext: isLinking,
+              ); // Page will be renamed later
             },
           ),
           GoRoute(
-            path: Routes.emailLinkSent,
-            name: Routes.emailLinkSentName,
-            builder: (context, state) => const EmailLinkSentPage(),
+            path:
+                '${Routes.verifyCode}/:email', // Use new path with email parameter
+            name: Routes.verifyCodeName, // Use new name
+            builder: (context, state) {
+              final email = state.pathParameters['email']!; // Extract email
+              return EmailCodeVerificationPage(
+                email: email,
+              ); // Use renamed page
+            },
           ),
         ],
       ),
@@ -283,19 +291,25 @@ GoRouter createRouter({
               BlocProvider(
                 create:
                     (context) => HeadlinesFeedBloc(
-                      headlinesRepository: htHeadlinesRepository,
+                      headlinesRepository:
+                          context.read<HtDataRepository<Headline>>(),
                     )..add(const HeadlinesFeedFetchRequested()),
               ),
               BlocProvider(
                 create:
                     (context) => HeadlinesSearchBloc(
-                      headlinesRepository: htHeadlinesRepository,
+                      headlinesRepository:
+                          context.read<HtDataRepository<Headline>>(),
                     ),
               ),
               BlocProvider(
                 create:
                     (context) => AccountBloc(
-                      authenticationRepository: htAuthenticationRepository,
+                      authenticationRepository:
+                          context.read<HtAuthRepository>(),
+                      userContentPreferencesRepository:
+                          context
+                              .read<HtDataRepository<UserContentPreferences>>(),
                     ),
               ),
             ],
@@ -320,7 +334,8 @@ GoRouter createRouter({
                       return BlocProvider(
                         create:
                             (context) => HeadlineDetailsBloc(
-                              headlinesRepository: htHeadlinesRepository,
+                              headlinesRepository:
+                                  context.read<HtDataRepository<Headline>>(),
                             )..add(HeadlineDetailsRequested(headlineId: id)),
                         child: HeadlineDetailsPage(headlineId: id),
                       );
@@ -364,7 +379,8 @@ GoRouter createRouter({
                               create:
                                   (context) => CategoriesFilterBloc(
                                     categoriesRepository:
-                                        context.read<HtCategoriesRepository>(),
+                                        context
+                                            .read<HtDataRepository<Category>>(),
                                   ),
                               child: const CategoryFilterPage(),
                             ),
@@ -381,7 +397,8 @@ GoRouter createRouter({
                               create:
                                   (context) => SourcesFilterBloc(
                                     sourcesRepository:
-                                        context.read<HtSourcesRepository>(),
+                                        context
+                                            .read<HtDataRepository<Source>>(),
                                   ),
                               child: const SourceFilterPage(),
                             ),
@@ -398,7 +415,8 @@ GoRouter createRouter({
                               create:
                                   (context) => CountriesFilterBloc(
                                     countriesRepository:
-                                        context.read<HtCountriesRepository>(),
+                                        context
+                                            .read<HtDataRepository<Country>>(),
                                   ),
                               child: const CountryFilterPage(),
                             ),
@@ -436,8 +454,11 @@ GoRouter createRouter({
                       return BlocProvider(
                         create:
                             (context) => SettingsBloc(
-                              preferencesRepository:
-                                  context.read<HtPreferencesRepository>(),
+                              userAppSettingsRepository:
+                                  context
+                                      .read<
+                                        HtDataRepository<UserAppSettings>
+                                      >(),
                             )..add(
                               const SettingsLoadRequested(),
                             ), // Load on entry
@@ -472,6 +493,31 @@ GoRouter createRouter({
                                 const NotificationSettingsPage(),
                       ),
                     ],
+                  ),
+                  // New routes for Account sub-pages
+                  GoRoute(
+                    path:
+                        Routes
+                            .accountContentPreferences, // Relative path 'content-preferences'
+                    name: Routes.accountContentPreferencesName,
+                    builder: (context, state) {
+                      // TODO(fulleni): Replace with actual ContentPreferencesPage
+                      return const Placeholder(
+                        child: Center(child: Text('CONTENT PREFERENCES PAGE')),
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    path:
+                        Routes
+                            .accountSavedHeadlines, // Relative path 'saved-headlines'
+                    name: Routes.accountSavedHeadlinesName,
+                    builder: (context, state) {
+                      // TODO(fulleni): Replace with actual SavedHeadlinesPage
+                      return const Placeholder(
+                        child: Center(child: Text('SAVED HEADLINES PAGE')),
+                      );
+                    },
                   ),
                 ],
               ),

@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_categories_client/ht_categories_client.dart';
-import 'package:ht_categories_repository/ht_categories_repository.dart';
-// For PaginatedResponse
+import 'package:ht_data_repository/ht_data_repository.dart'; // Generic Data Repository
+import 'package:ht_shared/ht_shared.dart'
+    show
+        Category,
+        HtHttpException; // Shared models, including Category and standardized exceptions
 
 part 'categories_filter_event.dart';
 part 'categories_filter_state.dart';
@@ -14,16 +16,17 @@ part 'categories_filter_state.dart';
 /// Manages the state for fetching and displaying categories for filtering.
 ///
 /// Handles initial fetching and pagination of categories using the
-/// provided [HtCategoriesRepository].
+/// provided [HtDataRepository].
 /// {@endtemplate}
 class CategoriesFilterBloc
     extends Bloc<CategoriesFilterEvent, CategoriesFilterState> {
   /// {@macro categories_filter_bloc}
   ///
-  /// Requires a [HtCategoriesRepository] to interact with the data layer.
-  CategoriesFilterBloc({required HtCategoriesRepository categoriesRepository})
-    : _categoriesRepository = categoriesRepository,
-      super(const CategoriesFilterState()) {
+  /// Requires a [HtDataRepository<Category>] to interact with the data layer.
+  CategoriesFilterBloc({
+    required HtDataRepository<Category> categoriesRepository,
+  }) : _categoriesRepository = categoriesRepository,
+       super(const CategoriesFilterState()) {
     on<CategoriesFilterRequested>(
       _onCategoriesFilterRequested,
       transformer: restartable(), // Only process the latest request
@@ -34,7 +37,7 @@ class CategoriesFilterBloc
     );
   }
 
-  final HtCategoriesRepository _categoriesRepository;
+  final HtDataRepository<Category> _categoriesRepository;
 
   /// Number of categories to fetch per page.
   static const _categoriesLimit = 20;
@@ -54,7 +57,7 @@ class CategoriesFilterBloc
     emit(state.copyWith(status: CategoriesFilterStatus.loading));
 
     try {
-      final response = await _categoriesRepository.getCategories(
+      final response = await _categoriesRepository.readAll(
         limit: _categoriesLimit,
       );
       emit(
@@ -66,7 +69,7 @@ class CategoriesFilterBloc
           clearError: true, // Clear any previous error
         ),
       );
-    } on GetCategoriesFailure catch (e) {
+    } on HtHttpException catch (e) {
       emit(state.copyWith(status: CategoriesFilterStatus.failure, error: e));
     } catch (e) {
       // Catch unexpected errors
@@ -87,7 +90,7 @@ class CategoriesFilterBloc
     emit(state.copyWith(status: CategoriesFilterStatus.loadingMore));
 
     try {
-      final response = await _categoriesRepository.getCategories(
+      final response = await _categoriesRepository.readAll(
         limit: _categoriesLimit,
         startAfterId: state.cursor, // Use the cursor from the current state
       );
@@ -100,7 +103,7 @@ class CategoriesFilterBloc
           cursor: response.cursor,
         ),
       );
-    } on GetCategoriesFailure catch (e) {
+    } on HtHttpException catch (e) {
       // Keep existing data but indicate failure
       emit(
         state.copyWith(

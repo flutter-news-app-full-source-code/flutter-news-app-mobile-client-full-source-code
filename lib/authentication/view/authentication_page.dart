@@ -127,21 +127,6 @@ class AuthenticationPage extends StatelessWidget {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: AppSpacing.xxl),
-                      // --- Google Sign-In Button ---
-                      ElevatedButton.icon(
-                        icon: const Icon(
-                          Icons.g_mobiledata,
-                        ), // Placeholder icon
-                        label: Text(l10n.authenticationGoogleSignInButton),
-                        onPressed:
-                            isLoading
-                                ? null
-                                : () => context.read<AuthenticationBloc>().add(
-                                  const AuthenticationGoogleSignInRequested(),
-                                ),
-                        // Style adjustments can be made via ElevatedButtonThemeData
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
                       // --- Email Sign-In Button ---
                       ElevatedButton(
                         // Consider an email icon
@@ -153,7 +138,7 @@ class AuthenticationPage extends StatelessWidget {
                                   // Navigate to the dedicated email sign-in page,
                                   // passing the linking context via 'extra'.
                                   context.goNamed(
-                                    Routes.emailSignInName,
+                                    Routes.requestCodeName,
                                     extra: isLinkingContext,
                                   );
                                 },
@@ -178,7 +163,8 @@ class AuthenticationPage extends StatelessWidget {
 
                       // --- Loading Indicator (Optional, for general loading state) ---
                       // If needed, show a general loading indicator when state is AuthenticationLoading
-                      if (isLoading && state is! AuthenticationLinkSending) ...[
+                      if (isLoading &&
+                          state is! AuthenticationRequestCodeLoading) ...[
                         const SizedBox(height: AppSpacing.xl),
                         const Center(child: CircularProgressIndicator()),
                       ],

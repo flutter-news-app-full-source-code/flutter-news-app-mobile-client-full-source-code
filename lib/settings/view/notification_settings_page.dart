@@ -27,7 +27,11 @@ class NotificationSettingsPage extends StatelessWidget {
       );
     }
 
-    final notificationsEnabled = state.notificationSettings.enabled;
+    // TODO(cline): Full implementation of Notification Settings UI and BLoC logic
+    // is pending backend and shared model development (specifically, adding
+    // a 'notificationsEnabled' field to UserAppSettings or a similar model).
+    // This UI is temporarily disabled.
+    const notificationsEnabled = false; // Placeholder value
 
     return Scaffold(
       appBar: AppBar(
@@ -40,15 +44,15 @@ class NotificationSettingsPage extends StatelessWidget {
           SwitchListTile(
             title: Text(l10n.settingsNotificationsEnableLabel), // Add l10n key
             value: notificationsEnabled,
-            onChanged: (bool value) {
-              settingsBloc.add(SettingsNotificationsEnabledChanged(value));
-            },
+            onChanged: null, // Disable the switch
             secondary: const Icon(Icons.notifications_active_outlined),
           ),
           const Divider(),
 
           // --- Detailed Notification Settings (Conditional) ---
-          // Only show these if notifications are enabled
+          // Only show these if notifications are enabled (currently disabled)
+          // The following section is commented out as it depends on notificationsEnabled
+          /*
           if (notificationsEnabled) ...[
             ListTile(
               leading: const Icon(Icons.category_outlined),
@@ -93,6 +97,7 @@ class NotificationSettingsPage extends StatelessWidget {
               },
             ),
           ],
+          */
         ],
       ),
     );

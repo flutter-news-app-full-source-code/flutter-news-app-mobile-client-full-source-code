@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/settings/bloc/settings_bloc.dart';
 import 'package:ht_main/shared/constants/constants.dart';
-import 'package:ht_preferences_client/ht_preferences_client.dart';
+import 'package:ht_shared/ht_shared.dart'; // Use types from ht_shared
 
 /// {@template appearance_settings_page}
 /// A page for configuring appearance-related settings like theme and fonts.
@@ -12,47 +12,69 @@ class AppearanceSettingsPage extends StatelessWidget {
   /// {@macro appearance_settings_page}
   const AppearanceSettingsPage({super.key});
 
-  // Helper to map AppThemeMode enum to user-friendly strings
-  String _themeModeToString(AppThemeMode mode, AppLocalizations l10n) {
+  // Helper to map AppBaseTheme enum to user-friendly strings
+  String _baseThemeToString(AppBaseTheme mode, AppLocalizations l10n) {
     switch (mode) {
-      case AppThemeMode.light:
-        return l10n.settingsAppearanceThemeModeLight; // Add l10n key
-      case AppThemeMode.dark:
-        return l10n.settingsAppearanceThemeModeDark; // Add l10n key
-      case AppThemeMode.system:
-        return l10n.settingsAppearanceThemeModeSystem; // Add l10n key
+      case AppBaseTheme.light:
+        return l10n.settingsAppearanceThemeModeLight;
+      case AppBaseTheme.dark:
+        return l10n.settingsAppearanceThemeModeDark;
+      case AppBaseTheme.system:
+        return l10n.settingsAppearanceThemeModeSystem;
     }
   }
 
-  // Helper to map AppThemeName enum to user-friendly strings
-  String _themeNameToString(AppThemeName name, AppLocalizations l10n) {
+  // Helper to map AppAccentTheme enum to user-friendly strings
+  String _accentThemeToString(AppAccentTheme name, AppLocalizations l10n) {
     switch (name) {
-      case AppThemeName.red:
-        return l10n.settingsAppearanceThemeNameRed; // Add l10n key
-      case AppThemeName.blue:
-        return l10n.settingsAppearanceThemeNameBlue; // Add l10n key
-      case AppThemeName.grey:
-        return l10n.settingsAppearanceThemeNameGrey; // Add l10n key
+      case AppAccentTheme.newsRed:
+        return l10n.settingsAppearanceThemeNameRed;
+      case AppAccentTheme.defaultBlue:
+        return l10n.settingsAppearanceThemeNameBlue;
+      case AppAccentTheme.graphiteGray:
+        return l10n.settingsAppearanceThemeNameGrey;
     }
   }
 
-  // Helper to map FontSize enum to user-friendly strings
-  String _fontSizeToString(FontSize size, AppLocalizations l10n) {
+  // Helper to map AppTextScaleFactor enum to user-friendly strings
+  String _textScaleFactorToString(
+    AppTextScaleFactor size,
+    AppLocalizations l10n,
+  ) {
     switch (size) {
-      case FontSize.small:
-        return l10n.settingsAppearanceFontSizeSmall; // Add l10n key
-      case FontSize.large:
-        return l10n.settingsAppearanceFontSizeLarge; // Add l10n key
-      case FontSize.medium:
-        return l10n.settingsAppearanceFontSizeMedium; // Add l10n key
+      case AppTextScaleFactor.small:
+        return l10n.settingsAppearanceFontSizeSmall;
+      case AppTextScaleFactor.large:
+        return l10n.settingsAppearanceFontSizeLarge;
+      case AppTextScaleFactor.medium:
+        return l10n.settingsAppearanceFontSizeMedium;
+      case AppTextScaleFactor.extraLarge:
+        return l10n.settingsAppearanceFontSizeExtraLarge; // Add l10n key
     }
   }
 
-  // Helper to map AppFontType enum to user-friendly strings
-  // (Using the enum name directly might be sufficient if they are clear)
-  String _fontTypeToString(AppFontType type, AppLocalizations l10n) {
+  // Helper to map font family string to user-friendly strings
+  String _fontFamilyToString(String fontFamily, AppLocalizations l10n) {
+    // This mapping might need to be more sophisticated if supporting multiple
+    // specific fonts. For now, just return the string or a placeholder.
     // Consider adding specific l10n keys if needed, e.g., l10n.fontRoboto
-    return type.name; // Example: 'roboto', 'openSans'
+    return fontFamily == 'SystemDefault'
+        ? l10n
+            .settingsAppearanceFontFamilySystemDefault // Add l10n key
+        : fontFamily;
+  }
+
+  // TODO(cline): Replace with localized strings once localization issue is resolved.
+  // Helper to map AppFontWeight enum to user-friendly strings (currently uses enum name)
+  String _fontWeightToString(AppFontWeight weight, AppLocalizations l10n) {
+    switch (weight) {
+      case AppFontWeight.light:
+        return 'Light'; // Temporary: Use enum name or placeholder
+      case AppFontWeight.regular:
+        return 'Regular'; // Temporary: Use enum name or placeholder
+      case AppFontWeight.bold:
+        return 'Bold'; // Temporary: Use enum name or placeholder
+    }
   }
 
   @override
@@ -73,19 +95,17 @@ class AppearanceSettingsPage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.settingsAppearanceTitle), // Reuse title key
-      ),
+      appBar: AppBar(title: Text(l10n.settingsAppearanceTitle)),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),
         children: [
-          // --- Theme Mode ---
-          _buildDropdownSetting<AppThemeMode>(
+          // --- Base Theme ---
+          _buildDropdownSetting<AppBaseTheme>(
             context: context,
-            title: l10n.settingsAppearanceThemeModeLabel, // Add l10n key
-            currentValue: state.themeSettings.themeMode,
-            items: AppThemeMode.values,
-            itemToString: (mode) => _themeModeToString(mode, l10n),
+            title: l10n.settingsAppearanceThemeModeLabel,
+            currentValue: state.userAppSettings.displaySettings.baseTheme,
+            items: AppBaseTheme.values,
+            itemToString: (mode) => _baseThemeToString(mode, l10n),
             onChanged: (value) {
               if (value != null) {
                 settingsBloc.add(SettingsAppThemeModeChanged(value));
@@ -94,46 +114,73 @@ class AppearanceSettingsPage extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.lg),
 
-          // --- Theme Name ---
-          _buildDropdownSetting<AppThemeName>(
+          // --- Accent Theme ---
+          _buildDropdownSetting<AppAccentTheme>(
             context: context,
-            title: l10n.settingsAppearanceThemeNameLabel, // Add l10n key
-            currentValue: state.themeSettings.themeName,
-            items: AppThemeName.values,
-            itemToString: (name) => _themeNameToString(name, l10n),
+            title: l10n.settingsAppearanceThemeNameLabel,
+            currentValue: state.userAppSettings.displaySettings.accentTheme,
+            items: AppAccentTheme.values,
+            itemToString: (name) => _accentThemeToString(name, l10n),
             onChanged: (value) {
               if (value != null) {
-                settingsBloc.add(SettingsAppThemeNameChanged(value));
+                context.read<SettingsBloc>().add(
+                  SettingsAppThemeNameChanged(value),
+                );
               }
             },
           ),
           const SizedBox(height: AppSpacing.lg),
 
-          // --- App Font Size ---
-          _buildDropdownSetting<FontSize>(
+          // --- Text Scale Factor ---
+          _buildDropdownSetting<AppTextScaleFactor>(
             context: context,
-            title: l10n.settingsAppearanceAppFontSizeLabel, // Add l10n key
-            currentValue: state.appSettings.appFontSize,
-            items: FontSize.values,
-            itemToString: (size) => _fontSizeToString(size, l10n),
+            title:
+                l10n.settingsAppearanceAppFontSizeLabel, // Reusing key for text size
+            currentValue: state.userAppSettings.displaySettings.textScaleFactor,
+            items: AppTextScaleFactor.values,
+            itemToString: (size) => _textScaleFactorToString(size, l10n),
             onChanged: (value) {
               if (value != null) {
-                settingsBloc.add(SettingsAppFontSizeChanged(value));
+                context.read<SettingsBloc>().add(
+                  SettingsAppFontSizeChanged(value),
+                );
               }
             },
           ),
           const SizedBox(height: AppSpacing.lg),
 
-          // --- App Font Type ---
-          _buildDropdownSetting<AppFontType>(
+          // --- Font Family ---
+          _buildDropdownSetting<String>(
+            // Font family is a String
             context: context,
-            title: l10n.settingsAppearanceAppFontTypeLabel, // Add l10n key
-            currentValue: state.appSettings.appFontType,
-            items: AppFontType.values,
-            itemToString: (type) => _fontTypeToString(type, l10n),
+            title:
+                l10n.settingsAppearanceAppFontTypeLabel, // Reusing key for font family
+            currentValue: state.userAppSettings.displaySettings.fontFamily,
+            items: const [
+              'SystemDefault',
+            ], // Only SystemDefault supported for now
+            itemToString: (fontFamily) => _fontFamilyToString(fontFamily, l10n),
             onChanged: (value) {
               if (value != null) {
-                settingsBloc.add(SettingsAppFontTypeChanged(value));
+                context.read<SettingsBloc>().add(
+                  SettingsAppFontTypeChanged(value),
+                );
+              }
+            },
+          ),
+          const SizedBox(height: AppSpacing.lg),
+
+          // --- Font Weight ---
+          _buildDropdownSetting<AppFontWeight>(
+            context: context,
+            title: l10n.settingsAppearanceFontWeightLabel, // Add l10n key
+            currentValue: state.userAppSettings.displaySettings.fontWeight,
+            items: AppFontWeight.values,
+            itemToString:
+                (weight) => _fontWeightToString(weight, l10n), // Use helper
+            onChanged: (value) {
+              if (value != null) {
+                settingsBloc.add(SettingsAppFontWeightChanged(value));
               }
             },
           ),

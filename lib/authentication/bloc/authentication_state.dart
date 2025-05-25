@@ -26,7 +26,7 @@ final class AuthenticationLoading extends AuthenticationState {}
 /// {@endtemplate}
 final class AuthenticationAuthenticated extends AuthenticationState {
   /// {@macro authentication_authenticated}
-  const AuthenticationAuthenticated(this.user);
+  const AuthenticationAuthenticated({required this.user});
 
   /// The authenticated [User] object.
   final User user;
@@ -40,15 +40,24 @@ final class AuthenticationAuthenticated extends AuthenticationState {
 /// {@endtemplate}
 final class AuthenticationUnauthenticated extends AuthenticationState {}
 
-/// {@template authentication_link_sending}
-/// State indicating that the sign-in link is being sent.
+/// {@template authentication_request_code_loading}
+/// State indicating that the sign-in code is being requested.
 /// {@endtemplate}
-final class AuthenticationLinkSending extends AuthenticationState {}
+final class AuthenticationRequestCodeLoading extends AuthenticationState {}
 
-/// {@template authentication_link_sent_success}
-/// State indicating that the sign-in link was sent successfully.
+/// {@template authentication_code_sent_success}
+/// State indicating that the sign-in code was sent successfully.
 /// {@endtemplate}
-final class AuthenticationLinkSentSuccess extends AuthenticationState {}
+final class AuthenticationCodeSentSuccess extends AuthenticationState {
+  /// {@macro authentication_code_sent_success}
+  const AuthenticationCodeSentSuccess({required this.email});
+
+  /// The email address the code was sent to.
+  final String email;
+
+  @override
+  List<Object> get props => [email];
+}
 
 /// {@template authentication_failure}
 /// Represents an authentication failure.

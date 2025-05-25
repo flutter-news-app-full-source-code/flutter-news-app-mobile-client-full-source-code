@@ -3,9 +3,15 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_headlines_client/ht_headlines_client.dart'; // Import for Headline and Exceptions
-import 'package:ht_headlines_repository/ht_headlines_repository.dart';
+import 'package:ht_data_repository/ht_data_repository.dart'; // Generic Data Repository
 import 'package:ht_main/headlines-feed/models/headline_filter.dart';
+import 'package:ht_shared/ht_shared.dart'
+    show
+        Category,
+        Country,
+        Headline,
+        HtHttpException,
+        Source; // Shared models and standardized exceptions
 
 part 'headlines_feed_event.dart';
 part 'headlines_feed_state.dart';
@@ -14,13 +20,13 @@ part 'headlines_feed_state.dart';
 /// Manages the state for the headlines feed feature.
 ///
 /// Handles fetching headlines, applying filters, pagination, and refreshing
-/// the feed using the provided [HtHeadlinesRepository].
+/// the feed using the provided [HtDataRepository].
 /// {@endtemplate}
 class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   /// {@macro headlines_feed_bloc}
   ///
-  /// Requires a [HtHeadlinesRepository] to interact with the data layer.
-  HeadlinesFeedBloc({required HtHeadlinesRepository headlinesRepository})
+  /// Requires a [HtDataRepository<Headline>] to interact with the data layer.
+  HeadlinesFeedBloc({required HtDataRepository<Headline> headlinesRepository})
     : _headlinesRepository = headlinesRepository,
       super(HeadlinesFeedLoading()) {
     on<HeadlinesFeedFetchRequested>(
@@ -37,7 +43,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     on<HeadlinesFeedFiltersCleared>(_onHeadlinesFeedFiltersCleared);
   }
 
-  final HtHeadlinesRepository _headlinesRepository;
+  final HtDataRepository<Headline> _headlinesRepository;
 
   /// The number of headlines to fetch per page during pagination or initial load.
   static const _headlinesFetchLimit = 10;
@@ -54,12 +60,26 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   ) async {
     emit(HeadlinesFeedLoading()); // Show loading for filter application
     try {
-      final response = await _headlinesRepository.getHeadlines(
-        limit: _headlinesFetchLimit,
-        categories: event.filter.categories,
-        sources: event.filter.sources,
-        eventCountries: event.filter.eventCountries,
-      );
+      final response = await _headlinesRepository.readAllByQuery({
+        if (event.filter.categories?.isNotEmpty ?? false)
+          'categories':
+              event.filter.categories!
+                  .whereType<Category>()
+                  .map((c) => c.id)
+                  .toList(),
+        if (event.filter.sources?.isNotEmpty ?? false)
+          'sources':
+              event.filter.sources!
+                  .whereType<Source>()
+                  .map((s) => s.id)
+                  .toList(),
+        if (event.filter.eventCountries?.isNotEmpty ?? false)
+          'eventCountries':
+              event.filter.eventCountries!
+                  .whereType<Country>()
+                  .map((c) => c.isoCode)
+                  .toList(),
+      }, limit: _headlinesFetchLimit,);
       emit(
         HeadlinesFeedLoaded(
           headlines: response.items,
@@ -68,7 +88,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           filter: event.filter, // Store the applied filter
         ),
       );
-    } on HeadlinesFetchException catch (e) {
+    } on HtHttpException catch (e) {
       emit(HeadlinesFeedError(message: e.message));
     } catch (e, st) {
       // Log the error and stack trace for unexpected errors
@@ -88,7 +108,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     emit(HeadlinesFeedLoading()); // Show loading indicator
     try {
       // Fetch the first page with no filters
-      final response = await _headlinesRepository.getHeadlines(
+      final response = await _headlinesRepository.readAll(
         limit: _headlinesFetchLimit,
       );
       emit(
@@ -98,7 +118,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           cursor: response.cursor,
         ),
       );
-    } on HeadlinesFetchException catch (e) {
+    } on HtHttpException catch (e) {
       emit(HeadlinesFeedError(message: e.message));
     } catch (e, st) {
       // Log the error and stack trace for unexpected errors
@@ -155,12 +175,29 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     }
 
     try {
-      final response = await _headlinesRepository.getHeadlines(
+      final response = await _headlinesRepository.readAllByQuery(
+        {
+          if (currentFilter.categories?.isNotEmpty ?? false)
+            'categories':
+                currentFilter.categories!
+                    .whereType<Category>()
+                    .map((c) => c.id)
+                    .toList(),
+          if (currentFilter.sources?.isNotEmpty ?? false)
+            'sources':
+                currentFilter.sources!
+                    .whereType<Source>()
+                    .map((s) => s.id)
+                    .toList(),
+          if (currentFilter.eventCountries?.isNotEmpty ?? false)
+            'eventCountries':
+                currentFilter.eventCountries!
+                    .whereType<Country>()
+                    .map((c) => c.isoCode)
+                    .toList(),
+        },
         limit: _headlinesFetchLimit,
         startAfterId: currentCursor, // Use determined cursor
-        categories: currentFilter.categories,
-        sources: currentFilter.sources,
-        eventCountries: currentFilter.eventCountries,
       );
       emit(
         HeadlinesFeedLoaded(
@@ -172,7 +209,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           filter: currentFilter, // Preserve the filter
         ),
       );
-    } on HeadlinesFetchException catch (e) {
+    } on HtHttpException catch (e) {
       emit(HeadlinesFeedError(message: e.message));
     } catch (e, st) {
       print('Unexpected error in _onHeadlinesFeedFetchRequested: $e\n$st');
@@ -198,12 +235,26 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
     try {
       // Fetch the first page using the current filter
-      final response = await _headlinesRepository.getHeadlines(
-        limit: _headlinesFetchLimit,
-        categories: currentFilter.categories,
-        sources: currentFilter.sources,
-        eventCountries: currentFilter.eventCountries,
-      );
+      final response = await _headlinesRepository.readAllByQuery({
+        if (currentFilter.categories?.isNotEmpty ?? false)
+          'categories':
+              currentFilter.categories!
+                  .whereType<Category>()
+                  .map((c) => c.id)
+                  .toList(),
+        if (currentFilter.sources?.isNotEmpty ?? false)
+          'sources':
+              currentFilter.sources!
+                  .whereType<Source>()
+                  .map((s) => s.id)
+                  .toList(),
+        if (currentFilter.eventCountries?.isNotEmpty ?? false)
+          'eventCountries':
+              currentFilter.eventCountries!
+                  .whereType<Country>()
+                  .map((c) => c.isoCode)
+                  .toList(),
+      }, limit: _headlinesFetchLimit,);
       emit(
         HeadlinesFeedLoaded(
           headlines: response.items, // Replace headlines on refresh
@@ -212,7 +263,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           filter: currentFilter, // Preserve the filter
         ),
       );
-    } on HeadlinesFetchException catch (e) {
+    } on HtHttpException catch (e) {
       emit(HeadlinesFeedError(message: e.message));
     } catch (e, st) {
       print('Unexpected error in _onHeadlinesFeedRefreshRequested: $e\n$st');

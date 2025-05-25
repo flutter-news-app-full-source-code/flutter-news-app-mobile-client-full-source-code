@@ -23,47 +23,24 @@ class SettingsState extends Equatable {
   /// {@macro settings_state}
   const SettingsState({
     this.status = SettingsStatus.initial,
-    this.appSettings = const AppSettings(
-      // Default value
-      appFontSize: FontSize.medium,
-      appFontType: AppFontType.roboto,
-    ),
-    this.articleSettings = const ArticleSettings(
-      // Default value
-      articleFontSize: FontSize.medium,
-    ),
-    this.themeSettings = const ThemeSettings(
-      // Default value
-      themeMode: AppThemeMode.system,
-      themeName: AppThemeName.grey,
-    ),
-    this.feedSettings = const FeedSettings(
-      // Default value
-      feedListTileType: FeedListTileType.imageStart,
-    ),
-    this.notificationSettings = const NotificationSettings(
-      enabled: false,
-    ), // Default
+    // Use new models from ht_shared
+    this.userAppSettings = const UserAppSettings(
+      id: '',
+    ), // Provide a default empty instance
+    this.userContentPreferences = const UserContentPreferences(
+      id: '',
+    ), // Provide a default empty instance
     this.error,
   });
 
   /// The current status of loading/updating settings.
   final SettingsStatus status;
 
-  /// Current application-wide settings (font size, font type).
-  final AppSettings appSettings;
+  /// Current user application settings.
+  final UserAppSettings userAppSettings;
 
-  /// Current settings specific to article display (font size).
-  final ArticleSettings articleSettings;
-
-  /// Current theme settings (mode, name/color scheme).
-  final ThemeSettings themeSettings;
-
-  /// Current settings for the news feed display (tile type).
-  final FeedSettings feedSettings;
-
-  /// Current notification settings (enabled, followed items).
-  final NotificationSettings notificationSettings;
+  /// Current user content preferences.
+  final UserContentPreferences userContentPreferences;
 
   /// An optional error object if the status is [SettingsStatus.failure].
   final Object? error;
@@ -71,21 +48,16 @@ class SettingsState extends Equatable {
   /// Creates a copy of the current state with updated values.
   SettingsState copyWith({
     SettingsStatus? status,
-    AppSettings? appSettings,
-    ArticleSettings? articleSettings,
-    ThemeSettings? themeSettings,
-    FeedSettings? feedSettings,
-    NotificationSettings? notificationSettings,
+    UserAppSettings? userAppSettings, // Update parameter type
+    UserContentPreferences? userContentPreferences, // Update parameter type
     Object? error,
     bool clearError = false, // Flag to explicitly clear error
   }) {
     return SettingsState(
       status: status ?? this.status,
-      appSettings: appSettings ?? this.appSettings,
-      articleSettings: articleSettings ?? this.articleSettings,
-      themeSettings: themeSettings ?? this.themeSettings,
-      feedSettings: feedSettings ?? this.feedSettings,
-      notificationSettings: notificationSettings ?? this.notificationSettings,
+      userAppSettings: userAppSettings ?? this.userAppSettings, // Update field
+      userContentPreferences:
+          userContentPreferences ?? this.userContentPreferences, // Update field
       error: clearError ? null : error ?? this.error,
     );
   }
@@ -93,11 +65,8 @@ class SettingsState extends Equatable {
   @override
   List<Object?> get props => [
     status,
-    appSettings,
-    articleSettings,
-    themeSettings,
-    feedSettings,
-    notificationSettings,
+    userAppSettings, // Update field
+    userContentPreferences, // Update field
     error,
   ];
 }

@@ -1,20 +1,20 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_headlines_client/ht_headlines_client.dart';
-import 'package:ht_headlines_repository/ht_headlines_repository.dart';
+import 'package:ht_data_repository/ht_data_repository.dart'; // Generic Data Repository
+import 'package:ht_shared/ht_shared.dart'; // Shared models, including Headline
 
 part 'headlines_search_event.dart';
 part 'headlines_search_state.dart';
 
 class HeadlinesSearchBloc
     extends Bloc<HeadlinesSearchEvent, HeadlinesSearchState> {
-  HeadlinesSearchBloc({required HtHeadlinesRepository headlinesRepository})
+  HeadlinesSearchBloc({required HtDataRepository<Headline> headlinesRepository})
     : _headlinesRepository = headlinesRepository,
       super(HeadlinesSearchLoading()) {
     on<HeadlinesSearchFetchRequested>(_onSearchFetchRequested);
   }
 
-  final HtHeadlinesRepository _headlinesRepository;
+  final HtDataRepository<Headline> _headlinesRepository;
   static const _limit = 10;
 
   Future<void> _onSearchFetchRequested(
@@ -38,8 +38,8 @@ class HeadlinesSearchBloc
       if (!currentState.hasMore) return;
 
       try {
-        final response = await _headlinesRepository.searchHeadlines(
-          query: event.searchTerm,
+        final response = await _headlinesRepository.readAllByQuery(
+          {'query': event.searchTerm}, // Use query map
           limit: _limit,
           startAfterId: currentState.cursor,
         );
@@ -58,8 +58,8 @@ class HeadlinesSearchBloc
       }
     } else {
       try {
-        final response = await _headlinesRepository.searchHeadlines(
-          query: event.searchTerm,
+        final response = await _headlinesRepository.readAllByQuery(
+          {'query': event.searchTerm}, // Use query map
           limit: _limit,
         );
         emit(

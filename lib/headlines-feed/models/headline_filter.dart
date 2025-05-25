@@ -1,7 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:ht_categories_client/ht_categories_client.dart';
-import 'package:ht_countries_client/ht_countries_client.dart';
-import 'package:ht_sources_client/ht_sources_client.dart';
+import 'package:ht_shared/ht_shared.dart';
 
 /// {@template headline_filter}
 /// A model representing the filter parameters for headlines.

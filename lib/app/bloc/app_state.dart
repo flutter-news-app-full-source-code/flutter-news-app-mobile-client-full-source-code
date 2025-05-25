@@ -8,7 +8,7 @@ enum AppStatus {
   /// The user is authenticated.
   authenticated,
 
-  /// The user is not authenticated.
+  /// The user is unauthenticated.
   unauthenticated,
 
   /// The user is anonymous (signed in using an anonymous provider).
@@ -17,15 +17,17 @@ enum AppStatus {
 
 class AppState extends Equatable {
   /// {@macro app_state}
-  AppState({
-    this.selectedBottomNavigationIndex = 0,
+  const AppState({
+    required this.settings, // Add settings property
+    required this.selectedBottomNavigationIndex,
     this.themeMode = ThemeMode.system,
-    this.appFontSize = FontSize.medium, // Default font size
+    this.appTextScaleFactor =
+        AppTextScaleFactor.medium, // Default text scale factor (enum)
     this.flexScheme = FlexScheme.material,
     this.fontFamily,
     this.status = AppStatus.initial,
-    User? user,
-  }) : user = user ?? User();
+    this.user, // User is now nullable and defaults to null
+  });
 
   /// The index of the currently selected item in the bottom navigation bar.
   final int selectedBottomNavigationIndex;
@@ -33,8 +35,8 @@ class AppState extends Equatable {
   /// The overall theme mode (light, dark, system).
   final ThemeMode themeMode;
 
-  /// The font size for the app's UI.
-  final FontSize appFontSize;
+  /// The text scale factor for the app's UI.
+  final AppTextScaleFactor appTextScaleFactor; // Change type to enum
 
   /// The active color scheme defined by FlexColorScheme.
   final FlexScheme flexScheme;
@@ -46,8 +48,11 @@ class AppState extends Equatable {
   /// The current authentication status of the application.
   final AppStatus status;
 
-  /// The current user details. Defaults to an empty user.
-  final User user;
+  /// The current user details. Null if unauthenticated.
+  final User? user;
+
+  /// User-specific application settings.
+  final UserAppSettings settings; // Add settings property
 
   /// Creates a copy of the current state with updated values.
   AppState copyWith({
@@ -55,9 +60,10 @@ class AppState extends Equatable {
     ThemeMode? themeMode,
     FlexScheme? flexScheme,
     String? fontFamily,
-    FontSize? appFontSize, // Added
+    AppTextScaleFactor? appTextScaleFactor, // Change type to enum
     AppStatus? status,
     User? user,
+    UserAppSettings? settings, // Add settings to copyWith
     bool clearFontFamily = false,
   }) {
     return AppState(
@@ -66,9 +72,10 @@ class AppState extends Equatable {
       themeMode: themeMode ?? this.themeMode,
       flexScheme: flexScheme ?? this.flexScheme,
       fontFamily: clearFontFamily ? null : fontFamily ?? this.fontFamily,
-      appFontSize: appFontSize ?? this.appFontSize, // Added
+      appTextScaleFactor: appTextScaleFactor ?? this.appTextScaleFactor,
       status: status ?? this.status,
       user: user ?? this.user,
+      settings: settings ?? this.settings, // Copy settings
     );
   }
 
@@ -78,8 +85,9 @@ class AppState extends Equatable {
     themeMode,
     flexScheme,
     fontFamily,
-    appFontSize, // Added
+    appTextScaleFactor,
     status,
     user,
+    settings, // Include settings in props
   ];
 }

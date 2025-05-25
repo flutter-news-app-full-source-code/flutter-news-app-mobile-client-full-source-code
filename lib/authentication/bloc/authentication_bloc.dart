@@ -1,12 +1,17 @@
-//
-// ignore_for_file: lines_longer_than_80_chars
-
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_authentication_client/ht_authentication_client.dart';
-import 'package:ht_authentication_repository/ht_authentication_repository.dart';
+import 'package:ht_auth_repository/ht_auth_repository.dart';
+import 'package:ht_shared/ht_shared.dart'
+    show
+        AuthenticationException,
+        HtHttpException,
+        InvalidInputException,
+        NetworkException,
+        OperationFailedException,
+        ServerException,
+        User;
 
 part 'authentication_event.dart';
 part 'authentication_state.dart';
@@ -17,33 +22,42 @@ part 'authentication_state.dart';
 class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
   /// {@macro authentication_bloc}
-  AuthenticationBloc({
-    required HtAuthenticationRepository authenticationRepository,
-  }) : _authenticationRepository = authenticationRepository,
-       super(AuthenticationInitial()) {
-    on<AuthenticationSendSignInLinkRequested>(
-      _onAuthenticationSendSignInLinkRequested,
+  AuthenticationBloc({required HtAuthRepository authenticationRepository})
+    : _authenticationRepository = authenticationRepository,
+      super(AuthenticationInitial()) {
+    // Listen to authentication state changes from the repository
+    _authenticationRepository.authStateChanges.listen(
+      (user) => add(_AuthenticationUserChanged(user: user)),
     );
-    on<AuthenticationSignInWithLinkAttempted>(
-      _onAuthenticationSignInWithLinkAttempted,
+
+    on<_AuthenticationUserChanged>(_onAuthenticationUserChanged);
+    on<AuthenticationRequestSignInCodeRequested>(
+      _onAuthenticationRequestSignInCodeRequested,
     );
-    on<AuthenticationGoogleSignInRequested>(
-      _onAuthenticationGoogleSignInRequested,
-    );
+    on<AuthenticationVerifyCodeRequested>(_onAuthenticationVerifyCodeRequested);
     on<AuthenticationAnonymousSignInRequested>(
       _onAuthenticationAnonymousSignInRequested,
     );
     on<AuthenticationSignOutRequested>(_onAuthenticationSignOutRequested);
-    on<AuthenticationDeleteAccountRequested>(
-      _onAuthenticationDeleteAccountRequested,
-    );
   }
 
-  final HtAuthenticationRepository _authenticationRepository;
+  final HtAuthRepository _authenticationRepository;
 
-  /// Handles [AuthenticationSendSignInLinkRequested] events.
-  Future<void> _onAuthenticationSendSignInLinkRequested(
-    AuthenticationSendSignInLinkRequested event,
+  /// Handles [_AuthenticationUserChanged] events.
+  Future<void> _onAuthenticationUserChanged(
+    _AuthenticationUserChanged event,
+    Emitter<AuthenticationState> emit,
+  ) async {
+    if (event.user != null) {
+      emit(AuthenticationAuthenticated(user: event.user!));
+    } else {
+      emit(AuthenticationUnauthenticated());
+    }
+  }
+
+  /// Handles [AuthenticationRequestSignInCodeRequested] events.
+  Future<void> _onAuthenticationRequestSignInCodeRequested(
+    AuthenticationRequestSignInCodeRequested event,
     Emitter<AuthenticationState> emit,
   ) async {
     // Validate email format (basic check)
@@ -51,14 +65,25 @@ class AuthenticationBloc
       emit(const AuthenticationFailure('Please enter a valid email address.'));
       return;
     }
-    emit(AuthenticationLinkSending()); // Indicate link sending
+    emit(
+      AuthenticationRequestCodeLoading(),
+    ); // Indicate code request is sending
     try {
-      // Simply call the repository method, email temprary storage storage
-      // is handled internally
-      await _authenticationRepository.sendSignInLinkToEmail(email: event.email);
-      emit(AuthenticationLinkSentSuccess()); // Confirm link sent
-    } on SendSignInLinkException catch (e) {
-      emit(AuthenticationFailure('Failed to send link: ${e.error}'));
+      await _authenticationRepository.requestSignInCode(event.email);
+      emit(
+        AuthenticationCodeSentSuccess(email: event.email),
+      ); // Confirm code requested and include email
+    } on InvalidInputException catch (e) {
+      emit(AuthenticationFailure('Invalid input: ${e.message}'));
+    } on NetworkException catch (_) {
+      emit(const AuthenticationFailure('Network error occurred.'));
+    } on ServerException catch (e) {
+      emit(AuthenticationFailure('Server error: ${e.message}'));
+    } on OperationFailedException catch (e) {
+      emit(AuthenticationFailure('Operation failed: ${e.message}'));
+    } on HtHttpException catch (e) {
+      // Catch any other HtHttpException subtypes
+      emit(AuthenticationFailure('HTTP error: ${e.message}'));
     } catch (e) {
       // Catch any other unexpected errors
       emit(AuthenticationFailure('An unexpected error occurred: $e'));
@@ -66,51 +91,33 @@ class AuthenticationBloc
     }
   }
 
-  /// Handles [AuthenticationSignInWithLinkAttempted] events.
-  /// This assumes the event is dispatched after the app receives the deep link.
-  Future<void> _onAuthenticationSignInWithLinkAttempted(
-    AuthenticationSignInWithLinkAttempted event,
+  /// Handles [AuthenticationVerifyCodeRequested] events.
+  Future<void> _onAuthenticationVerifyCodeRequested(
+    AuthenticationVerifyCodeRequested event,
     Emitter<AuthenticationState> emit,
   ) async {
-    emit(AuthenticationLoading()); // General loading for sign-in attempt
+    emit(AuthenticationLoading()); // Indicate code verification is loading
     try {
-      // Call the updated repository method (no email needed here)
-      await _authenticationRepository.signInWithEmailLink(
-        emailLink: event.emailLink,
-      );
-      // On success, AppBloc should react to the user stream change from the repo.
-      // Resetting to Initial state here.
-      emit(AuthenticationInitial());
-    } on InvalidSignInLinkException catch (e) {
-      emit(
-        AuthenticationFailure(
-          'Sign in failed: Invalid or expired link. ${e.error}',
-        ),
-      );
+      await _authenticationRepository.verifySignInCode(event.email, event.code);
+      // On success, the _AuthenticationUserChanged listener will handle
+      // emitting AuthenticationAuthenticated.
+    } on InvalidInputException catch (e) {
+      emit(AuthenticationFailure('Invalid input: ${e.message}'));
+    } on AuthenticationException catch (e) {
+      emit(AuthenticationFailure('Authentication failed: ${e.message}'));
+    } on NetworkException catch (_) {
+      emit(const AuthenticationFailure('Network error occurred.'));
+    } on ServerException catch (e) {
+      emit(AuthenticationFailure('Server error: ${e.message}'));
+    } on OperationFailedException catch (e) {
+      emit(AuthenticationFailure('Operation failed: ${e.message}'));
+    } on HtHttpException catch (e) {
+      // Catch any other HtHttpException subtypes
+      emit(AuthenticationFailure('HTTP error: ${e.message}'));
     } catch (e) {
       // Catch any other unexpected errors
-      emit(
-        AuthenticationFailure(
-          'An unexpected error occurred during sign in: $e',
-        ),
-      );
+      emit(AuthenticationFailure('An unexpected error occurred: $e'));
       // Optionally log the stackTrace here
-    }
-  }
-
-  /// Handles [AuthenticationGoogleSignInRequested] events.
-  Future<void> _onAuthenticationGoogleSignInRequested(
-    AuthenticationGoogleSignInRequested event,
-    Emitter<AuthenticationState> emit,
-  ) async {
-    emit(AuthenticationLoading());
-    try {
-      await _authenticationRepository.signInWithGoogle();
-      emit(AuthenticationInitial());
-    } on GoogleSignInException catch (e) {
-      emit(AuthenticationFailure(e.toString()));
-    } catch (e) {
-      emit(AuthenticationFailure(e.toString()));
     }
   }
 
@@ -119,14 +126,22 @@ class AuthenticationBloc
     AuthenticationAnonymousSignInRequested event,
     Emitter<AuthenticationState> emit,
   ) async {
-    emit(AuthenticationLoading());
+    emit(AuthenticationLoading()); // Indicate anonymous sign-in is loading
     try {
       await _authenticationRepository.signInAnonymously();
-      emit(AuthenticationInitial());
-    } on AnonymousLoginException catch (e) {
-      emit(AuthenticationFailure(e.toString()));
+      // On success, the _AuthenticationUserChanged listener will handle
+      // emitting AuthenticationAuthenticated.
+    } on NetworkException catch (_) {
+      emit(const AuthenticationFailure('Network error occurred.'));
+    } on ServerException catch (e) {
+      emit(AuthenticationFailure('Server error: ${e.message}'));
+    } on OperationFailedException catch (e) {
+      emit(AuthenticationFailure('Operation failed: ${e.message}'));
+    } on HtHttpException catch (e) {
+      // Catch any other HtHttpException subtypes
+      emit(AuthenticationFailure('HTTP error: ${e.message}'));
     } catch (e) {
-      emit(AuthenticationFailure(e.toString()));
+      emit(AuthenticationFailure('An unexpected error occurred: $e'));
     }
   }
 
@@ -135,29 +150,22 @@ class AuthenticationBloc
     AuthenticationSignOutRequested event,
     Emitter<AuthenticationState> emit,
   ) async {
-    emit(AuthenticationLoading());
+    emit(AuthenticationLoading()); // Indicate sign-out is loading
     try {
       await _authenticationRepository.signOut();
-      emit(AuthenticationInitial());
-    } on LogoutException catch (e) {
-      emit(AuthenticationFailure(e.toString()));
+      // On success, the _AuthenticationUserChanged listener will handle
+      // emitting AuthenticationUnauthenticated.
+    } on NetworkException catch (_) {
+      emit(const AuthenticationFailure('Network error occurred.'));
+    } on ServerException catch (e) {
+      emit(AuthenticationFailure('Server error: ${e.message}'));
+    } on OperationFailedException catch (e) {
+      emit(AuthenticationFailure('Operation failed: ${e.message}'));
+    } on HtHttpException catch (e) {
+      // Catch any other HtHttpException subtypes
+      emit(AuthenticationFailure('HTTP error: ${e.message}'));
     } catch (e) {
-      emit(AuthenticationFailure(e.toString()));
-    }
-  }
-
-  Future<void> _onAuthenticationDeleteAccountRequested(
-    AuthenticationDeleteAccountRequested event,
-    Emitter<AuthenticationState> emit,
-  ) async {
-    emit(AuthenticationLoading());
-    try {
-      await _authenticationRepository.deleteAccount();
-      emit(AuthenticationInitial());
-    } on DeleteAccountException catch (e) {
-      emit(AuthenticationFailure(e.toString()));
-    } catch (e) {
-      emit(AuthenticationFailure(e.toString()));
+      emit(AuthenticationFailure('An unexpected error occurred: $e'));
     }
   }
 }

@@ -1,7 +1,9 @@
+part of 'settings_bloc.dart';
+
 //
 // ignore_for_file: avoid_positional_boolean_parameters
 
-part of 'settings_bloc.dart';
+// Import models and enums from ht_shared
 
 /// {@template settings_event}
 /// Base class for all events related to the settings feature.
@@ -32,7 +34,7 @@ class SettingsAppThemeModeChanged extends SettingsEvent {
   const SettingsAppThemeModeChanged(this.themeMode);
 
   /// The newly selected theme mode.
-  final AppThemeMode themeMode;
+  final AppBaseTheme themeMode; // Use AppBaseTheme from ht_shared
 
   @override
   List<Object?> get props => [themeMode];
@@ -46,7 +48,7 @@ class SettingsAppThemeNameChanged extends SettingsEvent {
   const SettingsAppThemeNameChanged(this.themeName);
 
   /// The newly selected theme name.
-  final AppThemeName themeName;
+  final AppAccentTheme themeName; // Use AppAccentTheme from ht_shared
 
   @override
   List<Object?> get props => [themeName];
@@ -60,7 +62,7 @@ class SettingsAppFontSizeChanged extends SettingsEvent {
   const SettingsAppFontSizeChanged(this.fontSize);
 
   /// The newly selected font size.
-  final FontSize fontSize;
+  final AppTextScaleFactor fontSize; // Use AppTextScaleFactor from ht_shared
 
   @override
   List<Object?> get props => [fontSize];
@@ -74,10 +76,24 @@ class SettingsAppFontTypeChanged extends SettingsEvent {
   const SettingsAppFontTypeChanged(this.fontType);
 
   /// The newly selected font type.
-  final AppFontType fontType;
+  final String fontType; // Use String for fontFamily
 
   @override
   List<Object?> get props => [fontType];
+}
+
+/// {@template settings_app_font_weight_changed}
+/// Event added when the user changes the global app font weight.
+/// {@endtemplate}
+class SettingsAppFontWeightChanged extends SettingsEvent {
+  /// {@macro settings_app_font_weight_changed}
+  const SettingsAppFontWeightChanged(this.fontWeight);
+
+  /// The newly selected font weight.
+  final AppFontWeight fontWeight; // Use AppFontWeight from ht_shared
+
+  @override
+  List<Object?> get props => [fontWeight];
 }
 
 // --- Feed Settings Events ---
@@ -90,26 +106,11 @@ class SettingsFeedTileTypeChanged extends SettingsEvent {
   const SettingsFeedTileTypeChanged(this.tileType);
 
   /// The newly selected feed list tile type.
-  final FeedListTileType tileType;
+  // Note: This event might need to be split into density and image style changes.
+  final HeadlineImageStyle tileType; // Use HeadlineImageStyle from ht_shared
 
   @override
   List<Object?> get props => [tileType];
-}
-
-// --- Article Settings Events ---
-
-/// {@template settings_article_font_size_changed}
-/// Event added when the user changes the article content font size.
-/// {@endtemplate}
-class SettingsArticleFontSizeChanged extends SettingsEvent {
-  /// {@macro settings_article_font_size_changed}
-  const SettingsArticleFontSizeChanged(this.fontSize);
-
-  /// The newly selected font size for articles.
-  final FontSize fontSize;
-
-  @override
-  List<Object?> get props => [fontSize];
 }
 
 // --- Notification Settings Events ---

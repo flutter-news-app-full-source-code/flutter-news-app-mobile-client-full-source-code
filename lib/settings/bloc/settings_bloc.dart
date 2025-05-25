@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_preferences_client/ht_preferences_client.dart'; // Import models and exceptions
-import 'package:ht_preferences_repository/ht_preferences_repository.dart';
+import 'package:ht_data_repository/ht_data_repository.dart'; // Generic Data Repository
+import 'package:ht_shared/ht_shared.dart'; // Shared models, including UserAppSettings and UserContentPreferences
 
 part 'settings_event.dart'; // Contains event definitions
 part 'settings_state.dart';
@@ -12,14 +12,15 @@ part 'settings_state.dart';
 /// {@template settings_bloc}
 /// Manages the state for the application settings feature.
 ///
-/// Handles loading settings from [HtPreferencesRepository] and processing
+/// Handles loading settings from [HtDataRepository] and processing
 /// user actions to update settings.
 /// {@endtemplate}
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   /// {@macro settings_bloc}
-  SettingsBloc({required HtPreferencesRepository preferencesRepository})
-    : _preferencesRepository = preferencesRepository,
-      super(const SettingsState()) {
+  SettingsBloc({
+    required HtDataRepository<UserAppSettings> userAppSettingsRepository,
+  }) : _userAppSettingsRepository = userAppSettingsRepository,
+       super(const SettingsState()) {
     // Register event handlers
     on<SettingsLoadRequested>(_onLoadRequested);
     on<SettingsAppThemeModeChanged>(
@@ -42,17 +43,13 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       _onFeedTileTypeChanged,
       transformer: sequential(),
     );
-    on<SettingsArticleFontSizeChanged>(
-      _onArticleFontSizeChanged, // Corrected handler name if it was misspelled
-      transformer: sequential(),
-    );
-    on<SettingsNotificationsEnabledChanged>(
-      _onNotificationsEnabledChanged, // Corrected handler name if it was misspelled
-      transformer: sequential(),
-    );
+    // on<SettingsNotificationsEnabledChanged>(
+    //   _onNotificationsEnabledChanged, // Corrected handler name if it was misspelled
+    //   transformer: sequential(),
+    // );
   }
 
-  final HtPreferencesRepository _preferencesRepository;
+  final HtDataRepository<UserAppSettings> _userAppSettingsRepository;
 
   /// Handles the initial loading of all settings.
   Future<void> _onLoadRequested(
@@ -62,47 +59,27 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     emit(state.copyWith(status: SettingsStatus.loading));
     try {
       // Fetch all settings concurrently
-      final results = await Future.wait([
-        _tryFetch(_preferencesRepository.getAppSettings),
-        _tryFetch(_preferencesRepository.getArticleSettings),
-        _tryFetch(_preferencesRepository.getThemeSettings),
-        _tryFetch(_preferencesRepository.getFeedSettings),
-        _tryFetch(_preferencesRepository.getNotificationSettings),
-      ]);
+      // Note: UserAppSettings and UserContentPreferences are fetched as single objects
+      // from the new generic repositories.
+      // TODO(cline): Get actual user ID
+      final appSettings = await _userAppSettingsRepository.read(
+        id: 'user_id',
+      ); // Assuming a fixed ID for user settings
 
-      // Process results, using defaults from initial state if fetch returned null
+      // Process results
       emit(
         state.copyWith(
           status: SettingsStatus.success,
-          appSettings: results[0] as AppSettings? ?? state.appSettings,
-          articleSettings:
-              results[1] as ArticleSettings? ?? state.articleSettings,
-          themeSettings: results[2] as ThemeSettings? ?? state.themeSettings,
-          feedSettings: results[3] as FeedSettings? ?? state.feedSettings,
-          notificationSettings:
-              results[4] as NotificationSettings? ?? state.notificationSettings,
+          userAppSettings: appSettings, // Update state with new model
           clearError: true,
         ),
       );
-    } catch (e) {
-      // If any fetch failed beyond PreferenceNotFoundException
+    } on HtHttpException catch (e) {
+      // Catch standardized HTTP exceptions
       emit(state.copyWith(status: SettingsStatus.failure, error: e));
-    }
-  }
-
-  /// Helper to fetch a setting and handle PreferenceNotFoundException gracefully.
-  Future<T?> _tryFetch<T>(Future<T> Function() fetcher) async {
-    try {
-      return await fetcher();
-    } on PreferenceNotFoundException {
-      // Setting not found, return null to use default from state
-      return null;
-    } on PreferenceUpdateException {
-      // Rethrow other update/fetch exceptions to be caught by the caller
-      rethrow;
     } catch (e) {
-      // Rethrow unexpected errors
-      rethrow;
+      // Catch any other unexpected errors
+      emit(state.copyWith(status: SettingsStatus.failure, error: e));
     }
   }
 
@@ -111,31 +88,26 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     SettingsAppThemeModeChanged event,
     Emitter<SettingsState> emit,
   ) async {
-    // Manually create new instance as copyWith is missing
-    final newThemeSettings = ThemeSettings(
-      themeMode: event.themeMode,
-      themeName: state.themeSettings.themeName, // Keep existing value
-    );
-    // Optimistically update UI
-    emit(
-      state.copyWith(
-        status: SettingsStatus.success, // Keep success state
-        themeSettings: newThemeSettings,
-      ),
-    ); // Removed trailing comma
-
+    // Read current settings, update, and save
     try {
-      await _preferencesRepository.setThemeSettings(newThemeSettings);
-      // No need to emit again on success, UI already updated
-    } catch (e) {
-      // Revert optimistic update on failure and show error
-      emit(
-        state.copyWith(
-          status: SettingsStatus.failure,
-          themeSettings: state.themeSettings, // Revert to previous
-          error: e,
+      // TODO(cline): Get actual user ID
+      final currentSettings = await _userAppSettingsRepository.read(
+        id: 'user_id',
+      );
+      final updatedSettings = currentSettings.copyWith(
+        displaySettings: currentSettings.displaySettings.copyWith(
+          baseTheme: event.themeMode,
         ),
-      ); // Removed trailing comma
+      );
+      await _userAppSettingsRepository.update(
+        id: 'user_id',
+        item: updatedSettings,
+      );
+      emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));
+    } on HtHttpException catch (e) {
+      emit(state.copyWith(status: SettingsStatus.failure, error: e));
+    } catch (e) {
+      emit(state.copyWith(status: SettingsStatus.failure, error: e));
     }
   }
 
@@ -144,22 +116,26 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     SettingsAppThemeNameChanged event,
     Emitter<SettingsState> emit,
   ) async {
-    // Manually create new instance
-    final newThemeSettings = ThemeSettings(
-      themeMode: state.themeSettings.themeMode, // Keep existing value
-      themeName: event.themeName,
-    );
-    emit(state.copyWith(themeSettings: newThemeSettings));
+    // Read current settings, update, and save
     try {
-      await _preferencesRepository.setThemeSettings(newThemeSettings);
-    } catch (e) {
-      emit(
-        state.copyWith(
-          status: SettingsStatus.failure,
-          themeSettings: state.themeSettings,
-          error: e,
+      // TODO(cline): Get actual user ID
+      final currentSettings = await _userAppSettingsRepository.read(
+        id: 'user_id',
+      );
+      final updatedSettings = currentSettings.copyWith(
+        displaySettings: currentSettings.displaySettings.copyWith(
+          accentTheme: event.themeName,
         ),
-      ); // Removed trailing comma
+      );
+      await _userAppSettingsRepository.update(
+        id: 'user_id',
+        item: updatedSettings,
+      );
+      emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));
+    } on HtHttpException catch (e) {
+      emit(state.copyWith(status: SettingsStatus.failure, error: e));
+    } catch (e) {
+      emit(state.copyWith(status: SettingsStatus.failure, error: e));
     }
   }
 
@@ -168,22 +144,26 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     SettingsAppFontSizeChanged event,
     Emitter<SettingsState> emit,
   ) async {
-    // Manually create new instance
-    final newAppSettings = AppSettings(
-      appFontSize: event.fontSize,
-      appFontType: state.appSettings.appFontType, // Keep existing value
-    );
-    emit(state.copyWith(appSettings: newAppSettings));
+    // Read current settings, update, and save
     try {
-      await _preferencesRepository.setAppSettings(newAppSettings);
-    } catch (e) {
-      emit(
-        state.copyWith(
-          status: SettingsStatus.failure,
-          appSettings: state.appSettings,
-          error: e,
+      // TODO(cline): Get actual user ID
+      final currentSettings = await _userAppSettingsRepository.read(
+        id: 'user_id',
+      );
+      final updatedSettings = currentSettings.copyWith(
+        displaySettings: currentSettings.displaySettings.copyWith(
+          textScaleFactor: event.fontSize,
         ),
-      ); // Removed trailing comma
+      );
+      await _userAppSettingsRepository.update(
+        id: 'user_id',
+        item: updatedSettings,
+      );
+      emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));
+    } on HtHttpException catch (e) {
+      emit(state.copyWith(status: SettingsStatus.failure, error: e));
+    } catch (e) {
+      emit(state.copyWith(status: SettingsStatus.failure, error: e));
     }
   }
 
@@ -192,22 +172,26 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     SettingsAppFontTypeChanged event,
     Emitter<SettingsState> emit,
   ) async {
-    // Manually create new instance
-    final newAppSettings = AppSettings(
-      appFontSize: state.appSettings.appFontSize, // Keep existing value
-      appFontType: event.fontType,
-    );
-    emit(state.copyWith(appSettings: newAppSettings));
+    // Read current settings, update, and save
     try {
-      await _preferencesRepository.setAppSettings(newAppSettings);
-    } catch (e) {
-      emit(
-        state.copyWith(
-          status: SettingsStatus.failure,
-          appSettings: state.appSettings,
-          error: e,
+      // TODO(cline): Get actual user ID
+      final currentSettings = await _userAppSettingsRepository.read(
+        id: 'user_id',
+      );
+      final updatedSettings = currentSettings.copyWith(
+        displaySettings: currentSettings.displaySettings.copyWith(
+          fontFamily: event.fontType,
         ),
-      ); // Removed trailing comma
+      );
+      await _userAppSettingsRepository.update(
+        id: 'user_id',
+        item: updatedSettings,
+      );
+      emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));
+    } on HtHttpException catch (e) {
+      emit(state.copyWith(status: SettingsStatus.failure, error: e));
+    } catch (e) {
+      emit(state.copyWith(status: SettingsStatus.failure, error: e));
     }
   }
 
@@ -216,71 +200,66 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     SettingsFeedTileTypeChanged event,
     Emitter<SettingsState> emit,
   ) async {
-    // Manually create new instance
-    final newFeedSettings = FeedSettings(feedListTileType: event.tileType);
-    emit(state.copyWith(feedSettings: newFeedSettings));
+    // Read current settings, update, and save
     try {
-      await _preferencesRepository.setFeedSettings(newFeedSettings);
-    } catch (e) {
-      emit(
-        state.copyWith(
-          status: SettingsStatus.failure,
-          feedSettings: state.feedSettings,
-          error: e,
+      // TODO(cline): Get actual user ID
+      final currentSettings = await _userAppSettingsRepository.read(
+        id: 'user_id',
+      );
+      // Note: This event currently only handles HeadlineImageStyle.
+      // A separate event/logic might be needed for HeadlineDensity.
+      final updatedSettings = currentSettings.copyWith(
+        feedPreferences: currentSettings.feedPreferences.copyWith(
+          headlineImageStyle: event.tileType,
         ),
-      ); // Removed trailing comma
-    }
-  }
-
-  /// Handles changes to the Article Font Size setting.
-  Future<void> _onArticleFontSizeChanged(
-    SettingsArticleFontSizeChanged event,
-    Emitter<SettingsState> emit,
-  ) async {
-    // Manually create new instance
-    final newArticleSettings = ArticleSettings(articleFontSize: event.fontSize);
-    emit(state.copyWith(articleSettings: newArticleSettings));
-    try {
-      await _preferencesRepository.setArticleSettings(newArticleSettings);
+      );
+      await _userAppSettingsRepository.update(
+        id: 'user_id',
+        item: updatedSettings,
+      );
+      emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));
+    } on HtHttpException catch (e) {
+      emit(state.copyWith(status: SettingsStatus.failure, error: e));
     } catch (e) {
-      emit(
-        state.copyWith(
-          status: SettingsStatus.failure,
-          articleSettings: state.articleSettings,
-          error: e,
-        ),
-      ); // Removed trailing comma
+      emit(state.copyWith(status: SettingsStatus.failure, error: e));
     }
   }
 
   /// Handles changes to the Notifications Enabled setting.
-  Future<void> _onNotificationsEnabledChanged(
-    SettingsNotificationsEnabledChanged event,
-    Emitter<SettingsState> emit,
-  ) async {
-    // Manually create new instance
-    // Note: This only updates the 'enabled' flag. Updating followed items
-    // would require copying the lists as well.
-    final newNotificationSettings = NotificationSettings(
-      enabled: event.enabled,
-      categoryNotifications: state.notificationSettings.categoryNotifications,
-      sourceNotifications: state.notificationSettings.sourceNotifications,
-      followedEventCountryIds:
-          state.notificationSettings.followedEventCountryIds,
-    );
-    emit(state.copyWith(notificationSettings: newNotificationSettings));
-    try {
-      await _preferencesRepository.setNotificationSettings(
-        newNotificationSettings,
-      );
-    } catch (e) {
-      emit(
-        state.copyWith(
-          status: SettingsStatus.failure,
-          notificationSettings: state.notificationSettings,
-          error: e,
-        ),
-      ); // Removed trailing comma
-    }
-  }
-} // Added closing brace
+  // Future<void> _onNotificationsEnabledChanged(
+  //   SettingsNotificationsEnabledChanged event,
+  //   Emitter<SettingsState> emit,
+  // ) async {
+  //   // Read current preferences, update, and save
+  //   try {
+  //     // TODO(cline): Get actual user ID
+  //     final currentPreferences = await _userContentPreferencesRepository.read(id: 'user_id');
+  //     // Note: This only updates the 'enabled' flag. Updating followed items
+  //     // would require copying the lists as well.
+  //     // The NotificationSettings model from the old preferences client doesn't directly map
+  //     // to UserContentPreferences. Assuming notification enabled state is part of UserAppSettings.
+  //     // Re-evaluating based on UserAppSettings model... UserAppSettings has engagementShownCounts
+  //     // and engagementLastShownTimestamps, but no general notification enabled flag.
+  //     // This suggests the notification enabled setting might need to be added to UserAppSettings
+  //     // or handled differently. For now, I will add a TODO and emit a failure state.
+  //     // TODO(cline): Determine where notification enabled setting is stored in new models.
+  //     emit(state.copyWith(status: SettingsStatus.failure, error: Exception('Notification enabled setting location in new models is TBD.')));
+
+  //     // If it were in UserAppSettings:
+  //     /*
+  //     final currentSettings = await _userAppSettingsRepository.read(id: 'user_id');
+  //     final updatedSettings = currentSettings.copyWith(
+  //       // Assuming a field like 'notificationsEnabled' exists in UserAppSettings
+  //       notificationsEnabled: event.enabled,
+  //     );
+  //     await _userAppSettingsRepository.update(id: 'user_id', item: updatedSettings);
+  //     emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));
+  //     */
+
+  //   } on HtHttpException catch (e) {
+  //     emit(state.copyWith(status: SettingsStatus.failure, error: e));
+  //   } catch (e) {
+  //     emit(state.copyWith(status: SettingsStatus.failure, error: e));
+  //   }
+  // }
+}

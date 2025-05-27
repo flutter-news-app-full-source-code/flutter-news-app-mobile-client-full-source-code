@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ht_auth_api/ht_auth_api.dart'; // Concrete Auth Client Impl
-import 'package:ht_auth_repository/ht_auth_repository.dart'; // Auth Repository
-import 'package:ht_data_api/ht_data_api.dart'; // Concrete Data Client Impl
-import 'package:ht_data_repository/ht_data_repository.dart'; // Data Repository
-import 'package:ht_http_client/ht_http_client.dart'; // HTTP Client
-import 'package:ht_kv_storage_shared_preferences/ht_kv_storage_shared_preferences.dart'; // KV Storage Impl
-import 'package:ht_main/app/app.dart'; // The App widget
-import 'package:ht_main/bloc_observer.dart'; // App Bloc Observer
-import 'package:ht_shared/ht_shared.dart'; // Shared models, FromJson, ToJson, etc.
+import 'package:ht_auth_api/ht_auth_api.dart';
+import 'package:ht_auth_repository/ht_auth_repository.dart';
+import 'package:ht_data_api/ht_data_api.dart';
+import 'package:ht_data_repository/ht_data_repository.dart';
+import 'package:ht_http_client/ht_http_client.dart';
+import 'package:ht_kv_storage_shared_preferences/ht_kv_storage_shared_preferences.dart';
+import 'package:ht_main/app/app.dart';
+import 'package:ht_main/bloc_observer.dart';
+import 'package:ht_shared/ht_shared.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,23 +23,13 @@ void main() async {
   late final HtAuthRepository authenticationRepository;
 
   // 3. Define Token Provider
-  // TODO(refactor): This is a temporary workaround. The HtAuthRepository
-  // should be refactored to provide a public method/getter to retrieve
-  // the current authentication token string. This function should then
-  // call that method.
   Future<String?> tokenProvider() async {
-    // For now, return null as we don't have a way to get the token
-    // from the current HtAuthRepository implementation.
-    // The HtHttpClient will make unauthenticated requests by default.
-    // The authentication flow will handle obtaining and storing the token
-    // via the HtAuthRepository's signIn/verify methods.
-    // A future refactor is needed to make the token available here.
-    return null;
+    return authenticationRepository.getAuthToken();
   }
 
   // 4. Instantiate HTTP Client
   final httpClient = HtHttpClient(
-    baseUrl: 'http://localhost:8080', // Provided base URL for Dart Frog backend
+    baseUrl: 'http://localhost:8080',
     tokenProvider: tokenProvider,
   );
 
@@ -49,8 +39,7 @@ void main() async {
   // Initialize the authenticationRepository instance
   authenticationRepository = HtAuthRepository(
     authClient: authClient,
-    // storageService is not a parameter based on errors.
-    // Token persistence must be handled within HtAuthRepository using HtKVStorageService internally.
+    storageService: kvStorage,
   );
 
   // 6. Instantiate Data Clients and Repositories for each model type
@@ -59,7 +48,7 @@ void main() async {
 
   final headlinesClient = HtDataApi<Headline>(
     httpClient: httpClient,
-    modelName: 'headline', // Assuming 'headline' is the model name for the API
+    modelName: 'headline',
     fromJson: Headline.fromJson,
     toJson: (headline) => headline.toJson(),
   );
@@ -69,7 +58,7 @@ void main() async {
 
   final categoriesClient = HtDataApi<Category>(
     httpClient: httpClient,
-    modelName: 'category', // Assuming 'category' is the model name for the API
+    modelName: 'category',
     fromJson: Category.fromJson,
     toJson: (category) => category.toJson(),
   );
@@ -79,7 +68,7 @@ void main() async {
 
   final countriesClient = HtDataApi<Country>(
     httpClient: httpClient,
-    modelName: 'country', // Assuming 'country' is the model name for the API
+    modelName: 'country',
     fromJson: Country.fromJson,
     toJson: (country) => country.toJson(),
   );
@@ -89,7 +78,7 @@ void main() async {
 
   final sourcesClient = HtDataApi<Source>(
     httpClient: httpClient,
-    modelName: 'source', // Assuming 'source' is the model name for the API
+    modelName: 'source',
     fromJson: Source.fromJson,
     toJson: (source) => source.toJson(),
   );
@@ -97,7 +86,7 @@ void main() async {
 
   final userContentPreferencesClient = HtDataApi<UserContentPreferences>(
     httpClient: httpClient,
-    modelName: 'user_content_preferences', // Assuming model name
+    modelName: 'user_content_preferences',
     fromJson: UserContentPreferences.fromJson,
     toJson: (prefs) => prefs.toJson(),
   );
@@ -108,7 +97,7 @@ void main() async {
 
   final userAppSettingsClient = HtDataApi<UserAppSettings>(
     httpClient: httpClient,
-    modelName: 'user_app_settings', // Assuming model name
+    modelName: 'user_app_settings',
     fromJson: UserAppSettings.fromJson,
     toJson: (settings) => settings.toJson(),
   );
@@ -116,10 +105,9 @@ void main() async {
     dataClient: userAppSettingsClient,
   );
 
-  // Assuming AppConfig model exists in ht_shared and has fromJson/toJson
   final appConfigClient = HtDataApi<AppConfig>(
     httpClient: httpClient,
-    modelName: 'app_config', // Assuming model name
+    modelName: 'app_config',
     fromJson: AppConfig.fromJson,
     toJson: (config) => config.toJson(),
   );

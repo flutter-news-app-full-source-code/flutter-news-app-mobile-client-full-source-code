@@ -10,7 +10,7 @@ import 'package:ht_main/app/view/app_shell.dart';
 import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/authentication/view/authentication_page.dart';
 import 'package:ht_main/authentication/view/email_code_verification_page.dart';
-import 'package:ht_main/authentication/view/request_code_page.dart'; // Will be renamed to request_code_page.dart later
+import 'package:ht_main/authentication/view/request_code_page.dart';
 import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart';
 import 'package:ht_main/headline-details/view/headline_details_page.dart';
 import 'package:ht_main/headlines-feed/bloc/categories_filter_bloc.dart'; // Import new BLoC
@@ -264,9 +264,9 @@ GoRouter createRouter({
             builder: (context, state) {
               // Extract the linking context flag from 'extra', default to false.
               final isLinking = (state.extra as bool?) ?? false;
-              return EmailSignInPage(
+              return RequestCodePage(
                 isLinkingContext: isLinking,
-              ); // Page will be renamed later
+              );
             },
           ),
           GoRoute(

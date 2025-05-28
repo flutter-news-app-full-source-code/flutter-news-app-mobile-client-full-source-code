@@ -28,7 +28,6 @@ import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/settings/bloc/settings_bloc.dart'; // Added
 import 'package:ht_main/settings/view/appearance_settings_page.dart'; // Added
-import 'package:ht_main/settings/view/article_settings_page.dart'; // Added
 import 'package:ht_main/settings/view/feed_settings_page.dart'; // Added
 import 'package:ht_main/settings/view/notification_settings_page.dart'; // Added
 import 'package:ht_main/settings/view/settings_page.dart'; // Added
@@ -478,12 +477,6 @@ GoRouter createRouter({
                         path: Routes.settingsFeed, // 'feed'
                         name: Routes.settingsFeedName,
                         builder: (context, state) => const FeedSettingsPage(),
-                      ),
-                      GoRoute(
-                        path: Routes.settingsArticle, // 'article'
-                        name: Routes.settingsArticleName,
-                        builder:
-                            (context, state) => const ArticleSettingsPage(),
                       ),
                       GoRoute(
                         path: Routes.settingsNotifications, // 'notifications'

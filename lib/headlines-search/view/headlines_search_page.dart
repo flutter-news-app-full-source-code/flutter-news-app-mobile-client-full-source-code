@@ -68,7 +68,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
       final searchTerm = state.lastSearchTerm;
       if (state.hasMore) {
         context.read<HeadlinesSearchBloc>().add(
-          HeadlinesSearchFetchRequested(searchTerm: searchTerm!),
+          HeadlinesSearchFetchRequested(searchTerm: searchTerm),
         );
       }
     }
@@ -189,7 +189,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                       // Retry with the last successful search term
                       context.read<HeadlinesSearchBloc>().add(
                         HeadlinesSearchFetchRequested(
-                          searchTerm: lastSearchTerm ?? '',
+                          searchTerm: lastSearchTerm,
                         ),
                       );
                     },

@@ -116,9 +116,6 @@ void main() async {
   );
 
   // 7. Run the App, injecting repositories
-  // NOTE: The App widget constructor currently expects specific repository types.
-  // This will cause type errors that will be fixed in the next step (Step 3)
-  // when we refactor the App widget and router.
   runApp(
     App(
       htAuthenticationRepository: authenticationRepository,

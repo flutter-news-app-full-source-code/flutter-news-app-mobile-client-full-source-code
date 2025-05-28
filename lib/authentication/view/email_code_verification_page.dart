@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/shared/constants/app_spacing.dart';
 
@@ -17,75 +20,149 @@ class EmailCodeVerificationPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.emailCodeSentPageTitle), // Updated l10n key
-      ),
+      appBar: AppBar(title: Text(l10n.emailCodeSentPageTitle)),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.paddingLarge),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.mark_email_read_outlined, // Suggestive icon
-                  size: 80,
-                  // Consider using theme color
-                  // color: Theme.of(context).colorScheme.primary,
-                ),
-                const SizedBox(height: AppSpacing.xl),
-                Text(
-                  l10n.emailCodeSentConfirmation(email), // Pass email to l10n
-                  style: textTheme.titleLarge, // Prominent text style
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: AppSpacing.xxl),
-                Text(
-                  l10n.emailCodeSentInstructions, // New l10n key for instructions
-                  style: textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                // Input field for the 6-digit code
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
+        child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
+          listener: (context, state) {
+            if (state is AuthenticationFailure) {
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  SnackBar(
+                    content: Text(state.errorMessage),
+                    backgroundColor: colorScheme.error,
                   ),
-                  child: TextField(
-                    // TODO(cline): Add controller and validation
-                    keyboardType: TextInputType.number,
-                    maxLength: 6,
-                    textAlign: TextAlign.center,
-                    decoration: InputDecoration(
-                      hintText: l10n.emailCodeVerificationHint, // Add l10n key
-                      border: const OutlineInputBorder(),
-                      counterText: '', // Hide the counter
-                    ),
+                );
+            }
+            // Successful authentication is handled by AppBloc redirecting.
+          },
+          builder: (context, state) {
+            final isLoading = state is AuthenticationLoading;
+
+            return Padding(
+              padding: const EdgeInsets.all(AppSpacing.paddingLarge),
+              child: Center(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.mark_email_read_outlined, size: 80),
+                      const SizedBox(height: AppSpacing.xl),
+                      Text(
+                        l10n.emailCodeSentConfirmation(email),
+                        style: textTheme.titleLarge,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: AppSpacing.xxl),
+                      Text(
+                        l10n.emailCodeSentInstructions,
+                        style: textTheme.bodyMedium,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      _EmailCodeVerificationForm(
+                        email: email,
+                        isLoading: isLoading,
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: AppSpacing.xl),
-                // Verify button
-                ElevatedButton(
-                  // TODO(cline): Add onPressed logic to dispatch event
-                  onPressed: () {
-                    // Dispatch event to AuthenticationBloc
-                    // context.read<AuthenticationBloc>().add(
-                    //       AuthenticationEmailCodeVerificationRequested(
-                    //         email: email,
-                    //         code: 'entered_code', // Get code from TextField
-                    //       ),
-                    //     );
-                  },
-                  child: Text(
-                    l10n.emailCodeVerificationButtonLabel,
-                  ), // Add l10n key
-                ),
-              ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _EmailCodeVerificationForm extends StatefulWidget {
+  const _EmailCodeVerificationForm({
+    required this.email,
+    required this.isLoading,
+  });
+
+  final String email;
+  final bool isLoading;
+
+  @override
+  State<_EmailCodeVerificationForm> createState() =>
+      _EmailCodeVerificationFormState();
+}
+
+class _EmailCodeVerificationFormState
+    extends State<_EmailCodeVerificationForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _codeController = TextEditingController();
+
+  @override
+  void dispose() {
+    _codeController.dispose();
+    super.dispose();
+  }
+
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      context.read<AuthenticationBloc>().add(
+        AuthenticationVerifyCodeRequested(
+          email: widget.email,
+          code: _codeController.text.trim(),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
+    return Form(
+      key: _formKey,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            child: TextFormField(
+              controller: _codeController,
+              decoration: InputDecoration(
+                hintText: l10n.emailCodeVerificationHint,
+                border: const OutlineInputBorder(),
+                counterText: '', // Hide the counter
+              ),
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              maxLength: 6,
+              textAlign: TextAlign.center,
+              enabled: !widget.isLoading,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return l10n.emailCodeValidationEmptyError;
+                }
+                if (value.length != 6) {
+                  return l10n.emailCodeValidationLengthError;
+                }
+                return null;
+              },
+              onFieldSubmitted: widget.isLoading ? null : (_) => _submitForm(),
             ),
           ),
-        ),
+          const SizedBox(height: AppSpacing.xl),
+          ElevatedButton(
+            onPressed: widget.isLoading ? null : _submitForm,
+            child:
+                widget.isLoading
+                    ? const SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                    : Text(l10n.emailCodeVerificationButtonLabel),
+          ),
+        ],
       ),
     );
   }

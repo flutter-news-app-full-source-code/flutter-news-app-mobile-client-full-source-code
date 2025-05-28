@@ -541,5 +541,13 @@
     "emailCodeVerificationButtonLabel": "تحقق من الرمز",
     "@emailCodeVerificationButtonLabel": {
         "description": "Label for the button to verify the email code"
+    },
+    "emailCodeValidationEmptyError": "الرجاء إدخال الرمز المكون من 6 أرقام.",
+    "@emailCodeValidationEmptyError": {
+        "description": "Validation error when the email verification code is empty."
+    },
+    "emailCodeValidationLengthError": "يجب أن يتكون الرمز من 6 أرقام.",
+    "@emailCodeValidationLengthError": {
+        "description": "Validation error when the email verification code is not 6 digits."
     }
 }

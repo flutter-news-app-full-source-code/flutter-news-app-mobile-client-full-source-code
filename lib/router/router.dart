@@ -10,7 +10,7 @@ import 'package:ht_main/app/view/app_shell.dart';
 import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/authentication/view/authentication_page.dart';
 import 'package:ht_main/authentication/view/email_code_verification_page.dart';
-import 'package:ht_main/authentication/view/request_code_page.dart'; // Will be renamed to request_code_page.dart later
+import 'package:ht_main/authentication/view/request_code_page.dart';
 import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart';
 import 'package:ht_main/headline-details/view/headline_details_page.dart';
 import 'package:ht_main/headlines-feed/bloc/categories_filter_bloc.dart'; // Import new BLoC
@@ -28,7 +28,6 @@ import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/settings/bloc/settings_bloc.dart'; // Added
 import 'package:ht_main/settings/view/appearance_settings_page.dart'; // Added
-import 'package:ht_main/settings/view/article_settings_page.dart'; // Added
 import 'package:ht_main/settings/view/feed_settings_page.dart'; // Added
 import 'package:ht_main/settings/view/notification_settings_page.dart'; // Added
 import 'package:ht_main/settings/view/settings_page.dart'; // Added
@@ -264,9 +263,7 @@ GoRouter createRouter({
             builder: (context, state) {
               // Extract the linking context flag from 'extra', default to false.
               final isLinking = (state.extra as bool?) ?? false;
-              return EmailSignInPage(
-                isLinkingContext: isLinking,
-              ); // Page will be renamed later
+              return RequestCodePage(isLinkingContext: isLinking);
             },
           ),
           GoRoute(
@@ -451,17 +448,34 @@ GoRouter createRouter({
                     name: Routes.settingsName,
                     builder: (context, state) {
                       // Provide SettingsBloc here for SettingsPage and its children
+                      // Access AppBloc to get the current user ID
+                      final appBloc = context.read<AppBloc>();
+                      final userId = appBloc.state.user?.id;
+
                       return BlocProvider(
-                        create:
-                            (context) => SettingsBloc(
-                              userAppSettingsRepository:
-                                  context
-                                      .read<
-                                        HtDataRepository<UserAppSettings>
-                                      >(),
-                            )..add(
-                              const SettingsLoadRequested(),
-                            ), // Load on entry
+                        create: (context) {
+                          final settingsBloc = SettingsBloc(
+                            userAppSettingsRepository:
+                                context
+                                    .read<HtDataRepository<UserAppSettings>>(),
+                          );
+                          // Only load settings if a userId is available
+                          if (userId != null) {
+                            settingsBloc.add(
+                              SettingsLoadRequested(userId: userId),
+                            );
+                          } else {
+                            // Handle case where user is unexpectedly null.
+                            // This might involve logging or emitting an error state
+                            // directly in SettingsBloc if it's designed to handle it,
+                            // or simply not loading settings.
+                            // For now, we'll assume router redirects prevent this.
+                            print(
+                              'Warning: User ID is null when creating SettingsBloc. Settings will not be loaded.',
+                            );
+                          }
+                          return settingsBloc;
+                        },
                         child: const SettingsPage(), // Use the actual page
                       );
                     },
@@ -478,12 +492,6 @@ GoRouter createRouter({
                         path: Routes.settingsFeed, // 'feed'
                         name: Routes.settingsFeedName,
                         builder: (context, state) => const FeedSettingsPage(),
-                      ),
-                      GoRoute(
-                        path: Routes.settingsArticle, // 'article'
-                        name: Routes.settingsArticleName,
-                        builder:
-                            (context, state) => const ArticleSettingsPage(),
                       ),
                       GoRoute(
                         path: Routes.settingsNotifications, // 'notifications'

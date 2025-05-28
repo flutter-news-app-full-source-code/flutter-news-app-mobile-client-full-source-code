@@ -54,7 +54,7 @@ class FeedSettingsPage extends StatelessWidget {
             title: l10n.settingsFeedTileTypeLabel, // Add l10n key
             currentValue:
                 state
-                    .userAppSettings
+                    .userAppSettings!
                     .feedPreferences
                     .headlineImageStyle, // Use new model field
             items: HeadlineImageStyle.values,

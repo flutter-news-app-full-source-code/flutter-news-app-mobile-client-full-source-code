@@ -103,7 +103,7 @@ class AppearanceSettingsPage extends StatelessWidget {
           _buildDropdownSetting<AppBaseTheme>(
             context: context,
             title: l10n.settingsAppearanceThemeModeLabel,
-            currentValue: state.userAppSettings.displaySettings.baseTheme,
+            currentValue: state.userAppSettings!.displaySettings.baseTheme,
             items: AppBaseTheme.values,
             itemToString: (mode) => _baseThemeToString(mode, l10n),
             onChanged: (value) {
@@ -118,7 +118,7 @@ class AppearanceSettingsPage extends StatelessWidget {
           _buildDropdownSetting<AppAccentTheme>(
             context: context,
             title: l10n.settingsAppearanceThemeNameLabel,
-            currentValue: state.userAppSettings.displaySettings.accentTheme,
+            currentValue: state.userAppSettings!.displaySettings.accentTheme,
             items: AppAccentTheme.values,
             itemToString: (name) => _accentThemeToString(name, l10n),
             onChanged: (value) {
@@ -136,7 +136,8 @@ class AppearanceSettingsPage extends StatelessWidget {
             context: context,
             title:
                 l10n.settingsAppearanceAppFontSizeLabel, // Reusing key for text size
-            currentValue: state.userAppSettings.displaySettings.textScaleFactor,
+            currentValue:
+                state.userAppSettings!.displaySettings.textScaleFactor,
             items: AppTextScaleFactor.values,
             itemToString: (size) => _textScaleFactorToString(size, l10n),
             onChanged: (value) {
@@ -155,7 +156,7 @@ class AppearanceSettingsPage extends StatelessWidget {
             context: context,
             title:
                 l10n.settingsAppearanceAppFontTypeLabel, // Reusing key for font family
-            currentValue: state.userAppSettings.displaySettings.fontFamily,
+            currentValue: state.userAppSettings!.displaySettings.fontFamily,
             items: const [
               'SystemDefault',
             ], // Only SystemDefault supported for now
@@ -174,7 +175,7 @@ class AppearanceSettingsPage extends StatelessWidget {
           _buildDropdownSetting<AppFontWeight>(
             context: context,
             title: l10n.settingsAppearanceFontWeightLabel, // Add l10n key
-            currentValue: state.userAppSettings.displaySettings.fontWeight,
+            currentValue: state.userAppSettings!.displaySettings.fontWeight,
             items: AppFontWeight.values,
             itemToString:
                 (weight) => _fontWeightToString(weight, l10n), // Use helper

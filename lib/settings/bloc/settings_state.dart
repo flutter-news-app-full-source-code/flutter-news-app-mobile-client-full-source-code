@@ -17,19 +17,13 @@ enum SettingsStatus {
 
 /// {@template settings_state}
 /// Represents the state of the settings feature, including loading status
-/// and the current values of all user-configurable settings.
+/// and the current values of all user-configurable application settings.
 /// {@endtemplate}
 class SettingsState extends Equatable {
   /// {@macro settings_state}
   const SettingsState({
     this.status = SettingsStatus.initial,
-    // Use new models from ht_shared
-    this.userAppSettings = const UserAppSettings(
-      id: '',
-    ), // Provide a default empty instance
-    this.userContentPreferences = const UserContentPreferences(
-      id: '',
-    ), // Provide a default empty instance
+    this.userAppSettings, // Nullable, populated after successful load
     this.error,
   });
 
@@ -37,10 +31,9 @@ class SettingsState extends Equatable {
   final SettingsStatus status;
 
   /// Current user application settings.
-  final UserAppSettings userAppSettings;
-
-  /// Current user content preferences.
-  final UserContentPreferences userContentPreferences;
+  /// Null if settings haven't been loaded or if there's no authenticated user
+  /// context for settings yet.
+  final UserAppSettings? userAppSettings;
 
   /// An optional error object if the status is [SettingsStatus.failure].
   final Object? error;
@@ -48,25 +41,19 @@ class SettingsState extends Equatable {
   /// Creates a copy of the current state with updated values.
   SettingsState copyWith({
     SettingsStatus? status,
-    UserAppSettings? userAppSettings, // Update parameter type
-    UserContentPreferences? userContentPreferences, // Update parameter type
+    UserAppSettings? userAppSettings,
     Object? error,
     bool clearError = false, // Flag to explicitly clear error
+    bool clearUserAppSettings = false, // Flag to explicitly clear settings
   }) {
     return SettingsState(
       status: status ?? this.status,
-      userAppSettings: userAppSettings ?? this.userAppSettings, // Update field
-      userContentPreferences:
-          userContentPreferences ?? this.userContentPreferences, // Update field
+      userAppSettings:
+          clearUserAppSettings ? null : userAppSettings ?? this.userAppSettings,
       error: clearError ? null : error ?? this.error,
     );
   }
 
   @override
-  List<Object?> get props => [
-    status,
-    userAppSettings, // Update field
-    userContentPreferences, // Update field
-    error,
-  ];
+  List<Object?> get props => [status, userAppSettings, error];
 }

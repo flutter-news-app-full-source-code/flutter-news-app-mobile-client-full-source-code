@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ht_main/app/bloc/app_bloc.dart'; // Import AppBloc
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart'; // Assuming sub-routes will be added here
 import 'package:ht_main/settings/bloc/settings_bloc.dart';
@@ -43,13 +44,25 @@ class SettingsPage extends StatelessWidget {
           // Handle error state
           if (state.status == SettingsStatus.failure) {
             return FailureStateWidget(
-              message:
-                  state.error?.toString() ??
-                  l10n.settingsErrorDefault, // Add l10n key
-              onRetry:
-                  () => context.read<SettingsBloc>().add(
-                    const SettingsLoadRequested(),
-                  ),
+              message: state.error?.toString() ?? l10n.settingsErrorDefault,
+              onRetry: () {
+                // Access AppBloc to get the current user ID for retry
+                final appBloc = context.read<AppBloc>();
+                final userId = appBloc.state.user?.id;
+                if (userId != null) {
+                  context.read<SettingsBloc>().add(
+                    SettingsLoadRequested(userId: userId),
+                  );
+                } else {
+                  // Handle case where user is null on retry, though unlikely
+                  // if router guards are effective.
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(l10n.unknownError), // Or a specific error
+                    ),
+                  );
+                }
+              },
             );
           }
 
@@ -69,13 +82,6 @@ class SettingsPage extends StatelessWidget {
                 icon: Icons.feed_outlined,
                 title: l10n.settingsFeedDisplayTitle, // Add l10n key
                 onTap: () => context.goNamed(Routes.settingsFeedName),
-              ),
-              const Divider(indent: AppSpacing.lg, endIndent: AppSpacing.lg),
-              _buildSettingsTile(
-                context: context,
-                icon: Icons.article_outlined,
-                title: l10n.settingsArticleDisplayTitle, // Add l10n key
-                onTap: () => context.goNamed(Routes.settingsArticleName),
               ),
               const Divider(indent: AppSpacing.lg, endIndent: AppSpacing.lg),
               _buildSettingsTile(

@@ -48,17 +48,12 @@ class SettingsState extends Equatable {
   }) {
     return SettingsState(
       status: status ?? this.status,
-      userAppSettings: clearUserAppSettings
-          ? null
-          : userAppSettings ?? this.userAppSettings,
+      userAppSettings:
+          clearUserAppSettings ? null : userAppSettings ?? this.userAppSettings,
       error: clearError ? null : error ?? this.error,
     );
   }
 
   @override
-  List<Object?> get props => [
-        status,
-        userAppSettings,
-        error,
-      ];
+  List<Object?> get props => [status, userAppSettings, error];
 }

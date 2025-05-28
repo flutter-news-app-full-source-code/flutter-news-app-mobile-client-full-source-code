@@ -114,12 +114,15 @@ class ContentPreferencesPage extends StatelessWidget {
                 child: ListTile(
                   title: Text(category.name),
                   trailing: IconButton(
-                    icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+                    icon: const Icon(
+                      Icons.remove_circle_outline,
+                      color: Colors.red,
+                    ),
                     tooltip: 'Unfollow ${category.name}', // Consider l10n
                     onPressed: () {
                       context.read<AccountBloc>().add(
-                            AccountFollowCategoryToggled(category: category),
-                          );
+                        AccountFollowCategoryToggled(category: category),
+                      );
                     },
                   ),
                 ),
@@ -131,7 +134,9 @@ class ContentPreferencesPage extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.paddingMedium),
           child: ElevatedButton.icon(
             icon: const Icon(Icons.edit_outlined),
-            label: Text('Manage ${l10n.headlinesFeedFilterCategoryLabel}'), // "Manage Category"
+            label: Text(
+              'Manage ${l10n.headlinesFeedFilterCategoryLabel}',
+            ), // "Manage Category"
             onPressed: () {
               context.goNamed(Routes.feedFilterCategoriesName);
             },
@@ -180,12 +185,15 @@ class ContentPreferencesPage extends StatelessWidget {
                   title: Text(source.name),
                   // Consider adding source.iconUrl if available and desired
                   trailing: IconButton(
-                    icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+                    icon: const Icon(
+                      Icons.remove_circle_outline,
+                      color: Colors.red,
+                    ),
                     tooltip: 'Unfollow ${source.name}', // Consider l10n
                     onPressed: () {
                       context.read<AccountBloc>().add(
-                            AccountFollowSourceToggled(source: source),
-                          );
+                        AccountFollowSourceToggled(source: source),
+                      );
                     },
                   ),
                 ),
@@ -197,7 +205,9 @@ class ContentPreferencesPage extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.paddingMedium),
           child: ElevatedButton.icon(
             icon: const Icon(Icons.edit_outlined),
-            label: Text('Manage ${l10n.headlinesFeedFilterSourceLabel}'), // "Manage Source"
+            label: Text(
+              'Manage ${l10n.headlinesFeedFilterSourceLabel}',
+            ), // "Manage Source"
             onPressed: () {
               context.goNamed(Routes.feedFilterSourcesName);
             },
@@ -246,12 +256,15 @@ class ContentPreferencesPage extends StatelessWidget {
                   // leading: country.flagUrl != null ? Image.network(country.flagUrl!, width: 36, height: 24, fit: BoxFit.cover) : null, // Optional: Display flag
                   title: Text(country.name),
                   trailing: IconButton(
-                    icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+                    icon: const Icon(
+                      Icons.remove_circle_outline,
+                      color: Colors.red,
+                    ),
                     tooltip: 'Unfollow ${country.name}', // Consider l10n
                     onPressed: () {
                       context.read<AccountBloc>().add(
-                            AccountFollowCountryToggled(country: country),
-                          );
+                        AccountFollowCountryToggled(country: country),
+                      );
                     },
                   ),
                 ),
@@ -263,7 +276,9 @@ class ContentPreferencesPage extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.paddingMedium),
           child: ElevatedButton.icon(
             icon: const Icon(Icons.edit_outlined),
-            label: Text('Manage ${l10n.headlinesFeedFilterEventCountryLabel}'), // "Manage Country"
+            label: Text(
+              'Manage ${l10n.headlinesFeedFilterEventCountryLabel}',
+            ), // "Manage Country"
             onPressed: () {
               context.goNamed(Routes.feedFilterCountriesName);
             },

@@ -263,9 +263,7 @@ GoRouter createRouter({
             builder: (context, state) {
               // Extract the linking context flag from 'extra', default to false.
               final isLinking = (state.extra as bool?) ?? false;
-              return RequestCodePage(
-                isLinkingContext: isLinking,
-              );
+              return RequestCodePage(isLinkingContext: isLinking);
             },
           ),
           GoRoute(
@@ -457,12 +455,15 @@ GoRouter createRouter({
                       return BlocProvider(
                         create: (context) {
                           final settingsBloc = SettingsBloc(
-                            userAppSettingsRepository: context
-                                .read<HtDataRepository<UserAppSettings>>(),
+                            userAppSettingsRepository:
+                                context
+                                    .read<HtDataRepository<UserAppSettings>>(),
                           );
                           // Only load settings if a userId is available
                           if (userId != null) {
-                            settingsBloc.add(SettingsLoadRequested(userId: userId));
+                            settingsBloc.add(
+                              SettingsLoadRequested(userId: userId),
+                            );
                           } else {
                             // Handle case where user is unexpectedly null.
                             // This might involve logging or emitting an error state

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart' hide Category; // Hide Category
+// Hide Category
 import 'package:ht_auth_repository/ht_auth_repository.dart';
 import 'package:ht_data_repository/ht_data_repository.dart';
 import 'package:ht_shared/ht_shared.dart';
@@ -140,21 +140,25 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     if (state.preferences == null || state.user == null) return;
 
     final currentPrefs = state.preferences!;
-    final List<Category> updatedFollowedCategories =
-        List.from(currentPrefs.followedCategories);
+    final updatedFollowedCategories = List<Category>.from(
+      currentPrefs.followedCategories,
+    );
 
-    final isCurrentlyFollowing = updatedFollowedCategories
-        .any((category) => category.id == event.category.id);
+    final isCurrentlyFollowing = updatedFollowedCategories.any(
+      (category) => category.id == event.category.id,
+    );
 
     if (isCurrentlyFollowing) {
-      updatedFollowedCategories
-          .removeWhere((category) => category.id == event.category.id);
+      updatedFollowedCategories.removeWhere(
+        (category) => category.id == event.category.id,
+      );
     } else {
       updatedFollowedCategories.add(event.category);
     }
 
-    final newPreferences =
-        currentPrefs.copyWith(followedCategories: updatedFollowedCategories);
+    final newPreferences = currentPrefs.copyWith(
+      followedCategories: updatedFollowedCategories,
+    );
     emit(state.copyWith(preferences: newPreferences));
     await _persistPreferences(newPreferences, emit);
   }
@@ -166,21 +170,25 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     if (state.preferences == null || state.user == null) return;
 
     final currentPrefs = state.preferences!;
-    final List<Source> updatedFollowedSources =
-        List.from(currentPrefs.followedSources);
+    final updatedFollowedSources = List<Source>.from(
+      currentPrefs.followedSources,
+    );
 
-    final isCurrentlyFollowing = updatedFollowedSources
-        .any((source) => source.id == event.source.id);
+    final isCurrentlyFollowing = updatedFollowedSources.any(
+      (source) => source.id == event.source.id,
+    );
 
     if (isCurrentlyFollowing) {
-      updatedFollowedSources
-          .removeWhere((source) => source.id == event.source.id);
+      updatedFollowedSources.removeWhere(
+        (source) => source.id == event.source.id,
+      );
     } else {
       updatedFollowedSources.add(event.source);
     }
 
-    final newPreferences =
-        currentPrefs.copyWith(followedSources: updatedFollowedSources);
+    final newPreferences = currentPrefs.copyWith(
+      followedSources: updatedFollowedSources,
+    );
     emit(state.copyWith(preferences: newPreferences));
     await _persistPreferences(newPreferences, emit);
   }
@@ -192,21 +200,25 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     if (state.preferences == null || state.user == null) return;
 
     final currentPrefs = state.preferences!;
-    final List<Country> updatedFollowedCountries =
-        List.from(currentPrefs.followedCountries);
+    final updatedFollowedCountries = List<Country>.from(
+      currentPrefs.followedCountries,
+    );
 
-    final isCurrentlyFollowing = updatedFollowedCountries
-        .any((country) => country.id == event.country.id);
+    final isCurrentlyFollowing = updatedFollowedCountries.any(
+      (country) => country.id == event.country.id,
+    );
 
     if (isCurrentlyFollowing) {
-      updatedFollowedCountries
-          .removeWhere((country) => country.id == event.country.id);
+      updatedFollowedCountries.removeWhere(
+        (country) => country.id == event.country.id,
+      );
     } else {
       updatedFollowedCountries.add(event.country);
     }
 
-    final newPreferences =
-        currentPrefs.copyWith(followedCountries: updatedFollowedCountries);
+    final newPreferences = currentPrefs.copyWith(
+      followedCountries: updatedFollowedCountries,
+    );
     emit(state.copyWith(preferences: newPreferences));
     await _persistPreferences(newPreferences, emit);
   }
@@ -218,21 +230,25 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     if (state.preferences == null || state.user == null) return;
 
     final currentPrefs = state.preferences!;
-    final List<Headline> updatedSavedHeadlines =
-        List.from(currentPrefs.savedHeadlines);
+    final updatedSavedHeadlines = List<Headline>.from(
+      currentPrefs.savedHeadlines,
+    );
 
-    final isCurrentlySaved = updatedSavedHeadlines
-        .any((headline) => headline.id == event.headline.id);
+    final isCurrentlySaved = updatedSavedHeadlines.any(
+      (headline) => headline.id == event.headline.id,
+    );
 
     if (isCurrentlySaved) {
-      updatedSavedHeadlines
-          .removeWhere((headline) => headline.id == event.headline.id);
+      updatedSavedHeadlines.removeWhere(
+        (headline) => headline.id == event.headline.id,
+      );
     } else {
       updatedSavedHeadlines.add(event.headline);
     }
 
-    final newPreferences =
-        currentPrefs.copyWith(savedHeadlines: updatedSavedHeadlines);
+    final newPreferences = currentPrefs.copyWith(
+      savedHeadlines: updatedSavedHeadlines,
+    );
     emit(state.copyWith(preferences: newPreferences));
     await _persistPreferences(newPreferences, emit);
   }

@@ -50,19 +50,20 @@ class HeadlinesSearchSuccess extends HeadlinesSearchState {
       headlines: headlines ?? this.headlines,
       hasMore: hasMore ?? this.hasMore,
       cursor: cursor ?? this.cursor,
-      errorMessage: clearErrorMessage ? null : errorMessage ?? this.errorMessage,
+      errorMessage:
+          clearErrorMessage ? null : errorMessage ?? this.errorMessage,
       lastSearchTerm: lastSearchTerm ?? this.lastSearchTerm,
     );
   }
 
   @override
   List<Object?> get props => [
-        headlines,
-        hasMore,
-        cursor,
-        errorMessage,
-        lastSearchTerm,
-      ];
+    headlines,
+    hasMore,
+    cursor,
+    errorMessage,
+    lastSearchTerm,
+  ];
 }
 
 /// State when a search operation has failed.

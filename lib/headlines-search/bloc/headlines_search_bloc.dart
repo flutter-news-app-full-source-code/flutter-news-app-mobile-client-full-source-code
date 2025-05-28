@@ -10,8 +10,9 @@ part 'headlines_search_state.dart';
 class HeadlinesSearchBloc
     extends Bloc<HeadlinesSearchEvent, HeadlinesSearchState> {
   HeadlinesSearchBloc({required HtDataRepository<Headline> headlinesRepository})
-      : _headlinesRepository = headlinesRepository,
-        super(HeadlinesSearchInitial()) { // Start with Initial state
+    : _headlinesRepository = headlinesRepository,
+      super(const HeadlinesSearchInitial()) {
+    // Start with Initial state
     on<HeadlinesSearchFetchRequested>(
       _onSearchFetchRequested,
       transformer: restartable(), // Process only the latest search
@@ -56,30 +57,32 @@ class HeadlinesSearchBloc
             response.items.isEmpty
                 ? successState.copyWith(hasMore: false)
                 : successState.copyWith(
-                    headlines: List.of(successState.headlines)
-                      ..addAll(response.items),
-                    hasMore: response.hasMore,
-                    cursor: response.cursor,
-                    errorMessage: null, // Clear previous error on success
-                  ),
+                  headlines: List.of(successState.headlines)
+                    ..addAll(response.items),
+                  hasMore: response.hasMore,
+                  cursor: response.cursor,
+                ),
           );
         } on HtHttpException catch (e) {
           emit(successState.copyWith(errorMessage: e.message));
         } catch (e, st) {
           print('Search pagination error: $e\n$st');
-          emit(successState.copyWith(errorMessage: 'Failed to load more results.'));
+          emit(
+            successState.copyWith(errorMessage: 'Failed to load more results.'),
+          );
         }
         return; // Pagination handled
       }
     }
 
     // If not paginating for the same term, it's a new search or different term
-    emit(HeadlinesSearchLoading(lastSearchTerm: event.searchTerm)); // Show loading for new search
+    emit(
+      HeadlinesSearchLoading(lastSearchTerm: event.searchTerm),
+    ); // Show loading for new search
     try {
-      final response = await _headlinesRepository.readAllByQuery(
-        {'query': event.searchTerm},
-        limit: _limit,
-      );
+      final response = await _headlinesRepository.readAllByQuery({
+        'query': event.searchTerm,
+      }, limit: _limit);
       emit(
         HeadlinesSearchSuccess(
           headlines: response.items,
@@ -90,7 +93,7 @@ class HeadlinesSearchBloc
       );
     } on HtHttpException catch (e) {
       emit(
-        HeadlinesSearchFailure( 
+        HeadlinesSearchFailure(
           errorMessage: e.message,
           lastSearchTerm: event.searchTerm,
         ),
@@ -98,7 +101,7 @@ class HeadlinesSearchBloc
     } catch (e, st) {
       print('Search error: $e\n$st');
       emit(
-        HeadlinesSearchFailure( 
+        HeadlinesSearchFailure(
           errorMessage: 'An unexpected error occurred during search.',
           lastSearchTerm: event.searchTerm,
         ),

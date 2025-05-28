@@ -19,8 +19,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   /// {@macro settings_bloc}
   SettingsBloc({
     required HtDataRepository<UserAppSettings> userAppSettingsRepository,
-  })  : _userAppSettingsRepository = userAppSettingsRepository,
-        super(const SettingsState()) {
+  }) : _userAppSettingsRepository = userAppSettingsRepository,
+       super(const SettingsState()) {
     // Register event handlers
     on<SettingsLoadRequested>(_onLoadRequested);
     on<SettingsAppThemeModeChanged>(
@@ -39,7 +39,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       _onAppFontTypeChanged,
       transformer: sequential(),
     );
-    on<SettingsAppFontWeightChanged>( // Added handler for font weight
+    on<SettingsAppFontWeightChanged>(
+      // Added handler for font weight
       _onAppFontWeightChanged,
       transformer: sequential(),
     );
@@ -164,7 +165,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));
     await _persistSettings(updatedSettings, emit);
   }
-  
+
   Future<void> _onAppFontWeightChanged(
     SettingsAppFontWeightChanged event,
     Emitter<SettingsState> emit,

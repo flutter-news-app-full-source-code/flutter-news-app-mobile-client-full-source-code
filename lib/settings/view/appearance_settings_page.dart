@@ -136,7 +136,8 @@ class AppearanceSettingsPage extends StatelessWidget {
             context: context,
             title:
                 l10n.settingsAppearanceAppFontSizeLabel, // Reusing key for text size
-            currentValue: state.userAppSettings!.displaySettings.textScaleFactor,
+            currentValue:
+                state.userAppSettings!.displaySettings.textScaleFactor,
             items: AppTextScaleFactor.values,
             itemToString: (size) => _textScaleFactorToString(size, l10n),
             onChanged: (value) {

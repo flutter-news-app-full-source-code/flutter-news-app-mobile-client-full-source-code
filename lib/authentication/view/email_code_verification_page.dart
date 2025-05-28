@@ -23,9 +23,7 @@ class EmailCodeVerificationPage extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.emailCodeSentPageTitle),
-      ),
+      appBar: AppBar(title: Text(l10n.emailCodeSentPageTitle)),
       body: SafeArea(
         child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
           listener: (context, state) {
@@ -51,10 +49,7 @@ class EmailCodeVerificationPage extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
-                        Icons.mark_email_read_outlined,
-                        size: 80,
-                      ),
+                      const Icon(Icons.mark_email_read_outlined, size: 80),
                       const SizedBox(height: AppSpacing.xl),
                       Text(
                         l10n.emailCodeSentConfirmation(email),
@@ -112,11 +107,11 @@ class _EmailCodeVerificationFormState
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       context.read<AuthenticationBloc>().add(
-            AuthenticationVerifyCodeRequested(
-              email: widget.email,
-              code: _codeController.text.trim(),
-            ),
-          );
+        AuthenticationVerifyCodeRequested(
+          email: widget.email,
+          code: _codeController.text.trim(),
+        ),
+      );
     }
   }
 
@@ -158,13 +153,14 @@ class _EmailCodeVerificationFormState
           const SizedBox(height: AppSpacing.xl),
           ElevatedButton(
             onPressed: widget.isLoading ? null : _submitForm,
-            child: widget.isLoading
-                ? const SizedBox(
-                    height: 24,
-                    width: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : Text(l10n.emailCodeVerificationButtonLabel),
+            child:
+                widget.isLoading
+                    ? const SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                    : Text(l10n.emailCodeVerificationButtonLabel),
           ),
         ],
       ),

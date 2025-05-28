@@ -44,16 +44,15 @@ class SettingsPage extends StatelessWidget {
           // Handle error state
           if (state.status == SettingsStatus.failure) {
             return FailureStateWidget(
-              message:
-                  state.error?.toString() ?? l10n.settingsErrorDefault,
+              message: state.error?.toString() ?? l10n.settingsErrorDefault,
               onRetry: () {
                 // Access AppBloc to get the current user ID for retry
                 final appBloc = context.read<AppBloc>();
                 final userId = appBloc.state.user?.id;
                 if (userId != null) {
-                  context
-                      .read<SettingsBloc>()
-                      .add(SettingsLoadRequested(userId: userId));
+                  context.read<SettingsBloc>().add(
+                    SettingsLoadRequested(userId: userId),
+                  );
                 } else {
                   // Handle case where user is null on retry, though unlikely
                   // if router guards are effective.

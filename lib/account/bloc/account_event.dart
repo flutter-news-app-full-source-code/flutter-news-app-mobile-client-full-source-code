@@ -38,3 +38,55 @@ final class AccountLoadContentPreferencesRequested extends AccountEvent {
   @override
   List<Object> get props => [userId];
 }
+
+/// {@template account_follow_category_toggled}
+/// Event triggered when a user toggles following a category.
+/// {@endtemplate}
+final class AccountFollowCategoryToggled extends AccountEvent {
+  /// {@macro account_follow_category_toggled}
+  const AccountFollowCategoryToggled({required this.category});
+
+  final Category category;
+
+  @override
+  List<Object> get props => [category];
+}
+
+/// {@template account_follow_source_toggled}
+/// Event triggered when a user toggles following a source.
+/// {@endtemplate}
+final class AccountFollowSourceToggled extends AccountEvent {
+  /// {@macro account_follow_source_toggled}
+  const AccountFollowSourceToggled({required this.source});
+
+  final Source source;
+
+  @override
+  List<Object> get props => [source];
+}
+
+/// {@template account_follow_country_toggled}
+/// Event triggered when a user toggles following a country.
+/// {@endtemplate}
+final class AccountFollowCountryToggled extends AccountEvent {
+  /// {@macro account_follow_country_toggled}
+  const AccountFollowCountryToggled({required this.country});
+
+  final Country country;
+
+  @override
+  List<Object> get props => [country];
+}
+
+/// {@template account_save_headline_toggled}
+/// Event triggered when a user toggles saving a headline.
+/// {@endtemplate}
+final class AccountSaveHeadlineToggled extends AccountEvent {
+  /// {@macro account_save_headline_toggled}
+  const AccountSaveHeadlineToggled({required this.headline});
+
+  final Headline headline;
+
+  @override
+  List<Object> get props => [headline];
+}

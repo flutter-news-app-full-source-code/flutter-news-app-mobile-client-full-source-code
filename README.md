@@ -92,12 +92,3 @@ This project aims for high test coverage to ensure quality and reliability.
     ```bash
     flutter test
     ```
-
----
-
-## 📜 License
-
-This package is licensed under the **PolyForm Free Trial**.
-Please review the [LICENSE](LICENSE) file for details.
-
----

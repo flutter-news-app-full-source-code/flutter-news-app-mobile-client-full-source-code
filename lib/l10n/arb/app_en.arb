@@ -541,5 +541,13 @@
     "emailCodeVerificationButtonLabel": "Verify Code",
     "@emailCodeVerificationButtonLabel": {
         "description": "Button text for verifying the email code"
+    },
+    "emailCodeValidationEmptyError": "Please enter the 6-digit code.",
+    "@emailCodeValidationEmptyError": {
+        "description": "Validation error when the email verification code is empty."
+    },
+    "emailCodeValidationLengthError": "The code must be 6 digits.",
+    "@emailCodeValidationLengthError": {
+        "description": "Validation error when the email verification code is not 6 digits."
     }
 }

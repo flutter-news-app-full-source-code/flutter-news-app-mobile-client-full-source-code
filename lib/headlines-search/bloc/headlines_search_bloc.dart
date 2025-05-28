@@ -82,7 +82,7 @@ class HeadlinesSearchBloc
     try {
       final response = await _headlinesRepository.readAllByQuery({
         'query': event.searchTerm,
-      }, limit: _limit);
+      }, limit: _limit,);
       emit(
         HeadlinesSearchSuccess(
           headlines: response.items,

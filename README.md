@@ -54,17 +54,6 @@ Fully internationalized with working English and Arabic localizations (`.arb` fi
 
 ---
 
-## 🛠️ Technical Overview
-
-*   **Framework:** Flutter
-*   **Language:** Dart
-*   **State Management:** BLoC / flutter_bloc
-*   **Navigation:** GoRouter
-*   **Theming:** FlexColorScheme
-*   **Core Dependencies:** Integrates seamlessly with Headlines Toolkit shared packages (`ht_shared`, `ht_auth_repository`, `ht_data_repository`, `ht_http_client`, etc.).
-
----
-
 ## 🔑 Access and Licensing
 
 `ht-main` is source-available as part of the Headlines Toolkit ecosystem.

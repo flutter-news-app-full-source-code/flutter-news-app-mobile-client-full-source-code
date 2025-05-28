@@ -4,7 +4,7 @@
 [![style: very good analysis](https://img.shields.io/badge/style-very_good_analysis-B22C89.svg)](https://pub.dev/packages/very_good_analysis)
 [![License: PolyForm Free Trial](https://img.shields.io/badge/License-PolyForm%20Free%20Trial-blue)](https://polyformproject.org/licenses/free-trial/1.0.0)
 
-`ht_main`** is a Flutter mobile application serves as both a powerful, fully functional news application ready for deployment, and an exceptionally robust starter kit, architected for easy extension and customization. It is a key component of the [Headlines Toolkit](https://github.com/headlines-toolkit), an ecosystem that also includes a [Dart Frog backend API](https://github.com/headlines-toolkit/ht-api) and a [web-based content dashboard](https://github.com/headlines-toolkit/ht-dashboard).
+`ht_main` is a Flutter mobile application serves as both a powerful, fully functional news application ready for deployment, and an exceptionally robust starter kit, architected for easy extension and customization. It is a key component of the [Headlines Toolkit](https://github.com/headlines-toolkit), an ecosystem that also includes a [Dart Frog backend API](https://github.com/headlines-toolkit/ht-api) and a [web-based content dashboard](https://github.com/headlines-toolkit/ht-dashboard).
 
 ## ⭐ Features & Benefits
 

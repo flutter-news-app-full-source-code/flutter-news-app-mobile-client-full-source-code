@@ -9,13 +9,14 @@ import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/constants/app_spacing.dart';
 
-/// {@template email_sign_in_page}
-/// Page for initiating the email link sign-in process.
-/// Explains the passwordless flow and collects the user's email.
+/// {@template request_code_page}
+/// Page for initiating the email code sign-in process.
+/// Explains the passwordless flow and collects the user's email to send a
+/// verification code.
 /// {@endtemplate}
-class EmailSignInPage extends StatelessWidget {
-  /// {@macro email_sign_in_page}
-  const EmailSignInPage({
+class RequestCodePage extends StatelessWidget {
+  /// {@macro request_code_page}
+  const RequestCodePage({
     required this.isLinkingContext, // Accept the flag
     super.key,
   });
@@ -25,16 +26,15 @@ class EmailSignInPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Assuming AuthenticationBloc is provided by the parent route (AuthenticationPage)
-    // If not, it needs to be provided here or higher up.
-    // Pass the flag down to the view.
-    return _EmailSignInView(isLinkingContext: isLinkingContext);
+    // AuthenticationBloc is assumed to be provided by a parent route.
+    // Pass the linking context flag down to the view.
+    return _RequestCodeView(isLinkingContext: isLinkingContext);
   }
 }
 
-class _EmailSignInView extends StatelessWidget {
+class _RequestCodeView extends StatelessWidget {
   // Accept the flag from the parent page.
-  const _EmailSignInView({required this.isLinkingContext});
+  const _RequestCodeView({required this.isLinkingContext});
 
   final bool isLinkingContext;
 

@@ -450,17 +450,31 @@ GoRouter createRouter({
                     name: Routes.settingsName,
                     builder: (context, state) {
                       // Provide SettingsBloc here for SettingsPage and its children
+                      // Access AppBloc to get the current user ID
+                      final appBloc = context.read<AppBloc>();
+                      final userId = appBloc.state.user?.id;
+
                       return BlocProvider(
-                        create:
-                            (context) => SettingsBloc(
-                              userAppSettingsRepository:
-                                  context
-                                      .read<
-                                        HtDataRepository<UserAppSettings>
-                                      >(),
-                            )..add(
-                              const SettingsLoadRequested(),
-                            ), // Load on entry
+                        create: (context) {
+                          final settingsBloc = SettingsBloc(
+                            userAppSettingsRepository: context
+                                .read<HtDataRepository<UserAppSettings>>(),
+                          );
+                          // Only load settings if a userId is available
+                          if (userId != null) {
+                            settingsBloc.add(SettingsLoadRequested(userId: userId));
+                          } else {
+                            // Handle case where user is unexpectedly null.
+                            // This might involve logging or emitting an error state
+                            // directly in SettingsBloc if it's designed to handle it,
+                            // or simply not loading settings.
+                            // For now, we'll assume router redirects prevent this.
+                            print(
+                              'Warning: User ID is null when creating SettingsBloc. Settings will not be loaded.',
+                            );
+                          }
+                          return settingsBloc;
+                        },
                         child: const SettingsPage(), // Use the actual page
                       );
                     },

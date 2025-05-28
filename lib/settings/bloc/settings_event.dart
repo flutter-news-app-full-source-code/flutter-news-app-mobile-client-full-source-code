@@ -17,11 +17,17 @@ abstract class SettingsEvent extends Equatable {
 }
 
 /// {@template settings_load_requested}
-/// Event added when the settings page is entered to load initial settings.
+/// Event added when the settings page is entered to load initial settings
+/// for a specific user.
 /// {@endtemplate}
 class SettingsLoadRequested extends SettingsEvent {
   /// {@macro settings_load_requested}
-  const SettingsLoadRequested();
+  const SettingsLoadRequested({required this.userId});
+
+  final String userId;
+
+  @override
+  List<Object?> get props => [userId];
 }
 
 // --- Appearance Settings Events ---
@@ -114,20 +120,8 @@ class SettingsFeedTileTypeChanged extends SettingsEvent {
 }
 
 // --- Notification Settings Events ---
-
-/// {@template settings_notifications_enabled_changed}
-/// Event added when the user toggles the global notification setting.
-/// {@endtemplate}
-class SettingsNotificationsEnabledChanged extends SettingsEvent {
-  /// {@macro settings_notifications_enabled_changed}
-  const SettingsNotificationsEnabledChanged(this.enabled);
-
-  /// The new state of the notification enabled flag.
-  final bool enabled;
-
-  @override
-  List<Object?> get props => [enabled];
-}
+// SettingsNotificationsEnabledChanged event removed as UserAppSettings
+// does not currently support a general notifications enabled flag.
 
 // TODO(cline): Add events for changing followed categories/sources/countries
 // for notifications if needed later. Example:

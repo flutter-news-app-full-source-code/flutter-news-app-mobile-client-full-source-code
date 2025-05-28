@@ -1,4 +1,4 @@
-# 📱✨ ht_main: Headlines Toolkit Main App
+# 📱✨ ht_main
 
 ![coverage: percentage](https://img.shields.io/badge/coverage-XX-green)
 [![style: very good analysis](https://img.shields.io/badge/style-very_good_analysis-B22C89.svg)](https://pub.dev/packages/very_good_analysis)

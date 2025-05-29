@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_auth_api/ht_auth_api.dart';
@@ -31,6 +32,7 @@ void main() async {
   final httpClient = HtHttpClient(
     baseUrl: 'http://localhost:8080',
     tokenProvider: tokenProvider,
+    isWeb: kIsWeb,
   );
 
   // 5. Instantiate Auth Client and Repository

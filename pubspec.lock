@@ -170,7 +170,7 @@ packages:
     source: hosted
     version: "5.8.0+1"
   dio_web_adapter:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: dio_web_adapter
       sha256: "7586e476d70caecaf1686d21eee7247ea43ef5c345eab9e0cc3583ff13378d78"
@@ -314,7 +314,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: c0a8f8783ec27a6494c99d7bd47cb8600b0a5bec
+      resolved-ref: "9448865dbb1ef516a0406b8ce21645b82a25fec4"
       url: "https://github.com/headlines-toolkit/ht-auth-api.git"
     source: git
     version: "0.0.0"
@@ -323,7 +323,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "1c95c775085ed723923f9d9a53fe1c3becdeced4"
+      resolved-ref: "2c8a0a53ada3e31cc2be1061fee45d4e07612beb"
       url: "https://github.com/headlines-toolkit/ht-auth-client.git"
     source: git
     version: "0.0.0"
@@ -332,7 +332,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: cc20fa6d3b396ade6c70c1e972fa75e9cf23e37c
+      resolved-ref: ba5cb886c68b8f82b9a33903be04c44ef16d8bde
       url: "https://github.com/headlines-toolkit/ht-auth-repository.git"
     source: git
     version: "0.0.0"
@@ -368,7 +368,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "6e9f6301bc643798b9a1023f64bd262aa2e069be"
+      resolved-ref: fd3be932772473d8aed35ad5c12df7c2a63756d7
       url: "https://github.com/headlines-toolkit/ht-http-client.git"
     source: git
     version: "0.0.0"
@@ -395,7 +395,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "47094efe56f4359473f37c19a6bbf809cf927dc2"
+      resolved-ref: "2c594c8256181cdb86f03a11ed8ee1b9c5e79f28"
       url: "https://github.com/headlines-toolkit/ht-shared.git"
     source: git
     version: "0.0.0"

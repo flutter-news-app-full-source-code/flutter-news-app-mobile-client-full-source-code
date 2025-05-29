@@ -1,225 +1,273 @@
-//
 // ignore_for_file: lines_longer_than_80_chars
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import 'package:ht_main/headlines-feed/bloc/sources_filter_bloc.dart'; // Import the BLoC
+import 'package:ht_data_repository/ht_data_repository.dart';
+import 'package:ht_main/headlines-feed/bloc/sources_filter_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_main/shared/constants/constants.dart';
-import 'package:ht_main/shared/widgets/widgets.dart'; // For loading/error widgets
-import 'package:ht_shared/ht_shared.dart' show Source; // Import Source model
+import 'package:ht_main/shared/constants/app_spacing.dart';
+import 'package:ht_main/shared/widgets/failure_state_widget.dart';
+import 'package:ht_main/shared/widgets/loading_state_widget.dart';
+import 'package:ht_shared/ht_shared.dart' show Country, Source, SourceType;
 
-/// {@template source_filter_page}
-/// A page dedicated to selecting news sources for filtering headlines.
-///
-/// Uses [SourcesFilterBloc] to fetch sources paginatively, allows multiple
-/// selections, and returns the selected list via `context.pop` when the user
-/// applies the changes.
-/// {@endtemplate}
-class SourceFilterPage extends StatefulWidget {
-  /// {@macro source_filter_page}
-  const SourceFilterPage({super.key});
+class SourceFilterPage extends StatelessWidget {
+  const SourceFilterPage({
+    super.key,
+    this.initialSelectedSources = const [],
+  });
+
+  final List<Source> initialSelectedSources;
 
   @override
-  State<SourceFilterPage> createState() => _SourceFilterPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => SourcesFilterBloc(
+        sourcesRepository: context.read<HtDataRepository<Source>>(),
+        countriesRepository: context.read<HtDataRepository<Country>>(),
+      )..add(LoadSourceFilterData(initialSelectedSources: initialSelectedSources)),
+      child: const _SourceFilterView(),
+    );
+  }
 }
 
-/// State for the [SourceFilterPage].
-///
-/// Manages the local selection state ([_pageSelectedSources]) and interacts
-/// with [SourcesFilterBloc] for data fetching and pagination.
-class _SourceFilterPageState extends State<SourceFilterPage> {
-  /// Stores the sources selected by the user *on this specific page*.
-  /// This state is local to the `SourceFilterPage` lifecycle.
-  /// It's initialized in `initState` using the list of previously selected
-  /// sources passed via the `extra` parameter during navigation from
-  /// `HeadlinesFilterPage`. This ensures the checkboxes reflect the state
-  /// from the main filter page when this page loads.
-  late Set<Source> _pageSelectedSources;
-
-  /// Scroll controller to detect when the user reaches the end of the list
-  /// for pagination.
-  final _scrollController = ScrollController();
-
-  @override
-  void initState() {
-    super.initState();
-    // Initialization needs to happen after the first frame to safely access
-    // GoRouterState.of(context).
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // 1. Retrieve the list of sources that were already selected on the
-      //    previous page (HeadlinesFilterPage). This list is passed dynamically
-      //    via the `extra` parameter in the `context.pushNamed` call.
-      final initialSelection = GoRouterState.of(context).extra as List<Source>?;
-
-      // 2. Initialize the local selection state (`_pageSelectedSources`) for this
-      //    page. Use a Set for efficient add/remove/contains operations.
-      //    This ensures the checkboxes on this page are initially checked
-      //    correctly based on the selections made previously.
-      _pageSelectedSources = Set.from(initialSelection ?? []);
-
-      // 3. Trigger the page-specific BLoC (SourcesFilterBloc) to start
-      //    fetching the list of *all available* sources that the user can
-      //    potentially select from. The BLoC handles fetching, pagination,
-      //    loading states, and errors for the *list of options*.
-      context.read<SourcesFilterBloc>().add(SourcesFilterRequested());
-    });
-    // Add listener for pagination logic.
-    _scrollController.addListener(_onScroll);
-  }
-
-  @override
-  void dispose() {
-    _scrollController
-      ..removeListener(_onScroll)
-      ..dispose();
-    super.dispose();
-  }
-
-  /// Callback function for scroll events.
-  ///
-  /// Checks if the user has scrolled near the bottom of the list and triggers
-  /// fetching more sources via the BLoC if available.
-  void _onScroll() {
-    if (!_scrollController.hasClients) return;
-    final maxScroll = _scrollController.position.maxScrollExtent;
-    final currentScroll = _scrollController.offset;
-    final bloc = context.read<SourcesFilterBloc>();
-    // Fetch more when nearing the bottom, if BLoC has more and isn't already loading more
-    if (currentScroll >= (maxScroll * 0.9) &&
-        bloc.state.hasMore &&
-        bloc.state.status != SourcesFilterStatus.loadingMore) {
-      bloc.add(SourcesFilterLoadMoreRequested());
-    }
-  }
+class _SourceFilterView extends StatelessWidget {
+  const _SourceFilterView();
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final state = context.watch<SourcesFilterBloc>().state;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.headlinesFeedFilterSourceLabel),
         actions: [
           IconButton(
+            icon: const Icon(Icons.clear_all),
+            tooltip: l10n.headlinesFeedFilterResetButton,
+            onPressed: () {
+              context
+                  .read<SourcesFilterBloc>()
+                  .add(const ClearSourceFiltersRequested());
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.check),
             tooltip: l10n.headlinesFeedFilterApplyButton,
             onPressed: () {
-              // When the user taps 'Apply' (checkmark), pop the current route
-              // and return the final list of selected sources (`_pageSelectedSources`)
-              // from this page back to the previous page (`HeadlinesFilterPage`).
-              // `HeadlinesFilterPage` receives this list in its `onResult` callback.
-              context.pop(_pageSelectedSources.toList());
+              final selectedSources = state.displayableSources
+                  .where(
+                    (s) => state.finallySelectedSourceIds.contains(s.id),
+                  )
+                  .toList();
+              Navigator.of(context).pop(selectedSources);
             },
           ),
         ],
       ),
-      // Use BlocBuilder to react to state changes from SourcesFilterBloc
-      body: BlocBuilder<SourcesFilterBloc, SourcesFilterState>(
-        builder: _buildBody,
+      body: _buildBody(context, state, l10n),
+    );
+  }
+
+  Widget _buildBody(
+    BuildContext context,
+    SourcesFilterState state,
+    AppLocalizations l10n,
+  ) {
+    if (state.dataLoadingStatus == SourceFilterDataLoadingStatus.loading &&
+        state.availableCountries.isEmpty) {
+      return LoadingStateWidget(
+        icon: Icons.filter_list_alt, // Added generic icon
+        headline: l10n.headlinesFeedFilterLoadingCriteria,
+        subheadline: l10n.pleaseWait, // Added generic subheadline (l10n key)
+      );
+    }
+    if (state.dataLoadingStatus == SourceFilterDataLoadingStatus.failure &&
+        state.availableCountries.isEmpty) {
+      return FailureStateWidget(
+        message: state.errorMessage ?? l10n.headlinesFeedFilterErrorCriteria,
+        onRetry: () {
+          context.read<SourcesFilterBloc>().add(
+                LoadSourceFilterData(
+                  initialSelectedSources:
+                      ModalRoute.of(context)?.settings.arguments as List<Source>? ??
+                          const [],
+                ),
+              );
+        },
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildCountryCapsules(context, state, l10n),
+        const SizedBox(height: AppSpacing.lg),
+        _buildSourceTypeCapsules(context, state, l10n),
+        const SizedBox(height: AppSpacing.lg),
+        Expanded(child: _buildSourcesList(context, state, l10n)),
+      ],
+    );
+  }
+
+  Widget _buildCountryCapsules(
+    BuildContext context,
+    SourcesFilterState state,
+    AppLocalizations l10n,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingMedium),
+      child: Row(
+        children: [
+          Text('${l10n.headlinesFeedFilterCountryLabel}:',
+              style: Theme.of(context).textTheme.titleSmall),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: SizedBox(
+              height: 40, // Fixed height for the capsule list
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: state.availableCountries.length + 1, // +1 for "All"
+                separatorBuilder: (context, index) =>
+                    const SizedBox(width: AppSpacing.sm),
+                itemBuilder: (context, index) {
+                  if (index == 0) {
+                    // "All" chip
+                    return ChoiceChip(
+                      label: Text(l10n.headlinesFeedFilterAllLabel),
+                      selected: state.selectedCountryIsoCodes.isEmpty,
+                      onSelected: (_) {
+                        context.read<SourcesFilterBloc>().add(
+                              const CountryCapsuleToggled(''), // Special value for "All"
+                            );
+                      },
+                    );
+                  }
+                  final country = state.availableCountries[index - 1];
+                  return ChoiceChip(
+                    label: Text(country.name),
+                    selected:
+                        state.selectedCountryIsoCodes.contains(country.isoCode),
+                    onSelected: (_) {
+                      context.read<SourcesFilterBloc>().add(
+                            CountryCapsuleToggled(country.isoCode),
+                          );
+                    },
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  /// Builds the main content body based on the current [SourcesFilterState].
-  Widget _buildBody(BuildContext context, SourcesFilterState state) {
-    final l10n = context.l10n;
+  Widget _buildSourceTypeCapsules(
+    BuildContext context,
+    SourcesFilterState state,
+    AppLocalizations l10n,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingMedium),
+      child: Row(
+        children: [
+          Text('${l10n.headlinesFeedFilterSourceTypeLabel}:', // Assuming l10n key exists
+              style: Theme.of(context).textTheme.titleSmall),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: SizedBox(
+              height: 40, // Fixed height for the capsule list
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: state.availableSourceTypes.length + 1, // +1 for "All"
+                separatorBuilder: (context, index) =>
+                    const SizedBox(width: AppSpacing.sm),
+                itemBuilder: (context, index) {
+                  if (index == 0) {
+                    // "All" chip
+                    return ChoiceChip(
+                      label: Text(l10n.headlinesFeedFilterAllLabel),
+                      selected: state.selectedSourceTypes.isEmpty,
+                      onSelected: (_) {
+                        // For "All", if it's selected, it means no specific types are chosen.
+                        // The BLoC should interpret an empty selectedSourceTypes set as "All".
+                        // Toggling "All" when it's already selected (meaning list is empty)
+                        // doesn't have a clear action here without more complex "select all" logic.
+                        // For now, if "All" is tapped, we ensure the specific selections are cleared.
+                        // This is best handled in the BLoC.
+                        // We can send a specific event or a toggle that the BLoC interprets.
+                        // For simplicity, let's make it so tapping "All" when selected does nothing,
+                        // Tapping "All" for source types should clear specific selections.
+                        // This is now handled by the AllSourceTypesCapsuleToggled event.
+                        context.read<SourcesFilterBloc>().add(
+                              const AllSourceTypesCapsuleToggled(),
+                            );
+                      },
+                    );
+                  }
+                  final sourceType = state.availableSourceTypes[index - 1];
+                  return ChoiceChip(
+                    label: Text(sourceType.name), // Or a more user-friendly name
+                    selected: state.selectedSourceTypes.contains(sourceType),
+                    onSelected: (_) {
+                      context.read<SourcesFilterBloc>().add(
+                            SourceTypeCapsuleToggled(sourceType),
+                          );
+                    },
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-    // Handle initial loading state
-    if (state.status == SourcesFilterStatus.loading) {
-      return LoadingStateWidget(
-        icon: Icons.source_outlined,
-        headline: l10n.sourceFilterLoadingHeadline,
-        subheadline: l10n.sourceFilterLoadingSubheadline,
-      );
+  Widget _buildSourcesList(
+    BuildContext context,
+    SourcesFilterState state,
+    AppLocalizations l10n,
+  ) {
+    if (state.dataLoadingStatus == SourceFilterDataLoadingStatus.loading) {
+      return const Center(child: CircularProgressIndicator());
     }
-
-    // Handle failure state (show error and retry button)
-    if (state.status == SourcesFilterStatus.failure && state.sources.isEmpty) {
+    if (state.dataLoadingStatus == SourceFilterDataLoadingStatus.failure &&
+        state.displayableSources.isEmpty) {
       return FailureStateWidget(
-        message:
-            state.error?.toString() ??
-            l10n.unknownError, // Assumes unknownError exists
-        onRetry:
-            () =>
-                context.read<SourcesFilterBloc>().add(SourcesFilterRequested()),
-      );
-    }
-
-    // Handle empty state (after successful load but no sources found)
-    if (state.status == SourcesFilterStatus.success && state.sources.isEmpty) {
-      return InitialStateWidget(
-        icon: Icons.search_off,
-        headline: l10n.sourceFilterEmptyHeadline,
-        subheadline: l10n.sourceFilterEmptySubheadline,
-      );
-    }
-
-    // Handle loaded state (success or loading more)
-    return ListView.builder(
-      controller: _scrollController,
-      padding: const EdgeInsets.only(bottom: AppSpacing.xxl),
-      itemCount:
-          state.sources.length +
-          ((state.status == SourcesFilterStatus.loadingMore ||
-                  (state.status == SourcesFilterStatus.failure &&
-                      state.sources.isNotEmpty))
-              ? 1
-              : 0),
-      itemBuilder: (context, index) {
-        if (index >= state.sources.length) {
-          if (state.status == SourcesFilterStatus.loadingMore) {
-            return const Padding(
-              padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
-              child: Center(child: CircularProgressIndicator()),
-            );
-          } else if (state.status == SourcesFilterStatus.failure) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: AppSpacing.md,
-                horizontal: AppSpacing.lg,
-              ),
-              child: Center(
-                child: Text(
-                  l10n.loadMoreError, // Assumes loadMoreError exists
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.error,
-                  ),
+        message: state.errorMessage ?? l10n.headlinesFeedFilterErrorSources,
+        onRetry: () {
+          // Dispatch a public event to reload/retry, BLoC will handle internally
+          context.read<SourcesFilterBloc>().add(
+                LoadSourceFilterData(
+                  initialSelectedSources: state.displayableSources
+                      .where((s) => state.finallySelectedSourceIds.contains(s.id))
+                      .toList(), // Or pass current selections if needed for retry context
                 ),
-              ),
-            );
-          } else {
-            return const SizedBox.shrink();
-          }
-        }
+              );
+        },
+      );
+    }
+    if (state.displayableSources.isEmpty) {
+      return Center(
+        child: Text(l10n.headlinesFeedFilterNoSourcesMatch),
+      );
+    }
 
-        final source = state.sources[index];
-        final isSelected = _pageSelectedSources.contains(source);
-
+    return ListView.builder(
+      itemCount: state.displayableSources.length,
+      itemBuilder: (context, index) {
+        final source = state.displayableSources[index];
         return CheckboxListTile(
           title: Text(source.name),
-          subtitle:
-              source.description != null && source.description!.isNotEmpty
-                  ? Text(
-                    source.description!,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  )
-                  : null,
-          value: isSelected,
+          value: state.finallySelectedSourceIds.contains(source.id),
           onChanged: (bool? value) {
-            // When a checkbox state changes, update the local selection set
-            // (`_pageSelectedSources`) for this page.
-            setState(() {
-              if (value == true) {
-                // Add the source if checked.
-                _pageSelectedSources.add(source);
-              } else {
-                // Remove the source if unchecked.
-                _pageSelectedSources.remove(source);
-              }
-            });
+            if (value != null) {
+              context.read<SourcesFilterBloc>().add(
+                    SourceCheckboxToggled(source.id, value),
+                  );
+            }
           },
         );
       },

@@ -8,13 +8,21 @@ class FailureStateWidget extends StatelessWidget {
   ///
   /// The [onRetry] is an optional callback to be called
   /// when the retry button is pressed.
-  const FailureStateWidget({required this.message, super.key, this.onRetry});
+  const FailureStateWidget({
+    required this.message,
+    super.key,
+    this.onRetry,
+    this.retryButtonText, // Optional custom text for the retry button
+  });
 
   /// The error message to display.
   final String message;
 
   /// An optional callback to be called when the retry button is pressed.
   final VoidCallback? onRetry;
+
+  /// Optional custom text for the retry button. Defaults to "Retry".
+  final String? retryButtonText;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +41,7 @@ class FailureStateWidget extends StatelessWidget {
               padding: const EdgeInsets.only(top: 16),
               child: ElevatedButton(
                 onPressed: onRetry,
-                child: const Text('Retry'),
+                child: Text(retryButtonText ?? 'Retry'), // Use custom text or default
               ),
             ),
         ],

@@ -79,7 +79,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
                   .whereType<Country>()
                   .map((c) => c.isoCode)
                   .toList(),
-      }, limit: _headlinesFetchLimit,);
+      }, limit: _headlinesFetchLimit);
       emit(
         HeadlinesFeedLoaded(
           headlines: response.items,
@@ -254,7 +254,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
                   .whereType<Country>()
                   .map((c) => c.isoCode)
                   .toList(),
-      }, limit: _headlinesFetchLimit,);
+      }, limit: _headlinesFetchLimit);
       emit(
         HeadlinesFeedLoaded(
           headlines: response.items, // Replace headlines on refresh

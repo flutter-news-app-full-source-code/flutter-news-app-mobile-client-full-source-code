@@ -22,7 +22,7 @@ Empower users with intuitive filtering for headlines by categories, sources, and
 Secure and flexible authentication flows are built-in:
 *   📧 **Email + Code (Passwordless) Sign-In:** Modern and secure.
 *   👤 **Anonymous Sign-In:** Allow users to explore before committing.
-*   🔗 **Account Linking:** Seamlessly convert anonymous users to registered accounts, ensuring all their personalized settings (like theme and language), content preferences (followed categories, sources, countries), and saved headlines are preserved and synced.
+*   🔗 **Account Linking:** Seamlessly convert anonymous users to registered accounts, preserving all their personalized settings, content preferences, and saved headlines.
 *   **Benefit for you:** Complex security and user management handled, including data migration during account linking, letting you focus on features. ✅
 
 #### 🧑‍🎨 **Personalized User Accounts & Preferences**

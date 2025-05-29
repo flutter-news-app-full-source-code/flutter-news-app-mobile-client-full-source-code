@@ -10,7 +10,7 @@ import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/constants/constants.dart';
 import 'package:ht_shared/ht_shared.dart'
-    show Category, Country, Source; // Import models from ht_shared
+    show Category, Source; // Import models from ht_shared, Country removed
 
 /// {@template headlines_filter_page}
 /// A full-screen dialog page for selecting headline filters.
@@ -35,7 +35,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
   /// and are only applied back to the BLoC when the user taps 'Apply'.
   late List<Category> _tempSelectedCategories;
   late List<Source> _tempSelectedSources;
-  late List<Country> _tempSelectedCountries;
+  // late List<Country> _tempSelectedCountries; // Removed
 
   @override
   void initState() {
@@ -48,15 +48,15 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       // Create copies of the lists to avoid modifying the BLoC state directly.
       _tempSelectedCategories = List.from(currentState.filter.categories ?? []);
       _tempSelectedSources = List.from(currentState.filter.sources ?? []);
-      _tempSelectedCountries = List.from(
-        currentState.filter.eventCountries ?? [],
-      );
+      // _tempSelectedCountries = List.from(
+      //   currentState.filter.eventCountries ?? [],
+      // ); // Removed
     } else {
       // Default to empty lists if the feed isn't loaded yet. This might happen
       // if the filter page is accessed before the initial feed load completes.
       _tempSelectedCategories = [];
       _tempSelectedSources = [];
-      _tempSelectedCountries = [];
+      // _tempSelectedCountries = []; // Removed
     }
   }
 
@@ -155,10 +155,6 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
                     _tempSelectedSources.isNotEmpty
                         ? _tempSelectedSources
                         : null, // Use null if empty
-                eventCountries:
-                    _tempSelectedCountries.isNotEmpty
-                        ? _tempSelectedCountries
-                        : null, // Use null if empty
               );
 
               // Add an event to the main HeadlinesFeedBloc to apply the
@@ -198,18 +194,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
               }
             },
           ),
-          _buildFilterTile(
-            context: context,
-            title: l10n.headlinesFeedFilterEventCountryLabel,
-            selectedCount: _tempSelectedCountries.length,
-            routeName: Routes.feedFilterCountriesName,
-            currentSelection: _tempSelectedCountries,
-            onResult: (result) {
-              if (result is List<Country>) {
-                setState(() => _tempSelectedCountries = result);
-              }
-            },
-          ),
+          // _buildFilterTile for eventCountries removed
         ],
       ),
     );

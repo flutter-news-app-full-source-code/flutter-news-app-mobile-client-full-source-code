@@ -196,10 +196,9 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                   )
                   // Display "no results" if list is empty
                   : headlines.isEmpty
-                  ? InitialStateWidget(
-                    icon: Icons.search_off,
-                    headline: l10n.headlinesSearchNoResultsHeadline,
-                    subheadline: l10n.headlinesSearchNoResultsSubheadline,
+                  ? FailureStateWidget(
+                    message: '${l10n.headlinesSearchNoResultsHeadline}\n${l10n.headlinesSearchNoResultsSubheadline}',
+                    onRetry: null, // No retry/clear button for empty search results
                   )
                   // Display the list of headlines
                   : ListView.builder(

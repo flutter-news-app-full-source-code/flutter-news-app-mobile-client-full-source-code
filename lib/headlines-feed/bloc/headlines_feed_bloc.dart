@@ -28,7 +28,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   /// Requires a [HtDataRepository<Headline>] to interact with the data layer.
   HeadlinesFeedBloc({required HtDataRepository<Headline> headlinesRepository})
     : _headlinesRepository = headlinesRepository,
-      super(HeadlinesFeedLoading()) {
+      super(HeadlinesFeedInitial()) {
     on<HeadlinesFeedFetchRequested>(
       _onHeadlinesFeedFetchRequested,
       transformer:

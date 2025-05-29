@@ -42,6 +42,7 @@ class AppShell extends StatelessWidget {
     final l10n = context.l10n;
 
     return AdaptiveScaffold(
+      useDrawer: false,
       // Use the index from the navigationShell to sync the selected destination.
       selectedIndex: navigationShell.currentIndex,
       // Callback when a destination is selected.
@@ -71,25 +72,6 @@ class AppShell extends StatelessWidget {
       // The body displays the widget tree for the currently selected branch.
       // The [NavigationShell] widget handles building the appropriate page.
       body: (_) => navigationShell,
-
-      // Optional: Configure small screen navigation type (defaults to bottomNav)
-      // smallBreakpoint: const WidthPlatformBreakpoint(end: 700),
-      // smallBuilder: (_, __) => AdaptiveScaffold.standardBottomNavigationBar(
-      //   destinations: destinations,
-      // ),
-
-      // Optional: Configure medium screen navigation type (defaults to navRail)
-      // mediumBreakpoint: const WidthPlatformBreakpoint(begin: 700, end: 1000),
-      // mediumBuilder: (_, __, ___) => AdaptiveScaffold.standardNavigationRail(
-      //   destinations: destinations,
-      //   // leading: const Icon(Icons.menu), // Example leading widget
-      // ),
-
-      // Optional: Configure large screen navigation type (defaults to drawer)
-      // largeBreakpoint: const WidthPlatformBreakpoint(begin: 1000),
-      // largeBuilder: (_, __, ___) => AdaptiveScaffold.standardNavigationDrawer(
-      //   destinations: destinations,
-      // ),
     );
   }
 }

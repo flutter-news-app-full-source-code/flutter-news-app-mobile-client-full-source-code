@@ -11,6 +11,7 @@ import 'package:ht_main/headlines-feed/widgets/headline_item_widget.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/constants/constants.dart';
+import 'package:ht_main/shared/shared.dart';
 import 'package:ht_main/shared/widgets/failure_state_widget.dart';
 import 'package:ht_main/shared/widgets/loading_state_widget.dart';
 // Import Source
@@ -166,6 +167,21 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
               return const SizedBox.shrink();
 
             case HeadlinesFeedLoaded():
+              if (state.headlines.isEmpty) {
+                // If the list is empty, show an informative message using the
+                // shared InitialStateWidget. This is especially relevant after
+                // filters are applied and yield no results, or if the initial
+                // unfiltered feed is empty.
+                return InitialStateWidget(
+                  icon:
+                      Icons
+                          .search_off_outlined, // Visually indicates no results
+                  headline:
+                      l10n.headlinesFeedEmptyFilteredHeadline, // Placeholder l10n
+                  subheadline:
+                      l10n.headlinesFeedEmptyFilteredSubheadline, // Placeholder l10n
+                );
+              }
               // Display the list of headlines with pull-to-refresh
               return RefreshIndicator(
                 onRefresh: () async {

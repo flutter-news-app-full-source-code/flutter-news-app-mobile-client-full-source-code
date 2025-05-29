@@ -549,5 +549,13 @@
     "emailCodeValidationLengthError": "يجب أن يتكون الرمز من 6 أرقام.",
     "@emailCodeValidationLengthError": {
         "description": "Validation error when the email verification code is not 6 digits."
+    },
+    "headlinesFeedEmptyFilteredHeadline": "لا توجد عناوين تطابق فلاترك",
+    "@headlinesFeedEmptyFilteredHeadline": {
+        "description": "Headline text shown when headline filters result in an empty list"
+    },
+    "headlinesFeedEmptyFilteredSubheadline": "حاول تعديل معايير الفلترة أو مسحها لرؤية جميع العناوين.",
+    "@headlinesFeedEmptyFilteredSubheadline": {
+        "description": "Subheadline text shown when headline filters result in an empty list"
     }
 }

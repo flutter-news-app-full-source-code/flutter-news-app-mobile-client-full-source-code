@@ -549,5 +549,13 @@
     "emailCodeValidationLengthError": "The code must be 6 digits.",
     "@emailCodeValidationLengthError": {
         "description": "Validation error when the email verification code is not 6 digits."
+    },
+    "headlinesFeedEmptyFilteredHeadline": "No Headlines Match Your Filters",
+    "@headlinesFeedEmptyFilteredHeadline": {
+        "description": "Headline text shown when headline filters result in an empty list"
+    },
+    "headlinesFeedEmptyFilteredSubheadline": "Try adjusting your filter criteria or clearing them to see all headlines.",
+    "@headlinesFeedEmptyFilteredSubheadline": {
+        "description": "Subheadline text shown when headline filters result in an empty list"
     }
 }

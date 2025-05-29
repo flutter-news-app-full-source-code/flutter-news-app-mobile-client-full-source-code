@@ -32,7 +32,7 @@ import 'package:ht_main/settings/view/feed_settings_page.dart'; // Added
 import 'package:ht_main/settings/view/notification_settings_page.dart'; // Added
 import 'package:ht_main/settings/view/settings_page.dart'; // Added
 import 'package:ht_shared/ht_shared.dart'; // Shared models, FromJson, ToJson, etc.
-
+ 
 /// Creates and configures the GoRouter instance for the application.
 ///
 /// Requires an [authStatusNotifier] to trigger route re-evaluation when
@@ -396,6 +396,9 @@ GoRouter createRouter({
                                     sourcesRepository:
                                         context
                                             .read<HtDataRepository<Source>>(),
+                                    countriesRepository: // Added missing repository
+                                        context
+                                            .read<HtDataRepository<Country>>(),
                                   ),
                               child: const SourceFilterPage(),
                             ),

@@ -10,10 +10,7 @@ import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:ht_main/headlines-feed/widgets/headline_item_widget.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
-import 'package:ht_main/shared/constants/constants.dart';
 import 'package:ht_main/shared/shared.dart';
-import 'package:ht_main/shared/widgets/failure_state_widget.dart';
-import 'package:ht_main/shared/widgets/loading_state_widget.dart';
 // Import Source
 
 /// {@template headlines_feed_view}
@@ -171,13 +168,16 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                 // If the list is empty after filters, show a message
                 // with a "Clear Filters" button using FailureStateWidget.
                 return FailureStateWidget(
-                  message: '${l10n.headlinesFeedEmptyFilteredHeadline}\n${l10n.headlinesFeedEmptyFilteredSubheadline}',
-                  onRetry: () { // This will be our "Clear Filters" action
+                  message:
+                      '${l10n.headlinesFeedEmptyFilteredHeadline}\n${l10n.headlinesFeedEmptyFilteredSubheadline}',
+                  onRetry: () {
+                    // This will be our "Clear Filters" action
                     context.read<HeadlinesFeedBloc>().add(
                       HeadlinesFeedFiltersCleared(),
                     );
                   },
-                  retryButtonText: l10n.headlinesFeedClearFiltersButton, // New l10n string
+                  retryButtonText:
+                      l10n.headlinesFeedClearFiltersButton, // New l10n string
                 );
               }
               // Display the list of headlines with pull-to-refresh

@@ -8,23 +8,25 @@ import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/shared/constants/app_spacing.dart';
 import 'package:ht_main/shared/widgets/failure_state_widget.dart';
 import 'package:ht_main/shared/widgets/loading_state_widget.dart';
-import 'package:ht_shared/ht_shared.dart' show Country, Source, SourceType;
+import 'package:ht_shared/ht_shared.dart' show Country, Source;
 
 class SourceFilterPage extends StatelessWidget {
-  const SourceFilterPage({
-    super.key,
-    this.initialSelectedSources = const [],
-  });
+  const SourceFilterPage({super.key, this.initialSelectedSources = const []});
 
   final List<Source> initialSelectedSources;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => SourcesFilterBloc(
-        sourcesRepository: context.read<HtDataRepository<Source>>(),
-        countriesRepository: context.read<HtDataRepository<Country>>(),
-      )..add(LoadSourceFilterData(initialSelectedSources: initialSelectedSources)),
+      create:
+          (context) => SourcesFilterBloc(
+            sourcesRepository: context.read<HtDataRepository<Source>>(),
+            countriesRepository: context.read<HtDataRepository<Country>>(),
+          )..add(
+            LoadSourceFilterData(
+              initialSelectedSources: initialSelectedSources,
+            ),
+          ),
       child: const _SourceFilterView(),
     );
   }
@@ -46,20 +48,21 @@ class _SourceFilterView extends StatelessWidget {
             icon: const Icon(Icons.clear_all),
             tooltip: l10n.headlinesFeedFilterResetButton,
             onPressed: () {
-              context
-                  .read<SourcesFilterBloc>()
-                  .add(const ClearSourceFiltersRequested());
+              context.read<SourcesFilterBloc>().add(
+                const ClearSourceFiltersRequested(),
+              );
             },
           ),
           IconButton(
             icon: const Icon(Icons.check),
             tooltip: l10n.headlinesFeedFilterApplyButton,
             onPressed: () {
-              final selectedSources = state.displayableSources
-                  .where(
-                    (s) => state.finallySelectedSourceIds.contains(s.id),
-                  )
-                  .toList();
+              final selectedSources =
+                  state.displayableSources
+                      .where(
+                        (s) => state.finallySelectedSourceIds.contains(s.id),
+                      )
+                      .toList();
               Navigator.of(context).pop(selectedSources);
             },
           ),
@@ -88,12 +91,12 @@ class _SourceFilterView extends StatelessWidget {
         message: state.errorMessage ?? l10n.headlinesFeedFilterErrorCriteria,
         onRetry: () {
           context.read<SourcesFilterBloc>().add(
-                LoadSourceFilterData(
-                  initialSelectedSources:
-                      ModalRoute.of(context)?.settings.arguments as List<Source>? ??
-                          const [],
-                ),
-              );
+            LoadSourceFilterData(
+              initialSelectedSources:
+                  ModalRoute.of(context)?.settings.arguments as List<Source>? ??
+                  const [],
+            ),
+          );
         },
       );
     }
@@ -119,8 +122,10 @@ class _SourceFilterView extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingMedium),
       child: Row(
         children: [
-          Text('${l10n.headlinesFeedFilterCountryLabel}:',
-              style: Theme.of(context).textTheme.titleSmall),
+          Text(
+            '${l10n.headlinesFeedFilterCountryLabel}:',
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: SizedBox(
@@ -128,8 +133,8 @@ class _SourceFilterView extends StatelessWidget {
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: state.availableCountries.length + 1, // +1 for "All"
-                separatorBuilder: (context, index) =>
-                    const SizedBox(width: AppSpacing.sm),
+                separatorBuilder:
+                    (context, index) => const SizedBox(width: AppSpacing.sm),
                 itemBuilder: (context, index) {
                   if (index == 0) {
                     // "All" chip
@@ -138,20 +143,23 @@ class _SourceFilterView extends StatelessWidget {
                       selected: state.selectedCountryIsoCodes.isEmpty,
                       onSelected: (_) {
                         context.read<SourcesFilterBloc>().add(
-                              const CountryCapsuleToggled(''), // Special value for "All"
-                            );
+                          const CountryCapsuleToggled(
+                            '',
+                          ), // Special value for "All"
+                        );
                       },
                     );
                   }
                   final country = state.availableCountries[index - 1];
                   return ChoiceChip(
                     label: Text(country.name),
-                    selected:
-                        state.selectedCountryIsoCodes.contains(country.isoCode),
+                    selected: state.selectedCountryIsoCodes.contains(
+                      country.isoCode,
+                    ),
                     onSelected: (_) {
                       context.read<SourcesFilterBloc>().add(
-                            CountryCapsuleToggled(country.isoCode),
-                          );
+                        CountryCapsuleToggled(country.isoCode),
+                      );
                     },
                   );
                 },
@@ -172,17 +180,20 @@ class _SourceFilterView extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingMedium),
       child: Row(
         children: [
-          Text('${l10n.headlinesFeedFilterSourceTypeLabel}:', // Assuming l10n key exists
-              style: Theme.of(context).textTheme.titleSmall),
+          Text(
+            '${l10n.headlinesFeedFilterSourceTypeLabel}:', // Assuming l10n key exists
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: SizedBox(
               height: 40, // Fixed height for the capsule list
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
-                itemCount: state.availableSourceTypes.length + 1, // +1 for "All"
-                separatorBuilder: (context, index) =>
-                    const SizedBox(width: AppSpacing.sm),
+                itemCount:
+                    state.availableSourceTypes.length + 1, // +1 for "All"
+                separatorBuilder:
+                    (context, index) => const SizedBox(width: AppSpacing.sm),
                 itemBuilder: (context, index) {
                   if (index == 0) {
                     // "All" chip
@@ -201,19 +212,21 @@ class _SourceFilterView extends StatelessWidget {
                         // Tapping "All" for source types should clear specific selections.
                         // This is now handled by the AllSourceTypesCapsuleToggled event.
                         context.read<SourcesFilterBloc>().add(
-                              const AllSourceTypesCapsuleToggled(),
-                            );
+                          const AllSourceTypesCapsuleToggled(),
+                        );
                       },
                     );
                   }
                   final sourceType = state.availableSourceTypes[index - 1];
                   return ChoiceChip(
-                    label: Text(sourceType.name), // Or a more user-friendly name
+                    label: Text(
+                      sourceType.name,
+                    ), // Or a more user-friendly name
                     selected: state.selectedSourceTypes.contains(sourceType),
                     onSelected: (_) {
                       context.read<SourcesFilterBloc>().add(
-                            SourceTypeCapsuleToggled(sourceType),
-                          );
+                        SourceTypeCapsuleToggled(sourceType),
+                      );
                     },
                   );
                 },
@@ -240,19 +253,20 @@ class _SourceFilterView extends StatelessWidget {
         onRetry: () {
           // Dispatch a public event to reload/retry, BLoC will handle internally
           context.read<SourcesFilterBloc>().add(
-                LoadSourceFilterData(
-                  initialSelectedSources: state.displayableSources
-                      .where((s) => state.finallySelectedSourceIds.contains(s.id))
+            LoadSourceFilterData(
+              initialSelectedSources:
+                  state.displayableSources
+                      .where(
+                        (s) => state.finallySelectedSourceIds.contains(s.id),
+                      )
                       .toList(), // Or pass current selections if needed for retry context
-                ),
-              );
+            ),
+          );
         },
       );
     }
     if (state.displayableSources.isEmpty) {
-      return Center(
-        child: Text(l10n.headlinesFeedFilterNoSourcesMatch),
-      );
+      return Center(child: Text(l10n.headlinesFeedFilterNoSourcesMatch));
     }
 
     return ListView.builder(
@@ -265,8 +279,8 @@ class _SourceFilterView extends StatelessWidget {
           onChanged: (bool? value) {
             if (value != null) {
               context.read<SourcesFilterBloc>().add(
-                    SourceCheckboxToggled(source.id, value),
-                  );
+                SourceCheckboxToggled(source.id, value),
+              );
             }
           },
         );

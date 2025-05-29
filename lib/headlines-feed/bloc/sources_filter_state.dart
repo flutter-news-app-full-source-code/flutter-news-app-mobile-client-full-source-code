@@ -53,13 +53,13 @@ class SourcesFilterState extends Equatable {
 
   @override
   List<Object?> get props => [
-        availableCountries,
-        selectedCountryIsoCodes,
-        availableSourceTypes,
-        selectedSourceTypes,
-        displayableSources,
-        finallySelectedSourceIds,
-        dataLoadingStatus,
-        errorMessage,
-      ];
+    availableCountries,
+    selectedCountryIsoCodes,
+    availableSourceTypes,
+    selectedSourceTypes,
+    displayableSources,
+    finallySelectedSourceIds,
+    dataLoadingStatus,
+    errorMessage,
+  ];
 }

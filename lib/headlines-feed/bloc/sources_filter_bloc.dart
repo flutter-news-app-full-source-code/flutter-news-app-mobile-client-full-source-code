@@ -9,14 +9,13 @@ import 'package:ht_shared/ht_shared.dart'
 part 'sources_filter_event.dart';
 part 'sources_filter_state.dart';
 
-class SourcesFilterBloc
-    extends Bloc<SourcesFilterEvent, SourcesFilterState> {
+class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
   SourcesFilterBloc({
     required HtDataRepository<Source> sourcesRepository,
     required HtDataRepository<Country> countriesRepository,
-  })  : _sourcesRepository = sourcesRepository,
-        _countriesRepository = countriesRepository,
-        super(const SourcesFilterState()) {
+  }) : _sourcesRepository = sourcesRepository,
+       _countriesRepository = countriesRepository,
+       super(const SourcesFilterState()) {
     on<LoadSourceFilterData>(_onLoadSourceFilterData);
     on<CountryCapsuleToggled>(_onCountryCapsuleToggled);
     on<AllSourceTypesCapsuleToggled>(_onAllSourceTypesCapsuleToggled); // Added
@@ -34,18 +33,16 @@ class SourcesFilterBloc
     Emitter<SourcesFilterState> emit,
   ) async {
     emit(
-      state.copyWith(
-        dataLoadingStatus: SourceFilterDataLoadingStatus.loading,
-      ),
+      state.copyWith(dataLoadingStatus: SourceFilterDataLoadingStatus.loading),
     );
     try {
       final availableCountries = await _countriesRepository.readAll();
       final initialSelectedSourceIds =
           event.initialSelectedSources.map((s) => s.id).toSet();
-      
+
       // Initialize selected capsules based on initialSelectedSources
-      final Set<String> initialSelectedCountryIsoCodes = {};
-      final Set<SourceType> initialSelectedSourceTypes = {};
+      final initialSelectedCountryIsoCodes = <String>{};
+      final initialSelectedSourceTypes = <SourceType>{};
 
       if (event.initialSelectedSources.isNotEmpty) {
         for (final source in event.initialSelectedSources) {
@@ -84,7 +81,8 @@ class SourcesFilterBloc
     Emitter<SourcesFilterState> emit,
   ) async {
     final currentSelected = Set<String>.from(state.selectedCountryIsoCodes);
-    if (event.countryIsoCode.isEmpty) { // "All Countries" toggled
+    if (event.countryIsoCode.isEmpty) {
+      // "All Countries" toggled
       // If "All" is tapped and it's already effectively "All" (empty set), or if it's tapped to select "All"
       // we clear the set. If specific items are selected and "All" is tapped, it also clears.
       // Essentially, tapping "All" always results in an empty set, meaning no country filter.
@@ -163,23 +161,21 @@ class SourcesFilterBloc
       state.copyWith(
         dataLoadingStatus: SourceFilterDataLoadingStatus.loading,
         displayableSources: [], // Clear previous sources
-        errorMessage: null,
         clearErrorMessage: true,
       ),
     );
     try {
       final queryParameters = <String, dynamic>{};
       if (state.selectedCountryIsoCodes.isNotEmpty) {
-        queryParameters['countries'] =
-            state.selectedCountryIsoCodes.join(',');
+        queryParameters['countries'] = state.selectedCountryIsoCodes.join(',');
       }
       if (state.selectedSourceTypes.isNotEmpty) {
-        queryParameters['sourceTypes'] =
-            state.selectedSourceTypes.map((st) => st.name).join(',');
+        queryParameters['sourceTypes'] = state.selectedSourceTypes
+            .map((st) => st.name)
+            .join(',');
       }
 
-      final response =
-          await _sourcesRepository.readAllByQuery(queryParameters);
+      final response = await _sourcesRepository.readAllByQuery(queryParameters);
       emit(
         state.copyWith(
           displayableSources: response.items,

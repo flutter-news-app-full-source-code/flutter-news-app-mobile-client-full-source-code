@@ -21,10 +21,7 @@ class HeadlineFilter extends Equatable {
 
   /// Creates a copy of this [HeadlineFilter] with the given fields
   /// replaced with the new values.
-  HeadlineFilter copyWith({
-    List<Category>? categories,
-    List<Source>? sources,
-  }) {
+  HeadlineFilter copyWith({List<Category>? categories, List<Source>? sources}) {
     return HeadlineFilter(
       categories: categories ?? this.categories,
       sources: sources ?? this.sources,

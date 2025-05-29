@@ -234,9 +234,7 @@ class ContentPreferencesPage extends StatelessWidget {
           ElevatedButton.icon(
             icon: const Icon(Icons.add_circle_outline),
             label: Text(l10n.headlinesFeedFilterEventCountryLabel), // "Country"
-            // onPressed: () {
-            //   context.goNamed(Routes.feedFilterCountriesName);
-            // }, // TODO: Implement new navigation/management for followed countries
+            onPressed: null, // TODO: Implement new navigation/management for followed countries
           ),
         ],
       );

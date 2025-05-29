@@ -110,8 +110,8 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                 // Check if any filter list is non-null and not empty
                 isFilterApplied =
                     (state.filter.categories?.isNotEmpty ?? false) ||
-                    (state.filter.sources?.isNotEmpty ?? false) ||
-                    (state.filter.eventCountries?.isNotEmpty ?? false);
+                    (state.filter.sources?.isNotEmpty ?? false);
+                // (state.filter.eventCountries?.isNotEmpty ?? false); // Removed
               }
               return Stack(
                 children: [

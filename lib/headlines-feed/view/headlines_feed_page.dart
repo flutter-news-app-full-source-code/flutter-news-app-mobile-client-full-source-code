@@ -168,18 +168,16 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
 
             case HeadlinesFeedLoaded():
               if (state.headlines.isEmpty) {
-                // If the list is empty, show an informative message using the
-                // shared InitialStateWidget. This is especially relevant after
-                // filters are applied and yield no results, or if the initial
-                // unfiltered feed is empty.
-                return InitialStateWidget(
-                  icon:
-                      Icons
-                          .search_off_outlined, // Visually indicates no results
-                  headline:
-                      l10n.headlinesFeedEmptyFilteredHeadline, // Placeholder l10n
-                  subheadline:
-                      l10n.headlinesFeedEmptyFilteredSubheadline, // Placeholder l10n
+                // If the list is empty after filters, show a message
+                // with a "Clear Filters" button using FailureStateWidget.
+                return FailureStateWidget(
+                  message: '${l10n.headlinesFeedEmptyFilteredHeadline}\n${l10n.headlinesFeedEmptyFilteredSubheadline}',
+                  onRetry: () { // This will be our "Clear Filters" action
+                    context.read<HeadlinesFeedBloc>().add(
+                      HeadlinesFeedFiltersCleared(),
+                    );
+                  },
+                  retryButtonText: l10n.headlinesFeedClearFiltersButton, // New l10n string
                 );
               }
               // Display the list of headlines with pull-to-refresh

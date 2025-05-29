@@ -557,5 +557,9 @@
     "headlinesFeedEmptyFilteredSubheadline": "Try adjusting your filter criteria or clearing them to see all headlines.",
     "@headlinesFeedEmptyFilteredSubheadline": {
         "description": "Subheadline text shown when headline filters result in an empty list"
+    },
+    "headlinesFeedClearFiltersButton": "Clear Filters",
+    "@headlinesFeedClearFiltersButton": {
+        "description": "Button text to clear applied headline filters"
     }
 }

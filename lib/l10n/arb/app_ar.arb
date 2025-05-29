@@ -557,5 +557,9 @@
     "headlinesFeedEmptyFilteredSubheadline": "حاول تعديل معايير الفلترة أو مسحها لرؤية جميع العناوين.",
     "@headlinesFeedEmptyFilteredSubheadline": {
         "description": "Subheadline text shown when headline filters result in an empty list"
+    },
+    "headlinesFeedClearFiltersButton": "مسح الفلاتر",
+    "@headlinesFeedClearFiltersButton": {
+        "description": "Button text to clear applied headline filters"
     }
 }

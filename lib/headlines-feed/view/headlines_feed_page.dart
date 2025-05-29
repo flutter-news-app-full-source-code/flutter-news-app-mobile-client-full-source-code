@@ -151,6 +151,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
             (previous, current) => current is! HeadlinesFeedLoadingSilently,
         builder: (context, state) {
           switch (state) {
+            case HeadlinesFeedInitial(): // Handle initial state
             case HeadlinesFeedLoading():
               // Display full-screen loading indicator
               return LoadingStateWidget(

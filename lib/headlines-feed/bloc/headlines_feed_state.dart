@@ -11,6 +11,11 @@ sealed class HeadlinesFeedState extends Equatable {
   List<Object?> get props => [];
 }
 
+/// {@template headlines_feed_initial}
+/// The initial state of the headlines feed before any loading has begun.
+/// {@endtemplate}
+final class HeadlinesFeedInitial extends HeadlinesFeedState {}
+
 /// {@template headlines_feed_loading}
 /// State indicating that the headlines feed is currently being fetched,
 /// typically shown with a full-screen loading indicator. This is used for

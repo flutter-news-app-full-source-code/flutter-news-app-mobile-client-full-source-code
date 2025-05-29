@@ -234,9 +234,8 @@ class ContentPreferencesPage extends StatelessWidget {
           ElevatedButton.icon(
             icon: const Icon(Icons.add_circle_outline),
             label: Text(l10n.headlinesFeedFilterEventCountryLabel), // "Country"
-            onPressed: () {
-              context.goNamed(Routes.feedFilterCountriesName);
-            },
+            onPressed:
+                null, // TODO: Implement new navigation/management for followed countries
           ),
         ],
       );
@@ -279,9 +278,10 @@ class ContentPreferencesPage extends StatelessWidget {
             label: Text(
               'Manage ${l10n.headlinesFeedFilterEventCountryLabel}',
             ), // "Manage Country"
-            onPressed: () {
-              context.goNamed(Routes.feedFilterCountriesName);
-            },
+            // onPressed: () {
+            //   context.goNamed(Routes.feedFilterCountriesName);
+            // }, // TODO: Implement new navigation/management for followed countries
+            onPressed: null, // Temporarily disable until new flow is defined
             style: ElevatedButton.styleFrom(
               minimumSize: const Size(double.infinity, 48),
             ),

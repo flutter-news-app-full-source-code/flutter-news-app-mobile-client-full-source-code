@@ -17,10 +17,6 @@ abstract final class Routes {
   static const feedFilterSources = 'sources'; // Path: /feed/filter/sources
   static const feedFilterSourcesName = 'feedFilterSources';
 
-  static const feedFilterCountries =
-      'countries'; // Path: /feed/filter/countries
-  static const feedFilterCountriesName = 'feedFilterCountries';
-
   static const search = '/search';
   static const searchName = 'search';
   static const account = '/account';

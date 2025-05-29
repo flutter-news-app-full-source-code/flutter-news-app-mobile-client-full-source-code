@@ -561,5 +561,33 @@
     "headlinesFeedClearFiltersButton": "Clear Filters",
     "@headlinesFeedClearFiltersButton": {
         "description": "Button text to clear applied headline filters"
+    },
+    "headlinesFeedFilterLoadingCriteria": "Loading filter options...",
+    "@headlinesFeedFilterLoadingCriteria": {
+        "description": "Text shown when filter options are loading"
+    },
+    "pleaseWait": "Please wait...",
+    "@pleaseWait": {
+        "description": "Generic wait message"
+    },
+    "headlinesFeedFilterErrorCriteria": "Could not load filter options.",
+    "@headlinesFeedFilterErrorCriteria": {
+        "description": "Error message when filter options fail to load"
+    },
+    "headlinesFeedFilterCountryLabel": "Countries",
+    "@headlinesFeedFilterCountryLabel": {
+        "description": "Label for the country filter selection"
+    },
+    "headlinesFeedFilterSourceTypeLabel": "Types",
+    "@headlinesFeedFilterSourceTypeLabel": {
+        "description": "Label for the source type filter selection"
+    },
+    "headlinesFeedFilterErrorSources": "Could not load sources.",
+    "@headlinesFeedFilterErrorSources": {
+        "description": "Error message when sources fail to load for filtering"
+    },
+    "headlinesFeedFilterNoSourcesMatch": "No sources match your selected filters.",
+    "@headlinesFeedFilterNoSourcesMatch": {
+        "description": "Message shown when no sources match the selected filters"
     }
 }

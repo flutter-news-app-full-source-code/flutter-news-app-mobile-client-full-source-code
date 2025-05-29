@@ -561,5 +561,33 @@
     "headlinesFeedClearFiltersButton": "مسح الفلاتر",
     "@headlinesFeedClearFiltersButton": {
         "description": "Button text to clear applied headline filters"
+    },
+    "headlinesFeedFilterLoadingCriteria": "جارٍ تحميل خيارات التصفية...",
+    "@headlinesFeedFilterLoadingCriteria": {
+        "description": "Text shown when filter options are loading"
+    },
+    "pleaseWait": "يرجى الانتظار...",
+    "@pleaseWait": {
+        "description": "Generic wait message"
+    },
+    "headlinesFeedFilterErrorCriteria": "تعذر تحميل خيارات التصفية.",
+    "@headlinesFeedFilterErrorCriteria": {
+        "description": "Error message when filter options fail to load"
+    },
+    "headlinesFeedFilterCountryLabel": "الدول",
+    "@headlinesFeedFilterCountryLabel": {
+        "description": "Label for the country filter selection"
+    },
+    "headlinesFeedFilterSourceTypeLabel": "الأنواع",
+    "@headlinesFeedFilterSourceTypeLabel": {
+        "description": "Label for the source type filter selection"
+    },
+    "headlinesFeedFilterErrorSources": "تعذر تحميل المصادر.",
+    "@headlinesFeedFilterErrorSources": {
+        "description": "Error message when sources fail to load for filtering"
+    },
+    "headlinesFeedFilterNoSourcesMatch": "لا توجد مصادر تطابق الفلاتر المحددة.",
+    "@headlinesFeedFilterNoSourcesMatch": {
+        "description": "Message shown when no sources match the selected filters"
     }
 }

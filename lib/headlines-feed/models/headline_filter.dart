@@ -6,7 +6,7 @@ import 'package:ht_shared/ht_shared.dart';
 /// {@endtemplate}
 class HeadlineFilter extends Equatable {
   /// {@macro headline_filter}
-  const HeadlineFilter({this.categories, this.sources, this.eventCountries});
+  const HeadlineFilter({this.categories, this.sources});
 
   /// The list of selected category filters.
   /// Headlines matching *any* of these categories will be included (OR logic).
@@ -16,24 +16,15 @@ class HeadlineFilter extends Equatable {
   /// Headlines matching *any* of these sources will be included (OR logic).
   final List<Source>? sources;
 
-  /// The list of selected event country filters.
-  /// Headlines matching *any* of these countries will be included (OR logic).
-  final List<Country>? eventCountries;
-
   @override
-  List<Object?> get props => [categories, sources, eventCountries];
+  List<Object?> get props => [categories, sources];
 
   /// Creates a copy of this [HeadlineFilter] with the given fields
   /// replaced with the new values.
-  HeadlineFilter copyWith({
-    List<Category>? categories,
-    List<Source>? sources,
-    List<Country>? eventCountries,
-  }) {
+  HeadlineFilter copyWith({List<Category>? categories, List<Source>? sources}) {
     return HeadlineFilter(
       categories: categories ?? this.categories,
       sources: sources ?? this.sources,
-      eventCountries: eventCountries ?? this.eventCountries,
     );
   }
 }

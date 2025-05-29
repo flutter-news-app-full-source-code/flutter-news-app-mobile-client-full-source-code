@@ -41,7 +41,9 @@ class FailureStateWidget extends StatelessWidget {
               padding: const EdgeInsets.only(top: 16),
               child: ElevatedButton(
                 onPressed: onRetry,
-                child: Text(retryButtonText ?? 'Retry'), // Use custom text or default
+                child: Text(
+                  retryButtonText ?? 'Retry',
+                ), // Use custom text or default
               ),
             ),
         ],

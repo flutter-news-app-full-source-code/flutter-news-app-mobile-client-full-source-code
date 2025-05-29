@@ -1,76 +1,65 @@
 part of 'sources_filter_bloc.dart';
 
-/// Enum representing the different statuses of the source filter data fetching.
-enum SourcesFilterStatus {
-  /// Initial state, no data loaded yet.
-  initial,
+// Import for Country, Source, SourceType will be in sources_filter_bloc.dart
 
-  /// Currently fetching the first page of sources.
-  loading,
+enum SourceFilterDataLoadingStatus { initial, loading, success, failure }
 
-  /// Successfully loaded sources. May be loading more in the background.
-  success,
-
-  /// An error occurred while fetching sources.
-  failure,
-
-  /// Loading more sources for pagination (infinity scroll).
-  loadingMore,
-}
-
-/// {@template sources_filter_state}
-/// Represents the state for the source filter feature.
-///
-/// Contains the list of fetched sources, pagination information,
-/// loading/error status.
-/// {@endtemplate}
-final class SourcesFilterState extends Equatable {
-  /// {@macro sources_filter_state}
+class SourcesFilterState extends Equatable {
   const SourcesFilterState({
-    this.status = SourcesFilterStatus.initial,
-    this.sources = const [],
-    this.hasMore = true,
-    this.cursor,
-    this.error,
+    this.availableCountries = const [],
+    this.selectedCountryIsoCodes = const {},
+    this.availableSourceTypes = SourceType.values,
+    this.selectedSourceTypes = const {},
+    this.displayableSources = const [],
+    this.finallySelectedSourceIds = const {},
+    this.dataLoadingStatus = SourceFilterDataLoadingStatus.initial,
+    this.errorMessage,
   });
 
-  /// The current status of fetching sources.
-  final SourcesFilterStatus status;
+  final List<Country> availableCountries;
+  final Set<String> selectedCountryIsoCodes;
+  final List<SourceType> availableSourceTypes;
+  final Set<SourceType> selectedSourceTypes;
+  final List<Source> displayableSources;
+  final Set<String> finallySelectedSourceIds;
+  final SourceFilterDataLoadingStatus dataLoadingStatus;
+  final String? errorMessage;
 
-  /// The list of [Source] objects fetched so far.
-  final List<Source> sources;
-
-  /// Flag indicating if there are more sources available to fetch.
-  final bool hasMore;
-
-  /// The cursor string to fetch the next page of sources.
-  /// This is typically the ID of the last fetched source.
-  final String? cursor;
-
-  /// An optional error object if the status is [SourcesFilterStatus.failure].
-  final Object? error;
-
-  /// Creates a copy of this state with the given fields replaced.
   SourcesFilterState copyWith({
-    SourcesFilterStatus? status,
-    List<Source>? sources,
-    bool? hasMore,
-    String? cursor,
-    Object? error,
-    bool clearError = false, // Flag to explicitly clear the error
-    bool clearCursor = false, // Flag to explicitly clear the cursor
+    List<Country>? availableCountries,
+    Set<String>? selectedCountryIsoCodes,
+    List<SourceType>? availableSourceTypes,
+    Set<SourceType>? selectedSourceTypes,
+    List<Source>? displayableSources,
+    Set<String>? finallySelectedSourceIds,
+    SourceFilterDataLoadingStatus? dataLoadingStatus,
+    String? errorMessage,
+    bool clearErrorMessage = false,
   }) {
     return SourcesFilterState(
-      status: status ?? this.status,
-      sources: sources ?? this.sources,
-      hasMore: hasMore ?? this.hasMore,
-      // Allow explicitly setting cursor to null or clearing it
-      cursor: clearCursor ? null : (cursor ?? this.cursor),
-      // Clear error if requested, otherwise keep existing or use new one
-      error: clearError ? null : error ?? this.error,
+      availableCountries: availableCountries ?? this.availableCountries,
+      selectedCountryIsoCodes:
+          selectedCountryIsoCodes ?? this.selectedCountryIsoCodes,
+      availableSourceTypes: availableSourceTypes ?? this.availableSourceTypes,
+      selectedSourceTypes: selectedSourceTypes ?? this.selectedSourceTypes,
+      displayableSources: displayableSources ?? this.displayableSources,
+      finallySelectedSourceIds:
+          finallySelectedSourceIds ?? this.finallySelectedSourceIds,
+      dataLoadingStatus: dataLoadingStatus ?? this.dataLoadingStatus,
+      errorMessage:
+          clearErrorMessage ? null : errorMessage ?? this.errorMessage,
     );
   }
 
   @override
-  List<Object?> get props => [status, sources, hasMore, cursor, error];
+  List<Object?> get props => [
+    availableCountries,
+    selectedCountryIsoCodes,
+    availableSourceTypes,
+    selectedSourceTypes,
+    displayableSources,
+    finallySelectedSourceIds,
+    dataLoadingStatus,
+    errorMessage,
+  ];
 }

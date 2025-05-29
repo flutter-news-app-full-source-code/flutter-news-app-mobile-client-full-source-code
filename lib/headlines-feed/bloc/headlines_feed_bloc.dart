@@ -8,7 +8,7 @@ import 'package:ht_main/headlines-feed/models/headline_filter.dart';
 import 'package:ht_shared/ht_shared.dart'
     show
         Category,
-        Country,
+        // Country, // Removed as it's no longer used for headline filtering
         Headline,
         HtHttpException,
         Source; // Shared models and standardized exceptions
@@ -72,12 +72,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
               event.filter.sources!
                   .whereType<Source>()
                   .map((s) => s.id)
-                  .toList(),
-        if (event.filter.eventCountries?.isNotEmpty ?? false)
-          'eventCountries':
-              event.filter.eventCountries!
-                  .whereType<Country>()
-                  .map((c) => c.isoCode)
                   .toList(),
       }, limit: _headlinesFetchLimit);
       emit(
@@ -189,12 +183,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
                     .whereType<Source>()
                     .map((s) => s.id)
                     .toList(),
-          if (currentFilter.eventCountries?.isNotEmpty ?? false)
-            'eventCountries':
-                currentFilter.eventCountries!
-                    .whereType<Country>()
-                    .map((c) => c.isoCode)
-                    .toList(),
         },
         limit: _headlinesFetchLimit,
         startAfterId: currentCursor, // Use determined cursor
@@ -247,12 +235,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
               currentFilter.sources!
                   .whereType<Source>()
                   .map((s) => s.id)
-                  .toList(),
-        if (currentFilter.eventCountries?.isNotEmpty ?? false)
-          'eventCountries':
-              currentFilter.eventCountries!
-                  .whereType<Country>()
-                  .map((c) => c.isoCode)
                   .toList(),
       }, limit: _headlinesFetchLimit);
       emit(

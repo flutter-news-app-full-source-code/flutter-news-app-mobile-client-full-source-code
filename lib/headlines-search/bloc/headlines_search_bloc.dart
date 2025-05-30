@@ -48,9 +48,10 @@ class HeadlinesSearchBloc
 
     emit(HeadlinesSearchInitial(selectedModelType: event.newModelType));
 
-    if (currentSearchTerm != null && currentSearchTerm.isNotEmpty) {
-      add(HeadlinesSearchFetchRequested(searchTerm: currentSearchTerm));
-    }
+    // Removed automatic re-search:
+    // if (currentSearchTerm != null && currentSearchTerm.isNotEmpty) {
+    //   add(HeadlinesSearchFetchRequested(searchTerm: currentSearchTerm));
+    // }
   }
 
   Future<void> _onSearchFetchRequested(

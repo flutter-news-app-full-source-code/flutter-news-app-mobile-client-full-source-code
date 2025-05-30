@@ -10,12 +10,22 @@ abstract class SourcesFilterEvent extends Equatable {
 }
 
 class LoadSourceFilterData extends SourcesFilterEvent {
-  const LoadSourceFilterData({this.initialSelectedSources = const []});
+  const LoadSourceFilterData({
+    this.initialSelectedSources = const [],
+    this.initialSelectedCountryIsoCodes = const {},
+    this.initialSelectedSourceTypes = const {},
+  });
 
   final List<Source> initialSelectedSources;
+  final Set<String> initialSelectedCountryIsoCodes;
+  final Set<SourceType> initialSelectedSourceTypes;
 
   @override
-  List<Object?> get props => [initialSelectedSources];
+  List<Object?> get props => [
+        initialSelectedSources,
+        initialSelectedCountryIsoCodes,
+        initialSelectedSourceTypes,
+      ];
 }
 
 class CountryCapsuleToggled extends SourcesFilterEvent {

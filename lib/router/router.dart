@@ -26,6 +26,13 @@ import 'package:ht_main/headlines-search/bloc/headlines_search_bloc.dart';
 import 'package:ht_main/headlines-search/view/headlines_search_page.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
+import 'package:ht_main/account/view/manage_followed_items_page.dart'; // New
+import 'package:ht_main/account/view/followed_categories_list_page.dart'; // New
+import 'package:ht_main/account/view/followed_sources_list_page.dart'; // New
+import 'package:ht_main/account/view/followed_countries_list_page.dart'; // New
+import 'package:ht_main/account/view/add_category_to_follow_page.dart'; // New
+import 'package:ht_main/account/view/add_source_to_follow_page.dart'; // New
+import 'package:ht_main/account/view/add_country_to_follow_page.dart'; // New
 import 'package:ht_main/settings/bloc/settings_bloc.dart'; // Added
 import 'package:ht_main/settings/view/appearance_settings_page.dart'; // Added
 import 'package:ht_main/settings/view/feed_settings_page.dart'; // Added
@@ -541,21 +548,57 @@ GoRouter createRouter({
                   ),
                   // New routes for Account sub-pages
                   GoRoute(
-                    path:
-                        Routes
-                            .accountContentPreferences, // Relative path 'content-preferences'
-                    name: Routes.accountContentPreferencesName,
-                    builder: (context, state) {
-                      // TODO(fulleni): Replace with actual ContentPreferencesPage
-                      return const Placeholder(
-                        child: Center(child: Text('CONTENT PREFERENCES PAGE')),
-                      );
-                    },
+                    path: Routes.manageFollowedItems, // Updated path
+                    name: Routes.manageFollowedItemsName, // Updated name
+                    builder: (context, state) =>
+                        const ManageFollowedItemsPage(), // Use the new page
+                    routes: [
+                      GoRoute(
+                        path: Routes.followedCategoriesList,
+                        name: Routes.followedCategoriesListName,
+                        builder: (context, state) =>
+                            const FollowedCategoriesListPage(),
+                        routes: [
+                          GoRoute(
+                            path: Routes.addCategoryToFollow,
+                            name: Routes.addCategoryToFollowName,
+                            builder: (context, state) =>
+                                const AddCategoryToFollowPage(),
+                          ),
+                        ],
+                      ),
+                      GoRoute(
+                        path: Routes.followedSourcesList,
+                        name: Routes.followedSourcesListName,
+                        builder: (context, state) =>
+                            const FollowedSourcesListPage(),
+                        routes: [
+                          GoRoute(
+                            path: Routes.addSourceToFollow,
+                            name: Routes.addSourceToFollowName,
+                            builder: (context, state) =>
+                                const AddSourceToFollowPage(),
+                          ),
+                        ],
+                      ),
+                      GoRoute(
+                        path: Routes.followedCountriesList,
+                        name: Routes.followedCountriesListName,
+                        builder: (context, state) =>
+                            const FollowedCountriesListPage(),
+                        routes: [
+                          GoRoute(
+                            path: Routes.addCountryToFollow,
+                            name: Routes.addCountryToFollowName,
+                            builder: (context, state) =>
+                                const AddCountryToFollowPage(),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                   GoRoute(
-                    path:
-                        Routes
-                            .accountSavedHeadlines, // Relative path 'saved-headlines'
+                    path: Routes.accountSavedHeadlines,
                     name: Routes.accountSavedHeadlinesName,
                     builder: (context, state) {
                       // TODO(fulleni): Replace with actual SavedHeadlinesPage

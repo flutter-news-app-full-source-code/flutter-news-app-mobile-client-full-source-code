@@ -123,15 +123,18 @@ class _SourceFilterView extends StatelessWidget {
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
         _buildCountryCapsules(context, state, l10n),
         const SizedBox(height: AppSpacing.lg),
         _buildSourceTypeCapsules(context, state, l10n),
         const SizedBox(height: AppSpacing.lg),
         Expanded(child: _buildSourcesList(context, state, l10n)),
-      ],
+        ],
+      ),
     );
   }
 

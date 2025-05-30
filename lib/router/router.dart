@@ -297,6 +297,12 @@ GoRouter createRouter({
                     (context) => HeadlinesSearchBloc(
                       headlinesRepository:
                           context.read<HtDataRepository<Headline>>(),
+                      categoryRepository:
+                          context.read<HtDataRepository<Category>>(),
+                      sourceRepository:
+                          context.read<HtDataRepository<Source>>(),
+                      countryRepository:
+                          context.read<HtDataRepository<Country>>(),
                     ),
               ),
               BlocProvider(

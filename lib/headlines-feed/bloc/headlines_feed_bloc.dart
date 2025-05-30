@@ -6,12 +6,7 @@ import 'package:equatable/equatable.dart';
 import 'package:ht_data_repository/ht_data_repository.dart'; // Generic Data Repository
 import 'package:ht_main/headlines-feed/models/headline_filter.dart';
 import 'package:ht_shared/ht_shared.dart'
-    show
-        Category,
-        // Country, // Removed as it's no longer used for headline filtering
-        Headline,
-        HtHttpException,
-        Source; // Shared models and standardized exceptions
+    show Headline, HtHttpException; // Shared models and standardized exceptions
 
 part 'headlines_feed_event.dart';
 part 'headlines_feed_state.dart';

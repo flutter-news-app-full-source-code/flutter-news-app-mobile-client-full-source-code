@@ -4,12 +4,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_main/headlines-feed/widgets/headline_item_widget.dart';
-import 'package:ht_main/router/routes.dart'; // Import Routes
 import 'package:ht_main/headlines-search/bloc/headlines_search_bloc.dart';
+import 'package:ht_main/headlines-search/models/search_model_type.dart'; // Import SearchModelType
+// Import new item widgets
+import 'package:ht_main/headlines-search/widgets/category_item_widget.dart';
+import 'package:ht_main/headlines-search/widgets/country_item_widget.dart';
+import 'package:ht_main/headlines-search/widgets/source_item_widget.dart';
 import 'package:ht_main/l10n/l10n.dart';
+import 'package:ht_main/router/routes.dart'; // Import Routes
 import 'package:ht_main/shared/constants/app_spacing.dart'; // Import AppSpacing
 import 'package:ht_main/shared/widgets/failure_state_widget.dart';
 import 'package:ht_main/shared/widgets/initial_state_widget.dart';
+import 'package:ht_shared/ht_shared.dart'; // Import shared models
 
 /// Page widget responsible for providing the BLoC for the headlines search feature.
 class HeadlinesSearchPage extends StatelessWidget {
@@ -37,54 +43,51 @@ class _HeadlinesSearchView extends StatefulWidget {
 
 class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
   final _scrollController = ScrollController();
-  final _textController =
-      TextEditingController(); // Controller for the TextField
-  bool _showClearButton = false; // State to control clear button visibility
+  final _textController = TextEditingController();
+  bool _showClearButton = false;
+  SearchModelType _selectedModelType =
+      SearchModelType.headline; // Initial selection
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    // Listen to text changes to control clear button visibility
     _textController.addListener(() {
       setState(() {
         _showClearButton = _textController.text.isNotEmpty;
       });
     });
+    // Set initial model type in BLoC if not already set (e.g. on first load)
+    // Though BLoC state now defaults, this ensures UI and BLoC are in sync.
+    context.read<HeadlinesSearchBloc>().add(
+      HeadlinesSearchModelTypeChanged(_selectedModelType),
+    );
   }
 
   @override
   void dispose() {
-    _scrollController
-      ..removeListener(_onScroll)
-      ..dispose();
-    _textController.dispose(); // Dispose the text controller
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    _textController.dispose();
     super.dispose();
   }
 
-  /// Handles scroll events to trigger fetching more results when near the bottom.
   void _onScroll() {
     final state = context.read<HeadlinesSearchBloc>().state;
-    if (_isBottom && state is HeadlinesSearchSuccess) {
-      final searchTerm = state.lastSearchTerm;
-      if (state.hasMore) {
-        context.read<HeadlinesSearchBloc>().add(
-          HeadlinesSearchFetchRequested(searchTerm: searchTerm),
-        );
-      }
+    if (_isBottom && state is HeadlinesSearchSuccess && state.hasMore) {
+      context.read<HeadlinesSearchBloc>().add(
+        HeadlinesSearchFetchRequested(searchTerm: state.lastSearchTerm),
+      );
     }
   }
 
-  /// Checks if the scroll position is near the bottom of the list.
   bool get _isBottom {
     if (!_scrollController.hasClients) return false;
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.offset;
-    // Trigger slightly before the absolute bottom for a smoother experience
     return currentScroll >= (maxScroll * 0.98);
   }
 
-  /// Triggers a search request based on the current text input.
   void _performSearch() {
     context.read<HeadlinesSearchBloc>().add(
       HeadlinesSearchFetchRequested(searchTerm: _textController.text),
@@ -100,134 +103,224 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
 
     return Scaffold(
       appBar: AppBar(
-        // Enhanced TextField integrated into the AppBar title
-        title: TextField(
-          controller: _textController,
-
-          style: appBarTheme.titleTextStyle ?? theme.textTheme.titleLarge,
-          decoration: InputDecoration(
-            hintText: l10n.headlinesSearchHintText,
-
-            hintStyle:
-                appBarTheme.titleTextStyle?.copyWith(
-                  color: (appBarTheme.titleTextStyle?.color ??
-                          colorScheme.onSurface)
-                      .withAlpha(153), // Replaced withOpacity(0.6)
-                ) ??
-                theme.textTheme.titleLarge?.copyWith(
-                  color: colorScheme.onSurface.withAlpha(
-                    153,
-                  ), // Replaced withOpacity(0.6)
+        // Removed leading and leadingWidth
+        titleSpacing: AppSpacing.paddingSmall, // Adjust title spacing if needed
+        title: Row(
+          children: [
+            SizedBox(
+              width: 140, // Constrain dropdown width
+              child: DropdownButtonFormField<SearchModelType>(
+                value: _selectedModelType,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xs, // Minimal horizontal padding
+                    vertical: AppSpacing.xs, // Reduce vertical padding
+                  ),
                 ),
-            // Remove the default border
-            border: InputBorder.none,
-            // Remove focused border highlight if any
-            focusedBorder: InputBorder.none,
-            // Remove enabled border highlight if any
-            enabledBorder: InputBorder.none,
-            // Add a subtle background fill
-            filled: true,
-
-            fillColor: colorScheme.surface.withAlpha(
-              26,
-            ), // Replaced withOpacity(0.1)
-            // Apply consistent padding using AppSpacing
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.paddingMedium,
-              vertical:
-                  AppSpacing.paddingSmall, // Adjust vertical padding as needed
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color:
+                      appBarTheme.titleTextStyle?.color ??
+                      colorScheme.onSurface,
+                ),
+                dropdownColor: colorScheme.surfaceContainerHighest,
+                icon: Icon(
+                  Icons.arrow_drop_down,
+                  color: appBarTheme.iconTheme?.color ?? colorScheme.onSurface,
+                ),
+                items:
+                    SearchModelType.values.map((SearchModelType type) {
+                      String displayLocalizedName;
+                      switch (type) {
+                        case SearchModelType.headline:
+                          displayLocalizedName = l10n.searchModelTypeHeadline;
+                        case SearchModelType.category:
+                          displayLocalizedName = l10n.searchModelTypeCategory;
+                        case SearchModelType.source:
+                          displayLocalizedName = l10n.searchModelTypeSource;
+                        case SearchModelType.country:
+                          displayLocalizedName = l10n.searchModelTypeCountry;
+                      }
+                      return DropdownMenuItem<SearchModelType>(
+                        value: type,
+                        child: Text(
+                          displayLocalizedName,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            // Consistent style
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                onChanged: (SearchModelType? newValue) {
+                  if (newValue != null) {
+                    setState(() {
+                      _selectedModelType = newValue;
+                    });
+                    context.read<HeadlinesSearchBloc>().add(
+                      HeadlinesSearchModelTypeChanged(newValue),
+                    );
+                  }
+                },
+              ),
             ),
-            // Add a clear button that appears when text is entered
-            suffixIcon:
-                _showClearButton
-                    ? IconButton(
-                      icon: Icon(
-                        Icons.clear,
-
-                        color:
-                            appBarTheme.iconTheme?.color ??
-                            colorScheme.onSurface,
-                      ),
-                      onPressed: _textController.clear,
-                    )
-                    : null, // No icon when text field is empty
-          ),
-          // Trigger search on submit (e.g., pressing Enter on keyboard)
-          onSubmitted: (_) => _performSearch(),
+            const SizedBox(
+              width: AppSpacing.sm,
+            ), // Spacing between dropdown and textfield
+            Expanded(
+              child: TextField(
+                controller: _textController,
+                style: appBarTheme.titleTextStyle ?? theme.textTheme.titleLarge,
+                decoration: InputDecoration(
+                  hintText: _getHintTextForModelType(_selectedModelType, l10n),
+                  hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                    color: (appBarTheme.titleTextStyle?.color ??
+                            colorScheme.onSurface)
+                        .withAlpha(153),
+                  ),
+                  border: InputBorder.none,
+                  filled: true,
+                  fillColor: colorScheme.surface.withAlpha(26),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.paddingMedium,
+                    vertical:
+                        AppSpacing.paddingSmall +
+                        3, // Fine-tune vertical padding for alignment
+                  ),
+                  suffixIcon:
+                      _showClearButton
+                          ? IconButton(
+                            icon: Icon(
+                              Icons.clear,
+                              color:
+                                  appBarTheme.iconTheme?.color ??
+                                  colorScheme.onSurface,
+                            ),
+                            onPressed: _textController.clear,
+                          )
+                          : null,
+                ),
+                onSubmitted: (_) => _performSearch(),
+              ),
+            ),
+          ],
         ),
         actions: [
-          // Search action button
           IconButton(
             icon: const Icon(Icons.search),
-            tooltip: l10n.headlinesSearchActionTooltip, // Re-added tooltip
+            tooltip: l10n.headlinesSearchActionTooltip,
             onPressed: _performSearch,
           ),
         ],
       ),
       body: BlocBuilder<HeadlinesSearchBloc, HeadlinesSearchState>(
         builder: (context, state) {
-          // Handle different states of the search BLoC
           return switch (state) {
-            // Loading state
-            HeadlinesSearchLoading() => InitialStateWidget(
-              icon: Icons.manage_search, // Changed icon
-              headline:
-                  l10n.headlinesSearchInitialHeadline, // Keep initial text for loading phase
-              subheadline: l10n.headlinesSearchInitialSubheadline,
+            HeadlinesSearchInitial() => InitialStateWidget(
+              icon: Icons.search, // Changed icon
+              headline: l10n.searchPageInitialHeadline, // Use new generic key
+              subheadline:
+                  l10n.searchPageInitialSubheadline, // Use new generic key
             ),
-            // Success state with results
+            // Use more generic loading text or existing keys
+            HeadlinesSearchLoading() => InitialStateWidget(
+              icon: Icons.manage_search,
+              headline:
+                  l10n.headlinesFeedLoadingHeadline, // Re-use feed loading
+              subheadline:
+                  'Searching ${state.selectedModelType.displayName.toLowerCase()}...',
+            ),
             HeadlinesSearchSuccess(
-              :final headlines,
-              :final hasMore,
-              :final errorMessage, // Check for specific error message within success
-              :final lastSearchTerm,
+              results: final results,
+              hasMore: final hasMore,
+              errorMessage: final errorMessage,
+              lastSearchTerm: final lastSearchTerm,
+              selectedModelType: final resultsModelType,
             ) =>
               errorMessage != null
-                  // Display error if present within success state
                   ? FailureStateWidget(
                     message: errorMessage,
-                    onRetry: () {
-                      // Retry with the last successful search term
-                      context.read<HeadlinesSearchBloc>().add(
-                        HeadlinesSearchFetchRequested(
-                          searchTerm: lastSearchTerm,
+                    onRetry:
+                        () => context.read<HeadlinesSearchBloc>().add(
+                          HeadlinesSearchFetchRequested(
+                            searchTerm: lastSearchTerm,
+                          ),
                         ),
-                      );
-                    },
                   )
-                  // Display "no results" if list is empty
-                  : headlines.isEmpty
+                  : results.isEmpty
                   ? FailureStateWidget(
                     message:
-                        '${l10n.headlinesSearchNoResultsHeadline}\n${l10n.headlinesSearchNoResultsSubheadline}',
+                        '${l10n.headlinesSearchNoResultsHeadline} for "$lastSearchTerm" in ${resultsModelType.displayName.toLowerCase()}.\n${l10n.headlinesSearchNoResultsSubheadline}',
                   )
-                  // Display the list of headlines
-                  : ListView.builder(
+                  : ListView.separated(
                     controller: _scrollController,
-                    // Add 1 for loading indicator if more items exist
-                    itemCount:
-                        hasMore ? headlines.length + 1 : headlines.length,
+                    padding: const EdgeInsets.all(
+                      AppSpacing.paddingMedium,
+                    ), // Add overall padding
+                    itemCount: hasMore ? results.length + 1 : results.length,
+                    separatorBuilder:
+                        (context, index) => const SizedBox(
+                          height: AppSpacing.md,
+                        ), // Add separator
                     itemBuilder: (context, index) {
-                      // Show loading indicator at the end if hasMore
-                      if (index >= headlines.length) {
-                        // Ensure loading indicator is visible
+                      if (index >= results.length) {
                         return const Padding(
-                          padding: EdgeInsets.all(AppSpacing.paddingLarge),
+                          padding: EdgeInsets.symmetric(
+                            vertical: AppSpacing.lg,
+                          ), // Adjusted padding for loader
                           child: Center(child: CircularProgressIndicator()),
                         );
                       }
-                      // Display headline item
-                      return HeadlineItemWidget(
-                        headline: headlines[index],
-                        targetRouteName: Routes.searchArticleDetailsName,
-                      );
+                      final item = results[index];
+                      switch (resultsModelType) {
+                        case SearchModelType.headline:
+                          return HeadlineItemWidget(
+                            headline: item as Headline,
+                            targetRouteName: Routes.searchArticleDetailsName,
+                          );
+                        case SearchModelType.category:
+                          return CategoryItemWidget(category: item as Category);
+                        case SearchModelType.source:
+                          return SourceItemWidget(source: item as Source);
+                        case SearchModelType.country:
+                          return CountryItemWidget(country: item as Country);
+                      }
                     },
                   ),
-            // Default case (should ideally not be reached if states are handled)
+            HeadlinesSearchFailure(
+              errorMessage: final errorMessage,
+              lastSearchTerm: final lastSearchTerm,
+              selectedModelType: final failedModelType,
+            ) =>
+              FailureStateWidget(
+                message:
+                    'Failed to search $lastSearchTerm in ${failedModelType.displayName.toLowerCase()}:\n$errorMessage',
+                onRetry:
+                    () => context.read<HeadlinesSearchBloc>().add(
+                      HeadlinesSearchFetchRequested(searchTerm: lastSearchTerm),
+                    ),
+              ),
+            // Add default case for exhaustiveness
             _ => const SizedBox.shrink(),
           };
         },
       ),
     );
+  }
+
+  String _getHintTextForModelType(
+    SearchModelType modelType,
+    AppLocalizations l10n,
+  ) {
+    switch (modelType) {
+      case SearchModelType.headline:
+        return l10n.searchHintTextHeadline;
+      case SearchModelType.category:
+        return l10n.searchHintTextCategory;
+      case SearchModelType.source:
+        return l10n.searchHintTextSource;
+      case SearchModelType.country:
+        return l10n.searchHintTextCountry;
+    }
   }
 }

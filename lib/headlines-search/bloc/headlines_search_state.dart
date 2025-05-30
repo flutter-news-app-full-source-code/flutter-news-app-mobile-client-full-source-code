@@ -1,64 +1,74 @@
 part of 'headlines_search_bloc.dart';
 
 abstract class HeadlinesSearchState extends Equatable {
-  const HeadlinesSearchState();
-  // lastSearchTerm will be defined in specific states that need it.
+  const HeadlinesSearchState({
+    this.selectedModelType = SearchModelType.headline,
+  });
+
+  final SearchModelType selectedModelType;
+
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [selectedModelType];
 }
 
 /// Initial state before any search is performed.
 class HeadlinesSearchInitial extends HeadlinesSearchState {
-  const HeadlinesSearchInitial();
-  // No lastSearchTerm needed for initial state.
+  const HeadlinesSearchInitial({super.selectedModelType});
 }
 
 /// State when a search is actively in progress.
 class HeadlinesSearchLoading extends HeadlinesSearchState {
-  const HeadlinesSearchLoading({this.lastSearchTerm});
-  final String? lastSearchTerm; // Term being loaded
+  const HeadlinesSearchLoading({
+    required this.lastSearchTerm,
+    required super.selectedModelType,
+  });
+  final String lastSearchTerm; // Term being loaded
 
   @override
-  List<Object?> get props => [lastSearchTerm];
+  List<Object?> get props => [...super.props, lastSearchTerm];
 }
 
 /// State when a search has successfully returned results.
 class HeadlinesSearchSuccess extends HeadlinesSearchState {
   const HeadlinesSearchSuccess({
-    required this.headlines,
+    required this.results,
     required this.hasMore,
     required this.lastSearchTerm,
+    required super.selectedModelType, // The model type for these results
     this.cursor,
     this.errorMessage, // For non-critical errors like pagination failure
   });
 
-  final List<Headline> headlines;
+  final List<dynamic> results; // Can hold Headline, Category, Source, Country
   final bool hasMore;
   final String? cursor;
   final String? errorMessage; // e.g., for pagination errors
   final String lastSearchTerm; // The term that yielded these results
 
   HeadlinesSearchSuccess copyWith({
-    List<Headline>? headlines,
+    List<dynamic>? results,
     bool? hasMore,
     String? cursor,
-    String? errorMessage, // Allow clearing/setting error
+    String? errorMessage,
     String? lastSearchTerm,
+    SearchModelType? selectedModelType,
     bool clearErrorMessage = false,
   }) {
     return HeadlinesSearchSuccess(
-      headlines: headlines ?? this.headlines,
+      results: results ?? this.results,
       hasMore: hasMore ?? this.hasMore,
       cursor: cursor ?? this.cursor,
       errorMessage:
           clearErrorMessage ? null : errorMessage ?? this.errorMessage,
       lastSearchTerm: lastSearchTerm ?? this.lastSearchTerm,
+      selectedModelType: selectedModelType ?? this.selectedModelType,
     );
   }
 
   @override
   List<Object?> get props => [
-    headlines,
+    ...super.props,
+    results,
     hasMore,
     cursor,
     errorMessage,
@@ -71,11 +81,12 @@ class HeadlinesSearchFailure extends HeadlinesSearchState {
   const HeadlinesSearchFailure({
     required this.errorMessage,
     required this.lastSearchTerm,
+    required super.selectedModelType,
   });
 
   final String errorMessage;
   final String lastSearchTerm; // The term that failed
 
   @override
-  List<Object?> get props => [errorMessage, lastSearchTerm];
+  List<Object?> get props => [...super.props, errorMessage, lastSearchTerm];
 }

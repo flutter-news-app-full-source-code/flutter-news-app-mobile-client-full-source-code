@@ -589,5 +589,47 @@
     "headlinesFeedFilterNoSourcesMatch": "لا توجد مصادر تطابق الفلاتر المحددة.",
     "@headlinesFeedFilterNoSourcesMatch": {
         "description": "Message shown when no sources match the selected filters"
+    },
+
+    "searchModelTypeHeadline": "العناوين الرئيسية",
+    "@searchModelTypeHeadline": {
+        "description": "Dropdown display name for Headline search type"
+    },
+    "searchModelTypeCategory": "الفئات",
+    "@searchModelTypeCategory": {
+        "description": "Dropdown display name for Category search type"
+    },
+    "searchModelTypeSource": "المصادر",
+    "@searchModelTypeSource": {
+        "description": "Dropdown display name for Source search type"
+    },
+    "searchModelTypeCountry": "الدول",
+    "@searchModelTypeCountry": {
+        "description": "Dropdown display name for Country search type"
+    },
+    "searchHintTextHeadline": "مثال: تطورات الذكاء الاصطناعي, مركبة المريخ...",
+    "@searchHintTextHeadline": {
+        "description": "Hint text for searching headlines"
+    },
+    "searchHintTextCategory": "مثال: تكنولوجيا, رياضة, مالية...",
+    "@searchHintTextCategory": {
+        "description": "Hint text for searching categories"
+    },
+    "searchHintTextSource": "مثال: بي بي سي نيوز, تك كرانش, رويترز...",
+    "@searchHintTextSource": {
+        "description": "Hint text for searching sources"
+    },
+    "searchHintTextCountry": "مثال: الولايات المتحدة, اليابان, البرازيل...",
+    "@searchHintTextCountry": {
+        "description": "Hint text for searching countries"
+    },
+
+    "searchPageInitialHeadline": "ابدأ بحثك",
+    "@searchPageInitialHeadline": {
+        "description": "Generic headline for the initial state of the search page"
+    },
+    "searchPageInitialSubheadline": "اختر نوعًا وأدخل كلمات رئيسية للبدء.",
+    "@searchPageInitialSubheadline": {
+        "description": "Generic subheadline for the initial state of the search page"
     }
 }

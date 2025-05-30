@@ -8,10 +8,17 @@ import 'package:intl/intl.dart'; // For date formatting
 /// A widget that displays a single headline with enhanced styling.
 class HeadlineItemWidget extends StatelessWidget {
   /// Creates a [HeadlineItemWidget].
-  const HeadlineItemWidget({required this.headline, super.key});
+  const HeadlineItemWidget({
+    required this.headline,
+    required this.targetRouteName, // Add targetRouteName
+    super.key,
+  });
 
   /// The headline to display.
   final Headline headline;
+
+  /// The named route to navigate to when the item is tapped.
+  final String targetRouteName; // Add targetRouteName
 
   // Helper for date formatting
   static final _dateFormatter = DateFormat.yMd().add_jm();
@@ -38,7 +45,7 @@ class HeadlineItemWidget extends StatelessWidget {
       child: InkWell(
         onTap: () {
           context.goNamed(
-            Routes.articleDetailsName,
+            targetRouteName, // Use the new parameter here
             pathParameters: {'id': headline.id},
           );
         },

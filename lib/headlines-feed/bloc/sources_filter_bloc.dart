@@ -200,7 +200,7 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
       final matchesType =
           selectedTypes.isEmpty ||
           (source.sourceType != null &&
-              selectedTypes.contains(source.sourceType!));
+              selectedTypes.contains(source.sourceType));
       return matchesCountry && matchesType;
     }).toList();
   }

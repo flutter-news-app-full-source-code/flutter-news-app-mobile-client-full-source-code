@@ -73,7 +73,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
                   .whereType<Source>()
                   .map((s) => s.id)
                   .toList(),
-      }, limit: _headlinesFetchLimit);
+      }, limit: _headlinesFetchLimit,);
       emit(
         HeadlinesFeedLoaded(
           headlines: response.items,
@@ -110,7 +110,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           headlines: response.items,
           hasMore: response.hasMore,
           cursor: response.cursor,
-          filter: const HeadlineFilter(), // Clear all filter aspects
         ),
       );
     } on HtHttpException catch (e) {
@@ -237,7 +236,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
                   .whereType<Source>()
                   .map((s) => s.id)
                   .toList(),
-      }, limit: _headlinesFetchLimit);
+      }, limit: _headlinesFetchLimit,);
       emit(
         HeadlinesFeedLoaded(
           headlines: response.items, // Replace headlines on refresh

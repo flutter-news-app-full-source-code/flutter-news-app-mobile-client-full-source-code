@@ -122,13 +122,27 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
               color: appBarTheme.iconTheme?.color ?? colorScheme.onSurface,
             ),
             items: SearchModelType.values.map((SearchModelType type) {
+              String displayLocalizedName;
+              switch (type) {
+                case SearchModelType.headline:
+                  displayLocalizedName = l10n.searchModelTypeHeadline;
+                  break;
+                case SearchModelType.category:
+                  displayLocalizedName = l10n.searchModelTypeCategory;
+                  break;
+                case SearchModelType.source:
+                  displayLocalizedName = l10n.searchModelTypeSource;
+                  break;
+                case SearchModelType.country:
+                  displayLocalizedName = l10n.searchModelTypeCountry;
+                  break;
+              }
               return DropdownMenuItem<SearchModelType>(
                 value: type,
                 child: Text(
-                  type.displayName, // Using the new getter
-                  // Ensure text color contrasts with dropdownColor
+                  displayLocalizedName,
                   style: appBarTheme.titleTextStyle?.copyWith(
-                        color: colorScheme.onSurface, // Example color
+                        color: colorScheme.onSurface,
                       ) ??
                       theme.textTheme.titleLarge?.copyWith(
                         color: colorScheme.onSurface,
@@ -144,9 +158,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                 context
                     .read<HeadlinesSearchBloc>()
                     .add(HeadlinesSearchModelTypeChanged(newValue));
-                if (_textController.text.isNotEmpty) {
-                  _performSearch(); // Re-trigger search with new model type
-                }
+                // DO NOT automatically perform search here
               }
             },
           ),
@@ -155,7 +167,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
           controller: _textController,
           style: appBarTheme.titleTextStyle ?? theme.textTheme.titleLarge,
           decoration: InputDecoration(
-            hintText: l10n.headlinesSearchHintText,
+            hintText: _getHintTextForModelType(_selectedModelType, l10n),
             hintStyle: (appBarTheme.titleTextStyle ??
                     theme.textTheme.titleLarge)
                 ?.copyWith(color: colorScheme.onSurface.withAlpha(153)),
@@ -276,5 +288,18 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
         },
       ),
     );
+  }
+
+  String _getHintTextForModelType(SearchModelType modelType, AppLocalizations l10n) {
+    switch (modelType) {
+      case SearchModelType.headline:
+        return l10n.searchHintTextHeadline;
+      case SearchModelType.category:
+        return l10n.searchHintTextCategory;
+      case SearchModelType.source:
+        return l10n.searchHintTextSource;
+      case SearchModelType.country:
+        return l10n.searchHintTextCountry;
+    }
   }
 }

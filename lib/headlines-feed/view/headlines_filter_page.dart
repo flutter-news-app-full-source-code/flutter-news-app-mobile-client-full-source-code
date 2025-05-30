@@ -55,13 +55,11 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       // Create copies of the lists to avoid modifying the BLoC state directly.
       _tempSelectedCategories = List.from(currentState.filter.categories ?? []);
       _tempSelectedSources = List.from(currentState.filter.sources ?? []);
-      // Initialize source capsule states. These are persisted here.
-      // For now, let's assume they start empty and are populated by SourceFilterPage's result.
-      // Or, if HeadlineFilter could store them, we'd get them from there.
-      // For this iteration, they start empty. SourceFilterPage will manage its own capsule
-      // state and return it.
-      _tempSelectedSourceCountryIsoCodes = {};
-      _tempSelectedSourceSourceTypes = {};
+      // Initialize source capsule states from the BLoC's current filter
+      _tempSelectedSourceCountryIsoCodes =
+          Set.from(currentState.filter.selectedSourceCountryIsoCodes ?? {});
+      _tempSelectedSourceSourceTypes =
+          Set.from(currentState.filter.selectedSourceSourceTypes ?? {});
     } else {
       _tempSelectedCategories = [];
       _tempSelectedSources = [];
@@ -152,11 +150,19 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
                 categories:
                     _tempSelectedCategories.isNotEmpty
                         ? _tempSelectedCategories
-                        : null, // Use null if empty
+                        : null,
                 sources:
                     _tempSelectedSources.isNotEmpty
                         ? _tempSelectedSources
-                        : null, // Use null if empty
+                        : null,
+                selectedSourceCountryIsoCodes:
+                    _tempSelectedSourceCountryIsoCodes.isNotEmpty
+                        ? _tempSelectedSourceCountryIsoCodes
+                        : null,
+                selectedSourceSourceTypes:
+                    _tempSelectedSourceSourceTypes.isNotEmpty
+                        ? _tempSelectedSourceSourceTypes
+                        : null,
               );
 
               // Add an event to the main HeadlinesFeedBloc to apply the

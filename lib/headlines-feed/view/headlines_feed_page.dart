@@ -216,7 +216,10 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                     }
                     // Otherwise, build the headline item
                     final headline = state.headlines[index];
-                    return HeadlineItemWidget(headline: headline);
+                    return HeadlineItemWidget(
+                      headline: headline,
+                      targetRouteName: Routes.articleDetailsName,
+                    );
                   },
                 ),
               );

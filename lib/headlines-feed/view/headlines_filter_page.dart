@@ -1,5 +1,5 @@
 //
-// ignore_for_file: lines_longer_than_80_chars
+// ignore_for_file: lines_longer_than_80_chars, public_member_api_docs
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,8 +9,12 @@ import 'package:ht_main/headlines-feed/models/headline_filter.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/constants/constants.dart';
-import 'package:ht_shared/ht_shared.dart'
-    show Category, Source; // Import models from ht_shared, Country removed
+import 'package:ht_shared/ht_shared.dart' show Category, Source, SourceType;
+
+// Keys for passing data to/from SourceFilterPage
+const String keySelectedSources = 'selectedSources';
+const String keySelectedCountryIsoCodes = 'selectedCountryIsoCodes';
+const String keySelectedSourceTypes = 'selectedSourceTypes';
 
 /// {@template headlines_filter_page}
 /// A full-screen dialog page for selecting headline filters.
@@ -35,7 +39,9 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
   /// and are only applied back to the BLoC when the user taps 'Apply'.
   late List<Category> _tempSelectedCategories;
   late List<Source> _tempSelectedSources;
-  // late List<Country> _tempSelectedCountries; // Removed
+  // State for source filter capsules, to be passed to and from SourceFilterPage
+  late Set<String> _tempSelectedSourceCountryIsoCodes;
+  late Set<SourceType> _tempSelectedSourceSourceTypes;
 
   @override
   void initState() {
@@ -48,15 +54,18 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       // Create copies of the lists to avoid modifying the BLoC state directly.
       _tempSelectedCategories = List.from(currentState.filter.categories ?? []);
       _tempSelectedSources = List.from(currentState.filter.sources ?? []);
-      // _tempSelectedCountries = List.from(
-      //   currentState.filter.eventCountries ?? [],
-      // ); // Removed
+      // Initialize source capsule states from the BLoC's current filter
+      _tempSelectedSourceCountryIsoCodes = Set.from(
+        currentState.filter.selectedSourceCountryIsoCodes ?? {},
+      );
+      _tempSelectedSourceSourceTypes = Set.from(
+        currentState.filter.selectedSourceSourceTypes ?? {},
+      );
     } else {
-      // Default to empty lists if the feed isn't loaded yet. This might happen
-      // if the filter page is accessed before the initial feed load completes.
       _tempSelectedCategories = [];
       _tempSelectedSources = [];
-      // _tempSelectedCountries = []; // Removed
+      _tempSelectedSourceCountryIsoCodes = {};
+      _tempSelectedSourceSourceTypes = {};
     }
   }
 
@@ -76,8 +85,9 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
     required String title,
     required int selectedCount,
     required String routeName,
-    required List<dynamic> currentSelection, // Pass current temp selection
-    required void Function(List<dynamic>?) onResult,
+    // For sources, currentSelection will be a Map
+    required dynamic currentSelectionData,
+    required void Function(dynamic)? onResult, // Result can also be a Map
   }) {
     final l10n = context.l10n;
     final allLabel = l10n.headlinesFeedFilterAllLabel;
@@ -92,21 +102,12 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       subtitle: Text(subtitle),
       trailing: const Icon(Icons.chevron_right),
       onTap: () async {
-        // Navigate to the specific filter selection page (e.g., SourceFilterPage).
-        // Use pushNamed to wait for a result when the page is popped.
-        final result = await context.pushNamed<List<dynamic>>(
-          routeName, // The route name for the specific filter page.
-          // Pass the current temporary selection for this filter type
-          // (e.g., _tempSelectedSources) to the next page. This allows
-          // the next page to initialize its UI reflecting the current state.
-          extra: currentSelection,
+        final result = await context.pushNamed<dynamic>(
+          routeName,
+          extra: currentSelectionData, // Pass the map or list
         );
-        // When the filter selection page pops (usually via its 'Apply' button),
-        // it returns the potentially modified list of selected items.
-        // If the result is not null (meaning the user didn't just cancel/go back),
-        // update the corresponding temporary state list on *this* page.
-        if (result != null) {
-          onResult(result); // Calls setState to update the UI here.
+        if (result != null && onResult != null) {
+          onResult(result);
         }
       },
     );
@@ -150,11 +151,19 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
                 categories:
                     _tempSelectedCategories.isNotEmpty
                         ? _tempSelectedCategories
-                        : null, // Use null if empty
+                        : null,
                 sources:
                     _tempSelectedSources.isNotEmpty
                         ? _tempSelectedSources
-                        : null, // Use null if empty
+                        : null,
+                selectedSourceCountryIsoCodes:
+                    _tempSelectedSourceCountryIsoCodes.isNotEmpty
+                        ? _tempSelectedSourceCountryIsoCodes
+                        : null,
+                selectedSourceSourceTypes:
+                    _tempSelectedSourceSourceTypes.isNotEmpty
+                        ? _tempSelectedSourceSourceTypes
+                        : null,
               );
 
               // Add an event to the main HeadlinesFeedBloc to apply the
@@ -175,7 +184,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
             title: l10n.headlinesFeedFilterCategoryLabel,
             selectedCount: _tempSelectedCategories.length,
             routeName: Routes.feedFilterCategoriesName,
-            currentSelection: _tempSelectedCategories,
+            currentSelectionData: _tempSelectedCategories,
             onResult: (result) {
               if (result is List<Category>) {
                 setState(() => _tempSelectedCategories = result);
@@ -187,10 +196,21 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
             title: l10n.headlinesFeedFilterSourceLabel,
             selectedCount: _tempSelectedSources.length,
             routeName: Routes.feedFilterSourcesName,
-            currentSelection: _tempSelectedSources,
+            currentSelectionData: {
+              keySelectedSources: _tempSelectedSources,
+              keySelectedCountryIsoCodes: _tempSelectedSourceCountryIsoCodes,
+              keySelectedSourceTypes: _tempSelectedSourceSourceTypes,
+            },
             onResult: (result) {
-              if (result is List<Source>) {
-                setState(() => _tempSelectedSources = result);
+              if (result is Map<String, dynamic>) {
+                setState(() {
+                  _tempSelectedSources =
+                      result[keySelectedSources] as List<Source>? ?? [];
+                  _tempSelectedSourceCountryIsoCodes =
+                      result[keySelectedCountryIsoCodes] as Set<String>? ?? {};
+                  _tempSelectedSourceSourceTypes =
+                      result[keySelectedSourceTypes] as Set<SourceType>? ?? {};
+                });
               }
             },
           ),

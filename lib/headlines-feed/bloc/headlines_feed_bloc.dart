@@ -60,20 +60,22 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   ) async {
     emit(HeadlinesFeedLoading()); // Show loading for filter application
     try {
-      final response = await _headlinesRepository.readAllByQuery({
-        if (event.filter.categories?.isNotEmpty ?? false)
-          'categories':
-              event.filter.categories!
-                  .whereType<Category>()
-                  .map((c) => c.id)
-                  .toList(),
-        if (event.filter.sources?.isNotEmpty ?? false)
-          'sources':
-              event.filter.sources!
-                  .whereType<Source>()
-                  .map((s) => s.id)
-                  .toList(),
-      }, limit: _headlinesFetchLimit);
+      final queryParams = <String, dynamic>{};
+      if (event.filter.categories?.isNotEmpty ?? false) {
+        queryParams['categories'] = event.filter.categories!
+            .map((c) => c.id)
+            .join(',');
+      }
+      if (event.filter.sources?.isNotEmpty ?? false) {
+        queryParams['sources'] = event.filter.sources!
+            .map((s) => s.id)
+            .join(',');
+      }
+
+      final response = await _headlinesRepository.readAllByQuery(
+        queryParams,
+        limit: _headlinesFetchLimit,
+      );
       emit(
         HeadlinesFeedLoaded(
           headlines: response.items,
@@ -133,8 +135,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     Emitter<HeadlinesFeedState> emit,
   ) async {
     // Determine current filter and cursor based on state
-    var currentFilter = const HeadlineFilter();
-    var currentCursor =
+    var currentFilter = const HeadlineFilter(); // Made type explicit
+    var currentCursor = // Made type explicit
         event.cursor; // Use event's cursor if provided (for pagination)
     var currentHeadlines = <Headline>[];
     var isPaginating = false;
@@ -169,21 +171,20 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     }
 
     try {
+      final queryParams = <String, dynamic>{};
+      if (currentFilter.categories?.isNotEmpty ?? false) {
+        queryParams['categories'] = currentFilter.categories!
+            .map((c) => c.id)
+            .join(',');
+      }
+      if (currentFilter.sources?.isNotEmpty ?? false) {
+        queryParams['sources'] = currentFilter.sources!
+            .map((s) => s.id)
+            .join(',');
+      }
+
       final response = await _headlinesRepository.readAllByQuery(
-        {
-          if (currentFilter.categories?.isNotEmpty ?? false)
-            'categories':
-                currentFilter.categories!
-                    .whereType<Category>()
-                    .map((c) => c.id)
-                    .toList(),
-          if (currentFilter.sources?.isNotEmpty ?? false)
-            'sources':
-                currentFilter.sources!
-                    .whereType<Source>()
-                    .map((s) => s.id)
-                    .toList(),
-        },
+        queryParams,
         limit: _headlinesFetchLimit,
         startAfterId: currentCursor, // Use determined cursor
       );
@@ -216,27 +217,29 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     emit(HeadlinesFeedLoading()); // Show loading indicator for refresh
 
     // Determine the filter currently applied in the state
-    var currentFilter = const HeadlineFilter();
+    var currentFilter = const HeadlineFilter(); // Made type explicit
     if (state is HeadlinesFeedLoaded) {
       currentFilter = (state as HeadlinesFeedLoaded).filter;
     }
 
     try {
+      final queryParams = <String, dynamic>{};
+      if (currentFilter.categories?.isNotEmpty ?? false) {
+        queryParams['categories'] = currentFilter.categories!
+            .map((c) => c.id)
+            .join(',');
+      }
+      if (currentFilter.sources?.isNotEmpty ?? false) {
+        queryParams['sources'] = currentFilter.sources!
+            .map((s) => s.id)
+            .join(',');
+      }
+
       // Fetch the first page using the current filter
-      final response = await _headlinesRepository.readAllByQuery({
-        if (currentFilter.categories?.isNotEmpty ?? false)
-          'categories':
-              currentFilter.categories!
-                  .whereType<Category>()
-                  .map((c) => c.id)
-                  .toList(),
-        if (currentFilter.sources?.isNotEmpty ?? false)
-          'sources':
-              currentFilter.sources!
-                  .whereType<Source>()
-                  .map((s) => s.id)
-                  .toList(),
-      }, limit: _headlinesFetchLimit);
+      final response = await _headlinesRepository.readAllByQuery(
+        queryParams,
+        limit: _headlinesFetchLimit,
+      );
       emit(
         HeadlinesFeedLoaded(
           headlines: response.items, // Replace headlines on refresh

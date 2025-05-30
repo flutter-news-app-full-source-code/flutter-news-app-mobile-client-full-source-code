@@ -400,7 +400,34 @@ GoRouter createRouter({
                                         context
                                             .read<HtDataRepository<Country>>(),
                                   ),
-                              child: const SourceFilterPage(),
+                              // Pass initialSelectedSources, country ISO codes, and source types from state.extra
+                              child: Builder(
+                                builder: (context) {
+                                  final extraData =
+                                      state.extra as Map<String, dynamic>? ??
+                                      const {};
+                                  final initialSources =
+                                      extraData[keySelectedSources]
+                                          as List<Source>? ??
+                                      const [];
+                                  final initialCountryIsoCodes =
+                                      extraData[keySelectedCountryIsoCodes]
+                                          as Set<String>? ??
+                                      const {};
+                                  final initialSourceTypes =
+                                      extraData[keySelectedSourceTypes]
+                                          as Set<SourceType>? ??
+                                      const {};
+
+                                  return SourceFilterPage(
+                                    initialSelectedSources: initialSources,
+                                    initialSelectedCountryIsoCodes:
+                                        initialCountryIsoCodes,
+                                    initialSelectedSourceTypes:
+                                        initialSourceTypes,
+                                  );
+                                },
+                              ),
                             ),
                       ),
                       // Sub-route for country selection REMOVED

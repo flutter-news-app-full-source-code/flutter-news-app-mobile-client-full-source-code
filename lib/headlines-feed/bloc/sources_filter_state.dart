@@ -10,6 +10,7 @@ class SourcesFilterState extends Equatable {
     this.selectedCountryIsoCodes = const {},
     this.availableSourceTypes = SourceType.values,
     this.selectedSourceTypes = const {},
+    this.allAvailableSources = const [], // Added new property
     this.displayableSources = const [],
     this.finallySelectedSourceIds = const {},
     this.dataLoadingStatus = SourceFilterDataLoadingStatus.initial,
@@ -20,6 +21,7 @@ class SourcesFilterState extends Equatable {
   final Set<String> selectedCountryIsoCodes;
   final List<SourceType> availableSourceTypes;
   final Set<SourceType> selectedSourceTypes;
+  final List<Source> allAvailableSources; // Added new property
   final List<Source> displayableSources;
   final Set<String> finallySelectedSourceIds;
   final SourceFilterDataLoadingStatus dataLoadingStatus;
@@ -30,6 +32,7 @@ class SourcesFilterState extends Equatable {
     Set<String>? selectedCountryIsoCodes,
     List<SourceType>? availableSourceTypes,
     Set<SourceType>? selectedSourceTypes,
+    List<Source>? allAvailableSources, // Added new property
     List<Source>? displayableSources,
     Set<String>? finallySelectedSourceIds,
     SourceFilterDataLoadingStatus? dataLoadingStatus,
@@ -42,6 +45,8 @@ class SourcesFilterState extends Equatable {
           selectedCountryIsoCodes ?? this.selectedCountryIsoCodes,
       availableSourceTypes: availableSourceTypes ?? this.availableSourceTypes,
       selectedSourceTypes: selectedSourceTypes ?? this.selectedSourceTypes,
+      allAvailableSources:
+          allAvailableSources ?? this.allAvailableSources, // Added
       displayableSources: displayableSources ?? this.displayableSources,
       finallySelectedSourceIds:
           finallySelectedSourceIds ?? this.finallySelectedSourceIds,
@@ -57,6 +62,7 @@ class SourcesFilterState extends Equatable {
     selectedCountryIsoCodes,
     availableSourceTypes,
     selectedSourceTypes,
+    allAvailableSources, // Added new property
     displayableSources,
     finallySelectedSourceIds,
     dataLoadingStatus,

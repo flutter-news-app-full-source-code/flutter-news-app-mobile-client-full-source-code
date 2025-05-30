@@ -4,16 +4,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_data_repository/ht_data_repository.dart';
 import 'package:ht_main/headlines-feed/bloc/sources_filter_bloc.dart';
+import 'package:ht_main/headlines-feed/view/headlines_filter_page.dart'
+    show keySelectedCountryIsoCodes, keySelectedSourceTypes, keySelectedSources;
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/shared/constants/app_spacing.dart';
 import 'package:ht_main/shared/widgets/failure_state_widget.dart';
 import 'package:ht_main/shared/widgets/loading_state_widget.dart';
-import 'package:ht_shared/ht_shared.dart' show Country, Source;
+import 'package:ht_shared/ht_shared.dart' show Country, Source, SourceType;
+
+// Keys are defined in headlines_filter_page.dart and imported by router.dart
+// const String keySelectedSources = 'selectedSources'; // REMOVED
+// const String keySelectedCountryIsoCodes = 'selectedCountryIsoCodes'; // REMOVED
+// const String keySelectedSourceTypes = 'selectedSourceTypes'; // REMOVED
 
 class SourceFilterPage extends StatelessWidget {
-  const SourceFilterPage({super.key, this.initialSelectedSources = const []});
+  const SourceFilterPage({
+    super.key,
+    this.initialSelectedSources = const [],
+    this.initialSelectedCountryIsoCodes = const {},
+    this.initialSelectedSourceTypes = const {},
+  });
 
   final List<Source> initialSelectedSources;
+  final Set<String> initialSelectedCountryIsoCodes;
+  final Set<SourceType> initialSelectedSourceTypes;
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +39,8 @@ class SourceFilterPage extends StatelessWidget {
           )..add(
             LoadSourceFilterData(
               initialSelectedSources: initialSelectedSources,
+              initialSelectedCountryIsoCodes: initialSelectedCountryIsoCodes,
+              initialSelectedSourceTypes: initialSelectedSourceTypes,
             ),
           ),
       child: const _SourceFilterView(),
@@ -63,7 +79,12 @@ class _SourceFilterView extends StatelessWidget {
                         (s) => state.finallySelectedSourceIds.contains(s.id),
                       )
                       .toList();
-              Navigator.of(context).pop(selectedSources);
+              // Pop with a map containing all relevant filter state
+              Navigator.of(context).pop({
+                keySelectedSources: selectedSources,
+                keySelectedCountryIsoCodes: state.selectedCountryIsoCodes,
+                keySelectedSourceTypes: state.selectedSourceTypes,
+              });
             },
           ),
         ],
@@ -91,25 +112,29 @@ class _SourceFilterView extends StatelessWidget {
         message: state.errorMessage ?? l10n.headlinesFeedFilterErrorCriteria,
         onRetry: () {
           context.read<SourcesFilterBloc>().add(
-            LoadSourceFilterData(
-              initialSelectedSources:
-                  ModalRoute.of(context)?.settings.arguments as List<Source>? ??
-                  const [],
-            ),
+            // When retrying, we don't have initial capsule states from arguments
+            // So, we pass empty sets, BLoC will load all sources and countries.
+            // User can then re-apply capsule filters if needed.
+            // Or, we could try to persist/retrieve the last known good capsule state.
+            // For now, simple retry reloads all.
+            const LoadSourceFilterData(),
           );
         },
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildCountryCapsules(context, state, l10n),
-        const SizedBox(height: AppSpacing.lg),
-        _buildSourceTypeCapsules(context, state, l10n),
-        const SizedBox(height: AppSpacing.lg),
-        Expanded(child: _buildSourcesList(context, state, l10n)),
-      ],
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildCountryCapsules(context, state, l10n),
+          const SizedBox(height: AppSpacing.lg),
+          _buildSourceTypeCapsules(context, state, l10n),
+          const SizedBox(height: AppSpacing.lg),
+          Expanded(child: _buildSourcesList(context, state, l10n)),
+        ],
+      ),
     );
   }
 

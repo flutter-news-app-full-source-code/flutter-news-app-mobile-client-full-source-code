@@ -102,101 +102,105 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
 
     return Scaffold(
       appBar: AppBar(
-        leadingWidth: 150, // Adjust width to accommodate dropdown
-        leading: Padding(
-          padding: const EdgeInsets.only(left: AppSpacing.md, right: AppSpacing.sm),
-          child: DropdownButtonFormField<SearchModelType>(
-            value: _selectedModelType,
-            // Use a more subtle underline or remove it if it clashes
-            decoration: const InputDecoration(
-              border: InputBorder.none, // Removes underline
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: AppSpacing.xs, // Minimal horizontal padding
-              ),
-            ),
-            // Style the dropdown text to match AppBar title - Adjusted
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: appBarTheme.titleTextStyle?.color ?? colorScheme.onSurface,
-            ),
-            dropdownColor: colorScheme.surfaceContainerHighest, // Match theme
-            icon: Icon(
-              Icons.arrow_drop_down,
-              color: appBarTheme.iconTheme?.color ?? colorScheme.onSurface,
-            ),
-            items: SearchModelType.values.map((SearchModelType type) {
-              String displayLocalizedName;
-              switch (type) {
-                case SearchModelType.headline:
-                  displayLocalizedName = l10n.searchModelTypeHeadline;
-                  break;
-                case SearchModelType.category:
-                  displayLocalizedName = l10n.searchModelTypeCategory;
-                  break;
-                case SearchModelType.source:
-                  displayLocalizedName = l10n.searchModelTypeSource;
-                  break;
-                case SearchModelType.country:
-                  displayLocalizedName = l10n.searchModelTypeCountry;
-                  break;
-              }
-              return DropdownMenuItem<SearchModelType>(
-                value: type,
-                child: Text(
-                  displayLocalizedName,
-                  // Adjusted style for dropdown items
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: colorScheme.onSurface,
+        // Removed leading and leadingWidth
+        titleSpacing: AppSpacing.paddingSmall, // Adjust title spacing if needed
+        title: Row(
+          crossAxisAlignment: CrossAxisAlignment.center, // Center items vertically
+          children: [
+            SizedBox(
+              width: 140, // Constrain dropdown width
+              child: DropdownButtonFormField<SearchModelType>(
+                value: _selectedModelType,
+                isDense: true, // Makes the dropdown more compact
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xs, // Minimal horizontal padding
+                    vertical: AppSpacing.xs, // Reduce vertical padding
                   ),
                 ),
-              );
-            }).toList(),
-            onChanged: (SearchModelType? newValue) {
-              if (newValue != null) {
-                setState(() {
-                  _selectedModelType = newValue;
-                });
-                context
-                    .read<HeadlinesSearchBloc>()
-                    .add(HeadlinesSearchModelTypeChanged(newValue));
-                // DO NOT automatically perform search here
-              }
-            },
-          ),
-        ),
-        title: TextField(
-          controller: _textController,
-          style: appBarTheme.titleTextStyle ?? theme.textTheme.titleLarge,
-          decoration: InputDecoration(
-            hintText: _getHintTextForModelType(_selectedModelType, l10n),
-            // Adjusted hintStyle to use a smaller font
-            hintStyle: theme.textTheme.bodyMedium?.copyWith(
-              color: (appBarTheme.titleTextStyle?.color ??
-                      colorScheme.onSurface)
-                  .withAlpha(153),
-            ),
-            border: InputBorder.none,
-            filled: true,
-            fillColor: colorScheme.surface.withAlpha(26),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.paddingMedium,
-              vertical: AppSpacing.paddingSmall,
-            ),
-            suffixIcon: _showClearButton
-                ? IconButton(
-                    icon: Icon(
-                      Icons.clear,
-                      color: appBarTheme.iconTheme?.color ??
-                          colorScheme.onSurface,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: appBarTheme.titleTextStyle?.color ?? colorScheme.onSurface,
+                ),
+                dropdownColor: colorScheme.surfaceContainerHighest,
+                icon: Icon(
+                  Icons.arrow_drop_down,
+                  color: appBarTheme.iconTheme?.color ?? colorScheme.onSurface,
+                ),
+                items: SearchModelType.values.map((SearchModelType type) {
+                  String displayLocalizedName;
+                  switch (type) {
+                    case SearchModelType.headline:
+                      displayLocalizedName = l10n.searchModelTypeHeadline;
+                      break;
+                    case SearchModelType.category:
+                      displayLocalizedName = l10n.searchModelTypeCategory;
+                      break;
+                    case SearchModelType.source:
+                      displayLocalizedName = l10n.searchModelTypeSource;
+                      break;
+                    case SearchModelType.country:
+                      displayLocalizedName = l10n.searchModelTypeCountry;
+                      break;
+                  }
+                  return DropdownMenuItem<SearchModelType>(
+                    value: type,
+                    child: Text(
+                      displayLocalizedName,
+                      style: theme.textTheme.titleMedium?.copyWith( // Consistent style
+                        color: colorScheme.onSurface,
+                      ),
                     ),
-                    onPressed: () {
-                      _textController.clear();
-                      // Optionally clear search results when text is cleared
-                      // context.read<HeadlinesSearchBloc>().add(HeadlinesSearchModelTypeChanged(_selectedModelType));
-                    },
-                  )
-                : null,
-          ),
-          onSubmitted: (_) => _performSearch(),
+                  );
+                }).toList(),
+                onChanged: (SearchModelType? newValue) {
+                  if (newValue != null) {
+                    setState(() {
+                      _selectedModelType = newValue;
+                    });
+                    context
+                        .read<HeadlinesSearchBloc>()
+                        .add(HeadlinesSearchModelTypeChanged(newValue));
+                  }
+                },
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm), // Spacing between dropdown and textfield
+            Expanded(
+              child: TextField(
+                controller: _textController,
+                style: appBarTheme.titleTextStyle ?? theme.textTheme.titleLarge,
+                decoration: InputDecoration(
+                  hintText: _getHintTextForModelType(_selectedModelType, l10n),
+                  hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                    color: (appBarTheme.titleTextStyle?.color ??
+                            colorScheme.onSurface)
+                        .withAlpha(153),
+                  ),
+                  border: InputBorder.none,
+                  filled: true,
+                  fillColor: colorScheme.surface.withAlpha(26),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.paddingMedium,
+                    vertical: AppSpacing.paddingSmall + 3, // Fine-tune vertical padding for alignment
+                  ),
+                  suffixIcon: _showClearButton
+                      ? IconButton(
+                          icon: Icon(
+                            Icons.clear,
+                            color: appBarTheme.iconTheme?.color ??
+                                colorScheme.onSurface,
+                          ),
+                          onPressed: () {
+                            _textController.clear();
+                          },
+                        )
+                      : null,
+                ),
+                onSubmitted: (_) => _performSearch(),
+              ),
+            ),
+          ],
         ),
         actions: [
           IconButton(

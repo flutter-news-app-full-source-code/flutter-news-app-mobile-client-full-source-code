@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ht_data_repository/ht_data_repository.dart';
 import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/headlines-feed/bloc/sources_filter_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/shared/constants/app_spacing.dart';
 import 'package:ht_main/shared/widgets/widgets.dart';
 import 'package:ht_shared/ht_shared.dart';
-import 'package:ht_data_repository/ht_data_repository.dart';
 
 /// {@template add_source_to_follow_page}
 /// A page that allows users to browse and select sources to follow.

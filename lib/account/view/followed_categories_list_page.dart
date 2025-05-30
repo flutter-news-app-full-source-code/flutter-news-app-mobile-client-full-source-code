@@ -6,7 +6,6 @@ import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart'; // Assuming new routes will be added
 import 'package:ht_main/shared/constants/app_spacing.dart';
 import 'package:ht_main/shared/widgets/widgets.dart'; // For FailureStateWidget
-import 'package:ht_shared/ht_shared.dart';
 
 /// {@template followed_categories_list_page}
 /// Displays a list of categories the user is currently following.

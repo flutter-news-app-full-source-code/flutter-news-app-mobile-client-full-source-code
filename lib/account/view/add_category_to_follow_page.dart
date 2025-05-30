@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ht_data_repository/ht_data_repository.dart'; // Required for HtDataRepository
 import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/headlines-feed/bloc/categories_filter_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/shared/constants/app_spacing.dart';
 import 'package:ht_main/shared/widgets/widgets.dart';
 import 'package:ht_shared/ht_shared.dart';
-import 'package:ht_data_repository/ht_data_repository.dart'; // Required for HtDataRepository
 
 /// {@template add_category_to_follow_page}
 /// A page that allows users to browse and select categories to follow.
@@ -35,9 +35,9 @@ class AddCategoryToFollowPage extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             }
             if (categoriesState.status == CategoriesFilterStatus.failure) {
-              String errorMessage = l10n.categoryFilterError;
+              var errorMessage = l10n.categoryFilterError;
               if (categoriesState.error is HtHttpException) {
-                errorMessage = (categoriesState.error as HtHttpException).message;
+                errorMessage = (categoriesState.error! as HtHttpException).message;
               } else if (categoriesState.error != null) {
                 errorMessage = categoriesState.error.toString();
               }

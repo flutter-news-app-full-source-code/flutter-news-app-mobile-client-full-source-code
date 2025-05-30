@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ht_data_repository/ht_data_repository.dart';
 import 'package:ht_main/account/bloc/account_bloc.dart';
 // TODO(cline): May need a specific BLoC for fetching all countries if not using an existing one.
 // For now, we'll assume direct repository access or a placeholder.
@@ -7,7 +8,6 @@ import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/shared/constants/app_spacing.dart';
 import 'package:ht_main/shared/widgets/widgets.dart';
 import 'package:ht_shared/ht_shared.dart';
-import 'package:ht_data_repository/ht_data_repository.dart';
 
 /// {@template add_country_to_follow_page}
 /// A page that allows users to browse and select countries to follow.

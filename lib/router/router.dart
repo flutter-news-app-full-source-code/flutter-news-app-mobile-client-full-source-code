@@ -5,6 +5,13 @@ import 'package:ht_auth_repository/ht_auth_repository.dart'; // Auth Repository
 import 'package:ht_data_repository/ht_data_repository.dart'; // Generic Data Repository
 import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/account/view/account_page.dart';
+import 'package:ht_main/account/view/add_category_to_follow_page.dart'; // New
+import 'package:ht_main/account/view/add_country_to_follow_page.dart'; // New
+import 'package:ht_main/account/view/add_source_to_follow_page.dart'; // New
+import 'package:ht_main/account/view/followed_categories_list_page.dart'; // New
+import 'package:ht_main/account/view/followed_countries_list_page.dart'; // New
+import 'package:ht_main/account/view/followed_sources_list_page.dart'; // New
+import 'package:ht_main/account/view/manage_followed_items_page.dart'; // New
 import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/app/view/app_shell.dart';
 import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
@@ -26,13 +33,6 @@ import 'package:ht_main/headlines-search/bloc/headlines_search_bloc.dart';
 import 'package:ht_main/headlines-search/view/headlines_search_page.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
-import 'package:ht_main/account/view/manage_followed_items_page.dart'; // New
-import 'package:ht_main/account/view/followed_categories_list_page.dart'; // New
-import 'package:ht_main/account/view/followed_sources_list_page.dart'; // New
-import 'package:ht_main/account/view/followed_countries_list_page.dart'; // New
-import 'package:ht_main/account/view/add_category_to_follow_page.dart'; // New
-import 'package:ht_main/account/view/add_source_to_follow_page.dart'; // New
-import 'package:ht_main/account/view/add_country_to_follow_page.dart'; // New
 import 'package:ht_main/settings/bloc/settings_bloc.dart'; // Added
 import 'package:ht_main/settings/view/appearance_settings_page.dart'; // Added
 import 'package:ht_main/settings/view/feed_settings_page.dart'; // Added

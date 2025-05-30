@@ -589,5 +589,38 @@
     "headlinesFeedFilterNoSourcesMatch": "No sources match your selected filters.",
     "@headlinesFeedFilterNoSourcesMatch": {
         "description": "Message shown when no sources match the selected filters"
+    },
+
+    "searchModelTypeHeadline": "Headlines",
+    "@searchModelTypeHeadline": {
+        "description": "Dropdown display name for Headline search type"
+    },
+    "searchModelTypeCategory": "Categories",
+    "@searchModelTypeCategory": {
+        "description": "Dropdown display name for Category search type"
+    },
+    "searchModelTypeSource": "Sources",
+    "@searchModelTypeSource": {
+        "description": "Dropdown display name for Source search type"
+    },
+    "searchModelTypeCountry": "Countries",
+    "@searchModelTypeCountry": {
+        "description": "Dropdown display name for Country search type"
+    },
+    "searchHintTextHeadline": "e.g., AI advancements, Mars rover...",
+    "@searchHintTextHeadline": {
+        "description": "Hint text for searching headlines"
+    },
+    "searchHintTextCategory": "e.g., Technology, Sports, Finance...",
+    "@searchHintTextCategory": {
+        "description": "Hint text for searching categories"
+    },
+    "searchHintTextSource": "e.g., BBC News, TechCrunch, Reuters...",
+    "@searchHintTextSource": {
+        "description": "Hint text for searching sources"
+    },
+    "searchHintTextCountry": "e.g., USA, Japan, Brazil...",
+    "@searchHintTextCountry": {
+        "description": "Hint text for searching countries"
     }
 }

@@ -48,6 +48,9 @@ class AddSourceToFollowPage extends StatelessWidget {
             }
 
             return BlocBuilder<AccountBloc, AccountState>(
+              buildWhen: (previous, current) =>
+                  previous.preferences?.followedSources != current.preferences?.followedSources ||
+                  previous.status != current.status,
               builder: (context, accountState) {
                 final followedSources =
                     accountState.preferences?.followedSources ?? [];

@@ -631,5 +631,133 @@
     "searchPageInitialSubheadline": "Select a type and enter keywords to begin.",
     "@searchPageInitialSubheadline": {
         "description": "Generic subheadline for the initial state of the search page"
+    },
+    "followedCategoriesPageTitle": "Followed Categories",
+    "@followedCategoriesPageTitle": {
+        "description": "Title for the page listing followed categories"
+    },
+    "addCategoriesTooltip": "Add Categories",
+    "@addCategoriesTooltip": {
+        "description": "Tooltip for the button to add new categories to follow"
+    },
+    "noFollowedCategoriesMessage": "You are not following any categories yet.",
+    "@noFollowedCategoriesMessage": {
+        "description": "Message displayed when the user has no followed categories"
+    },
+    "addCategoriesButtonLabel": "Find Categories to Follow",
+    "@addCategoriesButtonLabel": {
+        "description": "Label for the button that navigates to the page for adding categories"
+    },
+    "unfollowCategoryTooltip": "Unfollow {categoryName}",
+    "@unfollowCategoryTooltip": {
+        "description": "Tooltip for the button to unfollow a specific category",
+        "placeholders": {
+            "categoryName": {
+                "type": "String",
+                "example": "Technology"
+            }
+        }
+    },
+    "followedSourcesPageTitle": "Followed Sources",
+    "@followedSourcesPageTitle": {
+        "description": "Title for the page listing followed sources"
+    },
+    "addSourcesTooltip": "Add Sources",
+    "@addSourcesTooltip": {
+        "description": "Tooltip for the button to add new sources to follow"
+    },
+    "noFollowedSourcesMessage": "You are not following any sources yet.",
+    "@noFollowedSourcesMessage": {
+        "description": "Message displayed when the user has no followed sources"
+    },
+    "addSourcesButtonLabel": "Find Sources to Follow",
+    "@addSourcesButtonLabel": {
+        "description": "Label for the button that navigates to the page for adding sources"
+    },
+    "unfollowSourceTooltip": "Unfollow {sourceName}",
+    "@unfollowSourceTooltip": {
+        "description": "Tooltip for the button to unfollow a specific source",
+        "placeholders": {
+            "sourceName": {
+                "type": "String",
+                "example": "BBC News"
+            }
+        }
+    },
+    "followedCountriesPageTitle": "Followed Countries",
+    "@followedCountriesPageTitle": {
+        "description": "Title for the page listing followed countries"
+    },
+    "addCountriesTooltip": "Add Countries",
+    "@addCountriesTooltip": {
+        "description": "Tooltip for the button to add new countries to follow"
+    },
+    "noFollowedCountriesMessage": "You are not following any countries yet.",
+    "@noFollowedCountriesMessage": {
+        "description": "Message displayed when the user has no followed countries"
+    },
+    "addCountriesButtonLabel": "Find Countries to Follow",
+    "@addCountriesButtonLabel": {
+        "description": "Label for the button that navigates to the page for adding countries"
+    },
+    "unfollowCountryTooltip": "Unfollow {countryName}",
+    "@unfollowCountryTooltip": {
+        "description": "Tooltip for the button to unfollow a specific country",
+        "placeholders": {
+            "countryName": {
+                "type": "String",
+                "example": "United States"
+            }
+        }
+    },
+    "addCategoriesPageTitle": "Add Categories to Follow",
+    "@addCategoriesPageTitle": {
+        "description": "Title for the page where users can add categories to follow"
+    },
+    "categoryFilterError": "Could not load categories. Please try again.",
+    "@categoryFilterError": {
+        "description": "Error message when categories fail to load on the filter/add page"
+    },
+    "followCategoryTooltip": "Follow {categoryName}",
+    "@followCategoryTooltip": {
+        "description": "Tooltip for the button to follow a specific category",
+        "placeholders": {
+            "categoryName": {
+                "type": "String",
+                "example": "Science"
+            }
+        }
+    },
+    "addSourcesPageTitle": "Add Sources to Follow",
+    "@addSourcesPageTitle": {
+        "description": "Title for the page where users can add sources to follow"
+    },
+    "sourceFilterError": "Could not load sources. Please try again.",
+    "@sourceFilterError": {
+        "description": "Error message when sources fail to load on the filter/add page"
+    },
+    "followSourceTooltip": "Follow {sourceName}",
+    "@followSourceTooltip": {
+        "description": "Tooltip for the button to follow a specific source",
+        "placeholders": {
+            "sourceName": {
+                "type": "String",
+                "example": "Tech News"
+            }
+        }
+    },
+    "addCountriesPageTitle": "Add Countries to Follow",
+    "@addCountriesPageTitle": {
+        "description": "Title for the page where users can add countries to follow"
+    },
+    "followCountryTooltip": "Follow {countryName}",
+    "@followCountryTooltip": {
+        "description": "Tooltip for the button to follow a specific country",
+        "placeholders": {
+            "countryName": {
+                "type": "String",
+                "example": "Germany"
+            }
+        }
     }
 }

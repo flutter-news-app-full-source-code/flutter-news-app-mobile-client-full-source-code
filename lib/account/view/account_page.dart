@@ -44,7 +44,7 @@ class AccountPage extends StatelessWidget {
             title: Text(l10n.accountContentPreferencesTile),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              context.goNamed(Routes.accountContentPreferencesName);
+              context.goNamed(Routes.manageFollowedItemsName); // Updated route
             },
           ),
           const Divider(), // Divider after Content Preferences

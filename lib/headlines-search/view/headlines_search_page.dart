@@ -211,8 +211,8 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
           return switch (state) {
             HeadlinesSearchInitial() => InitialStateWidget(
                 icon: Icons.search, // Changed icon
-                headline: l10n.headlinesSearchInitialHeadline,
-                subheadline: l10n.headlinesSearchInitialSubheadline,
+                headline: l10n.searchPageInitialHeadline, // Use new generic key
+                subheadline: l10n.searchPageInitialSubheadline, // Use new generic key
               ),
             // Use more generic loading text or existing keys
             HeadlinesSearchLoading() => InitialStateWidget(

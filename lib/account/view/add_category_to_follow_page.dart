@@ -56,6 +56,9 @@ class AddCategoryToFollowPage extends StatelessWidget {
 
             // Use AccountBloc to check which categories are already followed
             return BlocBuilder<AccountBloc, AccountState>(
+              buildWhen: (previous, current) =>
+                  previous.preferences?.followedCategories != current.preferences?.followedCategories ||
+                  previous.status != current.status, // Rebuild if status changes too
               builder: (context, accountState) {
                 final followedCategories =
                     accountState.preferences?.followedCategories ?? [];

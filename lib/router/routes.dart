@@ -25,6 +25,8 @@ abstract final class Routes {
   // --- Sub Routes ---
   // Article details is now relative to feed
   static const articleDetailsName = 'articleDetails';
+  // Add a new name for article details when accessed from search
+  static const searchArticleDetailsName = 'searchArticleDetails';
   // Settings is now relative to account
   static const settings = 'settings'; // Relative path
   static const settingsName = 'settings';

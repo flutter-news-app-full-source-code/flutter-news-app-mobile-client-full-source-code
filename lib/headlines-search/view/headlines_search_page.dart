@@ -114,8 +114,10 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                 horizontal: AppSpacing.xs, // Minimal horizontal padding
               ),
             ),
-            // Style the dropdown text to match AppBar title
-            style: appBarTheme.titleTextStyle ?? theme.textTheme.titleLarge,
+            // Style the dropdown text to match AppBar title - Adjusted
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: appBarTheme.titleTextStyle?.color ?? colorScheme.onSurface,
+            ),
             dropdownColor: colorScheme.surfaceContainerHighest, // Match theme
             icon: Icon(
               Icons.arrow_drop_down,
@@ -141,12 +143,10 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                 value: type,
                 child: Text(
                   displayLocalizedName,
-                  style: appBarTheme.titleTextStyle?.copyWith(
-                        color: colorScheme.onSurface,
-                      ) ??
-                      theme.textTheme.titleLarge?.copyWith(
-                        color: colorScheme.onSurface,
-                      ),
+                  // Adjusted style for dropdown items
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: colorScheme.onSurface,
+                  ),
                 ),
               );
             }).toList(),
@@ -168,9 +168,12 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
           style: appBarTheme.titleTextStyle ?? theme.textTheme.titleLarge,
           decoration: InputDecoration(
             hintText: _getHintTextForModelType(_selectedModelType, l10n),
-            hintStyle: (appBarTheme.titleTextStyle ??
-                    theme.textTheme.titleLarge)
-                ?.copyWith(color: colorScheme.onSurface.withAlpha(153)),
+            // Adjusted hintStyle to use a smaller font
+            hintStyle: theme.textTheme.bodyMedium?.copyWith(
+              color: (appBarTheme.titleTextStyle?.color ??
+                      colorScheme.onSurface)
+                  .withAlpha(153),
+            ),
             border: InputBorder.none,
             filled: true,
             fillColor: colorScheme.surface.withAlpha(26),
@@ -207,7 +210,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
         builder: (context, state) {
           return switch (state) {
             HeadlinesSearchInitial() => InitialStateWidget(
-                icon: Icons.search_off_rounded,
+                icon: Icons.search, // Changed icon
                 headline: l10n.headlinesSearchInitialHeadline,
                 subheadline: l10n.headlinesSearchInitialSubheadline,
               ),
@@ -238,15 +241,18 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                           message:
                               '${l10n.headlinesSearchNoResultsHeadline} for "${lastSearchTerm}" in ${resultsModelType.displayName.toLowerCase()}.\n${l10n.headlinesSearchNoResultsSubheadline}',
                         )
-                      : ListView.builder(
+                      : ListView.separated(
                           controller: _scrollController,
+                          padding: const EdgeInsets.all(AppSpacing.paddingMedium), // Add overall padding
                           itemCount:
                               hasMore ? results.length + 1 : results.length,
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(height: AppSpacing.md), // Add separator
                           itemBuilder: (context, index) {
                             if (index >= results.length) {
                               return const Padding(
                                 padding:
-                                    EdgeInsets.all(AppSpacing.paddingLarge),
+                                    EdgeInsets.symmetric(vertical: AppSpacing.lg), // Adjusted padding for loader
                                 child:
                                     Center(child: CircularProgressIndicator()),
                               );

@@ -69,27 +69,36 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     AccountLoadContentPreferencesRequested event,
     Emitter<AccountState> emit,
   ) async {
-    emit(state.copyWith(status: AccountStatus.loading));
+    emit(state.copyWith(status: AccountStatus.loading)); // Indicate loading
     try {
       final preferences = await _userContentPreferencesRepository.read(
         id: event.userId,
-        userId: event.userId, // Preferences are user-scoped
+        userId: event.userId,
       );
       emit(
         state.copyWith(status: AccountStatus.success, preferences: preferences),
       );
-    } on HtHttpException catch (e) {
+    } on NotFoundException { // Specifically handle NotFound
+      emit(
+        state.copyWith(
+          status: AccountStatus.success, // It's a success, just no data
+          preferences: UserContentPreferences(id: event.userId), // Provide default/empty
+        ),
+      );
+    } on HtHttpException catch (e) { // Handle other HTTP errors
       emit(
         state.copyWith(
           status: AccountStatus.failure,
           errorMessage: 'Failed to load preferences: ${e.message}',
+          preferences: null, // Ensure preferences are cleared on failure
         ),
       );
-    } catch (e) {
+    } catch (e) { // Catch-all for other unexpected errors
       emit(
         state.copyWith(
           status: AccountStatus.failure,
           errorMessage: 'An unexpected error occurred: $e',
+          preferences: null, // Ensure preferences are cleared on failure
         ),
       );
     }

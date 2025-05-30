@@ -117,9 +117,7 @@ class _SourceFilterView extends StatelessWidget {
             // User can then re-apply capsule filters if needed.
             // Or, we could try to persist/retrieve the last known good capsule state.
             // For now, simple retry reloads all.
-            const LoadSourceFilterData(
-              initialSelectedCountryIsoCodes: {},
-            ),
+            const LoadSourceFilterData(),
           );
         },
       );

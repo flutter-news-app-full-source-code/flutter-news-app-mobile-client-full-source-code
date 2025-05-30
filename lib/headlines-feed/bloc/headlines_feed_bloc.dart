@@ -135,8 +135,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     Emitter<HeadlinesFeedState> emit,
   ) async {
     // Determine current filter and cursor based on state
-    HeadlineFilter currentFilter = const HeadlineFilter(); // Made type explicit
-    String? currentCursor = // Made type explicit
+    var currentFilter = const HeadlineFilter(); // Made type explicit
+    var currentCursor = // Made type explicit
         event.cursor; // Use event's cursor if provided (for pagination)
     var currentHeadlines = <Headline>[];
     var isPaginating = false;
@@ -217,7 +217,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     emit(HeadlinesFeedLoading()); // Show loading indicator for refresh
 
     // Determine the filter currently applied in the state
-    HeadlineFilter currentFilter = const HeadlineFilter(); // Made type explicit
+    var currentFilter = const HeadlineFilter(); // Made type explicit
     if (state is HeadlinesFeedLoaded) {
       currentFilter = (state as HeadlinesFeedLoaded).filter;
     }

@@ -110,6 +110,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           headlines: response.items,
           hasMore: response.hasMore,
           cursor: response.cursor,
+          filter: const HeadlineFilter(), // Clear all filter aspects
         ),
       );
     } on HtHttpException catch (e) {

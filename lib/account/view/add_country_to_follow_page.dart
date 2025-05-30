@@ -85,6 +85,9 @@ class _AddCountryToFollowPageState extends State<AddCountryToFollowPage> {
           }
 
           return BlocBuilder<AccountBloc, AccountState>(
+            buildWhen: (previous, current) =>
+                previous.preferences?.followedCountries != current.preferences?.followedCountries ||
+                previous.status != current.status,
             builder: (context, accountState) {
               final followedCountries =
                   accountState.preferences?.followedCountries ?? [];

@@ -49,7 +49,7 @@ class HeadlinesSearchBloc
         // emit(HeadlinesSearchLoading(lastSearchTerm: event.searchTerm));
         try {
           final response = await _headlinesRepository.readAllByQuery(
-            {'query': event.searchTerm},
+            {'q': event.searchTerm},
             limit: _limit,
             startAfterId: successState.cursor,
           );
@@ -81,7 +81,7 @@ class HeadlinesSearchBloc
     ); // Show loading for new search
     try {
       final response = await _headlinesRepository.readAllByQuery({
-        'query': event.searchTerm,
+        'q': event.searchTerm,
       }, limit: _limit);
       emit(
         HeadlinesSearchSuccess(

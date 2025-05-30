@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ht_data_repository/ht_data_repository.dart'; // Generic Data Repository
+import 'package:ht_main/headlines-search/models/search_model_type.dart'; // Import SearchModelType
 import 'package:ht_shared/ht_shared.dart'; // Shared models, including Headline
 
 part 'headlines_search_event.dart';
@@ -9,10 +10,17 @@ part 'headlines_search_state.dart';
 
 class HeadlinesSearchBloc
     extends Bloc<HeadlinesSearchEvent, HeadlinesSearchState> {
-  HeadlinesSearchBloc({required HtDataRepository<Headline> headlinesRepository})
-    : _headlinesRepository = headlinesRepository,
-      super(const HeadlinesSearchInitial()) {
-    // Start with Initial state
+  HeadlinesSearchBloc({
+    required HtDataRepository<Headline> headlinesRepository,
+    required HtDataRepository<Category> categoryRepository,
+    required HtDataRepository<Source> sourceRepository,
+    required HtDataRepository<Country> countryRepository,
+  })  : _headlinesRepository = headlinesRepository,
+        _categoryRepository = categoryRepository,
+        _sourceRepository = sourceRepository,
+        _countryRepository = countryRepository,
+        super(const HeadlinesSearchInitial()) {
+    on<HeadlinesSearchModelTypeChanged>(_onHeadlinesSearchModelTypeChanged);
     on<HeadlinesSearchFetchRequested>(
       _onSearchFetchRequested,
       transformer: restartable(), // Process only the latest search
@@ -20,90 +28,157 @@ class HeadlinesSearchBloc
   }
 
   final HtDataRepository<Headline> _headlinesRepository;
+  final HtDataRepository<Category> _categoryRepository;
+  final HtDataRepository<Source> _sourceRepository;
+  final HtDataRepository<Country> _countryRepository;
   static const _limit = 10;
+
+  Future<void> _onHeadlinesSearchModelTypeChanged(
+    HeadlinesSearchModelTypeChanged event,
+    Emitter<HeadlinesSearchState> emit,
+  ) async {
+    // If there's an active search term, re-trigger search with new model type
+    final currentSearchTerm = state is HeadlinesSearchLoading
+        ? (state as HeadlinesSearchLoading).lastSearchTerm
+        : state is HeadlinesSearchSuccess
+            ? (state as HeadlinesSearchSuccess).lastSearchTerm
+            : state is HeadlinesSearchFailure
+                ? (state as HeadlinesSearchFailure).lastSearchTerm
+                : null;
+
+    emit(HeadlinesSearchInitial(selectedModelType: event.newModelType));
+
+    if (currentSearchTerm != null && currentSearchTerm.isNotEmpty) {
+      add(HeadlinesSearchFetchRequested(searchTerm: currentSearchTerm));
+    }
+  }
 
   Future<void> _onSearchFetchRequested(
     HeadlinesSearchFetchRequested event,
     Emitter<HeadlinesSearchState> emit,
   ) async {
-    if (event.searchTerm.isEmpty) {
+    final searchTerm = event.searchTerm;
+    final modelType = state.selectedModelType;
+
+    if (searchTerm.isEmpty) {
       emit(
-        const HeadlinesSearchSuccess(
-          headlines: [],
+        HeadlinesSearchSuccess(
+          results: const [],
           hasMore: false,
           lastSearchTerm: '',
+          selectedModelType: modelType,
         ),
       );
       return;
     }
 
-    // Check if current state is success and if the search term is the same for pagination
+    // Handle pagination
     if (state is HeadlinesSearchSuccess) {
       final successState = state as HeadlinesSearchSuccess;
-      if (event.searchTerm == successState.lastSearchTerm) {
-        // This is a pagination request for the current search term
-        if (!successState.hasMore) return; // No more items to paginate
+      if (searchTerm == successState.lastSearchTerm &&
+          modelType == successState.selectedModelType) {
+        if (!successState.hasMore) return;
 
-        // It's a bit unusual to emit Loading here for pagination,
-        // typically UI handles this. Let's keep it simple for now.
-        // emit(HeadlinesSearchLoading(lastSearchTerm: event.searchTerm));
         try {
-          final response = await _headlinesRepository.readAllByQuery(
-            {'q': event.searchTerm},
-            limit: _limit,
-            startAfterId: successState.cursor,
-          );
+          PaginatedResponse<dynamic> response;
+          switch (modelType) {
+            case SearchModelType.headline:
+              response = await _headlinesRepository.readAllByQuery(
+                {'q': searchTerm, 'model': modelType.toJson()},
+                limit: _limit,
+                startAfterId: successState.cursor,
+              );
+            case SearchModelType.category:
+              response = await _categoryRepository.readAllByQuery(
+                {'q': searchTerm, 'model': modelType.toJson()},
+                limit: _limit,
+                startAfterId: successState.cursor,
+              );
+            case SearchModelType.source:
+              response = await _sourceRepository.readAllByQuery(
+                {'q': searchTerm, 'model': modelType.toJson()},
+                limit: _limit,
+                startAfterId: successState.cursor,
+              );
+            case SearchModelType.country:
+              response = await _countryRepository.readAllByQuery(
+                {'q': searchTerm, 'model': modelType.toJson()},
+                limit: _limit,
+                startAfterId: successState.cursor,
+              );
+          }
           emit(
-            response.items.isEmpty
-                ? successState.copyWith(hasMore: false)
-                : successState.copyWith(
-                  headlines: List.of(successState.headlines)
-                    ..addAll(response.items),
-                  hasMore: response.hasMore,
-                  cursor: response.cursor,
-                ),
+            successState.copyWith(
+              results: List.of(successState.results)..addAll(response.items),
+              hasMore: response.hasMore,
+              cursor: response.cursor,
+            ),
           );
         } on HtHttpException catch (e) {
           emit(successState.copyWith(errorMessage: e.message));
         } catch (e, st) {
-          print('Search pagination error: $e\n$st');
-          emit(
-            successState.copyWith(errorMessage: 'Failed to load more results.'),
-          );
+          print('Search pagination error ($modelType): $e\n$st');
+          emit(successState.copyWith(
+            errorMessage: 'Failed to load more results.',
+          ));
         }
-        return; // Pagination handled
+        return;
       }
     }
 
-    // If not paginating for the same term, it's a new search or different term
-    emit(
-      HeadlinesSearchLoading(lastSearchTerm: event.searchTerm),
-    ); // Show loading for new search
+    // New search
+    emit(HeadlinesSearchLoading(
+      lastSearchTerm: searchTerm,
+      selectedModelType: modelType,
+    ));
     try {
-      final response = await _headlinesRepository.readAllByQuery({
-        'q': event.searchTerm,
-      }, limit: _limit);
+      PaginatedResponse<dynamic> response;
+      switch (modelType) {
+        case SearchModelType.headline:
+          response = await _headlinesRepository.readAllByQuery(
+            {'q': searchTerm, 'model': modelType.toJson()},
+            limit: _limit,
+          );
+        case SearchModelType.category:
+          response = await _categoryRepository.readAllByQuery(
+            {'q': searchTerm, 'model': modelType.toJson()},
+            limit: _limit,
+          );
+        case SearchModelType.source:
+          response = await _sourceRepository.readAllByQuery(
+            {'q': searchTerm, 'model': modelType.toJson()},
+            limit: _limit,
+          );
+        case SearchModelType.country:
+          response = await _countryRepository.readAllByQuery(
+            {'q': searchTerm, 'model': modelType.toJson()},
+            limit: _limit,
+          );
+      }
       emit(
         HeadlinesSearchSuccess(
-          headlines: response.items,
+          results: response.items,
           hasMore: response.hasMore,
           cursor: response.cursor,
-          lastSearchTerm: event.searchTerm,
+          lastSearchTerm: searchTerm,
+          selectedModelType: modelType,
         ),
       );
     } on HtHttpException catch (e) {
       emit(
         HeadlinesSearchFailure(
           errorMessage: e.message,
-          lastSearchTerm: event.searchTerm,
+          lastSearchTerm: searchTerm,
+          selectedModelType: modelType,
         ),
       );
     } catch (e, st) {
-      print('Search error: $e\n$st');
+      print('Search error ($modelType): $e\n$st');
       emit(
         HeadlinesSearchFailure(
           errorMessage: 'An unexpected error occurred during search.',
-          lastSearchTerm: event.searchTerm,
+          lastSearchTerm: searchTerm,
+          selectedModelType: modelType,
         ),
       );
     }

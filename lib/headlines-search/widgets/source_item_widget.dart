@@ -11,13 +11,14 @@ class SourceItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(source.name),
-      subtitle: source.description != null
-          ? Text(
-              source.description!,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            )
-          : null,
+      subtitle:
+          source.description != null
+              ? Text(
+                source.description!,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              )
+              : null,
       // TODO(you): Implement onTap navigation if needed for sources
       onTap: () {
         // Example: Navigate to a page showing headlines from this source

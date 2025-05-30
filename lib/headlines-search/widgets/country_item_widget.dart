@@ -15,9 +15,12 @@ class CountryItemWidget extends StatelessWidget {
         onBackgroundImageError: (exception, stackTrace) {
           debugPrint('Error loading country flag: $exception');
         },
-        child: country.flagUrl.isEmpty 
-            ? const Icon(Icons.public_off_outlined) // Placeholder if no flag
-            : null,
+        child:
+            country.flagUrl.isEmpty
+                ? const Icon(
+                  Icons.public_off_outlined,
+                ) // Placeholder if no flag
+                : null,
       ),
       title: Text(country.name),
       // TODO(you): Implement onTap navigation if needed for countries

@@ -64,8 +64,3 @@ class SourceCheckboxToggled extends SourcesFilterEvent {
 class ClearSourceFiltersRequested extends SourcesFilterEvent {
   const ClearSourceFiltersRequested();
 }
-
-// Internal event - not part of public API, hence leading underscore
-class _FetchFilteredSourcesRequested extends SourcesFilterEvent {
-  const _FetchFilteredSourcesRequested();
-}

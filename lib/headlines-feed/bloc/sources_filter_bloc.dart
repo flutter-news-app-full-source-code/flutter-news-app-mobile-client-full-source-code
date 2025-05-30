@@ -3,8 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ht_data_repository/ht_data_repository.dart';
-import 'package:ht_shared/ht_shared.dart'
-    show Country, HtHttpException, Source, SourceType;
+import 'package:ht_shared/ht_shared.dart' show Country, Source, SourceType;
 
 part 'sources_filter_event.dart';
 part 'sources_filter_state.dart';

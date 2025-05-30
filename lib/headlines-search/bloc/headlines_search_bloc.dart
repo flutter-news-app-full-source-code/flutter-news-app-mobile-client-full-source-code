@@ -15,11 +15,11 @@ class HeadlinesSearchBloc
     required HtDataRepository<Category> categoryRepository,
     required HtDataRepository<Source> sourceRepository,
     required HtDataRepository<Country> countryRepository,
-  })  : _headlinesRepository = headlinesRepository,
-        _categoryRepository = categoryRepository,
-        _sourceRepository = sourceRepository,
-        _countryRepository = countryRepository,
-        super(const HeadlinesSearchInitial()) {
+  }) : _headlinesRepository = headlinesRepository,
+       _categoryRepository = categoryRepository,
+       _sourceRepository = sourceRepository,
+       _countryRepository = countryRepository,
+       super(const HeadlinesSearchInitial()) {
     on<HeadlinesSearchModelTypeChanged>(_onHeadlinesSearchModelTypeChanged);
     on<HeadlinesSearchFetchRequested>(
       _onSearchFetchRequested,
@@ -38,13 +38,15 @@ class HeadlinesSearchBloc
     Emitter<HeadlinesSearchState> emit,
   ) async {
     // If there's an active search term, re-trigger search with new model type
-    final currentSearchTerm = state is HeadlinesSearchLoading
-        ? (state as HeadlinesSearchLoading).lastSearchTerm
-        : state is HeadlinesSearchSuccess
+    // ignore: unused_local_variable
+    final currentSearchTerm =
+        state is HeadlinesSearchLoading
+            ? (state as HeadlinesSearchLoading).lastSearchTerm
+            : state is HeadlinesSearchSuccess
             ? (state as HeadlinesSearchSuccess).lastSearchTerm
             : state is HeadlinesSearchFailure
-                ? (state as HeadlinesSearchFailure).lastSearchTerm
-                : null;
+            ? (state as HeadlinesSearchFailure).lastSearchTerm
+            : null;
 
     emit(HeadlinesSearchInitial(selectedModelType: event.newModelType));
 
@@ -119,42 +121,44 @@ class HeadlinesSearchBloc
           emit(successState.copyWith(errorMessage: e.message));
         } catch (e, st) {
           print('Search pagination error ($modelType): $e\n$st');
-          emit(successState.copyWith(
-            errorMessage: 'Failed to load more results.',
-          ));
+          emit(
+            successState.copyWith(errorMessage: 'Failed to load more results.'),
+          );
         }
         return;
       }
     }
 
     // New search
-    emit(HeadlinesSearchLoading(
-      lastSearchTerm: searchTerm,
-      selectedModelType: modelType,
-    ));
+    emit(
+      HeadlinesSearchLoading(
+        lastSearchTerm: searchTerm,
+        selectedModelType: modelType,
+      ),
+    );
     try {
       PaginatedResponse<dynamic> response;
       switch (modelType) {
         case SearchModelType.headline:
-          response = await _headlinesRepository.readAllByQuery(
-            {'q': searchTerm, 'model': modelType.toJson()},
-            limit: _limit,
-          );
+          response = await _headlinesRepository.readAllByQuery({
+            'q': searchTerm,
+            'model': modelType.toJson(),
+          }, limit: _limit,);
         case SearchModelType.category:
-          response = await _categoryRepository.readAllByQuery(
-            {'q': searchTerm, 'model': modelType.toJson()},
-            limit: _limit,
-          );
+          response = await _categoryRepository.readAllByQuery({
+            'q': searchTerm,
+            'model': modelType.toJson(),
+          }, limit: _limit,);
         case SearchModelType.source:
-          response = await _sourceRepository.readAllByQuery(
-            {'q': searchTerm, 'model': modelType.toJson()},
-            limit: _limit,
-          );
+          response = await _sourceRepository.readAllByQuery({
+            'q': searchTerm,
+            'model': modelType.toJson(),
+          }, limit: _limit,);
         case SearchModelType.country:
-          response = await _countryRepository.readAllByQuery(
-            {'q': searchTerm, 'model': modelType.toJson()},
-            limit: _limit,
-          );
+          response = await _countryRepository.readAllByQuery({
+            'q': searchTerm,
+            'model': modelType.toJson(),
+          }, limit: _limit,);
       }
       emit(
         HeadlinesSearchSuccess(

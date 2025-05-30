@@ -622,5 +622,14 @@
     "searchHintTextCountry": "مثال: الولايات المتحدة, اليابان, البرازيل...",
     "@searchHintTextCountry": {
         "description": "Hint text for searching countries"
+    },
+
+    "searchPageInitialHeadline": "ابدأ بحثك",
+    "@searchPageInitialHeadline": {
+        "description": "Generic headline for the initial state of the search page"
+    },
+    "searchPageInitialSubheadline": "اختر نوعًا وأدخل كلمات رئيسية للبدء.",
+    "@searchPageInitialSubheadline": {
+        "description": "Generic subheadline for the initial state of the search page"
     }
 }

@@ -444,6 +444,24 @@ GoRouter createRouter({
                 path: Routes.search, // '/search'
                 name: Routes.searchName,
                 builder: (context, state) => const HeadlinesSearchPage(),
+                routes: [
+                  // Sub-route for article details from search
+                  GoRoute(
+                    path: 'article/:id', // Relative path
+                    name: Routes.searchArticleDetailsName, // New route name
+                    builder: (context, state) {
+                      final id = state.pathParameters['id']!;
+                      return BlocProvider(
+                        create:
+                            (context) => HeadlineDetailsBloc(
+                              headlinesRepository:
+                                  context.read<HtDataRepository<Headline>>(),
+                            )..add(HeadlineDetailsRequested(headlineId: id)),
+                        child: HeadlineDetailsPage(headlineId: id),
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),

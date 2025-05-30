@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_main/headlines-feed/widgets/headline_item_widget.dart';
+import 'package:ht_main/router/routes.dart'; // Import Routes
 import 'package:ht_main/headlines-search/bloc/headlines_search_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/shared/constants/app_spacing.dart'; // Import AppSpacing
@@ -216,7 +217,10 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                         );
                       }
                       // Display headline item
-                      return HeadlineItemWidget(headline: headlines[index]);
+                      return HeadlineItemWidget(
+                        headline: headlines[index],
+                        targetRouteName: Routes.searchArticleDetailsName,
+                      );
                     },
                   ),
             // Default case (should ideally not be reached if states are handled)

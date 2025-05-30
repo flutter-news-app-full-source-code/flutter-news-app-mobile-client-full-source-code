@@ -128,11 +128,11 @@ class _SourceFilterView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-        _buildCountryCapsules(context, state, l10n),
-        const SizedBox(height: AppSpacing.lg),
-        _buildSourceTypeCapsules(context, state, l10n),
-        const SizedBox(height: AppSpacing.lg),
-        Expanded(child: _buildSourcesList(context, state, l10n)),
+          _buildCountryCapsules(context, state, l10n),
+          const SizedBox(height: AppSpacing.lg),
+          _buildSourceTypeCapsules(context, state, l10n),
+          const SizedBox(height: AppSpacing.lg),
+          Expanded(child: _buildSourcesList(context, state, l10n)),
         ],
       ),
     );

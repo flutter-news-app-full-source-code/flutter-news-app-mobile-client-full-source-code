@@ -28,9 +28,7 @@ class ManageFollowedItemsPage extends StatelessWidget {
             title: Text(l10n.headlinesFeedFilterCategoryLabel), // "Categories"
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              // TODO(cline): Replace with actual route name once defined
-              // context.goNamed(Routes.followedCategoriesListName);
-              print('Navigate to Followed Categories List Page');
+              context.goNamed(Routes.followedCategoriesListName);
             },
           ),
           const Divider(indent: AppSpacing.lg, endIndent: AppSpacing.lg),
@@ -39,9 +37,7 @@ class ManageFollowedItemsPage extends StatelessWidget {
             title: Text(l10n.headlinesFeedFilterSourceLabel), // "Sources"
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              // TODO(cline): Replace with actual route name once defined
-              // context.goNamed(Routes.followedSourcesListName);
-              print('Navigate to Followed Sources List Page');
+              context.goNamed(Routes.followedSourcesListName);
             },
           ),
           const Divider(indent: AppSpacing.lg, endIndent: AppSpacing.lg),
@@ -50,9 +46,7 @@ class ManageFollowedItemsPage extends StatelessWidget {
             title: Text(l10n.headlinesFeedFilterEventCountryLabel), // "Countries"
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              // TODO(cline): Replace with actual route name once defined
-              // context.goNamed(Routes.followedCountriesListName);
-              print('Navigate to Followed Countries List Page');
+              context.goNamed(Routes.followedCountriesListName);
             },
           ),
           const Divider(indent: AppSpacing.lg, endIndent: AppSpacing.lg),

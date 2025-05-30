@@ -61,9 +61,11 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
         state.copyWith(
           availableCountries: availableCountries.items,
           allAvailableSources: allAvailableSources,
-          displayableSources: displayableSources, // Now correctly filtered if initial capsules were set
+          displayableSources:
+              displayableSources, // Now correctly filtered if initial capsules were set
           finallySelectedSourceIds: initialSelectedSourceIds,
-          selectedCountryIsoCodes: initialSelectedCountryIsoCodes, // Use event's data
+          selectedCountryIsoCodes:
+              initialSelectedCountryIsoCodes, // Use event's data
           selectedSourceTypes: initialSelectedSourceTypes, // Use event's data
           dataLoadingStatus: SourceFilterDataLoadingStatus.success,
           clearErrorMessage: true,
@@ -191,10 +193,12 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
     }
 
     return allSources.where((source) {
-      final matchesCountry = selectedCountries.isEmpty ||
+      final matchesCountry =
+          selectedCountries.isEmpty ||
           (source.headquarters != null &&
               selectedCountries.contains(source.headquarters!.isoCode));
-      final matchesType = selectedTypes.isEmpty ||
+      final matchesType =
+          selectedTypes.isEmpty ||
           (source.sourceType != null &&
               selectedTypes.contains(source.sourceType!));
       return matchesCountry && matchesType;

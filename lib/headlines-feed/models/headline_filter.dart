@@ -29,11 +29,11 @@ class HeadlineFilter extends Equatable {
 
   @override
   List<Object?> get props => [
-        categories,
-        sources,
-        selectedSourceCountryIsoCodes,
-        selectedSourceSourceTypes,
-      ];
+    categories,
+    sources,
+    selectedSourceCountryIsoCodes,
+    selectedSourceSourceTypes,
+  ];
 
   /// Creates a copy of this [HeadlineFilter] with the given fields
   /// replaced with the new values.
@@ -46,8 +46,8 @@ class HeadlineFilter extends Equatable {
     return HeadlineFilter(
       categories: categories ?? this.categories,
       sources: sources ?? this.sources,
-      selectedSourceCountryIsoCodes: selectedSourceCountryIsoCodes ??
-          this.selectedSourceCountryIsoCodes,
+      selectedSourceCountryIsoCodes:
+          selectedSourceCountryIsoCodes ?? this.selectedSourceCountryIsoCodes,
       selectedSourceSourceTypes:
           selectedSourceSourceTypes ?? this.selectedSourceSourceTypes,
     );

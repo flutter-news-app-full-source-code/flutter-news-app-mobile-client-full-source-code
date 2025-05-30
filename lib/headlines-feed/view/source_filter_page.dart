@@ -118,7 +118,8 @@ class _SourceFilterView extends StatelessWidget {
             // Or, we could try to persist/retrieve the last known good capsule state.
             // For now, simple retry reloads all.
             const LoadSourceFilterData(
-              initialSelectedSources: [], // Or pass current selections if needed
+              initialSelectedSources:
+                  [], // Or pass current selections if needed
               initialSelectedCountryIsoCodes: {},
               initialSelectedSourceTypes: {},
             ),

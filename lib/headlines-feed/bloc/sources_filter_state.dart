@@ -45,7 +45,8 @@ class SourcesFilterState extends Equatable {
           selectedCountryIsoCodes ?? this.selectedCountryIsoCodes,
       availableSourceTypes: availableSourceTypes ?? this.availableSourceTypes,
       selectedSourceTypes: selectedSourceTypes ?? this.selectedSourceTypes,
-      allAvailableSources: allAvailableSources ?? this.allAvailableSources, // Added
+      allAvailableSources:
+          allAvailableSources ?? this.allAvailableSources, // Added
       displayableSources: displayableSources ?? this.displayableSources,
       finallySelectedSourceIds:
           finallySelectedSourceIds ?? this.finallySelectedSourceIds,

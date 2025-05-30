@@ -22,10 +22,10 @@ class LoadSourceFilterData extends SourcesFilterEvent {
 
   @override
   List<Object?> get props => [
-        initialSelectedSources,
-        initialSelectedCountryIsoCodes,
-        initialSelectedSourceTypes,
-      ];
+    initialSelectedSources,
+    initialSelectedCountryIsoCodes,
+    initialSelectedSourceTypes,
+  ];
 }
 
 class CountryCapsuleToggled extends SourcesFilterEvent {

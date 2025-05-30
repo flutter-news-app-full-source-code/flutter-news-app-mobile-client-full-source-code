@@ -9,8 +9,7 @@ import 'package:ht_main/headlines-feed/models/headline_filter.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/constants/constants.dart';
-import 'package:ht_shared/ht_shared.dart'
-    show Category, Source, SourceType;
+import 'package:ht_shared/ht_shared.dart' show Category, Source, SourceType;
 
 // Keys for passing data to/from SourceFilterPage
 const String keySelectedSources = 'selectedSources';
@@ -56,10 +55,12 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       _tempSelectedCategories = List.from(currentState.filter.categories ?? []);
       _tempSelectedSources = List.from(currentState.filter.sources ?? []);
       // Initialize source capsule states from the BLoC's current filter
-      _tempSelectedSourceCountryIsoCodes =
-          Set.from(currentState.filter.selectedSourceCountryIsoCodes ?? {});
-      _tempSelectedSourceSourceTypes =
-          Set.from(currentState.filter.selectedSourceSourceTypes ?? {});
+      _tempSelectedSourceCountryIsoCodes = Set.from(
+        currentState.filter.selectedSourceCountryIsoCodes ?? {},
+      );
+      _tempSelectedSourceSourceTypes = Set.from(
+        currentState.filter.selectedSourceSourceTypes ?? {},
+      );
     } else {
       _tempSelectedCategories = [];
       _tempSelectedSources = [];

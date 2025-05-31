@@ -50,6 +50,7 @@ class HeadlineItemWidget extends StatelessWidget {
           context.goNamed(
             targetRouteName, // Use the new parameter here
             pathParameters: {'id': headline.id},
+            extra: headline, // Pass the full headline object
           );
         },
         child: Padding(

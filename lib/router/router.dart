@@ -19,7 +19,7 @@ import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/authentication/view/authentication_page.dart';
 import 'package:ht_main/authentication/view/email_code_verification_page.dart';
 import 'package:ht_main/authentication/view/request_code_page.dart';
-// import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart'; // Removed
+import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart'; // Re-added
 import 'package:ht_main/headline-details/view/headline_details_page.dart';
 import 'package:ht_main/headlines-feed/bloc/categories_filter_bloc.dart'; // Import new BLoC
 // import 'package:ht_main/headlines-feed/bloc/countries_filter_bloc.dart'; // Import new BLoC - REMOVED
@@ -341,18 +341,20 @@ GoRouter createRouter({
                     path: 'article/:id', // Relative path
                     name: Routes.articleDetailsName,
                     builder: (context, state) {
-                      // final id = state.pathParameters['id']!; // No longer needed
-                      final headline = state.extra as Headline?;
-                      if (headline == null) {
-                        // Handle missing headline data, perhaps redirect or show error
-                        // For now, returning a placeholder, but a robust app
-                        // might redirect to an error page or back.
-                        return const Scaffold(
-                          body: Center(child: Text('Error: Headline data missing')),
-                        );
-                      }
-                      // No longer need BlocProvider for HeadlineDetailsBloc
-                      return HeadlineDetailsPage(headline: headline);
+                      final headlineFromExtra = state.extra as Headline?;
+                      final headlineIdFromPath = state.pathParameters['id'];
+
+                      return BlocProvider(
+                        create: (context) => HeadlineDetailsBloc(
+                          headlinesRepository:
+                              context.read<HtDataRepository<Headline>>(),
+                        ),
+                        child: HeadlineDetailsPage(
+                          initialHeadline: headlineFromExtra,
+                          // Ensure headlineId is non-null if initialHeadline is null
+                          headlineId: headlineFromExtra?.id ?? headlineIdFromPath,
+                        ),
+                      );
                     },
                   ),
                   // Sub-route for notifications (placeholder) - MOVED HERE
@@ -467,14 +469,18 @@ GoRouter createRouter({
                     path: 'article/:id', // Relative path
                     name: Routes.searchArticleDetailsName, // New route name
                     builder: (context, state) {
-                      // final id = state.pathParameters['id']!; // No longer needed
-                      final headline = state.extra as Headline?;
-                      if (headline == null) {
-                        return const Scaffold(
-                          body: Center(child: Text('Error: Headline data missing')),
-                        );
-                      }
-                      return HeadlineDetailsPage(headline: headline);
+                      final headlineFromExtra = state.extra as Headline?;
+                      final headlineIdFromPath = state.pathParameters['id'];
+                      return BlocProvider(
+                        create: (context) => HeadlineDetailsBloc(
+                          headlinesRepository:
+                              context.read<HtDataRepository<Headline>>(),
+                        ),
+                        child: HeadlineDetailsPage(
+                          initialHeadline: headlineFromExtra,
+                          headlineId: headlineFromExtra?.id ?? headlineIdFromPath,
+                        ),
+                      );
                     },
                   ),
                 ],
@@ -617,14 +623,18 @@ GoRouter createRouter({
                         path: Routes.accountArticleDetails, // 'article/:id'
                         name: Routes.accountArticleDetailsName,
                         builder: (context, state) {
-                          // final id = state.pathParameters['id']!; // No longer needed
-                          final headline = state.extra as Headline?;
-                          if (headline == null) {
-                            return const Scaffold(
-                              body: Center(child: Text('Error: Headline data missing')),
-                            );
-                          }
-                          return HeadlineDetailsPage(headline: headline);
+                          final headlineFromExtra = state.extra as Headline?;
+                          final headlineIdFromPath = state.pathParameters['id'];
+                          return BlocProvider(
+                            create: (context) => HeadlineDetailsBloc(
+                              headlinesRepository:
+                                  context.read<HtDataRepository<Headline>>(),
+                            ),
+                            child: HeadlineDetailsPage(
+                              initialHeadline: headlineFromExtra,
+                              headlineId: headlineFromExtra?.id ?? headlineIdFromPath,
+                            ),
+                          );
                         },
                       ),
                     ],

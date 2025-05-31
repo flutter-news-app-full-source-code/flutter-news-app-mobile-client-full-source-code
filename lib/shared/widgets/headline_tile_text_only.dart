@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart'; // Added
+import 'package:ht_main/entity_details/models/entity_type.dart';
+import 'package:ht_main/entity_details/view/entity_details_page.dart'; // Added for Page Arguments
 import 'package:ht_main/l10n/l10n.dart';
+import 'package:ht_main/router/routes.dart'; // Added
 import 'package:ht_main/shared/constants/app_spacing.dart';
 import 'package:ht_main/shared/utils/utils.dart'; // Import the new utility
 import 'package:ht_shared/ht_shared.dart' show Headline;
@@ -17,6 +21,8 @@ class HeadlineTileTextOnly extends StatelessWidget {
     super.key,
     this.onHeadlineTap,
     this.trailing,
+    this.currentContextEntityType,
+    this.currentContextEntityId,
   });
 
   /// The headline data to display.
@@ -27,6 +33,12 @@ class HeadlineTileTextOnly extends StatelessWidget {
 
   /// An optional widget to display at the end of the tile.
   final Widget? trailing;
+
+  /// The type of the entity currently being viewed in detail (e.g., on a category page).
+  final EntityType? currentContextEntityType;
+
+  /// The ID of the entity currently being viewed in detail.
+  final String? currentContextEntityId;
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +77,10 @@ class HeadlineTileTextOnly extends StatelessWidget {
                       l10n: l10n,
                       colorScheme: colorScheme,
                       textTheme: textTheme,
+                      currentContextEntityType:
+                          currentContextEntityType, // Pass down
+                      currentContextEntityId:
+                          currentContextEntityId, // Pass down
                     ),
                   ],
                 ),
@@ -88,12 +104,16 @@ class _HeadlineMetadataRow extends StatelessWidget {
     required this.l10n,
     required this.colorScheme,
     required this.textTheme,
+    this.currentContextEntityType,
+    this.currentContextEntityId,
   });
 
   final Headline headline;
   final AppLocalizations l10n;
   final ColorScheme colorScheme;
   final TextTheme textTheme;
+  final EntityType? currentContextEntityType;
+  final String? currentContextEntityId;
 
   @override
   Widget build(BuildContext context) {
@@ -137,7 +157,10 @@ class _HeadlineMetadataRow extends StatelessWidget {
               ],
             ),
           ),
-        if (headline.category?.name != null) ...[
+        // Conditionally render Category Chip
+        if (headline.category?.name != null &&
+            !(currentContextEntityType == EntityType.category &&
+                headline.category!.id == currentContextEntityId)) ...[
           if (formattedDate.isNotEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(
@@ -147,15 +170,12 @@ class _HeadlineMetadataRow extends StatelessWidget {
             ),
           GestureDetector(
             onTap: () {
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Tapped Category: ${headline.category!.name}',
-                    ),
-                  ),
+              if (headline.category != null) {
+                context.push(
+                  Routes.categoryDetails,
+                  extra: EntityDetailsPageArguments(entity: headline.category),
                 );
+              }
             },
             child: Chip(
               label: Text(headline.category!.name),
@@ -170,8 +190,14 @@ class _HeadlineMetadataRow extends StatelessWidget {
             ),
           ),
         ],
-        if (headline.source?.name != null) ...[
-          if (formattedDate.isNotEmpty || headline.category?.name != null)
+        // Conditionally render Source Chip
+        if (headline.source?.name != null &&
+            !(currentContextEntityType == EntityType.source &&
+                headline.source!.id == currentContextEntityId)) ...[
+          if (formattedDate.isNotEmpty ||
+              (headline.category?.name != null &&
+                  !(currentContextEntityType == EntityType.category &&
+                      headline.category!.id == currentContextEntityId)))
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.xs / 2,
@@ -180,13 +206,12 @@ class _HeadlineMetadataRow extends StatelessWidget {
             ),
           GestureDetector(
             onTap: () {
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(
-                    content: Text('Tapped Source: ${headline.source!.name}'),
-                  ),
+              if (headline.source != null) {
+                context.push(
+                  Routes.sourceDetails,
+                  extra: EntityDetailsPageArguments(entity: headline.source),
                 );
+              }
             },
             child: Chip(
               label: Text(headline.source!.name),

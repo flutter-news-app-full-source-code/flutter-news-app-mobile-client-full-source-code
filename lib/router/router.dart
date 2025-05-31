@@ -38,8 +38,10 @@ import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/settings/bloc/settings_bloc.dart'; // Added
 import 'package:ht_main/settings/view/appearance_settings_page.dart'; // Added
 import 'package:ht_main/settings/view/feed_settings_page.dart'; // Added
+import 'package:ht_main/settings/view/font_settings_page.dart'; // Added for new page
 import 'package:ht_main/settings/view/notification_settings_page.dart'; // Added
 import 'package:ht_main/settings/view/settings_page.dart'; // Added
+import 'package:ht_main/settings/view/theme_settings_page.dart'; // Added for new page
 import 'package:ht_shared/ht_shared.dart'; // Shared models, FromJson, ToJson, etc.
 
 /// Creates and configures the GoRouter instance for the application.
@@ -567,6 +569,18 @@ GoRouter createRouter({
                             path: Routes.settingsAppearance, // 'appearance' relative to /account/settings
                             name: Routes.settingsAppearanceName,
                             builder: (context, state) => const AppearanceSettingsPage(),
+                            routes: [ // Children of AppearanceSettingsPage
+                              GoRoute(
+                                path: Routes.settingsAppearanceTheme, // 'theme' relative to /account/settings/appearance
+                                name: Routes.settingsAppearanceThemeName,
+                                builder: (context, state) => const ThemeSettingsPage(),
+                              ),
+                              GoRoute(
+                                path: Routes.settingsAppearanceFont, // 'font' relative to /account/settings/appearance
+                                name: Routes.settingsAppearanceFontName,
+                                builder: (context, state) => const FontSettingsPage(),
+                              ),
+                            ],
                           ),
                           GoRoute(
                             path: Routes.settingsFeed, // 'feed' relative to /account/settings

@@ -97,7 +97,14 @@ class FontSettingsPage extends StatelessWidget {
             context: context,
             title: l10n.settingsAppearanceAppFontTypeLabel,
             currentValue: state.userAppSettings!.displaySettings.fontFamily,
-            items: const ['SystemDefault'], // Currently only SystemDefault
+            items: const [
+              'SystemDefault',
+              'Roboto',
+              'OpenSans',
+              'Lato',
+              'Montserrat',
+              'Merriweather',
+            ], // Updated font list
             itemToString: (fontFamily) => _fontFamilyToString(fontFamily, l10n),
             onChanged: (value) {
               if (value != null) {

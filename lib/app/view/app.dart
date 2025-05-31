@@ -181,8 +181,8 @@ class _AppViewState extends State<_AppView> {
                 previous.themeMode != current.themeMode ||
                 previous.flexScheme != current.flexScheme ||
                 previous.fontFamily != current.fontFamily ||
-                previous.appTextScaleFactor !=
-                    current.appTextScaleFactor, // Use text scale factor
+                previous.appTextScaleFactor != current.appTextScaleFactor ||
+                previous.locale != current.locale, // Added locale check
         builder: (context, state) {
           return MaterialApp.router(
             debugShowCheckedModeBanner: false,

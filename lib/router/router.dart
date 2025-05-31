@@ -526,22 +526,19 @@ GoRouter createRouter({
                 name: Routes.accountName,
                 builder: (context, state) => const AccountPage(),
                 routes: [
-                  // Sub-route for settings
-                  GoRoute(
-                    path: Routes.settings, // Relative path 'settings'
-                    name: Routes.settingsName,
-                    builder: (context, state) {
-                      // Provide SettingsBloc here for SettingsPage and its children
-                      // Access AppBloc to get the current user ID
+                  // ShellRoute for settings to provide SettingsBloc to children
+                  ShellRoute(
+                    builder: (BuildContext context, GoRouterState state, Widget child) {
+                      // This builder provides SettingsBloc to all routes within this ShellRoute.
+                      // 'child' will be SettingsPage, AppearanceSettingsPage, etc.
                       final appBloc = context.read<AppBloc>();
                       final userId = appBloc.state.user?.id;
 
-                      return BlocProvider(
+                      return BlocProvider<SettingsBloc>(
                         create: (context) {
                           final settingsBloc = SettingsBloc(
                             userAppSettingsRepository:
-                                context
-                                    .read<HtDataRepository<UserAppSettings>>(),
+                                context.read<HtDataRepository<UserAppSettings>>(),
                           );
                           // Only load settings if a userId is available
                           if (userId != null) {
@@ -550,39 +547,38 @@ GoRouter createRouter({
                             );
                           } else {
                             // Handle case where user is unexpectedly null.
-                            // This might involve logging or emitting an error state
-                            // directly in SettingsBloc if it's designed to handle it,
-                            // or simply not loading settings.
-                            // For now, we'll assume router redirects prevent this.
                             print(
-                              'Warning: User ID is null when creating SettingsBloc. Settings will not be loaded.',
+                              'ShellRoute/SettingsBloc: User ID is null when creating SettingsBloc. Settings will not be loaded.',
                             );
                           }
                           return settingsBloc;
                         },
-                        child: const SettingsPage(), // Use the actual page
+                        child: child, // child is the actual page widget (SettingsPage, AppearanceSettingsPage, etc.)
                       );
                     },
-                    // --- Settings Sub-Routes ---
                     routes: [
                       GoRoute(
-                        path: Routes.settingsAppearance, // 'appearance'
-                        name: Routes.settingsAppearanceName,
-                        builder:
-                            (context, state) => const AppearanceSettingsPage(),
-                        // SettingsBloc is inherited from parent route
-                      ),
-                      GoRoute(
-                        path: Routes.settingsFeed, // 'feed'
-                        name: Routes.settingsFeedName,
-                        builder: (context, state) => const FeedSettingsPage(),
-                      ),
-                      GoRoute(
-                        path: Routes.settingsNotifications, // 'notifications'
-                        name: Routes.settingsNotificationsName,
-                        builder:
-                            (context, state) =>
-                                const NotificationSettingsPage(),
+                        path: Routes.settings, // Relative path 'settings' from /account
+                        name: Routes.settingsName,
+                        builder: (context, state) => const SettingsPage(),
+                        // --- Settings Sub-Routes ---
+                        routes: [
+                          GoRoute(
+                            path: Routes.settingsAppearance, // 'appearance' relative to /account/settings
+                            name: Routes.settingsAppearanceName,
+                            builder: (context, state) => const AppearanceSettingsPage(),
+                          ),
+                          GoRoute(
+                            path: Routes.settingsFeed, // 'feed' relative to /account/settings
+                            name: Routes.settingsFeedName,
+                            builder: (context, state) => const FeedSettingsPage(),
+                          ),
+                          GoRoute(
+                            path: Routes.settingsNotifications, // 'notifications' relative to /account/settings
+                            name: Routes.settingsNotificationsName,
+                            builder: (context, state) => const NotificationSettingsPage(),
+                          ),
+                        ],
                       ),
                     ],
                   ),

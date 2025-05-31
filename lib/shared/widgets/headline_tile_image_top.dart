@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/shared/constants/app_spacing.dart';
+import 'package:ht_main/shared/utils/utils.dart'; // Import the new utility
 import 'package:ht_shared/ht_shared.dart' show Headline;
-import 'package:timeago/timeago.dart' as timeago;
+// timeago import removed from here, handled by utility
 
 /// {@template headline_tile_image_top}
 /// A shared widget to display a headline item with a large image at the top.
@@ -146,94 +147,30 @@ class _HeadlineMetadataRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String formattedDate;
-    if (headline.publishedAt != null) {
-      formattedDate = timeago.format(
-        headline.publishedAt!,
-        locale: Localizations.localeOf(context).languageCode,
-      );
-    } else {
-      formattedDate = '';
-    }
+    final formattedDate = formatRelativeTime(context, headline.publishedAt);
 
     final metadataStyle = textTheme.bodySmall?.copyWith(
       color: colorScheme.onSurfaceVariant,
     );
-    const iconSize = 12.0;
+    final chipLabelStyle = textTheme.labelSmall?.copyWith(
+      color: colorScheme.onSurfaceVariant,
+    );
+    final chipBackgroundColor =
+        colorScheme.surfaceContainerHighest.withOpacity(0.5);
+    const iconSize = 12.0; // Kept for date icon
 
     return Wrap(
-      spacing: AppSpacing.md,
+      spacing: AppSpacing.sm, // Reduced spacing for more compactness
       runSpacing: AppSpacing.xs,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
-        if (headline.category?.name != null)
-          GestureDetector(
-            onTap: () {
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Tapped Category: ${headline.category!.name}',
-                    ),
-                  ),
-                );
-            },
-            child: Chip(
-              avatar: Icon(
-                Icons.label_outline,
-                size: iconSize,
-                color: colorScheme.onSurfaceVariant, // Changed color
-              ),
-              label: Text(headline.category!.name),
-              labelStyle: textTheme.labelSmall?.copyWith(
-                color: colorScheme.onSurfaceVariant, // Changed color
-              ),
-              // backgroundColor removed
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-              visualDensity: VisualDensity.compact,
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-          ),
-        if (headline.source?.name != null)
-          GestureDetector(
-            onTap: () {
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(
-                    content: Text('Tapped Source: ${headline.source!.name}'),
-                  ),
-                );
-            },
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.source_outlined,
-                  size: iconSize,
-                  color: colorScheme.onSurfaceVariant,
-                ),
-                const SizedBox(width: AppSpacing.xs),
-                Flexible(
-                  child: Text(
-                    headline.source!.name,
-                    style: metadataStyle,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-          ),
         if (formattedDate.isNotEmpty)
           GestureDetector(
             onTap: () {
               ScaffoldMessenger.of(context)
                 ..hideCurrentSnackBar()
                 ..showSnackBar(
-                  SnackBar(
-                    content: Text('Tapped Date: $formattedDate'),
-                  ),
+                  SnackBar(content: Text('Tapped Date: $formattedDate')),
                 );
             },
             child: Row(
@@ -249,6 +186,61 @@ class _HeadlineMetadataRow extends StatelessWidget {
               ],
             ),
           ),
+        if (headline.category?.name != null) ...[
+          if (formattedDate.isNotEmpty)
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: AppSpacing.xs / 2),
+              child: Text('•', style: metadataStyle),
+            ),
+          GestureDetector(
+            onTap: () {
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  SnackBar(
+                    content:
+                        Text('Tapped Category: ${headline.category!.name}'),
+                  ),
+                );
+            },
+            child: Chip(
+              label: Text(headline.category!.name),
+              labelStyle: chipLabelStyle,
+              backgroundColor: chipBackgroundColor,
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+              visualDensity: VisualDensity.compact,
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ),
+        ],
+        if (headline.source?.name != null) ...[
+          if (formattedDate.isNotEmpty || headline.category?.name != null)
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: AppSpacing.xs / 2),
+              child: Text('•', style: metadataStyle),
+            ),
+          GestureDetector(
+            onTap: () {
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  SnackBar(
+                    content: Text('Tapped Source: ${headline.source!.name}'),
+                  ),
+                );
+            },
+            child: Chip(
+              label: Text(headline.source!.name),
+              labelStyle: chipLabelStyle,
+              backgroundColor: chipBackgroundColor,
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+              visualDensity: VisualDensity.compact,
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ),
+        ],
       ],
     );
   }

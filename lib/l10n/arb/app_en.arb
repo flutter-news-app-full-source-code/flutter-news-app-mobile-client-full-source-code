@@ -783,5 +783,9 @@
     "shareActionTooltip": "Share headline",
     "@shareActionTooltip": {
         "description": "Tooltip for the share button on the headline details page"
+    },
+    "sharingUnavailableSnackbar": "Sharing is not available on this device or platform.",
+    "@sharingUnavailableSnackbar": {
+        "description": "Snackbar message shown when sharing is unavailable"
     }
 }

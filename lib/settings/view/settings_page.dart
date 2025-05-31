@@ -90,6 +90,13 @@ class SettingsPage extends StatelessWidget {
                 title: l10n.settingsNotificationsTitle, // Add l10n key
                 onTap: () => context.goNamed(Routes.settingsNotificationsName),
               ),
+              const Divider(indent: AppSpacing.lg, endIndent: AppSpacing.lg),
+              _buildSettingsTile(
+                context: context,
+                icon: Icons.language_outlined,
+                title: l10n.settingsLanguageTitle, // Add l10n key
+                onTap: () => context.goNamed(Routes.settingsLanguageName),
+              ),
             ],
           );
         },

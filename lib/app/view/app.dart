@@ -192,15 +192,18 @@ class _AppViewState extends State<_AppView> {
               scheme: state.flexScheme,
               appTextScaleFactor:
                   state.settings.displaySettings.textScaleFactor,
+              appFontWeight: state.settings.displaySettings.fontWeight, // Added
               fontFamily: state.settings.displaySettings.fontFamily,
             ),
             darkTheme: darkTheme(
               scheme: state.flexScheme,
               appTextScaleFactor:
                   state.settings.displaySettings.textScaleFactor,
+              appFontWeight: state.settings.displaySettings.fontWeight, // Added
               fontFamily: state.settings.displaySettings.fontFamily,
             ),
             routerConfig: _router,
+            locale: state.locale, // Use locale from AppBloc state
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
           );

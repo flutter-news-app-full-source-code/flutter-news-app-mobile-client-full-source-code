@@ -787,5 +787,13 @@
     "sharingUnavailableSnackbar": "المشاركة غير متاحة على هذا الجهاز أو المنصة.",
     "@sharingUnavailableSnackbar": {
         "description": "Snackbar message shown when sharing is unavailable"
+    },
+    "similarHeadlinesSectionTitle": "قد يعجبك ايضا",
+    "@similarHeadlinesSectionTitle": {
+        "description": "Title for the similar headlines section on the details page"
+    },
+    "similarHeadlinesEmpty": "لم يتم العثور على عناوين مشابهة.",
+    "@similarHeadlinesEmpty": {
+        "description": "Message shown when no similar headlines are found"
     }
 }

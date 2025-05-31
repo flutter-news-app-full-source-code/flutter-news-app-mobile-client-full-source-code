@@ -397,6 +397,29 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
 
     final chips = <Widget>[];
 
+    // 1. Add Date Chip First
+    if (headline.publishedAt != null) {
+      final formattedDate = DateFormat(
+        'MMM d, yyyy',
+      ).format(headline.publishedAt!);
+      chips.add(
+        Chip(
+          avatar: Icon(
+            Icons.date_range,
+            size: chipAvatarSize,
+            color: chipAvatarColor,
+          ),
+          label: Text(formattedDate),
+          labelStyle: chipLabelStyle,
+          backgroundColor: chipBackgroundColor,
+          padding: chipPadding,
+          visualDensity: chipVisualDensity,
+          materialTapTargetSize: chipMaterialTapTargetSize,
+        ),
+      );
+    }
+
+    // 2. Add Source Chip Second
     if (headline.source != null) {
       chips.add(
         GestureDetector(
@@ -423,29 +446,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       );
     }
 
-    if (headline.publishedAt != null) {
-      final formattedDate = DateFormat(
-        'MMM d, yyyy',
-      ).format(headline.publishedAt!);
-      chips.add(
-        Chip(
-          avatar: Icon(
-            Icons.date_range,
-            size: chipAvatarSize,
-            color: chipAvatarColor,
-          ),
-          label: Text(formattedDate),
-          labelStyle: chipLabelStyle,
-          backgroundColor: chipBackgroundColor,
-          padding: chipPadding,
-          visualDensity: chipVisualDensity,
-          materialTapTargetSize: chipMaterialTapTargetSize,
-        ),
-      );
-    }
-
     // Country chip for headline.source.headquarters removed.
 
+    // 3. Add Category Chip Third
     if (headline.category != null) {
       chips.add(
         GestureDetector(

@@ -39,6 +39,10 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       context
           .read<HeadlineDetailsBloc>()
           .add(HeadlineProvided(widget.initialHeadline!));
+      // Also trigger fetching similar headlines if the main one is already provided
+      context
+          .read<SimilarHeadlinesBloc>()
+          .add(FetchSimilarHeadlines(currentHeadline: widget.initialHeadline!));
     } else if (widget.headlineId != null) {
       context
           .read<HeadlineDetailsBloc>()
@@ -50,141 +54,146 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
-    return SafeArea(
-      child: Scaffold(
-        body: BlocListener<AccountBloc, AccountState>(
-          listenWhen: (previous, current) {
-            final detailsState = context.read<HeadlineDetailsBloc>().state;
-            if (detailsState is HeadlineDetailsLoaded) {
-              if (current.status == AccountStatus.failure &&
-                  previous.status != AccountStatus.failure) {
-                return true;
+    return BlocListener<HeadlineDetailsBloc, HeadlineDetailsState>(
+      listener: (context, headlineState) {
+        if (headlineState is HeadlineDetailsLoaded) {
+          // Once the main headline is loaded (if fetched by ID),
+          // fetch similar ones.
+          // This check ensures it's not re-triggered if already loaded via initialHeadline.
+          if (widget.initialHeadline == null) {
+            context.read<SimilarHeadlinesBloc>().add(
+                  FetchSimilarHeadlines(currentHeadline: headlineState.headline),
+                );
+          }
+        }
+      },
+      child: SafeArea(
+        child: Scaffold(
+          body: BlocListener<AccountBloc, AccountState>(
+            listenWhen: (previous, current) {
+              final detailsState = context.read<HeadlineDetailsBloc>().state;
+              if (detailsState is HeadlineDetailsLoaded) {
+                if (current.status == AccountStatus.failure &&
+                    previous.status != AccountStatus.failure) {
+                  return true;
+                }
+                final currentHeadlineId = detailsState.headline.id;
+                final wasPreviouslySaved =
+                    previous.preferences?.savedHeadlines.any(
+                          (h) => h.id == currentHeadlineId,
+                        ) ??
+                        false;
+                final isCurrentlySaved =
+                    current.preferences?.savedHeadlines.any(
+                          (h) => h.id == currentHeadlineId,
+                        ) ??
+                        false;
+                return (wasPreviouslySaved != isCurrentlySaved) ||
+                    (current.status == AccountStatus.success &&
+                        previous.status != AccountStatus.success);
               }
-              final currentHeadlineId = detailsState.headline.id;
-              final wasPreviouslySaved =
-                  previous.preferences?.savedHeadlines.any(
-                    (h) => h.id == currentHeadlineId,
-                  ) ??
-                  false;
-              final isCurrentlySaved =
-                  current.preferences?.savedHeadlines.any(
-                    (h) => h.id == currentHeadlineId,
-                  ) ??
-                  false;
-              return (wasPreviouslySaved != isCurrentlySaved) ||
-                  (current.status == AccountStatus.success &&
-                      previous.status != AccountStatus.success);
-            }
-            return false;
-          },
-          listener: (context, accountState) {
-            final detailsState = context.read<HeadlineDetailsBloc>().state;
-            if (detailsState is HeadlineDetailsLoaded) {
-              final nowIsSaved =
-                  accountState.preferences?.savedHeadlines.any(
-                    (h) => h.id == detailsState.headline.id,
-                  ) ??
-                  false;
-
-              if (accountState.status == AccountStatus.failure &&
-                  accountState.errorMessage != null) {
-                ScaffoldMessenger.of(context)
-                  ..hideCurrentSnackBar()
-                  ..showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        accountState.errorMessage ??
-                            l10n.headlineSaveErrorSnackbar,
-                      ),
-                      backgroundColor: Theme.of(context).colorScheme.error,
-                    ),
-                  );
-              } else {
-                ScaffoldMessenger.of(context)
-                  ..hideCurrentSnackBar()
-                  ..showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        nowIsSaved
-                            ? l10n.headlineSavedSuccessSnackbar
-                            : l10n.headlineUnsavedSuccessSnackbar,
-                      ),
-                      duration: const Duration(seconds: 2),
-                    ),
-                  );
-              }
-            }
-          },
-          child: BlocBuilder<HeadlineDetailsBloc, HeadlineDetailsState>(
-            builder: (context, state) {
-              return switch (state) {
-                HeadlineDetailsInitial() ||
-                HeadlineDetailsLoading() =>
-                  LoadingStateWidget(
-                    icon: Icons.downloading,
-                    headline: l10n.headlineDetailsLoadingHeadline,
-                    subheadline: l10n.headlineDetailsLoadingSubheadline,
-                  ),
-                final HeadlineDetailsFailure failureState => FailureStateWidget(
-                    message: failureState.message,
-                    onRetry: () {
-                      if (widget.headlineId != null) {
-                        context
-                            .read<HeadlineDetailsBloc>()
-                            .add(FetchHeadlineById(widget.headlineId!));
-                      }
-                      // If only initialHeadline was provided and it failed to load
-                      // (which shouldn't happen with HeadlineProvided),
-                      // there's no ID to refetch. Consider a different UI.
-                    },
-                  ),
-                final HeadlineDetailsLoaded loadedState =>
-                  _buildLoadedContent(context, loadedState.headline),
-                // Add a default case to satisfy exhaustiveness
-                _ => const Center(child: Text('Unknown state')),
-              };
+              return false;
             },
+            listener: (context, accountState) {
+              final detailsState = context.read<HeadlineDetailsBloc>().state;
+              if (detailsState is HeadlineDetailsLoaded) {
+                final nowIsSaved =
+                    accountState.preferences?.savedHeadlines.any(
+                          (h) => h.id == detailsState.headline.id,
+                        ) ??
+                        false;
+
+                if (accountState.status == AccountStatus.failure &&
+                    accountState.errorMessage != null) {
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          accountState.errorMessage ??
+                              l10n.headlineSaveErrorSnackbar,
+                        ),
+                        backgroundColor: Theme.of(context).colorScheme.error,
+                      ),
+                    );
+                } else {
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          nowIsSaved
+                              ? l10n.headlineSavedSuccessSnackbar
+                              : l10n.headlineUnsavedSuccessSnackbar,
+                        ),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                }
+              }
+            },
+            child: BlocBuilder<HeadlineDetailsBloc, HeadlineDetailsState>(
+              builder: (context, state) {
+                return switch (state) {
+                  HeadlineDetailsInitial() ||
+                  HeadlineDetailsLoading() =>
+                    LoadingStateWidget(
+                      icon: Icons.downloading,
+                      headline: l10n.headlineDetailsLoadingHeadline,
+                      subheadline: l10n.headlineDetailsLoadingSubheadline,
+                    ),
+                  final HeadlineDetailsFailure failureState =>
+                    FailureStateWidget(
+                      message: failureState.message,
+                      onRetry: () {
+                        if (widget.headlineId != null) {
+                          context
+                              .read<HeadlineDetailsBloc>()
+                              .add(FetchHeadlineById(widget.headlineId!));
+                        }
+                      },
+                    ),
+                  final HeadlineDetailsLoaded loadedState =>
+                    _buildLoadedContent(context, loadedState.headline),
+                  _ => const Center(child: Text('Unknown state')),
+                };
+              },
+            ),
           ),
         ),
       ),
     );
   }
 
-  /// Builds the main content area using CustomScrollView and Slivers.
   Widget _buildLoadedContent(BuildContext context, Headline headline) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
 
-    // Define horizontal padding once
     const horizontalPadding = EdgeInsets.symmetric(
       horizontal: AppSpacing.paddingLarge,
     );
 
-    // Return CustomScrollView instead of SingleChildScrollView
-    // Watch AccountBloc state for saved status
     final accountState = context.watch<AccountBloc>().state;
     final isSaved =
         accountState.preferences?.savedHeadlines.any(
-          (h) => h.id == headline.id,
-        ) ??
-        false;
+              (h) => h.id == headline.id,
+            ) ??
+            false;
 
     final bookmarkButton = IconButton(
       icon: Icon(isSaved ? Icons.bookmark : Icons.bookmark_border),
-      tooltip:
-          isSaved
-              ? l10n.headlineDetailsRemoveFromSavedTooltip
-              : l10n.headlineDetailsSaveTooltip,
+      tooltip: isSaved
+          ? l10n.headlineDetailsRemoveFromSavedTooltip
+          : l10n.headlineDetailsSaveTooltip,
       onPressed: () {
         context.read<AccountBloc>().add(
-          AccountSaveHeadlineToggled(headline: headline),
-        );
+              AccountSaveHeadlineToggled(headline: headline),
+            );
       },
     );
 
-    // Use a Builder to get the correct context for sharePositionOrigin
     final Widget shareButtonWidget = Builder(
       builder: (BuildContext buttonContext) {
         return IconButton(
@@ -197,53 +206,37 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
               sharePositionOrigin = box.localToGlobal(Offset.zero) & box.size;
             }
 
-            String shareText = headline.title;
-            if (headline.url != null && headline.url!.isNotEmpty) {
-              shareText += '\n\n${headline.url}';
-            }
-
             ShareParams params;
             if (kIsWeb && headline.url != null && headline.url!.isNotEmpty) {
-              // For web, prioritize sharing the URL directly as a URI.
-              // The 'title' in ShareParams might be used by some platforms or if
-              // the plugin's web handling evolves to use it with navigator.share's title field.
               params = ShareParams(
                 uri: Uri.parse(headline.url!),
-                title: headline.title, // Title hint for the shared content
+                title: headline.title,
                 sharePositionOrigin: sharePositionOrigin,
               );
             } else if (headline.url != null && headline.url!.isNotEmpty) {
-              // For native platforms with a URL, combine title and URL in text.
-              // Subject can be used by email clients.
               params = ShareParams(
                 text: '${headline.title}\n\n${headline.url!}',
                 subject: headline.title,
                 sharePositionOrigin: sharePositionOrigin,
               );
             } else {
-              // No URL, share only the title as text (works for all platforms).
               params = ShareParams(
                 text: headline.title,
-                subject: headline.title, // Subject for email clients
+                subject: headline.title,
                 sharePositionOrigin: sharePositionOrigin,
               );
             }
 
             final shareResult = await SharePlus.instance.share(params);
 
-            // Optional: Handle ShareResult for user feedback
-            if (buttonContext.mounted) { // Check if context is still valid
+            if (buttonContext.mounted) {
               if (shareResult.status == ShareResultStatus.unavailable) {
                 ScaffoldMessenger.of(buttonContext).showSnackBar(
                   SnackBar(
-                    content: Text(
-                      l10n.sharingUnavailableSnackbar, // Add this l10n key
-                    ),
+                    content: Text(l10n.sharingUnavailableSnackbar),
                   ),
                 );
               }
-              // You can add more feedback for success/dismissed if desired
-              // e.g., print('Share result: ${shareResult.status}, raw: ${shareResult.raw}');
             }
           },
         );
@@ -252,33 +245,25 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
 
     return CustomScrollView(
       slivers: [
-        // --- App Bar ---
         SliverAppBar(
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () => Navigator.of(context).pop(),
           ),
-          actions: [bookmarkButton, shareButtonWidget], // Use the new widget
-          // Pinned=false, floating=true, snap=true is common for news apps
+          actions: [bookmarkButton, shareButtonWidget],
           pinned: false,
-          floating: true, // Trailing comma
-          snap: true, // Trailing comma
-          // Transparent background to let content scroll behind if needed
-          backgroundColor: Colors.transparent, // Trailing comma
-          elevation: 0, // Trailing comma
-          // Ensure icons use appropriate theme color
-          foregroundColor:
-              theme.colorScheme.onSurface, // Trailing comma (optional if last)
-        ), // SliverAppBar
-        // --- Title ---
+          floating: true,
+          snap: true,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          foregroundColor: theme.colorScheme.onSurface,
+        ),
         SliverPadding(
           padding: horizontalPadding.copyWith(top: AppSpacing.lg),
           sliver: SliverToBoxAdapter(
             child: Text(headline.title, style: textTheme.headlineMedium),
           ),
         ),
-
-        // --- Image ---
         if (headline.imageUrl != null)
           SliverPadding(
             padding: const EdgeInsets.only(
@@ -292,7 +277,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                 child: Image.network(
                   headline.imageUrl!,
                   width: double.infinity,
-                  height: 200, // Keep fixed height or make adaptive
+                  height: 200,
                   fit: BoxFit.cover,
                   loadingBuilder: (context, child, loadingProgress) {
                     if (loadingProgress == null) return child;
@@ -303,35 +288,30 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                       child: const Center(child: CircularProgressIndicator()),
                     );
                   },
-                  errorBuilder:
-                      (context, error, stackTrace) => Container(
-                        width: double.infinity,
-                        height: 200,
-                        color: colorScheme.surfaceContainerHighest,
-                        child: Icon(
-                          Icons.broken_image,
-                          color: colorScheme.onSurfaceVariant,
-                          size: AppSpacing.xxl,
-                        ),
-                      ),
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    width: double.infinity,
+                    height: 200,
+                    color: colorScheme.surfaceContainerHighest,
+                    child: Icon(
+                      Icons.broken_image,
+                      color: colorScheme.onSurfaceVariant,
+                      size: AppSpacing.xxl,
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
-
-        // --- Metadata Section (Wrap based) ---
         SliverPadding(
           padding: horizontalPadding.copyWith(top: AppSpacing.lg),
           sliver: SliverToBoxAdapter(
             child: Wrap(
-              spacing: AppSpacing.sm, // Horizontal space between chips
-              runSpacing: AppSpacing.sm, // Vertical space between lines
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
               children: _buildMetadataChips(context, headline),
             ),
           ),
         ),
-
-        // --- Description ---
         if (headline.description != null)
           SliverPadding(
             padding: horizontalPadding.copyWith(top: AppSpacing.lg),
@@ -339,11 +319,8 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
               child: Text(headline.description!, style: textTheme.bodyLarge),
             ),
           ),
-
-        // --- Continue Reading Button ---
         if (headline.url != null)
           SliverPadding(
-            // Add extra space before the button and bottom padding
             padding: horizontalPadding.copyWith(
               top: AppSpacing.xl,
               bottom: AppSpacing.paddingLarge,
@@ -353,7 +330,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () async {
-                    // Consider adding error handling for launchUrlString
                     await launchUrlString(headline.url!);
                   },
                   child: Text(l10n.headlineDetailsContinueReadingButton),
@@ -361,19 +337,16 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
               ),
             ),
           ),
-
-        // Add some bottom space if no button exists
         if (headline.url == null)
           const SliverPadding(
             padding: EdgeInsets.only(bottom: AppSpacing.paddingLarge),
             sliver: SliverToBoxAdapter(child: SizedBox.shrink()),
           ),
-        // --- Similar Headlines Section ---
         SliverToBoxAdapter(
           child: Padding(
             padding: horizontalPadding.copyWith(top: AppSpacing.xl),
             child: Text(
-              l10n.similarHeadlinesSectionTitle, // Add this l10n key
+              l10n.similarHeadlinesSectionTitle,
               style: textTheme.titleLarge,
             ),
           ),
@@ -383,7 +356,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     );
   }
 
-  /// Helper function to generate the list of metadata Chips for the Wrap.
   List<Widget> _buildMetadataChips(BuildContext context, Headline headline) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
@@ -400,17 +372,14 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
 
     final chips = <Widget>[];
 
-    // Source Chip
     if (headline.source != null) {
-      // Source model doesn't have a logoUrl, using a generic icon.
       chips.add(
         Chip(
           avatar: Icon(
-            Icons.source, // Generic source icon
+            Icons.source,
             size: chipAvatarSize,
             color: chipAvatarColor,
           ),
-          // Use source.name
           label: Text(headline.source!.name),
           labelStyle: chipLabelStyle,
           backgroundColor: chipBackgroundColor,
@@ -421,11 +390,8 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       );
     }
 
-    // Date Chip
     if (headline.publishedAt != null) {
-      final formattedDate = DateFormat(
-        'MMM d, yyyy',
-      ).format(headline.publishedAt!);
+      final formattedDate = DateFormat('MMM d, yyyy').format(headline.publishedAt!);
       chips.add(
         Chip(
           avatar: Icon(
@@ -443,7 +409,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       );
     }
 
-    // Country Chip (from Source Headquarters)
     if (headline.source?.headquarters != null) {
       final country = headline.source!.headquarters!;
       chips.add(
@@ -452,9 +417,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
             radius: chipAvatarSize / 2,
             backgroundColor: Colors.transparent,
             backgroundImage: NetworkImage(country.flagUrl),
-            onBackgroundImageError: (exception, stackTrace) {
-              // Optional: Handle image loading errors, e.g., show placeholder
-            },
+            onBackgroundImageError: (exception, stackTrace) {},
           ),
           label: Text(country.name),
           labelStyle: chipLabelStyle,
@@ -466,11 +429,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       );
     }
 
-    // Category Chip (No avatar for individual category)
     if (headline.category != null) {
       chips.add(
         Chip(
-          // Use category.name
           label: Text(headline.category!.name),
           labelStyle: chipLabelStyle,
           backgroundColor: chipBackgroundColor,
@@ -480,7 +441,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
         ),
       );
     }
-
     return chips;
   }
 
@@ -511,7 +471,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: Text(
-                  l10n.similarHeadlinesEmpty, // Add this l10n key
+                  l10n.similarHeadlinesEmpty,
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -520,15 +480,11 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
                   final similarHeadline = loadedState.similarHeadlines[index];
-                  // Use a more compact item or reuse HeadlineItemWidget
-                  // For now, reusing HeadlineItemWidget for simplicity
                   return Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.paddingMedium,
                       vertical: AppSpacing.sm,
                     ),
-                    // Navigate to a new HeadlineDetailsPage instance
-                    // Ensure the targetRouteName is appropriate or handle navigation differently
                     child: HeadlineItemWidget(
                       headline: similarHeadline,
                       targetRouteName: Routes.articleDetailsName,
@@ -538,7 +494,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                 childCount: loadedState.similarHeadlines.length,
               ),
             ),
-          // Add a default case to satisfy exhaustiveness for the switch statement
           _ => const SliverToBoxAdapter(child: SizedBox.shrink()),
         };
       },

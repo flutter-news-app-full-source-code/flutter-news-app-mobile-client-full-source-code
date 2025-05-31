@@ -779,5 +779,13 @@
     "headlineSaveErrorSnackbar": "تعذر تحديث حالة الحفظ. يرجى المحاولة مرة أخرى.",
     "@headlineSaveErrorSnackbar": {
         "description": "Snackbar message shown when saving/unsaving a headline fails"
+    },
+    "shareActionTooltip": "مشاركة العنوان",
+    "@shareActionTooltip": {
+        "description": "Tooltip for the share button on the headline details page"
+    },
+    "sharingUnavailableSnackbar": "المشاركة غير متاحة على هذا الجهاز أو المنصة.",
+    "@sharingUnavailableSnackbar": {
+        "description": "Snackbar message shown when sharing is unavailable"
     }
 }

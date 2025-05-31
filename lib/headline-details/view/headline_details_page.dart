@@ -1,41 +1,63 @@
 //
 // ignore_for_file: avoid_redundant_argument_values
 
+import 'package:flutter/foundation.dart' show kIsWeb; // Import kIsWeb
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_main/account/bloc/account_bloc.dart'; // Import AccountBloc
-import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart';
+import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart'; // Import BLoC
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/shared/shared.dart';
 import 'package:ht_shared/ht_shared.dart'
     show Headline; // Import Headline model
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart'; // Import share_plus
 import 'package:url_launcher/url_launcher_string.dart';
 
-class HeadlineDetailsPage extends StatelessWidget {
-  const HeadlineDetailsPage({required this.headlineId, super.key});
+class HeadlineDetailsPage extends StatefulWidget {
+  const HeadlineDetailsPage({
+    super.key,
+    this.headlineId,
+    this.initialHeadline,
+  }) : assert(headlineId != null || initialHeadline != null);
 
-  final String headlineId;
+  final String? headlineId;
+  final Headline? initialHeadline;
+
+  @override
+  State<HeadlineDetailsPage> createState() => _HeadlineDetailsPageState();
+}
+
+class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialHeadline != null) {
+      context
+          .read<HeadlineDetailsBloc>()
+          .add(HeadlineProvided(widget.initialHeadline!));
+    } else if (widget.headlineId != null) {
+      context
+          .read<HeadlineDetailsBloc>()
+          .add(FetchHeadlineById(widget.headlineId!));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    // Keep a reference to headlineDetailsState to use in BlocListener
-    final headlineDetailsState = context.watch<HeadlineDetailsBloc>().state;
 
     return SafeArea(
       child: Scaffold(
-        // Body contains the BlocBuilder which returns either state widgets
-        // or the scroll view
         body: BlocListener<AccountBloc, AccountState>(
           listenWhen: (previous, current) {
-            // Listen if status is failure or if the saved status of *this* headline changed
-            if (current.status == AccountStatus.failure &&
-                previous.status != AccountStatus.failure) {
-              return true;
-            }
-            if (headlineDetailsState is HeadlineDetailsLoaded) {
-              final currentHeadlineId = headlineDetailsState.headline.id;
+            final detailsState = context.read<HeadlineDetailsBloc>().state;
+            if (detailsState is HeadlineDetailsLoaded) {
+              if (current.status == AccountStatus.failure &&
+                  previous.status != AccountStatus.failure) {
+                return true;
+              }
+              final currentHeadlineId = detailsState.headline.id;
               final wasPreviouslySaved =
                   previous.preferences?.savedHeadlines.any(
                     (h) => h.id == currentHeadlineId,
@@ -46,8 +68,6 @@ class HeadlineDetailsPage extends StatelessWidget {
                     (h) => h.id == currentHeadlineId,
                   ) ??
                   false;
-              // Listen if the specific headline's saved status changed OR
-              // if a general success occurred (e.g. after an optimistic update that might not change the list length but confirms persistence)
               return (wasPreviouslySaved != isCurrentlySaved) ||
                   (current.status == AccountStatus.success &&
                       previous.status != AccountStatus.success);
@@ -55,11 +75,11 @@ class HeadlineDetailsPage extends StatelessWidget {
             return false;
           },
           listener: (context, accountState) {
-            if (headlineDetailsState is HeadlineDetailsLoaded) {
-              final currentHeadline = headlineDetailsState.headline;
+            final detailsState = context.read<HeadlineDetailsBloc>().state;
+            if (detailsState is HeadlineDetailsLoaded) {
               final nowIsSaved =
                   accountState.preferences?.savedHeadlines.any(
-                    (h) => h.id == currentHeadline.id,
+                    (h) => h.id == detailsState.headline.id,
                   ) ??
                   false;
 
@@ -72,12 +92,11 @@ class HeadlineDetailsPage extends StatelessWidget {
                       content: Text(
                         accountState.errorMessage ??
                             l10n.headlineSaveErrorSnackbar,
-                      ), // Use specific or generic error
+                      ),
                       backgroundColor: Theme.of(context).colorScheme.error,
                     ),
                   );
               } else {
-                // Only show success snackbar if the state isn't failure
                 ScaffoldMessenger.of(context)
                   ..hideCurrentSnackBar()
                   ..showSnackBar(
@@ -94,36 +113,32 @@ class HeadlineDetailsPage extends StatelessWidget {
             }
           },
           child: BlocBuilder<HeadlineDetailsBloc, HeadlineDetailsState>(
-            // No need to re-watch headlineDetailsState here, already have it.
-            // builder: (context, state) // state here is headlineDetailsState
-            builder: (context, headlineDetailsBuilderState) {
-              // Handle Loading/Initial/Failure states outside the scroll view
-              // for better user experience.
-              // Use headlineDetailsBuilderState for the switch
-              return switch (headlineDetailsBuilderState) {
-                HeadlineDetailsInitial _ => InitialStateWidget(
-                  icon: Icons.article,
-                  headline: l10n.headlineDetailsInitialHeadline,
-                  subheadline: l10n.headlineDetailsInitialSubheadline,
-                ),
-                HeadlineDetailsLoading _ => LoadingStateWidget(
-                  icon: Icons.downloading,
-                  headline: l10n.headlineDetailsLoadingHeadline,
-                  subheadline: l10n.headlineDetailsLoadingSubheadline,
-                ),
-                final HeadlineDetailsFailure state => FailureStateWidget(
-                  message: state.message,
-                  onRetry: () {
-                    context.read<HeadlineDetailsBloc>().add(
-                      HeadlineDetailsRequested(headlineId: headlineId),
-                    );
-                  },
-                ),
-                final HeadlineDetailsLoaded state => _buildLoadedContent(
-                  context,
-                  state.headline,
-                ),
-                _ => const SizedBox.shrink(), // Should not happen in practice
+            builder: (context, state) {
+              return switch (state) {
+                HeadlineDetailsInitial() ||
+                HeadlineDetailsLoading() =>
+                  LoadingStateWidget(
+                    icon: Icons.downloading,
+                    headline: l10n.headlineDetailsLoadingHeadline,
+                    subheadline: l10n.headlineDetailsLoadingSubheadline,
+                  ),
+                final HeadlineDetailsFailure failureState => FailureStateWidget(
+                    message: failureState.message,
+                    onRetry: () {
+                      if (widget.headlineId != null) {
+                        context
+                            .read<HeadlineDetailsBloc>()
+                            .add(FetchHeadlineById(widget.headlineId!));
+                      }
+                      // If only initialHeadline was provided and it failed to load
+                      // (which shouldn't happen with HeadlineProvided),
+                      // there's no ID to refetch. Consider a different UI.
+                    },
+                  ),
+                final HeadlineDetailsLoaded loadedState =>
+                  _buildLoadedContent(context, loadedState.headline),
+                // Add a default case to satisfy exhaustiveness
+                _ => const Center(child: Text('Unknown state')),
               };
             },
           ),
@@ -166,10 +181,69 @@ class HeadlineDetailsPage extends StatelessWidget {
       },
     );
 
-    final shareButton = IconButton(
-      icon: const Icon(Icons.share),
-      onPressed: () {
-        // TODO(fulleni): Implement share functionality
+    // Use a Builder to get the correct context for sharePositionOrigin
+    final Widget shareButtonWidget = Builder(
+      builder: (BuildContext buttonContext) {
+        return IconButton(
+          icon: const Icon(Icons.share),
+          tooltip: l10n.shareActionTooltip,
+          onPressed: () async {
+            final box = buttonContext.findRenderObject() as RenderBox?;
+            Rect? sharePositionOrigin;
+            if (box != null) {
+              sharePositionOrigin = box.localToGlobal(Offset.zero) & box.size;
+            }
+
+            String shareText = headline.title;
+            if (headline.url != null && headline.url!.isNotEmpty) {
+              shareText += '\n\n${headline.url}';
+            }
+
+            ShareParams params;
+            if (kIsWeb && headline.url != null && headline.url!.isNotEmpty) {
+              // For web, prioritize sharing the URL directly as a URI.
+              // The 'title' in ShareParams might be used by some platforms or if
+              // the plugin's web handling evolves to use it with navigator.share's title field.
+              params = ShareParams(
+                uri: Uri.parse(headline.url!),
+                title: headline.title, // Title hint for the shared content
+                sharePositionOrigin: sharePositionOrigin,
+              );
+            } else if (headline.url != null && headline.url!.isNotEmpty) {
+              // For native platforms with a URL, combine title and URL in text.
+              // Subject can be used by email clients.
+              params = ShareParams(
+                text: '${headline.title}\n\n${headline.url!}',
+                subject: headline.title,
+                sharePositionOrigin: sharePositionOrigin,
+              );
+            } else {
+              // No URL, share only the title as text (works for all platforms).
+              params = ShareParams(
+                text: headline.title,
+                subject: headline.title, // Subject for email clients
+                sharePositionOrigin: sharePositionOrigin,
+              );
+            }
+
+            final shareResult = await SharePlus.instance.share(params);
+
+            // Optional: Handle ShareResult for user feedback
+            if (buttonContext.mounted) { // Check if context is still valid
+              if (shareResult.status == ShareResultStatus.unavailable) {
+                ScaffoldMessenger.of(buttonContext).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      l10n.sharingUnavailableSnackbar, // Add this l10n key
+                    ),
+                  ),
+                );
+              }
+              // You can add more feedback for success/dismissed if desired
+              // e.g., print('Share result: ${shareResult.status}, raw: ${shareResult.raw}');
+            }
+          },
+        );
       },
     );
 
@@ -181,7 +255,7 @@ class HeadlineDetailsPage extends StatelessWidget {
             icon: const Icon(Icons.arrow_back),
             onPressed: () => Navigator.of(context).pop(),
           ),
-          actions: [bookmarkButton, shareButton],
+          actions: [bookmarkButton, shareButtonWidget], // Use the new widget
           // Pinned=false, floating=true, snap=true is common for news apps
           pinned: false,
           floating: true, // Trailing comma

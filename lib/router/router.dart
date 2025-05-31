@@ -388,6 +388,7 @@ GoRouter createRouter({
 
                       return MultiBlocProvider(
                         providers: [
+                          BlocProvider.value(value: accountBloc), // Added
                           BlocProvider(
                             create:
                                 (context) => HeadlineDetailsBloc(
@@ -530,6 +531,7 @@ GoRouter createRouter({
                       final headlineIdFromPath = state.pathParameters['id'];
                       return MultiBlocProvider(
                         providers: [
+                          BlocProvider.value(value: accountBloc), // Added
                           BlocProvider(
                             create:
                                 (context) => HeadlineDetailsBloc(
@@ -744,6 +746,7 @@ GoRouter createRouter({
                           final headlineIdFromPath = state.pathParameters['id'];
                           return MultiBlocProvider(
                             providers: [
+                              BlocProvider.value(value: accountBloc), // Added
                               BlocProvider(
                                 create:
                                     (context) => HeadlineDetailsBloc(

@@ -70,6 +70,10 @@ abstract final class Routes {
   static const manageFollowedItemsName = 'manageFollowedItems'; // Renamed
   static const accountSavedHeadlines = 'saved-headlines';
   static const accountSavedHeadlinesName = 'accountSavedHeadlines';
+  // New route for article details from saved headlines
+  static const String accountArticleDetails =
+      'article/:id'; // Relative to accountSavedHeadlines
+  static const String accountArticleDetailsName = 'accountArticleDetails';
 
   // --- Manage Followed Items Sub-Routes (relative to /account/manage-followed-items) ---
   static const followedCategoriesList = 'categories';

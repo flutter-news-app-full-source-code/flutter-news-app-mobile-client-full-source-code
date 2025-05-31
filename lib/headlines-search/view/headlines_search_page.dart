@@ -18,7 +18,6 @@ import 'package:ht_main/shared/constants/app_spacing.dart';
 import 'package:ht_main/shared/shared.dart'; // Imports new headline tiles
 import 'package:ht_shared/ht_shared.dart';
 
-
 /// Page widget responsible for providing the BLoC for the headlines search feature.
 class HeadlinesSearchPage extends StatelessWidget {
   const HeadlinesSearchPage({super.key});
@@ -277,42 +276,46 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                       switch (resultsModelType) {
                         case SearchModelType.headline:
                           final headline = item as Headline;
-                          final imageStyle = context
-                              .watch<AppBloc>()
-                              .state
-                              .settings
-                              .feedPreferences
-                              .headlineImageStyle;
+                          final imageStyle =
+                              context
+                                  .watch<AppBloc>()
+                                  .state
+                                  .settings
+                                  .feedPreferences
+                                  .headlineImageStyle;
                           Widget tile;
                           switch (imageStyle) {
                             case HeadlineImageStyle.hidden:
                               tile = HeadlineTileTextOnly(
                                 headline: headline,
-                                onHeadlineTap: () => context.goNamed(
-                                  Routes.searchArticleDetailsName,
-                                  pathParameters: {'id': headline.id},
-                                  extra: headline,
-                                ),
+                                onHeadlineTap:
+                                    () => context.goNamed(
+                                      Routes.searchArticleDetailsName,
+                                      pathParameters: {'id': headline.id},
+                                      extra: headline,
+                                    ),
                               );
                               break;
                             case HeadlineImageStyle.smallThumbnail:
                               tile = HeadlineTileImageStart(
                                 headline: headline,
-                                onHeadlineTap: () => context.goNamed(
-                                  Routes.searchArticleDetailsName,
-                                  pathParameters: {'id': headline.id},
-                                  extra: headline,
-                                ),
+                                onHeadlineTap:
+                                    () => context.goNamed(
+                                      Routes.searchArticleDetailsName,
+                                      pathParameters: {'id': headline.id},
+                                      extra: headline,
+                                    ),
                               );
                               break;
                             case HeadlineImageStyle.largeThumbnail:
                               tile = HeadlineTileImageTop(
                                 headline: headline,
-                                onHeadlineTap: () => context.goNamed(
-                                  Routes.searchArticleDetailsName,
-                                  pathParameters: {'id': headline.id},
-                                  extra: headline,
-                                ),
+                                onHeadlineTap:
+                                    () => context.goNamed(
+                                      Routes.searchArticleDetailsName,
+                                      pathParameters: {'id': headline.id},
+                                      extra: headline,
+                                    ),
                               );
                               break;
                           }

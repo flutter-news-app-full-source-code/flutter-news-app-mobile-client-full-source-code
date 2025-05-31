@@ -13,7 +13,8 @@ import 'package:ht_main/headline-details/bloc/similar_headlines_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/shared.dart';
-import 'package:ht_shared/ht_shared.dart' show Headline, HeadlineImageStyle; // Added HeadlineImageStyle
+import 'package:ht_shared/ht_shared.dart'
+    show Headline, HeadlineImageStyle; // Added HeadlineImageStyle
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart'; // Import share_plus
 import 'package:url_launcher/url_launcher_string.dart';
@@ -278,43 +279,46 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           sliver: SliverToBoxAdapter(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(AppSpacing.md),
-              child: headline.imageUrl != null
-                  ? Image.network(
-                      headline.imageUrl!,
-                      width: double.infinity,
-                      height: 200,
-                      fit: BoxFit.cover,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Container(
-                          width: double.infinity,
-                          height: 200,
-                          color: colorScheme.surfaceContainerHighest,
-                          child:
-                              const Center(child: CircularProgressIndicator()),
-                        );
-                      },
-                      errorBuilder: (context, error, stackTrace) => Container(
+              child:
+                  headline.imageUrl != null
+                      ? Image.network(
+                        headline.imageUrl!,
+                        width: double.infinity,
+                        height: 200,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            width: double.infinity,
+                            height: 200,
+                            color: colorScheme.surfaceContainerHighest,
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        },
+                        errorBuilder:
+                            (context, error, stackTrace) => Container(
+                              width: double.infinity,
+                              height: 200,
+                              color: colorScheme.surfaceContainerHighest,
+                              child: Icon(
+                                Icons.broken_image_outlined,
+                                color: colorScheme.onSurfaceVariant,
+                                size: AppSpacing.xxl,
+                              ),
+                            ),
+                      )
+                      : Container(
                         width: double.infinity,
                         height: 200,
                         color: colorScheme.surfaceContainerHighest,
                         child: Icon(
-                          Icons.broken_image_outlined,
+                          Icons.image_not_supported_outlined,
                           color: colorScheme.onSurfaceVariant,
                           size: AppSpacing.xxl,
                         ),
                       ),
-                    )
-                  : Container(
-                      width: double.infinity,
-                      height: 200,
-                      color: colorScheme.surfaceContainerHighest,
-                      child: Icon(
-                        Icons.image_not_supported_outlined,
-                        color: colorScheme.onSurfaceVariant,
-                        size: AppSpacing.xxl,
-                      ),
-                    ),
             ),
           ),
         ),
@@ -504,42 +508,46 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                 child: Builder(
                   // Use Builder to get a new context that can watch AppBloc
                   builder: (context) {
-                    final imageStyle = context
-                        .watch<AppBloc>()
-                        .state
-                        .settings
-                        .feedPreferences
-                        .headlineImageStyle;
+                    final imageStyle =
+                        context
+                            .watch<AppBloc>()
+                            .state
+                            .settings
+                            .feedPreferences
+                            .headlineImageStyle;
                     Widget tile;
                     switch (imageStyle) {
                       case HeadlineImageStyle.hidden:
                         tile = HeadlineTileTextOnly(
                           headline: similarHeadline,
-                          onHeadlineTap: () => context.pushNamed(
-                            Routes.articleDetailsName,
-                            pathParameters: {'id': similarHeadline.id},
-                            extra: similarHeadline,
-                          ),
+                          onHeadlineTap:
+                              () => context.pushNamed(
+                                Routes.articleDetailsName,
+                                pathParameters: {'id': similarHeadline.id},
+                                extra: similarHeadline,
+                              ),
                         );
                         break;
                       case HeadlineImageStyle.smallThumbnail:
                         tile = HeadlineTileImageStart(
                           headline: similarHeadline,
-                          onHeadlineTap: () => context.pushNamed(
-                            Routes.articleDetailsName,
-                            pathParameters: {'id': similarHeadline.id},
-                            extra: similarHeadline,
-                          ),
+                          onHeadlineTap:
+                              () => context.pushNamed(
+                                Routes.articleDetailsName,
+                                pathParameters: {'id': similarHeadline.id},
+                                extra: similarHeadline,
+                              ),
                         );
                         break;
                       case HeadlineImageStyle.largeThumbnail:
                         tile = HeadlineTileImageTop(
                           headline: similarHeadline,
-                          onHeadlineTap: () => context.pushNamed(
-                            Routes.articleDetailsName,
-                            pathParameters: {'id': similarHeadline.id},
-                            extra: similarHeadline,
-                          ),
+                          onHeadlineTap:
+                              () => context.pushNamed(
+                                Routes.articleDetailsName,
+                                pathParameters: {'id': similarHeadline.id},
+                                extra: similarHeadline,
+                              ),
                         );
                         break;
                     }

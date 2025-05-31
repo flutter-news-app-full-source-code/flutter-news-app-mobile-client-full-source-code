@@ -105,8 +105,9 @@ class _HeadlineMetadataRow extends StatelessWidget {
     final chipLabelStyle = textTheme.labelSmall?.copyWith(
       color: colorScheme.onSurfaceVariant,
     );
-    final chipBackgroundColor =
-        colorScheme.surfaceContainerHighest.withOpacity(0.5);
+    final chipBackgroundColor = colorScheme.surfaceContainerHighest.withOpacity(
+      0.5,
+    );
     const iconSize = 12.0; // Kept for date icon
 
     return Wrap(
@@ -139,8 +140,9 @@ class _HeadlineMetadataRow extends StatelessWidget {
         if (headline.category?.name != null) ...[
           if (formattedDate.isNotEmpty)
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: AppSpacing.xs / 2),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.xs / 2,
+              ),
               child: Text('•', style: metadataStyle),
             ),
           GestureDetector(
@@ -149,8 +151,9 @@ class _HeadlineMetadataRow extends StatelessWidget {
                 ..hideCurrentSnackBar()
                 ..showSnackBar(
                   SnackBar(
-                    content:
-                        Text('Tapped Category: ${headline.category!.name}'),
+                    content: Text(
+                      'Tapped Category: ${headline.category!.name}',
+                    ),
                   ),
                 );
             },
@@ -159,8 +162,9 @@ class _HeadlineMetadataRow extends StatelessWidget {
               labelStyle: chipLabelStyle,
               backgroundColor: chipBackgroundColor,
               padding: EdgeInsets.zero, // Changed
-              labelPadding:
-                  const EdgeInsets.symmetric(horizontal: AppSpacing.xs), // Added
+              labelPadding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.xs,
+              ), // Added
               visualDensity: VisualDensity.compact,
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
@@ -169,8 +173,9 @@ class _HeadlineMetadataRow extends StatelessWidget {
         if (headline.source?.name != null) ...[
           if (formattedDate.isNotEmpty || headline.category?.name != null)
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: AppSpacing.xs / 2),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.xs / 2,
+              ),
               child: Text('•', style: metadataStyle),
             ),
           GestureDetector(
@@ -188,8 +193,9 @@ class _HeadlineMetadataRow extends StatelessWidget {
               labelStyle: chipLabelStyle,
               backgroundColor: chipBackgroundColor,
               padding: EdgeInsets.zero, // Changed
-              labelPadding:
-                  const EdgeInsets.symmetric(horizontal: AppSpacing.xs), // Added
+              labelPadding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.xs,
+              ), // Added
               visualDensity: VisualDensity.compact,
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),

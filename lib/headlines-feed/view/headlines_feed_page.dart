@@ -14,7 +14,8 @@ import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/shared.dart';
-import 'package:ht_shared/ht_shared.dart' show Headline, HeadlineImageStyle; // Added HeadlineImageStyle
+import 'package:ht_shared/ht_shared.dart'
+    show Headline, HeadlineImageStyle; // Added HeadlineImageStyle
 
 /// {@template headlines_feed_view}
 /// The core view widget for the headlines feed.
@@ -219,43 +220,47 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                     }
                     // Otherwise, build the headline item
                     final headline = state.headlines[index];
-                    final imageStyle = context
-                        .watch<AppBloc>()
-                        .state
-                        .settings
-                        .feedPreferences
-                        .headlineImageStyle;
+                    final imageStyle =
+                        context
+                            .watch<AppBloc>()
+                            .state
+                            .settings
+                            .feedPreferences
+                            .headlineImageStyle;
 
                     Widget tile;
                     switch (imageStyle) {
                       case HeadlineImageStyle.hidden:
                         tile = HeadlineTileTextOnly(
                           headline: headline,
-                          onHeadlineTap: () => context.goNamed(
-                            Routes.articleDetailsName,
-                            pathParameters: {'id': headline.id},
-                            extra: headline,
-                          ),
+                          onHeadlineTap:
+                              () => context.goNamed(
+                                Routes.articleDetailsName,
+                                pathParameters: {'id': headline.id},
+                                extra: headline,
+                              ),
                         );
                         break;
                       case HeadlineImageStyle.smallThumbnail:
                         tile = HeadlineTileImageStart(
                           headline: headline,
-                          onHeadlineTap: () => context.goNamed(
-                            Routes.articleDetailsName,
-                            pathParameters: {'id': headline.id},
-                            extra: headline,
-                          ),
+                          onHeadlineTap:
+                              () => context.goNamed(
+                                Routes.articleDetailsName,
+                                pathParameters: {'id': headline.id},
+                                extra: headline,
+                              ),
                         );
                         break;
                       case HeadlineImageStyle.largeThumbnail:
                         tile = HeadlineTileImageTop(
                           headline: headline,
-                          onHeadlineTap: () => context.goNamed(
-                            Routes.articleDetailsName,
-                            pathParameters: {'id': headline.id},
-                            extra: headline,
-                          ),
+                          onHeadlineTap:
+                              () => context.goNamed(
+                                Routes.articleDetailsName,
+                                pathParameters: {'id': headline.id},
+                                extra: headline,
+                              ),
                         );
                         break;
                     }

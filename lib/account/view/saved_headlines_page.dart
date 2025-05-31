@@ -7,7 +7,8 @@ import 'package:ht_main/app/bloc/app_bloc.dart'; // Added AppBloc
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/shared.dart'; // Imports new headline tiles
-import 'package:ht_shared/ht_shared.dart' show Headline, HeadlineImageStyle; // Added HeadlineImageStyle
+import 'package:ht_shared/ht_shared.dart'
+    show Headline, HeadlineImageStyle; // Added HeadlineImageStyle
 
 /// {@template saved_headlines_page}
 /// Displays the list of headlines saved by the user.
@@ -71,20 +72,21 @@ class SavedHeadlinesPage extends StatelessWidget {
             separatorBuilder: (context, index) => const Divider(height: 1),
             itemBuilder: (context, index) {
               final headline = savedHeadlines[index];
-              final imageStyle = context
-                  .watch<AppBloc>()
-                  .state
-                  .settings
-                  .feedPreferences
-                  .headlineImageStyle;
+              final imageStyle =
+                  context
+                      .watch<AppBloc>()
+                      .state
+                      .settings
+                      .feedPreferences
+                      .headlineImageStyle;
 
               final trailingButton = IconButton(
                 icon: const Icon(Icons.delete_outline),
                 tooltip: l10n.headlineDetailsRemoveFromSavedTooltip, // Use l10n
                 onPressed: () {
                   context.read<AccountBloc>().add(
-                        AccountSaveHeadlineToggled(headline: headline),
-                      );
+                    AccountSaveHeadlineToggled(headline: headline),
+                  );
                 },
               );
 
@@ -93,33 +95,36 @@ class SavedHeadlinesPage extends StatelessWidget {
                 case HeadlineImageStyle.hidden:
                   tile = HeadlineTileTextOnly(
                     headline: headline,
-                    onHeadlineTap: () => context.goNamed(
-                      Routes.accountArticleDetailsName,
-                      pathParameters: {'id': headline.id},
-                      extra: headline,
-                    ),
+                    onHeadlineTap:
+                        () => context.goNamed(
+                          Routes.accountArticleDetailsName,
+                          pathParameters: {'id': headline.id},
+                          extra: headline,
+                        ),
                     trailing: trailingButton,
                   );
                   break;
                 case HeadlineImageStyle.smallThumbnail:
                   tile = HeadlineTileImageStart(
                     headline: headline,
-                    onHeadlineTap: () => context.goNamed(
-                      Routes.accountArticleDetailsName,
-                      pathParameters: {'id': headline.id},
-                      extra: headline,
-                    ),
+                    onHeadlineTap:
+                        () => context.goNamed(
+                          Routes.accountArticleDetailsName,
+                          pathParameters: {'id': headline.id},
+                          extra: headline,
+                        ),
                     trailing: trailingButton,
                   );
                   break;
                 case HeadlineImageStyle.largeThumbnail:
                   tile = HeadlineTileImageTop(
                     headline: headline,
-                    onHeadlineTap: () => context.goNamed(
-                      Routes.accountArticleDetailsName,
-                      pathParameters: {'id': headline.id},
-                      extra: headline,
-                    ),
+                    onHeadlineTap:
+                        () => context.goNamed(
+                          Routes.accountArticleDetailsName,
+                          pathParameters: {'id': headline.id},
+                          extra: headline,
+                        ),
                     trailing: trailingButton,
                   );
                   break;

@@ -50,38 +50,40 @@ class HeadlineTileImageStart extends StatelessWidget {
                 height: 72,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(AppSpacing.xs),
-                  child: headline.imageUrl != null
-                      ? Image.network(
-                          headline.imageUrl!,
-                          fit: BoxFit.cover,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Container(
-                              color: colorScheme.surfaceContainerHighest,
-                              child: const Center(
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2),
-                              ),
-                            );
-                          },
-                          errorBuilder: (context, error, stackTrace) =>
-                              Container(
+                  child:
+                      headline.imageUrl != null
+                          ? Image.network(
+                            headline.imageUrl!,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(
+                                color: colorScheme.surfaceContainerHighest,
+                                child: const Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              );
+                            },
+                            errorBuilder:
+                                (context, error, stackTrace) => Container(
+                                  color: colorScheme.surfaceContainerHighest,
+                                  child: Icon(
+                                    Icons.broken_image_outlined,
+                                    color: colorScheme.onSurfaceVariant,
+                                    size: AppSpacing.xl,
+                                  ),
+                                ),
+                          )
+                          : Container(
                             color: colorScheme.surfaceContainerHighest,
                             child: Icon(
-                              Icons.broken_image_outlined,
+                              Icons.image_not_supported_outlined,
                               color: colorScheme.onSurfaceVariant,
                               size: AppSpacing.xl,
                             ),
                           ),
-                        )
-                      : Container(
-                          color: colorScheme.surfaceContainerHighest,
-                          child: Icon(
-                            Icons.image_not_supported_outlined,
-                            color: colorScheme.onSurfaceVariant,
-                            size: AppSpacing.xl,
-                          ),
-                        ),
                 ),
               ),
               const SizedBox(width: AppSpacing.md), // Always add spacing
@@ -143,8 +145,9 @@ class _HeadlineMetadataRow extends StatelessWidget {
     final chipLabelStyle = textTheme.labelSmall?.copyWith(
       color: colorScheme.onSurfaceVariant,
     );
-    final chipBackgroundColor =
-        colorScheme.surfaceContainerHighest.withOpacity(0.5);
+    final chipBackgroundColor = colorScheme.surfaceContainerHighest.withOpacity(
+      0.5,
+    );
     const iconSize = 12.0; // Kept for date icon
 
     return Wrap(
@@ -177,8 +180,9 @@ class _HeadlineMetadataRow extends StatelessWidget {
         if (headline.category?.name != null) ...[
           if (formattedDate.isNotEmpty)
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: AppSpacing.xs / 2),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.xs / 2,
+              ),
               child: Text('•', style: metadataStyle),
             ),
           GestureDetector(
@@ -187,8 +191,9 @@ class _HeadlineMetadataRow extends StatelessWidget {
                 ..hideCurrentSnackBar()
                 ..showSnackBar(
                   SnackBar(
-                    content:
-                        Text('Tapped Category: ${headline.category!.name}'),
+                    content: Text(
+                      'Tapped Category: ${headline.category!.name}',
+                    ),
                   ),
                 );
             },
@@ -197,8 +202,9 @@ class _HeadlineMetadataRow extends StatelessWidget {
               labelStyle: chipLabelStyle,
               backgroundColor: chipBackgroundColor,
               padding: EdgeInsets.zero, // Changed
-              labelPadding:
-                  const EdgeInsets.symmetric(horizontal: AppSpacing.xs), // Added
+              labelPadding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.xs,
+              ), // Added
               visualDensity: VisualDensity.compact,
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
@@ -207,8 +213,9 @@ class _HeadlineMetadataRow extends StatelessWidget {
         if (headline.source?.name != null) ...[
           if (formattedDate.isNotEmpty || headline.category?.name != null)
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: AppSpacing.xs / 2),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.xs / 2,
+              ),
               child: Text('•', style: metadataStyle),
             ),
           GestureDetector(
@@ -226,8 +233,9 @@ class _HeadlineMetadataRow extends StatelessWidget {
               labelStyle: chipLabelStyle,
               backgroundColor: chipBackgroundColor,
               padding: EdgeInsets.zero, // Changed
-              labelPadding:
-                  const EdgeInsets.symmetric(horizontal: AppSpacing.xs), // Added
+              labelPadding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.xs,
+              ), // Added
               visualDensity: VisualDensity.compact,
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),

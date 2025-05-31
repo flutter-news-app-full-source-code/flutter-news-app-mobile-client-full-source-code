@@ -4,129 +4,84 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_main/account/bloc/account_bloc.dart'; // Import AccountBloc
-import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/shared/shared.dart';
 import 'package:ht_shared/ht_shared.dart'
     show Headline; // Import Headline model
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart'; // Import share_plus
 import 'package:url_launcher/url_launcher_string.dart';
 
 class HeadlineDetailsPage extends StatelessWidget {
-  const HeadlineDetailsPage({required this.headlineId, super.key});
+  const HeadlineDetailsPage({required this.headline, super.key});
 
-  final String headlineId;
+  final Headline headline;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    // Keep a reference to headlineDetailsState to use in BlocListener
-    final headlineDetailsState = context.watch<HeadlineDetailsBloc>().state;
+    // Headline is now a direct member: this.headline
+    // No longer need to watch HeadlineDetailsBloc or its state here.
 
     return SafeArea(
       child: Scaffold(
-        // Body contains the BlocBuilder which returns either state widgets
-        // or the scroll view
         body: BlocListener<AccountBloc, AccountState>(
           listenWhen: (previous, current) {
-            // Listen if status is failure or if the saved status of *this* headline changed
             if (current.status == AccountStatus.failure &&
                 previous.status != AccountStatus.failure) {
               return true;
             }
-            if (headlineDetailsState is HeadlineDetailsLoaded) {
-              final currentHeadlineId = headlineDetailsState.headline.id;
-              final wasPreviouslySaved =
-                  previous.preferences?.savedHeadlines.any(
-                    (h) => h.id == currentHeadlineId,
-                  ) ??
-                  false;
-              final isCurrentlySaved =
-                  current.preferences?.savedHeadlines.any(
-                    (h) => h.id == currentHeadlineId,
-                  ) ??
-                  false;
-              // Listen if the specific headline's saved status changed OR
-              // if a general success occurred (e.g. after an optimistic update that might not change the list length but confirms persistence)
-              return (wasPreviouslySaved != isCurrentlySaved) ||
-                  (current.status == AccountStatus.success &&
-                      previous.status != AccountStatus.success);
-            }
-            return false;
+            final currentHeadlineId = headline.id;
+            final wasPreviouslySaved =
+                previous.preferences?.savedHeadlines.any(
+                  (h) => h.id == currentHeadlineId,
+                ) ??
+                false;
+            final isCurrentlySaved =
+                current.preferences?.savedHeadlines.any(
+                  (h) => h.id == currentHeadlineId,
+                ) ??
+                false;
+            return (wasPreviouslySaved != isCurrentlySaved) ||
+                (current.status == AccountStatus.success &&
+                    previous.status != AccountStatus.success);
           },
           listener: (context, accountState) {
-            if (headlineDetailsState is HeadlineDetailsLoaded) {
-              final currentHeadline = headlineDetailsState.headline;
-              final nowIsSaved =
-                  accountState.preferences?.savedHeadlines.any(
-                    (h) => h.id == currentHeadline.id,
-                  ) ??
-                  false;
+            final nowIsSaved =
+                accountState.preferences?.savedHeadlines.any(
+                  (h) => h.id == headline.id,
+                ) ??
+                false;
 
-              if (accountState.status == AccountStatus.failure &&
-                  accountState.errorMessage != null) {
-                ScaffoldMessenger.of(context)
-                  ..hideCurrentSnackBar()
-                  ..showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        accountState.errorMessage ??
-                            l10n.headlineSaveErrorSnackbar,
-                      ), // Use specific or generic error
-                      backgroundColor: Theme.of(context).colorScheme.error,
+            if (accountState.status == AccountStatus.failure &&
+                accountState.errorMessage != null) {
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      accountState.errorMessage ??
+                          l10n.headlineSaveErrorSnackbar,
                     ),
-                  );
-              } else {
-                // Only show success snackbar if the state isn't failure
-                ScaffoldMessenger.of(context)
-                  ..hideCurrentSnackBar()
-                  ..showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        nowIsSaved
-                            ? l10n.headlineSavedSuccessSnackbar
-                            : l10n.headlineUnsavedSuccessSnackbar,
-                      ),
-                      duration: const Duration(seconds: 2),
+                    backgroundColor: Theme.of(context).colorScheme.error,
+                  ),
+                );
+            } else {
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      nowIsSaved
+                          ? l10n.headlineSavedSuccessSnackbar
+                          : l10n.headlineUnsavedSuccessSnackbar,
                     ),
-                  );
-              }
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
             }
-          },
-          child: BlocBuilder<HeadlineDetailsBloc, HeadlineDetailsState>(
-            // No need to re-watch headlineDetailsState here, already have it.
-            // builder: (context, state) // state here is headlineDetailsState
-            builder: (context, headlineDetailsBuilderState) {
-              // Handle Loading/Initial/Failure states outside the scroll view
-              // for better user experience.
-              // Use headlineDetailsBuilderState for the switch
-              return switch (headlineDetailsBuilderState) {
-                HeadlineDetailsInitial _ => InitialStateWidget(
-                  icon: Icons.article,
-                  headline: l10n.headlineDetailsInitialHeadline,
-                  subheadline: l10n.headlineDetailsInitialSubheadline,
-                ),
-                HeadlineDetailsLoading _ => LoadingStateWidget(
-                  icon: Icons.downloading,
-                  headline: l10n.headlineDetailsLoadingHeadline,
-                  subheadline: l10n.headlineDetailsLoadingSubheadline,
-                ),
-                final HeadlineDetailsFailure state => FailureStateWidget(
-                  message: state.message,
-                  onRetry: () {
-                    context.read<HeadlineDetailsBloc>().add(
-                      HeadlineDetailsRequested(headlineId: headlineId),
-                    );
-                  },
-                ),
-                final HeadlineDetailsLoaded state => _buildLoadedContent(
-                  context,
-                  state.headline,
-                ),
-                _ => const SizedBox.shrink(), // Should not happen in practice
-              };
-            },
-          ),
+          }, // Corrected: Removed extra closing brace from here
+          child: _buildLoadedContent(context, headline),
         ),
       ),
     );
@@ -168,8 +123,14 @@ class HeadlineDetailsPage extends StatelessWidget {
 
     final shareButton = IconButton(
       icon: const Icon(Icons.share),
+      tooltip: l10n.shareActionTooltip, // Added tooltip
       onPressed: () {
-        // TODO(fulleni): Implement share functionality
+        // Construct the share text
+        // Use headline.url if available, otherwise just the title
+        final shareText = headline.url != null
+            ? '${headline.title}\n\n${headline.url}'
+            : headline.title;
+        Share.share(shareText);
       },
     );
 

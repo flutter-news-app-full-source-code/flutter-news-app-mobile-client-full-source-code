@@ -36,6 +36,7 @@ TextTheme _customizeTextTheme(
   required AppTextScaleFactor appTextScaleFactor,
   required AppFontWeight appFontWeight, // Added parameter
 }) {
+  print('[_customizeTextTheme] Received appFontWeight: $appFontWeight, appTextScaleFactor: $appTextScaleFactor');
   // Define font size factors
   double factor;
   switch (appTextScaleFactor) {
@@ -66,6 +67,7 @@ TextTheme _customizeTextTheme(
       selectedFontWeight = FontWeight.w700;
       break;
   }
+  print('[_customizeTextTheme] Mapped to selectedFontWeight: $selectedFontWeight');
 
   return baseTextTheme.copyWith(
     // --- Headline/Title Styles ---
@@ -118,25 +120,32 @@ TextTheme _customizeTextTheme(
 // based on the provided font family name.
 // Corrected return type to match GoogleFonts functions (positional optional)
 TextTheme Function([TextTheme?]) _getGoogleFontTextTheme(String? fontFamily) {
+  print('[_getGoogleFontTextTheme] Received fontFamily: $fontFamily');
   // Map font family names (as used in AppBloc mapping) to GoogleFonts functions
   if (fontFamily == GoogleFonts.roboto().fontFamily) {
+    print('[_getGoogleFontTextTheme] Returning GoogleFonts.robotoTextTheme');
     return GoogleFonts.robotoTextTheme;
   }
   if (fontFamily == GoogleFonts.openSans().fontFamily) {
+    print('[_getGoogleFontTextTheme] Returning GoogleFonts.openSansTextTheme');
     return GoogleFonts.openSansTextTheme;
   }
   if (fontFamily == GoogleFonts.lato().fontFamily) {
+    print('[_getGoogleFontTextTheme] Returning GoogleFonts.latoTextTheme');
     return GoogleFonts.latoTextTheme;
   }
   if (fontFamily == GoogleFonts.montserrat().fontFamily) {
+    print('[_getGoogleFontTextTheme] Returning GoogleFonts.montserratTextTheme');
     return GoogleFonts.montserratTextTheme;
   }
   if (fontFamily == GoogleFonts.merriweather().fontFamily) {
+    print('[_getGoogleFontTextTheme] Returning GoogleFonts.merriweatherTextTheme');
     return GoogleFonts.merriweatherTextTheme;
   }
   // Add mappings for other AppFontType values if needed
 
   // Default fallback if fontFamily is null or not recognized
+  print('[_getGoogleFontTextTheme] Defaulting to GoogleFonts.notoSansTextTheme');
   return GoogleFonts.notoSansTextTheme;
 }
 
@@ -149,6 +158,7 @@ ThemeData lightTheme({
   required AppFontWeight appFontWeight, // Added parameter
   String? fontFamily,
 }) {
+  print('[AppTheme.lightTheme] Received scheme: $scheme, appTextScaleFactor: $appTextScaleFactor, appFontWeight: $appFontWeight, fontFamily: $fontFamily');
   final textThemeGetter = _getGoogleFontTextTheme(fontFamily);
   final baseTextTheme = textThemeGetter();
 
@@ -173,6 +183,7 @@ ThemeData darkTheme({
   required AppFontWeight appFontWeight, // Added parameter
   String? fontFamily,
 }) {
+  print('[AppTheme.darkTheme] Received scheme: $scheme, appTextScaleFactor: $appTextScaleFactor, appFontWeight: $appFontWeight, fontFamily: $fontFamily');
   final textThemeGetter = _getGoogleFontTextTheme(fontFamily);
   final baseTextTheme = textThemeGetter(
     ThemeData(brightness: Brightness.dark).textTheme,

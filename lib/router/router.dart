@@ -62,6 +62,12 @@ GoRouter createRouter({
   htUserContentPreferencesRepository,
   required HtDataRepository<AppConfig> htAppConfigRepository,
 }) {
+  // Instantiate AccountBloc once to be shared
+  final accountBloc = AccountBloc(
+    authenticationRepository: htAuthenticationRepository,
+    userContentPreferencesRepository: htUserContentPreferencesRepository,
+  );
+
   return GoRouter(
     refreshListenable: authStatusNotifier,
     initialLocation: Routes.feed,
@@ -178,21 +184,27 @@ GoRouter createRouter({
           );
           return null; // Allow access
         }
-        // **Sub-Case 2.3: Navigating Within the Main App Sections (Feed, Search, Account)**
-        // Allow anonymous users to access the main content sections and their sub-routes.
-        else if (isGoingToFeed || isGoingToSearch || isGoingToAccount) {
-          // Added checks for search and account
+        // **Sub-Case 2.3: Navigating Within the Main App Sections (Feed, Search, Account) or Details Pages**
+        // Allow anonymous users to access the main content sections, their sub-routes, and details pages.
+        else if (isGoingToFeed ||
+            isGoingToSearch ||
+            isGoingToAccount ||
+            currentLocation == Routes.categoryDetails ||
+            currentLocation == Routes.sourceDetails ||
+            currentLocation.startsWith('${Routes.feed}/${Routes.articleDetailsName.split('/:id').first}') ||
+            currentLocation.startsWith('${Routes.search}/${Routes.searchArticleDetailsName.split('/:id').first}') ||
+            currentLocation.startsWith('${Routes.account}/${Routes.accountSavedHeadlines}/${Routes.accountArticleDetailsName.split('/:id').first}')) {
           print(
-            '    Action: Allowing navigation within main app section ($currentLocation).', // Updated log message
+            '    Action: Allowing navigation to main app section or details page ($currentLocation).',
           );
           return null; // Allow access
         }
-        // **Sub-Case 2.4: Fallback for Unexpected Paths** // Now correctly handles only truly unexpected paths
+        // **Sub-Case 2.4: Fallback for Unexpected Paths**
         // If an anonymous user tries to navigate anywhere else unexpected,
         // redirect them to the main content feed as a safe default.
         else {
           print(
-            '    Action: Unexpected path ($currentLocation), redirecting to $feedPath', // Updated path constant
+            '    Action: Unexpected path ($currentLocation), redirecting to $feedPath',
           );
           return feedPath; // Redirect to feed
         }
@@ -299,12 +311,14 @@ GoRouter createRouter({
         builder: (context, state) {
           final args = state.extra as EntityDetailsPageArguments?;
           if (args == null) {
-            // Handle missing arguments, perhaps redirect or show error
             return const Scaffold(
               body: Center(child: Text('Error: Missing category details arguments')),
             );
           }
-          return EntityDetailsPage(args: args);
+          return BlocProvider.value(
+            value: accountBloc,
+            child: EntityDetailsPage(args: args),
+          );
         },
       ),
       GoRoute(
@@ -317,7 +331,10 @@ GoRouter createRouter({
               body: Center(child: Text('Error: Missing source details arguments')),
             );
           }
-          return EntityDetailsPage(args: args);
+          return BlocProvider.value(
+            value: accountBloc,
+            child: EntityDetailsPage(args: args),
+          );
         },
       ),
       // --- Main App Shell ---
@@ -326,6 +343,7 @@ GoRouter createRouter({
           // Return the shell widget which contains the AdaptiveScaffold
           return MultiBlocProvider(
             providers: [
+              BlocProvider.value(value: accountBloc), // Use the shared instance
               BlocProvider(
                 create:
                     (context) => HeadlinesFeedBloc(
@@ -346,16 +364,7 @@ GoRouter createRouter({
                           context.read<HtDataRepository<Country>>(),
                     ),
               ),
-              BlocProvider(
-                create:
-                    (context) => AccountBloc(
-                      authenticationRepository:
-                          context.read<HtAuthRepository>(),
-                      userContentPreferencesRepository:
-                          context
-                              .read<HtDataRepository<UserContentPreferences>>(),
-                    ),
-              ),
+              // Removed separate AccountBloc creation here
             ],
             child: AppShell(navigationShell: navigationShell),
           );

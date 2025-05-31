@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb; // Added
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart'; // Added
@@ -145,81 +146,116 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                   ? (state.entity as Source).description
                   : null;
           
-          final String? entityIconUrl = (state.entity is Category && (state.entity as Category).iconUrl != null)
+          final String? entityIconUrl = (state.entity is Category &&
+                  (state.entity as Category).iconUrl != null)
               ? (state.entity as Category).iconUrl
-              : null; // Source model does not have iconUrl
+              : null;
+
+          final followButton = IconButton(
+            icon: Icon(
+              state.isFollowing
+                  ? Icons.check_circle // Filled when following
+                  : Icons.add_circle_outline,
+              color: state.isFollowing
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurfaceVariant,
+            ),
+            tooltip: state.isFollowing
+                ? l10n.unfollowButtonLabel
+                : l10n.followButtonLabel,
+            onPressed: () {
+              context
+                  .read<EntityDetailsBloc>()
+                  .add(const EntityDetailsToggleFollowRequested());
+            },
+          );
+
+          final Widget appBarTitleWidget = Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (entityIconUrl != null)
+                Padding(
+                  padding: const EdgeInsets.only(right: AppSpacing.sm),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(AppSpacing.xs),
+                    child: Image.network(
+                      entityIconUrl,
+                      width: kToolbarHeight - 16, // AppBar height minus padding
+                      height: kToolbarHeight - 16,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const Icon(Icons.category_outlined, size: kToolbarHeight - 20),
+                    ),
+                  ),
+                )
+              else if (state.entityType == EntityType.category)
+                 Padding(
+                  padding: const EdgeInsets.only(right: AppSpacing.sm),
+                  child: Icon(Icons.category_outlined, size: kToolbarHeight - 20, color: theme.colorScheme.onSurface),
+                )
+              else if (state.entityType == EntityType.source)
+                 Padding(
+                  padding: const EdgeInsets.only(right: AppSpacing.sm),
+                  child: Icon(Icons.source_outlined, size: kToolbarHeight - 20, color: theme.colorScheme.onSurface),
+                ),
+              Flexible(
+                child: Text(
+                  appBarTitle,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              if (description != null && description.isNotEmpty)
+                Tooltip(
+                  message: description,
+                  child: IconButton(
+                    icon: Icon(Icons.info_outline, color: theme.colorScheme.onSurfaceVariant),
+                    onPressed: () {
+                      // On mobile, show dialog for description
+                      if (!kIsWeb) { // kIsWeb can be used to differentiate behavior
+                        showDialog<void>(
+                          context: context,
+                          builder: (BuildContext dialogContext) {
+                            return AlertDialog(
+                              title: Text(appBarTitle),
+                              content: SingleChildScrollView(child: Text(description)),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: Text(MaterialLocalizations.of(dialogContext).closeButtonLabel),
+                                  onPressed: () {
+                                    Navigator.of(dialogContext).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                    },
+                  ),
+                ),
+            ],
+          );
 
           return CustomScrollView(
             controller: _scrollController,
             slivers: [
               SliverAppBar(
-                title: Text(appBarTitle),
+                title: appBarTitleWidget,
                 pinned: true,
-                expandedHeight: entityIconUrl != null ? 200.0 : kToolbarHeight,
-                flexibleSpace: entityIconUrl != null
-                    ? FlexibleSpaceBar(
-                        background: Image.network(
-                          entityIconUrl,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => 
-                            const Icon(Icons.image_not_supported_outlined, size: 48),
-                        ),
-                      )
-                    : null,
+                actions: [followButton],
+                // Removed expandedHeight and flexibleSpace for a standard AppBar
               ),
-              SliverToBoxAdapter(
+              SliverToBoxAdapter( // This adapter is now just for spacing and the section title/divider
                 child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.paddingMedium),
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingMedium)
+                      .copyWith(top: AppSpacing.lg), // Add top padding
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              appBarTitle,
-                              style: theme.textTheme.headlineMedium,
-                            ),
-                          ),
-                          const SizedBox(width: AppSpacing.md),
-                          ElevatedButton.icon(
-                            icon: Icon(
-                              state.isFollowing
-                                  ? Icons.check_circle // Filled when following
-                                  : Icons.add_circle_outline,
-                            ),
-                            label: Text(
-                              state.isFollowing
-                                  ? l10n.unfollowButtonLabel
-                                  : l10n.followButtonLabel,
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: state.isFollowing 
-                                ? theme.colorScheme.secondaryContainer
-                                : theme.colorScheme.primaryContainer,
-                              foregroundColor: state.isFollowing
-                                ? theme.colorScheme.onSecondaryContainer
-                                : theme.colorScheme.onPrimaryContainer,
-                            ),
-                            onPressed: () {
-                              context
-                                  .read<EntityDetailsBloc>()
-                                  .add(const EntityDetailsToggleFollowRequested());
-                            },
-                          ),
-                        ],
-                      ),
-                      if (description != null && description.isNotEmpty) ...[
-                        const SizedBox(height: AppSpacing.md),
-                        Text(description, style: theme.textTheme.bodyMedium),
-                      ],
-                      const SizedBox(height: AppSpacing.lg), // Increased spacing
-                      if (state.headlines.isNotEmpty || state.headlinesStatus == EntityHeadlinesStatus.loadingMore)
-                        Text(l10n.headlinesSectionTitle, style: theme.textTheme.titleLarge), // Section title
-                      if (state.headlines.isNotEmpty || state.headlinesStatus == EntityHeadlinesStatus.loadingMore)
+                       if (state.headlines.isNotEmpty || state.headlinesStatus == EntityHeadlinesStatus.loadingMore) ...[
+                        Text(l10n.headlinesSectionTitle, style: theme.textTheme.titleLarge),
                         const Divider(height: AppSpacing.md),
+                       ]
                     ],
                   ),
                 ),

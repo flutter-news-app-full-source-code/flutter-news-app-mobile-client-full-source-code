@@ -15,7 +15,11 @@ import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/shared.dart';
 import 'package:ht_shared/ht_shared.dart'
-    show Headline, HeadlineImageStyle, Category, Source; // Added Category, Source
+    show
+        Headline,
+        HeadlineImageStyle,
+        Category,
+        Source; // Added Category, Source
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart'; // Import share_plus
 import 'package:url_launcher/url_launcher_string.dart';
@@ -395,7 +399,8 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
 
     if (headline.source != null) {
       chips.add(
-        GestureDetector( // Added GestureDetector
+        GestureDetector(
+          // Added GestureDetector
           onTap: () {
             context.push(
               Routes.sourceDetails,
@@ -443,7 +448,8 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     if (headline.source?.headquarters != null) {
       final country = headline.source!.headquarters!;
       chips.add(
-        Chip( // Country chip is usually not tappable to a details page in this context
+        Chip(
+          // Country chip is usually not tappable to a details page in this context
           avatar: CircleAvatar(
             radius: chipAvatarSize / 2,
             backgroundColor: Colors.transparent,
@@ -462,7 +468,8 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
 
     if (headline.category != null) {
       chips.add(
-        GestureDetector( // Added GestureDetector
+        GestureDetector(
+          // Added GestureDetector
           onTap: () {
             context.push(
               Routes.categoryDetails,

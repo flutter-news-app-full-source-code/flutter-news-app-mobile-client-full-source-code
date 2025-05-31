@@ -62,39 +62,40 @@ class HeadlineTileImageStart extends StatelessWidget {
                 height: 72,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(AppSpacing.xs),
-                  child: headline.imageUrl != null
-                      ? Image.network(
-                          headline.imageUrl!,
-                          fit: BoxFit.cover,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Container(
-                              color: colorScheme.surfaceContainerHighest,
-                              child: const Center(
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
+                  child:
+                      headline.imageUrl != null
+                          ? Image.network(
+                            headline.imageUrl!,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(
+                                color: colorScheme.surfaceContainerHighest,
+                                child: const Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                          errorBuilder: (context, error, stackTrace) =>
-                              Container(
+                              );
+                            },
+                            errorBuilder:
+                                (context, error, stackTrace) => Container(
+                                  color: colorScheme.surfaceContainerHighest,
+                                  child: Icon(
+                                    Icons.broken_image_outlined,
+                                    color: colorScheme.onSurfaceVariant,
+                                    size: AppSpacing.xl,
+                                  ),
+                                ),
+                          )
+                          : Container(
                             color: colorScheme.surfaceContainerHighest,
                             child: Icon(
-                              Icons.broken_image_outlined,
+                              Icons.image_not_supported_outlined,
                               color: colorScheme.onSurfaceVariant,
                               size: AppSpacing.xl,
                             ),
                           ),
-                        )
-                      : Container(
-                          color: colorScheme.surfaceContainerHighest,
-                          child: Icon(
-                            Icons.image_not_supported_outlined,
-                            color: colorScheme.onSurfaceVariant,
-                            size: AppSpacing.xl,
-                          ),
-                        ),
                 ),
               ),
               const SizedBox(width: AppSpacing.md), // Always add spacing

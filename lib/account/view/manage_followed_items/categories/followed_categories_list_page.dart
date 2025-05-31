@@ -112,7 +112,8 @@ class FollowedCategoriesListPage extends StatelessWidget {
                           )
                           : const Icon(Icons.category_outlined),
                   title: Text(category.name),
-                  onTap: () { // Added onTap for navigation
+                  onTap: () {
+                    // Added onTap for navigation
                     context.push(
                       Routes.categoryDetails,
                       extra: EntityDetailsPageArguments(entity: category),

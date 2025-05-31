@@ -191,10 +191,18 @@ GoRouter createRouter({
             isGoingToAccount ||
             currentLocation == Routes.categoryDetails ||
             currentLocation == Routes.sourceDetails ||
-            currentLocation.startsWith(Routes.globalArticleDetails.split('/:id').first) || // Allow global article details
-            currentLocation.startsWith('${Routes.feed}/${Routes.articleDetailsName.split('/:id').first}') ||
-            currentLocation.startsWith('${Routes.search}/${Routes.searchArticleDetailsName.split('/:id').first}') ||
-            currentLocation.startsWith('${Routes.account}/${Routes.accountSavedHeadlines}/${Routes.accountArticleDetailsName.split('/:id').first}')) {
+            currentLocation.startsWith(
+              Routes.globalArticleDetails.split('/:id').first,
+            ) || // Allow global article details
+            currentLocation.startsWith(
+              '${Routes.feed}/${Routes.articleDetailsName.split('/:id').first}',
+            ) ||
+            currentLocation.startsWith(
+              '${Routes.search}/${Routes.searchArticleDetailsName.split('/:id').first}',
+            ) ||
+            currentLocation.startsWith(
+              '${Routes.account}/${Routes.accountSavedHeadlines}/${Routes.accountArticleDetailsName.split('/:id').first}',
+            )) {
           print(
             '    Action: Allowing navigation to main app section or details page ($currentLocation).',
           );
@@ -313,7 +321,9 @@ GoRouter createRouter({
           final args = state.extra as EntityDetailsPageArguments?;
           if (args == null) {
             return const Scaffold(
-              body: Center(child: Text('Error: Missing category details arguments')),
+              body: Center(
+                child: Text('Error: Missing category details arguments'),
+              ),
             );
           }
           return BlocProvider.value(
@@ -329,7 +339,9 @@ GoRouter createRouter({
           final args = state.extra as EntityDetailsPageArguments?;
           if (args == null) {
             return const Scaffold(
-              body: Center(child: Text('Error: Missing source details arguments')),
+              body: Center(
+                child: Text('Error: Missing source details arguments'),
+              ),
             );
           }
           return BlocProvider.value(
@@ -379,16 +391,18 @@ GoRouter createRouter({
             providers: [
               BlocProvider.value(value: accountBloc),
               BlocProvider(
-                create: (context) => HeadlineDetailsBloc(
-                  headlinesRepository:
-                      context.read<HtDataRepository<Headline>>(),
-                ),
+                create:
+                    (context) => HeadlineDetailsBloc(
+                      headlinesRepository:
+                          context.read<HtDataRepository<Headline>>(),
+                    ),
               ),
               BlocProvider(
-                create: (context) => SimilarHeadlinesBloc(
-                  headlinesRepository:
-                      context.read<HtDataRepository<Headline>>(),
-                ),
+                create:
+                    (context) => SimilarHeadlinesBloc(
+                      headlinesRepository:
+                          context.read<HtDataRepository<Headline>>(),
+                    ),
               ),
             ],
             child: HeadlineDetailsPage(

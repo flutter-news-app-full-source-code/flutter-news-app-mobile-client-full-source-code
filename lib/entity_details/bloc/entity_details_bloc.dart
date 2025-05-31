@@ -16,13 +16,15 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     required HtDataRepository<Category> categoryRepository,
     required HtDataRepository<Source> sourceRepository,
     required AccountBloc accountBloc, // Changed to AccountBloc
-  })  : _headlinesRepository = headlinesRepository,
-        _categoryRepository = categoryRepository,
-        _sourceRepository = sourceRepository,
-        _accountBloc = accountBloc,
-        super(const EntityDetailsState()) {
+  }) : _headlinesRepository = headlinesRepository,
+       _categoryRepository = categoryRepository,
+       _sourceRepository = sourceRepository,
+       _accountBloc = accountBloc,
+       super(const EntityDetailsState()) {
     on<EntityDetailsLoadRequested>(_onEntityDetailsLoadRequested);
-    on<EntityDetailsToggleFollowRequested>(_onEntityDetailsToggleFollowRequested);
+    on<EntityDetailsToggleFollowRequested>(
+      _onEntityDetailsToggleFollowRequested,
+    );
     on<EntityDetailsLoadMoreHeadlinesRequested>(
       _onEntityDetailsLoadMoreHeadlinesRequested,
     );
@@ -50,7 +52,9 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     EntityDetailsLoadRequested event,
     Emitter<EntityDetailsState> emit,
   ) async {
-    emit(state.copyWith(status: EntityDetailsStatus.loading, clearEntity: true));
+    emit(
+      state.copyWith(status: EntityDetailsStatus.loading, clearEntity: true),
+    );
 
     dynamic entityToLoad = event.entity;
     EntityType? entityTypeToLoad = event.entityType;
@@ -62,8 +66,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
           event.entityType != null) {
         entityTypeToLoad = event.entityType; // Ensure type is set
         if (event.entityType == EntityType.category) {
-          entityToLoad =
-              await _categoryRepository.read(id: event.entityId!);
+          entityToLoad = await _categoryRepository.read(id: event.entityId!);
         } else if (event.entityType == EntityType.source) {
           entityToLoad = await _sourceRepository.read(id: event.entityId!);
         } else {
@@ -109,11 +112,15 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       if (currentAccountState.preferences != null) {
         if (entityTypeToLoad == EntityType.category &&
             entityToLoad is Category) {
-          isCurrentlyFollowing = currentAccountState.preferences!.followedCategories
+          isCurrentlyFollowing = currentAccountState
+              .preferences!
+              .followedCategories
               .any((cat) => cat.id == entityToLoad.id);
         } else if (entityTypeToLoad == EntityType.source &&
-                   entityToLoad is Source) {
-          isCurrentlyFollowing = currentAccountState.preferences!.followedSources
+            entityToLoad is Source) {
+          isCurrentlyFollowing = currentAccountState
+              .preferences!
+              .followedSources
               .any((src) => src.id == entityToLoad.id);
         }
       }
@@ -173,7 +180,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         AccountFollowCategoryToggled(category: state.entity as Category),
       );
     } else if (state.entityType == EntityType.source &&
-               state.entity is Source) {
+        state.entity is Source) {
       _accountBloc.add(
         AccountFollowSourceToggled(source: state.entity as Source),
       );
@@ -264,13 +271,15 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
 
     if (state.entityType == EntityType.category && state.entity is Category) {
       final currentCategory = state.entity as Category;
-      isCurrentlyFollowing = preferences.followedCategories
-          .any((cat) => cat.id == currentCategory.id);
+      isCurrentlyFollowing = preferences.followedCategories.any(
+        (cat) => cat.id == currentCategory.id,
+      );
     } else if (state.entityType == EntityType.source &&
-               state.entity is Source) {
+        state.entity is Source) {
       final currentSource = state.entity as Source;
-      isCurrentlyFollowing = preferences.followedSources
-          .any((src) => src.id == currentSource.id);
+      isCurrentlyFollowing = preferences.followedSources.any(
+        (src) => src.id == currentSource.id,
+      );
     }
 
     if (state.isFollowing != isCurrentlyFollowing) {

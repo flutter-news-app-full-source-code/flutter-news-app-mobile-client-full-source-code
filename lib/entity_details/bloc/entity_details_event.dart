@@ -15,9 +15,9 @@ class EntityDetailsLoadRequested extends EntityDetailsEvent {
     this.entityType,
     this.entity,
   }) : assert(
-            (entityId != null && entityType != null) || entity != null,
-            'Either entityId/entityType or entity must be provided.',
-          );
+         (entityId != null && entityType != null) || entity != null,
+         'Either entityId/entityType or entity must be provided.',
+       );
 
   final String? entityId;
   final EntityType? entityType;

@@ -96,7 +96,8 @@ class FollowedSourcesListPage extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: AppSpacing.sm),
                 child: ListTile(
                   title: Text(source.name),
-                  onTap: () { // Added onTap for navigation
+                  onTap: () {
+                    // Added onTap for navigation
                     context.push(
                       Routes.sourceDetails,
                       extra: EntityDetailsPageArguments(entity: source),

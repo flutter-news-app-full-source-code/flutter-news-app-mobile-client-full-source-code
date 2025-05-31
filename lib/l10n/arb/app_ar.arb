@@ -759,5 +759,25 @@
                 "example": "ألمانيا"
             }
         }
+    },
+    "headlineDetailsSaveTooltip": "حفظ العنوان",
+    "@headlineDetailsSaveTooltip": {
+        "description": "Tooltip for the button to save a headline"
+    },
+    "headlineDetailsRemoveFromSavedTooltip": "إزالة من المحفوظات",
+    "@headlineDetailsRemoveFromSavedTooltip": {
+        "description": "Tooltip for the button to remove a headline from saved list"
+    },
+    "headlineSavedSuccessSnackbar": "تم حفظ العنوان!",
+    "@headlineSavedSuccessSnackbar": {
+        "description": "Snackbar message shown when a headline is successfully saved"
+    },
+    "headlineUnsavedSuccessSnackbar": "تمت إزالة العنوان من المحفوظات.",
+    "@headlineUnsavedSuccessSnackbar": {
+        "description": "Snackbar message shown when a headline is successfully unsaved"
+    },
+    "headlineSaveErrorSnackbar": "تعذر تحديث حالة الحفظ. يرجى المحاولة مرة أخرى.",
+    "@headlineSaveErrorSnackbar": {
+        "description": "Snackbar message shown when saving/unsaving a headline fails"
     }
 }

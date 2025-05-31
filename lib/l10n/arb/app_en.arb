@@ -759,5 +759,25 @@
                 "example": "Germany"
             }
         }
+    },
+    "headlineDetailsSaveTooltip": "Save headline",
+    "@headlineDetailsSaveTooltip": {
+        "description": "Tooltip for the button to save a headline"
+    },
+    "headlineDetailsRemoveFromSavedTooltip": "Remove from saved",
+    "@headlineDetailsRemoveFromSavedTooltip": {
+        "description": "Tooltip for the button to remove a headline from saved list"
+    },
+    "headlineSavedSuccessSnackbar": "Headline saved!",
+    "@headlineSavedSuccessSnackbar": {
+        "description": "Snackbar message shown when a headline is successfully saved"
+    },
+    "headlineUnsavedSuccessSnackbar": "Headline removed from saved.",
+    "@headlineUnsavedSuccessSnackbar": {
+        "description": "Snackbar message shown when a headline is successfully unsaved"
+    },
+    "headlineSaveErrorSnackbar": "Could not update saved status. Please try again.",
+    "@headlineSaveErrorSnackbar": {
+        "description": "Snackbar message shown when saving/unsaving a headline fails"
     }
 }

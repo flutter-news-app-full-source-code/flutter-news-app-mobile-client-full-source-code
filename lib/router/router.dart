@@ -7,8 +7,8 @@ import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/account/view/account_page.dart';
 import 'package:ht_main/account/view/manage_followed_items/categories/add_category_to_follow_page.dart'; // New
 import 'package:ht_main/account/view/manage_followed_items/categories/followed_categories_list_page.dart'; // New
-import 'package:ht_main/account/view/manage_followed_items/countries/add_country_to_follow_page.dart'; // New
-import 'package:ht_main/account/view/manage_followed_items/countries/followed_countries_list_page.dart'; // New
+// import 'package:ht_main/account/view/manage_followed_items/countries/add_country_to_follow_page.dart'; // Removed
+// import 'package:ht_main/account/view/manage_followed_items/countries/followed_countries_list_page.dart'; // Removed
 import 'package:ht_main/account/view/manage_followed_items/manage_followed_items_page.dart'; // New
 import 'package:ht_main/account/view/manage_followed_items/sources/add_source_to_follow_page.dart'; // New
 import 'package:ht_main/account/view/manage_followed_items/sources/followed_sources_list_page.dart'; // New
@@ -435,8 +435,8 @@ GoRouter createRouter({
                           context.read<HtDataRepository<Category>>(),
                       sourceRepository:
                           context.read<HtDataRepository<Source>>(),
-                      countryRepository:
-                          context.read<HtDataRepository<Country>>(),
+                      // countryRepository: // Removed
+                      //     context.read<HtDataRepository<Country>>(), // Removed
                     ),
               ),
               // Removed separate AccountBloc creation here
@@ -788,22 +788,7 @@ GoRouter createRouter({
                           ),
                         ],
                       ),
-                      GoRoute(
-                        path: Routes.followedCountriesList,
-                        name: Routes.followedCountriesListName,
-                        builder:
-                            (context, state) =>
-                                const FollowedCountriesListPage(),
-                        routes: [
-                          GoRoute(
-                            path: Routes.addCountryToFollow,
-                            name: Routes.addCountryToFollowName,
-                            builder:
-                                (context, state) =>
-                                    const AddCountryToFollowPage(),
-                          ),
-                        ],
-                      ),
+                      // GoRoute for followedCountriesList removed
                     ],
                   ),
                   GoRoute(

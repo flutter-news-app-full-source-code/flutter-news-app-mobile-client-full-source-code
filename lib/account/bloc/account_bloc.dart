@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-// Hide Category
 import 'package:ht_auth_repository/ht_auth_repository.dart';
 import 'package:ht_data_repository/ht_data_repository.dart';
 import 'package:ht_shared/ht_shared.dart';
@@ -10,279 +9,291 @@ import 'package:ht_shared/ht_shared.dart';
 part 'account_event.dart';
 part 'account_state.dart';
 
-/// {@template account_bloc}
-/// BLoC responsible for managing the state and logic for the Account feature.
-/// {@endtemplate}
 class AccountBloc extends Bloc<AccountEvent, AccountState> {
-  /// {@macro account_bloc}
   AccountBloc({
     required HtAuthRepository authenticationRepository,
     required HtDataRepository<UserContentPreferences>
-    userContentPreferencesRepository,
-  }) : _authenticationRepository = authenticationRepository,
-       _userContentPreferencesRepository = userContentPreferencesRepository,
-       super(const AccountState()) {
-    // Listen to authentication state changes from the repository
-    _authenticationRepository.authStateChanges.listen(
-      (user) => add(_AccountUserChanged(user: user)),
-    );
+        userContentPreferencesRepository,
+  })  : _authenticationRepository = authenticationRepository,
+        _userContentPreferencesRepository = userContentPreferencesRepository,
+        super(const AccountState()) {
+    // Listen to user changes from HtAuthRepository
+    _userSubscription =
+        _authenticationRepository.authStateChanges.listen((user) {
+      add(AccountUserChanged(user));
+    });
 
-    on<_AccountUserChanged>(_onAccountUserChanged);
-    on<AccountLoadContentPreferencesRequested>(
-      _onAccountLoadContentPreferencesRequested,
-    );
-    on<AccountFollowCategoryToggled>(_onFollowCategoryToggled);
-    on<AccountFollowSourceToggled>(_onFollowSourceToggled);
-    on<AccountFollowCountryToggled>(_onFollowCountryToggled);
-    on<AccountSaveHeadlineToggled>(_onSaveHeadlineToggled);
-    // Handlers for AccountSettingsNavigationRequested and
-    // AccountBackupNavigationRequested are typically handled in the UI layer
-    // (e.g., BlocListener navigating) or could emit specific states if needed.
+    // Register event handlers
+    on<AccountUserChanged>(_onAccountUserChanged);
+    on<AccountLoadUserPreferences>(_onAccountLoadUserPreferences);
+    on<AccountSaveHeadlineToggled>(_onAccountSaveHeadlineToggled);
+    on<AccountFollowCategoryToggled>(_onAccountFollowCategoryToggled);
+    on<AccountFollowSourceToggled>(_onAccountFollowSourceToggled);
+    // AccountFollowCountryToggled handler removed
+    on<AccountClearUserPreferences>(_onAccountClearUserPreferences);
   }
 
   final HtAuthRepository _authenticationRepository;
   final HtDataRepository<UserContentPreferences>
-  _userContentPreferencesRepository;
+      _userContentPreferencesRepository;
+  late StreamSubscription<User?> _userSubscription;
 
-  /// Handles [_AccountUserChanged] events.
-  ///
-  /// Updates the state with the current user and triggers loading
-  /// of user preferences if the user is authenticated.
   Future<void> _onAccountUserChanged(
-    _AccountUserChanged event,
+    AccountUserChanged event,
     Emitter<AccountState> emit,
   ) async {
     emit(state.copyWith(user: event.user));
     if (event.user != null) {
-      // User is authenticated, load preferences
-      add(AccountLoadContentPreferencesRequested(userId: event.user!.id));
+      add(AccountLoadUserPreferences(userId: event.user!.id));
     } else {
-      // User is unauthenticated, clear preferences
-      emit(state.copyWith());
+      // Clear preferences if user is null (logged out)
+      emit(state.copyWith(clearPreferences: true, status: AccountStatus.initial));
     }
   }
 
-  /// Handles [AccountLoadContentPreferencesRequested] events.
-  ///
-  /// Attempts to load the user's content preferences.
-  Future<void> _onAccountLoadContentPreferencesRequested(
-    AccountLoadContentPreferencesRequested event,
+  Future<void> _onAccountLoadUserPreferences(
+    AccountLoadUserPreferences event,
     Emitter<AccountState> emit,
   ) async {
-    emit(state.copyWith(status: AccountStatus.loading)); // Indicate loading
+    emit(state.copyWith(status: AccountStatus.loading));
     try {
       final preferences = await _userContentPreferencesRepository.read(
         id: event.userId,
-        userId: event.userId,
+        userId: event.userId, // Scope to the current user
       );
       emit(
-        state.copyWith(status: AccountStatus.success, preferences: preferences),
+        state.copyWith(
+          status: AccountStatus.success,
+          preferences: preferences,
+          clearErrorMessage: true,
+        ),
       );
     } on NotFoundException {
-      // Specifically handle NotFound
-      emit(
-        state.copyWith(
-          status: AccountStatus.success, // It's a success, just no data
-          preferences: UserContentPreferences(
-            id: event.userId,
-          ), // Provide default/empty
-        ),
-      );
+      // If preferences not found, create a default one for the user
+      final defaultPreferences = UserContentPreferences(id: event.userId);
+      try {
+        await _userContentPreferencesRepository.create(
+          item: defaultPreferences,
+          userId: event.userId,
+        );
+        emit(
+          state.copyWith(
+            status: AccountStatus.success,
+            preferences: defaultPreferences,
+            clearErrorMessage: true,
+          ),
+        );
+      } catch (e) {
+        emit(
+          state.copyWith(
+            status: AccountStatus.failure,
+            errorMessage: 'Failed to create default preferences.',
+          ),
+        );
+      }
     } on HtHttpException catch (e) {
-      // Handle other HTTP errors
       emit(
-        state.copyWith(
-          status: AccountStatus.failure,
-          errorMessage: 'Failed to load preferences: ${e.message}',
-          preferences: UserContentPreferences(
-            id: event.userId,
-          ), // Provide default
-        ),
+        state.copyWith(status: AccountStatus.failure, errorMessage: e.message),
       );
     } catch (e) {
-      // Catch-all for other unexpected errors
       emit(
         state.copyWith(
           status: AccountStatus.failure,
-          errorMessage: 'An unexpected error occurred: $e',
-          preferences: UserContentPreferences(
-            id: event.userId,
-          ), // Provide default
+          errorMessage: 'An unexpected error occurred.',
         ),
       );
     }
   }
 
-  Future<void> _persistPreferences(
-    UserContentPreferences preferences,
-    Emitter<AccountState> emit,
-  ) async {
-    if (state.user == null) {
-      emit(
-        state.copyWith(
-          status: AccountStatus.failure,
-          errorMessage: 'User not authenticated to save preferences.',
-        ),
-      );
-      return;
-    }
-    print(
-      '[AccountBloc._persistPreferences] Attempting to persist preferences for user ${state.user!.id}',
-    );
-    print(
-      '[AccountBloc._persistPreferences] Preferences to save: ${preferences.toJson()}',
-    );
-    try {
-      await _userContentPreferencesRepository.update(
-        id: state.user!.id, // ID of the preferences object is the user's ID
-        item: preferences,
-        userId: state.user!.id,
-      );
-      print(
-        '[AccountBloc._persistPreferences] Successfully persisted preferences for user ${state.user!.id}',
-      );
-      // Optimistic update already done, emit success if needed for UI feedback
-      // emit(state.copyWith(status: AccountStatus.success));
-    } on HtHttpException catch (e) {
-      print(
-        '[AccountBloc._persistPreferences] HtHttpException while persisting: ${e.message}',
-      );
-      emit(
-        state.copyWith(
-          status: AccountStatus.failure,
-          errorMessage: 'Failed to save preferences: ${e.message}',
-        ),
-      );
-    } catch (e) {
-      print(
-        '[AccountBloc._persistPreferences] Unknown error while persisting: $e',
-      );
-      emit(
-        state.copyWith(
-          status: AccountStatus.failure,
-          errorMessage: 'An unexpected error occurred while saving: $e',
-        ),
-      );
-    }
-  }
-
-  Future<void> _onFollowCategoryToggled(
-    AccountFollowCategoryToggled event,
-    Emitter<AccountState> emit,
-  ) async {
-    if (state.preferences == null || state.user == null) return;
-
-    final currentPrefs = state.preferences!;
-    final updatedFollowedCategories = List<Category>.from(
-      currentPrefs.followedCategories,
-    );
-
-    final isCurrentlyFollowing = updatedFollowedCategories.any(
-      (category) => category.id == event.category.id,
-    );
-
-    if (isCurrentlyFollowing) {
-      updatedFollowedCategories.removeWhere(
-        (category) => category.id == event.category.id,
-      );
-    } else {
-      updatedFollowedCategories.add(event.category);
-    }
-
-    final newPreferences = currentPrefs.copyWith(
-      followedCategories: updatedFollowedCategories,
-    );
-    emit(state.copyWith(preferences: newPreferences));
-    await _persistPreferences(newPreferences, emit);
-  }
-
-  Future<void> _onFollowSourceToggled(
-    AccountFollowSourceToggled event,
-    Emitter<AccountState> emit,
-  ) async {
-    if (state.preferences == null || state.user == null) return;
-
-    final currentPrefs = state.preferences!;
-    final updatedFollowedSources = List<Source>.from(
-      currentPrefs.followedSources,
-    );
-
-    final isCurrentlyFollowing = updatedFollowedSources.any(
-      (source) => source.id == event.source.id,
-    );
-
-    if (isCurrentlyFollowing) {
-      updatedFollowedSources.removeWhere(
-        (source) => source.id == event.source.id,
-      );
-    } else {
-      updatedFollowedSources.add(event.source);
-    }
-
-    final newPreferences = currentPrefs.copyWith(
-      followedSources: updatedFollowedSources,
-    );
-    emit(state.copyWith(preferences: newPreferences));
-    await _persistPreferences(newPreferences, emit);
-  }
-
-  Future<void> _onFollowCountryToggled(
-    AccountFollowCountryToggled event,
-    Emitter<AccountState> emit,
-  ) async {
-    if (state.preferences == null || state.user == null) return;
-
-    final currentPrefs = state.preferences!;
-    final updatedFollowedCountries = List<Country>.from(
-      currentPrefs.followedCountries,
-    );
-
-    final isCurrentlyFollowing = updatedFollowedCountries.any(
-      (country) => country.id == event.country.id,
-    );
-
-    if (isCurrentlyFollowing) {
-      updatedFollowedCountries.removeWhere(
-        (country) => country.id == event.country.id,
-      );
-    } else {
-      updatedFollowedCountries.add(event.country);
-    }
-
-    final newPreferences = currentPrefs.copyWith(
-      followedCountries: updatedFollowedCountries,
-    );
-    emit(state.copyWith(preferences: newPreferences));
-    await _persistPreferences(newPreferences, emit);
-  }
-
-  Future<void> _onSaveHeadlineToggled(
+  Future<void> _onAccountSaveHeadlineToggled(
     AccountSaveHeadlineToggled event,
     Emitter<AccountState> emit,
   ) async {
-    if (state.preferences == null || state.user == null) return;
+    if (state.user == null || state.preferences == null) return;
+    emit(state.copyWith(status: AccountStatus.loading));
 
     final currentPrefs = state.preferences!;
-    final updatedSavedHeadlines = List<Headline>.from(
-      currentPrefs.savedHeadlines,
-    );
-
-    final isCurrentlySaved = updatedSavedHeadlines.any(
-      (headline) => headline.id == event.headline.id,
-    );
+    final isCurrentlySaved =
+        currentPrefs.savedHeadlines.any((h) => h.id == event.headline.id);
+    final List<Headline> updatedSavedHeadlines;
 
     if (isCurrentlySaved) {
-      updatedSavedHeadlines.removeWhere(
-        (headline) => headline.id == event.headline.id,
-      );
+      updatedSavedHeadlines = List.from(currentPrefs.savedHeadlines)
+        ..removeWhere((h) => h.id == event.headline.id);
     } else {
-      updatedSavedHeadlines.add(event.headline);
+      updatedSavedHeadlines = List.from(currentPrefs.savedHeadlines)
+        ..add(event.headline);
     }
 
-    final newPreferences = currentPrefs.copyWith(
-      savedHeadlines: updatedSavedHeadlines,
-    );
-    emit(state.copyWith(preferences: newPreferences));
-    await _persistPreferences(newPreferences, emit);
+    final updatedPrefs =
+        currentPrefs.copyWith(savedHeadlines: updatedSavedHeadlines);
+
+    try {
+      await _userContentPreferencesRepository.update(
+        id: state.user!.id,
+        item: updatedPrefs,
+        userId: state.user!.id,
+      );
+      emit(
+        state.copyWith(
+          status: AccountStatus.success,
+          preferences: updatedPrefs,
+          clearErrorMessage: true,
+        ),
+      );
+    } on HtHttpException catch (e) {
+      emit(
+        state.copyWith(status: AccountStatus.failure, errorMessage: e.message),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: AccountStatus.failure,
+          errorMessage: 'Failed to update saved headlines.',
+        ),
+      );
+    }
+  }
+
+  Future<void> _onAccountFollowCategoryToggled(
+    AccountFollowCategoryToggled event,
+    Emitter<AccountState> emit,
+  ) async {
+    if (state.user == null || state.preferences == null) return;
+    emit(state.copyWith(status: AccountStatus.loading));
+
+    final currentPrefs = state.preferences!;
+    final isCurrentlyFollowed = currentPrefs.followedCategories
+        .any((c) => c.id == event.category.id);
+    final List<Category> updatedFollowedCategories;
+
+    if (isCurrentlyFollowed) {
+      updatedFollowedCategories = List.from(currentPrefs.followedCategories)
+        ..removeWhere((c) => c.id == event.category.id);
+    } else {
+      updatedFollowedCategories = List.from(currentPrefs.followedCategories)
+        ..add(event.category);
+    }
+
+    final updatedPrefs =
+        currentPrefs.copyWith(followedCategories: updatedFollowedCategories);
+
+    try {
+      await _userContentPreferencesRepository.update(
+        id: state.user!.id,
+        item: updatedPrefs,
+        userId: state.user!.id,
+      );
+      emit(
+        state.copyWith(
+          status: AccountStatus.success,
+          preferences: updatedPrefs,
+          clearErrorMessage: true,
+        ),
+      );
+    } on HtHttpException catch (e) {
+      emit(
+        state.copyWith(status: AccountStatus.failure, errorMessage: e.message),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: AccountStatus.failure,
+          errorMessage: 'Failed to update followed categories.',
+        ),
+      );
+    }
+  }
+
+  Future<void> _onAccountFollowSourceToggled(
+    AccountFollowSourceToggled event,
+    Emitter<AccountState> emit,
+  ) async {
+    if (state.user == null || state.preferences == null) return;
+    emit(state.copyWith(status: AccountStatus.loading));
+
+    final currentPrefs = state.preferences!;
+    final isCurrentlyFollowed =
+        currentPrefs.followedSources.any((s) => s.id == event.source.id);
+    final List<Source> updatedFollowedSources;
+
+    if (isCurrentlyFollowed) {
+      updatedFollowedSources = List.from(currentPrefs.followedSources)
+        ..removeWhere((s) => s.id == event.source.id);
+    } else {
+      updatedFollowedSources = List.from(currentPrefs.followedSources)
+        ..add(event.source);
+    }
+
+    final updatedPrefs =
+        currentPrefs.copyWith(followedSources: updatedFollowedSources);
+
+    try {
+      await _userContentPreferencesRepository.update(
+        id: state.user!.id,
+        item: updatedPrefs,
+        userId: state.user!.id,
+      );
+      emit(
+        state.copyWith(
+          status: AccountStatus.success,
+          preferences: updatedPrefs,
+          clearErrorMessage: true,
+        ),
+      );
+    } on HtHttpException catch (e) {
+      emit(
+        state.copyWith(status: AccountStatus.failure, errorMessage: e.message),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: AccountStatus.failure,
+          errorMessage: 'Failed to update followed sources.',
+        ),
+      );
+    }
+  }
+
+  // _onAccountFollowCountryToggled method removed
+
+  Future<void> _onAccountClearUserPreferences(
+    AccountClearUserPreferences event,
+    Emitter<AccountState> emit,
+  ) async {
+    emit(state.copyWith(status: AccountStatus.loading));
+    try {
+      // Create a new default preferences object to "clear" existing ones
+      final defaultPreferences = UserContentPreferences(id: event.userId);
+      await _userContentPreferencesRepository.update(
+        id: event.userId,
+        item: defaultPreferences,
+        userId: event.userId,
+      );
+      emit(
+        state.copyWith(
+          status: AccountStatus.success,
+          preferences: defaultPreferences,
+          clearErrorMessage: true,
+        ),
+      );
+    } on HtHttpException catch (e) {
+      emit(
+        state.copyWith(status: AccountStatus.failure, errorMessage: e.message),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: AccountStatus.failure,
+          errorMessage: 'Failed to clear user preferences.',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<void> close() {
+    _userSubscription.cancel();
+    return super.close();
   }
 }

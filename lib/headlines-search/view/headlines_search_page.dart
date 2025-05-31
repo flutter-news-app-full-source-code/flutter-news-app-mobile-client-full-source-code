@@ -10,13 +10,14 @@ import 'package:ht_main/headlines-search/bloc/headlines_search_bloc.dart';
 import 'package:ht_main/headlines-search/models/search_model_type.dart';
 // Import new item widgets
 import 'package:ht_main/headlines-search/widgets/category_item_widget.dart';
-import 'package:ht_main/headlines-search/widgets/country_item_widget.dart';
+// import 'package:ht_main/headlines-search/widgets/country_item_widget.dart'; // Removed
 import 'package:ht_main/headlines-search/widgets/source_item_widget.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/constants/app_spacing.dart';
 import 'package:ht_main/shared/shared.dart'; // Imports new headline tiles
-import 'package:ht_shared/ht_shared.dart';
+// Adjusted imports to only include what's necessary after country removal
+import 'package:ht_shared/ht_shared.dart' show Category, Headline, Source, HeadlineImageStyle, SearchModelType;
 
 /// Page widget responsible for providing the BLoC for the headlines search feature.
 class HeadlinesSearchPage extends StatelessWidget {
@@ -58,8 +59,10 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
         _showClearButton = _textController.text.isNotEmpty;
       });
     });
-    // Set initial model type in BLoC if not already set (e.g. on first load)
-    // Though BLoC state now defaults, this ensures UI and BLoC are in sync.
+    // Ensure _selectedModelType is valid (it should be, as .country is removed from enum)
+    if (!SearchModelType.values.contains(_selectedModelType)) {
+        _selectedModelType = SearchModelType.headline; 
+    }
     context.read<HeadlinesSearchBloc>().add(
       HeadlinesSearchModelTypeChanged(_selectedModelType),
     );
@@ -102,21 +105,36 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
     final colorScheme = theme.colorScheme;
     final appBarTheme = theme.appBarTheme;
 
+    // Use all values from SearchModelType as .country is already removed from the enum itself
+    final availableSearchModelTypes = SearchModelType.values.toList();
+    
+    // Ensure _selectedModelType is still valid if it somehow was .country
+    // (though this shouldn't happen if initState logic is correct and enum is updated)
+    if (!availableSearchModelTypes.contains(_selectedModelType)) {
+      _selectedModelType = SearchModelType.headline; 
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+           context.read<HeadlinesSearchBloc>().add(
+                    HeadlinesSearchModelTypeChanged(_selectedModelType),
+                  );
+        }
+      });
+    }
+
     return Scaffold(
       appBar: AppBar(
-        // Removed leading and leadingWidth
-        titleSpacing: AppSpacing.paddingSmall, // Adjust title spacing if needed
+        titleSpacing: AppSpacing.paddingSmall,
         title: Row(
           children: [
             SizedBox(
-              width: 140, // Constrain dropdown width
+              width: 140,
               child: DropdownButtonFormField<SearchModelType>(
                 value: _selectedModelType,
                 decoration: const InputDecoration(
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.symmetric(
-                    horizontal: AppSpacing.xs, // Minimal horizontal padding
-                    vertical: AppSpacing.xs, // Reduce vertical padding
+                    horizontal: AppSpacing.xs,
+                    vertical: AppSpacing.xs,
                   ),
                 ),
                 style: theme.textTheme.titleMedium?.copyWith(
@@ -129,30 +147,30 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                   Icons.arrow_drop_down,
                   color: appBarTheme.iconTheme?.color ?? colorScheme.onSurface,
                 ),
-                items:
-                    SearchModelType.values.map((SearchModelType type) {
-                      String displayLocalizedName;
-                      switch (type) {
-                        case SearchModelType.headline:
-                          displayLocalizedName = l10n.searchModelTypeHeadline;
-                        case SearchModelType.category:
-                          displayLocalizedName = l10n.searchModelTypeCategory;
-                        case SearchModelType.source:
-                          displayLocalizedName = l10n.searchModelTypeSource;
-                        case SearchModelType.country:
-                          displayLocalizedName = l10n.searchModelTypeCountry;
-                      }
-                      return DropdownMenuItem<SearchModelType>(
-                        value: type,
-                        child: Text(
-                          displayLocalizedName,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            // Consistent style
-                            color: colorScheme.onSurface,
-                          ),
-                        ),
-                      );
-                    }).toList(),
+                items: availableSearchModelTypes.map((SearchModelType type) {
+                  String displayLocalizedName;
+                  // The switch is now exhaustive as SearchModelType.country is removed from the enum
+                  switch (type) {
+                    case SearchModelType.headline:
+                      displayLocalizedName = l10n.searchModelTypeHeadline;
+                      break;
+                    case SearchModelType.category:
+                      displayLocalizedName = l10n.searchModelTypeCategory;
+                      break;
+                    case SearchModelType.source:
+                      displayLocalizedName = l10n.searchModelTypeSource;
+                      break;
+                  }
+                  return DropdownMenuItem<SearchModelType>(
+                    value: type,
+                    child: Text(
+                      displayLocalizedName,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                  );
+                }).toList(),
                 onChanged: (SearchModelType? newValue) {
                   if (newValue != null) {
                     setState(() {
@@ -165,9 +183,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                 },
               ),
             ),
-            const SizedBox(
-              width: AppSpacing.sm,
-            ), // Spacing between dropdown and textfield
+            const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: TextField(
                 controller: _textController,
@@ -184,9 +200,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                   fillColor: colorScheme.surface.withAlpha(26),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.paddingMedium,
-                    vertical:
-                        AppSpacing.paddingSmall +
-                        3, // Fine-tune vertical padding for alignment
+                    vertical: AppSpacing.paddingSmall + 3,
                   ),
                   suffixIcon:
                       _showClearButton
@@ -218,16 +232,13 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
         builder: (context, state) {
           return switch (state) {
             HeadlinesSearchInitial() => InitialStateWidget(
-              icon: Icons.search, // Changed icon
-              headline: l10n.searchPageInitialHeadline, // Use new generic key
-              subheadline:
-                  l10n.searchPageInitialSubheadline, // Use new generic key
+              icon: Icons.search,
+              headline: l10n.searchPageInitialHeadline,
+              subheadline: l10n.searchPageInitialSubheadline,
             ),
-            // Use more generic loading text or existing keys
             HeadlinesSearchLoading() => InitialStateWidget(
               icon: Icons.manage_search,
-              headline:
-                  l10n.headlinesFeedLoadingHeadline, // Re-use feed loading
+              headline: l10n.headlinesFeedLoadingHeadline,
               subheadline:
                   'Searching ${state.selectedModelType.displayName.toLowerCase()}...',
             ),
@@ -255,24 +266,19 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                   )
                   : ListView.separated(
                     controller: _scrollController,
-                    padding: const EdgeInsets.all(
-                      AppSpacing.paddingMedium,
-                    ), // Add overall padding
+                    padding: const EdgeInsets.all(AppSpacing.paddingMedium),
                     itemCount: hasMore ? results.length + 1 : results.length,
                     separatorBuilder:
-                        (context, index) => const SizedBox(
-                          height: AppSpacing.md,
-                        ), // Add separator
+                        (context, index) => const SizedBox(height: AppSpacing.md),
                     itemBuilder: (context, index) {
                       if (index >= results.length) {
                         return const Padding(
-                          padding: EdgeInsets.symmetric(
-                            vertical: AppSpacing.lg,
-                          ), // Adjusted padding for loader
+                          padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
                           child: Center(child: CircularProgressIndicator()),
                         );
                       }
                       final item = results[index];
+                      // The switch is now exhaustive for the remaining SearchModelType values
                       switch (resultsModelType) {
                         case SearchModelType.headline:
                           final headline = item as Headline;
@@ -321,8 +327,6 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                           return CategoryItemWidget(category: item as Category);
                         case SearchModelType.source:
                           return SourceItemWidget(source: item as Source);
-                        case SearchModelType.country:
-                          return CountryItemWidget(country: item as Country);
                       }
                     },
                   ),
@@ -339,7 +343,6 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                       HeadlinesSearchFetchRequested(searchTerm: lastSearchTerm),
                     ),
               ),
-            // Add default case for exhaustiveness
             _ => const SizedBox.shrink(),
           };
         },
@@ -351,6 +354,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
     SearchModelType modelType,
     AppLocalizations l10n,
   ) {
+    // The switch is now exhaustive for the remaining SearchModelType values
     switch (modelType) {
       case SearchModelType.headline:
         return l10n.searchHintTextHeadline;
@@ -358,8 +362,6 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
         return l10n.searchHintTextCategory;
       case SearchModelType.source:
         return l10n.searchHintTextSource;
-      case SearchModelType.country:
-        return l10n.searchHintTextCountry;
     }
   }
 }

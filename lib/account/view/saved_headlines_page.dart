@@ -28,8 +28,8 @@ class SavedHeadlinesPage extends StatelessWidget {
       appBar: AppBar(title: Text(l10n.accountSavedHeadlinesTile)),
       body: BlocBuilder<AccountBloc, AccountState>(
         builder: (context, state) {
-          if (state.status == AccountStatus.loading &&
-              state.preferences == null) {
+          // Initial load or loading state for preferences
+          if (state.status == AccountStatus.loading && state.preferences == null) {
             return const LoadingStateWidget(
               icon: Icons.bookmarks_outlined,
               headline: 'Loading Saved Headlines...', // Placeholder
@@ -38,8 +38,8 @@ class SavedHeadlinesPage extends StatelessWidget {
             );
           }
 
-          if (state.status == AccountStatus.failure &&
-              state.preferences == null) {
+          // Failure to load preferences
+          if (state.status == AccountStatus.failure && state.preferences == null) {
             return FailureStateWidget(
               message:
                   state.errorMessage ??
@@ -47,10 +47,10 @@ class SavedHeadlinesPage extends StatelessWidget {
               onRetry: () {
                 if (state.user?.id != null) {
                   context.read<AccountBloc>().add(
-                    AccountLoadContentPreferencesRequested(
-                      userId: state.user!.id,
-                    ),
-                  );
+                        AccountLoadUserPreferences( // Corrected event name
+                          userId: state.user!.id,
+                        ),
+                      );
                 }
               },
             );
@@ -59,11 +59,11 @@ class SavedHeadlinesPage extends StatelessWidget {
           final savedHeadlines = state.preferences?.savedHeadlines ?? [];
 
           if (savedHeadlines.isEmpty) {
-            return const InitialStateWidget(
+            return const InitialStateWidget( 
               icon: Icons.bookmark_add_outlined,
-              headline: 'No Saved Headlines', // Placeholder
+              headline: 'No Saved Headlines', // Placeholder - Reverted
               subheadline:
-                  "You haven't saved any articles yet. Start exploring!", // Placeholder
+                  "You haven't saved any articles yet. Start exploring!", // Placeholder - Reverted
             );
           }
 
@@ -103,6 +103,7 @@ class SavedHeadlinesPage extends StatelessWidget {
                         ),
                     trailing: trailingButton,
                   );
+                  break;
                 case HeadlineImageStyle.smallThumbnail:
                   tile = HeadlineTileImageStart(
                     headline: headline,
@@ -114,6 +115,7 @@ class SavedHeadlinesPage extends StatelessWidget {
                         ),
                     trailing: trailingButton,
                   );
+                  break;
                 case HeadlineImageStyle.largeThumbnail:
                   tile = HeadlineTileImageTop(
                     headline: headline,
@@ -125,6 +127,7 @@ class SavedHeadlinesPage extends StatelessWidget {
                         ),
                     trailing: trailingButton,
                   );
+                  break;
               }
               return tile;
             },

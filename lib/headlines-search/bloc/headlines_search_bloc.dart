@@ -3,7 +3,7 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ht_data_repository/ht_data_repository.dart'; // Generic Data Repository
 import 'package:ht_main/headlines-search/models/search_model_type.dart'; // Import SearchModelType
-import 'package:ht_shared/ht_shared.dart'; // Shared models, including Headline
+import 'package:ht_shared/ht_shared.dart' show Headline, Category, Source, HtHttpException, PaginatedResponse; // Shared models
 
 part 'headlines_search_event.dart';
 part 'headlines_search_state.dart';
@@ -14,11 +14,11 @@ class HeadlinesSearchBloc
     required HtDataRepository<Headline> headlinesRepository,
     required HtDataRepository<Category> categoryRepository,
     required HtDataRepository<Source> sourceRepository,
-    required HtDataRepository<Country> countryRepository,
+    // required HtDataRepository<Country> countryRepository, // Removed
   }) : _headlinesRepository = headlinesRepository,
        _categoryRepository = categoryRepository,
        _sourceRepository = sourceRepository,
-       _countryRepository = countryRepository,
+       // _countryRepository = countryRepository, // Removed
        super(const HeadlinesSearchInitial()) {
     on<HeadlinesSearchModelTypeChanged>(_onHeadlinesSearchModelTypeChanged);
     on<HeadlinesSearchFetchRequested>(
@@ -30,7 +30,7 @@ class HeadlinesSearchBloc
   final HtDataRepository<Headline> _headlinesRepository;
   final HtDataRepository<Category> _categoryRepository;
   final HtDataRepository<Source> _sourceRepository;
-  final HtDataRepository<Country> _countryRepository;
+  // final HtDataRepository<Country> _countryRepository; // Removed
   static const _limit = 10;
 
   Future<void> _onHeadlinesSearchModelTypeChanged(
@@ -49,11 +49,6 @@ class HeadlinesSearchBloc
             : null;
 
     emit(HeadlinesSearchInitial(selectedModelType: event.newModelType));
-
-    // Removed automatic re-search:
-    // if (currentSearchTerm != null && currentSearchTerm.isNotEmpty) {
-    //   add(HeadlinesSearchFetchRequested(searchTerm: currentSearchTerm));
-    // }
   }
 
   Future<void> _onSearchFetchRequested(
@@ -103,12 +98,12 @@ class HeadlinesSearchBloc
                 limit: _limit,
                 startAfterId: successState.cursor,
               );
-            case SearchModelType.country:
-              response = await _countryRepository.readAllByQuery(
-                {'q': searchTerm, 'model': modelType.toJson()},
-                limit: _limit,
-                startAfterId: successState.cursor,
-              );
+            // case SearchModelType.country: // Removed
+            //   response = await _countryRepository.readAllByQuery(
+            //     {'q': searchTerm, 'model': modelType.toJson()},
+            //     limit: _limit,
+            //     startAfterId: successState.cursor,
+            //   );
           }
           emit(
             successState.copyWith(
@@ -154,11 +149,11 @@ class HeadlinesSearchBloc
             'q': searchTerm,
             'model': modelType.toJson(),
           }, limit: _limit,);
-        case SearchModelType.country:
-          response = await _countryRepository.readAllByQuery({
-            'q': searchTerm,
-            'model': modelType.toJson(),
-          }, limit: _limit,);
+        // case SearchModelType.country: // Removed
+        //   response = await _countryRepository.readAllByQuery({
+        //     'q': searchTerm,
+        //     'model': modelType.toJson(),
+        //   }, limit: _limit,);
       }
       emit(
         HeadlinesSearchSuccess(

@@ -191,6 +191,7 @@ GoRouter createRouter({
             isGoingToAccount ||
             currentLocation == Routes.categoryDetails ||
             currentLocation == Routes.sourceDetails ||
+            currentLocation.startsWith(Routes.globalArticleDetails.split('/:id').first) || // Allow global article details
             currentLocation.startsWith('${Routes.feed}/${Routes.articleDetailsName.split('/:id').first}') ||
             currentLocation.startsWith('${Routes.search}/${Routes.searchArticleDetailsName.split('/:id').first}') ||
             currentLocation.startsWith('${Routes.account}/${Routes.accountSavedHeadlines}/${Routes.accountArticleDetailsName.split('/:id').first}')) {
@@ -334,6 +335,66 @@ GoRouter createRouter({
           return BlocProvider.value(
             value: accountBloc,
             child: EntityDetailsPage(args: args),
+          );
+        },
+      ),
+      // --- Global Article Details Route (Top Level) ---
+      // This GoRoute provides a top-level, globally accessible way to view the
+      // HeadlineDetailsPage.
+      //
+      // Purpose:
+      // It is specifically designed for navigating to article details from contexts
+      // that are *outside* the main StatefulShellRoute's branches (e.g., from
+      // EntityDetailsPage, which is itself a top-level route, or potentially
+      // from other future top-level pages or deep links).
+      //
+      // Why it's necessary:
+      // Attempting to push a route that is deeply nested within a specific shell
+      // branch (like '/feed/article/:id') from a BuildContext outside of that
+      // shell can lead to navigator context issues and assertion failures.
+      // This global route avoids such problems by providing a clean, direct path
+      // to the HeadlineDetailsPage.
+      //
+      // How it differs:
+      // This route is distinct from the article detail routes nested within the
+      // StatefulShellRoute branches (e.g., Routes.articleDetailsName under /feed,
+      // Routes.searchArticleDetailsName under /search). Those nested routes are
+      // intended for navigation *within* their respective shell branches,
+      // preserving the shell's UI (like the bottom navigation bar).
+      // This global route, being top-level, will typically cover the entire screen.
+      GoRoute(
+        path: Routes.globalArticleDetails, // Use new path: '/article/:id'
+        name: Routes.globalArticleDetailsName, // Use new name
+        builder: (context, state) {
+          final headlineFromExtra = state.extra as Headline?;
+          final headlineIdFromPath = state.pathParameters['id'];
+
+          // Ensure accountBloc is available if needed by HeadlineDetailsPage
+          // or its descendants for actions like saving.
+          // If AccountBloc is already provided higher up (e.g., in AppShell or App),
+          // this specific BlocProvider.value might not be strictly necessary here,
+          // but it's safer to ensure it's available for this top-level route.
+          // We are using the `accountBloc` instance created at the top of `createRouter`.
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider.value(value: accountBloc),
+              BlocProvider(
+                create: (context) => HeadlineDetailsBloc(
+                  headlinesRepository:
+                      context.read<HtDataRepository<Headline>>(),
+                ),
+              ),
+              BlocProvider(
+                create: (context) => SimilarHeadlinesBloc(
+                  headlinesRepository:
+                      context.read<HtDataRepository<Headline>>(),
+                ),
+              ),
+            ],
+            child: HeadlineDetailsPage(
+              initialHeadline: headlineFromExtra,
+              headlineId: headlineFromExtra?.id ?? headlineIdFromPath,
+            ),
           );
         },
       ),

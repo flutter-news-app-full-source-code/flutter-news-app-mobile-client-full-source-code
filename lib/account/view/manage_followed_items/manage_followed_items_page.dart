@@ -43,17 +43,7 @@ class ManageFollowedItemsPage extends StatelessWidget {
             },
           ),
           const Divider(indent: AppSpacing.lg, endIndent: AppSpacing.lg),
-          ListTile(
-            leading: const Icon(Icons.public_outlined),
-            title: Text(
-              l10n.headlinesFeedFilterEventCountryLabel,
-            ), // "Countries"
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              context.goNamed(Routes.followedCountriesListName);
-            },
-          ),
-          const Divider(indent: AppSpacing.lg, endIndent: AppSpacing.lg),
+          // ListTile for Followed Countries removed
         ],
       ),
     );

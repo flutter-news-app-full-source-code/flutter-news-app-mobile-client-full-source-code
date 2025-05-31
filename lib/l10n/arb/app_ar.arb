@@ -779,5 +779,9 @@
     "headlineSaveErrorSnackbar": "تعذر تحديث حالة الحفظ. يرجى المحاولة مرة أخرى.",
     "@headlineSaveErrorSnackbar": {
         "description": "Snackbar message shown when saving/unsaving a headline fails"
+    },
+    "shareActionTooltip": "مشاركة العنوان",
+    "@shareActionTooltip": {
+        "description": "Tooltip for the share button on the headline details page"
     }
 }

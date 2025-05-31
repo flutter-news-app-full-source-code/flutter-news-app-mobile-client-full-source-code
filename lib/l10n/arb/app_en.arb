@@ -779,5 +779,9 @@
     "headlineSaveErrorSnackbar": "Could not update saved status. Please try again.",
     "@headlineSaveErrorSnackbar": {
         "description": "Snackbar message shown when saving/unsaving a headline fails"
+    },
+    "shareActionTooltip": "Share headline",
+    "@shareActionTooltip": {
+        "description": "Tooltip for the share button on the headline details page"
     }
 }

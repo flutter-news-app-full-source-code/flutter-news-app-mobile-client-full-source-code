@@ -268,45 +268,56 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
             child: Text(headline.title, style: textTheme.headlineMedium),
           ),
         ),
-        if (headline.imageUrl != null)
-          SliverPadding(
-            padding: const EdgeInsets.only(
-              top: AppSpacing.lg,
-              left: AppSpacing.paddingLarge,
-              right: AppSpacing.paddingLarge,
-            ),
-            sliver: SliverToBoxAdapter(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(AppSpacing.md),
-                child: Image.network(
-                  headline.imageUrl!,
-                  width: double.infinity,
-                  height: 200,
-                  fit: BoxFit.cover,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Container(
+        // Image or Placeholder Section
+        SliverPadding(
+          padding: const EdgeInsets.only(
+            top: AppSpacing.lg,
+            left: AppSpacing.paddingLarge,
+            right: AppSpacing.paddingLarge,
+          ),
+          sliver: SliverToBoxAdapter(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(AppSpacing.md),
+              child: headline.imageUrl != null
+                  ? Image.network(
+                      headline.imageUrl!,
                       width: double.infinity,
                       height: 200,
-                      color: colorScheme.surfaceContainerHighest,
-                      child: const Center(child: CircularProgressIndicator()),
-                    );
-                  },
-                  errorBuilder:
-                      (context, error, stackTrace) => Container(
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          width: double.infinity,
+                          height: 200,
+                          color: colorScheme.surfaceContainerHighest,
+                          child:
+                              const Center(child: CircularProgressIndicator()),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) => Container(
                         width: double.infinity,
                         height: 200,
                         color: colorScheme.surfaceContainerHighest,
                         child: Icon(
-                          Icons.broken_image,
+                          Icons.broken_image_outlined,
                           color: colorScheme.onSurfaceVariant,
                           size: AppSpacing.xxl,
                         ),
                       ),
-                ),
-              ),
+                    )
+                  : Container(
+                      width: double.infinity,
+                      height: 200,
+                      color: colorScheme.surfaceContainerHighest,
+                      child: Icon(
+                        Icons.image_not_supported_outlined,
+                        color: colorScheme.onSurfaceVariant,
+                        size: AppSpacing.xxl,
+                      ),
+                    ),
             ),
           ),
+        ),
         SliverPadding(
           padding: horizontalPadding.copyWith(top: AppSpacing.lg),
           sliver: SliverToBoxAdapter(

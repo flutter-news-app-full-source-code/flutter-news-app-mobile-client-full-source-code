@@ -208,7 +208,9 @@ class _HeadlineMetadataRow extends StatelessWidget {
               label: Text(headline.category!.name),
               labelStyle: chipLabelStyle,
               backgroundColor: chipBackgroundColor,
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+              padding: EdgeInsets.zero, // Changed
+              labelPadding:
+                  const EdgeInsets.symmetric(horizontal: AppSpacing.xs), // Added
               visualDensity: VisualDensity.compact,
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
@@ -235,7 +237,9 @@ class _HeadlineMetadataRow extends StatelessWidget {
               label: Text(headline.source!.name),
               labelStyle: chipLabelStyle,
               backgroundColor: chipBackgroundColor,
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+              padding: EdgeInsets.zero, // Changed
+              labelPadding:
+                  const EdgeInsets.symmetric(horizontal: AppSpacing.xs), // Added
               visualDensity: VisualDensity.compact,
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),

@@ -68,6 +68,11 @@ abstract final class Routes {
   static const settingsArticleName = 'settingsArticle';
   static const settingsNotifications = 'notifications';
   static const settingsNotificationsName = 'settingsNotifications';
+
+  // --- Language Settings Sub-Route (relative to /account/settings) ---
+  static const settingsLanguage = 'language'; // Path: /account/settings/language
+  static const settingsLanguageName = 'settingsLanguage';
+
   // Add names for notification sub-selection routes if needed later
   // static const settingsNotificationCategories = 'categories';
   // static const settingsNotificationCategoriesName = 'settingsNotificationCategories';

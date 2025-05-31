@@ -39,6 +39,7 @@ import 'package:ht_main/settings/bloc/settings_bloc.dart'; // Added
 import 'package:ht_main/settings/view/appearance_settings_page.dart'; // Added
 import 'package:ht_main/settings/view/feed_settings_page.dart'; // Added
 import 'package:ht_main/settings/view/font_settings_page.dart'; // Added for new page
+import 'package:ht_main/settings/view/language_settings_page.dart'; // Added for new page
 import 'package:ht_main/settings/view/notification_settings_page.dart'; // Added
 import 'package:ht_main/settings/view/settings_page.dart'; // Added
 import 'package:ht_main/settings/view/theme_settings_page.dart'; // Added for new page
@@ -591,6 +592,11 @@ GoRouter createRouter({
                             path: Routes.settingsNotifications, // 'notifications' relative to /account/settings
                             name: Routes.settingsNotificationsName,
                             builder: (context, state) => const NotificationSettingsPage(),
+                          ),
+                          GoRoute(
+                            path: Routes.settingsLanguage, // 'language' relative to /account/settings
+                            name: Routes.settingsLanguageName,
+                            builder: (context, state) => const LanguageSettingsPage(),
                           ),
                         ],
                       ),

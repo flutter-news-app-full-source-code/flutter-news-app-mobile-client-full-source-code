@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart'; // Added
+import 'package:ht_main/entity_details/view/entity_details_page.dart'; // Added
+import 'package:ht_main/router/routes.dart'; // Added
 import 'package:ht_shared/ht_shared.dart'; // Import Category model
 
 /// A simple widget to display a Category search result.
@@ -19,12 +22,10 @@ class CategoryItemWidget extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               )
               : null,
-      // TODO(you): Implement onTap navigation if needed for categories
       onTap: () {
-        // Example: Navigate to a filtered feed for this category
-        // context.goNamed('someCategoryFeedRoute', params: {'id': category.id});
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Tapped on category: ${category.name}')),
+        context.push(
+          Routes.categoryDetails,
+          extra: EntityDetailsPageArguments(entity: category),
         );
       },
     );

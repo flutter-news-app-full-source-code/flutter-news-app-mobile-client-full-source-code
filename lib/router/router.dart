@@ -606,6 +606,22 @@ GoRouter createRouter({
                         child: Center(child: Text('SAVED HEADLINES PAGE')),
                       );
                     },
+                    routes: [
+                      GoRoute(
+                        path: Routes.accountArticleDetails, // 'article/:id'
+                        name: Routes.accountArticleDetailsName,
+                        builder: (context, state) {
+                          final id = state.pathParameters['id']!;
+                          return BlocProvider(
+                            create: (context) => HeadlineDetailsBloc(
+                              headlinesRepository:
+                                  context.read<HtDataRepository<Headline>>(),
+                            )..add(HeadlineDetailsRequested(headlineId: id)),
+                            child: HeadlineDetailsPage(headlineId: id),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ],
               ),

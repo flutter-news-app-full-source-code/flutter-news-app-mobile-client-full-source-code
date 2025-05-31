@@ -10,6 +10,7 @@ class HeadlineItemWidget extends StatelessWidget {
   const HeadlineItemWidget({
     required this.headline,
     required this.targetRouteName, // Add targetRouteName
+    this.trailing, // Add optional trailing widget
     super.key,
   });
 
@@ -18,6 +19,9 @@ class HeadlineItemWidget extends StatelessWidget {
 
   /// The named route to navigate to when the item is tapped.
   final String targetRouteName; // Add targetRouteName
+
+  /// An optional widget to display at the end of the row.
+  final Widget? trailing;
 
   // Helper for date formatting
   static final _dateFormatter = DateFormat.yMd().add_jm();
@@ -159,6 +163,11 @@ class HeadlineItemWidget extends StatelessWidget {
                   ],
                 ),
               ),
+              // Add the trailing widget if provided
+              if (trailing != null) ...[
+                const SizedBox(width: AppSpacing.md),
+                trailing!,
+              ],
             ],
           ),
         ),

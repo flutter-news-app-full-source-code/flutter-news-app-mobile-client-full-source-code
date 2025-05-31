@@ -176,13 +176,13 @@ class _AppViewState extends State<_AppView> {
       },
       child: BlocBuilder<AppBloc, AppState>(
         // Build when theme-related properties change (including text scale factor)
-        buildWhen:
-            (previous, current) =>
-                previous.themeMode != current.themeMode ||
-                previous.flexScheme != current.flexScheme ||
-                previous.fontFamily != current.fontFamily ||
-                previous.appTextScaleFactor != current.appTextScaleFactor ||
-                previous.locale != current.locale, // Added locale check
+        buildWhen: (previous, current) =>
+            previous.themeMode != current.themeMode ||
+            previous.flexScheme != current.flexScheme ||
+            previous.fontFamily != current.fontFamily ||
+            previous.appTextScaleFactor != current.appTextScaleFactor ||
+            previous.locale != current.locale ||
+            previous.settings != current.settings, // Added settings check
         builder: (context, state) {
           print('[_AppViewState] Building MaterialApp.router');
           print('[_AppViewState] state.fontFamily: ${state.fontFamily}');

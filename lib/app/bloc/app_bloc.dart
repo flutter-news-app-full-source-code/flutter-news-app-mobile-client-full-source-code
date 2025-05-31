@@ -101,6 +101,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       final newAppTextScaleFactor = _mapTextScaleFactor(
         userAppSettings.displaySettings.textScaleFactor,
       );
+      // Map language code to Locale
+      final newLocale = Locale(userAppSettings.language);
 
       emit(
         state.copyWith(
@@ -109,6 +111,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           appTextScaleFactor: newAppTextScaleFactor,
           fontFamily: newFontFamily,
           settings: userAppSettings, // Store the fetched settings
+          locale: newLocale, // Store the new locale
         ),
       );
     } on NotFoundException {
@@ -120,6 +123,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           themeMode: ThemeMode.system,
           flexScheme: FlexScheme.material,
           appTextScaleFactor: AppTextScaleFactor.medium, // Default enum value
+          locale: const Locale('en'), // Default to English if settings not found
           settings: UserAppSettings(
             id: state.user!.id,
           ), // Provide default settings

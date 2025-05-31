@@ -12,6 +12,7 @@ import 'package:ht_main/account/view/manage_followed_items/categories/followed_c
 import 'package:ht_main/account/view/manage_followed_items/countries/followed_countries_list_page.dart'; // New
 import 'package:ht_main/account/view/manage_followed_items/sources/followed_sources_list_page.dart'; // New
 import 'package:ht_main/account/view/manage_followed_items/manage_followed_items_page.dart'; // New
+import 'package:ht_main/account/view/saved_headlines_page.dart'; // Import SavedHeadlinesPage
 import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/app/view/app_shell.dart';
 import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
@@ -601,10 +602,7 @@ GoRouter createRouter({
                     path: Routes.accountSavedHeadlines,
                     name: Routes.accountSavedHeadlinesName,
                     builder: (context, state) {
-                      // TODO(fulleni): Replace with actual SavedHeadlinesPage
-                      return const Placeholder(
-                        child: Center(child: Text('SAVED HEADLINES PAGE')),
-                      );
+                      return const SavedHeadlinesPage(); // Use the actual page
                     },
                     routes: [
                       GoRoute(

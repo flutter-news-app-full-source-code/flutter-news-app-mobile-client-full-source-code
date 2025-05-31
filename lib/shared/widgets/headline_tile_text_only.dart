@@ -119,42 +119,40 @@ class _HeadlineMetadataRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final formattedDate = formatRelativeTime(context, headline.publishedAt);
 
-    final baseTextStyle = textTheme.labelSmall;
-    final metadataStyle = baseTextStyle?.copyWith(
-      color: colorScheme.onSurfaceVariant,
-      fontSize: baseTextStyle.fontSize != null ? baseTextStyle.fontSize! * 0.85 : 10,
+    // Use bodySmall for a reasonable base size, with muted accent color
+    final metadataTextStyle = textTheme.bodySmall?.copyWith(
+      color: colorScheme.primary.withOpacity(0.7),
     );
-    final chipLabelStyle = metadataStyle; 
-
-    final chipBackgroundColor = colorScheme.secondaryContainer.withOpacity(0.4);
-    const iconSize = AppSpacing.sm; 
+    // Icon color to match the subtle text
+    final iconColor = colorScheme.primary.withOpacity(0.7);
+    const iconSize = AppSpacing.sm; // Standard small icon size
 
     return Wrap(
-      spacing: AppSpacing.xs, 
-      runSpacing: AppSpacing.xs, 
+      spacing: AppSpacing.sm, // Increased spacing for readability
+      runSpacing: AppSpacing.xs,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         if (formattedDate.isNotEmpty)
-          Row( 
+          Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 Icons.calendar_today_outlined,
-                size: iconSize, 
-                color: colorScheme.onSurfaceVariant,
+                size: iconSize,
+                color: iconColor,
               ),
-              const SizedBox(width: AppSpacing.xs / 2), 
-              Text(formattedDate, style: metadataStyle),
+              const SizedBox(width: AppSpacing.xs / 2),
+              Text(formattedDate, style: metadataTextStyle),
             ],
           ),
-        // Conditionally render Category Chip
+        // Conditionally render Category as Text
         if (headline.category?.name != null &&
             !(currentContextEntityType == EntityType.category &&
                 headline.category!.id == currentContextEntityId)) ...[
-          if (formattedDate.isNotEmpty) 
+          if (formattedDate.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs / 2),
-              child: Text('•', style: metadataStyle),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+              child: Text('•', style: metadataTextStyle),
             ),
           GestureDetector(
             onTap: () {
@@ -165,27 +163,23 @@ class _HeadlineMetadataRow extends StatelessWidget {
                 );
               }
             },
-            child: Chip(
-              label: Text(headline.category!.name),
-              labelStyle: chipLabelStyle,
-              backgroundColor: chipBackgroundColor,
-              padding: EdgeInsets.zero, 
-              labelPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs / 2, vertical: 0), 
-              visualDensity: VisualDensity.compact,
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            child: Text(
+              headline.category!.name,
+              style: metadataTextStyle,
             ),
           ),
         ],
-        // Conditionally render Source Chip
+        // Conditionally render Source as Text
         if (headline.source?.name != null &&
             !(currentContextEntityType == EntityType.source &&
                 headline.source!.id == currentContextEntityId)) ...[
-          if (formattedDate.isNotEmpty || (headline.category?.name != null &&
-            !(currentContextEntityType == EntityType.category &&
-                headline.category!.id == currentContextEntityId)) )
+          if (formattedDate.isNotEmpty ||
+              (headline.category?.name != null &&
+                  !(currentContextEntityType == EntityType.category &&
+                      headline.category!.id == currentContextEntityId)))
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs / 2),
-              child: Text('•', style: metadataStyle),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+              child: Text('•', style: metadataTextStyle),
             ),
           GestureDetector(
             onTap: () {
@@ -196,14 +190,9 @@ class _HeadlineMetadataRow extends StatelessWidget {
                 );
               }
             },
-            child: Chip(
-              label: Text(headline.source!.name),
-              labelStyle: chipLabelStyle,
-              backgroundColor: chipBackgroundColor,
-              padding: EdgeInsets.zero, 
-              labelPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs / 2, vertical: 0), 
-              visualDensity: VisualDensity.compact,
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            child: Text(
+              headline.source!.name,
+              style: metadataTextStyle,
             ),
           ),
         ],

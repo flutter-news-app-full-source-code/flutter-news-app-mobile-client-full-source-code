@@ -33,8 +33,10 @@ const FlexSubThemesData _commonSubThemesData = FlexSubThemesData(
 // Helper function to apply common text theme customizations
 TextTheme _customizeTextTheme(
   TextTheme baseTextTheme, {
-  required AppTextScaleFactor appTextScaleFactor, // Added parameter
+  required AppTextScaleFactor appTextScaleFactor,
+  required AppFontWeight appFontWeight, // Added parameter
 }) {
+  print('[_customizeTextTheme] Received appFontWeight: $appFontWeight, appTextScaleFactor: $appTextScaleFactor');
   // Define font size factors
   double factor;
   switch (appTextScaleFactor) {
@@ -52,39 +54,61 @@ TextTheme _customizeTextTheme(
   double? applyFactor(double? baseSize) =>
       baseSize != null ? (baseSize * factor).roundToDouble() : null;
 
+  // Map AppFontWeight to FontWeight
+  FontWeight selectedFontWeight;
+  switch (appFontWeight) {
+    case AppFontWeight.light:
+      selectedFontWeight = FontWeight.w300;
+      break;
+    case AppFontWeight.regular:
+      selectedFontWeight = FontWeight.w400;
+      break;
+    case AppFontWeight.bold:
+      selectedFontWeight = FontWeight.w700;
+      break;
+  }
+  print('[_customizeTextTheme] Mapped to selectedFontWeight: $selectedFontWeight');
+
   return baseTextTheme.copyWith(
     // --- Headline/Title Styles ---
+    // Headlines and titles often have their own explicit weights,
+    // but we can make them configurable if needed. For now, let's assume
+    // body text is the primary target for user-defined weight.
     headlineLarge: baseTextTheme.headlineLarge?.copyWith(
-      fontSize: applyFactor(28), // Apply factor
-      fontWeight: FontWeight.bold,
+      fontSize: applyFactor(28),
+      fontWeight: FontWeight.bold, // Keeping titles bold by default
     ),
     headlineMedium: baseTextTheme.headlineMedium?.copyWith(
-      fontSize: applyFactor(24), // Apply factor
-      fontWeight: FontWeight.bold,
+      fontSize: applyFactor(24),
+      fontWeight: FontWeight.bold, // Keeping titles bold by default
     ),
     titleLarge: baseTextTheme.titleLarge?.copyWith(
-      fontSize: applyFactor(18), // Apply factor
-      fontWeight: FontWeight.w600,
+      fontSize: applyFactor(18),
+      fontWeight: FontWeight.w600, // Keeping titles semi-bold by default
     ),
     titleMedium: baseTextTheme.titleMedium?.copyWith(
-      fontSize: applyFactor(16), // Apply factor
-      fontWeight: FontWeight.w600,
+      fontSize: applyFactor(16),
+      fontWeight: FontWeight.w600, // Keeping titles semi-bold by default
     ),
 
     // --- Body/Content Styles ---
+    // Apply user-selected font weight to body text
     bodyLarge: baseTextTheme.bodyLarge?.copyWith(
-      fontSize: applyFactor(16), // Apply factor
+      fontSize: applyFactor(16),
       height: 1.5,
+      fontWeight: selectedFontWeight, // Apply selected weight
     ),
     bodyMedium: baseTextTheme.bodyMedium?.copyWith(
-      fontSize: applyFactor(14), // Apply factor
+      fontSize: applyFactor(14),
       height: 1.4,
+      fontWeight: selectedFontWeight, // Apply selected weight
     ),
 
     // --- Metadata/Caption Styles ---
+    // Captions might also benefit from user-defined weight or stay regular.
     labelSmall: baseTextTheme.labelSmall?.copyWith(
-      fontSize: applyFactor(12), // Apply factor
-      fontWeight: FontWeight.normal,
+      fontSize: applyFactor(12),
+      fontWeight: selectedFontWeight, // Apply selected weight
     ),
 
     // --- Button Style (Usually default is fine) ---
@@ -96,46 +120,51 @@ TextTheme _customizeTextTheme(
 // based on the provided font family name.
 // Corrected return type to match GoogleFonts functions (positional optional)
 TextTheme Function([TextTheme?]) _getGoogleFontTextTheme(String? fontFamily) {
-  // Map font family names (as used in AppBloc mapping) to GoogleFonts functions
-  if (fontFamily == GoogleFonts.roboto().fontFamily) {
-    return GoogleFonts.robotoTextTheme;
+  print('[_getGoogleFontTextTheme] Received fontFamily: $fontFamily');
+  switch (fontFamily) {
+    case 'Roboto':
+      print('[_getGoogleFontTextTheme] Returning GoogleFonts.robotoTextTheme');
+      return GoogleFonts.robotoTextTheme;
+    case 'OpenSans':
+      print('[_getGoogleFontTextTheme] Returning GoogleFonts.openSansTextTheme');
+      return GoogleFonts.openSansTextTheme;
+    case 'Lato':
+      print('[_getGoogleFontTextTheme] Returning GoogleFonts.latoTextTheme');
+      return GoogleFonts.latoTextTheme;
+    case 'Montserrat':
+      print('[_getGoogleFontTextTheme] Returning GoogleFonts.montserratTextTheme');
+      return GoogleFonts.montserratTextTheme;
+    case 'Merriweather':
+      print('[_getGoogleFontTextTheme] Returning GoogleFonts.merriweatherTextTheme');
+      return GoogleFonts.merriweatherTextTheme;
+    case 'SystemDefault':
+    case null:
+    default:
+      print('[_getGoogleFontTextTheme] Defaulting to GoogleFonts.notoSansTextTheme for input: $fontFamily');
+      return GoogleFonts.notoSansTextTheme;
   }
-  if (fontFamily == GoogleFonts.openSans().fontFamily) {
-    return GoogleFonts.openSansTextTheme;
-  }
-  if (fontFamily == GoogleFonts.lato().fontFamily) {
-    return GoogleFonts.latoTextTheme;
-  }
-  if (fontFamily == GoogleFonts.montserrat().fontFamily) {
-    return GoogleFonts.montserratTextTheme;
-  }
-  if (fontFamily == GoogleFonts.merriweather().fontFamily) {
-    return GoogleFonts.merriweatherTextTheme;
-  }
-  // Add mappings for other AppFontType values if needed
-
-  // Default fallback if fontFamily is null or not recognized
-  return GoogleFonts.notoSansTextTheme;
 }
 
 /// Defines the application's light theme using FlexColorScheme.
 ///
-/// Takes the active [scheme], [appTextScaleFactor], and optional [fontFamily].
+/// Takes the active [scheme], [appTextScaleFactor], [appFontWeight], and optional [fontFamily].
 ThemeData lightTheme({
   required FlexScheme scheme,
-  required AppTextScaleFactor appTextScaleFactor, // Added parameter
+  required AppTextScaleFactor appTextScaleFactor,
+  required AppFontWeight appFontWeight, // Added parameter
   String? fontFamily,
 }) {
+  print('[AppTheme.lightTheme] Received scheme: $scheme, appTextScaleFactor: $appTextScaleFactor, appFontWeight: $appFontWeight, fontFamily: $fontFamily');
   final textThemeGetter = _getGoogleFontTextTheme(fontFamily);
   final baseTextTheme = textThemeGetter();
 
   return FlexThemeData.light(
     scheme: scheme,
     fontFamily: fontFamily,
-    // Pass appTextScaleFactor to customizeTextTheme
     textTheme: _customizeTextTheme(
       baseTextTheme,
       appTextScaleFactor: appTextScaleFactor,
+      appFontWeight: appFontWeight, // Pass new parameter
     ),
     subThemesData: _commonSubThemesData,
   );
@@ -143,12 +172,14 @@ ThemeData lightTheme({
 
 /// Defines the application's dark theme using FlexColorScheme.
 ///
-/// Takes the active [scheme], [appTextScaleFactor], and optional [fontFamily].
+/// Takes the active [scheme], [appTextScaleFactor], [appFontWeight], and optional [fontFamily].
 ThemeData darkTheme({
   required FlexScheme scheme,
-  required AppTextScaleFactor appTextScaleFactor, // Added parameter
+  required AppTextScaleFactor appTextScaleFactor,
+  required AppFontWeight appFontWeight, // Added parameter
   String? fontFamily,
 }) {
+  print('[AppTheme.darkTheme] Received scheme: $scheme, appTextScaleFactor: $appTextScaleFactor, appFontWeight: $appFontWeight, fontFamily: $fontFamily');
   final textThemeGetter = _getGoogleFontTextTheme(fontFamily);
   final baseTextTheme = textThemeGetter(
     ThemeData(brightness: Brightness.dark).textTheme,
@@ -157,10 +188,10 @@ ThemeData darkTheme({
   return FlexThemeData.dark(
     scheme: scheme,
     fontFamily: fontFamily,
-    // Pass appTextScaleFactor to customizeTextTheme
     textTheme: _customizeTextTheme(
       baseTextTheme,
       appTextScaleFactor: appTextScaleFactor,
+      appFontWeight: appFontWeight, // Pass new parameter
     ),
     subThemesData: _commonSubThemesData,
   );

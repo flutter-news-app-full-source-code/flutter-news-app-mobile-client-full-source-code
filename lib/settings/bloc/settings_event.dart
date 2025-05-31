@@ -119,6 +119,20 @@ class SettingsFeedTileTypeChanged extends SettingsEvent {
   List<Object?> get props => [tileType];
 }
 
+/// {@template settings_language_changed}
+/// Event added when the user changes the application language.
+/// {@endtemplate}
+class SettingsLanguageChanged extends SettingsEvent {
+  /// {@macro settings_language_changed}
+  const SettingsLanguageChanged(this.languageCode);
+
+  /// The newly selected language code (e.g., 'en', 'ar').
+  final AppLanguage languageCode; // Use AppLanguage typedef from ht_shared
+
+  @override
+  List<Object?> get props => [languageCode];
+}
+
 // --- Notification Settings Events ---
 // SettingsNotificationsEnabledChanged event removed as UserAppSettings
 // does not currently support a general notifications enabled flag.

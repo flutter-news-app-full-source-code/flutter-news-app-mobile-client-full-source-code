@@ -55,12 +55,24 @@ abstract final class Routes {
   // --- Settings Sub-Routes (relative to /account/settings) ---
   static const settingsAppearance = 'appearance';
   static const settingsAppearanceName = 'settingsAppearance';
+
+  // --- Appearance Sub-Routes (relative to /account/settings/appearance) ---
+  static const settingsAppearanceTheme = 'theme'; // Path: /account/settings/appearance/theme
+  static const settingsAppearanceThemeName = 'settingsAppearanceTheme';
+  static const settingsAppearanceFont = 'font'; // Path: /account/settings/appearance/font
+  static const settingsAppearanceFontName = 'settingsAppearanceFont';
+
   static const settingsFeed = 'feed';
   static const settingsFeedName = 'settingsFeed';
   static const settingsArticle = 'article';
   static const settingsArticleName = 'settingsArticle';
   static const settingsNotifications = 'notifications';
   static const settingsNotificationsName = 'settingsNotifications';
+
+  // --- Language Settings Sub-Route (relative to /account/settings) ---
+  static const settingsLanguage = 'language'; // Path: /account/settings/language
+  static const settingsLanguageName = 'settingsLanguage';
+
   // Add names for notification sub-selection routes if needed later
   // static const settingsNotificationCategories = 'categories';
   // static const settingsNotificationCategoriesName = 'settingsNotificationCategories';

@@ -181,9 +181,13 @@ class _AppViewState extends State<_AppView> {
                 previous.themeMode != current.themeMode ||
                 previous.flexScheme != current.flexScheme ||
                 previous.fontFamily != current.fontFamily ||
-                previous.appTextScaleFactor !=
-                    current.appTextScaleFactor, // Use text scale factor
+                previous.appTextScaleFactor != current.appTextScaleFactor ||
+                previous.locale != current.locale, // Added locale check
         builder: (context, state) {
+          print('[_AppViewState] Building MaterialApp.router');
+          print('[_AppViewState] state.fontFamily: ${state.fontFamily}');
+          print('[_AppViewState] state.settings.displaySettings.fontFamily: ${state.settings.displaySettings.fontFamily}');
+          print('[_AppViewState] state.settings.displaySettings.fontWeight: ${state.settings.displaySettings.fontWeight}');
           return MaterialApp.router(
             debugShowCheckedModeBanner: false,
             themeMode: state.themeMode,
@@ -192,15 +196,18 @@ class _AppViewState extends State<_AppView> {
               scheme: state.flexScheme,
               appTextScaleFactor:
                   state.settings.displaySettings.textScaleFactor,
+              appFontWeight: state.settings.displaySettings.fontWeight, // Added
               fontFamily: state.settings.displaySettings.fontFamily,
             ),
             darkTheme: darkTheme(
               scheme: state.flexScheme,
               appTextScaleFactor:
                   state.settings.displaySettings.textScaleFactor,
+              appFontWeight: state.settings.displaySettings.fontWeight, // Added
               fontFamily: state.settings.displaySettings.fontFamily,
             ),
             routerConfig: _router,
+            locale: state.locale, // Use locale from AppBloc state
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
           );

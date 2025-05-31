@@ -101,6 +101,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       final newAppTextScaleFactor = _mapTextScaleFactor(
         userAppSettings.displaySettings.textScaleFactor,
       );
+      // Map language code to Locale
+      final newLocale = Locale(userAppSettings.language);
+
+      print('[AppBloc] _onAppSettingsRefreshed: userAppSettings.fontFamily: ${userAppSettings.displaySettings.fontFamily}');
+      print('[AppBloc] _onAppSettingsRefreshed: userAppSettings.fontWeight: ${userAppSettings.displaySettings.fontWeight}');
+      print('[AppBloc] _onAppSettingsRefreshed: newFontFamily mapped to: $newFontFamily');
 
       emit(
         state.copyWith(
@@ -109,6 +115,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           appTextScaleFactor: newAppTextScaleFactor,
           fontFamily: newFontFamily,
           settings: userAppSettings, // Store the fetched settings
+          locale: newLocale, // Store the new locale
         ),
       );
     } on NotFoundException {
@@ -120,6 +127,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           themeMode: ThemeMode.system,
           flexScheme: FlexScheme.material,
           appTextScaleFactor: AppTextScaleFactor.medium, // Default enum value
+          locale: const Locale('en'), // Default to English if settings not found
           settings: UserAppSettings(
             id: state.user!.id,
           ), // Provide default settings
@@ -243,26 +251,17 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     }
   }
 
-  String? _mapFontFamily(String fontFamily) {
-    // Assuming 'SystemDefault' means use the theme's default font
-    if (fontFamily == 'SystemDefault') return null;
-
-    // Map specific font family names to GoogleFonts
-    switch (fontFamily) {
-      case 'Roboto':
-        return GoogleFonts.roboto().fontFamily;
-      case 'OpenSans':
-        return GoogleFonts.openSans().fontFamily;
-      case 'Lato':
-        return GoogleFonts.lato().fontFamily;
-      case 'Montserrat':
-        return GoogleFonts.montserrat().fontFamily;
-      case 'Merriweather':
-        return GoogleFonts.merriweather().fontFamily;
-      default:
-        // If an unknown font family is specified, fall back to theme default
-        return null;
+  String? _mapFontFamily(String fontFamilyString) {
+    // If the input is 'SystemDefault', return null so FlexColorScheme uses its default.
+    if (fontFamilyString == 'SystemDefault') {
+      print('[AppBloc] _mapFontFamily: Input is SystemDefault, returning null.');
+      return null;
     }
+    // Otherwise, return the font family string directly.
+    // The GoogleFonts.xyz().fontFamily getters often return strings like "Roboto-Regular",
+    // but FlexColorScheme's fontFamily parameter or GoogleFonts.xyzTextTheme() expect simple names.
+    print('[AppBloc] _mapFontFamily: Input is $fontFamilyString, returning as is.');
+    return fontFamilyString;
   }
 
   // Map AppTextScaleFactor to AppTextScaleFactor (no change needed)

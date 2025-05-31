@@ -24,7 +24,17 @@ class SettingsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        // Standard back button provided by Scaffold/GoRouter
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              // Fallback if it can't pop, perhaps go to account page directly
+              context.goNamed(Routes.accountName);
+            }
+          },
+        ),
         title: Text(l10n.settingsTitle), // Add l10n key: settingsTitle
       ),
       // Use BlocBuilder to react to loading/error states if needed,
@@ -70,6 +80,13 @@ class SettingsPage extends StatelessWidget {
           return ListView(
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
             children: [
+              _buildSettingsTile(
+                context: context,
+                icon: Icons.language_outlined,
+                title: l10n.settingsLanguageTitle, // Add l10n key
+                onTap: () => context.goNamed(Routes.settingsLanguageName),
+              ),
+              const Divider(indent: AppSpacing.lg, endIndent: AppSpacing.lg),
               _buildSettingsTile(
                 context: context,
                 icon: Icons.palette_outlined,

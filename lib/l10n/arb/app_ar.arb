@@ -516,6 +516,18 @@
     "@settingsAppearanceFontFamilySystemDefault": {
         "description": "Label for the system default font family option"
     },
+    "settingsAppearanceThemeSubPageTitle": "إعدادات المظهر",
+    "@settingsAppearanceThemeSubPageTitle": {
+        "description": "Title for the theme settings sub-page under appearance"
+    },
+    "settingsAppearanceFontSubPageTitle": "إعدادات الخط",
+    "@settingsAppearanceFontSubPageTitle": {
+        "description": "Title for the font settings sub-page under appearance"
+    },
+    "settingsLanguageTitle": "اللغة",
+    "@settingsLanguageTitle": {
+        "description": "Title for the language settings page/section"
+    },
     "emailCodeSentPageTitle": "أدخل الرمز",
     "@emailCodeSentPageTitle": {
         "description": "AppBar title for the email code verification page"

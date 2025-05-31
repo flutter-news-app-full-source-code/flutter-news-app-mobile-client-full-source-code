@@ -27,6 +27,7 @@ class AppState extends Equatable {
     this.fontFamily,
     this.status = AppStatus.initial,
     this.user, // User is now nullable and defaults to null
+    this.locale, // Added locale
   });
 
   /// The index of the currently selected item in the bottom navigation bar.
@@ -54,6 +55,9 @@ class AppState extends Equatable {
   /// User-specific application settings.
   final UserAppSettings settings; // Add settings property
 
+  /// The current application locale.
+  final Locale? locale; // Added locale
+
   /// Creates a copy of the current state with updated values.
   AppState copyWith({
     int? selectedBottomNavigationIndex,
@@ -64,7 +68,9 @@ class AppState extends Equatable {
     AppStatus? status,
     User? user,
     UserAppSettings? settings, // Add settings to copyWith
+    Locale? locale, // Added locale
     bool clearFontFamily = false,
+    bool clearLocale = false, // Added to allow clearing locale
   }) {
     return AppState(
       selectedBottomNavigationIndex:
@@ -76,6 +82,7 @@ class AppState extends Equatable {
       status: status ?? this.status,
       user: user ?? this.user,
       settings: settings ?? this.settings, // Copy settings
+      locale: clearLocale ? null : locale ?? this.locale, // Added locale
     );
   }
 
@@ -89,5 +96,6 @@ class AppState extends Equatable {
     status,
     user,
     settings, // Include settings in props
+    locale, // Added locale to props
   ];
 }

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart'; // Added
+import 'package:ht_main/entity_details/view/entity_details_page.dart'; // Added
+import 'package:ht_main/router/routes.dart'; // Added
 import 'package:ht_shared/ht_shared.dart'; // Import Source model
 
 /// A simple widget to display a Source search result.
@@ -19,12 +22,10 @@ class SourceItemWidget extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               )
               : null,
-      // TODO(you): Implement onTap navigation if needed for sources
       onTap: () {
-        // Example: Navigate to a page showing headlines from this source
-        // context.goNamed('someSourceFeedRoute', params: {'id': source.id});
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Tapped on source: ${source.name}')),
+        context.push(
+          Routes.sourceDetails,
+          extra: EntityDetailsPageArguments(entity: source),
         );
       },
     );

@@ -121,32 +121,28 @@ TextTheme _customizeTextTheme(
 // Corrected return type to match GoogleFonts functions (positional optional)
 TextTheme Function([TextTheme?]) _getGoogleFontTextTheme(String? fontFamily) {
   print('[_getGoogleFontTextTheme] Received fontFamily: $fontFamily');
-  // Map font family names (as used in AppBloc mapping) to GoogleFonts functions
-  if (fontFamily == GoogleFonts.roboto().fontFamily) {
-    print('[_getGoogleFontTextTheme] Returning GoogleFonts.robotoTextTheme');
-    return GoogleFonts.robotoTextTheme;
+  switch (fontFamily) {
+    case 'Roboto':
+      print('[_getGoogleFontTextTheme] Returning GoogleFonts.robotoTextTheme');
+      return GoogleFonts.robotoTextTheme;
+    case 'OpenSans':
+      print('[_getGoogleFontTextTheme] Returning GoogleFonts.openSansTextTheme');
+      return GoogleFonts.openSansTextTheme;
+    case 'Lato':
+      print('[_getGoogleFontTextTheme] Returning GoogleFonts.latoTextTheme');
+      return GoogleFonts.latoTextTheme;
+    case 'Montserrat':
+      print('[_getGoogleFontTextTheme] Returning GoogleFonts.montserratTextTheme');
+      return GoogleFonts.montserratTextTheme;
+    case 'Merriweather':
+      print('[_getGoogleFontTextTheme] Returning GoogleFonts.merriweatherTextTheme');
+      return GoogleFonts.merriweatherTextTheme;
+    case 'SystemDefault':
+    case null:
+    default:
+      print('[_getGoogleFontTextTheme] Defaulting to GoogleFonts.notoSansTextTheme for input: $fontFamily');
+      return GoogleFonts.notoSansTextTheme;
   }
-  if (fontFamily == GoogleFonts.openSans().fontFamily) {
-    print('[_getGoogleFontTextTheme] Returning GoogleFonts.openSansTextTheme');
-    return GoogleFonts.openSansTextTheme;
-  }
-  if (fontFamily == GoogleFonts.lato().fontFamily) {
-    print('[_getGoogleFontTextTheme] Returning GoogleFonts.latoTextTheme');
-    return GoogleFonts.latoTextTheme;
-  }
-  if (fontFamily == GoogleFonts.montserrat().fontFamily) {
-    print('[_getGoogleFontTextTheme] Returning GoogleFonts.montserratTextTheme');
-    return GoogleFonts.montserratTextTheme;
-  }
-  if (fontFamily == GoogleFonts.merriweather().fontFamily) {
-    print('[_getGoogleFontTextTheme] Returning GoogleFonts.merriweatherTextTheme');
-    return GoogleFonts.merriweatherTextTheme;
-  }
-  // Add mappings for other AppFontType values if needed
-
-  // Default fallback if fontFamily is null or not recognized
-  print('[_getGoogleFontTextTheme] Defaulting to GoogleFonts.notoSansTextTheme');
-  return GoogleFonts.notoSansTextTheme;
 }
 
 /// Defines the application's light theme using FlexColorScheme.

@@ -34,6 +34,12 @@ abstract final class Routes {
   static const notifications = 'notifications'; // Relative path
   static const notificationsName = 'notifications';
 
+  // --- Entity Details Routes (can be accessed from multiple places) ---
+  static const categoryDetails = '/category-details'; // New
+  static const categoryDetailsName = 'categoryDetails'; // New
+  static const sourceDetails = '/source-details'; // New
+  static const sourceDetailsName = 'sourceDetails'; // New
+
   // --- Authentication Routes ---
   static const authentication = '/authentication';
   static const authenticationName = 'authentication';
@@ -89,6 +95,12 @@ abstract final class Routes {
   static const String accountArticleDetails =
       'article/:id'; // Relative to accountSavedHeadlines
   static const String accountArticleDetailsName = 'accountArticleDetails';
+
+  // --- Global Article Details ---
+  // This route is intended for accessing article details from contexts
+  // outside the main bottom navigation shell (e.g., from entity detail pages).
+  static const globalArticleDetails = '/article/:id'; // Top-level path
+  static const globalArticleDetailsName = 'globalArticleDetails';
 
   // --- Manage Followed Items Sub-Routes (relative to /account/manage-followed-items) ---
   static const followedCategoriesList = 'categories';

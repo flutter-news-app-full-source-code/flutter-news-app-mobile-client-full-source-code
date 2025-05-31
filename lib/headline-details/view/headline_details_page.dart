@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart'; // Import GoRouter
 import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/app/bloc/app_bloc.dart'; // Added AppBloc
+import 'package:ht_main/entity_details/view/entity_details_page.dart'; // Added for Page Arguments
 import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart';
 import 'package:ht_main/headline-details/bloc/similar_headlines_bloc.dart';
 // HeadlineItemWidget import removed
@@ -14,7 +15,11 @@ import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/shared.dart';
 import 'package:ht_shared/ht_shared.dart'
-    show Headline, HeadlineImageStyle; // Added HeadlineImageStyle
+    show
+        Category,
+        Headline,
+        HeadlineImageStyle,
+        Source; // Added Category, Source
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart'; // Import share_plus
 import 'package:url_launcher/url_launcher_string.dart';
@@ -394,18 +399,27 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
 
     if (headline.source != null) {
       chips.add(
-        Chip(
-          avatar: Icon(
-            Icons.source,
-            size: chipAvatarSize,
-            color: chipAvatarColor,
+        GestureDetector(
+          // Added GestureDetector
+          onTap: () {
+            context.push(
+              Routes.sourceDetails,
+              extra: EntityDetailsPageArguments(entity: headline.source),
+            );
+          },
+          child: Chip(
+            avatar: Icon(
+              Icons.source,
+              size: chipAvatarSize,
+              color: chipAvatarColor,
+            ),
+            label: Text(headline.source!.name),
+            labelStyle: chipLabelStyle,
+            backgroundColor: chipBackgroundColor,
+            padding: chipPadding,
+            visualDensity: chipVisualDensity,
+            materialTapTargetSize: chipMaterialTapTargetSize,
           ),
-          label: Text(headline.source!.name),
-          labelStyle: chipLabelStyle,
-          backgroundColor: chipBackgroundColor,
-          padding: chipPadding,
-          visualDensity: chipVisualDensity,
-          materialTapTargetSize: chipMaterialTapTargetSize,
         ),
       );
     }
@@ -435,6 +449,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       final country = headline.source!.headquarters!;
       chips.add(
         Chip(
+          // Country chip is usually not tappable to a details page in this context
           avatar: CircleAvatar(
             radius: chipAvatarSize / 2,
             backgroundColor: Colors.transparent,
@@ -453,13 +468,22 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
 
     if (headline.category != null) {
       chips.add(
-        Chip(
-          label: Text(headline.category!.name),
-          labelStyle: chipLabelStyle,
-          backgroundColor: chipBackgroundColor,
-          padding: chipPadding,
-          visualDensity: chipVisualDensity,
-          materialTapTargetSize: chipMaterialTapTargetSize,
+        GestureDetector(
+          // Added GestureDetector
+          onTap: () {
+            context.push(
+              Routes.categoryDetails,
+              extra: EntityDetailsPageArguments(entity: headline.category),
+            );
+          },
+          child: Chip(
+            label: Text(headline.category!.name),
+            labelStyle: chipLabelStyle,
+            backgroundColor: chipBackgroundColor,
+            padding: chipPadding,
+            visualDensity: chipVisualDensity,
+            materialTapTargetSize: chipMaterialTapTargetSize,
+          ),
         ),
       );
     }
@@ -527,7 +551,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                                 extra: similarHeadline,
                               ),
                         );
-                        break;
                       case HeadlineImageStyle.smallThumbnail:
                         tile = HeadlineTileImageStart(
                           headline: similarHeadline,
@@ -538,7 +561,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                                 extra: similarHeadline,
                               ),
                         );
-                        break;
                       case HeadlineImageStyle.largeThumbnail:
                         tile = HeadlineTileImageTop(
                           headline: similarHeadline,
@@ -549,13 +571,12 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                                 extra: similarHeadline,
                               ),
                         );
-                        break;
                     }
                     return tile;
                   },
                 ),
               );
-            }, childCount: loadedState.similarHeadlines.length),
+            }, childCount: loadedState.similarHeadlines.length,),
           ),
           _ => const SliverToBoxAdapter(child: SizedBox.shrink()),
         };

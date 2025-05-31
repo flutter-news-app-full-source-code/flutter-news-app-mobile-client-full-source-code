@@ -143,22 +143,22 @@ class HeadlinesSearchBloc
           response = await _headlinesRepository.readAllByQuery({
             'q': searchTerm,
             'model': modelType.toJson(),
-          }, limit: _limit);
+          }, limit: _limit,);
         case SearchModelType.category:
           response = await _categoryRepository.readAllByQuery({
             'q': searchTerm,
             'model': modelType.toJson(),
-          }, limit: _limit);
+          }, limit: _limit,);
         case SearchModelType.source:
           response = await _sourceRepository.readAllByQuery({
             'q': searchTerm,
             'model': modelType.toJson(),
-          }, limit: _limit);
+          }, limit: _limit,);
         case SearchModelType.country:
           response = await _countryRepository.readAllByQuery({
             'q': searchTerm,
             'model': modelType.toJson(),
-          }, limit: _limit);
+          }, limit: _limit,);
       }
       emit(
         HeadlinesSearchSuccess(

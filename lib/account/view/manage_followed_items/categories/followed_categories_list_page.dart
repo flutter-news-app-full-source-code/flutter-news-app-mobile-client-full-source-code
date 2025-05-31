@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ht_main/account/bloc/account_bloc.dart';
+import 'package:ht_main/entity_details/view/entity_details_page.dart'; // Added
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/constants/app_spacing.dart';
@@ -111,6 +112,13 @@ class FollowedCategoriesListPage extends StatelessWidget {
                           )
                           : const Icon(Icons.category_outlined),
                   title: Text(category.name),
+                  onTap: () {
+                    // Added onTap for navigation
+                    context.push(
+                      Routes.categoryDetails,
+                      extra: EntityDetailsPageArguments(entity: category),
+                    );
+                  },
                   trailing: IconButton(
                     icon: Icon(
                       Icons.remove_circle_outline,

@@ -807,5 +807,29 @@
     "similarHeadlinesEmpty": "No similar headlines found.",
     "@similarHeadlinesEmpty": {
         "description": "Message shown when no similar headlines are found"
+    },
+    "detailsPageTitle": "Details",
+    "@detailsPageTitle": {
+        "description": "Title for the category/source details page"
+    },
+    "followButtonLabel": "Follow",
+    "@followButtonLabel": {
+        "description": "Label for the follow button"
+    },
+    "unfollowButtonLabel": "Unfollow",
+    "@unfollowButtonLabel": {
+        "description": "Label for the unfollow button"
+    },
+    "noHeadlinesFoundMessage": "No headlines found for this item.",
+    "@noHeadlinesFoundMessage": {
+        "description": "Message displayed when no headlines are available for a category/source"
+    },
+    "failedToLoadMoreHeadlines": "Failed to load more headlines.",
+    "@failedToLoadMoreHeadlines": {
+        "description": "Error message when loading more headlines fails on details page"
+    },
+    "headlinesSectionTitle": "Headlines",
+    "@headlinesSectionTitle": {
+        "description": "Title for the headlines section on details page"
     }
 }

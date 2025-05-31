@@ -807,5 +807,29 @@
     "similarHeadlinesEmpty": "لم يتم العثور على عناوين مشابهة.",
     "@similarHeadlinesEmpty": {
         "description": "Message shown when no similar headlines are found"
+    },
+    "detailsPageTitle": "[AR] Details",
+    "@detailsPageTitle": {
+        "description": "Title for the category/source details page"
+    },
+    "followButtonLabel": "[AR] Follow",
+    "@followButtonLabel": {
+        "description": "Label for the follow button"
+    },
+    "unfollowButtonLabel": "[AR] Unfollow",
+    "@unfollowButtonLabel": {
+        "description": "Label for the unfollow button"
+    },
+    "noHeadlinesFoundMessage": "[AR] No headlines found for this item.",
+    "@noHeadlinesFoundMessage": {
+        "description": "Message displayed when no headlines are available for a category/source"
+    },
+    "failedToLoadMoreHeadlines": "[AR] Failed to load more headlines.",
+    "@failedToLoadMoreHeadlines": {
+        "description": "Error message when loading more headlines fails on details page"
+    },
+    "headlinesSectionTitle": "[AR] Headlines",
+    "@headlinesSectionTitle": {
+        "description": "Title for the headlines section on details page"
     }
 }

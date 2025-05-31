@@ -103,7 +103,6 @@ class SavedHeadlinesPage extends StatelessWidget {
                         ),
                     trailing: trailingButton,
                   );
-                  break;
                 case HeadlineImageStyle.smallThumbnail:
                   tile = HeadlineTileImageStart(
                     headline: headline,
@@ -115,7 +114,6 @@ class SavedHeadlinesPage extends StatelessWidget {
                         ),
                     trailing: trailingButton,
                   );
-                  break;
                 case HeadlineImageStyle.largeThumbnail:
                   tile = HeadlineTileImageTop(
                     headline: headline,
@@ -127,7 +125,6 @@ class SavedHeadlinesPage extends StatelessWidget {
                         ),
                     trailing: trailingButton,
                   );
-                  break;
               }
               return tile;
             },

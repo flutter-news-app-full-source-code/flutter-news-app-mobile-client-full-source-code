@@ -104,6 +104,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // Map language code to Locale
       final newLocale = Locale(userAppSettings.language);
 
+      print('[AppBloc] _onAppSettingsRefreshed: userAppSettings.fontFamily: ${userAppSettings.displaySettings.fontFamily}');
+      print('[AppBloc] _onAppSettingsRefreshed: userAppSettings.fontWeight: ${userAppSettings.displaySettings.fontWeight}');
+      print('[AppBloc] _onAppSettingsRefreshed: newFontFamily mapped to: $newFontFamily');
+
       emit(
         state.copyWith(
           themeMode: newThemeMode,

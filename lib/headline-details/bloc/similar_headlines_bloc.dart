@@ -12,8 +12,8 @@ class SimilarHeadlinesBloc
     extends Bloc<SimilarHeadlinesEvent, SimilarHeadlinesState> {
   SimilarHeadlinesBloc({
     required HtDataRepository<Headline> headlinesRepository,
-  })  : _headlinesRepository = headlinesRepository,
-        super(SimilarHeadlinesInitial()) {
+  }) : _headlinesRepository = headlinesRepository,
+       super(SimilarHeadlinesInitial()) {
     on<FetchSimilarHeadlines>(_onFetchSimilarHeadlines);
   }
 
@@ -33,22 +33,24 @@ class SimilarHeadlinesBloc
         return;
       }
 
-      final queryParams = {
-        'categories': currentHeadline.category!.id,
-      };
+      final queryParams = {'categories': currentHeadline.category!.id};
 
       final response = await _headlinesRepository.readAllByQuery(
         queryParams,
-        limit: _similarHeadlinesLimit + 1, // Fetch one extra to check if current is there
+        limit:
+            _similarHeadlinesLimit +
+            1, // Fetch one extra to check if current is there
       );
 
       // Filter out the current headline from the results
-      final similarHeadlines = response.items
-          .where((headline) => headline.id != currentHeadline.id)
-          .toList();
+      final similarHeadlines =
+          response.items
+              .where((headline) => headline.id != currentHeadline.id)
+              .toList();
 
       // Take only the required limit after filtering
-      final finalSimilarHeadlines = similarHeadlines.take(_similarHeadlinesLimit).toList();
+      final finalSimilarHeadlines =
+          similarHeadlines.take(_similarHeadlinesLimit).toList();
 
       if (finalSimilarHeadlines.isEmpty) {
         emit(SimilarHeadlinesEmpty());

@@ -348,22 +348,27 @@ GoRouter createRouter({
                       return MultiBlocProvider(
                         providers: [
                           BlocProvider(
-                            create: (context) => HeadlineDetailsBloc(
-                              headlinesRepository:
-                                  context.read<HtDataRepository<Headline>>(),
-                            ),
+                            create:
+                                (context) => HeadlineDetailsBloc(
+                                  headlinesRepository:
+                                      context
+                                          .read<HtDataRepository<Headline>>(),
+                                ),
                           ),
                           BlocProvider(
-                            create: (context) => SimilarHeadlinesBloc(
-                              headlinesRepository:
-                                  context.read<HtDataRepository<Headline>>(),
-                            ),
+                            create:
+                                (context) => SimilarHeadlinesBloc(
+                                  headlinesRepository:
+                                      context
+                                          .read<HtDataRepository<Headline>>(),
+                                ),
                           ),
                         ],
                         child: HeadlineDetailsPage(
                           initialHeadline: headlineFromExtra,
                           // Ensure headlineId is non-null if initialHeadline is null
-                          headlineId: headlineFromExtra?.id ?? headlineIdFromPath,
+                          headlineId:
+                              headlineFromExtra?.id ?? headlineIdFromPath,
                         ),
                       );
                     },
@@ -485,21 +490,26 @@ GoRouter createRouter({
                       return MultiBlocProvider(
                         providers: [
                           BlocProvider(
-                            create: (context) => HeadlineDetailsBloc(
-                              headlinesRepository:
-                                  context.read<HtDataRepository<Headline>>(),
-                            ),
+                            create:
+                                (context) => HeadlineDetailsBloc(
+                                  headlinesRepository:
+                                      context
+                                          .read<HtDataRepository<Headline>>(),
+                                ),
                           ),
                           BlocProvider(
-                            create: (context) => SimilarHeadlinesBloc(
-                              headlinesRepository:
-                                  context.read<HtDataRepository<Headline>>(),
-                            ),
+                            create:
+                                (context) => SimilarHeadlinesBloc(
+                                  headlinesRepository:
+                                      context
+                                          .read<HtDataRepository<Headline>>(),
+                                ),
                           ),
                         ],
                         child: HeadlineDetailsPage(
                           initialHeadline: headlineFromExtra,
-                          headlineId: headlineFromExtra?.id ?? headlineIdFromPath,
+                          headlineId:
+                              headlineFromExtra?.id ?? headlineIdFromPath,
                         ),
                       );
                     },
@@ -649,21 +659,30 @@ GoRouter createRouter({
                           return MultiBlocProvider(
                             providers: [
                               BlocProvider(
-                                create: (context) => HeadlineDetailsBloc(
-                                  headlinesRepository:
-                                      context.read<HtDataRepository<Headline>>(),
-                                ),
+                                create:
+                                    (context) => HeadlineDetailsBloc(
+                                      headlinesRepository:
+                                          context
+                                              .read<
+                                                HtDataRepository<Headline>
+                                              >(),
+                                    ),
                               ),
                               BlocProvider(
-                                create: (context) => SimilarHeadlinesBloc(
-                                  headlinesRepository:
-                                      context.read<HtDataRepository<Headline>>(),
-                                ),
+                                create:
+                                    (context) => SimilarHeadlinesBloc(
+                                      headlinesRepository:
+                                          context
+                                              .read<
+                                                HtDataRepository<Headline>
+                                              >(),
+                                    ),
                               ),
                             ],
                             child: HeadlineDetailsPage(
                               initialHeadline: headlineFromExtra,
-                              headlineId: headlineFromExtra?.id ?? headlineIdFromPath,
+                              headlineId:
+                                  headlineFromExtra?.id ?? headlineIdFromPath,
                             ),
                           );
                         },

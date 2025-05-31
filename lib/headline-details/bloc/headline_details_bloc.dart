@@ -12,8 +12,8 @@ part 'headline_details_state.dart';
 class HeadlineDetailsBloc
     extends Bloc<HeadlineDetailsEvent, HeadlineDetailsState> {
   HeadlineDetailsBloc({required HtDataRepository<Headline> headlinesRepository})
-      : _headlinesRepository = headlinesRepository,
-        super(HeadlineDetailsInitial()) {
+    : _headlinesRepository = headlinesRepository,
+      super(HeadlineDetailsInitial()) {
     on<FetchHeadlineById>(_onFetchHeadlineById);
     on<HeadlineProvided>(_onHeadlineProvided);
   }

@@ -13,7 +13,10 @@ class HeadlineItemWidget extends StatelessWidget {
     this.onTap, // Add optional onTap callback
     this.trailing, // Add optional trailing widget
     super.key,
-  }) : assert(targetRouteName != null || onTap != null, 'Either targetRouteName or onTap must be provided');
+  }) : assert(
+         targetRouteName != null || onTap != null,
+         'Either targetRouteName or onTap must be provided',
+       );
 
   /// The headline to display.
   final Headline headline;

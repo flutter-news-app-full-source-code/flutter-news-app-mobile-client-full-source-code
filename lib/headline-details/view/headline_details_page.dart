@@ -19,11 +19,8 @@ import 'package:share_plus/share_plus.dart'; // Import share_plus
 import 'package:url_launcher/url_launcher_string.dart';
 
 class HeadlineDetailsPage extends StatefulWidget {
-  const HeadlineDetailsPage({
-    super.key,
-    this.headlineId,
-    this.initialHeadline,
-  }) : assert(headlineId != null || initialHeadline != null);
+  const HeadlineDetailsPage({super.key, this.headlineId, this.initialHeadline})
+    : assert(headlineId != null || initialHeadline != null);
 
   final String? headlineId;
   final Headline? initialHeadline;
@@ -37,17 +34,17 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
   void initState() {
     super.initState();
     if (widget.initialHeadline != null) {
-      context
-          .read<HeadlineDetailsBloc>()
-          .add(HeadlineProvided(widget.initialHeadline!));
+      context.read<HeadlineDetailsBloc>().add(
+        HeadlineProvided(widget.initialHeadline!),
+      );
       // Also trigger fetching similar headlines if the main one is already provided
-      context
-          .read<SimilarHeadlinesBloc>()
-          .add(FetchSimilarHeadlines(currentHeadline: widget.initialHeadline!));
+      context.read<SimilarHeadlinesBloc>().add(
+        FetchSimilarHeadlines(currentHeadline: widget.initialHeadline!),
+      );
     } else if (widget.headlineId != null) {
-      context
-          .read<HeadlineDetailsBloc>()
-          .add(FetchHeadlineById(widget.headlineId!));
+      context.read<HeadlineDetailsBloc>().add(
+        FetchHeadlineById(widget.headlineId!),
+      );
     }
   }
 
@@ -63,8 +60,8 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           // This check ensures it's not re-triggered if already loaded via initialHeadline.
           if (widget.initialHeadline == null) {
             context.read<SimilarHeadlinesBloc>().add(
-                  FetchSimilarHeadlines(currentHeadline: headlineState.headline),
-                );
+              FetchSimilarHeadlines(currentHeadline: headlineState.headline),
+            );
           }
         }
       },
@@ -77,21 +74,21 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                 final currentHeadlineId = detailsState.headline.id;
                 final wasPreviouslySaved =
                     previous.preferences?.savedHeadlines.any(
-                          (h) => h.id == currentHeadlineId,
-                        ) ??
-                        false;
+                      (h) => h.id == currentHeadlineId,
+                    ) ??
+                    false;
                 final isCurrentlySaved =
                     current.preferences?.savedHeadlines.any(
-                          (h) => h.id == currentHeadlineId,
-                        ) ??
-                        false;
+                      (h) => h.id == currentHeadlineId,
+                    ) ??
+                    false;
 
                 // Condition 1: Actual change in saved status for this headline
                 if (wasPreviouslySaved != isCurrentlySaved) {
                   // Only trigger if the status is success (to show confirmation)
                   // or failure (to show error). Avoid triggering if status is just loading.
                   return current.status == AccountStatus.success ||
-                         current.status == AccountStatus.failure;
+                      current.status == AccountStatus.failure;
                 }
 
                 // Condition 2: A specific save/unsave operation just failed
@@ -108,9 +105,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
               if (detailsState is HeadlineDetailsLoaded) {
                 final nowIsSaved =
                     accountState.preferences?.savedHeadlines.any(
-                          (h) => h.id == detailsState.headline.id,
-                        ) ??
-                        false;
+                      (h) => h.id == detailsState.headline.id,
+                    ) ??
+                    false;
 
                 if (accountState.status == AccountStatus.failure &&
                     accountState.errorMessage != null) {
@@ -145,20 +142,19 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
               builder: (context, state) {
                 return switch (state) {
                   HeadlineDetailsInitial() ||
-                  HeadlineDetailsLoading() =>
-                    LoadingStateWidget(
-                      icon: Icons.downloading,
-                      headline: l10n.headlineDetailsLoadingHeadline,
-                      subheadline: l10n.headlineDetailsLoadingSubheadline,
-                    ),
+                  HeadlineDetailsLoading() => LoadingStateWidget(
+                    icon: Icons.downloading,
+                    headline: l10n.headlineDetailsLoadingHeadline,
+                    subheadline: l10n.headlineDetailsLoadingSubheadline,
+                  ),
                   final HeadlineDetailsFailure failureState =>
                     FailureStateWidget(
                       message: failureState.message,
                       onRetry: () {
                         if (widget.headlineId != null) {
-                          context
-                              .read<HeadlineDetailsBloc>()
-                              .add(FetchHeadlineById(widget.headlineId!));
+                          context.read<HeadlineDetailsBloc>().add(
+                            FetchHeadlineById(widget.headlineId!),
+                          );
                         }
                       },
                     ),
@@ -187,19 +183,20 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     final accountState = context.watch<AccountBloc>().state;
     final isSaved =
         accountState.preferences?.savedHeadlines.any(
-              (h) => h.id == headline.id,
-            ) ??
-            false;
+          (h) => h.id == headline.id,
+        ) ??
+        false;
 
     final bookmarkButton = IconButton(
       icon: Icon(isSaved ? Icons.bookmark : Icons.bookmark_border),
-      tooltip: isSaved
-          ? l10n.headlineDetailsRemoveFromSavedTooltip
-          : l10n.headlineDetailsSaveTooltip,
+      tooltip:
+          isSaved
+              ? l10n.headlineDetailsRemoveFromSavedTooltip
+              : l10n.headlineDetailsSaveTooltip,
       onPressed: () {
         context.read<AccountBloc>().add(
-              AccountSaveHeadlineToggled(headline: headline),
-            );
+          AccountSaveHeadlineToggled(headline: headline),
+        );
       },
     );
 
@@ -241,9 +238,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
             if (buttonContext.mounted) {
               if (shareResult.status == ShareResultStatus.unavailable) {
                 ScaffoldMessenger.of(buttonContext).showSnackBar(
-                  SnackBar(
-                    content: Text(l10n.sharingUnavailableSnackbar),
-                  ),
+                  SnackBar(content: Text(l10n.sharingUnavailableSnackbar)),
                 );
               }
             }
@@ -297,16 +292,17 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                       child: const Center(child: CircularProgressIndicator()),
                     );
                   },
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    width: double.infinity,
-                    height: 200,
-                    color: colorScheme.surfaceContainerHighest,
-                    child: Icon(
-                      Icons.broken_image,
-                      color: colorScheme.onSurfaceVariant,
-                      size: AppSpacing.xxl,
-                    ),
-                  ),
+                  errorBuilder:
+                      (context, error, stackTrace) => Container(
+                        width: double.infinity,
+                        height: 200,
+                        color: colorScheme.surfaceContainerHighest,
+                        child: Icon(
+                          Icons.broken_image,
+                          color: colorScheme.onSurfaceVariant,
+                          size: AppSpacing.xxl,
+                        ),
+                      ),
                 ),
               ),
             ),
@@ -400,7 +396,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     }
 
     if (headline.publishedAt != null) {
-      final formattedDate = DateFormat('MMM d, yyyy').format(headline.publishedAt!);
+      final formattedDate = DateFormat(
+        'MMM d, yyyy',
+      ).format(headline.publishedAt!);
       chips.add(
         Chip(
           avatar: Icon(
@@ -459,58 +457,54 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       builder: (context, state) {
         return switch (state) {
           SimilarHeadlinesInitial() ||
-          SimilarHeadlinesLoading() =>
-            const SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.all(AppSpacing.lg),
-                child: Center(child: CircularProgressIndicator()),
-              ),
+          SimilarHeadlinesLoading() => const SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.all(AppSpacing.lg),
+              child: Center(child: CircularProgressIndicator()),
             ),
+          ),
           final SimilarHeadlinesError errorState => SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: Text(
-                  errorState.message,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),
-                ),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Text(
+                errorState.message,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
               ),
             ),
+          ),
           SimilarHeadlinesEmpty() => SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: Text(
-                  l10n.similarHeadlinesEmpty,
-                  textAlign: TextAlign.center,
-                ),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Text(
+                l10n.similarHeadlinesEmpty,
+                textAlign: TextAlign.center,
               ),
             ),
+          ),
           final SimilarHeadlinesLoaded loadedState => SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final similarHeadline = loadedState.similarHeadlines[index];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.paddingMedium,
-                      vertical: AppSpacing.sm,
-                    ),
-                    child: HeadlineItemWidget(
-                      headline: similarHeadline,
-                      // Use the onTap callback for navigation
-                      onTap: (tappedHeadline) {
-                        context.pushNamed(
-                          Routes.articleDetailsName,
-                          pathParameters: {'id': tappedHeadline.id},
-                          extra: tappedHeadline,
-                        );
-                      },
-                      // targetRouteName: Routes.articleDetailsName, // No longer needed here
-                    ),
-                  );
-                },
-                childCount: loadedState.similarHeadlines.length,
-              ),
-            ),
+            delegate: SliverChildBuilderDelegate((context, index) {
+              final similarHeadline = loadedState.similarHeadlines[index];
+              return Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.paddingMedium,
+                  vertical: AppSpacing.sm,
+                ),
+                child: HeadlineItemWidget(
+                  headline: similarHeadline,
+                  // Use the onTap callback for navigation
+                  onTap: (tappedHeadline) {
+                    context.pushNamed(
+                      Routes.articleDetailsName,
+                      pathParameters: {'id': tappedHeadline.id},
+                      extra: tappedHeadline,
+                    );
+                  },
+                  // targetRouteName: Routes.articleDetailsName, // No longer needed here
+                ),
+              );
+            }, childCount: loadedState.similarHeadlines.length),
+          ),
           _ => const SliverToBoxAdapter(child: SizedBox.shrink()),
         };
       },

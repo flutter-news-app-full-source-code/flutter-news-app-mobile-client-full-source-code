@@ -3,65 +3,40 @@ import 'package:timeago/timeago.dart' as timeago;
 /// Custom Arabic lookup messages for the timeago package.
 class ArTimeagoMessages implements timeago.LookupMessages {
   @override
-  String prefixAgo() => 'منذ';
+  String prefixAgo() => ''; // No prefix, will include in string
   @override
-  String prefixFromNow() => 'بعد';
+  String prefixFromNow() => 'بعد '; // Prefix for future
   @override
-  String suffixAgo() => '';
+  String suffixAgo() => ''; // No suffix
   @override
   String suffixFromNow() => '';
 
   @override
-  String lessThanOneMinute(int seconds) => 'لحظات';
+  String lessThanOneMinute(int seconds) => 'الآن';
   @override
-  String aboutAMinute(int minutes) => 'دقيقة واحدة';
+  String aboutAMinute(int minutes) => 'منذ 1د';
   @override
-  String minutes(int minutes) {
-    if (minutes == 1) return 'دقيقة واحدة';
-    if (minutes == 2) return 'دقيقتين';
-    if (minutes >= 3 && minutes <= 10) return '$minutes دقائق';
-    return '$minutes دقيقة';
-  }
+  String minutes(int minutes) => 'منذ ${minutes}د';
 
   @override
-  String aboutAnHour(int minutes) => 'ساعة واحدة';
+  String aboutAnHour(int minutes) => 'منذ 1س';
   @override
-  String hours(int hours) {
-    if (hours == 1) return 'ساعة واحدة';
-    if (hours == 2) return 'ساعتين';
-    if (hours >= 3 && hours <= 10) return '$hours ساعات';
-    return '$hours ساعة';
-  }
+  String hours(int hours) => 'منذ ${hours}س';
 
   @override
-  String aDay(int hours) => 'يوم واحد';
+  String aDay(int hours) => 'منذ 1ي'; // Or 'أمس' if preferred for exactly 1 day
   @override
-  String days(int days) {
-    if (days == 1) return 'يوم واحد';
-    if (days == 2) return 'يومين';
-    if (days >= 3 && days <= 10) return '$days أيام';
-    return '$days يومًا';
-  }
+  String days(int days) => 'منذ ${days}ي';
 
   @override
-  String aboutAMonth(int days) => 'شهر واحد';
+  String aboutAMonth(int days) => 'منذ 1ش';
   @override
-  String months(int months) {
-    if (months == 1) return 'شهر واحد';
-    if (months == 2) return 'شهرين';
-    if (months >= 3 && months <= 10) return '$months أشهر';
-    return '$months شهرًا';
-  }
+  String months(int months) => 'منذ ${months}ش';
 
   @override
-  String aboutAYear(int year) => 'سنة واحدة';
+  String aboutAYear(int year) => 'منذ 1سنة'; // Using سنة for year
   @override
-  String years(int years) {
-    if (years == 1) return 'سنة واحدة';
-    if (years == 2) return 'سنتين';
-    if (years >= 3 && years <= 10) return '$years سنوات';
-    return '$years سنة';
-  }
+  String years(int years) => 'منذ ${years}سنوات'; // Standard plural
 
   @override
   String wordSeparator() => ' ';

@@ -2,7 +2,7 @@
 enum SearchModelType {
   headline,
   category,
-  country,
+  // country, // Removed
   source;
 
   /// Returns a user-friendly display name for the enum value.
@@ -16,8 +16,8 @@ enum SearchModelType {
         return 'Headlines';
       case SearchModelType.category:
         return 'Categories';
-      case SearchModelType.country:
-        return 'Countries';
+      // case SearchModelType.country: // Removed
+      //   return 'Countries'; // Removed
       case SearchModelType.source:
         return 'Sources';
     }

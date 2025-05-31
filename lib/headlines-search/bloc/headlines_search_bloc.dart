@@ -3,7 +3,7 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ht_data_repository/ht_data_repository.dart'; // Generic Data Repository
 import 'package:ht_main/headlines-search/models/search_model_type.dart'; // Import SearchModelType
-import 'package:ht_shared/ht_shared.dart' show Headline, Category, Source, HtHttpException, PaginatedResponse; // Shared models
+import 'package:ht_shared/ht_shared.dart' show Category, Headline, HtHttpException, PaginatedResponse, Source; // Shared models
 
 part 'headlines_search_event.dart';
 part 'headlines_search_state.dart';

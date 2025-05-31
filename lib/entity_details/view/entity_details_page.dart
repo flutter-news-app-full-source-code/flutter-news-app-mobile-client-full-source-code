@@ -1,7 +1,7 @@
-import 'package:flutter/foundation.dart' show kIsWeb; // Added
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart'; // Added
+import 'package:ht_data_repository/ht_data_repository.dart'; // For repository provider
 import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/app/bloc/app_bloc.dart'; // For accessing settings
 import 'package:ht_main/entity_details/bloc/entity_details_bloc.dart';
@@ -11,7 +11,6 @@ import 'package:ht_main/router/routes.dart'; // Added
 import 'package:ht_main/shared/constants/app_spacing.dart';
 import 'package:ht_main/shared/widgets/widgets.dart';
 import 'package:ht_shared/ht_shared.dart';
-import 'package:ht_data_repository/ht_data_repository.dart'; // For repository provider
 
 class EntityDetailsPageArguments {
   const EntityDetailsPageArguments({

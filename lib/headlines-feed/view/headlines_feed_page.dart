@@ -4,10 +4,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-// Import Category
-// Import Country
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:ht_main/app/bloc/app_bloc.dart'; // Added to access settings
 import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
 // HeadlineItemWidget import removed
@@ -15,7 +11,7 @@ import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/shared.dart';
 import 'package:ht_shared/ht_shared.dart'
-    show Headline, HeadlineImageStyle; // Added HeadlineImageStyle
+    show HeadlineImageStyle; // Added HeadlineImageStyle
 
 /// {@template headlines_feed_view}
 /// The core view widget for the headlines feed.

@@ -349,7 +349,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "37d27c0d2e2dfbc2d892aa92abf866b5c0cc1956"
+      resolved-ref: "7583a821eef9ae645429a0143ea504a62433ab06"
       url: "https://github.com/headlines-toolkit/ht-data-api.git"
     source: git
     version: "0.0.0"
@@ -403,7 +403,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "2c594c8256181cdb86f03a11ed8ee1b9c5e79f28"
+      resolved-ref: "5258cd241bbab3e68692963124eeef2a36fc7f64"
       url: "https://github.com/headlines-toolkit/ht-shared.git"
     source: git
     version: "0.0.0"

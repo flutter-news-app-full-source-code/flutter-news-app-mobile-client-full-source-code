@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_main/account/bloc/account_bloc.dart'; // Corrected import
 import 'package:ht_data_repository/ht_data_repository.dart';
+import 'package:ht_main/account/bloc/account_bloc.dart'; // Corrected import
 import 'package:ht_main/entity_details/models/entity_type.dart';
 import 'package:ht_shared/ht_shared.dart';
 

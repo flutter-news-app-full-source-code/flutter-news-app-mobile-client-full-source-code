@@ -6,7 +6,6 @@ import 'package:ht_main/entity_details/view/entity_details_page.dart'; // Import
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/widgets/widgets.dart'; // For common widgets
-import 'package:ht_shared/ht_shared.dart';
 
 /// {@template followed_sources_list_page}
 /// Page to display and manage sources followed by the user.

@@ -17,7 +17,7 @@ import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/constants/app_spacing.dart';
 import 'package:ht_main/shared/shared.dart'; // Imports new headline tiles
 // Adjusted imports to only include what's necessary after country removal
-import 'package:ht_shared/ht_shared.dart' show Category, Headline, Source, HeadlineImageStyle, SearchModelType;
+import 'package:ht_shared/ht_shared.dart' show Category, Headline, HeadlineImageStyle, SearchModelType, Source;
 
 /// Page widget responsible for providing the BLoC for the headlines search feature.
 class HeadlinesSearchPage extends StatelessWidget {
@@ -153,13 +153,10 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                   switch (type) {
                     case SearchModelType.headline:
                       displayLocalizedName = l10n.searchModelTypeHeadline;
-                      break;
                     case SearchModelType.category:
                       displayLocalizedName = l10n.searchModelTypeCategory;
-                      break;
                     case SearchModelType.source:
                       displayLocalizedName = l10n.searchModelTypeSource;
-                      break;
                   }
                   return DropdownMenuItem<SearchModelType>(
                     value: type,

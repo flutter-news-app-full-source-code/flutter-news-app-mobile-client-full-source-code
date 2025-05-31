@@ -199,7 +199,7 @@ class _HeadlineMetadataRow extends StatelessWidget {
               if (headline.category != null) {
                 context.push(
                   Routes.categoryDetails,
-                  extra: EntityDetailsPageArguments(entity: headline.category!),
+                  extra: EntityDetailsPageArguments(entity: headline.category),
                 );
               }
             },
@@ -226,7 +226,7 @@ class _HeadlineMetadataRow extends StatelessWidget {
               if (headline.source != null) {
                 context.push(
                   Routes.sourceDetails,
-                  extra: EntityDetailsPageArguments(entity: headline.source!),
+                  extra: EntityDetailsPageArguments(entity: headline.source),
                 );
               }
             },

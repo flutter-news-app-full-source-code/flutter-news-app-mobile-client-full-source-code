@@ -5,3 +5,6 @@ library;
 export 'failure_state_widget.dart';
 export 'initial_state_widget.dart';
 export 'loading_state_widget.dart';
+export 'headline_tile_text_only.dart';
+export 'headline_tile_image_start.dart';
+export 'headline_tile_image_top.dart';

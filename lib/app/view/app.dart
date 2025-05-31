@@ -182,7 +182,8 @@ class _AppViewState extends State<_AppView> {
                 previous.flexScheme != current.flexScheme ||
                 previous.fontFamily != current.fontFamily ||
                 previous.appTextScaleFactor != current.appTextScaleFactor ||
-                previous.locale != current.locale, // Added locale check
+                previous.locale != current.locale ||
+                previous.settings != current.settings, // Added settings check
         builder: (context, state) {
           print('[_AppViewState] Building MaterialApp.router');
           print('[_AppViewState] state.fontFamily: ${state.fontFamily}');

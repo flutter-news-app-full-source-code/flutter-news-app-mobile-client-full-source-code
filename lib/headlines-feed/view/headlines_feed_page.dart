@@ -6,12 +6,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 // Import Category
 // Import Country
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ht_main/app/bloc/app_bloc.dart'; // Added to access settings
 import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
-import 'package:ht_main/headlines-feed/widgets/headline_item_widget.dart';
+// HeadlineItemWidget import removed
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/shared.dart';
-// Import Source
+import 'package:ht_shared/ht_shared.dart'
+    show Headline, HeadlineImageStyle; // Added HeadlineImageStyle
 
 /// {@template headlines_feed_view}
 /// The core view widget for the headlines feed.
@@ -216,10 +220,51 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                     }
                     // Otherwise, build the headline item
                     final headline = state.headlines[index];
-                    return HeadlineItemWidget(
-                      headline: headline,
-                      targetRouteName: Routes.articleDetailsName,
-                    );
+                    final imageStyle =
+                        context
+                            .watch<AppBloc>()
+                            .state
+                            .settings
+                            .feedPreferences
+                            .headlineImageStyle;
+
+                    Widget tile;
+                    switch (imageStyle) {
+                      case HeadlineImageStyle.hidden:
+                        tile = HeadlineTileTextOnly(
+                          headline: headline,
+                          onHeadlineTap:
+                              () => context.goNamed(
+                                Routes.articleDetailsName,
+                                pathParameters: {'id': headline.id},
+                                extra: headline,
+                              ),
+                        );
+                        break;
+                      case HeadlineImageStyle.smallThumbnail:
+                        tile = HeadlineTileImageStart(
+                          headline: headline,
+                          onHeadlineTap:
+                              () => context.goNamed(
+                                Routes.articleDetailsName,
+                                pathParameters: {'id': headline.id},
+                                extra: headline,
+                              ),
+                        );
+                        break;
+                      case HeadlineImageStyle.largeThumbnail:
+                        tile = HeadlineTileImageTop(
+                          headline: headline,
+                          onHeadlineTap:
+                              () => context.goNamed(
+                                Routes.articleDetailsName,
+                                pathParameters: {'id': headline.id},
+                                extra: headline,
+                              ),
+                        );
+                        break;
+                    }
+                    return tile;
                   },
                 ),
               );

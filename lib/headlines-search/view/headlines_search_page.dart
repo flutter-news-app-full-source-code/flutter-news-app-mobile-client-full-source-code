@@ -3,19 +3,20 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ht_main/headlines-feed/widgets/headline_item_widget.dart';
+import 'package:go_router/go_router.dart'; // Import GoRouter for navigation
+import 'package:ht_main/app/bloc/app_bloc.dart'; // Import AppBloc for settings
+// HeadlineItemWidget import removed
 import 'package:ht_main/headlines-search/bloc/headlines_search_bloc.dart';
-import 'package:ht_main/headlines-search/models/search_model_type.dart'; // Import SearchModelType
+import 'package:ht_main/headlines-search/models/search_model_type.dart';
 // Import new item widgets
 import 'package:ht_main/headlines-search/widgets/category_item_widget.dart';
 import 'package:ht_main/headlines-search/widgets/country_item_widget.dart';
 import 'package:ht_main/headlines-search/widgets/source_item_widget.dart';
 import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_main/router/routes.dart'; // Import Routes
-import 'package:ht_main/shared/constants/app_spacing.dart'; // Import AppSpacing
-import 'package:ht_main/shared/widgets/failure_state_widget.dart';
-import 'package:ht_main/shared/widgets/initial_state_widget.dart';
-import 'package:ht_shared/ht_shared.dart'; // Import shared models
+import 'package:ht_main/router/routes.dart';
+import 'package:ht_main/shared/constants/app_spacing.dart';
+import 'package:ht_main/shared/shared.dart'; // Imports new headline tiles
+import 'package:ht_shared/ht_shared.dart';
 
 /// Page widget responsible for providing the BLoC for the headlines search feature.
 class HeadlinesSearchPage extends StatelessWidget {
@@ -274,10 +275,51 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                       final item = results[index];
                       switch (resultsModelType) {
                         case SearchModelType.headline:
-                          return HeadlineItemWidget(
-                            headline: item as Headline,
-                            targetRouteName: Routes.searchArticleDetailsName,
-                          );
+                          final headline = item as Headline;
+                          final imageStyle =
+                              context
+                                  .watch<AppBloc>()
+                                  .state
+                                  .settings
+                                  .feedPreferences
+                                  .headlineImageStyle;
+                          Widget tile;
+                          switch (imageStyle) {
+                            case HeadlineImageStyle.hidden:
+                              tile = HeadlineTileTextOnly(
+                                headline: headline,
+                                onHeadlineTap:
+                                    () => context.goNamed(
+                                      Routes.searchArticleDetailsName,
+                                      pathParameters: {'id': headline.id},
+                                      extra: headline,
+                                    ),
+                              );
+                              break;
+                            case HeadlineImageStyle.smallThumbnail:
+                              tile = HeadlineTileImageStart(
+                                headline: headline,
+                                onHeadlineTap:
+                                    () => context.goNamed(
+                                      Routes.searchArticleDetailsName,
+                                      pathParameters: {'id': headline.id},
+                                      extra: headline,
+                                    ),
+                              );
+                              break;
+                            case HeadlineImageStyle.largeThumbnail:
+                              tile = HeadlineTileImageTop(
+                                headline: headline,
+                                onHeadlineTap:
+                                    () => context.goNamed(
+                                      Routes.searchArticleDetailsName,
+                                      pathParameters: {'id': headline.id},
+                                      extra: headline,
+                                    ),
+                              );
+                              break;
+                          }
+                          return tile;
                         case SearchModelType.category:
                           return CategoryItemWidget(category: item as Category);
                         case SearchModelType.source:

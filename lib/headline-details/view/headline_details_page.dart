@@ -5,15 +5,16 @@ import 'package:flutter/foundation.dart' show kIsWeb; // Import kIsWeb
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart'; // Import GoRouter
-import 'package:ht_main/account/bloc/account_bloc.dart'; // Import AccountBloc
-import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart'; // Import BLoC
-import 'package:ht_main/headline-details/bloc/similar_headlines_bloc.dart'; // Import SimilarHeadlinesBloc
-import 'package:ht_main/headlines-feed/widgets/headline_item_widget.dart'; // Import HeadlineItemWidget
+import 'package:ht_main/account/bloc/account_bloc.dart';
+import 'package:ht_main/app/bloc/app_bloc.dart'; // Added AppBloc
+import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart';
+import 'package:ht_main/headline-details/bloc/similar_headlines_bloc.dart';
+// HeadlineItemWidget import removed
 import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_main/router/routes.dart'; // Import Routes
+import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/shared.dart';
 import 'package:ht_shared/ht_shared.dart'
-    show Headline; // Import Headline model
+    show Headline, HeadlineImageStyle; // Added HeadlineImageStyle
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart'; // Import share_plus
 import 'package:url_launcher/url_launcher_string.dart';
@@ -268,45 +269,59 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
             child: Text(headline.title, style: textTheme.headlineMedium),
           ),
         ),
-        if (headline.imageUrl != null)
-          SliverPadding(
-            padding: const EdgeInsets.only(
-              top: AppSpacing.lg,
-              left: AppSpacing.paddingLarge,
-              right: AppSpacing.paddingLarge,
-            ),
-            sliver: SliverToBoxAdapter(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(AppSpacing.md),
-                child: Image.network(
-                  headline.imageUrl!,
-                  width: double.infinity,
-                  height: 200,
-                  fit: BoxFit.cover,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Container(
-                      width: double.infinity,
-                      height: 200,
-                      color: colorScheme.surfaceContainerHighest,
-                      child: const Center(child: CircularProgressIndicator()),
-                    );
-                  },
-                  errorBuilder:
-                      (context, error, stackTrace) => Container(
+        // Image or Placeholder Section
+        SliverPadding(
+          padding: const EdgeInsets.only(
+            top: AppSpacing.lg,
+            left: AppSpacing.paddingLarge,
+            right: AppSpacing.paddingLarge,
+          ),
+          sliver: SliverToBoxAdapter(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(AppSpacing.md),
+              child:
+                  headline.imageUrl != null
+                      ? Image.network(
+                        headline.imageUrl!,
+                        width: double.infinity,
+                        height: 200,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            width: double.infinity,
+                            height: 200,
+                            color: colorScheme.surfaceContainerHighest,
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        },
+                        errorBuilder:
+                            (context, error, stackTrace) => Container(
+                              width: double.infinity,
+                              height: 200,
+                              color: colorScheme.surfaceContainerHighest,
+                              child: Icon(
+                                Icons.broken_image_outlined,
+                                color: colorScheme.onSurfaceVariant,
+                                size: AppSpacing.xxl,
+                              ),
+                            ),
+                      )
+                      : Container(
                         width: double.infinity,
                         height: 200,
                         color: colorScheme.surfaceContainerHighest,
                         child: Icon(
-                          Icons.broken_image,
+                          Icons.image_not_supported_outlined,
                           color: colorScheme.onSurfaceVariant,
                           size: AppSpacing.xxl,
                         ),
                       ),
-                ),
-              ),
             ),
           ),
+        ),
         SliverPadding(
           padding: horizontalPadding.copyWith(top: AppSpacing.lg),
           sliver: SliverToBoxAdapter(
@@ -490,17 +505,54 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                   horizontal: AppSpacing.paddingMedium,
                   vertical: AppSpacing.sm,
                 ),
-                child: HeadlineItemWidget(
-                  headline: similarHeadline,
-                  // Use the onTap callback for navigation
-                  onTap: (tappedHeadline) {
-                    context.pushNamed(
-                      Routes.articleDetailsName,
-                      pathParameters: {'id': tappedHeadline.id},
-                      extra: tappedHeadline,
-                    );
+                child: Builder(
+                  // Use Builder to get a new context that can watch AppBloc
+                  builder: (context) {
+                    final imageStyle =
+                        context
+                            .watch<AppBloc>()
+                            .state
+                            .settings
+                            .feedPreferences
+                            .headlineImageStyle;
+                    Widget tile;
+                    switch (imageStyle) {
+                      case HeadlineImageStyle.hidden:
+                        tile = HeadlineTileTextOnly(
+                          headline: similarHeadline,
+                          onHeadlineTap:
+                              () => context.pushNamed(
+                                Routes.articleDetailsName,
+                                pathParameters: {'id': similarHeadline.id},
+                                extra: similarHeadline,
+                              ),
+                        );
+                        break;
+                      case HeadlineImageStyle.smallThumbnail:
+                        tile = HeadlineTileImageStart(
+                          headline: similarHeadline,
+                          onHeadlineTap:
+                              () => context.pushNamed(
+                                Routes.articleDetailsName,
+                                pathParameters: {'id': similarHeadline.id},
+                                extra: similarHeadline,
+                              ),
+                        );
+                        break;
+                      case HeadlineImageStyle.largeThumbnail:
+                        tile = HeadlineTileImageTop(
+                          headline: similarHeadline,
+                          onHeadlineTap:
+                              () => context.pushNamed(
+                                Routes.articleDetailsName,
+                                pathParameters: {'id': similarHeadline.id},
+                                extra: similarHeadline,
+                              ),
+                        );
+                        break;
+                    }
+                    return tile;
                   },
-                  // targetRouteName: Routes.articleDetailsName, // No longer needed here
                 ),
               );
             }, childCount: loadedState.similarHeadlines.length),

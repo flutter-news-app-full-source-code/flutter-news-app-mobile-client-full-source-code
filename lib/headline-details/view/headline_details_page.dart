@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ht_main/account/bloc/account_bloc.dart'; // Import AccountBloc
 import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/shared/shared.dart';
@@ -19,40 +20,113 @@ class HeadlineDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    // Keep a reference to headlineDetailsState to use in BlocListener
+    final headlineDetailsState = context.watch<HeadlineDetailsBloc>().state;
+
     return SafeArea(
       child: Scaffold(
         // Body contains the BlocBuilder which returns either state widgets
         // or the scroll view
-        body: BlocBuilder<HeadlineDetailsBloc, HeadlineDetailsState>(
-          builder: (context, state) {
-            // Handle Loading/Initial/Failure states outside the scroll view
-            // for better user experience.
-            return switch (state) {
-              HeadlineDetailsInitial _ => InitialStateWidget(
-                icon: Icons.article,
-                headline: l10n.headlineDetailsInitialHeadline,
-                subheadline: l10n.headlineDetailsInitialSubheadline,
-              ),
-              HeadlineDetailsLoading _ => LoadingStateWidget(
-                icon: Icons.downloading,
-                headline: l10n.headlineDetailsLoadingHeadline,
-                subheadline: l10n.headlineDetailsLoadingSubheadline,
-              ),
-              final HeadlineDetailsFailure state => FailureStateWidget(
-                message: state.message,
-                onRetry: () {
-                  context.read<HeadlineDetailsBloc>().add(
-                    HeadlineDetailsRequested(headlineId: headlineId),
-                  );
-                },
-              ),
-              final HeadlineDetailsLoaded state => _buildLoadedContent(
-                context,
-                state.headline,
-              ),
-              _ => const SizedBox.shrink(), // Should not happen in practice
-            };
+        body: BlocListener<AccountBloc, AccountState>(
+          listenWhen: (previous, current) {
+            // Listen if status is failure or if the saved status of *this* headline changed
+            if (current.status == AccountStatus.failure &&
+                previous.status != AccountStatus.failure) {
+              return true;
+            }
+            if (headlineDetailsState is HeadlineDetailsLoaded) {
+              final currentHeadlineId = headlineDetailsState.headline.id;
+              final wasPreviouslySaved =
+                  previous.preferences?.savedHeadlines.any(
+                    (h) => h.id == currentHeadlineId,
+                  ) ??
+                  false;
+              final isCurrentlySaved =
+                  current.preferences?.savedHeadlines.any(
+                    (h) => h.id == currentHeadlineId,
+                  ) ??
+                  false;
+              // Listen if the specific headline's saved status changed OR
+              // if a general success occurred (e.g. after an optimistic update that might not change the list length but confirms persistence)
+              return (wasPreviouslySaved != isCurrentlySaved) ||
+                  (current.status == AccountStatus.success &&
+                      previous.status != AccountStatus.success);
+            }
+            return false;
           },
+          listener: (context, accountState) {
+            if (headlineDetailsState is HeadlineDetailsLoaded) {
+              final currentHeadline = headlineDetailsState.headline;
+              final nowIsSaved =
+                  accountState.preferences?.savedHeadlines.any(
+                    (h) => h.id == currentHeadline.id,
+                  ) ??
+                  false;
+
+              if (accountState.status == AccountStatus.failure &&
+                  accountState.errorMessage != null) {
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        accountState.errorMessage ??
+                            l10n.headlineSaveErrorSnackbar,
+                      ), // Use specific or generic error
+                      backgroundColor: Theme.of(context).colorScheme.error,
+                    ),
+                  );
+              } else {
+                // Only show success snackbar if the state isn't failure
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        nowIsSaved
+                            ? l10n.headlineSavedSuccessSnackbar
+                            : l10n.headlineUnsavedSuccessSnackbar,
+                      ),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+              }
+            }
+          },
+          child: BlocBuilder<HeadlineDetailsBloc, HeadlineDetailsState>(
+            // No need to re-watch headlineDetailsState here, already have it.
+            // builder: (context, state) // state here is headlineDetailsState
+            builder: (context, headlineDetailsBuilderState) {
+              // Handle Loading/Initial/Failure states outside the scroll view
+              // for better user experience.
+              // Use headlineDetailsBuilderState for the switch
+              return switch (headlineDetailsBuilderState) {
+                HeadlineDetailsInitial _ => InitialStateWidget(
+                  icon: Icons.article,
+                  headline: l10n.headlineDetailsInitialHeadline,
+                  subheadline: l10n.headlineDetailsInitialSubheadline,
+                ),
+                HeadlineDetailsLoading _ => LoadingStateWidget(
+                  icon: Icons.downloading,
+                  headline: l10n.headlineDetailsLoadingHeadline,
+                  subheadline: l10n.headlineDetailsLoadingSubheadline,
+                ),
+                final HeadlineDetailsFailure state => FailureStateWidget(
+                  message: state.message,
+                  onRetry: () {
+                    context.read<HeadlineDetailsBloc>().add(
+                      HeadlineDetailsRequested(headlineId: headlineId),
+                    );
+                  },
+                ),
+                final HeadlineDetailsLoaded state => _buildLoadedContent(
+                  context,
+                  state.headline,
+                ),
+                _ => const SizedBox.shrink(), // Should not happen in practice
+              };
+            },
+          ),
         ),
       ),
     );
@@ -71,6 +145,33 @@ class HeadlineDetailsPage extends StatelessWidget {
     );
 
     // Return CustomScrollView instead of SingleChildScrollView
+    // Watch AccountBloc state for saved status
+    final accountState = context.watch<AccountBloc>().state;
+    final isSaved =
+        accountState.preferences?.savedHeadlines.any(
+          (h) => h.id == headline.id,
+        ) ??
+        false;
+
+    final bookmarkButton = IconButton(
+      icon: Icon(isSaved ? Icons.bookmark : Icons.bookmark_border),
+      tooltip: isSaved
+          ? l10n.headlineDetailsRemoveFromSavedTooltip
+          : l10n.headlineDetailsSaveTooltip,
+      onPressed: () {
+        context.read<AccountBloc>().add(
+          AccountSaveHeadlineToggled(headline: headline),
+        );
+      },
+    );
+
+    final shareButton = IconButton(
+      icon: const Icon(Icons.share),
+      onPressed: () {
+        // TODO(fulleni): Implement share functionality
+      },
+    );
+
     return CustomScrollView(
       slivers: [
         // --- App Bar ---
@@ -79,31 +180,18 @@ class HeadlineDetailsPage extends StatelessWidget {
             icon: const Icon(Icons.arrow_back),
             onPressed: () => Navigator.of(context).pop(),
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.bookmark_border),
-              onPressed: () {
-                // TODO(fulleni): Implement bookmark functionality
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.share),
-              onPressed: () {
-                // TODO(fulleni): Implement share functionality
-              },
-            ),
-          ],
+          actions: [bookmarkButton, shareButton],
           // Pinned=false, floating=true, snap=true is common for news apps
           pinned: false,
-          floating: true,
-          snap: true,
+          floating: true, // Trailing comma
+          snap: true, // Trailing comma
           // Transparent background to let content scroll behind if needed
-          backgroundColor: Colors.transparent,
-          elevation: 0,
+          backgroundColor: Colors.transparent, // Trailing comma
+          elevation: 0, // Trailing comma
           // Ensure icons use appropriate theme color
-          foregroundColor: theme.colorScheme.onSurface,
-        ),
-
+          foregroundColor:
+              theme.colorScheme.onSurface, // Trailing comma (optional if last)
+        ), // SliverAppBar
         // --- Title ---
         SliverPadding(
           padding: horizontalPadding.copyWith(top: AppSpacing.lg),

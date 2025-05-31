@@ -4,7 +4,6 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:ht_auth_repository/ht_auth_repository.dart';
 import 'package:ht_data_repository/ht_data_repository.dart';
 import 'package:ht_shared/ht_shared.dart'; // Import shared models and exceptions
@@ -104,9 +103,15 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // Map language code to Locale
       final newLocale = Locale(userAppSettings.language);
 
-      print('[AppBloc] _onAppSettingsRefreshed: userAppSettings.fontFamily: ${userAppSettings.displaySettings.fontFamily}');
-      print('[AppBloc] _onAppSettingsRefreshed: userAppSettings.fontWeight: ${userAppSettings.displaySettings.fontWeight}');
-      print('[AppBloc] _onAppSettingsRefreshed: newFontFamily mapped to: $newFontFamily');
+      print(
+        '[AppBloc] _onAppSettingsRefreshed: userAppSettings.fontFamily: ${userAppSettings.displaySettings.fontFamily}',
+      );
+      print(
+        '[AppBloc] _onAppSettingsRefreshed: userAppSettings.fontWeight: ${userAppSettings.displaySettings.fontWeight}',
+      );
+      print(
+        '[AppBloc] _onAppSettingsRefreshed: newFontFamily mapped to: $newFontFamily',
+      );
 
       emit(
         state.copyWith(
@@ -127,7 +132,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           themeMode: ThemeMode.system,
           flexScheme: FlexScheme.material,
           appTextScaleFactor: AppTextScaleFactor.medium, // Default enum value
-          locale: const Locale('en'), // Default to English if settings not found
+          locale: const Locale(
+            'en',
+          ), // Default to English if settings not found
           settings: UserAppSettings(
             id: state.user!.id,
           ), // Provide default settings
@@ -254,13 +261,17 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   String? _mapFontFamily(String fontFamilyString) {
     // If the input is 'SystemDefault', return null so FlexColorScheme uses its default.
     if (fontFamilyString == 'SystemDefault') {
-      print('[AppBloc] _mapFontFamily: Input is SystemDefault, returning null.');
+      print(
+        '[AppBloc] _mapFontFamily: Input is SystemDefault, returning null.',
+      );
       return null;
     }
     // Otherwise, return the font family string directly.
     // The GoogleFonts.xyz().fontFamily getters often return strings like "Roboto-Regular",
     // but FlexColorScheme's fontFamily parameter or GoogleFonts.xyzTextTheme() expect simple names.
-    print('[AppBloc] _mapFontFamily: Input is $fontFamilyString, returning as is.');
+    print(
+      '[AppBloc] _mapFontFamily: Input is $fontFamilyString, returning as is.',
+    );
     return fontFamilyString;
   }
 

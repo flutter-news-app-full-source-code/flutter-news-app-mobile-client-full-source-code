@@ -5,7 +5,7 @@ import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/settings/bloc/settings_bloc.dart';
 import 'package:ht_main/shared/constants/app_spacing.dart';
 import 'package:ht_shared/ht_shared.dart'
-    show AppTextScaleFactor, AppFontWeight;
+    show AppFontWeight, AppTextScaleFactor;
 
 /// {@template font_settings_page}
 /// A page for configuring font-related settings like size, family, and weight.
@@ -60,75 +60,81 @@ class FontSettingsPage extends StatelessWidget {
     if (state.status != SettingsStatus.success ||
         state.userAppSettings == null) {
       return Scaffold(
-        appBar: AppBar(title: Text(l10n.settingsAppearanceTitle)), // Use existing key
+        appBar: AppBar(
+          title: Text(l10n.settingsAppearanceTitle),
+        ), // Use existing key
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return BlocListener<SettingsBloc, SettingsState>(
-      listener: (context, settingsState) { // Renamed state to avoid conflict
+      listener: (context, settingsState) {
+        // Renamed state to avoid conflict
         if (settingsState.status == SettingsStatus.success) {
           context.read<AppBloc>().add(const AppSettingsRefreshed());
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: Text(l10n.settingsAppearanceTitle)), // Use existing key
+        appBar: AppBar(
+          title: Text(l10n.settingsAppearanceTitle),
+        ), // Use existing key
         body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        children: [
-          // --- Text Scale Factor ---
-          _buildDropdownSetting<AppTextScaleFactor>(
-            context: context,
-            title: l10n.settingsAppearanceAppFontSizeLabel,
-            currentValue:
-                state.userAppSettings!.displaySettings.textScaleFactor,
-            items: AppTextScaleFactor.values,
-            itemToString: (size) => _textScaleFactorToString(size, l10n),
-            onChanged: (value) {
-              if (value != null) {
-                settingsBloc.add(SettingsAppFontSizeChanged(value));
-              }
-            },
-          ),
-          const SizedBox(height: AppSpacing.lg),
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          children: [
+            // --- Text Scale Factor ---
+            _buildDropdownSetting<AppTextScaleFactor>(
+              context: context,
+              title: l10n.settingsAppearanceAppFontSizeLabel,
+              currentValue:
+                  state.userAppSettings!.displaySettings.textScaleFactor,
+              items: AppTextScaleFactor.values,
+              itemToString: (size) => _textScaleFactorToString(size, l10n),
+              onChanged: (value) {
+                if (value != null) {
+                  settingsBloc.add(SettingsAppFontSizeChanged(value));
+                }
+              },
+            ),
+            const SizedBox(height: AppSpacing.lg),
 
-          // --- Font Family ---
-          _buildDropdownSetting<String>(
-            context: context,
-            title: l10n.settingsAppearanceAppFontTypeLabel,
-            currentValue: state.userAppSettings!.displaySettings.fontFamily,
-            items: const [
-              'SystemDefault',
-              'Roboto',
-              'OpenSans',
-              'Lato',
-              'Montserrat',
-              'Merriweather',
-            ], // Updated font list
-            itemToString: (fontFamily) => _fontFamilyToString(fontFamily, l10n),
-            onChanged: (value) {
-              if (value != null) {
-                settingsBloc.add(SettingsAppFontTypeChanged(value));
-              }
-            },
-          ),
-          const SizedBox(height: AppSpacing.lg),
+            // --- Font Family ---
+            _buildDropdownSetting<String>(
+              context: context,
+              title: l10n.settingsAppearanceAppFontTypeLabel,
+              currentValue: state.userAppSettings!.displaySettings.fontFamily,
+              items: const [
+                'SystemDefault',
+                'Roboto',
+                'OpenSans',
+                'Lato',
+                'Montserrat',
+                'Merriweather',
+              ], // Updated font list
+              itemToString:
+                  (fontFamily) => _fontFamilyToString(fontFamily, l10n),
+              onChanged: (value) {
+                if (value != null) {
+                  settingsBloc.add(SettingsAppFontTypeChanged(value));
+                }
+              },
+            ),
+            const SizedBox(height: AppSpacing.lg),
 
-          // --- Font Weight ---
-          _buildDropdownSetting<AppFontWeight>(
-            context: context,
-            title: l10n.settingsAppearanceFontWeightLabel,
-            currentValue: state.userAppSettings!.displaySettings.fontWeight,
-            items: AppFontWeight.values,
-            itemToString: (weight) => _fontWeightToString(weight, l10n),
-            onChanged: (value) {
-              if (value != null) {
-                settingsBloc.add(SettingsAppFontWeightChanged(value));
-              }
-            },
-          ),
-        ],
-      ),
+            // --- Font Weight ---
+            _buildDropdownSetting<AppFontWeight>(
+              context: context,
+              title: l10n.settingsAppearanceFontWeightLabel,
+              currentValue: state.userAppSettings!.displaySettings.fontWeight,
+              items: AppFontWeight.values,
+              itemToString: (weight) => _fontWeightToString(weight, l10n),
+              onChanged: (value) {
+                if (value != null) {
+                  settingsBloc.add(SettingsAppFontWeightChanged(value));
+                }
+              },
+            ),
+          ],
+        ),
       ), // Correctly close BlocListener's child Scaffold
     );
   }
@@ -149,12 +155,13 @@ class FontSettingsPage extends StatelessWidget {
         const SizedBox(height: AppSpacing.sm),
         DropdownButtonFormField<T>(
           value: currentValue,
-          items: items.map((T value) {
-            return DropdownMenuItem<T>(
-              value: value,
-              child: Text(itemToString(value)),
-            );
-          }).toList(),
+          items:
+              items.map((T value) {
+                return DropdownMenuItem<T>(
+                  value: value,
+                  child: Text(itemToString(value)),
+                );
+              }).toList(),
           onChanged: onChanged,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),

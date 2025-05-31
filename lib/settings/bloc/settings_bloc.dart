@@ -48,10 +48,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       _onFeedTileTypeChanged,
       transformer: sequential(),
     );
-    on<SettingsLanguageChanged>(
-      _onLanguageChanged,
-      transformer: sequential(),
-    );
+    on<SettingsLanguageChanged>(_onLanguageChanged, transformer: sequential());
     // SettingsNotificationsEnabledChanged event and handler removed.
   }
 
@@ -160,14 +157,18 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     Emitter<SettingsState> emit,
   ) async {
     if (state.userAppSettings == null) return;
-    print('[SettingsBloc] _onAppFontTypeChanged: Received event.fontType: ${event.fontType}');
+    print(
+      '[SettingsBloc] _onAppFontTypeChanged: Received event.fontType: ${event.fontType}',
+    );
 
     final updatedSettings = state.userAppSettings!.copyWith(
       displaySettings: state.userAppSettings!.displaySettings.copyWith(
         fontFamily: event.fontType,
       ),
     );
-    print('[SettingsBloc] _onAppFontTypeChanged: Updated settings.fontFamily: ${updatedSettings.displaySettings.fontFamily}');
+    print(
+      '[SettingsBloc] _onAppFontTypeChanged: Updated settings.fontFamily: ${updatedSettings.displaySettings.fontFamily}',
+    );
     emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));
     await _persistSettings(updatedSettings, emit);
   }
@@ -177,14 +178,18 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     Emitter<SettingsState> emit,
   ) async {
     if (state.userAppSettings == null) return;
-    print('[SettingsBloc] _onAppFontWeightChanged: Received event.fontWeight: ${event.fontWeight}');
+    print(
+      '[SettingsBloc] _onAppFontWeightChanged: Received event.fontWeight: ${event.fontWeight}',
+    );
 
     final updatedSettings = state.userAppSettings!.copyWith(
       displaySettings: state.userAppSettings!.displaySettings.copyWith(
         fontWeight: event.fontWeight,
       ),
     );
-    print('[SettingsBloc] _onAppFontWeightChanged: Updated settings.fontWeight: ${updatedSettings.displaySettings.fontWeight}');
+    print(
+      '[SettingsBloc] _onAppFontWeightChanged: Updated settings.fontWeight: ${updatedSettings.displaySettings.fontWeight}',
+    );
     emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));
     await _persistSettings(updatedSettings, emit);
   }

@@ -186,8 +186,12 @@ class _AppViewState extends State<_AppView> {
         builder: (context, state) {
           print('[_AppViewState] Building MaterialApp.router');
           print('[_AppViewState] state.fontFamily: ${state.fontFamily}');
-          print('[_AppViewState] state.settings.displaySettings.fontFamily: ${state.settings.displaySettings.fontFamily}');
-          print('[_AppViewState] state.settings.displaySettings.fontWeight: ${state.settings.displaySettings.fontWeight}');
+          print(
+            '[_AppViewState] state.settings.displaySettings.fontFamily: ${state.settings.displaySettings.fontFamily}',
+          );
+          print(
+            '[_AppViewState] state.settings.displaySettings.fontWeight: ${state.settings.displaySettings.fontWeight}',
+          );
           return MaterialApp.router(
             debugShowCheckedModeBanner: false,
             themeMode: state.themeMode,

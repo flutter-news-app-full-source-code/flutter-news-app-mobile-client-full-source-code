@@ -36,7 +36,9 @@ TextTheme _customizeTextTheme(
   required AppTextScaleFactor appTextScaleFactor,
   required AppFontWeight appFontWeight, // Added parameter
 }) {
-  print('[_customizeTextTheme] Received appFontWeight: $appFontWeight, appTextScaleFactor: $appTextScaleFactor');
+  print(
+    '[_customizeTextTheme] Received appFontWeight: $appFontWeight, appTextScaleFactor: $appTextScaleFactor',
+  );
   // Define font size factors
   double factor;
   switch (appTextScaleFactor) {
@@ -59,15 +61,14 @@ TextTheme _customizeTextTheme(
   switch (appFontWeight) {
     case AppFontWeight.light:
       selectedFontWeight = FontWeight.w300;
-      break;
     case AppFontWeight.regular:
       selectedFontWeight = FontWeight.w400;
-      break;
     case AppFontWeight.bold:
       selectedFontWeight = FontWeight.w700;
-      break;
   }
-  print('[_customizeTextTheme] Mapped to selectedFontWeight: $selectedFontWeight');
+  print(
+    '[_customizeTextTheme] Mapped to selectedFontWeight: $selectedFontWeight',
+  );
 
   return baseTextTheme.copyWith(
     // --- Headline/Title Styles ---
@@ -126,21 +127,29 @@ TextTheme Function([TextTheme?]) _getGoogleFontTextTheme(String? fontFamily) {
       print('[_getGoogleFontTextTheme] Returning GoogleFonts.robotoTextTheme');
       return GoogleFonts.robotoTextTheme;
     case 'OpenSans':
-      print('[_getGoogleFontTextTheme] Returning GoogleFonts.openSansTextTheme');
+      print(
+        '[_getGoogleFontTextTheme] Returning GoogleFonts.openSansTextTheme',
+      );
       return GoogleFonts.openSansTextTheme;
     case 'Lato':
       print('[_getGoogleFontTextTheme] Returning GoogleFonts.latoTextTheme');
       return GoogleFonts.latoTextTheme;
     case 'Montserrat':
-      print('[_getGoogleFontTextTheme] Returning GoogleFonts.montserratTextTheme');
+      print(
+        '[_getGoogleFontTextTheme] Returning GoogleFonts.montserratTextTheme',
+      );
       return GoogleFonts.montserratTextTheme;
     case 'Merriweather':
-      print('[_getGoogleFontTextTheme] Returning GoogleFonts.merriweatherTextTheme');
+      print(
+        '[_getGoogleFontTextTheme] Returning GoogleFonts.merriweatherTextTheme',
+      );
       return GoogleFonts.merriweatherTextTheme;
     case 'SystemDefault':
     case null:
     default:
-      print('[_getGoogleFontTextTheme] Defaulting to GoogleFonts.notoSansTextTheme for input: $fontFamily');
+      print(
+        '[_getGoogleFontTextTheme] Defaulting to GoogleFonts.notoSansTextTheme for input: $fontFamily',
+      );
       return GoogleFonts.notoSansTextTheme;
   }
 }
@@ -154,7 +163,9 @@ ThemeData lightTheme({
   required AppFontWeight appFontWeight, // Added parameter
   String? fontFamily,
 }) {
-  print('[AppTheme.lightTheme] Received scheme: $scheme, appTextScaleFactor: $appTextScaleFactor, appFontWeight: $appFontWeight, fontFamily: $fontFamily');
+  print(
+    '[AppTheme.lightTheme] Received scheme: $scheme, appTextScaleFactor: $appTextScaleFactor, appFontWeight: $appFontWeight, fontFamily: $fontFamily',
+  );
   final textThemeGetter = _getGoogleFontTextTheme(fontFamily);
   final baseTextTheme = textThemeGetter();
 
@@ -179,7 +190,9 @@ ThemeData darkTheme({
   required AppFontWeight appFontWeight, // Added parameter
   String? fontFamily,
 }) {
-  print('[AppTheme.darkTheme] Received scheme: $scheme, appTextScaleFactor: $appTextScaleFactor, appFontWeight: $appFontWeight, fontFamily: $fontFamily');
+  print(
+    '[AppTheme.darkTheme] Received scheme: $scheme, appTextScaleFactor: $appTextScaleFactor, appFontWeight: $appFontWeight, fontFamily: $fontFamily',
+  );
   final textThemeGetter = _getGoogleFontTextTheme(fontFamily);
   final baseTextTheme = textThemeGetter(
     ThemeData(brightness: Brightness.dark).textTheme,

@@ -4,7 +4,7 @@ import 'package:ht_main/app/bloc/app_bloc.dart'; // Import AppBloc and events
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/settings/bloc/settings_bloc.dart';
 import 'package:ht_main/shared/constants/app_spacing.dart';
-import 'package:ht_shared/ht_shared.dart' show AppBaseTheme, AppAccentTheme;
+import 'package:ht_shared/ht_shared.dart' show AppAccentTheme, AppBaseTheme;
 
 /// {@template theme_settings_page}
 /// A page for configuring theme-related settings like base and accent themes.
@@ -55,7 +55,8 @@ class ThemeSettingsPage extends StatelessWidget {
     }
 
     return BlocListener<SettingsBloc, SettingsState>(
-      listener: (context, settingsState) { // Renamed state to avoid conflict
+      listener: (context, settingsState) {
+        // Renamed state to avoid conflict
         if (settingsState.status == SettingsStatus.success) {
           // Check if it's a successful update, not just initial load
           // A more robust check might involve comparing previous and current userAppSettings
@@ -73,38 +74,38 @@ class ThemeSettingsPage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(title: Text(l10n.settingsAppearanceTitle)),
         body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        children: [
-          // --- Base Theme ---
-          _buildDropdownSetting<AppBaseTheme>(
-            context: context,
-            title: l10n.settingsAppearanceThemeModeLabel,
-            currentValue: state.userAppSettings!.displaySettings.baseTheme,
-            items: AppBaseTheme.values,
-            itemToString: (mode) => _baseThemeToString(mode, l10n),
-            onChanged: (value) {
-              if (value != null) {
-                settingsBloc.add(SettingsAppThemeModeChanged(value));
-              }
-            },
-          ),
-          const SizedBox(height: AppSpacing.lg),
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          children: [
+            // --- Base Theme ---
+            _buildDropdownSetting<AppBaseTheme>(
+              context: context,
+              title: l10n.settingsAppearanceThemeModeLabel,
+              currentValue: state.userAppSettings!.displaySettings.baseTheme,
+              items: AppBaseTheme.values,
+              itemToString: (mode) => _baseThemeToString(mode, l10n),
+              onChanged: (value) {
+                if (value != null) {
+                  settingsBloc.add(SettingsAppThemeModeChanged(value));
+                }
+              },
+            ),
+            const SizedBox(height: AppSpacing.lg),
 
-          // --- Accent Theme ---
-          _buildDropdownSetting<AppAccentTheme>(
-            context: context,
-            title: l10n.settingsAppearanceThemeNameLabel,
-            currentValue: state.userAppSettings!.displaySettings.accentTheme,
-            items: AppAccentTheme.values,
-            itemToString: (name) => _accentThemeToString(name, l10n),
-            onChanged: (value) {
-              if (value != null) {
-                settingsBloc.add(SettingsAppThemeNameChanged(value));
-              }
-            },
-          ),
-        ],
-      ),
+            // --- Accent Theme ---
+            _buildDropdownSetting<AppAccentTheme>(
+              context: context,
+              title: l10n.settingsAppearanceThemeNameLabel,
+              currentValue: state.userAppSettings!.displaySettings.accentTheme,
+              items: AppAccentTheme.values,
+              itemToString: (name) => _accentThemeToString(name, l10n),
+              onChanged: (value) {
+                if (value != null) {
+                  settingsBloc.add(SettingsAppThemeNameChanged(value));
+                }
+              },
+            ),
+          ],
+        ),
       ), // Correctly close BlocListener's child Scaffold
     );
   }
@@ -126,12 +127,13 @@ class ThemeSettingsPage extends StatelessWidget {
         const SizedBox(height: AppSpacing.sm),
         DropdownButtonFormField<T>(
           value: currentValue,
-          items: items.map((T value) {
-            return DropdownMenuItem<T>(
-              value: value,
-              child: Text(itemToString(value)),
-            );
-          }).toList(),
+          items:
+              items.map((T value) {
+                return DropdownMenuItem<T>(
+                  value: value,
+                  child: Text(itemToString(value)),
+                );
+              }).toList(),
           onChanged: onChanged,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),

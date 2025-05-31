@@ -4,7 +4,6 @@ import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/settings/bloc/settings_bloc.dart';
 import 'package:ht_main/shared/constants/app_spacing.dart';
-import 'package:ht_shared/ht_shared.dart' show AppLanguage;
 
 // Defines the available languages and their display names.
 // In a real app, this might come from a configuration or be more dynamic.
@@ -47,8 +46,11 @@ class LanguageSettingsPage extends StatelessWidget {
         body: ListView.separated(
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
           itemCount: _supportedLanguages.length,
-          separatorBuilder: (context, index) =>
-              const Divider(indent: AppSpacing.lg, endIndent: AppSpacing.lg),
+          separatorBuilder:
+              (context, index) => const Divider(
+                indent: AppSpacing.lg,
+                endIndent: AppSpacing.lg,
+              ),
           itemBuilder: (context, index) {
             final languageCode = _supportedLanguages.keys.elementAt(index);
             final languageName = _supportedLanguages.values.elementAt(index);
@@ -56,15 +58,16 @@ class LanguageSettingsPage extends StatelessWidget {
 
             return ListTile(
               title: Text(languageName),
-              trailing: isSelected
-                  ? Icon(Icons.check, color: Theme.of(context).primaryColor)
-                  : null,
+              trailing:
+                  isSelected
+                      ? Icon(Icons.check, color: Theme.of(context).primaryColor)
+                      : null,
               onTap: () {
                 if (!isSelected) {
                   // Dispatch event to SettingsBloc
-                  context
-                      .read<SettingsBloc>()
-                      .add(SettingsLanguageChanged(languageCode));
+                  context.read<SettingsBloc>().add(
+                    SettingsLanguageChanged(languageCode),
+                  );
                 }
               },
             );

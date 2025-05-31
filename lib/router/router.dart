@@ -531,7 +531,11 @@ GoRouter createRouter({
                 routes: [
                   // ShellRoute for settings to provide SettingsBloc to children
                   ShellRoute(
-                    builder: (BuildContext context, GoRouterState state, Widget child) {
+                    builder: (
+                      BuildContext context,
+                      GoRouterState state,
+                      Widget child,
+                    ) {
                       // This builder provides SettingsBloc to all routes within this ShellRoute.
                       // 'child' will be SettingsPage, AppearanceSettingsPage, etc.
                       final appBloc = context.read<AppBloc>();
@@ -541,7 +545,8 @@ GoRouter createRouter({
                         create: (context) {
                           final settingsBloc = SettingsBloc(
                             userAppSettingsRepository:
-                                context.read<HtDataRepository<UserAppSettings>>(),
+                                context
+                                    .read<HtDataRepository<UserAppSettings>>(),
                           );
                           // Only load settings if a userId is available
                           if (userId != null) {
@@ -556,47 +561,74 @@ GoRouter createRouter({
                           }
                           return settingsBloc;
                         },
-                        child: child, // child is the actual page widget (SettingsPage, AppearanceSettingsPage, etc.)
+                        child:
+                            child, // child is the actual page widget (SettingsPage, AppearanceSettingsPage, etc.)
                       );
                     },
                     routes: [
                       GoRoute(
-                        path: Routes.settings, // Relative path 'settings' from /account
+                        path:
+                            Routes
+                                .settings, // Relative path 'settings' from /account
                         name: Routes.settingsName,
                         builder: (context, state) => const SettingsPage(),
                         // --- Settings Sub-Routes ---
                         routes: [
                           GoRoute(
-                            path: Routes.settingsAppearance, // 'appearance' relative to /account/settings
+                            path:
+                                Routes
+                                    .settingsAppearance, // 'appearance' relative to /account/settings
                             name: Routes.settingsAppearanceName,
-                            builder: (context, state) => const AppearanceSettingsPage(),
-                            routes: [ // Children of AppearanceSettingsPage
+                            builder:
+                                (context, state) =>
+                                    const AppearanceSettingsPage(),
+                            routes: [
+                              // Children of AppearanceSettingsPage
                               GoRoute(
-                                path: Routes.settingsAppearanceTheme, // 'theme' relative to /account/settings/appearance
+                                path:
+                                    Routes
+                                        .settingsAppearanceTheme, // 'theme' relative to /account/settings/appearance
                                 name: Routes.settingsAppearanceThemeName,
-                                builder: (context, state) => const ThemeSettingsPage(),
+                                builder:
+                                    (context, state) =>
+                                        const ThemeSettingsPage(),
                               ),
                               GoRoute(
-                                path: Routes.settingsAppearanceFont, // 'font' relative to /account/settings/appearance
+                                path:
+                                    Routes
+                                        .settingsAppearanceFont, // 'font' relative to /account/settings/appearance
                                 name: Routes.settingsAppearanceFontName,
-                                builder: (context, state) => const FontSettingsPage(),
+                                builder:
+                                    (context, state) =>
+                                        const FontSettingsPage(),
                               ),
                             ],
                           ),
                           GoRoute(
-                            path: Routes.settingsFeed, // 'feed' relative to /account/settings
+                            path:
+                                Routes
+                                    .settingsFeed, // 'feed' relative to /account/settings
                             name: Routes.settingsFeedName,
-                            builder: (context, state) => const FeedSettingsPage(),
+                            builder:
+                                (context, state) => const FeedSettingsPage(),
                           ),
                           GoRoute(
-                            path: Routes.settingsNotifications, // 'notifications' relative to /account/settings
+                            path:
+                                Routes
+                                    .settingsNotifications, // 'notifications' relative to /account/settings
                             name: Routes.settingsNotificationsName,
-                            builder: (context, state) => const NotificationSettingsPage(),
+                            builder:
+                                (context, state) =>
+                                    const NotificationSettingsPage(),
                           ),
                           GoRoute(
-                            path: Routes.settingsLanguage, // 'language' relative to /account/settings
+                            path:
+                                Routes
+                                    .settingsLanguage, // 'language' relative to /account/settings
                             name: Routes.settingsLanguageName,
-                            builder: (context, state) => const LanguageSettingsPage(),
+                            builder:
+                                (context, state) =>
+                                    const LanguageSettingsPage(),
                           ),
                         ],
                       ),

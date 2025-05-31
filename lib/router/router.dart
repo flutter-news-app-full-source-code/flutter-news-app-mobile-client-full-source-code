@@ -19,6 +19,7 @@ import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/authentication/view/authentication_page.dart';
 import 'package:ht_main/authentication/view/email_code_verification_page.dart';
 import 'package:ht_main/authentication/view/request_code_page.dart';
+import 'package:ht_main/entity_details/view/entity_details_page.dart'; // Added
 import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart'; // Re-added
 import 'package:ht_main/headline-details/bloc/similar_headlines_bloc.dart'; // Import SimilarHeadlinesBloc
 import 'package:ht_main/headline-details/view/headline_details_page.dart';
@@ -290,6 +291,34 @@ GoRouter createRouter({
             },
           ),
         ],
+      ),
+      // --- Entity Details Routes (Top Level) ---
+      GoRoute(
+        path: Routes.categoryDetails,
+        name: Routes.categoryDetailsName,
+        builder: (context, state) {
+          final args = state.extra as EntityDetailsPageArguments?;
+          if (args == null) {
+            // Handle missing arguments, perhaps redirect or show error
+            return const Scaffold(
+              body: Center(child: Text('Error: Missing category details arguments')),
+            );
+          }
+          return EntityDetailsPage(args: args);
+        },
+      ),
+      GoRoute(
+        path: Routes.sourceDetails,
+        name: Routes.sourceDetailsName,
+        builder: (context, state) {
+          final args = state.extra as EntityDetailsPageArguments?;
+          if (args == null) {
+            return const Scaffold(
+              body: Center(child: Text('Error: Missing source details arguments')),
+            );
+          }
+          return EntityDetailsPage(args: args);
+        },
       ),
       // --- Main App Shell ---
       StatefulShellRoute.indexedStack(

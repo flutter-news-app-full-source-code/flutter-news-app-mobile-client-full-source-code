@@ -6,7 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_main/account/bloc/account_bloc.dart'; // Import AccountBloc
 import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart'; // Import BLoC
+import 'package:ht_main/headline-details/bloc/similar_headlines_bloc.dart'; // Import SimilarHeadlinesBloc
+import 'package:ht_main/headlines-feed/widgets/headline_item_widget.dart'; // Import HeadlineItemWidget
 import 'package:ht_main/l10n/l10n.dart';
+import 'package:ht_main/router/routes.dart'; // Import Routes
 import 'package:ht_main/shared/shared.dart';
 import 'package:ht_shared/ht_shared.dart'
     show Headline; // Import Headline model
@@ -365,6 +368,17 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
             padding: EdgeInsets.only(bottom: AppSpacing.paddingLarge),
             sliver: SliverToBoxAdapter(child: SizedBox.shrink()),
           ),
+        // --- Similar Headlines Section ---
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: horizontalPadding.copyWith(top: AppSpacing.xl),
+            child: Text(
+              l10n.similarHeadlinesSectionTitle, // Add this l10n key
+              style: textTheme.titleLarge,
+            ),
+          ),
+        ),
+        _buildSimilarHeadlinesSection(context),
       ],
     );
   }
@@ -468,5 +482,66 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     }
 
     return chips;
+  }
+
+  Widget _buildSimilarHeadlinesSection(BuildContext context) {
+    final l10n = context.l10n;
+    return BlocBuilder<SimilarHeadlinesBloc, SimilarHeadlinesState>(
+      builder: (context, state) {
+        return switch (state) {
+          SimilarHeadlinesInitial() ||
+          SimilarHeadlinesLoading() =>
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.all(AppSpacing.lg),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            ),
+          final SimilarHeadlinesError errorState => SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Text(
+                  errorState.message,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
+              ),
+            ),
+          SimilarHeadlinesEmpty() => SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Text(
+                  l10n.similarHeadlinesEmpty, // Add this l10n key
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          final SimilarHeadlinesLoaded loadedState => SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final similarHeadline = loadedState.similarHeadlines[index];
+                  // Use a more compact item or reuse HeadlineItemWidget
+                  // For now, reusing HeadlineItemWidget for simplicity
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.paddingMedium,
+                      vertical: AppSpacing.sm,
+                    ),
+                    // Navigate to a new HeadlineDetailsPage instance
+                    // Ensure the targetRouteName is appropriate or handle navigation differently
+                    child: HeadlineItemWidget(
+                      headline: similarHeadline,
+                      targetRouteName: Routes.articleDetailsName,
+                    ),
+                  );
+                },
+                childCount: loadedState.similarHeadlines.length,
+              ),
+            ),
+          // Add a default case to satisfy exhaustiveness for the switch statement
+          _ => const SliverToBoxAdapter(child: SizedBox.shrink()),
+        };
+      },
+    );
   }
 }

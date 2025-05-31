@@ -273,7 +273,7 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                           tile = HeadlineTileTextOnly(
                             headline: headline,
                             onHeadlineTap: () => context.pushNamed(
-                              Routes.articleDetailsName, // Use named route
+                              Routes.globalArticleDetailsName, // Use new global route
                               pathParameters: {'id': headline.id},
                               extra: headline,
                             ),
@@ -289,7 +289,7 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                           tile = HeadlineTileImageStart(
                             headline: headline,
                             onHeadlineTap: () => context.pushNamed(
-                              Routes.articleDetailsName, // Use named route
+                              Routes.globalArticleDetailsName, // Use new global route
                               pathParameters: {'id': headline.id},
                               extra: headline,
                             ),
@@ -305,7 +305,7 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                           tile = HeadlineTileImageTop(
                             headline: headline,
                             onHeadlineTap: () => context.pushNamed(
-                              Routes.articleDetailsName, // Use named route
+                              Routes.globalArticleDetailsName, // Use new global route
                               pathParameters: {'id': headline.id},
                               extra: headline,
                             ),

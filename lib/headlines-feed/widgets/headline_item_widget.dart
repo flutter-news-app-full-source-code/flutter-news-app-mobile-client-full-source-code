@@ -9,16 +9,22 @@ class HeadlineItemWidget extends StatelessWidget {
   /// Creates a [HeadlineItemWidget].
   const HeadlineItemWidget({
     required this.headline,
-    required this.targetRouteName, // Add targetRouteName
+    this.targetRouteName, // Make optional
+    this.onTap, // Add optional onTap callback
     this.trailing, // Add optional trailing widget
     super.key,
-  });
+  }) : assert(targetRouteName != null || onTap != null, 'Either targetRouteName or onTap must be provided');
 
   /// The headline to display.
   final Headline headline;
 
   /// The named route to navigate to when the item is tapped.
-  final String targetRouteName; // Add targetRouteName
+  /// Used if [onTap] is null.
+  final String? targetRouteName;
+
+  /// Optional callback to handle tap events.
+  /// If provided, this is used instead of navigating via [targetRouteName].
+  final void Function(Headline headline)? onTap;
 
   /// An optional widget to display at the end of the row.
   final Widget? trailing;
@@ -47,11 +53,15 @@ class HeadlineItemWidget extends StatelessWidget {
           cardTheme.clipBehavior ?? Clip.antiAlias, // Use theme's clip behavior
       child: InkWell(
         onTap: () {
-          context.goNamed(
-            targetRouteName, // Use the new parameter here
-            pathParameters: {'id': headline.id},
-            extra: headline, // Pass the full headline object
-          );
+          if (onTap != null) {
+            onTap!(headline);
+          } else {
+            context.goNamed(
+              targetRouteName!, // Not null due to assert
+              pathParameters: {'id': headline.id},
+              extra: headline, // Pass the full headline object
+            );
+          }
         },
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md), // Internal padding

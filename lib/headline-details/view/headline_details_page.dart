@@ -4,6 +4,7 @@
 import 'package:flutter/foundation.dart' show kIsWeb; // Import kIsWeb
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart'; // Import GoRouter
 import 'package:ht_main/account/bloc/account_bloc.dart'; // Import AccountBloc
 import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart'; // Import BLoC
 import 'package:ht_main/headline-details/bloc/similar_headlines_bloc.dart'; // Import SimilarHeadlinesBloc
@@ -73,10 +74,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
             listenWhen: (previous, current) {
               final detailsState = context.read<HeadlineDetailsBloc>().state;
               if (detailsState is HeadlineDetailsLoaded) {
-                if (current.status == AccountStatus.failure &&
-                    previous.status != AccountStatus.failure) {
-                  return true;
-                }
                 final currentHeadlineId = detailsState.headline.id;
                 final wasPreviouslySaved =
                     previous.preferences?.savedHeadlines.any(
@@ -88,9 +85,21 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                           (h) => h.id == currentHeadlineId,
                         ) ??
                         false;
-                return (wasPreviouslySaved != isCurrentlySaved) ||
-                    (current.status == AccountStatus.success &&
-                        previous.status != AccountStatus.success);
+
+                // Condition 1: Actual change in saved status for this headline
+                if (wasPreviouslySaved != isCurrentlySaved) {
+                  // Only trigger if the status is success (to show confirmation)
+                  // or failure (to show error). Avoid triggering if status is just loading.
+                  return current.status == AccountStatus.success ||
+                         current.status == AccountStatus.failure;
+                }
+
+                // Condition 2: A specific save/unsave operation just failed
+                // This triggers if an operation was attempted (loading) and then failed.
+                if (current.status == AccountStatus.failure &&
+                    previous.status == AccountStatus.loading) {
+                  return true;
+                }
               }
               return false;
             },
@@ -487,7 +496,15 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                     ),
                     child: HeadlineItemWidget(
                       headline: similarHeadline,
-                      targetRouteName: Routes.articleDetailsName,
+                      // Use the onTap callback for navigation
+                      onTap: (tappedHeadline) {
+                        context.pushNamed(
+                          Routes.articleDetailsName,
+                          pathParameters: {'id': tappedHeadline.id},
+                          extra: tappedHeadline,
+                        );
+                      },
+                      // targetRouteName: Routes.articleDetailsName, // No longer needed here
                     ),
                   );
                 },

@@ -516,6 +516,18 @@
     "@settingsAppearanceFontFamilySystemDefault": {
         "description": "Label for the system default font family option"
     },
+    "settingsAppearanceThemeSubPageTitle": "Theme Settings",
+    "@settingsAppearanceThemeSubPageTitle": {
+        "description": "Title for the theme settings sub-page under appearance"
+    },
+    "settingsAppearanceFontSubPageTitle": "Font Settings",
+    "@settingsAppearanceFontSubPageTitle": {
+        "description": "Title for the font settings sub-page under appearance"
+    },
+    "settingsLanguageTitle": "Language",
+    "@settingsLanguageTitle": {
+        "description": "Title for the language settings page/section"
+    },
     "emailCodeSentPageTitle": "Enter Code",
     "@emailCodeSentPageTitle": {
         "description": "AppBar title for the email code verification page"

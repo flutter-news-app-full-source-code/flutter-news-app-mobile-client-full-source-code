@@ -3,9 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_main/router/routes.dart'; // Assuming new routes will be added
+import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/constants/app_spacing.dart';
-import 'package:ht_main/shared/widgets/widgets.dart'; // For FailureStateWidget
+import 'package:ht_main/shared/widgets/widgets.dart';
 
 /// {@template followed_countries_list_page}
 /// Displays a list of countries the user is currently following.
@@ -21,11 +21,11 @@ class FollowedCountriesListPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.followedCountriesPageTitle), // New l10n key
+        title: Text(l10n.followedCountriesPageTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.add_circle_outline),
-            tooltip: l10n.addCountriesTooltip, 
+            tooltip: l10n.addCountriesTooltip,
             onPressed: () {
               context.goNamed(Routes.addCountryToFollowName);
             },
@@ -68,14 +68,14 @@ class FollowedCountriesListPage extends StatelessWidget {
                     const Icon(Icons.public_outlined, size: 48),
                     const SizedBox(height: AppSpacing.md),
                     Text(
-                      l10n.noFollowedCountriesMessage, // New l10n key
+                      l10n.noFollowedCountriesMessage,
                       style: Theme.of(context).textTheme.titleMedium,
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     ElevatedButton.icon(
                       icon: const Icon(Icons.add_circle_outline),
-                      label: Text(l10n.addCountriesButtonLabel), 
+                      label: Text(l10n.addCountriesButtonLabel),
                       onPressed: () {
                         context.goNamed(Routes.addCountryToFollowName);
                       },
@@ -98,7 +98,7 @@ class FollowedCountriesListPage extends StatelessWidget {
                           Uri.tryParse(country.flagUrl)?.isAbsolute == true
                       ? SizedBox(
                           width: 36,
-                          height: 24, // Aspect ratio for flags
+                          height: 24,
                           child: Image.network(
                             country.flagUrl,
                             fit: BoxFit.cover,
@@ -113,7 +113,7 @@ class FollowedCountriesListPage extends StatelessWidget {
                       Icons.remove_circle_outline,
                       color: Theme.of(context).colorScheme.error,
                     ),
-                    tooltip: l10n.unfollowCountryTooltip(country.name), // New
+                    tooltip: l10n.unfollowCountryTooltip(country.name),
                     onPressed: () {
                       context.read<AccountBloc>().add(
                             AccountFollowCountryToggled(country: country),

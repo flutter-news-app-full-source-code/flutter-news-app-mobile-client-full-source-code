@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ht_data_repository/ht_data_repository.dart'; // Required for HtDataRepository
+import 'package:ht_data_repository/ht_data_repository.dart';
 import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/headlines-feed/bloc/categories_filter_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
@@ -18,13 +18,10 @@ class AddCategoryToFollowPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    // It's better to provide CategoriesFilterBloc here if it's specific to this page
-    // or ensure it's provided higher up if shared more broadly for "add" flows.
-    // For now, creating a new instance.
     return BlocProvider(
       create: (context) => CategoriesFilterBloc(
         categoriesRepository: context.read<HtDataRepository<Category>>(),
-      )..add(CategoriesFilterRequested()), // Removed const
+      )..add(CategoriesFilterRequested()),
       child: Scaffold(
         appBar: AppBar(
           title: Text(l10n.addCategoriesPageTitle),
@@ -45,20 +42,19 @@ class AddCategoryToFollowPage extends StatelessWidget {
                 message: errorMessage,
                 onRetry: () => context
                     .read<CategoriesFilterBloc>()
-                    .add(CategoriesFilterRequested()), // Removed const
+                    .add(CategoriesFilterRequested()),
               );
             }
             if (categoriesState.categories.isEmpty) {
               return FailureStateWidget(
                 message: l10n.categoryFilterEmptyHeadline,
-              ); // Re-use existing key
+              );
             }
 
-            // Use AccountBloc to check which categories are already followed
             return BlocBuilder<AccountBloc, AccountState>(
               buildWhen: (previous, current) =>
                   previous.preferences?.followedCategories != current.preferences?.followedCategories ||
-                  previous.status != current.status, // Rebuild if status changes too
+                  previous.status != current.status,
               builder: (context, accountState) {
                 final followedCategories =
                     accountState.preferences?.followedCategories ?? [];
@@ -99,7 +95,7 @@ class AddCategoryToFollowPage extends StatelessWidget {
                               : const Icon(Icons.add_circle_outline),
                           tooltip: isFollowed
                               ? l10n.unfollowCategoryTooltip(category.name)
-                              : l10n.followCategoryTooltip(category.name), // New
+                              : l10n.followCategoryTooltip(category.name),
                           onPressed: () {
                             context.read<AccountBloc>().add(
                                   AccountFollowCategoryToggled(
@@ -108,7 +104,6 @@ class AddCategoryToFollowPage extends StatelessWidget {
                                 );
                           },
                         ),
-                        // Optional: onTap could also toggle
                       ),
                     );
                   },

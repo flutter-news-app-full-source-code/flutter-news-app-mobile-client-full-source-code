@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_data_repository/ht_data_repository.dart';
 import 'package:ht_main/account/bloc/account_bloc.dart';
-// TODO(cline): May need a specific BLoC for fetching all countries if not using an existing one.
-// For now, we'll assume direct repository access or a placeholder.
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/shared/constants/app_spacing.dart';
 import 'package:ht_main/shared/widgets/widgets.dart';
@@ -37,9 +35,6 @@ class _AddCountryToFollowPageState extends State<AddCountryToFollowPage> {
       _errorMessage = null;
     });
     try {
-      // Directly use the repository to fetch all countries
-      // This assumes the Country repository's readAll method without userId
-      // fetches all available countries.
       final countryRepository = context.read<HtDataRepository<Country>>();
       final paginatedResponse = await countryRepository.readAll();
       setState(() {
@@ -65,7 +60,7 @@ class _AddCountryToFollowPageState extends State<AddCountryToFollowPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.addCountriesPageTitle), // New l10n key
+        title: Text(l10n.addCountriesPageTitle),
       ),
       body: Builder(
         builder: (context) {
@@ -80,7 +75,7 @@ class _AddCountryToFollowPageState extends State<AddCountryToFollowPage> {
           }
           if (_allCountries.isEmpty) {
             return FailureStateWidget(
-              message: l10n.countryFilterEmptyHeadline, // Re-use
+              message: l10n.countryFilterEmptyHeadline,
             );
           }
 
@@ -126,7 +121,7 @@ class _AddCountryToFollowPageState extends State<AddCountryToFollowPage> {
                             : const Icon(Icons.add_circle_outline),
                         tooltip: isFollowed
                             ? l10n.unfollowCountryTooltip(country.name)
-                            : l10n.followCountryTooltip(country.name), // New
+                            : l10n.followCountryTooltip(country.name),
                         onPressed: () {
                           context.read<AccountBloc>().add(
                                 AccountFollowCountryToggled(country: country),

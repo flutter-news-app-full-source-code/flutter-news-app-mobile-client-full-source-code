@@ -22,7 +22,7 @@ class AddSourceToFollowPage extends StatelessWidget {
       create: (context) => SourcesFilterBloc(
         sourcesRepository: context.read<HtDataRepository<Source>>(),
         countriesRepository: context.read<HtDataRepository<Country>>(),
-      )..add(const LoadSourceFilterData()), // Use correct event
+      )..add(const LoadSourceFilterData()),
       child: Scaffold(
         appBar: AppBar(
           title: Text(l10n.addSourcesPageTitle),
@@ -37,13 +37,12 @@ class AddSourceToFollowPage extends StatelessWidget {
                 message: sourcesState.errorMessage ?? l10n.sourceFilterError,
                 onRetry: () => context
                     .read<SourcesFilterBloc>()
-                    .add(const LoadSourceFilterData()), // Use correct event
+                    .add(const LoadSourceFilterData()),
               );
             }
-            // Use allAvailableSources to display all sources for selection
             if (sourcesState.allAvailableSources.isEmpty) {
               return FailureStateWidget(
-                message: l10n.sourceFilterEmptyHeadline, // Re-use
+                message: l10n.sourceFilterEmptyHeadline,
               );
             }
 
@@ -57,16 +56,15 @@ class AddSourceToFollowPage extends StatelessWidget {
 
                 return ListView.builder(
                   padding: const EdgeInsets.all(AppSpacing.md),
-                  itemCount: sourcesState.allAvailableSources.length, // Use allAvailableSources
+                  itemCount: sourcesState.allAvailableSources.length,
                   itemBuilder: (context, index) {
-                    final source = sourcesState.allAvailableSources[index]; // Use allAvailableSources
+                    final source = sourcesState.allAvailableSources[index];
                     final isFollowed =
                         followedSources.any((fs) => fs.id == source.id);
 
                     return Card(
                       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
                       child: ListTile(
-                        // Consider adding source.iconUrl if available
                         title: Text(source.name),
                         trailing: IconButton(
                           icon: isFollowed
@@ -77,7 +75,7 @@ class AddSourceToFollowPage extends StatelessWidget {
                               : const Icon(Icons.add_circle_outline),
                           tooltip: isFollowed
                               ? l10n.unfollowSourceTooltip(source.name)
-                              : l10n.followSourceTooltip(source.name), // New
+                              : l10n.followSourceTooltip(source.name),
                           onPressed: () {
                             context.read<AccountBloc>().add(
                                   AccountFollowSourceToggled(source: source),

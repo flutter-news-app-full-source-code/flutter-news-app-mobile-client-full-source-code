@@ -3,17 +3,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_main/router/routes.dart'; // Assuming new routes will be added
+import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/constants/app_spacing.dart';
-import 'package:ht_main/shared/widgets/widgets.dart'; // For FailureStateWidget
+import 'package:ht_main/shared/widgets/widgets.dart';
 
-/// {@template followed_sources_list_page}
-/// Displays a list of sources the user is currently following.
-/// Allows unfollowing and navigating to add more sources.
+/// {@template followed_categories_list_page}
+/// Displays a list of categories the user is currently following.
+/// Allows unfollowing and navigating to add more categories.
 /// {@endtemplate}
-class FollowedSourcesListPage extends StatelessWidget {
-  /// {@macro followed_sources_list_page}
-  const FollowedSourcesListPage({super.key});
+class FollowedCategoriesListPage extends StatelessWidget {
+  /// {@macro followed_categories_list_page}
+  const FollowedCategoriesListPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,13 +21,13 @@ class FollowedSourcesListPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.followedSourcesPageTitle), // New l10n key
+        title: Text(l10n.followedCategoriesPageTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.add_circle_outline),
-            tooltip: l10n.addSourcesTooltip, 
+            tooltip: l10n.addCategoriesTooltip,
             onPressed: () {
-              context.goNamed(Routes.addSourceToFollowName);
+              context.goNamed(Routes.addCategoryToFollowName);
             },
           ),
         ],
@@ -56,28 +56,28 @@ class FollowedSourcesListPage extends StatelessWidget {
             );
           }
 
-          final followedSources = state.preferences?.followedSources;
+          final followedCategories = state.preferences?.followedCategories;
 
-          if (followedSources == null || followedSources.isEmpty) {
+          if (followedCategories == null || followedCategories.isEmpty) {
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.source_outlined, size: 48),
+                    const Icon(Icons.category_outlined, size: 48),
                     const SizedBox(height: AppSpacing.md),
                     Text(
-                      l10n.noFollowedSourcesMessage, // New l10n key
+                      l10n.noFollowedCategoriesMessage,
                       style: Theme.of(context).textTheme.titleMedium,
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     ElevatedButton.icon(
                       icon: const Icon(Icons.add_circle_outline),
-                      label: Text(l10n.addSourcesButtonLabel), 
+                      label: Text(l10n.addCategoriesButtonLabel),
                       onPressed: () {
-                        context.goNamed(Routes.addSourceToFollowName);
+                        context.goNamed(Routes.addCategoryToFollowName);
                       },
                     ),
                   ],
@@ -88,23 +88,35 @@ class FollowedSourcesListPage extends StatelessWidget {
 
           return ListView.builder(
             padding: const EdgeInsets.all(AppSpacing.md),
-            itemCount: followedSources.length,
+            itemCount: followedCategories.length,
             itemBuilder: (context, index) {
-              final source = followedSources[index];
+              final category = followedCategories[index];
               return Card(
                 margin: const EdgeInsets.only(bottom: AppSpacing.sm),
                 child: ListTile(
-                  // Consider adding source.iconUrl if available
-                  title: Text(source.name),
+                  leading: category.iconUrl != null &&
+                          Uri.tryParse(category.iconUrl!)?.isAbsolute == true
+                      ? SizedBox(
+                          width: 36,
+                          height: 36,
+                          child: Image.network(
+                            category.iconUrl!,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(Icons.category_outlined),
+                          ),
+                        )
+                      : const Icon(Icons.category_outlined),
+                  title: Text(category.name),
                   trailing: IconButton(
                     icon: Icon(
                       Icons.remove_circle_outline,
                       color: Theme.of(context).colorScheme.error,
                     ),
-                    tooltip: l10n.unfollowSourceTooltip(source.name), // New
+                    tooltip: l10n.unfollowCategoryTooltip(category.name),
                     onPressed: () {
                       context.read<AccountBloc>().add(
-                            AccountFollowSourceToggled(source: source),
+                            AccountFollowCategoryToggled(category: category),
                           );
                     },
                   ),

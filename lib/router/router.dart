@@ -5,13 +5,13 @@ import 'package:ht_auth_repository/ht_auth_repository.dart'; // Auth Repository
 import 'package:ht_data_repository/ht_data_repository.dart'; // Generic Data Repository
 import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/account/view/account_page.dart';
-import 'package:ht_main/account/view/add_category_to_follow_page.dart'; // New
-import 'package:ht_main/account/view/add_country_to_follow_page.dart'; // New
-import 'package:ht_main/account/view/add_source_to_follow_page.dart'; // New
-import 'package:ht_main/account/view/followed_categories_list_page.dart'; // New
-import 'package:ht_main/account/view/followed_countries_list_page.dart'; // New
-import 'package:ht_main/account/view/followed_sources_list_page.dart'; // New
-import 'package:ht_main/account/view/manage_followed_items_page.dart'; // New
+import 'package:ht_main/account/view/manage_followed_items/categories/add_category_to_follow_page.dart'; // New
+import 'package:ht_main/account/view/manage_followed_items/countries/add_country_to_follow_page.dart'; // New
+import 'package:ht_main/account/view/manage_followed_items/sources/add_source_to_follow_page.dart'; // New
+import 'package:ht_main/account/view/manage_followed_items/categories/followed_categories_list_page.dart'; // New
+import 'package:ht_main/account/view/manage_followed_items/countries/followed_countries_list_page.dart'; // New
+import 'package:ht_main/account/view/manage_followed_items/sources/followed_sources_list_page.dart'; // New
+import 'package:ht_main/account/view/manage_followed_items/manage_followed_items_page.dart'; // New
 import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/app/view/app_shell.dart';
 import 'package:ht_main/authentication/bloc/authentication_bloc.dart';

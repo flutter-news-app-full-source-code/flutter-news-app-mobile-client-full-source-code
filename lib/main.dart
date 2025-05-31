@@ -9,15 +9,17 @@ import 'package:ht_http_client/ht_http_client.dart';
 import 'package:ht_kv_storage_shared_preferences/ht_kv_storage_shared_preferences.dart';
 import 'package:ht_main/app/app.dart';
 import 'package:ht_main/bloc_observer.dart';
-import 'package:ht_main/shared/localization/ar_timeago_messages.dart'; // Added
+import 'package:ht_main/shared/localization/ar_timeago_messages.dart';
+import 'package:ht_main/shared/localization/en_timeago_messages.dart'; // Added
 import 'package:ht_shared/ht_shared.dart';
-import 'package:timeago/timeago.dart' as timeago; // Added
+import 'package:timeago/timeago.dart' as timeago;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = const AppBlocObserver();
 
-  // Initialize timeago Arabic messages
+  // Initialize timeago custom locale messages
+  timeago.setLocaleMessages('en', EnTimeagoMessages()); // Added
   timeago.setLocaleMessages('ar', ArTimeagoMessages());
 
   // 1. Instantiate KV Storage Service

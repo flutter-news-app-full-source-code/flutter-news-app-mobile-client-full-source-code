@@ -20,6 +20,7 @@ import 'package:ht_main/authentication/view/authentication_page.dart';
 import 'package:ht_main/authentication/view/email_code_verification_page.dart';
 import 'package:ht_main/authentication/view/request_code_page.dart';
 import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart'; // Re-added
+import 'package:ht_main/headline-details/bloc/similar_headlines_bloc.dart'; // Import SimilarHeadlinesBloc
 import 'package:ht_main/headline-details/view/headline_details_page.dart';
 import 'package:ht_main/headlines-feed/bloc/categories_filter_bloc.dart'; // Import new BLoC
 // import 'package:ht_main/headlines-feed/bloc/countries_filter_bloc.dart'; // Import new BLoC - REMOVED
@@ -344,11 +345,21 @@ GoRouter createRouter({
                       final headlineFromExtra = state.extra as Headline?;
                       final headlineIdFromPath = state.pathParameters['id'];
 
-                      return BlocProvider(
-                        create: (context) => HeadlineDetailsBloc(
-                          headlinesRepository:
-                              context.read<HtDataRepository<Headline>>(),
-                        ),
+                      return MultiBlocProvider(
+                        providers: [
+                          BlocProvider(
+                            create: (context) => HeadlineDetailsBloc(
+                              headlinesRepository:
+                                  context.read<HtDataRepository<Headline>>(),
+                            ),
+                          ),
+                          BlocProvider(
+                            create: (context) => SimilarHeadlinesBloc(
+                              headlinesRepository:
+                                  context.read<HtDataRepository<Headline>>(),
+                            ),
+                          ),
+                        ],
                         child: HeadlineDetailsPage(
                           initialHeadline: headlineFromExtra,
                           // Ensure headlineId is non-null if initialHeadline is null
@@ -471,11 +482,21 @@ GoRouter createRouter({
                     builder: (context, state) {
                       final headlineFromExtra = state.extra as Headline?;
                       final headlineIdFromPath = state.pathParameters['id'];
-                      return BlocProvider(
-                        create: (context) => HeadlineDetailsBloc(
-                          headlinesRepository:
-                              context.read<HtDataRepository<Headline>>(),
-                        ),
+                      return MultiBlocProvider(
+                        providers: [
+                          BlocProvider(
+                            create: (context) => HeadlineDetailsBloc(
+                              headlinesRepository:
+                                  context.read<HtDataRepository<Headline>>(),
+                            ),
+                          ),
+                          BlocProvider(
+                            create: (context) => SimilarHeadlinesBloc(
+                              headlinesRepository:
+                                  context.read<HtDataRepository<Headline>>(),
+                            ),
+                          ),
+                        ],
                         child: HeadlineDetailsPage(
                           initialHeadline: headlineFromExtra,
                           headlineId: headlineFromExtra?.id ?? headlineIdFromPath,
@@ -625,11 +646,21 @@ GoRouter createRouter({
                         builder: (context, state) {
                           final headlineFromExtra = state.extra as Headline?;
                           final headlineIdFromPath = state.pathParameters['id'];
-                          return BlocProvider(
-                            create: (context) => HeadlineDetailsBloc(
-                              headlinesRepository:
-                                  context.read<HtDataRepository<Headline>>(),
-                            ),
+                          return MultiBlocProvider(
+                            providers: [
+                              BlocProvider(
+                                create: (context) => HeadlineDetailsBloc(
+                                  headlinesRepository:
+                                      context.read<HtDataRepository<Headline>>(),
+                                ),
+                              ),
+                              BlocProvider(
+                                create: (context) => SimilarHeadlinesBloc(
+                                  headlinesRepository:
+                                      context.read<HtDataRepository<Headline>>(),
+                                ),
+                              ),
+                            ],
                             child: HeadlineDetailsPage(
                               initialHeadline: headlineFromExtra,
                               headlineId: headlineFromExtra?.id ?? headlineIdFromPath,

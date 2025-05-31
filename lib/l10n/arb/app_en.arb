@@ -787,5 +787,13 @@
     "sharingUnavailableSnackbar": "Sharing is not available on this device or platform.",
     "@sharingUnavailableSnackbar": {
         "description": "Snackbar message shown when sharing is unavailable"
+    },
+    "similarHeadlinesSectionTitle": "You Might Also Like",
+    "@similarHeadlinesSectionTitle": {
+        "description": "Title for the similar headlines section on the details page"
+    },
+    "similarHeadlinesEmpty": "No similar headlines found.",
+    "@similarHeadlinesEmpty": {
+        "description": "Message shown when no similar headlines are found"
     }
 }

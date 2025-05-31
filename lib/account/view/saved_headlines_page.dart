@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/headlines-feed/widgets/headline_item_widget.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/widgets/widgets.dart';
-import 'package:ht_shared/ht_shared.dart' show Headline;
 
 /// {@template saved_headlines_page}
 /// Displays the list of headlines saved by the user.

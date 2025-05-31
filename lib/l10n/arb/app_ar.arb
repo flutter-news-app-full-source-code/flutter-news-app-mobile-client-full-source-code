@@ -631,5 +631,133 @@
     "searchPageInitialSubheadline": "اختر نوعًا وأدخل كلمات رئيسية للبدء.",
     "@searchPageInitialSubheadline": {
         "description": "Generic subheadline for the initial state of the search page"
+    },
+    "followedCategoriesPageTitle": "الفئات المتابَعة",
+    "@followedCategoriesPageTitle": {
+        "description": "عنوان صفحة عرض الفئات المتابعة"
+    },
+    "addCategoriesTooltip": "إضافة فئات",
+    "@addCategoriesTooltip": {
+        "description": "تلميح زر إضافة فئات جديدة للمتابعة"
+    },
+    "noFollowedCategoriesMessage": "أنت لا تتابع أي فئات حتى الآن.",
+    "@noFollowedCategoriesMessage": {
+        "description": "رسالة تُعرض عندما لا يكون المستخدم متابعًا لأي فئات"
+    },
+    "addCategoriesButtonLabel": "البحث عن فئات لمتابعتها",
+    "@addCategoriesButtonLabel": {
+        "description": "نص الزر الذي ينقل المستخدم لصفحة إضافة الفئات"
+    },
+    "unfollowCategoryTooltip": "إلغاء متابعة {categoryName}",
+    "@unfollowCategoryTooltip": {
+        "description": "تلميح زر إلغاء متابعة فئة معينة",
+        "placeholders": {
+            "categoryName": {
+                "type": "String",
+                "example": "تكنولوجيا"
+            }
+        }
+    },
+    "followedSourcesPageTitle": "المصادر المتابَعة",
+    "@followedSourcesPageTitle": {
+        "description": "عنوان صفحة عرض المصادر المتابعة"
+    },
+    "addSourcesTooltip": "إضافة مصادر",
+    "@addSourcesTooltip": {
+        "description": "تلميح زر إضافة مصادر جديدة للمتابعة"
+    },
+    "noFollowedSourcesMessage": "أنت لا تتابع أي مصادر حتى الآن.",
+    "@noFollowedSourcesMessage": {
+        "description": "رسالة تُعرض عندما لا يكون المستخدم متابعًا لأي مصادر"
+    },
+    "addSourcesButtonLabel": "البحث عن مصادر لمتابعتها",
+    "@addSourcesButtonLabel": {
+        "description": "نص الزر الذي ينقل المستخدم لصفحة إضافة المصادر"
+    },
+    "unfollowSourceTooltip": "إلغاء متابعة {sourceName}",
+    "@unfollowSourceTooltip": {
+        "description": "تلميح زر إلغاء متابعة مصدر معين",
+        "placeholders": {
+            "sourceName": {
+                "type": "String",
+                "example": "بي بي سي نيوز"
+            }
+        }
+    },
+    "followedCountriesPageTitle": "الدول المتابَعة",
+    "@followedCountriesPageTitle": {
+        "description": "عنوان صفحة عرض الدول المتابعة"
+    },
+    "addCountriesTooltip": "إضافة دول",
+    "@addCountriesTooltip": {
+        "description": "تلميح زر إضافة دول جديدة للمتابعة"
+    },
+    "noFollowedCountriesMessage": "أنت لا تتابع أي دول حتى الآن.",
+    "@noFollowedCountriesMessage": {
+        "description": "رسالة تُعرض عندما لا يكون المستخدم متابعًا لأي دول"
+    },
+    "addCountriesButtonLabel": "البحث عن دول لمتابعتها",
+    "@addCountriesButtonLabel": {
+        "description": "نص الزر الذي ينقل المستخدم لصفحة إضافة الدول"
+    },
+    "unfollowCountryTooltip": "إلغاء متابعة {countryName}",
+    "@unfollowCountryTooltip": {
+        "description": "تلميح زر إلغاء متابعة دولة معينة",
+        "placeholders": {
+            "countryName": {
+                "type": "String",
+                "example": "الولايات المتحدة"
+            }
+        }
+    },
+    "addCategoriesPageTitle": "إضافة فئات للمتابعة",
+    "@addCategoriesPageTitle": {
+        "description": "عنوان الصفحة التي يمكن للمستخدمين من خلالها إضافة فئات لمتابعتها"
+    },
+    "categoryFilterError": "تعذر تحميل الفئات. يرجى المحاولة مرة أخرى.",
+    "@categoryFilterError": {
+        "description": "رسالة خطأ عند فشل تحميل الفئات في صفحة التصفية/الإضافة"
+    },
+    "followCategoryTooltip": "متابعة {categoryName}",
+    "@followCategoryTooltip": {
+        "description": "تلميح زر متابعة فئة معينة",
+        "placeholders": {
+            "categoryName": {
+                "type": "String",
+                "example": "علوم"
+            }
+        }
+    },
+    "addSourcesPageTitle": "إضافة مصادر للمتابعة",
+    "@addSourcesPageTitle": {
+        "description": "عنوان الصفحة التي يمكن للمستخدمين من خلالها إضافة مصادر لمتابعتها"
+    },
+    "sourceFilterError": "تعذر تحميل المصادر. يرجى المحاولة مرة أخرى.",
+    "@sourceFilterError": {
+        "description": "رسالة خطأ عند فشل تحميل المصادر في صفحة التصفية/الإضافة"
+    },
+    "followSourceTooltip": "متابعة {sourceName}",
+    "@followSourceTooltip": {
+        "description": "تلميح زر متابعة مصدر معين",
+        "placeholders": {
+            "sourceName": {
+                "type": "String",
+                "example": "أخبار تقنية"
+            }
+        }
+    },
+    "addCountriesPageTitle": "إضافة دول للمتابعة",
+    "@addCountriesPageTitle": {
+        "description": "عنوان الصفحة التي يمكن للمستخدمين من خلالها إضافة دول لمتابعتها"
+    },
+    "followCountryTooltip": "متابعة {countryName}",
+    "@followCountryTooltip": {
+        "description": "تلميح زر متابعة دولة معينة",
+        "placeholders": {
+            "countryName": {
+                "type": "String",
+                "example": "ألمانيا"
+            }
+        }
     }
 }

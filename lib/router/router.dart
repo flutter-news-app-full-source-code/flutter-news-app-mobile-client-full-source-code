@@ -5,6 +5,13 @@ import 'package:ht_auth_repository/ht_auth_repository.dart'; // Auth Repository
 import 'package:ht_data_repository/ht_data_repository.dart'; // Generic Data Repository
 import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/account/view/account_page.dart';
+import 'package:ht_main/account/view/manage_followed_items/categories/add_category_to_follow_page.dart'; // New
+import 'package:ht_main/account/view/manage_followed_items/countries/add_country_to_follow_page.dart'; // New
+import 'package:ht_main/account/view/manage_followed_items/sources/add_source_to_follow_page.dart'; // New
+import 'package:ht_main/account/view/manage_followed_items/categories/followed_categories_list_page.dart'; // New
+import 'package:ht_main/account/view/manage_followed_items/countries/followed_countries_list_page.dart'; // New
+import 'package:ht_main/account/view/manage_followed_items/sources/followed_sources_list_page.dart'; // New
+import 'package:ht_main/account/view/manage_followed_items/manage_followed_items_page.dart'; // New
 import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/app/view/app_shell.dart';
 import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
@@ -541,21 +548,57 @@ GoRouter createRouter({
                   ),
                   // New routes for Account sub-pages
                   GoRoute(
-                    path:
-                        Routes
-                            .accountContentPreferences, // Relative path 'content-preferences'
-                    name: Routes.accountContentPreferencesName,
-                    builder: (context, state) {
-                      // TODO(fulleni): Replace with actual ContentPreferencesPage
-                      return const Placeholder(
-                        child: Center(child: Text('CONTENT PREFERENCES PAGE')),
-                      );
-                    },
+                    path: Routes.manageFollowedItems, // Updated path
+                    name: Routes.manageFollowedItemsName, // Updated name
+                    builder: (context, state) =>
+                        const ManageFollowedItemsPage(), // Use the new page
+                    routes: [
+                      GoRoute(
+                        path: Routes.followedCategoriesList,
+                        name: Routes.followedCategoriesListName,
+                        builder: (context, state) =>
+                            const FollowedCategoriesListPage(),
+                        routes: [
+                          GoRoute(
+                            path: Routes.addCategoryToFollow,
+                            name: Routes.addCategoryToFollowName,
+                            builder: (context, state) =>
+                                const AddCategoryToFollowPage(),
+                          ),
+                        ],
+                      ),
+                      GoRoute(
+                        path: Routes.followedSourcesList,
+                        name: Routes.followedSourcesListName,
+                        builder: (context, state) =>
+                            const FollowedSourcesListPage(),
+                        routes: [
+                          GoRoute(
+                            path: Routes.addSourceToFollow,
+                            name: Routes.addSourceToFollowName,
+                            builder: (context, state) =>
+                                const AddSourceToFollowPage(),
+                          ),
+                        ],
+                      ),
+                      GoRoute(
+                        path: Routes.followedCountriesList,
+                        name: Routes.followedCountriesListName,
+                        builder: (context, state) =>
+                            const FollowedCountriesListPage(),
+                        routes: [
+                          GoRoute(
+                            path: Routes.addCountryToFollow,
+                            name: Routes.addCountryToFollowName,
+                            builder: (context, state) =>
+                                const AddCountryToFollowPage(),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                   GoRoute(
-                    path:
-                        Routes
-                            .accountSavedHeadlines, // Relative path 'saved-headlines'
+                    path: Routes.accountSavedHeadlines,
                     name: Routes.accountSavedHeadlinesName,
                     builder: (context, state) {
                       // TODO(fulleni): Replace with actual SavedHeadlinesPage

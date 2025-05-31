@@ -66,8 +66,24 @@ abstract final class Routes {
   // static const settingsNotificationCategoriesName = 'settingsNotificationCategories';
 
   // --- Account Sub-Routes (relative to /account) ---
-  static const accountContentPreferences = 'content-preferences';
-  static const accountContentPreferencesName = 'accountContentPreferences';
+  static const manageFollowedItems = 'manage-followed-items'; // Renamed
+  static const manageFollowedItemsName = 'manageFollowedItems'; // Renamed
   static const accountSavedHeadlines = 'saved-headlines';
   static const accountSavedHeadlinesName = 'accountSavedHeadlines';
+
+  // --- Manage Followed Items Sub-Routes (relative to /account/manage-followed-items) ---
+  static const followedCategoriesList = 'categories';
+  static const followedCategoriesListName = 'followedCategoriesList';
+  static const addCategoryToFollow = 'add-category';
+  static const addCategoryToFollowName = 'addCategoryToFollow';
+
+  static const followedSourcesList = 'sources';
+  static const followedSourcesListName = 'followedSourcesList';
+  static const addSourceToFollow = 'add-source';
+  static const addSourceToFollowName = 'addSourceToFollow';
+
+  static const followedCountriesList = 'countries';
+  static const followedCountriesListName = 'followedCountriesList';
+  static const addCountryToFollow = 'add-country';
+  static const addCountryToFollowName = 'addCountryToFollow';
 }

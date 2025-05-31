@@ -156,9 +156,7 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
               state.isFollowing
                   ? Icons.check_circle // Filled when following
                   : Icons.add_circle_outline,
-              color: state.isFollowing
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.onSurfaceVariant,
+              color: theme.colorScheme.primary, // Use primary for both states for accent
             ),
             tooltip: state.isFollowing
                 ? l10n.unfollowButtonLabel
@@ -204,35 +202,7 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              if (description != null && description.isNotEmpty)
-                Tooltip(
-                  message: description,
-                  child: IconButton(
-                    icon: Icon(Icons.info_outline, color: theme.colorScheme.onSurfaceVariant),
-                    onPressed: () {
-                      // On mobile, show dialog for description
-                      if (!kIsWeb) { // kIsWeb can be used to differentiate behavior
-                        showDialog<void>(
-                          context: context,
-                          builder: (BuildContext dialogContext) {
-                            return AlertDialog(
-                              title: Text(appBarTitle),
-                              content: SingleChildScrollView(child: Text(description)),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: Text(MaterialLocalizations.of(dialogContext).closeButtonLabel),
-                                  onPressed: () {
-                                    Navigator.of(dialogContext).pop();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      }
-                    },
-                  ),
-                ),
+              // Info icon removed from here
             ],
           );
 
@@ -243,19 +213,27 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                 title: appBarTitleWidget,
                 pinned: true,
                 actions: [followButton],
-                // Removed expandedHeight and flexibleSpace for a standard AppBar
               ),
-              SliverToBoxAdapter( // This adapter is now just for spacing and the section title/divider
+              SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingMedium)
-                      .copyWith(top: AppSpacing.lg), // Add top padding
+                  padding: const EdgeInsets.all(AppSpacing.paddingMedium), // Consistent padding
                   child: Column(
-                     crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                       if (state.headlines.isNotEmpty || state.headlinesStatus == EntityHeadlinesStatus.loadingMore) ...[
+                      if (description != null && description.isNotEmpty) ...[
+                        Text(
+                          description,
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                      ],
+                      if (state.headlines.isNotEmpty ||
+                          state.headlinesStatus == EntityHeadlinesStatus.loadingMore) ...[
                         Text(l10n.headlinesSectionTitle, style: theme.textTheme.titleLarge),
                         const Divider(height: AppSpacing.md),
-                       ]
+                      ]
                     ],
                   ),
                 ),

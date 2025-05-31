@@ -57,7 +57,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     );
 
     dynamic entityToLoad = event.entity;
-    EntityType? entityTypeToLoad = event.entityType;
+    var entityTypeToLoad = event.entityType;
 
     try {
       // 1. Determine/Fetch Entity
@@ -107,7 +107,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       );
 
       // 3. Determine isFollowing status
-      bool isCurrentlyFollowing = false;
+      var isCurrentlyFollowing = false;
       final currentAccountState = _accountBloc.state;
       if (currentAccountState.preferences != null) {
         if (entityTypeToLoad == EntityType.category &&
@@ -266,7 +266,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
   ) {
     if (state.entity == null || state.entityType == null) return;
 
-    bool isCurrentlyFollowing = false;
+    var isCurrentlyFollowing = false;
     final preferences = event.preferences;
 
     if (state.entityType == EntityType.category && state.entity is Category) {

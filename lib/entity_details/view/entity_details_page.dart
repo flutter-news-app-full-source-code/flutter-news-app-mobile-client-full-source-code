@@ -29,7 +29,7 @@ class EntityDetailsPageArguments {
 }
 
 class EntityDetailsPage extends StatelessWidget {
-  const EntityDetailsPage({super.key, required this.args});
+  const EntityDetailsPage({required this.args, super.key});
 
   final EntityDetailsPageArguments args;
 
@@ -61,7 +61,7 @@ class EntityDetailsPage extends StatelessWidget {
 }
 
 class EntityDetailsView extends StatefulWidget {
-  const EntityDetailsView({super.key, required this.args}); // Accept args
+  const EntityDetailsView({required this.args, super.key}); // Accept args
 
   final EntityDetailsPageArguments args; // Store args
 
@@ -136,21 +136,21 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
           }
 
           // At this point, state.entity should not be null if success or loading more
-          final String appBarTitle =
+          final appBarTitle =
               state.entity is Category
                   ? (state.entity as Category).name
                   : state.entity is Source
                   ? (state.entity as Source).name
                   : l10n.detailsPageTitle;
 
-          final String? description =
+          final description =
               state.entity is Category
                   ? (state.entity as Category).description
                   : state.entity is Source
                   ? (state.entity as Source).description
                   : null;
 
-          final String? entityIconUrl =
+          final entityIconUrl =
               (state.entity is Category &&
                       (state.entity as Category).iconUrl != null)
                   ? (state.entity as Category).iconUrl
@@ -320,7 +320,6 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                                     ? (state.entity as Source).id
                                     : null,
                           );
-                          break;
                         case HeadlineImageStyle.smallThumbnail:
                           tile = HeadlineTileImageStart(
                             headline: headline,
@@ -339,7 +338,6 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                                     ? (state.entity as Source).id
                                     : null,
                           );
-                          break;
                         case HeadlineImageStyle.largeThumbnail:
                           tile = HeadlineTileImageTop(
                             headline: headline,
@@ -358,7 +356,6 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                                     ? (state.entity as Source).id
                                     : null,
                           );
-                          break;
                       }
                       return tile;
                     },

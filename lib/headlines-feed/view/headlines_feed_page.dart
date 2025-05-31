@@ -240,7 +240,6 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                                 extra: headline,
                               ),
                         );
-                        break;
                       case HeadlineImageStyle.smallThumbnail:
                         tile = HeadlineTileImageStart(
                           headline: headline,
@@ -251,7 +250,6 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                                 extra: headline,
                               ),
                         );
-                        break;
                       case HeadlineImageStyle.largeThumbnail:
                         tile = HeadlineTileImageTop(
                           headline: headline,
@@ -262,7 +260,6 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                                 extra: headline,
                               ),
                         );
-                        break;
                     }
                     return tile;
                   },

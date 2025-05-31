@@ -16,27 +16,27 @@ class ArTimeagoMessages implements timeago.LookupMessages {
   @override
   String aboutAMinute(int minutes) => 'منذ 1د';
   @override
-  String minutes(int minutes) => 'منذ ${minutes}د';
+  String minutes(int minutes) => 'منذ $minutesد';
 
   @override
   String aboutAnHour(int minutes) => 'منذ 1س';
   @override
-  String hours(int hours) => 'منذ ${hours}س';
+  String hours(int hours) => 'منذ $hoursس';
 
   @override
   String aDay(int hours) => 'منذ 1ي'; // Or 'أمس' if preferred for exactly 1 day
   @override
-  String days(int days) => 'منذ ${days}ي';
+  String days(int days) => 'منذ $daysي';
 
   @override
   String aboutAMonth(int days) => 'منذ 1ش';
   @override
-  String months(int months) => 'منذ ${months}ش';
+  String months(int months) => 'منذ $monthsش';
 
   @override
   String aboutAYear(int year) => 'منذ 1سنة'; // Using سنة for year
   @override
-  String years(int years) => 'منذ ${years}سنوات'; // Standard plural
+  String years(int years) => 'منذ $yearsسنوات'; // Standard plural
 
   @override
   String wordSeparator() => ' ';

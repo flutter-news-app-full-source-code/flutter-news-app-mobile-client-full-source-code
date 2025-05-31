@@ -69,7 +69,7 @@ class HeadlineTileImageStart extends StatelessWidget {
                             fit: BoxFit.cover,
                             loadingBuilder: (context, child, loadingProgress) {
                               if (loadingProgress == null) return child;
-                              return Container(
+                              return ColoredBox(
                                 color: colorScheme.surfaceContainerHighest,
                                 child: const Center(
                                   child: CircularProgressIndicator(
@@ -79,7 +79,7 @@ class HeadlineTileImageStart extends StatelessWidget {
                               );
                             },
                             errorBuilder:
-                                (context, error, stackTrace) => Container(
+                                (context, error, stackTrace) => ColoredBox(
                                   color: colorScheme.surfaceContainerHighest,
                                   child: Icon(
                                     Icons.broken_image_outlined,
@@ -88,7 +88,7 @@ class HeadlineTileImageStart extends StatelessWidget {
                                   ),
                                 ),
                           )
-                          : Container(
+                          : ColoredBox(
                             color: colorScheme.surfaceContainerHighest,
                             child: Icon(
                               Icons.image_not_supported_outlined,

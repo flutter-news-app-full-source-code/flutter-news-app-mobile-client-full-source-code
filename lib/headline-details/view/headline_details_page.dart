@@ -16,9 +16,9 @@ import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/shared.dart';
 import 'package:ht_shared/ht_shared.dart'
     show
+        Category,
         Headline,
         HeadlineImageStyle,
-        Category,
         Source; // Added Category, Source
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart'; // Import share_plus
@@ -404,7 +404,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           onTap: () {
             context.push(
               Routes.sourceDetails,
-              extra: EntityDetailsPageArguments(entity: headline.source!),
+              extra: EntityDetailsPageArguments(entity: headline.source),
             );
           },
           child: Chip(
@@ -473,7 +473,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           onTap: () {
             context.push(
               Routes.categoryDetails,
-              extra: EntityDetailsPageArguments(entity: headline.category!),
+              extra: EntityDetailsPageArguments(entity: headline.category),
             );
           },
           child: Chip(
@@ -551,7 +551,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                                 extra: similarHeadline,
                               ),
                         );
-                        break;
                       case HeadlineImageStyle.smallThumbnail:
                         tile = HeadlineTileImageStart(
                           headline: similarHeadline,
@@ -562,7 +561,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                                 extra: similarHeadline,
                               ),
                         );
-                        break;
                       case HeadlineImageStyle.largeThumbnail:
                         tile = HeadlineTileImageTop(
                           headline: similarHeadline,
@@ -573,13 +571,12 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                                 extra: similarHeadline,
                               ),
                         );
-                        break;
                     }
                     return tile;
                   },
                 ),
               );
-            }, childCount: loadedState.similarHeadlines.length),
+            }, childCount: loadedState.similarHeadlines.length,),
           ),
           _ => const SliverToBoxAdapter(child: SizedBox.shrink()),
         };

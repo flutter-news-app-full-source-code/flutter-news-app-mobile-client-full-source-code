@@ -166,12 +166,11 @@ class _HeadlineMetadataRow extends StatelessWidget {
       fontSize: baseTextStyle.fontSize != null ? baseTextStyle.fontSize! * 0.85 : 10, // 15% smaller or fallback
     );
     // Use the same derived style for chip labels for consistency
-    final chipLabelStyle = metadataStyle; 
+    final chipLabelStyle = metadataStyle;
 
-    final chipBackgroundColor = colorScheme.surfaceContainerHighest.withOpacity(
-      0.7, 
-    );
-    const iconSize = AppSpacing.sm; 
+    // Use a muted version of the secondary container color for the chip background
+    final chipBackgroundColor = colorScheme.secondaryContainer.withOpacity(0.4);
+    const iconSize = AppSpacing.sm;
 
     return Wrap(
       spacing: AppSpacing.xs, 
@@ -213,8 +212,8 @@ class _HeadlineMetadataRow extends StatelessWidget {
               label: Text(headline.category!.name),
               labelStyle: chipLabelStyle,
               backgroundColor: chipBackgroundColor,
-              padding: EdgeInsets.zero, // Minimal padding around label
-              labelPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs / 2 ), // Reduced padding
+              padding: EdgeInsets.zero,
+              labelPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs / 2, vertical: 0), // Minimal vertical padding
               visualDensity: VisualDensity.compact,
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
@@ -245,8 +244,8 @@ class _HeadlineMetadataRow extends StatelessWidget {
               label: Text(headline.source!.name),
               labelStyle: chipLabelStyle,
               backgroundColor: chipBackgroundColor,
-              padding: EdgeInsets.zero, // Minimal padding around label
-              labelPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs / 2), // Reduced padding
+              padding: EdgeInsets.zero,
+              labelPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs / 2, vertical: 0), // Minimal vertical padding
               visualDensity: VisualDensity.compact,
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),

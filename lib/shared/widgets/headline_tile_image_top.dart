@@ -177,9 +177,7 @@ class _HeadlineMetadataRow extends StatelessWidget {
     );
     final chipLabelStyle = metadataStyle; 
 
-    final chipBackgroundColor = colorScheme.surfaceContainerHighest.withOpacity(
-      0.7, 
-    );
+    final chipBackgroundColor = colorScheme.secondaryContainer.withOpacity(0.4);
     const iconSize = AppSpacing.sm; 
 
     return Wrap(
@@ -223,7 +221,7 @@ class _HeadlineMetadataRow extends StatelessWidget {
               labelStyle: chipLabelStyle,
               backgroundColor: chipBackgroundColor,
               padding: EdgeInsets.zero, 
-              labelPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs / 2 ), 
+              labelPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs / 2, vertical: 0), 
               visualDensity: VisualDensity.compact,
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
@@ -254,7 +252,7 @@ class _HeadlineMetadataRow extends StatelessWidget {
               labelStyle: chipLabelStyle,
               backgroundColor: chipBackgroundColor,
               padding: EdgeInsets.zero, 
-              labelPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs / 2), 
+              labelPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs / 2, vertical: 0), 
               visualDensity: VisualDensity.compact,
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),

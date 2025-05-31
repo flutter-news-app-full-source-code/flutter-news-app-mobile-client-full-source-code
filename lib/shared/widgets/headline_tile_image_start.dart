@@ -159,53 +159,45 @@ class _HeadlineMetadataRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final formattedDate = formatRelativeTime(context, headline.publishedAt);
 
-    final metadataStyle = textTheme.bodySmall?.copyWith(
+    // Use labelSmall as a base and make it smaller for metadata text
+    final baseTextStyle = textTheme.labelSmall;
+    final metadataStyle = baseTextStyle?.copyWith(
       color: colorScheme.onSurfaceVariant,
+      fontSize: baseTextStyle.fontSize != null ? baseTextStyle.fontSize! * 0.85 : 10, // 15% smaller or fallback
     );
-    final chipLabelStyle = textTheme.labelSmall?.copyWith(
-      color: colorScheme.onSurfaceVariant,
-    );
+    // Use the same derived style for chip labels for consistency
+    final chipLabelStyle = metadataStyle; 
+
     final chipBackgroundColor = colorScheme.surfaceContainerHighest.withOpacity(
-      0.5,
+      0.7, 
     );
-    const iconSize = 12.0; // Kept for date icon
+    const iconSize = AppSpacing.sm; 
 
     return Wrap(
-      spacing: AppSpacing.sm, // Reduced spacing for more compactness
-      runSpacing: AppSpacing.xs,
+      spacing: AppSpacing.xs, 
+      runSpacing: AppSpacing.xs, 
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         if (formattedDate.isNotEmpty)
-          GestureDetector(
-            onTap: () {
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(content: Text('Tapped Date: $formattedDate')),
-                );
-            },
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.calendar_today_outlined,
-                  size: iconSize,
-                  color: colorScheme.onSurfaceVariant,
-                ),
-                const SizedBox(width: AppSpacing.xs),
-                Text(formattedDate, style: metadataStyle),
-              ],
-            ),
+          Row( 
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.calendar_today_outlined,
+                size: iconSize, 
+                color: colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: AppSpacing.xs / 2), // Minimal space
+              Text(formattedDate, style: metadataStyle),
+            ],
           ),
         // Conditionally render Category Chip
         if (headline.category?.name != null &&
             !(currentContextEntityType == EntityType.category &&
                 headline.category!.id == currentContextEntityId)) ...[
-          if (formattedDate.isNotEmpty)
+          if (formattedDate.isNotEmpty) // Add separator if date was present
             Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.xs / 2,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs / 2),
               child: Text('•', style: metadataStyle),
             ),
           GestureDetector(
@@ -213,7 +205,7 @@ class _HeadlineMetadataRow extends StatelessWidget {
               if (headline.category != null) {
                 context.push(
                   Routes.categoryDetails,
-                  extra: EntityDetailsPageArguments(entity: headline.category),
+                  extra: EntityDetailsPageArguments(entity: headline.category!),
                 );
               }
             },
@@ -221,10 +213,8 @@ class _HeadlineMetadataRow extends StatelessWidget {
               label: Text(headline.category!.name),
               labelStyle: chipLabelStyle,
               backgroundColor: chipBackgroundColor,
-              padding: EdgeInsets.zero, // Changed
-              labelPadding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.xs,
-              ), // Added
+              padding: EdgeInsets.zero, // Minimal padding around label
+              labelPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs / 2 ), // Reduced padding
               visualDensity: VisualDensity.compact,
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
@@ -234,14 +224,12 @@ class _HeadlineMetadataRow extends StatelessWidget {
         if (headline.source?.name != null &&
             !(currentContextEntityType == EntityType.source &&
                 headline.source!.id == currentContextEntityId)) ...[
-          if (formattedDate.isNotEmpty ||
-              (headline.category?.name != null &&
-                  !(currentContextEntityType == EntityType.category &&
-                      headline.category!.id == currentContextEntityId)))
+          // Add separator if date or category was present
+          if (formattedDate.isNotEmpty || (headline.category?.name != null &&
+            !(currentContextEntityType == EntityType.category &&
+                headline.category!.id == currentContextEntityId)) )
             Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.xs / 2,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs / 2),
               child: Text('•', style: metadataStyle),
             ),
           GestureDetector(
@@ -249,7 +237,7 @@ class _HeadlineMetadataRow extends StatelessWidget {
               if (headline.source != null) {
                 context.push(
                   Routes.sourceDetails,
-                  extra: EntityDetailsPageArguments(entity: headline.source),
+                  extra: EntityDetailsPageArguments(entity: headline.source!),
                 );
               }
             },
@@ -257,10 +245,8 @@ class _HeadlineMetadataRow extends StatelessWidget {
               label: Text(headline.source!.name),
               labelStyle: chipLabelStyle,
               backgroundColor: chipBackgroundColor,
-              padding: EdgeInsets.zero, // Changed
-              labelPadding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.xs,
-              ), // Added
+              padding: EdgeInsets.zero, // Minimal padding around label
+              labelPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs / 2), // Reduced padding
               visualDensity: VisualDensity.compact,
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),

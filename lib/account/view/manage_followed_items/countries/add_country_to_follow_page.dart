@@ -59,9 +59,7 @@ class _AddCountryToFollowPageState extends State<AddCountryToFollowPage> {
     final l10n = context.l10n;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.addCountriesPageTitle),
-      ),
+      appBar: AppBar(title: Text(l10n.addCountriesPageTitle)),
       body: Builder(
         builder: (context) {
           if (_isLoading) {
@@ -74,15 +72,15 @@ class _AddCountryToFollowPageState extends State<AddCountryToFollowPage> {
             );
           }
           if (_allCountries.isEmpty) {
-            return FailureStateWidget(
-              message: l10n.countryFilterEmptyHeadline,
-            );
+            return FailureStateWidget(message: l10n.countryFilterEmptyHeadline);
           }
 
           return BlocBuilder<AccountBloc, AccountState>(
-            buildWhen: (previous, current) =>
-                previous.preferences?.followedCountries != current.preferences?.followedCountries ||
-                previous.status != current.status,
+            buildWhen:
+                (previous, current) =>
+                    previous.preferences?.followedCountries !=
+                        current.preferences?.followedCountries ||
+                    previous.status != current.status,
             builder: (context, accountState) {
               final followedCountries =
                   accountState.preferences?.followedCountries ?? [];
@@ -92,40 +90,46 @@ class _AddCountryToFollowPageState extends State<AddCountryToFollowPage> {
                 itemCount: _allCountries.length,
                 itemBuilder: (context, index) {
                   final country = _allCountries[index];
-                  final isFollowed =
-                      followedCountries.any((fc) => fc.id == country.id);
+                  final isFollowed = followedCountries.any(
+                    (fc) => fc.id == country.id,
+                  );
 
                   return Card(
                     margin: const EdgeInsets.only(bottom: AppSpacing.sm),
                     child: ListTile(
-                      leading: country.flagUrl.isNotEmpty &&
-                              Uri.tryParse(country.flagUrl)?.isAbsolute == true
-                          ? SizedBox(
-                              width: 36,
-                              height: 24,
-                              child: Image.network(
-                                country.flagUrl,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    const Icon(Icons.public_outlined),
-                              ),
-                            )
-                          : const Icon(Icons.public_outlined),
+                      leading:
+                          country.flagUrl.isNotEmpty &&
+                                  Uri.tryParse(country.flagUrl)?.isAbsolute ==
+                                      true
+                              ? SizedBox(
+                                width: 36,
+                                height: 24,
+                                child: Image.network(
+                                  country.flagUrl,
+                                  fit: BoxFit.cover,
+                                  errorBuilder:
+                                      (context, error, stackTrace) =>
+                                          const Icon(Icons.public_outlined),
+                                ),
+                              )
+                              : const Icon(Icons.public_outlined),
                       title: Text(country.name),
                       trailing: IconButton(
-                        icon: isFollowed
-                            ? Icon(
-                                Icons.check_circle,
-                                color: Theme.of(context).colorScheme.primary,
-                              )
-                            : const Icon(Icons.add_circle_outline),
-                        tooltip: isFollowed
-                            ? l10n.unfollowCountryTooltip(country.name)
-                            : l10n.followCountryTooltip(country.name),
+                        icon:
+                            isFollowed
+                                ? Icon(
+                                  Icons.check_circle,
+                                  color: Theme.of(context).colorScheme.primary,
+                                )
+                                : const Icon(Icons.add_circle_outline),
+                        tooltip:
+                            isFollowed
+                                ? l10n.unfollowCountryTooltip(country.name)
+                                : l10n.followCountryTooltip(country.name),
                         onPressed: () {
                           context.read<AccountBloc>().add(
-                                AccountFollowCountryToggled(country: country),
-                              );
+                            AccountFollowCountryToggled(country: country),
+                          );
                         },
                       ),
                     ),

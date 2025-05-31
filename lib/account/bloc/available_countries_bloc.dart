@@ -12,8 +12,8 @@ class AvailableCountriesBloc
     extends Bloc<AvailableCountriesEvent, AvailableCountriesState> {
   AvailableCountriesBloc({
     required HtDataRepository<Country> countriesRepository,
-  })  : _countriesRepository = countriesRepository,
-        super(const AvailableCountriesState()) {
+  }) : _countriesRepository = countriesRepository,
+       super(const AvailableCountriesState()) {
     on<FetchAvailableCountries>(_onFetchAvailableCountries);
   }
 

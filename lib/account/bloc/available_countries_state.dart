@@ -38,10 +38,10 @@ class AvailableCountriesState extends Equatable {
 
   @override
   List<Object?> get props => [
-        status,
-        availableCountries,
-        error,
-        // hasMore, // Add if pagination is implemented
-        // cursor, // Add if pagination is implemented
-      ];
+    status,
+    availableCountries,
+    error,
+    // hasMore, // Add if pagination is implemented
+    // cursor, // Add if pagination is implemented
+  ];
 }

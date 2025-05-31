@@ -10,16 +10,15 @@ part 'available_sources_state.dart';
 
 class AvailableSourcesBloc
     extends Bloc<AvailableSourcesEvent, AvailableSourcesState> {
-  AvailableSourcesBloc({
-    required HtDataRepository<Source> sourcesRepository,
-  })  : _sourcesRepository = sourcesRepository,
-        super(const AvailableSourcesState()) {
+  AvailableSourcesBloc({required HtDataRepository<Source> sourcesRepository})
+    : _sourcesRepository = sourcesRepository,
+      super(const AvailableSourcesState()) {
     on<FetchAvailableSources>(_onFetchAvailableSources);
   }
 
   final HtDataRepository<Source> _sourcesRepository;
   // Consider adding a limit if the number of sources can be very large.
-  // static const _sourcesLimit = 50; 
+  // static const _sourcesLimit = 50;
 
   Future<void> _onFetchAvailableSources(
     FetchAvailableSources event,
@@ -36,8 +35,8 @@ class AvailableSourcesBloc
       // Assuming readAll without parameters fetches all items.
       // Add pagination if necessary for very large datasets.
       final response = await _sourcesRepository.readAll(
-          // limit: _sourcesLimit, // Uncomment if pagination is needed
-          );
+        // limit: _sourcesLimit, // Uncomment if pagination is needed
+      );
       emit(
         state.copyWith(
           status: AvailableSourcesStatus.success,

@@ -47,10 +47,10 @@ class FollowedCountriesListPage extends StatelessWidget {
               onRetry: () {
                 if (state.user?.id != null) {
                   context.read<AccountBloc>().add(
-                        AccountLoadContentPreferencesRequested(
-                          userId: state.user!.id,
-                        ),
-                      );
+                    AccountLoadContentPreferencesRequested(
+                      userId: state.user!.id,
+                    ),
+                  );
                 }
               },
             );
@@ -94,19 +94,21 @@ class FollowedCountriesListPage extends StatelessWidget {
               return Card(
                 margin: const EdgeInsets.only(bottom: AppSpacing.sm),
                 child: ListTile(
-                  leading: country.flagUrl.isNotEmpty &&
-                          Uri.tryParse(country.flagUrl)?.isAbsolute == true
-                      ? SizedBox(
-                          width: 36,
-                          height: 24,
-                          child: Image.network(
-                            country.flagUrl,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(Icons.public_outlined),
-                          ),
-                        )
-                      : const Icon(Icons.public_outlined),
+                  leading:
+                      country.flagUrl.isNotEmpty &&
+                              Uri.tryParse(country.flagUrl)?.isAbsolute == true
+                          ? SizedBox(
+                            width: 36,
+                            height: 24,
+                            child: Image.network(
+                              country.flagUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder:
+                                  (context, error, stackTrace) =>
+                                      const Icon(Icons.public_outlined),
+                            ),
+                          )
+                          : const Icon(Icons.public_outlined),
                   title: Text(country.name),
                   trailing: IconButton(
                     icon: Icon(
@@ -116,8 +118,8 @@ class FollowedCountriesListPage extends StatelessWidget {
                     tooltip: l10n.unfollowCountryTooltip(country.name),
                     onPressed: () {
                       context.read<AccountBloc>().add(
-                            AccountFollowCountryToggled(country: country),
-                          );
+                        AccountFollowCountryToggled(country: country),
+                      );
                     },
                   ),
                 ),

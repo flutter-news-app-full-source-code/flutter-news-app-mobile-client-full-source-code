@@ -47,10 +47,10 @@ class FollowedCategoriesListPage extends StatelessWidget {
               onRetry: () {
                 if (state.user?.id != null) {
                   context.read<AccountBloc>().add(
-                        AccountLoadContentPreferencesRequested(
-                          userId: state.user!.id,
-                        ),
-                      );
+                    AccountLoadContentPreferencesRequested(
+                      userId: state.user!.id,
+                    ),
+                  );
                 }
               },
             );
@@ -94,19 +94,22 @@ class FollowedCategoriesListPage extends StatelessWidget {
               return Card(
                 margin: const EdgeInsets.only(bottom: AppSpacing.sm),
                 child: ListTile(
-                  leading: category.iconUrl != null &&
-                          Uri.tryParse(category.iconUrl!)?.isAbsolute == true
-                      ? SizedBox(
-                          width: 36,
-                          height: 36,
-                          child: Image.network(
-                            category.iconUrl!,
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(Icons.category_outlined),
-                          ),
-                        )
-                      : const Icon(Icons.category_outlined),
+                  leading:
+                      category.iconUrl != null &&
+                              Uri.tryParse(category.iconUrl!)?.isAbsolute ==
+                                  true
+                          ? SizedBox(
+                            width: 36,
+                            height: 36,
+                            child: Image.network(
+                              category.iconUrl!,
+                              fit: BoxFit.contain,
+                              errorBuilder:
+                                  (context, error, stackTrace) =>
+                                      const Icon(Icons.category_outlined),
+                            ),
+                          )
+                          : const Icon(Icons.category_outlined),
                   title: Text(category.name),
                   trailing: IconButton(
                     icon: Icon(
@@ -116,8 +119,8 @@ class FollowedCategoriesListPage extends StatelessWidget {
                     tooltip: l10n.unfollowCategoryTooltip(category.name),
                     onPressed: () {
                       context.read<AccountBloc>().add(
-                            AccountFollowCategoryToggled(category: category),
-                          );
+                        AccountFollowCategoryToggled(category: category),
+                      );
                     },
                   ),
                 ),

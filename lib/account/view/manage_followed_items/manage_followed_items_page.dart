@@ -18,7 +18,9 @@ class ManageFollowedItemsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.accountContentPreferencesTile), // "Content Preferences"
+        title: Text(
+          l10n.accountContentPreferencesTile,
+        ), // "Content Preferences"
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
@@ -43,7 +45,9 @@ class ManageFollowedItemsPage extends StatelessWidget {
           const Divider(indent: AppSpacing.lg, endIndent: AppSpacing.lg),
           ListTile(
             leading: const Icon(Icons.public_outlined),
-            title: Text(l10n.headlinesFeedFilterEventCountryLabel), // "Countries"
+            title: Text(
+              l10n.headlinesFeedFilterEventCountryLabel,
+            ), // "Countries"
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
               context.goNamed(Routes.followedCountriesListName);

@@ -78,27 +78,36 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       emit(
         state.copyWith(status: AccountStatus.success, preferences: preferences),
       );
-    } on NotFoundException { // Specifically handle NotFound
+    } on NotFoundException {
+      // Specifically handle NotFound
       emit(
         state.copyWith(
           status: AccountStatus.success, // It's a success, just no data
-          preferences: UserContentPreferences(id: event.userId), // Provide default/empty
+          preferences: UserContentPreferences(
+            id: event.userId,
+          ), // Provide default/empty
         ),
       );
-    } on HtHttpException catch (e) { // Handle other HTTP errors
+    } on HtHttpException catch (e) {
+      // Handle other HTTP errors
       emit(
         state.copyWith(
           status: AccountStatus.failure,
           errorMessage: 'Failed to load preferences: ${e.message}',
-          preferences: UserContentPreferences(id: event.userId), // Provide default
+          preferences: UserContentPreferences(
+            id: event.userId,
+          ), // Provide default
         ),
       );
-    } catch (e) { // Catch-all for other unexpected errors
+    } catch (e) {
+      // Catch-all for other unexpected errors
       emit(
         state.copyWith(
           status: AccountStatus.failure,
           errorMessage: 'An unexpected error occurred: $e',
-          preferences: UserContentPreferences(id: event.userId), // Provide default
+          preferences: UserContentPreferences(
+            id: event.userId,
+          ), // Provide default
         ),
       );
     }
@@ -117,19 +126,27 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       );
       return;
     }
-    print('[AccountBloc._persistPreferences] Attempting to persist preferences for user ${state.user!.id}');
-    print('[AccountBloc._persistPreferences] Preferences to save: ${preferences.toJson()}');
+    print(
+      '[AccountBloc._persistPreferences] Attempting to persist preferences for user ${state.user!.id}',
+    );
+    print(
+      '[AccountBloc._persistPreferences] Preferences to save: ${preferences.toJson()}',
+    );
     try {
       await _userContentPreferencesRepository.update(
         id: state.user!.id, // ID of the preferences object is the user's ID
         item: preferences,
         userId: state.user!.id,
       );
-      print('[AccountBloc._persistPreferences] Successfully persisted preferences for user ${state.user!.id}');
+      print(
+        '[AccountBloc._persistPreferences] Successfully persisted preferences for user ${state.user!.id}',
+      );
       // Optimistic update already done, emit success if needed for UI feedback
       // emit(state.copyWith(status: AccountStatus.success));
     } on HtHttpException catch (e) {
-      print('[AccountBloc._persistPreferences] HtHttpException while persisting: ${e.message}');
+      print(
+        '[AccountBloc._persistPreferences] HtHttpException while persisting: ${e.message}',
+      );
       emit(
         state.copyWith(
           status: AccountStatus.failure,
@@ -137,7 +154,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         ),
       );
     } catch (e) {
-      print('[AccountBloc._persistPreferences] Unknown error while persisting: $e');
+      print(
+        '[AccountBloc._persistPreferences] Unknown error while persisting: $e',
+      );
       emit(
         state.copyWith(
           status: AccountStatus.failure,

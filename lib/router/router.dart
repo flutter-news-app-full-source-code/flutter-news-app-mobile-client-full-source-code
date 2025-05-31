@@ -6,12 +6,12 @@ import 'package:ht_data_repository/ht_data_repository.dart'; // Generic Data Rep
 import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/account/view/account_page.dart';
 import 'package:ht_main/account/view/manage_followed_items/categories/add_category_to_follow_page.dart'; // New
-import 'package:ht_main/account/view/manage_followed_items/countries/add_country_to_follow_page.dart'; // New
-import 'package:ht_main/account/view/manage_followed_items/sources/add_source_to_follow_page.dart'; // New
 import 'package:ht_main/account/view/manage_followed_items/categories/followed_categories_list_page.dart'; // New
+import 'package:ht_main/account/view/manage_followed_items/countries/add_country_to_follow_page.dart'; // New
 import 'package:ht_main/account/view/manage_followed_items/countries/followed_countries_list_page.dart'; // New
-import 'package:ht_main/account/view/manage_followed_items/sources/followed_sources_list_page.dart'; // New
 import 'package:ht_main/account/view/manage_followed_items/manage_followed_items_page.dart'; // New
+import 'package:ht_main/account/view/manage_followed_items/sources/add_source_to_follow_page.dart'; // New
+import 'package:ht_main/account/view/manage_followed_items/sources/followed_sources_list_page.dart'; // New
 import 'package:ht_main/account/view/saved_headlines_page.dart'; // Import SavedHeadlinesPage
 import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/app/view/app_shell.dart';
@@ -551,48 +551,54 @@ GoRouter createRouter({
                   GoRoute(
                     path: Routes.manageFollowedItems, // Updated path
                     name: Routes.manageFollowedItemsName, // Updated name
-                    builder: (context, state) =>
-                        const ManageFollowedItemsPage(), // Use the new page
+                    builder:
+                        (context, state) =>
+                            const ManageFollowedItemsPage(), // Use the new page
                     routes: [
                       GoRoute(
                         path: Routes.followedCategoriesList,
                         name: Routes.followedCategoriesListName,
-                        builder: (context, state) =>
-                            const FollowedCategoriesListPage(),
+                        builder:
+                            (context, state) =>
+                                const FollowedCategoriesListPage(),
                         routes: [
                           GoRoute(
                             path: Routes.addCategoryToFollow,
                             name: Routes.addCategoryToFollowName,
-                            builder: (context, state) =>
-                                const AddCategoryToFollowPage(),
+                            builder:
+                                (context, state) =>
+                                    const AddCategoryToFollowPage(),
                           ),
                         ],
                       ),
                       GoRoute(
                         path: Routes.followedSourcesList,
                         name: Routes.followedSourcesListName,
-                        builder: (context, state) =>
-                            const FollowedSourcesListPage(),
+                        builder:
+                            (context, state) => const FollowedSourcesListPage(),
                         routes: [
                           GoRoute(
                             path: Routes.addSourceToFollow,
                             name: Routes.addSourceToFollowName,
-                            builder: (context, state) =>
-                                const AddSourceToFollowPage(),
+                            builder:
+                                (context, state) =>
+                                    const AddSourceToFollowPage(),
                           ),
                         ],
                       ),
                       GoRoute(
                         path: Routes.followedCountriesList,
                         name: Routes.followedCountriesListName,
-                        builder: (context, state) =>
-                            const FollowedCountriesListPage(),
+                        builder:
+                            (context, state) =>
+                                const FollowedCountriesListPage(),
                         routes: [
                           GoRoute(
                             path: Routes.addCountryToFollow,
                             name: Routes.addCountryToFollowName,
-                            builder: (context, state) =>
-                                const AddCountryToFollowPage(),
+                            builder:
+                                (context, state) =>
+                                    const AddCountryToFollowPage(),
                           ),
                         ],
                       ),
@@ -611,10 +617,14 @@ GoRouter createRouter({
                         builder: (context, state) {
                           final id = state.pathParameters['id']!;
                           return BlocProvider(
-                            create: (context) => HeadlineDetailsBloc(
-                              headlinesRepository:
-                                  context.read<HtDataRepository<Headline>>(),
-                            )..add(HeadlineDetailsRequested(headlineId: id)),
+                            create:
+                                (context) => HeadlineDetailsBloc(
+                                  headlinesRepository:
+                                      context
+                                          .read<HtDataRepository<Headline>>(),
+                                )..add(
+                                  HeadlineDetailsRequested(headlineId: id),
+                                ),
                             child: HeadlineDetailsPage(headlineId: id),
                           );
                         },

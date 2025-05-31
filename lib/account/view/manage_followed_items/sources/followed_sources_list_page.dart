@@ -47,10 +47,10 @@ class FollowedSourcesListPage extends StatelessWidget {
               onRetry: () {
                 if (state.user?.id != null) {
                   context.read<AccountBloc>().add(
-                        AccountLoadContentPreferencesRequested(
-                          userId: state.user!.id,
-                        ),
-                      );
+                    AccountLoadContentPreferencesRequested(
+                      userId: state.user!.id,
+                    ),
+                  );
                 }
               },
             );
@@ -103,8 +103,8 @@ class FollowedSourcesListPage extends StatelessWidget {
                     tooltip: l10n.unfollowSourceTooltip(source.name),
                     onPressed: () {
                       context.read<AccountBloc>().add(
-                            AccountFollowSourceToggled(source: source),
-                          );
+                        AccountFollowSourceToggled(source: source),
+                      );
                     },
                   ),
                 ),

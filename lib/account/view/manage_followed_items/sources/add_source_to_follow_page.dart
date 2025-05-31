@@ -19,25 +19,29 @@ class AddSourceToFollowPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return BlocProvider(
-      create: (context) => SourcesFilterBloc(
-        sourcesRepository: context.read<HtDataRepository<Source>>(),
-        countriesRepository: context.read<HtDataRepository<Country>>(),
-      )..add(const LoadSourceFilterData()),
+      create:
+          (context) => SourcesFilterBloc(
+            sourcesRepository: context.read<HtDataRepository<Source>>(),
+            countriesRepository: context.read<HtDataRepository<Country>>(),
+          )..add(const LoadSourceFilterData()),
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(l10n.addSourcesPageTitle),
-        ),
+        appBar: AppBar(title: Text(l10n.addSourcesPageTitle)),
         body: BlocBuilder<SourcesFilterBloc, SourcesFilterState>(
           builder: (context, sourcesState) {
-            if (sourcesState.dataLoadingStatus == SourceFilterDataLoadingStatus.loading || sourcesState.dataLoadingStatus == SourceFilterDataLoadingStatus.initial) {
+            if (sourcesState.dataLoadingStatus ==
+                    SourceFilterDataLoadingStatus.loading ||
+                sourcesState.dataLoadingStatus ==
+                    SourceFilterDataLoadingStatus.initial) {
               return const Center(child: CircularProgressIndicator());
             }
-            if (sourcesState.dataLoadingStatus == SourceFilterDataLoadingStatus.failure) {
+            if (sourcesState.dataLoadingStatus ==
+                SourceFilterDataLoadingStatus.failure) {
               return FailureStateWidget(
                 message: sourcesState.errorMessage ?? l10n.sourceFilterError,
-                onRetry: () => context
-                    .read<SourcesFilterBloc>()
-                    .add(const LoadSourceFilterData()),
+                onRetry:
+                    () => context.read<SourcesFilterBloc>().add(
+                      const LoadSourceFilterData(),
+                    ),
               );
             }
             if (sourcesState.allAvailableSources.isEmpty) {
@@ -47,9 +51,11 @@ class AddSourceToFollowPage extends StatelessWidget {
             }
 
             return BlocBuilder<AccountBloc, AccountState>(
-              buildWhen: (previous, current) =>
-                  previous.preferences?.followedSources != current.preferences?.followedSources ||
-                  previous.status != current.status,
+              buildWhen:
+                  (previous, current) =>
+                      previous.preferences?.followedSources !=
+                          current.preferences?.followedSources ||
+                      previous.status != current.status,
               builder: (context, accountState) {
                 final followedSources =
                     accountState.preferences?.followedSources ?? [];
@@ -59,27 +65,31 @@ class AddSourceToFollowPage extends StatelessWidget {
                   itemCount: sourcesState.allAvailableSources.length,
                   itemBuilder: (context, index) {
                     final source = sourcesState.allAvailableSources[index];
-                    final isFollowed =
-                        followedSources.any((fs) => fs.id == source.id);
+                    final isFollowed = followedSources.any(
+                      (fs) => fs.id == source.id,
+                    );
 
                     return Card(
                       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
                       child: ListTile(
                         title: Text(source.name),
                         trailing: IconButton(
-                          icon: isFollowed
-                              ? Icon(
-                                  Icons.check_circle,
-                                  color: Theme.of(context).colorScheme.primary,
-                                )
-                              : const Icon(Icons.add_circle_outline),
-                          tooltip: isFollowed
-                              ? l10n.unfollowSourceTooltip(source.name)
-                              : l10n.followSourceTooltip(source.name),
+                          icon:
+                              isFollowed
+                                  ? Icon(
+                                    Icons.check_circle,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                  )
+                                  : const Icon(Icons.add_circle_outline),
+                          tooltip:
+                              isFollowed
+                                  ? l10n.unfollowSourceTooltip(source.name)
+                                  : l10n.followSourceTooltip(source.name),
                           onPressed: () {
                             context.read<AccountBloc>().add(
-                                  AccountFollowSourceToggled(source: source),
-                                );
+                              AccountFollowSourceToggled(source: source),
+                            );
                           },
                         ),
                       ),

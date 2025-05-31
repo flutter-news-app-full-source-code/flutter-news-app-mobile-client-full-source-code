@@ -155,9 +155,10 @@ class HeadlineDetailsPage extends StatelessWidget {
 
     final bookmarkButton = IconButton(
       icon: Icon(isSaved ? Icons.bookmark : Icons.bookmark_border),
-      tooltip: isSaved
-          ? l10n.headlineDetailsRemoveFromSavedTooltip
-          : l10n.headlineDetailsSaveTooltip,
+      tooltip:
+          isSaved
+              ? l10n.headlineDetailsRemoveFromSavedTooltip
+              : l10n.headlineDetailsSaveTooltip,
       onPressed: () {
         context.read<AccountBloc>().add(
           AccountSaveHeadlineToggled(headline: headline),

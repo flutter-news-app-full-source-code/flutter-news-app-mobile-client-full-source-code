@@ -28,10 +28,11 @@ class SavedHeadlinesPage extends StatelessWidget {
         builder: (context, state) {
           if (state.status == AccountStatus.loading &&
               state.preferences == null) {
-            return LoadingStateWidget(
+            return const LoadingStateWidget(
               icon: Icons.bookmarks_outlined,
               headline: 'Loading Saved Headlines...', // Placeholder
-              subheadline: 'Please wait while we fetch your saved articles.', // Placeholder
+              subheadline:
+                  'Please wait while we fetch your saved articles.', // Placeholder
             );
           }
 
@@ -39,14 +40,15 @@ class SavedHeadlinesPage extends StatelessWidget {
               state.preferences == null) {
             return FailureStateWidget(
               message:
-                  state.errorMessage ?? 'Could not load saved headlines.', // Placeholder
+                  state.errorMessage ??
+                  'Could not load saved headlines.', // Placeholder
               onRetry: () {
                 if (state.user?.id != null) {
                   context.read<AccountBloc>().add(
-                        AccountLoadContentPreferencesRequested(
-                          userId: state.user!.id,
-                        ),
-                      );
+                    AccountLoadContentPreferencesRequested(
+                      userId: state.user!.id,
+                    ),
+                  );
                 }
               },
             );
@@ -55,10 +57,11 @@ class SavedHeadlinesPage extends StatelessWidget {
           final savedHeadlines = state.preferences?.savedHeadlines ?? [];
 
           if (savedHeadlines.isEmpty) {
-            return InitialStateWidget(
+            return const InitialStateWidget(
               icon: Icons.bookmark_add_outlined,
               headline: 'No Saved Headlines', // Placeholder
-              subheadline: 'You haven\'t saved any articles yet. Start exploring!', // Placeholder
+              subheadline:
+                  "You haven't saved any articles yet. Start exploring!", // Placeholder
             );
           }
 
@@ -70,13 +73,14 @@ class SavedHeadlinesPage extends StatelessWidget {
               return HeadlineItemWidget(
                 headline: headline,
                 targetRouteName: Routes.accountArticleDetailsName,
-                trailing: IconButton( // Changed from trailingWidget
+                trailing: IconButton(
+                  // Changed from trailingWidget
                   icon: const Icon(Icons.delete_outline),
                   tooltip: 'Remove from saved', // Placeholder
                   onPressed: () {
                     context.read<AccountBloc>().add(
-                          AccountSaveHeadlineToggled(headline: headline),
-                        );
+                      AccountSaveHeadlineToggled(headline: headline),
+                    );
                   },
                 ),
               );

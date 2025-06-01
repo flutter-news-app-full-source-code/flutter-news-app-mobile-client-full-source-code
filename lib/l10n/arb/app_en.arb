@@ -839,5 +839,9 @@
     "mustBeLoggedInToUseFeatureError": "You must be logged in to use this feature.",
     "@mustBeLoggedInToUseFeatureError": {
         "description": "Error message shown when a logged-in user is required for a feature"
+    },
+    "noFollowedItemsForFilterSnackbar": "You are not following any categories or sources to apply as a filter.",
+    "@noFollowedItemsForFilterSnackbar": {
+        "description": "Snackbar message shown when user tries to apply followed filters but has none."
     }
 }

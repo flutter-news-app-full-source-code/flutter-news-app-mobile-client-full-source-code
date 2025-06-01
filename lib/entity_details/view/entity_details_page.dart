@@ -108,30 +108,50 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
     return currentScroll >= (maxScroll * 0.9);
   }
 
+  String _getEntityTypeDisplayName(EntityType? type, AppLocalizations l10n) {
+    if (type == null) return l10n.detailsPageTitle; // Fallback
+    String name;
+    switch (type) {
+      case EntityType.category:
+        name = l10n.entityDetailsCategoryTitle; // Use direct l10n string
+        break;
+      case EntityType.source:
+        name = l10n.entityDetailsSourceTitle; // Use direct l10n string
+        break;
+      // EntityType.country does not exist, remove or map if added later
+      default:
+        name = l10n.detailsPageTitle; // Fallback
+        break;
+    }
+    // Manual capitalization
+    return name.isNotEmpty ? '${name[0].toUpperCase()}${name.substring(1)}' : name;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
+    final textTheme = theme.textTheme; 
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
       body: BlocBuilder<EntityDetailsBloc, EntityDetailsState>(
         builder: (context, state) {
+          final entityTypeDisplayNameForTitle = _getEntityTypeDisplayName(widget.args.entityType, l10n);
+
           if (state.status == EntityDetailsStatus.initial ||
-              (state.status == EntityDetailsStatus.loading &&
-                  state.entity == null)) {
+              (state.status == EntityDetailsStatus.loading && state.entity == null)) {
             return LoadingStateWidget(
-              icon: Icons.info_outline, 
-              headline: l10n.headlineDetailsLoadingHeadline, // Used generic loading
-              subheadline: l10n.pleaseWait, // Used generic please wait
+              icon: Icons.info_outline,
+              headline: entityTypeDisplayNameForTitle, // Use the display name directly
+              subheadline: l10n.pleaseWait,
             );
           }
 
-          if (state.status == EntityDetailsStatus.failure &&
-              state.entity == null) {
+          if (state.status == EntityDetailsStatus.failure && state.entity == null) {
             return FailureStateWidget(
-              message: state.errorMessage ?? l10n.unknownError, // Used generic error
-              onRetry:
-                  () => context.read<EntityDetailsBloc>().add(
+              message: state.errorMessage ?? l10n.entityDetailsErrorLoading(entityType: entityTypeDisplayNameForTitle),
+              onRetry: () => context.read<EntityDetailsBloc>().add(
                     EntityDetailsLoadRequested(
                       entityId: widget.args.entityId,
                       entityType: widget.args.entityType,
@@ -141,46 +161,46 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
             );
           }
 
-          // At this point, state.entity should not be null if success or loading more
-          final appBarTitle =
-              state.entity is Category
-                  ? (state.entity as Category).name
-                  : state.entity is Source
-                  ? (state.entity as Source).name
-                  : l10n.detailsPageTitle;
+          final String appBarTitleText;
+          IconData? appBarIconData;
+          // String? entityImageHeroTag; // Not currently used
 
-          final description =
-              state.entity is Category
-                  ? (state.entity as Category).description
-                  : state.entity is Source
+          if (state.entity is Category) {
+            final cat = state.entity as Category;
+            appBarTitleText = cat.name;
+            appBarIconData = Icons.category_outlined;
+            // entityImageHeroTag = 'category-image-${cat.id}';
+          } else if (state.entity is Source) {
+            final src = state.entity as Source;
+            appBarTitleText = src.name;
+            appBarIconData = Icons.source_outlined;
+          } else {
+            appBarTitleText = l10n.detailsPageTitle; // Fallback
+          }
+
+          final description = state.entity is Category
+              ? (state.entity as Category).description
+              : state.entity is Source
                   ? (state.entity as Source).description
                   : null;
 
-          final entityIconUrl =
-              (state.entity is Category &&
-                      (state.entity as Category).iconUrl != null)
-                  ? (state.entity as Category).iconUrl
-                  : null;
+          final entityIconUrl = (state.entity is Category &&
+                  (state.entity as Category).iconUrl != null)
+              ? (state.entity as Category).iconUrl
+              : null;
 
           final followButton = IconButton(
             icon: Icon(
-              state.isFollowing
-                  ? Icons
-                      .check_circle // Filled when following
-                  : Icons.add_circle_outline,
-              color:
-                  theme
-                      .colorScheme
-                      .primary, // Use primary for both states for accent
+              state.isFollowing ? Icons.check_circle : Icons.add_circle_outline,
+              color: colorScheme.primary,
             ),
-            tooltip:
-                state.isFollowing
-                    ? l10n.unfollowButtonLabel
-                    : l10n.followButtonLabel,
+            tooltip: state.isFollowing
+                ? l10n.unfollowButtonLabel
+                : l10n.followButtonLabel,
             onPressed: () {
-              context.read<EntityDetailsBloc>().add(
-                const EntityDetailsToggleFollowRequested(),
-              );
+              context
+                  .read<EntityDetailsBloc>()
+                  .add(const EntityDetailsToggleFollowRequested());
             },
           );
 
@@ -194,39 +214,33 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                     borderRadius: BorderRadius.circular(AppSpacing.xs),
                     child: Image.network(
                       entityIconUrl,
-                      width: kToolbarHeight - 16, // AppBar height minus padding
-                      height: kToolbarHeight - 16,
-                      fit: BoxFit.cover,
-                      errorBuilder:
-                          (context, error, stackTrace) => const Icon(
-                            Icons.category_outlined,
-                            size: kToolbarHeight - 20,
-                          ),
+                      width: kToolbarHeight - AppSpacing.lg,
+                      height: kToolbarHeight - AppSpacing.lg,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => Icon(
+                        appBarIconData ?? Icons.info_outline,
+                        size: kToolbarHeight - AppSpacing.xl,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
                 )
-              else if (state.entityType == EntityType.category)
+              else if (appBarIconData != null)
                 Padding(
                   padding: const EdgeInsets.only(right: AppSpacing.sm),
                   child: Icon(
-                    Icons.category_outlined,
-                    size: kToolbarHeight - 20,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                )
-              else if (state.entityType == EntityType.source)
-                Padding(
-                  padding: const EdgeInsets.only(right: AppSpacing.sm),
-                  child: Icon(
-                    Icons.source_outlined,
-                    size: kToolbarHeight - 20,
-                    color: theme.colorScheme.onSurface,
+                    appBarIconData,
+                    size: kToolbarHeight - AppSpacing.xl,
+                    color: colorScheme.onSurface,
                   ),
                 ),
-              Flexible(
-                child: Text(appBarTitle, overflow: TextOverflow.ellipsis),
+              Expanded(
+                child: Text(
+                  appBarTitleText,
+                  style: textTheme.titleLarge,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              // Info icon removed from here
             ],
           );
 
@@ -236,67 +250,80 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
               SliverAppBar(
                 title: appBarTitleWidget,
                 pinned: true,
-                actions: [followButton],
+                floating: false,
+                snap: false,
+                actions: [
+                  followButton,
+                  const SizedBox(width: AppSpacing.sm),
+                ],
               ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(
-                    AppSpacing.paddingMedium,
-                  ), // Consistent padding
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (description != null && description.isNotEmpty) ...[
-                        Text(
-                          description,
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
+              SliverPadding(
+                padding: const EdgeInsets.all(AppSpacing.paddingMedium),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    if (description != null && description.isNotEmpty) ...[
+                      Text(
+                        description,
+                        style: textTheme.bodyLarge?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                          height: 1.5,
                         ),
-                        const SizedBox(height: AppSpacing.lg),
-                      ],
-                      if (state.feedItems.isNotEmpty || // Changed
-                          state.headlinesStatus ==
-                              EntityHeadlinesStatus.loadingMore) ...[
-                        Text(
-                          l10n.headlinesSectionTitle,
-                          style: theme.textTheme.titleLarge,
-                        ),
-                        const Divider(height: AppSpacing.md),
-                      ],
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
                     ],
-                  ),
+                    if (state.feedItems.isNotEmpty ||
+                        state.headlinesStatus == EntityHeadlinesStatus.loadingMore) ...[
+                      Text(
+                        l10n.headlinesSectionTitle,
+                        style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      const Divider(
+                        height: AppSpacing.lg,
+                        thickness: 1,
+                      ),
+                    ],
+                  ]),
                 ),
               ),
-              if (state.feedItems.isEmpty && // Changed
+              if (state.feedItems.isEmpty &&
                   state.headlinesStatus != EntityHeadlinesStatus.initial &&
                   state.headlinesStatus != EntityHeadlinesStatus.loadingMore &&
                   state.status == EntityDetailsStatus.success)
                 SliverFillRemaining(
+                  hasScrollBody: false,
                   child: Center(
-                    child: Text(
-                      l10n.noHeadlinesFoundMessage,
-                      style: theme.textTheme.titleMedium,
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppSpacing.paddingLarge),
+                      child: Text(
+                        l10n.noHeadlinesFoundMessage,
+                        style: textTheme.titleMedium?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
                 )
               else
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      if (index >= state.feedItems.length) { // Changed
-                        return state.hasMoreHeadlines && // hasMoreHeadlines still refers to original headlines
-                                state.headlinesStatus ==
-                                    EntityHeadlinesStatus.loadingMore
-                            ? const Center(
-                                child: Padding(
-                                  padding: EdgeInsets.all(AppSpacing.md),
-                                  child: CircularProgressIndicator(),
-                                ),
-                              )
-                            : const SizedBox.shrink();
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingMedium),
+                  sliver: SliverList.separated(
+                    itemCount: state.feedItems.length +
+                        (state.hasMoreHeadlines &&
+                                state.headlinesStatus == EntityHeadlinesStatus.loadingMore
+                            ? 1
+                            : 0),
+                    separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.sm),
+                    itemBuilder: (context, index) {
+                      if (index >= state.feedItems.length) {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
                       }
-                      final item = state.feedItems[index]; // Changed
+                      final item = state.feedItems[index];
 
                       if (item is Headline) {
                         final imageStyle = context
@@ -354,107 +381,24 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                             );
                         }
                         return tile;
-                      } else if (item is Ad) {
-                        return Card(
-                          margin: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.paddingMedium,
-                            vertical: AppSpacing.xs,
-                          ),
-                          color: theme.colorScheme.surfaceContainerHighest,
-                          child: Padding(
-                            padding: const EdgeInsets.all(AppSpacing.md),
-                            child: Column(
-                              children: [
-                                if (item.imageUrl.isNotEmpty)
-                                  Image.network(
-                                    item.imageUrl,
-                                    height: 100,
-                                    errorBuilder: (ctx, err, st) =>
-                                        const Icon(Icons.broken_image, size: 50),
-                                  ),
-                                const SizedBox(height: AppSpacing.sm),
-                                Text(
-                                  'Placeholder Ad: ${item.adType?.name ?? 'Generic'}',
-                                  style: theme.textTheme.titleSmall,
-                                ),
-                                Text(
-                                  'Placement: ${item.placement?.name ?? 'Default'}',
-                                  style: theme.textTheme.bodySmall,
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      } else if (item is AccountAction) {
-                        return Card(
-                          margin: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.paddingMedium,
-                            vertical: AppSpacing.xs,
-                          ),
-                          color: theme.colorScheme.secondaryContainer,
-                          child: ListTile(
-                            leading: Icon(
-                              item.accountActionType == AccountActionType.linkAccount
-                                  ? Icons.link
-                                  : Icons.upgrade,
-                              color: theme.colorScheme.onSecondaryContainer,
-                            ),
-                            title: Text(
-                              item.title,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                color: theme.colorScheme.onSecondaryContainer,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            subtitle: item.description != null
-                                ? Text(
-                                    item.description!,
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: theme.colorScheme.onSecondaryContainer.withOpacity(0.8),
-                                    ),
-                                  )
-                                : null,
-                            trailing: item.callToActionText != null
-                                ? ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: theme.colorScheme.secondary,
-                                      foregroundColor: theme.colorScheme.onSecondary,
-                                    ),
-                                    onPressed: () {
-                                      if (item.callToActionUrl != null) {
-                                        context.push(item.callToActionUrl!);
-                                      }
-                                    },
-                                    child: Text(item.callToActionText!),
-                                  )
-                                : null,
-                            isThreeLine: item.description != null && item.description!.length > 50,
-                          ),
-                        );
                       }
-                      return const SizedBox.shrink(); // Should not happen
+                      return const SizedBox.shrink();
                     },
-                    childCount: state.feedItems.length + // Changed
-                        (state.hasMoreHeadlines && // hasMoreHeadlines still refers to original headlines
-                                state.headlinesStatus ==
-                                    EntityHeadlinesStatus.loadingMore
-                            ? 1
-                            : 0),
                   ),
                 ),
-              // Error display for headline loading specifically
               if (state.headlinesStatus == EntityHeadlinesStatus.failure &&
-                  state.feedItems.isNotEmpty) // Changed
+                  state.feedItems.isNotEmpty)
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.md),
+                    padding: const EdgeInsets.all(AppSpacing.paddingMedium),
                     child: Text(
                       state.errorMessage ?? l10n.failedToLoadMoreHeadlines,
-                      style: TextStyle(color: theme.colorScheme.error),
+                      style: textTheme.bodyMedium?.copyWith(color: colorScheme.error),
                       textAlign: TextAlign.center,
                     ),
                   ),
                 ),
+                SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xxl)), 
             ],
           );
         },

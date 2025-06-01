@@ -843,5 +843,57 @@
     "noFollowedItemsForFilterSnackbar": "أنت لا تتابع أي فئات أو مصادر لتطبيقها كفلتر.",
     "@noFollowedItemsForFilterSnackbar": {
         "description": "Snackbar message shown when user tries to apply followed filters but has none."
+    },
+    "requestCodePageHeadline": "أدخل بريدك الإلكتروني",
+    "@requestCodePageHeadline": {
+        "description": "Headline for the request code page"
+    },
+    "requestCodePageSubheadline": "سنرسل رمزًا آمنًا إلى بريدك الإلكتروني للتحقق من هويتك.",
+    "@requestCodePageSubheadline": {
+        "description": "Subheadline for the request code page"
+    },
+    "requestCodeEmailLabel": "عنوان البريد الإلكتروني",
+    "@requestCodeEmailLabel": {
+        "description": "Label for the email input on the request code page"
+    },
+    "requestCodeEmailHint": "you@example.com",
+    "@requestCodeEmailHint": {
+        "description": "Hint text for the email input on the request code page"
+    },
+    "requestCodeSendCodeButton": "إرسال الرمز",
+    "@requestCodeSendCodeButton": {
+        "description": "Button text to send the verification code"
+    },
+    "entityDetailsCategoryTitle": "الفئة",
+    "@entityDetailsCategoryTitle": {
+        "description": "Title for category entity type"
+    },
+    "entityDetailsSourceTitle": "المصدر",
+    "@entityDetailsSourceTitle": {
+        "description": "Title for source entity type"
+    },
+    "entityDetailsCountryTitle": "الدولة",
+    "@entityDetailsCountryTitle": {
+        "description": "Title for country entity type"
+    },
+    "savedHeadlinesLoadingHeadline": "جارٍ تحميل العناوين المحفوظة...",
+    "@savedHeadlinesLoadingHeadline": {
+        "description": "Headline for loading state on saved headlines page"
+    },
+    "savedHeadlinesLoadingSubheadline": "يرجى الانتظار بينما نقوم بجلب مقالاتك المحفوظة.",
+    "@savedHeadlinesLoadingSubheadline": {
+        "description": "Subheadline for loading state on saved headlines page"
+    },
+    "savedHeadlinesErrorHeadline": "تعذر تحميل العناوين المحفوظة",
+    "@savedHeadlinesErrorHeadline": {
+        "description": "Error message when saved headlines fail to load"
+    },
+    "savedHeadlinesEmptyHeadline": "لا توجد عناوين محفوظة",
+    "@savedHeadlinesEmptyHeadline": {
+        "description": "Headline for empty state on saved headlines page"
+    },
+    "savedHeadlinesEmptySubheadline": "لم تقم بحفظ أي مقالات بعد. ابدأ الاستكشاف!",
+    "@savedHeadlinesEmptySubheadline": {
+        "description": "Subheadline for empty state on saved headlines page"
     }
 }

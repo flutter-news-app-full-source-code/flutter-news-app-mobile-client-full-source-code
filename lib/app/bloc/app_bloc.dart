@@ -70,14 +70,17 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // Emit user and status update first
     emit(state.copyWith(status: status, user: event.user));
 
-    // Load settings now that we have a user (anonymous or authenticated)
     if (event.user != null) {
-      add(const AppSettingsRefreshed());
+      // User is present (authenticated or anonymous)
+      add(const AppSettingsRefreshed()); // Load user-specific settings
+      add(const AppConfigFetchRequested()); // Now attempt to fetch AppConfig
+    } else {
+      // User is null (unauthenticated or logged out)
+      // Clear appConfig if user is logged out, as it might be tied to auth context
+      // or simply to ensure fresh fetch on next login.
+      // Also ensure status is unauthenticated.
+      emit(state.copyWith(appConfig: null, clearAppConfig: true, status: AppStatus.unauthenticated));
     }
-    // Fetch AppConfig regardless of user, as it's global config
-    // Or fetch it once at BLoC initialization if it doesn't depend on user at all.
-    // For now, fetching after user ensures some app state is set.
-    add(const AppConfigFetchRequested());
   }
 
   /// Handles refreshing/loading app settings (theme, font).
@@ -301,25 +304,42 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     AppConfigFetchRequested event,
     Emitter<AppState> emit,
   ) async {
-    // Avoid refetching if already loaded and not initial, unless a refresh mechanism is added
-    if (state.appConfig != null && state.status != AppStatus.initial && state.status != AppStatus.configFetchFailed) {
+    // Guard: Only fetch if a user (authenticated or anonymous) is present.
+    if (state.user == null) {
+      print('[AppBloc] User is null. Skipping AppConfig fetch because it requires authentication.');
+      // If AppConfig was somehow present without a user, clear it.
+      // And ensure status isn't stuck on configFetching if this event was dispatched erroneously.
+      if (state.appConfig != null || state.status == AppStatus.configFetching) {
+         emit(state.copyWith(appConfig: null, clearAppConfig: true, status: AppStatus.unauthenticated));
+      }
       return;
     }
 
+    // Avoid refetching if already loaded for the current user session, unless explicitly trying to recover from a failed state.
+    if (state.appConfig != null && state.status != AppStatus.configFetchFailed) {
+      print('[AppBloc] AppConfig already loaded for user ${state.user?.id} and not in a failed state. Skipping fetch.');
+      return;
+    }
+
+    print('[AppBloc] Attempting to fetch AppConfig for user: ${state.user!.id}...');
     emit(state.copyWith(status: AppStatus.configFetching, appConfig: null, clearAppConfig: true));
 
     try {
-      final appConfig = await _appConfigRepository.read(id: 'app_config');
-      // If successful, AppState's status will be updated by user/auth changes,
-      // or it remains as configFetching until user status is resolved.
-      // We just need to set the appConfig here.
-      // The subsequent AppUserChanged event will set the final status (authenticated/anonymous).
-      emit(state.copyWith(appConfig: appConfig, status: AppStatus.initial)); // Reset status to allow user auth to drive it
+      final appConfig = await _appConfigRepository.read(id: 'app_config'); // API requires auth, so token will be used
+      print('[AppBloc] AppConfig fetched successfully. ID: ${appConfig.id} for user: ${state.user!.id}');
+      
+      // Determine the correct status based on the existing user's role.
+      // This ensures that successfully fetching config doesn't revert auth status to 'initial'.
+      final newStatusBasedOnUser = state.user!.role == UserRole.standardUser 
+                                  ? AppStatus.authenticated 
+                                  : AppStatus.anonymous;
+      emit(state.copyWith(appConfig: appConfig, status: newStatusBasedOnUser));
     } on HtHttpException catch (e) {
-      print('[AppBloc] Failed to fetch AppConfig: ${e.message}');
+      print('[AppBloc] Failed to fetch AppConfig (HtHttpException) for user ${state.user?.id}: ${e.runtimeType} - ${e.message}');
       emit(state.copyWith(status: AppStatus.configFetchFailed, appConfig: null, clearAppConfig: true));
-    } catch (e) {
-      print('[AppBloc] Unexpected error fetching AppConfig: $e');
+    } catch (e, s) {
+      print('[AppBloc] Unexpected error fetching AppConfig for user ${state.user?.id}: $e');
+      print('[AppBloc] Stacktrace: $s');
       emit(state.copyWith(status: AppStatus.configFetchFailed, appConfig: null, clearAppConfig: true));
     }
   }

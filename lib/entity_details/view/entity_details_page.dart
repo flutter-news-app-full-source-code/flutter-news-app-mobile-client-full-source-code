@@ -322,7 +322,6 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                                       ? (state.entity as Source).id
                                       : null,
                             );
-                            break;
                           case HeadlineImageStyle.smallThumbnail:
                             tile = HeadlineTileImageStart(
                               headline: item,
@@ -338,7 +337,6 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                                       ? (state.entity as Source).id
                                       : null,
                             );
-                            break;
                           case HeadlineImageStyle.largeThumbnail:
                             tile = HeadlineTileImageTop(
                               headline: item,
@@ -354,7 +352,6 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                                       ? (state.entity as Source).id
                                       : null,
                             );
-                            break;
                         }
                         return tile;
                       } else if (item is Ad) {

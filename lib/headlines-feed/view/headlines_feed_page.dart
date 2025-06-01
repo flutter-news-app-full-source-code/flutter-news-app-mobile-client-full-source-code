@@ -230,7 +230,6 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                               extra: item,
                             ),
                           );
-                          break;
                         case HeadlineImageStyle.smallThumbnail:
                           tile = HeadlineTileImageStart(
                             headline: item,
@@ -240,7 +239,6 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                               extra: item,
                             ),
                           );
-                          break;
                         case HeadlineImageStyle.largeThumbnail:
                           tile = HeadlineTileImageTop(
                             headline: item,
@@ -250,7 +248,6 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                               extra: item,
                             ),
                           );
-                          break;
                       }
                       return tile;
                     } else if (item is Ad) {

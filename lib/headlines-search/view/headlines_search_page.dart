@@ -14,7 +14,6 @@ import 'package:ht_main/headlines-search/widgets/category_item_widget.dart';
 import 'package:ht_main/headlines-search/widgets/source_item_widget.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
-import 'package:ht_main/shared/constants/app_spacing.dart';
 import 'package:ht_main/shared/shared.dart'; // Imports new headline tiles
 import 'package:ht_shared/ht_shared.dart'; // Changed to general import
 
@@ -303,7 +302,6 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                                 extra: feedItem,
                               ),
                             );
-                            break;
                           case HeadlineImageStyle.smallThumbnail:
                             tile = HeadlineTileImageStart(
                               headline: feedItem,
@@ -313,7 +311,6 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                                 extra: feedItem,
                               ),
                             );
-                            break;
                           case HeadlineImageStyle.largeThumbnail:
                             tile = HeadlineTileImageTop(
                               headline: feedItem,
@@ -323,7 +320,6 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                                 extra: feedItem,
                               ),
                             );
-                            break;
                         }
                         return tile;
                       } else if (feedItem is Category) {

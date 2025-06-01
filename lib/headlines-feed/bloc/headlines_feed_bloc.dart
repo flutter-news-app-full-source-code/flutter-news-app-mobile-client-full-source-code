@@ -185,10 +185,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   ) async {
     // Determine current filter and cursor based on state
     var currentFilter = const HeadlineFilter();
-    String? currentCursorForFetch = event.cursor;
-    List<FeedItem> currentFeedItems = [];
-    bool isPaginating = false;
-    int currentFeedItemCountForInjector = 0;
+    var currentCursorForFetch = event.cursor;
+    var currentFeedItems = <FeedItem>[];
+    var isPaginating = false;
+    var currentFeedItemCountForInjector = 0;
 
     if (state is HeadlinesFeedLoaded) {
       final loadedState = state as HeadlinesFeedLoaded;
@@ -310,10 +310,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         limit: _headlinesFetchLimit,
       );
 
-      final List<Headline> headlinesToInject = headlineResponse.items;
-      final User? userForInjector = currentUser;
-      final AppConfig configForInjector = appConfig;
-      const int itemCountForInjector = 0;
+      final headlinesToInject = headlineResponse.items;
+      final userForInjector = currentUser;
+      final configForInjector = appConfig;
+      const itemCountForInjector = 0;
 
       final processedFeedItems = _feedInjectorService.injectItems(
         headlines: headlinesToInject,

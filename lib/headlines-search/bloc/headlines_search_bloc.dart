@@ -117,7 +117,6 @@ class HeadlinesSearchBloc
                   _appBloc.state.user?.id != null) {
                 _appBloc.add(AppUserAccountActionShown(userId: _appBloc.state.user!.id));
               }
-              break; 
             case SearchModelType.category:
               response = await _categoryRepository.readAllByQuery(
                 {'q': searchTerm, 'model': modelType.toJson()},
@@ -131,7 +130,7 @@ class HeadlinesSearchBloc
                   cursor: response.cursor,
                 ),
               );
-              break; // Added break
+// Added break
             case SearchModelType.source:
               response = await _sourceRepository.readAllByQuery(
                 {'q': searchTerm, 'model': modelType.toJson()},
@@ -145,7 +144,7 @@ class HeadlinesSearchBloc
                   cursor: response.cursor,
                 ),
               );
-              break; // Added break
+// Added break
           }
         } on HtHttpException catch (e) {
           emit(successState.copyWith(errorMessage: e.message));
@@ -195,21 +194,18 @@ class HeadlinesSearchBloc
             appConfig: appConfig,
             currentFeedItemCount: 0,
           );
-          break;
         case SearchModelType.category:
           rawResponse = await _categoryRepository.readAllByQuery(
             {'q': searchTerm, 'model': modelType.toJson()},
             limit: _limit,
           );
           processedItems = rawResponse.items.cast<FeedItem>();
-          break;
         case SearchModelType.source:
           rawResponse = await _sourceRepository.readAllByQuery(
             {'q': searchTerm, 'model': modelType.toJson()},
             limit: _limit,
           );
           processedItems = rawResponse.items.cast<FeedItem>();
-          break;
       }
       emit(
         HeadlinesSearchSuccess(

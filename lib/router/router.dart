@@ -27,7 +27,6 @@ import 'package:ht_main/headlines-feed/bloc/categories_filter_bloc.dart'; // Imp
 // import 'package:ht_main/headlines-feed/bloc/countries_filter_bloc.dart'; // Import new BLoC - REMOVED
 import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:ht_main/headlines-feed/bloc/sources_filter_bloc.dart'; // Import new BLoC
-import 'package:ht_main/shared/services/feed_injector_service.dart'; // Added
 import 'package:ht_main/headlines-feed/view/category_filter_page.dart';
 // import 'package:ht_main/headlines-feed/view/country_filter_page.dart'; // REMOVED
 import 'package:ht_main/headlines-feed/view/headlines_feed_page.dart';
@@ -45,6 +44,7 @@ import 'package:ht_main/settings/view/language_settings_page.dart'; // Added for
 import 'package:ht_main/settings/view/notification_settings_page.dart'; // Added
 import 'package:ht_main/settings/view/settings_page.dart'; // Added
 import 'package:ht_main/settings/view/theme_settings_page.dart'; // Added for new page
+import 'package:ht_main/shared/services/feed_injector_service.dart'; // Added
 import 'package:ht_shared/ht_shared.dart'; // Shared models, FromJson, ToJson, etc.
 
 /// Creates and configures the GoRouter instance for the application.

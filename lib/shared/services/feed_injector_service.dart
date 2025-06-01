@@ -30,9 +30,9 @@ class FeedInjectorService {
     required AppConfig appConfig,
     int currentFeedItemCount = 0,
   }) {
-    final List<FeedItem> finalFeed = [];
-    bool accountActionInjectedThisBatch = false;
-    int headlinesInThisBatchCount = 0;
+    final finalFeed = <FeedItem>[];
+    var accountActionInjectedThisBatch = false;
+    var headlinesInThisBatchCount = 0;
     final adConfig = appConfig.adConfig;
     final userRole = user?.role ?? UserRole.guestUser;
 
@@ -43,19 +43,15 @@ class FeedInjectorService {
       case UserRole.guestUser:
         adFrequency = adConfig.guestAdFrequency;
         adPlacementInterval = adConfig.guestAdPlacementInterval;
-        break;
       case UserRole.standardUser: // Assuming 'authenticated' maps to standard
         adFrequency = adConfig.authenticatedAdFrequency;
         adPlacementInterval = adConfig.authenticatedAdPlacementInterval;
-        break;
       case UserRole.premiumUser:
         adFrequency = adConfig.premiumAdFrequency;
         adPlacementInterval = adConfig.premiumAdPlacementInterval;
-        break;
       default: // For any other roles, or if UserRole enum expands
         adFrequency = adConfig.guestAdFrequency; // Default to guest ads
         adPlacementInterval = adConfig.guestAdPlacementInterval;
-        break;
     }
 
     // Determine if an AccountAction is due before iterating
@@ -64,7 +60,7 @@ class FeedInjectorService {
       appConfig: appConfig,
     );
 
-    for (int i = 0; i < headlines.length; i++) {
+    for (var i = 0; i < headlines.length; i++) {
       final headline = headlines[i];
       finalFeed.add(headline);
       headlinesInThisBatchCount++;
@@ -139,7 +135,7 @@ class FeedInjectorService {
 
     String title;
     String description;
-    String ctaText = 'Learn More'; 
+    var ctaText = 'Learn More'; 
 
     switch (variant) {
       case 0:
@@ -147,19 +143,16 @@ class FeedInjectorService {
         description =
             'Link your account to enjoy expanded content access, keep your preferences synced, and experience a more streamlined ad display.';
         ctaText = 'Link Account & Explore';
-        break;
       case 1:
         title = 'Personalize Your Experience!';
         description =
             'Secure your settings and reading history across all your devices by linking your account. Enjoy a tailored news journey!';
         ctaText = 'Secure My Preferences';
-        break;
       default: // case 2
         title = 'Get More From Your News!';
         description =
             'Link your account for enhanced content limits, better ad experiences, and ensure your preferences are always with you.';
         ctaText = 'Get Started';
-        break;
     }
 
     return AccountAction(
@@ -181,7 +174,7 @@ class FeedInjectorService {
 
     String title;
     String description;
-    String ctaText = 'Explore Premium'; 
+    var ctaText = 'Explore Premium'; 
 
     switch (variant) {
       case 0:
@@ -189,19 +182,16 @@ class FeedInjectorService {
         description =
             'Go Premium to enjoy our most comprehensive content access, the best ad experience, and many more exclusive perks.';
         ctaText = 'Upgrade Now';
-        break;
       case 1:
         title = 'Elevate Your News Consumption!';
         description =
             'With Premium, your content limits are greatly expanded and you will enjoy our most favorable ad settings. Discover the difference!';
         ctaText = 'Discover Premium Benefits';
-        break;
       default: // case 2
         title = 'Want More Control & Fewer Interruptions?';
         description =
             'Upgrade to Premium for a superior ad experience, massively increased content limits, and a more focused news journey.';
         ctaText = 'Yes, Upgrade Me!';
-        break;
     }
     return AccountAction(
       title: title,

@@ -112,7 +112,12 @@ class HeadlinesSearchBloc
                   cursor: response.cursor,
                 ),
               );
-              break; // Added break
+              // Dispatch event if AccountAction was injected during pagination
+              if (injectedItems.any((item) => item is AccountAction) &&
+                  _appBloc.state.user?.id != null) {
+                _appBloc.add(AppUserAccountActionShown(userId: _appBloc.state.user!.id));
+              }
+              break; 
             case SearchModelType.category:
               response = await _categoryRepository.readAllByQuery(
                 {'q': searchTerm, 'model': modelType.toJson()},
@@ -208,13 +213,19 @@ class HeadlinesSearchBloc
       }
       emit(
         HeadlinesSearchSuccess(
-          items: processedItems, // Changed
+          items: processedItems, 
           hasMore: rawResponse.hasMore,
           cursor: rawResponse.cursor,
           lastSearchTerm: searchTerm,
           selectedModelType: modelType,
         ),
       );
+      // Dispatch event if AccountAction was injected in new search
+      if (modelType == SearchModelType.headline && 
+          processedItems.any((item) => item is AccountAction) &&
+          _appBloc.state.user?.id != null) {
+        _appBloc.add(AppUserAccountActionShown(userId: _appBloc.state.user!.id));
+      }
     } on HtHttpException catch (e) {
       emit(
         HeadlinesSearchFailure(

@@ -133,30 +133,31 @@ class FeedInjectorService {
 
   AccountAction _buildLinkAccountActionVariant(AppConfig appConfig) {
     final prefs = appConfig.userPreferenceLimits;
-    final ads = appConfig.adConfig;
+    // final prefs = appConfig.userPreferenceLimits; // Not using specific numbers
+    // final ads = appConfig.adConfig; // Not using specific numbers
     final variant = _random.nextInt(3);
 
     String title;
     String description;
-    String ctaText = 'Learn More'; // Generic CTA
+    String ctaText = 'Learn More'; 
 
     switch (variant) {
       case 0:
-        title = 'Unlock More Features!';
+        title = 'Unlock Your Full Potential!';
         description =
-            'Link your account to save up to ${prefs.authenticatedSavedHeadlinesLimit} headlines and follow ${prefs.authenticatedFollowedItemsLimit} topics. Plus, enjoy a less frequent ad experience!';
+            'Link your account to enjoy expanded content access, keep your preferences synced, and experience a more streamlined ad display.';
         ctaText = 'Link Account & Explore';
         break;
       case 1:
-        title = 'Keep Your Preferences Safe!';
+        title = 'Personalize Your Experience!';
         description =
-            'By linking your account, your followed items (up to ${prefs.authenticatedFollowedItemsLimit}) and saved articles (up to ${prefs.authenticatedSavedHeadlinesLimit}) are synced across devices.';
+            'Secure your settings and reading history across all your devices by linking your account. Enjoy a tailored news journey!';
         ctaText = 'Secure My Preferences';
         break;
       default: // case 2
-        title = 'Enhance Your News Journey!';
+        title = 'Get More From Your News!';
         description =
-            'Get more out of your feed. Link your account for higher content limits (save ${prefs.authenticatedSavedHeadlinesLimit}, follow ${prefs.authenticatedFollowedItemsLimit}) and see ads less often (currently every ${ads.guestAdFrequency} items, improves with linking).';
+            'Link your account for enhanced content limits, better ad experiences, and ensure your preferences are always with you.';
         ctaText = 'Get Started';
         break;
     }
@@ -174,30 +175,31 @@ class FeedInjectorService {
 
   AccountAction _buildUpgradeAccountActionVariant(AppConfig appConfig) {
     final prefs = appConfig.userPreferenceLimits;
-    final ads = appConfig.adConfig;
+    // final prefs = appConfig.userPreferenceLimits; // Not using specific numbers
+    // final ads = appConfig.adConfig; // Not using specific numbers
     final variant = _random.nextInt(3);
 
     String title;
     String description;
-    String ctaText = 'Explore Premium'; // Generic CTA
+    String ctaText = 'Explore Premium'; 
 
     switch (variant) {
       case 0:
-        title = 'Go Premium for the Ultimate Experience!';
+        title = 'Unlock Our Best Features!';
         description =
-            'Upgrade to enjoy an ad-free feed (or significantly fewer ads: ${ads.premiumAdFrequency} vs ${ads.authenticatedAdFrequency} items), save up to ${prefs.premiumSavedHeadlinesLimit} headlines, and follow ${prefs.premiumFollowedItemsLimit} interests!';
+            'Go Premium to enjoy our most comprehensive content access, the best ad experience, and many more exclusive perks.';
         ctaText = 'Upgrade Now';
         break;
       case 1:
-        title = 'Maximize Your Content Access!';
+        title = 'Elevate Your News Consumption!';
         description =
-            'With Premium, your limits expand! Follow ${prefs.premiumFollowedItemsLimit} sources/categories and save ${prefs.premiumSavedHeadlinesLimit} articles. Experience our best ad settings.';
+            'With Premium, your content limits are greatly expanded and you will enjoy our most favorable ad settings. Discover the difference!';
         ctaText = 'Discover Premium Benefits';
         break;
       default: // case 2
-        title = 'Tired of Ads? Want More Saves?';
+        title = 'Want More Control & Fewer Interruptions?';
         description =
-            'Upgrade to Premium for a superior ad experience (frequency: ${ads.premiumAdFrequency}) and massively increased limits: save ${prefs.premiumSavedHeadlinesLimit} headlines & follow ${prefs.premiumFollowedItemsLimit} items.';
+            'Upgrade to Premium for a superior ad experience, massively increased content limits, and a more focused news journey.';
         ctaText = 'Yes, Upgrade Me!';
         break;
     }
@@ -213,17 +215,17 @@ class FeedInjectorService {
 
   // Placeholder for _getAdToInject
   Ad? _getAdToInject() {
-    // For now, return a placeholder Ad.
+    // For now, return a placeholder Ad, always native.
     // In a real scenario, this would fetch from an ad network or predefined list.
-    final adTypes = AdType.values;
-    final adPlacements = AdPlacement.values;
+    // final adPlacements = AdPlacement.values; // Can still use for variety if needed
 
     return Ad(
       // id is generated by model if not provided
-      imageUrl: 'https://via.placeholder.com/300x250.png/000000/FFFFFF?Text=Placeholder+Ad',
+      imageUrl: 'https://via.placeholder.com/300x100.png/000000/FFFFFF?Text=Native+Placeholder+Ad', // Adjusted placeholder
       targetUrl: 'https://example.com/adtarget',
-      adType: adTypes[_random.nextInt(adTypes.length)],
-      placement: adPlacements[_random.nextInt(adPlacements.length)],
+      adType: AdType.native, // Always native
+      // Default placement or random from native-compatible placements
+      placement: AdPlacement.feedInlineNativeBanner, 
     );
   }
 }

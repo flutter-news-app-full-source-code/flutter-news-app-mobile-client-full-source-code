@@ -150,7 +150,9 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
 
           if (state.status == EntityDetailsStatus.failure && state.entity == null) {
             return FailureStateWidget(
-              message: state.errorMessage ?? l10n.entityDetailsErrorLoading(entityType: entityTypeDisplayNameForTitle),
+              //TODO(fulleni): add entityDetailsErrorLoadingto l10n
+              // message: state.errorMessage ?? l10n.entityDetailsErrorLoading(entityType: entityTypeDisplayNameForTitle),
+              message: state.errorMessage ?? '...',
               onRetry: () => context.read<EntityDetailsBloc>().add(
                     EntityDetailsLoadRequested(
                       entityId: widget.args.entityId,

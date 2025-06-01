@@ -4,9 +4,10 @@ import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ht_data_repository/ht_data_repository.dart'; // Generic Data Repository
+import 'package:ht_main/app/bloc/app_bloc.dart'; // Added
 import 'package:ht_main/headlines-feed/models/headline_filter.dart';
-import 'package:ht_shared/ht_shared.dart'
-    show Headline, HtHttpException; // Shared models and standardized exceptions
+import 'package:ht_main/shared/services/feed_injector_service.dart'; // Added
+import 'package:ht_shared/ht_shared.dart'; // Updated for FeedItem, AppConfig, User
 
 part 'headlines_feed_event.dart';
 part 'headlines_feed_state.dart';
@@ -15,15 +16,21 @@ part 'headlines_feed_state.dart';
 /// Manages the state for the headlines feed feature.
 ///
 /// Handles fetching headlines, applying filters, pagination, and refreshing
-/// the feed using the provided [HtDataRepository].
+/// the feed using the provided [HtDataRepository]. It uses [FeedInjectorService]
+/// to inject ads and account actions into the feed.
 /// {@endtemplate}
 class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   /// {@macro headlines_feed_bloc}
   ///
-  /// Requires a [HtDataRepository<Headline>] to interact with the data layer.
-  HeadlinesFeedBloc({required HtDataRepository<Headline> headlinesRepository})
-    : _headlinesRepository = headlinesRepository,
-      super(HeadlinesFeedInitial()) {
+  /// Requires repositories and services for its operations.
+  HeadlinesFeedBloc({
+    required HtDataRepository<Headline> headlinesRepository,
+    required FeedInjectorService feedInjectorService, // Added
+    required AppBloc appBloc, // Added
+  })  : _headlinesRepository = headlinesRepository,
+        _feedInjectorService = feedInjectorService, // Added
+        _appBloc = appBloc, // Added
+        super(HeadlinesFeedInitial()) {
     on<HeadlinesFeedFetchRequested>(
       _onHeadlinesFeedFetchRequested,
       transformer:
@@ -39,6 +46,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   }
 
   final HtDataRepository<Headline> _headlinesRepository;
+  final FeedInjectorService _feedInjectorService; // Added
+  final AppBloc _appBloc; // Added
 
   /// The number of headlines to fetch per page during pagination or initial load.
   static const _headlinesFetchLimit = 10;
@@ -67,15 +76,32 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
             .join(',');
       }
 
-      final response = await _headlinesRepository.readAllByQuery(
+      final headlineResponse = await _headlinesRepository.readAllByQuery(
         queryParams,
         limit: _headlinesFetchLimit,
       );
+
+      final currentUser = _appBloc.state.user;
+      final appConfig = _appBloc.state.appConfig;
+
+      if (appConfig == null) {
+        // AppConfig is crucial for injection rules.
+        emit(const HeadlinesFeedError(message: 'App configuration not available.'));
+        return;
+      }
+
+      final processedFeedItems = _feedInjectorService.injectItems(
+        headlines: headlineResponse.items,
+        user: currentUser,
+        appConfig: appConfig,
+        currentFeedItemCount: 0, // Initial load for filters
+      );
+
       emit(
         HeadlinesFeedLoaded(
-          headlines: response.items,
-          hasMore: response.hasMore,
-          cursor: response.cursor,
+          feedItems: processedFeedItems, // Changed
+          hasMore: headlineResponse.hasMore, // Based on original headline fetch
+          cursor: headlineResponse.cursor,
           filter: event.filter, // Store the applied filter
         ),
       );
@@ -99,14 +125,30 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     emit(HeadlinesFeedLoading()); // Show loading indicator
     try {
       // Fetch the first page with no filters
-      final response = await _headlinesRepository.readAll(
+      final headlineResponse = await _headlinesRepository.readAll(
         limit: _headlinesFetchLimit,
       );
+
+      final currentUser = _appBloc.state.user;
+      final appConfig = _appBloc.state.appConfig;
+
+      if (appConfig == null) {
+        emit(const HeadlinesFeedError(message: 'App configuration not available.'));
+        return;
+      }
+
+      final processedFeedItems = _feedInjectorService.injectItems(
+        headlines: headlineResponse.items,
+        user: currentUser,
+        appConfig: appConfig,
+        currentFeedItemCount: 0,
+      );
+
       emit(
         HeadlinesFeedLoaded(
-          headlines: response.items,
-          hasMore: response.hasMore,
-          cursor: response.cursor,
+          feedItems: processedFeedItems, // Changed
+          hasMore: headlineResponse.hasMore,
+          cursor: headlineResponse.cursor,
         ),
       );
     } on HtHttpException catch (e) {
@@ -130,42 +172,42 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     Emitter<HeadlinesFeedState> emit,
   ) async {
     // Determine current filter and cursor based on state
-    var currentFilter = const HeadlineFilter(); // Made type explicit
-    var currentCursor = // Made type explicit
-        event.cursor; // Use event's cursor if provided (for pagination)
-    var currentHeadlines = <Headline>[];
-    var isPaginating = false;
+    var currentFilter = const HeadlineFilter();
+    String? currentCursorForFetch = event.cursor;
+    List<FeedItem> currentFeedItems = [];
+    bool isPaginating = false;
+    int currentFeedItemCountForInjector = 0;
 
     if (state is HeadlinesFeedLoaded) {
       final loadedState = state as HeadlinesFeedLoaded;
       currentFilter = loadedState.filter;
-      // Only use state's cursor if event's cursor is null (i.e., not explicit pagination request)
-      currentCursor ??= loadedState.cursor;
-      currentHeadlines = loadedState.headlines;
-      // Check if we should paginate
-      isPaginating = event.cursor != null && loadedState.hasMore;
-      if (isPaginating && state is HeadlinesFeedLoadingSilently) {
-        return; // Avoid concurrent pagination
-      }
-      if (!loadedState.hasMore && event.cursor != null) {
-        return; // Don't fetch if no more items
-      }
-    } else if (state is HeadlinesFeedLoading ||
-        state is HeadlinesFeedLoadingSilently) {
-      // Avoid concurrent fetches if already loading, unless it's explicit pagination
-      if (event.cursor == null) return;
-    }
+      currentFeedItems = loadedState.feedItems;
+      currentFeedItemCountForInjector = loadedState.feedItems.length;
 
-    // Emit appropriate loading state
-    if (isPaginating) {
-      emit(HeadlinesFeedLoadingSilently());
-    } else {
-      // Initial load or load after error/clear
-      emit(HeadlinesFeedLoading());
-      currentHeadlines = []; // Reset headlines on non-pagination fetch
+      if (event.cursor != null) { // Explicit pagination request
+        if (!loadedState.hasMore) return; // No more items to fetch
+        isPaginating = true;
+        currentCursorForFetch = loadedState.cursor; // Use BLoC's cursor for safety
+      } else { // Initial fetch or refresh (event.cursor is null)
+        currentFeedItems = []; // Reset for non-pagination
+        currentFeedItemCountForInjector = 0;
+      }
+    } else if (state is HeadlinesFeedLoading || state is HeadlinesFeedLoadingSilently) {
+      if (event.cursor == null) return; // Avoid concurrent initial fetches
     }
+    // For initial load or if event.cursor is null, currentCursorForFetch remains null.
+
+    emit(isPaginating ? HeadlinesFeedLoadingSilently() : HeadlinesFeedLoading());
 
     try {
+      final currentUser = _appBloc.state.user;
+      final appConfig = _appBloc.state.appConfig;
+
+      if (appConfig == null) {
+        emit(const HeadlinesFeedError(message: 'App configuration not available.'));
+        return;
+      }
+
       final queryParams = <String, dynamic>{};
       if (currentFilter.categories?.isNotEmpty ?? false) {
         queryParams['categories'] = currentFilter.categories!
@@ -178,19 +220,27 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
             .join(',');
       }
 
-      final response = await _headlinesRepository.readAllByQuery(
+      final headlineResponse = await _headlinesRepository.readAllByQuery(
         queryParams,
         limit: _headlinesFetchLimit,
-        startAfterId: currentCursor, // Use determined cursor
+        startAfterId: currentCursorForFetch,
       );
+
+      final newProcessedFeedItems = _feedInjectorService.injectItems(
+        headlines: headlineResponse.items,
+        user: currentUser,
+        appConfig: appConfig,
+        currentFeedItemCount: currentFeedItemCountForInjector,
+      );
+
       emit(
         HeadlinesFeedLoaded(
-          // Append if paginating, otherwise replace
-          headlines:
-              isPaginating ? currentHeadlines + response.items : response.items,
-          hasMore: response.hasMore,
-          cursor: response.cursor,
-          filter: currentFilter, // Preserve the filter
+          feedItems: isPaginating
+              ? (List.of(currentFeedItems)..addAll(newProcessedFeedItems))
+              : newProcessedFeedItems,
+          hasMore: headlineResponse.hasMore,
+          cursor: headlineResponse.cursor,
+          filter: currentFilter,
         ),
       );
     } on HtHttpException catch (e) {
@@ -211,36 +261,53 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   ) async {
     emit(HeadlinesFeedLoading()); // Show loading indicator for refresh
 
-    // Determine the filter currently applied in the state
-    var currentFilter = const HeadlineFilter(); // Made type explicit
+    var currentFilter = const HeadlineFilter();
     if (state is HeadlinesFeedLoaded) {
       currentFilter = (state as HeadlinesFeedLoaded).filter;
     }
 
     try {
-      final queryParams = <String, dynamic>{};
-      if (currentFilter.categories?.isNotEmpty ?? false) {
-        queryParams['categories'] = currentFilter.categories!
-            .map((c) => c.id)
-            .join(',');
-      }
-      if (currentFilter.sources?.isNotEmpty ?? false) {
-        queryParams['sources'] = currentFilter.sources!
-            .map((s) => s.id)
-            .join(',');
+      final currentUser = _appBloc.state.user;
+      final appConfig = _appBloc.state.appConfig;
+
+      if (appConfig == null) {
+        emit(const HeadlinesFeedError(message: 'App configuration not available.'));
+        return;
       }
 
-      // Fetch the first page using the current filter
-      final response = await _headlinesRepository.readAllByQuery(
+      final queryParams = <String, dynamic>{};
+      if (currentFilter.categories?.isNotEmpty ?? false) {
+        queryParams['categories'] =
+            currentFilter.categories!.map((c) => c.id).join(',');
+      }
+      if (currentFilter.sources?.isNotEmpty ?? false) {
+        queryParams['sources'] =
+            currentFilter.sources!.map((s) => s.id).join(',');
+      }
+
+      final headlineResponse = await _headlinesRepository.readAllByQuery(
         queryParams,
         limit: _headlinesFetchLimit,
       );
+
+      final List<Headline> headlinesToInject = headlineResponse.items;
+      final User? userForInjector = currentUser;
+      final AppConfig configForInjector = appConfig;
+      const int itemCountForInjector = 0;
+
+      final processedFeedItems = _feedInjectorService.injectItems(
+        headlines: headlinesToInject,
+        user: userForInjector,
+        appConfig: configForInjector,
+        currentFeedItemCount: itemCountForInjector,
+      );
+
       emit(
         HeadlinesFeedLoaded(
-          headlines: response.items, // Replace headlines on refresh
-          hasMore: response.hasMore,
-          cursor: response.cursor,
-          filter: currentFilter, // Preserve the filter
+          feedItems: processedFeedItems,
+          hasMore: headlineResponse.hasMore,
+          cursor: headlineResponse.cursor,
+          filter: currentFilter,
         ),
       );
     } on HtHttpException catch (e) {

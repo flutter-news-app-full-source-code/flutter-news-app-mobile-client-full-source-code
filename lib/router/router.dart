@@ -75,182 +75,82 @@ GoRouter createRouter({
     debugLogDiagnostics: true, // Enable verbose logging for debugging redirects
     // --- Redirect Logic ---
     redirect: (BuildContext context, GoRouterState state) {
-      // --- Get Current State ---
-      // Safely read the AppBloc state. refreshListenable ensures this runs
-      // within a valid context after AppBloc state changes.
       final appStatus = context.read<AppBloc>().state.status;
-      // The matched route pattern (e.g., '/authentication/email-sign-in').
+      final appConfig = context.read<AppBloc>().state.appConfig; // Get appConfig
       final currentLocation = state.matchedLocation;
-      // The full URI including query parameters (e.g., '/authentication?context=linking').
       final currentUri = state.uri;
 
-      // --- Debug Logging ---
-      // Log current state for easier debugging of redirect behavior.
       print(
         'GoRouter Redirect Check:\n'
         '  Current Location (Matched): $currentLocation\n'
         '  Current URI (Full): $currentUri\n'
-        '  AppStatus: $appStatus',
+        '  AppStatus: $appStatus\n'
+        '  AppConfig isNull: ${appConfig == null}',
       );
 
       // --- Define Key Paths ---
-      // Base paths for major sections.
-      const authenticationPath = Routes.authentication; // '/authentication'
-      const feedPath = Routes.feed; // Updated path constant
-      // Specific authentication sub-routes crucial for the email code verification flow.
-      const requestCodePath =
-          '$authenticationPath/${Routes.requestCode}'; // '/authentication/request-code'
-      const verifyCodePath =
-          '$authenticationPath/${Routes.verifyCode}'; // '/authentication/verify-code'
-
-      // --- Helper Booleans ---
-      // Check if the navigation target is within the authentication section.
+      const authenticationPath = Routes.authentication;
+      const feedPath = Routes.feed;
       final isGoingToAuth = currentLocation.startsWith(authenticationPath);
-      // Check if the navigation target is within the feed section.
-      final isGoingToFeed = currentLocation.startsWith(
-        feedPath,
-      ); // Updated path constant
-      // Check if the navigation target is the *exact* base authentication path.
-      final isGoingToBaseAuthPath = currentLocation == authenticationPath;
-      // Check if the 'context=linking' query parameter is present in the URI.
-      final isLinkingContext =
-          currentUri.queryParameters['context'] == 'linking';
-      // Removed isGoingToSplash check
 
-      // --- Redirect Logic based on AppStatus ---
-
-      // --- Case 0: Initial Loading State ---
-      // While the app is initializing (status is initial), don't redirect.
-      // Let the initial navigation attempt proceed. The refreshListenable
-      // will trigger a redirect check again once the status is known.
-      if (appStatus == AppStatus.initial) {
-        print(
-          '  Redirect Decision: AppStatus is INITIAL. Allowing navigation.',
-        );
-        return null; // Do not redirect during initial phase
-      }
-
-      // --- Case 1: Unauthenticated User (After Initial Load) ---
-      // If the user is unauthenticated...
-      if (appStatus == AppStatus.unauthenticated) {
-        print('  Redirect Decision: User is UNauthenticated (post-initial).');
-        // If the user is NOT already going to an authentication path...
-        if (!isGoingToAuth) {
-          // ...redirect them to the main authentication page to sign in or sign up.
-          print('    Action: Redirecting to $authenticationPath');
+      // --- Case 0: App is Initializing or Config is being fetched/failed ---
+      if (appStatus == AppStatus.initial ||
+          appStatus == AppStatus.configFetching ||
+          appStatus == AppStatus.configFetchFailed) {
+        
+        // If AppStatus is initial and trying to go to a non-auth page (e.g. initial /feed)
+        // redirect to auth immediately to settle auth status first.
+        if (appStatus == AppStatus.initial && !isGoingToAuth) {
+          print(
+            '  Redirect Decision: AppStatus is INITIAL and not going to auth. Redirecting to $authenticationPath to settle auth first.',
+          );
           return authenticationPath;
         }
-        // Otherwise, allow them to stay on the authentication path they are navigating to.
-        print('    Action: Allowing navigation within authentication section.');
-        return null; // Allow access
-      }
-      // --- Case 2: Anonymous User ---
-      else if (appStatus == AppStatus.anonymous) {
-        print('  Redirect Decision: User is ANONYMOUS.');
-
-        // Define search and account paths for clarity
-        const searchPath = Routes.search; // '/search'
-        const accountPath = Routes.account; // '/account'
-
-        // Helper booleans for search and account sections
-        final isGoingToSearch = currentLocation.startsWith(searchPath);
-        final isGoingToAccount = currentLocation.startsWith(accountPath);
-
-        // **Sub-Case 2.1: Navigating to the BASE Authentication Path (`/authentication`)**
-        if (isGoingToBaseAuthPath) {
-          // Allow access ONLY if they are explicitly starting the linking flow
-          // (indicated by the 'context=linking' query parameter).
-          if (isLinkingContext) {
-            print(
-              '    Action: Allowing navigation to BASE auth for account linking.',
-            );
-            return null; // Allow access
-          } else {
-            // Prevent anonymous users from accessing the initial sign-in screen again.
-            // Redirect them to the main content (feed).
-            print(
-              '    Action: Preventing access to initial sign-in, redirecting to $feedPath', // Updated path constant
-            );
-            return feedPath; // Redirect to feed
-          }
-        }
-        // **Sub-Case 2.2: Navigating to Specific Email Code Verification Sub-Routes**
-        // Explicitly allow access to the necessary pages for the email code verification process,
-        // even if the 'context=linking' parameter is lost during navigation between these pages.
-        else if (currentLocation == requestCodePath ||
-            currentLocation.startsWith(verifyCodePath)) {
-          // Use startsWith for parameterized path
-          print(
-            '    Action: Allowing navigation to email code verification sub-route ($currentLocation).',
-          );
-          return null; // Allow access
-        }
-        // **Sub-Case 2.3: Navigating Within the Main App Sections (Feed, Search, Account) or Details Pages**
-        // Allow anonymous users to access the main content sections, their sub-routes, and details pages.
-        else if (isGoingToFeed ||
-            isGoingToSearch ||
-            isGoingToAccount ||
-            currentLocation == Routes.categoryDetails ||
-            currentLocation == Routes.sourceDetails ||
-            currentLocation.startsWith(
-              Routes.globalArticleDetails.split('/:id').first,
-            ) || // Allow global article details
-            currentLocation.startsWith(
-              '${Routes.feed}/${Routes.articleDetailsName.split('/:id').first}',
-            ) ||
-            currentLocation.startsWith(
-              '${Routes.search}/${Routes.searchArticleDetailsName.split('/:id').first}',
-            ) ||
-            currentLocation.startsWith(
-              '${Routes.account}/${Routes.accountSavedHeadlines}/${Routes.accountArticleDetailsName.split('/:id').first}',
-            )) {
-          print(
-            '    Action: Allowing navigation to main app section or details page ($currentLocation).',
-          );
-          return null; // Allow access
-        }
-        // **Sub-Case 2.4: Fallback for Unexpected Paths**
-        // If an anonymous user tries to navigate anywhere else unexpected,
-        // redirect them to the main content feed as a safe default.
-        else {
-          print(
-            '    Action: Unexpected path ($currentLocation), redirecting to $feedPath',
-          );
-          return feedPath; // Redirect to feed
-        }
-      }
-      // --- Case 3: Authenticated User ---
-      else if (appStatus == AppStatus.authenticated) {
-        print('  Redirect Decision: User is AUTHENTICATED.');
-        // If an authenticated user tries to access any part of the authentication flow...
-        if (isGoingToAuth) {
-          // ...redirect them away to the main content feed. They don't need to authenticate again.
-          print(
-            '    Action: Preventing access to authentication section, redirecting to $feedPath', // Updated path constant
-          );
-          return feedPath; // Redirect to feed
-        }
-        // Otherwise, allow authenticated users to access any other part of the app (feed, account, settings, etc.).
+        // For configFetching or configFetchFailed, or initial going to auth,
+        // let the App widget's builder handle the UI (loading/error screen).
         print(
-          '    Action: Allowing navigation to non-auth section ($currentLocation).',
+          '  Redirect Decision: AppStatus is $appStatus. Allowing App widget to handle display or navigation to auth.',
         );
-        return null; // Allow access
-      }
-      // --- Case 4: Fallback (Should not be reached with initial handling) ---
-      // This case is less likely now with explicit initial handling.
-      // If somehow the status is unknown after the initial phase, allow navigation.
-      else {
-        print(
-          '  Redirect Decision: AppStatus is UNEXPECTED ($appStatus). Allowing navigation (fallback).',
-        );
-        return null; // Allow access as a safe default
+        return null; 
       }
 
-      // --- Default: No Redirect (Should not be reached if logic is exhaustive) ---
-      // If none of the above conditions triggered an explicit redirect, allow navigation.
-      // This line should theoretically not be reached if the logic above is exhaustive.
-      // print('  Redirect Decision: No specific redirect condition met. Allowing navigation.');
-      // return null; // Allow access (already covered by the final return null below)
+      // --- Case 1: Unauthenticated User (after initial phase, config not relevant yet for this decision) ---
+      if (appStatus == AppStatus.unauthenticated) {
+        print('  Redirect Decision: User is UNauthenticated.');
+        if (!isGoingToAuth) {
+          print('    Action: Not going to auth. Redirecting to $authenticationPath');
+          return authenticationPath;
+        }
+        print('    Action: Already going to auth. Allowing navigation.');
+        return null;
+      }
+
+      // --- Case 2: Anonymous or Authenticated User ---
+      // (Covers AppStatus.anonymous and AppStatus.authenticated)
+      // At this point, AppConfig should be loaded or its loading/error state is handled by App widget.
+      // The main concern here is preventing authenticated users from re-entering basic auth flows.
+      if (appStatus == AppStatus.anonymous || appStatus == AppStatus.authenticated) {
+        print('  Redirect Decision: User is $appStatus.');
+        
+        final isLinkingContext = currentUri.queryParameters['context'] == 'linking';
+
+        // If an authenticated/anonymous user tries to access the BASE /authentication path
+        // AND it's NOT for account linking, redirect them to the feed.
+        if (currentLocation == authenticationPath && !isLinkingContext) {
+          print(
+            '    Action: $appStatus user trying to access base auth path without linking context. Redirecting to $feedPath',
+          );
+          return feedPath;
+        }
+        
+        // Allow access to other routes (including auth sub-routes if linking, or any other app route)
+        print('    Action: Allowing navigation to $currentLocation for $appStatus user.');
+        return null;
+      }
+
+      // Fallback (should ideally not be reached if all statuses are handled)
+      print('  Redirect Decision: Fallback, no specific condition met for $appStatus. Allowing navigation.');
+      return null;
     },
     // --- Authentication Routes ---
     routes: [
@@ -434,14 +334,14 @@ GoRouter createRouter({
               ),
               BlocProvider(
                 create: (context) {
-                  final feedInjectorService = FeedInjectorService(); // Instantiate
+                  final feedInjectorService =
+                      FeedInjectorService(); // Instantiate
                   return HeadlinesSearchBloc(
                     headlinesRepository:
                         context.read<HtDataRepository<Headline>>(),
                     categoryRepository:
                         context.read<HtDataRepository<Category>>(),
-                    sourceRepository:
-                        context.read<HtDataRepository<Source>>(),
+                    sourceRepository: context.read<HtDataRepository<Source>>(),
                     appBloc: context.read<AppBloc>(), // Provide AppBloc
                     feedInjectorService: feedInjectorService, // Provide Service
                   );

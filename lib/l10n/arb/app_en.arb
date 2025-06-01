@@ -831,5 +831,13 @@
     "headlinesSectionTitle": "Headlines",
     "@headlinesSectionTitle": {
         "description": "Title for the headlines section on details page"
+    },
+    "headlinesFeedFilterApplyFollowedLabel": "Apply my followed categories & sources",
+    "@headlinesFeedFilterApplyFollowedLabel": {
+        "description": "Label for the checkbox to apply followed items as filters"
+    },
+    "mustBeLoggedInToUseFeatureError": "You must be logged in to use this feature.",
+    "@mustBeLoggedInToUseFeatureError": {
+        "description": "Error message shown when a logged-in user is required for a feature"
     }
 }

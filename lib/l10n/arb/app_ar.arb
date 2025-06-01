@@ -808,28 +808,36 @@
     "@similarHeadlinesEmpty": {
         "description": "Message shown when no similar headlines are found"
     },
-    "detailsPageTitle": "[AR] Details",
+    "detailsPageTitle": "التفاصيل",
     "@detailsPageTitle": {
         "description": "Title for the category/source details page"
     },
-    "followButtonLabel": "[AR] Follow",
+    "followButtonLabel": "متابعة",
     "@followButtonLabel": {
         "description": "Label for the follow button"
     },
-    "unfollowButtonLabel": "[AR] Unfollow",
+    "unfollowButtonLabel": "إلغاء المتابعة",
     "@unfollowButtonLabel": {
         "description": "Label for the unfollow button"
     },
-    "noHeadlinesFoundMessage": "[AR] No headlines found for this item.",
+    "noHeadlinesFoundMessage": "لم يتم العثور على عناوين لهذا العنصر.",
     "@noHeadlinesFoundMessage": {
         "description": "Message displayed when no headlines are available for a category/source"
     },
-    "failedToLoadMoreHeadlines": "[AR] Failed to load more headlines.",
+    "failedToLoadMoreHeadlines": "فشل تحميل المزيد من العناوين.",
     "@failedToLoadMoreHeadlines": {
         "description": "Error message when loading more headlines fails on details page"
     },
-    "headlinesSectionTitle": "[AR] Headlines",
+    "headlinesSectionTitle": "العناوين الرئيسية",
     "@headlinesSectionTitle": {
         "description": "Title for the headlines section on details page"
+    },
+    "headlinesFeedFilterApplyFollowedLabel": "تطبيق الفئات والمصادر المتابَعة",
+    "@headlinesFeedFilterApplyFollowedLabel": {
+        "description": "Label for the checkbox to apply followed items as filters"
+    },
+    "mustBeLoggedInToUseFeatureError": "يجب عليك تسجيل الدخول لاستخدام هذه الميزة.",
+    "@mustBeLoggedInToUseFeatureError": {
+        "description": "Error message shown when a logged-in user is required for a feature"
     }
 }

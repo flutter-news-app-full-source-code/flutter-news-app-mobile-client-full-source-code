@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ht_data_repository/ht_data_repository.dart';
-import 'package:ht_main/account/bloc/account_bloc.dart'; // Corrected import
+import 'package:ht_main/account/bloc/account_bloc.dart';
+import 'package:ht_main/app/bloc/app_bloc.dart'; // Added
 import 'package:ht_main/entity_details/models/entity_type.dart';
-import 'package:ht_shared/ht_shared.dart';
+import 'package:ht_main/shared/services/feed_injector_service.dart'; // Added
+import 'package:ht_shared/ht_shared.dart'; // Ensures FeedItem, AppConfig, User are available
 
 part 'entity_details_event.dart';
 part 'entity_details_state.dart';
@@ -15,12 +17,16 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     required HtDataRepository<Headline> headlinesRepository,
     required HtDataRepository<Category> categoryRepository,
     required HtDataRepository<Source> sourceRepository,
-    required AccountBloc accountBloc, // Changed to AccountBloc
-  }) : _headlinesRepository = headlinesRepository,
-       _categoryRepository = categoryRepository,
-       _sourceRepository = sourceRepository,
-       _accountBloc = accountBloc,
-       super(const EntityDetailsState()) {
+    required AccountBloc accountBloc,
+    required AppBloc appBloc, // Added
+    required FeedInjectorService feedInjectorService, // Added
+  })  : _headlinesRepository = headlinesRepository,
+        _categoryRepository = categoryRepository,
+        _sourceRepository = sourceRepository,
+        _accountBloc = accountBloc,
+        _appBloc = appBloc, // Added
+        _feedInjectorService = feedInjectorService, // Added
+        super(const EntityDetailsState()) {
     on<EntityDetailsLoadRequested>(_onEntityDetailsLoadRequested);
     on<EntityDetailsToggleFollowRequested>(
       _onEntityDetailsToggleFollowRequested,
@@ -43,10 +49,12 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
   final HtDataRepository<Headline> _headlinesRepository;
   final HtDataRepository<Category> _categoryRepository;
   final HtDataRepository<Source> _sourceRepository;
-  final AccountBloc _accountBloc; // Changed to AccountBloc
+  final AccountBloc _accountBloc;
+  final AppBloc _appBloc; // Added
+  final FeedInjectorService _feedInjectorService; // Added
   late final StreamSubscription<AccountState> _accountBlocSubscription;
 
-  static const _headlinesLimit = 10;
+  static const _headlinesLimit = 10; // For fetching original headlines
 
   Future<void> _onEntityDetailsLoadRequested(
     EntityDetailsLoadRequested event,
@@ -101,9 +109,31 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         queryParams['sources'] = (entityToLoad as Source).id;
       }
 
-      final headlinesResponse = await _headlinesRepository.readAllByQuery(
+      final headlineResponse = await _headlinesRepository.readAllByQuery(
         queryParams,
         limit: _headlinesLimit,
+      );
+
+      final currentUser = _appBloc.state.user;
+      final appConfig = _appBloc.state.appConfig;
+
+      if (appConfig == null) {
+        emit(
+          state.copyWith(
+            status: EntityDetailsStatus.failure,
+            errorMessage: 'App configuration not available.',
+            entityType: entityTypeToLoad,
+            entity: entityToLoad,
+          ),
+        );
+        return;
+      }
+
+      final processedFeedItems = _feedInjectorService.injectItems(
+        headlines: headlineResponse.items,
+        user: currentUser,
+        appConfig: appConfig,
+        currentFeedItemCount: 0, // Initial load for this entity's feed
       );
 
       // 3. Determine isFollowing status
@@ -131,10 +161,10 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
           entityType: entityTypeToLoad,
           entity: entityToLoad,
           isFollowing: isCurrentlyFollowing,
-          headlines: headlinesResponse.items,
+          feedItems: processedFeedItems, // Changed
           headlinesStatus: EntityHeadlinesStatus.success,
-          hasMoreHeadlines: headlinesResponse.hasMore,
-          headlinesCursor: headlinesResponse.cursor,
+          hasMoreHeadlines: headlineResponse.hasMore, // Based on original headlines
+          headlinesCursor: headlineResponse.cursor,
           clearErrorMessage: true,
         ),
       );
@@ -203,7 +233,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     EntityDetailsLoadMoreHeadlinesRequested event,
     Emitter<EntityDetailsState> emit,
   ) async {
-    if (!state.hasMoreHeadlines ||
+    if (!state.hasMoreHeadlines || // Still refers to original headlines pagination
         state.headlinesStatus == EntityHeadlinesStatus.loadingMore) {
       return;
     }
@@ -218,7 +248,6 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       } else if (state.entityType == EntityType.source) {
         queryParams['sources'] = (state.entity as Source).id;
       } else {
-        // Should not happen
         emit(
           state.copyWith(
             headlinesStatus: EntityHeadlinesStatus.failure,
@@ -228,19 +257,39 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         return;
       }
 
-      final headlinesResponse = await _headlinesRepository.readAllByQuery(
+      final headlineResponse = await _headlinesRepository.readAllByQuery(
         queryParams,
         limit: _headlinesLimit,
-        startAfterId: state.headlinesCursor,
+        startAfterId: state.headlinesCursor, // Cursor for original headlines
+      );
+
+      final currentUser = _appBloc.state.user;
+      final appConfig = _appBloc.state.appConfig;
+
+      if (appConfig == null) {
+        emit(
+          state.copyWith(
+            headlinesStatus: EntityHeadlinesStatus.failure,
+            errorMessage: 'App configuration not available for pagination.',
+          ),
+        );
+        return;
+      }
+      
+      final newProcessedFeedItems = _feedInjectorService.injectItems(
+        headlines: headlineResponse.items,
+        user: currentUser,
+        appConfig: appConfig,
+        currentFeedItemCount: state.feedItems.length, // Pass current total
       );
 
       emit(
         state.copyWith(
-          headlines: List.of(state.headlines)..addAll(headlinesResponse.items),
+          feedItems: List.of(state.feedItems)..addAll(newProcessedFeedItems), // Changed
           headlinesStatus: EntityHeadlinesStatus.success,
-          hasMoreHeadlines: headlinesResponse.hasMore,
-          headlinesCursor: headlinesResponse.cursor,
-          clearHeadlinesCursor: !headlinesResponse.hasMore, // Clear if no more
+          hasMoreHeadlines: headlineResponse.hasMore, // Based on original headlines
+          headlinesCursor: headlineResponse.cursor,
+          clearHeadlinesCursor: !headlineResponse.hasMore,
         ),
       );
     } on HtHttpException catch (e) {

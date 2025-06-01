@@ -22,105 +22,122 @@ class AccountPage extends StatelessWidget {
     // Watch AppBloc for user details and authentication status
     final appState = context.watch<AppBloc>().state;
     final user = appState.user;
-    final status = appState.status; // Use AppStatus from AppBloc state
-
-    // Determine if the user is anonymous
-    final isAnonymous =
-        status == AppStatus.anonymous; // Use AppStatus.anonymous
+    final status = appState.status;
+    final isAnonymous = status == AppStatus.anonymous;
+    final theme = Theme.of(context); // Get theme for AppBar
+    final textTheme = theme.textTheme; // Get textTheme for AppBar
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.accountPageTitle)),
+      appBar: AppBar(
+        title: Text(
+          l10n.accountPageTitle,
+          style: textTheme.titleLarge, // Consistent AppBar title style
+        ),
+      ),
       body: ListView(
-        // Use ListView for potential scrolling if content grows
-        padding: const EdgeInsets.all(AppSpacing.lg), // Use AppSpacing
+        padding: const EdgeInsets.all(AppSpacing.paddingMedium), // Adjusted padding
         children: [
-          // --- User Header ---
           _buildUserHeader(context, user, isAnonymous),
-          const SizedBox(height: AppSpacing.xl), // Use AppSpacing
-          // --- Action Tiles ---
-          // Content Preferences Tile
+          const SizedBox(height: AppSpacing.lg), // Adjusted spacing
           ListTile(
-            leading: const Icon(Icons.tune_outlined),
-            title: Text(l10n.accountContentPreferencesTile),
+            leading: Icon(Icons.tune_outlined, color: theme.colorScheme.primary),
+            title: Text(
+              l10n.accountContentPreferencesTile,
+              style: textTheme.titleMedium,
+            ),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              context.goNamed(Routes.manageFollowedItemsName); // Updated route
+              context.goNamed(Routes.manageFollowedItemsName);
             },
           ),
-          const Divider(), // Divider after Content Preferences
-          // Saved Headlines Tile
+          const Divider(indent: AppSpacing.paddingMedium, endIndent: AppSpacing.paddingMedium),
           ListTile(
-            leading: const Icon(Icons.bookmark_outline),
-            title: Text(l10n.accountSavedHeadlinesTile),
+            leading: Icon(Icons.bookmark_outline, color: theme.colorScheme.primary),
+            title: Text(
+              l10n.accountSavedHeadlinesTile,
+              style: textTheme.titleMedium,
+            ),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
               context.goNamed(Routes.accountSavedHeadlinesName);
             },
           ),
-          const Divider(), // Divider after Saved Headlines
-          // Settings Tile
+          const Divider(indent: AppSpacing.paddingMedium, endIndent: AppSpacing.paddingMedium),
           _buildSettingsTile(context),
-          const Divider(), // Divider after settings
+          const Divider(indent: AppSpacing.paddingMedium, endIndent: AppSpacing.paddingMedium),
         ],
       ),
     );
   }
 
-  /// Builds the header section displaying user avatar, name, and status.
   Widget _buildUserHeader(BuildContext context, User? user, bool isAnonymous) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
+    final colorScheme = theme.colorScheme; // Get colorScheme
 
-    // Use a generic icon for the avatar
-    const avatarIcon = Icon(Icons.person, size: 40);
+    final avatarIcon = Icon(
+      Icons.person_outline, // Use outlined version
+      size: AppSpacing.xxl, // Standardized size
+      color: colorScheme.onPrimaryContainer,
+    );
 
-    // Determine display name and status text
     final String displayName;
     final Widget statusWidget;
 
     if (isAnonymous) {
       displayName = l10n.accountAnonymousUser;
       statusWidget = Padding(
-        padding: const EdgeInsets.only(top: AppSpacing.sm),
-        child: TextButton(
+        padding: const EdgeInsets.only(top: AppSpacing.md), // Increased padding
+        child: ElevatedButton.icon( // Changed to ElevatedButton
+          icon: const Icon(Icons.link_outlined),
+          label: Text(l10n.accountSignInPromptButton),
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.lg, vertical: AppSpacing.sm,
+            ),
+            textStyle: textTheme.labelLarge,
+          ),
           onPressed: () {
-            // Navigate to the authentication page in linking mode
             context.goNamed(
               Routes.authenticationName,
               queryParameters: {'context': 'linking'},
             );
           },
-          child: Text(l10n.accountSignInPromptButton),
         ),
       );
     } else {
-      // For authenticated users, display email and role
       displayName = user?.email ?? l10n.accountNoNameUser;
       statusWidget = Column(
+        mainAxisSize: MainAxisSize.min, // To keep column tight
         children: [
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            l10n.accountRoleLabel(user?.role.name ?? 'unknown'), // Display role
-            style: textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+          if (user?.role != null) ...[ // Show role only if available
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              l10n.accountRoleLabel(user!.role.name),
+              style: textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          OutlinedButton(
+          ],
+          const SizedBox(height: AppSpacing.md), // Consistent spacing
+          OutlinedButton.icon( // Changed to OutlinedButton.icon
+            icon: Icon(Icons.logout, color: colorScheme.error),
+            label: Text(l10n.accountSignOutTile),
             style: OutlinedButton.styleFrom(
-              foregroundColor: theme.colorScheme.error,
-              side: BorderSide(color: theme.colorScheme.error),
+              foregroundColor: colorScheme.error,
+              side: BorderSide(color: colorScheme.error.withOpacity(0.5)),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg, vertical: AppSpacing.sm,
+              ),
+              textStyle: textTheme.labelLarge,
             ),
             onPressed: () {
-              // Dispatch AuthenticationSignOutRequested from Auth Bloc
-              context.read<AuthenticationBloc>().add(
-                const AuthenticationSignOutRequested(),
-              );
-              // Global redirect will be handled by AppBloc/GoRouter
+              context
+                  .read<AuthenticationBloc>()
+                  .add(const AuthenticationSignOutRequested());
             },
-            child: Text(l10n.accountSignOutTile),
           ),
         ],
       );
@@ -129,30 +146,31 @@ class AccountPage extends StatelessWidget {
     return Column(
       children: [
         CircleAvatar(
-          radius: 40,
-          backgroundColor: theme.colorScheme.primaryContainer,
+          radius: AppSpacing.xxl - AppSpacing.sm, // Standardized radius (40)
+          backgroundColor: colorScheme.primaryContainer,
           child: avatarIcon,
         ),
-        const SizedBox(height: AppSpacing.lg), // Use AppSpacing
+        const SizedBox(height: AppSpacing.md), // Adjusted spacing
         Text(
           displayName,
-          style: textTheme.titleLarge,
+          style: textTheme.headlineSmall, // More prominent style
           textAlign: TextAlign.center,
         ),
-        statusWidget, // Display sign-in button or role/logout button
+        statusWidget,
       ],
     );
   }
 
-  /// Builds the ListTile for navigating to Settings.
   Widget _buildSettingsTile(BuildContext context) {
     final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+
     return ListTile(
-      leading: const Icon(Icons.settings_outlined),
-      title: Text(l10n.accountSettingsTile),
+      leading: Icon(Icons.settings_outlined, color: theme.colorScheme.primary),
+      title: Text(l10n.accountSettingsTile, style: textTheme.titleMedium),
       trailing: const Icon(Icons.chevron_right),
       onTap: () {
-        // Navigate to the existing settings route
         context.goNamed(Routes.settingsName);
       },
     );

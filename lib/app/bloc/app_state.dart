@@ -28,6 +28,7 @@ class AppState extends Equatable {
     this.status = AppStatus.initial,
     this.user, // User is now nullable and defaults to null
     this.locale, // Added locale
+    this.appConfig, // Added AppConfig
   });
 
   /// The index of the currently selected item in the bottom navigation bar.
@@ -58,6 +59,9 @@ class AppState extends Equatable {
   /// The current application locale.
   final Locale? locale; // Added locale
 
+  /// The global application configuration (remote config).
+  final AppConfig? appConfig; // Added AppConfig
+
   /// Creates a copy of the current state with updated values.
   AppState copyWith({
     int? selectedBottomNavigationIndex,
@@ -69,8 +73,10 @@ class AppState extends Equatable {
     User? user,
     UserAppSettings? settings, // Add settings to copyWith
     Locale? locale, // Added locale
+    AppConfig? appConfig, // Added AppConfig
     bool clearFontFamily = false,
     bool clearLocale = false, // Added to allow clearing locale
+    bool clearAppConfig = false, // Added to allow clearing appConfig
   }) {
     return AppState(
       selectedBottomNavigationIndex:
@@ -83,6 +89,7 @@ class AppState extends Equatable {
       user: user ?? this.user,
       settings: settings ?? this.settings, // Copy settings
       locale: clearLocale ? null : locale ?? this.locale, // Added locale
+      appConfig: clearAppConfig ? null : appConfig ?? this.appConfig, // Added
     );
   }
 
@@ -97,5 +104,6 @@ class AppState extends Equatable {
     user,
     settings, // Include settings in props
     locale, // Added locale to props
+    appConfig, // Added AppConfig to props
   ];
 }

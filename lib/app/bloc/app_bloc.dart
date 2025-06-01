@@ -15,18 +15,23 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   AppBloc({
     required HtAuthRepository authenticationRepository,
     required HtDataRepository<UserAppSettings> userAppSettingsRepository,
-  }) : _authenticationRepository = authenticationRepository,
-       _userAppSettingsRepository = userAppSettingsRepository,
-       // Initialize with default state, load settings after user is known
-       // Provide a default UserAppSettings instance
-       super(
-         const AppState(
-           settings: UserAppSettings(id: 'default'),
-           selectedBottomNavigationIndex: 0,
-         ),
-       ) {
+    required HtDataRepository<AppConfig> appConfigRepository, // Added
+  })  : _authenticationRepository = authenticationRepository,
+        _userAppSettingsRepository = userAppSettingsRepository,
+        _appConfigRepository = appConfigRepository, // Added
+        // Initialize with default state, load settings after user is known
+        // Provide a default UserAppSettings instance
+        super(
+          // AppConfig will be null initially, fetched later
+          const AppState(
+            settings: UserAppSettings(id: 'default'),
+            selectedBottomNavigationIndex: 0,
+            appConfig: null, 
+          ),
+        ) {
     on<AppUserChanged>(_onAppUserChanged);
     on<AppSettingsRefreshed>(_onAppSettingsRefreshed);
+    on<_AppConfigFetchRequested>(_onAppConfigFetchRequested); // Added
     on<AppLogoutRequested>(_onLogoutRequested);
     on<AppThemeModeChanged>(_onThemeModeChanged);
     on<AppFlexSchemeChanged>(_onFlexSchemeChanged);
@@ -41,6 +46,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   final HtAuthRepository _authenticationRepository;
   final HtDataRepository<UserAppSettings> _userAppSettingsRepository;
+  final HtDataRepository<AppConfig> _appConfigRepository; // Added
   late final StreamSubscription<User?> _userSubscription;
 
   /// Handles user changes and loads initial settings once user is available.
@@ -67,6 +73,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     if (event.user != null) {
       add(const AppSettingsRefreshed());
     }
+    // Fetch AppConfig regardless of user, as it's global config
+    // Or fetch it once at BLoC initialization if it doesn't depend on user at all.
+    // For now, fetching after user ensures some app state is set.
+    add(const _AppConfigFetchRequested());
   }
 
   /// Handles refreshing/loading app settings (theme, font).
@@ -284,5 +294,34 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   Future<void> close() {
     _userSubscription.cancel();
     return super.close();
+  }
+
+  Future<void> _onAppConfigFetchRequested(
+    _AppConfigFetchRequested event,
+    Emitter<AppState> emit,
+  ) async {
+    // Avoid refetching if already loaded, unless a refresh mechanism is added
+    if (state.appConfig != null && state.status != AppStatus.initial) return;
+
+    try {
+      final appConfig = await _appConfigRepository.read(id: 'app_config');
+      emit(state.copyWith(appConfig: appConfig));
+    } on NotFoundException {
+      // If AppConfig is not found on the backend, use a local default.
+      // The AppConfig model has default values for its nested configurations.
+      emit(state.copyWith(appConfig: const AppConfig(id: 'app_config')));
+      // Optionally, one might want to log this or attempt to create it on backend.
+      print(
+        '[AppBloc] AppConfig not found on backend, using local default.',
+      );
+    } on HtHttpException catch (e) {
+      // Failed to fetch AppConfig, log error. App might be partially functional.
+      print('[AppBloc] Failed to fetch AppConfig: ${e.message}');
+      // Emit state with null appConfig or keep existing if partially loaded before
+      emit(state.copyWith(appConfig: null, clearAppConfig: true));
+    } catch (e) {
+      print('[AppBloc] Unexpected error fetching AppConfig: $e');
+      emit(state.copyWith(appConfig: null, clearAppConfig: true));
+    }
   }
 }

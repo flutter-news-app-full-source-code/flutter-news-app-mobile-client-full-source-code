@@ -168,6 +168,12 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
           clearErrorMessage: true,
         ),
       );
+
+      // Dispatch event if AccountAction was injected in the initial load
+      if (processedFeedItems.any((item) => item is AccountAction) &&
+          _appBloc.state.user?.id != null) {
+        _appBloc.add(AppUserAccountActionShown(userId: _appBloc.state.user!.id));
+      }
     } on HtHttpException catch (e) {
       emit(
         state.copyWith(
@@ -292,6 +298,12 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
           clearHeadlinesCursor: !headlineResponse.hasMore,
         ),
       );
+
+      // Dispatch event if AccountAction was injected in the newly loaded items
+      if (newProcessedFeedItems.any((item) => item is AccountAction) &&
+          _appBloc.state.user?.id != null) {
+        _appBloc.add(AppUserAccountActionShown(userId: _appBloc.state.user!.id));
+      }
     } on HtHttpException catch (e) {
       emit(
         state.copyWith(

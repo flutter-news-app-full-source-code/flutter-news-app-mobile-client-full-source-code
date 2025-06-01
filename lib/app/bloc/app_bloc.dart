@@ -31,7 +31,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         ) {
     on<AppUserChanged>(_onAppUserChanged);
     on<AppSettingsRefreshed>(_onAppSettingsRefreshed);
-    on<_AppConfigFetchRequested>(_onAppConfigFetchRequested); // Added
+    on<_AppConfigFetchRequested>(_onAppConfigFetchRequested);
+    on<AppUserAccountActionShown>(_onAppUserAccountActionShown); // Added
     on<AppLogoutRequested>(_onLogoutRequested);
     on<AppThemeModeChanged>(_onThemeModeChanged);
     on<AppFlexSchemeChanged>(_onFlexSchemeChanged);
@@ -322,6 +323,38 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     } catch (e) {
       print('[AppBloc] Unexpected error fetching AppConfig: $e');
       emit(state.copyWith(appConfig: null, clearAppConfig: true));
+    }
+  }
+
+  Future<void> _onAppUserAccountActionShown(
+    AppUserAccountActionShown event,
+    Emitter<AppState> emit,
+  ) async {
+    if (state.user != null && state.user!.id == event.userId) {
+      final now = DateTime.now();
+      // Optimistically update the local user state.
+      // Corrected parameter name for copyWith as per User model in models.txt
+      final updatedUser = state.user!.copyWith(lastEngagementShownAt: now); 
+      
+      // Emit the change so UI can react if needed, and other BLoCs get the update.
+      // This also ensures that FeedInjectorService will see the updated timestamp immediately.
+      emit(state.copyWith(user: updatedUser));
+
+      // TODO: Persist this change to the backend.
+      // This would typically involve calling a method on a repository, e.g.:
+      // try {
+      //   await _authenticationRepository.updateUserLastActionTimestamp(event.userId, now);
+      //   // If the repository's authStateChanges stream doesn't automatically emit
+      //   // the updated user, you might need to re-fetch or handle it here.
+      //   // For now, we've optimistically updated the local state.
+      // } catch (e) {
+      //   // Handle error, potentially revert optimistic update or show an error.
+      //   print('Failed to update lastAccountActionShownAt on backend: $e');
+      //   // Optionally revert: emit(state.copyWith(user: state.user)); // Reverts to original
+      // }
+      print(
+        '[AppBloc] User ${event.userId} AccountAction shown. Last shown timestamp updated locally to $now. Backend update pending.',
+      );
     }
   }
 }

@@ -70,10 +70,12 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       final currentFilter = headlinesFeedState.filter;
       _tempSelectedCategories = List.from(currentFilter.categories ?? []);
       _tempSelectedSources = List.from(currentFilter.sources ?? []);
-      _tempSelectedSourceCountryIsoCodes =
-          Set.from(currentFilter.selectedSourceCountryIsoCodes ?? {});
-      _tempSelectedSourceSourceTypes =
-          Set.from(currentFilter.selectedSourceSourceTypes ?? {});
+      _tempSelectedSourceCountryIsoCodes = Set.from(
+        currentFilter.selectedSourceCountryIsoCodes ?? {},
+      );
+      _tempSelectedSourceSourceTypes = Set.from(
+        currentFilter.selectedSourceSourceTypes ?? {},
+      );
 
       // Use the new flag from the filter to set the checkbox state
       initialUseFollowedFilters = currentFilter.isFromFollowedItems;
@@ -161,12 +163,14 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       }
     } on NotFoundException {
       setState(() {
-        _currentUserPreferences =
-            UserContentPreferences(id: currentUser.id); // Empty prefs
+        _currentUserPreferences = UserContentPreferences(
+          id: currentUser.id,
+        ); // Empty prefs
         _tempSelectedCategories = [];
         _tempSelectedSources = [];
         _isLoadingFollowedFilters = false;
-        _useFollowedFilters = false; // Uncheck as no prefs found (implies no followed)
+        _useFollowedFilters =
+            false; // Uncheck as no prefs found (implies no followed)
       });
       if (mounted) {
         ScaffoldMessenger.of(context)
@@ -182,8 +186,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       setState(() {
         _isLoadingFollowedFilters = false;
         _useFollowedFilters = false; // Uncheck the box
-        _loadFollowedFiltersError =
-            e.message; // Or a generic "Failed to load"
+        _loadFollowedFiltersError = e.message; // Or a generic "Failed to load"
       });
     } catch (e) {
       setState(() {
@@ -238,17 +241,18 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       subtitle: Text(subtitle),
       trailing: const Icon(Icons.chevron_right),
       enabled: enabled, // Use the enabled parameter
-      onTap: enabled // Only allow tap if enabled
-          ? () async {
-              final result = await context.pushNamed<dynamic>(
-                routeName,
-                extra: currentSelectionData, // Pass the map or list
-              );
-              if (result != null && onResult != null) {
-                onResult(result);
+      onTap:
+          enabled // Only allow tap if enabled
+              ? () async {
+                final result = await context.pushNamed<dynamic>(
+                  routeName,
+                  extra: currentSelectionData, // Pass the map or list
+                );
+                if (result != null && onResult != null) {
+                  onResult(result);
+                }
               }
-            }
-          : null,
+              : null,
     );
   }
 
@@ -271,8 +275,8 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
             tooltip: l10n.headlinesFeedFilterResetButton,
             onPressed: () {
               context.read<HeadlinesFeedBloc>().add(
-                    HeadlinesFeedFiltersCleared(),
-                  );
+                HeadlinesFeedFiltersCleared(),
+              );
               // Also reset local state for the checkbox
               setState(() {
                 _useFollowedFilters = false;
@@ -288,12 +292,14 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
             tooltip: l10n.headlinesFeedFilterApplyButton,
             onPressed: () {
               final newFilter = HeadlineFilter(
-                categories: _tempSelectedCategories.isNotEmpty
-                    ? _tempSelectedCategories
-                    : null,
-                sources: _tempSelectedSources.isNotEmpty
-                    ? _tempSelectedSources
-                    : null,
+                categories:
+                    _tempSelectedCategories.isNotEmpty
+                        ? _tempSelectedCategories
+                        : null,
+                sources:
+                    _tempSelectedSources.isNotEmpty
+                        ? _tempSelectedSources
+                        : null,
                 selectedSourceCountryIsoCodes:
                     _tempSelectedSourceCountryIsoCodes.isNotEmpty
                         ? _tempSelectedSourceCountryIsoCodes
@@ -302,12 +308,11 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
                     _tempSelectedSourceSourceTypes.isNotEmpty
                         ? _tempSelectedSourceSourceTypes
                         : null,
-                isFromFollowedItems:
-                    _useFollowedFilters, // Set the new flag
+                isFromFollowedItems: _useFollowedFilters, // Set the new flag
               );
               context.read<HeadlinesFeedBloc>().add(
-                    HeadlinesFeedFiltersApplied(filter: newFilter),
-                  );
+                HeadlinesFeedFiltersApplied(filter: newFilter),
+              );
               context.pop();
             },
           ),
@@ -335,13 +340,14 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
                   }
                 });
               },
-              secondary: _isLoadingFollowedFilters
-                  ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : null,
+              secondary:
+                  _isLoadingFollowedFilters
+                      ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                      : null,
               controlAffinity: ListTileControlAffinity.leading,
             ),
           ),

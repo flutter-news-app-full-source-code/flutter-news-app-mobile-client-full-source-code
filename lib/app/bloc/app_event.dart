@@ -91,3 +91,11 @@ class AppTextScaleFactorChanged extends AppEvent {
   @override
   List<Object?> get props => [appTextScaleFactor];
 }
+
+/// {@template _app_config_fetch_requested}
+/// Internal event to trigger fetching of the global AppConfig.
+/// {@endtemplate}
+class _AppConfigFetchRequested extends AppEvent {
+  /// {@macro _app_config_fetch_requested}
+  const _AppConfigFetchRequested();
+}

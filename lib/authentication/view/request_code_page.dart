@@ -42,6 +42,7 @@ class _RequestCodeView extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme; // Added textTheme
 
     return Scaffold(
       appBar: AppBar(
@@ -106,27 +107,29 @@ class _RequestCodeView extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // --- Hardcoded Icon ---
+                      // --- Icon ---
                       Padding(
-                        padding: const EdgeInsets.only(
-                          bottom: AppSpacing.xl,
-                        ), // Spacing below icon
+                        padding: const EdgeInsets.only(bottom: AppSpacing.xl),
                         child: Icon(
-                          Icons.email_outlined, // Hardcoded icon
-                          size:
-                              (Theme.of(context).iconTheme.size ??
-                                  AppSpacing.xl) *
-                              3.0,
-                          color: Theme.of(context).colorScheme.primary,
+                          Icons.email_outlined,
+                          size: AppSpacing.xxl * 2, // Standardized large icon
+                          color: colorScheme.primary,
                         ),
                       ),
-                      const SizedBox(
-                        height: AppSpacing.lg,
-                      ), // Space between icon and text
+                      // const SizedBox(height: AppSpacing.lg), // Removed
                       // --- Explanation Text ---
                       Text(
-                        l10n.emailSignInExplanation,
-                        style: Theme.of(context).textTheme.bodyLarge,
+                        l10n.requestCodePageHeadline, // Using a more title-like l10n key
+                        style: textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      Text(
+                        l10n.requestCodePageSubheadline, // Using a more descriptive subheadline
+                        style: textTheme.bodyLarge
+                            ?.copyWith(color: colorScheme.onSurfaceVariant),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: AppSpacing.xxl),
@@ -177,6 +180,8 @@ class _EmailLinkFormState extends State<_EmailLinkForm> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme; // Added textTheme
+    final colorScheme = Theme.of(context).colorScheme; // Added colorScheme
 
     return Form(
       key: _formKey,
@@ -186,9 +191,9 @@ class _EmailLinkFormState extends State<_EmailLinkForm> {
           TextFormField(
             controller: _emailController,
             decoration: InputDecoration(
-              labelText: l10n.authenticationEmailLabel,
-              border: const OutlineInputBorder(),
-              // Consider adding hint text if needed
+              labelText: l10n.requestCodeEmailLabel, // More specific label
+              hintText: l10n.requestCodeEmailHint, // Added hint text
+              // border: const OutlineInputBorder(), // Uses theme default
             ),
             keyboardType: TextInputType.emailAddress,
             autocorrect: false,
@@ -206,14 +211,20 @@ class _EmailLinkFormState extends State<_EmailLinkForm> {
           const SizedBox(height: AppSpacing.lg),
           ElevatedButton(
             onPressed: widget.isLoading ? null : _submitForm,
-            child:
-                widget.isLoading
-                    ? const SizedBox(
-                      height: 24,
-                      width: 24,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                    : Text(l10n.authenticationSendLinkButton),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+              textStyle: textTheme.labelLarge,
+            ),
+            child: widget.isLoading
+                ? SizedBox(
+                    height: AppSpacing.xl, // Consistent size with text
+                    width: AppSpacing.xl,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: colorScheme.onPrimary, // Color for loader on button
+                    ),
+                  )
+                : Text(l10n.requestCodeSendCodeButton), // More specific button text
           ),
         ],
       ),

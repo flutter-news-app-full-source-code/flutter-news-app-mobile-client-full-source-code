@@ -843,5 +843,73 @@
     "noFollowedItemsForFilterSnackbar": "You are not following any categories or sources to apply as a filter.",
     "@noFollowedItemsForFilterSnackbar": {
         "description": "Snackbar message shown when user tries to apply followed filters but has none."
+    },
+    "requestCodePageHeadline": "Enter Your Email",
+    "@requestCodePageHeadline": {
+        "description": "Headline for the request code page"
+    },
+    "requestCodePageSubheadline": "We'll send a secure code to your email to verify your identity.",
+    "@requestCodePageSubheadline": {
+        "description": "Subheadline for the request code page"
+    },
+    "requestCodeEmailLabel": "Email Address",
+    "@requestCodeEmailLabel": {
+        "description": "Label for the email input on the request code page"
+    },
+    "requestCodeEmailHint": "you@example.com",
+    "@requestCodeEmailHint": {
+        "description": "Hint text for the email input on the request code page"
+    },
+    "requestCodeSendCodeButton": "Send Code",
+    "@requestCodeSendCodeButton": {
+        "description": "Button text to send the verification code"
+    },
+    "entityDetailsCategoryTitle": "Category",
+    "@entityDetailsCategoryTitle": {
+        "description": "Title for category entity type"
+    },
+    "entityDetailsSourceTitle": "Source",
+    "@entityDetailsSourceTitle": {
+        "description": "Title for source entity type"
+    },
+    "entityDetailsCountryTitle": "Country",
+    "@entityDetailsCountryTitle": {
+        "description": "Title for country entity type"
+    },
+    "savedHeadlinesLoadingHeadline": "Loading Saved Headlines...",
+    "@savedHeadlinesLoadingHeadline": {
+        "description": "Headline for loading state on saved headlines page"
+    },
+    "savedHeadlinesLoadingSubheadline": "Please wait while we fetch your saved articles.",
+    "@savedHeadlinesLoadingSubheadline": {
+        "description": "Subheadline for loading state on saved headlines page"
+    },
+    "savedHeadlinesErrorHeadline": "Could Not Load Saved Headlines",
+    "@savedHeadlinesErrorHeadline": {
+        "description": "Error message when saved headlines fail to load"
+    },
+    "savedHeadlinesEmptyHeadline": "No Saved Headlines",
+    "@savedHeadlinesEmptyHeadline": {
+        "description": "Headline for empty state on saved headlines page"
+    },
+    "savedHeadlinesEmptySubheadline": "You haven't saved any articles yet. Start exploring!",
+    "@savedHeadlinesEmptySubheadline": {
+        "description": "Subheadline for empty state on saved headlines page"
+    },
+    "followedCategoriesLoadingHeadline": "Loading Followed Categories...",
+    "@followedCategoriesLoadingHeadline": {
+        "description": "Headline for loading state on followed categories page"
+    },
+    "followedCategoriesErrorHeadline": "Could Not Load Followed Categories",
+    "@followedCategoriesErrorHeadline": {
+        "description": "Error message when followed categories fail to load"
+    },
+    "followedCategoriesEmptyHeadline": "No Followed Categories",
+    "@followedCategoriesEmptyHeadline": {
+        "description": "Headline for empty state on followed categories page"
+    },
+    "followedCategoriesEmptySubheadline": "Start following categories to see them here.",
+    "@followedCategoriesEmptySubheadline": {
+        "description": "Subheadline for empty state on followed categories page"
     }
 }

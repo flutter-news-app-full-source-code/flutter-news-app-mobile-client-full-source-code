@@ -100,12 +100,17 @@ class _CategoryFilterPageState extends State<CategoryFilterPage> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
+    final theme = Theme.of(context); // Get theme
+    final textTheme = theme.textTheme; // Get textTheme
+    final colorScheme = theme.colorScheme; // Get colorScheme
+
     return Scaffold(
       appBar: AppBar(
-        // Default back button will pop without result (cancelling)
-        title: Text(l10n.headlinesFeedFilterCategoryLabel),
+        title: Text(
+          l10n.headlinesFeedFilterCategoryLabel,
+          style: textTheme.titleLarge, // Apply consistent title style
+        ),
         actions: [
-          // Apply Button
           IconButton(
             icon: const Icon(Icons.check),
             tooltip: l10n.headlinesFeedFilterApplyButton,
@@ -129,6 +134,9 @@ class _CategoryFilterPageState extends State<CategoryFilterPage> {
   /// Builds the main content body based on the current [CategoriesFilterState].
   Widget _buildBody(BuildContext context, CategoriesFilterState state) {
     final l10n = context.l10n;
+    final theme = Theme.of(context); // Get theme
+    final textTheme = theme.textTheme; // Get textTheme
+    final colorScheme = theme.colorScheme; // Get colorScheme
 
     // Handle initial loading state
     if (state.status == CategoriesFilterStatus.loading) {
@@ -140,15 +148,12 @@ class _CategoryFilterPageState extends State<CategoryFilterPage> {
     }
 
     // Handle failure state (show error and retry button)
-    // Only show full error screen if not loading more (i.e., initial load failed)
     if (state.status == CategoriesFilterStatus.failure &&
         state.categories.isEmpty) {
       return FailureStateWidget(
         message: state.error?.toString() ?? l10n.unknownError,
-        onRetry:
-            () => context.read<CategoriesFilterBloc>().add(
-              CategoriesFilterRequested(),
-            ),
+        onRetry: () =>
+            context.read<CategoriesFilterBloc>().add(CategoriesFilterRequested()),
       );
     }
 
@@ -156,29 +161,24 @@ class _CategoryFilterPageState extends State<CategoryFilterPage> {
     if (state.status == CategoriesFilterStatus.success &&
         state.categories.isEmpty) {
       return InitialStateWidget(
-        icon: Icons.search_off,
+        icon: Icons.search_off_outlined, // Use outlined version
         headline: l10n.categoryFilterEmptyHeadline,
         subheadline: l10n.categoryFilterEmptySubheadline,
       );
     }
 
     // Handle loaded state (success or loading more)
-    // Show the list, potentially with a loading indicator at the bottom
     return ListView.builder(
       controller: _scrollController,
-      padding: const EdgeInsets.only(
-        bottom: AppSpacing.xxl, // Padding at the bottom for loader/content
-      ),
-      // Add 1 to item count if loading more or if failed during load more
-      itemCount:
-          state.categories.length +
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.paddingSmall)
+          .copyWith(bottom: AppSpacing.xxl), // Consistent vertical padding
+      itemCount: state.categories.length +
           ((state.status == CategoriesFilterStatus.loadingMore ||
                   (state.status == CategoriesFilterStatus.failure &&
                       state.categories.isNotEmpty))
               ? 1
               : 0),
       itemBuilder: (context, index) {
-        // Check if we need to render the loading/error indicator at the end
         if (index >= state.categories.length) {
           if (state.status == CategoriesFilterStatus.loadingMore) {
             return const Padding(
@@ -186,7 +186,6 @@ class _CategoryFilterPageState extends State<CategoryFilterPage> {
               child: Center(child: CircularProgressIndicator()),
             );
           } else if (state.status == CategoriesFilterStatus.failure) {
-            // Show a smaller error indicator at the bottom if load more failed
             return Padding(
               padding: const EdgeInsets.symmetric(
                 vertical: AppSpacing.md,
@@ -195,51 +194,64 @@ class _CategoryFilterPageState extends State<CategoryFilterPage> {
               child: Center(
                 child: Text(
                   l10n.loadMoreError,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.error,
-                  ),
+                  style: textTheme.bodySmall
+                      ?.copyWith(color: colorScheme.error),
                 ),
               ),
             );
-          } else {
-            return const SizedBox.shrink(); // Should not happen if hasMore is false
           }
+          return const SizedBox.shrink();
         }
 
-        // Render the actual category item
         final category = state.categories[index];
         final isSelected = _pageSelectedCategories.contains(category);
 
         return CheckboxListTile(
-          title: Text(category.name),
-          secondary:
-              category.iconUrl != null
-                  ? SizedBox(
-                    width: 40,
-                    height: 40,
+          title: Text(category.name, style: textTheme.titleMedium),
+          secondary: category.iconUrl != null
+              ? SizedBox(
+                  width: AppSpacing.xl + AppSpacing.sm, // 40 -> 32
+                  height: AppSpacing.xl + AppSpacing.sm,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(AppSpacing.xs),
                     child: Image.network(
                       category.iconUrl!,
                       fit: BoxFit.contain,
-                      errorBuilder:
-                          (context, error, stackTrace) =>
-                              const Icon(Icons.category), // Placeholder icon
+                      errorBuilder: (context, error, stackTrace) => Icon(
+                        Icons.category_outlined, // Use outlined
+                        color: colorScheme.onSurfaceVariant, // Theme color
+                        size: AppSpacing.xl,
+                      ),
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes!
+                                : null,
+                          ),
+                        );
+                      },
                     ),
-                  )
-                  : null,
+                  ),
+                )
+              : null,
           value: isSelected,
           onChanged: (bool? value) {
-            // When a checkbox state changes, update the local selection set
-            // (`_pageSelectedCategories`) for this page.
             setState(() {
               if (value == true) {
-                // Add the category if checked.
                 _pageSelectedCategories.add(category);
               } else {
-                // Remove the category if unchecked.
                 _pageSelectedCategories.remove(category);
               }
             });
           },
+          controlAffinity: ListTileControlAffinity.leading,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.paddingMedium, // Standard padding
+          ),
         );
       },
     );

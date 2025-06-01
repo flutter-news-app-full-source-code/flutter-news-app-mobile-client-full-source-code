@@ -98,10 +98,15 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final theme = Theme.of(context); // Get theme
+    final textTheme = theme.textTheme; // Get textTheme
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.headlinesFeedFilterEventCountryLabel),
+        title: Text(
+          l10n.headlinesFeedFilterEventCountryLabel,
+          style: textTheme.titleLarge, // Apply consistent title style
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.check),
@@ -126,14 +131,16 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
   /// Builds the main content body based on the current [CountriesFilterState].
   Widget _buildBody(BuildContext context, CountriesFilterState state) {
     final l10n = context.l10n;
+    final theme = Theme.of(context); // Get theme
+    final textTheme = theme.textTheme; // Get textTheme
+    final colorScheme = theme.colorScheme; // Get colorScheme
 
     // Handle initial loading state
     if (state.status == CountriesFilterStatus.loading) {
       return LoadingStateWidget(
-        icon: Icons.public_outlined, // Changed icon
-        headline: l10n.countryFilterLoadingHeadline, // Assumes this exists
-        subheadline:
-            l10n.countryFilterLoadingSubheadline, // Assumes this exists
+        icon: Icons.public_outlined,
+        headline: l10n.countryFilterLoadingHeadline,
+        subheadline: l10n.countryFilterLoadingSubheadline,
       );
     }
 
@@ -141,12 +148,9 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
     if (state.status == CountriesFilterStatus.failure &&
         state.countries.isEmpty) {
       return FailureStateWidget(
-        message:
-            state.error?.toString() ?? l10n.unknownError, // Assumes this exists
-        onRetry:
-            () => context.read<CountriesFilterBloc>().add(
-              CountriesFilterRequested(),
-            ),
+        message: state.error?.toString() ?? l10n.unknownError,
+        onRetry: () =>
+            context.read<CountriesFilterBloc>().add(CountriesFilterRequested()),
       );
     }
 
@@ -154,18 +158,18 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
     if (state.status == CountriesFilterStatus.success &&
         state.countries.isEmpty) {
       return InitialStateWidget(
-        icon: Icons.search_off,
-        headline: l10n.countryFilterEmptyHeadline, // Assumes this exists
-        subheadline: l10n.countryFilterEmptySubheadline, // Assumes this exists
+        icon: Icons.flag_circle_outlined, // More relevant icon
+        headline: l10n.countryFilterEmptyHeadline,
+        subheadline: l10n.countryFilterEmptySubheadline,
       );
     }
 
     // Handle loaded state (success or loading more)
     return ListView.builder(
       controller: _scrollController,
-      padding: const EdgeInsets.only(bottom: AppSpacing.xxl),
-      itemCount:
-          state.countries.length +
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.paddingSmall)
+          .copyWith(bottom: AppSpacing.xxl), // Consistent vertical padding
+      itemCount: state.countries.length +
           ((state.status == CountriesFilterStatus.loadingMore ||
                   (state.status == CountriesFilterStatus.failure &&
                       state.countries.isNotEmpty))
@@ -186,49 +190,63 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
               ),
               child: Center(
                 child: Text(
-                  l10n.loadMoreError, // Assumes this exists
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.error,
-                  ),
+                  l10n.loadMoreError,
+                  style: textTheme.bodySmall
+                      ?.copyWith(color: colorScheme.error),
                 ),
               ),
             );
-          } else {
-            return const SizedBox.shrink();
           }
+          return const SizedBox.shrink();
         }
 
         final country = state.countries[index];
         final isSelected = _pageSelectedCountries.contains(country);
 
         return CheckboxListTile(
-          title: Text(country.name),
+          title: Text(country.name, style: textTheme.titleMedium),
           secondary: SizedBox(
-            // Use SizedBox for consistent flag size
-            width: 40,
-            height: 30, // Adjust height for flag aspect ratio if needed
-            child: Image.network(
-              country.flagUrl,
-              fit: BoxFit.contain,
-              errorBuilder:
-                  (context, error, stackTrace) =>
-                      const Icon(Icons.flag_outlined), // Placeholder icon
+            width: AppSpacing.xl + AppSpacing.xs, // Standardized width (36)
+            height: AppSpacing.lg + AppSpacing.sm, // Standardized height (24)
+            child: ClipRRect( // Clip the image for rounded corners if desired
+              borderRadius: BorderRadius.circular(AppSpacing.xs / 2),
+              child: Image.network(
+                country.flagUrl,
+                fit: BoxFit.cover, // Use cover for better filling
+                errorBuilder: (context, error, stackTrace) => Icon(
+                  Icons.flag_outlined,
+                  color: colorScheme.onSurfaceVariant,
+                  size: AppSpacing.lg, // Adjust size as needed
+                ),
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes!
+                          : null,
+                    ),
+                  );
+                },
+              ),
             ),
           ),
           value: isSelected,
           onChanged: (bool? value) {
-            // When a checkbox state changes, update the local selection set
-            // (`_pageSelectedCountries`) for this page.
             setState(() {
               if (value == true) {
-                // Add the country if checked.
                 _pageSelectedCountries.add(country);
               } else {
-                // Remove the country if unchecked.
                 _pageSelectedCountries.remove(country);
               }
             });
           },
+          controlAffinity: ListTileControlAffinity.leading,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.paddingMedium,
+          ),
         );
       },
     );

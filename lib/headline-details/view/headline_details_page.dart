@@ -10,10 +10,9 @@ import 'package:ht_main/app/bloc/app_bloc.dart'; // Added AppBloc
 import 'package:ht_main/entity_details/view/entity_details_page.dart'; // Added for Page Arguments
 import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart';
 import 'package:ht_main/headline-details/bloc/similar_headlines_bloc.dart';
-// HeadlineItemWidget import removed
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
-import 'package:ht_main/shared/shared.dart';
+import 'package:ht_main/shared/shared.dart'; // Imports AppSpacing
 import 'package:ht_shared/ht_shared.dart'
     show
         Category,
@@ -43,7 +42,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       context.read<HeadlineDetailsBloc>().add(
         HeadlineProvided(widget.initialHeadline!),
       );
-      // Also trigger fetching similar headlines if the main one is already provided
       context.read<SimilarHeadlinesBloc>().add(
         FetchSimilarHeadlines(currentHeadline: widget.initialHeadline!),
       );
@@ -61,9 +59,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     return BlocListener<HeadlineDetailsBloc, HeadlineDetailsState>(
       listener: (context, headlineState) {
         if (headlineState is HeadlineDetailsLoaded) {
-          // Once the main headline is loaded (if fetched by ID),
-          // fetch similar ones.
-          // This check ensures it's not re-triggered if already loaded via initialHeadline.
           if (widget.initialHeadline == null) {
             context.read<SimilarHeadlinesBloc>().add(
               FetchSimilarHeadlines(currentHeadline: headlineState.headline),
@@ -88,17 +83,10 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                       (h) => h.id == currentHeadlineId,
                     ) ??
                     false;
-
-                // Condition 1: Actual change in saved status for this headline
                 if (wasPreviouslySaved != isCurrentlySaved) {
-                  // Only trigger if the status is success (to show confirmation)
-                  // or failure (to show error). Avoid triggering if status is just loading.
                   return current.status == AccountStatus.success ||
                       current.status == AccountStatus.failure;
                 }
-
-                // Condition 2: A specific save/unsave operation just failed
-                // This triggers if an operation was attempted (loading) and then failed.
                 if (current.status == AccountStatus.failure &&
                     previous.status == AccountStatus.loading) {
                   return true;
@@ -114,7 +102,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                       (h) => h.id == detailsState.headline.id,
                     ) ??
                     false;
-
                 if (accountState.status == AccountStatus.failure &&
                     accountState.errorMessage != null) {
                   ScaffoldMessenger.of(context)
@@ -149,7 +136,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                 return switch (state) {
                   HeadlineDetailsInitial() ||
                   HeadlineDetailsLoading() => LoadingStateWidget(
-                    icon: Icons.downloading,
+                    icon: Icons.article_outlined, // Themed icon
                     headline: l10n.headlineDetailsLoadingHeadline,
                     subheadline: l10n.headlineDetailsLoadingSubheadline,
                   ),
@@ -166,7 +153,12 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                     ),
                   final HeadlineDetailsLoaded loadedState =>
                     _buildLoadedContent(context, loadedState.headline),
-                  _ => const Center(child: Text('Unknown state')),
+                  _ => Center(
+                      child: Text(
+                        l10n.unknownError,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                    ),
                 };
               },
             ),
@@ -182,7 +174,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
 
-    const horizontalPadding = EdgeInsets.symmetric(
+    final horizontalPadding = EdgeInsets.symmetric(
       horizontal: AppSpacing.paddingLarge,
     );
 
@@ -194,11 +186,13 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
         false;
 
     final bookmarkButton = IconButton(
-      icon: Icon(isSaved ? Icons.bookmark : Icons.bookmark_border),
-      tooltip:
-          isSaved
-              ? l10n.headlineDetailsRemoveFromSavedTooltip
-              : l10n.headlineDetailsSaveTooltip,
+      icon: Icon(
+        isSaved ? Icons.bookmark : Icons.bookmark_border_outlined,
+        color: colorScheme.primary, // Ensure icon color from theme
+      ),
+      tooltip: isSaved
+          ? l10n.headlineDetailsRemoveFromSavedTooltip
+          : l10n.headlineDetailsSaveTooltip,
       onPressed: () {
         context.read<AccountBloc>().add(
           AccountSaveHeadlineToggled(headline: headline),
@@ -209,7 +203,10 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     final Widget shareButtonWidget = Builder(
       builder: (BuildContext buttonContext) {
         return IconButton(
-          icon: const Icon(Icons.share),
+          icon: Icon(
+            Icons.share_outlined,
+            color: colorScheme.primary, // Ensure icon color from theme
+          ),
           tooltip: l10n.shareActionTooltip,
           onPressed: () async {
             final box = buttonContext.findRenderObject() as RenderBox?;
@@ -217,7 +214,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
             if (box != null) {
               sharePositionOrigin = box.localToGlobal(Offset.zero) & box.size;
             }
-
             ShareParams params;
             if (kIsWeb && headline.url != null && headline.url!.isNotEmpty) {
               params = ShareParams(
@@ -238,9 +234,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                 sharePositionOrigin: sharePositionOrigin,
               );
             }
-
             final shareResult = await SharePlus.instance.share(params);
-
             if (buttonContext.mounted) {
               if (shareResult.status == ShareResultStatus.unavailable) {
                 ScaffoldMessenger.of(buttonContext).showSnackBar(
@@ -257,126 +251,162 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       slivers: [
         SliverAppBar(
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => Navigator.of(context).pop(),
+            icon: const Icon(Icons.arrow_back_ios_new),
+            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+            onPressed: () => context.pop(),
+            color: colorScheme.onSurface, // Ensure icon color from theme
           ),
-          actions: [bookmarkButton, shareButtonWidget],
+          actions: [
+            bookmarkButton,
+            shareButtonWidget,
+            const SizedBox(width: AppSpacing.sm),
+          ],
           pinned: false,
           floating: true,
           snap: true,
           backgroundColor: Colors.transparent,
           elevation: 0,
-          foregroundColor: theme.colorScheme.onSurface,
+          foregroundColor: colorScheme.onSurface,
         ),
         SliverPadding(
-          padding: horizontalPadding.copyWith(top: AppSpacing.lg),
+          padding: horizontalPadding.copyWith(top: AppSpacing.sm), // Adjusted
           sliver: SliverToBoxAdapter(
-            child: Text(headline.title, style: textTheme.headlineMedium),
+            child: Text(
+              headline.title,
+              style: textTheme.headlineSmall
+                  ?.copyWith(fontWeight: FontWeight.bold), // Adjusted style
+            ),
           ),
         ),
-        // Image or Placeholder Section
-        SliverPadding(
-          padding: const EdgeInsets.only(
-            top: AppSpacing.lg,
-            left: AppSpacing.paddingLarge,
-            right: AppSpacing.paddingLarge,
-          ),
-          sliver: SliverToBoxAdapter(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(AppSpacing.md),
-              child:
-                  headline.imageUrl != null
-                      ? Image.network(
-                        headline.imageUrl!,
-                        width: double.infinity,
-                        height: 200,
-                        fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Container(
-                            width: double.infinity,
-                            height: 200,
-                            color: colorScheme.surfaceContainerHighest,
-                            child: const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          );
-                        },
-                        errorBuilder:
-                            (context, error, stackTrace) => Container(
-                              width: double.infinity,
-                              height: 200,
-                              color: colorScheme.surfaceContainerHighest,
-                              child: Icon(
-                                Icons.broken_image_outlined,
-                                color: colorScheme.onSurfaceVariant,
-                                size: AppSpacing.xxl,
-                              ),
-                            ),
-                      )
-                      : Container(
-                        width: double.infinity,
-                        height: 200,
+        if (headline.imageUrl != null)
+          SliverPadding(
+            padding: EdgeInsets.only(
+              top: AppSpacing.md,
+              left: horizontalPadding.left,
+              right: horizontalPadding.right,
+            ),
+            sliver: SliverToBoxAdapter(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(AppSpacing.md), // Consistent radius
+                child: AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: Image.network(
+                    headline.imageUrl!,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
                         color: colorScheme.surfaceContainerHighest,
-                        child: Icon(
-                          Icons.image_not_supported_outlined,
-                          color: colorScheme.onSurfaceVariant,
-                          size: AppSpacing.xxl,
+                        child: const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
                         ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      color: colorScheme.surfaceContainerHighest,
+                      child: Icon(
+                        Icons.broken_image_outlined,
+                        color: colorScheme.onSurfaceVariant,
+                        size: AppSpacing.xxl * 1.5, // Larger placeholder
                       ),
+                    ),
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
-        SliverPadding(
-          padding: horizontalPadding.copyWith(top: AppSpacing.lg),
-          sliver: SliverToBoxAdapter(
-            child: Wrap(
-              spacing: AppSpacing.sm,
-              runSpacing: AppSpacing.sm,
-              children: _buildMetadataChips(context, headline),
-            ),
-          ),
-        ),
-        if (headline.description != null)
+          )
+        else // Placeholder if no image
           SliverPadding(
-            padding: horizontalPadding.copyWith(top: AppSpacing.lg),
-            sliver: SliverToBoxAdapter(
-              child: Text(headline.description!, style: textTheme.bodyLarge),
-            ),
-          ),
-        if (headline.url != null)
-          SliverPadding(
-            padding: horizontalPadding.copyWith(
-              top: AppSpacing.xl,
-              bottom: AppSpacing.paddingLarge,
+            padding: EdgeInsets.only(
+              top: AppSpacing.md,
+              left: horizontalPadding.left,
+              right: horizontalPadding.right,
             ),
             sliver: SliverToBoxAdapter(
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    await launchUrlString(headline.url!);
-                  },
-                  child: Text(l10n.headlineDetailsContinueReadingButton),
+              child: AspectRatio(
+                aspectRatio: 16 / 9,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(AppSpacing.md),
+                  ),
+                  child: Icon(
+                    Icons.image_not_supported_outlined,
+                    color: colorScheme.onSurfaceVariant,
+                    size: AppSpacing.xxl * 1.5, // Larger placeholder
+                  ),
                 ),
               ),
             ),
           ),
-        if (headline.url == null)
-          const SliverPadding(
-            padding: EdgeInsets.only(bottom: AppSpacing.paddingLarge),
-            sliver: SliverToBoxAdapter(child: SizedBox.shrink()),
-          ),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: horizontalPadding.copyWith(top: AppSpacing.xl),
-            child: Text(
-              l10n.similarHeadlinesSectionTitle,
-              style: textTheme.titleLarge,
+        SliverPadding(
+          padding: horizontalPadding.copyWith(top: AppSpacing.lg), // Increased spacing
+          sliver: SliverToBoxAdapter(
+            child: Wrap(
+              spacing: AppSpacing.md, // Increased spacing
+              runSpacing: AppSpacing.sm, // Adjusted runSpacing
+              children: _buildMetadataChips(context, headline),
             ),
           ),
         ),
-        _buildSimilarHeadlinesSection(context),
+        if (headline.description != null && headline.description!.isNotEmpty)
+          SliverPadding(
+            padding: horizontalPadding.copyWith(top: AppSpacing.lg), // Increased
+            sliver: SliverToBoxAdapter(
+              child: Text(
+                headline.description!,
+                style: textTheme.bodyLarge?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  height: 1.6, // Improved line height
+                ),
+              ),
+            ),
+          ),
+        if (headline.url != null && headline.url!.isNotEmpty)
+          SliverPadding(
+            padding: horizontalPadding.copyWith(
+              top: AppSpacing.xl,
+              bottom: AppSpacing.xl, // Consistent padding
+            ),
+            sliver: SliverToBoxAdapter(
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.open_in_new_outlined),
+                onPressed: () async {
+                  await launchUrlString(headline.url!);
+                },
+                label: Text(l10n.headlineDetailsContinueReadingButton),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                    vertical: AppSpacing.md,
+                  ),
+                  textStyle: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ),
+        if (headline.url == null || headline.url!.isEmpty) // Ensure bottom padding
+          SliverPadding(
+            padding: EdgeInsets.only(bottom: AppSpacing.xl),
+            sliver: const SliverToBoxAdapter(child: SizedBox.shrink()),
+          ),
+        SliverPadding(
+          padding: horizontalPadding,
+          sliver: SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.only(
+                top: (headline.url != null && headline.url!.isNotEmpty) ? AppSpacing.sm : AppSpacing.xl,
+                bottom: AppSpacing.md,
+              ),
+              child: Text(
+                l10n.similarHeadlinesSectionTitle,
+                style: textTheme.titleLarge
+                    ?.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ),
+        _buildSimilarHeadlinesSection(context, horizontalPadding),
       ],
     );
   }
@@ -384,28 +414,31 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
   List<Widget> _buildMetadataChips(BuildContext context, Headline headline) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-    final chipLabelStyle = textTheme.labelSmall;
-    final chipBackgroundColor = theme.colorScheme.surfaceContainerHighest;
-    final chipAvatarColor = theme.colorScheme.onSurfaceVariant;
-    const chipAvatarSize = 14.0;
-    const chipPadding = EdgeInsets.symmetric(
-      horizontal: AppSpacing.xs,
-      vertical: AppSpacing.xs / 2,
+    final colorScheme = theme.colorScheme;
+    final chipLabelStyle = textTheme.labelMedium?.copyWith(
+      color: colorScheme.onSecondaryContainer, // Ensure text is visible
     );
-    const chipVisualDensity = VisualDensity.compact;
-    const chipMaterialTapTargetSize = MaterialTapTargetSize.shrinkWrap;
+    final chipBackgroundColor = colorScheme.secondaryContainer;
+    final chipAvatarColor = colorScheme.onSecondaryContainer;
+    const chipAvatarSize = AppSpacing.md;
+    final chipPadding = EdgeInsets.symmetric(
+      horizontal: AppSpacing.sm,
+      vertical: AppSpacing.xs,
+    );
+    final chipShape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(AppSpacing.sm),
+      side: BorderSide(color: colorScheme.outlineVariant.withOpacity(0.3)),
+    );
 
     final chips = <Widget>[];
 
-    // 1. Add Date Chip First
     if (headline.publishedAt != null) {
-      final formattedDate = DateFormat(
-        'MMM d, yyyy',
-      ).format(headline.publishedAt!);
+      final formattedDate =
+          DateFormat('MMM d, yyyy').format(headline.publishedAt!);
       chips.add(
         Chip(
           avatar: Icon(
-            Icons.date_range,
+            Icons.calendar_today_outlined,
             size: chipAvatarSize,
             color: chipAvatarColor,
           ),
@@ -413,25 +446,26 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           labelStyle: chipLabelStyle,
           backgroundColor: chipBackgroundColor,
           padding: chipPadding,
-          visualDensity: chipVisualDensity,
-          materialTapTargetSize: chipMaterialTapTargetSize,
+          shape: chipShape,
+          visualDensity: VisualDensity.compact,
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
       );
     }
 
-    // 2. Add Source Chip Second
     if (headline.source != null) {
       chips.add(
-        GestureDetector(
+        InkWell( // Make chip tappable
           onTap: () {
             context.push(
               Routes.sourceDetails,
               extra: EntityDetailsPageArguments(entity: headline.source),
             );
           },
+          borderRadius: BorderRadius.circular(AppSpacing.sm), // Match chip shape
           child: Chip(
             avatar: Icon(
-              Icons.source,
+              Icons.source_outlined,
               size: chipAvatarSize,
               color: chipAvatarColor,
             ),
@@ -439,32 +473,37 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
             labelStyle: chipLabelStyle,
             backgroundColor: chipBackgroundColor,
             padding: chipPadding,
-            visualDensity: chipVisualDensity,
-            materialTapTargetSize: chipMaterialTapTargetSize,
+            shape: chipShape,
+            visualDensity: VisualDensity.compact,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
         ),
       );
     }
 
-    // Country chip for headline.source.headquarters removed.
-
-    // 3. Add Category Chip Third
     if (headline.category != null) {
       chips.add(
-        GestureDetector(
+        InkWell( // Make chip tappable
           onTap: () {
             context.push(
               Routes.categoryDetails,
               extra: EntityDetailsPageArguments(entity: headline.category),
             );
           },
+          borderRadius: BorderRadius.circular(AppSpacing.sm), // Match chip shape
           child: Chip(
+            avatar: Icon(
+              Icons.category_outlined,
+              size: chipAvatarSize,
+              color: chipAvatarColor,
+            ),
             label: Text(headline.category!.name),
             labelStyle: chipLabelStyle,
             backgroundColor: chipBackgroundColor,
             padding: chipPadding,
-            visualDensity: chipVisualDensity,
-            materialTapTargetSize: chipMaterialTapTargetSize,
+            shape: chipShape,
+            visualDensity: VisualDensity.compact,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
         ),
       );
@@ -472,93 +511,98 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     return chips;
   }
 
-  Widget _buildSimilarHeadlinesSection(BuildContext context) {
+  Widget _buildSimilarHeadlinesSection(
+      BuildContext context, EdgeInsets hPadding) {
     final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final colorScheme = theme.colorScheme;
+
     return BlocBuilder<SimilarHeadlinesBloc, SimilarHeadlinesState>(
       builder: (context, state) {
         return switch (state) {
           SimilarHeadlinesInitial() ||
-          SimilarHeadlinesLoading() => const SliverToBoxAdapter(
+          SimilarHeadlinesLoading() => SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.all(AppSpacing.lg),
-              child: Center(child: CircularProgressIndicator()),
+              padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
+              child: const Center(child: CircularProgressIndicator()),
             ),
           ),
           final SimilarHeadlinesError errorState => SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
+              padding: hPadding.copyWith(
+                  top: AppSpacing.md, bottom: AppSpacing.xl),
               child: Text(
                 errorState.message,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
+                style: textTheme.bodyMedium
+                    ?.copyWith(color: colorScheme.error),
               ),
             ),
           ),
           SimilarHeadlinesEmpty() => SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
+              padding: hPadding.copyWith(
+                  top: AppSpacing.md, bottom: AppSpacing.xl),
               child: Text(
                 l10n.similarHeadlinesEmpty,
                 textAlign: TextAlign.center,
+                style: textTheme.bodyLarge
+                    ?.copyWith(color: colorScheme.onSurfaceVariant),
               ),
             ),
           ),
-          final SimilarHeadlinesLoaded loadedState => SliverList(
-            delegate: SliverChildBuilderDelegate((context, index) {
-              final similarHeadline = loadedState.similarHeadlines[index];
-              return Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.paddingMedium,
-                  vertical: AppSpacing.sm,
-                ),
-                child: Builder(
-                  // Use Builder to get a new context that can watch AppBloc
+          final SimilarHeadlinesLoaded loadedState => SliverPadding(
+            padding: hPadding.copyWith(bottom: AppSpacing.xxl),
+            sliver: SliverList.separated(
+              separatorBuilder: (context, index) =>
+                  const SizedBox(height: AppSpacing.sm), // Spacing between items
+              itemCount: loadedState.similarHeadlines.length,
+              itemBuilder: (context, index) { // Corrected: SliverList.separated uses itemBuilder
+                final similarHeadline = loadedState.similarHeadlines[index];
+                return Builder(
                   builder: (context) {
-                    final imageStyle =
-                        context
-                            .watch<AppBloc>()
-                            .state
-                            .settings
-                            .feedPreferences
-                            .headlineImageStyle;
+                    final imageStyle = context
+                        .watch<AppBloc>()
+                        .state
+                        .settings
+                        .feedPreferences
+                        .headlineImageStyle;
                     Widget tile;
                     switch (imageStyle) {
                       case HeadlineImageStyle.hidden:
                         tile = HeadlineTileTextOnly(
                           headline: similarHeadline,
-                          onHeadlineTap:
-                              () => context.pushNamed(
-                                Routes.articleDetailsName,
-                                pathParameters: {'id': similarHeadline.id},
-                                extra: similarHeadline,
-                              ),
+                          onHeadlineTap: () => context.pushNamed(
+                            Routes.globalArticleDetailsName,
+                            pathParameters: {'id': similarHeadline.id},
+                            extra: similarHeadline,
+                          ),
                         );
                       case HeadlineImageStyle.smallThumbnail:
                         tile = HeadlineTileImageStart(
                           headline: similarHeadline,
-                          onHeadlineTap:
-                              () => context.pushNamed(
-                                Routes.articleDetailsName,
-                                pathParameters: {'id': similarHeadline.id},
-                                extra: similarHeadline,
-                              ),
+                          onHeadlineTap: () => context.pushNamed(
+                            Routes.globalArticleDetailsName,
+                            pathParameters: {'id': similarHeadline.id},
+                            extra: similarHeadline,
+                          ),
                         );
                       case HeadlineImageStyle.largeThumbnail:
                         tile = HeadlineTileImageTop(
                           headline: similarHeadline,
-                          onHeadlineTap:
-                              () => context.pushNamed(
-                                Routes.articleDetailsName,
-                                pathParameters: {'id': similarHeadline.id},
-                                extra: similarHeadline,
-                              ),
+                          onHeadlineTap: () => context.pushNamed(
+                            Routes.globalArticleDetailsName,
+                            pathParameters: {'id': similarHeadline.id},
+                            extra: similarHeadline,
+                          ),
                         );
                     }
                     return tile;
                   },
-                ),
-              );
-            }, childCount: loadedState.similarHeadlines.length,),
+                );
+              },
+            ),
           ),
           _ => const SliverToBoxAdapter(child: SizedBox.shrink()),
         };

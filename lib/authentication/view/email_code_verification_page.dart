@@ -48,21 +48,30 @@ class EmailCodeVerificationPage extends StatelessWidget {
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch, // Stretch buttons
                     children: [
-                      const Icon(Icons.mark_email_read_outlined, size: 80),
+                      Icon(
+                        Icons.mark_email_read_outlined,
+                        size: AppSpacing.xxl * 2, // Standardized large icon
+                        color: colorScheme.primary,
+                      ),
                       const SizedBox(height: AppSpacing.xl),
                       Text(
                         l10n.emailCodeSentConfirmation(email),
-                        style: textTheme.titleLarge,
+                        style: textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold, // Ensure prominence
+                        ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: AppSpacing.xxl),
+                      const SizedBox(height: AppSpacing.lg), // Adjusted spacing
                       Text(
                         l10n.emailCodeSentInstructions,
-                        style: textTheme.bodyMedium,
+                        style: textTheme.bodyLarge?.copyWith(
+                            color: colorScheme
+                                .onSurfaceVariant), // Softer color
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: AppSpacing.lg),
+                      const SizedBox(height: AppSpacing.xl), // Increased spacing
                       _EmailCodeVerificationForm(
                         email: email,
                         isLoading: isLoading,
@@ -118,6 +127,7 @@ class _EmailCodeVerificationFormState
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme; // Added missing textTheme
 
     return Form(
       key: _formKey,
@@ -125,18 +135,21 @@ class _EmailCodeVerificationFormState
         mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            // No horizontal padding needed if column is stretched
+            // padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            padding: EdgeInsets.zero,
             child: TextFormField(
               controller: _codeController,
               decoration: InputDecoration(
-                hintText: l10n.emailCodeVerificationHint,
-                border: const OutlineInputBorder(),
+                labelText: l10n.emailCodeVerificationHint, // Use labelText
+                // border: const OutlineInputBorder(), // Uses theme default
                 counterText: '', // Hide the counter
               ),
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               maxLength: 6,
               textAlign: TextAlign.center,
+              style: textTheme.headlineSmall, // Make input text larger
               enabled: !widget.isLoading,
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -150,17 +163,23 @@ class _EmailCodeVerificationFormState
               onFieldSubmitted: widget.isLoading ? null : (_) => _submitForm(),
             ),
           ),
-          const SizedBox(height: AppSpacing.xl),
+          const SizedBox(height: AppSpacing.xxl), // Increased spacing
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+              textStyle: textTheme.labelLarge,
+            ),
             onPressed: widget.isLoading ? null : _submitForm,
-            child:
-                widget.isLoading
-                    ? const SizedBox(
-                      height: 24,
-                      width: 24,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                    : Text(l10n.emailCodeVerificationButtonLabel),
+            child: widget.isLoading
+                ? const SizedBox(
+                    height: AppSpacing.xl, // Consistent size with text
+                    width: AppSpacing.xl,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white, // Explicit color for loader on button
+                    ),
+                  )
+                : Text(l10n.emailCodeVerificationButtonLabel),
           ),
         ],
       ),

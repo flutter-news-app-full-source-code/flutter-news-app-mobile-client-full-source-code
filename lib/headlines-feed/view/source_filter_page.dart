@@ -54,14 +54,19 @@ class _SourceFilterView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final theme = Theme.of(context); // Get theme
+    final textTheme = theme.textTheme; // Get textTheme
     final state = context.watch<SourcesFilterBloc>().state;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.headlinesFeedFilterSourceLabel),
+        title: Text(
+          l10n.headlinesFeedFilterSourceLabel,
+          style: textTheme.titleLarge, // Apply consistent title style
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.clear_all),
+            icon: const Icon(Icons.clear_all_outlined), // Use outlined
             tooltip: l10n.headlinesFeedFilterResetButton,
             onPressed: () {
               context.read<SourcesFilterBloc>().add(
@@ -98,43 +103,48 @@ class _SourceFilterView extends StatelessWidget {
     SourcesFilterState state,
     AppLocalizations l10n,
   ) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+
     if (state.dataLoadingStatus == SourceFilterDataLoadingStatus.loading &&
-        state.availableCountries.isEmpty) {
+        state.allAvailableSources.isEmpty) { // Check allAvailableSources
       return LoadingStateWidget(
-        icon: Icons.filter_list_alt, // Added generic icon
-        headline: l10n.headlinesFeedFilterLoadingCriteria,
-        subheadline: l10n.pleaseWait, // Added generic subheadline (l10n key)
+        icon: Icons.source_outlined, // More relevant icon
+        headline: l10n.sourceFilterLoadingHeadline, // Specific l10n
+        subheadline: l10n.sourceFilterLoadingSubheadline, // Specific l10n
       );
     }
     if (state.dataLoadingStatus == SourceFilterDataLoadingStatus.failure &&
-        state.availableCountries.isEmpty) {
+        state.allAvailableSources.isEmpty) { // Check allAvailableSources
       return FailureStateWidget(
         message: state.errorMessage ?? l10n.headlinesFeedFilterErrorCriteria,
         onRetry: () {
-          context.read<SourcesFilterBloc>().add(
-            // When retrying, we don't have initial capsule states from arguments
-            // So, we pass empty sets, BLoC will load all sources and countries.
-            // User can then re-apply capsule filters if needed.
-            // Or, we could try to persist/retrieve the last known good capsule state.
-            // For now, simple retry reloads all.
-            const LoadSourceFilterData(),
-          );
+          context
+              .read<SourcesFilterBloc>()
+              .add(const LoadSourceFilterData());
         },
       );
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSpacing.md),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildCountryCapsules(context, state, l10n),
-          const SizedBox(height: AppSpacing.lg),
-          _buildSourceTypeCapsules(context, state, l10n),
-          const SizedBox(height: AppSpacing.lg),
-          Expanded(child: _buildSourcesList(context, state, l10n)),
-        ],
-      ),
+    return Column( // Removed Padding, handled by children
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildCountryCapsules(context, state, l10n, textTheme),
+        const SizedBox(height: AppSpacing.md), // Adjusted spacing
+        _buildSourceTypeCapsules(context, state, l10n, textTheme),
+        const SizedBox(height: AppSpacing.md), // Adjusted spacing
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.paddingMedium,
+          ),
+          child: Text(
+            l10n.headlinesFeedFilterSourceLabel, // "Sources" title
+            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Expanded(child: _buildSourcesList(context, state, l10n, textTheme)),
+      ],
     );
   }
 
@@ -142,53 +152,58 @@ class _SourceFilterView extends StatelessWidget {
     BuildContext context,
     SourcesFilterState state,
     AppLocalizations l10n,
+    TextTheme textTheme, // Added textTheme
   ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingMedium),
-      child: Row(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingMedium)
+          .copyWith(top: AppSpacing.md), // Add top padding
+      child: Column( // Use Column for label and then list
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '${l10n.headlinesFeedFilterCountryLabel}:',
-            style: Theme.of(context).textTheme.titleSmall,
+            l10n.headlinesFeedFilterCountryLabel, // "Countries" label
+            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: SizedBox(
-              height: 40, // Fixed height for the capsule list
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: state.availableCountries.length + 1, // +1 for "All"
-                separatorBuilder:
-                    (context, index) => const SizedBox(width: AppSpacing.sm),
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    // "All" chip
-                    return ChoiceChip(
-                      label: Text(l10n.headlinesFeedFilterAllLabel),
-                      selected: state.selectedCountryIsoCodes.isEmpty,
-                      onSelected: (_) {
-                        context.read<SourcesFilterBloc>().add(
-                          const CountryCapsuleToggled(
-                            '',
-                          ), // Special value for "All"
-                        );
-                      },
-                    );
-                  }
-                  final country = state.availableCountries[index - 1];
+          const SizedBox(height: AppSpacing.sm),
+          SizedBox(
+            height: AppSpacing.xl + AppSpacing.md, // Standardized height
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: state.availableCountries.length + 1,
+              separatorBuilder: (context, index) =>
+                  const SizedBox(width: AppSpacing.sm),
+              itemBuilder: (context, index) {
+                if (index == 0) {
                   return ChoiceChip(
-                    label: Text(country.name),
-                    selected: state.selectedCountryIsoCodes.contains(
-                      country.isoCode,
-                    ),
+                    label: Text(l10n.headlinesFeedFilterAllLabel),
+                    labelStyle: textTheme.labelLarge,
+                    selected: state.selectedCountryIsoCodes.isEmpty,
                     onSelected: (_) {
-                      context.read<SourcesFilterBloc>().add(
-                        CountryCapsuleToggled(country.isoCode),
-                      );
+                      context
+                          .read<SourcesFilterBloc>()
+                          .add(const CountryCapsuleToggled(''));
                     },
                   );
-                },
-              ),
+                }
+                final country = state.availableCountries[index - 1];
+                return ChoiceChip(
+                  avatar: country.flagUrl.isNotEmpty
+                      ? CircleAvatar(
+                          backgroundImage: NetworkImage(country.flagUrl),
+                          radius: AppSpacing.sm + AppSpacing.xs,
+                        )
+                      : null,
+                  label: Text(country.name),
+                  labelStyle: textTheme.labelLarge,
+                  selected:
+                      state.selectedCountryIsoCodes.contains(country.isoCode),
+                  onSelected: (_) {
+                    context
+                        .read<SourcesFilterBloc>()
+                        .add(CountryCapsuleToggled(country.isoCode));
+                  },
+                );
+              },
             ),
           ),
         ],
@@ -200,62 +215,50 @@ class _SourceFilterView extends StatelessWidget {
     BuildContext context,
     SourcesFilterState state,
     AppLocalizations l10n,
+    TextTheme textTheme, // Added textTheme
   ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingMedium),
-      child: Row(
+      child: Column( // Use Column for label and then list
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '${l10n.headlinesFeedFilterSourceTypeLabel}:', // Assuming l10n key exists
-            style: Theme.of(context).textTheme.titleSmall,
+            l10n.headlinesFeedFilterSourceTypeLabel,
+            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: SizedBox(
-              height: 40, // Fixed height for the capsule list
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount:
-                    state.availableSourceTypes.length + 1, // +1 for "All"
-                separatorBuilder:
-                    (context, index) => const SizedBox(width: AppSpacing.sm),
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    // "All" chip
-                    return ChoiceChip(
-                      label: Text(l10n.headlinesFeedFilterAllLabel),
-                      selected: state.selectedSourceTypes.isEmpty,
-                      onSelected: (_) {
-                        // For "All", if it's selected, it means no specific types are chosen.
-                        // The BLoC should interpret an empty selectedSourceTypes set as "All".
-                        // Toggling "All" when it's already selected (meaning list is empty)
-                        // doesn't have a clear action here without more complex "select all" logic.
-                        // For now, if "All" is tapped, we ensure the specific selections are cleared.
-                        // This is best handled in the BLoC.
-                        // We can send a specific event or a toggle that the BLoC interprets.
-                        // For simplicity, let's make it so tapping "All" when selected does nothing,
-                        // Tapping "All" for source types should clear specific selections.
-                        // This is now handled by the AllSourceTypesCapsuleToggled event.
-                        context.read<SourcesFilterBloc>().add(
-                          const AllSourceTypesCapsuleToggled(),
-                        );
-                      },
-                    );
-                  }
-                  final sourceType = state.availableSourceTypes[index - 1];
+          const SizedBox(height: AppSpacing.sm),
+          SizedBox(
+            height: AppSpacing.xl + AppSpacing.md, // Standardized height
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: state.availableSourceTypes.length + 1,
+              separatorBuilder: (context, index) =>
+                  const SizedBox(width: AppSpacing.sm),
+              itemBuilder: (context, index) {
+                if (index == 0) {
                   return ChoiceChip(
-                    label: Text(
-                      sourceType.name,
-                    ), // Or a more user-friendly name
-                    selected: state.selectedSourceTypes.contains(sourceType),
+                    label: Text(l10n.headlinesFeedFilterAllLabel),
+                    labelStyle: textTheme.labelLarge,
+                    selected: state.selectedSourceTypes.isEmpty,
                     onSelected: (_) {
-                      context.read<SourcesFilterBloc>().add(
-                        SourceTypeCapsuleToggled(sourceType),
-                      );
+                      context
+                          .read<SourcesFilterBloc>()
+                          .add(const AllSourceTypesCapsuleToggled());
                     },
                   );
-                },
-              ),
+                }
+                final sourceType = state.availableSourceTypes[index - 1];
+                return ChoiceChip(
+                  label: Text(sourceType.name), // Assuming SourceType.name is user-friendly
+                  labelStyle: textTheme.labelLarge,
+                  selected: state.selectedSourceTypes.contains(sourceType),
+                  onSelected: (_) {
+                    context
+                        .read<SourcesFilterBloc>()
+                        .add(SourceTypeCapsuleToggled(sourceType));
+                  },
+                );
+              },
             ),
           ),
         ],
@@ -267,8 +270,10 @@ class _SourceFilterView extends StatelessWidget {
     BuildContext context,
     SourcesFilterState state,
     AppLocalizations l10n,
+    TextTheme textTheme, // Added textTheme
   ) {
-    if (state.dataLoadingStatus == SourceFilterDataLoadingStatus.loading) {
+    if (state.dataLoadingStatus == SourceFilterDataLoadingStatus.loading &&
+        state.displayableSources.isEmpty) { // Added check for displayableSources
       return const Center(child: CircularProgressIndicator());
     }
     if (state.dataLoadingStatus == SourceFilterDataLoadingStatus.failure &&
@@ -276,38 +281,46 @@ class _SourceFilterView extends StatelessWidget {
       return FailureStateWidget(
         message: state.errorMessage ?? l10n.headlinesFeedFilterErrorSources,
         onRetry: () {
-          // Dispatch a public event to reload/retry, BLoC will handle internally
-          context.read<SourcesFilterBloc>().add(
-            LoadSourceFilterData(
-              initialSelectedSources:
-                  state.displayableSources
-                      .where(
-                        (s) => state.finallySelectedSourceIds.contains(s.id),
-                      )
-                      .toList(), // Or pass current selections if needed for retry context
-            ),
-          );
+          context
+              .read<SourcesFilterBloc>()
+              .add(const LoadSourceFilterData());
         },
       );
     }
-    if (state.displayableSources.isEmpty) {
-      return Center(child: Text(l10n.headlinesFeedFilterNoSourcesMatch));
+    if (state.displayableSources.isEmpty &&
+        state.dataLoadingStatus != SourceFilterDataLoadingStatus.loading) { // Avoid showing if still loading
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingLarge),
+          child: Text(
+            l10n.headlinesFeedFilterNoSourcesMatch,
+            style: textTheme.bodyLarge,
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
     }
 
     return ListView.builder(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.paddingSmall)
+          .copyWith(bottom: AppSpacing.xxl),
       itemCount: state.displayableSources.length,
       itemBuilder: (context, index) {
         final source = state.displayableSources[index];
         return CheckboxListTile(
-          title: Text(source.name),
+          title: Text(source.name, style: textTheme.titleMedium),
           value: state.finallySelectedSourceIds.contains(source.id),
           onChanged: (bool? value) {
             if (value != null) {
-              context.read<SourcesFilterBloc>().add(
-                SourceCheckboxToggled(source.id, value),
-              );
+              context
+                  .read<SourcesFilterBloc>()
+                  .add(SourceCheckboxToggled(source.id, value));
             }
           },
+          controlAffinity: ListTileControlAffinity.leading,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.paddingMedium,
+          ),
         );
       },
     );

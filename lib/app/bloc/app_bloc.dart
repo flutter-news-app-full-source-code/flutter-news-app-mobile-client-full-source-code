@@ -31,7 +31,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         ) {
     on<AppUserChanged>(_onAppUserChanged);
     on<AppSettingsRefreshed>(_onAppSettingsRefreshed);
-    on<_AppConfigFetchRequested>(_onAppConfigFetchRequested);
+    on<AppConfigFetchRequested>(_onAppConfigFetchRequested);
     on<AppUserAccountActionShown>(_onAppUserAccountActionShown); // Added
     on<AppLogoutRequested>(_onLogoutRequested);
     on<AppThemeModeChanged>(_onThemeModeChanged);
@@ -77,7 +77,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // Fetch AppConfig regardless of user, as it's global config
     // Or fetch it once at BLoC initialization if it doesn't depend on user at all.
     // For now, fetching after user ensures some app state is set.
-    add(const _AppConfigFetchRequested());
+    add(const AppConfigFetchRequested());
   }
 
   /// Handles refreshing/loading app settings (theme, font).
@@ -298,31 +298,29 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   }
 
   Future<void> _onAppConfigFetchRequested(
-    _AppConfigFetchRequested event,
+    AppConfigFetchRequested event,
     Emitter<AppState> emit,
   ) async {
-    // Avoid refetching if already loaded, unless a refresh mechanism is added
-    if (state.appConfig != null && state.status != AppStatus.initial) return;
+    // Avoid refetching if already loaded and not initial, unless a refresh mechanism is added
+    if (state.appConfig != null && state.status != AppStatus.initial && state.status != AppStatus.configFetchFailed) {
+      return;
+    }
+
+    emit(state.copyWith(status: AppStatus.configFetching, appConfig: null, clearAppConfig: true));
 
     try {
       final appConfig = await _appConfigRepository.read(id: 'app_config');
-      emit(state.copyWith(appConfig: appConfig));
-    } on NotFoundException {
-      // If AppConfig is not found on the backend, use a local default.
-      // The AppConfig model has default values for its nested configurations.
-      emit(state.copyWith(appConfig: const AppConfig(id: 'app_config')));
-      // Optionally, one might want to log this or attempt to create it on backend.
-      print(
-        '[AppBloc] AppConfig not found on backend, using local default.',
-      );
+      // If successful, AppState's status will be updated by user/auth changes,
+      // or it remains as configFetching until user status is resolved.
+      // We just need to set the appConfig here.
+      // The subsequent AppUserChanged event will set the final status (authenticated/anonymous).
+      emit(state.copyWith(appConfig: appConfig, status: AppStatus.initial)); // Reset status to allow user auth to drive it
     } on HtHttpException catch (e) {
-      // Failed to fetch AppConfig, log error. App might be partially functional.
       print('[AppBloc] Failed to fetch AppConfig: ${e.message}');
-      // Emit state with null appConfig or keep existing if partially loaded before
-      emit(state.copyWith(appConfig: null, clearAppConfig: true));
+      emit(state.copyWith(status: AppStatus.configFetchFailed, appConfig: null, clearAppConfig: true));
     } catch (e) {
       print('[AppBloc] Unexpected error fetching AppConfig: $e');
-      emit(state.copyWith(appConfig: null, clearAppConfig: true));
+      emit(state.copyWith(status: AppStatus.configFetchFailed, appConfig: null, clearAppConfig: true));
     }
   }
 

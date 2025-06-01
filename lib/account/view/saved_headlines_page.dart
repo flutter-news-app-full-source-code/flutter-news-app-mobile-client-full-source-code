@@ -23,31 +23,34 @@ class SavedHeadlinesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.accountSavedHeadlinesTile)),
+      appBar: AppBar(
+        title: Text(
+          l10n.accountSavedHeadlinesTile,
+          style: textTheme.titleLarge, // Consistent AppBar title
+        ),
+      ),
       body: BlocBuilder<AccountBloc, AccountState>(
         builder: (context, state) {
-          // Initial load or loading state for preferences
           if (state.status == AccountStatus.loading && state.preferences == null) {
-            return const LoadingStateWidget(
+            return LoadingStateWidget(
               icon: Icons.bookmarks_outlined,
-              headline: 'Loading Saved Headlines...', // Placeholder
-              subheadline:
-                  'Please wait while we fetch your saved articles.', // Placeholder
+              headline: l10n.savedHeadlinesLoadingHeadline, // Use l10n
+              subheadline: l10n.savedHeadlinesLoadingSubheadline, // Use l10n
             );
           }
 
-          // Failure to load preferences
           if (state.status == AccountStatus.failure && state.preferences == null) {
             return FailureStateWidget(
-              message:
-                  state.errorMessage ??
-                  'Could not load saved headlines.', // Placeholder
+              message: state.errorMessage ?? l10n.savedHeadlinesErrorHeadline, // Use l10n
               onRetry: () {
                 if (state.user?.id != null) {
                   context.read<AccountBloc>().add(
-                        AccountLoadUserPreferences( // Corrected event name
+                        AccountLoadUserPreferences(
                           userId: state.user!.id,
                         ),
                       );
@@ -59,34 +62,37 @@ class SavedHeadlinesPage extends StatelessWidget {
           final savedHeadlines = state.preferences?.savedHeadlines ?? [];
 
           if (savedHeadlines.isEmpty) {
-            return const InitialStateWidget( 
+            return InitialStateWidget(
               icon: Icons.bookmark_add_outlined,
-              headline: 'No Saved Headlines', // Placeholder - Reverted
-              subheadline:
-                  "You haven't saved any articles yet. Start exploring!", // Placeholder - Reverted
+              headline: l10n.savedHeadlinesEmptyHeadline, // Use l10n
+              subheadline: l10n.savedHeadlinesEmptySubheadline, // Use l10n
             );
           }
 
           return ListView.separated(
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.paddingSmall), // Add padding
             itemCount: savedHeadlines.length,
-            separatorBuilder: (context, index) => const Divider(height: 1),
+            separatorBuilder: (context, index) => Divider(
+              height: 1,
+              indent: AppSpacing.paddingMedium, // Indent divider
+              endIndent: AppSpacing.paddingMedium,
+            ),
             itemBuilder: (context, index) {
               final headline = savedHeadlines[index];
-              final imageStyle =
-                  context
-                      .watch<AppBloc>()
-                      .state
-                      .settings
-                      .feedPreferences
-                      .headlineImageStyle;
+              final imageStyle = context
+                  .watch<AppBloc>()
+                  .state
+                  .settings
+                  .feedPreferences
+                  .headlineImageStyle;
 
               final trailingButton = IconButton(
-                icon: const Icon(Icons.delete_outline),
-                tooltip: l10n.headlineDetailsRemoveFromSavedTooltip, // Use l10n
+                icon: Icon(Icons.delete_outline, color: colorScheme.error), // Themed icon
+                tooltip: l10n.headlineDetailsRemoveFromSavedTooltip,
                 onPressed: () {
                   context.read<AccountBloc>().add(
-                    AccountSaveHeadlineToggled(headline: headline),
-                  );
+                        AccountSaveHeadlineToggled(headline: headline),
+                      );
                 },
               );
 

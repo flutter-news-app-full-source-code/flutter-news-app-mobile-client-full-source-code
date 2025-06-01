@@ -99,12 +99,18 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
       emit(
         HeadlinesFeedLoaded(
-          feedItems: processedFeedItems, // Changed
-          hasMore: headlineResponse.hasMore, // Based on original headline fetch
+          feedItems: processedFeedItems,
+          hasMore: headlineResponse.hasMore,
           cursor: headlineResponse.cursor,
-          filter: event.filter, // Store the applied filter
+          filter: event.filter,
         ),
       );
+
+      // Dispatch event if AccountAction was injected
+      if (processedFeedItems.any((item) => item is AccountAction) &&
+          _appBloc.state.user?.id != null) {
+        _appBloc.add(AppUserAccountActionShown(userId: _appBloc.state.user!.id));
+      }
     } on HtHttpException catch (e) {
       emit(HeadlinesFeedError(message: e.message));
     } catch (e, st) {
@@ -146,11 +152,17 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
       emit(
         HeadlinesFeedLoaded(
-          feedItems: processedFeedItems, // Changed
+          feedItems: processedFeedItems,
           hasMore: headlineResponse.hasMore,
           cursor: headlineResponse.cursor,
         ),
       );
+      
+      // Dispatch event if AccountAction was injected
+      if (processedFeedItems.any((item) => item is AccountAction) &&
+          _appBloc.state.user?.id != null) {
+        _appBloc.add(AppUserAccountActionShown(userId: _appBloc.state.user!.id));
+      }
     } on HtHttpException catch (e) {
       emit(HeadlinesFeedError(message: e.message));
     } catch (e, st) {
@@ -233,16 +245,24 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         currentFeedItemCount: currentFeedItemCountForInjector,
       );
 
+      final resultingFeedItems = isPaginating
+          ? (List.of(currentFeedItems)..addAll(newProcessedFeedItems))
+          : newProcessedFeedItems;
+
       emit(
         HeadlinesFeedLoaded(
-          feedItems: isPaginating
-              ? (List.of(currentFeedItems)..addAll(newProcessedFeedItems))
-              : newProcessedFeedItems,
+          feedItems: resultingFeedItems,
           hasMore: headlineResponse.hasMore,
           cursor: headlineResponse.cursor,
           filter: currentFilter,
         ),
       );
+
+      // Dispatch event if AccountAction was injected
+      if (newProcessedFeedItems.any((item) => item is AccountAction) &&
+          _appBloc.state.user?.id != null) {
+        _appBloc.add(AppUserAccountActionShown(userId: _appBloc.state.user!.id));
+      }
     } on HtHttpException catch (e) {
       emit(HeadlinesFeedError(message: e.message));
     } catch (e, st) {
@@ -310,6 +330,12 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           filter: currentFilter,
         ),
       );
+
+      // Dispatch event if AccountAction was injected
+      if (processedFeedItems.any((item) => item is AccountAction) &&
+          _appBloc.state.user?.id != null) {
+        _appBloc.add(AppUserAccountActionShown(userId: _appBloc.state.user!.id));
+      }
     } on HtHttpException catch (e) {
       emit(HeadlinesFeedError(message: e.message));
     } catch (e, st) {

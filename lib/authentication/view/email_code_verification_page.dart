@@ -166,7 +166,10 @@ class _EmailCodeVerificationFormState
           const SizedBox(height: AppSpacing.xxl), // Increased spacing
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+              padding: const EdgeInsets.symmetric(
+                vertical: AppSpacing.md,
+                horizontal: AppSpacing.lg, // Added horizontal padding
+              ),
               textStyle: textTheme.labelLarge,
             ),
             onPressed: widget.isLoading ? null : _submitForm,

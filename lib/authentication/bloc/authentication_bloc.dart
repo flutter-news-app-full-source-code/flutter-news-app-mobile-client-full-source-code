@@ -26,7 +26,7 @@ class AuthenticationBloc
     : _authenticationRepository = authenticationRepository,
       super(AuthenticationInitial()) {
     // Listen to authentication state changes from the repository
-    _authenticationRepository.authStateChanges.listen(
+    _userAuthSubscription = _authenticationRepository.authStateChanges.listen(
       (user) => add(_AuthenticationUserChanged(user: user)),
     );
 
@@ -42,6 +42,7 @@ class AuthenticationBloc
   }
 
   final HtAuthRepository _authenticationRepository;
+  late final StreamSubscription<User?> _userAuthSubscription;
 
   /// Handles [_AuthenticationUserChanged] events.
   Future<void> _onAuthenticationUserChanged(
@@ -83,7 +84,8 @@ class AuthenticationBloc
       emit(AuthenticationFailure('Operation failed: ${e.message}'));
     } on HtHttpException catch (e) {
       // Catch any other HtHttpException subtypes
-      emit(AuthenticationFailure('HTTP error: ${e.message}'));
+      final message = e.message.isNotEmpty ? e.message : 'An unspecified HTTP error occurred.';
+      emit(AuthenticationFailure('HTTP error: $message'));
     } catch (e) {
       // Catch any other unexpected errors
       emit(AuthenticationFailure('An unexpected error occurred: $e'));
@@ -102,9 +104,9 @@ class AuthenticationBloc
       // On success, the _AuthenticationUserChanged listener will handle
       // emitting AuthenticationAuthenticated.
     } on InvalidInputException catch (e) {
-      emit(AuthenticationFailure('Invalid input: ${e.message}'));
+      emit(AuthenticationFailure(e.message)); // Use specific error message
     } on AuthenticationException catch (e) {
-      emit(AuthenticationFailure('Authentication failed: ${e.message}'));
+      emit(AuthenticationFailure(e.message)); // Use specific error message
     } on NetworkException catch (_) {
       emit(const AuthenticationFailure('Network error occurred.'));
     } on ServerException catch (e) {
@@ -155,6 +157,10 @@ class AuthenticationBloc
       await _authenticationRepository.signOut();
       // On success, the _AuthenticationUserChanged listener will handle
       // emitting AuthenticationUnauthenticated.
+      // No need to emit AuthenticationLoading() before calling signOut if
+      // the authStateChanges listener handles the subsequent state update.
+      // However, if immediate feedback is desired, it can be kept.
+      // For now, let's assume the listener is sufficient.
     } on NetworkException catch (_) {
       emit(const AuthenticationFailure('Network error occurred.'));
     } on ServerException catch (e) {
@@ -167,5 +173,11 @@ class AuthenticationBloc
     } catch (e) {
       emit(AuthenticationFailure('An unexpected error occurred: $e'));
     }
+  }
+
+  @override
+  Future<void> close() {
+    _userAuthSubscription.cancel();
+    return super.close();
   }
 }

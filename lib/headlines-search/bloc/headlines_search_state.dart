@@ -31,7 +31,7 @@ class HeadlinesSearchLoading extends HeadlinesSearchState {
 /// State when a search has successfully returned results.
 class HeadlinesSearchSuccess extends HeadlinesSearchState {
   const HeadlinesSearchSuccess({
-    required this.results,
+    required this.items, // Changed from results
     required this.hasMore,
     required this.lastSearchTerm,
     required super.selectedModelType, // The model type for these results
@@ -39,14 +39,14 @@ class HeadlinesSearchSuccess extends HeadlinesSearchState {
     this.errorMessage, // For non-critical errors like pagination failure
   });
 
-  final List<dynamic> results; // Can hold Headline, Category, Source, Country
+  final List<FeedItem> items; // Changed from List<dynamic> to List<FeedItem>
   final bool hasMore;
   final String? cursor;
   final String? errorMessage; // e.g., for pagination errors
   final String lastSearchTerm; // The term that yielded these results
 
   HeadlinesSearchSuccess copyWith({
-    List<dynamic>? results,
+    List<FeedItem>? items, // Changed
     bool? hasMore,
     String? cursor,
     String? errorMessage,
@@ -55,7 +55,7 @@ class HeadlinesSearchSuccess extends HeadlinesSearchState {
     bool clearErrorMessage = false,
   }) {
     return HeadlinesSearchSuccess(
-      results: results ?? this.results,
+      items: items ?? this.items, // Changed
       hasMore: hasMore ?? this.hasMore,
       cursor: cursor ?? this.cursor,
       errorMessage:
@@ -68,7 +68,7 @@ class HeadlinesSearchSuccess extends HeadlinesSearchState {
   @override
   List<Object?> get props => [
     ...super.props,
-    results,
+    items, // Changed
     hasMore,
     cursor,
     errorMessage,

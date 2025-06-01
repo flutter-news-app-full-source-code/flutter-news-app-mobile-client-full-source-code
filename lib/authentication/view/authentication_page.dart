@@ -97,76 +97,80 @@ class AuthenticationPage extends StatelessWidget {
                         MainAxisAlignment.center, // Center vertically
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // --- Hardcoded Icon ---
+                      // --- Icon ---
                       Padding(
-                        padding: const EdgeInsets.only(
-                          bottom: AppSpacing.xl,
-                        ), // Spacing below icon
+                        padding: const EdgeInsets.only(bottom: AppSpacing.xl),
                         child: Icon(
-                          Icons.security, // Hardcode the icon
-                          size:
-                              (Theme.of(context).iconTheme.size ??
-                                  AppSpacing.xl) *
-                              3.0,
-                          color: Theme.of(context).colorScheme.primary,
+                          Icons.security,
+                          size: AppSpacing.xxl * 2, // Standardized large icon
+                          color: colorScheme.primary,
                         ),
                       ),
-                      const SizedBox(
-                        height: AppSpacing.lg,
-                      ), // Space between icon and headline
+                      // const SizedBox(height: AppSpacing.lg), // Removed, padding above handles it
                       // --- Headline and Subheadline ---
                       Text(
                         headline,
-                        style: textTheme.headlineMedium,
+                        style: textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.bold, // Ensure prominence
+                        ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: AppSpacing.sm),
+                      const SizedBox(height: AppSpacing.md), // Increased spacing
                       Text(
                         subHeadline,
-                        style: textTheme.bodyLarge,
+                        style: textTheme.bodyLarge?.copyWith(
+                          color: colorScheme.onSurfaceVariant, // Softer color
+                        ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: AppSpacing.xxl),
+
                       // --- Email Sign-In Button ---
-                      ElevatedButton(
-                        // Consider an email icon
-                        // icon: const Icon(Icons.email_outlined),
-                        onPressed:
-                            isLoading
-                                ? null
-                                : () {
-                                  // Navigate to the dedicated email sign-in page,
-                                  // passing the linking context via 'extra'.
-                                  context.goNamed(
-                                    Routes.requestCodeName,
-                                    extra: isLinkingContext,
-                                  );
-                                },
-                        // Consider an email icon
-                        // icon: const Icon(Icons.email_outlined),
-                        child: Text(l10n.authenticationEmailSignInButton),
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.email_outlined),
+                        onPressed: isLoading
+                            ? null
+                            : () {
+                                context.goNamed(
+                                  Routes.requestCodeName,
+                                  extra: isLinkingContext,
+                                );
+                              },
+                        label: Text(l10n.authenticationEmailSignInButton),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: AppSpacing.md,
+                          ),
+                          textStyle: textTheme.labelLarge,
+                        ),
                       ),
+                      const SizedBox(height: AppSpacing.lg),
 
                       // --- Anonymous Sign-In Button (Conditional) ---
                       if (showAnonymousButton) ...[
-                        const SizedBox(height: AppSpacing.lg),
-                        OutlinedButton(
-                          onPressed:
-                              isLoading
-                                  ? null
-                                  : () => context.read<AuthenticationBloc>().add(
+                        OutlinedButton.icon(
+                          icon: const Icon(Icons.person_outline),
+                          onPressed: isLoading
+                              ? null
+                              : () => context.read<AuthenticationBloc>().add(
                                     const AuthenticationAnonymousSignInRequested(),
                                   ),
-                          child: Text(l10n.authenticationAnonymousSignInButton),
+                          label: Text(l10n.authenticationAnonymousSignInButton),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppSpacing.md,
+                            ),
+                            textStyle: textTheme.labelLarge,
+                          ),
                         ),
                       ],
 
-                      // --- Loading Indicator (Optional, for general loading state) ---
-                      // If needed, show a general loading indicator when state is AuthenticationLoading
-                      if (isLoading &&
-                          state is! AuthenticationRequestCodeLoading) ...[
-                        const SizedBox(height: AppSpacing.xl),
-                        const Center(child: CircularProgressIndicator()),
+                      // --- Loading Indicator ---
+                      if (isLoading && state is! AuthenticationRequestCodeLoading) ...[
+                        const Padding(
+                          padding: EdgeInsets.only(top: AppSpacing.xl),
+                          child: Center(child: CircularProgressIndicator()),
+                        ),
                       ],
                     ],
                   ),

@@ -70,9 +70,10 @@ class App extends StatelessWidget {
             create:
                 (context) => AppBloc(
                   authenticationRepository: context.read<HtAuthRepository>(),
-                  // Pass generic data repositories for preferences
                   userAppSettingsRepository:
                       context.read<HtDataRepository<UserAppSettings>>(),
+                  appConfigRepository: // Added
+                      context.read<HtDataRepository<AppConfig>>(), // Added
                 ),
           ),
           BlocProvider(

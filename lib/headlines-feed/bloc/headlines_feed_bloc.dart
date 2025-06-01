@@ -155,6 +155,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           feedItems: processedFeedItems,
           hasMore: headlineResponse.hasMore,
           cursor: headlineResponse.cursor,
+          filter: const HeadlineFilter(), // Ensure filter is reset
         ),
       );
       

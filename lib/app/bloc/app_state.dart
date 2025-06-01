@@ -13,6 +13,12 @@ enum AppStatus {
 
   /// The user is anonymous (signed in using an anonymous provider).
   anonymous,
+
+  /// Fetching the essential AppConfig.
+  configFetching,
+
+  /// Fetching the essential AppConfig failed.
+  configFetchFailed,
 }
 
 class AppState extends Equatable {

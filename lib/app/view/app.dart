@@ -1,6 +1,7 @@
 //
 // ignore_for_file: deprecated_member_use
 
+import 'package:flex_color_scheme/flex_color_scheme.dart'; // Added
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -12,6 +13,8 @@ import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/router.dart';
 import 'package:ht_main/shared/theme/app_theme.dart';
+import 'package:ht_main/shared/widgets/failure_state_widget.dart'; // Added
+import 'package:ht_main/shared/widgets/loading_state_widget.dart'; // Added
 import 'package:ht_shared/ht_shared.dart'; // Shared models, FromJson, ToJson, etc.
 
 class App extends StatelessWidget {
@@ -168,24 +171,93 @@ class _AppViewState extends State<_AppView> {
     // (specifically for updating the ValueNotifier) with a BlocListener.
     // The BlocBuilder remains for theme changes.
     return BlocListener<AppBloc, AppState>(
-      // Only listen when the status actually changes
+      // Listen for status changes to update the GoRouter's ValueNotifier
       listenWhen: (previous, current) => previous.status != current.status,
       listener: (context, state) {
-        // Directly update the ValueNotifier when the AppBloc status changes.
-        // This triggers the GoRouter's refreshListenable.
         _statusNotifier.value = state.status;
       },
       child: BlocBuilder<AppBloc, AppState>(
-        // Build when theme-related properties change (including text scale factor)
-        buildWhen:
-            (previous, current) =>
-                previous.themeMode != current.themeMode ||
-                previous.flexScheme != current.flexScheme ||
-                previous.fontFamily != current.fontFamily ||
-                previous.appTextScaleFactor != current.appTextScaleFactor ||
-                previous.locale != current.locale ||
-                previous.settings != current.settings, // Added settings check
+        // Rebuild the UI based on AppBloc's state (theme, locale, and critical app statuses)
         builder: (context, state) {
+          // Defer l10n access until inside a MaterialApp context
+
+          // Handle critical AppConfig loading states globally
+          if (state.status == AppStatus.configFetching) {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              theme: lightTheme(
+                scheme: FlexScheme.material, // Default scheme
+                appTextScaleFactor: AppTextScaleFactor.medium, // Default
+                appFontWeight: AppFontWeight.regular, // Default
+                fontFamily: null, // System default font
+              ),
+              darkTheme: darkTheme(
+                scheme: FlexScheme.material, // Default scheme
+                appTextScaleFactor: AppTextScaleFactor.medium, // Default
+                appFontWeight: AppFontWeight.regular, // Default
+                fontFamily: null, // System default font
+              ),
+              themeMode: state.themeMode, // Still respect light/dark if available from system
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(
+                body: Builder( // Use Builder to get context under MaterialApp
+                  builder: (innerContext) {
+                    final l10n = innerContext.l10n;
+                    return LoadingStateWidget(
+                      icon: Icons.settings_applications_outlined,
+                      headline: l10n.headlinesFeedLoadingHeadline, // "Loading..."
+                      subheadline: l10n.pleaseWait, // "Please wait..."
+                    );
+                  },
+                ),
+              ),
+            );
+          }
+
+          if (state.status == AppStatus.configFetchFailed) {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              theme: lightTheme(
+                scheme: FlexScheme.material, // Default scheme
+                appTextScaleFactor: AppTextScaleFactor.medium, // Default
+                appFontWeight: AppFontWeight.regular, // Default
+                fontFamily: null, // System default font
+              ),
+              darkTheme: darkTheme(
+                scheme: FlexScheme.material, // Default scheme
+                appTextScaleFactor: AppTextScaleFactor.medium, // Default
+                appFontWeight: AppFontWeight.regular, // Default
+                fontFamily: null, // System default font
+              ),
+              themeMode: state.themeMode,
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(
+                body: Builder( // Use Builder to get context under MaterialApp
+                  builder: (innerContext) {
+                    final l10n = innerContext.l10n;
+                    return FailureStateWidget(
+                      message: l10n.unknownError, // "An unknown error occurred."
+                      retryButtonText: "Retry", // Hardcoded for now
+                      onRetry: () {
+                        // Use outer context for BLoC access
+                        context 
+                            .read<AppBloc>()
+                            .add(const AppConfigFetchRequested());
+                      },
+                    );
+                  },
+                ),
+              ),
+            );
+          }
+          
+          // If config is loaded (or not in a failed/fetching state for config), proceed with main app UI
+          // It's safe to access l10n here if needed for print statements,
+          // as this path implies we are about to build the main MaterialApp.router
+          // which provides localizations.
+          // final l10n = context.l10n; 
           print('[_AppViewState] Building MaterialApp.router');
           print('[_AppViewState] state.fontFamily: ${state.fontFamily}');
           print(
@@ -197,23 +269,22 @@ class _AppViewState extends State<_AppView> {
           return MaterialApp.router(
             debugShowCheckedModeBanner: false,
             themeMode: state.themeMode,
-            // Pass scheme and font family from state to theme functions
             theme: lightTheme(
               scheme: state.flexScheme,
               appTextScaleFactor:
                   state.settings.displaySettings.textScaleFactor,
-              appFontWeight: state.settings.displaySettings.fontWeight, // Added
+              appFontWeight: state.settings.displaySettings.fontWeight,
               fontFamily: state.settings.displaySettings.fontFamily,
             ),
             darkTheme: darkTheme(
               scheme: state.flexScheme,
               appTextScaleFactor:
                   state.settings.displaySettings.textScaleFactor,
-              appFontWeight: state.settings.displaySettings.fontWeight, // Added
+              appFontWeight: state.settings.displaySettings.fontWeight,
               fontFamily: state.settings.displaySettings.fontFamily,
             ),
             routerConfig: _router,
-            locale: state.locale, // Use locale from AppBloc state
+            locale: state.locale,
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
           );

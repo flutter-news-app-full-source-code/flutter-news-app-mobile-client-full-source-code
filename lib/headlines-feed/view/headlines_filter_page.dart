@@ -129,15 +129,36 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
         userId: currentUser.id,
       ); // Assuming read by user ID
 
-      setState(() {
-        _currentUserPreferences = preferences;
-        _tempSelectedCategories = List.from(preferences.followedCategories);
-        _tempSelectedSources = List.from(preferences.followedSources);
-        // We don't auto-apply source country/type filters from user preferences here
-        // as the "Apply my followed" checkbox is primarily for categories/sources.
-        // If needed, this logic could be expanded.
-        _isLoadingFollowedFilters = false;
-      });
+      // NEW: Check if followed items are empty
+      if (preferences.followedCategories.isEmpty &&
+          preferences.followedSources.isEmpty) {
+        setState(() {
+          _isLoadingFollowedFilters = false;
+          _useFollowedFilters = false; // Uncheck the box
+          _tempSelectedCategories = []; // Ensure lists are cleared
+          _tempSelectedSources = [];
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                content: Text(context.l10n.noFollowedItemsForFilterSnackbar),
+                duration: const Duration(seconds: 3),
+              ),
+            );
+        }
+        return; // Exit the function as no filters to apply
+      } else {
+        setState(() {
+          _currentUserPreferences = preferences;
+          _tempSelectedCategories = List.from(preferences.followedCategories);
+          _tempSelectedSources = List.from(preferences.followedSources);
+          // We don't auto-apply source country/type filters from user preferences here
+          // as the "Apply my followed" checkbox is primarily for categories/sources.
+          _isLoadingFollowedFilters = false;
+        });
+      }
     } on NotFoundException {
       setState(() {
         _currentUserPreferences =
@@ -145,9 +166,18 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
         _tempSelectedCategories = [];
         _tempSelectedSources = [];
         _isLoadingFollowedFilters = false;
-        // Optionally, inform user they have no followed items:
-        // _loadFollowedFiltersError = context.l10n.noFollowedItemsFound;
+        _useFollowedFilters = false; // Uncheck as no prefs found (implies no followed)
       });
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content: Text(context.l10n.noFollowedItemsForFilterSnackbar),
+              duration: const Duration(seconds: 3),
+            ),
+          );
+      }
     } on HtHttpException catch (e) {
       setState(() {
         _isLoadingFollowedFilters = false;

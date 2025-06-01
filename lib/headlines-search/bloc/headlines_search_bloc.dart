@@ -1,9 +1,11 @@
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_data_repository/ht_data_repository.dart'; // Generic Data Repository
-import 'package:ht_main/headlines-search/models/search_model_type.dart'; // Import SearchModelType
-import 'package:ht_shared/ht_shared.dart' show Category, Headline, HtHttpException, PaginatedResponse, Source; // Shared models
+import 'package:ht_data_repository/ht_data_repository.dart';
+import 'package:ht_main/app/bloc/app_bloc.dart'; // Added
+import 'package:ht_main/headlines-search/models/search_model_type.dart';
+import 'package:ht_main/shared/services/feed_injector_service.dart'; // Added
+import 'package:ht_shared/ht_shared.dart'; // Updated for FeedItem, AppConfig, User etc.
 
 part 'headlines_search_event.dart';
 part 'headlines_search_state.dart';
@@ -14,12 +16,14 @@ class HeadlinesSearchBloc
     required HtDataRepository<Headline> headlinesRepository,
     required HtDataRepository<Category> categoryRepository,
     required HtDataRepository<Source> sourceRepository,
-    // required HtDataRepository<Country> countryRepository, // Removed
-  }) : _headlinesRepository = headlinesRepository,
-       _categoryRepository = categoryRepository,
-       _sourceRepository = sourceRepository,
-       // _countryRepository = countryRepository, // Removed
-       super(const HeadlinesSearchInitial()) {
+    required AppBloc appBloc, // Added
+    required FeedInjectorService feedInjectorService, // Added
+  })  : _headlinesRepository = headlinesRepository,
+        _categoryRepository = categoryRepository,
+        _sourceRepository = sourceRepository,
+        _appBloc = appBloc, // Added
+        _feedInjectorService = feedInjectorService, // Added
+        super(const HeadlinesSearchInitial()) {
     on<HeadlinesSearchModelTypeChanged>(_onHeadlinesSearchModelTypeChanged);
     on<HeadlinesSearchFetchRequested>(
       _onSearchFetchRequested,
@@ -30,7 +34,8 @@ class HeadlinesSearchBloc
   final HtDataRepository<Headline> _headlinesRepository;
   final HtDataRepository<Category> _categoryRepository;
   final HtDataRepository<Source> _sourceRepository;
-  // final HtDataRepository<Country> _countryRepository; // Removed
+  final AppBloc _appBloc; // Added
+  final FeedInjectorService _feedInjectorService; // Added
   static const _limit = 10;
 
   Future<void> _onHeadlinesSearchModelTypeChanged(
@@ -61,7 +66,7 @@ class HeadlinesSearchBloc
     if (searchTerm.isEmpty) {
       emit(
         HeadlinesSearchSuccess(
-          results: const [],
+          items: const [], // Changed
           hasMore: false,
           lastSearchTerm: '',
           selectedModelType: modelType,
@@ -86,32 +91,62 @@ class HeadlinesSearchBloc
                 limit: _limit,
                 startAfterId: successState.cursor,
               );
+              // Cast to List<Headline> for the injector
+              final headlines = response.items.cast<Headline>();
+              final currentUser = _appBloc.state.user;
+              final appConfig = _appBloc.state.appConfig;
+              if (appConfig == null) {
+                emit(successState.copyWith(errorMessage: 'App configuration not available for pagination.'));
+                return;
+              }
+              final injectedItems = _feedInjectorService.injectItems(
+                headlines: headlines,
+                user: currentUser,
+                appConfig: appConfig,
+                currentFeedItemCount: successState.items.length,
+              );
+              emit(
+                successState.copyWith(
+                  items: List.of(successState.items)..addAll(injectedItems),
+                  hasMore: response.hasMore, // hasMore from original headline fetch
+                  cursor: response.cursor,
+                ),
+              );
+              // Dispatch event if AccountAction was injected during pagination
+              if (injectedItems.any((item) => item is AccountAction) &&
+                  _appBloc.state.user?.id != null) {
+                _appBloc.add(AppUserAccountActionShown(userId: _appBloc.state.user!.id));
+              }
+              break; 
             case SearchModelType.category:
               response = await _categoryRepository.readAllByQuery(
                 {'q': searchTerm, 'model': modelType.toJson()},
                 limit: _limit,
                 startAfterId: successState.cursor,
               );
+              emit(
+                successState.copyWith(
+                  items: List.of(successState.items)..addAll(response.items.cast<FeedItem>()),
+                  hasMore: response.hasMore,
+                  cursor: response.cursor,
+                ),
+              );
+              break; // Added break
             case SearchModelType.source:
               response = await _sourceRepository.readAllByQuery(
                 {'q': searchTerm, 'model': modelType.toJson()},
                 limit: _limit,
                 startAfterId: successState.cursor,
               );
-            // case SearchModelType.country: // Removed
-            //   response = await _countryRepository.readAllByQuery(
-            //     {'q': searchTerm, 'model': modelType.toJson()},
-            //     limit: _limit,
-            //     startAfterId: successState.cursor,
-            //   );
+              emit(
+                successState.copyWith(
+                  items: List.of(successState.items)..addAll(response.items.cast<FeedItem>()),
+                  hasMore: response.hasMore,
+                  cursor: response.cursor,
+                ),
+              );
+              break; // Added break
           }
-          emit(
-            successState.copyWith(
-              results: List.of(successState.results)..addAll(response.items),
-              hasMore: response.hasMore,
-              cursor: response.cursor,
-            ),
-          );
         } on HtHttpException catch (e) {
           emit(successState.copyWith(errorMessage: e.message));
         } catch (e, st) {
@@ -132,38 +167,65 @@ class HeadlinesSearchBloc
       ),
     );
     try {
-      PaginatedResponse<dynamic> response;
+      PaginatedResponse<dynamic> rawResponse;
+      List<FeedItem> processedItems;
+
       switch (modelType) {
         case SearchModelType.headline:
-          response = await _headlinesRepository.readAllByQuery({
-            'q': searchTerm,
-            'model': modelType.toJson(),
-          }, limit: _limit,);
+          rawResponse = await _headlinesRepository.readAllByQuery(
+            {'q': searchTerm, 'model': modelType.toJson()},
+            limit: _limit,
+          );
+          final headlines = rawResponse.items.cast<Headline>();
+          final currentUser = _appBloc.state.user;
+          final appConfig = _appBloc.state.appConfig;
+          if (appConfig == null) {
+            emit(
+              HeadlinesSearchFailure(
+                errorMessage: 'App configuration not available.',
+                lastSearchTerm: searchTerm,
+                selectedModelType: modelType,
+              ),
+            );
+            return;
+          }
+          processedItems = _feedInjectorService.injectItems(
+            headlines: headlines,
+            user: currentUser,
+            appConfig: appConfig,
+            currentFeedItemCount: 0,
+          );
+          break;
         case SearchModelType.category:
-          response = await _categoryRepository.readAllByQuery({
-            'q': searchTerm,
-            'model': modelType.toJson(),
-          }, limit: _limit,);
+          rawResponse = await _categoryRepository.readAllByQuery(
+            {'q': searchTerm, 'model': modelType.toJson()},
+            limit: _limit,
+          );
+          processedItems = rawResponse.items.cast<FeedItem>();
+          break;
         case SearchModelType.source:
-          response = await _sourceRepository.readAllByQuery({
-            'q': searchTerm,
-            'model': modelType.toJson(),
-          }, limit: _limit,);
-        // case SearchModelType.country: // Removed
-        //   response = await _countryRepository.readAllByQuery({
-        //     'q': searchTerm,
-        //     'model': modelType.toJson(),
-        //   }, limit: _limit,);
+          rawResponse = await _sourceRepository.readAllByQuery(
+            {'q': searchTerm, 'model': modelType.toJson()},
+            limit: _limit,
+          );
+          processedItems = rawResponse.items.cast<FeedItem>();
+          break;
       }
       emit(
         HeadlinesSearchSuccess(
-          results: response.items,
-          hasMore: response.hasMore,
-          cursor: response.cursor,
+          items: processedItems, 
+          hasMore: rawResponse.hasMore,
+          cursor: rawResponse.cursor,
           lastSearchTerm: searchTerm,
           selectedModelType: modelType,
         ),
       );
+      // Dispatch event if AccountAction was injected in new search
+      if (modelType == SearchModelType.headline && 
+          processedItems.any((item) => item is AccountAction) &&
+          _appBloc.state.user?.id != null) {
+        _appBloc.add(AppUserAccountActionShown(userId: _appBloc.state.user!.id));
+      }
     } on HtHttpException catch (e) {
       emit(
         HeadlinesSearchFailure(

@@ -12,9 +12,9 @@ class EntityDetailsState extends Equatable {
     this.entityType,
     this.entity,
     this.isFollowing = false,
-    this.headlines = const [],
+    this.feedItems = const [], // Changed from headlines
     this.headlinesStatus = EntityHeadlinesStatus.initial,
-    this.hasMoreHeadlines = true,
+    this.hasMoreHeadlines = true, // This refers to original headlines
     this.headlinesCursor,
     this.errorMessage,
   });
@@ -23,10 +23,10 @@ class EntityDetailsState extends Equatable {
   final EntityType? entityType;
   final dynamic entity; // Will be Category or Source
   final bool isFollowing;
-  final List<Headline> headlines;
+  final List<FeedItem> feedItems; // Changed from List<Headline>
   final EntityHeadlinesStatus headlinesStatus;
-  final bool hasMoreHeadlines;
-  final String? headlinesCursor;
+  final bool hasMoreHeadlines; // This refers to original headlines
+  final String? headlinesCursor; // Cursor for fetching original headlines
   final String? errorMessage;
 
   EntityDetailsState copyWith({
@@ -34,7 +34,7 @@ class EntityDetailsState extends Equatable {
     EntityType? entityType,
     dynamic entity,
     bool? isFollowing,
-    List<Headline>? headlines,
+    List<FeedItem>? feedItems, // Changed
     EntityHeadlinesStatus? headlinesStatus,
     bool? hasMoreHeadlines,
     String? headlinesCursor,
@@ -48,10 +48,10 @@ class EntityDetailsState extends Equatable {
       entityType: entityType ?? this.entityType,
       entity: clearEntity ? null : entity ?? this.entity,
       isFollowing: isFollowing ?? this.isFollowing,
-      headlines: headlines ?? this.headlines,
+      feedItems: feedItems ?? this.feedItems, // Changed
       headlinesStatus: headlinesStatus ?? this.headlinesStatus,
       hasMoreHeadlines: hasMoreHeadlines ?? this.hasMoreHeadlines,
-      headlinesCursor:
+      headlinesCursor: // This cursor is for fetching original headlines
           clearHeadlinesCursor ? null : headlinesCursor ?? this.headlinesCursor,
       errorMessage:
           clearErrorMessage ? null : errorMessage ?? this.errorMessage,
@@ -64,7 +64,7 @@ class EntityDetailsState extends Equatable {
     entityType,
     entity,
     isFollowing,
-    headlines,
+    feedItems, // Changed
     headlinesStatus,
     hasMoreHeadlines,
     headlinesCursor,

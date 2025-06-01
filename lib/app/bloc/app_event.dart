@@ -91,3 +91,25 @@ class AppTextScaleFactorChanged extends AppEvent {
   @override
   List<Object?> get props => [appTextScaleFactor];
 }
+
+/// {@template _app_config_fetch_requested}
+/// Internal event to trigger fetching of the global AppConfig.
+/// {@endtemplate}
+class _AppConfigFetchRequested extends AppEvent {
+  /// {@macro _app_config_fetch_requested}
+  const _AppConfigFetchRequested();
+}
+
+/// {@template app_user_account_action_shown}
+/// Event triggered when an AccountAction has been shown to the user,
+/// prompting an update to their `lastAccountActionShownAt` timestamp.
+/// {@endtemplate}
+class AppUserAccountActionShown extends AppEvent {
+  /// {@macro app_user_account_action_shown}
+  const AppUserAccountActionShown({required this.userId});
+
+  final String userId;
+
+  @override
+  List<Object> get props => [userId];
+}

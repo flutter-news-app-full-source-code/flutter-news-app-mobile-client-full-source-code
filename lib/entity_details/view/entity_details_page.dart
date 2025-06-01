@@ -9,6 +9,7 @@ import 'package:ht_main/entity_details/models/entity_type.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart'; // Added
 import 'package:ht_main/shared/constants/app_spacing.dart';
+import 'package:ht_main/shared/services/feed_injector_service.dart'; // Added
 import 'package:ht_main/shared/widgets/widgets.dart';
 import 'package:ht_shared/ht_shared.dart';
 
@@ -40,21 +41,27 @@ class EntityDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create:
-          (context) => EntityDetailsBloc(
-            headlinesRepository: context.read<HtDataRepository<Headline>>(),
-            categoryRepository: context.read<HtDataRepository<Category>>(),
-            sourceRepository: context.read<HtDataRepository<Source>>(),
-            accountBloc: context.read<AccountBloc>(),
-          )..add(
-            EntityDetailsLoadRequested(
-              entityId: args.entityId,
-              entityType: args.entityType,
-              entity: args.entity,
-            ),
+    return BlocProvider<EntityDetailsBloc>( // Explicitly type BlocProvider
+      create: (context) {
+        final feedInjectorService = FeedInjectorService();
+        final entityDetailsBloc = EntityDetailsBloc(
+          headlinesRepository: context.read<HtDataRepository<Headline>>(),
+          categoryRepository: context.read<HtDataRepository<Category>>(),
+          sourceRepository: context.read<HtDataRepository<Source>>(),
+          accountBloc: context.read<AccountBloc>(),
+          appBloc: context.read<AppBloc>(),
+          feedInjectorService: feedInjectorService,
+        );
+        entityDetailsBloc.add(
+          EntityDetailsLoadRequested(
+            entityId: args.entityId,
+            entityType: args.entityType,
+            entity: args.entity,
           ),
-      child: EntityDetailsView(args: args), // Pass args
+        );
+        return entityDetailsBloc;
+      },
+      child: EntityDetailsView(args: args),
     );
   }
 }
@@ -112,17 +119,17 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
           if (state.status == EntityDetailsStatus.initial ||
               (state.status == EntityDetailsStatus.loading &&
                   state.entity == null)) {
-            return const LoadingStateWidget(
-              icon: Icons.info_outline, // Or a more specific icon
-              headline: 'Loading Details', // Replace with l10n
-              subheadline: 'Please wait...', // Replace with l10n
+            return LoadingStateWidget(
+              icon: Icons.info_outline, 
+              headline: l10n.headlineDetailsLoadingHeadline, // Used generic loading
+              subheadline: l10n.pleaseWait, // Used generic please wait
             );
           }
 
           if (state.status == EntityDetailsStatus.failure &&
               state.entity == null) {
             return FailureStateWidget(
-              message: state.errorMessage ?? 'Failed to load details.', // l10n
+              message: state.errorMessage ?? l10n.unknownError, // Used generic error
               onRetry:
                   () => context.read<EntityDetailsBloc>().add(
                     EntityDetailsLoadRequested(
@@ -248,7 +255,7 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                         ),
                         const SizedBox(height: AppSpacing.lg),
                       ],
-                      if (state.headlines.isNotEmpty ||
+                      if (state.feedItems.isNotEmpty || // Changed
                           state.headlinesStatus ==
                               EntityHeadlinesStatus.loadingMore) ...[
                         Text(
@@ -261,12 +268,11 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                   ),
                 ),
               ),
-              if (state.headlines.isEmpty &&
+              if (state.feedItems.isEmpty && // Changed
                   state.headlinesStatus != EntityHeadlinesStatus.initial &&
                   state.headlinesStatus != EntityHeadlinesStatus.loadingMore &&
                   state.status == EntityDetailsStatus.success)
                 SliverFillRemaining(
-                  // Use SliverFillRemaining for empty state
                   child: Center(
                     child: Text(
                       l10n.noHeadlinesFoundMessage,
@@ -278,89 +284,161 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      if (index >= state.headlines.length) {
-                        return state.hasMoreHeadlines &&
+                      if (index >= state.feedItems.length) { // Changed
+                        return state.hasMoreHeadlines && // hasMoreHeadlines still refers to original headlines
                                 state.headlinesStatus ==
                                     EntityHeadlinesStatus.loadingMore
                             ? const Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(AppSpacing.md),
-                                child: CircularProgressIndicator(),
-                              ),
-                            )
+                                child: Padding(
+                                  padding: EdgeInsets.all(AppSpacing.md),
+                                  child: CircularProgressIndicator(),
+                                ),
+                              )
                             : const SizedBox.shrink();
                       }
-                      final headline = state.headlines[index];
-                      final imageStyle =
-                          context
-                              .watch<AppBloc>()
-                              .state
-                              .settings
-                              .feedPreferences
-                              .headlineImageStyle;
+                      final item = state.feedItems[index]; // Changed
 
-                      Widget tile;
-                      switch (imageStyle) {
-                        case HeadlineImageStyle.hidden:
-                          tile = HeadlineTileTextOnly(
-                            headline: headline,
-                            onHeadlineTap:
-                                () => context.pushNamed(
-                                  Routes
-                                      .globalArticleDetailsName, // Use new global route
-                                  pathParameters: {'id': headline.id},
-                                  extra: headline,
+                      if (item is Headline) {
+                        final imageStyle = context
+                            .watch<AppBloc>()
+                            .state
+                            .settings
+                            .feedPreferences
+                            .headlineImageStyle;
+                        Widget tile;
+                        switch (imageStyle) {
+                          case HeadlineImageStyle.hidden:
+                            tile = HeadlineTileTextOnly(
+                              headline: item,
+                              onHeadlineTap: () => context.pushNamed(
+                                Routes.globalArticleDetailsName,
+                                pathParameters: {'id': item.id},
+                                extra: item,
+                              ),
+                              currentContextEntityType: state.entityType,
+                              currentContextEntityId: state.entity is Category
+                                  ? (state.entity as Category).id
+                                  : state.entity is Source
+                                      ? (state.entity as Source).id
+                                      : null,
+                            );
+                            break;
+                          case HeadlineImageStyle.smallThumbnail:
+                            tile = HeadlineTileImageStart(
+                              headline: item,
+                              onHeadlineTap: () => context.pushNamed(
+                                Routes.globalArticleDetailsName,
+                                pathParameters: {'id': item.id},
+                                extra: item,
+                              ),
+                              currentContextEntityType: state.entityType,
+                              currentContextEntityId: state.entity is Category
+                                  ? (state.entity as Category).id
+                                  : state.entity is Source
+                                      ? (state.entity as Source).id
+                                      : null,
+                            );
+                            break;
+                          case HeadlineImageStyle.largeThumbnail:
+                            tile = HeadlineTileImageTop(
+                              headline: item,
+                              onHeadlineTap: () => context.pushNamed(
+                                Routes.globalArticleDetailsName,
+                                pathParameters: {'id': item.id},
+                                extra: item,
+                              ),
+                              currentContextEntityType: state.entityType,
+                              currentContextEntityId: state.entity is Category
+                                  ? (state.entity as Category).id
+                                  : state.entity is Source
+                                      ? (state.entity as Source).id
+                                      : null,
+                            );
+                            break;
+                        }
+                        return tile;
+                      } else if (item is Ad) {
+                        return Card(
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.paddingMedium,
+                            vertical: AppSpacing.xs,
+                          ),
+                          color: theme.colorScheme.surfaceContainerHighest,
+                          child: Padding(
+                            padding: const EdgeInsets.all(AppSpacing.md),
+                            child: Column(
+                              children: [
+                                if (item.imageUrl.isNotEmpty)
+                                  Image.network(
+                                    item.imageUrl,
+                                    height: 100,
+                                    errorBuilder: (ctx, err, st) =>
+                                        const Icon(Icons.broken_image, size: 50),
+                                  ),
+                                const SizedBox(height: AppSpacing.sm),
+                                Text(
+                                  'Placeholder Ad: ${item.adType?.name ?? 'Generic'}',
+                                  style: theme.textTheme.titleSmall,
                                 ),
-                            currentContextEntityType: state.entityType,
-                            currentContextEntityId:
-                                state.entity is Category
-                                    ? (state.entity as Category).id
-                                    : state.entity is Source
-                                    ? (state.entity as Source).id
-                                    : null,
-                          );
-                        case HeadlineImageStyle.smallThumbnail:
-                          tile = HeadlineTileImageStart(
-                            headline: headline,
-                            onHeadlineTap:
-                                () => context.pushNamed(
-                                  Routes
-                                      .globalArticleDetailsName, // Use new global route
-                                  pathParameters: {'id': headline.id},
-                                  extra: headline,
+                                Text(
+                                  'Placement: ${item.placement?.name ?? 'Default'}',
+                                  style: theme.textTheme.bodySmall,
                                 ),
-                            currentContextEntityType: state.entityType,
-                            currentContextEntityId:
-                                state.entity is Category
-                                    ? (state.entity as Category).id
-                                    : state.entity is Source
-                                    ? (state.entity as Source).id
-                                    : null,
-                          );
-                        case HeadlineImageStyle.largeThumbnail:
-                          tile = HeadlineTileImageTop(
-                            headline: headline,
-                            onHeadlineTap:
-                                () => context.pushNamed(
-                                  Routes
-                                      .globalArticleDetailsName, // Use new global route
-                                  pathParameters: {'id': headline.id},
-                                  extra: headline,
-                                ),
-                            currentContextEntityType: state.entityType,
-                            currentContextEntityId:
-                                state.entity is Category
-                                    ? (state.entity as Category).id
-                                    : state.entity is Source
-                                    ? (state.entity as Source).id
-                                    : null,
-                          );
+                              ],
+                            ),
+                          ),
+                        );
+                      } else if (item is AccountAction) {
+                        return Card(
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.paddingMedium,
+                            vertical: AppSpacing.xs,
+                          ),
+                          color: theme.colorScheme.secondaryContainer,
+                          child: ListTile(
+                            leading: Icon(
+                              item.accountActionType == AccountActionType.linkAccount
+                                  ? Icons.link
+                                  : Icons.upgrade,
+                              color: theme.colorScheme.onSecondaryContainer,
+                            ),
+                            title: Text(
+                              item.title,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                color: theme.colorScheme.onSecondaryContainer,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle: item.description != null
+                                ? Text(
+                                    item.description!,
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: theme.colorScheme.onSecondaryContainer.withOpacity(0.8),
+                                    ),
+                                  )
+                                : null,
+                            trailing: item.callToActionText != null
+                                ? ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: theme.colorScheme.secondary,
+                                      foregroundColor: theme.colorScheme.onSecondary,
+                                    ),
+                                    onPressed: () {
+                                      if (item.callToActionUrl != null) {
+                                        context.push(item.callToActionUrl!);
+                                      }
+                                    },
+                                    child: Text(item.callToActionText!),
+                                  )
+                                : null,
+                            isThreeLine: item.description != null && item.description!.length > 50,
+                          ),
+                        );
                       }
-                      return tile;
+                      return const SizedBox.shrink(); // Should not happen
                     },
-                    childCount:
-                        state.headlines.length +
-                        (state.hasMoreHeadlines &&
+                    childCount: state.feedItems.length + // Changed
+                        (state.hasMoreHeadlines && // hasMoreHeadlines still refers to original headlines
                                 state.headlinesStatus ==
                                     EntityHeadlinesStatus.loadingMore
                             ? 1
@@ -369,7 +447,7 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                 ),
               // Error display for headline loading specifically
               if (state.headlinesStatus == EntityHeadlinesStatus.failure &&
-                  state.headlines.isNotEmpty)
+                  state.feedItems.isNotEmpty) // Changed
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.all(AppSpacing.md),

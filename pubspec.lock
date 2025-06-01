@@ -403,7 +403,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "5258cd241bbab3e68692963124eeef2a36fc7f64"
+      resolved-ref: d309fa8da138a706d22fe78c73046fb2cede06e5
       url: "https://github.com/headlines-toolkit/ht-shared.git"
     source: git
     version: "0.0.0"

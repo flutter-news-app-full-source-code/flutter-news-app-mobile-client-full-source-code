@@ -27,6 +27,7 @@ import 'package:ht_main/headlines-feed/bloc/categories_filter_bloc.dart'; // Imp
 // import 'package:ht_main/headlines-feed/bloc/countries_filter_bloc.dart'; // Import new BLoC - REMOVED
 import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:ht_main/headlines-feed/bloc/sources_filter_bloc.dart'; // Import new BLoC
+import 'package:ht_main/shared/services/feed_injector_service.dart'; // Added
 import 'package:ht_main/headlines-feed/view/category_filter_page.dart';
 // import 'package:ht_main/headlines-feed/view/country_filter_page.dart'; // REMOVED
 import 'package:ht_main/headlines-feed/view/headlines_feed_page.dart';
@@ -420,24 +421,31 @@ GoRouter createRouter({
             providers: [
               BlocProvider.value(value: accountBloc), // Use the shared instance
               BlocProvider(
-                create:
-                    (context) => HeadlinesFeedBloc(
-                      headlinesRepository:
-                          context.read<HtDataRepository<Headline>>(),
-                    )..add(const HeadlinesFeedFetchRequested()),
+                create: (context) {
+                  // Instantiate FeedInjectorService here as it's stateless for now
+                  final feedInjectorService = FeedInjectorService();
+                  return HeadlinesFeedBloc(
+                    headlinesRepository:
+                        context.read<HtDataRepository<Headline>>(),
+                    feedInjectorService: feedInjectorService, // Pass instance
+                    appBloc: context.read<AppBloc>(), // Pass AppBloc instance
+                  )..add(const HeadlinesFeedFetchRequested());
+                },
               ),
               BlocProvider(
-                create:
-                    (context) => HeadlinesSearchBloc(
-                      headlinesRepository:
-                          context.read<HtDataRepository<Headline>>(),
-                      categoryRepository:
-                          context.read<HtDataRepository<Category>>(),
-                      sourceRepository:
-                          context.read<HtDataRepository<Source>>(),
-                      // countryRepository: // Removed
-                      //     context.read<HtDataRepository<Country>>(), // Removed
-                    ),
+                create: (context) {
+                  final feedInjectorService = FeedInjectorService(); // Instantiate
+                  return HeadlinesSearchBloc(
+                    headlinesRepository:
+                        context.read<HtDataRepository<Headline>>(),
+                    categoryRepository:
+                        context.read<HtDataRepository<Category>>(),
+                    sourceRepository:
+                        context.read<HtDataRepository<Source>>(),
+                    appBloc: context.read<AppBloc>(), // Provide AppBloc
+                    feedInjectorService: feedInjectorService, // Provide Service
+                  );
+                },
               ),
               // Removed separate AccountBloc creation here
             ],

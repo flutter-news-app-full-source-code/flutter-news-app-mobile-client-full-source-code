@@ -16,8 +16,7 @@ import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/constants/app_spacing.dart';
 import 'package:ht_main/shared/shared.dart'; // Imports new headline tiles
-// Adjusted imports to only include what's necessary after country removal
-import 'package:ht_shared/ht_shared.dart' show Category, Headline, HeadlineImageStyle, SearchModelType, Source;
+import 'package:ht_shared/ht_shared.dart'; // Changed to general import
 
 /// Page widget responsible for providing the BLoC for the headlines search feature.
 class HeadlinesSearchPage extends StatelessWidget {
@@ -240,7 +239,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                   'Searching ${state.selectedModelType.displayName.toLowerCase()}...',
             ),
             HeadlinesSearchSuccess(
-              results: final results,
+              items: final items, // Changed from results: final results
               hasMore: final hasMore,
               errorMessage: final errorMessage,
               lastSearchTerm: final lastSearchTerm,
@@ -256,7 +255,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                           ),
                         ),
                   )
-                  : results.isEmpty
+                  : items.isEmpty 
                   ? FailureStateWidget(
                     message:
                         '${l10n.headlinesSearchNoResultsHeadline} for "$lastSearchTerm" in ${resultsModelType.displayName.toLowerCase()}.\n${l10n.headlinesSearchNoResultsSubheadline}',
@@ -264,67 +263,148 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                   : ListView.separated(
                     controller: _scrollController,
                     padding: const EdgeInsets.all(AppSpacing.paddingMedium),
-                    itemCount: hasMore ? results.length + 1 : results.length,
-                    separatorBuilder:
-                        (context, index) => const SizedBox(height: AppSpacing.md),
+                    itemCount: hasMore ? items.length + 1 : items.length, 
+                    separatorBuilder: (context, index) {
+                       // Add a bit more space if the next item is an Ad or AccountAction
+                      if (index < items.length -1) {
+                        final currentItem = items[index];
+                        final nextItem = items[index+1];
+                        if ((currentItem is Headline && (nextItem is Ad || nextItem is AccountAction)) ||
+                            ((currentItem is Ad || currentItem is AccountAction) && nextItem is Headline)) {
+                          return const SizedBox(height: AppSpacing.md);
+                        }
+                      }
+                      return const SizedBox(height: AppSpacing.md);
+                    },
                     itemBuilder: (context, index) {
-                      if (index >= results.length) {
+                      if (index >= items.length) { 
                         return const Padding(
                           padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
                           child: Center(child: CircularProgressIndicator()),
                         );
                       }
-                      final item = results[index];
-                      // The switch is now exhaustive for the remaining SearchModelType values
-                      switch (resultsModelType) {
-                        case SearchModelType.headline:
-                          final headline = item as Headline;
-                          final imageStyle =
-                              context
-                                  .watch<AppBloc>()
-                                  .state
-                                  .settings
-                                  .feedPreferences
-                                  .headlineImageStyle;
-                          Widget tile;
-                          switch (imageStyle) {
-                            case HeadlineImageStyle.hidden:
-                              tile = HeadlineTileTextOnly(
-                                headline: headline,
-                                onHeadlineTap:
-                                    () => context.goNamed(
-                                      Routes.searchArticleDetailsName,
-                                      pathParameters: {'id': headline.id},
-                                      extra: headline,
+                      final feedItem = items[index]; 
+
+                      if (feedItem is Headline) {
+                        final imageStyle = context
+                            .watch<AppBloc>()
+                            .state
+                            .settings
+                            .feedPreferences
+                            .headlineImageStyle;
+                        Widget tile;
+                        switch (imageStyle) {
+                          case HeadlineImageStyle.hidden:
+                            tile = HeadlineTileTextOnly(
+                              headline: feedItem,
+                              onHeadlineTap: () => context.goNamed(
+                                Routes.searchArticleDetailsName,
+                                pathParameters: {'id': feedItem.id},
+                                extra: feedItem,
+                              ),
+                            );
+                            break;
+                          case HeadlineImageStyle.smallThumbnail:
+                            tile = HeadlineTileImageStart(
+                              headline: feedItem,
+                              onHeadlineTap: () => context.goNamed(
+                                Routes.searchArticleDetailsName,
+                                pathParameters: {'id': feedItem.id},
+                                extra: feedItem,
+                              ),
+                            );
+                            break;
+                          case HeadlineImageStyle.largeThumbnail:
+                            tile = HeadlineTileImageTop(
+                              headline: feedItem,
+                              onHeadlineTap: () => context.goNamed(
+                                Routes.searchArticleDetailsName,
+                                pathParameters: {'id': feedItem.id},
+                                extra: feedItem,
+                              ),
+                            );
+                            break;
+                        }
+                        return tile;
+                      } else if (feedItem is Category) {
+                        return CategoryItemWidget(category: feedItem);
+                      } else if (feedItem is Source) {
+                        return SourceItemWidget(source: feedItem);
+                      } else if (feedItem is Ad) {
+                        // Placeholder UI for Ad
+                        return Card(
+                          margin: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+                          color: colorScheme.surfaceContainerHighest,
+                          child: Padding(
+                            padding: const EdgeInsets.all(AppSpacing.md),
+                            child: Column(
+                              children: [
+                                if (feedItem.imageUrl.isNotEmpty)
+                                  Image.network(
+                                    feedItem.imageUrl,
+                                    height: 100,
+                                    errorBuilder: (ctx, err, st) =>
+                                        const Icon(Icons.broken_image, size: 50),
+                                  ),
+                                const SizedBox(height: AppSpacing.sm),
+                                Text(
+                                  'Placeholder Ad: ${feedItem.adType?.name ?? 'Generic'}',
+                                  style: theme.textTheme.titleSmall,
+                                ),
+                                Text(
+                                  'Placement: ${feedItem.placement?.name ?? 'Default'}',
+                                  style: theme.textTheme.bodySmall,
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      } else if (feedItem is AccountAction) {
+                        // Placeholder UI for AccountAction
+                        return Card(
+                          margin: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+                          color: colorScheme.secondaryContainer,
+                          child: ListTile(
+                            leading: Icon(
+                              feedItem.accountActionType == AccountActionType.linkAccount
+                                  ? Icons.link
+                                  : Icons.upgrade,
+                              color: colorScheme.onSecondaryContainer,
+                            ),
+                            title: Text(
+                              feedItem.title,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                color: colorScheme.onSecondaryContainer,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle: feedItem.description != null
+                                ? Text(
+                                    feedItem.description!,
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: colorScheme.onSecondaryContainer.withOpacity(0.8),
                                     ),
-                              );
-                            case HeadlineImageStyle.smallThumbnail:
-                              tile = HeadlineTileImageStart(
-                                headline: headline,
-                                onHeadlineTap:
-                                    () => context.goNamed(
-                                      Routes.searchArticleDetailsName,
-                                      pathParameters: {'id': headline.id},
-                                      extra: headline,
+                                  )
+                                : null,
+                            trailing: feedItem.callToActionText != null
+                                ? ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: colorScheme.secondary,
+                                      foregroundColor: colorScheme.onSecondary,
                                     ),
-                              );
-                            case HeadlineImageStyle.largeThumbnail:
-                              tile = HeadlineTileImageTop(
-                                headline: headline,
-                                onHeadlineTap:
-                                    () => context.goNamed(
-                                      Routes.searchArticleDetailsName,
-                                      pathParameters: {'id': headline.id},
-                                      extra: headline,
-                                    ),
-                              );
-                          }
-                          return tile;
-                        case SearchModelType.category:
-                          return CategoryItemWidget(category: item as Category);
-                        case SearchModelType.source:
-                          return SourceItemWidget(source: item as Source);
+                                    onPressed: () {
+                                      if (feedItem.callToActionUrl != null) {
+                                        context.push(feedItem.callToActionUrl!);
+                                      }
+                                    },
+                                    child: Text(feedItem.callToActionText!),
+                                  )
+                                : null,
+                            isThreeLine: feedItem.description != null && feedItem.description!.length > 50,
+                          ),
+                        );
                       }
+                      return const SizedBox.shrink(); // Should not happen
                     },
                   ),
             HeadlinesSearchFailure(

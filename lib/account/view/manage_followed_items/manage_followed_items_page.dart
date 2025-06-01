@@ -15,34 +15,50 @@ class ManageFollowedItemsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
           l10n.accountContentPreferencesTile,
-        ), // "Content Preferences"
+          style: textTheme.titleLarge, // Consistent AppBar title style
+        ),
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.paddingSmall), // Adjusted padding
         children: [
           ListTile(
-            leading: const Icon(Icons.category_outlined),
-            title: Text(l10n.headlinesFeedFilterCategoryLabel), // "Categories"
+            leading: Icon(Icons.category_outlined, color: colorScheme.primary),
+            title: Text(
+              l10n.headlinesFeedFilterCategoryLabel, // "Categories"
+              style: textTheme.titleMedium,
+            ),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
               context.goNamed(Routes.followedCategoriesListName);
             },
           ),
-          const Divider(indent: AppSpacing.lg, endIndent: AppSpacing.lg),
+          const Divider(
+            indent: AppSpacing.paddingMedium, // Consistent indent
+            endIndent: AppSpacing.paddingMedium,
+          ),
           ListTile(
-            leading: const Icon(Icons.source_outlined),
-            title: Text(l10n.headlinesFeedFilterSourceLabel), // "Sources"
+            leading: Icon(Icons.source_outlined, color: colorScheme.primary),
+            title: Text(
+              l10n.headlinesFeedFilterSourceLabel, // "Sources"
+              style: textTheme.titleMedium,
+            ),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
               context.goNamed(Routes.followedSourcesListName);
             },
           ),
-          const Divider(indent: AppSpacing.lg, endIndent: AppSpacing.lg),
+          const Divider(
+            indent: AppSpacing.paddingMedium, // Consistent indent
+            endIndent: AppSpacing.paddingMedium,
+          ),
           // ListTile for Followed Countries removed
         ],
       ),

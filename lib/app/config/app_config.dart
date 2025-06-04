@@ -7,9 +7,6 @@ class AppConfig {
     // Add other environment-specific configs here (e.g., analytics keys)
   });
 
-  final AppEnvironment environment;
-  final String baseUrl;
-
   // Factory constructors for different environments
   factory AppConfig.production() => const AppConfig(
     environment: AppEnvironment.production,
@@ -28,4 +25,7 @@ class AppConfig {
     environment: AppEnvironment.developmentApi,
     baseUrl: 'http://localhost:8080', // Default Dart Frog local URL
   );
+
+  final AppEnvironment environment;
+  final String baseUrl;
 }

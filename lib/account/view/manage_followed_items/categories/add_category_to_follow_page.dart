@@ -104,8 +104,9 @@ class AddCategoryToFollowPage extends StatelessWidget {
                         child: Center(child: CircularProgressIndicator()),
                       );
                     }
-                    if (index >= categories.length)
+                    if (index >= categories.length) {
                       return const SizedBox.shrink();
+                    }
 
                     final category = categories[index];
                     final isFollowed = followedCategories.any(
@@ -151,8 +152,9 @@ class AddCategoryToFollowPage extends StatelessWidget {
                                         child,
                                         loadingProgress,
                                       ) {
-                                        if (loadingProgress == null)
+                                        if (loadingProgress == null) {
                                           return child;
+                                        }
                                         return Center(
                                           child: CircularProgressIndicator(
                                             strokeWidth: 2,

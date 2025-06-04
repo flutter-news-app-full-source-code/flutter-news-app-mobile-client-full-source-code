@@ -154,11 +154,11 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                   final HeadlineDetailsLoaded loadedState =>
                     _buildLoadedContent(context, loadedState.headline),
                   _ => Center(
-                      child: Text(
-                        l10n.unknownError,
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
+                    child: Text(
+                      l10n.unknownError,
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
+                  ),
                 };
               },
             ),
@@ -190,9 +190,10 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
         isSaved ? Icons.bookmark : Icons.bookmark_border_outlined,
         color: colorScheme.primary, // Ensure icon color from theme
       ),
-      tooltip: isSaved
-          ? l10n.headlineDetailsRemoveFromSavedTooltip
-          : l10n.headlineDetailsSaveTooltip,
+      tooltip:
+          isSaved
+              ? l10n.headlineDetailsRemoveFromSavedTooltip
+              : l10n.headlineDetailsSaveTooltip,
       onPressed: () {
         context.read<AccountBloc>().add(
           AccountSaveHeadlineToggled(headline: headline),
@@ -273,8 +274,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           sliver: SliverToBoxAdapter(
             child: Text(
               headline.title,
-              style: textTheme.headlineSmall
-                  ?.copyWith(fontWeight: FontWeight.bold), // Adjusted style
+              style: textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ), // Adjusted style
             ),
           ),
         ),
@@ -287,7 +289,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
             ),
             sliver: SliverToBoxAdapter(
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(AppSpacing.md), // Consistent radius
+                borderRadius: BorderRadius.circular(
+                  AppSpacing.md,
+                ), // Consistent radius
                 child: AspectRatio(
                   aspectRatio: 16 / 9,
                   child: Image.network(
@@ -302,14 +306,15 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                         ),
                       );
                     },
-                    errorBuilder: (context, error, stackTrace) => ColoredBox(
-                      color: colorScheme.surfaceContainerHighest,
-                      child: Icon(
-                        Icons.broken_image_outlined,
-                        color: colorScheme.onSurfaceVariant,
-                        size: AppSpacing.xxl * 1.5, // Larger placeholder
-                      ),
-                    ),
+                    errorBuilder:
+                        (context, error, stackTrace) => ColoredBox(
+                          color: colorScheme.surfaceContainerHighest,
+                          child: Icon(
+                            Icons.broken_image_outlined,
+                            color: colorScheme.onSurfaceVariant,
+                            size: AppSpacing.xxl * 1.5, // Larger placeholder
+                          ),
+                        ),
                   ),
                 ),
               ),
@@ -340,7 +345,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
             ),
           ),
         SliverPadding(
-          padding: horizontalPadding.copyWith(top: AppSpacing.lg), // Increased spacing
+          padding: horizontalPadding.copyWith(
+            top: AppSpacing.lg,
+          ), // Increased spacing
           sliver: SliverToBoxAdapter(
             child: Wrap(
               spacing: AppSpacing.md, // Increased spacing
@@ -351,7 +358,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
         ),
         if (headline.description != null && headline.description!.isNotEmpty)
           SliverPadding(
-            padding: horizontalPadding.copyWith(top: AppSpacing.lg), // Increased
+            padding: horizontalPadding.copyWith(
+              top: AppSpacing.lg,
+            ), // Increased
             sliver: SliverToBoxAdapter(
               child: Text(
                 headline.description!,
@@ -380,12 +389,15 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                     horizontal: AppSpacing.lg,
                     vertical: AppSpacing.md,
                   ),
-                  textStyle: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
+                  textStyle: textTheme.labelLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
           ),
-        if (headline.url == null || headline.url!.isEmpty) // Ensure bottom padding
+        if (headline.url == null ||
+            headline.url!.isEmpty) // Ensure bottom padding
           const SliverPadding(
             padding: EdgeInsets.only(bottom: AppSpacing.xl),
             sliver: SliverToBoxAdapter(child: SizedBox.shrink()),
@@ -395,13 +407,17 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           sliver: SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.only(
-                top: (headline.url != null && headline.url!.isNotEmpty) ? AppSpacing.sm : AppSpacing.xl,
+                top:
+                    (headline.url != null && headline.url!.isNotEmpty)
+                        ? AppSpacing.sm
+                        : AppSpacing.xl,
                 bottom: AppSpacing.md,
               ),
               child: Text(
                 l10n.similarHeadlinesSectionTitle,
-                style: textTheme.titleLarge
-                    ?.copyWith(fontWeight: FontWeight.bold),
+                style: textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -433,8 +449,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     final chips = <Widget>[];
 
     if (headline.publishedAt != null) {
-      final formattedDate =
-          DateFormat('MMM d, yyyy').format(headline.publishedAt!);
+      final formattedDate = DateFormat(
+        'MMM d, yyyy',
+      ).format(headline.publishedAt!);
       chips.add(
         Chip(
           avatar: Icon(
@@ -455,14 +472,17 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
 
     if (headline.source != null) {
       chips.add(
-        InkWell( // Make chip tappable
+        InkWell(
+          // Make chip tappable
           onTap: () {
             context.push(
               Routes.sourceDetails,
               extra: EntityDetailsPageArguments(entity: headline.source),
             );
           },
-          borderRadius: BorderRadius.circular(AppSpacing.sm), // Match chip shape
+          borderRadius: BorderRadius.circular(
+            AppSpacing.sm,
+          ), // Match chip shape
           child: Chip(
             avatar: Icon(
               Icons.source_outlined,
@@ -483,14 +503,17 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
 
     if (headline.category != null) {
       chips.add(
-        InkWell( // Make chip tappable
+        InkWell(
+          // Make chip tappable
           onTap: () {
             context.push(
               Routes.categoryDetails,
               extra: EntityDetailsPageArguments(entity: headline.category),
             );
           },
-          borderRadius: BorderRadius.circular(AppSpacing.sm), // Match chip shape
+          borderRadius: BorderRadius.circular(
+            AppSpacing.sm,
+          ), // Match chip shape
           child: Chip(
             avatar: Icon(
               Icons.category_outlined,
@@ -512,7 +535,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
   }
 
   Widget _buildSimilarHeadlinesSection(
-      BuildContext context, EdgeInsets hPadding,) {
+    BuildContext context,
+    EdgeInsets hPadding,
+  ) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
@@ -531,71 +556,82 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           final SimilarHeadlinesError errorState => SliverToBoxAdapter(
             child: Padding(
               padding: hPadding.copyWith(
-                  top: AppSpacing.md, bottom: AppSpacing.xl,),
+                top: AppSpacing.md,
+                bottom: AppSpacing.xl,
+              ),
               child: Text(
                 errorState.message,
                 textAlign: TextAlign.center,
-                style: textTheme.bodyMedium
-                    ?.copyWith(color: colorScheme.error),
+                style: textTheme.bodyMedium?.copyWith(color: colorScheme.error),
               ),
             ),
           ),
           SimilarHeadlinesEmpty() => SliverToBoxAdapter(
             child: Padding(
               padding: hPadding.copyWith(
-                  top: AppSpacing.md, bottom: AppSpacing.xl,),
+                top: AppSpacing.md,
+                bottom: AppSpacing.xl,
+              ),
               child: Text(
                 l10n.similarHeadlinesEmpty,
                 textAlign: TextAlign.center,
-                style: textTheme.bodyLarge
-                    ?.copyWith(color: colorScheme.onSurfaceVariant),
+                style: textTheme.bodyLarge?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
               ),
             ),
           ),
           final SimilarHeadlinesLoaded loadedState => SliverPadding(
             padding: hPadding.copyWith(bottom: AppSpacing.xxl),
             sliver: SliverList.separated(
-              separatorBuilder: (context, index) =>
-                  const SizedBox(height: AppSpacing.sm), // Spacing between items
+              separatorBuilder:
+                  (context, index) => const SizedBox(
+                    height: AppSpacing.sm,
+                  ), // Spacing between items
               itemCount: loadedState.similarHeadlines.length,
-              itemBuilder: (context, index) { // Corrected: SliverList.separated uses itemBuilder
+              itemBuilder: (context, index) {
+                // Corrected: SliverList.separated uses itemBuilder
                 final similarHeadline = loadedState.similarHeadlines[index];
                 return Builder(
                   builder: (context) {
-                    final imageStyle = context
-                        .watch<AppBloc>()
-                        .state
-                        .settings
-                        .feedPreferences
-                        .headlineImageStyle;
+                    final imageStyle =
+                        context
+                            .watch<AppBloc>()
+                            .state
+                            .settings
+                            .feedPreferences
+                            .headlineImageStyle;
                     Widget tile;
                     switch (imageStyle) {
                       case HeadlineImageStyle.hidden:
                         tile = HeadlineTileTextOnly(
                           headline: similarHeadline,
-                          onHeadlineTap: () => context.pushNamed(
-                            Routes.globalArticleDetailsName,
-                            pathParameters: {'id': similarHeadline.id},
-                            extra: similarHeadline,
-                          ),
+                          onHeadlineTap:
+                              () => context.pushNamed(
+                                Routes.globalArticleDetailsName,
+                                pathParameters: {'id': similarHeadline.id},
+                                extra: similarHeadline,
+                              ),
                         );
                       case HeadlineImageStyle.smallThumbnail:
                         tile = HeadlineTileImageStart(
                           headline: similarHeadline,
-                          onHeadlineTap: () => context.pushNamed(
-                            Routes.globalArticleDetailsName,
-                            pathParameters: {'id': similarHeadline.id},
-                            extra: similarHeadline,
-                          ),
+                          onHeadlineTap:
+                              () => context.pushNamed(
+                                Routes.globalArticleDetailsName,
+                                pathParameters: {'id': similarHeadline.id},
+                                extra: similarHeadline,
+                              ),
                         );
                       case HeadlineImageStyle.largeThumbnail:
                         tile = HeadlineTileImageTop(
                           headline: similarHeadline,
-                          onHeadlineTap: () => context.pushNamed(
-                            Routes.globalArticleDetailsName,
-                            pathParameters: {'id': similarHeadline.id},
-                            extra: similarHeadline,
-                          ),
+                          onHeadlineTap:
+                              () => context.pushNamed(
+                                Routes.globalArticleDetailsName,
+                                pathParameters: {'id': similarHeadline.id},
+                                extra: similarHeadline,
+                              ),
                         );
                     }
                     return tile;

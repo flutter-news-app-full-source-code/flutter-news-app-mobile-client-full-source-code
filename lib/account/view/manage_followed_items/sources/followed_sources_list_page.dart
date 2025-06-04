@@ -47,14 +47,17 @@ class FollowedSourcesListPage extends StatelessWidget {
           if (state.status == AccountStatus.failure &&
               state.preferences == null) {
             return FailureStateWidget(
-              message: state.errorMessage ?? 'Could not load followed sources.', // Placeholder
+              message:
+                  state.errorMessage ??
+                  'Could not load followed sources.', // Placeholder
               onRetry: () {
                 if (state.user?.id != null) {
                   context.read<AccountBloc>().add(
-                        AccountLoadUserPreferences( // Corrected event name
-                          userId: state.user!.id,
-                        ),
-                      );
+                    AccountLoadUserPreferences(
+                      // Corrected event name
+                      userId: state.user!.id,
+                    ),
+                  );
                 }
               },
             );
@@ -64,7 +67,8 @@ class FollowedSourcesListPage extends StatelessWidget {
             return const InitialStateWidget(
               icon: Icons.no_sim_outlined, // Placeholder icon
               headline: 'No Followed Sources', // Placeholder
-              subheadline: 'Start following sources to see them here.', // Placeholder
+              subheadline:
+                  'Start following sources to see them here.', // Placeholder
             );
           }
 
@@ -75,20 +79,24 @@ class FollowedSourcesListPage extends StatelessWidget {
               return ListTile(
                 leading: const Icon(Icons.source_outlined), // Generic icon
                 title: Text(source.name),
-                subtitle: source.description != null
-                    ? Text(
-                        source.description!,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      )
-                    : null,
+                subtitle:
+                    source.description != null
+                        ? Text(
+                          source.description!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        )
+                        : null,
                 trailing: IconButton(
-                  icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+                  icon: const Icon(
+                    Icons.remove_circle_outline,
+                    color: Colors.red,
+                  ),
                   tooltip: 'Unfollow Source', // Placeholder
                   onPressed: () {
                     context.read<AccountBloc>().add(
-                          AccountFollowSourceToggled(source: source),
-                        );
+                      AccountFollowSourceToggled(source: source),
+                    );
                   },
                 ),
                 onTap: () {

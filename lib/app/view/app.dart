@@ -197,16 +197,20 @@ class _AppViewState extends State<_AppView> {
                 appFontWeight: AppFontWeight.regular, // Default
                 fontFamily: null, // System default font
               ),
-              themeMode: state.themeMode, // Still respect light/dark if available from system
+              themeMode:
+                  state
+                      .themeMode, // Still respect light/dark if available from system
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(
-                body: Builder( // Use Builder to get context under MaterialApp
+                body: Builder(
+                  // Use Builder to get context under MaterialApp
                   builder: (innerContext) {
                     final l10n = innerContext.l10n;
                     return LoadingStateWidget(
                       icon: Icons.settings_applications_outlined,
-                      headline: l10n.headlinesFeedLoadingHeadline, // "Loading..."
+                      headline:
+                          l10n.headlinesFeedLoadingHeadline, // "Loading..."
                       subheadline: l10n.pleaseWait, // "Please wait..."
                     );
                   },
@@ -234,17 +238,19 @@ class _AppViewState extends State<_AppView> {
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(
-                body: Builder( // Use Builder to get context under MaterialApp
+                body: Builder(
+                  // Use Builder to get context under MaterialApp
                   builder: (innerContext) {
                     final l10n = innerContext.l10n;
                     return FailureStateWidget(
-                      message: l10n.unknownError, // "An unknown error occurred."
+                      message:
+                          l10n.unknownError, // "An unknown error occurred."
                       retryButtonText: 'Retry', // Hardcoded for now
                       onRetry: () {
                         // Use outer context for BLoC access
-                        context 
-                            .read<AppBloc>()
-                            .add(const AppConfigFetchRequested());
+                        context.read<AppBloc>().add(
+                          const AppConfigFetchRequested(),
+                        );
                       },
                     );
                   },
@@ -252,12 +258,12 @@ class _AppViewState extends State<_AppView> {
               ),
             );
           }
-          
+
           // If config is loaded (or not in a failed/fetching state for config), proceed with main app UI
           // It's safe to access l10n here if needed for print statements,
           // as this path implies we are about to build the main MaterialApp.router
           // which provides localizations.
-          // final l10n = context.l10n; 
+          // final l10n = context.l10n;
           print('[_AppViewState] Building MaterialApp.router');
           print('[_AppViewState] state.fontFamily: ${state.fontFamily}');
           print(

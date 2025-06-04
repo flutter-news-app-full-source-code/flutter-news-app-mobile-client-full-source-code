@@ -27,10 +27,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     required HtDataRepository<Headline> headlinesRepository,
     required FeedInjectorService feedInjectorService, // Added
     required AppBloc appBloc, // Added
-  })  : _headlinesRepository = headlinesRepository,
-        _feedInjectorService = feedInjectorService, // Added
-        _appBloc = appBloc, // Added
-        super(HeadlinesFeedInitial()) {
+  }) : _headlinesRepository = headlinesRepository,
+       _feedInjectorService = feedInjectorService, // Added
+       _appBloc = appBloc, // Added
+       super(HeadlinesFeedInitial()) {
     on<HeadlinesFeedFetchRequested>(
       _onHeadlinesFeedFetchRequested,
       transformer:
@@ -86,7 +86,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
       if (appConfig == null) {
         // AppConfig is crucial for injection rules.
-        emit(const HeadlinesFeedError(message: 'App configuration not available.'));
+        emit(
+          const HeadlinesFeedError(message: 'App configuration not available.'),
+        );
         return;
       }
 
@@ -109,7 +111,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       // Dispatch event if AccountAction was injected
       if (processedFeedItems.any((item) => item is AccountAction) &&
           _appBloc.state.user?.id != null) {
-        _appBloc.add(AppUserAccountActionShown(userId: _appBloc.state.user!.id));
+        _appBloc.add(
+          AppUserAccountActionShown(userId: _appBloc.state.user!.id),
+        );
       }
     } on HtHttpException catch (e) {
       emit(HeadlinesFeedError(message: e.message));
@@ -139,7 +143,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       final appConfig = _appBloc.state.appConfig;
 
       if (appConfig == null) {
-        emit(const HeadlinesFeedError(message: 'App configuration not available.'));
+        emit(
+          const HeadlinesFeedError(message: 'App configuration not available.'),
+        );
         return;
       }
 
@@ -158,11 +164,13 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           filter: const HeadlineFilter(), // Ensure filter is reset
         ),
       );
-      
+
       // Dispatch event if AccountAction was injected
       if (processedFeedItems.any((item) => item is AccountAction) &&
           _appBloc.state.user?.id != null) {
-        _appBloc.add(AppUserAccountActionShown(userId: _appBloc.state.user!.id));
+        _appBloc.add(
+          AppUserAccountActionShown(userId: _appBloc.state.user!.id),
+        );
       }
     } on HtHttpException catch (e) {
       emit(HeadlinesFeedError(message: e.message));
@@ -197,27 +205,35 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       currentFeedItems = loadedState.feedItems;
       currentFeedItemCountForInjector = loadedState.feedItems.length;
 
-      if (event.cursor != null) { // Explicit pagination request
+      if (event.cursor != null) {
+        // Explicit pagination request
         if (!loadedState.hasMore) return; // No more items to fetch
         isPaginating = true;
-        currentCursorForFetch = loadedState.cursor; // Use BLoC's cursor for safety
-      } else { // Initial fetch or refresh (event.cursor is null)
+        currentCursorForFetch =
+            loadedState.cursor; // Use BLoC's cursor for safety
+      } else {
+        // Initial fetch or refresh (event.cursor is null)
         currentFeedItems = []; // Reset for non-pagination
         currentFeedItemCountForInjector = 0;
       }
-    } else if (state is HeadlinesFeedLoading || state is HeadlinesFeedLoadingSilently) {
+    } else if (state is HeadlinesFeedLoading ||
+        state is HeadlinesFeedLoadingSilently) {
       if (event.cursor == null) return; // Avoid concurrent initial fetches
     }
     // For initial load or if event.cursor is null, currentCursorForFetch remains null.
 
-    emit(isPaginating ? HeadlinesFeedLoadingSilently() : HeadlinesFeedLoading());
+    emit(
+      isPaginating ? HeadlinesFeedLoadingSilently() : HeadlinesFeedLoading(),
+    );
 
     try {
       final currentUser = _appBloc.state.user;
       final appConfig = _appBloc.state.appConfig;
 
       if (appConfig == null) {
-        emit(const HeadlinesFeedError(message: 'App configuration not available.'));
+        emit(
+          const HeadlinesFeedError(message: 'App configuration not available.'),
+        );
         return;
       }
 
@@ -246,9 +262,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         currentFeedItemCount: currentFeedItemCountForInjector,
       );
 
-      final resultingFeedItems = isPaginating
-          ? (List.of(currentFeedItems)..addAll(newProcessedFeedItems))
-          : newProcessedFeedItems;
+      final resultingFeedItems =
+          isPaginating
+              ? (List.of(currentFeedItems)..addAll(newProcessedFeedItems))
+              : newProcessedFeedItems;
 
       emit(
         HeadlinesFeedLoaded(
@@ -262,7 +279,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       // Dispatch event if AccountAction was injected
       if (newProcessedFeedItems.any((item) => item is AccountAction) &&
           _appBloc.state.user?.id != null) {
-        _appBloc.add(AppUserAccountActionShown(userId: _appBloc.state.user!.id));
+        _appBloc.add(
+          AppUserAccountActionShown(userId: _appBloc.state.user!.id),
+        );
       }
     } on HtHttpException catch (e) {
       emit(HeadlinesFeedError(message: e.message));
@@ -292,18 +311,22 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       final appConfig = _appBloc.state.appConfig;
 
       if (appConfig == null) {
-        emit(const HeadlinesFeedError(message: 'App configuration not available.'));
+        emit(
+          const HeadlinesFeedError(message: 'App configuration not available.'),
+        );
         return;
       }
 
       final queryParams = <String, dynamic>{};
       if (currentFilter.categories?.isNotEmpty ?? false) {
-        queryParams['categories'] =
-            currentFilter.categories!.map((c) => c.id).join(',');
+        queryParams['categories'] = currentFilter.categories!
+            .map((c) => c.id)
+            .join(',');
       }
       if (currentFilter.sources?.isNotEmpty ?? false) {
-        queryParams['sources'] =
-            currentFilter.sources!.map((s) => s.id).join(',');
+        queryParams['sources'] = currentFilter.sources!
+            .map((s) => s.id)
+            .join(',');
       }
 
       final headlineResponse = await _headlinesRepository.readAllByQuery(
@@ -335,7 +358,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       // Dispatch event if AccountAction was injected
       if (processedFeedItems.any((item) => item is AccountAction) &&
           _appBloc.state.user?.id != null) {
-        _appBloc.add(AppUserAccountActionShown(userId: _appBloc.state.user!.id));
+        _appBloc.add(
+          AppUserAccountActionShown(userId: _appBloc.state.user!.id),
+        );
       }
     } on HtHttpException catch (e) {
       emit(HeadlinesFeedError(message: e.message));

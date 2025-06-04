@@ -33,12 +33,12 @@ class HeadlineFilter extends Equatable {
 
   @override
   List<Object?> get props => [
-        categories,
-        sources,
-        selectedSourceCountryIsoCodes,
-        selectedSourceSourceTypes,
-        isFromFollowedItems, // Added to props
-      ];
+    categories,
+    sources,
+    selectedSourceCountryIsoCodes,
+    selectedSourceSourceTypes,
+    isFromFollowedItems, // Added to props
+  ];
 
   /// Creates a copy of this [HeadlineFilter] with the given fields
   /// replaced with the new values.
@@ -56,7 +56,8 @@ class HeadlineFilter extends Equatable {
           selectedSourceCountryIsoCodes ?? this.selectedSourceCountryIsoCodes,
       selectedSourceSourceTypes:
           selectedSourceSourceTypes ?? this.selectedSourceSourceTypes,
-      isFromFollowedItems: isFromFollowedItems ?? this.isFromFollowedItems, // Added
+      isFromFollowedItems:
+          isFromFollowedItems ?? this.isFromFollowedItems, // Added
     );
   }
 }

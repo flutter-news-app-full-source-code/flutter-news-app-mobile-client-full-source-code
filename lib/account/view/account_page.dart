@@ -35,12 +35,17 @@ class AccountPage extends StatelessWidget {
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.paddingMedium), // Adjusted padding
+        padding: const EdgeInsets.all(
+          AppSpacing.paddingMedium,
+        ), // Adjusted padding
         children: [
           _buildUserHeader(context, user, isAnonymous),
           const SizedBox(height: AppSpacing.lg), // Adjusted spacing
           ListTile(
-            leading: Icon(Icons.tune_outlined, color: theme.colorScheme.primary),
+            leading: Icon(
+              Icons.tune_outlined,
+              color: theme.colorScheme.primary,
+            ),
             title: Text(
               l10n.accountContentPreferencesTile,
               style: textTheme.titleMedium,
@@ -50,9 +55,15 @@ class AccountPage extends StatelessWidget {
               context.goNamed(Routes.manageFollowedItemsName);
             },
           ),
-          const Divider(indent: AppSpacing.paddingMedium, endIndent: AppSpacing.paddingMedium),
+          const Divider(
+            indent: AppSpacing.paddingMedium,
+            endIndent: AppSpacing.paddingMedium,
+          ),
           ListTile(
-            leading: Icon(Icons.bookmark_outline, color: theme.colorScheme.primary),
+            leading: Icon(
+              Icons.bookmark_outline,
+              color: theme.colorScheme.primary,
+            ),
             title: Text(
               l10n.accountSavedHeadlinesTile,
               style: textTheme.titleMedium,
@@ -62,9 +73,15 @@ class AccountPage extends StatelessWidget {
               context.goNamed(Routes.accountSavedHeadlinesName);
             },
           ),
-          const Divider(indent: AppSpacing.paddingMedium, endIndent: AppSpacing.paddingMedium),
+          const Divider(
+            indent: AppSpacing.paddingMedium,
+            endIndent: AppSpacing.paddingMedium,
+          ),
           _buildSettingsTile(context),
-          const Divider(indent: AppSpacing.paddingMedium, endIndent: AppSpacing.paddingMedium),
+          const Divider(
+            indent: AppSpacing.paddingMedium,
+            endIndent: AppSpacing.paddingMedium,
+          ),
         ],
       ),
     );
@@ -89,12 +106,14 @@ class AccountPage extends StatelessWidget {
       displayName = l10n.accountAnonymousUser;
       statusWidget = Padding(
         padding: const EdgeInsets.only(top: AppSpacing.md), // Increased padding
-        child: ElevatedButton.icon( // Changed to ElevatedButton
+        child: ElevatedButton.icon(
+          // Changed to ElevatedButton
           icon: const Icon(Icons.link_outlined),
           label: Text(l10n.accountSignInPromptButton),
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.lg, vertical: AppSpacing.sm,
+              horizontal: AppSpacing.lg,
+              vertical: AppSpacing.sm,
             ),
             textStyle: textTheme.labelLarge,
           ),
@@ -111,7 +130,8 @@ class AccountPage extends StatelessWidget {
       statusWidget = Column(
         mainAxisSize: MainAxisSize.min, // To keep column tight
         children: [
-          if (user?.role != null) ...[ // Show role only if available
+          if (user?.role != null) ...[
+            // Show role only if available
             const SizedBox(height: AppSpacing.xs),
             Text(
               l10n.accountRoleLabel(user!.role.name),
@@ -122,21 +142,23 @@ class AccountPage extends StatelessWidget {
             ),
           ],
           const SizedBox(height: AppSpacing.md), // Consistent spacing
-          OutlinedButton.icon( // Changed to OutlinedButton.icon
+          OutlinedButton.icon(
+            // Changed to OutlinedButton.icon
             icon: Icon(Icons.logout, color: colorScheme.error),
             label: Text(l10n.accountSignOutTile),
             style: OutlinedButton.styleFrom(
               foregroundColor: colorScheme.error,
               side: BorderSide(color: colorScheme.error.withOpacity(0.5)),
               padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.lg, vertical: AppSpacing.sm,
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.sm,
               ),
               textStyle: textTheme.labelLarge,
             ),
             onPressed: () {
-              context
-                  .read<AuthenticationBloc>()
-                  .add(const AuthenticationSignOutRequested());
+              context.read<AuthenticationBloc>().add(
+                const AuthenticationSignOutRequested(),
+              );
             },
           ),
         ],

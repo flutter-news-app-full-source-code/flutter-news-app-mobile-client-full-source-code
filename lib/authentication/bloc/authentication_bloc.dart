@@ -84,7 +84,10 @@ class AuthenticationBloc
       emit(AuthenticationFailure('Operation failed: ${e.message}'));
     } on HtHttpException catch (e) {
       // Catch any other HtHttpException subtypes
-      final message = e.message.isNotEmpty ? e.message : 'An unspecified HTTP error occurred.';
+      final message =
+          e.message.isNotEmpty
+              ? e.message
+              : 'An unspecified HTTP error occurred.';
       emit(AuthenticationFailure('HTTP error: $message'));
     } catch (e) {
       // Catch any other unexpected errors

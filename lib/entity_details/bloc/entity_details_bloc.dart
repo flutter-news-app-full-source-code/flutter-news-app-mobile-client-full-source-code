@@ -20,13 +20,13 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     required AccountBloc accountBloc,
     required AppBloc appBloc, // Added
     required FeedInjectorService feedInjectorService, // Added
-  })  : _headlinesRepository = headlinesRepository,
-        _categoryRepository = categoryRepository,
-        _sourceRepository = sourceRepository,
-        _accountBloc = accountBloc,
-        _appBloc = appBloc, // Added
-        _feedInjectorService = feedInjectorService, // Added
-        super(const EntityDetailsState()) {
+  }) : _headlinesRepository = headlinesRepository,
+       _categoryRepository = categoryRepository,
+       _sourceRepository = sourceRepository,
+       _accountBloc = accountBloc,
+       _appBloc = appBloc, // Added
+       _feedInjectorService = feedInjectorService, // Added
+       super(const EntityDetailsState()) {
     on<EntityDetailsLoadRequested>(_onEntityDetailsLoadRequested);
     on<EntityDetailsToggleFollowRequested>(
       _onEntityDetailsToggleFollowRequested,
@@ -163,7 +163,8 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
           isFollowing: isCurrentlyFollowing,
           feedItems: processedFeedItems, // Changed
           headlinesStatus: EntityHeadlinesStatus.success,
-          hasMoreHeadlines: headlineResponse.hasMore, // Based on original headlines
+          hasMoreHeadlines:
+              headlineResponse.hasMore, // Based on original headlines
           headlinesCursor: headlineResponse.cursor,
           clearErrorMessage: true,
         ),
@@ -172,7 +173,9 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       // Dispatch event if AccountAction was injected in the initial load
       if (processedFeedItems.any((item) => item is AccountAction) &&
           _appBloc.state.user?.id != null) {
-        _appBloc.add(AppUserAccountActionShown(userId: _appBloc.state.user!.id));
+        _appBloc.add(
+          AppUserAccountActionShown(userId: _appBloc.state.user!.id),
+        );
       }
     } on HtHttpException catch (e) {
       emit(
@@ -239,7 +242,8 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     EntityDetailsLoadMoreHeadlinesRequested event,
     Emitter<EntityDetailsState> emit,
   ) async {
-    if (!state.hasMoreHeadlines || // Still refers to original headlines pagination
+    if (!state
+            .hasMoreHeadlines || // Still refers to original headlines pagination
         state.headlinesStatus == EntityHeadlinesStatus.loadingMore) {
       return;
     }
@@ -281,7 +285,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         );
         return;
       }
-      
+
       final newProcessedFeedItems = _feedInjectorService.injectItems(
         headlines: headlineResponse.items,
         user: currentUser,
@@ -291,9 +295,11 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
 
       emit(
         state.copyWith(
-          feedItems: List.of(state.feedItems)..addAll(newProcessedFeedItems), // Changed
+          feedItems: List.of(state.feedItems)
+            ..addAll(newProcessedFeedItems), // Changed
           headlinesStatus: EntityHeadlinesStatus.success,
-          hasMoreHeadlines: headlineResponse.hasMore, // Based on original headlines
+          hasMoreHeadlines:
+              headlineResponse.hasMore, // Based on original headlines
           headlinesCursor: headlineResponse.cursor,
           clearHeadlinesCursor: !headlineResponse.hasMore,
         ),
@@ -302,7 +308,9 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       // Dispatch event if AccountAction was injected in the newly loaded items
       if (newProcessedFeedItems.any((item) => item is AccountAction) &&
           _appBloc.state.user?.id != null) {
-        _appBloc.add(AppUserAccountActionShown(userId: _appBloc.state.user!.id));
+        _appBloc.add(
+          AppUserAccountActionShown(userId: _appBloc.state.user!.id),
+        );
       }
     } on HtHttpException catch (e) {
       emit(

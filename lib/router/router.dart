@@ -76,7 +76,8 @@ GoRouter createRouter({
     // --- Redirect Logic ---
     redirect: (BuildContext context, GoRouterState state) {
       final appStatus = context.read<AppBloc>().state.status;
-      final appConfig = context.read<AppBloc>().state.appConfig; // Get appConfig
+      final appConfig =
+          context.read<AppBloc>().state.appConfig; // Get appConfig
       final currentLocation = state.matchedLocation;
       final currentUri = state.uri;
 
@@ -97,7 +98,6 @@ GoRouter createRouter({
       if (appStatus == AppStatus.initial ||
           appStatus == AppStatus.configFetching ||
           appStatus == AppStatus.configFetchFailed) {
-        
         // If AppStatus is initial and trying to go to a non-auth page (e.g. initial /feed)
         // redirect to auth immediately to settle auth status first.
         if (appStatus == AppStatus.initial && !isGoingToAuth) {
@@ -111,14 +111,16 @@ GoRouter createRouter({
         print(
           '  Redirect Decision: AppStatus is $appStatus. Allowing App widget to handle display or navigation to auth.',
         );
-        return null; 
+        return null;
       }
 
       // --- Case 1: Unauthenticated User (after initial phase, config not relevant yet for this decision) ---
       if (appStatus == AppStatus.unauthenticated) {
         print('  Redirect Decision: User is UNauthenticated.');
         if (!isGoingToAuth) {
-          print('    Action: Not going to auth. Redirecting to $authenticationPath');
+          print(
+            '    Action: Not going to auth. Redirecting to $authenticationPath',
+          );
           return authenticationPath;
         }
         print('    Action: Already going to auth. Allowing navigation.');
@@ -129,10 +131,12 @@ GoRouter createRouter({
       // (Covers AppStatus.anonymous and AppStatus.authenticated)
       // At this point, AppConfig should be loaded or its loading/error state is handled by App widget.
       // The main concern here is preventing authenticated users from re-entering basic auth flows.
-      if (appStatus == AppStatus.anonymous || appStatus == AppStatus.authenticated) {
+      if (appStatus == AppStatus.anonymous ||
+          appStatus == AppStatus.authenticated) {
         print('  Redirect Decision: User is $appStatus.');
-        
-        final isLinkingContext = currentUri.queryParameters['context'] == 'linking';
+
+        final isLinkingContext =
+            currentUri.queryParameters['context'] == 'linking';
 
         // If an authenticated/anonymous user tries to access the BASE /authentication path
         // AND it's NOT for account linking, redirect them to the feed.
@@ -142,14 +146,18 @@ GoRouter createRouter({
           );
           return feedPath;
         }
-        
+
         // Allow access to other routes (including auth sub-routes if linking, or any other app route)
-        print('    Action: Allowing navigation to $currentLocation for $appStatus user.');
+        print(
+          '    Action: Allowing navigation to $currentLocation for $appStatus user.',
+        );
         return null;
       }
 
       // Fallback (should ideally not be reached if all statuses are handled)
-      print('  Redirect Decision: Fallback, no specific condition met for $appStatus. Allowing navigation.');
+      print(
+        '  Redirect Decision: Fallback, no specific condition met for $appStatus. Allowing navigation.',
+      );
       return null;
     },
     // --- Authentication Routes ---

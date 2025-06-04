@@ -36,7 +36,8 @@ class SavedHeadlinesPage extends StatelessWidget {
       ),
       body: BlocBuilder<AccountBloc, AccountState>(
         builder: (context, state) {
-          if (state.status == AccountStatus.loading && state.preferences == null) {
+          if (state.status == AccountStatus.loading &&
+              state.preferences == null) {
             return LoadingStateWidget(
               icon: Icons.bookmarks_outlined,
               headline: l10n.savedHeadlinesLoadingHeadline, // Use l10n
@@ -44,16 +45,17 @@ class SavedHeadlinesPage extends StatelessWidget {
             );
           }
 
-          if (state.status == AccountStatus.failure && state.preferences == null) {
+          if (state.status == AccountStatus.failure &&
+              state.preferences == null) {
             return FailureStateWidget(
-              message: state.errorMessage ?? l10n.savedHeadlinesErrorHeadline, // Use l10n
+              message:
+                  state.errorMessage ??
+                  l10n.savedHeadlinesErrorHeadline, // Use l10n
               onRetry: () {
                 if (state.user?.id != null) {
                   context.read<AccountBloc>().add(
-                        AccountLoadUserPreferences(
-                          userId: state.user!.id,
-                        ),
-                      );
+                    AccountLoadUserPreferences(userId: state.user!.id),
+                  );
                 }
               },
             );
@@ -70,29 +72,36 @@ class SavedHeadlinesPage extends StatelessWidget {
           }
 
           return ListView.separated(
-            padding: const EdgeInsets.symmetric(vertical: AppSpacing.paddingSmall), // Add padding
+            padding: const EdgeInsets.symmetric(
+              vertical: AppSpacing.paddingSmall,
+            ), // Add padding
             itemCount: savedHeadlines.length,
-            separatorBuilder: (context, index) => const Divider(
-              height: 1,
-              indent: AppSpacing.paddingMedium, // Indent divider
-              endIndent: AppSpacing.paddingMedium,
-            ),
+            separatorBuilder:
+                (context, index) => const Divider(
+                  height: 1,
+                  indent: AppSpacing.paddingMedium, // Indent divider
+                  endIndent: AppSpacing.paddingMedium,
+                ),
             itemBuilder: (context, index) {
               final headline = savedHeadlines[index];
-              final imageStyle = context
-                  .watch<AppBloc>()
-                  .state
-                  .settings
-                  .feedPreferences
-                  .headlineImageStyle;
+              final imageStyle =
+                  context
+                      .watch<AppBloc>()
+                      .state
+                      .settings
+                      .feedPreferences
+                      .headlineImageStyle;
 
               final trailingButton = IconButton(
-                icon: Icon(Icons.delete_outline, color: colorScheme.error), // Themed icon
+                icon: Icon(
+                  Icons.delete_outline,
+                  color: colorScheme.error,
+                ), // Themed icon
                 tooltip: l10n.headlineDetailsRemoveFromSavedTooltip,
                 onPressed: () {
                   context.read<AccountBloc>().add(
-                        AccountSaveHeadlineToggled(headline: headline),
-                      );
+                    AccountSaveHeadlineToggled(headline: headline),
+                  );
                 },
               );
 

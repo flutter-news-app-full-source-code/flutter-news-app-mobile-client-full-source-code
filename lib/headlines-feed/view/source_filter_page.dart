@@ -107,7 +107,8 @@ class _SourceFilterView extends StatelessWidget {
     final textTheme = theme.textTheme;
 
     if (state.dataLoadingStatus == SourceFilterDataLoadingStatus.loading &&
-        state.allAvailableSources.isEmpty) { // Check allAvailableSources
+        state.allAvailableSources.isEmpty) {
+      // Check allAvailableSources
       return LoadingStateWidget(
         icon: Icons.source_outlined, // More relevant icon
         headline: l10n.sourceFilterLoadingHeadline, // Specific l10n
@@ -115,18 +116,18 @@ class _SourceFilterView extends StatelessWidget {
       );
     }
     if (state.dataLoadingStatus == SourceFilterDataLoadingStatus.failure &&
-        state.allAvailableSources.isEmpty) { // Check allAvailableSources
+        state.allAvailableSources.isEmpty) {
+      // Check allAvailableSources
       return FailureStateWidget(
         message: state.errorMessage ?? l10n.headlinesFeedFilterErrorCriteria,
         onRetry: () {
-          context
-              .read<SourcesFilterBloc>()
-              .add(const LoadSourceFilterData());
+          context.read<SourcesFilterBloc>().add(const LoadSourceFilterData());
         },
       );
     }
 
-    return Column( // Removed Padding, handled by children
+    return Column(
+      // Removed Padding, handled by children
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildCountryCapsules(context, state, l10n, textTheme),
@@ -155,9 +156,11 @@ class _SourceFilterView extends StatelessWidget {
     TextTheme textTheme, // Added textTheme
   ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingMedium)
-          .copyWith(top: AppSpacing.md), // Add top padding
-      child: Column( // Use Column for label and then list
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.paddingMedium,
+      ).copyWith(top: AppSpacing.md), // Add top padding
+      child: Column(
+        // Use Column for label and then list
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -170,8 +173,8 @@ class _SourceFilterView extends StatelessWidget {
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: state.availableCountries.length + 1,
-              separatorBuilder: (context, index) =>
-                  const SizedBox(width: AppSpacing.sm),
+              separatorBuilder:
+                  (context, index) => const SizedBox(width: AppSpacing.sm),
               itemBuilder: (context, index) {
                 if (index == 0) {
                   return ChoiceChip(
@@ -179,28 +182,30 @@ class _SourceFilterView extends StatelessWidget {
                     labelStyle: textTheme.labelLarge,
                     selected: state.selectedCountryIsoCodes.isEmpty,
                     onSelected: (_) {
-                      context
-                          .read<SourcesFilterBloc>()
-                          .add(const CountryCapsuleToggled(''));
+                      context.read<SourcesFilterBloc>().add(
+                        const CountryCapsuleToggled(''),
+                      );
                     },
                   );
                 }
                 final country = state.availableCountries[index - 1];
                 return ChoiceChip(
-                  avatar: country.flagUrl.isNotEmpty
-                      ? CircleAvatar(
-                          backgroundImage: NetworkImage(country.flagUrl),
-                          radius: AppSpacing.sm + AppSpacing.xs,
-                        )
-                      : null,
+                  avatar:
+                      country.flagUrl.isNotEmpty
+                          ? CircleAvatar(
+                            backgroundImage: NetworkImage(country.flagUrl),
+                            radius: AppSpacing.sm + AppSpacing.xs,
+                          )
+                          : null,
                   label: Text(country.name),
                   labelStyle: textTheme.labelLarge,
-                  selected:
-                      state.selectedCountryIsoCodes.contains(country.isoCode),
+                  selected: state.selectedCountryIsoCodes.contains(
+                    country.isoCode,
+                  ),
                   onSelected: (_) {
-                    context
-                        .read<SourcesFilterBloc>()
-                        .add(CountryCapsuleToggled(country.isoCode));
+                    context.read<SourcesFilterBloc>().add(
+                      CountryCapsuleToggled(country.isoCode),
+                    );
                   },
                 );
               },
@@ -219,7 +224,8 @@ class _SourceFilterView extends StatelessWidget {
   ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingMedium),
-      child: Column( // Use Column for label and then list
+      child: Column(
+        // Use Column for label and then list
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -232,8 +238,8 @@ class _SourceFilterView extends StatelessWidget {
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: state.availableSourceTypes.length + 1,
-              separatorBuilder: (context, index) =>
-                  const SizedBox(width: AppSpacing.sm),
+              separatorBuilder:
+                  (context, index) => const SizedBox(width: AppSpacing.sm),
               itemBuilder: (context, index) {
                 if (index == 0) {
                   return ChoiceChip(
@@ -241,21 +247,23 @@ class _SourceFilterView extends StatelessWidget {
                     labelStyle: textTheme.labelLarge,
                     selected: state.selectedSourceTypes.isEmpty,
                     onSelected: (_) {
-                      context
-                          .read<SourcesFilterBloc>()
-                          .add(const AllSourceTypesCapsuleToggled());
+                      context.read<SourcesFilterBloc>().add(
+                        const AllSourceTypesCapsuleToggled(),
+                      );
                     },
                   );
                 }
                 final sourceType = state.availableSourceTypes[index - 1];
                 return ChoiceChip(
-                  label: Text(sourceType.name), // Assuming SourceType.name is user-friendly
+                  label: Text(
+                    sourceType.name,
+                  ), // Assuming SourceType.name is user-friendly
                   labelStyle: textTheme.labelLarge,
                   selected: state.selectedSourceTypes.contains(sourceType),
                   onSelected: (_) {
-                    context
-                        .read<SourcesFilterBloc>()
-                        .add(SourceTypeCapsuleToggled(sourceType));
+                    context.read<SourcesFilterBloc>().add(
+                      SourceTypeCapsuleToggled(sourceType),
+                    );
                   },
                 );
               },
@@ -273,7 +281,8 @@ class _SourceFilterView extends StatelessWidget {
     TextTheme textTheme, // Added textTheme
   ) {
     if (state.dataLoadingStatus == SourceFilterDataLoadingStatus.loading &&
-        state.displayableSources.isEmpty) { // Added check for displayableSources
+        state.displayableSources.isEmpty) {
+      // Added check for displayableSources
       return const Center(child: CircularProgressIndicator());
     }
     if (state.dataLoadingStatus == SourceFilterDataLoadingStatus.failure &&
@@ -281,14 +290,13 @@ class _SourceFilterView extends StatelessWidget {
       return FailureStateWidget(
         message: state.errorMessage ?? l10n.headlinesFeedFilterErrorSources,
         onRetry: () {
-          context
-              .read<SourcesFilterBloc>()
-              .add(const LoadSourceFilterData());
+          context.read<SourcesFilterBloc>().add(const LoadSourceFilterData());
         },
       );
     }
     if (state.displayableSources.isEmpty &&
-        state.dataLoadingStatus != SourceFilterDataLoadingStatus.loading) { // Avoid showing if still loading
+        state.dataLoadingStatus != SourceFilterDataLoadingStatus.loading) {
+      // Avoid showing if still loading
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.paddingLarge),
@@ -302,8 +310,9 @@ class _SourceFilterView extends StatelessWidget {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.paddingSmall)
-          .copyWith(bottom: AppSpacing.xxl),
+      padding: const EdgeInsets.symmetric(
+        vertical: AppSpacing.paddingSmall,
+      ).copyWith(bottom: AppSpacing.xxl),
       itemCount: state.displayableSources.length,
       itemBuilder: (context, index) {
         final source = state.displayableSources[index];
@@ -312,9 +321,9 @@ class _SourceFilterView extends StatelessWidget {
           value: state.finallySelectedSourceIds.contains(source.id),
           onChanged: (bool? value) {
             if (value != null) {
-              context
-                  .read<SourcesFilterBloc>()
-                  .add(SourceCheckboxToggled(source.id, value));
+              context.read<SourcesFilterBloc>().add(
+                SourceCheckboxToggled(source.id, value),
+              );
             }
           },
           controlAffinity: ListTileControlAffinity.leading,

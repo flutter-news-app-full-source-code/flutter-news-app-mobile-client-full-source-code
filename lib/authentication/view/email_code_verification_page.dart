@@ -48,7 +48,8 @@ class EmailCodeVerificationPage extends StatelessWidget {
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch, // Stretch buttons
+                    crossAxisAlignment:
+                        CrossAxisAlignment.stretch, // Stretch buttons
                     children: [
                       Icon(
                         Icons.mark_email_read_outlined,
@@ -67,11 +68,13 @@ class EmailCodeVerificationPage extends StatelessWidget {
                       Text(
                         l10n.emailCodeSentInstructions,
                         style: textTheme.bodyLarge?.copyWith(
-                            color: colorScheme
-                                .onSurfaceVariant,), // Softer color
+                          color: colorScheme.onSurfaceVariant,
+                        ), // Softer color
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: AppSpacing.xl), // Increased spacing
+                      const SizedBox(
+                        height: AppSpacing.xl,
+                      ), // Increased spacing
                       _EmailCodeVerificationForm(
                         email: email,
                         isLoading: isLoading,
@@ -173,16 +176,18 @@ class _EmailCodeVerificationFormState
               textStyle: textTheme.labelLarge,
             ),
             onPressed: widget.isLoading ? null : _submitForm,
-            child: widget.isLoading
-                ? const SizedBox(
-                    height: AppSpacing.xl, // Consistent size with text
-                    width: AppSpacing.xl,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white, // Explicit color for loader on button
-                    ),
-                  )
-                : Text(l10n.emailCodeVerificationButtonLabel),
+            child:
+                widget.isLoading
+                    ? const SizedBox(
+                      height: AppSpacing.xl, // Consistent size with text
+                      width: AppSpacing.xl,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color:
+                            Colors.white, // Explicit color for loader on button
+                      ),
+                    )
+                    : Text(l10n.emailCodeVerificationButtonLabel),
           ),
         ],
       ),

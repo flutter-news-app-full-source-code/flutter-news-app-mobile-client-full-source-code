@@ -362,6 +362,15 @@ packages:
       url: "https://github.com/headlines-toolkit/ht-data-client.git"
     source: git
     version: "0.0.0"
+  ht_data_inmemory:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "6310e0561f9c27af5719aa7a2b95225f38776595"
+      url: "https://github.com/headlines-toolkit/ht-data-inmemory.git"
+    source: git
+    version: "0.0.0"
   ht_data_repository:
     dependency: "direct main"
     description:
@@ -403,7 +412,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: d309fa8da138a706d22fe78c73046fb2cede06e5
+      resolved-ref: "2caadf1dc7cfa476cc062f20247986c420116b62"
       url: "https://github.com/headlines-toolkit/ht-shared.git"
     source: git
     version: "0.0.0"

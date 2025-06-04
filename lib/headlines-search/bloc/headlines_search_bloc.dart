@@ -18,12 +18,12 @@ class HeadlinesSearchBloc
     required HtDataRepository<Source> sourceRepository,
     required AppBloc appBloc, // Added
     required FeedInjectorService feedInjectorService, // Added
-  })  : _headlinesRepository = headlinesRepository,
-        _categoryRepository = categoryRepository,
-        _sourceRepository = sourceRepository,
-        _appBloc = appBloc, // Added
-        _feedInjectorService = feedInjectorService, // Added
-        super(const HeadlinesSearchInitial()) {
+  }) : _headlinesRepository = headlinesRepository,
+       _categoryRepository = categoryRepository,
+       _sourceRepository = sourceRepository,
+       _appBloc = appBloc, // Added
+       _feedInjectorService = feedInjectorService, // Added
+       super(const HeadlinesSearchInitial()) {
     on<HeadlinesSearchModelTypeChanged>(_onHeadlinesSearchModelTypeChanged);
     on<HeadlinesSearchFetchRequested>(
       _onSearchFetchRequested,
@@ -96,7 +96,12 @@ class HeadlinesSearchBloc
               final currentUser = _appBloc.state.user;
               final appConfig = _appBloc.state.appConfig;
               if (appConfig == null) {
-                emit(successState.copyWith(errorMessage: 'App configuration not available for pagination.'));
+                emit(
+                  successState.copyWith(
+                    errorMessage:
+                        'App configuration not available for pagination.',
+                  ),
+                );
                 return;
               }
               final injectedItems = _feedInjectorService.injectItems(
@@ -108,14 +113,17 @@ class HeadlinesSearchBloc
               emit(
                 successState.copyWith(
                   items: List.of(successState.items)..addAll(injectedItems),
-                  hasMore: response.hasMore, // hasMore from original headline fetch
+                  hasMore:
+                      response.hasMore, // hasMore from original headline fetch
                   cursor: response.cursor,
                 ),
               );
               // Dispatch event if AccountAction was injected during pagination
               if (injectedItems.any((item) => item is AccountAction) &&
                   _appBloc.state.user?.id != null) {
-                _appBloc.add(AppUserAccountActionShown(userId: _appBloc.state.user!.id));
+                _appBloc.add(
+                  AppUserAccountActionShown(userId: _appBloc.state.user!.id),
+                );
               }
             case SearchModelType.category:
               response = await _categoryRepository.readAllByQuery(
@@ -125,12 +133,13 @@ class HeadlinesSearchBloc
               );
               emit(
                 successState.copyWith(
-                  items: List.of(successState.items)..addAll(response.items.cast<FeedItem>()),
+                  items: List.of(successState.items)
+                    ..addAll(response.items.cast<FeedItem>()),
                   hasMore: response.hasMore,
                   cursor: response.cursor,
                 ),
               );
-// Added break
+            // Added break
             case SearchModelType.source:
               response = await _sourceRepository.readAllByQuery(
                 {'q': searchTerm, 'model': modelType.toJson()},
@@ -139,12 +148,13 @@ class HeadlinesSearchBloc
               );
               emit(
                 successState.copyWith(
-                  items: List.of(successState.items)..addAll(response.items.cast<FeedItem>()),
+                  items: List.of(successState.items)
+                    ..addAll(response.items.cast<FeedItem>()),
                   hasMore: response.hasMore,
                   cursor: response.cursor,
                 ),
               );
-// Added break
+            // Added break
           }
         } on HtHttpException catch (e) {
           emit(successState.copyWith(errorMessage: e.message));
@@ -171,10 +181,10 @@ class HeadlinesSearchBloc
 
       switch (modelType) {
         case SearchModelType.headline:
-          rawResponse = await _headlinesRepository.readAllByQuery(
-            {'q': searchTerm, 'model': modelType.toJson()},
-            limit: _limit,
-          );
+          rawResponse = await _headlinesRepository.readAllByQuery({
+            'q': searchTerm,
+            'model': modelType.toJson(),
+          }, limit: _limit);
           final headlines = rawResponse.items.cast<Headline>();
           final currentUser = _appBloc.state.user;
           final appConfig = _appBloc.state.appConfig;
@@ -195,21 +205,21 @@ class HeadlinesSearchBloc
             currentFeedItemCount: 0,
           );
         case SearchModelType.category:
-          rawResponse = await _categoryRepository.readAllByQuery(
-            {'q': searchTerm, 'model': modelType.toJson()},
-            limit: _limit,
-          );
+          rawResponse = await _categoryRepository.readAllByQuery({
+            'q': searchTerm,
+            'model': modelType.toJson(),
+          }, limit: _limit);
           processedItems = rawResponse.items.cast<FeedItem>();
         case SearchModelType.source:
-          rawResponse = await _sourceRepository.readAllByQuery(
-            {'q': searchTerm, 'model': modelType.toJson()},
-            limit: _limit,
-          );
+          rawResponse = await _sourceRepository.readAllByQuery({
+            'q': searchTerm,
+            'model': modelType.toJson(),
+          }, limit: _limit);
           processedItems = rawResponse.items.cast<FeedItem>();
       }
       emit(
         HeadlinesSearchSuccess(
-          items: processedItems, 
+          items: processedItems,
           hasMore: rawResponse.hasMore,
           cursor: rawResponse.cursor,
           lastSearchTerm: searchTerm,
@@ -217,10 +227,12 @@ class HeadlinesSearchBloc
         ),
       );
       // Dispatch event if AccountAction was injected in new search
-      if (modelType == SearchModelType.headline && 
+      if (modelType == SearchModelType.headline &&
           processedItems.any((item) => item is AccountAction) &&
           _appBloc.state.user?.id != null) {
-        _appBloc.add(AppUserAccountActionShown(userId: _appBloc.state.user!.id));
+        _appBloc.add(
+          AppUserAccountActionShown(userId: _appBloc.state.user!.id),
+        );
       }
     } on HtHttpException catch (e) {
       emit(

@@ -115,7 +115,9 @@ class AuthenticationPage extends StatelessWidget {
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: AppSpacing.md), // Increased spacing
+                      const SizedBox(
+                        height: AppSpacing.md,
+                      ), // Increased spacing
                       Text(
                         subHeadline,
                         style: textTheme.bodyLarge?.copyWith(
@@ -128,14 +130,15 @@ class AuthenticationPage extends StatelessWidget {
                       // --- Email Sign-In Button ---
                       ElevatedButton.icon(
                         icon: const Icon(Icons.email_outlined),
-                        onPressed: isLoading
-                            ? null
-                            : () {
-                                context.goNamed(
-                                  Routes.requestCodeName,
-                                  extra: isLinkingContext,
-                                );
-                              },
+                        onPressed:
+                            isLoading
+                                ? null
+                                : () {
+                                  context.goNamed(
+                                    Routes.requestCodeName,
+                                    extra: isLinkingContext,
+                                  );
+                                },
                         label: Text(l10n.authenticationEmailSignInButton),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
@@ -150,9 +153,10 @@ class AuthenticationPage extends StatelessWidget {
                       if (showAnonymousButton) ...[
                         OutlinedButton.icon(
                           icon: const Icon(Icons.person_outline),
-                          onPressed: isLoading
-                              ? null
-                              : () => context.read<AuthenticationBloc>().add(
+                          onPressed:
+                              isLoading
+                                  ? null
+                                  : () => context.read<AuthenticationBloc>().add(
                                     const AuthenticationAnonymousSignInRequested(),
                                   ),
                           label: Text(l10n.authenticationAnonymousSignInButton),
@@ -166,7 +170,8 @@ class AuthenticationPage extends StatelessWidget {
                       ],
 
                       // --- Loading Indicator ---
-                      if (isLoading && state is! AuthenticationRequestCodeLoading) ...[
+                      if (isLoading &&
+                          state is! AuthenticationRequestCodeLoading) ...[
                         const Padding(
                           padding: EdgeInsets.only(top: AppSpacing.xl),
                           child: Center(child: CircularProgressIndicator()),

@@ -41,7 +41,8 @@ class EntityDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<EntityDetailsBloc>( // Explicitly type BlocProvider
+    return BlocProvider<EntityDetailsBloc>(
+      // Explicitly type BlocProvider
       create: (context) {
         final feedInjectorService = FeedInjectorService();
         final entityDetailsBloc = EntityDetailsBloc(
@@ -121,36 +122,45 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
         name = l10n.detailsPageTitle; // Fallback
     }
     // Manual capitalization
-    return name.isNotEmpty ? '${name[0].toUpperCase()}${name.substring(1)}' : name;
+    return name.isNotEmpty
+        ? '${name[0].toUpperCase()}${name.substring(1)}'
+        : name;
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
-    final textTheme = theme.textTheme; 
+    final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
       body: BlocBuilder<EntityDetailsBloc, EntityDetailsState>(
         builder: (context, state) {
-          final entityTypeDisplayNameForTitle = _getEntityTypeDisplayName(widget.args.entityType, l10n);
+          final entityTypeDisplayNameForTitle = _getEntityTypeDisplayName(
+            widget.args.entityType,
+            l10n,
+          );
 
           if (state.status == EntityDetailsStatus.initial ||
-              (state.status == EntityDetailsStatus.loading && state.entity == null)) {
+              (state.status == EntityDetailsStatus.loading &&
+                  state.entity == null)) {
             return LoadingStateWidget(
               icon: Icons.info_outline,
-              headline: entityTypeDisplayNameForTitle, // Use the display name directly
+              headline:
+                  entityTypeDisplayNameForTitle, // Use the display name directly
               subheadline: l10n.pleaseWait,
             );
           }
 
-          if (state.status == EntityDetailsStatus.failure && state.entity == null) {
+          if (state.status == EntityDetailsStatus.failure &&
+              state.entity == null) {
             return FailureStateWidget(
               //TODO(fulleni): add entityDetailsErrorLoadingto l10n
               // message: state.errorMessage ?? l10n.entityDetailsErrorLoading(entityType: entityTypeDisplayNameForTitle),
               message: state.errorMessage ?? '...',
-              onRetry: () => context.read<EntityDetailsBloc>().add(
+              onRetry:
+                  () => context.read<EntityDetailsBloc>().add(
                     EntityDetailsLoadRequested(
                       entityId: widget.args.entityId,
                       entityType: widget.args.entityType,
@@ -177,29 +187,32 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
             appBarTitleText = l10n.detailsPageTitle; // Fallback
           }
 
-          final description = state.entity is Category
-              ? (state.entity as Category).description
-              : state.entity is Source
+          final description =
+              state.entity is Category
+                  ? (state.entity as Category).description
+                  : state.entity is Source
                   ? (state.entity as Source).description
                   : null;
 
-          final entityIconUrl = (state.entity is Category &&
-                  (state.entity as Category).iconUrl != null)
-              ? (state.entity as Category).iconUrl
-              : null;
+          final entityIconUrl =
+              (state.entity is Category &&
+                      (state.entity as Category).iconUrl != null)
+                  ? (state.entity as Category).iconUrl
+                  : null;
 
           final followButton = IconButton(
             icon: Icon(
               state.isFollowing ? Icons.check_circle : Icons.add_circle_outline,
               color: colorScheme.primary,
             ),
-            tooltip: state.isFollowing
-                ? l10n.unfollowButtonLabel
-                : l10n.followButtonLabel,
+            tooltip:
+                state.isFollowing
+                    ? l10n.unfollowButtonLabel
+                    : l10n.followButtonLabel,
             onPressed: () {
-              context
-                  .read<EntityDetailsBloc>()
-                  .add(const EntityDetailsToggleFollowRequested());
+              context.read<EntityDetailsBloc>().add(
+                const EntityDetailsToggleFollowRequested(),
+              );
             },
           );
 
@@ -216,11 +229,12 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                       width: kToolbarHeight - AppSpacing.lg,
                       height: kToolbarHeight - AppSpacing.lg,
                       fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) => Icon(
-                        appBarIconData ?? Icons.info_outline,
-                        size: kToolbarHeight - AppSpacing.xl,
-                        color: colorScheme.onSurfaceVariant,
-                      ),
+                      errorBuilder:
+                          (context, error, stackTrace) => Icon(
+                            appBarIconData ?? Icons.info_outline,
+                            size: kToolbarHeight - AppSpacing.xl,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
                     ),
                   ),
                 )
@@ -251,10 +265,7 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                 pinned: true,
                 floating: false,
                 snap: false,
-                actions: [
-                  followButton,
-                  const SizedBox(width: AppSpacing.sm),
-                ],
+                actions: [followButton, const SizedBox(width: AppSpacing.sm)],
               ),
               SliverPadding(
                 padding: const EdgeInsets.all(AppSpacing.paddingMedium),
@@ -271,15 +282,15 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                       const SizedBox(height: AppSpacing.lg),
                     ],
                     if (state.feedItems.isNotEmpty ||
-                        state.headlinesStatus == EntityHeadlinesStatus.loadingMore) ...[
+                        state.headlinesStatus ==
+                            EntityHeadlinesStatus.loadingMore) ...[
                       Text(
                         l10n.headlinesSectionTitle,
-                        style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                        style: textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      const Divider(
-                        height: AppSpacing.lg,
-                        thickness: 1,
-                      ),
+                      const Divider(height: AppSpacing.lg, thickness: 1),
                     ],
                   ]),
                 ),
@@ -305,19 +316,27 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                 )
               else
                 SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingMedium),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.paddingMedium,
+                  ),
                   sliver: SliverList.separated(
-                    itemCount: state.feedItems.length +
+                    itemCount:
+                        state.feedItems.length +
                         (state.hasMoreHeadlines &&
-                                state.headlinesStatus == EntityHeadlinesStatus.loadingMore
+                                state.headlinesStatus ==
+                                    EntityHeadlinesStatus.loadingMore
                             ? 1
                             : 0),
-                    separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.sm),
+                    separatorBuilder:
+                        (context, index) =>
+                            const SizedBox(height: AppSpacing.sm),
                     itemBuilder: (context, index) {
                       if (index >= state.feedItems.length) {
                         return const Center(
                           child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                            padding: EdgeInsets.symmetric(
+                              vertical: AppSpacing.lg,
+                            ),
                             child: CircularProgressIndicator(),
                           ),
                         );
@@ -325,56 +344,63 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                       final item = state.feedItems[index];
 
                       if (item is Headline) {
-                        final imageStyle = context
-                            .watch<AppBloc>()
-                            .state
-                            .settings
-                            .feedPreferences
-                            .headlineImageStyle;
+                        final imageStyle =
+                            context
+                                .watch<AppBloc>()
+                                .state
+                                .settings
+                                .feedPreferences
+                                .headlineImageStyle;
                         Widget tile;
                         switch (imageStyle) {
                           case HeadlineImageStyle.hidden:
                             tile = HeadlineTileTextOnly(
                               headline: item,
-                              onHeadlineTap: () => context.pushNamed(
-                                Routes.globalArticleDetailsName,
-                                pathParameters: {'id': item.id},
-                                extra: item,
-                              ),
+                              onHeadlineTap:
+                                  () => context.pushNamed(
+                                    Routes.globalArticleDetailsName,
+                                    pathParameters: {'id': item.id},
+                                    extra: item,
+                                  ),
                               currentContextEntityType: state.entityType,
-                              currentContextEntityId: state.entity is Category
-                                  ? (state.entity as Category).id
-                                  : state.entity is Source
+                              currentContextEntityId:
+                                  state.entity is Category
+                                      ? (state.entity as Category).id
+                                      : state.entity is Source
                                       ? (state.entity as Source).id
                                       : null,
                             );
                           case HeadlineImageStyle.smallThumbnail:
                             tile = HeadlineTileImageStart(
                               headline: item,
-                              onHeadlineTap: () => context.pushNamed(
-                                Routes.globalArticleDetailsName,
-                                pathParameters: {'id': item.id},
-                                extra: item,
-                              ),
+                              onHeadlineTap:
+                                  () => context.pushNamed(
+                                    Routes.globalArticleDetailsName,
+                                    pathParameters: {'id': item.id},
+                                    extra: item,
+                                  ),
                               currentContextEntityType: state.entityType,
-                              currentContextEntityId: state.entity is Category
-                                  ? (state.entity as Category).id
-                                  : state.entity is Source
+                              currentContextEntityId:
+                                  state.entity is Category
+                                      ? (state.entity as Category).id
+                                      : state.entity is Source
                                       ? (state.entity as Source).id
                                       : null,
                             );
                           case HeadlineImageStyle.largeThumbnail:
                             tile = HeadlineTileImageTop(
                               headline: item,
-                              onHeadlineTap: () => context.pushNamed(
-                                Routes.globalArticleDetailsName,
-                                pathParameters: {'id': item.id},
-                                extra: item,
-                              ),
+                              onHeadlineTap:
+                                  () => context.pushNamed(
+                                    Routes.globalArticleDetailsName,
+                                    pathParameters: {'id': item.id},
+                                    extra: item,
+                                  ),
                               currentContextEntityType: state.entityType,
-                              currentContextEntityId: state.entity is Category
-                                  ? (state.entity as Category).id
-                                  : state.entity is Source
+                              currentContextEntityId:
+                                  state.entity is Category
+                                      ? (state.entity as Category).id
+                                      : state.entity is Source
                                       ? (state.entity as Source).id
                                       : null,
                             );
@@ -392,12 +418,14 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                     padding: const EdgeInsets.all(AppSpacing.paddingMedium),
                     child: Text(
                       state.errorMessage ?? l10n.failedToLoadMoreHeadlines,
-                      style: textTheme.bodyMedium?.copyWith(color: colorScheme.error),
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.error,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                   ),
                 ),
-                const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xxl)), 
+              const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xxl)),
             ],
           );
         },

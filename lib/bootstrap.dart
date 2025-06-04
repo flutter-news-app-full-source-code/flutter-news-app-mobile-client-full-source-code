@@ -17,7 +17,8 @@ import 'package:ht_main/shared/localization/en_timeago_messages.dart';
 import 'package:ht_shared/ht_shared.dart'; // Keep this import as is for other shared models
 import 'package:timeago/timeago.dart' as timeago;
 
-Future<void> bootstrap(app_config.AppConfig appConfig) async { // Use prefixed AppConfig here
+Future<void> bootstrap(app_config.AppConfig appConfig) async {
+  // Use prefixed AppConfig here
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = const AppBlocObserver();
 
@@ -51,9 +52,11 @@ Future<void> bootstrap(app_config.AppConfig appConfig) async { // Use prefixed A
   HtDataClient<Source> sourcesClient;
   HtDataClient<UserContentPreferences> userContentPreferencesClient;
   HtDataClient<UserAppSettings> userAppSettingsClient;
-  HtDataClient<AppConfig> appConfigClient; // This AppConfig refers to the shared model
+  HtDataClient<AppConfig>
+  appConfigClient; // This AppConfig refers to the shared model
 
-  if (appConfig.environment == app_config.AppEnvironment.developmentInMemory) { // Use prefixed AppEnvironment
+  if (appConfig.environment == app_config.AppEnvironment.developmentInMemory) {
+    // Use prefixed AppEnvironment
     headlinesClient = HtDataInMemoryClient<Headline>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
@@ -82,12 +85,17 @@ Future<void> bootstrap(app_config.AppConfig appConfig) async { // Use prefixed A
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
     );
-    appConfigClient = HtDataInMemoryClient<AppConfig>( // This AppConfig refers to the shared model
+    appConfigClient = HtDataInMemoryClient<AppConfig>(
+      // This AppConfig refers to the shared model
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
-      initialData: [AppConfig.fromJson(appConfigFixtureData)], // This AppConfig refers to the shared model
+      initialData: [
+        AppConfig.fromJson(appConfigFixtureData),
+      ], // This AppConfig refers to the shared model
     );
-  } else if (appConfig.environment == app_config.AppEnvironment.developmentApi) { // Use prefixed AppEnvironment
+  } else if (appConfig.environment ==
+      app_config.AppEnvironment.developmentApi) {
+    // Use prefixed AppEnvironment
     headlinesClient = HtDataApi<Headline>(
       httpClient: httpClient,
       modelName: 'headline',
@@ -124,7 +132,8 @@ Future<void> bootstrap(app_config.AppConfig appConfig) async { // Use prefixed A
       fromJson: UserAppSettings.fromJson,
       toJson: (settings) => settings.toJson(),
     );
-    appConfigClient = HtDataApi<AppConfig>( // This AppConfig refers to the shared model
+    appConfigClient = HtDataApi<AppConfig>(
+      // This AppConfig refers to the shared model
       httpClient: httpClient,
       modelName: 'app_config',
       fromJson: AppConfig.fromJson, // This AppConfig refers to the shared model
@@ -168,7 +177,8 @@ Future<void> bootstrap(app_config.AppConfig appConfig) async { // Use prefixed A
       fromJson: UserAppSettings.fromJson,
       toJson: (settings) => settings.toJson(),
     );
-    appConfigClient = HtDataApi<AppConfig>( // This AppConfig refers to the shared model
+    appConfigClient = HtDataApi<AppConfig>(
+      // This AppConfig refers to the shared model
       httpClient: httpClient,
       modelName: 'app_config',
       fromJson: AppConfig.fromJson, // This AppConfig refers to the shared model
@@ -185,9 +195,7 @@ Future<void> bootstrap(app_config.AppConfig appConfig) async { // Use prefixed A
   final countriesRepository = HtDataRepository<Country>(
     dataClient: countriesClient,
   );
-  final sourcesRepository = HtDataRepository<Source>(
-    dataClient: sourcesClient,
-  );
+  final sourcesRepository = HtDataRepository<Source>(dataClient: sourcesClient);
   final userContentPreferencesRepository =
       HtDataRepository<UserContentPreferences>(
         dataClient: userContentPreferencesClient,
@@ -195,7 +203,8 @@ Future<void> bootstrap(app_config.AppConfig appConfig) async { // Use prefixed A
   final userAppSettingsRepository = HtDataRepository<UserAppSettings>(
     dataClient: userAppSettingsClient,
   );
-  final appConfigRepository = HtDataRepository<AppConfig>( // This AppConfig refers to the shared model
+  final appConfigRepository = HtDataRepository<AppConfig>(
+    // This AppConfig refers to the shared model
     dataClient: appConfigClient,
   );
 

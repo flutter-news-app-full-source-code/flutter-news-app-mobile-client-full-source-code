@@ -27,7 +27,9 @@ class ManageFollowedItemsPage extends StatelessWidget {
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: AppSpacing.paddingSmall), // Adjusted padding
+        padding: const EdgeInsets.symmetric(
+          vertical: AppSpacing.paddingSmall,
+        ), // Adjusted padding
         children: [
           ListTile(
             leading: Icon(Icons.category_outlined, color: colorScheme.primary),

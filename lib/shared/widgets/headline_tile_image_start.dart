@@ -203,10 +203,7 @@ class _HeadlineMetadataRow extends StatelessWidget {
                 );
               }
             },
-            child: Text(
-              headline.category!.name,
-              style: metadataTextStyle,
-            ),
+            child: Text(headline.category!.name, style: metadataTextStyle),
           ),
         ],
         // Conditionally render Source as Text
@@ -230,10 +227,7 @@ class _HeadlineMetadataRow extends StatelessWidget {
                 );
               }
             },
-            child: Text(
-              headline.source!.name,
-              style: metadataTextStyle,
-            ),
+            child: Text(headline.source!.name, style: metadataTextStyle),
           ),
         ],
       ],

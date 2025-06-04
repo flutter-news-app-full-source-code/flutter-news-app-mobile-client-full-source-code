@@ -27,8 +27,7 @@ class AccountState extends Equatable {
     return AccountState(
       status: status ?? this.status,
       user: clearUser ? null : user ?? this.user,
-      preferences:
-          clearPreferences ? null : preferences ?? this.preferences,
+      preferences: clearPreferences ? null : preferences ?? this.preferences,
       errorMessage:
           clearErrorMessage ? null : errorMessage ?? this.errorMessage,
     );

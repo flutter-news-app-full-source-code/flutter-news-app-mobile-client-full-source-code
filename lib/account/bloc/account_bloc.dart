@@ -13,13 +13,14 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   AccountBloc({
     required HtAuthRepository authenticationRepository,
     required HtDataRepository<UserContentPreferences>
-        userContentPreferencesRepository,
-  })  : _authenticationRepository = authenticationRepository,
-        _userContentPreferencesRepository = userContentPreferencesRepository,
-        super(const AccountState()) {
+    userContentPreferencesRepository,
+  }) : _authenticationRepository = authenticationRepository,
+       _userContentPreferencesRepository = userContentPreferencesRepository,
+       super(const AccountState()) {
     // Listen to user changes from HtAuthRepository
-    _userSubscription =
-        _authenticationRepository.authStateChanges.listen((user) {
+    _userSubscription = _authenticationRepository.authStateChanges.listen((
+      user,
+    ) {
       add(AccountUserChanged(user));
     });
 
@@ -35,7 +36,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
 
   final HtAuthRepository _authenticationRepository;
   final HtDataRepository<UserContentPreferences>
-      _userContentPreferencesRepository;
+  _userContentPreferencesRepository;
   late StreamSubscription<User?> _userSubscription;
 
   Future<void> _onAccountUserChanged(
@@ -47,7 +48,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       add(AccountLoadUserPreferences(userId: event.user!.id));
     } else {
       // Clear preferences if user is null (logged out)
-      emit(state.copyWith(clearPreferences: true, status: AccountStatus.initial));
+      emit(
+        state.copyWith(clearPreferences: true, status: AccountStatus.initial),
+      );
     }
   }
 
@@ -113,8 +116,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     emit(state.copyWith(status: AccountStatus.loading));
 
     final currentPrefs = state.preferences!;
-    final isCurrentlySaved =
-        currentPrefs.savedHeadlines.any((h) => h.id == event.headline.id);
+    final isCurrentlySaved = currentPrefs.savedHeadlines.any(
+      (h) => h.id == event.headline.id,
+    );
     final List<Headline> updatedSavedHeadlines;
 
     if (isCurrentlySaved) {
@@ -125,8 +129,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         ..add(event.headline);
     }
 
-    final updatedPrefs =
-        currentPrefs.copyWith(savedHeadlines: updatedSavedHeadlines);
+    final updatedPrefs = currentPrefs.copyWith(
+      savedHeadlines: updatedSavedHeadlines,
+    );
 
     try {
       await _userContentPreferencesRepository.update(
@@ -163,8 +168,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     emit(state.copyWith(status: AccountStatus.loading));
 
     final currentPrefs = state.preferences!;
-    final isCurrentlyFollowed = currentPrefs.followedCategories
-        .any((c) => c.id == event.category.id);
+    final isCurrentlyFollowed = currentPrefs.followedCategories.any(
+      (c) => c.id == event.category.id,
+    );
     final List<Category> updatedFollowedCategories;
 
     if (isCurrentlyFollowed) {
@@ -175,8 +181,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         ..add(event.category);
     }
 
-    final updatedPrefs =
-        currentPrefs.copyWith(followedCategories: updatedFollowedCategories);
+    final updatedPrefs = currentPrefs.copyWith(
+      followedCategories: updatedFollowedCategories,
+    );
 
     try {
       await _userContentPreferencesRepository.update(
@@ -213,8 +220,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     emit(state.copyWith(status: AccountStatus.loading));
 
     final currentPrefs = state.preferences!;
-    final isCurrentlyFollowed =
-        currentPrefs.followedSources.any((s) => s.id == event.source.id);
+    final isCurrentlyFollowed = currentPrefs.followedSources.any(
+      (s) => s.id == event.source.id,
+    );
     final List<Source> updatedFollowedSources;
 
     if (isCurrentlyFollowed) {
@@ -225,8 +233,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         ..add(event.source);
     }
 
-    final updatedPrefs =
-        currentPrefs.copyWith(followedSources: updatedFollowedSources);
+    final updatedPrefs = currentPrefs.copyWith(
+      followedSources: updatedFollowedSources,
+    );
 
     try {
       await _userContentPreferencesRepository.update(

@@ -16,19 +16,19 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required HtAuthRepository authenticationRepository,
     required HtDataRepository<UserAppSettings> userAppSettingsRepository,
     required HtDataRepository<AppConfig> appConfigRepository, // Added
-  })  : _authenticationRepository = authenticationRepository,
-        _userAppSettingsRepository = userAppSettingsRepository,
-        _appConfigRepository = appConfigRepository, // Added
-        // Initialize with default state, load settings after user is known
-        // Provide a default UserAppSettings instance
-        super(
-          // AppConfig will be null initially, fetched later
-          const AppState(
-            settings: UserAppSettings(id: 'default'),
-            selectedBottomNavigationIndex: 0,
-            appConfig: null, 
-          ),
-        ) {
+  }) : _authenticationRepository = authenticationRepository,
+       _userAppSettingsRepository = userAppSettingsRepository,
+       _appConfigRepository = appConfigRepository, // Added
+       // Initialize with default state, load settings after user is known
+       // Provide a default UserAppSettings instance
+       super(
+         // AppConfig will be null initially, fetched later
+         const AppState(
+           settings: UserAppSettings(id: 'default'),
+           selectedBottomNavigationIndex: 0,
+           appConfig: null,
+         ),
+       ) {
     on<AppUserChanged>(_onAppUserChanged);
     on<AppSettingsRefreshed>(_onAppSettingsRefreshed);
     on<AppConfigFetchRequested>(_onAppConfigFetchRequested);
@@ -79,7 +79,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // Clear appConfig if user is logged out, as it might be tied to auth context
       // or simply to ensure fresh fetch on next login.
       // Also ensure status is unauthenticated.
-      emit(state.copyWith(appConfig: null, clearAppConfig: true, status: AppStatus.unauthenticated));
+      emit(
+        state.copyWith(
+          appConfig: null,
+          clearAppConfig: true,
+          status: AppStatus.unauthenticated,
+        ),
+      );
     }
   }
 
@@ -306,41 +312,81 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   ) async {
     // Guard: Only fetch if a user (authenticated or anonymous) is present.
     if (state.user == null) {
-      print('[AppBloc] User is null. Skipping AppConfig fetch because it requires authentication.');
+      print(
+        '[AppBloc] User is null. Skipping AppConfig fetch because it requires authentication.',
+      );
       // If AppConfig was somehow present without a user, clear it.
       // And ensure status isn't stuck on configFetching if this event was dispatched erroneously.
       if (state.appConfig != null || state.status == AppStatus.configFetching) {
-         emit(state.copyWith(appConfig: null, clearAppConfig: true, status: AppStatus.unauthenticated));
+        emit(
+          state.copyWith(
+            appConfig: null,
+            clearAppConfig: true,
+            status: AppStatus.unauthenticated,
+          ),
+        );
       }
       return;
     }
 
     // Avoid refetching if already loaded for the current user session, unless explicitly trying to recover from a failed state.
-    if (state.appConfig != null && state.status != AppStatus.configFetchFailed) {
-      print('[AppBloc] AppConfig already loaded for user ${state.user?.id} and not in a failed state. Skipping fetch.');
+    if (state.appConfig != null &&
+        state.status != AppStatus.configFetchFailed) {
+      print(
+        '[AppBloc] AppConfig already loaded for user ${state.user?.id} and not in a failed state. Skipping fetch.',
+      );
       return;
     }
 
-    print('[AppBloc] Attempting to fetch AppConfig for user: ${state.user!.id}...');
-    emit(state.copyWith(status: AppStatus.configFetching, appConfig: null, clearAppConfig: true));
+    print(
+      '[AppBloc] Attempting to fetch AppConfig for user: ${state.user!.id}...',
+    );
+    emit(
+      state.copyWith(
+        status: AppStatus.configFetching,
+        appConfig: null,
+        clearAppConfig: true,
+      ),
+    );
 
     try {
-      final appConfig = await _appConfigRepository.read(id: 'app_config'); // API requires auth, so token will be used
-      print('[AppBloc] AppConfig fetched successfully. ID: ${appConfig.id} for user: ${state.user!.id}');
-      
+      final appConfig = await _appConfigRepository.read(
+        id: 'app_config',
+      ); // API requires auth, so token will be used
+      print(
+        '[AppBloc] AppConfig fetched successfully. ID: ${appConfig.id} for user: ${state.user!.id}',
+      );
+
       // Determine the correct status based on the existing user's role.
       // This ensures that successfully fetching config doesn't revert auth status to 'initial'.
-      final newStatusBasedOnUser = state.user!.role == UserRole.standardUser 
-                                  ? AppStatus.authenticated 
-                                  : AppStatus.anonymous;
+      final newStatusBasedOnUser =
+          state.user!.role == UserRole.standardUser
+              ? AppStatus.authenticated
+              : AppStatus.anonymous;
       emit(state.copyWith(appConfig: appConfig, status: newStatusBasedOnUser));
     } on HtHttpException catch (e) {
-      print('[AppBloc] Failed to fetch AppConfig (HtHttpException) for user ${state.user?.id}: ${e.runtimeType} - ${e.message}');
-      emit(state.copyWith(status: AppStatus.configFetchFailed, appConfig: null, clearAppConfig: true));
+      print(
+        '[AppBloc] Failed to fetch AppConfig (HtHttpException) for user ${state.user?.id}: ${e.runtimeType} - ${e.message}',
+      );
+      emit(
+        state.copyWith(
+          status: AppStatus.configFetchFailed,
+          appConfig: null,
+          clearAppConfig: true,
+        ),
+      );
     } catch (e, s) {
-      print('[AppBloc] Unexpected error fetching AppConfig for user ${state.user?.id}: $e');
+      print(
+        '[AppBloc] Unexpected error fetching AppConfig for user ${state.user?.id}: $e',
+      );
       print('[AppBloc] Stacktrace: $s');
-      emit(state.copyWith(status: AppStatus.configFetchFailed, appConfig: null, clearAppConfig: true));
+      emit(
+        state.copyWith(
+          status: AppStatus.configFetchFailed,
+          appConfig: null,
+          clearAppConfig: true,
+        ),
+      );
     }
   }
 
@@ -352,8 +398,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       final now = DateTime.now();
       // Optimistically update the local user state.
       // Corrected parameter name for copyWith as per User model in models.txt
-      final updatedUser = state.user!.copyWith(lastEngagementShownAt: now); 
-      
+      final updatedUser = state.user!.copyWith(lastEngagementShownAt: now);
+
       // Emit the change so UI can react if needed, and other BLoCs get the update.
       // This also ensures that FeedInjectorService will see the updated timestamp immediately.
       emit(state.copyWith(user: updatedUser));

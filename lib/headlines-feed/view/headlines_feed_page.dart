@@ -163,7 +163,8 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
               return const SizedBox.shrink();
 
             case HeadlinesFeedLoaded():
-              if (state.feedItems.isEmpty) { // Changed from state.headlines
+              if (state.feedItems.isEmpty) {
+                // Changed from state.headlines
                 return FailureStateWidget(
                   message:
                       '${l10n.headlinesFeedEmptyFilteredHeadline}\n${l10n.headlinesFeedEmptyFilteredSubheadline}',
@@ -172,8 +173,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                       HeadlinesFeedFiltersCleared(),
                     );
                   },
-                  retryButtonText:
-                      l10n.headlinesFeedClearFiltersButton,
+                  retryButtonText: l10n.headlinesFeedClearFiltersButton,
                 );
               }
               return RefreshIndicator(
@@ -188,23 +188,29 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                     top: AppSpacing.md,
                     bottom: AppSpacing.xxl,
                   ),
-                  itemCount: state.hasMore
-                      ? state.feedItems.length + 1 // Changed
-                      : state.feedItems.length, // Changed
+                  itemCount:
+                      state.hasMore
+                          ? state.feedItems.length +
+                              1 // Changed
+                          : state.feedItems.length, // Changed
                   separatorBuilder: (context, index) {
                     // Add a bit more space if the next item is an Ad or AccountAction
-                    if (index < state.feedItems.length -1) {
+                    if (index < state.feedItems.length - 1) {
                       final currentItem = state.feedItems[index];
-                      final nextItem = state.feedItems[index+1];
-                      if ((currentItem is Headline && (nextItem is Ad || nextItem is AccountAction)) ||
-                          ((currentItem is Ad || currentItem is AccountAction) && nextItem is Headline)) {
+                      final nextItem = state.feedItems[index + 1];
+                      if ((currentItem is Headline &&
+                              (nextItem is Ad || nextItem is AccountAction)) ||
+                          ((currentItem is Ad ||
+                                  currentItem is AccountAction) &&
+                              nextItem is Headline)) {
                         return const SizedBox(height: AppSpacing.md);
                       }
                     }
                     return const SizedBox(height: AppSpacing.lg);
                   },
                   itemBuilder: (context, index) {
-                    if (index >= state.feedItems.length) { // Changed
+                    if (index >= state.feedItems.length) {
+                      // Changed
                       return const Padding(
                         padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
                         child: Center(child: CircularProgressIndicator()),
@@ -213,40 +219,44 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                     final item = state.feedItems[index]; // Changed
 
                     if (item is Headline) {
-                      final imageStyle = context
-                          .watch<AppBloc>()
-                          .state
-                          .settings
-                          .feedPreferences
-                          .headlineImageStyle;
+                      final imageStyle =
+                          context
+                              .watch<AppBloc>()
+                              .state
+                              .settings
+                              .feedPreferences
+                              .headlineImageStyle;
                       Widget tile;
                       switch (imageStyle) {
                         case HeadlineImageStyle.hidden:
                           tile = HeadlineTileTextOnly(
                             headline: item,
-                            onHeadlineTap: () => context.goNamed(
-                              Routes.articleDetailsName,
-                              pathParameters: {'id': item.id},
-                              extra: item,
-                            ),
+                            onHeadlineTap:
+                                () => context.goNamed(
+                                  Routes.articleDetailsName,
+                                  pathParameters: {'id': item.id},
+                                  extra: item,
+                                ),
                           );
                         case HeadlineImageStyle.smallThumbnail:
                           tile = HeadlineTileImageStart(
                             headline: item,
-                            onHeadlineTap: () => context.goNamed(
-                              Routes.articleDetailsName,
-                              pathParameters: {'id': item.id},
-                              extra: item,
-                            ),
+                            onHeadlineTap:
+                                () => context.goNamed(
+                                  Routes.articleDetailsName,
+                                  pathParameters: {'id': item.id},
+                                  extra: item,
+                                ),
                           );
                         case HeadlineImageStyle.largeThumbnail:
                           tile = HeadlineTileImageTop(
                             headline: item,
-                            onHeadlineTap: () => context.goNamed(
-                              Routes.articleDetailsName,
-                              pathParameters: {'id': item.id},
-                              extra: item,
-                            ),
+                            onHeadlineTap:
+                                () => context.goNamed(
+                                  Routes.articleDetailsName,
+                                  pathParameters: {'id': item.id},
+                                  extra: item,
+                                ),
                           );
                       }
                       return tile;
@@ -266,8 +276,11 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                                 Image.network(
                                   item.imageUrl,
                                   height: 100,
-                                  errorBuilder: (ctx, err, st) =>
-                                      const Icon(Icons.broken_image, size: 50),
+                                  errorBuilder:
+                                      (ctx, err, st) => const Icon(
+                                        Icons.broken_image,
+                                        size: 50,
+                                      ),
                                 ),
                               const SizedBox(height: AppSpacing.sm),
                               Text(
@@ -299,7 +312,8 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                         color: colorScheme.secondaryContainer,
                         child: ListTile(
                           leading: Icon(
-                            item.accountActionType == AccountActionType.linkAccount
+                            item.accountActionType ==
+                                    AccountActionType.linkAccount
                                 ? Icons.link
                                 : Icons.upgrade,
                             color: colorScheme.onSecondaryContainer,
@@ -311,29 +325,34 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          subtitle: item.description != null
-                              ? Text(
-                                  item.description!,
-                                  style: textTheme.bodySmall?.copyWith(
-                                    color: colorScheme.onSecondaryContainer.withOpacity(0.8),
-                                  ),
-                                )
-                              : null,
-                          trailing: item.callToActionText != null
-                              ? ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: colorScheme.secondary,
-                                    foregroundColor: colorScheme.onSecondary,
-                                  ),
-                                  onPressed: () {
-                                    if (item.callToActionUrl != null) {
-                                      context.push(item.callToActionUrl!);
-                                    }
-                                  },
-                                  child: Text(item.callToActionText!),
-                                )
-                              : null,
-                          isThreeLine: item.description != null && item.description!.length > 50,
+                          subtitle:
+                              item.description != null
+                                  ? Text(
+                                    item.description!,
+                                    style: textTheme.bodySmall?.copyWith(
+                                      color: colorScheme.onSecondaryContainer
+                                          .withOpacity(0.8),
+                                    ),
+                                  )
+                                  : null,
+                          trailing:
+                              item.callToActionText != null
+                                  ? ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: colorScheme.secondary,
+                                      foregroundColor: colorScheme.onSecondary,
+                                    ),
+                                    onPressed: () {
+                                      if (item.callToActionUrl != null) {
+                                        context.push(item.callToActionUrl!);
+                                      }
+                                    },
+                                    child: Text(item.callToActionText!),
+                                  )
+                                  : null,
+                          isThreeLine:
+                              item.description != null &&
+                              item.description!.length > 50,
                         ),
                       );
                     }

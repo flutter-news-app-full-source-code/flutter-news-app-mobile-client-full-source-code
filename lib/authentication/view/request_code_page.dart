@@ -128,8 +128,9 @@ class _RequestCodeView extends StatelessWidget {
                       const SizedBox(height: AppSpacing.md),
                       Text(
                         l10n.requestCodePageSubheadline, // Using a more descriptive subheadline
-                        style: textTheme.bodyLarge
-                            ?.copyWith(color: colorScheme.onSurfaceVariant),
+                        style: textTheme.bodyLarge?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: AppSpacing.xxl),
@@ -215,16 +216,20 @@ class _EmailLinkFormState extends State<_EmailLinkForm> {
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
               textStyle: textTheme.labelLarge,
             ),
-            child: widget.isLoading
-                ? SizedBox(
-                    height: AppSpacing.xl, // Consistent size with text
-                    width: AppSpacing.xl,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: colorScheme.onPrimary, // Color for loader on button
-                    ),
-                  )
-                : Text(l10n.requestCodeSendCodeButton), // More specific button text
+            child:
+                widget.isLoading
+                    ? SizedBox(
+                      height: AppSpacing.xl, // Consistent size with text
+                      width: AppSpacing.xl,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color:
+                            colorScheme.onPrimary, // Color for loader on button
+                      ),
+                    )
+                    : Text(
+                      l10n.requestCodeSendCodeButton,
+                    ), // More specific button text
           ),
         ],
       ),

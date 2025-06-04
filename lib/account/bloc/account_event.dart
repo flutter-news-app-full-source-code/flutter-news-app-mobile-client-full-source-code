@@ -7,7 +7,8 @@ abstract class AccountEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class AccountUserChanged extends AccountEvent { // Corrected name
+class AccountUserChanged extends AccountEvent {
+  // Corrected name
   const AccountUserChanged(this.user);
   final User? user;
 
@@ -15,7 +16,8 @@ class AccountUserChanged extends AccountEvent { // Corrected name
   List<Object?> get props => [user];
 }
 
-class AccountLoadUserPreferences extends AccountEvent { // Corrected name
+class AccountLoadUserPreferences extends AccountEvent {
+  // Corrected name
   const AccountLoadUserPreferences({required this.userId});
   final String userId;
 

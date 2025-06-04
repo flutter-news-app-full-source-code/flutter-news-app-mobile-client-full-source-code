@@ -19,7 +19,7 @@ class FollowedCategoriesListPage extends StatelessWidget {
     final l10n = context.l10n;
     final followedCategories =
         context.watch<AccountBloc>().state.preferences?.followedCategories ??
-            [];
+        [];
 
     return Scaffold(
       appBar: AppBar(
@@ -48,14 +48,14 @@ class FollowedCategoriesListPage extends StatelessWidget {
           if (state.status == AccountStatus.failure &&
               state.preferences == null) {
             return FailureStateWidget(
-              message: state.errorMessage ?? 'Could not load followed categories.', // Placeholder
+              message:
+                  state.errorMessage ??
+                  'Could not load followed categories.', // Placeholder
               onRetry: () {
                 if (state.user?.id != null) {
                   context.read<AccountBloc>().add(
-                        AccountLoadUserPreferences(
-                          userId: state.user!.id,
-                        ),
-                      );
+                    AccountLoadUserPreferences(userId: state.user!.id),
+                  );
                 }
               },
             );
@@ -65,7 +65,8 @@ class FollowedCategoriesListPage extends StatelessWidget {
             return const InitialStateWidget(
               icon: Icons.no_sim_outlined, // Placeholder icon
               headline: 'No Followed Categories', // Placeholder
-              subheadline: 'Start following categories to see them here.', // Placeholder
+              subheadline:
+                  'Start following categories to see them here.', // Placeholder
             );
           }
 
@@ -74,32 +75,38 @@ class FollowedCategoriesListPage extends StatelessWidget {
             itemBuilder: (context, index) {
               final category = followedCategories[index];
               return ListTile(
-                leading: category.iconUrl != null
-                    ? SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: Image.network(
-                          category.iconUrl!,
-                          errorBuilder: (context, error, stackTrace) =>
-                              const Icon(Icons.category_outlined),
-                        ),
-                      )
-                    : const Icon(Icons.category_outlined),
+                leading:
+                    category.iconUrl != null
+                        ? SizedBox(
+                          width: 40,
+                          height: 40,
+                          child: Image.network(
+                            category.iconUrl!,
+                            errorBuilder:
+                                (context, error, stackTrace) =>
+                                    const Icon(Icons.category_outlined),
+                          ),
+                        )
+                        : const Icon(Icons.category_outlined),
                 title: Text(category.name),
-                subtitle: category.description != null
-                    ? Text(
-                        category.description!,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      )
-                    : null,
+                subtitle:
+                    category.description != null
+                        ? Text(
+                          category.description!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        )
+                        : null,
                 trailing: IconButton(
-                  icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+                  icon: const Icon(
+                    Icons.remove_circle_outline,
+                    color: Colors.red,
+                  ),
                   tooltip: 'Unfollow Category', // Placeholder
                   onPressed: () {
                     context.read<AccountBloc>().add(
-                          AccountFollowCategoryToggled(category: category),
-                        );
+                      AccountFollowCategoryToggled(category: category),
+                    );
                   },
                 ),
                 onTap: () {

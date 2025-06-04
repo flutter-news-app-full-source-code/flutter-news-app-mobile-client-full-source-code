@@ -149,8 +149,10 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
         state.countries.isEmpty) {
       return FailureStateWidget(
         message: state.error?.toString() ?? l10n.unknownError,
-        onRetry: () =>
-            context.read<CountriesFilterBloc>().add(CountriesFilterRequested()),
+        onRetry:
+            () => context.read<CountriesFilterBloc>().add(
+              CountriesFilterRequested(),
+            ),
       );
     }
 
@@ -167,9 +169,11 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
     // Handle loaded state (success or loading more)
     return ListView.builder(
       controller: _scrollController,
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.paddingSmall)
-          .copyWith(bottom: AppSpacing.xxl), // Consistent vertical padding
-      itemCount: state.countries.length +
+      padding: const EdgeInsets.symmetric(
+        vertical: AppSpacing.paddingSmall,
+      ).copyWith(bottom: AppSpacing.xxl), // Consistent vertical padding
+      itemCount:
+          state.countries.length +
           ((state.status == CountriesFilterStatus.loadingMore ||
                   (state.status == CountriesFilterStatus.failure &&
                       state.countries.isNotEmpty))
@@ -191,8 +195,9 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
               child: Center(
                 child: Text(
                   l10n.loadMoreError,
-                  style: textTheme.bodySmall
-                      ?.copyWith(color: colorScheme.error),
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.error,
+                  ),
                 ),
               ),
             );
@@ -208,25 +213,28 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
           secondary: SizedBox(
             width: AppSpacing.xl + AppSpacing.xs, // Standardized width (36)
             height: AppSpacing.lg + AppSpacing.sm, // Standardized height (24)
-            child: ClipRRect( // Clip the image for rounded corners if desired
+            child: ClipRRect(
+              // Clip the image for rounded corners if desired
               borderRadius: BorderRadius.circular(AppSpacing.xs / 2),
               child: Image.network(
                 country.flagUrl,
                 fit: BoxFit.cover, // Use cover for better filling
-                errorBuilder: (context, error, stackTrace) => Icon(
-                  Icons.flag_outlined,
-                  color: colorScheme.onSurfaceVariant,
-                  size: AppSpacing.lg, // Adjust size as needed
-                ),
+                errorBuilder:
+                    (context, error, stackTrace) => Icon(
+                      Icons.flag_outlined,
+                      color: colorScheme.onSurfaceVariant,
+                      size: AppSpacing.lg, // Adjust size as needed
+                    ),
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
                   return Center(
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded /
-                              loadingProgress.expectedTotalBytes!
-                          : null,
+                      value:
+                          loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                              : null,
                     ),
                   );
                 },

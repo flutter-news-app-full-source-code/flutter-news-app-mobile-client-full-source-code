@@ -239,7 +239,7 @@ class _AppViewState extends State<_AppView> {
                     final l10n = innerContext.l10n;
                     return FailureStateWidget(
                       message: l10n.unknownError, // "An unknown error occurred."
-                      retryButtonText: "Retry", // Hardcoded for now
+                      retryButtonText: 'Retry', // Hardcoded for now
                       onRetry: () {
                         // Use outer context for BLoC access
                         context 

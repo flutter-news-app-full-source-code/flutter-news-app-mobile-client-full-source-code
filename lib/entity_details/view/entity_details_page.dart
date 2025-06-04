@@ -114,14 +114,11 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
     switch (type) {
       case EntityType.category:
         name = l10n.entityDetailsCategoryTitle; // Use direct l10n string
-        break;
       case EntityType.source:
         name = l10n.entityDetailsSourceTitle; // Use direct l10n string
-        break;
       // EntityType.country does not exist, remove or map if added later
       default:
         name = l10n.detailsPageTitle; // Fallback
-        break;
     }
     // Manual capitalization
     return name.isNotEmpty ? '${name[0].toUpperCase()}${name.substring(1)}' : name;
@@ -400,7 +397,7 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                     ),
                   ),
                 ),
-                SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xxl)), 
+                const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xxl)), 
             ],
           );
         },

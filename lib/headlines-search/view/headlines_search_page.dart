@@ -128,7 +128,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
               width: 150, // Adjusted width for potentially longer translations
               child: DropdownButtonFormField<SearchModelType>(
                 value: _selectedModelType,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   border: InputBorder.none, // Clean look
                   contentPadding: EdgeInsets.symmetric(
                     horizontal: AppSpacing.sm, // Adjusted padding
@@ -202,11 +202,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                             color: appBarTheme.iconTheme?.color ??
                                 colorScheme.onSurfaceVariant,
                           ),
-                          onPressed: () {
-                            _textController.clear();
-                            // Optionally clear search results when text is cleared
-                            // context.read<HeadlinesSearchBloc>().add(HeadlinesSearchTermCleared());
-                          },
+                          onPressed: _textController.clear,
                         )
                       : null,
                 ),
@@ -222,7 +218,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
             onPressed: _performSearch,
             // color: appBarTheme.actionsIconTheme?.color, // Use theme
           ),
-          const SizedBox(width: AppSpacing.xs) // Add a bit of padding
+          const SizedBox(width: AppSpacing.xs), // Add a bit of padding
         ],
       ),
       body: BlocBuilder<HeadlinesSearchBloc, HeadlinesSearchState>(
@@ -279,7 +275,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                             if (index >= items.length) {
                               return const Padding(
                                 padding: EdgeInsets.symmetric(
-                                    vertical: AppSpacing.lg),
+                                    vertical: AppSpacing.lg,),
                                 child:
                                     Center(child: CircularProgressIndicator()),
                               );
@@ -331,7 +327,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                             } else if (feedItem is Ad) {
                               return Card(
                                 margin: const EdgeInsets.symmetric(
-                                    vertical: AppSpacing.xs),
+                                    vertical: AppSpacing.xs,),
                                 color: currentColorScheme.surfaceContainerHighest,
                                 child: Padding(
                                   padding: const EdgeInsets.all(AppSpacing.md),
@@ -368,7 +364,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                             } else if (feedItem is AccountAction) {
                               return Card(
                                 margin: const EdgeInsets.symmetric(
-                                    vertical: AppSpacing.xs),
+                                    vertical: AppSpacing.xs,),
                                 color: currentColorScheme.secondaryContainer,
                                 child: ListTile(
                                   leading: Icon(
@@ -415,7 +411,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                                             if (feedItem.callToActionUrl !=
                                                 null) {
                                               context.push(
-                                                  feedItem.callToActionUrl!);
+                                                  feedItem.callToActionUrl!,);
                                             }
                                           },
                                           child:
@@ -444,7 +440,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                     'Failed to search "$lastSearchTerm" in ${failedModelType.displayName.toLowerCase()}:\n$errorMessage', // Improved message
                 onRetry: () => context.read<HeadlinesSearchBloc>().add(
                       HeadlinesSearchFetchRequested(
-                          searchTerm: lastSearchTerm),
+                          searchTerm: lastSearchTerm,),
                     ),
               ),
             _ => const SizedBox.shrink(), // Fallback for any other state

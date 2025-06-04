@@ -14,12 +14,12 @@ import 'package:ht_main/shared/constants/constants.dart';
 import 'package:ht_shared/ht_shared.dart'
     show
         Category,
+        HtHttpException,
+        NotFoundException,
         Source,
         SourceType,
-        UserContentPreferences,
-        User,
-        HtHttpException, // Added
-        NotFoundException; // Added
+        User, // Added
+        UserContentPreferences; // Added
 
 // Keys for passing data to/from SourceFilterPage
 const String keySelectedSources = 'selectedSources';
@@ -64,7 +64,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
     final headlinesFeedState =
         BlocProvider.of<HeadlinesFeedBloc>(context).state;
 
-    bool initialUseFollowedFilters = false;
+    var initialUseFollowedFilters = false;
 
     if (headlinesFeedState is HeadlinesFeedLoaded) {
       final currentFilter = headlinesFeedState.filter;
@@ -111,7 +111,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
     });
 
     final appState = context.read<AppBloc>().state;
-    final User? currentUser = appState.user;
+    final currentUser = appState.user;
 
     if (currentUser == null) {
       setState(() {

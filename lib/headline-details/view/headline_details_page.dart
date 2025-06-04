@@ -174,7 +174,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
 
-    final horizontalPadding = EdgeInsets.symmetric(
+    const horizontalPadding = EdgeInsets.symmetric(
       horizontal: AppSpacing.paddingLarge,
     );
 
@@ -295,14 +295,14 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                     fit: BoxFit.cover,
                     loadingBuilder: (context, child, loadingProgress) {
                       if (loadingProgress == null) return child;
-                      return Container(
+                      return ColoredBox(
                         color: colorScheme.surfaceContainerHighest,
                         child: const Center(
                           child: CircularProgressIndicator(strokeWidth: 2),
                         ),
                       );
                     },
-                    errorBuilder: (context, error, stackTrace) => Container(
+                    errorBuilder: (context, error, stackTrace) => ColoredBox(
                       color: colorScheme.surfaceContainerHighest,
                       child: Icon(
                         Icons.broken_image_outlined,
@@ -386,9 +386,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
             ),
           ),
         if (headline.url == null || headline.url!.isEmpty) // Ensure bottom padding
-          SliverPadding(
+          const SliverPadding(
             padding: EdgeInsets.only(bottom: AppSpacing.xl),
-            sliver: const SliverToBoxAdapter(child: SizedBox.shrink()),
+            sliver: SliverToBoxAdapter(child: SizedBox.shrink()),
           ),
         SliverPadding(
           padding: horizontalPadding,
@@ -421,7 +421,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     final chipBackgroundColor = colorScheme.secondaryContainer;
     final chipAvatarColor = colorScheme.onSecondaryContainer;
     const chipAvatarSize = AppSpacing.md;
-    final chipPadding = EdgeInsets.symmetric(
+    const chipPadding = EdgeInsets.symmetric(
       horizontal: AppSpacing.sm,
       vertical: AppSpacing.xs,
     );
@@ -512,7 +512,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
   }
 
   Widget _buildSimilarHeadlinesSection(
-      BuildContext context, EdgeInsets hPadding) {
+      BuildContext context, EdgeInsets hPadding,) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
@@ -522,16 +522,16 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       builder: (context, state) {
         return switch (state) {
           SimilarHeadlinesInitial() ||
-          SimilarHeadlinesLoading() => SliverToBoxAdapter(
+          SimilarHeadlinesLoading() => const SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
-              child: const Center(child: CircularProgressIndicator()),
+              child: Center(child: CircularProgressIndicator()),
             ),
           ),
           final SimilarHeadlinesError errorState => SliverToBoxAdapter(
             child: Padding(
               padding: hPadding.copyWith(
-                  top: AppSpacing.md, bottom: AppSpacing.xl),
+                  top: AppSpacing.md, bottom: AppSpacing.xl,),
               child: Text(
                 errorState.message,
                 textAlign: TextAlign.center,
@@ -543,7 +543,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           SimilarHeadlinesEmpty() => SliverToBoxAdapter(
             child: Padding(
               padding: hPadding.copyWith(
-                  top: AppSpacing.md, bottom: AppSpacing.xl),
+                  top: AppSpacing.md, bottom: AppSpacing.xl,),
               child: Text(
                 l10n.similarHeadlinesEmpty,
                 textAlign: TextAlign.center,

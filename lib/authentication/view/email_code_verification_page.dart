@@ -68,7 +68,7 @@ class EmailCodeVerificationPage extends StatelessWidget {
                         l10n.emailCodeSentInstructions,
                         style: textTheme.bodyLarge?.copyWith(
                             color: colorScheme
-                                .onSurfaceVariant), // Softer color
+                                .onSurfaceVariant,), // Softer color
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: AppSpacing.xl), // Increased spacing

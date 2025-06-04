@@ -72,7 +72,7 @@ class SavedHeadlinesPage extends StatelessWidget {
           return ListView.separated(
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.paddingSmall), // Add padding
             itemCount: savedHeadlines.length,
-            separatorBuilder: (context, index) => Divider(
+            separatorBuilder: (context, index) => const Divider(
               height: 1,
               indent: AppSpacing.paddingMedium, // Indent divider
               endIndent: AppSpacing.paddingMedium,

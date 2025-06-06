@@ -3,8 +3,8 @@ import 'package:ht_main/bootstrap.dart';
 
 // Define the current application environment here.
 // Change this value to switch between environments for local development.
-const app_config.AppEnvironment currentEnvironment =
-    app_config.AppEnvironment.development; // production/development/demo
+// production/development/demo
+const currentEnvironment = app_config.AppEnvironment.development;
 
 void main() async {
   final appConfig = switch (currentEnvironment) {

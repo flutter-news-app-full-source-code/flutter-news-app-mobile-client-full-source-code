@@ -14,15 +14,14 @@ class AppConfig {
         'http://api.yourproductiondomain.com', // Replace with actual production URL
   );
 
-  factory AppConfig.developmentInMemory() => const AppConfig(
-    environment: AppEnvironment.developmentInMemory,
-    baseUrl:
-        'http://localhost:8080', // Base URL still needed for Auth API client, even if data is in-memory
+  factory AppConfig.demo() => const AppConfig(
+    environment: AppEnvironment.demo,
+    baseUrl: '', // No API access needed for in-memory demo
   );
 
-  factory AppConfig.developmentApi() => const AppConfig(
-    // New: For local Dart Frog API
-    environment: AppEnvironment.developmentApi,
+  factory AppConfig.development() => const AppConfig(
+    // For local Dart Frog API
+    environment: AppEnvironment.development,
     baseUrl: 'http://localhost:8080', // Default Dart Frog local URL
   );
 

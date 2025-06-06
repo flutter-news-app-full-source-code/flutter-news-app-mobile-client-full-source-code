@@ -1,9 +1,6 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_auth_api/ht_auth_api.dart';
 import 'package:ht_auth_client/ht_auth_client.dart';
 import 'package:ht_auth_inmemory/ht_auth_inmemory.dart';
@@ -96,9 +93,7 @@ Future<void> bootstrap(app_config.AppConfig appConfig) async {
     appConfigClient = HtDataInMemoryClient<AppConfig>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
-      initialData: [
-        AppConfig.fromJson(appConfigFixtureData),
-      ],
+      initialData: [AppConfig.fromJson(appConfigFixtureData)],
     );
   } else if (appConfig.environment == app_config.AppEnvironment.development) {
     headlinesClient = HtDataApi<Headline>(
@@ -108,37 +103,37 @@ Future<void> bootstrap(app_config.AppConfig appConfig) async {
       toJson: (headline) => headline.toJson(),
     );
     categoriesClient = HtDataApi<Category>(
-      httpClient: httpClient!,
+      httpClient: httpClient,
       modelName: 'category',
       fromJson: Category.fromJson,
       toJson: (category) => category.toJson(),
     );
     countriesClient = HtDataApi<Country>(
-      httpClient: httpClient!,
+      httpClient: httpClient,
       modelName: 'country',
       fromJson: Country.fromJson,
       toJson: (country) => country.toJson(),
     );
     sourcesClient = HtDataApi<Source>(
-      httpClient: httpClient!,
+      httpClient: httpClient,
       modelName: 'source',
       fromJson: Source.fromJson,
       toJson: (source) => source.toJson(),
     );
     userContentPreferencesClient = HtDataApi<UserContentPreferences>(
-      httpClient: httpClient!,
+      httpClient: httpClient,
       modelName: 'user_content_preferences',
       fromJson: UserContentPreferences.fromJson,
       toJson: (prefs) => prefs.toJson(),
     );
     userAppSettingsClient = HtDataApi<UserAppSettings>(
-      httpClient: httpClient!,
+      httpClient: httpClient,
       modelName: 'user_app_settings',
       fromJson: UserAppSettings.fromJson,
       toJson: (settings) => settings.toJson(),
     );
     appConfigClient = HtDataApi<AppConfig>(
-      httpClient: httpClient!,
+      httpClient: httpClient,
       modelName: 'app_config',
       fromJson: AppConfig.fromJson,
       toJson: (config) => config.toJson(),
@@ -152,37 +147,37 @@ Future<void> bootstrap(app_config.AppConfig appConfig) async {
       toJson: (headline) => headline.toJson(),
     );
     categoriesClient = HtDataApi<Category>(
-      httpClient: httpClient!,
+      httpClient: httpClient,
       modelName: 'category',
       fromJson: Category.fromJson,
       toJson: (category) => category.toJson(),
     );
     countriesClient = HtDataApi<Country>(
-      httpClient: httpClient!,
+      httpClient: httpClient,
       modelName: 'country',
       fromJson: Country.fromJson,
       toJson: (country) => country.toJson(),
     );
     sourcesClient = HtDataApi<Source>(
-      httpClient: httpClient!,
+      httpClient: httpClient,
       modelName: 'source',
       fromJson: Source.fromJson,
       toJson: (source) => source.toJson(),
     );
     userContentPreferencesClient = HtDataApi<UserContentPreferences>(
-      httpClient: httpClient!,
+      httpClient: httpClient,
       modelName: 'user_content_preferences',
       fromJson: UserContentPreferences.fromJson,
       toJson: (prefs) => prefs.toJson(),
     );
     userAppSettingsClient = HtDataApi<UserAppSettings>(
-      httpClient: httpClient!,
+      httpClient: httpClient,
       modelName: 'user_app_settings',
       fromJson: UserAppSettings.fromJson,
       toJson: (settings) => settings.toJson(),
     );
     appConfigClient = HtDataApi<AppConfig>(
-      httpClient: httpClient!,
+      httpClient: httpClient,
       modelName: 'app_config',
       fromJson: AppConfig.fromJson,
       toJson: (config) => config.toJson(),

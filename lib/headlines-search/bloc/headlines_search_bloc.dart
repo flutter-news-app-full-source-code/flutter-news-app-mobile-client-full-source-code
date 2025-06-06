@@ -184,7 +184,7 @@ class HeadlinesSearchBloc
           rawResponse = await _headlinesRepository.readAllByQuery({
             'q': searchTerm,
             'model': modelType.toJson(),
-          }, limit: _limit);
+          }, limit: _limit,);
           final headlines = rawResponse.items.cast<Headline>();
           final currentUser = _appBloc.state.user;
           final appConfig = _appBloc.state.appConfig;
@@ -208,13 +208,13 @@ class HeadlinesSearchBloc
           rawResponse = await _categoryRepository.readAllByQuery({
             'q': searchTerm,
             'model': modelType.toJson(),
-          }, limit: _limit);
+          }, limit: _limit,);
           processedItems = rawResponse.items.cast<FeedItem>();
         case SearchModelType.source:
           rawResponse = await _sourceRepository.readAllByQuery({
             'q': searchTerm,
             'model': modelType.toJson(),
-          }, limit: _limit);
+          }, limit: _limit,);
           processedItems = rawResponse.items.cast<FeedItem>();
       }
       emit(

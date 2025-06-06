@@ -335,6 +335,15 @@ packages:
       url: "https://github.com/headlines-toolkit/ht-auth-client.git"
     source: git
     version: "0.0.0"
+  ht_auth_inmemory:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "7276ba82bfb24550c0e19d00a1c702b55ebc10ee"
+      url: "https://github.com/headlines-toolkit/ht-auth-inmemory"
+    source: git
+    version: "0.0.0"
   ht_auth_repository:
     dependency: "direct main"
     description:

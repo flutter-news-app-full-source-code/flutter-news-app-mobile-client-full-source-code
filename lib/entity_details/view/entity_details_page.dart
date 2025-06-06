@@ -6,6 +6,7 @@ import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/app/bloc/app_bloc.dart'; // For accessing settings
 import 'package:ht_main/entity_details/bloc/entity_details_bloc.dart';
 import 'package:ht_main/entity_details/models/entity_type.dart';
+import 'package:ht_main/l10n/app_localizations.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart'; // Added
 import 'package:ht_main/shared/constants/app_spacing.dart';

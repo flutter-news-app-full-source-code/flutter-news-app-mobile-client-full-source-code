@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart'; // Added
 import 'package:ht_main/entity_details/models/entity_type.dart';
 import 'package:ht_main/entity_details/view/entity_details_page.dart'; // Added for Page Arguments
+import 'package:ht_main/l10n/app_localizations.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart'; // Added
 import 'package:ht_main/shared/constants/app_spacing.dart';

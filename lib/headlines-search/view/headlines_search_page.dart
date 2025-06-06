@@ -12,6 +12,7 @@ import 'package:ht_main/headlines-search/models/search_model_type.dart';
 import 'package:ht_main/headlines-search/widgets/category_item_widget.dart';
 // import 'package:ht_main/headlines-search/widgets/country_item_widget.dart'; // Removed
 import 'package:ht_main/headlines-search/widgets/source_item_widget.dart';
+import 'package:ht_main/l10n/app_localizations.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/shared.dart'; // Imports new headline tiles

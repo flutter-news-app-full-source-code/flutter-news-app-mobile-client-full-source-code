@@ -10,6 +10,7 @@ import 'package:ht_data_repository/ht_data_repository.dart'; // Generic Data Rep
 import 'package:ht_kv_storage_service/ht_kv_storage_service.dart'; // KV Storage Interface
 import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
+import 'package:ht_main/l10n/app_localizations.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/router.dart';
 import 'package:ht_main/shared/theme/app_theme.dart';

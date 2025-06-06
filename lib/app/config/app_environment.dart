@@ -6,6 +6,12 @@ enum AppEnvironment {
   /// production backend services and configurations.
   production,
 
+  /// Represents a development environment connecting to a local API.
+  ///
+  /// This environment is used during local development, typically connecting
+  /// to a locally running Dart Frog backend API.
+  development,
+  
   /// Represents a demonstration environment with in-memory data.
   ///
   /// This environment is designed for showcasing the application's user
@@ -14,10 +20,5 @@ enum AppEnvironment {
   /// eliminating the need for API access.
   demo,
 
-  /// Represents a development environment connecting to a local API.
-  ///
-  /// This environment is used during local development, typically connecting
-  /// to a locally running Dart Frog backend API.
-  development,
   // Add other environments like staging, etc. as needed
 }

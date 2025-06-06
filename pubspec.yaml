@@ -1,10 +1,9 @@
 name: ht_main
 description: main headlines toolkit mobile app.
-version: 0.50.0
 publish_to: none
 repository: https://github.com/headlines-toolkit/ht-main
 environment:
-  sdk: ^3.7.0
+  sdk: ^3.8.0
 
 dependencies:
   bloc: ^9.0.0

@@ -26,6 +26,9 @@ dependencies:
   ht_auth_client:
     git:
       url: https://github.com/headlines-toolkit/ht-auth-client.git
+  ht_auth_inmemory:
+    git:
+      url: https://github.com/headlines-toolkit/ht-auth-inmemory
   ht_auth_repository:
     git:
       url: https://github.com/headlines-toolkit/ht-auth-repository.git

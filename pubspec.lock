@@ -297,10 +297,10 @@ packages:
     dependency: "direct main"
     description:
       name: go_router
-      sha256: "0b1e06223bee260dee31a171fb1153e306907563a0b0225e8c1733211911429a"
+      sha256: b453934c36e289cef06525734d1e676c1f91da9e22e2017d9dcab6ce0f999175
       url: "https://pub.dev"
     source: hosted
-    version: "15.1.2"
+    version: "15.1.3"
   google_fonts:
     dependency: "direct main"
     description:
@@ -314,7 +314,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "9448865dbb1ef516a0406b8ce21645b82a25fec4"
+      resolved-ref: fd31ce8e255c27e1fcc17e849c41f9c8511a6d87
       url: "https://github.com/headlines-toolkit/ht-auth-api.git"
     source: git
     version: "0.0.0"
@@ -323,7 +323,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "2c8a0a53ada3e31cc2be1061fee45d4e07612beb"
+      resolved-ref: f9c3b44b79fc19dfd9b9a7e0d1e21e60f4885617
       url: "https://github.com/headlines-toolkit/ht-auth-client.git"
     source: git
     version: "0.0.0"
@@ -332,7 +332,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "7276ba82bfb24550c0e19d00a1c702b55ebc10ee"
+      resolved-ref: "028ebfa29ebc8f95c2da30fee68566723d1e6897"
       url: "https://github.com/headlines-toolkit/ht-auth-inmemory"
     source: git
     version: "0.0.0"
@@ -341,7 +341,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: ba5cb886c68b8f82b9a33903be04c44ef16d8bde
+      resolved-ref: "596ba311cdbbdf61a216f60dac0218fab9e234d9"
       url: "https://github.com/headlines-toolkit/ht-auth-repository.git"
     source: git
     version: "0.0.0"
@@ -350,7 +350,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "7583a821eef9ae645429a0143ea504a62433ab06"
+      resolved-ref: d64d8b8cf24f9b4bc5ad639b9c6b968807cf5d93
       url: "https://github.com/headlines-toolkit/ht-data-api.git"
     source: git
     version: "0.0.0"
@@ -359,7 +359,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "30d92f5211c33ee8a16ae7e10d4b0d04e8e2782d"
+      resolved-ref: "2b9c82fc5d3aff78e1e6f51b844927508bc06e48"
       url: "https://github.com/headlines-toolkit/ht-data-client.git"
     source: git
     version: "0.0.0"
@@ -368,7 +368,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "6310e0561f9c27af5719aa7a2b95225f38776595"
+      resolved-ref: "82b6f31b8c23b740e9c473d6f40831b4f2cbd802"
       url: "https://github.com/headlines-toolkit/ht-data-inmemory.git"
     source: git
     version: "0.0.0"
@@ -377,7 +377,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "4bcc4c4671ac6b51c211d2a5cbb3ee5a129fd5c7"
+      resolved-ref: "2f1b1e81ff91eeae636f822edbb9088a28fd4906"
       url: "https://github.com/headlines-toolkit/ht-data-repository.git"
     source: git
     version: "0.0.0"
@@ -386,7 +386,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: fd3be932772473d8aed35ad5c12df7c2a63756d7
+      resolved-ref: "648e8549d7ceb2ffb293fa66bdd02f5e0ca8def6"
       url: "https://github.com/headlines-toolkit/ht-http-client.git"
     source: git
     version: "0.0.0"
@@ -395,7 +395,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: c451604ef791eb70c7f7e2eda418afa463164c37
+      resolved-ref: e2860560d21c1cf43f0e65f28c9ba722823254f2
       url: "https://github.com/headlines-toolkit/ht-kv-storage-service.git"
     source: git
     version: "0.0.0"
@@ -404,7 +404,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: ebe65c8ecfb6dc0ac42a3bf497e5728206340664
+      resolved-ref: "3c65be5424cfe155ec0f35f9a61ddf5c3bdae5cf"
       url: "https://github.com/headlines-toolkit/ht-kv-storage-shared-preferences.git"
     source: git
     version: "0.0.0"
@@ -413,7 +413,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "2caadf1dc7cfa476cc062f20247986c420116b62"
+      resolved-ref: "9cbe2dcf84860f5be655d091b9e15bc1d48fa3dc"
       url: "https://github.com/headlines-toolkit/ht-shared.git"
     source: git
     version: "0.0.0"

@@ -1,3 +1,6 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:device_preview/device_preview.dart';
 import 'package:ht_main/app/config/config.dart';
 import 'package:ht_main/bootstrap.dart';
 
@@ -12,5 +15,17 @@ void main() async {
     AppEnvironment.development => AppConfig.development(),
     AppEnvironment.demo => AppConfig.demo(),
   };
-  await bootstrap(appConfig);
+
+  final appWidget = await bootstrap(appConfig);
+
+  if (appConfig.environment == AppEnvironment.demo) {
+    runApp(
+      DevicePreview(
+        enabled: !kReleaseMode,
+        builder: (context) => appWidget,
+      ),
+    );
+  } else {
+    runApp(appWidget);
+  }
 }

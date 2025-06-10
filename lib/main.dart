@@ -23,6 +23,8 @@ void main() async {
       DevicePreview(
         enabled: !kReleaseMode,
         builder: (context) => appWidget,
+        tools: const [DeviceSection()],
+        
       ),
     );
   } else {

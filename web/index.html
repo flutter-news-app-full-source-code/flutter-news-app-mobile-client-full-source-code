@@ -31,14 +31,14 @@
   <link rel="manifest" href="manifest.json">
   <style id="splash-screen-style">
     html {
-      height: 100%
+      height: 100%;
     }
 
     body {
       margin: 0;
       min-height: 100%;
       background-color: #FFFFFF;
-          background-size: 100% 100%;
+      background-size: 100% 100%;
     }
 
     .center {
@@ -51,19 +51,22 @@
     }
 
     .contain {
-      display:block;
-      width:100%; height:100%;
+      display: block;
+      width: 100%;
+      height: 100%;
       object-fit: contain;
     }
 
     .stretch {
-      display:block;
-      width:100%; height:100%;
+      display: block;
+      width: 100%;
+      height: 100%;
     }
 
     .cover {
-      display:block;
-      width:100%; height:100%;
+      display: block;
+      width: 100%;
+      height: 100%;
       object-fit: cover;
     }
 
@@ -90,19 +93,58 @@
     @media (prefers-color-scheme: dark) {
       body {
         background-color: #212121;
-          }
+      }
+    }
+
+    /* Styles for the loading indicator */
+    #loading-indicator {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #FFFFFF; /* Match body background */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999; /* Ensure it's on top */
+    }
+
+    @media (prefers-color-scheme: dark) {
+      #loading-indicator {
+        background-color: #212121; /* Match dark mode body background */
+      }
+    }
+
+    /* Simple spinner animation */
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left-color: #0175C2; /* Use theme color from manifest */
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
   <script id="splash-screen-script">
     function removeSplashFromWeb() {
       document.getElementById("splash")?.remove();
       document.getElementById("splash-branding")?.remove();
+      document.getElementById("loading-indicator")?.remove(); // Remove the new loading indicator
       document.body.style.background = "transparent";
     }
   </script>
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 </head>
 <body>
+  <div id="loading-indicator">
+    <div class="spinner"></div>
+  </div>
   <script>
     {{flutter_bootstrap_js}}
   </script>

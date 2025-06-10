@@ -57,6 +57,7 @@ dependencies:
     git:
       url: https://github.com/headlines-toolkit/ht-shared.git
   intl: ^0.20.2
+  js_interop: ^0.0.1
   meta: ^1.16.0
   share_plus: ^11.0.0
   stream_transform: ^2.1.1

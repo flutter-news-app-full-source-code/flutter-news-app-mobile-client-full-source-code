@@ -60,12 +60,20 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   ) async {
     try {
       await _userAppSettingsRepository.update(
-        id: settingsToSave.id, // UserID is the ID of UserAppSettings
+        id: settingsToSave.id,
         item: settingsToSave,
-        userId: settingsToSave.id, // Pass userId for repository method
+        userId: settingsToSave.id,
       );
-      // State already updated optimistically, no need to emit success here
-      // unless we want a specific "save success" status.
+    } on NotFoundException {
+      // If settings not found, create them
+      // needed speciically for teh demo mode
+      // that uses the ht data in memory impl
+      // as for the api impl, teh backend handle 
+      // this use case.
+      await _userAppSettingsRepository.create(
+        item: settingsToSave,
+        userId: settingsToSave.id,
+      );
     } on HtHttpException catch (e) {
       emit(state.copyWith(status: SettingsStatus.failure, error: e));
     } catch (e) {

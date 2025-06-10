@@ -18,5 +18,5 @@ flutter_launcher_icons:
   web:
     generate: true
     # image_path: "assets/icon/headlines_toolkit.png"
-    background_color: "#fcfcfc"
-    theme_color: "#fcfcfc"
+    background_color: "#FFFFFF"
+    theme_color: "#FFFFFF"

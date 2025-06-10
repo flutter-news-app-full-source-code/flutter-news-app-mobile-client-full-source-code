@@ -1,0 +1,37 @@
+# Name of this workflow
+name: deploy
+
+# Run this workflow when a push is made to the main branch
+on:
+  push:
+    branches: [ main ] 
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest # Use the latest version of Ubuntu
+
+    steps:
+      # 1. Checkout the repository code
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # 2. Setup Flutter SDK
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable' # Use the stable channel of Flutter
+
+      # 3. Get Flutter dependencies
+      - name: Get dependencies
+        run: flutter pub get
+
+      # 4. Build the Flutter web app
+      # IMPORTANT: Replace <repository-name> with the name of your GitHub repository
+      - name: Build Web App
+        run: flutter build web --release --base-href /headlines-toolkit/
+
+      # 5. Deploy the built app to GitHub Pages
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/web

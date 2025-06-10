@@ -62,35 +62,35 @@ Future<void> bootstrap(app_config.AppConfig appConfig) async {
   HtDataClient<AppConfig> appConfigClient;
 
   if (appConfig.environment == app_config.AppEnvironment.demo) {
-    headlinesClient = HtDataInMemoryClient<Headline>(
+    headlinesClient = HtDataInMemory<Headline>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
       initialData: headlinesFixturesData.map(Headline.fromJson).toList(),
     );
-    categoriesClient = HtDataInMemoryClient<Category>(
+    categoriesClient = HtDataInMemory<Category>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
       initialData: categoriesFixturesData.map(Category.fromJson).toList(),
     );
-    countriesClient = HtDataInMemoryClient<Country>(
+    countriesClient = HtDataInMemory<Country>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
       initialData: countriesFixturesData.map(Country.fromJson).toList(),
     );
-    sourcesClient = HtDataInMemoryClient<Source>(
+    sourcesClient = HtDataInMemory<Source>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
       initialData: sourcesFixturesData.map(Source.fromJson).toList(),
     );
-    userContentPreferencesClient = HtDataInMemoryClient<UserContentPreferences>(
+    userContentPreferencesClient = HtDataInMemory<UserContentPreferences>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
     );
-    userAppSettingsClient = HtDataInMemoryClient<UserAppSettings>(
+    userAppSettingsClient = HtDataInMemory<UserAppSettings>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
     );
-    appConfigClient = HtDataInMemoryClient<AppConfig>(
+    appConfigClient = HtDataInMemory<AppConfig>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
       initialData: [AppConfig.fromJson(appConfigFixtureData)],

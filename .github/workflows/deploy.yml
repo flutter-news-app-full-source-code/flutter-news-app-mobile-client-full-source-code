@@ -27,7 +27,7 @@ jobs:
       # 4. Build the Flutter web app
       # IMPORTANT: Replace <repository-name> with the name of your GitHub repository
       - name: Build Web App
-        run: flutter build web --release --base-href /headlines-toolkit/
+        run: flutter build web --release --base-href /ht-main/
 
       # 5. Deploy the built app to GitHub Pages
       - name: Deploy

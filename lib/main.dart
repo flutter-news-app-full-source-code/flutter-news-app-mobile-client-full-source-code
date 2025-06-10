@@ -21,7 +21,7 @@ void main() async {
   if (appConfig.environment == AppEnvironment.demo) {
     runApp(
       DevicePreview(
-        enabled: !kReleaseMode,
+        enabled: true,
         builder: (context) => appWidget,
         tools: const [DeviceSection()],
         

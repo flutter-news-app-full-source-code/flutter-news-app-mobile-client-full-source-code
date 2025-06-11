@@ -34,6 +34,7 @@ void main() async {
         enabled: true,
         builder: (context) => appWidget,
         tools: const [DeviceSection()],
+        backgroundColor: Colors.black87,
       ),
     );
   } else {

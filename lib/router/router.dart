@@ -138,16 +138,18 @@ GoRouter createRouter({
         final isLinkingContext =
             currentUri.queryParameters['context'] == 'linking';
 
-        // If an authenticated/anonymous user tries to access the BASE /authentication path
-        // AND it's NOT for account linking, redirect them to the feed.
-        if (currentLocation == authenticationPath && !isLinkingContext) {
+        // If an authenticated/anonymous user is on any authentication-related path,
+        // redirect them to the feed, unless it's the base authentication path
+        // AND it's specifically for account linking.
+        if (currentLocation.startsWith(authenticationPath) &&
+            !(currentLocation == authenticationPath && isLinkingContext)) {
           print(
-            '    Action: $appStatus user trying to access base auth path without linking context. Redirecting to $feedPath',
+            '    Action: $appStatus user trying to access an auth path. Redirecting to $feedPath',
           );
           return feedPath;
         }
 
-        // Allow access to other routes (including auth sub-routes if linking, or any other app route)
+        // Allow access to other routes (only if not an auth path, or if it's the base auth path for linking)
         print(
           '    Action: Allowing navigation to $currentLocation for $appStatus user.',
         );

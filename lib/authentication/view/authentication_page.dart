@@ -132,10 +132,9 @@ class AuthenticationPage extends StatelessWidget {
                             ? null
                             : () {
                                 context.goNamed(
-                                  Routes.requestCodeName,
-                                  queryParameters: isLinkingContext
-                                      ? {'context': 'linking'}
-                                      : const {},
+                                  isLinkingContext
+                                      ? Routes.linkingRequestCodeName
+                                      : Routes.requestCodeName,
                                 );
                               },
                         label: Text(l10n.authenticationEmailSignInButton),

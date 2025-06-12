@@ -85,10 +85,10 @@ class _RequestCodeView extends StatelessWidget {
             } else if (state is AuthenticationCodeSentSuccess) {
               // Navigate to the code verification page on success, passing the email
               context.goNamed(
-                Routes.verifyCodeName,
+                isLinkingContext
+                    ? Routes.linkingVerifyCodeName
+                    : Routes.verifyCodeName,
                 pathParameters: {'email': state.email},
-                queryParameters:
-                    isLinkingContext ? {'context': 'linking'} : const {},
               );
             }
           },

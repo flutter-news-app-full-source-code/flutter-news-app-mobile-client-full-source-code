@@ -60,7 +60,8 @@ class _RequestCodeView extends StatelessWidget {
               // If linking, go back to Auth page preserving the linking query param.
               context.goNamed(
                 Routes.authenticationName,
-                queryParameters: {'context': 'linking'},
+                queryParameters:
+                    isLinkingContext ? {'context': 'linking'} : const {},
               );
             } else {
               // If normal sign-in, just go back to the Auth page.
@@ -86,6 +87,8 @@ class _RequestCodeView extends StatelessWidget {
               context.goNamed(
                 Routes.verifyCodeName,
                 pathParameters: {'email': state.email},
+                queryParameters:
+                    isLinkingContext ? {'context': 'linking'} : const {},
               );
             }
           },

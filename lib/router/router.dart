@@ -135,25 +135,30 @@ GoRouter createRouter({
           appStatus == AppStatus.authenticated) {
         print('  Redirect Decision: User is $appStatus.');
 
-        final isLinkingContext =
-            currentUri.queryParameters['context'] == 'linking';
+          final isLinkingContext =
+              state.uri.queryParameters['context'] == 'linking';
 
-        // If an authenticated/anonymous user is on any authentication-related path,
-        // redirect them to the feed, unless it's the base authentication path
-        // AND it's specifically for account linking.
-        if (currentLocation.startsWith(authenticationPath) &&
-            !(currentLocation == authenticationPath && isLinkingContext)) {
+          // If an authenticated/anonymous user is on any authentication-related path:
+          if (currentLocation.startsWith(authenticationPath)) {
+            // Allow navigation within auth paths if the linking context is active
+            if (isLinkingContext) {
+              print(
+                '    Action: $appStatus user on auth path ($currentLocation) with linking context. Allowing navigation.',
+              );
+              return null;
+            } else {
+              // Redirect to feed if not in a linking context (e.g., user manually types /authentication)
+              print(
+                '    Action: $appStatus user trying to access an auth path ($currentLocation) without linking context. Redirecting to $feedPath',
+              );
+              return feedPath;
+            }
+          }
+          // Allow access to other routes (non-auth paths)
           print(
-            '    Action: $appStatus user trying to access an auth path. Redirecting to $feedPath',
+            '    Action: Allowing navigation to $currentLocation for $appStatus user (non-auth path).',
           );
-          return feedPath;
-        }
-
-        // Allow access to other routes (only if not an auth path, or if it's the base auth path for linking)
-        print(
-          '    Action: Allowing navigation to $currentLocation for $appStatus user.',
-        );
-        return null;
+          return null;
       }
 
       // Fallback (should ideally not be reached if all statuses are handled)
@@ -733,7 +738,7 @@ GoRouter createRouter({
                                               .read<
                                                 HtDataRepository<Headline>
                                               >(),
-                                    ),
+                                     ),
                               ),
                               BlocProvider(
                                 create:

@@ -149,16 +149,24 @@ GoRouter createRouter({
             print('    Debug: isLinkingPathSegmentPresent: $isLinkingPathSegmentPresent');
             print('    Debug: isAnyLinkingContext evaluated to: $isAnyLinkingContext');
 
-            // Allow navigation within auth paths if any linking context is active
+            // If the user is authenticated, always redirect away from auth paths.
+            if (appStatus == AppStatus.authenticated) {
+              print(
+                '    Action: Authenticated user on auth path ($currentLocation). Redirecting to $feedPath',
+              );
+              return feedPath;
+            }
+
+            // If the user is anonymous, allow navigation within auth paths if in a linking context.
+            // Otherwise, redirect anonymous users trying to access non-linking auth paths to feed.
             if (isAnyLinkingContext) {
               print(
-                '    Action: $appStatus user on auth linking path ($currentLocation). Allowing navigation.',
+                '    Action: Anonymous user on auth linking path ($currentLocation). Allowing navigation.',
               );
               return null;
             } else {
-              // Redirect to feed if not in a linking context (e.g., user manually types /authentication)
               print(
-                '    Action: $appStatus user trying to access an auth path ($currentLocation) without linking context. Redirecting to $feedPath',
+                '    Action: Anonymous user trying to access non-linking auth path ($currentLocation). Redirecting to $feedPath',
               );
               return feedPath;
             }

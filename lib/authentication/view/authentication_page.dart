@@ -48,20 +48,18 @@ class AuthenticationPage extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         // Conditionally add the leading close button only in linking context
-        leading:
-            isLinkingContext
-                ? IconButton(
-                  icon: const Icon(Icons.close),
-                  tooltip:
-                      MaterialLocalizations.of(
-                        context,
-                      ).closeButtonTooltip, // Accessibility
-                  onPressed: () {
-                    // Navigate back to the account page when close is pressed
-                    context.goNamed(Routes.accountName);
-                  },
-                )
-                : null, // No leading button if not linking (relies on system back if pushed)
+        leading: isLinkingContext
+            ? IconButton(
+                icon: const Icon(Icons.close),
+                tooltip: MaterialLocalizations.of(
+                  context,
+                ).closeButtonTooltip, // Accessibility
+                onPressed: () {
+                  // Navigate back to the account page when close is pressed
+                  context.goNamed(Routes.accountName);
+                },
+              )
+            : null, // No leading button if not linking (relies on system back if pushed)
       ),
       body: SafeArea(
         child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
@@ -130,15 +128,15 @@ class AuthenticationPage extends StatelessWidget {
                       // --- Email Sign-In Button ---
                       ElevatedButton.icon(
                         icon: const Icon(Icons.email_outlined),
-                        onPressed:
-                            isLoading
-                                ? null
-                                : () {
-                                  context.goNamed(
-                                    Routes.requestCodeName,
-                                    extra: isLinkingContext,
-                                  );
-                                },
+                        onPressed: isLoading
+                            ? null
+                            : () {
+                                context.goNamed(
+                                  isLinkingContext
+                                      ? Routes.linkingRequestCodeName
+                                      : Routes.requestCodeName,
+                                );
+                              },
                         label: Text(l10n.authenticationEmailSignInButton),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
@@ -153,12 +151,11 @@ class AuthenticationPage extends StatelessWidget {
                       if (showAnonymousButton) ...[
                         OutlinedButton.icon(
                           icon: const Icon(Icons.person_outline),
-                          onPressed:
-                              isLoading
-                                  ? null
-                                  : () => context.read<AuthenticationBloc>().add(
-                                    const AuthenticationAnonymousSignInRequested(),
-                                  ),
+                          onPressed: isLoading
+                              ? null
+                              : () => context.read<AuthenticationBloc>().add(
+                                  const AuthenticationAnonymousSignInRequested(),
+                                ),
                           label: Text(l10n.authenticationAnonymousSignInButton),
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(

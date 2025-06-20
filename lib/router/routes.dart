@@ -58,6 +58,12 @@ abstract final class Routes {
   static const verifyCode = 'verify-code';
   static const verifyCodeName = 'verifyCode';
 
+  // Linking-specific authentication routes
+  static const linkingRequestCode = 'linking/request-code';
+  static const linkingRequestCodeName = 'linkingRequestCode';
+  static const linkingVerifyCode = 'linking/verify-code';
+  static const linkingVerifyCodeName = 'linkingVerifyCode';
+
   // --- Settings Sub-Routes (relative to /account/settings) ---
   static const settingsAppearance = 'appearance';
   static const settingsAppearanceName = 'settingsAppearance';

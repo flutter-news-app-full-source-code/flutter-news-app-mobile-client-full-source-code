@@ -135,23 +135,47 @@ GoRouter createRouter({
           appStatus == AppStatus.authenticated) {
         print('  Redirect Decision: User is $appStatus.');
 
-        final isLinkingContext =
-            currentUri.queryParameters['context'] == 'linking';
+          final isLinkingContextQueryPresent = state.uri.queryParameters['context'] == 'linking';
+          final isLinkingPathSegmentPresent = currentLocation.contains('/linking/');
 
-        // If an authenticated/anonymous user tries to access the BASE /authentication path
-        // AND it's NOT for account linking, redirect them to the feed.
-        if (currentLocation == authenticationPath && !isLinkingContext) {
+          // Determine if the current location is part of any linking flow (either via query or path segment)
+          final isAnyLinkingContext = isLinkingContextQueryPresent || isLinkingPathSegmentPresent;
+
+          // If an authenticated/anonymous user is on any authentication-related path:
+          if (currentLocation.startsWith(authenticationPath)) {
+            print('    Debug: Auth path detected. Current Location: $currentLocation');
+            print('    Debug: URI Query Parameters: ${state.uri.queryParameters}');
+            print('    Debug: isLinkingContextQueryPresent: $isLinkingContextQueryPresent');
+            print('    Debug: isLinkingPathSegmentPresent: $isLinkingPathSegmentPresent');
+            print('    Debug: isAnyLinkingContext evaluated to: $isAnyLinkingContext');
+
+            // If the user is authenticated, always redirect away from auth paths.
+            if (appStatus == AppStatus.authenticated) {
+              print(
+                '    Action: Authenticated user on auth path ($currentLocation). Redirecting to $feedPath',
+              );
+              return feedPath;
+            }
+
+            // If the user is anonymous, allow navigation within auth paths if in a linking context.
+            // Otherwise, redirect anonymous users trying to access non-linking auth paths to feed.
+            if (isAnyLinkingContext) {
+              print(
+                '    Action: Anonymous user on auth linking path ($currentLocation). Allowing navigation.',
+              );
+              return null;
+            } else {
+              print(
+                '    Action: Anonymous user trying to access non-linking auth path ($currentLocation). Redirecting to $feedPath',
+              );
+              return feedPath;
+            }
+          }
+          // Allow access to other routes (non-auth paths)
           print(
-            '    Action: $appStatus user trying to access base auth path without linking context. Redirecting to $feedPath',
+            '    Action: Allowing navigation to $currentLocation for $appStatus user (non-auth path).',
           );
-          return feedPath;
-        }
-
-        // Allow access to other routes (including auth sub-routes if linking, or any other app route)
-        print(
-          '    Action: Allowing navigation to $currentLocation for $appStatus user.',
-        );
-        return null;
+          return null;
       }
 
       // Fallback (should ideally not be reached if all statuses are handled)
@@ -200,24 +224,41 @@ GoRouter createRouter({
           );
         },
         routes: [
+          // Nested route for account linking flow (defined first for priority)
           GoRoute(
-            path: Routes.requestCode, // Use new path
-            name: Routes.requestCodeName, // Use new name
-            builder: (context, state) {
-              // Extract the linking context flag from 'extra', default to false.
-              final isLinking = (state.extra as bool?) ?? false;
-              return RequestCodePage(isLinkingContext: isLinking);
-            },
+            path: Routes.accountLinking, // This is 'linking'
+            name: Routes.accountLinkingName, // Name for the linking segment
+            builder: (context, state) => const SizedBox.shrink(), // Placeholder
+            routes: [
+              GoRoute(
+                path: Routes.requestCode, // Path: /authentication/linking/request-code
+                name: Routes.linkingRequestCodeName,
+                builder: (context, state) =>
+                    const RequestCodePage(isLinkingContext: true),
+              ),
+              GoRoute(
+                path: '${Routes.verifyCode}/:email', // Path: /authentication/linking/verify-code/:email
+                name: Routes.linkingVerifyCodeName,
+                builder: (context, state) {
+                  final email = state.pathParameters['email']!;
+                  return EmailCodeVerificationPage(email: email);
+                },
+              ),
+            ],
+          ),
+          // Non-linking authentication routes (defined after linking routes)
+          GoRoute(
+            path: Routes.requestCode,
+            name: Routes.requestCodeName,
+            builder: (context, state) =>
+                const RequestCodePage(isLinkingContext: false),
           ),
           GoRoute(
-            path:
-                '${Routes.verifyCode}/:email', // Use new path with email parameter
-            name: Routes.verifyCodeName, // Use new name
+            path: '${Routes.verifyCode}/:email',
+            name: Routes.verifyCodeName,
             builder: (context, state) {
-              final email = state.pathParameters['email']!; // Extract email
-              return EmailCodeVerificationPage(
-                email: email,
-              ); // Use renamed page
+              final email = state.pathParameters['email']!;
+              return EmailCodeVerificationPage(email: email);
             },
           ),
         ],
@@ -731,7 +772,7 @@ GoRouter createRouter({
                                               .read<
                                                 HtDataRepository<Headline>
                                               >(),
-                                    ),
+                                     ),
                               ),
                               BlocProvider(
                                 create:

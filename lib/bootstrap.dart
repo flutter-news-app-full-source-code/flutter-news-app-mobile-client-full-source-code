@@ -19,7 +19,10 @@ import 'package:ht_main/shared/localization/en_timeago_messages.dart';
 import 'package:ht_shared/ht_shared.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-Future<Widget> bootstrap(app_config.AppConfig appConfig) async {
+Future<Widget> bootstrap(
+  app_config.AppConfig appConfig,
+  app_config.AppEnvironment environment, // Added
+) async {
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = const AppBlocObserver();
 
@@ -215,5 +218,6 @@ Future<Widget> bootstrap(app_config.AppConfig appConfig) async {
     htUserContentPreferencesRepository: userContentPreferencesRepository,
     htAppConfigRepository: appConfigRepository,
     kvStorageService: kvStorage,
+    environment: environment, // Pass environment to App
   );
 }

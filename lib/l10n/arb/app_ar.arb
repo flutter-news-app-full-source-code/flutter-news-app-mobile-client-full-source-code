@@ -895,5 +895,15 @@
     "savedHeadlinesEmptySubheadline": "لم تقم بحفظ أي مقالات بعد. ابدأ الاستكشاف!",
     "@savedHeadlinesEmptySubheadline": {
         "description": "Subheadline for empty state on saved headlines page"
+    },
+     "demoVerificationCodeMessage": "وضع العرض التوضيحي: استخدم الرمز {code}",
+    "@demoVerificationCodeMessage": {
+        "description": "رسالة تظهر في وضع العرض التوضيحي لتوفير رمز التحقق",
+        "placeholders": {
+            "code": {
+                "type": "String",
+                "example": "123456"
+            }
+        }
     }
 }

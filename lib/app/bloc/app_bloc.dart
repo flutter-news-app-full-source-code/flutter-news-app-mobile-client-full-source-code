@@ -6,6 +6,7 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:ht_auth_repository/ht_auth_repository.dart';
 import 'package:ht_data_repository/ht_data_repository.dart';
+import 'package:ht_main/app/config/config.dart' as local_config;
 import 'package:ht_shared/ht_shared.dart'; // Import shared models and exceptions
 
 part 'app_event.dart';
@@ -15,24 +16,23 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   AppBloc({
     required HtAuthRepository authenticationRepository,
     required HtDataRepository<UserAppSettings> userAppSettingsRepository,
-    required HtDataRepository<AppConfig> appConfigRepository, // Added
-  }) : _authenticationRepository = authenticationRepository,
-       _userAppSettingsRepository = userAppSettingsRepository,
-       _appConfigRepository = appConfigRepository, // Added
-       // Initialize with default state, load settings after user is known
-       // Provide a default UserAppSettings instance
-       super(
-         // AppConfig will be null initially, fetched later
-         const AppState(
-           settings: UserAppSettings(id: 'default'),
-           selectedBottomNavigationIndex: 0,
-           appConfig: null,
-         ),
-       ) {
+    required HtDataRepository<AppConfig> appConfigRepository,
+    required local_config.AppEnvironment environment, // Added
+  })  : _authenticationRepository = authenticationRepository,
+        _userAppSettingsRepository = userAppSettingsRepository,
+        _appConfigRepository = appConfigRepository,
+        super(
+          AppState(
+            settings: const UserAppSettings(id: 'default'),
+            selectedBottomNavigationIndex: 0,
+            appConfig: null,
+            environment: environment, // Pass environment to AppState
+          ),
+        ) {
     on<AppUserChanged>(_onAppUserChanged);
     on<AppSettingsRefreshed>(_onAppSettingsRefreshed);
     on<AppConfigFetchRequested>(_onAppConfigFetchRequested);
-    on<AppUserAccountActionShown>(_onAppUserAccountActionShown); // Added
+    on<AppUserAccountActionShown>(_onAppUserAccountActionShown);
     on<AppLogoutRequested>(_onLogoutRequested);
     on<AppThemeModeChanged>(_onThemeModeChanged);
     on<AppFlexSchemeChanged>(_onFlexSchemeChanged);

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ht_main/app/bloc/app_bloc.dart'; // Added
+import 'package:ht_main/app/config/config.dart'; // Added for AppEnvironment
 import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/shared/constants/app_spacing.dart';
@@ -71,6 +73,30 @@ class EmailCodeVerificationPage extends StatelessWidget {
                           color: colorScheme.onSurfaceVariant,
                         ), // Softer color
                         textAlign: TextAlign.center,
+                      ),
+                      // Display demo code if in demo environment
+                      BlocSelector<AppBloc, AppState, AppEnvironment?>(
+                        selector: (state) => state.environment,
+                        builder: (context, environment) {
+                          if (environment == AppEnvironment.demo) {
+                            return Column(
+                              children: [
+                                const SizedBox(height: AppSpacing.md),
+                                Text(
+                                  l10n.demoVerificationCodeMessage(
+                                    '123456',
+                                  ), // Demo code
+                                  style: textTheme.bodyMedium?.copyWith(
+                                    color: colorScheme.secondary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        },
                       ),
                       const SizedBox(
                         height: AppSpacing.xl,

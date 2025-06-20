@@ -9,6 +9,7 @@ import 'package:ht_auth_repository/ht_auth_repository.dart'; // Auth Repository
 import 'package:ht_data_repository/ht_data_repository.dart'; // Generic Data Repository
 import 'package:ht_kv_storage_service/ht_kv_storage_service.dart'; // KV Storage Interface
 import 'package:ht_main/app/bloc/app_bloc.dart';
+import 'package:ht_main/app/config/app_environment.dart';
 import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/l10n/app_localizations.dart';
 import 'package:ht_main/l10n/l10n.dart';
@@ -30,6 +31,7 @@ class App extends StatelessWidget {
     htUserContentPreferencesRepository,
     required HtDataRepository<AppConfig> htAppConfigRepository,
     required HtKVStorageService kvStorageService,
+    required AppEnvironment environment, // Added
     super.key,
   }) : _htAuthenticationRepository = htAuthenticationRepository,
        _htHeadlinesRepository = htHeadlinesRepository,
@@ -39,7 +41,8 @@ class App extends StatelessWidget {
        _htUserAppSettingsRepository = htUserAppSettingsRepository,
        _htUserContentPreferencesRepository = htUserContentPreferencesRepository,
        _htAppConfigRepository = htAppConfigRepository,
-       _kvStorageService = kvStorageService;
+       _kvStorageService = kvStorageService,
+       _environment = environment; // Added
 
   final HtAuthRepository _htAuthenticationRepository;
   final HtDataRepository<Headline> _htHeadlinesRepository;
@@ -51,6 +54,7 @@ class App extends StatelessWidget {
   _htUserContentPreferencesRepository;
   final HtDataRepository<AppConfig> _htAppConfigRepository;
   final HtKVStorageService _kvStorageService;
+  final AppEnvironment _environment; // Added
 
   @override
   Widget build(BuildContext context) {
@@ -76,8 +80,9 @@ class App extends StatelessWidget {
                   authenticationRepository: context.read<HtAuthRepository>(),
                   userAppSettingsRepository:
                       context.read<HtDataRepository<UserAppSettings>>(),
-                  appConfigRepository: // Added
-                      context.read<HtDataRepository<AppConfig>>(), // Added
+                  appConfigRepository:
+                      context.read<HtDataRepository<AppConfig>>(),
+                  environment: _environment, // Pass environment
                 ),
           ),
           BlocProvider(
@@ -97,6 +102,7 @@ class App extends StatelessWidget {
           htUserContentPreferencesRepository:
               _htUserContentPreferencesRepository,
           htAppConfigRepository: _htAppConfigRepository,
+          environment: _environment, // Pass environment
         ),
       ),
     );
@@ -113,6 +119,7 @@ class _AppView extends StatefulWidget {
     required this.htUserAppSettingsRepository,
     required this.htUserContentPreferencesRepository,
     required this.htAppConfigRepository,
+    required this.environment, // Added
   });
 
   final HtAuthRepository htAuthenticationRepository;
@@ -124,6 +131,7 @@ class _AppView extends StatefulWidget {
   final HtDataRepository<UserContentPreferences>
   htUserContentPreferencesRepository;
   final HtDataRepository<AppConfig> htAppConfigRepository;
+  final AppEnvironment environment; // Added
 
   @override
   State<_AppView> createState() => _AppViewState();

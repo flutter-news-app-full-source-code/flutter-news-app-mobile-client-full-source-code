@@ -21,7 +21,7 @@ void main() async {
     AppEnvironment.demo => AppConfig.demo(),
   };
 
-  final appWidget = await bootstrap(appConfig);
+  final appWidget = await bootstrap(appConfig, currentEnvironment);
 
   // Only remove the splash screen on web after the app is ready.
   if (kIsWeb) {

@@ -705,4 +705,9 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get followedCategoriesEmptySubheadline =>
       'Start following categories to see them here.';
+
+  @override
+  String demoVerificationCodeMessage(String code) {
+    return 'وضع العرض التوضيحي: استخدم الرمز $code';
+  }
 }

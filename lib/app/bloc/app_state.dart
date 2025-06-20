@@ -1,5 +1,8 @@
 part of 'app_bloc.dart';
 
+import 'package:ht_main/app/config/config.dart' as local_config;
+import 'package:ht_shared/ht_shared.dart' show AppConfig, UserAppSettings; // For AppConfig
+
 /// Represents the application's authentication status.
 enum AppStatus {
   /// The application is initializing and the status is unknown.
@@ -34,7 +37,8 @@ class AppState extends Equatable {
     this.status = AppStatus.initial,
     this.user, // User is now nullable and defaults to null
     this.locale, // Added locale
-    this.appConfig, // Added AppConfig
+    this.appConfig,
+    this.environment,
   });
 
   /// The index of the currently selected item in the bottom navigation bar.
@@ -66,7 +70,10 @@ class AppState extends Equatable {
   final Locale? locale; // Added locale
 
   /// The global application configuration (remote config).
-  final AppConfig? appConfig; // Added AppConfig
+  final AppConfig? appConfig;
+
+  /// The current application environment (e.g., production, development, demo).
+  final local_config.AppEnvironment? environment;
 
   /// Creates a copy of the current state with updated values.
   AppState copyWith({
@@ -79,10 +86,12 @@ class AppState extends Equatable {
     User? user,
     UserAppSettings? settings, // Add settings to copyWith
     Locale? locale, // Added locale
-    AppConfig? appConfig, // Added AppConfig
+    AppConfig? appConfig,
+    local_config.AppEnvironment? environment, // Added AppEnvironment
     bool clearFontFamily = false,
     bool clearLocale = false, // Added to allow clearing locale
     bool clearAppConfig = false, // Added to allow clearing appConfig
+    bool clearEnvironment = false, // Added to allow clearing environment
   }) {
     return AppState(
       selectedBottomNavigationIndex:
@@ -95,7 +104,9 @@ class AppState extends Equatable {
       user: user ?? this.user,
       settings: settings ?? this.settings, // Copy settings
       locale: clearLocale ? null : locale ?? this.locale, // Added locale
-      appConfig: clearAppConfig ? null : appConfig ?? this.appConfig, // Added
+      appConfig: clearAppConfig ? null : appConfig ?? this.appConfig,
+      environment:
+          clearEnvironment ? null : environment ?? this.environment, // Added
     );
   }
 
@@ -110,6 +121,7 @@ class AppState extends Equatable {
     user,
     settings, // Include settings in props
     locale, // Added locale to props
-    appConfig, // Added AppConfig to props
+    appConfig,
+    environment,
   ];
 }

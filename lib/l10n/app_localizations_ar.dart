@@ -194,7 +194,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get authenticationLinkingSubheadline =>
-      'إحفظ إعداداتك، تفضيلات المحتوى والمزيد عبر الأجهزة.';
+      'إحفظ إعداداتك، تفضيلات المحتوى والمزيد عبر مختلف الأجهزة.';
 
   @override
   String get authenticationSignInHeadline => 'هادلاينز تولكيت';

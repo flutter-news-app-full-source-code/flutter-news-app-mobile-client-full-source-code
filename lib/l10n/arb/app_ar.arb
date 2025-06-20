@@ -242,7 +242,7 @@
     "@authenticationLinkingHeadline": {
         "description": "عنوان صفحة المصادقة عند ربط حساب مجهول"
     },
-    "authenticationLinkingSubheadline": "إحفظ إعداداتك، تفضيلات المحتوى والمزيد عبر الأجهزة.",
+    "authenticationLinkingSubheadline": "إحفظ إعداداتك، تفضيلات المحتوى والمزيد عبر مختلف الأجهزة.",
     "@authenticationLinkingSubheadline": {
         "description": "عنوان فرعي يشرح فائدة ربط حساب مجهول"
     },

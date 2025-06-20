@@ -18,17 +18,17 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required HtDataRepository<UserAppSettings> userAppSettingsRepository,
     required HtDataRepository<AppConfig> appConfigRepository,
     required local_config.AppEnvironment environment, // Added
-  })  : _authenticationRepository = authenticationRepository,
-        _userAppSettingsRepository = userAppSettingsRepository,
-        _appConfigRepository = appConfigRepository,
-        super(
-          AppState(
-            settings: const UserAppSettings(id: 'default'),
-            selectedBottomNavigationIndex: 0,
-            appConfig: null,
-            environment: environment, // Pass environment to AppState
-          ),
-        ) {
+  }) : _authenticationRepository = authenticationRepository,
+       _userAppSettingsRepository = userAppSettingsRepository,
+       _appConfigRepository = appConfigRepository,
+       super(
+         AppState(
+           settings: const UserAppSettings(id: 'default'),
+           selectedBottomNavigationIndex: 0,
+           appConfig: null,
+           environment: environment, // Pass environment to AppState
+         ),
+       ) {
     on<AppUserChanged>(_onAppUserChanged);
     on<AppSettingsRefreshed>(_onAppSettingsRefreshed);
     on<AppConfigFetchRequested>(_onAppConfigFetchRequested);
@@ -180,12 +180,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // Update settings and emit new state
     final updatedSettings = state.settings.copyWith(
       displaySettings: state.settings.displaySettings.copyWith(
-        baseTheme:
-            event.themeMode == ThemeMode.light
-                ? AppBaseTheme.light
-                : (event.themeMode == ThemeMode.dark
-                    ? AppBaseTheme.dark
-                    : AppBaseTheme.system),
+        baseTheme: event.themeMode == ThemeMode.light
+            ? AppBaseTheme.light
+            : (event.themeMode == ThemeMode.dark
+                  ? AppBaseTheme.dark
+                  : AppBaseTheme.system),
       ),
     );
     emit(state.copyWith(settings: updatedSettings, themeMode: event.themeMode));
@@ -200,12 +199,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // Update settings and emit new state
     final updatedSettings = state.settings.copyWith(
       displaySettings: state.settings.displaySettings.copyWith(
-        accentTheme:
-            event.flexScheme == FlexScheme.blue
-                ? AppAccentTheme.defaultBlue
-                : (event.flexScheme == FlexScheme.red
-                    ? AppAccentTheme.newsRed
-                    : AppAccentTheme
+        accentTheme: event.flexScheme == FlexScheme.blue
+            ? AppAccentTheme.defaultBlue
+            : (event.flexScheme == FlexScheme.red
+                  ? AppAccentTheme.newsRed
+                  : AppAccentTheme
                         .graphiteGray), // Mapping material to graphiteGray
       ),
     );
@@ -359,10 +357,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
       // Determine the correct status based on the existing user's role.
       // This ensures that successfully fetching config doesn't revert auth status to 'initial'.
-      final newStatusBasedOnUser =
-          state.user!.role == UserRole.standardUser
-              ? AppStatus.authenticated
-              : AppStatus.anonymous;
+      final newStatusBasedOnUser = state.user!.role == UserRole.standardUser
+          ? AppStatus.authenticated
+          : AppStatus.anonymous;
       emit(state.copyWith(appConfig: appConfig, status: newStatusBasedOnUser));
     } on HtHttpException catch (e) {
       print(

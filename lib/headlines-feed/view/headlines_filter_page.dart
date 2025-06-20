@@ -61,8 +61,9 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
   @override
   void initState() {
     super.initState();
-    final headlinesFeedState =
-        BlocProvider.of<HeadlinesFeedBloc>(context).state;
+    final headlinesFeedState = BlocProvider.of<HeadlinesFeedBloc>(
+      context,
+    ).state;
 
     var initialUseFollowedFilters = false;
 
@@ -124,8 +125,8 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
     }
 
     try {
-      final preferencesRepo =
-          context.read<HtDataRepository<UserContentPreferences>>();
+      final preferencesRepo = context
+          .read<HtDataRepository<UserContentPreferences>>();
       final preferences = await preferencesRepo.read(
         id: currentUser.id,
         userId: currentUser.id,
@@ -243,16 +244,16 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       enabled: enabled, // Use the enabled parameter
       onTap:
           enabled // Only allow tap if enabled
-              ? () async {
-                final result = await context.pushNamed<dynamic>(
-                  routeName,
-                  extra: currentSelectionData, // Pass the map or list
-                );
-                if (result != null && onResult != null) {
-                  onResult(result);
-                }
+          ? () async {
+              final result = await context.pushNamed<dynamic>(
+                routeName,
+                extra: currentSelectionData, // Pass the map or list
+              );
+              if (result != null && onResult != null) {
+                onResult(result);
               }
-              : null,
+            }
+          : null,
     );
   }
 
@@ -292,22 +293,20 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
             tooltip: l10n.headlinesFeedFilterApplyButton,
             onPressed: () {
               final newFilter = HeadlineFilter(
-                categories:
-                    _tempSelectedCategories.isNotEmpty
-                        ? _tempSelectedCategories
-                        : null,
-                sources:
-                    _tempSelectedSources.isNotEmpty
-                        ? _tempSelectedSources
-                        : null,
+                categories: _tempSelectedCategories.isNotEmpty
+                    ? _tempSelectedCategories
+                    : null,
+                sources: _tempSelectedSources.isNotEmpty
+                    ? _tempSelectedSources
+                    : null,
                 selectedSourceCountryIsoCodes:
                     _tempSelectedSourceCountryIsoCodes.isNotEmpty
-                        ? _tempSelectedSourceCountryIsoCodes
-                        : null,
+                    ? _tempSelectedSourceCountryIsoCodes
+                    : null,
                 selectedSourceSourceTypes:
                     _tempSelectedSourceSourceTypes.isNotEmpty
-                        ? _tempSelectedSourceSourceTypes
-                        : null,
+                    ? _tempSelectedSourceSourceTypes
+                    : null,
                 isFromFollowedItems: _useFollowedFilters, // Set the new flag
               );
               context.read<HeadlinesFeedBloc>().add(
@@ -340,14 +339,13 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
                   }
                 });
               },
-              secondary:
-                  _isLoadingFollowedFilters
-                      ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                      : null,
+              secondary: _isLoadingFollowedFilters
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : null,
               controlAffinity: ListTileControlAffinity.leading,
             ),
           ),

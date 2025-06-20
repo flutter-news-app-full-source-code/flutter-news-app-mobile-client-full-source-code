@@ -68,7 +68,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       // If settings not found, create them
       // needed speciically for teh demo mode
       // that uses the ht data in memory impl
-      // as for the api impl, teh backend handle 
+      // as for the api impl, teh backend handle
       // this use case.
       await _userAppSettingsRepository.create(
         item: settingsToSave,

@@ -116,8 +116,8 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                     tooltip: l10n.headlinesFeedFilterTooltip,
                     onPressed: () {
                       // Navigate to the filter page route
-                      final headlinesFeedBloc =
-                          context.read<HeadlinesFeedBloc>();
+                      final headlinesFeedBloc = context
+                          .read<HeadlinesFeedBloc>();
                       context.goNamed(
                         Routes.feedFilterName,
                         extra: headlinesFeedBloc,
@@ -144,8 +144,8 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
         ],
       ),
       body: BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
-        buildWhen:
-            (previous, current) => current is! HeadlinesFeedLoadingSilently,
+        buildWhen: (previous, current) =>
+            current is! HeadlinesFeedLoadingSilently,
         builder: (context, state) {
           switch (state) {
             case HeadlinesFeedInitial(): // Handle initial state
@@ -188,11 +188,10 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                     top: AppSpacing.md,
                     bottom: AppSpacing.xxl,
                   ),
-                  itemCount:
-                      state.hasMore
-                          ? state.feedItems.length +
-                              1 // Changed
-                          : state.feedItems.length, // Changed
+                  itemCount: state.hasMore
+                      ? state.feedItems.length +
+                            1 // Changed
+                      : state.feedItems.length, // Changed
                   separatorBuilder: (context, index) {
                     // Add a bit more space if the next item is an Ad or AccountAction
                     if (index < state.feedItems.length - 1) {
@@ -219,44 +218,40 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                     final item = state.feedItems[index]; // Changed
 
                     if (item is Headline) {
-                      final imageStyle =
-                          context
-                              .watch<AppBloc>()
-                              .state
-                              .settings
-                              .feedPreferences
-                              .headlineImageStyle;
+                      final imageStyle = context
+                          .watch<AppBloc>()
+                          .state
+                          .settings
+                          .feedPreferences
+                          .headlineImageStyle;
                       Widget tile;
                       switch (imageStyle) {
                         case HeadlineImageStyle.hidden:
                           tile = HeadlineTileTextOnly(
                             headline: item,
-                            onHeadlineTap:
-                                () => context.goNamed(
-                                  Routes.articleDetailsName,
-                                  pathParameters: {'id': item.id},
-                                  extra: item,
-                                ),
+                            onHeadlineTap: () => context.goNamed(
+                              Routes.articleDetailsName,
+                              pathParameters: {'id': item.id},
+                              extra: item,
+                            ),
                           );
                         case HeadlineImageStyle.smallThumbnail:
                           tile = HeadlineTileImageStart(
                             headline: item,
-                            onHeadlineTap:
-                                () => context.goNamed(
-                                  Routes.articleDetailsName,
-                                  pathParameters: {'id': item.id},
-                                  extra: item,
-                                ),
+                            onHeadlineTap: () => context.goNamed(
+                              Routes.articleDetailsName,
+                              pathParameters: {'id': item.id},
+                              extra: item,
+                            ),
                           );
                         case HeadlineImageStyle.largeThumbnail:
                           tile = HeadlineTileImageTop(
                             headline: item,
-                            onHeadlineTap:
-                                () => context.goNamed(
-                                  Routes.articleDetailsName,
-                                  pathParameters: {'id': item.id},
-                                  extra: item,
-                                ),
+                            onHeadlineTap: () => context.goNamed(
+                              Routes.articleDetailsName,
+                              pathParameters: {'id': item.id},
+                              extra: item,
+                            ),
                           );
                       }
                       return tile;
@@ -276,11 +271,8 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                                 Image.network(
                                   item.imageUrl,
                                   height: 100,
-                                  errorBuilder:
-                                      (ctx, err, st) => const Icon(
-                                        Icons.broken_image,
-                                        size: 50,
-                                      ),
+                                  errorBuilder: (ctx, err, st) =>
+                                      const Icon(Icons.broken_image, size: 50),
                                 ),
                               const SizedBox(height: AppSpacing.sm),
                               Text(
@@ -325,31 +317,29 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          subtitle:
-                              item.description != null
-                                  ? Text(
-                                    item.description!,
-                                    style: textTheme.bodySmall?.copyWith(
-                                      color: colorScheme.onSecondaryContainer
-                                          .withOpacity(0.8),
-                                    ),
-                                  )
-                                  : null,
-                          trailing:
-                              item.callToActionText != null
-                                  ? ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: colorScheme.secondary,
-                                      foregroundColor: colorScheme.onSecondary,
-                                    ),
-                                    onPressed: () {
-                                      if (item.callToActionUrl != null) {
-                                        context.push(item.callToActionUrl!);
-                                      }
-                                    },
-                                    child: Text(item.callToActionText!),
-                                  )
-                                  : null,
+                          subtitle: item.description != null
+                              ? Text(
+                                  item.description!,
+                                  style: textTheme.bodySmall?.copyWith(
+                                    color: colorScheme.onSecondaryContainer
+                                        .withOpacity(0.8),
+                                  ),
+                                )
+                              : null,
+                          trailing: item.callToActionText != null
+                              ? ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: colorScheme.secondary,
+                                    foregroundColor: colorScheme.onSecondary,
+                                  ),
+                                  onPressed: () {
+                                    if (item.callToActionUrl != null) {
+                                      context.push(item.callToActionUrl!);
+                                    }
+                                  },
+                                  child: Text(item.callToActionText!),
+                                )
+                              : null,
                           isThreeLine:
                               item.description != null &&
                               item.description!.length > 50,

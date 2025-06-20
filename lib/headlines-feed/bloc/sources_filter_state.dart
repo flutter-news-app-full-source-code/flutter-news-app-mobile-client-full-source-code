@@ -51,8 +51,9 @@ class SourcesFilterState extends Equatable {
       finallySelectedSourceIds:
           finallySelectedSourceIds ?? this.finallySelectedSourceIds,
       dataLoadingStatus: dataLoadingStatus ?? this.dataLoadingStatus,
-      errorMessage:
-          clearErrorMessage ? null : errorMessage ?? this.errorMessage,
+      errorMessage: clearErrorMessage
+          ? null
+          : errorMessage ?? this.errorMessage,
     );
   }
 

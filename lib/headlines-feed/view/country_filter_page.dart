@@ -149,10 +149,8 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
         state.countries.isEmpty) {
       return FailureStateWidget(
         message: state.error?.toString() ?? l10n.unknownError,
-        onRetry:
-            () => context.read<CountriesFilterBloc>().add(
-              CountriesFilterRequested(),
-            ),
+        onRetry: () =>
+            context.read<CountriesFilterBloc>().add(CountriesFilterRequested()),
       );
     }
 
@@ -219,22 +217,20 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
               child: Image.network(
                 country.flagUrl,
                 fit: BoxFit.cover, // Use cover for better filling
-                errorBuilder:
-                    (context, error, stackTrace) => Icon(
-                      Icons.flag_outlined,
-                      color: colorScheme.onSurfaceVariant,
-                      size: AppSpacing.lg, // Adjust size as needed
-                    ),
+                errorBuilder: (context, error, stackTrace) => Icon(
+                  Icons.flag_outlined,
+                  color: colorScheme.onSurfaceVariant,
+                  size: AppSpacing.lg, // Adjust size as needed
+                ),
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
                   return Center(
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      value:
-                          loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                  loadingProgress.expectedTotalBytes!
-                              : null,
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                          : null,
                     ),
                   );
                 },

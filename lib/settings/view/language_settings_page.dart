@@ -46,11 +46,8 @@ class LanguageSettingsPage extends StatelessWidget {
         body: ListView.separated(
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
           itemCount: _supportedLanguages.length,
-          separatorBuilder:
-              (context, index) => const Divider(
-                indent: AppSpacing.lg,
-                endIndent: AppSpacing.lg,
-              ),
+          separatorBuilder: (context, index) =>
+              const Divider(indent: AppSpacing.lg, endIndent: AppSpacing.lg),
           itemBuilder: (context, index) {
             final languageCode = _supportedLanguages.keys.elementAt(index);
             final languageName = _supportedLanguages.values.elementAt(index);
@@ -58,10 +55,9 @@ class LanguageSettingsPage extends StatelessWidget {
 
             return ListTile(
               title: Text(languageName),
-              trailing:
-                  isSelected
-                      ? Icon(Icons.check, color: Theme.of(context).primaryColor)
-                      : null,
+              trailing: isSelected
+                  ? Icon(Icons.check, color: Theme.of(context).primaryColor)
+                  : null,
               onTap: () {
                 if (!isSelected) {
                   // Dispatch event to SettingsBloc

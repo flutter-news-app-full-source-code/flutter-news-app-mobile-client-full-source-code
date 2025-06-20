@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/l10n/app_localizations.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/settings/bloc/settings_bloc.dart';
@@ -42,33 +43,39 @@ class FeedSettingsPage extends StatelessWidget {
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.settingsFeedDisplayTitle), // Reuse title
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        children: [
-          // --- Feed Tile Type ---
-          _buildDropdownSetting<HeadlineImageStyle>(
-            context: context,
-            title: l10n.settingsFeedTileTypeLabel, // Add l10n key
-            currentValue:
-                state
-                    .userAppSettings!
-                    .feedPreferences
-                    .headlineImageStyle, // Use new model field
-            items: HeadlineImageStyle.values,
-            itemToString: (style) => _imageStyleToString(style, l10n),
-            onChanged: (value) {
-              if (value != null) {
-                settingsBloc.add(
-                  SettingsFeedTileTypeChanged(value),
-                ); // Use new event
-              }
-            },
-          ),
-        ],
+    return BlocListener<SettingsBloc, SettingsState>(
+      listener: (context, settingsState) {
+        if (settingsState.status == SettingsStatus.success) {
+          context.read<AppBloc>().add(const AppSettingsRefreshed());
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(l10n.settingsFeedDisplayTitle), // Reuse title
+        ),
+        body: ListView(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          children: [
+            // --- Feed Tile Type ---
+            _buildDropdownSetting<HeadlineImageStyle>(
+              context: context,
+              title: l10n.settingsFeedTileTypeLabel, // Add l10n key
+              currentValue: state
+                  .userAppSettings!
+                  .feedPreferences
+                  .headlineImageStyle, // Use new model field
+              items: HeadlineImageStyle.values,
+              itemToString: (style) => _imageStyleToString(style, l10n),
+              onChanged: (value) {
+                if (value != null) {
+                  settingsBloc.add(
+                    SettingsFeedTileTypeChanged(value),
+                  ); // Use new event
+                }
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -90,13 +97,12 @@ class FeedSettingsPage extends StatelessWidget {
         const SizedBox(height: AppSpacing.sm),
         DropdownButtonFormField<T>(
           value: currentValue,
-          items:
-              items.map((T value) {
-                return DropdownMenuItem<T>(
-                  value: value,
-                  child: Text(itemToString(value)),
-                );
-              }).toList(),
+          items: items.map((T value) {
+            return DropdownMenuItem<T>(
+              value: value,
+              child: Text(itemToString(value)),
+            );
+          }).toList(),
           onChanged: onChanged,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),

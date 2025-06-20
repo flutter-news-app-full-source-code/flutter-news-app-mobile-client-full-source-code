@@ -102,8 +102,9 @@ class AppState extends Equatable {
       settings: settings ?? this.settings, // Copy settings
       locale: clearLocale ? null : locale ?? this.locale, // Added locale
       appConfig: clearAppConfig ? null : appConfig ?? this.appConfig,
-      environment:
-          clearEnvironment ? null : environment ?? this.environment, // Added
+      environment: clearEnvironment
+          ? null
+          : environment ?? this.environment, // Added
     );
   }
 

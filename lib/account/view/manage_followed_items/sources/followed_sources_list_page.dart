@@ -79,14 +79,13 @@ class FollowedSourcesListPage extends StatelessWidget {
               return ListTile(
                 leading: const Icon(Icons.source_outlined), // Generic icon
                 title: Text(source.name),
-                subtitle:
-                    source.description != null
-                        ? Text(
-                          source.description!,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        )
-                        : null,
+                subtitle: source.description != null
+                    ? Text(
+                        source.description!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      )
+                    : null,
                 trailing: IconButton(
                   icon: const Icon(
                     Icons.remove_circle_outline,

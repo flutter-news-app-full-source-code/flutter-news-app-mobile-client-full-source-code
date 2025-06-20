@@ -58,8 +58,9 @@ class HeadlinesSearchSuccess extends HeadlinesSearchState {
       items: items ?? this.items, // Changed
       hasMore: hasMore ?? this.hasMore,
       cursor: cursor ?? this.cursor,
-      errorMessage:
-          clearErrorMessage ? null : errorMessage ?? this.errorMessage,
+      errorMessage: clearErrorMessage
+          ? null
+          : errorMessage ?? this.errorMessage,
       lastSearchTerm: lastSearchTerm ?? this.lastSearchTerm,
       selectedModelType: selectedModelType ?? this.selectedModelType,
     );

@@ -76,8 +76,10 @@ GoRouter createRouter({
     // --- Redirect Logic ---
     redirect: (BuildContext context, GoRouterState state) {
       final appStatus = context.read<AppBloc>().state.status;
-      final appConfig =
-          context.read<AppBloc>().state.appConfig; // Get appConfig
+      final appConfig = context
+          .read<AppBloc>()
+          .state
+          .appConfig; // Get appConfig
       final currentLocation = state.matchedLocation;
       final currentUri = state.uri;
 
@@ -135,47 +137,61 @@ GoRouter createRouter({
           appStatus == AppStatus.authenticated) {
         print('  Redirect Decision: User is $appStatus.');
 
-          final isLinkingContextQueryPresent = state.uri.queryParameters['context'] == 'linking';
-          final isLinkingPathSegmentPresent = currentLocation.contains('/linking/');
+        final isLinkingContextQueryPresent =
+            state.uri.queryParameters['context'] == 'linking';
+        final isLinkingPathSegmentPresent = currentLocation.contains(
+          '/linking/',
+        );
 
-          // Determine if the current location is part of any linking flow (either via query or path segment)
-          final isAnyLinkingContext = isLinkingContextQueryPresent || isLinkingPathSegmentPresent;
+        // Determine if the current location is part of any linking flow (either via query or path segment)
+        final isAnyLinkingContext =
+            isLinkingContextQueryPresent || isLinkingPathSegmentPresent;
 
-          // If an authenticated/anonymous user is on any authentication-related path:
-          if (currentLocation.startsWith(authenticationPath)) {
-            print('    Debug: Auth path detected. Current Location: $currentLocation');
-            print('    Debug: URI Query Parameters: ${state.uri.queryParameters}');
-            print('    Debug: isLinkingContextQueryPresent: $isLinkingContextQueryPresent');
-            print('    Debug: isLinkingPathSegmentPresent: $isLinkingPathSegmentPresent');
-            print('    Debug: isAnyLinkingContext evaluated to: $isAnyLinkingContext');
-
-            // If the user is authenticated, always redirect away from auth paths.
-            if (appStatus == AppStatus.authenticated) {
-              print(
-                '    Action: Authenticated user on auth path ($currentLocation). Redirecting to $feedPath',
-              );
-              return feedPath;
-            }
-
-            // If the user is anonymous, allow navigation within auth paths if in a linking context.
-            // Otherwise, redirect anonymous users trying to access non-linking auth paths to feed.
-            if (isAnyLinkingContext) {
-              print(
-                '    Action: Anonymous user on auth linking path ($currentLocation). Allowing navigation.',
-              );
-              return null;
-            } else {
-              print(
-                '    Action: Anonymous user trying to access non-linking auth path ($currentLocation). Redirecting to $feedPath',
-              );
-              return feedPath;
-            }
-          }
-          // Allow access to other routes (non-auth paths)
+        // If an authenticated/anonymous user is on any authentication-related path:
+        if (currentLocation.startsWith(authenticationPath)) {
           print(
-            '    Action: Allowing navigation to $currentLocation for $appStatus user (non-auth path).',
+            '    Debug: Auth path detected. Current Location: $currentLocation',
           );
-          return null;
+          print(
+            '    Debug: URI Query Parameters: ${state.uri.queryParameters}',
+          );
+          print(
+            '    Debug: isLinkingContextQueryPresent: $isLinkingContextQueryPresent',
+          );
+          print(
+            '    Debug: isLinkingPathSegmentPresent: $isLinkingPathSegmentPresent',
+          );
+          print(
+            '    Debug: isAnyLinkingContext evaluated to: $isAnyLinkingContext',
+          );
+
+          // If the user is authenticated, always redirect away from auth paths.
+          if (appStatus == AppStatus.authenticated) {
+            print(
+              '    Action: Authenticated user on auth path ($currentLocation). Redirecting to $feedPath',
+            );
+            return feedPath;
+          }
+
+          // If the user is anonymous, allow navigation within auth paths if in a linking context.
+          // Otherwise, redirect anonymous users trying to access non-linking auth paths to feed.
+          if (isAnyLinkingContext) {
+            print(
+              '    Action: Anonymous user on auth linking path ($currentLocation). Allowing navigation.',
+            );
+            return null;
+          } else {
+            print(
+              '    Action: Anonymous user trying to access non-linking auth path ($currentLocation). Redirecting to $feedPath',
+            );
+            return feedPath;
+          }
+        }
+        // Allow access to other routes (non-auth paths)
+        print(
+          '    Action: Allowing navigation to $currentLocation for $appStatus user (non-auth path).',
+        );
+        return null;
       }
 
       // Fallback (should ideally not be reached if all statuses are handled)
@@ -211,10 +227,9 @@ GoRouter createRouter({
           }
 
           return BlocProvider(
-            create:
-                (context) => AuthenticationBloc(
-                  authenticationRepository: context.read<HtAuthRepository>(),
-                ),
+            create: (context) => AuthenticationBloc(
+              authenticationRepository: context.read<HtAuthRepository>(),
+            ),
             child: AuthenticationPage(
               headline: headline,
               subHeadline: subHeadline,
@@ -231,13 +246,15 @@ GoRouter createRouter({
             builder: (context, state) => const SizedBox.shrink(), // Placeholder
             routes: [
               GoRoute(
-                path: Routes.requestCode, // Path: /authentication/linking/request-code
+                path: Routes
+                    .requestCode, // Path: /authentication/linking/request-code
                 name: Routes.linkingRequestCodeName,
                 builder: (context, state) =>
                     const RequestCodePage(isLinkingContext: true),
               ),
               GoRoute(
-                path: '${Routes.verifyCode}/:email', // Path: /authentication/linking/verify-code/:email
+                path:
+                    '${Routes.verifyCode}/:email', // Path: /authentication/linking/verify-code/:email
                 name: Routes.linkingVerifyCodeName,
                 builder: (context, state) {
                   final email = state.pathParameters['email']!;
@@ -341,18 +358,16 @@ GoRouter createRouter({
             providers: [
               BlocProvider.value(value: accountBloc),
               BlocProvider(
-                create:
-                    (context) => HeadlineDetailsBloc(
-                      headlinesRepository:
-                          context.read<HtDataRepository<Headline>>(),
-                    ),
+                create: (context) => HeadlineDetailsBloc(
+                  headlinesRepository: context
+                      .read<HtDataRepository<Headline>>(),
+                ),
               ),
               BlocProvider(
-                create:
-                    (context) => SimilarHeadlinesBloc(
-                      headlinesRepository:
-                          context.read<HtDataRepository<Headline>>(),
-                    ),
+                create: (context) => SimilarHeadlinesBloc(
+                  headlinesRepository: context
+                      .read<HtDataRepository<Headline>>(),
+                ),
               ),
             ],
             child: HeadlineDetailsPage(
@@ -374,8 +389,8 @@ GoRouter createRouter({
                   // Instantiate FeedInjectorService here as it's stateless for now
                   final feedInjectorService = FeedInjectorService();
                   return HeadlinesFeedBloc(
-                    headlinesRepository:
-                        context.read<HtDataRepository<Headline>>(),
+                    headlinesRepository: context
+                        .read<HtDataRepository<Headline>>(),
                     feedInjectorService: feedInjectorService, // Pass instance
                     appBloc: context.read<AppBloc>(), // Pass AppBloc instance
                   )..add(const HeadlinesFeedFetchRequested());
@@ -386,10 +401,10 @@ GoRouter createRouter({
                   final feedInjectorService =
                       FeedInjectorService(); // Instantiate
                   return HeadlinesSearchBloc(
-                    headlinesRepository:
-                        context.read<HtDataRepository<Headline>>(),
-                    categoryRepository:
-                        context.read<HtDataRepository<Category>>(),
+                    headlinesRepository: context
+                        .read<HtDataRepository<Headline>>(),
+                    categoryRepository: context
+                        .read<HtDataRepository<Category>>(),
                     sourceRepository: context.read<HtDataRepository<Source>>(),
                     appBloc: context.read<AppBloc>(), // Provide AppBloc
                     feedInjectorService: feedInjectorService, // Provide Service
@@ -422,20 +437,16 @@ GoRouter createRouter({
                         providers: [
                           BlocProvider.value(value: accountBloc), // Added
                           BlocProvider(
-                            create:
-                                (context) => HeadlineDetailsBloc(
-                                  headlinesRepository:
-                                      context
-                                          .read<HtDataRepository<Headline>>(),
-                                ),
+                            create: (context) => HeadlineDetailsBloc(
+                              headlinesRepository: context
+                                  .read<HtDataRepository<Headline>>(),
+                            ),
                           ),
                           BlocProvider(
-                            create:
-                                (context) => SimilarHeadlinesBloc(
-                                  headlinesRepository:
-                                      context
-                                          .read<HtDataRepository<Headline>>(),
-                                ),
+                            create: (context) => SimilarHeadlinesBloc(
+                              headlinesRepository: context
+                                  .read<HtDataRepository<Headline>>(),
+                            ),
                           ),
                         ],
                         child: HeadlineDetailsPage(
@@ -475,69 +486,60 @@ GoRouter createRouter({
                     routes: [
                       // Sub-route for category selection
                       GoRoute(
-                        path:
-                            Routes
-                                .feedFilterCategories, // Relative path: 'categories'
+                        path: Routes
+                            .feedFilterCategories, // Relative path: 'categories'
                         name: Routes.feedFilterCategoriesName,
                         // Wrap with BlocProvider
-                        builder:
-                            (context, state) => BlocProvider(
-                              create:
-                                  (context) => CategoriesFilterBloc(
-                                    categoriesRepository:
-                                        context
-                                            .read<HtDataRepository<Category>>(),
-                                  ),
-                              child: const CategoryFilterPage(),
-                            ),
+                        builder: (context, state) => BlocProvider(
+                          create: (context) => CategoriesFilterBloc(
+                            categoriesRepository: context
+                                .read<HtDataRepository<Category>>(),
+                          ),
+                          child: const CategoryFilterPage(),
+                        ),
                       ),
                       // Sub-route for source selection
                       GoRoute(
-                        path:
-                            Routes
-                                .feedFilterSources, // Relative path: 'sources'
+                        path: Routes
+                            .feedFilterSources, // Relative path: 'sources'
                         name: Routes.feedFilterSourcesName,
                         // Wrap with BlocProvider
-                        builder:
-                            (context, state) => BlocProvider(
-                              create:
-                                  (context) => SourcesFilterBloc(
-                                    sourcesRepository:
-                                        context
-                                            .read<HtDataRepository<Source>>(),
-                                    countriesRepository: // Added missing repository
-                                        context
-                                            .read<HtDataRepository<Country>>(),
-                                  ),
-                              // Pass initialSelectedSources, country ISO codes, and source types from state.extra
-                              child: Builder(
-                                builder: (context) {
-                                  final extraData =
-                                      state.extra as Map<String, dynamic>? ??
-                                      const {};
-                                  final initialSources =
-                                      extraData[keySelectedSources]
-                                          as List<Source>? ??
-                                      const [];
-                                  final initialCountryIsoCodes =
-                                      extraData[keySelectedCountryIsoCodes]
-                                          as Set<String>? ??
-                                      const {};
-                                  final initialSourceTypes =
-                                      extraData[keySelectedSourceTypes]
-                                          as Set<SourceType>? ??
-                                      const {};
+                        builder: (context, state) => BlocProvider(
+                          create: (context) => SourcesFilterBloc(
+                            sourcesRepository: context
+                                .read<HtDataRepository<Source>>(),
+                            countriesRepository: // Added missing repository
+                            context
+                                .read<HtDataRepository<Country>>(),
+                          ),
+                          // Pass initialSelectedSources, country ISO codes, and source types from state.extra
+                          child: Builder(
+                            builder: (context) {
+                              final extraData =
+                                  state.extra as Map<String, dynamic>? ??
+                                  const {};
+                              final initialSources =
+                                  extraData[keySelectedSources]
+                                      as List<Source>? ??
+                                  const [];
+                              final initialCountryIsoCodes =
+                                  extraData[keySelectedCountryIsoCodes]
+                                      as Set<String>? ??
+                                  const {};
+                              final initialSourceTypes =
+                                  extraData[keySelectedSourceTypes]
+                                      as Set<SourceType>? ??
+                                  const {};
 
-                                  return SourceFilterPage(
-                                    initialSelectedSources: initialSources,
-                                    initialSelectedCountryIsoCodes:
-                                        initialCountryIsoCodes,
-                                    initialSelectedSourceTypes:
-                                        initialSourceTypes,
-                                  );
-                                },
-                              ),
-                            ),
+                              return SourceFilterPage(
+                                initialSelectedSources: initialSources,
+                                initialSelectedCountryIsoCodes:
+                                    initialCountryIsoCodes,
+                                initialSelectedSourceTypes: initialSourceTypes,
+                              );
+                            },
+                          ),
+                        ),
                       ),
                       // Sub-route for country selection REMOVED
                     ],
@@ -565,20 +567,16 @@ GoRouter createRouter({
                         providers: [
                           BlocProvider.value(value: accountBloc), // Added
                           BlocProvider(
-                            create:
-                                (context) => HeadlineDetailsBloc(
-                                  headlinesRepository:
-                                      context
-                                          .read<HtDataRepository<Headline>>(),
-                                ),
+                            create: (context) => HeadlineDetailsBloc(
+                              headlinesRepository: context
+                                  .read<HtDataRepository<Headline>>(),
+                            ),
                           ),
                           BlocProvider(
-                            create:
-                                (context) => SimilarHeadlinesBloc(
-                                  headlinesRepository:
-                                      context
-                                          .read<HtDataRepository<Headline>>(),
-                                ),
+                            create: (context) => SimilarHeadlinesBloc(
+                              headlinesRepository: context
+                                  .read<HtDataRepository<Headline>>(),
+                            ),
                           ),
                         ],
                         child: HeadlineDetailsPage(
@@ -603,11 +601,7 @@ GoRouter createRouter({
                 routes: [
                   // ShellRoute for settings to provide SettingsBloc to children
                   ShellRoute(
-                    builder: (
-                      BuildContext context,
-                      GoRouterState state,
-                      Widget child,
-                    ) {
+                    builder: (BuildContext context, GoRouterState state, Widget child) {
                       // This builder provides SettingsBloc to all routes within this ShellRoute.
                       // 'child' will be SettingsPage, AppearanceSettingsPage, etc.
                       final appBloc = context.read<AppBloc>();
@@ -616,9 +610,8 @@ GoRouter createRouter({
                       return BlocProvider<SettingsBloc>(
                         create: (context) {
                           final settingsBloc = SettingsBloc(
-                            userAppSettingsRepository:
-                                context
-                                    .read<HtDataRepository<UserAppSettings>>(),
+                            userAppSettingsRepository: context
+                                .read<HtDataRepository<UserAppSettings>>(),
                           );
                           // Only load settings if a userId is available
                           if (userId != null) {
@@ -639,68 +632,56 @@ GoRouter createRouter({
                     },
                     routes: [
                       GoRoute(
-                        path:
-                            Routes
-                                .settings, // Relative path 'settings' from /account
+                        path: Routes
+                            .settings, // Relative path 'settings' from /account
                         name: Routes.settingsName,
                         builder: (context, state) => const SettingsPage(),
                         // --- Settings Sub-Routes ---
                         routes: [
                           GoRoute(
-                            path:
-                                Routes
-                                    .settingsAppearance, // 'appearance' relative to /account/settings
+                            path: Routes
+                                .settingsAppearance, // 'appearance' relative to /account/settings
                             name: Routes.settingsAppearanceName,
-                            builder:
-                                (context, state) =>
-                                    const AppearanceSettingsPage(),
+                            builder: (context, state) =>
+                                const AppearanceSettingsPage(),
                             routes: [
                               // Children of AppearanceSettingsPage
                               GoRoute(
-                                path:
-                                    Routes
-                                        .settingsAppearanceTheme, // 'theme' relative to /account/settings/appearance
+                                path: Routes
+                                    .settingsAppearanceTheme, // 'theme' relative to /account/settings/appearance
                                 name: Routes.settingsAppearanceThemeName,
-                                builder:
-                                    (context, state) =>
-                                        const ThemeSettingsPage(),
+                                builder: (context, state) =>
+                                    const ThemeSettingsPage(),
                               ),
                               GoRoute(
-                                path:
-                                    Routes
-                                        .settingsAppearanceFont, // 'font' relative to /account/settings/appearance
+                                path: Routes
+                                    .settingsAppearanceFont, // 'font' relative to /account/settings/appearance
                                 name: Routes.settingsAppearanceFontName,
-                                builder:
-                                    (context, state) =>
-                                        const FontSettingsPage(),
+                                builder: (context, state) =>
+                                    const FontSettingsPage(),
                               ),
                             ],
                           ),
                           GoRoute(
-                            path:
-                                Routes
-                                    .settingsFeed, // 'feed' relative to /account/settings
+                            path: Routes
+                                .settingsFeed, // 'feed' relative to /account/settings
                             name: Routes.settingsFeedName,
-                            builder:
-                                (context, state) => const FeedSettingsPage(),
+                            builder: (context, state) =>
+                                const FeedSettingsPage(),
                           ),
                           GoRoute(
-                            path:
-                                Routes
-                                    .settingsNotifications, // 'notifications' relative to /account/settings
+                            path: Routes
+                                .settingsNotifications, // 'notifications' relative to /account/settings
                             name: Routes.settingsNotificationsName,
-                            builder:
-                                (context, state) =>
-                                    const NotificationSettingsPage(),
+                            builder: (context, state) =>
+                                const NotificationSettingsPage(),
                           ),
                           GoRoute(
-                            path:
-                                Routes
-                                    .settingsLanguage, // 'language' relative to /account/settings
+                            path: Routes
+                                .settingsLanguage, // 'language' relative to /account/settings
                             name: Routes.settingsLanguageName,
-                            builder:
-                                (context, state) =>
-                                    const LanguageSettingsPage(),
+                            builder: (context, state) =>
+                                const LanguageSettingsPage(),
                           ),
                         ],
                       ),
@@ -710,38 +691,34 @@ GoRouter createRouter({
                   GoRoute(
                     path: Routes.manageFollowedItems, // Updated path
                     name: Routes.manageFollowedItemsName, // Updated name
-                    builder:
-                        (context, state) =>
-                            const ManageFollowedItemsPage(), // Use the new page
+                    builder: (context, state) =>
+                        const ManageFollowedItemsPage(), // Use the new page
                     routes: [
                       GoRoute(
                         path: Routes.followedCategoriesList,
                         name: Routes.followedCategoriesListName,
-                        builder:
-                            (context, state) =>
-                                const FollowedCategoriesListPage(),
+                        builder: (context, state) =>
+                            const FollowedCategoriesListPage(),
                         routes: [
                           GoRoute(
                             path: Routes.addCategoryToFollow,
                             name: Routes.addCategoryToFollowName,
-                            builder:
-                                (context, state) =>
-                                    const AddCategoryToFollowPage(),
+                            builder: (context, state) =>
+                                const AddCategoryToFollowPage(),
                           ),
                         ],
                       ),
                       GoRoute(
                         path: Routes.followedSourcesList,
                         name: Routes.followedSourcesListName,
-                        builder:
-                            (context, state) => const FollowedSourcesListPage(),
+                        builder: (context, state) =>
+                            const FollowedSourcesListPage(),
                         routes: [
                           GoRoute(
                             path: Routes.addSourceToFollow,
                             name: Routes.addSourceToFollowName,
-                            builder:
-                                (context, state) =>
-                                    const AddSourceToFollowPage(),
+                            builder: (context, state) =>
+                                const AddSourceToFollowPage(),
                           ),
                         ],
                       ),
@@ -765,24 +742,16 @@ GoRouter createRouter({
                             providers: [
                               BlocProvider.value(value: accountBloc), // Added
                               BlocProvider(
-                                create:
-                                    (context) => HeadlineDetailsBloc(
-                                      headlinesRepository:
-                                          context
-                                              .read<
-                                                HtDataRepository<Headline>
-                                              >(),
-                                     ),
+                                create: (context) => HeadlineDetailsBloc(
+                                  headlinesRepository: context
+                                      .read<HtDataRepository<Headline>>(),
+                                ),
                               ),
                               BlocProvider(
-                                create:
-                                    (context) => SimilarHeadlinesBloc(
-                                      headlinesRepository:
-                                          context
-                                              .read<
-                                                HtDataRepository<Headline>
-                                              >(),
-                                    ),
+                                create: (context) => SimilarHeadlinesBloc(
+                                  headlinesRepository: context
+                                      .read<HtDataRepository<Headline>>(),
+                                ),
                               ),
                             ],
                             child: HeadlineDetailsPage(

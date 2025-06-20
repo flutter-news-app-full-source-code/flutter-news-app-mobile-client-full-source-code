@@ -14,14 +14,13 @@ class SourceItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(source.name),
-      subtitle:
-          source.description != null
-              ? Text(
-                source.description!,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              )
-              : null,
+      subtitle: source.description != null
+          ? Text(
+              source.description!,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            )
+          : null,
       onTap: () {
         context.push(
           Routes.sourceDetails,

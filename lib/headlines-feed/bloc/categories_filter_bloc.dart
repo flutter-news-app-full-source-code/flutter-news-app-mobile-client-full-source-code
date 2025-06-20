@@ -107,9 +107,8 @@ class CategoriesFilterBloc
       // Keep existing data but indicate failure
       emit(
         state.copyWith(
-          status:
-              CategoriesFilterStatus
-                  .failure, // Or a specific 'loadMoreFailure' status?
+          status: CategoriesFilterStatus
+              .failure, // Or a specific 'loadMoreFailure' status?
           error: e,
         ),
       );

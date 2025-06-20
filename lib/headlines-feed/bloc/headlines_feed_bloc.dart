@@ -262,10 +262,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         currentFeedItemCount: currentFeedItemCountForInjector,
       );
 
-      final resultingFeedItems =
-          isPaginating
-              ? (List.of(currentFeedItems)..addAll(newProcessedFeedItems))
-              : newProcessedFeedItems;
+      final resultingFeedItems = isPaginating
+          ? (List.of(currentFeedItems)..addAll(newProcessedFeedItems))
+          : newProcessedFeedItems;
 
       emit(
         HeadlinesFeedLoaded(

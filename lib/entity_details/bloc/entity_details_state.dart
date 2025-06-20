@@ -52,9 +52,12 @@ class EntityDetailsState extends Equatable {
       headlinesStatus: headlinesStatus ?? this.headlinesStatus,
       hasMoreHeadlines: hasMoreHeadlines ?? this.hasMoreHeadlines,
       headlinesCursor: // This cursor is for fetching original headlines
-          clearHeadlinesCursor ? null : headlinesCursor ?? this.headlinesCursor,
-      errorMessage:
-          clearErrorMessage ? null : errorMessage ?? this.errorMessage,
+      clearHeadlinesCursor
+          ? null
+          : headlinesCursor ?? this.headlinesCursor,
+      errorMessage: clearErrorMessage
+          ? null
+          : errorMessage ?? this.errorMessage,
     );
   }
 

@@ -36,8 +36,9 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
     );
     try {
       final availableCountries = await _countriesRepository.readAll();
-      final initialSelectedSourceIds =
-          event.initialSelectedSources.map((s) => s.id).toSet();
+      final initialSelectedSourceIds = event.initialSelectedSources
+          .map((s) => s.id)
+          .toSet();
 
       // Use the passed-in initial capsule selections directly
       final initialSelectedCountryIsoCodes =

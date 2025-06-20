@@ -50,18 +50,18 @@ class _RequestCodeView extends StatelessWidget {
         // Add a custom leading back button to control navigation based on context.
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          tooltip:
-              MaterialLocalizations.of(
-                context,
-              ).backButtonTooltip, // Accessibility
+          tooltip: MaterialLocalizations.of(
+            context,
+          ).backButtonTooltip, // Accessibility
           onPressed: () {
             // Navigate back differently based on the context.
             if (isLinkingContext) {
               // If linking, go back to Auth page preserving the linking query param.
               context.goNamed(
                 Routes.authenticationName,
-                queryParameters:
-                    isLinkingContext ? {'context': 'linking'} : const {},
+                queryParameters: isLinkingContext
+                    ? {'context': 'linking'}
+                    : const {},
               );
             } else {
               // If normal sign-in, just go back to the Auth page.
@@ -93,12 +93,11 @@ class _RequestCodeView extends StatelessWidget {
             }
           },
           // BuildWhen prevents unnecessary rebuilds if only listening
-          buildWhen:
-              (previous, current) =>
-                  current is AuthenticationInitial ||
-                  current is AuthenticationRequestCodeLoading ||
-                  current
-                      is AuthenticationFailure, // Rebuild on failure to re-enable form
+          buildWhen: (previous, current) =>
+              current is AuthenticationInitial ||
+              current is AuthenticationRequestCodeLoading ||
+              current
+                  is AuthenticationFailure, // Rebuild on failure to re-enable form
           builder: (context, state) {
             final isLoading = state is AuthenticationRequestCodeLoading;
 
@@ -209,8 +208,8 @@ class _EmailLinkFormState extends State<_EmailLinkForm> {
               }
               return null;
             },
-            onFieldSubmitted:
-                (_) => _submitForm(), // Allow submitting from keyboard
+            onFieldSubmitted: (_) =>
+                _submitForm(), // Allow submitting from keyboard
           ),
           const SizedBox(height: AppSpacing.lg),
           ElevatedButton(
@@ -219,20 +218,19 @@ class _EmailLinkFormState extends State<_EmailLinkForm> {
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
               textStyle: textTheme.labelLarge,
             ),
-            child:
-                widget.isLoading
-                    ? SizedBox(
-                      height: AppSpacing.xl, // Consistent size with text
-                      width: AppSpacing.xl,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color:
-                            colorScheme.onPrimary, // Color for loader on button
-                      ),
-                    )
-                    : Text(
-                      l10n.requestCodeSendCodeButton,
-                    ), // More specific button text
+            child: widget.isLoading
+                ? SizedBox(
+                    height: AppSpacing.xl, // Consistent size with text
+                    width: AppSpacing.xl,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color:
+                          colorScheme.onPrimary, // Color for loader on button
+                    ),
+                  )
+                : Text(
+                    l10n.requestCodeSendCodeButton,
+                  ), // More specific button text
           ),
         ],
       ),

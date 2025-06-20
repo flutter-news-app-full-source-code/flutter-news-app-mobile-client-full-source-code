@@ -75,28 +75,25 @@ class FollowedCategoriesListPage extends StatelessWidget {
             itemBuilder: (context, index) {
               final category = followedCategories[index];
               return ListTile(
-                leading:
-                    category.iconUrl != null
-                        ? SizedBox(
-                          width: 40,
-                          height: 40,
-                          child: Image.network(
-                            category.iconUrl!,
-                            errorBuilder:
-                                (context, error, stackTrace) =>
-                                    const Icon(Icons.category_outlined),
-                          ),
-                        )
-                        : const Icon(Icons.category_outlined),
+                leading: category.iconUrl != null
+                    ? SizedBox(
+                        width: 40,
+                        height: 40,
+                        child: Image.network(
+                          category.iconUrl!,
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(Icons.category_outlined),
+                        ),
+                      )
+                    : const Icon(Icons.category_outlined),
                 title: Text(category.name),
-                subtitle:
-                    category.description != null
-                        ? Text(
-                          category.description!,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        )
-                        : null,
+                subtitle: category.description != null
+                    ? Text(
+                        category.description!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      )
+                    : null,
                 trailing: IconButton(
                   icon: const Icon(
                     Icons.remove_circle_outline,

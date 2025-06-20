@@ -76,21 +76,19 @@ class SavedHeadlinesPage extends StatelessWidget {
               vertical: AppSpacing.paddingSmall,
             ), // Add padding
             itemCount: savedHeadlines.length,
-            separatorBuilder:
-                (context, index) => const Divider(
-                  height: 1,
-                  indent: AppSpacing.paddingMedium, // Indent divider
-                  endIndent: AppSpacing.paddingMedium,
-                ),
+            separatorBuilder: (context, index) => const Divider(
+              height: 1,
+              indent: AppSpacing.paddingMedium, // Indent divider
+              endIndent: AppSpacing.paddingMedium,
+            ),
             itemBuilder: (context, index) {
               final headline = savedHeadlines[index];
-              final imageStyle =
-                  context
-                      .watch<AppBloc>()
-                      .state
-                      .settings
-                      .feedPreferences
-                      .headlineImageStyle;
+              final imageStyle = context
+                  .watch<AppBloc>()
+                  .state
+                  .settings
+                  .feedPreferences
+                  .headlineImageStyle;
 
               final trailingButton = IconButton(
                 icon: Icon(
@@ -110,34 +108,31 @@ class SavedHeadlinesPage extends StatelessWidget {
                 case HeadlineImageStyle.hidden:
                   tile = HeadlineTileTextOnly(
                     headline: headline,
-                    onHeadlineTap:
-                        () => context.goNamed(
-                          Routes.accountArticleDetailsName,
-                          pathParameters: {'id': headline.id},
-                          extra: headline,
-                        ),
+                    onHeadlineTap: () => context.goNamed(
+                      Routes.accountArticleDetailsName,
+                      pathParameters: {'id': headline.id},
+                      extra: headline,
+                    ),
                     trailing: trailingButton,
                   );
                 case HeadlineImageStyle.smallThumbnail:
                   tile = HeadlineTileImageStart(
                     headline: headline,
-                    onHeadlineTap:
-                        () => context.goNamed(
-                          Routes.accountArticleDetailsName,
-                          pathParameters: {'id': headline.id},
-                          extra: headline,
-                        ),
+                    onHeadlineTap: () => context.goNamed(
+                      Routes.accountArticleDetailsName,
+                      pathParameters: {'id': headline.id},
+                      extra: headline,
+                    ),
                     trailing: trailingButton,
                   );
                 case HeadlineImageStyle.largeThumbnail:
                   tile = HeadlineTileImageTop(
                     headline: headline,
-                    onHeadlineTap:
-                        () => context.goNamed(
-                          Routes.accountArticleDetailsName,
-                          pathParameters: {'id': headline.id},
-                          extra: headline,
-                        ),
+                    onHeadlineTap: () => context.goNamed(
+                      Routes.accountArticleDetailsName,
+                      pathParameters: {'id': headline.id},
+                      extra: headline,
+                    ),
                     trailing: trailingButton,
                   );
               }

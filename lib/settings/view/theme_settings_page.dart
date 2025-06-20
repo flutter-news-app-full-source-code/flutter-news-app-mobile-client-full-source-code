@@ -128,13 +128,12 @@ class ThemeSettingsPage extends StatelessWidget {
         const SizedBox(height: AppSpacing.sm),
         DropdownButtonFormField<T>(
           value: currentValue,
-          items:
-              items.map((T value) {
-                return DropdownMenuItem<T>(
-                  value: value,
-                  child: Text(itemToString(value)),
-                );
-              }).toList(),
+          items: items.map((T value) {
+            return DropdownMenuItem<T>(
+              value: value,
+              child: Text(itemToString(value)),
+            );
+          }).toList(),
           onChanged: onChanged,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),

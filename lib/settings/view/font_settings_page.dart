@@ -111,8 +111,8 @@ class FontSettingsPage extends StatelessWidget {
                 'Montserrat',
                 'Merriweather',
               ], // Updated font list
-              itemToString:
-                  (fontFamily) => _fontFamilyToString(fontFamily, l10n),
+              itemToString: (fontFamily) =>
+                  _fontFamilyToString(fontFamily, l10n),
               onChanged: (value) {
                 if (value != null) {
                   settingsBloc.add(SettingsAppFontTypeChanged(value));
@@ -156,13 +156,12 @@ class FontSettingsPage extends StatelessWidget {
         const SizedBox(height: AppSpacing.sm),
         DropdownButtonFormField<T>(
           value: currentValue,
-          items:
-              items.map((T value) {
-                return DropdownMenuItem<T>(
-                  value: value,
-                  child: Text(itemToString(value)),
-                );
-              }).toList(),
+          items: items.map((T value) {
+            return DropdownMenuItem<T>(
+              value: value,
+              child: Text(itemToString(value)),
+            );
+          }).toList(),
           onChanged: onChanged,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),

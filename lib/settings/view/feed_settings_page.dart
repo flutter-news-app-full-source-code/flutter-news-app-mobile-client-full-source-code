@@ -60,8 +60,10 @@ class FeedSettingsPage extends StatelessWidget {
             _buildDropdownSetting<HeadlineImageStyle>(
               context: context,
               title: l10n.settingsFeedTileTypeLabel, // Add l10n key
-              currentValue:
-                  state.userAppSettings!.feedPreferences.headlineImageStyle, // Use new model field
+              currentValue: state
+                  .userAppSettings!
+                  .feedPreferences
+                  .headlineImageStyle, // Use new model field
               items: HeadlineImageStyle.values,
               itemToString: (style) => _imageStyleToString(style, l10n),
               onChanged: (value) {
@@ -95,13 +97,12 @@ class FeedSettingsPage extends StatelessWidget {
         const SizedBox(height: AppSpacing.sm),
         DropdownButtonFormField<T>(
           value: currentValue,
-          items:
-              items.map((T value) {
-                return DropdownMenuItem<T>(
-                  value: value,
-                  child: Text(itemToString(value)),
-                );
-              }).toList(),
+          items: items.map((T value) {
+            return DropdownMenuItem<T>(
+              value: value,
+              child: Text(itemToString(value)),
+            );
+          }).toList(),
           onChanged: onChanged,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),

@@ -44,14 +44,13 @@ class HeadlinesSearchBloc
   ) async {
     // If there's an active search term, re-trigger search with new model type
     // ignore: unused_local_variable
-    final currentSearchTerm =
-        state is HeadlinesSearchLoading
-            ? (state as HeadlinesSearchLoading).lastSearchTerm
-            : state is HeadlinesSearchSuccess
-            ? (state as HeadlinesSearchSuccess).lastSearchTerm
-            : state is HeadlinesSearchFailure
-            ? (state as HeadlinesSearchFailure).lastSearchTerm
-            : null;
+    final currentSearchTerm = state is HeadlinesSearchLoading
+        ? (state as HeadlinesSearchLoading).lastSearchTerm
+        : state is HeadlinesSearchSuccess
+        ? (state as HeadlinesSearchSuccess).lastSearchTerm
+        : state is HeadlinesSearchFailure
+        ? (state as HeadlinesSearchFailure).lastSearchTerm
+        : null;
 
     emit(HeadlinesSearchInitial(selectedModelType: event.newModelType));
   }

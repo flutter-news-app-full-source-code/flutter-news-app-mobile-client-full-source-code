@@ -22,10 +22,9 @@ class AddCategoryToFollowPage extends StatelessWidget {
     final textTheme = theme.textTheme; // Get textTheme
 
     return BlocProvider(
-      create:
-          (context) => CategoriesFilterBloc(
-            categoriesRepository: context.read<HtDataRepository<Category>>(),
-          )..add(CategoriesFilterRequested()),
+      create: (context) => CategoriesFilterBloc(
+        categoriesRepository: context.read<HtDataRepository<Category>>(),
+      )..add(CategoriesFilterRequested()),
       child: Scaffold(
         appBar: AppBar(
           title: Text(
@@ -56,10 +55,9 @@ class AddCategoryToFollowPage extends StatelessWidget {
               }
               return FailureStateWidget(
                 message: errorMessage,
-                onRetry:
-                    () => context.read<CategoriesFilterBloc>().add(
-                      CategoriesFilterRequested(),
-                    ),
+                onRetry: () => context.read<CategoriesFilterBloc>().add(
+                  CategoriesFilterRequested(),
+                ),
               );
             }
             if (categoriesState.categories.isEmpty &&
@@ -79,23 +77,23 @@ class AddCategoryToFollowPage extends StatelessWidget {
                 categoriesState.status == CategoriesFilterStatus.loadingMore;
 
             return BlocBuilder<AccountBloc, AccountState>(
-              buildWhen:
-                  (previous, current) =>
-                      previous.preferences?.followedCategories !=
-                          current.preferences?.followedCategories ||
-                      previous.status != current.status,
+              buildWhen: (previous, current) =>
+                  previous.preferences?.followedCategories !=
+                      current.preferences?.followedCategories ||
+                  previous.status != current.status,
               builder: (context, accountState) {
                 final followedCategories =
                     accountState.preferences?.followedCategories ?? [];
 
                 return ListView.builder(
-                  padding: const EdgeInsets.symmetric(
-                    // Consistent padding
-                    horizontal: AppSpacing.paddingMedium,
-                    vertical: AppSpacing.paddingSmall,
-                  ).copyWith(
-                    bottom: AppSpacing.xxl,
-                  ), // Ensure bottom space for loader
+                  padding:
+                      const EdgeInsets.symmetric(
+                        // Consistent padding
+                        horizontal: AppSpacing.paddingMedium,
+                        vertical: AppSpacing.paddingSmall,
+                      ).copyWith(
+                        bottom: AppSpacing.xxl,
+                      ), // Ensure bottom space for loader
                   itemCount: categories.length + (isLoadingMore ? 1 : 0),
                   itemBuilder: (context, index) {
                     if (index == categories.length && isLoadingMore) {
@@ -130,73 +128,66 @@ class AddCategoryToFollowPage extends StatelessWidget {
                           height: AppSpacing.xl + AppSpacing.xs,
                           child:
                               category.iconUrl != null &&
-                                      Uri.tryParse(
-                                            category.iconUrl!,
-                                          )?.isAbsolute ==
-                                          true
-                                  ? ClipRRect(
-                                    borderRadius: BorderRadius.circular(
-                                      AppSpacing.xs,
-                                    ),
-                                    child: Image.network(
-                                      category.iconUrl!,
-                                      fit: BoxFit.contain,
-                                      errorBuilder:
-                                          (context, error, stackTrace) => Icon(
-                                            Icons.category_outlined,
-                                            color: colorScheme.onSurfaceVariant,
-                                            size: AppSpacing.lg,
-                                          ),
-                                      loadingBuilder: (
-                                        context,
-                                        child,
-                                        loadingProgress,
-                                      ) {
-                                        if (loadingProgress == null) {
-                                          return child;
-                                        }
-                                        return Center(
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            value:
-                                                loadingProgress
-                                                            .expectedTotalBytes !=
-                                                        null
-                                                    ? loadingProgress
+                                  Uri.tryParse(category.iconUrl!)?.isAbsolute ==
+                                      true
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(
+                                    AppSpacing.xs,
+                                  ),
+                                  child: Image.network(
+                                    category.iconUrl!,
+                                    fit: BoxFit.contain,
+                                    errorBuilder:
+                                        (context, error, stackTrace) => Icon(
+                                          Icons.category_outlined,
+                                          color: colorScheme.onSurfaceVariant,
+                                          size: AppSpacing.lg,
+                                        ),
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
+                                          if (loadingProgress == null) {
+                                            return child;
+                                          }
+                                          return Center(
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              value:
+                                                  loadingProgress
+                                                          .expectedTotalBytes !=
+                                                      null
+                                                  ? loadingProgress
                                                             .cumulativeBytesLoaded /
                                                         loadingProgress
                                                             .expectedTotalBytes!
-                                                    : null,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  )
-                                  : Icon(
-                                    Icons.category_outlined,
-                                    color: colorScheme.onSurfaceVariant,
-                                    size: AppSpacing.lg,
+                                                  : null,
+                                            ),
+                                          );
+                                        },
                                   ),
+                                )
+                              : Icon(
+                                  Icons.category_outlined,
+                                  color: colorScheme.onSurfaceVariant,
+                                  size: AppSpacing.lg,
+                                ),
                         ),
                         title: Text(
                           category.name,
                           style: textTheme.titleMedium,
                         ),
                         trailing: IconButton(
-                          icon:
-                              isFollowed
-                                  ? Icon(
-                                    Icons.check_circle,
-                                    color: colorScheme.primary,
-                                  )
-                                  : Icon(
-                                    Icons.add_circle_outline,
-                                    color: colorScheme.onSurfaceVariant,
-                                  ),
-                          tooltip:
-                              isFollowed
-                                  ? l10n.unfollowCategoryTooltip(category.name)
-                                  : l10n.followCategoryTooltip(category.name),
+                          icon: isFollowed
+                              ? Icon(
+                                  Icons.check_circle,
+                                  color: colorScheme.primary,
+                                )
+                              : Icon(
+                                  Icons.add_circle_outline,
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                          tooltip: isFollowed
+                              ? l10n.unfollowCategoryTooltip(category.name)
+                              : l10n.followCategoryTooltip(category.name),
                           onPressed: () {
                             context.read<AccountBloc>().add(
                               AccountFollowCategoryToggled(category: category),

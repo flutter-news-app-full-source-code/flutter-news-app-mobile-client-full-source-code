@@ -152,10 +152,9 @@ class _CategoryFilterPageState extends State<CategoryFilterPage> {
         state.categories.isEmpty) {
       return FailureStateWidget(
         message: state.error?.toString() ?? l10n.unknownError,
-        onRetry:
-            () => context.read<CategoriesFilterBloc>().add(
-              CategoriesFilterRequested(),
-            ),
+        onRetry: () => context.read<CategoriesFilterBloc>().add(
+          CategoriesFilterRequested(),
+        ),
       );
     }
 
@@ -213,40 +212,36 @@ class _CategoryFilterPageState extends State<CategoryFilterPage> {
 
         return CheckboxListTile(
           title: Text(category.name, style: textTheme.titleMedium),
-          secondary:
-              category.iconUrl != null
-                  ? SizedBox(
-                    width: AppSpacing.xl + AppSpacing.sm, // 40 -> 32
-                    height: AppSpacing.xl + AppSpacing.sm,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(AppSpacing.xs),
-                      child: Image.network(
-                        category.iconUrl!,
-                        fit: BoxFit.contain,
-                        errorBuilder:
-                            (context, error, stackTrace) => Icon(
-                              Icons.category_outlined, // Use outlined
-                              color:
-                                  colorScheme.onSurfaceVariant, // Theme color
-                              size: AppSpacing.xl,
-                            ),
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Center(
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              value:
-                                  loadingProgress.expectedTotalBytes != null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                          loadingProgress.expectedTotalBytes!
-                                      : null,
-                            ),
-                          );
-                        },
+          secondary: category.iconUrl != null
+              ? SizedBox(
+                  width: AppSpacing.xl + AppSpacing.sm, // 40 -> 32
+                  height: AppSpacing.xl + AppSpacing.sm,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(AppSpacing.xs),
+                    child: Image.network(
+                      category.iconUrl!,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => Icon(
+                        Icons.category_outlined, // Use outlined
+                        color: colorScheme.onSurfaceVariant, // Theme color
+                        size: AppSpacing.xl,
                       ),
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                : null,
+                          ),
+                        );
+                      },
                     ),
-                  )
-                  : null,
+                  ),
+                )
+              : null,
           value: isSelected,
           onChanged: (bool? value) {
             setState(() {

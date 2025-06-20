@@ -19,11 +19,10 @@ class AddSourceToFollowPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return BlocProvider(
-      create:
-          (context) => SourcesFilterBloc(
-            sourcesRepository: context.read<HtDataRepository<Source>>(),
-            countriesRepository: context.read<HtDataRepository<Country>>(),
-          )..add(const LoadSourceFilterData()),
+      create: (context) => SourcesFilterBloc(
+        sourcesRepository: context.read<HtDataRepository<Source>>(),
+        countriesRepository: context.read<HtDataRepository<Country>>(),
+      )..add(const LoadSourceFilterData()),
       child: Scaffold(
         appBar: AppBar(title: Text(l10n.addSourcesPageTitle)),
         body: BlocBuilder<SourcesFilterBloc, SourcesFilterState>(
@@ -38,10 +37,9 @@ class AddSourceToFollowPage extends StatelessWidget {
                 SourceFilterDataLoadingStatus.failure) {
               return FailureStateWidget(
                 message: sourcesState.errorMessage ?? l10n.sourceFilterError,
-                onRetry:
-                    () => context.read<SourcesFilterBloc>().add(
-                      const LoadSourceFilterData(),
-                    ),
+                onRetry: () => context.read<SourcesFilterBloc>().add(
+                  const LoadSourceFilterData(),
+                ),
               );
             }
             if (sourcesState.allAvailableSources.isEmpty) {
@@ -51,11 +49,10 @@ class AddSourceToFollowPage extends StatelessWidget {
             }
 
             return BlocBuilder<AccountBloc, AccountState>(
-              buildWhen:
-                  (previous, current) =>
-                      previous.preferences?.followedSources !=
-                          current.preferences?.followedSources ||
-                      previous.status != current.status,
+              buildWhen: (previous, current) =>
+                  previous.preferences?.followedSources !=
+                      current.preferences?.followedSources ||
+                  previous.status != current.status,
               builder: (context, accountState) {
                 final followedSources =
                     accountState.preferences?.followedSources ?? [];
@@ -74,18 +71,15 @@ class AddSourceToFollowPage extends StatelessWidget {
                       child: ListTile(
                         title: Text(source.name),
                         trailing: IconButton(
-                          icon:
-                              isFollowed
-                                  ? Icon(
-                                    Icons.check_circle,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  )
-                                  : const Icon(Icons.add_circle_outline),
-                          tooltip:
-                              isFollowed
-                                  ? l10n.unfollowSourceTooltip(source.name)
-                                  : l10n.followSourceTooltip(source.name),
+                          icon: isFollowed
+                              ? Icon(
+                                  Icons.check_circle,
+                                  color: Theme.of(context).colorScheme.primary,
+                                )
+                              : const Icon(Icons.add_circle_outline),
+                          tooltip: isFollowed
+                              ? l10n.unfollowSourceTooltip(source.name)
+                              : l10n.followSourceTooltip(source.name),
                           onPressed: () {
                             context.read<AccountBloc>().add(
                               AccountFollowSourceToggled(source: source),

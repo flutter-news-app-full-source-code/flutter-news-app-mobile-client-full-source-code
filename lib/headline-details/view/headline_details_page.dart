@@ -190,10 +190,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
         isSaved ? Icons.bookmark : Icons.bookmark_border_outlined,
         color: colorScheme.primary, // Ensure icon color from theme
       ),
-      tooltip:
-          isSaved
-              ? l10n.headlineDetailsRemoveFromSavedTooltip
-              : l10n.headlineDetailsSaveTooltip,
+      tooltip: isSaved
+          ? l10n.headlineDetailsRemoveFromSavedTooltip
+          : l10n.headlineDetailsSaveTooltip,
       onPressed: () {
         context.read<AccountBloc>().add(
           AccountSaveHeadlineToggled(headline: headline),
@@ -306,15 +305,14 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                         ),
                       );
                     },
-                    errorBuilder:
-                        (context, error, stackTrace) => ColoredBox(
-                          color: colorScheme.surfaceContainerHighest,
-                          child: Icon(
-                            Icons.broken_image_outlined,
-                            color: colorScheme.onSurfaceVariant,
-                            size: AppSpacing.xxl * 1.5, // Larger placeholder
-                          ),
-                        ),
+                    errorBuilder: (context, error, stackTrace) => ColoredBox(
+                      color: colorScheme.surfaceContainerHighest,
+                      child: Icon(
+                        Icons.broken_image_outlined,
+                        color: colorScheme.onSurfaceVariant,
+                        size: AppSpacing.xxl * 1.5, // Larger placeholder
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -407,10 +405,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           sliver: SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.only(
-                top:
-                    (headline.url != null && headline.url!.isNotEmpty)
-                        ? AppSpacing.sm
-                        : AppSpacing.xl,
+                top: (headline.url != null && headline.url!.isNotEmpty)
+                    ? AppSpacing.sm
+                    : AppSpacing.xl,
                 bottom: AppSpacing.md,
               ),
               child: Text(
@@ -584,54 +581,49 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           final SimilarHeadlinesLoaded loadedState => SliverPadding(
             padding: hPadding.copyWith(bottom: AppSpacing.xxl),
             sliver: SliverList.separated(
-              separatorBuilder:
-                  (context, index) => const SizedBox(
-                    height: AppSpacing.sm,
-                  ), // Spacing between items
+              separatorBuilder: (context, index) => const SizedBox(
+                height: AppSpacing.sm,
+              ), // Spacing between items
               itemCount: loadedState.similarHeadlines.length,
               itemBuilder: (context, index) {
                 // Corrected: SliverList.separated uses itemBuilder
                 final similarHeadline = loadedState.similarHeadlines[index];
                 return Builder(
                   builder: (context) {
-                    final imageStyle =
-                        context
-                            .watch<AppBloc>()
-                            .state
-                            .settings
-                            .feedPreferences
-                            .headlineImageStyle;
+                    final imageStyle = context
+                        .watch<AppBloc>()
+                        .state
+                        .settings
+                        .feedPreferences
+                        .headlineImageStyle;
                     Widget tile;
                     switch (imageStyle) {
                       case HeadlineImageStyle.hidden:
                         tile = HeadlineTileTextOnly(
                           headline: similarHeadline,
-                          onHeadlineTap:
-                              () => context.pushNamed(
-                                Routes.globalArticleDetailsName,
-                                pathParameters: {'id': similarHeadline.id},
-                                extra: similarHeadline,
-                              ),
+                          onHeadlineTap: () => context.pushNamed(
+                            Routes.globalArticleDetailsName,
+                            pathParameters: {'id': similarHeadline.id},
+                            extra: similarHeadline,
+                          ),
                         );
                       case HeadlineImageStyle.smallThumbnail:
                         tile = HeadlineTileImageStart(
                           headline: similarHeadline,
-                          onHeadlineTap:
-                              () => context.pushNamed(
-                                Routes.globalArticleDetailsName,
-                                pathParameters: {'id': similarHeadline.id},
-                                extra: similarHeadline,
-                              ),
+                          onHeadlineTap: () => context.pushNamed(
+                            Routes.globalArticleDetailsName,
+                            pathParameters: {'id': similarHeadline.id},
+                            extra: similarHeadline,
+                          ),
                         );
                       case HeadlineImageStyle.largeThumbnail:
                         tile = HeadlineTileImageTop(
                           headline: similarHeadline,
-                          onHeadlineTap:
-                              () => context.pushNamed(
-                                Routes.globalArticleDetailsName,
-                                pathParameters: {'id': similarHeadline.id},
-                                extra: similarHeadline,
-                              ),
+                          onHeadlineTap: () => context.pushNamed(
+                            Routes.globalArticleDetailsName,
+                            pathParameters: {'id': similarHeadline.id},
+                            extra: similarHeadline,
+                          ),
                         );
                     }
                     return tile;

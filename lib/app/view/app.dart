@@ -75,21 +75,18 @@ class App extends StatelessWidget {
         providers: [
           BlocProvider(
             // AppBloc constructor needs refactoring in Step 4
-            create:
-                (context) => AppBloc(
-                  authenticationRepository: context.read<HtAuthRepository>(),
-                  userAppSettingsRepository:
-                      context.read<HtDataRepository<UserAppSettings>>(),
-                  appConfigRepository:
-                      context.read<HtDataRepository<AppConfig>>(),
-                  environment: _environment, // Pass environment
-                ),
+            create: (context) => AppBloc(
+              authenticationRepository: context.read<HtAuthRepository>(),
+              userAppSettingsRepository: context
+                  .read<HtDataRepository<UserAppSettings>>(),
+              appConfigRepository: context.read<HtDataRepository<AppConfig>>(),
+              environment: _environment, // Pass environment
+            ),
           ),
           BlocProvider(
-            create:
-                (context) => AuthenticationBloc(
-                  authenticationRepository: context.read<HtAuthRepository>(),
-                ),
+            create: (context) => AuthenticationBloc(
+              authenticationRepository: context.read<HtAuthRepository>(),
+            ),
           ),
         ],
         child: _AppView(
@@ -206,9 +203,8 @@ class _AppViewState extends State<_AppView> {
                 appFontWeight: AppFontWeight.regular, // Default
                 fontFamily: null, // System default font
               ),
-              themeMode:
-                  state
-                      .themeMode, // Still respect light/dark if available from system
+              themeMode: state
+                  .themeMode, // Still respect light/dark if available from system
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(

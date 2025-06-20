@@ -43,14 +43,14 @@ class SimilarHeadlinesBloc
       );
 
       // Filter out the current headline from the results
-      final similarHeadlines =
-          response.items
-              .where((headline) => headline.id != currentHeadline.id)
-              .toList();
+      final similarHeadlines = response.items
+          .where((headline) => headline.id != currentHeadline.id)
+          .toList();
 
       // Take only the required limit after filtering
-      final finalSimilarHeadlines =
-          similarHeadlines.take(_similarHeadlinesLimit).toList();
+      final finalSimilarHeadlines = similarHeadlines
+          .take(_similarHeadlinesLimit)
+          .toList();
 
       if (finalSimilarHeadlines.isEmpty) {
         emit(SimilarHeadlinesEmpty());

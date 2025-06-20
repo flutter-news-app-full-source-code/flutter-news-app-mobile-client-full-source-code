@@ -33,8 +33,8 @@ class SourceFilterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create:
-          (context) => SourcesFilterBloc(
+      create: (context) =>
+          SourcesFilterBloc(
             sourcesRepository: context.read<HtDataRepository<Source>>(),
             countriesRepository: context.read<HtDataRepository<Country>>(),
           )..add(
@@ -79,12 +79,9 @@ class _SourceFilterView extends StatelessWidget {
             icon: const Icon(Icons.check),
             tooltip: l10n.headlinesFeedFilterApplyButton,
             onPressed: () {
-              final selectedSources =
-                  state.displayableSources
-                      .where(
-                        (s) => state.finallySelectedSourceIds.contains(s.id),
-                      )
-                      .toList();
+              final selectedSources = state.displayableSources
+                  .where((s) => state.finallySelectedSourceIds.contains(s.id))
+                  .toList();
               // Pop with a map containing all relevant filter state
               Navigator.of(context).pop({
                 keySelectedSources: selectedSources,
@@ -174,8 +171,8 @@ class _SourceFilterView extends StatelessWidget {
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: state.availableCountries.length + 1,
-              separatorBuilder:
-                  (context, index) => const SizedBox(width: AppSpacing.sm),
+              separatorBuilder: (context, index) =>
+                  const SizedBox(width: AppSpacing.sm),
               itemBuilder: (context, index) {
                 if (index == 0) {
                   return ChoiceChip(
@@ -191,13 +188,12 @@ class _SourceFilterView extends StatelessWidget {
                 }
                 final country = state.availableCountries[index - 1];
                 return ChoiceChip(
-                  avatar:
-                      country.flagUrl.isNotEmpty
-                          ? CircleAvatar(
-                            backgroundImage: NetworkImage(country.flagUrl),
-                            radius: AppSpacing.sm + AppSpacing.xs,
-                          )
-                          : null,
+                  avatar: country.flagUrl.isNotEmpty
+                      ? CircleAvatar(
+                          backgroundImage: NetworkImage(country.flagUrl),
+                          radius: AppSpacing.sm + AppSpacing.xs,
+                        )
+                      : null,
                   label: Text(country.name),
                   labelStyle: textTheme.labelLarge,
                   selected: state.selectedCountryIsoCodes.contains(
@@ -239,8 +235,8 @@ class _SourceFilterView extends StatelessWidget {
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: state.availableSourceTypes.length + 1,
-              separatorBuilder:
-                  (context, index) => const SizedBox(width: AppSpacing.sm),
+              separatorBuilder: (context, index) =>
+                  const SizedBox(width: AppSpacing.sm),
               itemBuilder: (context, index) {
                 if (index == 0) {
                   return ChoiceChip(

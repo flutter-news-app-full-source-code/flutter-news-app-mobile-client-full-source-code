@@ -202,18 +202,17 @@ class _EmailCodeVerificationFormState
               textStyle: textTheme.labelLarge,
             ),
             onPressed: widget.isLoading ? null : _submitForm,
-            child:
-                widget.isLoading
-                    ? const SizedBox(
-                      height: AppSpacing.xl, // Consistent size with text
-                      width: AppSpacing.xl,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color:
-                            Colors.white, // Explicit color for loader on button
-                      ),
-                    )
-                    : Text(l10n.emailCodeVerificationButtonLabel),
+            child: widget.isLoading
+                ? const SizedBox(
+                    height: AppSpacing.xl, // Consistent size with text
+                    width: AppSpacing.xl,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color:
+                          Colors.white, // Explicit color for loader on button
+                    ),
+                  )
+                : Text(l10n.emailCodeVerificationButtonLabel),
           ),
         ],
       ),

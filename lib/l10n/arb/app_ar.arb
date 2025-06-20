@@ -246,11 +246,11 @@
     "@authenticationLinkingSubheadline": {
         "description": "عنوان فرعي يشرح فائدة ربط حساب مجهول"
     },
-    "authenticationSignInHeadline": "تسجيل الدخول",
+    "authenticationSignInHeadline": "هادلاينز تولكيت",
     "@authenticationSignInHeadline": {
         "description": "عنوان صفحة المصادقة أثناء تسجيل الدخول القياسي"
     },
-    "authenticationSignInSubheadline": "سجل الدخول أو تابع كمجهول لتخصيص موجز الأخبار الخاص بك.",
+    "authenticationSignInSubheadline": "طور التطبيقات الإخبارية بسرعة وبشكل موثوق.",
     "@authenticationSignInSubheadline": {
         "description": "عنوان فرعي لصفحة المصادقة أثناء تسجيل الدخول القياسي"
     },

@@ -461,13 +461,13 @@ abstract class AppLocalizations {
   /// Headline for the authentication page during standard sign-in
   ///
   /// In en, this message translates to:
-  /// **'Sign In'**
+  /// **'Headlines Toolkit'**
   String get authenticationSignInHeadline;
 
   /// Subheadline for the authentication page during standard sign-in
   ///
   /// In en, this message translates to:
-  /// **'Sign in or continue anonymously to personalize your feed.'**
+  /// **'Develop News Headlines Apps Rapidly & Reliably.'**
   String get authenticationSignInSubheadline;
 
   /// AppBar title for the email sign-in page

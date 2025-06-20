@@ -246,11 +246,11 @@
     "@authenticationLinkingSubheadline": {
         "description": "Subheadline explaining the benefit of linking an anonymous account"
     },
-    "authenticationSignInHeadline": "Sign In",
+    "authenticationSignInHeadline": "Headlines Toolkit",
     "@authenticationSignInHeadline": {
         "description": "Headline for the authentication page during standard sign-in"
     },
-    "authenticationSignInSubheadline": "Sign in or continue anonymously to personalize your feed.",
+    "authenticationSignInSubheadline": "Develop News Headlines Apps Rapidly & Reliably.",
     "@authenticationSignInSubheadline": {
         "description": "Subheadline for the authentication page during standard sign-in"
     },

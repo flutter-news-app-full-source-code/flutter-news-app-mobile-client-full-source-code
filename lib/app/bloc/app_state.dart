@@ -1,8 +1,5 @@
 part of 'app_bloc.dart';
 
-import 'package:ht_main/app/config/config.dart' as local_config;
-import 'package:ht_shared/ht_shared.dart' show AppConfig, UserAppSettings; // For AppConfig
-
 /// Represents the application's authentication status.
 enum AppStatus {
   /// The application is initializing and the status is unknown.

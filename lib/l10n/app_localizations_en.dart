@@ -707,4 +707,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get followedCategoriesEmptySubheadline =>
       'Start following categories to see them here.';
+
+  @override
+  String demoVerificationCodeMessage(String code) {
+    return 'Demo Mode: Use code $code';
+  }
 }

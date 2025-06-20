@@ -1381,6 +1381,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Start following categories to see them here.'**
   String get followedCategoriesEmptySubheadline;
+
+  /// Message shown in demo mode to provide the verification code
+  ///
+  /// In en, this message translates to:
+  /// **'Demo Mode: Use code {code}'**
+  String demoVerificationCodeMessage(String code);
 }
 
 class _AppLocalizationsDelegate

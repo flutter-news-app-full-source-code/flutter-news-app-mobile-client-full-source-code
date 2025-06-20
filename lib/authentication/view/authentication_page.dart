@@ -99,7 +99,7 @@ class AuthenticationPage extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(bottom: AppSpacing.xl),
                         child: Icon(
-                          Icons.security,
+                          isLinkingContext ? Icons.sync : Icons.newspaper,
                           size: AppSpacing.xxl * 2, // Standardized large icon
                           color: colorScheme.primary,
                         ),

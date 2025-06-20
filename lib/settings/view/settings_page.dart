@@ -101,12 +101,12 @@ class SettingsPage extends StatelessWidget {
                 onTap: () => context.goNamed(Routes.settingsFeedName),
               ),
               const Divider(indent: AppSpacing.lg, endIndent: AppSpacing.lg),
-              _buildSettingsTile(
-                context: context,
-                icon: Icons.notifications_outlined,
-                title: l10n.settingsNotificationsTitle, // Add l10n key
-                onTap: () => context.goNamed(Routes.settingsNotificationsName),
-              ),
+              // _buildSettingsTile(
+              //   context: context,
+              //   icon: Icons.notifications_outlined,
+              //   title: l10n.settingsNotificationsTitle,
+              //   onTap: () => context.goNamed(Routes.settingsNotificationsName),
+              // ),
             ],
           );
         },

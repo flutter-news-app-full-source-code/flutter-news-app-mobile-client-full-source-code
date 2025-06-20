@@ -190,18 +190,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authenticationEmailSignInButton => 'متابعة بالبريد الإلكتروني';
 
   @override
-  String get authenticationLinkingHeadline => 'ربط حسابك';
+  String get authenticationLinkingHeadline => 'زامن بياناتك';
 
   @override
   String get authenticationLinkingSubheadline =>
-      'سجل الدخول باستخدام جوجل أو البريد الإلكتروني لحفظ تفضيلاتك وسجل القراءة عبر الأجهزة.';
+      'إحفظ إعداداتك، تفضيلات المحتوى والمزيد عبر مختلف الأجهزة.';
 
   @override
-  String get authenticationSignInHeadline => 'تسجيل الدخول';
+  String get authenticationSignInHeadline => 'هادلاينز تولكيت';
 
   @override
   String get authenticationSignInSubheadline =>
-      'سجل الدخول أو تابع كمجهول لتخصيص موجز الأخبار الخاص بك.';
+      'طور التطبيقات الإخبارية بسرعة وبشكل موثوق.';
 
   @override
   String get emailSignInPageTitle => 'تسجيل الدخول بالبريد الإلكتروني';

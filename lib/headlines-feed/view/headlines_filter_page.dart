@@ -272,7 +272,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
         title: Text(l10n.headlinesFeedFilterTitle),
         actions: [
           IconButton(
-            icon: const Icon(Icons.clear_all),
+            icon: const Icon(Icons.refresh),
             tooltip: l10n.headlinesFeedFilterResetButton,
             onPressed: () {
               context.read<HeadlinesFeedBloc>().add(

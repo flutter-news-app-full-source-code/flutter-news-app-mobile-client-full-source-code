@@ -238,19 +238,19 @@
     "@authenticationEmailSignInButton": {
         "description": "نص زر بدء تدفق تسجيل الدخول بالبريد الإلكتروني"
     },
-    "authenticationLinkingHeadline": "ربط حسابك",
+    "authenticationLinkingHeadline": "زامن بياناتك",
     "@authenticationLinkingHeadline": {
         "description": "عنوان صفحة المصادقة عند ربط حساب مجهول"
     },
-    "authenticationLinkingSubheadline": "سجل الدخول باستخدام جوجل أو البريد الإلكتروني لحفظ تفضيلاتك وسجل القراءة عبر الأجهزة.",
+    "authenticationLinkingSubheadline": "إحفظ إعداداتك، تفضيلات المحتوى والمزيد عبر مختلف الأجهزة.",
     "@authenticationLinkingSubheadline": {
         "description": "عنوان فرعي يشرح فائدة ربط حساب مجهول"
     },
-    "authenticationSignInHeadline": "تسجيل الدخول",
+    "authenticationSignInHeadline": "هادلاينز تولكيت",
     "@authenticationSignInHeadline": {
         "description": "عنوان صفحة المصادقة أثناء تسجيل الدخول القياسي"
     },
-    "authenticationSignInSubheadline": "سجل الدخول أو تابع كمجهول لتخصيص موجز الأخبار الخاص بك.",
+    "authenticationSignInSubheadline": "طور التطبيقات الإخبارية بسرعة وبشكل موثوق.",
     "@authenticationSignInSubheadline": {
         "description": "عنوان فرعي لصفحة المصادقة أثناء تسجيل الدخول القياسي"
     },

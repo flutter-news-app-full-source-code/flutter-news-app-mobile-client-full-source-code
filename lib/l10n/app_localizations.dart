@@ -449,25 +449,25 @@ abstract class AppLocalizations {
   /// Headline for the authentication page when linking an anonymous account
   ///
   /// In en, this message translates to:
-  /// **'Connect Your Account'**
+  /// **'Sync Your Data'**
   String get authenticationLinkingHeadline;
 
   /// Subheadline explaining the benefit of linking an anonymous account
   ///
   /// In en, this message translates to:
-  /// **'Sign in with Google or Email to save your preferences and reading history across devices.'**
+  /// **'save your settings, content preferences and more across devices.'**
   String get authenticationLinkingSubheadline;
 
   /// Headline for the authentication page during standard sign-in
   ///
   /// In en, this message translates to:
-  /// **'Sign In'**
+  /// **'Headlines Toolkit'**
   String get authenticationSignInHeadline;
 
   /// Subheadline for the authentication page during standard sign-in
   ///
   /// In en, this message translates to:
-  /// **'Sign in or continue anonymously to personalize your feed.'**
+  /// **'Develop News Headlines Apps Rapidly & Reliably.'**
   String get authenticationSignInSubheadline;
 
   /// AppBar title for the email sign-in page

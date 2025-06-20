@@ -192,18 +192,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authenticationEmailSignInButton => 'Continue with Email';
 
   @override
-  String get authenticationLinkingHeadline => 'Connect Your Account';
+  String get authenticationLinkingHeadline => 'Sync Your Data';
 
   @override
   String get authenticationLinkingSubheadline =>
-      'Sign in with Google or Email to save your preferences and reading history across devices.';
+      'save your settings, content preferences and more across devices.';
 
   @override
-  String get authenticationSignInHeadline => 'Sign In';
+  String get authenticationSignInHeadline => 'Headlines Toolkit';
 
   @override
   String get authenticationSignInSubheadline =>
-      'Sign in or continue anonymously to personalize your feed.';
+      'Develop News Headlines Apps Rapidly & Reliably.';
 
   @override
   String get emailSignInPageTitle => 'Sign in with Email';

@@ -90,15 +90,15 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
           style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            tooltip: l10n.notificationsTooltip, // Add tooltip for accessibility
-            onPressed: () {
-              context.goNamed(
-                Routes.notificationsName,
-              ); // Ensure correct route name
-            },
-          ),
+          // IconButton(
+          //   icon: const Icon(Icons.notifications_outlined),
+          //   tooltip: l10n.notificationsTooltip, // Add tooltip for accessibility
+          //   onPressed: () {
+          //     context.goNamed(
+          //       Routes.notificationsName,
+          //     ); // Ensure correct route name
+          //   },
+          // ),
           BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
             builder: (context, state) {
               var isFilterApplied = false;

@@ -238,11 +238,11 @@
     "@authenticationEmailSignInButton": {
         "description": "نص زر بدء تدفق تسجيل الدخول بالبريد الإلكتروني"
     },
-    "authenticationLinkingHeadline": "ربط حسابك",
+    "authenticationLinkingHeadline": "زامن بياناتك",
     "@authenticationLinkingHeadline": {
         "description": "عنوان صفحة المصادقة عند ربط حساب مجهول"
     },
-    "authenticationLinkingSubheadline": "سجل الدخول باستخدام جوجل أو البريد الإلكتروني لحفظ تفضيلاتك وسجل القراءة عبر الأجهزة.",
+    "authenticationLinkingSubheadline": "إحفظ إعداداتك، تفضيلات المحتوى والمزيد عبر الأجهزة.",
     "@authenticationLinkingSubheadline": {
         "description": "عنوان فرعي يشرح فائدة ربط حساب مجهول"
     },

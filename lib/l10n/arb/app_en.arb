@@ -238,11 +238,11 @@
     "@authenticationEmailSignInButton": {
         "description": "Button text for initiating email sign-in flow"
     },
-    "authenticationLinkingHeadline": "Connect Your Account",
+    "authenticationLinkingHeadline": "Sync Your Data",
     "@authenticationLinkingHeadline": {
         "description": "Headline for the authentication page when linking an anonymous account"
     },
-    "authenticationLinkingSubheadline": "Sign in with Google or Email to save your preferences and reading history across devices.",
+    "authenticationLinkingSubheadline": "save your settings, content preferences and more across devices.",
     "@authenticationLinkingSubheadline": {
         "description": "Subheadline explaining the benefit of linking an anonymous account"
     },

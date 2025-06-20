@@ -130,17 +130,17 @@ class AccountPage extends StatelessWidget {
       statusWidget = Column(
         mainAxisSize: MainAxisSize.min, // To keep column tight
         children: [
-          if (user?.role != null) ...[
-            // Show role only if available
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              l10n.accountRoleLabel(user!.role.name),
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
+          // if (user?.role != null) ...[
+          //   // Show role only if available
+          //   const SizedBox(height: AppSpacing.xs),
+          //   Text(
+          //     l10n.accountRoleLabel(user!.role.name),
+          //     style: textTheme.bodyMedium?.copyWith(
+          //       color: colorScheme.onSurfaceVariant,
+          //     ),
+          //     textAlign: TextAlign.center,
+          //   ),
+          // ],
           const SizedBox(height: AppSpacing.md), // Consistent spacing
           OutlinedButton.icon(
             // Changed to OutlinedButton.icon

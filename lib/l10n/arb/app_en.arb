@@ -911,5 +911,15 @@
     "followedCategoriesEmptySubheadline": "Start following categories to see them here.",
     "@followedCategoriesEmptySubheadline": {
         "description": "Subheadline for empty state on followed categories page"
+    },
+     "demoVerificationCodeMessage": "Demo Mode: Use code {code}",
+    "@demoVerificationCodeMessage": {
+        "description": "Message shown in demo mode to provide the verification code",
+        "placeholders": {
+            "code": {
+                "type": "String",
+                "example": "123456"
+            }
+        }
     }
 }

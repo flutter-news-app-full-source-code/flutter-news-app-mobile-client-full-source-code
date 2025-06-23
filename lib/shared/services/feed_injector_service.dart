@@ -108,11 +108,16 @@ class FeedInjectorService {
     if (userRole == UserRole.guestUser) {
       daysThreshold = daysBetweenActionsConfig.guestDaysBetweenAccountActions;
       actionType = AccountActionType.linkAccount;
-    } else if (userRole == UserRole.standardUser) {
-      // Assuming standardUser is the target for upgrade prompts
+    } else if (userRole == UserRole.standardUser) {      
       daysThreshold =
           daysBetweenActionsConfig.standardUserDaysBetweenAccountActions;
-      actionType = AccountActionType.upgrade;
+      
+      // todo(fulleni): once account upgrade feature is implemented, 
+      // uncomment the action type line
+      // and remove teh null return line.
+      
+      // actionType = AccountActionType.upgrade;
+      return null;
     } else {
       // No account actions for premium users or other roles for now
       return null;

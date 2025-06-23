@@ -1,9 +1,9 @@
 name: deploy
 
-# Run this workflow when a push is made to the main branch
+# Run this workflow when a new release is published
 on:
-  push:
-    branches: [ main ] 
+  release:
+    types: [published]
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest # Use the latest version of Ubuntu

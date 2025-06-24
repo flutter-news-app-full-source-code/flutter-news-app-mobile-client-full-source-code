@@ -43,11 +43,32 @@ class DemoDataMigrationService {
         userId: oldUserId,
       );
       final newSettings = oldSettings.copyWith(id: newUserId);
-      await _userAppSettingsRepository.update(
-        id: newUserId,
-        item: newSettings,
-        userId: newUserId,
-      );
+
+      try {
+        // Attempt to update first (if a default entry already exists)
+        await _userAppSettingsRepository.update(
+          id: newUserId,
+          item: newSettings,
+          userId: newUserId,
+        );
+      } on NotFoundException {
+        // If update fails because item not found, try to create
+        try {
+          await _userAppSettingsRepository.create(
+            item: newSettings,
+            userId: newUserId,
+          );
+        } on ConflictException {
+          // If create fails due to conflict (item was created concurrently),
+          // re-attempt update. This handles a race condition.
+          await _userAppSettingsRepository.update(
+            id: newUserId,
+            item: newSettings,
+            userId: newUserId,
+          );
+        }
+      }
+
       await _userAppSettingsRepository.delete(
         id: oldUserId,
         userId: oldUserId,
@@ -75,11 +96,32 @@ class DemoDataMigrationService {
         userId: oldUserId,
       );
       final newPreferences = oldPreferences.copyWith(id: newUserId);
-      await _userContentPreferencesRepository.update(
-        id: newUserId,
-        item: newPreferences,
-        userId: newUserId,
-      );
+
+      try {
+        // Attempt to update first (if a default entry already exists)
+        await _userContentPreferencesRepository.update(
+          id: newUserId,
+          item: newPreferences,
+          userId: newUserId,
+        );
+      } on NotFoundException {
+        // If update fails because item not found, try to create
+        try {
+          await _userContentPreferencesRepository.create(
+            item: newPreferences,
+            userId: newUserId,
+          );
+        } on ConflictException {
+          // If create fails due to conflict (item was created concurrently),
+          // re-attempt update. This handles a race condition.
+          await _userContentPreferencesRepository.update(
+            id: newUserId,
+            item: newPreferences,
+            userId: newUserId,
+          );
+        }
+      }
+
       await _userContentPreferencesRepository.delete(
         id: oldUserId,
         userId: oldUserId,

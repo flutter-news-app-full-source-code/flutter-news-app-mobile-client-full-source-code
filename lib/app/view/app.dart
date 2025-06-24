@@ -14,10 +14,11 @@ import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/l10n/app_localizations.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/router.dart';
+import 'package:ht_main/shared/services/demo_data_migration_service.dart';
 import 'package:ht_main/shared/theme/app_theme.dart';
-import 'package:ht_main/shared/widgets/failure_state_widget.dart'; // Added
-import 'package:ht_main/shared/widgets/loading_state_widget.dart'; // Added
-import 'package:ht_shared/ht_shared.dart'; // Shared models, FromJson, ToJson, etc.
+import 'package:ht_main/shared/widgets/failure_state_widget.dart';
+import 'package:ht_main/shared/widgets/loading_state_widget.dart';
+import 'package:ht_shared/ht_shared.dart';
 
 class App extends StatelessWidget {
   const App({
@@ -28,21 +29,22 @@ class App extends StatelessWidget {
     required HtDataRepository<Source> htSourcesRepository,
     required HtDataRepository<UserAppSettings> htUserAppSettingsRepository,
     required HtDataRepository<UserContentPreferences>
-    htUserContentPreferencesRepository,
+        htUserContentPreferencesRepository,
     required HtDataRepository<AppConfig> htAppConfigRepository,
     required HtKVStorageService kvStorageService,
-    required AppEnvironment environment, // Added
+    required AppEnvironment environment,
+    this.demoDataMigrationService,
     super.key,
-  }) : _htAuthenticationRepository = htAuthenticationRepository,
-       _htHeadlinesRepository = htHeadlinesRepository,
-       _htCategoriesRepository = htCategoriesRepository,
-       _htCountriesRepository = htCountriesRepository,
-       _htSourcesRepository = htSourcesRepository,
-       _htUserAppSettingsRepository = htUserAppSettingsRepository,
-       _htUserContentPreferencesRepository = htUserContentPreferencesRepository,
-       _htAppConfigRepository = htAppConfigRepository,
-       _kvStorageService = kvStorageService,
-       _environment = environment; // Added
+  })  : _htAuthenticationRepository = htAuthenticationRepository,
+        _htHeadlinesRepository = htHeadlinesRepository,
+        _htCategoriesRepository = htCategoriesRepository,
+        _htCountriesRepository = htCountriesRepository,
+        _htSourcesRepository = htSourcesRepository,
+        _htUserAppSettingsRepository = htUserAppSettingsRepository,
+        _htUserContentPreferencesRepository = htUserContentPreferencesRepository,
+        _htAppConfigRepository = htAppConfigRepository,
+        _kvStorageService = kvStorageService,
+        _environment = environment;
 
   final HtAuthRepository _htAuthenticationRepository;
   final HtDataRepository<Headline> _htHeadlinesRepository;
@@ -51,10 +53,11 @@ class App extends StatelessWidget {
   final HtDataRepository<Source> _htSourcesRepository;
   final HtDataRepository<UserAppSettings> _htUserAppSettingsRepository;
   final HtDataRepository<UserContentPreferences>
-  _htUserContentPreferencesRepository;
+      _htUserContentPreferencesRepository;
   final HtDataRepository<AppConfig> _htAppConfigRepository;
   final HtKVStorageService _kvStorageService;
-  final AppEnvironment _environment; // Added
+  final AppEnvironment _environment;
+  final DemoDataMigrationService? demoDataMigrationService;
 
   @override
   Widget build(BuildContext context) {
@@ -70,17 +73,16 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _htAppConfigRepository),
         RepositoryProvider.value(value: _kvStorageService),
       ],
-      // Use MultiBlocProvider to provide global BLoCs
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            // AppBloc constructor needs refactoring in Step 4
             create: (context) => AppBloc(
               authenticationRepository: context.read<HtAuthRepository>(),
-              userAppSettingsRepository: context
-                  .read<HtDataRepository<UserAppSettings>>(),
+              userAppSettingsRepository:
+                  context.read<HtDataRepository<UserAppSettings>>(),
               appConfigRepository: context.read<HtDataRepository<AppConfig>>(),
-              environment: _environment, // Pass environment
+              environment: _environment,
+              demoDataMigrationService: demoDataMigrationService,
             ),
           ),
           BlocProvider(
@@ -99,7 +101,7 @@ class App extends StatelessWidget {
           htUserContentPreferencesRepository:
               _htUserContentPreferencesRepository,
           htAppConfigRepository: _htAppConfigRepository,
-          environment: _environment, // Pass environment
+          environment: _environment,
         ),
       ),
     );

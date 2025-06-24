@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:ht_auth_repository/ht_auth_repository.dart';
 import 'package:ht_data_repository/ht_data_repository.dart';
 import 'package:ht_main/app/config/config.dart' as local_config;
+import 'package:ht_main/shared/services/demo_data_migration_service.dart';
 import 'package:ht_shared/ht_shared.dart'; // Import shared models and exceptions
 
 part 'app_event.dart';
@@ -17,18 +18,20 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required HtAuthRepository authenticationRepository,
     required HtDataRepository<UserAppSettings> userAppSettingsRepository,
     required HtDataRepository<AppConfig> appConfigRepository,
-    required local_config.AppEnvironment environment, // Added
-  }) : _authenticationRepository = authenticationRepository,
-       _userAppSettingsRepository = userAppSettingsRepository,
-       _appConfigRepository = appConfigRepository,
-       super(
-         AppState(
-           settings: const UserAppSettings(id: 'default'),
-           selectedBottomNavigationIndex: 0,
-           appConfig: null,
-           environment: environment, // Pass environment to AppState
-         ),
-       ) {
+    required local_config.AppEnvironment environment,
+    this.demoDataMigrationService, // Added
+  })  : _authenticationRepository = authenticationRepository,
+        _userAppSettingsRepository = userAppSettingsRepository,
+        _appConfigRepository = appConfigRepository,
+        _environment = environment,
+        super(
+          AppState(
+            settings: const UserAppSettings(id: 'default'),
+            selectedBottomNavigationIndex: 0,
+            appConfig: null,
+            environment: environment,
+          ),
+        ) {
     on<AppUserChanged>(_onAppUserChanged);
     on<AppSettingsRefreshed>(_onAppSettingsRefreshed);
     on<AppConfigFetchRequested>(_onAppConfigFetchRequested);
@@ -47,7 +50,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   final HtAuthRepository _authenticationRepository;
   final HtDataRepository<UserAppSettings> _userAppSettingsRepository;
-  final HtDataRepository<AppConfig> _appConfigRepository; // Added
+  final HtDataRepository<AppConfig> _appConfigRepository;
+  final local_config.AppEnvironment _environment;
+  final DemoDataMigrationService? demoDataMigrationService; // Added
   late final StreamSubscription<User?> _userSubscription;
 
   /// Handles user changes and loads initial settings once user is available.
@@ -57,13 +62,16 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   ) async {
     // Determine the AppStatus based on the user object and its role
     final AppStatus status;
+    final User? oldUser = state.user; // Capture current user before state update
+
     switch (event.user?.role) {
-      case null: // User is null (unauthenticated)
+      case null:
         status = AppStatus.unauthenticated;
       case UserRole.standardUser:
         status = AppStatus.authenticated;
-      // ignore: no_default_cases
-      default:
+      case UserRole.guestUser: // Explicitly map guestUser to anonymous
+        status = AppStatus.anonymous;
+      default: // Fallback for any other roles not explicitly handled
         status = AppStatus.anonymous;
     }
 
@@ -74,11 +82,32 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // User is present (authenticated or anonymous)
       add(const AppSettingsRefreshed()); // Load user-specific settings
       add(const AppConfigFetchRequested()); // Now attempt to fetch AppConfig
+
+      // Check for anonymous to authenticated transition for data migration
+      if (oldUser != null &&
+          oldUser.role == UserRole.guestUser &&
+          event.user!.role == UserRole.standardUser) {
+        print(
+          '[AppBloc] Anonymous user ${oldUser.id} transitioned to '
+          'authenticated user ${event.user!.id}. Attempting data migration.',
+        );
+        // Trigger data migration if service is available (i.e., in demo mode)
+        if (demoDataMigrationService != null) {
+          unawaited(
+            demoDataMigrationService!.migrateAnonymousData(
+              oldUserId: oldUser.id,
+              newUserId: event.user!.id,
+            ),
+          );
+        } else {
+          print(
+            '[AppBloc] DemoDataMigrationService not available. '
+            'Skipping client-side data migration.',
+          );
+        }
+      }
     } else {
       // User is null (unauthenticated or logged out)
-      // Clear appConfig if user is logged out, as it might be tied to auth context
-      // or simply to ensure fresh fetch on next login.
-      // Also ensure status is unauthenticated.
       emit(
         state.copyWith(
           appConfig: null,

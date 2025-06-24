@@ -16,6 +16,7 @@ import 'package:ht_main/app/config/config.dart' as app_config;
 import 'package:ht_main/bloc_observer.dart';
 import 'package:ht_main/shared/localization/ar_timeago_messages.dart';
 import 'package:ht_main/shared/localization/en_timeago_messages.dart';
+import 'package:ht_main/shared/services/demo_data_migration_service.dart';
 import 'package:ht_shared/ht_shared.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -208,6 +209,15 @@ Future<Widget> bootstrap(
     dataClient: appConfigClient,
   );
 
+  // Conditionally instantiate DemoDataMigrationService
+  final DemoDataMigrationService? demoDataMigrationService =
+      appConfig.environment == app_config.AppEnvironment.demo
+          ? DemoDataMigrationService(
+              userAppSettingsRepository: userAppSettingsRepository,
+              userContentPreferencesRepository: userContentPreferencesRepository,
+            )
+          : null;
+
   return App(
     htAuthenticationRepository: authenticationRepository,
     htHeadlinesRepository: headlinesRepository,
@@ -218,6 +228,7 @@ Future<Widget> bootstrap(
     htUserContentPreferencesRepository: userContentPreferencesRepository,
     htAppConfigRepository: appConfigRepository,
     kvStorageService: kvStorage,
-    environment: environment, // Pass environment to App
+    environment: environment,
+    demoDataMigrationService: demoDataMigrationService,
   );
 }

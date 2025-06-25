@@ -20,18 +20,18 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required HtDataRepository<AppConfig> appConfigRepository,
     required local_config.AppEnvironment environment,
     this.demoDataMigrationService, // Added
-  })  : _authenticationRepository = authenticationRepository,
-        _userAppSettingsRepository = userAppSettingsRepository,
-        _appConfigRepository = appConfigRepository,
-        _environment = environment,
-        super(
-          AppState(
-            settings: const UserAppSettings(id: 'default'),
-            selectedBottomNavigationIndex: 0,
-            appConfig: null,
-            environment: environment,
-          ),
-        ) {
+  }) : _authenticationRepository = authenticationRepository,
+       _userAppSettingsRepository = userAppSettingsRepository,
+       _appConfigRepository = appConfigRepository,
+       _environment = environment,
+       super(
+         AppState(
+           settings: const UserAppSettings(id: 'default'),
+           selectedBottomNavigationIndex: 0,
+           appConfig: null,
+           environment: environment,
+         ),
+       ) {
     on<AppUserChanged>(_onAppUserChanged);
     on<AppSettingsRefreshed>(_onAppSettingsRefreshed);
     on<AppConfigFetchRequested>(_onAppConfigFetchRequested);
@@ -62,7 +62,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   ) async {
     // Determine the AppStatus based on the user object and its role
     final AppStatus status;
-    final User? oldUser = state.user; // Capture current user before state update
+    final User? oldUser =
+        state.user; // Capture current user before state update
 
     switch (event.user?.role) {
       case null:
@@ -91,18 +92,30 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           '[AppBloc] Anonymous user ${oldUser.id} transitioned to '
           'authenticated user ${event.user!.id}. Attempting data migration.',
         );
-        // Trigger data migration if service is available (i.e., in demo mode)
-        if (demoDataMigrationService != null) {
-          unawaited(
-            demoDataMigrationService!.migrateAnonymousData(
-              oldUserId: oldUser.id,
-              newUserId: event.user!.id,
-            ),
+        // This block handles data migration specifically for the demo environment.
+        // In production/development, this logic is typically handled by the backend.
+        if (demoDataMigrationService != null &&
+            _environment == local_config.AppEnvironment.demo) {
+          print(
+            '[AppBloc] Demo mode: Awaiting data migration from anonymous '
+            'user ${oldUser.id} to authenticated user ${event.user!.id}.',
+          );
+          // Await the migration to ensure it completes before refreshing settings.
+          await demoDataMigrationService!.migrateAnonymousData(
+            oldUserId: oldUser.id,
+            newUserId: event.user!.id,
+          );
+          // After successful migration, explicitly refresh app settings
+          // to load the newly migrated data into the AppBloc's state.
+          add(const AppSettingsRefreshed());
+          print(
+            '[AppBloc] Demo mode: Data migration completed and settings '
+            'refresh triggered for user ${event.user!.id}.',
           );
         } else {
           print(
-            '[AppBloc] DemoDataMigrationService not available. '
-            'Skipping client-side data migration.',
+            '[AppBloc] DemoDataMigrationService not available or not in demo '
+            'environment. Skipping client-side data migration.',
           );
         }
       }

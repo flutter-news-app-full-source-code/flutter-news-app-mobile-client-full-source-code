@@ -22,7 +22,7 @@ import 'package:timeago/timeago.dart' as timeago;
 
 Future<Widget> bootstrap(
   app_config.AppConfig appConfig,
-  app_config.AppEnvironment environment, // Added
+  app_config.AppEnvironment environment,
 ) async {
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = const AppBlocObserver();

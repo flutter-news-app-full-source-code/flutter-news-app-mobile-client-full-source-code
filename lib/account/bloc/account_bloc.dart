@@ -15,10 +15,10 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     required HtAuthRepository authenticationRepository,
     required HtDataRepository<UserContentPreferences>
     userContentPreferencesRepository,
-    required local_config.AppEnvironment environment, // Added environment
+    required local_config.AppEnvironment environment,
   }) : _authenticationRepository = authenticationRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
-       _environment = environment, // Initialize environment
+       _environment = environment,
        super(const AccountState()) {
     // Listen to user changes from HtAuthRepository
     _userSubscription = _authenticationRepository.authStateChanges.listen((
@@ -40,7 +40,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   final HtAuthRepository _authenticationRepository;
   final HtDataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
-  final local_config.AppEnvironment _environment; // New field for environment
+  final local_config.AppEnvironment _environment;
   late StreamSubscription<User?> _userSubscription;
 
   Future<void> _onAccountUserChanged(
@@ -66,7 +66,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     try {
       final preferences = await _userContentPreferencesRepository.read(
         id: event.userId,
-        userId: event.userId, // Scope to the current user
+        userId: event.userId,
       );
       emit(
         state.copyWith(

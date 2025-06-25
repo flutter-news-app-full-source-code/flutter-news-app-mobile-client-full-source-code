@@ -8,7 +8,7 @@ import 'package:ht_auth_repository/ht_auth_repository.dart';
 import 'package:ht_data_repository/ht_data_repository.dart';
 import 'package:ht_main/app/config/config.dart' as local_config;
 import 'package:ht_main/shared/services/demo_data_migration_service.dart';
-import 'package:ht_shared/ht_shared.dart'; // Import shared models and exceptions
+import 'package:ht_shared/ht_shared.dart';
 
 part 'app_event.dart';
 part 'app_state.dart';
@@ -19,7 +19,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required HtDataRepository<UserAppSettings> userAppSettingsRepository,
     required HtDataRepository<AppConfig> appConfigRepository,
     required local_config.AppEnvironment environment,
-    this.demoDataMigrationService, // Added
+    this.demoDataMigrationService,
   }) : _authenticationRepository = authenticationRepository,
        _userAppSettingsRepository = userAppSettingsRepository,
        _appConfigRepository = appConfigRepository,
@@ -44,7 +44,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     // Listen directly to the auth state changes stream
     _userSubscription = _authenticationRepository.authStateChanges.listen(
-      (User? user) => add(AppUserChanged(user)), // Handle nullable user
+      (User? user) => add(AppUserChanged(user)),
     );
   }
 
@@ -52,7 +52,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final HtDataRepository<UserAppSettings> _userAppSettingsRepository;
   final HtDataRepository<AppConfig> _appConfigRepository;
   final local_config.AppEnvironment _environment;
-  final DemoDataMigrationService? demoDataMigrationService; // Added
+  final DemoDataMigrationService? demoDataMigrationService;
   late final StreamSubscription<User?> _userSubscription;
 
   /// Handles user changes and loads initial settings once user is available.
@@ -62,8 +62,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   ) async {
     // Determine the AppStatus based on the user object and its role
     final AppStatus status;
-    final User? oldUser =
-        state.user; // Capture current user before state update
+    final User? oldUser = state.user;
 
     switch (event.user?.role) {
       case null:
@@ -81,8 +80,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     if (event.user != null) {
       // User is present (authenticated or anonymous)
-      add(const AppSettingsRefreshed()); // Load user-specific settings
-      add(const AppConfigFetchRequested()); // Now attempt to fetch AppConfig
+      add(const AppSettingsRefreshed());
+      add(const AppConfigFetchRequested());
 
       // Check for anonymous to authenticated transition for data migration
       if (oldUser != null &&
@@ -146,7 +145,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // Use the current user's ID to fetch user-specific settings
       final userAppSettings = await _userAppSettingsRepository.read(
         id: state.user!.id,
-        userId: state.user!.id, // Scope to the current user
+        userId: state.user!.id,
       );
 
       // Map settings from UserAppSettings to AppState properties
@@ -181,8 +180,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           flexScheme: newFlexScheme,
           appTextScaleFactor: newAppTextScaleFactor,
           fontFamily: newFontFamily,
-          settings: userAppSettings, // Store the fetched settings
-          locale: newLocale, // Store the new locale
+          settings: userAppSettings,
+          locale: newLocale,
         ),
       );
     } on NotFoundException {
@@ -193,13 +192,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         state.copyWith(
           themeMode: ThemeMode.system,
           flexScheme: FlexScheme.material,
-          appTextScaleFactor: AppTextScaleFactor.medium, // Default enum value
-          locale: const Locale(
-            'en',
-          ), // Default to English if settings not found
-          settings: UserAppSettings(
-            id: state.user!.id,
-          ), // Provide default settings
+          appTextScaleFactor: AppTextScaleFactor.medium,
+          locale: const Locale('en'),
+          settings: UserAppSettings(id: state.user!.id),
         ),
       );
     } catch (e) {
@@ -207,9 +202,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // Optionally emit a failure state or log the error
       print('Error loading user app settings in AppBloc: $e');
       // Keep the existing theme/font state on error, but ensure settings is not null
-      emit(
-        state.copyWith(settings: state.settings),
-      ); // Ensure settings is present
+      emit(state.copyWith(settings: state.settings));
     }
   }
 
@@ -245,8 +238,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             ? AppAccentTheme.defaultBlue
             : (event.flexScheme == FlexScheme.red
                   ? AppAccentTheme.newsRed
-                  : AppAccentTheme
-                        .graphiteGray), // Mapping material to graphiteGray
+                  : AppAccentTheme.graphiteGray),
       ),
     );
     emit(
@@ -263,8 +255,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // Update settings and emit new state
     final updatedSettings = state.settings.copyWith(
       displaySettings: state.settings.displaySettings.copyWith(
-        fontFamily:
-            event.fontFamily ?? 'SystemDefault', // Map null to 'SystemDefault'
+        fontFamily: event.fontFamily ?? 'SystemDefault',
       ),
     );
     emit(
@@ -314,7 +305,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       case AppAccentTheme.newsRed:
         return FlexScheme.red;
       case AppAccentTheme.graphiteGray:
-        return FlexScheme.material; // Mapping graphiteGray to material for now
+        return FlexScheme.material;
     }
   }
 
@@ -390,9 +381,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     );
 
     try {
-      final appConfig = await _appConfigRepository.read(
-        id: 'app_config',
-      ); // API requires auth, so token will be used
+      final appConfig = await _appConfigRepository.read(id: 'app_config');
       print(
         '[AppBloc] AppConfig fetched successfully. ID: ${appConfig.id} for user: ${state.user!.id}',
       );
@@ -453,7 +442,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // } catch (e) {
       //   // Handle error, potentially revert optimistic update or show an error.
       //   print('Failed to update lastAccountActionShownAt on backend: $e');
-      //   // Optionally revert: emit(state.copyWith(user: state.user)); // Reverts to original
+      //   // Optionally revert: emit(state.copyWith(user: state.user));
       // }
       print(
         '[AppBloc] User ${event.userId} AccountAction shown. Last shown timestamp updated locally to $now. Backend update pending.',

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ht_main/app/bloc/app_bloc.dart'; // Added
-import 'package:ht_main/app/config/config.dart'; // Added for AppEnvironment
+import 'package:ht_main/app/bloc/app_bloc.dart';
+import 'package:ht_main/app/config/config.dart';
 import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/shared/constants/app_spacing.dart';
@@ -50,28 +50,27 @@ class EmailCodeVerificationPage extends StatelessWidget {
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment:
-                        CrossAxisAlignment.stretch, // Stretch buttons
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Icon(
                         Icons.mark_email_read_outlined,
-                        size: AppSpacing.xxl * 2, // Standardized large icon
+                        size: AppSpacing.xxl * 2,
                         color: colorScheme.primary,
                       ),
                       const SizedBox(height: AppSpacing.xl),
                       Text(
                         l10n.emailCodeSentConfirmation(email),
                         style: textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold, // Ensure prominence
+                          fontWeight: FontWeight.bold,
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: AppSpacing.lg), // Adjusted spacing
+                      const SizedBox(height: AppSpacing.lg),
                       Text(
                         l10n.emailCodeSentInstructions,
                         style: textTheme.bodyLarge?.copyWith(
                           color: colorScheme.onSurfaceVariant,
-                        ), // Softer color
+                        ),
                         textAlign: TextAlign.center,
                       ),
                       // Display demo code if in demo environment
@@ -83,9 +82,7 @@ class EmailCodeVerificationPage extends StatelessWidget {
                               children: [
                                 const SizedBox(height: AppSpacing.md),
                                 Text(
-                                  l10n.demoVerificationCodeMessage(
-                                    '123456',
-                                  ), // Demo code
+                                  l10n.demoVerificationCodeMessage('123456'),
                                   style: textTheme.bodyMedium?.copyWith(
                                     color: colorScheme.secondary,
                                     fontWeight: FontWeight.bold,
@@ -98,9 +95,7 @@ class EmailCodeVerificationPage extends StatelessWidget {
                           return const SizedBox.shrink();
                         },
                       ),
-                      const SizedBox(
-                        height: AppSpacing.xl,
-                      ), // Increased spacing
+                      const SizedBox(height: AppSpacing.xl),
                       _EmailCodeVerificationForm(
                         email: email,
                         isLoading: isLoading,
@@ -156,7 +151,7 @@ class _EmailCodeVerificationFormState
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final textTheme = Theme.of(context).textTheme; // Added missing textTheme
+    final textTheme = Theme.of(context).textTheme;
 
     return Form(
       key: _formKey,
@@ -170,15 +165,15 @@ class _EmailCodeVerificationFormState
             child: TextFormField(
               controller: _codeController,
               decoration: InputDecoration(
-                labelText: l10n.emailCodeVerificationHint, // Use labelText
-                // border: const OutlineInputBorder(), // Uses theme default
-                counterText: '', // Hide the counter
+                labelText: l10n.emailCodeVerificationHint,
+                // border: const OutlineInputBorder(),
+                counterText: '',
               ),
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               maxLength: 6,
               textAlign: TextAlign.center,
-              style: textTheme.headlineSmall, // Make input text larger
+              style: textTheme.headlineSmall,
               enabled: !widget.isLoading,
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -192,24 +187,23 @@ class _EmailCodeVerificationFormState
               onFieldSubmitted: widget.isLoading ? null : (_) => _submitForm(),
             ),
           ),
-          const SizedBox(height: AppSpacing.xxl), // Increased spacing
+          const SizedBox(height: AppSpacing.xxl),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(
                 vertical: AppSpacing.md,
-                horizontal: AppSpacing.lg, // Added horizontal padding
+                horizontal: AppSpacing.lg,
               ),
               textStyle: textTheme.labelLarge,
             ),
             onPressed: widget.isLoading ? null : _submitForm,
             child: widget.isLoading
                 ? const SizedBox(
-                    height: AppSpacing.xl, // Consistent size with text
+                    height: AppSpacing.xl,
                     width: AppSpacing.xl,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color:
-                          Colors.white, // Explicit color for loader on button
+                      color: Colors.white,
                     ),
                   )
                 : Text(l10n.emailCodeVerificationButtonLabel),

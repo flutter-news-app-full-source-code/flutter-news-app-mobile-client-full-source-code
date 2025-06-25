@@ -7,14 +7,13 @@ abstract final class Routes {
   static const feedName = 'feed';
 
   // --- Filter Sub-Routes (relative to /feed) ---
-  static const feedFilter = 'filter'; // Path: /feed/filter
+  static const feedFilter = 'filter';
   static const feedFilterName = 'feedFilter';
 
-  static const feedFilterCategories =
-      'categories'; // Path: /feed/filter/categories
+  static const feedFilterCategories = 'categories';
   static const feedFilterCategoriesName = 'feedFilterCategories';
 
-  static const feedFilterSources = 'sources'; // Path: /feed/filter/sources
+  static const feedFilterSources = 'sources';
   static const feedFilterSourcesName = 'feedFilterSources';
 
   static const search = '/search';
@@ -28,17 +27,17 @@ abstract final class Routes {
   // Add a new name for article details when accessed from search
   static const searchArticleDetailsName = 'searchArticleDetails';
   // Settings is now relative to account
-  static const settings = 'settings'; // Relative path
+  static const settings = 'settings';
   static const settingsName = 'settings';
   // Notifications is now relative to account
-  static const notifications = 'notifications'; // Relative path
+  static const notifications = 'notifications';
   static const notificationsName = 'notifications';
 
   // --- Entity Details Routes (can be accessed from multiple places) ---
-  static const categoryDetails = '/category-details'; // New
-  static const categoryDetailsName = 'categoryDetails'; // New
-  static const sourceDetails = '/source-details'; // New
-  static const sourceDetailsName = 'sourceDetails'; // New
+  static const categoryDetails = '/category-details';
+  static const categoryDetailsName = 'categoryDetails';
+  static const sourceDetails = '/source-details';
+  static const sourceDetailsName = 'sourceDetails';
 
   // --- Authentication Routes ---
   static const authentication = '/authentication';
@@ -49,8 +48,8 @@ abstract final class Routes {
   static const resetPasswordName = 'resetPassword';
   static const confirmEmail = 'confirm-email';
   static const confirmEmailName = 'confirmEmail';
-  static const accountLinking = 'linking'; // Query param context, not a path
-  static const accountLinkingName = 'accountLinking'; // Name for context
+  static const accountLinking = 'linking';
+  static const accountLinkingName = 'accountLinking';
 
   // routes for email code verification flow
   static const requestCode = 'request-code';
@@ -69,11 +68,9 @@ abstract final class Routes {
   static const settingsAppearanceName = 'settingsAppearance';
 
   // --- Appearance Sub-Routes (relative to /account/settings/appearance) ---
-  static const settingsAppearanceTheme =
-      'theme'; // Path: /account/settings/appearance/theme
+  static const settingsAppearanceTheme = 'theme';
   static const settingsAppearanceThemeName = 'settingsAppearanceTheme';
-  static const settingsAppearanceFont =
-      'font'; // Path: /account/settings/appearance/font
+  static const settingsAppearanceFont = 'font';
   static const settingsAppearanceFontName = 'settingsAppearanceFont';
 
   static const settingsFeed = 'feed';
@@ -84,8 +81,7 @@ abstract final class Routes {
   static const settingsNotificationsName = 'settingsNotifications';
 
   // --- Language Settings Sub-Route (relative to /account/settings) ---
-  static const settingsLanguage =
-      'language'; // Path: /account/settings/language
+  static const settingsLanguage = 'language';
   static const settingsLanguageName = 'settingsLanguage';
 
   // Add names for notification sub-selection routes if needed later
@@ -93,19 +89,18 @@ abstract final class Routes {
   // static const settingsNotificationCategoriesName = 'settingsNotificationCategories';
 
   // --- Account Sub-Routes (relative to /account) ---
-  static const manageFollowedItems = 'manage-followed-items'; // Renamed
-  static const manageFollowedItemsName = 'manageFollowedItems'; // Renamed
+  static const manageFollowedItems = 'manage-followed-items';
+  static const manageFollowedItemsName = 'manageFollowedItems';
   static const accountSavedHeadlines = 'saved-headlines';
   static const accountSavedHeadlinesName = 'accountSavedHeadlines';
   // New route for article details from saved headlines
-  static const String accountArticleDetails =
-      'article/:id'; // Relative to accountSavedHeadlines
+  static const String accountArticleDetails = 'article/:id';
   static const String accountArticleDetailsName = 'accountArticleDetails';
 
   // --- Global Article Details ---
   // This route is intended for accessing article details from contexts
   // outside the main bottom navigation shell (e.g., from entity detail pages).
-  static const globalArticleDetails = '/article/:id'; // Top-level path
+  static const globalArticleDetails = '/article/:id';
   static const globalArticleDetailsName = 'globalArticleDetails';
 
   // --- Manage Followed Items Sub-Routes (relative to /account/manage-followed-items) ---
@@ -119,8 +114,8 @@ abstract final class Routes {
   static const addSourceToFollow = 'add-source';
   static const addSourceToFollowName = 'addSourceToFollow';
 
-  // static const followedCountriesList = 'countries'; // Removed
-  // static const followedCountriesListName = 'followedCountriesList'; // Removed
-  // static const addCountryToFollow = 'add-country'; // Removed
-  // static const addCountryToFollowName = 'addCountryToFollow'; // Removed
+  // static const followedCountriesList = 'countries';
+  // static const followedCountriesListName = 'followedCountriesList';
+  // static const addCountryToFollow = 'add-country';
+  // static const addCountryToFollowName = 'addCountryToFollow';
 }

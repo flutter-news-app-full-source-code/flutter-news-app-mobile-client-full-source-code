@@ -4,12 +4,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ht_main/headlines-feed/bloc/categories_filter_bloc.dart'; // Import the BLoC
+import 'package:ht_main/headlines-feed/bloc/categories_filter_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/shared/constants/constants.dart';
-import 'package:ht_main/shared/widgets/widgets.dart'; // For loading/error widgets
-import 'package:ht_shared/ht_shared.dart'
-    show Category; // Import Category model
+import 'package:ht_main/shared/widgets/widgets.dart';
+import 'package:ht_shared/ht_shared.dart' show Category;
 
 /// {@template category_filter_page}
 /// A page dedicated to selecting news categories for filtering headlines.
@@ -100,15 +99,15 @@ class _CategoryFilterPageState extends State<CategoryFilterPage> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
-    final theme = Theme.of(context); // Get theme
-    final textTheme = theme.textTheme; // Get textTheme
-    final colorScheme = theme.colorScheme; // Get colorScheme
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
           l10n.headlinesFeedFilterCategoryLabel,
-          style: textTheme.titleLarge, // Apply consistent title style
+          style: textTheme.titleLarge,
         ),
         actions: [
           IconButton(
@@ -134,9 +133,9 @@ class _CategoryFilterPageState extends State<CategoryFilterPage> {
   /// Builds the main content body based on the current [CategoriesFilterState].
   Widget _buildBody(BuildContext context, CategoriesFilterState state) {
     final l10n = context.l10n;
-    final theme = Theme.of(context); // Get theme
-    final textTheme = theme.textTheme; // Get textTheme
-    final colorScheme = theme.colorScheme; // Get colorScheme
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final colorScheme = theme.colorScheme;
 
     // Handle initial loading state
     if (state.status == CategoriesFilterStatus.loading) {
@@ -162,7 +161,7 @@ class _CategoryFilterPageState extends State<CategoryFilterPage> {
     if (state.status == CategoriesFilterStatus.success &&
         state.categories.isEmpty) {
       return InitialStateWidget(
-        icon: Icons.search_off_outlined, // Use outlined version
+        icon: Icons.search_off_outlined,
         headline: l10n.categoryFilterEmptyHeadline,
         subheadline: l10n.categoryFilterEmptySubheadline,
       );
@@ -173,7 +172,7 @@ class _CategoryFilterPageState extends State<CategoryFilterPage> {
       controller: _scrollController,
       padding: const EdgeInsets.symmetric(
         vertical: AppSpacing.paddingSmall,
-      ).copyWith(bottom: AppSpacing.xxl), // Consistent vertical padding
+      ).copyWith(bottom: AppSpacing.xxl),
       itemCount:
           state.categories.length +
           ((state.status == CategoriesFilterStatus.loadingMore ||
@@ -214,7 +213,7 @@ class _CategoryFilterPageState extends State<CategoryFilterPage> {
           title: Text(category.name, style: textTheme.titleMedium),
           secondary: category.iconUrl != null
               ? SizedBox(
-                  width: AppSpacing.xl + AppSpacing.sm, // 40 -> 32
+                  width: AppSpacing.xl + AppSpacing.sm,
                   height: AppSpacing.xl + AppSpacing.sm,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(AppSpacing.xs),
@@ -222,8 +221,8 @@ class _CategoryFilterPageState extends State<CategoryFilterPage> {
                       category.iconUrl!,
                       fit: BoxFit.contain,
                       errorBuilder: (context, error, stackTrace) => Icon(
-                        Icons.category_outlined, // Use outlined
-                        color: colorScheme.onSurfaceVariant, // Theme color
+                        Icons.category_outlined,
+                        color: colorScheme.onSurfaceVariant,
                         size: AppSpacing.xl,
                       ),
                       loadingBuilder: (context, child, loadingProgress) {
@@ -254,7 +253,7 @@ class _CategoryFilterPageState extends State<CategoryFilterPage> {
           },
           controlAffinity: ListTileControlAffinity.leading,
           contentPadding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.paddingMedium, // Standard padding
+            horizontal: AppSpacing.paddingMedium,
           ),
         );
       },

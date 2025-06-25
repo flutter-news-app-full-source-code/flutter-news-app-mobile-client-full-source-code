@@ -14,9 +14,9 @@ import 'package:ht_main/shared/widgets/loading_state_widget.dart';
 import 'package:ht_shared/ht_shared.dart' show Country, Source, SourceType;
 
 // Keys are defined in headlines_filter_page.dart and imported by router.dart
-// const String keySelectedSources = 'selectedSources'; // REMOVED
-// const String keySelectedCountryIsoCodes = 'selectedCountryIsoCodes'; // REMOVED
-// const String keySelectedSourceTypes = 'selectedSourceTypes'; // REMOVED
+// const String keySelectedSources = 'selectedSources';
+// const String keySelectedCountryIsoCodes = 'selectedCountryIsoCodes';
+// const String keySelectedSourceTypes = 'selectedSourceTypes';
 
 class SourceFilterPage extends StatelessWidget {
   const SourceFilterPage({
@@ -55,19 +55,19 @@ class _SourceFilterView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final theme = Theme.of(context); // Get theme
-    final textTheme = theme.textTheme; // Get textTheme
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
     final state = context.watch<SourcesFilterBloc>().state;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
           l10n.headlinesFeedFilterSourceLabel,
-          style: textTheme.titleLarge, // Apply consistent title style
+          style: textTheme.titleLarge,
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.clear_all_outlined), // Use outlined
+            icon: const Icon(Icons.clear_all_outlined),
             tooltip: l10n.headlinesFeedFilterResetButton,
             onPressed: () {
               context.read<SourcesFilterBloc>().add(
@@ -108,9 +108,9 @@ class _SourceFilterView extends StatelessWidget {
         state.allAvailableSources.isEmpty) {
       // Check allAvailableSources
       return LoadingStateWidget(
-        icon: Icons.source_outlined, // More relevant icon
-        headline: l10n.sourceFilterLoadingHeadline, // Specific l10n
-        subheadline: l10n.sourceFilterLoadingSubheadline, // Specific l10n
+        icon: Icons.source_outlined,
+        headline: l10n.sourceFilterLoadingHeadline,
+        subheadline: l10n.sourceFilterLoadingSubheadline,
       );
     }
     if (state.dataLoadingStatus == SourceFilterDataLoadingStatus.failure &&
@@ -129,15 +129,15 @@ class _SourceFilterView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildCountryCapsules(context, state, l10n, textTheme),
-        const SizedBox(height: AppSpacing.md), // Adjusted spacing
+        const SizedBox(height: AppSpacing.md),
         _buildSourceTypeCapsules(context, state, l10n, textTheme),
-        const SizedBox(height: AppSpacing.md), // Adjusted spacing
+        const SizedBox(height: AppSpacing.md),
         Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.paddingMedium,
           ),
           child: Text(
-            l10n.headlinesFeedFilterSourceLabel, // "Sources" title
+            l10n.headlinesFeedFilterSourceLabel,
             style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
         ),
@@ -151,23 +151,23 @@ class _SourceFilterView extends StatelessWidget {
     BuildContext context,
     SourcesFilterState state,
     AppLocalizations l10n,
-    TextTheme textTheme, // Added textTheme
+    TextTheme textTheme,
   ) {
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.paddingMedium,
-      ).copyWith(top: AppSpacing.md), // Add top padding
+      ).copyWith(top: AppSpacing.md),
       child: Column(
         // Use Column for label and then list
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            l10n.headlinesFeedFilterCountryLabel, // "Countries" label
+            l10n.headlinesFeedFilterCountryLabel,
             style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: AppSpacing.sm),
           SizedBox(
-            height: AppSpacing.xl + AppSpacing.md, // Standardized height
+            height: AppSpacing.xl + AppSpacing.md,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: state.availableCountries.length + 1,
@@ -217,7 +217,7 @@ class _SourceFilterView extends StatelessWidget {
     BuildContext context,
     SourcesFilterState state,
     AppLocalizations l10n,
-    TextTheme textTheme, // Added textTheme
+    TextTheme textTheme,
   ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingMedium),
@@ -231,7 +231,7 @@ class _SourceFilterView extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.sm),
           SizedBox(
-            height: AppSpacing.xl + AppSpacing.md, // Standardized height
+            height: AppSpacing.xl + AppSpacing.md,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: state.availableSourceTypes.length + 1,
@@ -252,9 +252,7 @@ class _SourceFilterView extends StatelessWidget {
                 }
                 final sourceType = state.availableSourceTypes[index - 1];
                 return ChoiceChip(
-                  label: Text(
-                    sourceType.name,
-                  ), // Assuming SourceType.name is user-friendly
+                  label: Text(sourceType.name),
                   labelStyle: textTheme.labelLarge,
                   selected: state.selectedSourceTypes.contains(sourceType),
                   onSelected: (_) {
@@ -275,7 +273,7 @@ class _SourceFilterView extends StatelessWidget {
     BuildContext context,
     SourcesFilterState state,
     AppLocalizations l10n,
-    TextTheme textTheme, // Added textTheme
+    TextTheme textTheme,
   ) {
     if (state.dataLoadingStatus == SourceFilterDataLoadingStatus.loading &&
         state.displayableSources.isEmpty) {

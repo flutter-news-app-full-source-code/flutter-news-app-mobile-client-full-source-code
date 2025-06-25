@@ -4,11 +4,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ht_main/headlines-feed/bloc/countries_filter_bloc.dart'; // Import the BLoC
+import 'package:ht_main/headlines-feed/bloc/countries_filter_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/shared/constants/constants.dart';
-import 'package:ht_main/shared/widgets/widgets.dart'; // For loading/error widgets
-import 'package:ht_shared/ht_shared.dart' show Country; // Import Country model
+import 'package:ht_main/shared/widgets/widgets.dart';
+import 'package:ht_shared/ht_shared.dart' show Country;
 
 /// {@template country_filter_page}
 /// A page dedicated to selecting event countries for filtering headlines.
@@ -98,14 +98,14 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final theme = Theme.of(context); // Get theme
-    final textTheme = theme.textTheme; // Get textTheme
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
           l10n.headlinesFeedFilterEventCountryLabel,
-          style: textTheme.titleLarge, // Apply consistent title style
+          style: textTheme.titleLarge,
         ),
         actions: [
           IconButton(
@@ -131,9 +131,9 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
   /// Builds the main content body based on the current [CountriesFilterState].
   Widget _buildBody(BuildContext context, CountriesFilterState state) {
     final l10n = context.l10n;
-    final theme = Theme.of(context); // Get theme
-    final textTheme = theme.textTheme; // Get textTheme
-    final colorScheme = theme.colorScheme; // Get colorScheme
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final colorScheme = theme.colorScheme;
 
     // Handle initial loading state
     if (state.status == CountriesFilterStatus.loading) {
@@ -158,7 +158,7 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
     if (state.status == CountriesFilterStatus.success &&
         state.countries.isEmpty) {
       return InitialStateWidget(
-        icon: Icons.flag_circle_outlined, // More relevant icon
+        icon: Icons.flag_circle_outlined,
         headline: l10n.countryFilterEmptyHeadline,
         subheadline: l10n.countryFilterEmptySubheadline,
       );
@@ -169,7 +169,7 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
       controller: _scrollController,
       padding: const EdgeInsets.symmetric(
         vertical: AppSpacing.paddingSmall,
-      ).copyWith(bottom: AppSpacing.xxl), // Consistent vertical padding
+      ).copyWith(bottom: AppSpacing.xxl),
       itemCount:
           state.countries.length +
           ((state.status == CountriesFilterStatus.loadingMore ||
@@ -209,18 +209,18 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
         return CheckboxListTile(
           title: Text(country.name, style: textTheme.titleMedium),
           secondary: SizedBox(
-            width: AppSpacing.xl + AppSpacing.xs, // Standardized width (36)
-            height: AppSpacing.lg + AppSpacing.sm, // Standardized height (24)
+            width: AppSpacing.xl + AppSpacing.xs,
+            height: AppSpacing.lg + AppSpacing.sm,
             child: ClipRRect(
               // Clip the image for rounded corners if desired
               borderRadius: BorderRadius.circular(AppSpacing.xs / 2),
               child: Image.network(
                 country.flagUrl,
-                fit: BoxFit.cover, // Use cover for better filling
+                fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) => Icon(
                   Icons.flag_outlined,
                   color: colorScheme.onSurfaceVariant,
-                  size: AppSpacing.lg, // Adjust size as needed
+                  size: AppSpacing.lg,
                 ),
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;

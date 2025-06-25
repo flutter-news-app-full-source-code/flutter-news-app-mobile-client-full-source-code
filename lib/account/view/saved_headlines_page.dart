@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart'; // Added GoRouter
+import 'package:go_router/go_router.dart';
 import 'package:ht_main/account/bloc/account_bloc.dart';
-import 'package:ht_main/app/bloc/app_bloc.dart'; // Added AppBloc
+import 'package:ht_main/app/bloc/app_bloc.dart';
 // HeadlineItemWidget import removed
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
-import 'package:ht_main/shared/shared.dart'; // Imports new headline tiles
-import 'package:ht_shared/ht_shared.dart'
-    show Headline, HeadlineImageStyle; // Added HeadlineImageStyle
+import 'package:ht_main/shared/shared.dart';
+import 'package:ht_shared/ht_shared.dart' show Headline, HeadlineImageStyle;
 
 /// {@template saved_headlines_page}
 /// Displays the list of headlines saved by the user.
@@ -31,7 +30,7 @@ class SavedHeadlinesPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           l10n.accountSavedHeadlinesTile,
-          style: textTheme.titleLarge, // Consistent AppBar title
+          style: textTheme.titleLarge,
         ),
       ),
       body: BlocBuilder<AccountBloc, AccountState>(
@@ -40,17 +39,15 @@ class SavedHeadlinesPage extends StatelessWidget {
               state.preferences == null) {
             return LoadingStateWidget(
               icon: Icons.bookmarks_outlined,
-              headline: l10n.savedHeadlinesLoadingHeadline, // Use l10n
-              subheadline: l10n.savedHeadlinesLoadingSubheadline, // Use l10n
+              headline: l10n.savedHeadlinesLoadingHeadline,
+              subheadline: l10n.savedHeadlinesLoadingSubheadline,
             );
           }
 
           if (state.status == AccountStatus.failure &&
               state.preferences == null) {
             return FailureStateWidget(
-              message:
-                  state.errorMessage ??
-                  l10n.savedHeadlinesErrorHeadline, // Use l10n
+              message: state.errorMessage ?? l10n.savedHeadlinesErrorHeadline,
               onRetry: () {
                 if (state.user?.id != null) {
                   context.read<AccountBloc>().add(
@@ -66,19 +63,19 @@ class SavedHeadlinesPage extends StatelessWidget {
           if (savedHeadlines.isEmpty) {
             return InitialStateWidget(
               icon: Icons.bookmark_add_outlined,
-              headline: l10n.savedHeadlinesEmptyHeadline, // Use l10n
-              subheadline: l10n.savedHeadlinesEmptySubheadline, // Use l10n
+              headline: l10n.savedHeadlinesEmptyHeadline,
+              subheadline: l10n.savedHeadlinesEmptySubheadline,
             );
           }
 
           return ListView.separated(
             padding: const EdgeInsets.symmetric(
               vertical: AppSpacing.paddingSmall,
-            ), // Add padding
+            ),
             itemCount: savedHeadlines.length,
             separatorBuilder: (context, index) => const Divider(
               height: 1,
-              indent: AppSpacing.paddingMedium, // Indent divider
+              indent: AppSpacing.paddingMedium,
               endIndent: AppSpacing.paddingMedium,
             ),
             itemBuilder: (context, index) {
@@ -91,10 +88,7 @@ class SavedHeadlinesPage extends StatelessWidget {
                   .headlineImageStyle;
 
               final trailingButton = IconButton(
-                icon: Icon(
-                  Icons.delete_outline,
-                  color: colorScheme.error,
-                ), // Themed icon
+                icon: Icon(Icons.delete_outline, color: colorScheme.error),
                 tooltip: l10n.headlineDetailsRemoveFromSavedTooltip,
                 onPressed: () {
                   context.read<AccountBloc>().add(

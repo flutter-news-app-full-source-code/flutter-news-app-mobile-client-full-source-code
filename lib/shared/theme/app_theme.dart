@@ -22,9 +22,9 @@ const FlexSubThemesData _commonSubThemesData = FlexSubThemesData(
 
   // --- Input Decorator (for Search TextField) ---
   // Example: Add a border radius
-  inputDecoratorRadius: 8, // Corrected parameter name
+  inputDecoratorRadius: 8,
   // Example: Use outline border (common modern style)
-  inputDecoratorIsFilled: false, // Set to false if using outline border
+  inputDecoratorIsFilled: false,
   inputDecoratorBorderType: FlexInputBorderType.outline,
 
   // Add other component themes as needed (Buttons, Dialogs, etc.)
@@ -34,7 +34,7 @@ const FlexSubThemesData _commonSubThemesData = FlexSubThemesData(
 TextTheme _customizeTextTheme(
   TextTheme baseTextTheme, {
   required AppTextScaleFactor appTextScaleFactor,
-  required AppFontWeight appFontWeight, // Added parameter
+  required AppFontWeight appFontWeight,
 }) {
   print(
     '[_customizeTextTheme] Received appFontWeight: $appFontWeight, appTextScaleFactor: $appTextScaleFactor',
@@ -49,7 +49,7 @@ TextTheme _customizeTextTheme(
     case AppTextScaleFactor.medium:
       factor = 1.0;
     case AppTextScaleFactor.extraLarge:
-      factor = 1.3; // Define factor for extraLarge
+      factor = 1.3;
   }
 
   // Helper to apply factor safely
@@ -77,19 +77,19 @@ TextTheme _customizeTextTheme(
     // body text is the primary target for user-defined weight.
     headlineLarge: baseTextTheme.headlineLarge?.copyWith(
       fontSize: applyFactor(28),
-      fontWeight: FontWeight.bold, // Keeping titles bold by default
+      fontWeight: FontWeight.bold,
     ),
     headlineMedium: baseTextTheme.headlineMedium?.copyWith(
       fontSize: applyFactor(24),
-      fontWeight: FontWeight.bold, // Keeping titles bold by default
+      fontWeight: FontWeight.bold,
     ),
     titleLarge: baseTextTheme.titleLarge?.copyWith(
       fontSize: applyFactor(18),
-      fontWeight: FontWeight.w600, // Keeping titles semi-bold by default
+      fontWeight: FontWeight.w600,
     ),
     titleMedium: baseTextTheme.titleMedium?.copyWith(
       fontSize: applyFactor(16),
-      fontWeight: FontWeight.w600, // Keeping titles semi-bold by default
+      fontWeight: FontWeight.w600,
     ),
 
     // --- Body/Content Styles ---
@@ -97,19 +97,19 @@ TextTheme _customizeTextTheme(
     bodyLarge: baseTextTheme.bodyLarge?.copyWith(
       fontSize: applyFactor(16),
       height: 1.5,
-      fontWeight: selectedFontWeight, // Apply selected weight
+      fontWeight: selectedFontWeight,
     ),
     bodyMedium: baseTextTheme.bodyMedium?.copyWith(
       fontSize: applyFactor(14),
       height: 1.4,
-      fontWeight: selectedFontWeight, // Apply selected weight
+      fontWeight: selectedFontWeight,
     ),
 
     // --- Metadata/Caption Styles ---
     // Captions might also benefit from user-defined weight or stay regular.
     labelSmall: baseTextTheme.labelSmall?.copyWith(
       fontSize: applyFactor(12),
-      fontWeight: selectedFontWeight, // Apply selected weight
+      fontWeight: selectedFontWeight,
     ),
 
     // --- Button Style (Usually default is fine) ---
@@ -160,7 +160,7 @@ TextTheme Function([TextTheme?]) _getGoogleFontTextTheme(String? fontFamily) {
 ThemeData lightTheme({
   required FlexScheme scheme,
   required AppTextScaleFactor appTextScaleFactor,
-  required AppFontWeight appFontWeight, // Added parameter
+  required AppFontWeight appFontWeight,
   String? fontFamily,
 }) {
   print(
@@ -175,7 +175,7 @@ ThemeData lightTheme({
     textTheme: _customizeTextTheme(
       baseTextTheme,
       appTextScaleFactor: appTextScaleFactor,
-      appFontWeight: appFontWeight, // Pass new parameter
+      appFontWeight: appFontWeight,
     ),
     subThemesData: _commonSubThemesData,
   );
@@ -187,7 +187,7 @@ ThemeData lightTheme({
 ThemeData darkTheme({
   required FlexScheme scheme,
   required AppTextScaleFactor appTextScaleFactor,
-  required AppFontWeight appFontWeight, // Added parameter
+  required AppFontWeight appFontWeight,
   String? fontFamily,
 }) {
   print(
@@ -204,7 +204,7 @@ ThemeData darkTheme({
     textTheme: _customizeTextTheme(
       baseTextTheme,
       appTextScaleFactor: appTextScaleFactor,
-      appFontWeight: appFontWeight, // Pass new parameter
+      appFontWeight: appFontWeight,
     ),
     subThemesData: _commonSubThemesData,
   );

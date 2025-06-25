@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ht_main/app/bloc/app_bloc.dart';
-import 'package:ht_main/authentication/bloc/authentication_bloc.dart'; // Import AuthenticationBloc
+import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/constants/app_spacing.dart';
-import 'package:ht_shared/ht_shared.dart'; // Import User and AppStatus
+import 'package:ht_shared/ht_shared.dart';
 
 /// {@template account_view}
 /// Displays the user's account information and actions.
@@ -24,23 +24,18 @@ class AccountPage extends StatelessWidget {
     final user = appState.user;
     final status = appState.status;
     final isAnonymous = status == AppStatus.anonymous;
-    final theme = Theme.of(context); // Get theme for AppBar
-    final textTheme = theme.textTheme; // Get textTheme for AppBar
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          l10n.accountPageTitle,
-          style: textTheme.titleLarge, // Consistent AppBar title style
-        ),
+        title: Text(l10n.accountPageTitle, style: textTheme.titleLarge),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(
-          AppSpacing.paddingMedium,
-        ), // Adjusted padding
+        padding: const EdgeInsets.all(AppSpacing.paddingMedium),
         children: [
           _buildUserHeader(context, user, isAnonymous),
-          const SizedBox(height: AppSpacing.lg), // Adjusted spacing
+          const SizedBox(height: AppSpacing.lg),
           ListTile(
             leading: Icon(
               Icons.tune_outlined,
@@ -91,11 +86,11 @@ class AccountPage extends StatelessWidget {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-    final colorScheme = theme.colorScheme; // Get colorScheme
+    final colorScheme = theme.colorScheme;
 
     final avatarIcon = Icon(
-      Icons.person_outline, // Use outlined version
-      size: AppSpacing.xxl, // Standardized size
+      Icons.person_outline,
+      size: AppSpacing.xxl,
       color: colorScheme.onPrimaryContainer,
     );
 
@@ -105,7 +100,7 @@ class AccountPage extends StatelessWidget {
     if (isAnonymous) {
       displayName = l10n.accountAnonymousUser;
       statusWidget = Padding(
-        padding: const EdgeInsets.only(top: AppSpacing.md), // Increased padding
+        padding: const EdgeInsets.only(top: AppSpacing.md),
         child: ElevatedButton.icon(
           // Changed to ElevatedButton
           icon: const Icon(Icons.link_outlined),
@@ -128,7 +123,7 @@ class AccountPage extends StatelessWidget {
     } else {
       displayName = user?.email ?? l10n.accountNoNameUser;
       statusWidget = Column(
-        mainAxisSize: MainAxisSize.min, // To keep column tight
+        mainAxisSize: MainAxisSize.min,
         children: [
           // if (user?.role != null) ...[
           //   // Show role only if available
@@ -141,7 +136,7 @@ class AccountPage extends StatelessWidget {
           //     textAlign: TextAlign.center,
           //   ),
           // ],
-          const SizedBox(height: AppSpacing.md), // Consistent spacing
+          const SizedBox(height: AppSpacing.md),
           OutlinedButton.icon(
             // Changed to OutlinedButton.icon
             icon: Icon(Icons.logout, color: colorScheme.error),
@@ -168,14 +163,14 @@ class AccountPage extends StatelessWidget {
     return Column(
       children: [
         CircleAvatar(
-          radius: AppSpacing.xxl - AppSpacing.sm, // Standardized radius (40)
+          radius: AppSpacing.xxl - AppSpacing.sm,
           backgroundColor: colorScheme.primaryContainer,
           child: avatarIcon,
         ),
-        const SizedBox(height: AppSpacing.md), // Adjusted spacing
+        const SizedBox(height: AppSpacing.md),
         Text(
           displayName,
-          style: textTheme.headlineSmall, // More prominent style
+          style: textTheme.headlineSmall,
           textAlign: TextAlign.center,
         ),
         statusWidget,

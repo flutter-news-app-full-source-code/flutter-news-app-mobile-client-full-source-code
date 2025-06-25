@@ -1,13 +1,10 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:bloc_concurrency/bloc_concurrency.dart'; // For transformers
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_data_repository/ht_data_repository.dart'; // Generic Data Repository
-import 'package:ht_shared/ht_shared.dart'
-    show
-        Country,
-        HtHttpException; // Shared models, including Country and standardized exceptions
+import 'package:ht_data_repository/ht_data_repository.dart';
+import 'package:ht_shared/ht_shared.dart' show Country, HtHttpException;
 
 part 'countries_filter_event.dart';
 part 'countries_filter_state.dart';
@@ -28,11 +25,11 @@ class CountriesFilterBloc
       super(const CountriesFilterState()) {
     on<CountriesFilterRequested>(
       _onCountriesFilterRequested,
-      transformer: restartable(), // Only process the latest request
+      transformer: restartable(),
     );
     on<CountriesFilterLoadMoreRequested>(
       _onCountriesFilterLoadMoreRequested,
-      transformer: droppable(), // Ignore new requests while one is processing
+      transformer: droppable(),
     );
   }
 
@@ -64,7 +61,7 @@ class CountriesFilterBloc
           countries: response.items,
           hasMore: response.hasMore,
           cursor: response.cursor,
-          clearError: true, // Clear any previous error
+          clearError: true,
         ),
       );
     } on HtHttpException catch (e) {
@@ -90,7 +87,7 @@ class CountriesFilterBloc
     try {
       final response = await _countriesRepository.readAll(
         limit: _countriesLimit,
-        startAfterId: state.cursor, // Use the cursor from the current state
+        startAfterId: state.cursor,
       );
       emit(
         state.copyWith(

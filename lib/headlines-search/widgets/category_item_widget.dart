@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart'; // Added
-import 'package:ht_main/entity_details/view/entity_details_page.dart'; // Added
-import 'package:ht_main/router/routes.dart'; // Added
-import 'package:ht_shared/ht_shared.dart'; // Import Category model
+import 'package:go_router/go_router.dart';
+import 'package:ht_main/entity_details/view/entity_details_page.dart';
+import 'package:ht_main/router/routes.dart';
+import 'package:ht_shared/ht_shared.dart';
 
 /// A simple widget to display a Category search result.
 class CategoryItemWidget extends StatelessWidget {

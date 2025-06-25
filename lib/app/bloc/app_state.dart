@@ -24,16 +24,15 @@ enum AppStatus {
 class AppState extends Equatable {
   /// {@macro app_state}
   const AppState({
-    required this.settings, // Add settings property
+    required this.settings,
     required this.selectedBottomNavigationIndex,
     this.themeMode = ThemeMode.system,
-    this.appTextScaleFactor =
-        AppTextScaleFactor.medium, // Default text scale factor (enum)
+    this.appTextScaleFactor = AppTextScaleFactor.medium,
     this.flexScheme = FlexScheme.material,
     this.fontFamily,
     this.status = AppStatus.initial,
-    this.user, // User is now nullable and defaults to null
-    this.locale, // Added locale
+    this.user,
+    this.locale,
     this.appConfig,
     this.environment,
   });
@@ -45,7 +44,7 @@ class AppState extends Equatable {
   final ThemeMode themeMode;
 
   /// The text scale factor for the app's UI.
-  final AppTextScaleFactor appTextScaleFactor; // Change type to enum
+  final AppTextScaleFactor appTextScaleFactor;
 
   /// The active color scheme defined by FlexColorScheme.
   final FlexScheme flexScheme;
@@ -61,10 +60,10 @@ class AppState extends Equatable {
   final User? user;
 
   /// User-specific application settings.
-  final UserAppSettings settings; // Add settings property
+  final UserAppSettings settings;
 
   /// The current application locale.
-  final Locale? locale; // Added locale
+  final Locale? locale;
 
   /// The global application configuration (remote config).
   final AppConfig? appConfig;
@@ -78,17 +77,17 @@ class AppState extends Equatable {
     ThemeMode? themeMode,
     FlexScheme? flexScheme,
     String? fontFamily,
-    AppTextScaleFactor? appTextScaleFactor, // Change type to enum
+    AppTextScaleFactor? appTextScaleFactor,
     AppStatus? status,
     User? user,
-    UserAppSettings? settings, // Add settings to copyWith
-    Locale? locale, // Added locale
+    UserAppSettings? settings,
+    Locale? locale,
     AppConfig? appConfig,
-    local_config.AppEnvironment? environment, // Added AppEnvironment
+    local_config.AppEnvironment? environment,
     bool clearFontFamily = false,
-    bool clearLocale = false, // Added to allow clearing locale
-    bool clearAppConfig = false, // Added to allow clearing appConfig
-    bool clearEnvironment = false, // Added to allow clearing environment
+    bool clearLocale = false,
+    bool clearAppConfig = false,
+    bool clearEnvironment = false,
   }) {
     return AppState(
       selectedBottomNavigationIndex:
@@ -99,12 +98,10 @@ class AppState extends Equatable {
       appTextScaleFactor: appTextScaleFactor ?? this.appTextScaleFactor,
       status: status ?? this.status,
       user: user ?? this.user,
-      settings: settings ?? this.settings, // Copy settings
-      locale: clearLocale ? null : locale ?? this.locale, // Added locale
+      settings: settings ?? this.settings,
+      locale: clearLocale ? null : locale ?? this.locale,
       appConfig: clearAppConfig ? null : appConfig ?? this.appConfig,
-      environment: clearEnvironment
-          ? null
-          : environment ?? this.environment, // Added
+      environment: clearEnvironment ? null : environment ?? this.environment,
     );
   }
 
@@ -117,8 +114,8 @@ class AppState extends Equatable {
     appTextScaleFactor,
     status,
     user,
-    settings, // Include settings in props
-    locale, // Added locale to props
+    settings,
+    locale,
     appConfig,
     environment,
   ];

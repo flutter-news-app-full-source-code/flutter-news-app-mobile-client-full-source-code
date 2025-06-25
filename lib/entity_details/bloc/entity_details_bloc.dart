@@ -4,10 +4,10 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ht_data_repository/ht_data_repository.dart';
 import 'package:ht_main/account/bloc/account_bloc.dart';
-import 'package:ht_main/app/bloc/app_bloc.dart'; // Added
+import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/entity_details/models/entity_type.dart';
-import 'package:ht_main/shared/services/feed_injector_service.dart'; // Added
-import 'package:ht_shared/ht_shared.dart'; // Ensures FeedItem, AppConfig, User are available
+import 'package:ht_main/shared/services/feed_injector_service.dart';
+import 'package:ht_shared/ht_shared.dart';
 
 part 'entity_details_event.dart';
 part 'entity_details_state.dart';
@@ -18,14 +18,14 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     required HtDataRepository<Category> categoryRepository,
     required HtDataRepository<Source> sourceRepository,
     required AccountBloc accountBloc,
-    required AppBloc appBloc, // Added
-    required FeedInjectorService feedInjectorService, // Added
+    required AppBloc appBloc,
+    required FeedInjectorService feedInjectorService,
   }) : _headlinesRepository = headlinesRepository,
        _categoryRepository = categoryRepository,
        _sourceRepository = sourceRepository,
        _accountBloc = accountBloc,
-       _appBloc = appBloc, // Added
-       _feedInjectorService = feedInjectorService, // Added
+       _appBloc = appBloc,
+       _feedInjectorService = feedInjectorService,
        super(const EntityDetailsState()) {
     on<EntityDetailsLoadRequested>(_onEntityDetailsLoadRequested);
     on<EntityDetailsToggleFollowRequested>(
@@ -50,11 +50,11 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
   final HtDataRepository<Category> _categoryRepository;
   final HtDataRepository<Source> _sourceRepository;
   final AccountBloc _accountBloc;
-  final AppBloc _appBloc; // Added
-  final FeedInjectorService _feedInjectorService; // Added
+  final AppBloc _appBloc;
+  final FeedInjectorService _feedInjectorService;
   late final StreamSubscription<AccountState> _accountBlocSubscription;
 
-  static const _headlinesLimit = 10; // For fetching original headlines
+  static const _headlinesLimit = 10;
 
   Future<void> _onEntityDetailsLoadRequested(
     EntityDetailsLoadRequested event,
@@ -72,7 +72,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       if (entityToLoad == null &&
           event.entityId != null &&
           event.entityType != null) {
-        entityTypeToLoad = event.entityType; // Ensure type is set
+        entityTypeToLoad = event.entityType;
         if (event.entityType == EntityType.category) {
           entityToLoad = await _categoryRepository.read(id: event.entityId!);
         } else if (event.entityType == EntityType.source) {
@@ -133,7 +133,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         headlines: headlineResponse.items,
         user: currentUser,
         appConfig: appConfig,
-        currentFeedItemCount: 0, // Initial load for this entity's feed
+        currentFeedItemCount: 0,
       );
 
       // 3. Determine isFollowing status
@@ -161,10 +161,9 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
           entityType: entityTypeToLoad,
           entity: entityToLoad,
           isFollowing: isCurrentlyFollowing,
-          feedItems: processedFeedItems, // Changed
+          feedItems: processedFeedItems,
           headlinesStatus: EntityHeadlinesStatus.success,
-          hasMoreHeadlines:
-              headlineResponse.hasMore, // Based on original headlines
+          hasMoreHeadlines: headlineResponse.hasMore,
           headlinesCursor: headlineResponse.cursor,
           clearErrorMessage: true,
         ),
@@ -182,7 +181,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         state.copyWith(
           status: EntityDetailsStatus.failure,
           errorMessage: e.message,
-          entityType: entityTypeToLoad, // Keep type if known
+          entityType: entityTypeToLoad,
         ),
       );
     } catch (e) {
@@ -190,7 +189,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         state.copyWith(
           status: EntityDetailsStatus.failure,
           errorMessage: 'An unexpected error occurred: $e',
-          entityType: entityTypeToLoad, // Keep type if known
+          entityType: entityTypeToLoad,
         ),
       );
     }
@@ -205,7 +204,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       emit(
         state.copyWith(
           errorMessage: 'No entity loaded to follow/unfollow.',
-          clearErrorMessage: false, // Keep existing error if any, or set new
+          clearErrorMessage: false,
         ),
       );
       return;
@@ -270,7 +269,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       final headlineResponse = await _headlinesRepository.readAllByQuery(
         queryParams,
         limit: _headlinesLimit,
-        startAfterId: state.headlinesCursor, // Cursor for original headlines
+        startAfterId: state.headlinesCursor,
       );
 
       final currentUser = _appBloc.state.user;
@@ -290,16 +289,14 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         headlines: headlineResponse.items,
         user: currentUser,
         appConfig: appConfig,
-        currentFeedItemCount: state.feedItems.length, // Pass current total
+        currentFeedItemCount: state.feedItems.length,
       );
 
       emit(
         state.copyWith(
-          feedItems: List.of(state.feedItems)
-            ..addAll(newProcessedFeedItems), // Changed
+          feedItems: List.of(state.feedItems)..addAll(newProcessedFeedItems),
           headlinesStatus: EntityHeadlinesStatus.success,
-          hasMoreHeadlines:
-              headlineResponse.hasMore, // Based on original headlines
+          hasMoreHeadlines: headlineResponse.hasMore,
           headlinesCursor: headlineResponse.cursor,
           clearHeadlinesCursor: !headlineResponse.hasMore,
         ),

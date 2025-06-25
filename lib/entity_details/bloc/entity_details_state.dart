@@ -12,21 +12,21 @@ class EntityDetailsState extends Equatable {
     this.entityType,
     this.entity,
     this.isFollowing = false,
-    this.feedItems = const [], // Changed from headlines
+    this.feedItems = const [],
     this.headlinesStatus = EntityHeadlinesStatus.initial,
-    this.hasMoreHeadlines = true, // This refers to original headlines
+    this.hasMoreHeadlines = true,
     this.headlinesCursor,
     this.errorMessage,
   });
 
   final EntityDetailsStatus status;
   final EntityType? entityType;
-  final dynamic entity; // Will be Category or Source
+  final dynamic entity;
   final bool isFollowing;
-  final List<FeedItem> feedItems; // Changed from List<Headline>
+  final List<FeedItem> feedItems;
   final EntityHeadlinesStatus headlinesStatus;
-  final bool hasMoreHeadlines; // This refers to original headlines
-  final String? headlinesCursor; // Cursor for fetching original headlines
+  final bool hasMoreHeadlines;
+  final String? headlinesCursor;
   final String? errorMessage;
 
   EntityDetailsState copyWith({
@@ -34,7 +34,7 @@ class EntityDetailsState extends Equatable {
     EntityType? entityType,
     dynamic entity,
     bool? isFollowing,
-    List<FeedItem>? feedItems, // Changed
+    List<FeedItem>? feedItems,
     EntityHeadlinesStatus? headlinesStatus,
     bool? hasMoreHeadlines,
     String? headlinesCursor,
@@ -48,7 +48,7 @@ class EntityDetailsState extends Equatable {
       entityType: entityType ?? this.entityType,
       entity: clearEntity ? null : entity ?? this.entity,
       isFollowing: isFollowing ?? this.isFollowing,
-      feedItems: feedItems ?? this.feedItems, // Changed
+      feedItems: feedItems ?? this.feedItems,
       headlinesStatus: headlinesStatus ?? this.headlinesStatus,
       hasMoreHeadlines: hasMoreHeadlines ?? this.hasMoreHeadlines,
       headlinesCursor: // This cursor is for fetching original headlines
@@ -67,7 +67,7 @@ class EntityDetailsState extends Equatable {
     entityType,
     entity,
     isFollowing,
-    feedItems, // Changed
+    feedItems,
     headlinesStatus,
     hasMoreHeadlines,
     headlinesCursor,

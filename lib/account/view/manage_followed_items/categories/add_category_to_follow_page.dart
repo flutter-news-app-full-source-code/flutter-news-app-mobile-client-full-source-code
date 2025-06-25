@@ -18,8 +18,8 @@ class AddCategoryToFollowPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final theme = Theme.of(context); // Get theme
-    final textTheme = theme.textTheme; // Get textTheme
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
 
     return BlocProvider(
       create: (context) => CategoriesFilterBloc(
@@ -27,10 +27,7 @@ class AddCategoryToFollowPage extends StatelessWidget {
       )..add(CategoriesFilterRequested()),
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
-            l10n.addCategoriesPageTitle,
-            style: textTheme.titleLarge, // Consistent AppBar title
-          ),
+          title: Text(l10n.addCategoriesPageTitle, style: textTheme.titleLarge),
         ),
         body: BlocBuilder<CategoriesFilterBloc, CategoriesFilterState>(
           builder: (context, categoriesState) {
@@ -86,14 +83,11 @@ class AddCategoryToFollowPage extends StatelessWidget {
                     accountState.preferences?.followedCategories ?? [];
 
                 return ListView.builder(
-                  padding:
-                      const EdgeInsets.symmetric(
-                        // Consistent padding
-                        horizontal: AppSpacing.paddingMedium,
-                        vertical: AppSpacing.paddingSmall,
-                      ).copyWith(
-                        bottom: AppSpacing.xxl,
-                      ), // Ensure bottom space for loader
+                  padding: const EdgeInsets.symmetric(
+                    // Consistent padding
+                    horizontal: AppSpacing.paddingMedium,
+                    vertical: AppSpacing.paddingSmall,
+                  ).copyWith(bottom: AppSpacing.xxl),
                   itemCount: categories.length + (isLoadingMore ? 1 : 0),
                   itemBuilder: (context, index) {
                     if (index == categories.length && isLoadingMore) {
@@ -114,7 +108,7 @@ class AddCategoryToFollowPage extends StatelessWidget {
 
                     return Card(
                       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-                      elevation: 0.5, // Subtle elevation
+                      elevation: 0.5,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(AppSpacing.sm),
                         side: BorderSide(
@@ -124,7 +118,7 @@ class AddCategoryToFollowPage extends StatelessWidget {
                       child: ListTile(
                         leading: SizedBox(
                           // Standardized leading icon/image size
-                          width: AppSpacing.xl + AppSpacing.xs, // 36
+                          width: AppSpacing.xl + AppSpacing.xs,
                           height: AppSpacing.xl + AppSpacing.xs,
                           child:
                               category.iconUrl != null &&

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ht_main/app/bloc/app_bloc.dart'; // Import AppBloc
+import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_main/router/routes.dart'; // Assuming sub-routes will be added here
+import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/settings/bloc/settings_bloc.dart';
 import 'package:ht_main/shared/constants/constants.dart';
-import 'package:ht_main/shared/widgets/widgets.dart'; // For loading/error
+import 'package:ht_main/shared/widgets/widgets.dart';
 
 /// {@template settings_page}
 /// The main page for accessing different application settings categories.
@@ -35,7 +35,7 @@ class SettingsPage extends StatelessWidget {
             }
           },
         ),
-        title: Text(l10n.settingsTitle), // Add l10n key: settingsTitle
+        title: Text(l10n.settingsTitle),
       ),
       // Use BlocBuilder to react to loading/error states if needed,
       // though the main list is often static.
@@ -46,8 +46,8 @@ class SettingsPage extends StatelessWidget {
           if (state.status == SettingsStatus.loading) {
             return LoadingStateWidget(
               icon: Icons.settings_outlined,
-              headline: l10n.settingsLoadingHeadline, // Add l10n key
-              subheadline: l10n.settingsLoadingSubheadline, // Add l10n key
+              headline: l10n.settingsLoadingHeadline,
+              subheadline: l10n.settingsLoadingSubheadline,
             );
           }
 
@@ -66,11 +66,9 @@ class SettingsPage extends StatelessWidget {
                 } else {
                   // Handle case where user is null on retry, though unlikely
                   // if router guards are effective.
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(l10n.unknownError), // Or a specific error
-                    ),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(l10n.unknownError)));
                 }
               },
             );
@@ -83,21 +81,21 @@ class SettingsPage extends StatelessWidget {
               _buildSettingsTile(
                 context: context,
                 icon: Icons.language_outlined,
-                title: l10n.settingsLanguageTitle, // Add l10n key
+                title: l10n.settingsLanguageTitle,
                 onTap: () => context.goNamed(Routes.settingsLanguageName),
               ),
               const Divider(indent: AppSpacing.lg, endIndent: AppSpacing.lg),
               _buildSettingsTile(
                 context: context,
                 icon: Icons.palette_outlined,
-                title: l10n.settingsAppearanceTitle, // Add l10n key
+                title: l10n.settingsAppearanceTitle,
                 onTap: () => context.goNamed(Routes.settingsAppearanceName),
               ),
               const Divider(indent: AppSpacing.lg, endIndent: AppSpacing.lg),
               _buildSettingsTile(
                 context: context,
                 icon: Icons.feed_outlined,
-                title: l10n.settingsFeedDisplayTitle, // Add l10n key
+                title: l10n.settingsFeedDisplayTitle,
                 onTap: () => context.goNamed(Routes.settingsFeedName),
               ),
               const Divider(indent: AppSpacing.lg, endIndent: AppSpacing.lg),

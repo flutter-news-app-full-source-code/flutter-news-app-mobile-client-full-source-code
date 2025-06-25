@@ -10,8 +10,8 @@ class AppConfig {
   // Factory constructors for different environments
   factory AppConfig.production() => const AppConfig(
     environment: AppEnvironment.production,
-    baseUrl:
-        'http://api.yourproductiondomain.com', // Replace with actual production URL
+    // Todo(you): Replace with actual production URL
+    baseUrl: 'http://api.yourproductiondomain.com',
   );
 
   factory AppConfig.demo() => const AppConfig(

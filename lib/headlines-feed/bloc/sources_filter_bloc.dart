@@ -53,20 +53,18 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
       // However, if initial capsule filters ARE provided, we should respect them for the initial display.
       final displayableSources = _getFilteredSources(
         allSources: allAvailableSources,
-        selectedCountries: initialSelectedCountryIsoCodes, // Use event's data
-        selectedTypes: initialSelectedSourceTypes, // Use event's data
+        selectedCountries: initialSelectedCountryIsoCodes,
+        selectedTypes: initialSelectedSourceTypes,
       );
 
       emit(
         state.copyWith(
           availableCountries: availableCountries.items,
           allAvailableSources: allAvailableSources,
-          displayableSources:
-              displayableSources, // Now correctly filtered if initial capsules were set
+          displayableSources: displayableSources,
           finallySelectedSourceIds: initialSelectedSourceIds,
-          selectedCountryIsoCodes:
-              initialSelectedCountryIsoCodes, // Use event's data
-          selectedSourceTypes: initialSelectedSourceTypes, // Use event's data
+          selectedCountryIsoCodes: initialSelectedCountryIsoCodes,
+          selectedSourceTypes: initialSelectedSourceTypes,
           dataLoadingStatus: SourceFilterDataLoadingStatus.success,
           clearErrorMessage: true,
         ),
@@ -120,7 +118,7 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
     final newDisplayableSources = _getFilteredSources(
       allSources: state.allAvailableSources,
       selectedCountries: state.selectedCountryIsoCodes,
-      selectedTypes: {}, // Cleared source types
+      selectedTypes: {},
     );
     emit(
       state.copyWith(
@@ -175,7 +173,7 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
         selectedCountryIsoCodes: {},
         selectedSourceTypes: {},
         finallySelectedSourceIds: {},
-        displayableSources: List.from(state.allAvailableSources), // Reset
+        displayableSources: List.from(state.allAvailableSources),
         dataLoadingStatus: SourceFilterDataLoadingStatus.success,
         clearErrorMessage: true,
       ),
@@ -189,7 +187,7 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
     required Set<SourceType> selectedTypes,
   }) {
     if (selectedCountries.isEmpty && selectedTypes.isEmpty) {
-      return List.from(allSources); // Return all if no filters
+      return List.from(allSources);
     }
 
     return allSources.where((source) {

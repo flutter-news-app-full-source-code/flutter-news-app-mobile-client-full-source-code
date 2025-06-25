@@ -57,8 +57,8 @@ final class CategoriesFilterState extends Equatable {
     bool? hasMore,
     String? cursor,
     Object? error,
-    bool clearError = false, // Flag to explicitly clear the error
-    bool clearCursor = false, // Flag to explicitly clear the cursor
+    bool clearError = false,
+    bool clearCursor = false,
   }) {
     return CategoriesFilterState(
       status: status ?? this.status,

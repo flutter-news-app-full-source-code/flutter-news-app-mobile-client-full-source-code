@@ -23,18 +23,16 @@ class ManageFollowedItemsPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           l10n.accountContentPreferencesTile,
-          style: textTheme.titleLarge, // Consistent AppBar title style
+          style: textTheme.titleLarge,
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(
-          vertical: AppSpacing.paddingSmall,
-        ), // Adjusted padding
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.paddingSmall),
         children: [
           ListTile(
             leading: Icon(Icons.category_outlined, color: colorScheme.primary),
             title: Text(
-              l10n.headlinesFeedFilterCategoryLabel, // "Categories"
+              l10n.headlinesFeedFilterCategoryLabel,
               style: textTheme.titleMedium,
             ),
             trailing: const Icon(Icons.chevron_right),
@@ -43,13 +41,13 @@ class ManageFollowedItemsPage extends StatelessWidget {
             },
           ),
           const Divider(
-            indent: AppSpacing.paddingMedium, // Consistent indent
+            indent: AppSpacing.paddingMedium,
             endIndent: AppSpacing.paddingMedium,
           ),
           ListTile(
             leading: Icon(Icons.source_outlined, color: colorScheme.primary),
             title: Text(
-              l10n.headlinesFeedFilterSourceLabel, // "Sources"
+              l10n.headlinesFeedFilterSourceLabel,
               style: textTheme.titleMedium,
             ),
             trailing: const Icon(Icons.chevron_right),
@@ -58,7 +56,7 @@ class ManageFollowedItemsPage extends StatelessWidget {
             },
           ),
           const Divider(
-            indent: AppSpacing.paddingMedium, // Consistent indent
+            indent: AppSpacing.paddingMedium,
             endIndent: AppSpacing.paddingMedium,
           ),
           // ListTile for Followed Countries removed

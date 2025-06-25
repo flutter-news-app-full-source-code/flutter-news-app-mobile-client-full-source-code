@@ -21,7 +21,7 @@ class EntityDetailsLoadRequested extends EntityDetailsEvent {
 
   final String? entityId;
   final EntityType? entityType;
-  final dynamic entity; // Category or Source
+  final dynamic entity;
 
   @override
   List<Object?> get props => [entityId, entityType, entity];

@@ -89,11 +89,8 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         // After delay, re-attempt to read the preferences.
         // This is crucial because migration might have completed during the delay.
         try {
-          final migratedPreferences =
-              await _userContentPreferencesRepository.read(
-            id: event.userId,
-            userId: event.userId,
-          );
+          final migratedPreferences = await _userContentPreferencesRepository
+              .read(id: event.userId, userId: event.userId);
           emit(
             state.copyWith(
               status: AccountStatus.success,
@@ -134,11 +131,8 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
           '[AccountBloc] Conflict during creation of UserContentPreferences. '
           'Attempting to re-read.',
         );
-        final existingPreferences =
-            await _userContentPreferencesRepository.read(
-          id: event.userId,
-          userId: event.userId,
-        );
+        final existingPreferences = await _userContentPreferencesRepository
+            .read(id: event.userId, userId: event.userId);
         emit(
           state.copyWith(
             status: AccountStatus.success,

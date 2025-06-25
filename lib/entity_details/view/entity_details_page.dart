@@ -46,21 +46,21 @@ class EntityDetailsPage extends StatelessWidget {
       // Explicitly type BlocProvider
       create: (context) {
         final feedInjectorService = FeedInjectorService();
-        final entityDetailsBloc = EntityDetailsBloc(
-          headlinesRepository: context.read<HtDataRepository<Headline>>(),
-          categoryRepository: context.read<HtDataRepository<Category>>(),
-          sourceRepository: context.read<HtDataRepository<Source>>(),
-          accountBloc: context.read<AccountBloc>(),
-          appBloc: context.read<AppBloc>(),
-          feedInjectorService: feedInjectorService,
-        )
-        ..add(
-          EntityDetailsLoadRequested(
-            entityId: args.entityId,
-            entityType: args.entityType,
-            entity: args.entity,
-          ),
-        );
+        final entityDetailsBloc =
+            EntityDetailsBloc(
+              headlinesRepository: context.read<HtDataRepository<Headline>>(),
+              categoryRepository: context.read<HtDataRepository<Category>>(),
+              sourceRepository: context.read<HtDataRepository<Source>>(),
+              accountBloc: context.read<AccountBloc>(),
+              appBloc: context.read<AppBloc>(),
+              feedInjectorService: feedInjectorService,
+            )..add(
+              EntityDetailsLoadRequested(
+                entityId: args.entityId,
+                entityType: args.entityType,
+                entity: args.entity,
+              ),
+            );
         return entityDetailsBloc;
       },
       child: EntityDetailsView(args: args),
@@ -118,7 +118,7 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
         name = l10n.entityDetailsCategoryTitle;
       case EntityType.source:
         name = l10n.entityDetailsSourceTitle;
-      }
+    }
     // Manual capitalization
     return name.isNotEmpty
         ? '${name[0].toUpperCase()}${name.substring(1)}'

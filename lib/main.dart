@@ -6,9 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:ht_main/app/config/config.dart';
 import 'package:ht_main/bootstrap.dart';
 
-// Define the current application environment here.
-// Change this value to switch between environments for local development.
-// production/development/demo
+// Define the current application environment (production/development/demo).
 const appEnvironment = AppEnvironment.demo;
 
 @JS('removeSplashFromWeb')

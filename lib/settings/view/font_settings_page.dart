@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ht_main/app/bloc/app_bloc.dart'; // Import AppBloc and events
+import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/l10n/app_localizations.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/settings/bloc/settings_bloc.dart';
@@ -44,11 +44,11 @@ class FontSettingsPage extends StatelessWidget {
     // Using direct strings as placeholders until specific l10n keys are confirmed
     switch (weight) {
       case AppFontWeight.light:
-        return 'Light'; // Placeholder
+        return 'Light';
       case AppFontWeight.regular:
-        return 'Regular'; // Placeholder
+        return 'Regular';
       case AppFontWeight.bold:
-        return 'Bold'; // Placeholder
+        return 'Bold';
     }
   }
 
@@ -61,9 +61,7 @@ class FontSettingsPage extends StatelessWidget {
     if (state.status != SettingsStatus.success ||
         state.userAppSettings == null) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text(l10n.settingsAppearanceTitle),
-        ), // Use existing key
+        appBar: AppBar(title: Text(l10n.settingsAppearanceTitle)),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
@@ -76,9 +74,7 @@ class FontSettingsPage extends StatelessWidget {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(l10n.settingsAppearanceTitle),
-        ), // Use existing key
+        appBar: AppBar(title: Text(l10n.settingsAppearanceTitle)),
         body: ListView(
           padding: const EdgeInsets.all(AppSpacing.lg),
           children: [
@@ -110,7 +106,7 @@ class FontSettingsPage extends StatelessWidget {
                 'Lato',
                 'Montserrat',
                 'Merriweather',
-              ], // Updated font list
+              ],
               itemToString: (fontFamily) =>
                   _fontFamilyToString(fontFamily, l10n),
               onChanged: (value) {
@@ -136,7 +132,7 @@ class FontSettingsPage extends StatelessWidget {
             ),
           ],
         ),
-      ), // Correctly close BlocListener's child Scaffold
+      ),
     );
   }
 

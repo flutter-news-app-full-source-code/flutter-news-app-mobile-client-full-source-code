@@ -5,8 +5,7 @@ import 'package:ht_main/l10n/app_localizations.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/settings/bloc/settings_bloc.dart';
 import 'package:ht_main/shared/constants/constants.dart';
-import 'package:ht_shared/ht_shared.dart'
-    show HeadlineImageStyle; // Import new enum
+import 'package:ht_shared/ht_shared.dart' show HeadlineImageStyle;
 
 /// {@template feed_settings_page}
 /// A page for configuring feed display settings.
@@ -19,11 +18,11 @@ class FeedSettingsPage extends StatelessWidget {
   String _imageStyleToString(HeadlineImageStyle style, AppLocalizations l10n) {
     switch (style) {
       case HeadlineImageStyle.hidden:
-        return l10n.settingsFeedTileTypeTextOnly; // Closest match
+        return l10n.settingsFeedTileTypeTextOnly;
       case HeadlineImageStyle.smallThumbnail:
-        return l10n.settingsFeedTileTypeImageStart; // Closest match
+        return l10n.settingsFeedTileTypeImageStart;
       case HeadlineImageStyle.largeThumbnail:
-        return l10n.settingsFeedTileTypeImageTop; // Closest match
+        return l10n.settingsFeedTileTypeImageTop;
     }
   }
 
@@ -36,9 +35,7 @@ class FeedSettingsPage extends StatelessWidget {
     // Ensure we have loaded state before building controls
     if (state.status != SettingsStatus.success) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text(l10n.settingsFeedDisplayTitle),
-        ), // Reuse title
+        appBar: AppBar(title: Text(l10n.settingsFeedDisplayTitle)),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
@@ -50,27 +47,21 @@ class FeedSettingsPage extends StatelessWidget {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(l10n.settingsFeedDisplayTitle), // Reuse title
-        ),
+        appBar: AppBar(title: Text(l10n.settingsFeedDisplayTitle)),
         body: ListView(
           padding: const EdgeInsets.all(AppSpacing.lg),
           children: [
             // --- Feed Tile Type ---
             _buildDropdownSetting<HeadlineImageStyle>(
               context: context,
-              title: l10n.settingsFeedTileTypeLabel, // Add l10n key
-              currentValue: state
-                  .userAppSettings!
-                  .feedPreferences
-                  .headlineImageStyle, // Use new model field
+              title: l10n.settingsFeedTileTypeLabel,
+              currentValue:
+                  state.userAppSettings!.feedPreferences.headlineImageStyle,
               items: HeadlineImageStyle.values,
               itemToString: (style) => _imageStyleToString(style, l10n),
               onChanged: (value) {
                 if (value != null) {
-                  settingsBloc.add(
-                    SettingsFeedTileTypeChanged(value),
-                  ); // Use new event
+                  settingsBloc.add(SettingsFeedTileTypeChanged(value));
                 }
               },
             ),

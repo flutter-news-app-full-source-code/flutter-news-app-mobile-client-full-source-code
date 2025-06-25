@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ht_auth_repository/ht_auth_repository.dart';
 import 'package:ht_data_repository/ht_data_repository.dart';
+import 'package:ht_main/app/config/config.dart' as local_config;
 import 'package:ht_shared/ht_shared.dart';
 
 part 'account_event.dart';
@@ -14,8 +15,10 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     required HtAuthRepository authenticationRepository,
     required HtDataRepository<UserContentPreferences>
     userContentPreferencesRepository,
+    required local_config.AppEnvironment environment,
   }) : _authenticationRepository = authenticationRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
+       _environment = environment,
        super(const AccountState()) {
     // Listen to user changes from HtAuthRepository
     _userSubscription = _authenticationRepository.authStateChanges.listen((
@@ -37,6 +40,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   final HtAuthRepository _authenticationRepository;
   final HtDataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
+  final local_config.AppEnvironment _environment;
   late StreamSubscription<User?> _userSubscription;
 
   Future<void> _onAccountUserChanged(
@@ -62,7 +66,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     try {
       final preferences = await _userContentPreferencesRepository.read(
         id: event.userId,
-        userId: event.userId, // Scope to the current user
+        userId: event.userId,
       );
       emit(
         state.copyWith(
@@ -72,7 +76,39 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         ),
       );
     } on NotFoundException {
-      // If preferences not found, create a default one for the user
+      // In demo mode, a short delay is introduced here to mitigate a race
+      // condition during anonymous to authenticated data migration.
+      // This ensures that the DemoDataMigrationService has a chance to
+      // complete its migration of UserContentPreferences before AccountBloc
+      // attempts to create a new default preference for the authenticated user.
+      // This is a temporary stub for the demo environment only and is not
+      // needed in production/development where backend handles migration.
+      if (_environment == local_config.AppEnvironment.demo) {
+        // ignore: inference_failure_on_instance_creation
+        await Future.delayed(const Duration(seconds: 1));
+        // After delay, re-attempt to read the preferences.
+        // This is crucial because migration might have completed during the delay.
+        try {
+          final migratedPreferences = await _userContentPreferencesRepository
+              .read(id: event.userId, userId: event.userId);
+          emit(
+            state.copyWith(
+              status: AccountStatus.success,
+              preferences: migratedPreferences,
+              clearErrorMessage: true,
+            ),
+          );
+          return; // Exit if successfully read after migration
+        } on NotFoundException {
+          // Still not found after delay, proceed to create default.
+          print(
+            '[AccountBloc] UserContentPreferences still not found after '
+            'migration delay. Creating default preferences.',
+          );
+        }
+      }
+      // If preferences not found (either initially or after re-attempt),
+      // create a default one for the user.
       final defaultPreferences = UserContentPreferences(id: event.userId);
       try {
         await _userContentPreferencesRepository.create(
@@ -86,11 +122,29 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
             clearErrorMessage: true,
           ),
         );
+      } on ConflictException {
+        // If a conflict occurs during creation (e.g., another process
+        // created it concurrently), attempt to read it again to get the
+        // existing one. This can happen if the migration service
+        // created it right after the second NotFoundException.
+        print(
+          '[AccountBloc] Conflict during creation of UserContentPreferences. '
+          'Attempting to re-read.',
+        );
+        final existingPreferences = await _userContentPreferencesRepository
+            .read(id: event.userId, userId: event.userId);
+        emit(
+          state.copyWith(
+            status: AccountStatus.success,
+            preferences: existingPreferences,
+            clearErrorMessage: true,
+          ),
+        );
       } catch (e) {
         emit(
           state.copyWith(
             status: AccountStatus.failure,
-            errorMessage: 'Failed to create default preferences.',
+            errorMessage: 'Failed to create default preferences: $e',
           ),
         );
       }

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart'; // Added
+import 'package:go_router/go_router.dart';
 import 'package:ht_main/entity_details/models/entity_type.dart';
-import 'package:ht_main/entity_details/view/entity_details_page.dart'; // Added for Page Arguments
+import 'package:ht_main/entity_details/view/entity_details_page.dart';
 import 'package:ht_main/l10n/app_localizations.dart';
 import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_main/router/routes.dart'; // Added
+import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/constants/app_spacing.dart';
-import 'package:ht_main/shared/utils/utils.dart'; // Import the new utility
+import 'package:ht_main/shared/utils/utils.dart';
 import 'package:ht_shared/ht_shared.dart' show Headline;
 // timeago import removed from here, handled by utility
 
@@ -55,7 +55,7 @@ class HeadlineTileImageTop extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           InkWell(
-            onTap: onHeadlineTap, // Image area is part of the main tap area
+            onTap: onHeadlineTap,
             child: ClipRRect(
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(AppSpacing.xs),
@@ -65,7 +65,7 @@ class HeadlineTileImageTop extends StatelessWidget {
                   ? Image.network(
                       headline.imageUrl!,
                       width: double.infinity,
-                      height: 180, // Standard large image height
+                      height: 180,
                       fit: BoxFit.cover,
                       loadingBuilder: (context, child, loadingProgress) {
                         if (loadingProgress == null) return child;
@@ -111,7 +111,7 @@ class HeadlineTileImageTop extends StatelessWidget {
                   children: [
                     Expanded(
                       child: InkWell(
-                        onTap: onHeadlineTap, // Title is part of main tap area
+                        onTap: onHeadlineTap,
                         child: Text(
                           headline.title,
                           style: textTheme.titleMedium?.copyWith(
@@ -134,9 +134,8 @@ class HeadlineTileImageTop extends StatelessWidget {
                   l10n: l10n,
                   colorScheme: colorScheme,
                   textTheme: textTheme,
-                  currentContextEntityType:
-                      currentContextEntityType, // Pass down
-                  currentContextEntityId: currentContextEntityId, // Pass down
+                  currentContextEntityType: currentContextEntityType,
+                  currentContextEntityId: currentContextEntityId,
                 ),
               ],
             ),
@@ -175,10 +174,10 @@ class _HeadlineMetadataRow extends StatelessWidget {
     );
     // Icon color to match the subtle text
     final iconColor = colorScheme.primary.withOpacity(0.7);
-    const iconSize = AppSpacing.sm; // Standard small icon size
+    const iconSize = AppSpacing.sm;
 
     return Wrap(
-      spacing: AppSpacing.sm, // Increased spacing for readability
+      spacing: AppSpacing.sm,
       runSpacing: AppSpacing.xs,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [

@@ -3,13 +3,13 @@ import 'package:timeago/timeago.dart' as timeago;
 /// Custom English lookup messages for the timeago package (concise).
 class EnTimeagoMessages implements timeago.LookupMessages {
   @override
-  String prefixAgo() => ''; // No prefix
+  String prefixAgo() => '';
   @override
-  String prefixFromNow() => ''; // No prefix
+  String prefixFromNow() => '';
   @override
-  String suffixAgo() => ' ago'; // Suffix instead
+  String suffixAgo() => ' ago';
   @override
-  String suffixFromNow() => ' from now'; // Suffix instead
+  String suffixFromNow() => ' from now';
 
   @override
   String lessThanOneMinute(int seconds) => 'now';

@@ -40,7 +40,7 @@ class SettingsAppThemeModeChanged extends SettingsEvent {
   const SettingsAppThemeModeChanged(this.themeMode);
 
   /// The newly selected theme mode.
-  final AppBaseTheme themeMode; // Use AppBaseTheme from ht_shared
+  final AppBaseTheme themeMode;
 
   @override
   List<Object?> get props => [themeMode];
@@ -54,7 +54,7 @@ class SettingsAppThemeNameChanged extends SettingsEvent {
   const SettingsAppThemeNameChanged(this.themeName);
 
   /// The newly selected theme name.
-  final AppAccentTheme themeName; // Use AppAccentTheme from ht_shared
+  final AppAccentTheme themeName;
 
   @override
   List<Object?> get props => [themeName];
@@ -68,7 +68,7 @@ class SettingsAppFontSizeChanged extends SettingsEvent {
   const SettingsAppFontSizeChanged(this.fontSize);
 
   /// The newly selected font size.
-  final AppTextScaleFactor fontSize; // Use AppTextScaleFactor from ht_shared
+  final AppTextScaleFactor fontSize;
 
   @override
   List<Object?> get props => [fontSize];
@@ -82,7 +82,7 @@ class SettingsAppFontTypeChanged extends SettingsEvent {
   const SettingsAppFontTypeChanged(this.fontType);
 
   /// The newly selected font type.
-  final String fontType; // Use String for fontFamily
+  final String fontType;
 
   @override
   List<Object?> get props => [fontType];
@@ -96,7 +96,7 @@ class SettingsAppFontWeightChanged extends SettingsEvent {
   const SettingsAppFontWeightChanged(this.fontWeight);
 
   /// The newly selected font weight.
-  final AppFontWeight fontWeight; // Use AppFontWeight from ht_shared
+  final AppFontWeight fontWeight;
 
   @override
   List<Object?> get props => [fontWeight];
@@ -113,7 +113,7 @@ class SettingsFeedTileTypeChanged extends SettingsEvent {
 
   /// The newly selected feed list tile type.
   // Note: This event might need to be split into density and image style changes.
-  final HeadlineImageStyle tileType; // Use HeadlineImageStyle from ht_shared
+  final HeadlineImageStyle tileType;
 
   @override
   List<Object?> get props => [tileType];
@@ -127,7 +127,7 @@ class SettingsLanguageChanged extends SettingsEvent {
   const SettingsLanguageChanged(this.languageCode);
 
   /// The newly selected language code (e.g., 'en', 'ar').
-  final AppLanguage languageCode; // Use AppLanguage typedef from ht_shared
+  final AppLanguage languageCode;
 
   @override
   List<Object?> get props => [languageCode];
@@ -137,6 +137,6 @@ class SettingsLanguageChanged extends SettingsEvent {
 // SettingsNotificationsEnabledChanged event removed as UserAppSettings
 // does not currently support a general notifications enabled flag.
 
-// TODO(cline): Add events for changing followed categories/sources/countries
+// TODO(fulleni): Add events for changing followed categories/sources/countries
 // for notifications if needed later. Example:
 // class SettingsNotificationCategoriesChanged extends SettingsEvent { ... }

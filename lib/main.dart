@@ -9,19 +9,19 @@ import 'package:ht_main/bootstrap.dart';
 // Define the current application environment here.
 // Change this value to switch between environments for local development.
 // production/development/demo
-const currentEnvironment = AppEnvironment.demo;
+const appEnvironment = AppEnvironment.demo;
 
 @JS('removeSplashFromWeb')
 external void removeSplashFromWeb();
 
 void main() async {
-  final appConfig = switch (currentEnvironment) {
+  final appConfig = switch (appEnvironment) {
     AppEnvironment.production => AppConfig.production(),
     AppEnvironment.development => AppConfig.development(),
     AppEnvironment.demo => AppConfig.demo(),
   };
 
-  final appWidget = await bootstrap(appConfig, currentEnvironment);
+  final appWidget = await bootstrap(appConfig, appEnvironment);
 
   // Only remove the splash screen on web after the app is ready.
   if (kIsWeb) {

@@ -1,23 +1,24 @@
 //
 // ignore_for_file: deprecated_member_use
 
-import 'package:flex_color_scheme/flex_color_scheme.dart'; // Added
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ht_auth_repository/ht_auth_repository.dart'; // Auth Repository
-import 'package:ht_data_repository/ht_data_repository.dart'; // Generic Data Repository
-import 'package:ht_kv_storage_service/ht_kv_storage_service.dart'; // KV Storage Interface
+import 'package:ht_auth_repository/ht_auth_repository.dart';
+import 'package:ht_data_repository/ht_data_repository.dart';
+import 'package:ht_kv_storage_service/ht_kv_storage_service.dart';
 import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/app/config/app_environment.dart';
 import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/l10n/app_localizations.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/router.dart';
+import 'package:ht_main/shared/services/demo_data_migration_service.dart';
 import 'package:ht_main/shared/theme/app_theme.dart';
-import 'package:ht_main/shared/widgets/failure_state_widget.dart'; // Added
-import 'package:ht_main/shared/widgets/loading_state_widget.dart'; // Added
-import 'package:ht_shared/ht_shared.dart'; // Shared models, FromJson, ToJson, etc.
+import 'package:ht_main/shared/widgets/failure_state_widget.dart';
+import 'package:ht_main/shared/widgets/loading_state_widget.dart';
+import 'package:ht_shared/ht_shared.dart';
 
 class App extends StatelessWidget {
   const App({
@@ -31,7 +32,8 @@ class App extends StatelessWidget {
     htUserContentPreferencesRepository,
     required HtDataRepository<AppConfig> htAppConfigRepository,
     required HtKVStorageService kvStorageService,
-    required AppEnvironment environment, // Added
+    required AppEnvironment environment,
+    this.demoDataMigrationService,
     super.key,
   }) : _htAuthenticationRepository = htAuthenticationRepository,
        _htHeadlinesRepository = htHeadlinesRepository,
@@ -42,7 +44,7 @@ class App extends StatelessWidget {
        _htUserContentPreferencesRepository = htUserContentPreferencesRepository,
        _htAppConfigRepository = htAppConfigRepository,
        _kvStorageService = kvStorageService,
-       _environment = environment; // Added
+       _environment = environment;
 
   final HtAuthRepository _htAuthenticationRepository;
   final HtDataRepository<Headline> _htHeadlinesRepository;
@@ -54,7 +56,8 @@ class App extends StatelessWidget {
   _htUserContentPreferencesRepository;
   final HtDataRepository<AppConfig> _htAppConfigRepository;
   final HtKVStorageService _kvStorageService;
-  final AppEnvironment _environment; // Added
+  final AppEnvironment _environment;
+  final DemoDataMigrationService? demoDataMigrationService;
 
   @override
   Widget build(BuildContext context) {
@@ -70,17 +73,16 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _htAppConfigRepository),
         RepositoryProvider.value(value: _kvStorageService),
       ],
-      // Use MultiBlocProvider to provide global BLoCs
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            // AppBloc constructor needs refactoring in Step 4
             create: (context) => AppBloc(
               authenticationRepository: context.read<HtAuthRepository>(),
               userAppSettingsRepository: context
                   .read<HtDataRepository<UserAppSettings>>(),
               appConfigRepository: context.read<HtDataRepository<AppConfig>>(),
-              environment: _environment, // Pass environment
+              environment: _environment,
+              demoDataMigrationService: demoDataMigrationService,
             ),
           ),
           BlocProvider(
@@ -99,7 +101,7 @@ class App extends StatelessWidget {
           htUserContentPreferencesRepository:
               _htUserContentPreferencesRepository,
           htAppConfigRepository: _htAppConfigRepository,
-          environment: _environment, // Pass environment
+          environment: _environment,
         ),
       ),
     );
@@ -116,7 +118,7 @@ class _AppView extends StatefulWidget {
     required this.htUserAppSettingsRepository,
     required this.htUserContentPreferencesRepository,
     required this.htAppConfigRepository,
-    required this.environment, // Added
+    required this.environment,
   });
 
   final HtAuthRepository htAuthenticationRepository;
@@ -128,7 +130,7 @@ class _AppView extends StatefulWidget {
   final HtDataRepository<UserContentPreferences>
   htUserContentPreferencesRepository;
   final HtDataRepository<AppConfig> htAppConfigRepository;
-  final AppEnvironment environment; // Added
+  final AppEnvironment environment;
 
   @override
   State<_AppView> createState() => _AppViewState();
@@ -157,6 +159,7 @@ class _AppViewState extends State<_AppView> {
       htUserContentPreferencesRepository:
           widget.htUserContentPreferencesRepository,
       htAppConfigRepository: widget.htAppConfigRepository,
+      environment: widget.environment,
     );
 
     // Removed Dynamic Link Initialization
@@ -164,7 +167,7 @@ class _AppViewState extends State<_AppView> {
 
   @override
   void dispose() {
-    _statusNotifier.dispose(); // Dispose the correct notifier
+    _statusNotifier.dispose();
     // Removed Dynamic Links subscription cancellation
     super.dispose();
   }
@@ -192,15 +195,15 @@ class _AppViewState extends State<_AppView> {
             return MaterialApp(
               debugShowCheckedModeBanner: false,
               theme: lightTheme(
-                scheme: FlexScheme.material, // Default scheme
-                appTextScaleFactor: AppTextScaleFactor.medium, // Default
-                appFontWeight: AppFontWeight.regular, // Default
-                fontFamily: null, // System default font
+                scheme: FlexScheme.material,
+                appTextScaleFactor: AppTextScaleFactor.medium,
+                appFontWeight: AppFontWeight.regular,
+                fontFamily: null,
               ),
               darkTheme: darkTheme(
-                scheme: FlexScheme.material, // Default scheme
-                appTextScaleFactor: AppTextScaleFactor.medium, // Default
-                appFontWeight: AppFontWeight.regular, // Default
+                scheme: FlexScheme.material,
+                appTextScaleFactor: AppTextScaleFactor.medium,
+                appFontWeight: AppFontWeight.regular,
                 fontFamily: null, // System default font
               ),
               themeMode: state
@@ -214,9 +217,8 @@ class _AppViewState extends State<_AppView> {
                     final l10n = innerContext.l10n;
                     return LoadingStateWidget(
                       icon: Icons.settings_applications_outlined,
-                      headline:
-                          l10n.headlinesFeedLoadingHeadline, // "Loading..."
-                      subheadline: l10n.pleaseWait, // "Please wait..."
+                      headline: l10n.headlinesFeedLoadingHeadline,
+                      subheadline: l10n.pleaseWait,
                     );
                   },
                 ),
@@ -228,16 +230,16 @@ class _AppViewState extends State<_AppView> {
             return MaterialApp(
               debugShowCheckedModeBanner: false,
               theme: lightTheme(
-                scheme: FlexScheme.material, // Default scheme
-                appTextScaleFactor: AppTextScaleFactor.medium, // Default
-                appFontWeight: AppFontWeight.regular, // Default
-                fontFamily: null, // System default font
+                scheme: FlexScheme.material,
+                appTextScaleFactor: AppTextScaleFactor.medium,
+                appFontWeight: AppFontWeight.regular,
+                fontFamily: null,
               ),
               darkTheme: darkTheme(
-                scheme: FlexScheme.material, // Default scheme
-                appTextScaleFactor: AppTextScaleFactor.medium, // Default
-                appFontWeight: AppFontWeight.regular, // Default
-                fontFamily: null, // System default font
+                scheme: FlexScheme.material,
+                appTextScaleFactor: AppTextScaleFactor.medium,
+                appFontWeight: AppFontWeight.regular,
+                fontFamily: null,
               ),
               themeMode: state.themeMode,
               localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -248,9 +250,8 @@ class _AppViewState extends State<_AppView> {
                   builder: (innerContext) {
                     final l10n = innerContext.l10n;
                     return FailureStateWidget(
-                      message:
-                          l10n.unknownError, // "An unknown error occurred."
-                      retryButtonText: 'Retry', // Hardcoded for now
+                      message: l10n.unknownError,
+                      retryButtonText: 'Retry',
                       onRetry: () {
                         // Use outer context for BLoC access
                         context.read<AppBloc>().add(

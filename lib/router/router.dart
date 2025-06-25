@@ -1,34 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ht_auth_repository/ht_auth_repository.dart'; // Auth Repository
-import 'package:ht_data_repository/ht_data_repository.dart'; // Generic Data Repository
+import 'package:ht_auth_repository/ht_auth_repository.dart';
+import 'package:ht_data_repository/ht_data_repository.dart';
 import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/account/view/account_page.dart';
-import 'package:ht_main/account/view/manage_followed_items/categories/add_category_to_follow_page.dart'; // New
-import 'package:ht_main/account/view/manage_followed_items/categories/followed_categories_list_page.dart'; // New
-// import 'package:ht_main/account/view/manage_followed_items/countries/add_country_to_follow_page.dart'; // Removed
-// import 'package:ht_main/account/view/manage_followed_items/countries/followed_countries_list_page.dart'; // Removed
-import 'package:ht_main/account/view/manage_followed_items/manage_followed_items_page.dart'; // New
-import 'package:ht_main/account/view/manage_followed_items/sources/add_source_to_follow_page.dart'; // New
-import 'package:ht_main/account/view/manage_followed_items/sources/followed_sources_list_page.dart'; // New
-import 'package:ht_main/account/view/saved_headlines_page.dart'; // Import SavedHeadlinesPage
+import 'package:ht_main/account/view/manage_followed_items/categories/add_category_to_follow_page.dart';
+import 'package:ht_main/account/view/manage_followed_items/categories/followed_categories_list_page.dart';
+// import 'package:ht_main/account/view/manage_followed_items/countries/add_country_to_follow_page.dart';
+// import 'package:ht_main/account/view/manage_followed_items/countries/followed_countries_list_page.dart';
+import 'package:ht_main/account/view/manage_followed_items/manage_followed_items_page.dart';
+import 'package:ht_main/account/view/manage_followed_items/sources/add_source_to_follow_page.dart';
+import 'package:ht_main/account/view/manage_followed_items/sources/followed_sources_list_page.dart';
+import 'package:ht_main/account/view/saved_headlines_page.dart';
 import 'package:ht_main/app/bloc/app_bloc.dart';
+import 'package:ht_main/app/config/config.dart' as local_config;
 import 'package:ht_main/app/view/app_shell.dart';
 import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/authentication/view/authentication_page.dart';
 import 'package:ht_main/authentication/view/email_code_verification_page.dart';
 import 'package:ht_main/authentication/view/request_code_page.dart';
-import 'package:ht_main/entity_details/view/entity_details_page.dart'; // Added
-import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart'; // Re-added
-import 'package:ht_main/headline-details/bloc/similar_headlines_bloc.dart'; // Import SimilarHeadlinesBloc
+import 'package:ht_main/entity_details/view/entity_details_page.dart';
+import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart';
+import 'package:ht_main/headline-details/bloc/similar_headlines_bloc.dart';
 import 'package:ht_main/headline-details/view/headline_details_page.dart';
-import 'package:ht_main/headlines-feed/bloc/categories_filter_bloc.dart'; // Import new BLoC
-// import 'package:ht_main/headlines-feed/bloc/countries_filter_bloc.dart'; // Import new BLoC - REMOVED
+import 'package:ht_main/headlines-feed/bloc/categories_filter_bloc.dart';
+// import 'package:ht_main/headlines-feed/bloc/countries_filter_bloc.dart';
 import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
-import 'package:ht_main/headlines-feed/bloc/sources_filter_bloc.dart'; // Import new BLoC
+import 'package:ht_main/headlines-feed/bloc/sources_filter_bloc.dart';
 import 'package:ht_main/headlines-feed/view/category_filter_page.dart';
-// import 'package:ht_main/headlines-feed/view/country_filter_page.dart'; // REMOVED
+// import 'package:ht_main/headlines-feed/view/country_filter_page.dart';
 import 'package:ht_main/headlines-feed/view/headlines_feed_page.dart';
 import 'package:ht_main/headlines-feed/view/headlines_filter_page.dart';
 import 'package:ht_main/headlines-feed/view/source_filter_page.dart';
@@ -36,16 +37,16 @@ import 'package:ht_main/headlines-search/bloc/headlines_search_bloc.dart';
 import 'package:ht_main/headlines-search/view/headlines_search_page.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
-import 'package:ht_main/settings/bloc/settings_bloc.dart'; // Added
-import 'package:ht_main/settings/view/appearance_settings_page.dart'; // Added
-import 'package:ht_main/settings/view/feed_settings_page.dart'; // Added
-import 'package:ht_main/settings/view/font_settings_page.dart'; // Added for new page
-import 'package:ht_main/settings/view/language_settings_page.dart'; // Added for new page
-import 'package:ht_main/settings/view/notification_settings_page.dart'; // Added
-import 'package:ht_main/settings/view/settings_page.dart'; // Added
-import 'package:ht_main/settings/view/theme_settings_page.dart'; // Added for new page
-import 'package:ht_main/shared/services/feed_injector_service.dart'; // Added
-import 'package:ht_shared/ht_shared.dart'; // Shared models, FromJson, ToJson, etc.
+import 'package:ht_main/settings/bloc/settings_bloc.dart';
+import 'package:ht_main/settings/view/appearance_settings_page.dart';
+import 'package:ht_main/settings/view/feed_settings_page.dart';
+import 'package:ht_main/settings/view/font_settings_page.dart';
+import 'package:ht_main/settings/view/language_settings_page.dart';
+import 'package:ht_main/settings/view/notification_settings_page.dart';
+import 'package:ht_main/settings/view/settings_page.dart';
+import 'package:ht_main/settings/view/theme_settings_page.dart';
+import 'package:ht_main/shared/services/feed_injector_service.dart';
+import 'package:ht_shared/ht_shared.dart';
 
 /// Creates and configures the GoRouter instance for the application.
 ///
@@ -62,24 +63,23 @@ GoRouter createRouter({
   required HtDataRepository<UserContentPreferences>
   htUserContentPreferencesRepository,
   required HtDataRepository<AppConfig> htAppConfigRepository,
+  required local_config.AppEnvironment environment,
 }) {
   // Instantiate AccountBloc once to be shared
   final accountBloc = AccountBloc(
     authenticationRepository: htAuthenticationRepository,
     userContentPreferencesRepository: htUserContentPreferencesRepository,
+    environment: environment,
   );
 
   return GoRouter(
     refreshListenable: authStatusNotifier,
     initialLocation: Routes.feed,
-    debugLogDiagnostics: true, // Enable verbose logging for debugging redirects
+    debugLogDiagnostics: true,
     // --- Redirect Logic ---
     redirect: (BuildContext context, GoRouterState state) {
       final appStatus = context.read<AppBloc>().state.status;
-      final appConfig = context
-          .read<AppBloc>()
-          .state
-          .appConfig; // Get appConfig
+      final appConfig = context.read<AppBloc>().state.appConfig;
       final currentLocation = state.matchedLocation;
       final currentUri = state.uri;
 
@@ -219,11 +219,11 @@ GoRouter createRouter({
           if (isLinkingContext) {
             headline = l10n.authenticationLinkingHeadline;
             subHeadline = l10n.authenticationLinkingSubheadline;
-            showAnonymousButton = false; // Don't show anon button when linking
+            showAnonymousButton = false;
           } else {
             headline = l10n.authenticationSignInHeadline;
             subHeadline = l10n.authenticationSignInSubheadline;
-            showAnonymousButton = true; // Show anon button for initial sign-in
+            showAnonymousButton = true;
           }
 
           return BlocProvider(
@@ -241,20 +241,18 @@ GoRouter createRouter({
         routes: [
           // Nested route for account linking flow (defined first for priority)
           GoRoute(
-            path: Routes.accountLinking, // This is 'linking'
-            name: Routes.accountLinkingName, // Name for the linking segment
-            builder: (context, state) => const SizedBox.shrink(), // Placeholder
+            path: Routes.accountLinking,
+            name: Routes.accountLinkingName,
+            builder: (context, state) => const SizedBox.shrink(),
             routes: [
               GoRoute(
-                path: Routes
-                    .requestCode, // Path: /authentication/linking/request-code
+                path: Routes.requestCode,
                 name: Routes.linkingRequestCodeName,
                 builder: (context, state) =>
                     const RequestCodePage(isLinkingContext: true),
               ),
               GoRoute(
-                path:
-                    '${Routes.verifyCode}/:email', // Path: /authentication/linking/verify-code/:email
+                path: '${Routes.verifyCode}/:email',
                 name: Routes.linkingVerifyCodeName,
                 builder: (context, state) {
                   final email = state.pathParameters['email']!;
@@ -342,8 +340,8 @@ GoRouter createRouter({
       // preserving the shell's UI (like the bottom navigation bar).
       // This global route, being top-level, will typically cover the entire screen.
       GoRoute(
-        path: Routes.globalArticleDetails, // Use new path: '/article/:id'
-        name: Routes.globalArticleDetailsName, // Use new name
+        path: Routes.globalArticleDetails,
+        name: Routes.globalArticleDetailsName,
         builder: (context, state) {
           final headlineFromExtra = state.extra as Headline?;
           final headlineIdFromPath = state.pathParameters['id'];
@@ -383,7 +381,7 @@ GoRouter createRouter({
           // Return the shell widget which contains the AdaptiveScaffold
           return MultiBlocProvider(
             providers: [
-              BlocProvider.value(value: accountBloc), // Use the shared instance
+              BlocProvider.value(value: accountBloc),
               BlocProvider(
                 create: (context) {
                   // Instantiate FeedInjectorService here as it's stateless for now
@@ -391,23 +389,22 @@ GoRouter createRouter({
                   return HeadlinesFeedBloc(
                     headlinesRepository: context
                         .read<HtDataRepository<Headline>>(),
-                    feedInjectorService: feedInjectorService, // Pass instance
-                    appBloc: context.read<AppBloc>(), // Pass AppBloc instance
+                    feedInjectorService: feedInjectorService,
+                    appBloc: context.read<AppBloc>(),
                   )..add(const HeadlinesFeedFetchRequested());
                 },
               ),
               BlocProvider(
                 create: (context) {
-                  final feedInjectorService =
-                      FeedInjectorService(); // Instantiate
+                  final feedInjectorService = FeedInjectorService();
                   return HeadlinesSearchBloc(
                     headlinesRepository: context
                         .read<HtDataRepository<Headline>>(),
                     categoryRepository: context
                         .read<HtDataRepository<Category>>(),
                     sourceRepository: context.read<HtDataRepository<Source>>(),
-                    appBloc: context.read<AppBloc>(), // Provide AppBloc
-                    feedInjectorService: feedInjectorService, // Provide Service
+                    appBloc: context.read<AppBloc>(),
+                    feedInjectorService: feedInjectorService,
                   );
                 },
               ),
@@ -421,13 +418,13 @@ GoRouter createRouter({
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: Routes.feed, // '/feed'
+                path: Routes.feed,
                 name: Routes.feedName,
                 builder: (context, state) => const HeadlinesFeedPage(),
                 routes: [
                   // Sub-route for article details
                   GoRoute(
-                    path: 'article/:id', // Relative path
+                    path: 'article/:id',
                     name: Routes.articleDetailsName,
                     builder: (context, state) {
                       final headlineFromExtra = state.extra as Headline?;
@@ -435,7 +432,7 @@ GoRouter createRouter({
 
                       return MultiBlocProvider(
                         providers: [
-                          BlocProvider.value(value: accountBloc), // Added
+                          BlocProvider.value(value: accountBloc),
                           BlocProvider(
                             create: (context) => HeadlineDetailsBloc(
                               headlinesRepository: context
@@ -460,7 +457,7 @@ GoRouter createRouter({
                   ),
                   // Sub-route for notifications (placeholder) - MOVED HERE
                   GoRoute(
-                    path: Routes.notifications, // Relative path 'notifications'
+                    path: Routes.notifications,
                     name: Routes.notificationsName,
                     builder: (context, state) {
                       // TODO(fulleni): Replace with actual NotificationsPage
@@ -472,7 +469,7 @@ GoRouter createRouter({
 
                   // --- Filter Routes (Nested under Feed) ---
                   GoRoute(
-                    path: Routes.feedFilter, // Relative path: 'filter'
+                    path: Routes.feedFilter,
                     name: Routes.feedFilterName,
                     // Use MaterialPage with fullscreenDialog for modal presentation
                     pageBuilder: (context, state) {
@@ -480,14 +477,13 @@ GoRouter createRouter({
                       BlocProvider.of<HeadlinesFeedBloc>(context);
                       return const MaterialPage(
                         fullscreenDialog: true,
-                        child: HeadlinesFilterPage(), // Pass the BLoC instance
+                        child: HeadlinesFilterPage(),
                       );
                     },
                     routes: [
                       // Sub-route for category selection
                       GoRoute(
-                        path: Routes
-                            .feedFilterCategories, // Relative path: 'categories'
+                        path: Routes.feedFilterCategories,
                         name: Routes.feedFilterCategoriesName,
                         // Wrap with BlocProvider
                         builder: (context, state) => BlocProvider(
@@ -500,8 +496,7 @@ GoRouter createRouter({
                       ),
                       // Sub-route for source selection
                       GoRoute(
-                        path: Routes
-                            .feedFilterSources, // Relative path: 'sources'
+                        path: Routes.feedFilterSources,
                         name: Routes.feedFilterSourcesName,
                         // Wrap with BlocProvider
                         builder: (context, state) => BlocProvider(
@@ -552,20 +547,20 @@ GoRouter createRouter({
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: Routes.search, // '/search'
+                path: Routes.search,
                 name: Routes.searchName,
                 builder: (context, state) => const HeadlinesSearchPage(),
                 routes: [
                   // Sub-route for article details from search
                   GoRoute(
-                    path: 'article/:id', // Relative path
-                    name: Routes.searchArticleDetailsName, // New route name
+                    path: 'article/:id',
+                    name: Routes.searchArticleDetailsName,
                     builder: (context, state) {
                       final headlineFromExtra = state.extra as Headline?;
                       final headlineIdFromPath = state.pathParameters['id'];
                       return MultiBlocProvider(
                         providers: [
-                          BlocProvider.value(value: accountBloc), // Added
+                          BlocProvider.value(value: accountBloc),
                           BlocProvider(
                             create: (context) => HeadlineDetailsBloc(
                               headlinesRepository: context
@@ -595,7 +590,7 @@ GoRouter createRouter({
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: Routes.account, // '/account'
+                path: Routes.account,
                 name: Routes.accountName,
                 builder: (context, state) => const AccountPage(),
                 routes: [
@@ -632,30 +627,26 @@ GoRouter createRouter({
                     },
                     routes: [
                       GoRoute(
-                        path: Routes
-                            .settings, // Relative path 'settings' from /account
+                        path: Routes.settings,
                         name: Routes.settingsName,
                         builder: (context, state) => const SettingsPage(),
                         // --- Settings Sub-Routes ---
                         routes: [
                           GoRoute(
-                            path: Routes
-                                .settingsAppearance, // 'appearance' relative to /account/settings
+                            path: Routes.settingsAppearance,
                             name: Routes.settingsAppearanceName,
                             builder: (context, state) =>
                                 const AppearanceSettingsPage(),
                             routes: [
                               // Children of AppearanceSettingsPage
                               GoRoute(
-                                path: Routes
-                                    .settingsAppearanceTheme, // 'theme' relative to /account/settings/appearance
+                                path: Routes.settingsAppearanceTheme,
                                 name: Routes.settingsAppearanceThemeName,
                                 builder: (context, state) =>
                                     const ThemeSettingsPage(),
                               ),
                               GoRoute(
-                                path: Routes
-                                    .settingsAppearanceFont, // 'font' relative to /account/settings/appearance
+                                path: Routes.settingsAppearanceFont,
                                 name: Routes.settingsAppearanceFontName,
                                 builder: (context, state) =>
                                     const FontSettingsPage(),
@@ -663,22 +654,19 @@ GoRouter createRouter({
                             ],
                           ),
                           GoRoute(
-                            path: Routes
-                                .settingsFeed, // 'feed' relative to /account/settings
+                            path: Routes.settingsFeed,
                             name: Routes.settingsFeedName,
                             builder: (context, state) =>
                                 const FeedSettingsPage(),
                           ),
                           GoRoute(
-                            path: Routes
-                                .settingsNotifications, // 'notifications' relative to /account/settings
+                            path: Routes.settingsNotifications,
                             name: Routes.settingsNotificationsName,
                             builder: (context, state) =>
                                 const NotificationSettingsPage(),
                           ),
                           GoRoute(
-                            path: Routes
-                                .settingsLanguage, // 'language' relative to /account/settings
+                            path: Routes.settingsLanguage,
                             name: Routes.settingsLanguageName,
                             builder: (context, state) =>
                                 const LanguageSettingsPage(),
@@ -689,10 +677,10 @@ GoRouter createRouter({
                   ),
                   // New routes for Account sub-pages
                   GoRoute(
-                    path: Routes.manageFollowedItems, // Updated path
-                    name: Routes.manageFollowedItemsName, // Updated name
+                    path: Routes.manageFollowedItems,
+                    name: Routes.manageFollowedItemsName,
                     builder: (context, state) =>
-                        const ManageFollowedItemsPage(), // Use the new page
+                        const ManageFollowedItemsPage(),
                     routes: [
                       GoRoute(
                         path: Routes.followedCategoriesList,
@@ -729,18 +717,18 @@ GoRouter createRouter({
                     path: Routes.accountSavedHeadlines,
                     name: Routes.accountSavedHeadlinesName,
                     builder: (context, state) {
-                      return const SavedHeadlinesPage(); // Use the actual page
+                      return const SavedHeadlinesPage();
                     },
                     routes: [
                       GoRoute(
-                        path: Routes.accountArticleDetails, // 'article/:id'
+                        path: Routes.accountArticleDetails,
                         name: Routes.accountArticleDetailsName,
                         builder: (context, state) {
                           final headlineFromExtra = state.extra as Headline?;
                           final headlineIdFromPath = state.pathParameters['id'];
                           return MultiBlocProvider(
                             providers: [
-                              BlocProvider.value(value: accountBloc), // Added
+                              BlocProvider.value(value: accountBloc),
                               BlocProvider(
                                 create: (context) => HeadlineDetailsBloc(
                                   headlinesRepository: context

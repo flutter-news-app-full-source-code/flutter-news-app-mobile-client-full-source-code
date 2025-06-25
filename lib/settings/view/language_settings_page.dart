@@ -28,7 +28,7 @@ class LanguageSettingsPage extends StatelessWidget {
     if (settingsState.status != SettingsStatus.success ||
         settingsState.userAppSettings == null) {
       return Scaffold(
-        appBar: AppBar(title: Text(l10n.settingsTitle)), // Placeholder l10n key
+        appBar: AppBar(title: Text(l10n.settingsTitle)),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
@@ -42,7 +42,7 @@ class LanguageSettingsPage extends StatelessWidget {
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: Text(l10n.settingsTitle)), // Placeholder l10n key
+        appBar: AppBar(title: Text(l10n.settingsTitle)),
         body: ListView.separated(
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
           itemCount: _supportedLanguages.length,

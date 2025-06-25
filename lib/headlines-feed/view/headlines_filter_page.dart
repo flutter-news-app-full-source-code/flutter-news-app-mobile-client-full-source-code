@@ -1,25 +1,17 @@
 //
-// ignore_for_file: lines_longer_than_80_chars, public_member_api_docs
+// ignore_for_file: lines_longer_than_80_chars, public_member_api_docs, unused_field
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ht_data_repository/ht_data_repository.dart'; // Added
-import 'package:ht_main/app/bloc/app_bloc.dart'; // Added
+import 'package:ht_data_repository/ht_data_repository.dart';
+import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:ht_main/headlines-feed/models/headline_filter.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/constants/constants.dart';
-import 'package:ht_shared/ht_shared.dart'
-    show
-        Category,
-        HtHttpException,
-        NotFoundException,
-        Source,
-        SourceType,
-        User, // Added
-        UserContentPreferences; // Added
+import 'package:ht_shared/ht_shared.dart';
 
 // Keys for passing data to/from SourceFilterPage
 const String keySelectedSources = 'selectedSources';
@@ -117,7 +109,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
     if (currentUser == null) {
       setState(() {
         _isLoadingFollowedFilters = false;
-        _useFollowedFilters = false; // Uncheck the box
+        _useFollowedFilters = false;
         _loadFollowedFiltersError =
             context.l10n.mustBeLoggedInToUseFeatureError;
       });
@@ -130,15 +122,15 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       final preferences = await preferencesRepo.read(
         id: currentUser.id,
         userId: currentUser.id,
-      ); // Assuming read by user ID
+      );
 
       // NEW: Check if followed items are empty
       if (preferences.followedCategories.isEmpty &&
           preferences.followedSources.isEmpty) {
         setState(() {
           _isLoadingFollowedFilters = false;
-          _useFollowedFilters = false; // Uncheck the box
-          _tempSelectedCategories = []; // Ensure lists are cleared
+          _useFollowedFilters = false;
+          _tempSelectedCategories = [];
           _tempSelectedSources = [];
         });
         if (mounted) {
@@ -151,7 +143,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
               ),
             );
         }
-        return; // Exit the function as no filters to apply
+        return;
       } else {
         setState(() {
           _currentUserPreferences = preferences;
@@ -164,14 +156,11 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       }
     } on NotFoundException {
       setState(() {
-        _currentUserPreferences = UserContentPreferences(
-          id: currentUser.id,
-        ); // Empty prefs
+        _currentUserPreferences = UserContentPreferences(id: currentUser.id);
         _tempSelectedCategories = [];
         _tempSelectedSources = [];
         _isLoadingFollowedFilters = false;
-        _useFollowedFilters =
-            false; // Uncheck as no prefs found (implies no followed)
+        _useFollowedFilters = false;
       });
       if (mounted) {
         ScaffoldMessenger.of(context)
@@ -186,13 +175,13 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
     } on HtHttpException catch (e) {
       setState(() {
         _isLoadingFollowedFilters = false;
-        _useFollowedFilters = false; // Uncheck the box
-        _loadFollowedFiltersError = e.message; // Or a generic "Failed to load"
+        _useFollowedFilters = false;
+        _loadFollowedFiltersError = e.message;
       });
     } catch (e) {
       setState(() {
         _isLoadingFollowedFilters = false;
-        _useFollowedFilters = false; // Uncheck the box
+        _useFollowedFilters = false;
         _loadFollowedFiltersError = context.l10n.unknownError;
       });
     }
@@ -226,7 +215,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
     required String routeName,
     // For sources, currentSelection will be a Map
     required dynamic currentSelectionData,
-    required void Function(dynamic)? onResult, // Result can also be a Map
+    required void Function(dynamic)? onResult,
     bool enabled = true,
   }) {
     final l10n = context.l10n;
@@ -241,13 +230,13 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       title: Text(title),
       subtitle: Text(subtitle),
       trailing: const Icon(Icons.chevron_right),
-      enabled: enabled, // Use the enabled parameter
+      enabled: enabled,
       onTap:
           enabled // Only allow tap if enabled
           ? () async {
               final result = await context.pushNamed<dynamic>(
                 routeName,
-                extra: currentSelectionData, // Pass the map or list
+                extra: currentSelectionData,
               );
               if (result != null && onResult != null) {
                 onResult(result);
@@ -267,7 +256,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
         leading: IconButton(
           icon: const Icon(Icons.close),
           tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-          onPressed: () => context.pop(), // Discard changes
+          onPressed: () => context.pop(),
         ),
         title: Text(l10n.headlinesFeedFilterTitle),
         actions: [
@@ -307,7 +296,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
                     _tempSelectedSourceSourceTypes.isNotEmpty
                     ? _tempSelectedSourceSourceTypes
                     : null,
-                isFromFollowedItems: _useFollowedFilters, // Set the new flag
+                isFromFollowedItems: _useFollowedFilters,
               );
               context.read<HeadlinesFeedBloc>().add(
                 HeadlinesFeedFiltersApplied(filter: newFilter),
@@ -322,7 +311,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.paddingSmall, // Consistent with ListTiles
+              horizontal: AppSpacing.paddingSmall,
             ),
             child: CheckboxListTile(
               title: Text(l10n.headlinesFeedFilterApplyFollowedLabel),
@@ -335,7 +324,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
                   } else {
                     _isLoadingFollowedFilters = false;
                     _loadFollowedFiltersError = null;
-                    _clearTemporaryFilters(); // Clear auto-applied filters
+                    _clearTemporaryFilters();
                   }
                 });
               },

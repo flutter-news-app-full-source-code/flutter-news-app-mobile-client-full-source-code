@@ -11,7 +11,7 @@ class HeadlineFilter extends Equatable {
     this.sources,
     this.selectedSourceCountryIsoCodes,
     this.selectedSourceSourceTypes,
-    this.isFromFollowedItems = false, // Added new field with default
+    this.isFromFollowedItems = false,
   });
 
   /// The list of selected category filters.
@@ -37,7 +37,7 @@ class HeadlineFilter extends Equatable {
     sources,
     selectedSourceCountryIsoCodes,
     selectedSourceSourceTypes,
-    isFromFollowedItems, // Added to props
+    isFromFollowedItems,
   ];
 
   /// Creates a copy of this [HeadlineFilter] with the given fields
@@ -47,7 +47,7 @@ class HeadlineFilter extends Equatable {
     List<Source>? sources,
     Set<String>? selectedSourceCountryIsoCodes,
     Set<SourceType>? selectedSourceSourceTypes,
-    bool? isFromFollowedItems, // Added to copyWith
+    bool? isFromFollowedItems,
   }) {
     return HeadlineFilter(
       categories: categories ?? this.categories,
@@ -56,8 +56,7 @@ class HeadlineFilter extends Equatable {
           selectedSourceCountryIsoCodes ?? this.selectedSourceCountryIsoCodes,
       selectedSourceSourceTypes:
           selectedSourceSourceTypes ?? this.selectedSourceSourceTypes,
-      isFromFollowedItems:
-          isFromFollowedItems ?? this.isFromFollowedItems, // Added
+      isFromFollowedItems: isFromFollowedItems ?? this.isFromFollowedItems,
     );
   }
 }

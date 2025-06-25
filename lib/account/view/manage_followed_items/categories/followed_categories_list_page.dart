@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ht_main/account/bloc/account_bloc.dart';
-import 'package:ht_main/entity_details/view/entity_details_page.dart'; // Import for Arguments
+import 'package:ht_main/entity_details/view/entity_details_page.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/widgets/widgets.dart';
@@ -23,11 +23,11 @@ class FollowedCategoriesListPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Followed Categories'), // Placeholder
+        title: const Text('Followed Categories'),
         actions: [
           IconButton(
             icon: const Icon(Icons.add_circle_outline),
-            tooltip: 'Add Category to Follow', // Placeholder
+            tooltip: 'Add Category to Follow',
             onPressed: () {
               context.goNamed(Routes.addCategoryToFollowName);
             },
@@ -40,8 +40,8 @@ class FollowedCategoriesListPage extends StatelessWidget {
               state.preferences == null) {
             return LoadingStateWidget(
               icon: Icons.category_outlined,
-              headline: 'Loading Followed Categories...', // Placeholder
-              subheadline: l10n.pleaseWait, // Assuming this exists
+              headline: 'Loading Followed Categories...',
+              subheadline: l10n.pleaseWait,
             );
           }
 
@@ -49,8 +49,7 @@ class FollowedCategoriesListPage extends StatelessWidget {
               state.preferences == null) {
             return FailureStateWidget(
               message:
-                  state.errorMessage ??
-                  'Could not load followed categories.', // Placeholder
+                  state.errorMessage ?? 'Could not load followed categories.',
               onRetry: () {
                 if (state.user?.id != null) {
                   context.read<AccountBloc>().add(
@@ -63,10 +62,9 @@ class FollowedCategoriesListPage extends StatelessWidget {
 
           if (followedCategories.isEmpty) {
             return const InitialStateWidget(
-              icon: Icons.no_sim_outlined, // Placeholder icon
-              headline: 'No Followed Categories', // Placeholder
-              subheadline:
-                  'Start following categories to see them here.', // Placeholder
+              icon: Icons.no_sim_outlined,
+              headline: 'No Followed Categories',
+              subheadline: 'Start following categories to see them here.',
             );
           }
 
@@ -99,7 +97,7 @@ class FollowedCategoriesListPage extends StatelessWidget {
                     Icons.remove_circle_outline,
                     color: Colors.red,
                   ),
-                  tooltip: 'Unfollow Category', // Placeholder
+                  tooltip: 'Unfollow Category',
                   onPressed: () {
                     context.read<AccountBloc>().add(
                       AccountFollowCategoryToggled(category: category),

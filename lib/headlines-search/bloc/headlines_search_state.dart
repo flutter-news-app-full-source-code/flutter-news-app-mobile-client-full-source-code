@@ -22,7 +22,7 @@ class HeadlinesSearchLoading extends HeadlinesSearchState {
     required this.lastSearchTerm,
     required super.selectedModelType,
   });
-  final String lastSearchTerm; // Term being loaded
+  final String lastSearchTerm;
 
   @override
   List<Object?> get props => [...super.props, lastSearchTerm];
@@ -31,22 +31,22 @@ class HeadlinesSearchLoading extends HeadlinesSearchState {
 /// State when a search has successfully returned results.
 class HeadlinesSearchSuccess extends HeadlinesSearchState {
   const HeadlinesSearchSuccess({
-    required this.items, // Changed from results
+    required this.items,
     required this.hasMore,
     required this.lastSearchTerm,
-    required super.selectedModelType, // The model type for these results
+    required super.selectedModelType,
     this.cursor,
-    this.errorMessage, // For non-critical errors like pagination failure
+    this.errorMessage,
   });
 
-  final List<FeedItem> items; // Changed from List<dynamic> to List<FeedItem>
+  final List<FeedItem> items;
   final bool hasMore;
   final String? cursor;
-  final String? errorMessage; // e.g., for pagination errors
-  final String lastSearchTerm; // The term that yielded these results
+  final String? errorMessage;
+  final String lastSearchTerm;
 
   HeadlinesSearchSuccess copyWith({
-    List<FeedItem>? items, // Changed
+    List<FeedItem>? items,
     bool? hasMore,
     String? cursor,
     String? errorMessage,
@@ -55,7 +55,7 @@ class HeadlinesSearchSuccess extends HeadlinesSearchState {
     bool clearErrorMessage = false,
   }) {
     return HeadlinesSearchSuccess(
-      items: items ?? this.items, // Changed
+      items: items ?? this.items,
       hasMore: hasMore ?? this.hasMore,
       cursor: cursor ?? this.cursor,
       errorMessage: clearErrorMessage
@@ -69,7 +69,7 @@ class HeadlinesSearchSuccess extends HeadlinesSearchState {
   @override
   List<Object?> get props => [
     ...super.props,
-    items, // Changed
+    items,
     hasMore,
     cursor,
     errorMessage,
@@ -86,7 +86,7 @@ class HeadlinesSearchFailure extends HeadlinesSearchState {
   });
 
   final String errorMessage;
-  final String lastSearchTerm; // The term that failed
+  final String lastSearchTerm;
 
   @override
   List<Object?> get props => [...super.props, errorMessage, lastSearchTerm];

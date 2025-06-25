@@ -3,11 +3,8 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_data_repository/ht_data_repository.dart'; // Generic Data Repository
-import 'package:ht_shared/ht_shared.dart'
-    show
-        Category,
-        HtHttpException; // Shared models, including Category and standardized exceptions
+import 'package:ht_data_repository/ht_data_repository.dart';
+import 'package:ht_shared/ht_shared.dart' show Category, HtHttpException;
 
 part 'categories_filter_event.dart';
 part 'categories_filter_state.dart';
@@ -29,11 +26,11 @@ class CategoriesFilterBloc
        super(const CategoriesFilterState()) {
     on<CategoriesFilterRequested>(
       _onCategoriesFilterRequested,
-      transformer: restartable(), // Only process the latest request
+      transformer: restartable(),
     );
     on<CategoriesFilterLoadMoreRequested>(
       _onCategoriesFilterLoadMoreRequested,
-      transformer: droppable(), // Ignore new requests while one is processing
+      transformer: droppable(),
     );
   }
 
@@ -66,7 +63,7 @@ class CategoriesFilterBloc
           categories: response.items,
           hasMore: response.hasMore,
           cursor: response.cursor,
-          clearError: true, // Clear any previous error
+          clearError: true,
         ),
       );
     } on HtHttpException catch (e) {
@@ -92,7 +89,7 @@ class CategoriesFilterBloc
     try {
       final response = await _categoriesRepository.readAll(
         limit: _categoriesLimit,
-        startAfterId: state.cursor, // Use the cursor from the current state
+        startAfterId: state.cursor,
       );
       emit(
         state.copyWith(
@@ -105,13 +102,7 @@ class CategoriesFilterBloc
       );
     } on HtHttpException catch (e) {
       // Keep existing data but indicate failure
-      emit(
-        state.copyWith(
-          status: CategoriesFilterStatus
-              .failure, // Or a specific 'loadMoreFailure' status?
-          error: e,
-        ),
-      );
+      emit(state.copyWith(status: CategoriesFilterStatus.failure, error: e));
     } catch (e) {
       // Catch unexpected errors
       emit(state.copyWith(status: CategoriesFilterStatus.failure, error: e));

@@ -2,10 +2,10 @@ import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ht_data_repository/ht_data_repository.dart';
-import 'package:ht_main/app/bloc/app_bloc.dart'; // Added
+import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/headlines-search/models/search_model_type.dart';
-import 'package:ht_main/shared/services/feed_injector_service.dart'; // Added
-import 'package:ht_shared/ht_shared.dart'; // Updated for FeedItem, AppConfig, User etc.
+import 'package:ht_main/shared/services/feed_injector_service.dart';
+import 'package:ht_shared/ht_shared.dart';
 
 part 'headlines_search_event.dart';
 part 'headlines_search_state.dart';
@@ -16,26 +16,26 @@ class HeadlinesSearchBloc
     required HtDataRepository<Headline> headlinesRepository,
     required HtDataRepository<Category> categoryRepository,
     required HtDataRepository<Source> sourceRepository,
-    required AppBloc appBloc, // Added
-    required FeedInjectorService feedInjectorService, // Added
+    required AppBloc appBloc,
+    required FeedInjectorService feedInjectorService,
   }) : _headlinesRepository = headlinesRepository,
        _categoryRepository = categoryRepository,
        _sourceRepository = sourceRepository,
-       _appBloc = appBloc, // Added
-       _feedInjectorService = feedInjectorService, // Added
+       _appBloc = appBloc,
+       _feedInjectorService = feedInjectorService,
        super(const HeadlinesSearchInitial()) {
     on<HeadlinesSearchModelTypeChanged>(_onHeadlinesSearchModelTypeChanged);
     on<HeadlinesSearchFetchRequested>(
       _onSearchFetchRequested,
-      transformer: restartable(), // Process only the latest search
+      transformer: restartable(),
     );
   }
 
   final HtDataRepository<Headline> _headlinesRepository;
   final HtDataRepository<Category> _categoryRepository;
   final HtDataRepository<Source> _sourceRepository;
-  final AppBloc _appBloc; // Added
-  final FeedInjectorService _feedInjectorService; // Added
+  final AppBloc _appBloc;
+  final FeedInjectorService _feedInjectorService;
   static const _limit = 10;
 
   Future<void> _onHeadlinesSearchModelTypeChanged(
@@ -65,7 +65,7 @@ class HeadlinesSearchBloc
     if (searchTerm.isEmpty) {
       emit(
         HeadlinesSearchSuccess(
-          items: const [], // Changed
+          items: const [],
           hasMore: false,
           lastSearchTerm: '',
           selectedModelType: modelType,
@@ -112,8 +112,7 @@ class HeadlinesSearchBloc
               emit(
                 successState.copyWith(
                   items: List.of(successState.items)..addAll(injectedItems),
-                  hasMore:
-                      response.hasMore, // hasMore from original headline fetch
+                  hasMore: response.hasMore,
                   cursor: response.cursor,
                 ),
               );

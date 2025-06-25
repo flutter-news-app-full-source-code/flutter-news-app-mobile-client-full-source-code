@@ -23,7 +23,7 @@ class SettingsState extends Equatable {
   /// {@macro settings_state}
   const SettingsState({
     this.status = SettingsStatus.initial,
-    this.userAppSettings, // Nullable, populated after successful load
+    this.userAppSettings,
     this.error,
   });
 
@@ -43,8 +43,8 @@ class SettingsState extends Equatable {
     SettingsStatus? status,
     UserAppSettings? userAppSettings,
     Object? error,
-    bool clearError = false, // Flag to explicitly clear error
-    bool clearUserAppSettings = false, // Flag to explicitly clear settings
+    bool clearError = false,
+    bool clearUserAppSettings = false,
   }) {
     return SettingsState(
       status: status ?? this.status,

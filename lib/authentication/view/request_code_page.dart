@@ -16,10 +16,7 @@ import 'package:ht_main/shared/constants/app_spacing.dart';
 /// {@endtemplate}
 class RequestCodePage extends StatelessWidget {
   /// {@macro request_code_page}
-  const RequestCodePage({
-    required this.isLinkingContext, // Accept the flag
-    super.key,
-  });
+  const RequestCodePage({required this.isLinkingContext, super.key});
 
   /// Whether this page is being shown in the account linking context.
   final bool isLinkingContext;
@@ -42,7 +39,7 @@ class _RequestCodeView extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme; // Added textTheme
+    final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -50,9 +47,7 @@ class _RequestCodeView extends StatelessWidget {
         // Add a custom leading back button to control navigation based on context.
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          tooltip: MaterialLocalizations.of(
-            context,
-          ).backButtonTooltip, // Accessibility
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () {
             // Navigate back differently based on the context.
             if (isLinkingContext) {
@@ -96,8 +91,7 @@ class _RequestCodeView extends StatelessWidget {
           buildWhen: (previous, current) =>
               current is AuthenticationInitial ||
               current is AuthenticationRequestCodeLoading ||
-              current
-                  is AuthenticationFailure, // Rebuild on failure to re-enable form
+              current is AuthenticationFailure,
           builder: (context, state) {
             final isLoading = state is AuthenticationRequestCodeLoading;
 
@@ -114,14 +108,14 @@ class _RequestCodeView extends StatelessWidget {
                         padding: const EdgeInsets.only(bottom: AppSpacing.xl),
                         child: Icon(
                           Icons.email_outlined,
-                          size: AppSpacing.xxl * 2, // Standardized large icon
+                          size: AppSpacing.xxl * 2,
                           color: colorScheme.primary,
                         ),
                       ),
-                      // const SizedBox(height: AppSpacing.lg), // Removed
+                      // const SizedBox(height: AppSpacing.lg),
                       // --- Explanation Text ---
                       Text(
-                        l10n.requestCodePageHeadline, // Using a more title-like l10n key
+                        l10n.requestCodePageHeadline,
                         style: textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -129,7 +123,7 @@ class _RequestCodeView extends StatelessWidget {
                       ),
                       const SizedBox(height: AppSpacing.md),
                       Text(
-                        l10n.requestCodePageSubheadline, // Using a more descriptive subheadline
+                        l10n.requestCodePageSubheadline,
                         style: textTheme.bodyLarge?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
@@ -183,8 +177,8 @@ class _EmailLinkFormState extends State<_EmailLinkForm> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final textTheme = Theme.of(context).textTheme; // Added textTheme
-    final colorScheme = Theme.of(context).colorScheme; // Added colorScheme
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Form(
       key: _formKey,
@@ -194,9 +188,9 @@ class _EmailLinkFormState extends State<_EmailLinkForm> {
           TextFormField(
             controller: _emailController,
             decoration: InputDecoration(
-              labelText: l10n.requestCodeEmailLabel, // More specific label
-              hintText: l10n.requestCodeEmailHint, // Added hint text
-              // border: const OutlineInputBorder(), // Uses theme default
+              labelText: l10n.requestCodeEmailLabel,
+              hintText: l10n.requestCodeEmailHint,
+              // border: const OutlineInputBorder(),
             ),
             keyboardType: TextInputType.emailAddress,
             autocorrect: false,
@@ -208,8 +202,7 @@ class _EmailLinkFormState extends State<_EmailLinkForm> {
               }
               return null;
             },
-            onFieldSubmitted: (_) =>
-                _submitForm(), // Allow submitting from keyboard
+            onFieldSubmitted: (_) => _submitForm(),
           ),
           const SizedBox(height: AppSpacing.lg),
           ElevatedButton(
@@ -220,17 +213,14 @@ class _EmailLinkFormState extends State<_EmailLinkForm> {
             ),
             child: widget.isLoading
                 ? SizedBox(
-                    height: AppSpacing.xl, // Consistent size with text
+                    height: AppSpacing.xl,
                     width: AppSpacing.xl,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color:
-                          colorScheme.onPrimary, // Color for loader on button
+                      color: colorScheme.onPrimary,
                     ),
                   )
-                : Text(
-                    l10n.requestCodeSendCodeButton,
-                  ), // More specific button text
+                : Text(l10n.requestCodeSendCodeButton),
           ),
         ],
       ),

@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_data_repository/ht_data_repository.dart'; // Generic Data Repository
-import 'package:ht_main/app/bloc/app_bloc.dart'; // Added
+import 'package:ht_data_repository/ht_data_repository.dart';
+import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/headlines-feed/models/headline_filter.dart';
-import 'package:ht_main/shared/services/feed_injector_service.dart'; // Added
-import 'package:ht_shared/ht_shared.dart'; // Updated for FeedItem, AppConfig, User
+import 'package:ht_main/shared/services/feed_injector_service.dart';
+import 'package:ht_shared/ht_shared.dart';
 
 part 'headlines_feed_event.dart';
 part 'headlines_feed_state.dart';
@@ -25,11 +25,11 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   /// Requires repositories and services for its operations.
   HeadlinesFeedBloc({
     required HtDataRepository<Headline> headlinesRepository,
-    required FeedInjectorService feedInjectorService, // Added
-    required AppBloc appBloc, // Added
+    required FeedInjectorService feedInjectorService,
+    required AppBloc appBloc,
   }) : _headlinesRepository = headlinesRepository,
-       _feedInjectorService = feedInjectorService, // Added
-       _appBloc = appBloc, // Added
+       _feedInjectorService = feedInjectorService,
+       _appBloc = appBloc,
        super(HeadlinesFeedInitial()) {
     on<HeadlinesFeedFetchRequested>(
       _onHeadlinesFeedFetchRequested,
@@ -46,8 +46,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   }
 
   final HtDataRepository<Headline> _headlinesRepository;
-  final FeedInjectorService _feedInjectorService; // Added
-  final AppBloc _appBloc; // Added
+  final FeedInjectorService _feedInjectorService;
+  final AppBloc _appBloc;
 
   /// The number of headlines to fetch per page during pagination or initial load.
   static const _headlinesFetchLimit = 10;
@@ -62,7 +62,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     HeadlinesFeedFiltersApplied event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
-    emit(HeadlinesFeedLoading()); // Show loading for filter application
+    emit(HeadlinesFeedLoading());
     try {
       final queryParams = <String, dynamic>{};
       if (event.filter.categories?.isNotEmpty ?? false) {
@@ -96,7 +96,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         headlines: headlineResponse.items,
         user: currentUser,
         appConfig: appConfig,
-        currentFeedItemCount: 0, // Initial load for filters
+        currentFeedItemCount: 0,
       );
 
       emit(
@@ -132,7 +132,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     HeadlinesFeedFiltersCleared event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
-    emit(HeadlinesFeedLoading()); // Show loading indicator
+    emit(HeadlinesFeedLoading());
     try {
       // Fetch the first page with no filters
       final headlineResponse = await _headlinesRepository.readAll(
@@ -161,7 +161,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           feedItems: processedFeedItems,
           hasMore: headlineResponse.hasMore,
           cursor: headlineResponse.cursor,
-          filter: const HeadlineFilter(), // Ensure filter is reset
+          filter: const HeadlineFilter(),
         ),
       );
 
@@ -207,18 +207,17 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
       if (event.cursor != null) {
         // Explicit pagination request
-        if (!loadedState.hasMore) return; // No more items to fetch
+        if (!loadedState.hasMore) return;
         isPaginating = true;
-        currentCursorForFetch =
-            loadedState.cursor; // Use BLoC's cursor for safety
+        currentCursorForFetch = loadedState.cursor;
       } else {
         // Initial fetch or refresh (event.cursor is null)
-        currentFeedItems = []; // Reset for non-pagination
+        currentFeedItems = [];
         currentFeedItemCountForInjector = 0;
       }
     } else if (state is HeadlinesFeedLoading ||
         state is HeadlinesFeedLoadingSilently) {
-      if (event.cursor == null) return; // Avoid concurrent initial fetches
+      if (event.cursor == null) return;
     }
     // For initial load or if event.cursor is null, currentCursorForFetch remains null.
 
@@ -298,7 +297,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     HeadlinesFeedRefreshRequested event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
-    emit(HeadlinesFeedLoading()); // Show loading indicator for refresh
+    emit(HeadlinesFeedLoading());
 
     var currentFilter = const HeadlineFilter();
     if (state is HeadlinesFeedLoaded) {

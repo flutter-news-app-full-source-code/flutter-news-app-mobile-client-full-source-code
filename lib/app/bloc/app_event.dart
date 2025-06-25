@@ -4,7 +4,7 @@ abstract class AppEvent extends Equatable {
   const AppEvent();
 
   @override
-  List<Object?> get props => []; // Allow nullable objects in props
+  List<Object?> get props => [];
 }
 
 @Deprecated('Use SettingsBloc events instead')
@@ -17,10 +17,10 @@ class AppThemeChanged extends AppEvent {
 class AppUserChanged extends AppEvent {
   const AppUserChanged(this.user);
 
-  final User? user; // Make user nullable
+  final User? user;
 
   @override
-  List<Object?> get props => [user]; // Update props to handle nullable
+  List<Object?> get props => [user];
 }
 
 /// {@template app_settings_refreshed}

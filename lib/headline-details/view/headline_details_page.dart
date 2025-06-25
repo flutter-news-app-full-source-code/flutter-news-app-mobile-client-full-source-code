@@ -1,26 +1,21 @@
 //
 // ignore_for_file: avoid_redundant_argument_values
 
-import 'package:flutter/foundation.dart' show kIsWeb; // Import kIsWeb
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart'; // Import GoRouter
+import 'package:go_router/go_router.dart';
 import 'package:ht_main/account/bloc/account_bloc.dart';
-import 'package:ht_main/app/bloc/app_bloc.dart'; // Added AppBloc
-import 'package:ht_main/entity_details/view/entity_details_page.dart'; // Added for Page Arguments
+import 'package:ht_main/app/bloc/app_bloc.dart';
+import 'package:ht_main/entity_details/view/entity_details_page.dart';
 import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart';
 import 'package:ht_main/headline-details/bloc/similar_headlines_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
-import 'package:ht_main/shared/shared.dart'; // Imports AppSpacing
-import 'package:ht_shared/ht_shared.dart'
-    show
-        Category,
-        Headline,
-        HeadlineImageStyle,
-        Source; // Added Category, Source
+import 'package:ht_main/shared/shared.dart';
+import 'package:ht_shared/ht_shared.dart';
 import 'package:intl/intl.dart';
-import 'package:share_plus/share_plus.dart'; // Import share_plus
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class HeadlineDetailsPage extends StatefulWidget {
@@ -136,7 +131,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                 return switch (state) {
                   HeadlineDetailsInitial() ||
                   HeadlineDetailsLoading() => LoadingStateWidget(
-                    icon: Icons.article_outlined, // Themed icon
+                    icon: Icons.article_outlined,
                     headline: l10n.headlineDetailsLoadingHeadline,
                     subheadline: l10n.headlineDetailsLoadingSubheadline,
                   ),
@@ -188,7 +183,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     final bookmarkButton = IconButton(
       icon: Icon(
         isSaved ? Icons.bookmark : Icons.bookmark_border_outlined,
-        color: colorScheme.primary, // Ensure icon color from theme
+        color: colorScheme.primary,
       ),
       tooltip: isSaved
           ? l10n.headlineDetailsRemoveFromSavedTooltip
@@ -203,10 +198,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     final Widget shareButtonWidget = Builder(
       builder: (BuildContext buttonContext) {
         return IconButton(
-          icon: Icon(
-            Icons.share_outlined,
-            color: colorScheme.primary, // Ensure icon color from theme
-          ),
+          icon: Icon(Icons.share_outlined, color: colorScheme.primary),
           tooltip: l10n.shareActionTooltip,
           onPressed: () async {
             final box = buttonContext.findRenderObject() as RenderBox?;
@@ -254,7 +246,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
             icon: const Icon(Icons.arrow_back_ios_new),
             tooltip: MaterialLocalizations.of(context).backButtonTooltip,
             onPressed: () => context.pop(),
-            color: colorScheme.onSurface, // Ensure icon color from theme
+            color: colorScheme.onSurface,
           ),
           actions: [
             bookmarkButton,
@@ -269,13 +261,13 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           foregroundColor: colorScheme.onSurface,
         ),
         SliverPadding(
-          padding: horizontalPadding.copyWith(top: AppSpacing.sm), // Adjusted
+          padding: horizontalPadding.copyWith(top: AppSpacing.sm),
           sliver: SliverToBoxAdapter(
             child: Text(
               headline.title,
               style: textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
-              ), // Adjusted style
+              ),
             ),
           ),
         ),
@@ -288,9 +280,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
             ),
             sliver: SliverToBoxAdapter(
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(
-                  AppSpacing.md,
-                ), // Consistent radius
+                borderRadius: BorderRadius.circular(AppSpacing.md),
                 child: AspectRatio(
                   aspectRatio: 16 / 9,
                   child: Image.network(
@@ -310,7 +300,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                       child: Icon(
                         Icons.broken_image_outlined,
                         color: colorScheme.onSurfaceVariant,
-                        size: AppSpacing.xxl * 1.5, // Larger placeholder
+                        size: AppSpacing.xxl * 1.5,
                       ),
                     ),
                   ),
@@ -336,35 +326,31 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                   child: Icon(
                     Icons.image_not_supported_outlined,
                     color: colorScheme.onSurfaceVariant,
-                    size: AppSpacing.xxl * 1.5, // Larger placeholder
+                    size: AppSpacing.xxl * 1.5,
                   ),
                 ),
               ),
             ),
           ),
         SliverPadding(
-          padding: horizontalPadding.copyWith(
-            top: AppSpacing.lg,
-          ), // Increased spacing
+          padding: horizontalPadding.copyWith(top: AppSpacing.lg),
           sliver: SliverToBoxAdapter(
             child: Wrap(
-              spacing: AppSpacing.md, // Increased spacing
-              runSpacing: AppSpacing.sm, // Adjusted runSpacing
+              spacing: AppSpacing.md,
+              runSpacing: AppSpacing.sm,
               children: _buildMetadataChips(context, headline),
             ),
           ),
         ),
         if (headline.description != null && headline.description!.isNotEmpty)
           SliverPadding(
-            padding: horizontalPadding.copyWith(
-              top: AppSpacing.lg,
-            ), // Increased
+            padding: horizontalPadding.copyWith(top: AppSpacing.lg),
             sliver: SliverToBoxAdapter(
               child: Text(
                 headline.description!,
                 style: textTheme.bodyLarge?.copyWith(
                   color: colorScheme.onSurfaceVariant,
-                  height: 1.6, // Improved line height
+                  height: 1.6,
                 ),
               ),
             ),
@@ -373,7 +359,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           SliverPadding(
             padding: horizontalPadding.copyWith(
               top: AppSpacing.xl,
-              bottom: AppSpacing.xl, // Consistent padding
+              bottom: AppSpacing.xl,
             ),
             sliver: SliverToBoxAdapter(
               child: ElevatedButton.icon(
@@ -429,7 +415,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
     final chipLabelStyle = textTheme.labelMedium?.copyWith(
-      color: colorScheme.onSecondaryContainer, // Ensure text is visible
+      color: colorScheme.onSecondaryContainer,
     );
     final chipBackgroundColor = colorScheme.secondaryContainer;
     final chipAvatarColor = colorScheme.onSecondaryContainer;
@@ -477,9 +463,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
               extra: EntityDetailsPageArguments(entity: headline.source),
             );
           },
-          borderRadius: BorderRadius.circular(
-            AppSpacing.sm,
-          ), // Match chip shape
+          borderRadius: BorderRadius.circular(AppSpacing.sm),
           child: Chip(
             avatar: Icon(
               Icons.source_outlined,
@@ -508,9 +492,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
               extra: EntityDetailsPageArguments(entity: headline.category),
             );
           },
-          borderRadius: BorderRadius.circular(
-            AppSpacing.sm,
-          ), // Match chip shape
+          borderRadius: BorderRadius.circular(AppSpacing.sm),
           child: Chip(
             avatar: Icon(
               Icons.category_outlined,
@@ -581,9 +563,8 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           final SimilarHeadlinesLoaded loadedState => SliverPadding(
             padding: hPadding.copyWith(bottom: AppSpacing.xxl),
             sliver: SliverList.separated(
-              separatorBuilder: (context, index) => const SizedBox(
-                height: AppSpacing.sm,
-              ), // Spacing between items
+              separatorBuilder: (context, index) =>
+                  const SizedBox(height: AppSpacing.sm),
               itemCount: loadedState.similarHeadlines.length,
               itemBuilder: (context, index) {
                 // Corrected: SliverList.separated uses itemBuilder

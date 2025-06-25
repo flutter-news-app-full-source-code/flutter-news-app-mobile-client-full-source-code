@@ -3,20 +3,20 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart'; // Import GoRouter for navigation
-import 'package:ht_main/app/bloc/app_bloc.dart'; // Import AppBloc for settings
+import 'package:go_router/go_router.dart';
+import 'package:ht_main/app/bloc/app_bloc.dart';
 // HeadlineItemWidget import removed
 import 'package:ht_main/headlines-search/bloc/headlines_search_bloc.dart';
 import 'package:ht_main/headlines-search/models/search_model_type.dart';
 // Import new item widgets
 import 'package:ht_main/headlines-search/widgets/category_item_widget.dart';
-// import 'package:ht_main/headlines-search/widgets/country_item_widget.dart'; // Removed
+// import 'package:ht_main/headlines-search/widgets/country_item_widget.dart';
 import 'package:ht_main/headlines-search/widgets/source_item_widget.dart';
 import 'package:ht_main/l10n/app_localizations.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
-import 'package:ht_main/shared/shared.dart'; // Imports new headline tiles
-import 'package:ht_shared/ht_shared.dart'; // Changed to general import
+import 'package:ht_main/shared/shared.dart';
+import 'package:ht_shared/ht_shared.dart';
 
 /// Page widget responsible for providing the BLoC for the headlines search feature.
 class HeadlinesSearchPage extends StatelessWidget {
@@ -36,7 +36,7 @@ class HeadlinesSearchPage extends StatelessWidget {
 /// Private View widget that builds the UI for the headlines search page.
 /// It listens to the HeadlinesSearchBloc state and displays the appropriate UI.
 class _HeadlinesSearchView extends StatefulWidget {
-  const _HeadlinesSearchView(); // Private constructor
+  const _HeadlinesSearchView();
 
   @override
   State<_HeadlinesSearchView> createState() => _HeadlinesSearchViewState();
@@ -46,8 +46,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
   final _scrollController = ScrollController();
   final _textController = TextEditingController();
   bool _showClearButton = false;
-  SearchModelType _selectedModelType =
-      SearchModelType.headline; // Initial selection
+  SearchModelType _selectedModelType = SearchModelType.headline;
 
   @override
   void initState() {
@@ -69,8 +68,9 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
 
   @override
   void dispose() {
-    _scrollController.removeListener(_onScroll);
-    _scrollController.dispose();
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
     _textController.dispose();
     super.dispose();
   }
@@ -102,7 +102,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme; // Defined for use
+    final textTheme = theme.textTheme;
     final appBarTheme = theme.appBarTheme;
 
     final availableSearchModelTypes = SearchModelType.values.toList();
@@ -121,21 +121,21 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
     return Scaffold(
       appBar: AppBar(
         titleSpacing: AppSpacing.paddingSmall,
-        // backgroundColor: appBarTheme.backgroundColor ?? colorScheme.surface, // Use theme
-        elevation: appBarTheme.elevation ?? 0, // Use theme elevation
+        // backgroundColor: appBarTheme.backgroundColor ?? colorScheme.surface,
+        elevation: appBarTheme.elevation ?? 0,
         title: Row(
           children: [
             SizedBox(
-              width: 150, // Adjusted width for potentially longer translations
+              width: 150,
               child: DropdownButtonFormField<SearchModelType>(
                 value: _selectedModelType,
                 decoration: const InputDecoration(
-                  border: InputBorder.none, // Clean look
+                  border: InputBorder.none,
                   contentPadding: EdgeInsets.symmetric(
-                    horizontal: AppSpacing.sm, // Adjusted padding
+                    horizontal: AppSpacing.sm,
                     vertical: AppSpacing.xs,
                   ),
-                  isDense: true, // Make it more compact
+                  isDense: true,
                 ),
                 style: textTheme.titleMedium?.copyWith(
                   color:
@@ -144,7 +144,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                 ),
                 dropdownColor: colorScheme.surfaceContainerHighest,
                 icon: Icon(
-                  Icons.arrow_drop_down_rounded, // Rounded icon
+                  Icons.arrow_drop_down_rounded,
                   color:
                       appBarTheme.iconTheme?.color ??
                       colorScheme.onSurfaceVariant,
@@ -161,9 +161,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                   }
                   return DropdownMenuItem<SearchModelType>(
                     value: type,
-                    child: Text(
-                      displayLocalizedName,
-                    ), // Style applied by DropdownButtonFormField
+                    child: Text(displayLocalizedName),
                   );
                 }).toList(),
                 onChanged: (SearchModelType? newValue) {
@@ -176,7 +174,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                     );
                     // Optionally trigger search or clear text when type changes
                     // _textController.clear();
-                    // _performSearch(); // Or wait for user to tap search
+                    // _performSearch();
                   }
                 },
               ),
@@ -185,28 +183,26 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
             Expanded(
               child: TextField(
                 controller: _textController,
-                style:
-                    appBarTheme.titleTextStyle ??
-                    textTheme.titleMedium, // Consistent style
+                style: appBarTheme.titleTextStyle ?? textTheme.titleMedium,
                 decoration: InputDecoration(
                   hintText: _getHintTextForModelType(_selectedModelType, l10n),
                   hintStyle: textTheme.bodyMedium?.copyWith(
                     color:
                         (appBarTheme.titleTextStyle?.color ??
                                 colorScheme.onSurface)
-                            .withOpacity(0.6), // Adjusted opacity
+                            .withOpacity(0.6),
                   ),
-                  border: InputBorder.none, // Clean look
-                  filled: false, // Use theme's inputDecoratorIsFilled
-                  // fillColor: colorScheme.surface.withAlpha(26), // Use theme
+                  border: InputBorder.none,
+                  filled: false,
+                  // fillColor: colorScheme.surface.withAlpha(26),
                   contentPadding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md, // Standard padding
-                    vertical: AppSpacing.sm, // Adjusted
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.sm,
                   ),
                   suffixIcon: _showClearButton
                       ? IconButton(
                           icon: Icon(
-                            Icons.clear_rounded, // Rounded icon
+                            Icons.clear_rounded,
                             color:
                                 appBarTheme.iconTheme?.color ??
                                 colorScheme.onSurfaceVariant,
@@ -222,12 +218,12 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.search_outlined), // Use outlined
+            icon: const Icon(Icons.search_outlined),
             tooltip: l10n.headlinesSearchActionTooltip,
             onPressed: _performSearch,
-            // color: appBarTheme.actionsIconTheme?.color, // Use theme
+            // color: appBarTheme.actionsIconTheme?.color,
           ),
-          const SizedBox(width: AppSpacing.xs), // Add a bit of padding
+          const SizedBox(width: AppSpacing.xs),
         ],
       ),
       body: BlocBuilder<HeadlinesSearchBloc, HeadlinesSearchState>(
@@ -238,14 +234,14 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
 
           return switch (state) {
             HeadlinesSearchInitial() => InitialStateWidget(
-              icon: Icons.search_outlined, // Themed icon
+              icon: Icons.search_outlined,
               headline: l10n.searchPageInitialHeadline,
               subheadline: l10n.searchPageInitialSubheadline,
             ),
             HeadlinesSearchLoading() => LoadingStateWidget(
               // Use LoadingStateWidget
-              icon: Icons.search_outlined, // Themed icon
-              headline: l10n.headlinesFeedLoadingHeadline, // Re-use existing
+              icon: Icons.search_outlined,
+              headline: l10n.headlinesFeedLoadingHeadline,
               subheadline:
                   'Searching ${state.selectedModelType.displayName.toLowerCase()}...',
             ),
@@ -278,11 +274,10 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                         // Consistent padding
                         horizontal: AppSpacing.paddingMedium,
                         vertical: AppSpacing.paddingSmall,
-                      ).copyWith(bottom: AppSpacing.xxl), // Ensure bottom space
+                      ).copyWith(bottom: AppSpacing.xxl),
                       itemCount: hasMore ? items.length + 1 : items.length,
-                      separatorBuilder: (context, index) => const SizedBox(
-                        height: AppSpacing.sm,
-                      ), // Consistent spacing
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: AppSpacing.sm),
                       itemBuilder: (context, index) {
                         if (index >= items.length) {
                           return const Padding(
@@ -354,7 +349,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                                       ),
                                       child: Image.network(
                                         feedItem.imageUrl,
-                                        height: 100, // Consistent height
+                                        height: 100,
                                         fit: BoxFit.cover,
                                         errorBuilder: (ctx, err, st) => Icon(
                                           Icons.broken_image_outlined,
@@ -389,7 +384,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                                         AccountActionType.linkAccount
                                     ? Icons
                                           .link_outlined // Outlined
-                                    : Icons.upgrade_outlined, // Outlined
+                                    : Icons.upgrade_outlined,
                                 color: currentColorScheme.onSecondaryContainer,
                               ),
                               title: Text(
@@ -407,9 +402,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                                           ?.copyWith(
                                             color: currentColorScheme
                                                 .onSecondaryContainer
-                                                .withOpacity(
-                                                  0.85,
-                                                ), // Adjusted opacity
+                                                .withOpacity(0.85),
                                           ),
                                     )
                                   : null,
@@ -458,12 +451,12 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
             ) =>
               FailureStateWidget(
                 message:
-                    'Failed to search "$lastSearchTerm" in ${failedModelType.displayName.toLowerCase()}:\n$errorMessage', // Improved message
+                    'Failed to search "$lastSearchTerm" in ${failedModelType.displayName.toLowerCase()}:\n$errorMessage',
                 onRetry: () => context.read<HeadlinesSearchBloc>().add(
                   HeadlinesSearchFetchRequested(searchTerm: lastSearchTerm),
                 ),
               ),
-            _ => const SizedBox.shrink(), // Fallback for any other state
+            _ => const SizedBox.shrink(),
           };
         },
       ),

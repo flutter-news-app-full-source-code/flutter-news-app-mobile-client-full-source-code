@@ -34,9 +34,7 @@ class AppearanceSettingsPage extends StatelessWidget {
         children: [
           ListTile(
             leading: const Icon(Icons.color_lens_outlined),
-            title: Text(
-              l10n.settingsAppearanceThemeSubPageTitle,
-            ), // Use new l10n key
+            title: Text(l10n.settingsAppearanceThemeSubPageTitle),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
               context.goNamed(Routes.settingsAppearanceThemeName);
@@ -45,9 +43,7 @@ class AppearanceSettingsPage extends StatelessWidget {
           const Divider(indent: AppSpacing.lg, endIndent: AppSpacing.lg),
           ListTile(
             leading: const Icon(Icons.font_download_outlined),
-            title: Text(
-              l10n.settingsAppearanceFontSubPageTitle,
-            ), // Use new l10n key
+            title: Text(l10n.settingsAppearanceFontSubPageTitle),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
               context.goNamed(Routes.settingsAppearanceFontName);

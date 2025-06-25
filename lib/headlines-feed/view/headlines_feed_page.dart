@@ -4,13 +4,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ht_main/app/bloc/app_bloc.dart'; // Added to access settings
+import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
 // HeadlineItemWidget import removed
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/shared.dart';
-import 'package:ht_shared/ht_shared.dart'; // Import all of ht_shared
+import 'package:ht_shared/ht_shared.dart';
 
 /// {@template headlines_feed_view}
 /// The core view widget for the headlines feed.
@@ -59,7 +59,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
       if (state.hasMore) {
         // Request the next page of headlines
         context.read<HeadlinesFeedBloc>().add(
-          HeadlinesFeedFetchRequested(cursor: state.cursor), // Pass cursor
+          HeadlinesFeedFetchRequested(cursor: state.cursor),
         );
       }
     }
@@ -92,11 +92,11 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
         actions: [
           // IconButton(
           //   icon: const Icon(Icons.notifications_outlined),
-          //   tooltip: l10n.notificationsTooltip, // Add tooltip for accessibility
+          //   tooltip: l10n.notificationsTooltip,
           //   onPressed: () {
           //     context.goNamed(
           //       Routes.notificationsName,
-          //     ); // Ensure correct route name
+          //     );
           //   },
           // ),
           BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
@@ -107,7 +107,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                 isFilterApplied =
                     (state.filter.categories?.isNotEmpty ?? false) ||
                     (state.filter.sources?.isNotEmpty ?? false);
-                // (state.filter.eventCountries?.isNotEmpty ?? false); // Removed
+                // (state.filter.eventCountries?.isNotEmpty ?? false);
               }
               return Stack(
                 children: [
@@ -152,7 +152,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
             case HeadlinesFeedLoading():
               // Display full-screen loading indicator
               return LoadingStateWidget(
-                icon: Icons.newspaper, // Use a relevant icon
+                icon: Icons.newspaper,
                 headline: l10n.headlinesFeedLoadingHeadline,
                 subheadline: l10n.headlinesFeedLoadingSubheadline,
               );
@@ -191,7 +191,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                   itemCount: state.hasMore
                       ? state.feedItems.length +
                             1 // Changed
-                      : state.feedItems.length, // Changed
+                      : state.feedItems.length,
                   separatorBuilder: (context, index) {
                     // Add a bit more space if the next item is an Ad or AccountAction
                     if (index < state.feedItems.length - 1) {
@@ -215,7 +215,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                         child: Center(child: CircularProgressIndicator()),
                       );
                     }
-                    final item = state.feedItems[index]; // Changed
+                    final item = state.feedItems[index];
 
                     if (item is Headline) {
                       final imageStyle = context
@@ -346,7 +346,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                         ),
                       );
                     }
-                    return const SizedBox.shrink(); // Should not happen
+                    return const SizedBox.shrink();
                   },
                 ),
               );

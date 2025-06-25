@@ -20,31 +20,27 @@ class NotificationSettingsPage extends StatelessWidget {
     // Ensure we have loaded state before building controls
     if (state.status != SettingsStatus.success) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text(l10n.settingsNotificationsTitle),
-        ), // Reuse title
+        appBar: AppBar(title: Text(l10n.settingsNotificationsTitle)),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
-    // TODO(cline): Full implementation of Notification Settings UI and BLoC logic
+    // TODO(fulleni): Full implementation of Notification Settings UI and BLoC logic
     // is pending backend and shared model development (specifically, adding
     // a 'notificationsEnabled' field to UserAppSettings or a similar model).
     // This UI is temporarily disabled.
-    const notificationsEnabled = false; // Placeholder value
+    const notificationsEnabled = false;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.settingsNotificationsTitle), // Reuse title
-      ),
+      appBar: AppBar(title: Text(l10n.settingsNotificationsTitle)),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),
         children: [
           // --- Enable/Disable Notifications ---
           SwitchListTile(
-            title: Text(l10n.settingsNotificationsEnableLabel), // Add l10n key
+            title: Text(l10n.settingsNotificationsEnableLabel),
             value: notificationsEnabled,
-            onChanged: null, // Disable the switch
+            onChanged: null,
             secondary: const Icon(Icons.notifications_active_outlined),
           ),
           const Divider(),
@@ -58,10 +54,10 @@ class NotificationSettingsPage extends StatelessWidget {
               leading: const Icon(Icons.category_outlined),
               title: Text(
                 l10n.settingsNotificationsCategoriesLabel,
-              ), // Add l10n key
+              ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
-                // TODO(cline): Implement navigation to category selection page
+                // TODO(fulleni): Implement navigation to category selection page
                 // Example: context.goNamed(Routes.settingsNotificationCategoriesName);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Category selection TBD')),
@@ -72,10 +68,10 @@ class NotificationSettingsPage extends StatelessWidget {
               leading: const Icon(Icons.source_outlined),
               title: Text(
                 l10n.settingsNotificationsSourcesLabel,
-              ), // Add l10n key
+              ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
-                // TODO(cline): Implement navigation to source selection page
+                // TODO(fulleni): Implement navigation to source selection page
                 // Example: context.goNamed(Routes.settingsNotificationSourcesName);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Source selection TBD')),
@@ -86,10 +82,10 @@ class NotificationSettingsPage extends StatelessWidget {
               leading: const Icon(Icons.public_outlined),
               title: Text(
                 l10n.settingsNotificationsCountriesLabel,
-              ), // Add l10n key
+              ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
-                // TODO(cline): Implement navigation to country selection page
+                // TODO(fulleni): Implement navigation to country selection page
                 // Example: context.goNamed(Routes.settingsNotificationCountriesName);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Country selection TBD')),

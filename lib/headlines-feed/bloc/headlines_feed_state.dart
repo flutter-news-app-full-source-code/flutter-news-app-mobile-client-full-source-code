@@ -41,14 +41,14 @@ final class HeadlinesFeedLoadingSilently extends HeadlinesFeedState {}
 final class HeadlinesFeedLoaded extends HeadlinesFeedState {
   /// {@macro headlines_feed_loaded}
   const HeadlinesFeedLoaded({
-    this.feedItems = const [], // Changed from headlines
+    this.feedItems = const [],
     this.hasMore = true,
     this.cursor,
     this.filter = const HeadlineFilter(),
   });
 
   /// The list of [FeedItem] objects currently loaded.
-  final List<FeedItem> feedItems; // Changed from List<Headline>
+  final List<FeedItem> feedItems;
 
   /// Flag indicating if there are more headlines available to fetch
   /// via pagination. `true` if more might exist, `false` otherwise.
@@ -65,13 +65,13 @@ final class HeadlinesFeedLoaded extends HeadlinesFeedState {
   /// Creates a copy of this [HeadlinesFeedLoaded] state with the given fields
   /// replaced with new values.
   HeadlinesFeedLoaded copyWith({
-    List<FeedItem>? feedItems, // Changed from List<Headline>
+    List<FeedItem>? feedItems,
     bool? hasMore,
     String? cursor,
     HeadlineFilter? filter,
   }) {
     return HeadlinesFeedLoaded(
-      feedItems: feedItems ?? this.feedItems, // Changed
+      feedItems: feedItems ?? this.feedItems,
       hasMore: hasMore ?? this.hasMore,
       cursor: cursor ?? this.cursor,
       filter: filter ?? this.filter,
@@ -79,7 +79,7 @@ final class HeadlinesFeedLoaded extends HeadlinesFeedState {
   }
 
   @override
-  List<Object?> get props => [feedItems, hasMore, cursor, filter]; // Changed
+  List<Object?> get props => [feedItems, hasMore, cursor, filter];
 }
 
 /// {@template headlines_feed_error}

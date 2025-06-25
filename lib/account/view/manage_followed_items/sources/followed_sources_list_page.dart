@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ht_main/account/bloc/account_bloc.dart';
-import 'package:ht_main/entity_details/view/entity_details_page.dart'; // Import for Arguments
+import 'package:ht_main/entity_details/view/entity_details_page.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
-import 'package:ht_main/shared/widgets/widgets.dart'; // For common widgets
+import 'package:ht_main/shared/widgets/widgets.dart';
 
 /// {@template followed_sources_list_page}
 /// Page to display and manage sources followed by the user.
@@ -22,11 +22,11 @@ class FollowedSourcesListPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Followed Sources'), // Placeholder
+        title: const Text('Followed Sources'),
         actions: [
           IconButton(
             icon: const Icon(Icons.add_circle_outline),
-            tooltip: 'Add Source to Follow', // Placeholder
+            tooltip: 'Add Source to Follow',
             onPressed: () {
               context.goNamed(Routes.addSourceToFollowName);
             },
@@ -39,17 +39,15 @@ class FollowedSourcesListPage extends StatelessWidget {
               state.preferences == null) {
             return LoadingStateWidget(
               icon: Icons.source_outlined,
-              headline: 'Loading Followed Sources...', // Placeholder
-              subheadline: l10n.pleaseWait, // Assuming this exists
+              headline: 'Loading Followed Sources...',
+              subheadline: l10n.pleaseWait,
             );
           }
 
           if (state.status == AccountStatus.failure &&
               state.preferences == null) {
             return FailureStateWidget(
-              message:
-                  state.errorMessage ??
-                  'Could not load followed sources.', // Placeholder
+              message: state.errorMessage ?? 'Could not load followed sources.',
               onRetry: () {
                 if (state.user?.id != null) {
                   context.read<AccountBloc>().add(
@@ -65,10 +63,9 @@ class FollowedSourcesListPage extends StatelessWidget {
 
           if (followedSources.isEmpty) {
             return const InitialStateWidget(
-              icon: Icons.no_sim_outlined, // Placeholder icon
-              headline: 'No Followed Sources', // Placeholder
-              subheadline:
-                  'Start following sources to see them here.', // Placeholder
+              icon: Icons.no_sim_outlined,
+              headline: 'No Followed Sources',
+              subheadline: 'Start following sources to see them here.',
             );
           }
 
@@ -77,7 +74,7 @@ class FollowedSourcesListPage extends StatelessWidget {
             itemBuilder: (context, index) {
               final source = followedSources[index];
               return ListTile(
-                leading: const Icon(Icons.source_outlined), // Generic icon
+                leading: const Icon(Icons.source_outlined),
                 title: Text(source.name),
                 subtitle: source.description != null
                     ? Text(
@@ -91,7 +88,7 @@ class FollowedSourcesListPage extends StatelessWidget {
                     Icons.remove_circle_outline,
                     color: Colors.red,
                   ),
-                  tooltip: 'Unfollow Source', // Placeholder
+                  tooltip: 'Unfollow Source',
                   onPressed: () {
                     context.read<AccountBloc>().add(
                       AccountFollowSourceToggled(source: source),
@@ -100,7 +97,7 @@ class FollowedSourcesListPage extends StatelessWidget {
                 ),
                 onTap: () {
                   context.push(
-                    Routes.sourceDetails, // Navigate to source details
+                    Routes.sourceDetails,
                     extra: EntityDetailsPageArguments(entity: source),
                   );
                 },

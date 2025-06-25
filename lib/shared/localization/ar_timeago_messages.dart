@@ -3,11 +3,11 @@ import 'package:timeago/timeago.dart' as timeago;
 /// Custom Arabic lookup messages for the timeago package.
 class ArTimeagoMessages implements timeago.LookupMessages {
   @override
-  String prefixAgo() => ''; // No prefix, will include in string
+  String prefixAgo() => '';
   @override
-  String prefixFromNow() => 'بعد '; // Prefix for future
+  String prefixFromNow() => 'بعد ';
   @override
-  String suffixAgo() => ''; // No suffix
+  String suffixAgo() => '';
   @override
   String suffixFromNow() => '';
 
@@ -24,7 +24,7 @@ class ArTimeagoMessages implements timeago.LookupMessages {
   String hours(int hours) => 'منذ $hoursس';
 
   @override
-  String aDay(int hours) => 'منذ 1ي'; // Or 'أمس' if preferred for exactly 1 day
+  String aDay(int hours) => 'منذ 1ي';
   @override
   String days(int days) => 'منذ $daysي';
 
@@ -34,9 +34,9 @@ class ArTimeagoMessages implements timeago.LookupMessages {
   String months(int months) => 'منذ $monthsش';
 
   @override
-  String aboutAYear(int year) => 'منذ 1سنة'; // Using سنة for year
+  String aboutAYear(int year) => 'منذ 1سنة';
   @override
-  String years(int years) => 'منذ $yearsسنوات'; // Standard plural
+  String years(int years) => 'منذ $yearsسنوات';
 
   @override
   String wordSeparator() => ' ';

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart'; // Added
-import 'package:ht_data_repository/ht_data_repository.dart'; // For repository provider
+import 'package:go_router/go_router.dart';
+import 'package:ht_data_repository/ht_data_repository.dart';
 import 'package:ht_main/account/bloc/account_bloc.dart';
-import 'package:ht_main/app/bloc/app_bloc.dart'; // For accessing settings
+import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/entity_details/bloc/entity_details_bloc.dart';
 import 'package:ht_main/entity_details/models/entity_type.dart';
 import 'package:ht_main/l10n/app_localizations.dart';
 import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_main/router/routes.dart'; // Added
+import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/constants/app_spacing.dart';
-import 'package:ht_main/shared/services/feed_injector_service.dart'; // Added
+import 'package:ht_main/shared/services/feed_injector_service.dart';
 import 'package:ht_main/shared/widgets/widgets.dart';
 import 'package:ht_shared/ht_shared.dart';
 
@@ -26,7 +26,7 @@ class EntityDetailsPageArguments {
 
   final String? entityId;
   final EntityType? entityType;
-  final dynamic entity; // Category or Source
+  final dynamic entity;
 }
 
 class EntityDetailsPage extends StatelessWidget {
@@ -46,21 +46,21 @@ class EntityDetailsPage extends StatelessWidget {
       // Explicitly type BlocProvider
       create: (context) {
         final feedInjectorService = FeedInjectorService();
-        final entityDetailsBloc = EntityDetailsBloc(
-          headlinesRepository: context.read<HtDataRepository<Headline>>(),
-          categoryRepository: context.read<HtDataRepository<Category>>(),
-          sourceRepository: context.read<HtDataRepository<Source>>(),
-          accountBloc: context.read<AccountBloc>(),
-          appBloc: context.read<AppBloc>(),
-          feedInjectorService: feedInjectorService,
-        );
-        entityDetailsBloc.add(
-          EntityDetailsLoadRequested(
-            entityId: args.entityId,
-            entityType: args.entityType,
-            entity: args.entity,
-          ),
-        );
+        final entityDetailsBloc =
+            EntityDetailsBloc(
+              headlinesRepository: context.read<HtDataRepository<Headline>>(),
+              categoryRepository: context.read<HtDataRepository<Category>>(),
+              sourceRepository: context.read<HtDataRepository<Source>>(),
+              accountBloc: context.read<AccountBloc>(),
+              appBloc: context.read<AppBloc>(),
+              feedInjectorService: feedInjectorService,
+            )..add(
+              EntityDetailsLoadRequested(
+                entityId: args.entityId,
+                entityType: args.entityType,
+                entity: args.entity,
+              ),
+            );
         return entityDetailsBloc;
       },
       child: EntityDetailsView(args: args),
@@ -69,9 +69,9 @@ class EntityDetailsPage extends StatelessWidget {
 }
 
 class EntityDetailsView extends StatefulWidget {
-  const EntityDetailsView({required this.args, super.key}); // Accept args
+  const EntityDetailsView({required this.args, super.key});
 
-  final EntityDetailsPageArguments args; // Store args
+  final EntityDetailsPageArguments args;
 
   @override
   State<EntityDetailsView> createState() => _EntityDetailsViewState();
@@ -111,16 +111,13 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
   }
 
   String _getEntityTypeDisplayName(EntityType? type, AppLocalizations l10n) {
-    if (type == null) return l10n.detailsPageTitle; // Fallback
+    if (type == null) return l10n.detailsPageTitle;
     String name;
     switch (type) {
       case EntityType.category:
-        name = l10n.entityDetailsCategoryTitle; // Use direct l10n string
+        name = l10n.entityDetailsCategoryTitle;
       case EntityType.source:
-        name = l10n.entityDetailsSourceTitle; // Use direct l10n string
-      // EntityType.country does not exist, remove or map if added later
-      default:
-        name = l10n.detailsPageTitle; // Fallback
+        name = l10n.entityDetailsSourceTitle;
     }
     // Manual capitalization
     return name.isNotEmpty
@@ -148,8 +145,7 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                   state.entity == null)) {
             return LoadingStateWidget(
               icon: Icons.info_outline,
-              headline:
-                  entityTypeDisplayNameForTitle, // Use the display name directly
+              headline: entityTypeDisplayNameForTitle,
               subheadline: l10n.pleaseWait,
             );
           }
@@ -172,7 +168,7 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
 
           final String appBarTitleText;
           IconData? appBarIconData;
-          // String? entityImageHeroTag; // Not currently used
+          // String? entityImageHeroTag;
 
           if (state.entity is Category) {
             final cat = state.entity as Category;
@@ -184,7 +180,7 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
             appBarTitleText = src.name;
             appBarIconData = Icons.source_outlined;
           } else {
-            appBarTitleText = l10n.detailsPageTitle; // Fallback
+            appBarTitleText = l10n.detailsPageTitle;
           }
 
           final description = state.entity is Category

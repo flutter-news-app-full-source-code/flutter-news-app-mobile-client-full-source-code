@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_data_repository/ht_data_repository.dart'; // Generic Data Repository
-import 'package:ht_shared/ht_shared.dart'; // Shared models, including UserAppSettings and UserContentPreferences
+import 'package:ht_data_repository/ht_data_repository.dart';
+import 'package:ht_shared/ht_shared.dart';
 
-part 'settings_event.dart'; // Contains event definitions
+part 'settings_event.dart';
 part 'settings_state.dart';
 
 /// {@template settings_bloc}
@@ -119,7 +119,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     SettingsAppThemeModeChanged event,
     Emitter<SettingsState> emit,
   ) async {
-    if (state.userAppSettings == null) return; // Guard against null settings
+    if (state.userAppSettings == null) return;
 
     final updatedSettings = state.userAppSettings!.copyWith(
       displaySettings: state.userAppSettings!.displaySettings.copyWith(

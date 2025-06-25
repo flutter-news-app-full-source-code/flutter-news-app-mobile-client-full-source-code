@@ -51,15 +51,13 @@ class AuthenticationPage extends StatelessWidget {
         leading: isLinkingContext
             ? IconButton(
                 icon: const Icon(Icons.close),
-                tooltip: MaterialLocalizations.of(
-                  context,
-                ).closeButtonTooltip, // Accessibility
+                tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                 onPressed: () {
                   // Navigate back to the account page when close is pressed
                   context.goNamed(Routes.accountName);
                 },
               )
-            : null, // No leading button if not linking (relies on system back if pushed)
+            : null,
       ),
       body: SafeArea(
         child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
@@ -72,7 +70,7 @@ class AuthenticationPage extends StatelessWidget {
                   SnackBar(
                     content: Text(
                       // Provide a more user-friendly error message if possible
-                      state.errorMessage, // Or map specific errors
+                      state.errorMessage,
                     ),
                     backgroundColor: colorScheme.error,
                   ),
@@ -83,16 +81,14 @@ class AuthenticationPage extends StatelessWidget {
             // Email link success is handled in the dedicated email flow pages.
           },
           builder: (context, state) {
-            final isLoading =
-                state is AuthenticationLoading; // Simplified loading check
+            final isLoading = state is AuthenticationLoading;
 
             return Padding(
               padding: const EdgeInsets.all(AppSpacing.paddingLarge),
               child: Center(
                 child: SingleChildScrollView(
                   child: Column(
-                    mainAxisAlignment:
-                        MainAxisAlignment.center, // Center vertically
+                    mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       // --- Icon ---
@@ -100,26 +96,24 @@ class AuthenticationPage extends StatelessWidget {
                         padding: const EdgeInsets.only(bottom: AppSpacing.xl),
                         child: Icon(
                           isLinkingContext ? Icons.sync : Icons.newspaper,
-                          size: AppSpacing.xxl * 2, // Standardized large icon
+                          size: AppSpacing.xxl * 2,
                           color: colorScheme.primary,
                         ),
                       ),
-                      // const SizedBox(height: AppSpacing.lg), // Removed, padding above handles it
+                      // const SizedBox(height: AppSpacing.lg),
                       // --- Headline and Subheadline ---
                       Text(
                         headline,
                         style: textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold, // Ensure prominence
+                          fontWeight: FontWeight.bold,
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(
-                        height: AppSpacing.md,
-                      ), // Increased spacing
+                      const SizedBox(height: AppSpacing.md),
                       Text(
                         subHeadline,
                         style: textTheme.bodyLarge?.copyWith(
-                          color: colorScheme.onSurfaceVariant, // Softer color
+                          color: colorScheme.onSurfaceVariant,
                         ),
                         textAlign: TextAlign.center,
                       ),

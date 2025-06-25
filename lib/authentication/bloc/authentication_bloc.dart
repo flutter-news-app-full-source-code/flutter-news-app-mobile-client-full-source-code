@@ -66,14 +66,10 @@ class AuthenticationBloc
       emit(const AuthenticationFailure('Please enter a valid email address.'));
       return;
     }
-    emit(
-      AuthenticationRequestCodeLoading(),
-    ); // Indicate code request is sending
+    emit(AuthenticationRequestCodeLoading());
     try {
       await _authenticationRepository.requestSignInCode(event.email);
-      emit(
-        AuthenticationCodeSentSuccess(email: event.email),
-      ); // Confirm code requested and include email
+      emit(AuthenticationCodeSentSuccess(email: event.email));
     } on InvalidInputException catch (e) {
       emit(AuthenticationFailure('Invalid input: ${e.message}'));
     } on NetworkException catch (_) {
@@ -100,15 +96,15 @@ class AuthenticationBloc
     AuthenticationVerifyCodeRequested event,
     Emitter<AuthenticationState> emit,
   ) async {
-    emit(AuthenticationLoading()); // Indicate code verification is loading
+    emit(AuthenticationLoading());
     try {
       await _authenticationRepository.verifySignInCode(event.email, event.code);
       // On success, the _AuthenticationUserChanged listener will handle
       // emitting AuthenticationAuthenticated.
     } on InvalidInputException catch (e) {
-      emit(AuthenticationFailure(e.message)); // Use specific error message
+      emit(AuthenticationFailure(e.message));
     } on AuthenticationException catch (e) {
-      emit(AuthenticationFailure(e.message)); // Use specific error message
+      emit(AuthenticationFailure(e.message));
     } on NetworkException catch (_) {
       emit(const AuthenticationFailure('Network error occurred.'));
     } on ServerException catch (e) {
@@ -130,7 +126,7 @@ class AuthenticationBloc
     AuthenticationAnonymousSignInRequested event,
     Emitter<AuthenticationState> emit,
   ) async {
-    emit(AuthenticationLoading()); // Indicate anonymous sign-in is loading
+    emit(AuthenticationLoading());
     try {
       await _authenticationRepository.signInAnonymously();
       // On success, the _AuthenticationUserChanged listener will handle
@@ -154,7 +150,7 @@ class AuthenticationBloc
     AuthenticationSignOutRequested event,
     Emitter<AuthenticationState> emit,
   ) async {
-    emit(AuthenticationLoading()); // Indicate sign-out is loading
+    emit(AuthenticationLoading());
     try {
       await _authenticationRepository.signOut();
       // On success, the _AuthenticationUserChanged listener will handle

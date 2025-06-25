@@ -41,7 +41,7 @@ class AvailableSourcesState extends Equatable {
     status,
     availableSources,
     error,
-    // hasMore, // Add if pagination is implemented
-    // cursor, // Add if pagination is implemented
+    // hasMore,
+    // cursor,
   ];
 }

@@ -2,14 +2,14 @@
 enum SearchModelType {
   headline,
   category,
-  // country, // Removed
+  // country,
   source;
 
   /// Returns a user-friendly display name for the enum value.
   ///
   /// This should ideally be localized using context.l10n,
   /// but for simplicity in this step, we'll use direct strings.
-  /// TODO(Cline): Localize these display names.
+  /// TODO(fulleni): Localize these display names.
   String get displayName {
     switch (this) {
       case SearchModelType.headline:
@@ -17,7 +17,7 @@ enum SearchModelType {
       case SearchModelType.category:
         return 'Categories';
       // case SearchModelType.country: // Removed
-      //   return 'Countries'; // Removed
+      //   return 'Countries';
       case SearchModelType.source:
         return 'Sources';
     }

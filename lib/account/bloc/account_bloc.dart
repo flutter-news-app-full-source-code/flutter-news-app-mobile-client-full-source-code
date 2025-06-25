@@ -86,8 +86,32 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       if (_environment == local_config.AppEnvironment.demo) {
         // ignore: inference_failure_on_instance_creation
         await Future.delayed(const Duration(seconds: 1));
+        // After delay, re-attempt to read the preferences.
+        // This is crucial because migration might have completed during the delay.
+        try {
+          final migratedPreferences =
+              await _userContentPreferencesRepository.read(
+            id: event.userId,
+            userId: event.userId,
+          );
+          emit(
+            state.copyWith(
+              status: AccountStatus.success,
+              preferences: migratedPreferences,
+              clearErrorMessage: true,
+            ),
+          );
+          return; // Exit if successfully read after migration
+        } on NotFoundException {
+          // Still not found after delay, proceed to create default.
+          print(
+            '[AccountBloc] UserContentPreferences still not found after '
+            'migration delay. Creating default preferences.',
+          );
+        }
       }
-      // If preferences not found, create a default one for the user
+      // If preferences not found (either initially or after re-attempt),
+      // create a default one for the user.
       final defaultPreferences = UserContentPreferences(id: event.userId);
       try {
         await _userContentPreferencesRepository.create(
@@ -101,11 +125,32 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
             clearErrorMessage: true,
           ),
         );
+      } on ConflictException {
+        // If a conflict occurs during creation (e.g., another process
+        // created it concurrently), attempt to read it again to get the
+        // existing one. This can happen if the migration service
+        // created it right after the second NotFoundException.
+        print(
+          '[AccountBloc] Conflict during creation of UserContentPreferences. '
+          'Attempting to re-read.',
+        );
+        final existingPreferences =
+            await _userContentPreferencesRepository.read(
+          id: event.userId,
+          userId: event.userId,
+        );
+        emit(
+          state.copyWith(
+            status: AccountStatus.success,
+            preferences: existingPreferences,
+            clearErrorMessage: true,
+          ),
+        );
       } catch (e) {
         emit(
           state.copyWith(
             status: AccountStatus.failure,
-            errorMessage: 'Failed to create default preferences.',
+            errorMessage: 'Failed to create default preferences: $e',
           ),
         );
       }

@@ -101,12 +101,13 @@ class App extends StatelessWidget {
           htUserContentPreferencesRepository:
               _htUserContentPreferencesRepository,
           htAppConfigRepository: _htAppConfigRepository,
-          environment: _environment,
+          environment: _environment, // Pass environment
         ),
       ),
     );
   }
 }
+
 
 class _AppView extends StatefulWidget {
   const _AppView({
@@ -159,6 +160,7 @@ class _AppViewState extends State<_AppView> {
       htUserContentPreferencesRepository:
           widget.htUserContentPreferencesRepository,
       htAppConfigRepository: widget.htAppConfigRepository,
+      environment: widget.environment, // Pass environment
     );
 
     // Removed Dynamic Link Initialization

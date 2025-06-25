@@ -14,6 +14,7 @@ import 'package:ht_main/account/view/manage_followed_items/sources/add_source_to
 import 'package:ht_main/account/view/manage_followed_items/sources/followed_sources_list_page.dart'; // New
 import 'package:ht_main/account/view/saved_headlines_page.dart'; // Import SavedHeadlinesPage
 import 'package:ht_main/app/bloc/app_bloc.dart';
+import 'package:ht_main/app/config/config.dart' as local_config;
 import 'package:ht_main/app/view/app_shell.dart';
 import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/authentication/view/authentication_page.dart';
@@ -62,11 +63,13 @@ GoRouter createRouter({
   required HtDataRepository<UserContentPreferences>
   htUserContentPreferencesRepository,
   required HtDataRepository<AppConfig> htAppConfigRepository,
+  required local_config.AppEnvironment environment, // Added environment
 }) {
   // Instantiate AccountBloc once to be shared
   final accountBloc = AccountBloc(
     authenticationRepository: htAuthenticationRepository,
     userContentPreferencesRepository: htUserContentPreferencesRepository,
+    environment: environment, // Pass environment to AccountBloc
   );
 
   return GoRouter(

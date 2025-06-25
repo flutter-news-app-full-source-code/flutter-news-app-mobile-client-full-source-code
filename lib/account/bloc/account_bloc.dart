@@ -4,18 +4,22 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ht_auth_repository/ht_auth_repository.dart';
 import 'package:ht_data_repository/ht_data_repository.dart';
+import 'package:ht_main/app/config/config.dart' as local_config;
 import 'package:ht_shared/ht_shared.dart';
 
 part 'account_event.dart';
 part 'account_state.dart';
+
 
 class AccountBloc extends Bloc<AccountEvent, AccountState> {
   AccountBloc({
     required HtAuthRepository authenticationRepository,
     required HtDataRepository<UserContentPreferences>
     userContentPreferencesRepository,
+    required local_config.AppEnvironment environment, // Added environment
   }) : _authenticationRepository = authenticationRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
+       _environment = environment, // Initialize environment
        super(const AccountState()) {
     // Listen to user changes from HtAuthRepository
     _userSubscription = _authenticationRepository.authStateChanges.listen((
@@ -37,6 +41,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   final HtAuthRepository _authenticationRepository;
   final HtDataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
+  final local_config.AppEnvironment _environment; // New field for environment
   late StreamSubscription<User?> _userSubscription;
 
   Future<void> _onAccountUserChanged(
@@ -72,6 +77,17 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         ),
       );
     } on NotFoundException {
+      // In demo mode, a short delay is introduced here to mitigate a race
+      // condition during anonymous to authenticated data migration.
+      // This ensures that the DemoDataMigrationService has a chance to
+      // complete its migration of UserContentPreferences before AccountBloc
+      // attempts to create a new default preference for the authenticated user.
+      // This is a temporary stub for the demo environment only and is not
+      // needed in production/development where backend handles migration.
+      if (_environment == local_config.AppEnvironment.demo) {
+        // ignore: inference_failure_on_instance_creation
+        await Future.delayed(const Duration(seconds: 1));
+      }
       // If preferences not found, create a default one for the user
       final defaultPreferences = UserContentPreferences(id: event.userId);
       try {

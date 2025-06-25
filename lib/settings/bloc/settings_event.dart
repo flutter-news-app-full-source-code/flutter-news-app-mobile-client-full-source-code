@@ -137,6 +137,6 @@ class SettingsLanguageChanged extends SettingsEvent {
 // SettingsNotificationsEnabledChanged event removed as UserAppSettings
 // does not currently support a general notifications enabled flag.
 
-// TODO(cline): Add events for changing followed categories/sources/countries
+// TODO(fulleni): Add events for changing followed categories/sources/countries
 // for notifications if needed later. Example:
 // class SettingsNotificationCategoriesChanged extends SettingsEvent { ... }

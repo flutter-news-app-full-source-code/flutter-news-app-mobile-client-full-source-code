@@ -1,5 +1,5 @@
 //
-// ignore_for_file: lines_longer_than_80_chars, public_member_api_docs
+// ignore_for_file: lines_longer_than_80_chars, public_member_api_docs, unused_field
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,15 +11,7 @@ import 'package:ht_main/headlines-feed/models/headline_filter.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/constants/constants.dart';
-import 'package:ht_shared/ht_shared.dart'
-    show
-        Category,
-        HtHttpException,
-        NotFoundException,
-        Source,
-        SourceType,
-        User,
-        UserContentPreferences;
+import 'package:ht_shared/ht_shared.dart';
 
 // Keys for passing data to/from SourceFilterPage
 const String keySelectedSources = 'selectedSources';

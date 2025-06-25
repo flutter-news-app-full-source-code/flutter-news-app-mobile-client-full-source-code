@@ -13,8 +13,7 @@ import 'package:ht_main/headline-details/bloc/similar_headlines_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/shared.dart';
-import 'package:ht_shared/ht_shared.dart'
-    show Category, Headline, HeadlineImageStyle, Source;
+import 'package:ht_shared/ht_shared.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';

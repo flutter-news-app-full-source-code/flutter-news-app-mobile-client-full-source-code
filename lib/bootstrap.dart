@@ -210,7 +210,7 @@ Future<Widget> bootstrap(
   );
 
   // Conditionally instantiate DemoDataMigrationService
-  final DemoDataMigrationService? demoDataMigrationService =
+  final demoDataMigrationService =
       appConfig.environment == app_config.AppEnvironment.demo
       ? DemoDataMigrationService(
           userAppSettingsRepository: userAppSettingsRepository,

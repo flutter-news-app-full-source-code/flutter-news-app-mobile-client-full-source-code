@@ -25,7 +25,7 @@ class NotificationSettingsPage extends StatelessWidget {
       );
     }
 
-    // TODO(cline): Full implementation of Notification Settings UI and BLoC logic
+    // TODO(fulleni): Full implementation of Notification Settings UI and BLoC logic
     // is pending backend and shared model development (specifically, adding
     // a 'notificationsEnabled' field to UserAppSettings or a similar model).
     // This UI is temporarily disabled.
@@ -57,7 +57,7 @@ class NotificationSettingsPage extends StatelessWidget {
               ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
-                // TODO(cline): Implement navigation to category selection page
+                // TODO(fulleni): Implement navigation to category selection page
                 // Example: context.goNamed(Routes.settingsNotificationCategoriesName);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Category selection TBD')),
@@ -71,7 +71,7 @@ class NotificationSettingsPage extends StatelessWidget {
               ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
-                // TODO(cline): Implement navigation to source selection page
+                // TODO(fulleni): Implement navigation to source selection page
                 // Example: context.goNamed(Routes.settingsNotificationSourcesName);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Source selection TBD')),
@@ -85,7 +85,7 @@ class NotificationSettingsPage extends StatelessWidget {
               ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
-                // TODO(cline): Implement navigation to country selection page
+                // TODO(fulleni): Implement navigation to country selection page
                 // Example: context.goNamed(Routes.settingsNotificationCountriesName);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Country selection TBD')),

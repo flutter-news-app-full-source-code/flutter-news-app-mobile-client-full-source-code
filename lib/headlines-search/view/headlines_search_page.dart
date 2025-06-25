@@ -68,8 +68,9 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
 
   @override
   void dispose() {
-    _scrollController.removeListener(_onScroll);
-    _scrollController.dispose();
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
     _textController.dispose();
     super.dispose();
   }

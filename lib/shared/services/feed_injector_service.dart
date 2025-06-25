@@ -49,6 +49,7 @@ class FeedInjectorService {
       case UserRole.premiumUser:
         adFrequency = adConfig.premiumAdFrequency;
         adPlacementInterval = adConfig.premiumAdPlacementInterval;
+      // ignore: no_default_cases
       default: // For any other roles, or if UserRole enum expands
         adFrequency = adConfig.guestAdFrequency;
         adPlacementInterval = adConfig.guestAdPlacementInterval;
@@ -134,7 +135,6 @@ class FeedInjectorService {
   }
 
   AccountAction _buildLinkAccountActionVariant(AppConfig appConfig) {
-    final prefs = appConfig.userPreferenceLimits;
     // final prefs = appConfig.userPreferenceLimits;
     // final ads = appConfig.adConfig;
     final variant = _random.nextInt(3);
@@ -173,7 +173,6 @@ class FeedInjectorService {
   }
 
   AccountAction _buildUpgradeAccountActionVariant(AppConfig appConfig) {
-    final prefs = appConfig.userPreferenceLimits;
     // final prefs = appConfig.userPreferenceLimits;
     // final ads = appConfig.adConfig;
     final variant = _random.nextInt(3);

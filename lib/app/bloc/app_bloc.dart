@@ -62,7 +62,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   ) async {
     // Determine the AppStatus based on the user object and its role
     final AppStatus status;
-    final User? oldUser = state.user;
+    final oldUser = state.user;
 
     switch (event.user?.role) {
       case null:
@@ -71,6 +71,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         status = AppStatus.authenticated;
       case UserRole.guestUser: // Explicitly map guestUser to anonymous
         status = AppStatus.anonymous;
+      // ignore: no_default_cases
       default: // Fallback for any other roles not explicitly handled
         status = AppStatus.anonymous;
     }

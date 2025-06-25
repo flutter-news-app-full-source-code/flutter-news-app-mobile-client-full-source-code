@@ -53,8 +53,8 @@ class EntityDetailsPage extends StatelessWidget {
           accountBloc: context.read<AccountBloc>(),
           appBloc: context.read<AppBloc>(),
           feedInjectorService: feedInjectorService,
-        );
-        entityDetailsBloc.add(
+        )
+        ..add(
           EntityDetailsLoadRequested(
             entityId: args.entityId,
             entityType: args.entityType,
@@ -118,10 +118,7 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
         name = l10n.entityDetailsCategoryTitle;
       case EntityType.source:
         name = l10n.entityDetailsSourceTitle;
-      // EntityType.country does not exist, remove or map if added later
-      default:
-        name = l10n.detailsPageTitle;
-    }
+      }
     // Manual capitalization
     return name.isNotEmpty
         ? '${name[0].toUpperCase()}${name.substring(1)}'

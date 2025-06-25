@@ -9,7 +9,7 @@ enum SearchModelType {
   ///
   /// This should ideally be localized using context.l10n,
   /// but for simplicity in this step, we'll use direct strings.
-  /// TODO(Cline): Localize these display names.
+  /// TODO(fulleni): Localize these display names.
   String get displayName {
     switch (this) {
       case SearchModelType.headline:

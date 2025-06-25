@@ -85,7 +85,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       // needed in production/development where backend handles migration.
       if (_environment == local_config.AppEnvironment.demo) {
         // ignore: inference_failure_on_instance_creation
-        await Future.delayed(const Duration(seconds: 1));
+        await Future.delayed(const Duration(milliseconds: 50));
         // After delay, re-attempt to read the preferences.
         // This is crucial because migration might have completed during the delay.
         try {

@@ -14,13 +14,13 @@ class DemoDataMigrationService {
   const DemoDataMigrationService({
     required HtDataRepository<UserAppSettings> userAppSettingsRepository,
     required HtDataRepository<UserContentPreferences>
-        userContentPreferencesRepository,
-  })  : _userAppSettingsRepository = userAppSettingsRepository,
-        _userContentPreferencesRepository = userContentPreferencesRepository;
+    userContentPreferencesRepository,
+  }) : _userAppSettingsRepository = userAppSettingsRepository,
+       _userContentPreferencesRepository = userContentPreferencesRepository;
 
   final HtDataRepository<UserAppSettings> _userAppSettingsRepository;
   final HtDataRepository<UserContentPreferences>
-      _userContentPreferencesRepository;
+  _userContentPreferencesRepository;
 
   /// Migrates user settings and content preferences from an old anonymous
   /// user ID to a new authenticated user ID.
@@ -69,10 +69,7 @@ class DemoDataMigrationService {
         }
       }
 
-      await _userAppSettingsRepository.delete(
-        id: oldUserId,
-        userId: oldUserId,
-      );
+      await _userAppSettingsRepository.delete(id: oldUserId, userId: oldUserId);
       print(
         '[DemoDataMigrationService] UserAppSettings migrated successfully '
         'from $oldUserId to $newUserId.',

@@ -212,11 +212,11 @@ Future<Widget> bootstrap(
   // Conditionally instantiate DemoDataMigrationService
   final DemoDataMigrationService? demoDataMigrationService =
       appConfig.environment == app_config.AppEnvironment.demo
-          ? DemoDataMigrationService(
-              userAppSettingsRepository: userAppSettingsRepository,
-              userContentPreferencesRepository: userContentPreferencesRepository,
-            )
-          : null;
+      ? DemoDataMigrationService(
+          userAppSettingsRepository: userAppSettingsRepository,
+          userContentPreferencesRepository: userContentPreferencesRepository,
+        )
+      : null;
 
   return App(
     htAuthenticationRepository: authenticationRepository,

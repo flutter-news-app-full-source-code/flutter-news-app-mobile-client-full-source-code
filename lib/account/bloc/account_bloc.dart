@@ -10,7 +10,6 @@ import 'package:ht_shared/ht_shared.dart';
 part 'account_event.dart';
 part 'account_state.dart';
 
-
 class AccountBloc extends Bloc<AccountEvent, AccountState> {
   AccountBloc({
     required HtAuthRepository authenticationRepository,

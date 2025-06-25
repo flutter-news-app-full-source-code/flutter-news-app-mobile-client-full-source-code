@@ -108,14 +108,14 @@ class FeedInjectorService {
     if (userRole == UserRole.guestUser) {
       daysThreshold = daysBetweenActionsConfig.guestDaysBetweenAccountActions;
       actionType = AccountActionType.linkAccount;
-    } else if (userRole == UserRole.standardUser) {      
+    } else if (userRole == UserRole.standardUser) {
       daysThreshold =
           daysBetweenActionsConfig.standardUserDaysBetweenAccountActions;
-      
-      // todo(fulleni): once account upgrade feature is implemented, 
+
+      // todo(fulleni): once account upgrade feature is implemented,
       // uncomment the action type line
       // and remove teh null return line.
-      
+
       // actionType = AccountActionType.upgrade;
       return null;
     } else {

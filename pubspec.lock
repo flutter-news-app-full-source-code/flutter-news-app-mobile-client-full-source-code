@@ -5,18 +5,18 @@ packages:
     dependency: transitive
     description:
       name: _fe_analyzer_shared
-      sha256: e55636ed79578b9abca5fecf9437947798f5ef7456308b5cb85720b793eac92f
+      sha256: da0d9209ca76bde579f2da330aeb9df62b6319c834fa7baae052021b0462401f
       url: "https://pub.dev"
     source: hosted
-    version: "82.0.0"
+    version: "85.0.0"
   analyzer:
     dependency: transitive
     description:
       name: analyzer
-      sha256: "904ae5bb474d32c38fb9482e2d925d5454cda04ddd0e55d2e6826bc72f6ba8c0"
+      sha256: b1ade5707ab7a90dfd519eaac78a7184341d19adb6096c68d499b59c7c6cf880
       url: "https://pub.dev"
     source: hosted
-    version: "7.4.5"
+    version: "7.7.0"
   ansicolor:
     dependency: transitive
     description:
@@ -141,10 +141,10 @@ packages:
     dependency: transitive
     description:
       name: coverage
-      sha256: aa07dbe5f2294c827b7edb9a87bba44a9c15a3cc81bc8da2ca19b37322d30080
+      sha256: "5da775aa218eaf2151c721b16c01c7676fbfdd99cebba2bf64e8b807a28ff94d"
       url: "https://pub.dev"
     source: hosted
-    version: "1.14.1"
+    version: "1.15.0"
   cross_file:
     dependency: transitive
     description:
@@ -173,18 +173,18 @@ packages:
     dependency: transitive
     description:
       name: device_frame
-      sha256: d031a06f5d6f4750009672db98a5aa1536aa4a231713852469ce394779a23d75
+      sha256: "7b2ebb2a09d6cc0f086b51bd1412d7be83e0170056a7290349169be41164c86a"
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.0"
+    version: "1.4.0"
   device_preview:
     dependency: "direct main"
     description:
       name: device_preview
-      sha256: a694acdd3894b4c7d600f4ee413afc4ff917f76026b97ab06575fe886429ef19
+      sha256: "88aa1cc73ee9a8ec771b309dcbc4000cc66b5d8456b825980997640ab1195bf5"
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.0"
+    version: "1.3.1"
   diff_match_patch:
     dependency: transitive
     description:
@@ -321,10 +321,10 @@ packages:
     dependency: transitive
     description:
       name: freezed_annotation
-      sha256: c2e2d632dd9b8a2b7751117abcfc2b4888ecfe181bd9fca7170d9ef02e595fe2
+      sha256: "7294967ff0a6d98638e7acb774aac3af2550777accd8149c90af5b014e6d44d8"
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.4"
+    version: "3.1.0"
   frontend_server_client:
     dependency: transitive
     description:
@@ -362,7 +362,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: fd31ce8e255c27e1fcc17e849c41f9c8511a6d87
+      resolved-ref: a2fc2a651494831a461fff96807141bdba9cc28b
       url: "https://github.com/headlines-toolkit/ht-auth-api.git"
     source: git
     version: "0.0.0"
@@ -371,7 +371,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: f9c3b44b79fc19dfd9b9a7e0d1e21e60f4885617
+      resolved-ref: a003eb493db4fc134db419a721ee2fda0b598032
       url: "https://github.com/headlines-toolkit/ht-auth-client.git"
     source: git
     version: "0.0.0"
@@ -380,7 +380,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "3a8dc5ff81c59805fa59996517eb0fdf136a0b67"
+      resolved-ref: ea9ad0361b1e0beab4690959889b7056091d29dc
       url: "https://github.com/headlines-toolkit/ht-auth-inmemory"
     source: git
     version: "0.0.0"
@@ -389,7 +389,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "596ba311cdbbdf61a216f60dac0218fab9e234d9"
+      resolved-ref: b7de5cc86d432b17710c83a1bf8de105bb4fa00d
       url: "https://github.com/headlines-toolkit/ht-auth-repository.git"
     source: git
     version: "0.0.0"
@@ -398,7 +398,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: d64d8b8cf24f9b4bc5ad639b9c6b968807cf5d93
+      resolved-ref: "16630c8717646663e52eee3ebedc4daa35ec4d39"
       url: "https://github.com/headlines-toolkit/ht-data-api.git"
     source: git
     version: "0.0.0"
@@ -407,7 +407,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "2b9c82fc5d3aff78e1e6f51b844927508bc06e48"
+      resolved-ref: e566ee6eae5261c00d0987972efc77a37a0c4c3a
       url: "https://github.com/headlines-toolkit/ht-data-client.git"
     source: git
     version: "0.0.0"
@@ -416,7 +416,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "3353842a1f1be1ab2563f2ba236daf49dd19a85e"
+      resolved-ref: abef81e5294d70ace82d3e87f1efc94fca6a8445
       url: "https://github.com/headlines-toolkit/ht-data-inmemory.git"
     source: git
     version: "0.0.0"
@@ -425,7 +425,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "2f1b1e81ff91eeae636f822edbb9088a28fd4906"
+      resolved-ref: f19fe64c67a2febdef853b15f6df9c63240ad48e
       url: "https://github.com/headlines-toolkit/ht-data-repository.git"
     source: git
     version: "0.0.0"
@@ -434,7 +434,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "648e8549d7ceb2ffb293fa66bdd02f5e0ca8def6"
+      resolved-ref: "6484a5641c3d633d286ea5848c5b7cf1e723ebc1"
       url: "https://github.com/headlines-toolkit/ht-http-client.git"
     source: git
     version: "0.0.0"
@@ -443,7 +443,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: e2860560d21c1cf43f0e65f28c9ba722823254f2
+      resolved-ref: "2378d6698df1cdeb7c5a17470f94fb8a5a99ca01"
       url: "https://github.com/headlines-toolkit/ht-kv-storage-service.git"
     source: git
     version: "0.0.0"
@@ -461,8 +461,17 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "9cbe2dcf84860f5be655d091b9e15bc1d48fa3dc"
+      resolved-ref: "2f78ac83c319242822250088c1edb11324404cb3"
       url: "https://github.com/headlines-toolkit/ht-shared.git"
+    source: git
+    version: "0.0.0"
+  ht_ui_kit:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "1c13e5accfa5fad7d262fbc5693780eac6f03fd9"
+      url: "https://github.com/headlines-toolkit/ht-ui-kit.git"
     source: git
     version: "0.0.0"
   html:
@@ -733,10 +742,10 @@ packages:
     dependency: transitive
     description:
       name: posix
-      sha256: f0d7856b6ca1887cfa6d1d394056a296ae33489db914e365e2044fdada449e62
+      sha256: "6323a5b0fa688b6a010df4905a56b00181479e6d10534cecfecede2aa55add61"
       url: "https://pub.dev"
     source: hosted
-    version: "6.0.2"
+    version: "6.0.3"
   provider:
     dependency: transitive
     description:
@@ -986,10 +995,10 @@ packages:
     dependency: "direct main"
     description:
       name: url_launcher
-      sha256: "9d06212b1362abc2f0f0d78e6f09f726608c74e3b9462e8368bb03314aa8d603"
+      sha256: f6a7e5c4835bb4e3026a04793a4199ca2d14c739ec378fdfe23fc8075d0439f8
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.1"
+    version: "6.3.2"
   url_launcher_android:
     dependency: transitive
     description:
@@ -1122,10 +1131,10 @@ packages:
     dependency: transitive
     description:
       name: win32
-      sha256: "329edf97fdd893e0f1e3b9e88d6a0e627128cc17cc316a8d67fda8f1451178ba"
+      sha256: "66814138c3562338d05613a6e368ed8cfb237ad6d64a9e9334be3f309acfca03"
       url: "https://pub.dev"
     source: hosted
-    version: "5.13.0"
+    version: "5.14.0"
   xdg_directories:
     dependency: transitive
     description:
@@ -1152,4 +1161,4 @@ packages:
     version: "3.1.3"
 sdks:
   dart: ">=3.8.0 <4.0.0"
-  flutter: ">=3.29.0"
+  flutter: ">=3.32.0"

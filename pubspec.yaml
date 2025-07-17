@@ -57,6 +57,9 @@ dependencies:
   ht_shared:
     git:
       url: https://github.com/headlines-toolkit/ht-shared.git
+  ht_ui_kit:
+    git:
+      url: https://github.com/headlines-toolkit/ht-ui-kit.git
   intl: ^0.20.2
   js_interop: ^0.0.1
   meta: ^1.16.0

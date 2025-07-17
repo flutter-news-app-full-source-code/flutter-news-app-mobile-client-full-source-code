@@ -66,7 +66,7 @@ class AppState extends Equatable {
   final Locale? locale;
 
   /// The global application configuration (remote config).
-  final AppConfig? appConfig;
+  final RemoteConfig? appConfig;
 
   /// The current application environment (e.g., production, development, demo).
   final local_config.AppEnvironment? environment;
@@ -82,7 +82,7 @@ class AppState extends Equatable {
     User? user,
     UserAppSettings? settings,
     Locale? locale,
-    AppConfig? appConfig,
+    RemoteConfig? appConfig,
     local_config.AppEnvironment? environment,
     bool clearFontFamily = false,
     bool clearLocale = false,

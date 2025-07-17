@@ -10,51 +10,49 @@ import 'package:ht_data_repository/ht_data_repository.dart';
 import 'package:ht_kv_storage_service/ht_kv_storage_service.dart';
 import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/app/config/app_environment.dart';
+import 'package:ht_main/app/services/demo_data_migration_service.dart';
 import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/l10n/app_localizations.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/router.dart';
-import 'package:ht_main/shared/services/demo_data_migration_service.dart';
-import 'package:ht_main/shared/theme/app_theme.dart';
-import 'package:ht_main/shared/widgets/failure_state_widget.dart';
-import 'package:ht_main/shared/widgets/loading_state_widget.dart';
-import 'package:ht_shared/ht_shared.dart';
+import 'package:ht_shared/ht_shared.dart' hide AppStatus;
+import 'package:ht_ui_kit/ht_ui_kit.dart';
 
 class App extends StatelessWidget {
   const App({
     required HtAuthRepository htAuthenticationRepository,
     required HtDataRepository<Headline> htHeadlinesRepository,
-    required HtDataRepository<Category> htCategoriesRepository,
+    required HtDataRepository<Topic> htTopicsRepository,
     required HtDataRepository<Country> htCountriesRepository,
     required HtDataRepository<Source> htSourcesRepository,
     required HtDataRepository<UserAppSettings> htUserAppSettingsRepository,
     required HtDataRepository<UserContentPreferences>
     htUserContentPreferencesRepository,
-    required HtDataRepository<AppConfig> htAppConfigRepository,
+    required HtDataRepository<RemoteConfig> htRemoteConfigRepository,
     required HtKVStorageService kvStorageService,
     required AppEnvironment environment,
     this.demoDataMigrationService,
     super.key,
   }) : _htAuthenticationRepository = htAuthenticationRepository,
        _htHeadlinesRepository = htHeadlinesRepository,
-       _htCategoriesRepository = htCategoriesRepository,
+       _htTopicsRepository = htTopicsRepository,
        _htCountriesRepository = htCountriesRepository,
        _htSourcesRepository = htSourcesRepository,
        _htUserAppSettingsRepository = htUserAppSettingsRepository,
        _htUserContentPreferencesRepository = htUserContentPreferencesRepository,
-       _htAppConfigRepository = htAppConfigRepository,
+       _htAppConfigRepository = htRemoteConfigRepository,
        _kvStorageService = kvStorageService,
        _environment = environment;
 
   final HtAuthRepository _htAuthenticationRepository;
   final HtDataRepository<Headline> _htHeadlinesRepository;
-  final HtDataRepository<Category> _htCategoriesRepository;
+  final HtDataRepository<Topic> _htTopicsRepository;
   final HtDataRepository<Country> _htCountriesRepository;
   final HtDataRepository<Source> _htSourcesRepository;
   final HtDataRepository<UserAppSettings> _htUserAppSettingsRepository;
   final HtDataRepository<UserContentPreferences>
   _htUserContentPreferencesRepository;
-  final HtDataRepository<AppConfig> _htAppConfigRepository;
+  final HtDataRepository<RemoteConfig> _htAppConfigRepository;
   final HtKVStorageService _kvStorageService;
   final AppEnvironment _environment;
   final DemoDataMigrationService? demoDataMigrationService;
@@ -65,7 +63,7 @@ class App extends StatelessWidget {
       providers: [
         RepositoryProvider.value(value: _htAuthenticationRepository),
         RepositoryProvider.value(value: _htHeadlinesRepository),
-        RepositoryProvider.value(value: _htCategoriesRepository),
+        RepositoryProvider.value(value: _htTopicsRepository),
         RepositoryProvider.value(value: _htCountriesRepository),
         RepositoryProvider.value(value: _htSourcesRepository),
         RepositoryProvider.value(value: _htUserAppSettingsRepository),
@@ -80,7 +78,7 @@ class App extends StatelessWidget {
               authenticationRepository: context.read<HtAuthRepository>(),
               userAppSettingsRepository: context
                   .read<HtDataRepository<UserAppSettings>>(),
-              appConfigRepository: context.read<HtDataRepository<AppConfig>>(),
+              appConfigRepository: context.read<HtDataRepository<RemoteConfig>>(),
               environment: _environment,
               demoDataMigrationService: demoDataMigrationService,
             ),
@@ -94,7 +92,7 @@ class App extends StatelessWidget {
         child: _AppView(
           htAuthenticationRepository: _htAuthenticationRepository,
           htHeadlinesRepository: _htHeadlinesRepository,
-          htCategoriesRepository: _htCategoriesRepository,
+          htCategoriesRepository: _htTopicsRepository,
           htCountriesRepository: _htCountriesRepository,
           htSourcesRepository: _htSourcesRepository,
           htUserAppSettingsRepository: _htUserAppSettingsRepository,
@@ -123,13 +121,13 @@ class _AppView extends StatefulWidget {
 
   final HtAuthRepository htAuthenticationRepository;
   final HtDataRepository<Headline> htHeadlinesRepository;
-  final HtDataRepository<Category> htCategoriesRepository;
+  final HtDataRepository<Topic> htCategoriesRepository;
   final HtDataRepository<Country> htCountriesRepository;
   final HtDataRepository<Source> htSourcesRepository;
   final HtDataRepository<UserAppSettings> htUserAppSettingsRepository;
   final HtDataRepository<UserContentPreferences>
   htUserContentPreferencesRepository;
-  final HtDataRepository<AppConfig> htAppConfigRepository;
+  final HtDataRepository<RemoteConfig> htAppConfigRepository;
   final AppEnvironment environment;
 
   @override
@@ -190,7 +188,7 @@ class _AppViewState extends State<_AppView> {
         builder: (context, state) {
           // Defer l10n access until inside a MaterialApp context
 
-          // Handle critical AppConfig loading states globally
+          // Handle critical RemoteConfig loading states globally
           if (state.status == AppStatus.configFetching) {
             return MaterialApp(
               debugShowCheckedModeBanner: false,
@@ -250,7 +248,6 @@ class _AppViewState extends State<_AppView> {
                   builder: (innerContext) {
                     final l10n = innerContext.l10n;
                     return FailureStateWidget(
-                      message: l10n.unknownError,
                       retryButtonText: 'Retry',
                       onRetry: () {
                         // Use outer context for BLoC access

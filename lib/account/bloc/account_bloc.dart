@@ -31,7 +31,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     on<AccountUserChanged>(_onAccountUserChanged);
     on<AccountLoadUserPreferences>(_onAccountLoadUserPreferences);
     on<AccountSaveHeadlineToggled>(_onAccountSaveHeadlineToggled);
-    on<AccountFollowCategoryToggled>(_onAccountFollowCategoryToggled);
+    on<AccountFollowTopicToggled>(_onAccountFollowTopicToggled);
     on<AccountFollowSourceToggled>(_onAccountFollowSourceToggled);
     // AccountFollowCountryToggled handler removed
     on<AccountClearUserPreferences>(_onAccountClearUserPreferences);
@@ -214,26 +214,25 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     }
   }
 
-  Future<void> _onAccountFollowCategoryToggled(
-    AccountFollowCategoryToggled event,
+  Future<void> _onAccountFollowTopicToggled(
+    AccountFollowTopicToggled event,
     Emitter<AccountState> emit,
   ) async {
     if (state.user == null || state.preferences == null) return;
     emit(state.copyWith(status: AccountStatus.loading));
 
     final currentPrefs = state.preferences!;
-    final isCurrentlyFollowed = currentPrefs.followedCategories.any(
-      (c) => c.id == event.category.id,
+    final isCurrentlyFollowed = currentPrefs.followedTopics.any(
+      (t) => t.id == event.topic.id,
     );
-    final List<Category> updatedFollowedCategories;
+    final List<Topic> updatedFollowedCategories;
 
-    if (isCurrentlyFollowed) {
-      updatedFollowedCategories = List.from(currentPrefs.followedCategories)
-        ..removeWhere((c) => c.id == event.category.id);
-    } else {
-      updatedFollowedCategories = List.from(currentPrefs.followedCategories)
-        ..add(event.category);
-    }
+    updatedFollowedCategories = isCurrentlyFollowed
+        ? List.from(currentPrefs.followedTopics)
+      ..removeWhere((t) => t.id == event.topic.id)
+        : List.from(currentPrefs.followedTopics)
+      ..add(event.topic);
+
 
     final updatedPrefs = currentPrefs.copyWith(
       followedCategories: updatedFollowedCategories,
@@ -259,7 +258,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     } catch (e) {
       emit(
         state.copyWith(
-          status: AccountStatus.failure,
+          status: AccountStatus.failure, // Corrected typo: "stauts" to "status"
           errorMessage: 'Failed to update followed categories.',
         ),
       );

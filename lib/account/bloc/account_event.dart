@@ -33,12 +33,12 @@ class AccountSaveHeadlineToggled extends AccountEvent {
   List<Object> get props => [headline];
 }
 
-class AccountFollowCategoryToggled extends AccountEvent {
-  const AccountFollowCategoryToggled({required this.category});
-  final Category category;
+class AccountFollowTopicToggled extends AccountEvent {
+  const AccountFollowTopicToggled({required this.topic});
+  final Topic topic;
 
   @override
-  List<Object> get props => [category];
+  List<Object> get props => [topic];
 }
 
 class AccountFollowSourceToggled extends AccountEvent {

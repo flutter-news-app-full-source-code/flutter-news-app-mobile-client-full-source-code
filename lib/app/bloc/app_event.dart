@@ -7,13 +7,6 @@ abstract class AppEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-@Deprecated('Use SettingsBloc events instead')
-class AppThemeChanged extends AppEvent {
-  //
-  // ignore: deprecated_consistency
-  const AppThemeChanged();
-}
-
 class AppUserChanged extends AppEvent {
   const AppUserChanged(this.user);
 
@@ -106,10 +99,16 @@ class AppConfigFetchRequested extends AppEvent {
 /// {@endtemplate}
 class AppUserAccountActionShown extends AppEvent {
   /// {@macro app_user_account_action_shown}
-  const AppUserAccountActionShown({required this.userId});
+  const AppUserAccountActionShown({
+    required this.userId,
+    required this.feedActionType,
+    required this.isCompleted,
+  });
 
   final String userId;
+  final FeedActionType feedActionType;
+  final bool isCompleted;
 
   @override
-  List<Object> get props => [userId];
+  List<Object> get props => [userId, feedActionType, isCompleted];
 }

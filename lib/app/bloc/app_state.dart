@@ -14,10 +14,10 @@ enum AppStatus {
   /// The user is anonymous (signed in using an anonymous provider).
   anonymous,
 
-  /// Fetching the essential AppConfig.
+  /// Fetching the essential RemoteConfig.
   configFetching,
 
-  /// Fetching the essential AppConfig failed.
+  /// Fetching the essential RemoteConfig failed.
   configFetchFailed,
 }
 
@@ -30,7 +30,7 @@ class AppState extends Equatable {
     this.appTextScaleFactor = AppTextScaleFactor.medium,
     this.flexScheme = FlexScheme.material,
     this.fontFamily,
-    this.status = AppStatus.initial,
+    this.status = AppStatus.initial, // Changed from AppStatus
     this.user,
     this.locale,
     this.appConfig,
@@ -78,7 +78,7 @@ class AppState extends Equatable {
     FlexScheme? flexScheme,
     String? fontFamily,
     AppTextScaleFactor? appTextScaleFactor,
-    AppStatus? status,
+    AppStatus? status, // Changed from AppStatus
     User? user,
     UserAppSettings? settings,
     Locale? locale,

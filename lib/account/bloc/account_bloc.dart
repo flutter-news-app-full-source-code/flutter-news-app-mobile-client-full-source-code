@@ -92,11 +92,8 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         // After delay, re-attempt to read the preferences. This is crucial
         // because migration might have completed during the delay.
         try {
-          final migratedPreferences =
-              await _userContentPreferencesRepository.read(
-            id: event.userId,
-            userId: event.userId,
-          );
+          final migratedPreferences = await _userContentPreferencesRepository
+              .read(id: event.userId, userId: event.userId);
           emit(
             state.copyWith(
               status: AccountStatus.success,
@@ -178,14 +175,18 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         );
       }
     } on HtHttpException catch (e) {
-      _logger.severe('AccountLoadUserPreferences failed with HtHttpException: $e');
-        emit(
-          state.copyWith(
-            preferences: defaultPreferences,
-            clearErrorMessage: true,
-            status: AccountStatus.success,
-          ),
-        );
+      _logger.severe(
+        'AccountLoadUserPreferences failed with HtHttpException: $e',
+      );
+      emit(
+        state.copyWith(status: AccountStatus.failure, errorMessage: e.message),
+      );
+    } catch (e, st) {
+      _logger.severe(
+        'AccountLoadUserPreferences failed with unexpected error: $e',
+        e,
+        st,
+      );
       emit(
         state.copyWith(
           status: AccountStatus.failure,
@@ -236,7 +237,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         ),
       );
     } on HtHttpException catch (e) {
-      _logger.severe('AccountSaveHeadlineToggled failed with HtHttpException: $e');
+      _logger.severe(
+        'AccountSaveHeadlineToggled failed with HtHttpException: $e',
+      );
       emit(
         state.copyWith(status: AccountStatus.failure, errorMessage: e.message),
       );
@@ -271,10 +274,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     final List<Topic> updatedFollowedCategories;
 
     updatedFollowedCategories = isCurrentlyFollowed
-        ? List.from(currentPrefs.followedTopics)
-      ..removeWhere((t) => t.id == event.topic.id)
-        : List.from(currentPrefs.followedTopics)
-      ..add(event.topic);
+        ? (List.from(currentPrefs.followedTopics)
+            ..removeWhere((t) => t.id == event.topic.id))
+        : (List.from(currentPrefs.followedTopics)..add(event.topic));
 
     final updatedPrefs = currentPrefs.copyWith(
       followedTopics: updatedFollowedCategories,
@@ -294,7 +296,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         ),
       );
     } on HtHttpException catch (e) {
-      _logger.severe('AccountFollowTopicToggled failed with HtHttpException: $e');
+      _logger.severe(
+        'AccountFollowTopicToggled failed with HtHttpException: $e',
+      );
       emit(
         state.copyWith(status: AccountStatus.failure, errorMessage: e.message),
       );
@@ -354,7 +358,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         ),
       );
     } on HtHttpException catch (e) {
-      _logger.severe('AccountFollowSourceToggled failed with HtHttpException: $e');
+      _logger.severe(
+        'AccountFollowSourceToggled failed with HtHttpException: $e',
+      );
       emit(
         state.copyWith(status: AccountStatus.failure, errorMessage: e.message),
       );
@@ -402,7 +408,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         ),
       );
     } on HtHttpException catch (e) {
-      _logger.severe('AccountClearUserPreferences failed with HtHttpException: $e');
+      _logger.severe(
+        'AccountClearUserPreferences failed with HtHttpException: $e',
+      );
       emit(
         state.copyWith(status: AccountStatus.failure, errorMessage: e.message),
       );

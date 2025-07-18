@@ -5,7 +5,8 @@ import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/entity_details/view/entity_details_page.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
-import 'package:ht_main/shared/widgets/widgets.dart';
+import 'package:ht_shared/ht_shared.dart';
+import 'package:ht_ui_kit/ht_ui_kit.dart';
 
 /// {@template followed_sources_list_page}
 /// Page to display and manage sources followed by the user.
@@ -16,17 +17,17 @@ class FollowedSourcesListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final followedSources =
         context.watch<AccountBloc>().state.preferences?.followedSources ?? [];
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Followed Sources'),
+        title: Text(l10n.followedSourcesPageTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.add_circle_outline),
-            tooltip: 'Add Source to Follow',
+            tooltip: l10n.addSourcesTooltip,
             onPressed: () {
               context.goNamed(Routes.addSourceToFollowName);
             },
@@ -39,7 +40,7 @@ class FollowedSourcesListPage extends StatelessWidget {
               state.preferences == null) {
             return LoadingStateWidget(
               icon: Icons.source_outlined,
-              headline: 'Loading Followed Sources...',
+              headline: l10n.followedSourcesLoadingHeadline,
               subheadline: l10n.pleaseWait,
             );
           }
@@ -47,25 +48,24 @@ class FollowedSourcesListPage extends StatelessWidget {
           if (state.status == AccountStatus.failure &&
               state.preferences == null) {
             return FailureStateWidget(
-              message: state.errorMessage ?? 'Could not load followed sources.',
+              exception: OperationFailedException(
+                state.errorMessage ?? l10n.followedSourcesErrorHeadline,
+              ),
               onRetry: () {
                 if (state.user?.id != null) {
-                  context.read<AccountBloc>().add(
-                    AccountLoadUserPreferences(
-                      // Corrected event name
-                      userId: state.user!.id,
-                    ),
-                  );
+                  context
+                      .read<AccountBloc>()
+                      .add(AccountLoadUserPreferences(userId: state.user!.id));
                 }
               },
             );
           }
 
           if (followedSources.isEmpty) {
-            return const InitialStateWidget(
+            return InitialStateWidget(
               icon: Icons.no_sim_outlined,
-              headline: 'No Followed Sources',
-              subheadline: 'Start following sources to see them here.',
+              headline: l10n.followedSourcesEmptyHeadline,
+              subheadline: l10n.followedSourcesEmptySubheadline,
             );
           }
 
@@ -76,23 +76,21 @@ class FollowedSourcesListPage extends StatelessWidget {
               return ListTile(
                 leading: const Icon(Icons.source_outlined),
                 title: Text(source.name),
-                subtitle: source.description != null
-                    ? Text(
-                        source.description!,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      )
-                    : null,
+                subtitle: Text(
+                  source.description,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 trailing: IconButton(
                   icon: const Icon(
                     Icons.remove_circle_outline,
                     color: Colors.red,
                   ),
-                  tooltip: 'Unfollow Source',
+                  tooltip: l10n.unfollowSourceTooltip(source.name),
                   onPressed: () {
-                    context.read<AccountBloc>().add(
-                      AccountFollowSourceToggled(source: source),
-                    );
+                    context
+                        .read<AccountBloc>()
+                        .add(AccountFollowSourceToggled(source: source));
                   },
                 ),
                 onTap: () {

@@ -99,7 +99,23 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       );
     } on NotFoundException {
       // Settings not found for the user, create and persist defaults
-      final defaultSettings = UserAppSettings(id: event.userId);
+      final defaultSettings = UserAppSettings(
+        id: event.userId,
+        displaySettings: const DisplaySettings(
+          baseTheme: AppBaseTheme.system,
+          accentTheme: AppAccentTheme.defaultBlue,
+          fontFamily: 'SystemDefault',
+          textScaleFactor: AppTextScaleFactor.medium,
+          fontWeight: AppFontWeight.regular,
+        ),
+        language: 'en',
+        feedPreferences: const FeedDisplayPreferences(
+          headlineDensity: HeadlineDensity.standard,
+          headlineImageStyle: HeadlineImageStyle.largeThumbnail,
+          showSourceInHeadlineFeed: true,
+          showPublishDateInHeadlineFeed: true,
+        ),
+      );
       emit(
         state.copyWith(
           status: SettingsStatus.success,
@@ -165,17 +181,11 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     Emitter<SettingsState> emit,
   ) async {
     if (state.userAppSettings == null) return;
-    print(
-      '[SettingsBloc] _onAppFontTypeChanged: Received event.fontType: ${event.fontType}',
-    );
 
     final updatedSettings = state.userAppSettings!.copyWith(
       displaySettings: state.userAppSettings!.displaySettings.copyWith(
         fontFamily: event.fontType,
       ),
-    );
-    print(
-      '[SettingsBloc] _onAppFontTypeChanged: Updated settings.fontFamily: ${updatedSettings.displaySettings.fontFamily}',
     );
     emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));
     await _persistSettings(updatedSettings, emit);
@@ -186,17 +196,11 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     Emitter<SettingsState> emit,
   ) async {
     if (state.userAppSettings == null) return;
-    print(
-      '[SettingsBloc] _onAppFontWeightChanged: Received event.fontWeight: ${event.fontWeight}',
-    );
 
     final updatedSettings = state.userAppSettings!.copyWith(
       displaySettings: state.userAppSettings!.displaySettings.copyWith(
         fontWeight: event.fontWeight,
       ),
-    );
-    print(
-      '[SettingsBloc] _onAppFontWeightChanged: Updated settings.fontWeight: ${updatedSettings.displaySettings.fontWeight}',
     );
     emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));
     await _persistSettings(updatedSettings, emit);

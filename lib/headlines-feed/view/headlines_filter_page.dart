@@ -10,8 +10,8 @@ import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:ht_main/headlines-feed/models/headline_filter.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
-import 'package:ht_main/shared/constants/constants.dart';
 import 'package:ht_shared/ht_shared.dart';
+import 'package:ht_ui_kit/ht_ui_kit.dart';
 
 // Keys for passing data to/from SourceFilterPage
 const String keySelectedSources = 'selectedSources';
@@ -39,7 +39,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
   /// and its sub-pages (Category, Source, Country) are open.
   /// They are initialized from the main [HeadlinesFeedBloc]'s current filter
   /// and are only applied back to the BLoC when the user taps 'Apply'.
-  late List<Category> _tempSelectedCategories;
+  late List<Topic> _tempSelectedTopics;
   late List<Source> _tempSelectedSources;
   late Set<String> _tempSelectedSourceCountryIsoCodes;
   late Set<SourceType> _tempSelectedSourceSourceTypes;
@@ -57,29 +57,15 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       context,
     ).state;
 
-    var initialUseFollowedFilters = false;
+    final currentFilter = headlinesFeedState.filter;
+    _tempSelectedTopics = List.from(currentFilter.topics ?? []);
+    _tempSelectedSources = List.from(currentFilter.sources ?? []);
+    _tempSelectedSourceCountryIsoCodes =
+        Set.from(currentFilter.selectedSourceCountryIsoCodes ?? {});
+    _tempSelectedSourceSourceTypes =
+        Set.from(currentFilter.selectedSourceSourceTypes ?? {});
 
-    if (headlinesFeedState is HeadlinesFeedLoaded) {
-      final currentFilter = headlinesFeedState.filter;
-      _tempSelectedCategories = List.from(currentFilter.categories ?? []);
-      _tempSelectedSources = List.from(currentFilter.sources ?? []);
-      _tempSelectedSourceCountryIsoCodes = Set.from(
-        currentFilter.selectedSourceCountryIsoCodes ?? {},
-      );
-      _tempSelectedSourceSourceTypes = Set.from(
-        currentFilter.selectedSourceSourceTypes ?? {},
-      );
-
-      // Use the new flag from the filter to set the checkbox state
-      initialUseFollowedFilters = currentFilter.isFromFollowedItems;
-    } else {
-      _tempSelectedCategories = [];
-      _tempSelectedSources = [];
-      _tempSelectedSourceCountryIsoCodes = {};
-      _tempSelectedSourceSourceTypes = {};
-    }
-
-    _useFollowedFilters = initialUseFollowedFilters;
+    _useFollowedFilters = currentFilter.isFromFollowedItems;
     _isLoadingFollowedFilters = false;
     _loadFollowedFiltersError = null;
     _currentUserPreferences = null;
@@ -111,7 +97,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
         _isLoadingFollowedFilters = false;
         _useFollowedFilters = false;
         _loadFollowedFiltersError =
-            context.l10n.mustBeLoggedInToUseFeatureError;
+            AppLocalizationsX(context).l10n.mustBeLoggedInToUseFeatureError;
       });
       return;
     }
@@ -125,12 +111,12 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       );
 
       // NEW: Check if followed items are empty
-      if (preferences.followedCategories.isEmpty &&
+      if (preferences.followedTopics.isEmpty &&
           preferences.followedSources.isEmpty) {
         setState(() {
           _isLoadingFollowedFilters = false;
           _useFollowedFilters = false;
-          _tempSelectedCategories = [];
+          _tempSelectedTopics = [];
           _tempSelectedSources = [];
         });
         if (mounted) {
@@ -138,7 +124,9 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
             ..hideCurrentSnackBar()
             ..showSnackBar(
               SnackBar(
-                content: Text(context.l10n.noFollowedItemsForFilterSnackbar),
+                content: Text(
+                  AppLocalizationsX(context).l10n.noFollowedItemsForFilterSnackbar,
+                ),
                 duration: const Duration(seconds: 3),
               ),
             );
@@ -147,17 +135,18 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       } else {
         setState(() {
           _currentUserPreferences = preferences;
-          _tempSelectedCategories = List.from(preferences.followedCategories);
+          _tempSelectedTopics = List.from(preferences.followedTopics);
           _tempSelectedSources = List.from(preferences.followedSources);
           // We don't auto-apply source country/type filters from user preferences here
-          // as the "Apply my followed" checkbox is primarily for categories/sources.
+          // as the "Apply my followed" checkbox is primarily for topics/sources.
           _isLoadingFollowedFilters = false;
         });
       }
     } on NotFoundException {
       setState(() {
-        _currentUserPreferences = UserContentPreferences(id: currentUser.id);
-        _tempSelectedCategories = [];
+        _currentUserPreferences =
+            UserContentPreferences(id: currentUser.id, followedTopics: [], followedSources: [], followedCountries: [], savedHeadlines: []);
+        _tempSelectedTopics = [];
         _tempSelectedSources = [];
         _isLoadingFollowedFilters = false;
         _useFollowedFilters = false;
@@ -167,7 +156,9 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
           ..hideCurrentSnackBar()
           ..showSnackBar(
             SnackBar(
-              content: Text(context.l10n.noFollowedItemsForFilterSnackbar),
+              content: Text(
+                AppLocalizationsX(context).l10n.noFollowedItemsForFilterSnackbar,
+              ),
               duration: const Duration(seconds: 3),
             ),
           );
@@ -182,14 +173,14 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       setState(() {
         _isLoadingFollowedFilters = false;
         _useFollowedFilters = false;
-        _loadFollowedFiltersError = context.l10n.unknownError;
+        _loadFollowedFiltersError = AppLocalizationsX(context).l10n.unknownError;
       });
     }
   }
 
   void _clearTemporaryFilters() {
     setState(() {
-      _tempSelectedCategories = [];
+      _tempSelectedTopics = [];
       _tempSelectedSources = [];
       // Keep source country/type filters as they are not part of this quick filter
       // _tempSelectedSourceCountryIsoCodes = {};
@@ -218,7 +209,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
     required void Function(dynamic)? onResult,
     bool enabled = true,
   }) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final allLabel = l10n.headlinesFeedFilterAllLabel;
     final selectedLabel = l10n.headlinesFeedFilterSelectedCountLabel(
       selectedCount,
@@ -248,7 +239,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -282,9 +273,8 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
             tooltip: l10n.headlinesFeedFilterApplyButton,
             onPressed: () {
               final newFilter = HeadlineFilter(
-                categories: _tempSelectedCategories.isNotEmpty
-                    ? _tempSelectedCategories
-                    : null,
+                topics:
+                    _tempSelectedTopics.isNotEmpty ? _tempSelectedTopics : null,
                 sources: _tempSelectedSources.isNotEmpty
                     ? _tempSelectedSources
                     : null,
@@ -352,14 +342,14 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
           const Divider(),
           _buildFilterTile(
             context: context,
-            title: l10n.headlinesFeedFilterCategoryLabel,
+            title: l10n.headlinesFeedFilterTopicLabel,
             enabled: !_useFollowedFilters && !_isLoadingFollowedFilters,
-            selectedCount: _tempSelectedCategories.length,
-            routeName: Routes.feedFilterCategoriesName,
-            currentSelectionData: _tempSelectedCategories,
+            selectedCount: _tempSelectedTopics.length,
+            routeName: Routes.feedFilterTopicsName,
+            currentSelectionData: _tempSelectedTopics,
             onResult: (result) {
-              if (result is List<Category>) {
-                setState(() => _tempSelectedCategories = result);
+              if (result is List<Topic>) {
+                setState(() => _tempSelectedTopics = result);
               }
             },
           ),

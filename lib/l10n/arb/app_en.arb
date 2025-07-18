@@ -710,6 +710,22 @@
             }
         }
     },
+    "followedSourcesLoadingHeadline": "Loading Followed Sources...",
+    "@followedSourcesLoadingHeadline": {
+        "description": "Headline for loading state on followed sources page"
+    },
+    "followedSourcesErrorHeadline": "Could Not Load Followed Sources",
+    "@followedSourcesErrorHeadline": {
+        "description": "Error message when followed sources fail to load"
+    },
+    "followedSourcesEmptyHeadline": "No Followed Sources",
+    "@followedSourcesEmptyHeadline": {
+        "description": "Headline for empty state on followed sources page"
+    },
+    "followedSourcesEmptySubheadline": "Start following sources to see them here.",
+    "@followedSourcesEmptySubheadline": {
+        "description": "Subheadline for empty state on followed sources page"
+    },
     "followedTopicsPageTitle": "Followed Topics",
     "@followedTopicsPageTitle": {
         "description": "Title for the page listing followed topics"

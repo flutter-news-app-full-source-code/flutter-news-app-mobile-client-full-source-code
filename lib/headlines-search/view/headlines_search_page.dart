@@ -7,9 +7,9 @@ import 'package:go_router/go_router.dart';
 import 'package:ht_main/app/bloc/app_bloc.dart';
 // HeadlineItemWidget import removed
 import 'package:ht_main/headlines-search/bloc/headlines_search_bloc.dart';
-import 'package:ht_main/headlines-search/models/search_model_type.dart';
 // Import new item widgets
 import 'package:ht_main/headlines-search/widgets/category_item_widget.dart';
+import 'package:ht_main/shared/extensions/content_type_extensions.dart';
 // import 'package:ht_main/headlines-search/widgets/country_item_widget.dart';
 import 'package:ht_main/headlines-search/widgets/source_item_widget.dart';
 import 'package:ht_main/l10n/app_localizations.dart';
@@ -17,6 +17,7 @@ import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/shared.dart';
 import 'package:ht_shared/ht_shared.dart';
+import 'package:ht_ui_kit/ht_ui_kit.dart';
 
 /// Page widget responsible for providing the BLoC for the headlines search feature.
 class HeadlinesSearchPage extends StatelessWidget {
@@ -46,7 +47,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
   final _scrollController = ScrollController();
   final _textController = TextEditingController();
   bool _showClearButton = false;
-  SearchModelType _selectedModelType = SearchModelType.headline;
+  ContentType _selectedModelType = ContentType.headline;
 
   @override
   void initState() {
@@ -57,9 +58,15 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
         _showClearButton = _textController.text.isNotEmpty;
       });
     });
-    // Ensure _selectedModelType is valid (it should be, as .country is removed from enum)
-    if (!SearchModelType.values.contains(_selectedModelType)) {
-      _selectedModelType = SearchModelType.headline;
+    // TODO(user): This logic might need adjustment if not all ContentType values are searchable.
+    // For now, we default to headline if the current selection is not in the allowed list.
+    final searchableTypes = [
+      ContentType.headline,
+      ContentType.topic,
+      ContentType.source
+    ];
+    if (!searchableTypes.contains(_selectedModelType)) {
+      _selectedModelType = ContentType.headline;
     }
     context.read<HeadlinesSearchBloc>().add(
       HeadlinesSearchModelTypeChanged(_selectedModelType),
@@ -99,16 +106,21 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
     final appBarTheme = theme.appBarTheme;
 
-    final availableSearchModelTypes = SearchModelType.values.toList();
+    // TODO(user): Replace this with a filtered list of searchable content types.
+    final availableSearchModelTypes = [
+      ContentType.headline,
+      ContentType.topic,
+      ContentType.source,
+    ];
 
     if (!availableSearchModelTypes.contains(_selectedModelType)) {
-      _selectedModelType = SearchModelType.headline;
+      _selectedModelType = ContentType.headline;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           context.read<HeadlinesSearchBloc>().add(
@@ -127,7 +139,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
           children: [
             SizedBox(
               width: 150,
-              child: DropdownButtonFormField<SearchModelType>(
+              child: DropdownButtonFormField<ContentType>(
                 value: _selectedModelType,
                 decoration: const InputDecoration(
                   border: InputBorder.none,
@@ -149,22 +161,14 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                       appBarTheme.iconTheme?.color ??
                       colorScheme.onSurfaceVariant,
                 ),
-                items: availableSearchModelTypes.map((SearchModelType type) {
-                  String displayLocalizedName;
-                  switch (type) {
-                    case SearchModelType.headline:
-                      displayLocalizedName = l10n.searchModelTypeHeadline;
-                    case SearchModelType.category:
-                      displayLocalizedName = l10n.searchModelTypeCategory;
-                    case SearchModelType.source:
-                      displayLocalizedName = l10n.searchModelTypeSource;
-                  }
-                  return DropdownMenuItem<SearchModelType>(
+                // TODO(user): Use the new localization extension here.
+                items: availableSearchModelTypes.map((ContentType type) {
+                  return DropdownMenuItem<ContentType>(
                     value: type,
-                    child: Text(displayLocalizedName),
+                    child: Text(type.displayName(context)),
                   );
                 }).toList(),
-                onChanged: (SearchModelType? newValue) {
+                onChanged: (ContentType? newValue) {
                   if (newValue != null) {
                     setState(() {
                       _selectedModelType = newValue;
@@ -185,7 +189,8 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                 controller: _textController,
                 style: appBarTheme.titleTextStyle ?? textTheme.titleMedium,
                 decoration: InputDecoration(
-                  hintText: _getHintTextForModelType(_selectedModelType, l10n),
+                  // TODO(user): Create a similar localization extension for hint text.
+                  hintText: 'Search...',
                   hintStyle: textTheme.bodyMedium?.copyWith(
                     color:
                         (appBarTheme.titleTextStyle?.color ??
@@ -243,7 +248,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
               icon: Icons.search_outlined,
               headline: l10n.headlinesFeedLoadingHeadline,
               subheadline:
-                  'Searching ${state.selectedModelType.displayName.toLowerCase()}...',
+                  'Searching ${state.selectedModelType.displayName(context).toLowerCase()}...',
             ),
             HeadlinesSearchSuccess(
               items: final items,
@@ -254,7 +259,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
             ) =>
               errorMessage != null
                   ? FailureStateWidget(
-                      message: errorMessage,
+                      exception: UnknownException(errorMessage),
                       onRetry: () => context.read<HeadlinesSearchBloc>().add(
                         HeadlinesSearchFetchRequested(
                           searchTerm: lastSearchTerm,
@@ -262,11 +267,12 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                       ),
                     )
                   : items.isEmpty
-                  ? FailureStateWidget(
-                      // Use FailureStateWidget for no results
-                      message:
-                          '${l10n.headlinesSearchNoResultsHeadline} for "$lastSearchTerm" in ${resultsModelType.displayName.toLowerCase()}.\n${l10n.headlinesSearchNoResultsSubheadline}',
-                      // No retry button for "no results"
+                  ? InitialStateWidget(
+                      // Use InitialStateWidget for no results as it's not a failure
+                      icon: Icons.search_off_outlined,
+                      headline: l10n.headlinesSearchNoResultsHeadline,
+                      subheadline:
+                          'For "$lastSearchTerm" in ${resultsModelType.displayName(context).toLowerCase()}.\n${l10n.headlinesSearchNoResultsSubheadline}',
                     )
                   : ListView.separated(
                       controller: _scrollController,
@@ -327,8 +333,9 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                               );
                           }
                           return tile;
-                        } else if (feedItem is Category) {
-                          return CategoryItemWidget(category: feedItem);
+                        } else if (feedItem is Topic) {
+                          // TODO(user): Create a TopicItemWidget similar to CategoryItemWidget
+                          return ListTile(title: Text(feedItem.name));
                         } else if (feedItem is Source) {
                           return SourceItemWidget(source: feedItem);
                         } else if (feedItem is Ad) {
@@ -361,18 +368,18 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                                     ),
                                   const SizedBox(height: AppSpacing.sm),
                                   Text(
-                                    'Placeholder Ad: ${feedItem.adType.name ?? 'Generic'}',
+                                    'Placeholder Ad: ${feedItem.adType.name}',
                                     style: currentTextTheme.titleSmall,
                                   ),
                                   Text(
-                                    'Placement: ${feedItem.placement.name ?? 'Default'}',
+                                    'Placement: ${feedItem.placement.name}',
                                     style: currentTextTheme.bodySmall,
                                   ),
                                 ],
                               ),
                             ),
                           );
-                        } else if (feedItem is AccountAction) {
+                        } else if (feedItem is FeedAction) {
                           return Card(
                             margin: const EdgeInsets.symmetric(
                               vertical: AppSpacing.xs,
@@ -380,10 +387,9 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                             color: currentColorScheme.secondaryContainer,
                             child: ListTile(
                               leading: Icon(
-                                feedItem.accountActionType ==
-                                        AccountActionType.linkAccount
-                                    ? Icons
-                                          .link_outlined // Outlined
+                                feedItem.feedActionType ==
+                                        FeedActionType.linkAccount
+                                    ? Icons.link_outlined // Outlined
                                     : Icons.upgrade_outlined,
                                 color: currentColorScheme.onSecondaryContainer,
                               ),
@@ -450,8 +456,9 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
               selectedModelType: final failedModelType,
             ) =>
               FailureStateWidget(
-                message:
-                    'Failed to search "$lastSearchTerm" in ${failedModelType.displayName.toLowerCase()}:\n$errorMessage',
+                exception: UnknownException(
+                  'Failed to search "$lastSearchTerm" in ${failedModelType.displayName(context).toLowerCase()}:\n$errorMessage',
+                ),
                 onRetry: () => context.read<HeadlinesSearchBloc>().add(
                   HeadlinesSearchFetchRequested(searchTerm: lastSearchTerm),
                 ),
@@ -463,18 +470,21 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
     );
   }
 
+  // TODO(user): This method should be removed and replaced with a localization extension.
   String _getHintTextForModelType(
-    SearchModelType modelType,
+    ContentType modelType,
     AppLocalizations l10n,
   ) {
     // The switch is now exhaustive for the remaining SearchModelType values
     switch (modelType) {
-      case SearchModelType.headline:
+      case ContentType.headline:
         return l10n.searchHintTextHeadline;
-      case SearchModelType.category:
+      case ContentType.topic:
         return l10n.searchHintTextCategory;
-      case SearchModelType.source:
+      case ContentType.source:
         return l10n.searchHintTextSource;
+      default:
+        return 'Search...';
     }
   }
 }

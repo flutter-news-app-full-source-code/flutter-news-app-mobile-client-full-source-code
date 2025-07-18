@@ -5,31 +5,31 @@ import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/entity_details/view/entity_details_page.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
-import 'package:ht_main/shared/widgets/widgets.dart';
+import 'package:ht_shared/ht_shared.dart';
+import 'package:ht_ui_kit/ht_ui_kit.dart';
 
-/// {@template followed_categories_list_page}
-/// Page to display and manage categories followed by the user.
+/// {@template followed_topics_list_page}
+/// Page to display and manage topics followed by the user.
 /// {@endtemplate}
-class FollowedCategoriesListPage extends StatelessWidget {
-  /// {@macro followed_categories_list_page}
-  const FollowedCategoriesListPage({super.key});
+class FollowedTopicsListPage extends StatelessWidget {
+  /// {@macro followed_topics_list_page}
+  const FollowedTopicsListPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final followedCategories =
-        context.watch<AccountBloc>().state.preferences?.followedCategories ??
-        [];
+    final l10n = AppLocalizationsX(context).l10n;
+    final followedTopics =
+        context.watch<AccountBloc>().state.preferences?.followedTopics ?? [];
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Followed Categories'),
+        title: Text(l10n.followedTopicsPageTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.add_circle_outline),
-            tooltip: 'Add Category to Follow',
+            tooltip: l10n.addTopicsTooltip,
             onPressed: () {
-              context.goNamed(Routes.addCategoryToFollowName);
+              context.goNamed(Routes.addTopicToFollowName);
             },
           ),
         ],
@@ -39,8 +39,8 @@ class FollowedCategoriesListPage extends StatelessWidget {
           if (state.status == AccountStatus.loading &&
               state.preferences == null) {
             return LoadingStateWidget(
-              icon: Icons.category_outlined,
-              headline: 'Loading Followed Categories...',
+              icon: Icons.topic_outlined,
+              headline: l10n.followedTopicsLoadingHeadline,
               subheadline: l10n.pleaseWait,
             );
           }
@@ -48,66 +48,63 @@ class FollowedCategoriesListPage extends StatelessWidget {
           if (state.status == AccountStatus.failure &&
               state.preferences == null) {
             return FailureStateWidget(
-              message:
-                  state.errorMessage ?? 'Could not load followed categories.',
+              exception: OperationFailedException(
+                state.errorMessage ?? l10n.followedTopicsErrorHeadline,
+              ),
               onRetry: () {
                 if (state.user?.id != null) {
-                  context.read<AccountBloc>().add(
-                    AccountLoadUserPreferences(userId: state.user!.id),
-                  );
+                  context
+                      .read<AccountBloc>()
+                      .add(AccountLoadUserPreferences(userId: state.user!.id));
                 }
               },
             );
           }
 
-          if (followedCategories.isEmpty) {
-            return const InitialStateWidget(
+          if (followedTopics.isEmpty) {
+            return InitialStateWidget(
               icon: Icons.no_sim_outlined,
-              headline: 'No Followed Categories',
-              subheadline: 'Start following categories to see them here.',
+              headline: l10n.followedTopicsEmptyHeadline,
+              subheadline: l10n.followedTopicsEmptySubheadline,
             );
           }
 
           return ListView.builder(
-            itemCount: followedCategories.length,
+            itemCount: followedTopics.length,
             itemBuilder: (context, index) {
-              final category = followedCategories[index];
+              final topic = followedTopics[index];
               return ListTile(
-                leading: category.iconUrl != null
-                    ? SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: Image.network(
-                          category.iconUrl!,
-                          errorBuilder: (context, error, stackTrace) =>
-                              const Icon(Icons.category_outlined),
-                        ),
-                      )
-                    : const Icon(Icons.category_outlined),
-                title: Text(category.name),
-                subtitle: category.description != null
-                    ? Text(
-                        category.description!,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      )
-                    : null,
+                leading: SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: Image.network(
+                    topic.iconUrl,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.topic_outlined),
+                  ),
+                ),
+                title: Text(topic.name),
+                subtitle: Text(
+                  topic.description,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 trailing: IconButton(
                   icon: const Icon(
                     Icons.remove_circle_outline,
                     color: Colors.red,
                   ),
-                  tooltip: 'Unfollow Category',
+                  tooltip: l10n.unfollowTopicTooltip(topic.name),
                   onPressed: () {
-                    context.read<AccountBloc>().add(
-                      AccountFollowCategoryToggled(category: category),
-                    );
+                    context
+                        .read<AccountBloc>()
+                        .add(AccountFollowTopicToggled(topic: topic));
                   },
                 ),
                 onTap: () {
                   context.push(
-                    Routes.categoryDetails,
-                    extra: EntityDetailsPageArguments(entity: category),
+                    Routes.topicDetails,
+                    extra: EntityDetailsPageArguments(entity: topic),
                   );
                 },
               );

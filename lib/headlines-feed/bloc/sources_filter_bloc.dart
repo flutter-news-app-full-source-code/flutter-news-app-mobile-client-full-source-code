@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ht_data_repository/ht_data_repository.dart';
-import 'package:ht_shared/ht_shared.dart' show Country, Source, SourceType;
+import 'package:ht_shared/ht_shared.dart';
 
 part 'sources_filter_event.dart';
 part 'sources_filter_state.dart';
@@ -12,9 +12,9 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
   SourcesFilterBloc({
     required HtDataRepository<Source> sourcesRepository,
     required HtDataRepository<Country> countriesRepository,
-  }) : _sourcesRepository = sourcesRepository,
-       _countriesRepository = countriesRepository,
-       super(const SourcesFilterState()) {
+  })  : _sourcesRepository = sourcesRepository,
+        _countriesRepository = countriesRepository,
+        super(const SourcesFilterState()) {
     on<LoadSourceFilterData>(_onLoadSourceFilterData);
     on<CountryCapsuleToggled>(_onCountryCapsuleToggled);
     on<AllSourceTypesCapsuleToggled>(_onAllSourceTypesCapsuleToggled);
@@ -35,7 +35,7 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
       state.copyWith(dataLoadingStatus: SourceFilterDataLoadingStatus.loading),
     );
     try {
-      final availableCountries = await _countriesRepository.readAll();
+      final availableCountries = (await _countriesRepository.readAll()).items;
       final initialSelectedSourceIds = event.initialSelectedSources
           .map((s) => s.id)
           .toSet();
@@ -45,8 +45,7 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
           event.initialSelectedCountryIsoCodes;
       final initialSelectedSourceTypes = event.initialSelectedSourceTypes;
 
-      final allSourcesResponse = await _sourcesRepository.readAll();
-      final allAvailableSources = allSourcesResponse.items;
+      final allAvailableSources = (await _sourcesRepository.readAll()).items;
 
       // Initially, display all sources. Capsules are visually set but don't filter the list yet.
       // Filtering will occur if a capsule is manually toggled.
@@ -59,7 +58,7 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
 
       emit(
         state.copyWith(
-          availableCountries: availableCountries.items,
+          availableCountries: availableCountries,
           allAvailableSources: allAvailableSources,
           displayableSources: displayableSources,
           finallySelectedSourceIds: initialSelectedSourceIds,
@@ -69,11 +68,11 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
           clearErrorMessage: true,
         ),
       );
-    } catch (e) {
+    } on HtHttpException catch (e) {
       emit(
         state.copyWith(
           dataLoadingStatus: SourceFilterDataLoadingStatus.failure,
-          errorMessage: 'Failed to load filter criteria.',
+          error: e,
         ),
       );
     }

@@ -9,9 +9,6 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get counterAppBarTitle => 'Counter';
-
-  @override
   String get accountLinkingPageTitle => 'Link Your Account';
 
   @override
@@ -776,4 +773,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String demoVerificationCodeMessage(String code) {
     return 'Demo Mode: Use code $code';
   }
+
+  @override
+  String get contentTypeHeadline => 'Headlines';
+
+  @override
+  String get contentTypeTopic => 'Topics';
+
+  @override
+  String get contentTypeSource => 'Sources';
+
+  @override
+  String get contentTypeCountry => 'Countries';
 }

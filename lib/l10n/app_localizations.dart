@@ -98,12 +98,6 @@ abstract class AppLocalizations {
     Locale('en'),
   ];
 
-  /// Text shown in the AppBar of the Counter Page
-  ///
-  /// In en, this message translates to:
-  /// **'Counter'**
-  String get counterAppBarTitle;
-
   /// Title for the account linking page
   ///
   /// In en, this message translates to:
@@ -1501,6 +1495,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Demo Mode: Use code {code}'**
   String demoVerificationCodeMessage(String code);
+
+  /// Label for Headline content type
+  ///
+  /// In en, this message translates to:
+  /// **'Headlines'**
+  String get contentTypeHeadline;
+
+  /// Label for Topic content type
+  ///
+  /// In en, this message translates to:
+  /// **'Topics'**
+  String get contentTypeTopic;
+
+  /// Label for Source content type
+  ///
+  /// In en, this message translates to:
+  /// **'Sources'**
+  String get contentTypeSource;
+
+  /// Label for Country content type
+  ///
+  /// In en, this message translates to:
+  /// **'Countries'**
+  String get contentTypeCountry;
 }
 
 class _AppLocalizationsDelegate

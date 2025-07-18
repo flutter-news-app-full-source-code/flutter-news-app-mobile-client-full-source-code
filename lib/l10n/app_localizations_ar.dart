@@ -9,9 +9,6 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
-  String get counterAppBarTitle => '[AR] Counter';
-
-  @override
   String get accountLinkingPageTitle => 'ربط حسابك';
 
   @override
@@ -776,4 +773,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String demoVerificationCodeMessage(String code) {
     return 'وضع العرض التوضيحي: استخدم الرمز $code';
   }
+
+  @override
+  String get contentTypeHeadline => 'العناوين الرئيسية';
+
+  @override
+  String get contentTypeTopic => 'المواضيع';
+
+  @override
+  String get contentTypeSource => 'المصادر';
+
+  @override
+  String get contentTypeCountry => 'الدول';
 }

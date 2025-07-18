@@ -1,10 +1,35 @@
 part of 'available_topics_bloc.dart';
 
-sealed class AvailableTopicsState extends Equatable {
-  const AvailableTopicsState();
-  
-  @override
-  List<Object> get props => [];
-}
+enum AvailableTopicsStatus { initial, loading, success, failure }
 
-final class AvailableTopicsInitial extends AvailableTopicsState {}
+class AvailableTopicsState extends Equatable {
+  const AvailableTopicsState({
+    this.status = AvailableTopicsStatus.initial,
+    this.availableTopics = const [],
+    this.error,
+  });
+
+  final AvailableTopicsStatus status;
+  final List<Topic> availableTopics;
+  final String? error;
+
+  AvailableTopicsState copyWith({
+    AvailableTopicsStatus? status,
+    List<Topic>? availableTopics,
+    String? error,
+    bool clearError = false,
+  }) {
+    return AvailableTopicsState(
+      status: status ?? this.status,
+      availableTopics: availableTopics ?? this.availableTopics,
+      error: clearError ? null : error ?? this.error,
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+        status,
+        availableTopics,
+        error,
+      ];
+}

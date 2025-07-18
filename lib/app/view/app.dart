@@ -1,6 +1,3 @@
-//
-// ignore_for_file: deprecated_member_use
-
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,7 +10,6 @@ import 'package:ht_main/app/config/app_environment.dart';
 import 'package:ht_main/app/services/demo_data_migration_service.dart';
 import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/l10n/app_localizations.dart';
-import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/router.dart';
 import 'package:ht_shared/ht_shared.dart' hide AppStatus;
 import 'package:ht_ui_kit/ht_ui_kit.dart';
@@ -33,16 +29,17 @@ class App extends StatelessWidget {
     required AppEnvironment environment,
     this.demoDataMigrationService,
     super.key,
-  }) : _htAuthenticationRepository = htAuthenticationRepository,
-       _htHeadlinesRepository = htHeadlinesRepository,
-       _htTopicsRepository = htTopicsRepository,
-       _htCountriesRepository = htCountriesRepository,
-       _htSourcesRepository = htSourcesRepository,
-       _htUserAppSettingsRepository = htUserAppSettingsRepository,
-       _htUserContentPreferencesRepository = htUserContentPreferencesRepository,
-       _htAppConfigRepository = htRemoteConfigRepository,
-       _kvStorageService = kvStorageService,
-       _environment = environment;
+  })  : _htAuthenticationRepository = htAuthenticationRepository,
+        _htHeadlinesRepository = htHeadlinesRepository,
+        _htTopicsRepository = htTopicsRepository,
+        _htCountriesRepository = htCountriesRepository,
+        _htSourcesRepository = htSourcesRepository,
+        _htUserAppSettingsRepository = htUserAppSettingsRepository,
+        _htUserContentPreferencesRepository =
+        htUserContentPreferencesRepository,
+        _htAppConfigRepository = htRemoteConfigRepository,
+        _kvStorageService = kvStorageService,
+        _environment = environment;
 
   final HtAuthRepository _htAuthenticationRepository;
   final HtDataRepository<Headline> _htHeadlinesRepository;
@@ -206,17 +203,24 @@ class _AppViewState extends State<_AppView> {
               ),
               themeMode: state
                   .themeMode, // Still respect light/dark if available from system
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
-              supportedLocales: AppLocalizations.supportedLocales,
+              localizationsDelegates: const [
+                ...AppLocalizations.localizationsDelegates,
+                ...HtUiKitLocalizations.localizationsDelegates,
+              ],
+              supportedLocales: const [
+                ...AppLocalizations.supportedLocales,
+                ...HtUiKitLocalizations.supportedLocales,
+              ],
               home: Scaffold(
                 body: Builder(
                   // Use Builder to get context under MaterialApp
                   builder: (innerContext) {
-                    final l10n = innerContext.l10n;
                     return LoadingStateWidget(
                       icon: Icons.settings_applications_outlined,
-                      headline: l10n.headlinesFeedLoadingHeadline,
-                      subheadline: l10n.pleaseWait,
+                      headline: AppLocalizations.of(innerContext)
+                          .headlinesFeedLoadingHeadline,
+                      subheadline:
+                          AppLocalizations.of(innerContext).pleaseWait,
                     );
                   },
                 ),
@@ -240,20 +244,27 @@ class _AppViewState extends State<_AppView> {
                 fontFamily: null,
               ),
               themeMode: state.themeMode,
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
-              supportedLocales: AppLocalizations.supportedLocales,
+              localizationsDelegates: const [
+                ...AppLocalizations.localizationsDelegates,
+                ...HtUiKitLocalizations.localizationsDelegates,
+              ],
+              supportedLocales: const [
+                ...AppLocalizations.supportedLocales,
+                ...HtUiKitLocalizations.supportedLocales,
+              ],
               home: Scaffold(
                 body: Builder(
                   // Use Builder to get context under MaterialApp
                   builder: (innerContext) {
-                    final l10n = innerContext.l10n;
                     return FailureStateWidget(
-                      retryButtonText: 'Retry',
+                      exception: const NetworkException(),
+                      retryButtonText:
+                          HtUiKitLocalizations.of(innerContext)!.retryButtonText,
                       onRetry: () {
                         // Use outer context for BLoC access
                         context.read<AppBloc>().add(
-                          const AppConfigFetchRequested(),
-                        );
+                              const AppConfigFetchRequested(),
+                            );
                       },
                     );
                   },
@@ -294,8 +305,14 @@ class _AppViewState extends State<_AppView> {
             ),
             routerConfig: _router,
             locale: state.locale,
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
+            localizationsDelegates: const [
+              ...AppLocalizations.localizationsDelegates,
+              ...HtUiKitLocalizations.localizationsDelegates,
+            ],
+            supportedLocales: const [
+              ...AppLocalizations.supportedLocales,
+              ...HtUiKitLocalizations.supportedLocales,
+            ],
           );
         },
       ),

@@ -710,6 +710,30 @@
             }
         }
     },
+    "followedTopicsPageTitle": "المواضيع المتابَعة",
+    "@followedTopicsPageTitle": {
+        "description": "عنوان صفحة عرض المواضيع المتابعة"
+    },
+    "addTopicsTooltip": "إضافة مواضيع",
+    "@addTopicsTooltip": {
+        "description": "تلميح زر إضافة مواضيع جديدة للمتابعة"
+    },
+    "followedTopicsLoadingHeadline": "جارٍ تحميل المواضيع المتابَعة...",
+    "@followedTopicsLoadingHeadline": {
+        "description": "عنوان لحالة التحميل في صفحة المواضيع المتابعة"
+    },
+    "followedTopicsErrorHeadline": "تعذر تحميل المواضيع المتابَعة",
+    "@followedTopicsErrorHeadline": {
+        "description": "رسالة خطأ عند فشل تحميل المواضيع المتابعة"
+    },
+    "followedTopicsEmptyHeadline": "لا توجد مواضيع متابَعة",
+    "@followedTopicsEmptyHeadline": {
+        "description": "عنوان للحالة الفارغة في صفحة المواضيع المتابعة"
+    },
+    "followedTopicsEmptySubheadline": "ابدأ بمتابعة المواضيع لكي تظهر هنا.",
+    "@followedTopicsEmptySubheadline": {
+        "description": "عنوان فرعي للحالة الفارغة في صفحة المواضيع المتابعة"
+    },
     "followedSourcesPageTitle": "المصادر المتابَعة",
     "@followedSourcesPageTitle": {
         "description": "عنوان صفحة عرض المصادر المتابعة"

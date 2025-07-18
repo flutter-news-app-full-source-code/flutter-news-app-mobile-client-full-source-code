@@ -131,8 +131,8 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
           entity: entityToLoad,
           isFollowing: isCurrentlyFollowing,
           feedItems: processedFeedItems,
-          hasMoreHeadlines: headlineResponse.nextCursor != null,
-          headlinesCursor: headlineResponse.nextCursor,
+          hasMoreHeadlines: headlineResponse.hasMore,
+          headlinesCursor: headlineResponse.cursor,
           clearException: true,
         ),
       );
@@ -141,13 +141,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       if (processedFeedItems.any((item) => item is FeedAction) &&
           _appBloc.state.user?.id != null) {
         _appBloc.add(
-          AppFeedActionShown(
-            userId: _appBloc.state.user!.id,
-            feedActionType: (processedFeedItems.firstWhere(
-              (item) => item is FeedAction,
-            ) as FeedAction)
-                .feedActionType,
-          ),
+          const AppFeedActionShown(),
         );
       }
     } on HtHttpException catch (e) {
@@ -171,9 +165,9 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     EntityDetailsToggleFollowRequested event,
     Emitter<EntityDetailsState> emit,
   ) async {
-    if (state.entity == null) return;
+    final entity = state.entity;
+    if (entity == null) return;
 
-    final entity = state.entity!;
     if (entity is Topic) {
       _accountBloc.add(AccountFollowTopicToggled(topic: entity));
     } else if (entity is Source) {
@@ -229,22 +223,16 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         state.copyWith(
           status: EntityDetailsStatus.success,
           feedItems: List.of(state.feedItems)..addAll(newProcessedFeedItems),
-          hasMoreHeadlines: headlineResponse.nextCursor != null,
-          headlinesCursor: headlineResponse.nextCursor,
-          clearHeadlinesCursor: headlineResponse.nextCursor == null,
+          hasMoreHeadlines: headlineResponse.hasMore,
+          headlinesCursor: headlineResponse.cursor,
+          clearHeadlinesCursor: !headlineResponse.hasMore,
         ),
       );
 
       if (newProcessedFeedItems.any((item) => item is FeedAction) &&
           _appBloc.state.user?.id != null) {
         _appBloc.add(
-          AppFeedActionShown(
-            userId: _appBloc.state.user!.id,
-            feedActionType: (newProcessedFeedItems.firstWhere(
-              (item) => item is FeedAction,
-            ) as FeedAction)
-                .feedActionType,
-          ),
+          const AppFeedActionShown(),
         );
       }
     } on HtHttpException catch (e) {
@@ -268,11 +256,11 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     _EntityDetailsUserPreferencesChanged event,
     Emitter<EntityDetailsState> emit,
   ) {
-    if (state.entity == null) return;
+    final entity = state.entity;
+    if (entity == null) return;
 
     var isCurrentlyFollowing = false;
     final preferences = event.preferences;
-    final entity = state.entity!;
 
     if (entity is Topic) {
       isCurrentlyFollowing =

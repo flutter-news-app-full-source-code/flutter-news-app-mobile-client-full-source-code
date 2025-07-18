@@ -68,32 +68,36 @@ class _RequestCodeView extends StatelessWidget {
       body: SafeArea(
         child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
           listener: (context, state) {
-            if (state is AuthenticationFailure) {
+            if (state.status == AuthenticationStatus.failure) {
               ScaffoldMessenger.of(context)
                 ..hideCurrentSnackBar()
                 ..showSnackBar(
                   SnackBar(
-                    content: Text(state.errorMessage),
+                    content: Text(state.exception!.toFriendlyMessage(context)),
                     backgroundColor: colorScheme.error,
                   ),
                 );
-            } else if (state is AuthenticationCodeSentSuccess) {
+            } else if (state.status ==
+                AuthenticationStatus.requestCodeSuccess) {
               // Navigate to the code verification page on success, passing the email
               context.goNamed(
                 isLinkingContext
                     ? Routes.linkingVerifyCodeName
                     : Routes.verifyCodeName,
-                pathParameters: {'email': state.email},
+                pathParameters: {'email': state.email!},
               );
             }
           },
           // BuildWhen prevents unnecessary rebuilds if only listening
           buildWhen: (previous, current) =>
-              current is AuthenticationInitial ||
-              current is AuthenticationRequestCodeLoading ||
-              current is AuthenticationFailure,
+              current.status != previous.status &&
+              (current.status == AuthenticationStatus.initial ||
+                  current.status ==
+                      AuthenticationStatus.requestCodeInProgress ||
+                  current.status == AuthenticationStatus.failure),
           builder: (context, state) {
-            final isLoading = state is AuthenticationRequestCodeLoading;
+            final isLoading =
+                state.status == AuthenticationStatus.requestCodeInProgress;
 
             return Padding(
               padding: const EdgeInsets.all(AppSpacing.paddingLarge),

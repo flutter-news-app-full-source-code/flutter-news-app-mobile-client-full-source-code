@@ -22,7 +22,7 @@ class SavedHeadlinesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
@@ -48,12 +48,13 @@ class SavedHeadlinesPage extends StatelessWidget {
           if (state.status == AccountStatus.failure &&
               state.preferences == null) {
             return FailureStateWidget(
-              message: state.errorMessage ?? l10n.savedHeadlinesErrorHeadline,
+              exception: state.error ??
+                  OperationFailedException(l10n.savedHeadlinesErrorHeadline),
               onRetry: () {
                 if (state.user?.id != null) {
                   context.read<AccountBloc>().add(
-                    AccountLoadUserPreferences(userId: state.user!.id),
-                  );
+                        AccountLoadUserPreferences(userId: state.user!.id),
+                      );
                 }
               },
             );

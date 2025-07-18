@@ -1,9 +1,5 @@
 {
     "@@locale": "en",
-    "counterAppBarTitle": "Counter",
-    "@counterAppBarTitle": {
-        "description": "Text shown in the AppBar of the Counter Page"
-    },
     "accountLinkingPageTitle": "Link Your Account",
     "@accountLinkingPageTitle": {
         "description": "Title for the account linking page"
@@ -1009,5 +1005,21 @@
                 "example": "123456"
             }
         }
+    },
+    "contentTypeHeadline": "Headlines",
+    "@contentTypeHeadline": {
+        "description": "Label for Headline content type"
+    },
+    "contentTypeTopic": "Topics",
+    "@contentTypeTopic": {
+        "description": "Label for Topic content type"
+    },
+    "contentTypeSource": "Sources",
+    "@contentTypeSource": {
+        "description": "Label for Source content type"
+    },
+    "contentTypeCountry": "Countries",
+    "@contentTypeCountry": {
+        "description": "Label for Country content type"
     }
 }

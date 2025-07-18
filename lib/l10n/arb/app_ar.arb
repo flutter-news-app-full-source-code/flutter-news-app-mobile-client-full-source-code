@@ -1,9 +1,5 @@
 {
     "@@locale": "ar",
-    "counterAppBarTitle": "[AR] Counter",
-    "@counterAppBarTitle": {
-        "description": "Text shown in the AppBar of the Counter Page"
-    },
     "accountLinkingPageTitle": "ربط حسابك",
     "@accountLinkingPageTitle": {
         "description": "Title for the account linking page"
@@ -993,5 +989,21 @@
                 "example": "123456"
             }
         }
+    },
+    "contentTypeHeadline": "العناوين الرئيسية",
+    "@contentTypeHeadline": {
+        "description": "Label for Headline content type"
+    },
+    "contentTypeTopic": "المواضيع",
+    "@contentTypeTopic": {
+        "description": "Label for Topic content type"
+    },
+    "contentTypeSource": "المصادر",
+    "@contentTypeSource": {
+        "description": "Label for Source content type"
+    },
+    "contentTypeCountry": "الدول",
+    "@contentTypeCountry": {
+        "description": "Label for Country content type"
     }
 }

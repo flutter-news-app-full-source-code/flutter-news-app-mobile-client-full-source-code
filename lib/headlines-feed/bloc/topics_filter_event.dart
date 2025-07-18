@@ -1,22 +1,22 @@
 part of 'topics_filter_bloc.dart';
 
-/// {@template categories_filter_event}
-/// Base class for events related to fetching and managing category filters.
+/// {@template topics_filter_event}
+/// Base class for events related to fetching and managing topic filters.
 /// {@endtemplate}
-sealed class CategoriesFilterEvent extends Equatable {
-  /// {@macro categories_filter_event}
-  const CategoriesFilterEvent();
+sealed class TopicsFilterEvent extends Equatable {
+  /// {@macro topics_filter_event}
+  const TopicsFilterEvent();
 
   @override
   List<Object> get props => [];
 }
 
-/// {@template categories_filter_requested}
-/// Event triggered to request the initial list of categories.
+/// {@template topics_filter_requested}
+/// Event triggered to request the initial list of topics.
 /// {@endtemplate}
-final class CategoriesFilterRequested extends CategoriesFilterEvent {}
+final class TopicsFilterRequested extends TopicsFilterEvent {}
 
-/// {@template categories_filter_load_more_requested}
-/// Event triggered to request the next page of categories for pagination.
+/// {@template topics_filter_load_more_requested}
+/// Event triggered to request the next page of topics for pagination.
 /// {@endtemplate}
-final class CategoriesFilterLoadMoreRequested extends CategoriesFilterEvent {}
+final class TopicsFilterLoadMoreRequested extends TopicsFilterEvent {}

@@ -116,10 +116,17 @@ class HeadlinesSearchBloc
                 ),
               );
               // Dispatch event if AccountAction was injected during pagination
-              if (injectedItems.any((item) => item is AccountAction) &&
+              if (injectedItems.any((item) => item is FeedAction) &&
                   _appBloc.state.user?.id != null) {
+                final feedAction =
+                    injectedItems.firstWhere((item) => item is FeedAction)
+                        as FeedAction;
                 _appBloc.add(
-                  AppUserAccountActionShown(userId: _appBloc.state.user!.id),
+                  AppUserAccountActionShown(
+                    userId: _appBloc.state.user!.id,
+                    feedActionType: feedAction.feedActionType,
+                    isCompleted: false,
+                  ),
                 );
               }
             case ContentType.topic:
@@ -152,6 +159,12 @@ class HeadlinesSearchBloc
                 ),
               );
             // Added break
+            default:
+              response = const PaginatedResponse(
+                items: [],
+                cursor: null,
+                hasMore: false,
+              );
           }
         } on HtHttpException catch (e) {
           emit(successState.copyWith(errorMessage: e.message));
@@ -228,12 +241,19 @@ class HeadlinesSearchBloc
           selectedModelType: modelType,
         ),
       );
-      // Dispatch event if AccountAction was injected in new search
+      // Dispatch event if Feed Action was injected in new search
       if (modelType == ContentType.headline &&
-          processedItems.any((item) => item is AccountAction) &&
+          processedItems.any((item) => item is FeedAction) &&
           _appBloc.state.user?.id != null) {
+        final feedAction =
+            processedItems.firstWhere((item) => item is FeedAction)
+                as FeedAction;
         _appBloc.add(
-          AppUserAccountActionShown(userId: _appBloc.state.user!.id),
+          AppUserAccountActionShown(
+            userId: _appBloc.state.user!.id,
+            feedActionType: feedAction.feedActionType,
+            isCompleted: false,
+          ),
         );
       }
     } on HtHttpException catch (e) {

@@ -552,6 +552,38 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get followedSourcesLoadingHeadline => 'Loading Followed Sources...';
+
+  @override
+  String get followedSourcesErrorHeadline => 'Could Not Load Followed Sources';
+
+  @override
+  String get followedSourcesEmptyHeadline => 'No Followed Sources';
+
+  @override
+  String get followedSourcesEmptySubheadline =>
+      'Start following sources to see them here.';
+
+  @override
+  String get followedTopicsPageTitle => 'Followed Topics';
+
+  @override
+  String get addTopicsTooltip => 'Add Topics';
+
+  @override
+  String get followedTopicsLoadingHeadline => 'Loading Followed Topics...';
+
+  @override
+  String get followedTopicsErrorHeadline => 'Could Not Load Followed Topics';
+
+  @override
+  String get followedTopicsEmptyHeadline => 'No Followed Topics';
+
+  @override
+  String get followedTopicsEmptySubheadline =>
+      'Start following topics to see them here.';
+
+  @override
   String get followedSourcesPageTitle => 'Followed Sources';
 
   @override

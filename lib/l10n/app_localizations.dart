@@ -1106,6 +1106,66 @@ abstract class AppLocalizations {
   /// **'Follow {topicName}'**
   String followTopicTooltip(String topicName);
 
+  /// Headline for loading state on followed sources page
+  ///
+  /// In en, this message translates to:
+  /// **'Loading Followed Sources...'**
+  String get followedSourcesLoadingHeadline;
+
+  /// Error message when followed sources fail to load
+  ///
+  /// In en, this message translates to:
+  /// **'Could Not Load Followed Sources'**
+  String get followedSourcesErrorHeadline;
+
+  /// Headline for empty state on followed sources page
+  ///
+  /// In en, this message translates to:
+  /// **'No Followed Sources'**
+  String get followedSourcesEmptyHeadline;
+
+  /// Subheadline for empty state on followed sources page
+  ///
+  /// In en, this message translates to:
+  /// **'Start following sources to see them here.'**
+  String get followedSourcesEmptySubheadline;
+
+  /// Title for the page listing followed topics
+  ///
+  /// In en, this message translates to:
+  /// **'Followed Topics'**
+  String get followedTopicsPageTitle;
+
+  /// Tooltip for the button to add new topics to follow
+  ///
+  /// In en, this message translates to:
+  /// **'Add Topics'**
+  String get addTopicsTooltip;
+
+  /// Headline for loading state on followed topics page
+  ///
+  /// In en, this message translates to:
+  /// **'Loading Followed Topics...'**
+  String get followedTopicsLoadingHeadline;
+
+  /// Error message when followed topics fail to load
+  ///
+  /// In en, this message translates to:
+  /// **'Could Not Load Followed Topics'**
+  String get followedTopicsErrorHeadline;
+
+  /// Headline for empty state on followed topics page
+  ///
+  /// In en, this message translates to:
+  /// **'No Followed Topics'**
+  String get followedTopicsEmptyHeadline;
+
+  /// Subheadline for empty state on followed topics page
+  ///
+  /// In en, this message translates to:
+  /// **'Start following topics to see them here.'**
+  String get followedTopicsEmptySubheadline;
+
   /// Title for the page listing followed sources
   ///
   /// In en, this message translates to:

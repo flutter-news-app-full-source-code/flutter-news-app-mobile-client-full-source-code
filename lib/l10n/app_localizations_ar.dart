@@ -551,6 +551,40 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get followedSourcesLoadingHeadline =>
+      'جارٍ تحميل المصادر المتابَعة...';
+
+  @override
+  String get followedSourcesErrorHeadline => 'تعذر تحميل المصادر المتابَعة';
+
+  @override
+  String get followedSourcesEmptyHeadline => 'لا توجد مصادر متابَعة';
+
+  @override
+  String get followedSourcesEmptySubheadline =>
+      'ابدأ بمتابعة المصادر لكي تظهر هنا.';
+
+  @override
+  String get followedTopicsPageTitle => 'المواضيع المتابَعة';
+
+  @override
+  String get addTopicsTooltip => 'إضافة مواضيع';
+
+  @override
+  String get followedTopicsLoadingHeadline =>
+      'جارٍ تحميل المواضيع المتابَعة...';
+
+  @override
+  String get followedTopicsErrorHeadline => 'تعذر تحميل المواضيع المتابَعة';
+
+  @override
+  String get followedTopicsEmptyHeadline => 'لا توجد مواضيع متابَعة';
+
+  @override
+  String get followedTopicsEmptySubheadline =>
+      'ابدأ بمتابعة المواضيع لكي تظهر هنا.';
+
+  @override
   String get followedSourcesPageTitle => 'المصادر المتابَعة';
 
   @override

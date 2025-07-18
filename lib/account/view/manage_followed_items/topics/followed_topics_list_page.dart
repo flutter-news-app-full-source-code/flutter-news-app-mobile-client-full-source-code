@@ -48,9 +48,8 @@ class FollowedTopicsListPage extends StatelessWidget {
           if (state.status == AccountStatus.failure &&
               state.preferences == null) {
             return FailureStateWidget(
-              exception: OperationFailedException(
-                state.errorMessage ?? l10n.followedTopicsErrorHeadline,
-              ),
+              exception: state.error ??
+                  OperationFailedException(l10n.followedTopicsErrorHeadline),
               onRetry: () {
                 if (state.user?.id != null) {
                   context

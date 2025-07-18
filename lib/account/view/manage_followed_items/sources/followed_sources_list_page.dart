@@ -48,9 +48,8 @@ class FollowedSourcesListPage extends StatelessWidget {
           if (state.status == AccountStatus.failure &&
               state.preferences == null) {
             return FailureStateWidget(
-              exception: OperationFailedException(
-                state.errorMessage ?? l10n.followedSourcesErrorHeadline,
-              ),
+              exception: state.error ??
+                  OperationFailedException(l10n.followedSourcesErrorHeadline),
               onRetry: () {
                 if (state.user?.id != null) {
                   context

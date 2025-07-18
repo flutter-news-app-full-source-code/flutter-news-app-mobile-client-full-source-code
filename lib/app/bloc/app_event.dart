@@ -85,6 +85,20 @@ class AppTextScaleFactorChanged extends AppEvent {
   List<Object?> get props => [appTextScaleFactor];
 }
 
+/// {@template app_font_weight_changed}
+/// Event to change the application's font weight.
+/// {@endtemplate}
+class AppFontWeightChanged extends AppEvent {
+  /// {@macro app_font_weight_changed}
+  const AppFontWeightChanged(this.fontWeight);
+
+  /// The new font weight to apply.
+  final AppFontWeight fontWeight;
+
+  @override
+  List<Object> get props => [fontWeight];
+}
+
 /// {@template app_config_fetch_requested}
 /// Event to trigger fetching of the global AppConfig.
 /// {@endtemplate}

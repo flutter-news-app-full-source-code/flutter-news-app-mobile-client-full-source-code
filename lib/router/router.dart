@@ -26,7 +26,7 @@ import 'package:ht_main/headline-details/view/headline_details_page.dart';
 import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:ht_main/headlines-feed/bloc/sources_filter_bloc.dart';
 import 'package:ht_main/headlines-feed/bloc/topics_filter_bloc.dart';
-import 'package:ht_main/headlines-feed/services/feed_injector_service.dart';
+import 'package:ht_main/shared/services/feed_injector_service.dart';
 // import 'package:ht_main/headlines-feed/view/country_filter_page.dart';
 import 'package:ht_main/headlines-feed/view/headlines_feed_page.dart';
 import 'package:ht_main/headlines-feed/view/headlines_filter_page.dart';

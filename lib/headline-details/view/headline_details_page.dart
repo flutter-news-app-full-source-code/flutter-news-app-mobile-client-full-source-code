@@ -14,6 +14,7 @@ import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/shared.dart';
 import 'package:ht_shared/ht_shared.dart';
+import 'package:ht_ui_kit/ht_ui_kit.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -49,7 +50,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
 
     return BlocListener<HeadlineDetailsBloc, HeadlineDetailsState>(
       listener: (context, headlineState) {
@@ -98,15 +99,12 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                     ) ??
                     false;
                 if (accountState.status == AccountStatus.failure &&
-                    accountState.errorMessage != null) {
+                    accountState.error != null) {
                   ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
                     ..showSnackBar(
                       SnackBar(
-                        content: Text(
-                          accountState.errorMessage ??
-                              l10n.headlineSaveErrorSnackbar,
-                        ),
+                        content: Text(l10n.headlineSaveErrorSnackbar),
                         backgroundColor: Theme.of(context).colorScheme.error,
                       ),
                     );
@@ -137,7 +135,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                   ),
                   final HeadlineDetailsFailure failureState =>
                     FailureStateWidget(
-                      message: failureState.message,
+                      exception: failureState.exception,
                       onRetry: () {
                         if (widget.headlineId != null) {
                           context.read<HeadlineDetailsBloc>().add(
@@ -164,7 +162,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
   }
 
   Widget _buildLoadedContent(BuildContext context, Headline headline) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
@@ -317,12 +315,12 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
             ),
           ),
         ),
-        if (headline.description != null && headline.description!.isNotEmpty)
+        if (headline.excerpt.isNotEmpty)
           SliverPadding(
             padding: horizontalPadding.copyWith(top: AppSpacing.lg),
             sliver: SliverToBoxAdapter(
               child: Text(
-                headline.description!,
+                headline.excerpt,
                 style: textTheme.bodyLarge?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                   height: 1.6,
@@ -405,31 +403,26 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
 
     final chips = <Widget>[];
 
-    if (headline.publishedAt != null) {
-      final formattedDate = DateFormat(
-        'MMM d, yyyy',
-      ).format(headline.publishedAt!);
-      chips.add(
-        Chip(
-          avatar: Icon(
-            Icons.calendar_today_outlined,
-            size: chipAvatarSize,
-            color: chipAvatarColor,
-          ),
-          label: Text(formattedDate),
-          labelStyle: chipLabelStyle,
-          backgroundColor: chipBackgroundColor,
-          padding: chipPadding,
-          shape: chipShape,
-          visualDensity: VisualDensity.compact,
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    final formattedDate = DateFormat('MMM d, yyyy').format(headline.createdAt);
+    chips.add(
+      Chip(
+        avatar: Icon(
+          Icons.calendar_today_outlined,
+          size: chipAvatarSize,
+          color: chipAvatarColor,
         ),
-      );
-    }
+        label: Text(formattedDate),
+        labelStyle: chipLabelStyle,
+        backgroundColor: chipBackgroundColor,
+        padding: chipPadding,
+        shape: chipShape,
+        visualDensity: VisualDensity.compact,
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+    );
 
     chips.add(
       InkWell(
-        // Make chip tappable
         onTap: () {
           context.push(
             Routes.sourceDetails,
@@ -453,35 +446,33 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
         ),
       ),
     );
-  
-    if (headline.category != null) {
-      chips.add(
-        InkWell(
-          // Make chip tappable
-          onTap: () {
-            context.push(
-              Routes.categoryDetails,
-              extra: EntityDetailsPageArguments(entity: headline.category),
-            );
-          },
-          borderRadius: BorderRadius.circular(AppSpacing.sm),
-          child: Chip(
-            avatar: Icon(
-              Icons.category_outlined,
-              size: chipAvatarSize,
-              color: chipAvatarColor,
-            ),
-            label: Text(headline.category!.name),
-            labelStyle: chipLabelStyle,
-            backgroundColor: chipBackgroundColor,
-            padding: chipPadding,
-            shape: chipShape,
-            visualDensity: VisualDensity.compact,
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+
+    chips.add(
+      InkWell(
+        onTap: () {
+          context.push(
+            Routes.topicDetails,
+            extra: EntityDetailsPageArguments(entity: headline.topic),
+          );
+        },
+        borderRadius: BorderRadius.circular(AppSpacing.sm),
+        child: Chip(
+          avatar: Icon(
+            Icons.category_outlined,
+            size: chipAvatarSize,
+            color: chipAvatarColor,
           ),
+          label: Text(headline.topic.name),
+          labelStyle: chipLabelStyle,
+          backgroundColor: chipBackgroundColor,
+          padding: chipPadding,
+          shape: chipShape,
+          visualDensity: VisualDensity.compact,
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
-      );
-    }
+      ),
+    );
+
     return chips;
   }
 
@@ -489,7 +480,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     BuildContext context,
     EdgeInsets hPadding,
   ) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;

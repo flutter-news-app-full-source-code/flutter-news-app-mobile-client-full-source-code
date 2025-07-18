@@ -7,33 +7,31 @@ class AccountState extends Equatable {
     this.status = AccountStatus.initial,
     this.user,
     this.preferences,
-    this.errorMessage,
+    this.error,
   });
 
   final AccountStatus status;
   final User? user;
   final UserContentPreferences? preferences;
-  final String? errorMessage;
+  final HtHttpException? error;
 
   AccountState copyWith({
     AccountStatus? status,
     User? user,
     UserContentPreferences? preferences,
-    String? errorMessage,
+    HtHttpException? error,
     bool clearUser = false,
     bool clearPreferences = false,
-    bool clearErrorMessage = false,
+    bool clearError = false,
   }) {
     return AccountState(
       status: status ?? this.status,
       user: clearUser ? null : user ?? this.user,
       preferences: clearPreferences ? null : preferences ?? this.preferences,
-      errorMessage: clearErrorMessage
-          ? null
-          : errorMessage ?? this.errorMessage,
+      error: clearError ? null : error ?? this.error,
     );
   }
 
   @override
-  List<Object?> get props => [status, user, preferences, errorMessage];
+  List<Object?> get props => [status, user, preferences, error];
 }

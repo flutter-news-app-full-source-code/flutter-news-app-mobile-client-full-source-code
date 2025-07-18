@@ -141,7 +141,13 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       if (processedFeedItems.any((item) => item is FeedAction) &&
           _appBloc.state.user?.id != null) {
         _appBloc.add(
-          const AppFeedActionShown(),
+          AppFeedActionShown(
+            userId: _appBloc.state.user!.id,
+            feedActionType: (processedFeedItems.firstWhere(
+              (item) => item is FeedAction,
+            ) as FeedAction)
+                .feedActionType,
+          ),
         );
       }
     } on HtHttpException catch (e) {
@@ -232,7 +238,13 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       if (newProcessedFeedItems.any((item) => item is FeedAction) &&
           _appBloc.state.user?.id != null) {
         _appBloc.add(
-          const AppFeedActionShown(),
+          AppFeedActionShown(
+            userId: _appBloc.state.user!.id,
+            feedActionType: (newProcessedFeedItems.firstWhere(
+              (item) => item is FeedAction,
+            ) as FeedAction)
+                .feedActionType,
+          ),
         );
       }
     } on HtHttpException catch (e) {

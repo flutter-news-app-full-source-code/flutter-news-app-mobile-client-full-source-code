@@ -58,7 +58,7 @@ class CountriesFilterBloc
         state.copyWith(
           status: CountriesFilterStatus.success,
           countries: response.items,
-          hasMore: response.cursor != null,
+          hasMore: response.hasMore,
           cursor: response.cursor,
           clearError: true,
         ),
@@ -90,7 +90,7 @@ class CountriesFilterBloc
         state.copyWith(
           status: CountriesFilterStatus.success,
           countries: List.of(state.countries)..addAll(response.items),
-          hasMore: response.cursor != null,
+          hasMore: response.hasMore,
           cursor: response.cursor,
         ),
       );

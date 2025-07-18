@@ -247,8 +247,9 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
               // Use LoadingStateWidget
               icon: Icons.search_outlined,
               headline: l10n.headlinesFeedLoadingHeadline,
-              subheadline:
-                  'Searching ${state.selectedModelType.displayName(context).toLowerCase()}...',
+              subheadline: l10n.searchingFor(
+                state.selectedModelType.displayName(context).toLowerCase(),
+              ),
             ),
             HeadlinesSearchSuccess(
               items: final items,

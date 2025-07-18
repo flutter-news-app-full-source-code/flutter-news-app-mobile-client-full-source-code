@@ -89,7 +89,7 @@ class App extends StatelessWidget {
         child: _AppView(
           htAuthenticationRepository: _htAuthenticationRepository,
           htHeadlinesRepository: _htHeadlinesRepository,
-          htCategoriesRepository: _htTopicsRepository,
+          htTopicRepository: _htTopicsRepository,
           htCountriesRepository: _htCountriesRepository,
           htSourcesRepository: _htSourcesRepository,
           htUserAppSettingsRepository: _htUserAppSettingsRepository,
@@ -107,7 +107,7 @@ class _AppView extends StatefulWidget {
   const _AppView({
     required this.htAuthenticationRepository,
     required this.htHeadlinesRepository,
-    required this.htCategoriesRepository,
+    required this.htTopicRepository,
     required this.htCountriesRepository,
     required this.htSourcesRepository,
     required this.htUserAppSettingsRepository,
@@ -118,7 +118,7 @@ class _AppView extends StatefulWidget {
 
   final HtAuthRepository htAuthenticationRepository;
   final HtDataRepository<Headline> htHeadlinesRepository;
-  final HtDataRepository<Topic> htCategoriesRepository;
+  final HtDataRepository<Topic> htTopicRepository;
   final HtDataRepository<Country> htCountriesRepository;
   final HtDataRepository<Source> htSourcesRepository;
   final HtDataRepository<UserAppSettings> htUserAppSettingsRepository;
@@ -147,7 +147,7 @@ class _AppViewState extends State<_AppView> {
       authStatusNotifier: _statusNotifier,
       htAuthenticationRepository: widget.htAuthenticationRepository,
       htHeadlinesRepository: widget.htHeadlinesRepository,
-      htCategoriesRepository: widget.htCategoriesRepository,
+      htTopicsRepository: widget.htTopicRepository,
       htCountriesRepository: widget.htCountriesRepository,
       htSourcesRepository: widget.htSourcesRepository,
       htUserAppSettingsRepository: widget.htUserAppSettingsRepository,

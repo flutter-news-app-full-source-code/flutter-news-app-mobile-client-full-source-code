@@ -23,8 +23,8 @@ class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
   /// {@macro authentication_bloc}
   AuthenticationBloc({required HtAuthRepository authenticationRepository})
-    : _authenticationRepository = authenticationRepository,
-      super(AuthenticationInitial()) {
+      : _authenticationRepository = authenticationRepository,
+        super(const AuthenticationState()) {
     // Listen to authentication state changes from the repository
     _userAuthSubscription = _authenticationRepository.authStateChanges.listen(
       (user) => add(_AuthenticationUserChanged(user: user)),
@@ -50,9 +50,19 @@ class AuthenticationBloc
     Emitter<AuthenticationState> emit,
   ) async {
     if (event.user != null) {
-      emit(AuthenticationAuthenticated(user: event.user!));
+      emit(
+        state.copyWith(
+          status: AuthenticationStatus.authenticated,
+          user: event.user,
+        ),
+      );
     } else {
-      emit(AuthenticationUnauthenticated());
+      emit(
+        state.copyWith(
+          status: AuthenticationStatus.unauthenticated,
+          user: null,
+        ),
+      );
     }
   }
 
@@ -61,33 +71,29 @@ class AuthenticationBloc
     AuthenticationRequestSignInCodeRequested event,
     Emitter<AuthenticationState> emit,
   ) async {
-    // Validate email format (basic check)
-    if (event.email.isEmpty || !event.email.contains('@')) {
-      emit(const AuthenticationFailure('Please enter a valid email address.'));
-      return;
-    }
-    emit(AuthenticationRequestCodeLoading());
+    emit(state.copyWith(status: AuthenticationStatus.requestCodeInProgress));
     try {
       await _authenticationRepository.requestSignInCode(event.email);
-      emit(AuthenticationCodeSentSuccess(email: event.email));
-    } on InvalidInputException catch (e) {
-      emit(AuthenticationFailure('Invalid input: ${e.message}'));
-    } on NetworkException catch (_) {
-      emit(const AuthenticationFailure('Network error occurred.'));
-    } on ServerException catch (e) {
-      emit(AuthenticationFailure('Server error: ${e.message}'));
-    } on OperationFailedException catch (e) {
-      emit(AuthenticationFailure('Operation failed: ${e.message}'));
+      emit(
+        state.copyWith(
+          status: AuthenticationStatus.requestCodeSuccess,
+          email: event.email,
+        ),
+      );
     } on HtHttpException catch (e) {
-      // Catch any other HtHttpException subtypes
-      final message = e.message.isNotEmpty
-          ? e.message
-          : 'An unspecified HTTP error occurred.';
-      emit(AuthenticationFailure('HTTP error: $message'));
+      emit(
+        state.copyWith(
+          status: AuthenticationStatus.failure,
+          exception: e,
+        ),
+      );
     } catch (e) {
-      // Catch any other unexpected errors
-      emit(AuthenticationFailure('An unexpected error occurred: $e'));
-      // Optionally log the stackTrace here
+      emit(
+        state.copyWith(
+          status: AuthenticationStatus.failure,
+          exception: UnknownException(e.toString()),
+        ),
+      );
     }
   }
 
@@ -96,28 +102,25 @@ class AuthenticationBloc
     AuthenticationVerifyCodeRequested event,
     Emitter<AuthenticationState> emit,
   ) async {
-    emit(AuthenticationLoading());
+    emit(state.copyWith(status: AuthenticationStatus.loading));
     try {
       await _authenticationRepository.verifySignInCode(event.email, event.code);
       // On success, the _AuthenticationUserChanged listener will handle
-      // emitting AuthenticationAuthenticated.
-    } on InvalidInputException catch (e) {
-      emit(AuthenticationFailure(e.message));
-    } on AuthenticationException catch (e) {
-      emit(AuthenticationFailure(e.message));
-    } on NetworkException catch (_) {
-      emit(const AuthenticationFailure('Network error occurred.'));
-    } on ServerException catch (e) {
-      emit(AuthenticationFailure('Server error: ${e.message}'));
-    } on OperationFailedException catch (e) {
-      emit(AuthenticationFailure('Operation failed: ${e.message}'));
+      // emitting the authenticated state.
     } on HtHttpException catch (e) {
-      // Catch any other HtHttpException subtypes
-      emit(AuthenticationFailure('HTTP error: ${e.message}'));
+      emit(
+        state.copyWith(
+          status: AuthenticationStatus.failure,
+          exception: e,
+        ),
+      );
     } catch (e) {
-      // Catch any other unexpected errors
-      emit(AuthenticationFailure('An unexpected error occurred: $e'));
-      // Optionally log the stackTrace here
+      emit(
+        state.copyWith(
+          status: AuthenticationStatus.failure,
+          exception: UnknownException(e.toString()),
+        ),
+      );
     }
   }
 
@@ -126,22 +129,25 @@ class AuthenticationBloc
     AuthenticationAnonymousSignInRequested event,
     Emitter<AuthenticationState> emit,
   ) async {
-    emit(AuthenticationLoading());
+    emit(state.copyWith(status: AuthenticationStatus.loading));
     try {
       await _authenticationRepository.signInAnonymously();
       // On success, the _AuthenticationUserChanged listener will handle
-      // emitting AuthenticationAuthenticated.
-    } on NetworkException catch (_) {
-      emit(const AuthenticationFailure('Network error occurred.'));
-    } on ServerException catch (e) {
-      emit(AuthenticationFailure('Server error: ${e.message}'));
-    } on OperationFailedException catch (e) {
-      emit(AuthenticationFailure('Operation failed: ${e.message}'));
+      // emitting the authenticated state.
     } on HtHttpException catch (e) {
-      // Catch any other HtHttpException subtypes
-      emit(AuthenticationFailure('HTTP error: ${e.message}'));
+      emit(
+        state.copyWith(
+          status: AuthenticationStatus.failure,
+          exception: e,
+        ),
+      );
     } catch (e) {
-      emit(AuthenticationFailure('An unexpected error occurred: $e'));
+      emit(
+        state.copyWith(
+          status: AuthenticationStatus.failure,
+          exception: UnknownException(e.toString()),
+        ),
+      );
     }
   }
 
@@ -150,26 +156,25 @@ class AuthenticationBloc
     AuthenticationSignOutRequested event,
     Emitter<AuthenticationState> emit,
   ) async {
-    emit(AuthenticationLoading());
+    emit(state.copyWith(status: AuthenticationStatus.loading));
     try {
       await _authenticationRepository.signOut();
       // On success, the _AuthenticationUserChanged listener will handle
-      // emitting AuthenticationUnauthenticated.
-      // No need to emit AuthenticationLoading() before calling signOut if
-      // the authStateChanges listener handles the subsequent state update.
-      // However, if immediate feedback is desired, it can be kept.
-      // For now, let's assume the listener is sufficient.
-    } on NetworkException catch (_) {
-      emit(const AuthenticationFailure('Network error occurred.'));
-    } on ServerException catch (e) {
-      emit(AuthenticationFailure('Server error: ${e.message}'));
-    } on OperationFailedException catch (e) {
-      emit(AuthenticationFailure('Operation failed: ${e.message}'));
+      // emitting the unauthenticated state.
     } on HtHttpException catch (e) {
-      // Catch any other HtHttpException subtypes
-      emit(AuthenticationFailure('HTTP error: ${e.message}'));
+      emit(
+        state.copyWith(
+          status: AuthenticationStatus.failure,
+          exception: e,
+        ),
+      );
     } catch (e) {
-      emit(AuthenticationFailure('An unexpected error occurred: $e'));
+      emit(
+        state.copyWith(
+          status: AuthenticationStatus.failure,
+          exception: UnknownException(e.toString()),
+        ),
+      );
     }
   }
 

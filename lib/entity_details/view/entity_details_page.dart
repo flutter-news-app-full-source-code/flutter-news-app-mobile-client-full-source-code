@@ -5,28 +5,27 @@ import 'package:ht_data_repository/ht_data_repository.dart';
 import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/entity_details/bloc/entity_details_bloc.dart';
-import 'package:ht_main/entity_details/models/entity_type.dart';
 import 'package:ht_main/l10n/app_localizations.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
-import 'package:ht_main/shared/constants/app_spacing.dart';
 import 'package:ht_main/shared/services/feed_injector_service.dart';
-import 'package:ht_main/shared/widgets/widgets.dart';
+import 'package:ht_main/shared/shared.dart';
 import 'package:ht_shared/ht_shared.dart';
+import 'package:ht_ui_kit/ht_ui_kit.dart';
 
 class EntityDetailsPageArguments {
   const EntityDetailsPageArguments({
     this.entityId,
-    this.entityType,
+    this.contentType,
     this.entity,
   }) : assert(
-         (entityId != null && entityType != null) || entity != null,
-         'Either entityId/entityType or entity must be provided.',
-       );
+          (entityId != null && contentType != null) || entity != null,
+          'Either entityId/contentType or a full entity object must be provided.',
+        );
 
   final String? entityId;
-  final EntityType? entityType;
-  final dynamic entity;
+  final ContentType? contentType;
+  final FeedItem? entity;
 }
 
 class EntityDetailsPage extends StatelessWidget {
@@ -46,21 +45,20 @@ class EntityDetailsPage extends StatelessWidget {
       // Explicitly type BlocProvider
       create: (context) {
         final feedInjectorService = FeedInjectorService();
-        final entityDetailsBloc =
-            EntityDetailsBloc(
-              headlinesRepository: context.read<HtDataRepository<Headline>>(),
-              categoryRepository: context.read<HtDataRepository<Category>>(),
-              sourceRepository: context.read<HtDataRepository<Source>>(),
-              accountBloc: context.read<AccountBloc>(),
-              appBloc: context.read<AppBloc>(),
-              feedInjectorService: feedInjectorService,
-            )..add(
-              EntityDetailsLoadRequested(
-                entityId: args.entityId,
-                entityType: args.entityType,
-                entity: args.entity,
-              ),
-            );
+        final entityDetailsBloc = EntityDetailsBloc(
+          headlinesRepository: context.read<HtDataRepository<Headline>>(),
+          topicRepository: context.read<HtDataRepository<Topic>>(),
+          sourceRepository: context.read<HtDataRepository<Source>>(),
+          accountBloc: context.read<AccountBloc>(),
+          appBloc: context.read<AppBloc>(),
+          feedInjectorService: feedInjectorService,
+        )..add(
+            EntityDetailsLoadRequested(
+              entityId: args.entityId,
+              contentType: args.contentType,
+              entity: args.entity,
+            ),
+          );
         return entityDetailsBloc;
       },
       child: EntityDetailsView(args: args),
@@ -110,16 +108,17 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
     return currentScroll >= (maxScroll * 0.9);
   }
 
-  String _getEntityTypeDisplayName(EntityType? type, AppLocalizations l10n) {
+  String _getContentTypeDisplayName(ContentType? type, AppLocalizations l10n) {
     if (type == null) return l10n.detailsPageTitle;
     String name;
     switch (type) {
-      case EntityType.category:
-        name = l10n.entityDetailsCategoryTitle;
-      case EntityType.source:
+      case ContentType.topic:
+        name = l10n.entityDetailsTopicTitle;
+      case ContentType.source:
         name = l10n.entityDetailsSourceTitle;
+      default:
+        name = l10n.detailsPageTitle;
     }
-    // Manual capitalization
     return name.isNotEmpty
         ? '${name[0].toUpperCase()}${name.substring(1)}'
         : name;
@@ -135,8 +134,8 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
     return Scaffold(
       body: BlocBuilder<EntityDetailsBloc, EntityDetailsState>(
         builder: (context, state) {
-          final entityTypeDisplayNameForTitle = _getEntityTypeDisplayName(
-            widget.args.entityType,
+          final entityTypeDisplayNameForTitle = _getContentTypeDisplayName(
+            state.contentType,
             l10n,
           );
 
@@ -153,28 +152,24 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
           if (state.status == EntityDetailsStatus.failure &&
               state.entity == null) {
             return FailureStateWidget(
-              //TODO(fulleni): add entityDetailsErrorLoadingto l10n
-              // message: state.errorMessage ?? l10n.entityDetailsErrorLoading(entityType: entityTypeDisplayNameForTitle),
-              message: state.errorMessage ?? '...',
+              exception: state.exception!,
               onRetry: () => context.read<EntityDetailsBloc>().add(
-                EntityDetailsLoadRequested(
-                  entityId: widget.args.entityId,
-                  entityType: widget.args.entityType,
-                  entity: widget.args.entity,
-                ),
-              ),
+                    EntityDetailsLoadRequested(
+                      entityId: widget.args.entityId,
+                      contentType: widget.args.contentType,
+                      entity: widget.args.entity,
+                    ),
+                  ),
             );
           }
 
           final String appBarTitleText;
           IconData? appBarIconData;
-          // String? entityImageHeroTag;
 
-          if (state.entity is Category) {
-            final cat = state.entity as Category;
-            appBarTitleText = cat.name;
+          if (state.entity is Topic) {
+            final topic = state.entity as Topic;
+            appBarTitleText = topic.name;
             appBarIconData = Icons.category_outlined;
-            // entityImageHeroTag = 'category-image-${cat.id}';
           } else if (state.entity is Source) {
             final src = state.entity as Source;
             appBarTitleText = src.name;
@@ -183,16 +178,14 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
             appBarTitleText = l10n.detailsPageTitle;
           }
 
-          final description = state.entity is Category
-              ? (state.entity as Category).description
+          final description = state.entity is Topic
+              ? (state.entity as Topic).description
               : state.entity is Source
               ? (state.entity as Source).description
               : null;
 
-          final entityIconUrl =
-              (state.entity is Category &&
-                  (state.entity as Category).iconUrl != null)
-              ? (state.entity as Category).iconUrl
+          final entityIconUrl = (state.entity is Topic)
+              ? (state.entity as Topic).iconUrl
               : null;
 
           final followButton = IconButton(
@@ -278,8 +271,7 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                       const SizedBox(height: AppSpacing.lg),
                     ],
                     if (state.feedItems.isNotEmpty ||
-                        state.headlinesStatus ==
-                            EntityHeadlinesStatus.loadingMore) ...[
+                        state.status == EntityDetailsStatus.loadingMore) ...[
                       Text(
                         l10n.headlinesSectionTitle,
                         style: textTheme.titleLarge?.copyWith(
@@ -292,8 +284,8 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                 ),
               ),
               if (state.feedItems.isEmpty &&
-                  state.headlinesStatus != EntityHeadlinesStatus.initial &&
-                  state.headlinesStatus != EntityHeadlinesStatus.loadingMore &&
+                  state.status != EntityDetailsStatus.initial &&
+                  state.status != EntityDetailsStatus.loadingMore &&
                   state.status == EntityDetailsStatus.success)
                 SliverFillRemaining(
                   hasScrollBody: false,
@@ -316,11 +308,9 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                     horizontal: AppSpacing.paddingMedium,
                   ),
                   sliver: SliverList.separated(
-                    itemCount:
-                        state.feedItems.length +
+                    itemCount: state.feedItems.length +
                         (state.hasMoreHeadlines &&
-                                state.headlinesStatus ==
-                                    EntityHeadlinesStatus.loadingMore
+                                state.status == EntityDetailsStatus.loadingMore
                             ? 1
                             : 0),
                     separatorBuilder: (context, index) =>
@@ -355,12 +345,6 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                                 pathParameters: {'id': item.id},
                                 extra: item,
                               ),
-                              currentContextEntityType: state.entityType,
-                              currentContextEntityId: state.entity is Category
-                                  ? (state.entity as Category).id
-                                  : state.entity is Source
-                                  ? (state.entity as Source).id
-                                  : null,
                             );
                           case HeadlineImageStyle.smallThumbnail:
                             tile = HeadlineTileImageStart(
@@ -370,12 +354,6 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                                 pathParameters: {'id': item.id},
                                 extra: item,
                               ),
-                              currentContextEntityType: state.entityType,
-                              currentContextEntityId: state.entity is Category
-                                  ? (state.entity as Category).id
-                                  : state.entity is Source
-                                  ? (state.entity as Source).id
-                                  : null,
                             );
                           case HeadlineImageStyle.largeThumbnail:
                             tile = HeadlineTileImageTop(
@@ -385,12 +363,6 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                                 pathParameters: {'id': item.id},
                                 extra: item,
                               ),
-                              currentContextEntityType: state.entityType,
-                              currentContextEntityId: state.entity is Category
-                                  ? (state.entity as Category).id
-                                  : state.entity is Source
-                                  ? (state.entity as Source).id
-                                  : null,
                             );
                         }
                         return tile;
@@ -399,13 +371,14 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                     },
                   ),
                 ),
-              if (state.headlinesStatus == EntityHeadlinesStatus.failure &&
+              if (state.status == EntityDetailsStatus.partialFailure &&
                   state.feedItems.isNotEmpty)
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.all(AppSpacing.paddingMedium),
                     child: Text(
-                      state.errorMessage ?? l10n.failedToLoadMoreHeadlines,
+                      state.exception?.toFriendlyMessage(context) ??
+                          l10n.failedToLoadMoreHeadlines,
                       style: textTheme.bodyMedium?.copyWith(
                         color: colorScheme.error,
                       ),

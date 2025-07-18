@@ -114,8 +114,15 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
       if (newProcessedFeedItems.any((item) => item is FeedAction) &&
           currentUser?.id != null) {
-        // TODO(ht-development): Implement correct event dispatching
-        // _appBloc.add(AppUserFeedActionShown(userId: currentUser!.id));
+        _appBloc.add(
+          AppUserAccountActionShown(
+            userId: currentUser!.id,
+            feedActionType: (newProcessedFeedItems
+                    .firstWhere((item) => item is FeedAction) as FeedAction)
+                .feedActionType,
+            isCompleted: false,
+          ),
+        );
       }
     } on HtHttpException catch (e) {
       emit(state.copyWith(status: HeadlinesFeedStatus.failure, error: e));
@@ -160,8 +167,15 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
       if (processedFeedItems.any((item) => item is FeedAction) &&
           currentUser?.id != null) {
-        // TODO(ht-development): Implement correct event dispatching
-        // _appBloc.add(AppUserFeedActionShown(userId: currentUser!.id));
+        _appBloc.add(
+          AppUserAccountActionShown(
+            userId: currentUser!.id,
+            feedActionType: (processedFeedItems
+                    .firstWhere((item) => item is FeedAction) as FeedAction)
+                .feedActionType,
+            isCompleted: false,
+          ),
+        );
       }
     } on HtHttpException catch (e) {
       emit(state.copyWith(status: HeadlinesFeedStatus.failure, error: e));
@@ -213,8 +227,15 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
       if (processedFeedItems.any((item) => item is FeedAction) &&
           currentUser?.id != null) {
-        // TODO(ht-development): Implement correct event dispatching
-        // _appBloc.add(AppUserFeedActionShown(userId: currentUser!.id));
+        _appBloc.add(
+          AppUserAccountActionShown(
+            userId: currentUser!.id,
+            feedActionType: (processedFeedItems
+                    .firstWhere((item) => item is FeedAction) as FeedAction)
+                .feedActionType,
+            isCompleted: false,
+          ),
+        );
       }
     } on HtHttpException catch (e) {
       emit(state.copyWith(status: HeadlinesFeedStatus.failure, error: e));

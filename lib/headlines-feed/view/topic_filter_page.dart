@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ht_main/headlines-feed/bloc/topics_filter_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_shared/ht_shared.dart';
@@ -15,6 +16,7 @@ class TopicFilterPage extends StatefulWidget {
 class _TopicFilterPageState extends State<TopicFilterPage> {
   final _scrollController = ScrollController();
   late final TopicsFilterBloc _topicsFilterBloc;
+  late Set<Topic> _pageSelectedTopics;
 
   @override
   void initState() {
@@ -22,6 +24,11 @@ class _TopicFilterPageState extends State<TopicFilterPage> {
     _scrollController.addListener(_onScroll);
     _topicsFilterBloc = context.read<TopicsFilterBloc>()
       ..add(TopicsFilterRequested());
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final initialSelection = GoRouterState.of(context).extra as List<Topic>?;
+      _pageSelectedTopics = Set.from(initialSelection ?? []);
+    });
   }
 
   @override
@@ -49,13 +56,26 @@ class _TopicFilterPageState extends State<TopicFilterPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.headlinesFeedFilterTopicLabel),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.check),
+            tooltip: l10n.headlinesFeedFilterApplyButton,
+            onPressed: () {
+              context.pop(_pageSelectedTopics.toList());
+            },
+          ),
+        ],
       ),
       body: BlocBuilder<TopicsFilterBloc, TopicsFilterState>(
         builder: (context, state) {
           switch (state.status) {
             case TopicsFilterStatus.initial:
             case TopicsFilterStatus.loading:
-              return const Center(child: CircularProgressIndicator());
+              return LoadingStateWidget(
+                icon: Icons.category_outlined,
+                headline: l10n.topicFilterLoadingHeadline,
+                subheadline: l10n.pleaseWait,
+              );
             case TopicsFilterStatus.failure:
               return Center(
                 child: FailureStateWidget(
@@ -86,11 +106,18 @@ class _TopicFilterPageState extends State<TopicFilterPage> {
                     return const Center(child: CircularProgressIndicator());
                   }
                   final topic = state.topics[index];
+                  final isSelected = _pageSelectedTopics.contains(topic);
                   return CheckboxListTile(
                     title: Text(topic.name),
-                    value: false, // This will be handled by another BLoC
+                    value: isSelected,
                     onChanged: (bool? value) {
-                      // This will be handled by another BLoC
+                      setState(() {
+                        if (value == true) {
+                          _pageSelectedTopics.add(topic);
+                        } else {
+                          _pageSelectedTopics.remove(topic);
+                        }
+                      });
                     },
                   );
                 },

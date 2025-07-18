@@ -61,27 +61,22 @@ class AuthenticationPage extends StatelessWidget {
       ),
       body: SafeArea(
         child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
-          // Listener remains crucial for feedback (errors)
           listener: (context, state) {
-            if (state is AuthenticationFailure) {
+            if (state.status == AuthenticationStatus.failure) {
               ScaffoldMessenger.of(context)
                 ..hideCurrentSnackBar()
                 ..showSnackBar(
                   SnackBar(
                     content: Text(
-                      // Provide a more user-friendly error message if possible
-                      state.errorMessage,
+                      state.exception!.toFriendlyMessage(context),
                     ),
                     backgroundColor: colorScheme.error,
                   ),
                 );
             }
-            // Success states (Google/Anonymous) are typically handled by
-            // the AppBloc listening to repository changes and triggering redirects.
-            // Email link success is handled in the dedicated email flow pages.
           },
           builder: (context, state) {
-            final isLoading = state is AuthenticationLoading;
+            final isLoading = state.status == AuthenticationStatus.loading;
 
             return Padding(
               padding: const EdgeInsets.all(AppSpacing.paddingLarge),
@@ -161,8 +156,7 @@ class AuthenticationPage extends StatelessWidget {
                       ],
 
                       // --- Loading Indicator ---
-                      if (isLoading &&
-                          state is! AuthenticationRequestCodeLoading) ...[
+                      if (isLoading) ...[
                         const Padding(
                           padding: EdgeInsets.only(top: AppSpacing.xl),
                           child: Center(child: CircularProgressIndicator()),

@@ -470,10 +470,10 @@ GoRouter createRouter({
                     name: Routes.feedFilterName,
                     // Use MaterialPage with fullscreenDialog for modal presentation
                     pageBuilder: (context, state) {
-                      // Access the HeadlinesFeedBloc from the context
-                      BlocProvider.of<HeadlinesFeedBloc>(context);
                       return const MaterialPage(
                         fullscreenDialog: true,
+                        child: HeadlinesFilterPage(),
+                      );
                         child: HeadlinesFilterPage(),
                       );
                     },

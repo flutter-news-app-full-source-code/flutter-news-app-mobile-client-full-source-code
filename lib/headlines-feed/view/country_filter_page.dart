@@ -6,9 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ht_main/headlines-feed/bloc/countries_filter_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_main/shared/constants/constants.dart';
 import 'package:ht_main/shared/widgets/widgets.dart';
-import 'package:ht_shared/ht_shared.dart' show Country;
+import 'package:ht_shared/ht_shared.dart';
+import 'package:ht_ui_kit/ht_ui_kit.dart';
 
 /// {@template country_filter_page}
 /// A page dedicated to selecting event countries for filtering headlines.
@@ -97,7 +97,7 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
 
@@ -130,7 +130,7 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
 
   /// Builds the main content body based on the current [CountriesFilterState].
   Widget _buildBody(BuildContext context, CountriesFilterState state) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
@@ -148,7 +148,7 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
     if (state.status == CountriesFilterStatus.failure &&
         state.countries.isEmpty) {
       return FailureStateWidget(
-        message: state.error?.toString() ?? l10n.unknownError,
+        exception: state.error ?? const UnknownException('Unknown error'),
         onRetry: () =>
             context.read<CountriesFilterBloc>().add(CountriesFilterRequested()),
       );

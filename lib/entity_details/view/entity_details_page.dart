@@ -1,3 +1,5 @@
+// ignore_for_file: no_default_cases
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -8,7 +10,6 @@ import 'package:ht_main/entity_details/bloc/entity_details_bloc.dart';
 import 'package:ht_main/l10n/app_localizations.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
-import 'package:ht_main/shared/services/feed_injector_service.dart';
 import 'package:ht_main/shared/shared.dart';
 import 'package:ht_shared/ht_shared.dart';
 import 'package:ht_ui_kit/ht_ui_kit.dart';
@@ -167,11 +168,11 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
           IconData? appBarIconData;
 
           if (state.entity is Topic) {
-            final topic = state.entity as Topic;
+            final topic = state.entity! as Topic;
             appBarTitleText = topic.name;
             appBarIconData = Icons.category_outlined;
           } else if (state.entity is Source) {
-            final src = state.entity as Source;
+            final src = state.entity! as Source;
             appBarTitleText = src.name;
             appBarIconData = Icons.source_outlined;
           } else {
@@ -179,13 +180,13 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
           }
 
           final description = state.entity is Topic
-              ? (state.entity as Topic).description
+              ? (state.entity! as Topic).description
               : state.entity is Source
-              ? (state.entity as Source).description
+              ? (state.entity! as Source).description
               : null;
 
           final entityIconUrl = (state.entity is Topic)
-              ? (state.entity as Topic).iconUrl
+              ? (state.entity! as Topic).iconUrl
               : null;
 
           final followButton = IconButton(

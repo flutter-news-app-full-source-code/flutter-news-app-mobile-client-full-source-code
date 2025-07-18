@@ -207,15 +207,15 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
               sharePositionOrigin = box.localToGlobal(Offset.zero) & box.size;
             }
             ShareParams params;
-            if (kIsWeb && headline.url != null && headline.url!.isNotEmpty) {
+            if (kIsWeb && headline.url.isNotEmpty) {
               params = ShareParams(
-                uri: Uri.parse(headline.url!),
+                uri: Uri.parse(headline.url),
                 title: headline.title,
                 sharePositionOrigin: sharePositionOrigin,
               );
-            } else if (headline.url != null && headline.url!.isNotEmpty) {
+            } else if (headline.url.isNotEmpty) {
               params = ShareParams(
-                text: '${headline.title}\n\n${headline.url!}',
+                text: '${headline.title}\n\n${headline.url}',
                 subject: headline.title,
                 sharePositionOrigin: sharePositionOrigin,
               );
@@ -271,67 +271,42 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
             ),
           ),
         ),
-        if (headline.imageUrl != null)
-          SliverPadding(
-            padding: EdgeInsets.only(
-              top: AppSpacing.md,
-              left: horizontalPadding.left,
-              right: horizontalPadding.right,
-            ),
-            sliver: SliverToBoxAdapter(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(AppSpacing.md),
-                child: AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: Image.network(
-                    headline.imageUrl!,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return ColoredBox(
-                        color: colorScheme.surfaceContainerHighest,
-                        child: const Center(
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) => ColoredBox(
+        SliverPadding(
+          padding: EdgeInsets.only(
+            top: AppSpacing.md,
+            left: horizontalPadding.left,
+            right: horizontalPadding.right,
+          ),
+          sliver: SliverToBoxAdapter(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(AppSpacing.md),
+              child: AspectRatio(
+                aspectRatio: 16 / 9,
+                child: Image.network(
+                  headline.imageUrl,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return ColoredBox(
                       color: colorScheme.surfaceContainerHighest,
-                      child: Icon(
-                        Icons.broken_image_outlined,
-                        color: colorScheme.onSurfaceVariant,
-                        size: AppSpacing.xxl * 1.5,
+                      child: const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
                       ),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) => ColoredBox(
+                    color: colorScheme.surfaceContainerHighest,
+                    child: Icon(
+                      Icons.broken_image_outlined,
+                      color: colorScheme.onSurfaceVariant,
+                      size: AppSpacing.xxl * 1.5,
                     ),
                   ),
                 ),
               ),
             ),
-          )
-        else // Placeholder if no image
-          SliverPadding(
-            padding: EdgeInsets.only(
-              top: AppSpacing.md,
-              left: horizontalPadding.left,
-              right: horizontalPadding.right,
-            ),
-            sliver: SliverToBoxAdapter(
-              child: AspectRatio(
-                aspectRatio: 16 / 9,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(AppSpacing.md),
-                  ),
-                  child: Icon(
-                    Icons.image_not_supported_outlined,
-                    color: colorScheme.onSurfaceVariant,
-                    size: AppSpacing.xxl * 1.5,
-                  ),
-                ),
-              ),
-            ),
           ),
+        ),
         SliverPadding(
           padding: horizontalPadding.copyWith(top: AppSpacing.lg),
           sliver: SliverToBoxAdapter(
@@ -355,7 +330,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
               ),
             ),
           ),
-        if (headline.url != null && headline.url!.isNotEmpty)
+        if (headline.url.isNotEmpty)
           SliverPadding(
             padding: horizontalPadding.copyWith(
               top: AppSpacing.xl,
@@ -365,7 +340,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
               child: ElevatedButton.icon(
                 icon: const Icon(Icons.open_in_new_outlined),
                 onPressed: () async {
-                  await launchUrlString(headline.url!);
+                  await launchUrlString(headline.url);
                 },
                 label: Text(l10n.headlineDetailsContinueReadingButton),
                 style: ElevatedButton.styleFrom(
@@ -380,8 +355,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
               ),
             ),
           ),
-        if (headline.url == null ||
-            headline.url!.isEmpty) // Ensure bottom padding
+        if (headline.url.isEmpty) // Ensure bottom padding
           const SliverPadding(
             padding: EdgeInsets.only(bottom: AppSpacing.xl),
             sliver: SliverToBoxAdapter(child: SizedBox.shrink()),
@@ -391,7 +365,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           sliver: SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.only(
-                top: (headline.url != null && headline.url!.isNotEmpty)
+                top: (headline.url.isNotEmpty)
                     ? AppSpacing.sm
                     : AppSpacing.xl,
                 bottom: AppSpacing.md,
@@ -453,35 +427,33 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       );
     }
 
-    if (headline.source != null) {
-      chips.add(
-        InkWell(
-          // Make chip tappable
-          onTap: () {
-            context.push(
-              Routes.sourceDetails,
-              extra: EntityDetailsPageArguments(entity: headline.source),
-            );
-          },
-          borderRadius: BorderRadius.circular(AppSpacing.sm),
-          child: Chip(
-            avatar: Icon(
-              Icons.source_outlined,
-              size: chipAvatarSize,
-              color: chipAvatarColor,
-            ),
-            label: Text(headline.source!.name),
-            labelStyle: chipLabelStyle,
-            backgroundColor: chipBackgroundColor,
-            padding: chipPadding,
-            shape: chipShape,
-            visualDensity: VisualDensity.compact,
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    chips.add(
+      InkWell(
+        // Make chip tappable
+        onTap: () {
+          context.push(
+            Routes.sourceDetails,
+            extra: EntityDetailsPageArguments(entity: headline.source),
+          );
+        },
+        borderRadius: BorderRadius.circular(AppSpacing.sm),
+        child: Chip(
+          avatar: Icon(
+            Icons.source_outlined,
+            size: chipAvatarSize,
+            color: chipAvatarColor,
           ),
+          label: Text(headline.source.name),
+          labelStyle: chipLabelStyle,
+          backgroundColor: chipBackgroundColor,
+          padding: chipPadding,
+          shape: chipShape,
+          visualDensity: VisualDensity.compact,
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
-      );
-    }
-
+      ),
+    );
+  
     if (headline.category != null) {
       chips.add(
         InkWell(

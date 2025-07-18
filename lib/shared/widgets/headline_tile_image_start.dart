@@ -64,7 +64,7 @@ class HeadlineTileImageStart extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppSpacing.xs),
                   child: headline.imageUrl != null
                       ? Image.network(
-                          headline.imageUrl!,
+                          headline.imageUrl,
                           fit: BoxFit.cover,
                           loadingBuilder: (context, child, loadingProgress) {
                             if (loadingProgress == null) return child;
@@ -206,9 +206,8 @@ class _HeadlineMetadataRow extends StatelessWidget {
           ),
         ],
         // Conditionally render Source as Text
-        if (headline.source?.name != null &&
-            !(currentContextEntityType == EntityType.source &&
-                headline.source!.id == currentContextEntityId)) ...[
+        if (!(currentContextEntityType == EntityType.source &&
+                headline.source.id == currentContextEntityId)) ...[
           if (formattedDate.isNotEmpty ||
               (headline.category?.name != null &&
                   !(currentContextEntityType == EntityType.category &&
@@ -219,14 +218,12 @@ class _HeadlineMetadataRow extends StatelessWidget {
             ),
           GestureDetector(
             onTap: () {
-              if (headline.source != null) {
-                context.push(
-                  Routes.sourceDetails,
-                  extra: EntityDetailsPageArguments(entity: headline.source),
-                );
-              }
-            },
-            child: Text(headline.source!.name, style: metadataTextStyle),
+              context.push(
+                Routes.sourceDetails,
+                extra: EntityDetailsPageArguments(entity: headline.source),
+              );
+                        },
+            child: Text(headline.source.name, style: metadataTextStyle),
           ),
         ],
       ],

@@ -276,11 +276,11 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                                 ),
                               const SizedBox(height: AppSpacing.sm),
                               Text(
-                                'Placeholder Ad: ${item.adType?.name ?? 'Generic'}',
+                                'Placeholder Ad: ${item.adType.name ?? 'Generic'}',
                                 style: textTheme.titleSmall,
                               ),
                               Text(
-                                'Placement: ${item.placement?.name ?? 'Default'}',
+                                'Placement: ${item.placement.name ?? 'Default'}',
                                 style: textTheme.bodySmall,
                               ),
                               if (item.targetUrl.isNotEmpty)

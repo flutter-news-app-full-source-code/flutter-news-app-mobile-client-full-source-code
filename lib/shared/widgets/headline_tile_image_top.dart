@@ -63,7 +63,7 @@ class HeadlineTileImageTop extends StatelessWidget {
               ),
               child: headline.imageUrl != null
                   ? Image.network(
-                      headline.imageUrl!,
+                      headline.imageUrl,
                       width: double.infinity,
                       height: 180, // Standard large image height
                       fit: BoxFit.cover,
@@ -217,9 +217,8 @@ class _HeadlineMetadataRow extends StatelessWidget {
           ),
         ],
         // Conditionally render Source as Text
-        if (headline.source?.name != null &&
-            !(currentContextEntityType == EntityType.source &&
-                headline.source!.id == currentContextEntityId)) ...[
+        if (!(currentContextEntityType == EntityType.source &&
+                headline.source.id == currentContextEntityId)) ...[
           if (formattedDate.isNotEmpty ||
               (headline.category?.name != null &&
                   !(currentContextEntityType == EntityType.category &&
@@ -230,14 +229,12 @@ class _HeadlineMetadataRow extends StatelessWidget {
             ),
           GestureDetector(
             onTap: () {
-              if (headline.source != null) {
-                context.push(
-                  Routes.sourceDetails,
-                  extra: EntityDetailsPageArguments(entity: headline.source),
-                );
-              }
-            },
-            child: Text(headline.source!.name, style: metadataTextStyle),
+              context.push(
+                Routes.sourceDetails,
+                extra: EntityDetailsPageArguments(entity: headline.source),
+              );
+                        },
+            child: Text(headline.source.name, style: metadataTextStyle),
           ),
         ],
       ],

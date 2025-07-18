@@ -197,9 +197,9 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     try {
       final filter = <String, dynamic>{};
       if (state.entity is Topic) {
-        filter['topic.id'] = (state.entity as Topic).id;
+        filter['topic.id'] = (state.entity! as Topic).id;
       } else if (state.entity is Source) {
-        filter['source.id'] = (state.entity as Source).id;
+        filter['source.id'] = (state.entity! as Source).id;
       }
 
       final headlineResponse = await _headlinesRepository.readAll(
@@ -278,10 +278,10 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
 
     if (entity is Topic) {
       isCurrentlyFollowing =
-          preferences.followedTopics.any((t) => t.id == (entity as Topic).id);
+          preferences.followedTopics.any((t) => t.id == entity.id);
     } else if (entity is Source) {
       isCurrentlyFollowing =
-          preferences.followedSources.any((s) => s.id == (entity as Source).id);
+          preferences.followedSources.any((s) => s.id == entity.id);
     }
 
     if (state.isFollowing != isCurrentlyFollowing) {

@@ -25,7 +25,7 @@ Future<Widget> bootstrap(
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = const AppBlocObserver();
 
-  final _logger = Logger('bootstrap');
+  final logger = Logger('bootstrap');
 
   final kvStorage = await HtKvStorageSharedPreferences.getInstance();
 
@@ -45,7 +45,7 @@ Future<Widget> bootstrap(
       baseUrl: appConfig.baseUrl,
       tokenProvider: () => authenticationRepository.getAuthToken(),
       isWeb: kIsWeb,
-      logger: _logger,
+      logger: logger,
     );
     authClient = HtAuthApi(httpClient: httpClient);
     authenticationRepository = HtAuthRepository(
@@ -68,41 +68,41 @@ Future<Widget> bootstrap(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
       initialData: headlinesFixturesData,
-      logger: _logger,
+      logger: logger,
     );
     topicsClient = HtDataInMemory<Topic>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
       initialData: topicsFixturesData,
-      logger: _logger,
+      logger: logger,
     );
     countriesClient = HtDataInMemory<Country>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
       initialData: countriesFixturesData,
-      logger: _logger,
+      logger: logger,
     );
     sourcesClient = HtDataInMemory<Source>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
       initialData: sourcesFixturesData,
-      logger: _logger,
+      logger: logger,
     );
     userContentPreferencesClient = HtDataInMemory<UserContentPreferences>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
-      logger: _logger,
+      logger: logger,
     );
     userAppSettingsClient = HtDataInMemory<UserAppSettings>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
-      logger: _logger,
+      logger: logger,
     );
     remoteConfigClient = HtDataInMemory<RemoteConfig>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
       initialData: remoteConfigsFixturesData,
-      logger: _logger,
+      logger: logger,
     );
   } else if (appConfig.environment == app_config.AppEnvironment.development) {
     headlinesClient = HtDataApi<Headline>(
@@ -110,49 +110,49 @@ Future<Widget> bootstrap(
       modelName: 'headline',
       fromJson: Headline.fromJson,
       toJson: (headline) => headline.toJson(),
-      logger: _logger,
+      logger: logger,
     );
     topicsClient = HtDataApi<Topic>(
       httpClient: httpClient,
       modelName: 'topic',
       fromJson: Topic.fromJson,
       toJson: (topic) => topic.toJson(),
-      logger: _logger,
+      logger: logger,
     );
     countriesClient = HtDataApi<Country>(
       httpClient: httpClient,
       modelName: 'country',
       fromJson: Country.fromJson,
       toJson: (country) => country.toJson(),
-      logger: _logger,
+      logger: logger,
     );
     sourcesClient = HtDataApi<Source>(
       httpClient: httpClient,
       modelName: 'source',
       fromJson: Source.fromJson,
       toJson: (source) => source.toJson(),
-      logger: _logger,
+      logger: logger,
     );
     userContentPreferencesClient = HtDataApi<UserContentPreferences>(
       httpClient: httpClient,
       modelName: 'user_content_preferences',
       fromJson: UserContentPreferences.fromJson,
       toJson: (prefs) => prefs.toJson(),
-      logger: _logger,
+      logger: logger,
     );
     userAppSettingsClient = HtDataApi<UserAppSettings>(
       httpClient: httpClient,
       modelName: 'user_app_settings',
       fromJson: UserAppSettings.fromJson,
       toJson: (settings) => settings.toJson(),
-      logger: _logger,
+      logger: logger,
     );
     remoteConfigClient = HtDataApi<RemoteConfig>(
       httpClient: httpClient,
       modelName: 'remote_config',
       fromJson: RemoteConfig.fromJson,
       toJson: (config) => config.toJson(),
-      logger: _logger,
+      logger: logger,
     );
   } else {
     // Default to API clients for production
@@ -161,49 +161,49 @@ Future<Widget> bootstrap(
       modelName: 'headline',
       fromJson: Headline.fromJson,
       toJson: (headline) => headline.toJson(),
-      logger: _logger,
+      logger: logger,
     );
     topicsClient = HtDataApi<Topic>(
       httpClient: httpClient,
       modelName: 'topic',
       fromJson: Topic.fromJson,
       toJson: (topic) => topic.toJson(),
-      logger: _logger,
+      logger: logger,
     );
     countriesClient = HtDataApi<Country>(
       httpClient: httpClient,
       modelName: 'country',
       fromJson: Country.fromJson,
       toJson: (country) => country.toJson(),
-      logger: _logger,
+      logger: logger,
     );
     sourcesClient = HtDataApi<Source>(
       httpClient: httpClient,
       modelName: 'source',
       fromJson: Source.fromJson,
       toJson: (source) => source.toJson(),
-      logger: _logger,
+      logger: logger,
     );
     userContentPreferencesClient = HtDataApi<UserContentPreferences>(
       httpClient: httpClient,
       modelName: 'user_content_preferences',
       fromJson: UserContentPreferences.fromJson,
       toJson: (prefs) => prefs.toJson(),
-      logger: _logger,
+      logger: logger,
     );
     userAppSettingsClient = HtDataApi<UserAppSettings>(
       httpClient: httpClient,
       modelName: 'user_app_settings',
       fromJson: UserAppSettings.fromJson,
       toJson: (settings) => settings.toJson(),
-      logger: _logger,
+      logger: logger,
     );
     remoteConfigClient = HtDataApi<RemoteConfig>(
       httpClient: httpClient,
       modelName: 'remote_config',
       fromJson: RemoteConfig.fromJson,
       toJson: (config) => config.toJson(),
-      logger: _logger,
+      logger: logger,
     );
   }
 

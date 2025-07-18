@@ -16,7 +16,7 @@ class SourceItemWidget extends StatelessWidget {
       title: Text(source.name),
       subtitle: source.description != null
           ? Text(
-              source.description!,
+              source.description,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             )

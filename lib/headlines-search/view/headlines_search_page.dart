@@ -361,11 +361,11 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                                     ),
                                   const SizedBox(height: AppSpacing.sm),
                                   Text(
-                                    'Placeholder Ad: ${feedItem.adType?.name ?? 'Generic'}',
+                                    'Placeholder Ad: ${feedItem.adType.name ?? 'Generic'}',
                                     style: currentTextTheme.titleSmall,
                                   ),
                                   Text(
-                                    'Placement: ${feedItem.placement?.name ?? 'Default'}',
+                                    'Placement: ${feedItem.placement.name ?? 'Default'}',
                                     style: currentTextTheme.bodySmall,
                                   ),
                                 ],

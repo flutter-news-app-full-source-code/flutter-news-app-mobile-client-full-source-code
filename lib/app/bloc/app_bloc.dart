@@ -58,6 +58,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppFontFamilyChanged>(_onFontFamilyChanged);
     on<AppTextScaleFactorChanged>(_onAppTextScaleFactorChanged);
     on<AppFontWeightChanged>(_onAppFontWeightChanged);
+    on<AppOpened>(_onAppOpened);
 
     // Listen directly to the auth state changes stream
     _userSubscription = _authenticationRepository.authStateChanges.listen(
@@ -329,11 +330,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         fontWeight: event.fontWeight,
       ),
     );
-    emit(
-      state.copyWith(
-        settings: updatedSettings,
-      ),
-    );
+    emit(state.copyWith(settings: updatedSettings));
     // Optionally save settings to repository here
     // unawaited(_userAppSettingsRepository.update(id: updatedSettings.id, item: updatedSettings));
   }
@@ -518,6 +515,29 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         'shown/completed. Status updated locally to $updatedActionStatus. '
         'Backend update pending.',
       );
+    }
+  }
+
+  Future<void> _onAppOpened(
+    AppOpened event,
+    Emitter<AppState> emit,
+  ) async {
+    if (state.appConfig == null) {
+      return;
+    }
+
+    final appStatus = state.appConfig!.appStatus;
+
+    if (appStatus.isUnderMaintenance) {
+      emit(state.copyWith(status: AppStatus.underMaintenance));
+      return;
+    }
+
+    // TODO(ht-development): Get the current app version from a package like
+    // package_info_plus and compare it with appStatus.latestAppVersion.
+    if (appStatus.isLatestVersionOnly) {
+      emit(state.copyWith(status: AppStatus.updateRequired));
+      return;
     }
   }
 }

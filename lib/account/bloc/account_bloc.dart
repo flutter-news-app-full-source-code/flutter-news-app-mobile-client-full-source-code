@@ -271,15 +271,15 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     final isCurrentlyFollowed = currentPrefs.followedTopics.any(
       (t) => t.id == event.topic.id,
     );
-    final List<Topic> updatedFollowedCategories;
+    final List<Topic> updatedFollowedTopics;
 
-    updatedFollowedCategories = isCurrentlyFollowed
+    updatedFollowedTopics = isCurrentlyFollowed
         ? (List.from(currentPrefs.followedTopics)
-            ..removeWhere((t) => t.id == event.topic.id))
+          ..removeWhere((t) => t.id == event.topic.id))
         : (List.from(currentPrefs.followedTopics)..add(event.topic));
 
     final updatedPrefs = currentPrefs.copyWith(
-      followedTopics: updatedFollowedCategories,
+      followedTopics: updatedFollowedTopics,
     );
 
     try {

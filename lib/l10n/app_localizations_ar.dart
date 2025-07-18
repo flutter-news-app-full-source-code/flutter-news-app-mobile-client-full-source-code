@@ -785,4 +785,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get contentTypeCountry => 'الدول';
+
+  @override
+  String searchingFor(String contentType) {
+    return 'جار البحث عن $contentType...';
+  }
 }

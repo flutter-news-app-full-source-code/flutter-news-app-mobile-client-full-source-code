@@ -785,4 +785,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get contentTypeCountry => 'Countries';
+
+  @override
+  String searchingFor(String contentType) {
+    return 'Searching for $contentType...';
+  }
 }

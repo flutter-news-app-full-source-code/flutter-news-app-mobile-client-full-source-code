@@ -1519,6 +1519,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Countries'**
   String get contentTypeCountry;
+
+  /// Subheadline for loading state on search page
+  ///
+  /// In en, this message translates to:
+  /// **'Searching for {contentType}...'**
+  String searchingFor(String contentType);
 }
 
 class _AppLocalizationsDelegate

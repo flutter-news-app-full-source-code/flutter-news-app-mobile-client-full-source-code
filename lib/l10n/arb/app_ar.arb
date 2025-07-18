@@ -1005,5 +1005,14 @@
     "contentTypeCountry": "الدول",
     "@contentTypeCountry": {
         "description": "Label for Country content type"
+    },
+    "searchingFor": "جار البحث عن {contentType}...",
+    "@searchingFor": {
+        "description": "Subheadline for loading state on search page",
+        "placeholders": {
+            "contentType": {
+                "type": "String"
+            }
+        }
     }
 }

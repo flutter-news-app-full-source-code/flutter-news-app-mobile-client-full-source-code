@@ -75,7 +75,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         state.copyWith(
           status: AccountStatus.success,
           preferences: preferences,
-          clearErrorMessage: true,
+          clearError: true,
         ),
       );
     } on NotFoundException {
@@ -98,7 +98,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
             state.copyWith(
               status: AccountStatus.success,
               preferences: migratedPreferences,
-              clearErrorMessage: true,
+              clearError: true,
             ),
           );
           return; // Exit if successfully read after migration
@@ -127,7 +127,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         emit(
           state.copyWith(
             preferences: defaultPreferences,
-            clearErrorMessage: true,
+            clearError: true,
             status: AccountStatus.success,
           ),
         );
@@ -146,7 +146,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
           state.copyWith(
             status: AccountStatus.success,
             preferences: existingPreferences,
-            clearErrorMessage: true,
+            clearError: true,
           ),
         );
       } on HtHttpException catch (e) {
@@ -156,7 +156,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         emit(
           state.copyWith(
             status: AccountStatus.failure,
-            errorMessage: e.message,
+            error: e,
           ),
         );
       } catch (e, st) {
@@ -168,9 +168,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         emit(
           state.copyWith(
             status: AccountStatus.failure,
-            errorMessage: OperationFailedException(
+            error: OperationFailedException(
               'Failed to create default preferences: $e',
-            ).message,
+            ),
           ),
         );
       }
@@ -179,7 +179,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         'AccountLoadUserPreferences failed with HtHttpException: $e',
       );
       emit(
-        state.copyWith(status: AccountStatus.failure, errorMessage: e.message),
+        state.copyWith(status: AccountStatus.failure, error: e),
       );
     } catch (e, st) {
       _logger.severe(
@@ -190,9 +190,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       emit(
         state.copyWith(
           status: AccountStatus.failure,
-          errorMessage: OperationFailedException(
+          error: OperationFailedException(
             'An unexpected error occurred: $e',
-          ).message,
+          ),
         ),
       );
     }
@@ -233,7 +233,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         state.copyWith(
           status: AccountStatus.success,
           preferences: updatedPrefs,
-          clearErrorMessage: true,
+          clearError: true,
         ),
       );
     } on HtHttpException catch (e) {
@@ -241,7 +241,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         'AccountSaveHeadlineToggled failed with HtHttpException: $e',
       );
       emit(
-        state.copyWith(status: AccountStatus.failure, errorMessage: e.message),
+        state.copyWith(status: AccountStatus.failure, error: e),
       );
     } catch (e, st) {
       _logger.severe(
@@ -252,9 +252,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       emit(
         state.copyWith(
           status: AccountStatus.failure,
-          errorMessage: OperationFailedException(
+          error: OperationFailedException(
             'Failed to update saved headlines: $e',
-          ).message,
+          ),
         ),
       );
     }
@@ -292,7 +292,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         state.copyWith(
           status: AccountStatus.success,
           preferences: updatedPrefs,
-          clearErrorMessage: true,
+          clearError: true,
         ),
       );
     } on HtHttpException catch (e) {
@@ -300,7 +300,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         'AccountFollowTopicToggled failed with HtHttpException: $e',
       );
       emit(
-        state.copyWith(status: AccountStatus.failure, errorMessage: e.message),
+        state.copyWith(status: AccountStatus.failure, error: e),
       );
     } catch (e, st) {
       _logger.severe(
@@ -311,9 +311,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       emit(
         state.copyWith(
           status: AccountStatus.failure,
-          errorMessage: OperationFailedException(
+          error: OperationFailedException(
             'Failed to update followed topics: $e',
-          ).message,
+          ),
         ),
       );
     }
@@ -354,7 +354,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         state.copyWith(
           status: AccountStatus.success,
           preferences: updatedPrefs,
-          clearErrorMessage: true,
+          clearError: true,
         ),
       );
     } on HtHttpException catch (e) {
@@ -362,7 +362,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         'AccountFollowSourceToggled failed with HtHttpException: $e',
       );
       emit(
-        state.copyWith(status: AccountStatus.failure, errorMessage: e.message),
+        state.copyWith(status: AccountStatus.failure, error: e),
       );
     } catch (e, st) {
       _logger.severe(
@@ -373,9 +373,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       emit(
         state.copyWith(
           status: AccountStatus.failure,
-          errorMessage: OperationFailedException(
+          error: OperationFailedException(
             'Failed to update followed sources: $e',
-          ).message,
+          ),
         ),
       );
     }
@@ -404,7 +404,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         state.copyWith(
           status: AccountStatus.success,
           preferences: defaultPreferences,
-          clearErrorMessage: true,
+          clearError: true,
         ),
       );
     } on HtHttpException catch (e) {
@@ -412,7 +412,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         'AccountClearUserPreferences failed with HtHttpException: $e',
       );
       emit(
-        state.copyWith(status: AccountStatus.failure, errorMessage: e.message),
+        state.copyWith(status: AccountStatus.failure, error: e),
       );
     } catch (e, st) {
       _logger.severe(
@@ -423,9 +423,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       emit(
         state.copyWith(
           status: AccountStatus.failure,
-          errorMessage: OperationFailedException(
+          error: OperationFailedException(
             'Failed to clear user preferences: $e',
-          ).message,
+          ),
         ),
       );
     }

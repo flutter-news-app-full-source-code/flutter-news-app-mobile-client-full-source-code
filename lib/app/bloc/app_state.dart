@@ -19,6 +19,12 @@ enum AppStatus {
 
   /// Fetching the essential RemoteConfig failed.
   configFetchFailed,
+
+  /// A new version of the app is required.
+  updateRequired,
+
+  /// The app is currently under maintenance.
+  underMaintenance,
 }
 
 class AppState extends Equatable {

@@ -126,7 +126,7 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;

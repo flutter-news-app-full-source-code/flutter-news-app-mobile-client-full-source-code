@@ -29,17 +29,16 @@ class App extends StatelessWidget {
     required AppEnvironment environment,
     this.demoDataMigrationService,
     super.key,
-  })  : _htAuthenticationRepository = htAuthenticationRepository,
-        _htHeadlinesRepository = htHeadlinesRepository,
-        _htTopicsRepository = htTopicsRepository,
-        _htCountriesRepository = htCountriesRepository,
-        _htSourcesRepository = htSourcesRepository,
-        _htUserAppSettingsRepository = htUserAppSettingsRepository,
-        _htUserContentPreferencesRepository =
-        htUserContentPreferencesRepository,
-        _htAppConfigRepository = htRemoteConfigRepository,
-        _kvStorageService = kvStorageService,
-        _environment = environment;
+  }) : _htAuthenticationRepository = htAuthenticationRepository,
+       _htHeadlinesRepository = htHeadlinesRepository,
+       _htTopicsRepository = htTopicsRepository,
+       _htCountriesRepository = htCountriesRepository,
+       _htSourcesRepository = htSourcesRepository,
+       _htUserAppSettingsRepository = htUserAppSettingsRepository,
+       _htUserContentPreferencesRepository = htUserContentPreferencesRepository,
+       _htAppConfigRepository = htRemoteConfigRepository,
+       _kvStorageService = kvStorageService,
+       _environment = environment;
 
   final HtAuthRepository _htAuthenticationRepository;
   final HtDataRepository<Headline> _htHeadlinesRepository;
@@ -75,7 +74,8 @@ class App extends StatelessWidget {
               authenticationRepository: context.read<HtAuthRepository>(),
               userAppSettingsRepository: context
                   .read<HtDataRepository<UserAppSettings>>(),
-              appConfigRepository: context.read<HtDataRepository<RemoteConfig>>(),
+              appConfigRepository: context
+                  .read<HtDataRepository<RemoteConfig>>(),
               environment: _environment,
               demoDataMigrationService: demoDataMigrationService,
             ),
@@ -153,7 +153,7 @@ class _AppViewState extends State<_AppView> {
       htUserAppSettingsRepository: widget.htUserAppSettingsRepository,
       htUserContentPreferencesRepository:
           widget.htUserContentPreferencesRepository,
-      htAppConfigRepository: widget.htAppConfigRepository,
+      htRemoteConfigRepository: widget.htAppConfigRepository,
       environment: widget.environment,
     );
 
@@ -217,10 +217,10 @@ class _AppViewState extends State<_AppView> {
                   builder: (innerContext) {
                     return LoadingStateWidget(
                       icon: Icons.settings_applications_outlined,
-                      headline: AppLocalizations.of(innerContext)
-                          .headlinesFeedLoadingHeadline,
-                      subheadline:
-                          AppLocalizations.of(innerContext).pleaseWait,
+                      headline: AppLocalizations.of(
+                        innerContext,
+                      ).headlinesFeedLoadingHeadline,
+                      subheadline: AppLocalizations.of(innerContext).pleaseWait,
                     );
                   },
                 ),
@@ -258,13 +258,14 @@ class _AppViewState extends State<_AppView> {
                   builder: (innerContext) {
                     return FailureStateWidget(
                       exception: const NetworkException(),
-                      retryButtonText:
-                          HtUiKitLocalizations.of(innerContext)!.retryButtonText,
+                      retryButtonText: HtUiKitLocalizations.of(
+                        innerContext,
+                      )!.retryButtonText,
                       onRetry: () {
                         // Use outer context for BLoC access
                         context.read<AppBloc>().add(
-                              const AppConfigFetchRequested(),
-                            );
+                          const AppConfigFetchRequested(),
+                        );
                       },
                     );
                   },

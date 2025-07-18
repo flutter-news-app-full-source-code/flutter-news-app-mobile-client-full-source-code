@@ -5,13 +5,11 @@ import 'package:ht_auth_repository/ht_auth_repository.dart';
 import 'package:ht_data_repository/ht_data_repository.dart';
 import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/account/view/account_page.dart';
-import 'package:ht_main/account/view/manage_followed_items/topics/add_topic_to_follow_page.dart';
-import 'package:ht_main/account/view/manage_followed_items/topics/followed_topics_list_page.dart';
-// import 'package:ht_main/account/view/manage_followed_items/countries/add_country_to_follow_page.dart';
-// import 'package:ht_main/account/view/manage_followed_items/countries/followed_countries_list_page.dart';
 import 'package:ht_main/account/view/manage_followed_items/manage_followed_items_page.dart';
 import 'package:ht_main/account/view/manage_followed_items/sources/add_source_to_follow_page.dart';
 import 'package:ht_main/account/view/manage_followed_items/sources/followed_sources_list_page.dart';
+import 'package:ht_main/account/view/manage_followed_items/topics/add_topic_to_follow_page.dart';
+import 'package:ht_main/account/view/manage_followed_items/topics/followed_topics_list_page.dart';
 import 'package:ht_main/account/view/saved_headlines_page.dart';
 import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/app/config/config.dart' as local_config;
@@ -24,15 +22,16 @@ import 'package:ht_main/entity_details/view/entity_details_page.dart';
 import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart';
 import 'package:ht_main/headline-details/bloc/similar_headlines_bloc.dart';
 import 'package:ht_main/headline-details/view/headline_details_page.dart';
-import 'package:ht_main/headlines-feed/bloc/categories_filter_bloc.dart';
 // import 'package:ht_main/headlines-feed/bloc/countries_filter_bloc.dart';
 import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:ht_main/headlines-feed/bloc/sources_filter_bloc.dart';
-import 'package:ht_main/headlines-feed/view/category_filter_page.dart';
+import 'package:ht_main/headlines-feed/bloc/topics_filter_bloc.dart';
+import 'package:ht_main/headlines-feed/services/feed_injector_service.dart';
 // import 'package:ht_main/headlines-feed/view/country_filter_page.dart';
 import 'package:ht_main/headlines-feed/view/headlines_feed_page.dart';
 import 'package:ht_main/headlines-feed/view/headlines_filter_page.dart';
 import 'package:ht_main/headlines-feed/view/source_filter_page.dart';
+import 'package:ht_main/headlines-feed/view/topic_filter_page.dart';
 import 'package:ht_main/headlines-search/bloc/headlines_search_bloc.dart';
 import 'package:ht_main/headlines-search/view/headlines_search_page.dart';
 import 'package:ht_main/l10n/l10n.dart';
@@ -45,8 +44,7 @@ import 'package:ht_main/settings/view/language_settings_page.dart';
 import 'package:ht_main/settings/view/notification_settings_page.dart';
 import 'package:ht_main/settings/view/settings_page.dart';
 import 'package:ht_main/settings/view/theme_settings_page.dart';
-import 'package:ht_main/shared/services/feed_injector_service.dart';
-import 'package:ht_shared/ht_shared.dart';
+import 'package:ht_shared/ht_shared.dart' hide AppStatus;
 
 /// Creates and configures the GoRouter instance for the application.
 ///
@@ -56,13 +54,13 @@ GoRouter createRouter({
   required ValueNotifier<AppStatus> authStatusNotifier,
   required HtAuthRepository htAuthenticationRepository,
   required HtDataRepository<Headline> htHeadlinesRepository,
-  required HtDataRepository<Category> htCategoriesRepository,
+  required HtDataRepository<Topic> htTopicsRepository,
   required HtDataRepository<Country> htCountriesRepository,
   required HtDataRepository<Source> htSourcesRepository,
   required HtDataRepository<UserAppSettings> htUserAppSettingsRepository,
   required HtDataRepository<UserContentPreferences>
   htUserContentPreferencesRepository,
-  required HtDataRepository<AppConfig> htAppConfigRepository,
+  required HtDataRepository<RemoteConfig> htRemoteConfigRepository,
   required local_config.AppEnvironment environment,
 }) {
   // Instantiate AccountBloc once to be shared
@@ -280,14 +278,14 @@ GoRouter createRouter({
       ),
       // --- Entity Details Routes (Top Level) ---
       GoRoute(
-        path: Routes.categoryDetails,
-        name: Routes.categoryDetailsName,
+        path: Routes.topicDetails,
+        name: Routes.topicDetailsName,
         builder: (context, state) {
           final args = state.extra as EntityDetailsPageArguments?;
           if (args == null) {
             return const Scaffold(
               body: Center(
-                child: Text('Error: Missing category details arguments'),
+                child: Text('Error: Missing topic details arguments'),
               ),
             );
           }
@@ -400,8 +398,7 @@ GoRouter createRouter({
                   return HeadlinesSearchBloc(
                     headlinesRepository: context
                         .read<HtDataRepository<Headline>>(),
-                    categoryRepository: context
-                        .read<HtDataRepository<Category>>(),
+                    topicRepository: context.read<HtDataRepository<Topic>>(),
                     sourceRepository: context.read<HtDataRepository<Source>>(),
                     appBloc: context.read<AppBloc>(),
                     feedInjectorService: feedInjectorService,
@@ -481,17 +478,17 @@ GoRouter createRouter({
                       );
                     },
                     routes: [
-                      // Sub-route for category selection
+                      // Sub-route for topic selection
                       GoRoute(
-                        path: Routes.feedFilterCategories,
-                        name: Routes.feedFilterCategoriesName,
+                        path: Routes.feedFilterTopics,
+                        name: Routes.feedFilterTopicsName,
                         // Wrap with BlocProvider
                         builder: (context, state) => BlocProvider(
-                          create: (context) => CategoriesFilterBloc(
-                            categoriesRepository: context
-                                .read<HtDataRepository<Category>>(),
+                          create: (context) => TopicsFilterBloc(
+                            topicsRepository: context
+                                .read<HtDataRepository<Topic>>(),
                           ),
-                          child: const CategoryFilterPage(),
+                          child: const TopicFilterPage(),
                         ),
                       ),
                       // Sub-route for source selection
@@ -683,16 +680,16 @@ GoRouter createRouter({
                         const ManageFollowedItemsPage(),
                     routes: [
                       GoRoute(
-                        path: Routes.followedCategoriesList,
-                        name: Routes.followedCategoriesListName,
+                        path: Routes.followedTopicsList,
+                        name: Routes.followedTopicsListName,
                         builder: (context, state) =>
-                            const FollowedCategoriesListPage(),
+                            const FollowedTopicsListPage(),
                         routes: [
                           GoRoute(
-                            path: Routes.addCategoryToFollow,
-                            name: Routes.addCategoryToFollowName,
+                            path: Routes.addTopicToFollow,
+                            name: Routes.addTopicToFollowName,
                             builder: (context, state) =>
-                                const AddCategoryToFollowPage(),
+                                const AddTopicToFollowPage(),
                           ),
                         ],
                       ),

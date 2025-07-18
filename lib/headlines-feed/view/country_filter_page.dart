@@ -6,7 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ht_main/headlines-feed/bloc/countries_filter_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_main/shared/widgets/widgets.dart';
 import 'package:ht_shared/ht_shared.dart';
 import 'package:ht_ui_kit/ht_ui_kit.dart';
 

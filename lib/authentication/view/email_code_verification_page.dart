@@ -29,12 +29,12 @@ class EmailCodeVerificationPage extends StatelessWidget {
       body: SafeArea(
         child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
           listener: (context, state) {
-            if (state is AuthenticationFailure) {
+            if (state.status == AuthenticationStatus.failure) {
               ScaffoldMessenger.of(context)
                 ..hideCurrentSnackBar()
                 ..showSnackBar(
                   SnackBar(
-                    content: Text(state.errorMessage),
+                    content: Text(state.exception!.toFriendlyMessage(context)),
                     backgroundColor: colorScheme.error,
                   ),
                 );
@@ -42,7 +42,7 @@ class EmailCodeVerificationPage extends StatelessWidget {
             // Successful authentication is handled by AppBloc redirecting.
           },
           builder: (context, state) {
-            final isLoading = state is AuthenticationLoading;
+            final isLoading = state.status == AuthenticationStatus.loading;
 
             return Padding(
               padding: const EdgeInsets.all(AppSpacing.paddingLarge),

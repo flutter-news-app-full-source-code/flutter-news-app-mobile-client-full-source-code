@@ -5,7 +5,7 @@ import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/app/config/config.dart';
 import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_main/shared/constants/app_spacing.dart';
+import 'package:ht_ui_kit/ht_ui_kit.dart';
 
 /// {@template email_code_verification_page}
 /// Page where the user enters the 6-digit code sent to their email
@@ -20,7 +20,7 @@ class EmailCodeVerificationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -150,7 +150,7 @@ class _EmailCodeVerificationFormState
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final textTheme = Theme.of(context).textTheme;
 
     return Form(

@@ -44,8 +44,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       _onAppFontWeightChanged,
       transformer: sequential(),
     );
-    on<SettingsFeedTileTypeChanged>(
-      _onFeedTileTypeChanged,
+    on<SettingsHeadlineImageStyleChanged>(
+      _onHeadlineImageStyleChanged,
       transformer: sequential(),
     );
     on<SettingsLanguageChanged>(_onLanguageChanged, transformer: sequential());
@@ -206,15 +206,15 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     await _persistSettings(updatedSettings, emit);
   }
 
-  Future<void> _onFeedTileTypeChanged(
-    SettingsFeedTileTypeChanged event,
+  Future<void> _onHeadlineImageStyleChanged(
+    SettingsHeadlineImageStyleChanged event,
     Emitter<SettingsState> emit,
   ) async {
     if (state.userAppSettings == null) return;
 
     final updatedSettings = state.userAppSettings!.copyWith(
       feedPreferences: state.userAppSettings!.feedPreferences.copyWith(
-        headlineImageStyle: event.tileType,
+        headlineImageStyle: event.imageStyle,
       ),
     );
     emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));

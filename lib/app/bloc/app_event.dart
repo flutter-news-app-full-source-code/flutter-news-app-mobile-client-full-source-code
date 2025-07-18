@@ -107,6 +107,15 @@ class AppConfigFetchRequested extends AppEvent {
   const AppConfigFetchRequested();
 }
 
+/// {@template app_opened}
+/// Event triggered when the application is opened.
+/// Used to check for required updates or maintenance mode.
+/// {@endtemplate}
+class AppOpened extends AppEvent {
+  /// {@macro app_opened}
+  const AppOpened();
+}
+
 /// {@template app_user_account_action_shown}
 /// Event triggered when an AccountAction has been shown to the user,
 /// prompting an update to their `lastAccountActionShownAt` timestamp.

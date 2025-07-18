@@ -1130,6 +1130,12 @@ abstract class AppLocalizations {
   /// **'Start following sources to see them here.'**
   String get followedSourcesEmptySubheadline;
 
+  /// Label for the topic filter dropdown
+  ///
+  /// In en, this message translates to:
+  /// **'Topic'**
+  String get headlinesFeedFilterTopicLabel;
+
   /// Title for the page listing followed topics
   ///
   /// In en, this message translates to:

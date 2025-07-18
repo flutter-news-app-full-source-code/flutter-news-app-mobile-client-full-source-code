@@ -565,6 +565,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Start following sources to see them here.';
 
   @override
+  String get headlinesFeedFilterTopicLabel => 'Topic';
+
+  @override
   String get followedTopicsPageTitle => 'Followed Topics';
 
   @override

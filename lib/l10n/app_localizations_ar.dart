@@ -565,6 +565,9 @@ class AppLocalizationsAr extends AppLocalizations {
       'ابدأ بمتابعة المصادر لكي تظهر هنا.';
 
   @override
+  String get headlinesFeedFilterTopicLabel => 'الموضوع';
+
+  @override
   String get followedTopicsPageTitle => 'المواضيع المتابَعة';
 
   @override

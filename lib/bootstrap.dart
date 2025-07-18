@@ -13,11 +13,10 @@ import 'package:ht_http_client/ht_http_client.dart';
 import 'package:ht_kv_storage_shared_preferences/ht_kv_storage_shared_preferences.dart';
 import 'package:ht_main/app/app.dart';
 import 'package:ht_main/app/config/config.dart' as app_config;
-import 'package:ht_main/bloc_observer.dart';
-import 'package:logging/logging.dart';
 import 'package:ht_main/app/services/demo_data_migration_service.dart';
+import 'package:ht_main/bloc_observer.dart';
 import 'package:ht_shared/ht_shared.dart';
-import 'package:timeago/timeago.dart' as timeago;
+import 'package:logging/logging.dart';
 
 Future<Widget> bootstrap(
   app_config.AppConfig appConfig,

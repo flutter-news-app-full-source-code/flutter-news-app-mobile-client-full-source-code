@@ -726,6 +726,10 @@
     "@followedSourcesEmptySubheadline": {
         "description": "عنوان فرعي للحالة الفارغة في صفحة المصادر المتابعة"
     },
+    "headlinesFeedFilterTopicLabel": "الموضوع",
+    "@headlinesFeedFilterTopicLabel": {
+        "description": "Label for the topic filter dropdown"
+    },
     "followedTopicsPageTitle": "المواضيع المتابَعة",
     "@followedTopicsPageTitle": {
         "description": "عنوان صفحة عرض المواضيع المتابعة"

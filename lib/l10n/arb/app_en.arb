@@ -726,6 +726,10 @@
     "@followedSourcesEmptySubheadline": {
         "description": "Subheadline for empty state on followed sources page"
     },
+    "headlinesFeedFilterTopicLabel": "Topic",
+    "@headlinesFeedFilterTopicLabel": {
+        "description": "Label for the topic filter dropdown"
+    },
     "followedTopicsPageTitle": "Followed Topics",
     "@followedTopicsPageTitle": {
         "description": "Title for the page listing followed topics"

@@ -735,6 +735,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get entityDetailsSourceTitle => 'المصدر';
 
   @override
+  String get entityDetailsTopicTitle => 'الموضوع';
+
+  @override
   String get entityDetailsCountryTitle => 'الدولة';
 
   @override

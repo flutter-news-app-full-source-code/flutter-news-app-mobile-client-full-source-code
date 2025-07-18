@@ -956,6 +956,10 @@
     "@entityDetailsSourceTitle": {
         "description": "Title for source entity type"
     },
+    "entityDetailsTopicTitle": "Topic",
+    "@entityDetailsTopicTitle": {
+        "description": "Title for topic entity type"
+    },
     "entityDetailsCountryTitle": "Country",
     "@entityDetailsCountryTitle": {
         "description": "Title for country entity type"

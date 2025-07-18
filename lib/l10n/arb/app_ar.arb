@@ -956,6 +956,10 @@
     "@entityDetailsSourceTitle": {
         "description": "Title for source entity type"
     },
+    "entityDetailsTopicTitle": "الموضوع",
+    "@entityDetailsTopicTitle": {
+        "description": "Title for topic entity type"
+    },
     "entityDetailsCountryTitle": "الدولة",
     "@entityDetailsCountryTitle": {
         "description": "Title for country entity type"

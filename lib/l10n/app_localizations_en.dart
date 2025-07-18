@@ -735,6 +735,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get entityDetailsSourceTitle => 'Source';
 
   @override
+  String get entityDetailsTopicTitle => 'Topic';
+
+  @override
   String get entityDetailsCountryTitle => 'Country';
 
   @override

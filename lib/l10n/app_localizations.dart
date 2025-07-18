@@ -1430,6 +1430,12 @@ abstract class AppLocalizations {
   /// **'Source'**
   String get entityDetailsSourceTitle;
 
+  /// Title for topic entity type
+  ///
+  /// In en, this message translates to:
+  /// **'Topic'**
+  String get entityDetailsTopicTitle;
+
   /// Title for country entity type
   ///
   /// In en, this message translates to:

@@ -1012,5 +1012,17 @@
                 "type": "String"
             }
         }
+    },
+    "settingsAppearanceFontWeightLight": "صغير",
+    "@settingsAppearanceFontWeightLight": {
+        "description": "Label for the light font weight option"
+    },
+    "settingsAppearanceFontWeightRegular": "عادي",
+    "@settingsAppearanceFontWeightRegular": {
+        "description": "Label for the regular font weight option"
+    },
+    "settingsAppearanceFontWeightBold": "عريض",
+    "@settingsAppearanceFontWeightBold": {
+        "description": "Label for the bold font weight option"
     }
 }

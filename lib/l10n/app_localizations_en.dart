@@ -790,4 +790,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String searchingFor(String contentType) {
     return 'Searching for $contentType...';
   }
+
+  @override
+  String get settingsAppearanceFontWeightLight => 'Light';
+
+  @override
+  String get settingsAppearanceFontWeightRegular => 'Regular';
+
+  @override
+  String get settingsAppearanceFontWeightBold => 'Bold';
 }

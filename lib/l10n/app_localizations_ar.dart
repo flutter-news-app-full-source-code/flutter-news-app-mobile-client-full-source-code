@@ -790,4 +790,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String searchingFor(String contentType) {
     return 'جار البحث عن $contentType...';
   }
+
+  @override
+  String get settingsAppearanceFontWeightLight => 'صغير';
+
+  @override
+  String get settingsAppearanceFontWeightRegular => 'عادي';
+
+  @override
+  String get settingsAppearanceFontWeightBold => 'عريض';
 }

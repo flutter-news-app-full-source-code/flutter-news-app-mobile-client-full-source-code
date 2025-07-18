@@ -1525,6 +1525,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Searching for {contentType}...'**
   String searchingFor(String contentType);
+
+  /// Label for the light font weight option
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get settingsAppearanceFontWeightLight;
+
+  /// Label for the regular font weight option
+  ///
+  /// In en, this message translates to:
+  /// **'Regular'**
+  String get settingsAppearanceFontWeightRegular;
+
+  /// Label for the bold font weight option
+  ///
+  /// In en, this message translates to:
+  /// **'Bold'**
+  String get settingsAppearanceFontWeightBold;
 }
 
 class _AppLocalizationsDelegate

@@ -1030,5 +1030,17 @@
                 "type": "String"
             }
         }
+    },
+    "settingsAppearanceFontWeightLight": "Light",
+    "@settingsAppearanceFontWeightLight": {
+        "description": "Label for the light font weight option"
+    },
+    "settingsAppearanceFontWeightRegular": "Regular",
+    "@settingsAppearanceFontWeightRegular": {
+        "description": "Label for the regular font weight option"
+    },
+    "settingsAppearanceFontWeightBold": "Bold",
+    "@settingsAppearanceFontWeightBold": {
+        "description": "Label for the bold font weight option"
     }
 }

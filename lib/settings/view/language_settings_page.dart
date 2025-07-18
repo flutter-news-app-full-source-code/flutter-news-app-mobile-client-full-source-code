@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/settings/bloc/settings_bloc.dart';
-import 'package:ht_main/shared/constants/app_spacing.dart';
+import 'package:ht_ui_kit/ht_ui_kit.dart';
 
 // Defines the available languages and their display names.
 // In a real app, this might come from a configuration or be more dynamic.
@@ -21,7 +21,7 @@ class LanguageSettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final settingsBloc = context.watch<SettingsBloc>();
     final settingsState = settingsBloc.state;
 

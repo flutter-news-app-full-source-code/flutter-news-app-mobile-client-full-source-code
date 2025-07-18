@@ -8,10 +8,8 @@ import 'package:ht_main/headlines-feed/view/headlines_filter_page.dart'
     show keySelectedCountryIsoCodes, keySelectedSourceTypes, keySelectedSources;
 import 'package:ht_main/l10n/app_localizations.dart';
 import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_main/shared/constants/app_spacing.dart';
-import 'package:ht_main/shared/widgets/failure_state_widget.dart';
-import 'package:ht_main/shared/widgets/loading_state_widget.dart';
-import 'package:ht_shared/ht_shared.dart' show Country, Source, SourceType;
+import 'package:ht_shared/ht_shared.dart';
+import 'package:ht_ui_kit/ht_ui_kit.dart';
 
 // Keys are defined in headlines_filter_page.dart and imported by router.dart
 // const String keySelectedSources = 'selectedSources';
@@ -54,7 +52,7 @@ class _SourceFilterView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final state = context.watch<SourcesFilterBloc>().state;
@@ -117,7 +115,8 @@ class _SourceFilterView extends StatelessWidget {
         state.allAvailableSources.isEmpty) {
       // Check allAvailableSources
       return FailureStateWidget(
-        message: state.errorMessage ?? l10n.headlinesFeedFilterErrorCriteria,
+        exception: state.error ??
+            const UnknownException('Failed to load source filter data.'),
         onRetry: () {
           context.read<SourcesFilterBloc>().add(const LoadSourceFilterData());
         },
@@ -283,7 +282,8 @@ class _SourceFilterView extends StatelessWidget {
     if (state.dataLoadingStatus == SourceFilterDataLoadingStatus.failure &&
         state.displayableSources.isEmpty) {
       return FailureStateWidget(
-        message: state.errorMessage ?? l10n.headlinesFeedFilterErrorSources,
+        exception: state.error ??
+            const UnknownException('Failed to load displayable sources.'),
         onRetry: () {
           context.read<SourcesFilterBloc>().add(const LoadSourceFilterData());
         },

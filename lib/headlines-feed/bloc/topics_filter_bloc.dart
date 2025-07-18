@@ -4,7 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ht_data_repository/ht_data_repository.dart';
-import 'package:ht_shared/ht_shared.dart' show Category, HtHttpException;
+import 'package:ht_shared/ht_shared.dart' show Topic, HtHttpException;
 
 part 'topics_filter_event.dart';
 part 'topics_filter_state.dart';

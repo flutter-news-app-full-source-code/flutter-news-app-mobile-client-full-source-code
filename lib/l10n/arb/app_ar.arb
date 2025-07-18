@@ -710,6 +710,22 @@
             }
         }
     },
+    "followedSourcesLoadingHeadline": "جارٍ تحميل المصادر المتابَعة...",
+    "@followedSourcesLoadingHeadline": {
+        "description": "عنوان لحالة التحميل في صفحة المصادر المتابعة"
+    },
+    "followedSourcesErrorHeadline": "تعذر تحميل المصادر المتابَعة",
+    "@followedSourcesErrorHeadline": {
+        "description": "رسالة خطأ عند فشل تحميل المصادر المتابعة"
+    },
+    "followedSourcesEmptyHeadline": "لا توجد مصادر متابَعة",
+    "@followedSourcesEmptyHeadline": {
+        "description": "عنوان للحالة الفارغة في صفحة المصادر المتابعة"
+    },
+    "followedSourcesEmptySubheadline": "ابدأ بمتابعة المصادر لكي تظهر هنا.",
+    "@followedSourcesEmptySubheadline": {
+        "description": "عنوان فرعي للحالة الفارغة في صفحة المصادر المتابعة"
+    },
     "followedTopicsPageTitle": "المواضيع المتابَعة",
     "@followedTopicsPageTitle": {
         "description": "عنوان صفحة عرض المواضيع المتابعة"

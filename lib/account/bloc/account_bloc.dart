@@ -153,12 +153,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         _logger.severe(
           'Failed to create default preferences with HtHttpException: $e',
         );
-        emit(
-          state.copyWith(
-            status: AccountStatus.failure,
-            error: e,
-          ),
-        );
+        emit(state.copyWith(status: AccountStatus.failure, error: e));
       } catch (e, st) {
         _logger.severe(
           'Failed to create default preferences with unexpected error: $e',
@@ -178,9 +173,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       _logger.severe(
         'AccountLoadUserPreferences failed with HtHttpException: $e',
       );
-      emit(
-        state.copyWith(status: AccountStatus.failure, error: e),
-      );
+      emit(state.copyWith(status: AccountStatus.failure, error: e));
     } catch (e, st) {
       _logger.severe(
         'AccountLoadUserPreferences failed with unexpected error: $e',
@@ -190,9 +183,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       emit(
         state.copyWith(
           status: AccountStatus.failure,
-          error: OperationFailedException(
-            'An unexpected error occurred: $e',
-          ),
+          error: OperationFailedException('An unexpected error occurred: $e'),
         ),
       );
     }
@@ -240,9 +231,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       _logger.severe(
         'AccountSaveHeadlineToggled failed with HtHttpException: $e',
       );
-      emit(
-        state.copyWith(status: AccountStatus.failure, error: e),
-      );
+      emit(state.copyWith(status: AccountStatus.failure, error: e));
     } catch (e, st) {
       _logger.severe(
         'AccountSaveHeadlineToggled failed with unexpected error: $e',
@@ -275,7 +264,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
 
     updatedFollowedTopics = isCurrentlyFollowed
         ? (List.from(currentPrefs.followedTopics)
-          ..removeWhere((t) => t.id == event.topic.id))
+            ..removeWhere((t) => t.id == event.topic.id))
         : (List.from(currentPrefs.followedTopics)..add(event.topic));
 
     final updatedPrefs = currentPrefs.copyWith(
@@ -299,9 +288,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       _logger.severe(
         'AccountFollowTopicToggled failed with HtHttpException: $e',
       );
-      emit(
-        state.copyWith(status: AccountStatus.failure, error: e),
-      );
+      emit(state.copyWith(status: AccountStatus.failure, error: e));
     } catch (e, st) {
       _logger.severe(
         'AccountFollowTopicToggled failed with unexpected error: $e',
@@ -361,9 +348,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       _logger.severe(
         'AccountFollowSourceToggled failed with HtHttpException: $e',
       );
-      emit(
-        state.copyWith(status: AccountStatus.failure, error: e),
-      );
+      emit(state.copyWith(status: AccountStatus.failure, error: e));
     } catch (e, st) {
       _logger.severe(
         'AccountFollowSourceToggled failed with unexpected error: $e',
@@ -411,9 +396,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       _logger.severe(
         'AccountClearUserPreferences failed with HtHttpException: $e',
       );
-      emit(
-        state.copyWith(status: AccountStatus.failure, error: e),
-      );
+      emit(state.copyWith(status: AccountStatus.failure, error: e));
     } catch (e, st) {
       _logger.severe(
         'AccountClearUserPreferences failed with unexpected error: $e',

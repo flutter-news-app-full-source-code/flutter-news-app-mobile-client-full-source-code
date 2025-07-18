@@ -19,10 +19,9 @@ class TopicsFilterBloc extends Bloc<TopicsFilterEvent, TopicsFilterState> {
   /// {@macro topics_filter_bloc}
   ///
   /// Requires a [HtDataRepository<Topic>] to interact with the data layer.
-  TopicsFilterBloc({
-    required HtDataRepository<Topic> topicsRepository,
-  })  : _topicsRepository = topicsRepository,
-        super(const TopicsFilterState()) {
+  TopicsFilterBloc({required HtDataRepository<Topic> topicsRepository})
+    : _topicsRepository = topicsRepository,
+      super(const TopicsFilterState()) {
     on<TopicsFilterRequested>(
       _onTopicsFilterRequested,
       transformer: restartable(),

@@ -19,12 +19,12 @@ class HeadlinesSearchBloc
     required HtDataRepository<Source> sourceRepository,
     required AppBloc appBloc,
     required FeedInjectorService feedInjectorService,
-  })  : _headlinesRepository = headlinesRepository,
-        _topicRepository = topicRepository,
-        _sourceRepository = sourceRepository,
-        _appBloc = appBloc,
-        _feedInjectorService = feedInjectorService,
-        super(const HeadlinesSearchInitial()) {
+  }) : _headlinesRepository = headlinesRepository,
+       _topicRepository = topicRepository,
+       _sourceRepository = sourceRepository,
+       _appBloc = appBloc,
+       _feedInjectorService = feedInjectorService,
+       super(const HeadlinesSearchInitial()) {
     on<HeadlinesSearchModelTypeChanged>(_onHeadlinesSearchModelTypeChanged);
     on<HeadlinesSearchFetchRequested>(
       _onSearchFetchRequested,
@@ -88,8 +88,10 @@ class HeadlinesSearchBloc
             case ContentType.headline:
               response = await _headlinesRepository.readAll(
                 filter: {'q': searchTerm},
-                pagination:
-                    PaginationOptions(limit: _limit, cursor: successState.cursor),
+                pagination: PaginationOptions(
+                  limit: _limit,
+                  cursor: successState.cursor,
+                ),
               );
               // Cast to List<Headline> for the injector
               final headlines = response.items.cast<Headline>();
@@ -134,8 +136,10 @@ class HeadlinesSearchBloc
             case ContentType.topic:
               response = await _topicRepository.readAll(
                 filter: {'q': searchTerm},
-                pagination:
-                    PaginationOptions(limit: _limit, cursor: successState.cursor),
+                pagination: PaginationOptions(
+                  limit: _limit,
+                  cursor: successState.cursor,
+                ),
               );
               emit(
                 successState.copyWith(
@@ -149,8 +153,10 @@ class HeadlinesSearchBloc
             case ContentType.source:
               response = await _sourceRepository.readAll(
                 filter: {'q': searchTerm},
-                pagination:
-                    PaginationOptions(limit: _limit, cursor: successState.cursor),
+                pagination: PaginationOptions(
+                  limit: _limit,
+                  cursor: successState.cursor,
+                ),
               );
               emit(
                 successState.copyWith(
@@ -230,8 +236,11 @@ class HeadlinesSearchBloc
           processedItems = rawResponse.items.cast<FeedItem>();
         default:
           // Handle unexpected content types if necessary
-          rawResponse =
-              const PaginatedResponse(items: [], cursor: null, hasMore: false);
+          rawResponse = const PaginatedResponse(
+            items: [],
+            cursor: null,
+            hasMore: false,
+          );
           processedItems = [];
       }
       emit(

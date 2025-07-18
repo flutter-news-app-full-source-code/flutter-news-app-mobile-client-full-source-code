@@ -42,9 +42,9 @@ class AddTopicToFollowPage extends StatelessWidget {
                 exception: OperationFailedException(
                   topicsState.error ?? l10n.topicFilterError,
                 ),
-                onRetry: () => context
-                    .read<AvailableTopicsBloc>()
-                    .add(const FetchAvailableTopics()),
+                onRetry: () => context.read<AvailableTopicsBloc>().add(
+                  const FetchAvailableTopics(),
+                ),
               );
             }
             if (topicsState.availableTopics.isEmpty) {
@@ -102,29 +102,30 @@ class AddTopicToFollowPage extends StatelessWidget {
                                     fit: BoxFit.contain,
                                     errorBuilder:
                                         (context, error, stackTrace) => Icon(
-                                      Icons.topic_outlined,
-                                      color: colorScheme.onSurfaceVariant,
-                                      size: AppSpacing.lg,
-                                    ),
+                                          Icons.topic_outlined,
+                                          color: colorScheme.onSurfaceVariant,
+                                          size: AppSpacing.lg,
+                                        ),
                                     loadingBuilder:
                                         (context, child, loadingProgress) {
-                                      if (loadingProgress == null) {
-                                        return child;
-                                      }
-                                      return Center(
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          value: loadingProgress
-                                                      .expectedTotalBytes !=
-                                                  null
-                                              ? loadingProgress
-                                                      .cumulativeBytesLoaded /
+                                          if (loadingProgress == null) {
+                                            return child;
+                                          }
+                                          return Center(
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              value:
                                                   loadingProgress
-                                                      .expectedTotalBytes!
-                                              : null,
-                                        ),
-                                      );
-                                    },
+                                                          .expectedTotalBytes !=
+                                                      null
+                                                  ? loadingProgress
+                                                            .cumulativeBytesLoaded /
+                                                        loadingProgress
+                                                            .expectedTotalBytes!
+                                                  : null,
+                                            ),
+                                          );
+                                        },
                                   ),
                                 )
                               : Icon(
@@ -133,10 +134,7 @@ class AddTopicToFollowPage extends StatelessWidget {
                                   size: AppSpacing.lg,
                                 ),
                         ),
-                        title: Text(
-                          topic.name,
-                          style: textTheme.titleMedium,
-                        ),
+                        title: Text(topic.name, style: textTheme.titleMedium),
                         trailing: IconButton(
                           icon: isFollowed
                               ? Icon(
@@ -152,8 +150,8 @@ class AddTopicToFollowPage extends StatelessWidget {
                               : l10n.followTopicTooltip(topic.name),
                           onPressed: () {
                             context.read<AccountBloc>().add(
-                                  AccountFollowTopicToggled(topic: topic),
-                                );
+                              AccountFollowTopicToggled(topic: topic),
+                            );
                           },
                         ),
                         contentPadding: const EdgeInsets.symmetric(

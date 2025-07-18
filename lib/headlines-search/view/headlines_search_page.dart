@@ -7,14 +7,12 @@ import 'package:go_router/go_router.dart';
 import 'package:ht_main/app/bloc/app_bloc.dart';
 // HeadlineItemWidget import removed
 import 'package:ht_main/headlines-search/bloc/headlines_search_bloc.dart';
-// Import new item widgets
-import 'package:ht_main/headlines-search/widgets/category_item_widget.dart';
-import 'package:ht_main/shared/extensions/content_type_extensions.dart';
 // import 'package:ht_main/headlines-search/widgets/country_item_widget.dart';
 import 'package:ht_main/headlines-search/widgets/source_item_widget.dart';
 import 'package:ht_main/l10n/app_localizations.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
+import 'package:ht_main/shared/extensions/content_type_extensions.dart';
 import 'package:ht_main/shared/shared.dart';
 import 'package:ht_shared/ht_shared.dart';
 import 'package:ht_ui_kit/ht_ui_kit.dart';
@@ -63,7 +61,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
     final searchableTypes = [
       ContentType.headline,
       ContentType.topic,
-      ContentType.source
+      ContentType.source,
     ];
     if (!searchableTypes.contains(_selectedModelType)) {
       _selectedModelType = ContentType.headline;
@@ -390,7 +388,8 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                               leading: Icon(
                                 feedItem.feedActionType ==
                                         FeedActionType.linkAccount
-                                    ? Icons.link_outlined // Outlined
+                                    ? Icons
+                                          .link_outlined // Outlined
                                     : Icons.upgrade_outlined,
                                 color: currentColorScheme.onSecondaryContainer,
                               ),
@@ -404,7 +403,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                               ),
                               subtitle: feedItem.description != null
                                   ? Text(
-                                      feedItem.description!,
+                                      feedItem.description,
                                       style: currentTextTheme.bodySmall
                                           ?.copyWith(
                                             color: currentColorScheme
@@ -428,18 +427,12 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                                         textStyle: currentTextTheme.labelLarge,
                                       ),
                                       onPressed: () {
-                                        if (feedItem.callToActionUrl != null) {
-                                          context.push(
-                                            feedItem.callToActionUrl!,
-                                          );
-                                        }
+                                        context.push(feedItem.callToActionUrl);
                                       },
-                                      child: Text(feedItem.callToActionText!),
+                                      child: Text(feedItem.callToActionText),
                                     )
                                   : null,
-                              isThreeLine:
-                                  feedItem.description != null &&
-                                  feedItem.description!.length > 50,
+                              isThreeLine: feedItem.description.length > 50,
                               contentPadding: const EdgeInsets.symmetric(
                                 // Consistent padding
                                 horizontal: AppSpacing.paddingMedium,

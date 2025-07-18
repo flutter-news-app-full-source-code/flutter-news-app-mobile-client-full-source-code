@@ -18,9 +18,9 @@ class EntityDetailsLoadRequested extends EntityDetailsEvent {
     this.contentType,
     this.entity,
   }) : assert(
-          (entityId != null && contentType != null) || entity != null,
-          'Either entityId/contentType or a full entity object must be provided.',
-        );
+         (entityId != null && contentType != null) || entity != null,
+         'Either entityId/contentType or a full entity object must be provided.',
+       );
 
   /// The unique ID of the entity to load.
   final String? entityId;

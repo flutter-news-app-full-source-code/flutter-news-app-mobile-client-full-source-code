@@ -27,10 +27,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     required HtDataRepository<Headline> headlinesRepository,
     required FeedInjectorService feedInjectorService,
     required AppBloc appBloc,
-  })  : _headlinesRepository = headlinesRepository,
-        _feedInjectorService = feedInjectorService,
-        _appBloc = appBloc,
-        super(const HeadlinesFeedState()) {
+  }) : _headlinesRepository = headlinesRepository,
+       _feedInjectorService = feedInjectorService,
+       _appBloc = appBloc,
+       super(const HeadlinesFeedState()) {
     on<HeadlinesFeedFetchRequested>(
       _onHeadlinesFeedFetchRequested,
       transformer: droppable(),
@@ -60,12 +60,12 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     final queryFilter = <String, dynamic>{};
     if (filter.topics?.isNotEmpty ?? false) {
       queryFilter['topic.id'] = {
-        '\$in': filter.topics!.map((t) => t.id).toList(),
+        r'$in': filter.topics!.map((t) => t.id).toList(),
       };
     }
     if (filter.sources?.isNotEmpty ?? false) {
       queryFilter['source.id'] = {
-        '\$in': filter.sources!.map((s) => s.id).toList(),
+        r'$in': filter.sources!.map((s) => s.id).toList(),
       };
     }
     return queryFilter;
@@ -117,9 +117,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         _appBloc.add(
           AppUserAccountActionShown(
             userId: currentUser!.id,
-            feedActionType: (newProcessedFeedItems
-                    .firstWhere((item) => item is FeedAction) as FeedAction)
-                .feedActionType,
+            feedActionType:
+                (newProcessedFeedItems.firstWhere((item) => item is FeedAction)
+                        as FeedAction)
+                    .feedActionType,
             isCompleted: false,
           ),
         );
@@ -170,9 +171,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         _appBloc.add(
           AppUserAccountActionShown(
             userId: currentUser!.id,
-            feedActionType: (processedFeedItems
-                    .firstWhere((item) => item is FeedAction) as FeedAction)
-                .feedActionType,
+            feedActionType:
+                (processedFeedItems.firstWhere((item) => item is FeedAction)
+                        as FeedAction)
+                    .feedActionType,
             isCompleted: false,
           ),
         );
@@ -230,9 +232,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         _appBloc.add(
           AppUserAccountActionShown(
             userId: currentUser!.id,
-            feedActionType: (processedFeedItems
-                    .firstWhere((item) => item is FeedAction) as FeedAction)
-                .feedActionType,
+            feedActionType:
+                (processedFeedItems.firstWhere((item) => item is FeedAction)
+                        as FeedAction)
+                    .feedActionType,
             isCompleted: false,
           ),
         );

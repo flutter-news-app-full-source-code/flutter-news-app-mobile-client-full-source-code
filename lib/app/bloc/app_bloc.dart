@@ -518,10 +518,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     }
   }
 
-  Future<void> _onAppOpened(
-    AppOpened event,
-    Emitter<AppState> emit,
-  ) async {
+  Future<void> _onAppOpened(AppOpened event, Emitter<AppState> emit) async {
     if (state.appConfig == null) {
       return;
     }

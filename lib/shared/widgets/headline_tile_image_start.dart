@@ -207,7 +207,7 @@ class _HeadlineMetadataRow extends StatelessWidget {
         ],
         // Conditionally render Source as Text
         if (!(currentContextEntityType == EntityType.source &&
-                headline.source.id == currentContextEntityId)) ...[
+            headline.source.id == currentContextEntityId)) ...[
           if (formattedDate.isNotEmpty ||
               (headline.category?.name != null &&
                   !(currentContextEntityType == EntityType.category &&
@@ -222,7 +222,7 @@ class _HeadlineMetadataRow extends StatelessWidget {
                 Routes.sourceDetails,
                 extra: EntityDetailsPageArguments(entity: headline.source),
               );
-                        },
+            },
             child: Text(headline.source.name, style: metadataTextStyle),
           ),
         ],

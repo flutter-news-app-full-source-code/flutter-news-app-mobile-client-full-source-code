@@ -16,7 +16,7 @@ class TopicItemWidget extends StatelessWidget {
       title: Text(topic.name),
       subtitle: topic.description != null
           ? Text(
-              topic.description!,
+              topic.description,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             )

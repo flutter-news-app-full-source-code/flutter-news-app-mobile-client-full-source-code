@@ -60,10 +60,12 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
     final currentFilter = headlinesFeedState.filter;
     _tempSelectedTopics = List.from(currentFilter.topics ?? []);
     _tempSelectedSources = List.from(currentFilter.sources ?? []);
-    _tempSelectedSourceCountryIsoCodes =
-        Set.from(currentFilter.selectedSourceCountryIsoCodes ?? {});
-    _tempSelectedSourceSourceTypes =
-        Set.from(currentFilter.selectedSourceSourceTypes ?? {});
+    _tempSelectedSourceCountryIsoCodes = Set.from(
+      currentFilter.selectedSourceCountryIsoCodes ?? {},
+    );
+    _tempSelectedSourceSourceTypes = Set.from(
+      currentFilter.selectedSourceSourceTypes ?? {},
+    );
 
     _useFollowedFilters = currentFilter.isFromFollowedItems;
     _isLoadingFollowedFilters = false;
@@ -96,8 +98,9 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       setState(() {
         _isLoadingFollowedFilters = false;
         _useFollowedFilters = false;
-        _loadFollowedFiltersError =
-            AppLocalizationsX(context).l10n.mustBeLoggedInToUseFeatureError;
+        _loadFollowedFiltersError = AppLocalizationsX(
+          context,
+        ).l10n.mustBeLoggedInToUseFeatureError;
       });
       return;
     }
@@ -125,7 +128,9 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
             ..showSnackBar(
               SnackBar(
                 content: Text(
-                  AppLocalizationsX(context).l10n.noFollowedItemsForFilterSnackbar,
+                  AppLocalizationsX(
+                    context,
+                  ).l10n.noFollowedItemsForFilterSnackbar,
                 ),
                 duration: const Duration(seconds: 3),
               ),
@@ -144,8 +149,13 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       }
     } on NotFoundException {
       setState(() {
-        _currentUserPreferences =
-            UserContentPreferences(id: currentUser.id, followedTopics: [], followedSources: [], followedCountries: [], savedHeadlines: []);
+        _currentUserPreferences = UserContentPreferences(
+          id: currentUser.id,
+          followedTopics: const [],
+          followedSources: const [],
+          followedCountries: const [],
+          savedHeadlines: const [],
+        );
         _tempSelectedTopics = [];
         _tempSelectedSources = [];
         _isLoadingFollowedFilters = false;
@@ -157,7 +167,9 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
           ..showSnackBar(
             SnackBar(
               content: Text(
-                AppLocalizationsX(context).l10n.noFollowedItemsForFilterSnackbar,
+                AppLocalizationsX(
+                  context,
+                ).l10n.noFollowedItemsForFilterSnackbar,
               ),
               duration: const Duration(seconds: 3),
             ),
@@ -173,7 +185,9 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       setState(() {
         _isLoadingFollowedFilters = false;
         _useFollowedFilters = false;
-        _loadFollowedFiltersError = AppLocalizationsX(context).l10n.unknownError;
+        _loadFollowedFiltersError = AppLocalizationsX(
+          context,
+        ).l10n.unknownError;
       });
     }
   }
@@ -273,8 +287,9 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
             tooltip: l10n.headlinesFeedFilterApplyButton,
             onPressed: () {
               final newFilter = HeadlineFilter(
-                topics:
-                    _tempSelectedTopics.isNotEmpty ? _tempSelectedTopics : null,
+                topics: _tempSelectedTopics.isNotEmpty
+                    ? _tempSelectedTopics
+                    : null,
                 sources: _tempSelectedSources.isNotEmpty
                     ? _tempSelectedSources
                     : null,

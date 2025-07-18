@@ -1,12 +1,6 @@
 part of 'headlines_feed_bloc.dart';
 
-enum HeadlinesFeedStatus {
-  initial,
-  loading,
-  success,
-  failure,
-  loadingMore,
-}
+enum HeadlinesFeedStatus { initial, loading, success, failure, loadingMore }
 
 class HeadlinesFeedState extends Equatable {
   const HeadlinesFeedState({
@@ -46,11 +40,11 @@ class HeadlinesFeedState extends Equatable {
 
   @override
   List<Object?> get props => [
-        status,
-        feedItems,
-        hasMore,
-        cursor,
-        filter,
-        error,
-      ];
+    status,
+    feedItems,
+    hasMore,
+    cursor,
+    filter,
+    error,
+  ];
 }

@@ -48,13 +48,14 @@ class FollowedTopicsListPage extends StatelessWidget {
           if (state.status == AccountStatus.failure &&
               state.preferences == null) {
             return FailureStateWidget(
-              exception: state.error ??
+              exception:
+                  state.error ??
                   OperationFailedException(l10n.followedTopicsErrorHeadline),
               onRetry: () {
                 if (state.user?.id != null) {
-                  context
-                      .read<AccountBloc>()
-                      .add(AccountLoadUserPreferences(userId: state.user!.id));
+                  context.read<AccountBloc>().add(
+                    AccountLoadUserPreferences(userId: state.user!.id),
+                  );
                 }
               },
             );
@@ -95,9 +96,9 @@ class FollowedTopicsListPage extends StatelessWidget {
                   ),
                   tooltip: l10n.unfollowTopicTooltip(topic.name),
                   onPressed: () {
-                    context
-                        .read<AccountBloc>()
-                        .add(AccountFollowTopicToggled(topic: topic));
+                    context.read<AccountBloc>().add(
+                      AccountFollowTopicToggled(topic: topic),
+                    );
                   },
                 ),
                 onTap: () {

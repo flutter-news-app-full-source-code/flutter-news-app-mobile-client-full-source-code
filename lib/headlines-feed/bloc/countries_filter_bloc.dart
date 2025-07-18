@@ -21,8 +21,8 @@ class CountriesFilterBloc
   ///
   /// Requires a [HtDataRepository<Country>] to interact with the data layer.
   CountriesFilterBloc({required HtDataRepository<Country> countriesRepository})
-      : _countriesRepository = countriesRepository,
-        super(const CountriesFilterState()) {
+    : _countriesRepository = countriesRepository,
+      super(const CountriesFilterState()) {
     on<CountriesFilterRequested>(
       _onCountriesFilterRequested,
       transformer: restartable(),

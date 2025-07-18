@@ -59,8 +59,8 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
         state.hasMore &&
         state.status != HeadlinesFeedStatus.loadingMore) {
       context.read<HeadlinesFeedBloc>().add(
-            const HeadlinesFeedFetchRequested(),
-          );
+        const HeadlinesFeedFetchRequested(),
+      );
     }
   }
 
@@ -102,8 +102,8 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
             builder: (context, state) {
               final isFilterApplied =
                   (state.filter.topics?.isNotEmpty ?? false) ||
-                      (state.filter.sources?.isNotEmpty ?? false) ||
-                      state.filter.isFromFollowedItems;
+                  (state.filter.sources?.isNotEmpty ?? false) ||
+                  state.filter.isFromFollowedItems;
               return Stack(
                 children: [
                   IconButton(
@@ -155,8 +155,8 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
             return FailureStateWidget(
               exception: state.error!,
               onRetry: () => context.read<HeadlinesFeedBloc>().add(
-                    HeadlinesFeedRefreshRequested(),
-                  ),
+                HeadlinesFeedRefreshRequested(),
+              ),
             );
           }
 
@@ -167,8 +167,8 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                 'No headlines found matching your criteria.',
               ),
               onRetry: () => context.read<HeadlinesFeedBloc>().add(
-                    HeadlinesFeedFiltersCleared(),
-                  ),
+                HeadlinesFeedFiltersCleared(),
+              ),
               retryButtonText: l10n.headlinesFeedClearFiltersButton,
             );
           }
@@ -176,8 +176,8 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
           return RefreshIndicator(
             onRefresh: () async {
               context.read<HeadlinesFeedBloc>().add(
-                    HeadlinesFeedRefreshRequested(),
-                  );
+                HeadlinesFeedRefreshRequested(),
+              );
             },
             child: ListView.separated(
               controller: _scrollController,
@@ -205,7 +205,9 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                 if (index >= state.feedItems.length) {
                   return state.status == HeadlinesFeedStatus.loadingMore
                       ? const Padding(
-                          padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                          padding: EdgeInsets.symmetric(
+                            vertical: AppSpacing.lg,
+                          ),
                           child: Center(child: CircularProgressIndicator()),
                         )
                       : const SizedBox.shrink();
@@ -312,8 +314,9 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                       subtitle: Text(
                         item.description,
                         style: textTheme.bodySmall?.copyWith(
-                          color:
-                              colorScheme.onSecondaryContainer.withOpacity(0.8),
+                          color: colorScheme.onSecondaryContainer.withOpacity(
+                            0.8,
+                          ),
                         ),
                       ),
                       trailing: ElevatedButton(

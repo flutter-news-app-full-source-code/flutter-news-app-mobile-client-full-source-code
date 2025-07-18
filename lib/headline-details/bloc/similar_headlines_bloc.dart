@@ -29,14 +29,13 @@ class SimilarHeadlinesBloc
     try {
       final currentHeadline = event.currentHeadline;
 
-      final filter = <String, dynamic>{
-        'topic.id': currentHeadline.topic.id,
-      };
+      final filter = <String, dynamic>{'topic.id': currentHeadline.topic.id};
 
       final response = await _headlinesRepository.readAll(
         filter: filter,
         pagination: const PaginationOptions(
-          limit: _similarHeadlinesLimit +
+          limit:
+              _similarHeadlinesLimit +
               1, // Fetch one extra to check if current is there
         ),
       );

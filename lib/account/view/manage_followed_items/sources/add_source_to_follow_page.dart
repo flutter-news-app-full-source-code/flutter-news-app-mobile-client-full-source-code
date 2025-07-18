@@ -34,9 +34,9 @@ class AddSourceToFollowPage extends StatelessWidget {
                 exception: OperationFailedException(
                   sourcesState.error ?? l10n.sourceFilterError,
                 ),
-                onRetry: () => context
-                    .read<AvailableSourcesBloc>()
-                    .add(const FetchAvailableSources()),
+                onRetry: () => context.read<AvailableSourcesBloc>().add(
+                  const FetchAvailableSources(),
+                ),
               );
             }
             if (sourcesState.availableSources.isEmpty) {
@@ -81,8 +81,8 @@ class AddSourceToFollowPage extends StatelessWidget {
                               : l10n.followSourceTooltip(source.name),
                           onPressed: () {
                             context.read<AccountBloc>().add(
-                                  AccountFollowSourceToggled(source: source),
-                                );
+                              AccountFollowSourceToggled(source: source),
+                            );
                           },
                         ),
                       ),

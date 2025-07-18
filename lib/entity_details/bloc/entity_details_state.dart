@@ -86,21 +86,22 @@ class EntityDetailsState extends Equatable {
       isFollowing: isFollowing ?? this.isFollowing,
       feedItems: feedItems ?? this.feedItems,
       hasMoreHeadlines: hasMoreHeadlines ?? this.hasMoreHeadlines,
-      headlinesCursor:
-          clearHeadlinesCursor ? null : headlinesCursor ?? this.headlinesCursor,
+      headlinesCursor: clearHeadlinesCursor
+          ? null
+          : headlinesCursor ?? this.headlinesCursor,
       exception: clearException ? null : exception ?? this.exception,
     );
   }
 
   @override
   List<Object?> get props => [
-        status,
-        contentType,
-        entity,
-        isFollowing,
-        feedItems,
-        hasMoreHeadlines,
-        headlinesCursor,
-        exception,
-      ];
+    status,
+    contentType,
+    entity,
+    isFollowing,
+    feedItems,
+    hasMoreHeadlines,
+    headlinesCursor,
+    exception,
+  ];
 }

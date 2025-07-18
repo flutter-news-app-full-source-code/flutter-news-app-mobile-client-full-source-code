@@ -598,7 +598,6 @@
     "@headlinesFeedFilterNoSourcesMatch": {
         "description": "Message shown when no sources match the selected filters"
     },
-
     "searchModelTypeHeadline": "العناوين الرئيسية",
     "@searchModelTypeHeadline": {
         "description": "Dropdown display name for Headline search type"
@@ -631,7 +630,6 @@
     "@searchHintTextCountry": {
         "description": "Hint text for searching countries"
     },
-
     "searchPageInitialHeadline": "ابدأ بحثك",
     "@searchPageInitialHeadline": {
         "description": "Generic headline for the initial state of the search page"
@@ -980,7 +978,7 @@
     "@savedHeadlinesEmptySubheadline": {
         "description": "Subheadline for empty state on saved headlines page"
     },
-     "demoVerificationCodeMessage": "وضع العرض التوضيحي: استخدم الرمز {code}",
+    "demoVerificationCodeMessage": "وضع العرض التوضيحي: استخدم الرمز {code}",
     "@demoVerificationCodeMessage": {
         "description": "رسالة تظهر في وضع العرض التوضيحي لتوفير رمز التحقق",
         "placeholders": {

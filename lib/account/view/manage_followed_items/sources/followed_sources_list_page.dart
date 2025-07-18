@@ -48,13 +48,14 @@ class FollowedSourcesListPage extends StatelessWidget {
           if (state.status == AccountStatus.failure &&
               state.preferences == null) {
             return FailureStateWidget(
-              exception: state.error ??
+              exception:
+                  state.error ??
                   OperationFailedException(l10n.followedSourcesErrorHeadline),
               onRetry: () {
                 if (state.user?.id != null) {
-                  context
-                      .read<AccountBloc>()
-                      .add(AccountLoadUserPreferences(userId: state.user!.id));
+                  context.read<AccountBloc>().add(
+                    AccountLoadUserPreferences(userId: state.user!.id),
+                  );
                 }
               },
             );
@@ -87,9 +88,9 @@ class FollowedSourcesListPage extends StatelessWidget {
                   ),
                   tooltip: l10n.unfollowSourceTooltip(source.name),
                   onPressed: () {
-                    context
-                        .read<AccountBloc>()
-                        .add(AccountFollowSourceToggled(source: source));
+                    context.read<AccountBloc>().add(
+                      AccountFollowSourceToggled(source: source),
+                    );
                   },
                 ),
                 onTap: () {

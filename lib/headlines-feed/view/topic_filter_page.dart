@@ -79,12 +79,12 @@ class _TopicFilterPageState extends State<TopicFilterPage> {
             case TopicsFilterStatus.failure:
               return Center(
                 child: FailureStateWidget(
-                  exception: state.error ??
+                  exception:
+                      state.error ??
                       const UnknownException(
                         'An unknown error occurred while fetching topics.',
                       ),
-                  onRetry: () =>
-                      _topicsFilterBloc.add(TopicsFilterRequested()),
+                  onRetry: () => _topicsFilterBloc.add(TopicsFilterRequested()),
                 ),
               );
             case TopicsFilterStatus.success:

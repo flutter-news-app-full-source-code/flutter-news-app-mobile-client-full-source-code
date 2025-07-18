@@ -396,8 +396,8 @@ GoRouter createRouter({
                 create: (context) {
                   final feedInjectorService = FeedInjectorService();
                   return HeadlinesSearchBloc(
-                    headlinesRepository:
-                        context.read<HtDataRepository<Headline>>(),
+                    headlinesRepository: context
+                        .read<HtDataRepository<Headline>>(),
                     topicRepository: context.read<HtDataRepository<Topic>>(),
                     sourceRepository: context.read<HtDataRepository<Source>>(),
                     appBloc: context.read<AppBloc>(),

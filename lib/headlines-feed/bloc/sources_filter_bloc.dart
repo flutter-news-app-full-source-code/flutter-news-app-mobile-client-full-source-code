@@ -12,9 +12,9 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
   SourcesFilterBloc({
     required HtDataRepository<Source> sourcesRepository,
     required HtDataRepository<Country> countriesRepository,
-  })  : _sourcesRepository = sourcesRepository,
-        _countriesRepository = countriesRepository,
-        super(const SourcesFilterState()) {
+  }) : _sourcesRepository = sourcesRepository,
+       _countriesRepository = countriesRepository,
+       super(const SourcesFilterState()) {
     on<LoadSourceFilterData>(_onLoadSourceFilterData);
     on<CountryCapsuleToggled>(_onCountryCapsuleToggled);
     on<AllSourceTypesCapsuleToggled>(_onAllSourceTypesCapsuleToggled);
@@ -194,8 +194,7 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
           selectedCountries.isEmpty ||
           (selectedCountries.contains(source.headquarters.isoCode));
       final matchesType =
-          selectedTypes.isEmpty ||
-          (selectedTypes.contains(source.sourceType));
+          selectedTypes.isEmpty || (selectedTypes.contains(source.sourceType));
       return matchesCountry && matchesType;
     }).toList();
   }

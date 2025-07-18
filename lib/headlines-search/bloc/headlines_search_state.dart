@@ -1,9 +1,7 @@
 part of 'headlines_search_bloc.dart';
 
 abstract class HeadlinesSearchState extends Equatable {
-  const HeadlinesSearchState({
-    this.selectedModelType = ContentType.headline,
-  });
+  const HeadlinesSearchState({this.selectedModelType = ContentType.headline});
 
   final ContentType selectedModelType;
 

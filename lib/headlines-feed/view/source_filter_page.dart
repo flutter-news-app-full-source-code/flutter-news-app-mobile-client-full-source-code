@@ -115,7 +115,8 @@ class _SourceFilterView extends StatelessWidget {
         state.allAvailableSources.isEmpty) {
       // Check allAvailableSources
       return FailureStateWidget(
-        exception: state.error ??
+        exception:
+            state.error ??
             const UnknownException('Failed to load source filter data.'),
         onRetry: () {
           context.read<SourcesFilterBloc>().add(const LoadSourceFilterData());
@@ -282,7 +283,8 @@ class _SourceFilterView extends StatelessWidget {
     if (state.dataLoadingStatus == SourceFilterDataLoadingStatus.failure &&
         state.displayableSources.isEmpty) {
       return FailureStateWidget(
-        exception: state.error ??
+        exception:
+            state.error ??
             const UnknownException('Failed to load displayable sources.'),
         onRetry: () {
           context.read<SourcesFilterBloc>().add(const LoadSourceFilterData());

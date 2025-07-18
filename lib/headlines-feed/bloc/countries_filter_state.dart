@@ -49,7 +49,7 @@ final class CountriesFilterState extends Equatable {
   /// This is typically the ID of the last fetched country.
   final String? cursor;
 
-/// An optional error object if the status is [CountriesFilterStatus.failure].
+  /// An optional error object if the status is [CountriesFilterStatus.failure].
   final HtHttpException? error;
 
   /// Creates a copy of this state with the given fields replaced.

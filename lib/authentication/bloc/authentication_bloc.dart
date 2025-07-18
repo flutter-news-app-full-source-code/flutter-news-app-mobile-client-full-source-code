@@ -15,8 +15,8 @@ class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
   /// {@macro authentication_bloc}
   AuthenticationBloc({required HtAuthRepository authenticationRepository})
-      : _authenticationRepository = authenticationRepository,
-        super(const AuthenticationState()) {
+    : _authenticationRepository = authenticationRepository,
+      super(const AuthenticationState()) {
     // Listen to authentication state changes from the repository
     _userAuthSubscription = _authenticationRepository.authStateChanges.listen(
       (user) => add(_AuthenticationUserChanged(user: user)),
@@ -73,12 +73,7 @@ class AuthenticationBloc
         ),
       );
     } on HtHttpException catch (e) {
-      emit(
-        state.copyWith(
-          status: AuthenticationStatus.failure,
-          exception: e,
-        ),
-      );
+      emit(state.copyWith(status: AuthenticationStatus.failure, exception: e));
     } catch (e) {
       emit(
         state.copyWith(
@@ -100,12 +95,7 @@ class AuthenticationBloc
       // On success, the _AuthenticationUserChanged listener will handle
       // emitting the authenticated state.
     } on HtHttpException catch (e) {
-      emit(
-        state.copyWith(
-          status: AuthenticationStatus.failure,
-          exception: e,
-        ),
-      );
+      emit(state.copyWith(status: AuthenticationStatus.failure, exception: e));
     } catch (e) {
       emit(
         state.copyWith(
@@ -127,12 +117,7 @@ class AuthenticationBloc
       // On success, the _AuthenticationUserChanged listener will handle
       // emitting the authenticated state.
     } on HtHttpException catch (e) {
-      emit(
-        state.copyWith(
-          status: AuthenticationStatus.failure,
-          exception: e,
-        ),
-      );
+      emit(state.copyWith(status: AuthenticationStatus.failure, exception: e));
     } catch (e) {
       emit(
         state.copyWith(
@@ -154,12 +139,7 @@ class AuthenticationBloc
       // On success, the _AuthenticationUserChanged listener will handle
       // emitting the unauthenticated state.
     } on HtHttpException catch (e) {
-      emit(
-        state.copyWith(
-          status: AuthenticationStatus.failure,
-          exception: e,
-        ),
-      );
+      emit(state.copyWith(status: AuthenticationStatus.failure, exception: e));
     } catch (e) {
       emit(
         state.copyWith(

@@ -20,9 +20,9 @@ class EntityDetailsPageArguments {
     this.contentType,
     this.entity,
   }) : assert(
-          (entityId != null && contentType != null) || entity != null,
-          'Either entityId/contentType or a full entity object must be provided.',
-        );
+         (entityId != null && contentType != null) || entity != null,
+         'Either entityId/contentType or a full entity object must be provided.',
+       );
 
   final String? entityId;
   final ContentType? contentType;
@@ -46,20 +46,21 @@ class EntityDetailsPage extends StatelessWidget {
       // Explicitly type BlocProvider
       create: (context) {
         final feedInjectorService = FeedInjectorService();
-        final entityDetailsBloc = EntityDetailsBloc(
-          headlinesRepository: context.read<HtDataRepository<Headline>>(),
-          topicRepository: context.read<HtDataRepository<Topic>>(),
-          sourceRepository: context.read<HtDataRepository<Source>>(),
-          accountBloc: context.read<AccountBloc>(),
-          appBloc: context.read<AppBloc>(),
-          feedInjectorService: feedInjectorService,
-        )..add(
-            EntityDetailsLoadRequested(
-              entityId: args.entityId,
-              contentType: args.contentType,
-              entity: args.entity,
-            ),
-          );
+        final entityDetailsBloc =
+            EntityDetailsBloc(
+              headlinesRepository: context.read<HtDataRepository<Headline>>(),
+              topicRepository: context.read<HtDataRepository<Topic>>(),
+              sourceRepository: context.read<HtDataRepository<Source>>(),
+              accountBloc: context.read<AccountBloc>(),
+              appBloc: context.read<AppBloc>(),
+              feedInjectorService: feedInjectorService,
+            )..add(
+              EntityDetailsLoadRequested(
+                entityId: args.entityId,
+                contentType: args.contentType,
+                entity: args.entity,
+              ),
+            );
         return entityDetailsBloc;
       },
       child: EntityDetailsView(args: args),
@@ -155,12 +156,12 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
             return FailureStateWidget(
               exception: state.exception!,
               onRetry: () => context.read<EntityDetailsBloc>().add(
-                    EntityDetailsLoadRequested(
-                      entityId: widget.args.entityId,
-                      contentType: widget.args.contentType,
-                      entity: widget.args.entity,
-                    ),
-                  ),
+                EntityDetailsLoadRequested(
+                  entityId: widget.args.entityId,
+                  contentType: widget.args.contentType,
+                  entity: widget.args.entity,
+                ),
+              ),
             );
           }
 
@@ -309,7 +310,8 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                     horizontal: AppSpacing.paddingMedium,
                   ),
                   sliver: SliverList.separated(
-                    itemCount: state.feedItems.length +
+                    itemCount:
+                        state.feedItems.length +
                         (state.hasMoreHeadlines &&
                                 state.status == EntityDetailsStatus.loadingMore
                             ? 1

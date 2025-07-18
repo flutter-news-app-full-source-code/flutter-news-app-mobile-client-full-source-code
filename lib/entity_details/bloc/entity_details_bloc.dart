@@ -21,13 +21,13 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     required AccountBloc accountBloc,
     required AppBloc appBloc,
     required FeedInjectorService feedInjectorService,
-  })  : _headlinesRepository = headlinesRepository,
-        _topicRepository = topicRepository,
-        _sourceRepository = sourceRepository,
-        _accountBloc = accountBloc,
-        _appBloc = appBloc,
-        _feedInjectorService = feedInjectorService,
-        super(const EntityDetailsState()) {
+  }) : _headlinesRepository = headlinesRepository,
+       _topicRepository = topicRepository,
+       _sourceRepository = sourceRepository,
+       _accountBloc = accountBloc,
+       _appBloc = appBloc,
+       _feedInjectorService = feedInjectorService,
+       super(const EntityDetailsState()) {
     on<EntityDetailsLoadRequested>(_onEntityDetailsLoadRequested);
     on<EntityDetailsToggleFollowRequested>(
       _onEntityDetailsToggleFollowRequested,
@@ -61,7 +61,9 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     EntityDetailsLoadRequested event,
     Emitter<EntityDetailsState> emit,
   ) async {
-    emit(state.copyWith(status: EntityDetailsStatus.loading, clearEntity: true));
+    emit(
+      state.copyWith(status: EntityDetailsStatus.loading, clearEntity: true),
+    );
 
     try {
       // 1. Determine/Fetch Entity
@@ -116,11 +118,13 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       final preferences = _accountBloc.state.preferences;
       if (preferences != null) {
         if (entityToLoad is Topic) {
-          isCurrentlyFollowing =
-              preferences.followedTopics.any((t) => t.id == (entityToLoad as Topic).id);
+          isCurrentlyFollowing = preferences.followedTopics.any(
+            (t) => t.id == (entityToLoad as Topic).id,
+          );
         } else if (entityToLoad is Source) {
-          isCurrentlyFollowing =
-              preferences.followedSources.any((s) => s.id == (entityToLoad as Source).id);
+          isCurrentlyFollowing = preferences.followedSources.any(
+            (s) => s.id == (entityToLoad as Source).id,
+          );
         }
       }
 
@@ -143,21 +147,16 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         _appBloc.add(
           AppUserAccountActionShown(
             userId: _appBloc.state.user!.id,
-            feedActionType: (processedFeedItems.firstWhere(
-              (item) => item is FeedAction,
-            ) as FeedAction)
-                .feedActionType,
+            feedActionType:
+                (processedFeedItems.firstWhere((item) => item is FeedAction)
+                        as FeedAction)
+                    .feedActionType,
             isCompleted: false,
           ),
         );
       }
     } on HtHttpException catch (e) {
-      emit(
-        state.copyWith(
-          status: EntityDetailsStatus.failure,
-          exception: e,
-        ),
-      );
+      emit(state.copyWith(status: EntityDetailsStatus.failure, exception: e));
     } catch (e) {
       emit(
         state.copyWith(
@@ -241,10 +240,10 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         _appBloc.add(
           AppUserAccountActionShown(
             userId: _appBloc.state.user!.id,
-            feedActionType: (newProcessedFeedItems.firstWhere(
-              (item) => item is FeedAction,
-            ) as FeedAction)
-                .feedActionType,
+            feedActionType:
+                (newProcessedFeedItems.firstWhere((item) => item is FeedAction)
+                        as FeedAction)
+                    .feedActionType,
             isCompleted: false,
           ),
         );
@@ -277,11 +276,13 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     final preferences = event.preferences;
 
     if (entity is Topic) {
-      isCurrentlyFollowing =
-          preferences.followedTopics.any((t) => t.id == entity.id);
+      isCurrentlyFollowing = preferences.followedTopics.any(
+        (t) => t.id == entity.id,
+      );
     } else if (entity is Source) {
-      isCurrentlyFollowing =
-          preferences.followedSources.any((s) => s.id == entity.id);
+      isCurrentlyFollowing = preferences.followedSources.any(
+        (s) => s.id == entity.id,
+      );
     }
 
     if (state.isFollowing != isCurrentlyFollowing) {

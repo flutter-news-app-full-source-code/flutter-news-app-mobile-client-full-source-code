@@ -11,8 +11,8 @@ part 'available_topics_state.dart';
 class AvailableTopicsBloc
     extends Bloc<AvailableTopicsEvent, AvailableTopicsState> {
   AvailableTopicsBloc({required HtDataRepository<Topic> topicsRepository})
-      : _topicsRepository = topicsRepository,
-        super(const AvailableTopicsState()) {
+    : _topicsRepository = topicsRepository,
+      super(const AvailableTopicsState()) {
     on<FetchAvailableTopics>(_onFetchAvailableTopics);
   }
 
@@ -38,10 +38,7 @@ class AvailableTopicsBloc
       );
     } on HtHttpException catch (e) {
       emit(
-        state.copyWith(
-          status: AvailableTopicsStatus.failure,
-          error: e.message,
-        ),
+        state.copyWith(status: AvailableTopicsStatus.failure, error: e.message),
       );
     } catch (e) {
       emit(

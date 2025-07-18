@@ -363,9 +363,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           sliver: SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.only(
-                top: (headline.url.isNotEmpty)
-                    ? AppSpacing.sm
-                    : AppSpacing.xl,
+                top: (headline.url.isNotEmpty) ? AppSpacing.sm : AppSpacing.xl,
                 bottom: AppSpacing.md,
               ),
               child: Text(

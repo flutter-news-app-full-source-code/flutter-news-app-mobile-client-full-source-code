@@ -48,13 +48,14 @@ class SavedHeadlinesPage extends StatelessWidget {
           if (state.status == AccountStatus.failure &&
               state.preferences == null) {
             return FailureStateWidget(
-              exception: state.error ??
+              exception:
+                  state.error ??
                   OperationFailedException(l10n.savedHeadlinesErrorHeadline),
               onRetry: () {
                 if (state.user?.id != null) {
                   context.read<AccountBloc>().add(
-                        AccountLoadUserPreferences(userId: state.user!.id),
-                      );
+                    AccountLoadUserPreferences(userId: state.user!.id),
+                  );
                 }
               },
             );

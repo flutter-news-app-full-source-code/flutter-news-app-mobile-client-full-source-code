@@ -4,9 +4,9 @@ import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/l10n/app_localizations.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/settings/bloc/settings_bloc.dart';
-import 'package:ht_main/shared/constants/app_spacing.dart';
 import 'package:ht_shared/ht_shared.dart'
     show AppFontWeight, AppTextScaleFactor;
+import 'package:ht_ui_kit/ht_ui_kit.dart';
 
 /// {@template font_settings_page}
 /// A page for configuring font-related settings like size, family, and weight.
@@ -41,20 +41,19 @@ class FontSettingsPage extends StatelessWidget {
 
   // Helper to map AppFontWeight enum to user-friendly strings
   String _fontWeightToString(AppFontWeight weight, AppLocalizations l10n) {
-    // Using direct strings as placeholders until specific l10n keys are confirmed
     switch (weight) {
       case AppFontWeight.light:
-        return 'Light';
+        return l10n.settingsAppearanceFontWeightLight;
       case AppFontWeight.regular:
-        return 'Regular';
+        return l10n.settingsAppearanceFontWeightRegular;
       case AppFontWeight.bold:
-        return 'Bold';
+        return l10n.settingsAppearanceFontWeightBold;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final settingsBloc = context.watch<SettingsBloc>();
     final state = settingsBloc.state;
 

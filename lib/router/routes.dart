@@ -10,8 +10,8 @@ abstract final class Routes {
   static const feedFilter = 'filter';
   static const feedFilterName = 'feedFilter';
 
-  static const feedFilterCategories = 'categories';
-  static const feedFilterCategoriesName = 'feedFilterCategories';
+  static const feedFilterTopics = 'topics';
+  static const feedFilterTopicsName = 'feedFilterTopics';
 
   static const feedFilterSources = 'sources';
   static const feedFilterSourcesName = 'feedFilterSources';
@@ -34,8 +34,8 @@ abstract final class Routes {
   static const notificationsName = 'notifications';
 
   // --- Entity Details Routes (can be accessed from multiple places) ---
-  static const categoryDetails = '/category-details';
-  static const categoryDetailsName = 'categoryDetails';
+  static const topicDetails = '/topic-details';
+  static const topicDetailsName = 'topicDetails';
   static const sourceDetails = '/source-details';
   static const sourceDetailsName = 'sourceDetails';
 
@@ -104,10 +104,10 @@ abstract final class Routes {
   static const globalArticleDetailsName = 'globalArticleDetails';
 
   // --- Manage Followed Items Sub-Routes (relative to /account/manage-followed-items) ---
-  static const followedCategoriesList = 'categories';
-  static const followedCategoriesListName = 'followedCategoriesList';
-  static const addCategoryToFollow = 'add-category';
-  static const addCategoryToFollowName = 'addCategoryToFollow';
+  static const followedTopicsList = 'topics';
+  static const followedTopicsListName = 'followedTopicsList';
+  static const addTopicToFollow = 'add-topic';
+  static const addTopicToFollowName = 'addTopicToFollow';
 
   static const followedSourcesList = 'sources';
   static const followedSourcesListName = 'followedSourcesList';

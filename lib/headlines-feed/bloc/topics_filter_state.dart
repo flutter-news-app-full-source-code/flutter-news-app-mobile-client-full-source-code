@@ -1,4 +1,4 @@
-part of 'categories_filter_bloc.dart';
+part of 'topics_filter_bloc.dart';
 
 /// Enum representing the different statuses of the category filter data fetching.
 enum CategoriesFilterStatus {

@@ -1,4 +1,4 @@
-part of 'categories_filter_bloc.dart';
+part of 'topics_filter_bloc.dart';
 
 /// {@template categories_filter_event}
 /// Base class for events related to fetching and managing category filters.

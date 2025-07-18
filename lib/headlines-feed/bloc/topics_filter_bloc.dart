@@ -6,8 +6,8 @@ import 'package:equatable/equatable.dart';
 import 'package:ht_data_repository/ht_data_repository.dart';
 import 'package:ht_shared/ht_shared.dart' show Category, HtHttpException;
 
-part 'categories_filter_event.dart';
-part 'categories_filter_state.dart';
+part 'topics_filter_event.dart';
+part 'topics_filter_state.dart';
 
 /// {@template categories_filter_bloc}
 /// Manages the state for fetching and displaying categories for filtering.

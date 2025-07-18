@@ -526,6 +526,32 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get addTopicsPageTitle => 'Follow Topics';
+
+  @override
+  String get topicFilterLoadingHeadline => 'Loading Topics...';
+
+  @override
+  String get topicFilterError => 'Could not load topics. Please try again.';
+
+  @override
+  String get topicFilterEmptyHeadline => 'No Topics Found';
+
+  @override
+  String get topicFilterEmptySubheadline =>
+      'There are no topics available at the moment.';
+
+  @override
+  String unfollowTopicTooltip(String topicName) {
+    return 'Unfollow $topicName';
+  }
+
+  @override
+  String followTopicTooltip(String topicName) {
+    return 'Follow $topicName';
+  }
+
+  @override
   String get followedSourcesPageTitle => 'Followed Sources';
 
   @override

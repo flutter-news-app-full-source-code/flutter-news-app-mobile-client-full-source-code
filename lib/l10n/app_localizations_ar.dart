@@ -525,6 +525,32 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get addTopicsPageTitle => 'متابعة المواضيع';
+
+  @override
+  String get topicFilterLoadingHeadline => 'جارٍ تحميل المواضيع...';
+
+  @override
+  String get topicFilterError => 'تعذر تحميل المواضيع. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get topicFilterEmptyHeadline => 'لم يتم العثور على مواضيع';
+
+  @override
+  String get topicFilterEmptySubheadline =>
+      'لا توجد مواضيع متاحة في الوقت الحالي.';
+
+  @override
+  String unfollowTopicTooltip(String topicName) {
+    return 'إلغاء متابعة $topicName';
+  }
+
+  @override
+  String followTopicTooltip(String topicName) {
+    return 'متابعة $topicName';
+  }
+
+  @override
   String get followedSourcesPageTitle => 'المصادر المتابَعة';
 
   @override

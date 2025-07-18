@@ -1064,6 +1064,48 @@ abstract class AppLocalizations {
   /// **'Unfollow {categoryName}'**
   String unfollowCategoryTooltip(String categoryName);
 
+  /// Title for the page where users can add topics to follow
+  ///
+  /// In en, this message translates to:
+  /// **'Follow Topics'**
+  String get addTopicsPageTitle;
+
+  /// Headline for loading state on topic filter page
+  ///
+  /// In en, this message translates to:
+  /// **'Loading Topics...'**
+  String get topicFilterLoadingHeadline;
+
+  /// Error message when topics fail to load on the filter/add page
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load topics. Please try again.'**
+  String get topicFilterError;
+
+  /// Headline for empty state on topic filter page
+  ///
+  /// In en, this message translates to:
+  /// **'No Topics Found'**
+  String get topicFilterEmptyHeadline;
+
+  /// Subheadline for empty state on topic filter page
+  ///
+  /// In en, this message translates to:
+  /// **'There are no topics available at the moment.'**
+  String get topicFilterEmptySubheadline;
+
+  /// Tooltip for the button to unfollow a specific topic
+  ///
+  /// In en, this message translates to:
+  /// **'Unfollow {topicName}'**
+  String unfollowTopicTooltip(String topicName);
+
+  /// Tooltip for the button to follow a specific topic
+  ///
+  /// In en, this message translates to:
+  /// **'Follow {topicName}'**
+  String followTopicTooltip(String topicName);
+
   /// Title for the page listing followed sources
   ///
   /// In en, this message translates to:

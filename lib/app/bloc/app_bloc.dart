@@ -57,6 +57,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppFlexSchemeChanged>(_onFlexSchemeChanged);
     on<AppFontFamilyChanged>(_onFontFamilyChanged);
     on<AppTextScaleFactorChanged>(_onAppTextScaleFactorChanged);
+    on<AppFontWeightChanged>(_onAppFontWeightChanged);
 
     // Listen directly to the auth state changes stream
     _userSubscription = _authenticationRepository.authStateChanges.listen(
@@ -312,6 +313,25 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       state.copyWith(
         settings: updatedSettings,
         appTextScaleFactor: event.appTextScaleFactor,
+      ),
+    );
+    // Optionally save settings to repository here
+    // unawaited(_userAppSettingsRepository.update(id: updatedSettings.id, item: updatedSettings));
+  }
+
+  void _onAppFontWeightChanged(
+    AppFontWeightChanged event,
+    Emitter<AppState> emit,
+  ) {
+    // Update settings and emit new state
+    final updatedSettings = state.settings.copyWith(
+      displaySettings: state.settings.displaySettings.copyWith(
+        fontWeight: event.fontWeight,
+      ),
+    );
+    emit(
+      state.copyWith(
+        settings: updatedSettings,
       ),
     );
     // Optionally save settings to repository here

@@ -1,63 +1,59 @@
-import 'dart:math';
-
 import 'package:ht_shared/ht_shared.dart';
+import 'package:uuid/uuid.dart';
 
 /// A service responsible for injecting various types of FeedItems (like Ads
-/// and AccountActions) into a list of primary content items (e.g., Headlines).
+/// and FeedActions) into a list of primary content items (e.g., Headlines).
 class FeedInjectorService {
-  final Random _random = Random();
+  final Uuid _uuid = const Uuid();
 
   /// Processes a list of [Headline] items and injects [Ad] and
-  /// [AccountAction] items based on the provided configurations and user state.
+  /// [FeedAction] items based on the provided configurations and user state.
   ///
   /// Parameters:
   /// - `headlines`: The list of original [Headline] items.
   /// - `user`: The current [User] object (nullable). This is used to determine
-  ///   user role for ad frequency and account action relevance.
-  /// - `appConfig`: The application's configuration ([AppConfig]), which contains
-  ///   [AdConfig] for ad injection rules and [AccountActionConfig] for
-  ///   account action rules.
+  ///   user role for ad frequency and feed action relevance.
+  /// - `remoteConfig`: The application's remote configuration ([RemoteConfig]),
+  ///   which contains [AdConfig] for ad injection rules and
+  ///   [AccountActionConfig] for feed action rules.
   /// - `currentFeedItemCount`: The total number of items already present in the
   ///   feed before this batch of headlines is processed. This is crucial for
   ///   correctly applying ad frequency and placement intervals, especially
   ///   during pagination. Defaults to 0 for the first batch.
   ///
   /// Returns a new list of [FeedItem] objects, interspersed with ads and
-  /// account actions according to the defined logic.
+  /// feed actions according to the defined logic.
   List<FeedItem> injectItems({
     required List<Headline> headlines,
     required User? user,
-    required AppConfig appConfig,
+    required RemoteConfig remoteConfig,
     int currentFeedItemCount = 0,
   }) {
     final finalFeed = <FeedItem>[];
-    var accountActionInjectedThisBatch = false;
+    var feedActionInjectedThisBatch = false;
     var headlinesInThisBatchCount = 0;
-    final adConfig = appConfig.adConfig;
-    final userRole = user?.role ?? UserRole.guestUser;
+    final adConfig = remoteConfig.adConfig;
+    final userRole = user?.appRole ?? AppUserRole.guestUser;
 
     int adFrequency;
     int adPlacementInterval;
 
     switch (userRole) {
-      case UserRole.guestUser:
+      case AppUserRole.guestUser:
         adFrequency = adConfig.guestAdFrequency;
         adPlacementInterval = adConfig.guestAdPlacementInterval;
-      case UserRole.standardUser: // Assuming 'authenticated' maps to standard
+      case AppUserRole.standardUser:
         adFrequency = adConfig.authenticatedAdFrequency;
         adPlacementInterval = adConfig.authenticatedAdPlacementInterval;
-      case UserRole.premiumUser:
+      case AppUserRole.premiumUser:
         adFrequency = adConfig.premiumAdFrequency;
         adPlacementInterval = adConfig.premiumAdPlacementInterval;
-      default: // For any other roles, or if UserRole enum expands
-        adFrequency = adConfig.guestAdFrequency; // Default to guest ads
-        adPlacementInterval = adConfig.guestAdPlacementInterval;
     }
 
-    // Determine if an AccountAction is due before iterating
-    final accountActionToInject = _getDueAccountActionDetails(
+    // Determine if a FeedAction is due before iterating
+    final feedActionToInject = _getDueFeedAction(
       user: user,
-      appConfig: appConfig,
+      remoteConfig: remoteConfig,
     );
 
     for (var i = 0; i < headlines.length; i++) {
@@ -67,20 +63,17 @@ class FeedInjectorService {
 
       final totalItemsSoFar = currentFeedItemCount + finalFeed.length;
 
-      // 1. Inject AccountAction (if due and not already injected in this batch)
+      // 1. Inject FeedAction (if due and not already injected in this batch)
       //    Attempt to inject after the first headline of the current batch.
       if (i == 0 &&
-          accountActionToInject != null &&
-          !accountActionInjectedThisBatch) {
-        finalFeed.add(accountActionToInject);
-        accountActionInjectedThisBatch = true;
-        // Note: AccountAction also counts as an item for ad placement interval
+          feedActionToInject != null &&
+          !feedActionInjectedThisBatch) {
+        finalFeed.add(feedActionToInject);
+        feedActionInjectedThisBatch = true;
       }
 
       // 2. Inject Ad
       if (adFrequency > 0 && totalItemsSoFar >= adPlacementInterval) {
-        // Check frequency against headlines processed *in this batch* after interval met
-        // This is a simplified local frequency. A global counter might be needed for strict global frequency.
         if (headlinesInThisBatchCount % adFrequency == 0) {
           final adToInject = _getAdToInject();
           if (adToInject != null) {
@@ -92,138 +85,109 @@ class FeedInjectorService {
     return finalFeed;
   }
 
-  AccountAction? _getDueAccountActionDetails({
+  FeedAction? _getDueFeedAction({
     required User? user,
-    required AppConfig appConfig,
+    required RemoteConfig remoteConfig,
   }) {
-    final userRole =
-        user?.role ?? UserRole.guestUser; // Default to guest if user is null
+    final userRole = user?.appRole ?? AppUserRole.guestUser;
     final now = DateTime.now();
-    final lastActionShown = user?.lastAccountActionShownAt;
-    final daysBetweenActionsConfig = appConfig.accountActionConfig;
+    final actionConfig = remoteConfig.accountActionConfig;
 
-    int daysThreshold;
-    AccountActionType? actionType;
+    // Iterate through all possible action types to find one that is due.
+    for (final actionType in FeedActionType.values) {
+      final status = user?.feedActionStatus[actionType];
 
-    if (userRole == UserRole.guestUser) {
-      daysThreshold = daysBetweenActionsConfig.guestDaysBetweenAccountActions;
-      actionType = AccountActionType.linkAccount;
-    } else if (userRole == UserRole.standardUser) {
-      daysThreshold =
-          daysBetweenActionsConfig.standardUserDaysBetweenAccountActions;
+      // Skip if the action has already been completed.
+      if (status?.isCompleted ?? false) {
+        continue;
+      }
 
-      // todo(fulleni): once account upgrade feature is implemented,
-      // uncomment the action type line
-      // and remove teh null return line.
+      final daysBetweenActionsMap = (userRole == AppUserRole.guestUser)
+          ? actionConfig.guestDaysBetweenActions
+          : actionConfig.standardUserDaysBetweenActions;
 
-      // actionType = AccountActionType.upgrade;
-      return null;
-    } else {
-      // No account actions for premium users or other roles for now
-      return null;
-    }
+      final daysThreshold = daysBetweenActionsMap[actionType];
 
-    if (lastActionShown == null ||
-        now.difference(lastActionShown).inDays >= daysThreshold) {
-      if (actionType == AccountActionType.linkAccount) {
-        return _buildLinkAccountActionVariant(appConfig);
-      } else if (actionType == AccountActionType.upgrade) {
-        return _buildUpgradeAccountActionVariant(appConfig);
+      // Skip if there's no configuration for this action type for the user's role.
+      if (daysThreshold == null) {
+        continue;
+      }
+
+      final lastShown = status?.lastShownAt;
+
+      // Check if the cooldown period has passed.
+      if (lastShown == null ||
+          now.difference(lastShown).inDays >= daysThreshold) {
+        // Found a due action, build and return it.
+        return _buildFeedActionVariant(actionType);
       }
     }
+
+    // No actions are due at this time.
     return null;
   }
 
-  AccountAction _buildLinkAccountActionVariant(AppConfig appConfig) {
-    final prefs = appConfig.userPreferenceLimits;
-    // final prefs = appConfig.userPreferenceLimits; // Not using specific numbers
-    // final ads = appConfig.adConfig; // Not using specific numbers
-    final variant = _random.nextInt(3);
-
+  FeedAction _buildFeedActionVariant(FeedActionType actionType) {
     String title;
     String description;
-    var ctaText = 'Learn More';
+    String ctaText;
+    String ctaUrl;
 
-    switch (variant) {
-      case 0:
+    // TODO(anyone): Use a random variant selection for more dynamic content.
+    switch (actionType) {
+      case FeedActionType.linkAccount:
         title = 'Unlock Your Full Potential!';
         description =
             'Link your account to enjoy expanded content access, keep your preferences synced, and experience a more streamlined ad display.';
         ctaText = 'Link Account & Explore';
-      case 1:
-        title = 'Personalize Your Experience!';
-        description =
-            'Secure your settings and reading history across all your devices by linking your account. Enjoy a tailored news journey!';
-        ctaText = 'Secure My Preferences';
-      default: // case 2
-        title = 'Get More From Your News!';
-        description =
-            'Link your account for enhanced content limits, better ad experiences, and ensure your preferences are always with you.';
-        ctaText = 'Get Started';
-    }
-
-    return AccountAction(
-      title: title,
-      description: description,
-      accountActionType: AccountActionType.linkAccount,
-      callToActionText: ctaText,
-      // The actual navigation for linking is typically handled by the UI
-      // when this action item is tapped. The URL can be a deep link or a route.
-      callToActionUrl: '/authentication?context=linking',
-    );
-  }
-
-  AccountAction _buildUpgradeAccountActionVariant(AppConfig appConfig) {
-    final prefs = appConfig.userPreferenceLimits;
-    // final prefs = appConfig.userPreferenceLimits; // Not using specific numbers
-    // final ads = appConfig.adConfig; // Not using specific numbers
-    final variant = _random.nextInt(3);
-
-    String title;
-    String description;
-    var ctaText = 'Explore Premium';
-
-    switch (variant) {
-      case 0:
+        ctaUrl = '/authentication?context=linking';
+      case FeedActionType.upgrade:
         title = 'Unlock Our Best Features!';
         description =
             'Go Premium to enjoy our most comprehensive content access, the best ad experience, and many more exclusive perks.';
         ctaText = 'Upgrade Now';
-      case 1:
-        title = 'Elevate Your News Consumption!';
-        description =
-            'With Premium, your content limits are greatly expanded and you will enjoy our most favorable ad settings. Discover the difference!';
-        ctaText = 'Discover Premium Benefits';
-      default: // case 2
-        title = 'Want More Control & Fewer Interruptions?';
-        description =
-            'Upgrade to Premium for a superior ad experience, massively increased content limits, and a more focused news journey.';
-        ctaText = 'Yes, Upgrade Me!';
+        ctaUrl = '/account/upgrade';
+      case FeedActionType.rateApp:
+        title = 'Enjoying the App?';
+        description = 'A rating on the app store helps us grow.';
+        ctaText = 'Rate Us';
+        ctaUrl = '/app-store-rating'; // Placeholder
+      case FeedActionType.enableNotifications:
+        title = 'Stay Updated!';
+        description = 'Enable notifications to get the latest news instantly.';
+        ctaText = 'Enable Notifications';
+        ctaUrl = '/settings/notifications';
+      case FeedActionType.followTopics:
+        title = 'Personalize Your Feed';
+        description = 'Follow topics to see more of what you love.';
+        ctaText = 'Follow Topics';
+        ctaUrl = '/account/manage-followed-items/topics';
+      case FeedActionType.followSources:
+        title = 'Discover Your Favorite Sources';
+        description = 'Follow sources to get news from who you trust.';
+        ctaText = 'Follow Sources';
+        ctaUrl = '/account/manage-followed-items/sources';
     }
-    return AccountAction(
+
+    return FeedAction(
+      id: _uuid.v4(),
       title: title,
       description: description,
-      accountActionType: AccountActionType.upgrade,
+      feedActionType: actionType,
       callToActionText: ctaText,
-      // URL could point to a subscription page/flow
-      callToActionUrl: '/account/upgrade', // Placeholder route
+      callToActionUrl: ctaUrl,
     );
   }
 
-  // Placeholder for _getAdToInject
   Ad? _getAdToInject() {
     // For now, return a placeholder Ad, always native.
     // In a real scenario, this would fetch from an ad network or predefined list.
-    // final adPlacements = AdPlacement.values; // Can still use for variety if needed
-
-    return const Ad(
-      id: 'tmp-id',
-      // id is generated by model if not provided
+    return Ad(
+      id: _uuid.v4(),
       imageUrl:
-          'https://via.placeholder.com/300x100.png/000000/FFFFFF?Text=Native+Placeholder+Ad', // Adjusted placeholder
+          'https://via.placeholder.com/300x100.png/000000/FFFFFF?Text=Native+Placeholder+Ad',
       targetUrl: 'https://example.com/adtarget',
-      adType: AdType.native, // Always native
-      // Default placement or random from native-compatible placements
+      adType: AdType.native,
       placement: AdPlacement.feedInlineNativeBanner,
     );
   }

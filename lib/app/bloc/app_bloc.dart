@@ -432,9 +432,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     );
 
     try {
-      final appConfig = await _appConfigRepository.read(id: 'app_config');
+      final remoteConfig = await _appConfigRepository.read(id: kRemoteConfigId);
       print(
-        '[AppBloc] AppConfig fetched successfully. ID: ${appConfig.id} for user: ${state.user!.id}',
+        '[AppBloc] Remote Config fetched successfully. ID: ${remoteConfig.id} for user: ${state.user!.id}',
       );
 
       // Determine the correct status based on the existing user's role.
@@ -444,7 +444,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           ? AppStatus.authenticated
           : AppStatus.anonymous;
       emit(
-        state.copyWith(remoteConfig: appConfig, status: newStatusBasedOnUser),
+        state.copyWith(
+          remoteConfig: remoteConfig,
+          status: newStatusBasedOnUser,
+        ),
       );
     } on HtHttpException catch (e) {
       print(

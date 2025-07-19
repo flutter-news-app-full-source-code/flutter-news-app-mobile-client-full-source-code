@@ -96,7 +96,7 @@ class HeadlinesSearchBloc
               // Cast to List<Headline> for the injector
               final headlines = response.items.cast<Headline>();
               final currentUser = _appBloc.state.user;
-              final appConfig = _appBloc.state.appConfig;
+              final appConfig = _appBloc.state.remoteConfig;
               if (appConfig == null) {
                 emit(
                   successState.copyWith(
@@ -205,7 +205,7 @@ class HeadlinesSearchBloc
           );
           final headlines = rawResponse.items.cast<Headline>();
           final currentUser = _appBloc.state.user;
-          final appConfig = _appBloc.state.appConfig;
+          final appConfig = _appBloc.state.remoteConfig;
           if (appConfig == null) {
             emit(
               HeadlinesSearchFailure(

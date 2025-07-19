@@ -81,7 +81,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
     try {
       final currentUser = _appBloc.state.user;
-      final appConfig = _appBloc.state.appConfig;
+      final appConfig = _appBloc.state.remoteConfig;
 
       if (appConfig == null) {
         emit(state.copyWith(status: HeadlinesFeedStatus.failure));
@@ -137,7 +137,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     emit(state.copyWith(status: HeadlinesFeedStatus.loading));
     try {
       final currentUser = _appBloc.state.user;
-      final appConfig = _appBloc.state.appConfig;
+      final appConfig = _appBloc.state.remoteConfig;
 
       if (appConfig == null) {
         emit(state.copyWith(status: HeadlinesFeedStatus.failure));
@@ -199,7 +199,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     );
     try {
       final currentUser = _appBloc.state.user;
-      final appConfig = _appBloc.state.appConfig;
+      final appConfig = _appBloc.state.remoteConfig;
 
       if (appConfig == null) {
         emit(state.copyWith(status: HeadlinesFeedStatus.failure));
@@ -260,7 +260,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     );
     try {
       final currentUser = _appBloc.state.user;
-      final appConfig = _appBloc.state.appConfig;
+      final appConfig = _appBloc.state.remoteConfig;
 
       if (appConfig == null) {
         emit(state.copyWith(status: HeadlinesFeedStatus.failure));

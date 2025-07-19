@@ -44,7 +44,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
              ),
            ),
            selectedBottomNavigationIndex: 0,
-           appConfig: null,
+           remoteConfig: null,
            environment: environment,
          ),
        ) {
@@ -141,7 +141,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // User is null (unauthenticated or logged out)
       emit(
         state.copyWith(
-          appConfig: null,
+          remoteConfig: null,
           clearAppConfig: true,
           status: AppStatus.unauthenticated,
         ),
@@ -398,10 +398,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       );
       // If AppConfig was somehow present without a user, clear it.
       // And ensure status isn't stuck on configFetching if this event was dispatched erroneously.
-      if (state.appConfig != null || state.status == AppStatus.configFetching) {
+      if (state.remoteConfig != null ||
+          state.status == AppStatus.configFetching) {
         emit(
           state.copyWith(
-            appConfig: null,
+            remoteConfig: null,
             clearAppConfig: true,
             status: AppStatus.unauthenticated,
           ),
@@ -411,7 +412,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     }
 
     // Avoid refetching if already loaded for the current user session, unless explicitly trying to recover from a failed state.
-    if (state.appConfig != null &&
+    if (state.remoteConfig != null &&
         state.status != AppStatus.configFetchFailed) {
       print(
         '[AppBloc] AppConfig already loaded for user ${state.user?.id} and not in a failed state. Skipping fetch.',
@@ -425,7 +426,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     emit(
       state.copyWith(
         status: AppStatus.configFetching,
-        appConfig: null,
+        remoteConfig: null,
         clearAppConfig: true,
       ),
     );
@@ -442,7 +443,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           state.user!.appRole == AppUserRole.standardUser
           ? AppStatus.authenticated
           : AppStatus.anonymous;
-      emit(state.copyWith(appConfig: appConfig, status: newStatusBasedOnUser));
+      emit(
+        state.copyWith(remoteConfig: appConfig, status: newStatusBasedOnUser),
+      );
     } on HtHttpException catch (e) {
       print(
         '[AppBloc] Failed to fetch AppConfig (HtHttpException) for user ${state.user?.id}: ${e.runtimeType} - ${e.message}',
@@ -450,7 +453,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       emit(
         state.copyWith(
           status: AppStatus.configFetchFailed,
-          appConfig: null,
+          remoteConfig: null,
           clearAppConfig: true,
         ),
       );
@@ -462,7 +465,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       emit(
         state.copyWith(
           status: AppStatus.configFetchFailed,
-          appConfig: null,
+          remoteConfig: null,
           clearAppConfig: true,
         ),
       );
@@ -519,11 +522,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   }
 
   Future<void> _onAppOpened(AppOpened event, Emitter<AppState> emit) async {
-    if (state.appConfig == null) {
+    if (state.remoteConfig == null) {
       return;
     }
 
-    final appStatus = state.appConfig!.appStatus;
+    final appStatus = state.remoteConfig!.appStatus;
 
     if (appStatus.isUnderMaintenance) {
       emit(state.copyWith(status: AppStatus.underMaintenance));

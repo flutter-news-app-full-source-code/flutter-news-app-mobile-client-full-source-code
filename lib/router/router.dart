@@ -77,7 +77,7 @@ GoRouter createRouter({
     // --- Redirect Logic ---
     redirect: (BuildContext context, GoRouterState state) {
       final appStatus = context.read<AppBloc>().state.status;
-      final appConfig = context.read<AppBloc>().state.appConfig;
+      final appConfig = context.read<AppBloc>().state.remoteConfig;
       final currentLocation = state.matchedLocation;
       final currentUri = state.uri;
 

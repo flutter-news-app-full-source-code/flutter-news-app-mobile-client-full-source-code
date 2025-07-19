@@ -81,9 +81,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
     try {
       final currentUser = _appBloc.state.user;
-      final appConfig = _appBloc.state.remoteConfig;
+      final remoteConfig = _appBloc.state.remoteConfig;
 
-      if (appConfig == null) {
+      if (remoteConfig == null) {
         emit(state.copyWith(status: HeadlinesFeedStatus.failure));
         return;
       }
@@ -99,7 +99,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       final newProcessedFeedItems = _feedInjectorService.injectItems(
         headlines: headlineResponse.items,
         user: currentUser,
-        appConfig: appConfig,
+        remoteConfig: remoteConfig,
         currentFeedItemCount: state.feedItems.length,
       );
 
@@ -152,7 +152,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       final processedFeedItems = _feedInjectorService.injectItems(
         headlines: headlineResponse.items,
         user: currentUser,
-        appConfig: appConfig,
+        remoteConfig: appConfig,
         currentFeedItemCount: 0,
       );
 
@@ -214,7 +214,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       final processedFeedItems = _feedInjectorService.injectItems(
         headlines: headlineResponse.items,
         user: currentUser,
-        appConfig: appConfig,
+        remoteConfig: appConfig,
         currentFeedItemCount: 0,
       );
 
@@ -274,7 +274,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       final processedFeedItems = _feedInjectorService.injectItems(
         headlines: headlineResponse.items,
         user: currentUser,
-        appConfig: appConfig,
+        remoteConfig: appConfig,
         currentFeedItemCount: 0,
       );
 

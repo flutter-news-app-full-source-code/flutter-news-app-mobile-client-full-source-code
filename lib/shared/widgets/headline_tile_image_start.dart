@@ -183,7 +183,7 @@ class _HeadlineMetadataRow extends StatelessWidget {
                 Routes.topicDetails,
                 extra: EntityDetailsPageArguments(
                   entity: headline.topic,
-                  entityType: ContentType.topic,
+                  contentType: ContentType.topic,
                 ),
               );
             },
@@ -207,7 +207,7 @@ class _HeadlineMetadataRow extends StatelessWidget {
                 Routes.sourceDetails,
                 extra: EntityDetailsPageArguments(
                   entity: headline.source,
-                  entityType: ContentType.source,
+                  contentType: ContentType.source,
                 ),
               );
             },

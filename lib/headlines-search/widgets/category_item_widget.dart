@@ -14,7 +14,7 @@ class TopicItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(topic.name),
-      subtitle: topic.description != null
+      subtitle: topic.description.isNotEmpty
           ? Text(
               topic.description,
               maxLines: 2,

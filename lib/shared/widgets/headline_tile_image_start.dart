@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart'; // Added
-import 'package:ht_main/entity_details/models/entity_type.dart';
-import 'package:ht_main/entity_details/view/entity_details_page.dart'; // Added for Page Arguments
+import 'package:go_router/go_router.dart';
+import 'package:ht_main/entity_details/view/entity_details_page.dart';
 import 'package:ht_main/l10n/app_localizations.dart';
 import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_main/router/routes.dart'; // Added
-import 'package:ht_shared/ht_shared.dart' show Headline;
+import 'package:ht_main/router/routes.dart';
+import 'package:ht_shared/ht_shared.dart';
 import 'package:ht_ui_kit/ht_ui_kit.dart';
 // timeago import removed from here, handled by utility
 
@@ -33,7 +32,7 @@ class HeadlineTileImageStart extends StatelessWidget {
   final Widget? trailing;
 
   /// The type of the entity currently being viewed in detail (e.g., on a category page).
-  final EntityType? currentContextEntityType;
+  final ContentType? currentContextEntityType;
 
   /// The ID of the entity currently being viewed in detail.
   final String? currentContextEntityId;
@@ -62,32 +61,154 @@ class HeadlineTileImageStart extends StatelessWidget {
                 height: 72,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(AppSpacing.xs),
-                  child: headline.imageUrl != null
-                      ? Image.network(
-                          headline.imageUrl,
-                          fit: BoxFit.cover,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return ColoredBox(
-                              color: colorScheme.surfaceContainerHighest,
-                              child: const Center(
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              ),
-                            );
-                          },
-                          errorBuilder: (context, error, stackTrace) =>
-                              ColoredBox(
-                                color: colorScheme.surfaceContainerHighest,
-                                child: Icon(
-                                  Icons.broken_image_outlined,
-                                  color: colorScheme.onSurfaceVariant,
-                                  size: AppSpacing.xl,
-                                ),
-                              ),
-                        )
-                      : ColoredBox(
+                  child: Image.network(
+                    headline.imageUrl,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return ColoredBox(
+                        color: colorScheme.surfaceContainerHighest,
+                        child: const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) => ColoredBox(
+                      color: colorScheme.surfaceContainerHighest,
+                      child: Icon(
+                        Icons.broken_image_outlined,
+                        color: colorScheme.onSurfaceVariant,
+                        size: AppSpacing.xl,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      headline.title,
+                      style: textTheme.titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w500),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    _HeadlineMetadataRow(
+                      headline: headline,
+                      l10n: l10n,
+                      colorScheme: colorScheme,
+                      textTheme: textTheme,
+                      currentContextEntityType: currentContextEntityType,
+                      currentContextEntityId: currentContextEntityId,
+                    ),
+                  ],
+                ),
+              ),
+              if (trailing != null) ...[
+                const SizedBox(width: AppSpacing.sm),
+                trailing!,
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Private helper widget to build the metadata row.
+class _HeadlineMetadataRow extends StatelessWidget {
+  const _HeadlineMetadataRow({
+    required this.headline,
+    required this.l10n,
+    required this.colorScheme,
+    required this.textTheme,
+    this.currentContextEntityType,
+    this.currentContextEntityId,
+  });
+
+  final Headline headline;
+  final AppLocalizations l10n;
+  final ColorScheme colorScheme;
+  final TextTheme textTheme;
+  final ContentType? currentContextEntityType;
+  final String? currentContextEntityId;
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO(all): Use a utility function for relative time formatting.
+    final formattedDate = ''; // formatRelativeTime(context, headline.createdAt);
+
+    final metadataTextStyle = textTheme.bodySmall?.copyWith(
+      color: colorScheme.primary.withOpacity(0.7),
+    );
+    final iconColor = colorScheme.primary.withOpacity(0.7);
+    const iconSize = AppSpacing.sm;
+
+    return Wrap(
+      spacing: AppSpacing.sm,
+      runSpacing: AppSpacing.xs,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        if (formattedDate.isNotEmpty)
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.calendar_today_outlined,
+                size: iconSize,
+                color: iconColor,
+              ),
+              const SizedBox(width: AppSpacing.xs / 2),
+              Text(formattedDate, style: metadataTextStyle),
+            ],
+          ),
+        if (headline.topic.name.isNotEmpty &&
+            !(currentContextEntityType == ContentType.topic &&
+                headline.topic.id == currentContextEntityId)) ...[
+          if (formattedDate.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+              child: Text('•', style: metadataTextStyle),
+            ),
+          GestureDetector(
+            onTap: () {
+              context.push(
+                Routes.topicDetails,
+                extra: EntityDetailsPageArguments(entity: headline.topic),
+              );
+            },
+            child: Text(headline.topic.name, style: metadataTextStyle),
+          ),
+        ],
+        if (!(currentContextEntityType == ContentType.source &&
+            headline.source.id == currentContextEntityId)) ...[
+          if (formattedDate.isNotEmpty ||
+              (headline.topic.name.isNotEmpty &&
+                  !(currentContextEntityType == ContentType.topic &&
+                      headline.topic.id == currentContextEntityId)))
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+              child: Text('•', style: metadataTextStyle),
+            ),
+          GestureDetector(
+            onTap: () {
+              context.push(
+                Routes.sourceDetails,
+                extra: EntityDetailsPageArguments(entity: headline.source),
+              );
+            },
+            child: Text(headline.source.name, style: metadataTextStyle),
+          ),
+        ],
+      ],
+    );
+  }
+}
                           color: colorScheme.surfaceContainerHighest,
                           child: Icon(
                             Icons.image_not_supported_outlined,

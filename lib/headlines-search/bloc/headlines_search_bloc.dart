@@ -109,7 +109,7 @@ class HeadlinesSearchBloc
               final injectedItems = _feedInjectorService.injectItems(
                 headlines: headlines,
                 user: currentUser,
-                appConfig: appConfig,
+                remoteConfig: appConfig,
                 currentFeedItemCount: successState.items.length,
               );
               emit(
@@ -219,7 +219,7 @@ class HeadlinesSearchBloc
           processedItems = _feedInjectorService.injectItems(
             headlines: headlines,
             user: currentUser,
-            appConfig: appConfig,
+            remoteConfig: appConfig,
             currentFeedItemCount: 0,
           );
         case ContentType.topic:

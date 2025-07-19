@@ -9,7 +9,6 @@ import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/headlines-search/bloc/headlines_search_bloc.dart';
 // import 'package:ht_main/headlines-search/widgets/country_item_widget.dart';
 import 'package:ht_main/headlines-search/widgets/source_item_widget.dart';
-import 'package:ht_main/l10n/app_localizations.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/extensions/content_type_extensions.dart';
@@ -401,7 +400,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              subtitle: feedItem.description != null
+                              subtitle: feedItem.description.isNotEmpty
                                   ? Text(
                                       feedItem.description,
                                       style: currentTextTheme.bodySmall
@@ -412,7 +411,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                                           ),
                                     )
                                   : null,
-                              trailing: feedItem.callToActionText != null
+                              trailing: feedItem.callToActionText.isNotEmpty
                                   ? ElevatedButton(
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor:
@@ -464,21 +463,4 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
     );
   }
 
-  // TODO(user): This method should be removed and replaced with a localization extension.
-  String _getHintTextForModelType(
-    ContentType modelType,
-    AppLocalizations l10n,
-  ) {
-    // The switch is now exhaustive for the remaining SearchModelType values
-    switch (modelType) {
-      case ContentType.headline:
-        return l10n.searchHintTextHeadline;
-      case ContentType.topic:
-        return l10n.searchHintTextCategory;
-      case ContentType.source:
-        return l10n.searchHintTextSource;
-      default:
-        return 'Search...';
-    }
-  }
 }

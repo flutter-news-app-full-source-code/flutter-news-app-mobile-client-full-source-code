@@ -54,7 +54,8 @@ class SettingsPage extends StatelessWidget {
           // Handle error state
           if (state.status == SettingsStatus.failure) {
             return FailureStateWidget(
-              exception: state.error as HtHttpException? ??
+              exception:
+                  state.error as HtHttpException? ??
                   const UnknownException('An unknown error occurred'),
               onRetry: () {
                 // Access AppBloc to get the current user ID for retry

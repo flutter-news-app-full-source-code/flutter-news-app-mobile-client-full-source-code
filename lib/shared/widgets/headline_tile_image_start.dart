@@ -65,9 +65,7 @@ class HeadlineTileImageStart extends StatelessWidget {
                       return ColoredBox(
                         color: colorScheme.surfaceContainerHighest,
                         child: const Center(
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                          ),
+                          child: CircularProgressIndicator(strokeWidth: 2),
                         ),
                       );
                     },

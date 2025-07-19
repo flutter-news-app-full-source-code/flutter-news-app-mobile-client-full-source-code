@@ -462,5 +462,4 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
       ),
     );
   }
-
 }

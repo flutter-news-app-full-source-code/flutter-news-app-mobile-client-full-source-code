@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart'; // Added
-import 'package:ht_main/entity_details/models/entity_type.dart';
-import 'package:ht_main/entity_details/view/entity_details_page.dart'; // Added for Page Arguments
-import 'package:ht_main/l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ht_main/entity_details/view/entity_details_page.dart';
 import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_main/router/routes.dart'; // Added
-import 'package:ht_main/shared/constants/app_spacing.dart';
-import 'package:ht_main/shared/utils/utils.dart'; // Import the new utility
-import 'package:ht_shared/ht_shared.dart' show Headline;
-// timeago import removed from here, handled by utility
+import 'package:ht_main/router/routes.dart';
+import 'package:ht_shared/ht_shared.dart';
+import 'package:ht_ui_kit/ht_ui_kit.dart';
 
 /// {@template headline_tile_text_only}
 /// A widget to display a headline item with text only.
@@ -36,17 +32,15 @@ class HeadlineTileTextOnly extends StatelessWidget {
   final Widget? trailing;
 
   /// The type of the entity currently being viewed in detail (e.g., on a category page).
-  final EntityType? currentContextEntityType;
+  final ContentType? currentContextEntityType;
 
   /// The ID of the entity currently being viewed in detail.
   final String? currentContextEntityId;
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-    final colorScheme = theme.colorScheme;
 
     return Card(
       margin: const EdgeInsets.symmetric(
@@ -75,8 +69,7 @@ class HeadlineTileTextOnly extends StatelessWidget {
                     const SizedBox(height: AppSpacing.sm),
                     _HeadlineMetadataRow(
                       headline: headline,
-                      l10n: l10n,
-                      colorScheme: colorScheme,
+                      colorScheme: theme.colorScheme,
                       textTheme: textTheme,
                       currentContextEntityType:
                           currentContextEntityType, // Pass down
@@ -102,7 +95,6 @@ class HeadlineTileTextOnly extends StatelessWidget {
 class _HeadlineMetadataRow extends StatelessWidget {
   const _HeadlineMetadataRow({
     required this.headline,
-    required this.l10n,
     required this.colorScheme,
     required this.textTheme,
     this.currentContextEntityType,
@@ -110,15 +102,15 @@ class _HeadlineMetadataRow extends StatelessWidget {
   });
 
   final Headline headline;
-  final AppLocalizations l10n;
   final ColorScheme colorScheme;
   final TextTheme textTheme;
-  final EntityType? currentContextEntityType;
+  final ContentType? currentContextEntityType;
   final String? currentContextEntityId;
 
   @override
   Widget build(BuildContext context) {
-    final formattedDate = formatRelativeTime(context, headline.publishedAt);
+    // TODO(anyone): Use a proper timeago library.
+    final formattedDate = headline.createdAt.toString();
 
     // Use bodySmall for a reasonable base size, with muted accent color
     final metadataTextStyle = textTheme.bodySmall?.copyWith(
@@ -146,10 +138,10 @@ class _HeadlineMetadataRow extends StatelessWidget {
               Text(formattedDate, style: metadataTextStyle),
             ],
           ),
-        // Conditionally render Category as Text
-        if (headline.category?.name != null &&
-            !(currentContextEntityType == EntityType.category &&
-                headline.category!.id == currentContextEntityId)) ...[
+        // Conditionally render Topic as Text
+        if (headline.topic.name.isNotEmpty &&
+            !(currentContextEntityType == ContentType.topic &&
+                headline.topic.id == currentContextEntityId)) ...[
           if (formattedDate.isNotEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
@@ -157,23 +149,24 @@ class _HeadlineMetadataRow extends StatelessWidget {
             ),
           GestureDetector(
             onTap: () {
-              if (headline.category != null) {
-                context.push(
-                  Routes.categoryDetails,
-                  extra: EntityDetailsPageArguments(entity: headline.category),
-                );
-              }
+              context.push(
+                Routes.topicDetails,
+                extra: EntityDetailsPageArguments(
+                  entity: headline.topic,
+                  contentType: ContentType.topic,
+                ),
+              );
             },
-            child: Text(headline.category!.name, style: metadataTextStyle),
+            child: Text(headline.topic.name, style: metadataTextStyle),
           ),
         ],
         // Conditionally render Source as Text
-        if (!(currentContextEntityType == EntityType.source &&
+        if (!(currentContextEntityType == ContentType.source &&
             headline.source.id == currentContextEntityId)) ...[
           if (formattedDate.isNotEmpty ||
-              (headline.category?.name != null &&
-                  !(currentContextEntityType == EntityType.category &&
-                      headline.category!.id == currentContextEntityId)))
+              (headline.topic.name.isNotEmpty &&
+                  !(currentContextEntityType == ContentType.topic &&
+                      headline.topic.id == currentContextEntityId)))
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
               child: Text('•', style: metadataTextStyle),
@@ -182,7 +175,10 @@ class _HeadlineMetadataRow extends StatelessWidget {
             onTap: () {
               context.push(
                 Routes.sourceDetails,
-                extra: EntityDetailsPageArguments(entity: headline.source),
+                extra: EntityDetailsPageArguments(
+                  entity: headline.source,
+                  contentType: ContentType.source,
+                ),
               );
             },
             child: Text(headline.source.name, style: metadataTextStyle),

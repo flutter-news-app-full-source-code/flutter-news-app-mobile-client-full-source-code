@@ -98,9 +98,9 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       );
 
       final currentUser = _appBloc.state.user;
-      final appConfig = _appBloc.state.appConfig;
+      final remoteConfig = _appBloc.state.remoteConfig;
 
-      if (appConfig == null) {
+      if (remoteConfig == null) {
         throw const OperationFailedException(
           'App configuration not available.',
         );
@@ -109,7 +109,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       final processedFeedItems = _feedInjectorService.injectItems(
         headlines: headlineResponse.items,
         user: currentUser,
-        appConfig: appConfig,
+        remoteConfig: remoteConfig,
         currentFeedItemCount: 0,
       );
 
@@ -210,9 +210,9 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       );
 
       final currentUser = _appBloc.state.user;
-      final appConfig = _appBloc.state.appConfig;
+      final remoteConfig = _appBloc.state.remoteConfig;
 
-      if (appConfig == null) {
+      if (remoteConfig == null) {
         throw const OperationFailedException(
           'App configuration not available for pagination.',
         );
@@ -221,7 +221,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       final newProcessedFeedItems = _feedInjectorService.injectItems(
         headlines: headlineResponse.items,
         user: currentUser,
-        appConfig: appConfig,
+        remoteConfig: remoteConfig,
         currentFeedItemCount: state.feedItems.length,
       );
 

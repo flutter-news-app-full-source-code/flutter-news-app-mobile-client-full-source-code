@@ -7,13 +7,6 @@ abstract class AppEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-@Deprecated('Use SettingsBloc events instead')
-class AppThemeChanged extends AppEvent {
-  //
-  // ignore: deprecated_consistency
-  const AppThemeChanged();
-}
-
 class AppUserChanged extends AppEvent {
   const AppUserChanged(this.user);
 
@@ -92,6 +85,20 @@ class AppTextScaleFactorChanged extends AppEvent {
   List<Object?> get props => [appTextScaleFactor];
 }
 
+/// {@template app_font_weight_changed}
+/// Event to change the application's font weight.
+/// {@endtemplate}
+class AppFontWeightChanged extends AppEvent {
+  /// {@macro app_font_weight_changed}
+  const AppFontWeightChanged(this.fontWeight);
+
+  /// The new font weight to apply.
+  final AppFontWeight fontWeight;
+
+  @override
+  List<Object> get props => [fontWeight];
+}
+
 /// {@template app_config_fetch_requested}
 /// Event to trigger fetching of the global AppConfig.
 /// {@endtemplate}
@@ -100,16 +107,31 @@ class AppConfigFetchRequested extends AppEvent {
   const AppConfigFetchRequested();
 }
 
+/// {@template app_opened}
+/// Event triggered when the application is opened.
+/// Used to check for required updates or maintenance mode.
+/// {@endtemplate}
+class AppOpened extends AppEvent {
+  /// {@macro app_opened}
+  const AppOpened();
+}
+
 /// {@template app_user_account_action_shown}
 /// Event triggered when an AccountAction has been shown to the user,
 /// prompting an update to their `lastAccountActionShownAt` timestamp.
 /// {@endtemplate}
 class AppUserAccountActionShown extends AppEvent {
   /// {@macro app_user_account_action_shown}
-  const AppUserAccountActionShown({required this.userId});
+  const AppUserAccountActionShown({
+    required this.userId,
+    required this.feedActionType,
+    required this.isCompleted,
+  });
 
   final String userId;
+  final FeedActionType feedActionType;
+  final bool isCompleted;
 
   @override
-  List<Object> get props => [userId];
+  List<Object> get props => [userId, feedActionType, isCompleted];
 }

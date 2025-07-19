@@ -98,12 +98,6 @@ abstract class AppLocalizations {
     Locale('en'),
   ];
 
-  /// Text shown in the AppBar of the Counter Page
-  ///
-  /// In en, this message translates to:
-  /// **'Counter'**
-  String get counterAppBarTitle;
-
   /// Title for the account linking page
   ///
   /// In en, this message translates to:
@@ -1064,6 +1058,114 @@ abstract class AppLocalizations {
   /// **'Unfollow {categoryName}'**
   String unfollowCategoryTooltip(String categoryName);
 
+  /// Title for the page where users can add topics to follow
+  ///
+  /// In en, this message translates to:
+  /// **'Follow Topics'**
+  String get addTopicsPageTitle;
+
+  /// Headline for loading state on topic filter page
+  ///
+  /// In en, this message translates to:
+  /// **'Loading Topics...'**
+  String get topicFilterLoadingHeadline;
+
+  /// Error message when topics fail to load on the filter/add page
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load topics. Please try again.'**
+  String get topicFilterError;
+
+  /// Headline for empty state on topic filter page
+  ///
+  /// In en, this message translates to:
+  /// **'No Topics Found'**
+  String get topicFilterEmptyHeadline;
+
+  /// Subheadline for empty state on topic filter page
+  ///
+  /// In en, this message translates to:
+  /// **'There are no topics available at the moment.'**
+  String get topicFilterEmptySubheadline;
+
+  /// Tooltip for the button to unfollow a specific topic
+  ///
+  /// In en, this message translates to:
+  /// **'Unfollow {topicName}'**
+  String unfollowTopicTooltip(String topicName);
+
+  /// Tooltip for the button to follow a specific topic
+  ///
+  /// In en, this message translates to:
+  /// **'Follow {topicName}'**
+  String followTopicTooltip(String topicName);
+
+  /// Headline for loading state on followed sources page
+  ///
+  /// In en, this message translates to:
+  /// **'Loading Followed Sources...'**
+  String get followedSourcesLoadingHeadline;
+
+  /// Error message when followed sources fail to load
+  ///
+  /// In en, this message translates to:
+  /// **'Could Not Load Followed Sources'**
+  String get followedSourcesErrorHeadline;
+
+  /// Headline for empty state on followed sources page
+  ///
+  /// In en, this message translates to:
+  /// **'No Followed Sources'**
+  String get followedSourcesEmptyHeadline;
+
+  /// Subheadline for empty state on followed sources page
+  ///
+  /// In en, this message translates to:
+  /// **'Start following sources to see them here.'**
+  String get followedSourcesEmptySubheadline;
+
+  /// Label for the topic filter dropdown
+  ///
+  /// In en, this message translates to:
+  /// **'Topic'**
+  String get headlinesFeedFilterTopicLabel;
+
+  /// Title for the page listing followed topics
+  ///
+  /// In en, this message translates to:
+  /// **'Followed Topics'**
+  String get followedTopicsPageTitle;
+
+  /// Tooltip for the button to add new topics to follow
+  ///
+  /// In en, this message translates to:
+  /// **'Add Topics'**
+  String get addTopicsTooltip;
+
+  /// Headline for loading state on followed topics page
+  ///
+  /// In en, this message translates to:
+  /// **'Loading Followed Topics...'**
+  String get followedTopicsLoadingHeadline;
+
+  /// Error message when followed topics fail to load
+  ///
+  /// In en, this message translates to:
+  /// **'Could Not Load Followed Topics'**
+  String get followedTopicsErrorHeadline;
+
+  /// Headline for empty state on followed topics page
+  ///
+  /// In en, this message translates to:
+  /// **'No Followed Topics'**
+  String get followedTopicsEmptyHeadline;
+
+  /// Subheadline for empty state on followed topics page
+  ///
+  /// In en, this message translates to:
+  /// **'Start following topics to see them here.'**
+  String get followedTopicsEmptySubheadline;
+
   /// Title for the page listing followed sources
   ///
   /// In en, this message translates to:
@@ -1322,6 +1424,12 @@ abstract class AppLocalizations {
   /// **'Source'**
   String get entityDetailsSourceTitle;
 
+  /// Title for topic entity type
+  ///
+  /// In en, this message translates to:
+  /// **'Topic'**
+  String get entityDetailsTopicTitle;
+
   /// Title for country entity type
   ///
   /// In en, this message translates to:
@@ -1387,6 +1495,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Demo Mode: Use code {code}'**
   String demoVerificationCodeMessage(String code);
+
+  /// Label for Headline content type
+  ///
+  /// In en, this message translates to:
+  /// **'Headlines'**
+  String get contentTypeHeadline;
+
+  /// Label for Topic content type
+  ///
+  /// In en, this message translates to:
+  /// **'Topics'**
+  String get contentTypeTopic;
+
+  /// Label for Source content type
+  ///
+  /// In en, this message translates to:
+  /// **'Sources'**
+  String get contentTypeSource;
+
+  /// Label for Country content type
+  ///
+  /// In en, this message translates to:
+  /// **'Countries'**
+  String get contentTypeCountry;
+
+  /// Subheadline for loading state on search page
+  ///
+  /// In en, this message translates to:
+  /// **'Searching for {contentType}...'**
+  String searchingFor(String contentType);
+
+  /// Label for the light font weight option
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get settingsAppearanceFontWeightLight;
+
+  /// Label for the regular font weight option
+  ///
+  /// In en, this message translates to:
+  /// **'Regular'**
+  String get settingsAppearanceFontWeightRegular;
+
+  /// Label for the bold font weight option
+  ///
+  /// In en, this message translates to:
+  /// **'Bold'**
+  String get settingsAppearanceFontWeightBold;
 }
 
 class _AppLocalizationsDelegate

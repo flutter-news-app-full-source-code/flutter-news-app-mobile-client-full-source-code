@@ -8,28 +8,28 @@ import 'package:ht_main/router/routes.dart';
 import 'package:ht_shared/ht_shared.dart';
 import 'package:ht_ui_kit/ht_ui_kit.dart';
 
-/// {@template followed_sources_list_page}
-/// Page to display and manage sources followed by the user.
+/// {@template followed_topics_list_page}
+/// Page to display and manage topics followed by the user.
 /// {@endtemplate}
-class FollowedSourcesListPage extends StatelessWidget {
-  /// {@macro followed_sources_list_page}
-  const FollowedSourcesListPage({super.key});
+class FollowedTopicsListPage extends StatelessWidget {
+  /// {@macro followed_topics_list_page}
+  const FollowedTopicsListPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
-    final followedSources =
-        context.watch<AccountBloc>().state.preferences?.followedSources ?? [];
+    final followedTopics =
+        context.watch<AccountBloc>().state.preferences?.followedTopics ?? [];
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.followedSourcesPageTitle),
+        title: Text(l10n.followedTopicsPageTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.add_circle_outline),
-            tooltip: l10n.addSourcesTooltip,
+            tooltip: l10n.addTopicsTooltip,
             onPressed: () {
-              context.goNamed(Routes.addSourceToFollowName);
+              context.goNamed(Routes.addTopicToFollowName);
             },
           ),
         ],
@@ -39,8 +39,8 @@ class FollowedSourcesListPage extends StatelessWidget {
           if (state.status == AccountStatus.loading &&
               state.preferences == null) {
             return LoadingStateWidget(
-              icon: Icons.source_outlined,
-              headline: l10n.followedSourcesLoadingHeadline,
+              icon: Icons.topic_outlined,
+              headline: l10n.followedTopicsLoadingHeadline,
               subheadline: l10n.pleaseWait,
             );
           }
@@ -50,7 +50,7 @@ class FollowedSourcesListPage extends StatelessWidget {
             return FailureStateWidget(
               exception:
                   state.error ??
-                  OperationFailedException(l10n.followedSourcesErrorHeadline),
+                  OperationFailedException(l10n.followedTopicsErrorHeadline),
               onRetry: () {
                 if (state.user?.id != null) {
                   context.read<AccountBloc>().add(
@@ -61,23 +61,31 @@ class FollowedSourcesListPage extends StatelessWidget {
             );
           }
 
-          if (followedSources.isEmpty) {
+          if (followedTopics.isEmpty) {
             return InitialStateWidget(
               icon: Icons.no_sim_outlined,
-              headline: l10n.followedSourcesEmptyHeadline,
-              subheadline: l10n.followedSourcesEmptySubheadline,
+              headline: l10n.followedTopicsEmptyHeadline,
+              subheadline: l10n.followedTopicsEmptySubheadline,
             );
           }
 
           return ListView.builder(
-            itemCount: followedSources.length,
+            itemCount: followedTopics.length,
             itemBuilder: (context, index) {
-              final source = followedSources[index];
+              final topic = followedTopics[index];
               return ListTile(
-                leading: const Icon(Icons.source_outlined),
-                title: Text(source.name),
+                leading: SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: Image.network(
+                    topic.iconUrl,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.topic_outlined),
+                  ),
+                ),
+                title: Text(topic.name),
                 subtitle: Text(
-                  source.description,
+                  topic.description,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -86,17 +94,17 @@ class FollowedSourcesListPage extends StatelessWidget {
                     Icons.remove_circle_outline,
                     color: Colors.red,
                   ),
-                  tooltip: l10n.unfollowSourceTooltip(source.name),
+                  tooltip: l10n.unfollowTopicTooltip(topic.name),
                   onPressed: () {
                     context.read<AccountBloc>().add(
-                      AccountFollowSourceToggled(source: source),
+                      AccountFollowTopicToggled(topic: topic),
                     );
                   },
                 ),
                 onTap: () {
                   context.push(
-                    Routes.sourceDetails,
-                    extra: EntityDetailsPageArguments(entity: source),
+                    Routes.topicDetails,
+                    extra: EntityDetailsPageArguments(entity: topic),
                   );
                 },
               );

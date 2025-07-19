@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:ht_auth_repository/ht_auth_repository.dart';
 import 'package:ht_data_repository/ht_data_repository.dart';
 import 'package:ht_main/app/config/config.dart' as local_config;
-import 'package:ht_main/shared/services/demo_data_migration_service.dart';
+import 'package:ht_main/app/services/demo_data_migration_service.dart';
 import 'package:ht_shared/ht_shared.dart';
 
 part 'app_event.dart';
@@ -17,7 +17,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   AppBloc({
     required HtAuthRepository authenticationRepository,
     required HtDataRepository<UserAppSettings> userAppSettingsRepository,
-    required HtDataRepository<AppConfig> appConfigRepository,
+    required HtDataRepository<RemoteConfig> appConfigRepository,
     required local_config.AppEnvironment environment,
     this.demoDataMigrationService,
   }) : _authenticationRepository = authenticationRepository,
@@ -26,9 +26,25 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _environment = environment,
        super(
          AppState(
-           settings: const UserAppSettings(id: 'default'),
+           settings: const UserAppSettings(
+             id: 'default',
+             displaySettings: DisplaySettings(
+               baseTheme: AppBaseTheme.system,
+               accentTheme: AppAccentTheme.defaultBlue,
+               fontFamily: 'SystemDefault',
+               textScaleFactor: AppTextScaleFactor.medium,
+               fontWeight: AppFontWeight.regular,
+             ),
+             language: 'en',
+             feedPreferences: FeedDisplayPreferences(
+               headlineDensity: HeadlineDensity.standard,
+               headlineImageStyle: HeadlineImageStyle.largeThumbnail,
+               showSourceInHeadlineFeed: true,
+               showPublishDateInHeadlineFeed: true,
+             ),
+           ),
            selectedBottomNavigationIndex: 0,
-           appConfig: null,
+           remoteConfig: null,
            environment: environment,
          ),
        ) {
@@ -41,6 +57,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppFlexSchemeChanged>(_onFlexSchemeChanged);
     on<AppFontFamilyChanged>(_onFontFamilyChanged);
     on<AppTextScaleFactorChanged>(_onAppTextScaleFactorChanged);
+    on<AppFontWeightChanged>(_onAppFontWeightChanged);
+    on<AppOpened>(_onAppOpened);
 
     // Listen directly to the auth state changes stream
     _userSubscription = _authenticationRepository.authStateChanges.listen(
@@ -50,7 +68,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   final HtAuthRepository _authenticationRepository;
   final HtDataRepository<UserAppSettings> _userAppSettingsRepository;
-  final HtDataRepository<AppConfig> _appConfigRepository;
+  final HtDataRepository<RemoteConfig> _appConfigRepository;
   final local_config.AppEnvironment _environment;
   final DemoDataMigrationService? demoDataMigrationService;
   late final StreamSubscription<User?> _userSubscription;
@@ -64,12 +82,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     final AppStatus status;
     final oldUser = state.user;
 
-    switch (event.user?.role) {
+    switch (event.user?.appRole) {
       case null:
         status = AppStatus.unauthenticated;
-      case UserRole.standardUser:
+      case AppUserRole.standardUser:
         status = AppStatus.authenticated;
-      case UserRole.guestUser: // Explicitly map guestUser to anonymous
+      case AppUserRole.guestUser: // Explicitly map guestUser to anonymous
         status = AppStatus.anonymous;
       // ignore: no_default_cases
       default: // Fallback for any other roles not explicitly handled
@@ -86,8 +104,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
       // Check for anonymous to authenticated transition for data migration
       if (oldUser != null &&
-          oldUser.role == UserRole.guestUser &&
-          event.user!.role == UserRole.standardUser) {
+          oldUser.appRole == AppUserRole.guestUser &&
+          event.user!.appRole == AppUserRole.standardUser) {
         print(
           '[AppBloc] Anonymous user ${oldUser.id} transitioned to '
           'authenticated user ${event.user!.id}. Attempting data migration.',
@@ -123,7 +141,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // User is null (unauthenticated or logged out)
       emit(
         state.copyWith(
-          appConfig: null,
+          remoteConfig: null,
           clearAppConfig: true,
           status: AppStatus.unauthenticated,
         ),
@@ -195,7 +213,23 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           flexScheme: FlexScheme.material,
           appTextScaleFactor: AppTextScaleFactor.medium,
           locale: const Locale('en'),
-          settings: UserAppSettings(id: state.user!.id),
+          settings: UserAppSettings(
+            id: state.user!.id,
+            displaySettings: const DisplaySettings(
+              baseTheme: AppBaseTheme.system,
+              accentTheme: AppAccentTheme.defaultBlue,
+              fontFamily: 'SystemDefault',
+              textScaleFactor: AppTextScaleFactor.medium,
+              fontWeight: AppFontWeight.regular,
+            ),
+            language: 'en',
+            feedPreferences: const FeedDisplayPreferences(
+              headlineDensity: HeadlineDensity.standard,
+              headlineImageStyle: HeadlineImageStyle.largeThumbnail,
+              showSourceInHeadlineFeed: true,
+              showPublishDateInHeadlineFeed: true,
+            ),
+          ),
         ),
       );
     } catch (e) {
@@ -286,6 +320,21 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // unawaited(_userAppSettingsRepository.update(id: updatedSettings.id, item: updatedSettings));
   }
 
+  void _onAppFontWeightChanged(
+    AppFontWeightChanged event,
+    Emitter<AppState> emit,
+  ) {
+    // Update settings and emit new state
+    final updatedSettings = state.settings.copyWith(
+      displaySettings: state.settings.displaySettings.copyWith(
+        fontWeight: event.fontWeight,
+      ),
+    );
+    emit(state.copyWith(settings: updatedSettings));
+    // Optionally save settings to repository here
+    // unawaited(_userAppSettingsRepository.update(id: updatedSettings.id, item: updatedSettings));
+  }
+
   // --- Settings Mapping Helpers ---
 
   ThemeMode _mapAppBaseTheme(AppBaseTheme mode) {
@@ -349,10 +398,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       );
       // If AppConfig was somehow present without a user, clear it.
       // And ensure status isn't stuck on configFetching if this event was dispatched erroneously.
-      if (state.appConfig != null || state.status == AppStatus.configFetching) {
+      if (state.remoteConfig != null ||
+          state.status == AppStatus.configFetching) {
         emit(
           state.copyWith(
-            appConfig: null,
+            remoteConfig: null,
             clearAppConfig: true,
             status: AppStatus.unauthenticated,
           ),
@@ -362,7 +412,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     }
 
     // Avoid refetching if already loaded for the current user session, unless explicitly trying to recover from a failed state.
-    if (state.appConfig != null &&
+    if (state.remoteConfig != null &&
         state.status != AppStatus.configFetchFailed) {
       print(
         '[AppBloc] AppConfig already loaded for user ${state.user?.id} and not in a failed state. Skipping fetch.',
@@ -376,7 +426,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     emit(
       state.copyWith(
         status: AppStatus.configFetching,
-        appConfig: null,
+        remoteConfig: null,
         clearAppConfig: true,
       ),
     );
@@ -389,10 +439,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
       // Determine the correct status based on the existing user's role.
       // This ensures that successfully fetching config doesn't revert auth status to 'initial'.
-      final newStatusBasedOnUser = state.user!.role == UserRole.standardUser
+      final newStatusBasedOnUser =
+          state.user!.appRole == AppUserRole.standardUser
           ? AppStatus.authenticated
           : AppStatus.anonymous;
-      emit(state.copyWith(appConfig: appConfig, status: newStatusBasedOnUser));
+      emit(
+        state.copyWith(remoteConfig: appConfig, status: newStatusBasedOnUser),
+      );
     } on HtHttpException catch (e) {
       print(
         '[AppBloc] Failed to fetch AppConfig (HtHttpException) for user ${state.user?.id}: ${e.runtimeType} - ${e.message}',
@@ -400,7 +453,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       emit(
         state.copyWith(
           status: AppStatus.configFetchFailed,
-          appConfig: null,
+          remoteConfig: null,
           clearAppConfig: true,
         ),
       );
@@ -412,7 +465,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       emit(
         state.copyWith(
           status: AppStatus.configFetchFailed,
-          appConfig: null,
+          remoteConfig: null,
           clearAppConfig: true,
         ),
       );
@@ -425,29 +478,66 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   ) async {
     if (state.user != null && state.user!.id == event.userId) {
       final now = DateTime.now();
-      // Optimistically update the local user state.
-      // Corrected parameter name for copyWith as per User model in models.txt
-      final updatedUser = state.user!.copyWith(lastEngagementShownAt: now);
+      // Create a new UserFeedActionStatus for the specific action
+      final updatedActionStatus = UserFeedActionStatus(
+        isCompleted: event.isCompleted,
+        lastShownAt: now,
+      );
+
+      // Create a new map with the updated status for the specific action type
+      final newFeedActionStatus =
+          Map<FeedActionType, UserFeedActionStatus>.from(
+            state.user!.feedActionStatus,
+          )..update(
+            event.feedActionType,
+            (_) => updatedActionStatus,
+            ifAbsent: () => updatedActionStatus,
+          );
+
+      // Update the user with the new feedActionStatus map
+      final updatedUser = state.user!.copyWith(
+        feedActionStatus: newFeedActionStatus,
+      );
 
       // Emit the change so UI can react if needed, and other BLoCs get the update.
-      // This also ensures that FeedInjectorService will see the updated timestamp immediately.
       emit(state.copyWith(user: updatedUser));
 
       // TODO: Persist this change to the backend.
       // This would typically involve calling a method on a repository, e.g.:
       // try {
-      //   await _authenticationRepository.updateUserLastActionTimestamp(event.userId, now);
-      //   // If the repository's authStateChanges stream doesn't automatically emit
-      //   // the updated user, you might need to re-fetch or handle it here.
-      //   // For now, we've optimistically updated the local state.
+      //   await _authenticationRepository.updateUserFeedActionStatus(
+      //     event.userId,
+      //     event.feedActionType,
+      //     updatedActionStatus,
+      //   );
       // } catch (e) {
-      //   // Handle error, potentially revert optimistic update or show an error.
-      //   print('Failed to update lastAccountActionShownAt on backend: $e');
-      //   // Optionally revert: emit(state.copyWith(user: state.user));
+      //   print('Failed to update feed action status on backend: $e');
       // }
       print(
-        '[AppBloc] User ${event.userId} AccountAction shown. Last shown timestamp updated locally to $now. Backend update pending.',
+        '[AppBloc] User ${event.userId} FeedAction ${event.feedActionType} '
+        'shown/completed. Status updated locally to $updatedActionStatus. '
+        'Backend update pending.',
       );
+    }
+  }
+
+  Future<void> _onAppOpened(AppOpened event, Emitter<AppState> emit) async {
+    if (state.remoteConfig == null) {
+      return;
+    }
+
+    final appStatus = state.remoteConfig!.appStatus;
+
+    if (appStatus.isUnderMaintenance) {
+      emit(state.copyWith(status: AppStatus.underMaintenance));
+      return;
+    }
+
+    // TODO(ht-development): Get the current app version from a package like
+    // package_info_plus and compare it with appStatus.latestAppVersion.
+    if (appStatus.isLatestVersionOnly) {
+      emit(state.copyWith(status: AppStatus.updateRequired));
+      return;
     }
   }
 }

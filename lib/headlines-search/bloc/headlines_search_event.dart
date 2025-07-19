@@ -10,7 +10,7 @@ sealed class HeadlinesSearchEvent extends Equatable {
 final class HeadlinesSearchModelTypeChanged extends HeadlinesSearchEvent {
   const HeadlinesSearchModelTypeChanged(this.newModelType);
 
-  final SearchModelType newModelType;
+  final ContentType newModelType;
 
   @override
   List<Object> get props => [newModelType];

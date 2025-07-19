@@ -9,9 +9,6 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
-  String get counterAppBarTitle => '[AR] Counter';
-
-  @override
   String get accountLinkingPageTitle => 'ربط حسابك';
 
   @override
@@ -525,6 +522,69 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get addTopicsPageTitle => 'متابعة المواضيع';
+
+  @override
+  String get topicFilterLoadingHeadline => 'جارٍ تحميل المواضيع...';
+
+  @override
+  String get topicFilterError => 'تعذر تحميل المواضيع. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get topicFilterEmptyHeadline => 'لم يتم العثور على مواضيع';
+
+  @override
+  String get topicFilterEmptySubheadline =>
+      'لا توجد مواضيع متاحة في الوقت الحالي.';
+
+  @override
+  String unfollowTopicTooltip(String topicName) {
+    return 'إلغاء متابعة $topicName';
+  }
+
+  @override
+  String followTopicTooltip(String topicName) {
+    return 'متابعة $topicName';
+  }
+
+  @override
+  String get followedSourcesLoadingHeadline =>
+      'جارٍ تحميل المصادر المتابَعة...';
+
+  @override
+  String get followedSourcesErrorHeadline => 'تعذر تحميل المصادر المتابَعة';
+
+  @override
+  String get followedSourcesEmptyHeadline => 'لا توجد مصادر متابَعة';
+
+  @override
+  String get followedSourcesEmptySubheadline =>
+      'ابدأ بمتابعة المصادر لكي تظهر هنا.';
+
+  @override
+  String get headlinesFeedFilterTopicLabel => 'الموضوع';
+
+  @override
+  String get followedTopicsPageTitle => 'المواضيع المتابَعة';
+
+  @override
+  String get addTopicsTooltip => 'إضافة مواضيع';
+
+  @override
+  String get followedTopicsLoadingHeadline =>
+      'جارٍ تحميل المواضيع المتابَعة...';
+
+  @override
+  String get followedTopicsErrorHeadline => 'تعذر تحميل المواضيع المتابَعة';
+
+  @override
+  String get followedTopicsEmptyHeadline => 'لا توجد مواضيع متابَعة';
+
+  @override
+  String get followedTopicsEmptySubheadline =>
+      'ابدأ بمتابعة المواضيع لكي تظهر هنا.';
+
+  @override
   String get followedSourcesPageTitle => 'المصادر المتابَعة';
 
   @override
@@ -672,6 +732,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get entityDetailsSourceTitle => 'المصدر';
 
   @override
+  String get entityDetailsTopicTitle => 'الموضوع';
+
+  @override
   String get entityDetailsCountryTitle => 'الدولة';
 
   @override
@@ -710,4 +773,30 @@ class AppLocalizationsAr extends AppLocalizations {
   String demoVerificationCodeMessage(String code) {
     return 'وضع العرض التوضيحي: استخدم الرمز $code';
   }
+
+  @override
+  String get contentTypeHeadline => 'العناوين الرئيسية';
+
+  @override
+  String get contentTypeTopic => 'المواضيع';
+
+  @override
+  String get contentTypeSource => 'المصادر';
+
+  @override
+  String get contentTypeCountry => 'الدول';
+
+  @override
+  String searchingFor(String contentType) {
+    return 'جار البحث عن $contentType...';
+  }
+
+  @override
+  String get settingsAppearanceFontWeightLight => 'صغير';
+
+  @override
+  String get settingsAppearanceFontWeightRegular => 'عادي';
+
+  @override
+  String get settingsAppearanceFontWeightBold => 'عريض';
 }

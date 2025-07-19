@@ -4,8 +4,8 @@ import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/l10n/app_localizations.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/settings/bloc/settings_bloc.dart';
-import 'package:ht_main/shared/constants/app_spacing.dart';
 import 'package:ht_shared/ht_shared.dart' show AppAccentTheme, AppBaseTheme;
+import 'package:ht_ui_kit/ht_ui_kit.dart';
 
 /// {@template theme_settings_page}
 /// A page for configuring theme-related settings like base and accent themes.
@@ -40,7 +40,7 @@ class ThemeSettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final settingsBloc = context.watch<SettingsBloc>();
     final state = settingsBloc.state;
 

@@ -1,0 +1,105 @@
+import 'dart:async';
+
+import 'package:bloc/bloc.dart';
+import 'package:bloc_concurrency/bloc_concurrency.dart';
+import 'package:equatable/equatable.dart';
+import 'package:ht_data_repository/ht_data_repository.dart';
+import 'package:ht_shared/ht_shared.dart';
+
+part 'topics_filter_event.dart';
+part 'topics_filter_state.dart';
+
+/// {@template topics_filter_bloc}
+/// Manages the state for fetching and displaying topics for filtering.
+///
+/// Handles initial fetching and pagination of topics using the
+/// provided [HtDataRepository].
+/// {@endtemplate}
+class TopicsFilterBloc extends Bloc<TopicsFilterEvent, TopicsFilterState> {
+  /// {@macro topics_filter_bloc}
+  ///
+  /// Requires a [HtDataRepository<Topic>] to interact with the data layer.
+  TopicsFilterBloc({required HtDataRepository<Topic> topicsRepository})
+    : _topicsRepository = topicsRepository,
+      super(const TopicsFilterState()) {
+    on<TopicsFilterRequested>(
+      _onTopicsFilterRequested,
+      transformer: restartable(),
+    );
+    on<TopicsFilterLoadMoreRequested>(
+      _onTopicsFilterLoadMoreRequested,
+      transformer: droppable(),
+    );
+  }
+
+  final HtDataRepository<Topic> _topicsRepository;
+
+  /// Number of topics to fetch per page.
+  static const _topicsLimit = 20;
+
+  /// Handles the initial request to fetch topics.
+  Future<void> _onTopicsFilterRequested(
+    TopicsFilterRequested event,
+    Emitter<TopicsFilterState> emit,
+  ) async {
+    // Prevent fetching if already loading or successful (unless forced refresh)
+    if (state.status == TopicsFilterStatus.loading ||
+        state.status == TopicsFilterStatus.success) {
+      // Optionally add logic here for forced refresh if needed
+      return;
+    }
+
+    emit(state.copyWith(status: TopicsFilterStatus.loading));
+
+    try {
+      final response = await _topicsRepository.readAll(
+        pagination: const PaginationOptions(limit: _topicsLimit),
+      );
+      emit(
+        state.copyWith(
+          status: TopicsFilterStatus.success,
+          topics: response.items,
+          hasMore: response.hasMore,
+          cursor: response.cursor,
+          clearError: true,
+        ),
+      );
+    } on HtHttpException catch (e) {
+      emit(state.copyWith(status: TopicsFilterStatus.failure, error: e));
+    }
+  }
+
+  /// Handles the request to load more topics for pagination.
+  Future<void> _onTopicsFilterLoadMoreRequested(
+    TopicsFilterLoadMoreRequested event,
+    Emitter<TopicsFilterState> emit,
+  ) async {
+    // Only proceed if currently successful and has more items
+    if (state.status != TopicsFilterStatus.success || !state.hasMore) {
+      return;
+    }
+
+    emit(state.copyWith(status: TopicsFilterStatus.loadingMore));
+
+    try {
+      final response = await _topicsRepository.readAll(
+        pagination: PaginationOptions(
+          limit: _topicsLimit,
+          cursor: state.cursor,
+        ),
+      );
+      emit(
+        state.copyWith(
+          status: TopicsFilterStatus.success,
+          // Append new topics to the existing list
+          topics: List.of(state.topics)..addAll(response.items),
+          hasMore: response.hasMore,
+          cursor: response.cursor,
+        ),
+      );
+    } on HtHttpException catch (e) {
+      // Keep existing data but indicate failure
+      emit(state.copyWith(status: TopicsFilterStatus.failure, error: e));
+    }
+  }
+}

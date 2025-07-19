@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/settings/bloc/settings_bloc.dart';
-import 'package:ht_main/shared/constants/constants.dart';
+import 'package:ht_ui_kit/ht_ui_kit.dart';
 
 /// {@template notification_settings_page}
 /// A page for configuring notification settings.
@@ -13,7 +13,7 @@ class NotificationSettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final settingsBloc = context.watch<SettingsBloc>();
     final state = settingsBloc.state;
 

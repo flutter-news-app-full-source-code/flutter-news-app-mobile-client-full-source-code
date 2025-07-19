@@ -1,9 +1,5 @@
 {
     "@@locale": "en",
-    "counterAppBarTitle": "Counter",
-    "@counterAppBarTitle": {
-        "description": "Text shown in the AppBar of the Counter Page"
-    },
     "accountLinkingPageTitle": "Link Your Account",
     "@accountLinkingPageTitle": {
         "description": "Title for the account linking page"
@@ -670,6 +666,90 @@
             }
         }
     },
+    "addTopicsPageTitle": "Follow Topics",
+    "@addTopicsPageTitle": {
+        "description": "Title for the page where users can add topics to follow"
+    },
+    "topicFilterLoadingHeadline": "Loading Topics...",
+    "@topicFilterLoadingHeadline": {
+        "description": "Headline for loading state on topic filter page"
+    },
+    "topicFilterError": "Could not load topics. Please try again.",
+    "@topicFilterError": {
+        "description": "Error message when topics fail to load on the filter/add page"
+    },
+    "topicFilterEmptyHeadline": "No Topics Found",
+    "@topicFilterEmptyHeadline": {
+        "description": "Headline for empty state on topic filter page"
+    },
+    "topicFilterEmptySubheadline": "There are no topics available at the moment.",
+    "@topicFilterEmptySubheadline": {
+        "description": "Subheadline for empty state on topic filter page"
+    },
+    "unfollowTopicTooltip": "Unfollow {topicName}",
+    "@unfollowTopicTooltip": {
+        "description": "Tooltip for the button to unfollow a specific topic",
+        "placeholders": {
+            "topicName": {
+                "type": "String",
+                "example": "Science"
+            }
+        }
+    },
+    "followTopicTooltip": "Follow {topicName}",
+    "@followTopicTooltip": {
+        "description": "Tooltip for the button to follow a specific topic",
+        "placeholders": {
+            "topicName": {
+                "type": "String",
+                "example": "Science"
+            }
+        }
+    },
+    "followedSourcesLoadingHeadline": "Loading Followed Sources...",
+    "@followedSourcesLoadingHeadline": {
+        "description": "Headline for loading state on followed sources page"
+    },
+    "followedSourcesErrorHeadline": "Could Not Load Followed Sources",
+    "@followedSourcesErrorHeadline": {
+        "description": "Error message when followed sources fail to load"
+    },
+    "followedSourcesEmptyHeadline": "No Followed Sources",
+    "@followedSourcesEmptyHeadline": {
+        "description": "Headline for empty state on followed sources page"
+    },
+    "followedSourcesEmptySubheadline": "Start following sources to see them here.",
+    "@followedSourcesEmptySubheadline": {
+        "description": "Subheadline for empty state on followed sources page"
+    },
+    "headlinesFeedFilterTopicLabel": "Topic",
+    "@headlinesFeedFilterTopicLabel": {
+        "description": "Label for the topic filter dropdown"
+    },
+    "followedTopicsPageTitle": "Followed Topics",
+    "@followedTopicsPageTitle": {
+        "description": "Title for the page listing followed topics"
+    },
+    "addTopicsTooltip": "Add Topics",
+    "@addTopicsTooltip": {
+        "description": "Tooltip for the button to add new topics to follow"
+    },
+    "followedTopicsLoadingHeadline": "Loading Followed Topics...",
+    "@followedTopicsLoadingHeadline": {
+        "description": "Headline for loading state on followed topics page"
+    },
+    "followedTopicsErrorHeadline": "Could Not Load Followed Topics",
+    "@followedTopicsErrorHeadline": {
+        "description": "Error message when followed topics fail to load"
+    },
+    "followedTopicsEmptyHeadline": "No Followed Topics",
+    "@followedTopicsEmptyHeadline": {
+        "description": "Headline for empty state on followed topics page"
+    },
+    "followedTopicsEmptySubheadline": "Start following topics to see them here.",
+    "@followedTopicsEmptySubheadline": {
+        "description": "Subheadline for empty state on followed topics page"
+    },
     "followedSourcesPageTitle": "Followed Sources",
     "@followedSourcesPageTitle": {
         "description": "Title for the page listing followed sources"
@@ -872,6 +952,10 @@
     "@entityDetailsSourceTitle": {
         "description": "Title for source entity type"
     },
+    "entityDetailsTopicTitle": "Topic",
+    "@entityDetailsTopicTitle": {
+        "description": "Title for topic entity type"
+    },
     "entityDetailsCountryTitle": "Country",
     "@entityDetailsCountryTitle": {
         "description": "Title for country entity type"
@@ -921,5 +1005,42 @@
                 "example": "123456"
             }
         }
+    },
+    "contentTypeHeadline": "Headlines",
+    "@contentTypeHeadline": {
+        "description": "Label for Headline content type"
+    },
+    "contentTypeTopic": "Topics",
+    "@contentTypeTopic": {
+        "description": "Label for Topic content type"
+    },
+    "contentTypeSource": "Sources",
+    "@contentTypeSource": {
+        "description": "Label for Source content type"
+    },
+    "contentTypeCountry": "Countries",
+    "@contentTypeCountry": {
+        "description": "Label for Country content type"
+    },
+    "searchingFor": "Searching for {contentType}...",
+    "@searchingFor": {
+        "description": "Subheadline for loading state on search page",
+        "placeholders": {
+            "contentType": {
+                "type": "String"
+            }
+        }
+    },
+    "settingsAppearanceFontWeightLight": "Light",
+    "@settingsAppearanceFontWeightLight": {
+        "description": "Label for the light font weight option"
+    },
+    "settingsAppearanceFontWeightRegular": "Regular",
+    "@settingsAppearanceFontWeightRegular": {
+        "description": "Label for the regular font weight option"
+    },
+    "settingsAppearanceFontWeightBold": "Bold",
+    "@settingsAppearanceFontWeightBold": {
+        "description": "Label for the bold font weight option"
     }
 }

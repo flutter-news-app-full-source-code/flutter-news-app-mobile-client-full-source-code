@@ -9,9 +9,6 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get counterAppBarTitle => 'Counter';
-
-  @override
   String get accountLinkingPageTitle => 'Link Your Account';
 
   @override
@@ -526,6 +523,67 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get addTopicsPageTitle => 'Follow Topics';
+
+  @override
+  String get topicFilterLoadingHeadline => 'Loading Topics...';
+
+  @override
+  String get topicFilterError => 'Could not load topics. Please try again.';
+
+  @override
+  String get topicFilterEmptyHeadline => 'No Topics Found';
+
+  @override
+  String get topicFilterEmptySubheadline =>
+      'There are no topics available at the moment.';
+
+  @override
+  String unfollowTopicTooltip(String topicName) {
+    return 'Unfollow $topicName';
+  }
+
+  @override
+  String followTopicTooltip(String topicName) {
+    return 'Follow $topicName';
+  }
+
+  @override
+  String get followedSourcesLoadingHeadline => 'Loading Followed Sources...';
+
+  @override
+  String get followedSourcesErrorHeadline => 'Could Not Load Followed Sources';
+
+  @override
+  String get followedSourcesEmptyHeadline => 'No Followed Sources';
+
+  @override
+  String get followedSourcesEmptySubheadline =>
+      'Start following sources to see them here.';
+
+  @override
+  String get headlinesFeedFilterTopicLabel => 'Topic';
+
+  @override
+  String get followedTopicsPageTitle => 'Followed Topics';
+
+  @override
+  String get addTopicsTooltip => 'Add Topics';
+
+  @override
+  String get followedTopicsLoadingHeadline => 'Loading Followed Topics...';
+
+  @override
+  String get followedTopicsErrorHeadline => 'Could Not Load Followed Topics';
+
+  @override
+  String get followedTopicsEmptyHeadline => 'No Followed Topics';
+
+  @override
+  String get followedTopicsEmptySubheadline =>
+      'Start following topics to see them here.';
+
+  @override
   String get followedSourcesPageTitle => 'Followed Sources';
 
   @override
@@ -674,6 +732,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get entityDetailsSourceTitle => 'Source';
 
   @override
+  String get entityDetailsTopicTitle => 'Topic';
+
+  @override
   String get entityDetailsCountryTitle => 'Country';
 
   @override
@@ -712,4 +773,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String demoVerificationCodeMessage(String code) {
     return 'Demo Mode: Use code $code';
   }
+
+  @override
+  String get contentTypeHeadline => 'Headlines';
+
+  @override
+  String get contentTypeTopic => 'Topics';
+
+  @override
+  String get contentTypeSource => 'Sources';
+
+  @override
+  String get contentTypeCountry => 'Countries';
+
+  @override
+  String searchingFor(String contentType) {
+    return 'Searching for $contentType...';
+  }
+
+  @override
+  String get settingsAppearanceFontWeightLight => 'Light';
+
+  @override
+  String get settingsAppearanceFontWeightRegular => 'Regular';
+
+  @override
+  String get settingsAppearanceFontWeightBold => 'Bold';
 }

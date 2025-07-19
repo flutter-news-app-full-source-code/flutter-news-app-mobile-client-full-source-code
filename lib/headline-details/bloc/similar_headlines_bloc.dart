@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ht_data_repository/ht_data_repository.dart';
-import 'package:ht_shared/ht_shared.dart' show Headline, HtHttpException;
+import 'package:ht_shared/ht_shared.dart'
+    show Headline, HtHttpException, PaginationOptions;
 
 part 'similar_headlines_event.dart';
 part 'similar_headlines_state.dart';
@@ -27,19 +28,16 @@ class SimilarHeadlinesBloc
     emit(SimilarHeadlinesLoading());
     try {
       final currentHeadline = event.currentHeadline;
-      if (currentHeadline.category == null ||
-          currentHeadline.category!.id.isEmpty) {
-        emit(SimilarHeadlinesEmpty());
-        return;
-      }
 
-      final queryParams = {'categories': currentHeadline.category!.id};
+      final filter = <String, dynamic>{'topic.id': currentHeadline.topic.id};
 
-      final response = await _headlinesRepository.readAllByQuery(
-        queryParams,
-        limit:
-            _similarHeadlinesLimit +
-            1, // Fetch one extra to check if current is there
+      final response = await _headlinesRepository.readAll(
+        filter: filter,
+        pagination: const PaginationOptions(
+          limit:
+              _similarHeadlinesLimit +
+              1, // Fetch one extra to check if current is there
+        ),
       );
 
       // Filter out the current headline from the results

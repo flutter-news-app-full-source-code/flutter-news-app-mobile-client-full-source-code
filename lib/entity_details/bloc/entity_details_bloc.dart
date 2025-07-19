@@ -7,7 +7,6 @@ import 'package:equatable/equatable.dart';
 import 'package:ht_data_repository/ht_data_repository.dart';
 import 'package:ht_main/account/bloc/account_bloc.dart';
 import 'package:ht_main/app/bloc/app_bloc.dart';
-import 'package:ht_main/entity_details/models/entity_type.dart';
 import 'package:ht_main/shared/services/feed_injector_service.dart';
 import 'package:ht_shared/ht_shared.dart';
 
@@ -17,13 +16,13 @@ part 'entity_details_state.dart';
 class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
   EntityDetailsBloc({
     required HtDataRepository<Headline> headlinesRepository,
-    required HtDataRepository<Category> categoryRepository,
+    required HtDataRepository<Topic> topicRepository,
     required HtDataRepository<Source> sourceRepository,
     required AccountBloc accountBloc,
     required AppBloc appBloc,
     required FeedInjectorService feedInjectorService,
   }) : _headlinesRepository = headlinesRepository,
-       _categoryRepository = categoryRepository,
+       _topicRepository = topicRepository,
        _sourceRepository = sourceRepository,
        _accountBloc = accountBloc,
        _appBloc = appBloc,
@@ -49,7 +48,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
   }
 
   final HtDataRepository<Headline> _headlinesRepository;
-  final HtDataRepository<Category> _categoryRepository;
+  final HtDataRepository<Topic> _topicRepository;
   final HtDataRepository<Source> _sourceRepository;
   final AccountBloc _accountBloc;
   final AppBloc _appBloc;
@@ -66,132 +65,103 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       state.copyWith(status: EntityDetailsStatus.loading, clearEntity: true),
     );
 
-    dynamic entityToLoad = event.entity;
-    var entityTypeToLoad = event.entityType;
-
     try {
       // 1. Determine/Fetch Entity
-      if (entityToLoad == null &&
-          event.entityId != null &&
-          event.entityType != null) {
-        entityTypeToLoad = event.entityType;
-        if (event.entityType == EntityType.category) {
-          entityToLoad = await _categoryRepository.read(id: event.entityId!);
-        } else if (event.entityType == EntityType.source) {
-          entityToLoad = await _sourceRepository.read(id: event.entityId!);
-        } else {
-          throw Exception('Unknown entity type for ID fetch');
-        }
-      } else if (entityToLoad != null) {
-        // If entity is directly provided, determine its type
-        if (entityToLoad is Category) {
-          entityTypeToLoad = EntityType.category;
-        } else if (entityToLoad is Source) {
-          entityTypeToLoad = EntityType.source;
-        } else {
-          throw Exception('Provided entity is of unknown type');
-        }
-      }
+      FeedItem entityToLoad;
+      ContentType contentTypeToLoad;
 
-      if (entityToLoad == null || entityTypeToLoad == null) {
-        emit(
-          state.copyWith(
-            status: EntityDetailsStatus.failure,
-            errorMessage: 'Entity could not be determined or loaded.',
-          ),
-        );
-        return;
+      if (event.entity != null) {
+        entityToLoad = event.entity!;
+        contentTypeToLoad = event.entity is Topic
+            ? ContentType.topic
+            : ContentType.source;
+      } else {
+        contentTypeToLoad = event.contentType!;
+        if (contentTypeToLoad == ContentType.topic) {
+          entityToLoad = await _topicRepository.read(id: event.entityId!);
+        } else {
+          entityToLoad = await _sourceRepository.read(id: event.entityId!);
+        }
       }
 
       // 2. Fetch Initial Headlines
-      final queryParams = <String, dynamic>{};
-      if (entityTypeToLoad == EntityType.category) {
-        queryParams['categories'] = (entityToLoad as Category).id;
-      } else if (entityTypeToLoad == EntityType.source) {
-        queryParams['sources'] = (entityToLoad as Source).id;
+      final filter = <String, dynamic>{};
+      if (contentTypeToLoad == ContentType.topic) {
+        filter['topic.id'] = (entityToLoad as Topic).id;
+      } else {
+        filter['source.id'] = (entityToLoad as Source).id;
       }
 
-      final headlineResponse = await _headlinesRepository.readAllByQuery(
-        queryParams,
-        limit: _headlinesLimit,
+      final headlineResponse = await _headlinesRepository.readAll(
+        filter: filter,
+        pagination: const PaginationOptions(limit: _headlinesLimit),
       );
 
       final currentUser = _appBloc.state.user;
-      final appConfig = _appBloc.state.appConfig;
+      final remoteConfig = _appBloc.state.remoteConfig;
 
-      if (appConfig == null) {
-        emit(
-          state.copyWith(
-            status: EntityDetailsStatus.failure,
-            errorMessage: 'App configuration not available.',
-            entityType: entityTypeToLoad,
-            entity: entityToLoad,
-          ),
+      if (remoteConfig == null) {
+        throw const OperationFailedException(
+          'App configuration not available.',
         );
-        return;
       }
 
       final processedFeedItems = _feedInjectorService.injectItems(
         headlines: headlineResponse.items,
         user: currentUser,
-        appConfig: appConfig,
+        remoteConfig: remoteConfig,
         currentFeedItemCount: 0,
       );
 
       // 3. Determine isFollowing status
       var isCurrentlyFollowing = false;
-      final currentAccountState = _accountBloc.state;
-      if (currentAccountState.preferences != null) {
-        if (entityTypeToLoad == EntityType.category &&
-            entityToLoad is Category) {
-          isCurrentlyFollowing = currentAccountState
-              .preferences!
-              .followedCategories
-              .any((cat) => cat.id == entityToLoad.id);
-        } else if (entityTypeToLoad == EntityType.source &&
-            entityToLoad is Source) {
-          isCurrentlyFollowing = currentAccountState
-              .preferences!
-              .followedSources
-              .any((src) => src.id == entityToLoad.id);
+      final preferences = _accountBloc.state.preferences;
+      if (preferences != null) {
+        if (entityToLoad is Topic) {
+          isCurrentlyFollowing = preferences.followedTopics.any(
+            (t) => t.id == (entityToLoad as Topic).id,
+          );
+        } else if (entityToLoad is Source) {
+          isCurrentlyFollowing = preferences.followedSources.any(
+            (s) => s.id == (entityToLoad as Source).id,
+          );
         }
       }
 
       emit(
         state.copyWith(
           status: EntityDetailsStatus.success,
-          entityType: entityTypeToLoad,
+          contentType: contentTypeToLoad,
           entity: entityToLoad,
           isFollowing: isCurrentlyFollowing,
           feedItems: processedFeedItems,
-          headlinesStatus: EntityHeadlinesStatus.success,
           hasMoreHeadlines: headlineResponse.hasMore,
           headlinesCursor: headlineResponse.cursor,
-          clearErrorMessage: true,
+          clearException: true,
         ),
       );
 
       // Dispatch event if AccountAction was injected in the initial load
-      if (processedFeedItems.any((item) => item is AccountAction) &&
+      if (processedFeedItems.any((item) => item is FeedAction) &&
           _appBloc.state.user?.id != null) {
         _appBloc.add(
-          AppUserAccountActionShown(userId: _appBloc.state.user!.id),
+          AppUserAccountActionShown(
+            userId: _appBloc.state.user!.id,
+            feedActionType:
+                (processedFeedItems.firstWhere((item) => item is FeedAction)
+                        as FeedAction)
+                    .feedActionType,
+            isCompleted: false,
+          ),
         );
       }
     } on HtHttpException catch (e) {
-      emit(
-        state.copyWith(
-          status: EntityDetailsStatus.failure,
-          errorMessage: e.message,
-          entityType: entityTypeToLoad,
-        ),
-      );
+      emit(state.copyWith(status: EntityDetailsStatus.failure, exception: e));
     } catch (e) {
       emit(
         state.copyWith(
           status: EntityDetailsStatus.failure,
-          errorMessage: 'An unexpected error occurred: $e',
-          entityType: entityTypeToLoad,
+          exception: UnknownException(e.toString()),
         ),
       );
     }
@@ -201,128 +171,95 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     EntityDetailsToggleFollowRequested event,
     Emitter<EntityDetailsState> emit,
   ) async {
-    if (state.entity == null || state.entityType == null) {
-      // Cannot toggle follow if no entity is loaded
-      emit(
-        state.copyWith(
-          errorMessage: 'No entity loaded to follow/unfollow.',
-          clearErrorMessage: false,
-        ),
-      );
-      return;
-    }
+    final entity = state.entity;
+    if (entity == null) return;
 
-    // Optimistic update of UI can be handled by listening to AccountBloc state changes
-    // which will trigger _onEntityDetailsUserPreferencesChanged.
-
-    if (state.entityType == EntityType.category && state.entity is Category) {
-      _accountBloc.add(
-        AccountFollowCategoryToggled(category: state.entity as Category),
-      );
-    } else if (state.entityType == EntityType.source &&
-        state.entity is Source) {
-      _accountBloc.add(
-        AccountFollowSourceToggled(source: state.entity as Source),
-      );
-    } else {
-      // Should not happen if entity and entityType are consistent
-      emit(
-        state.copyWith(
-          errorMessage: 'Cannot determine entity type to follow/unfollow.',
-          clearErrorMessage: false,
-        ),
-      );
+    if (entity is Topic) {
+      _accountBloc.add(AccountFollowTopicToggled(topic: entity));
+    } else if (entity is Source) {
+      _accountBloc.add(AccountFollowSourceToggled(source: entity));
     }
-    // Note: We don't emit a new state here for `isFollowing` directly.
-    // The change will propagate from AccountBloc -> _accountBlocSubscription
-    // -> _EntityDetailsUserPreferencesChanged -> update state.isFollowing.
-    // This keeps AccountBloc as the source of truth for preferences.
   }
 
   Future<void> _onEntityDetailsLoadMoreHeadlinesRequested(
     EntityDetailsLoadMoreHeadlinesRequested event,
     Emitter<EntityDetailsState> emit,
   ) async {
-    if (!state
-            .hasMoreHeadlines || // Still refers to original headlines pagination
-        state.headlinesStatus == EntityHeadlinesStatus.loadingMore) {
+    if (!state.hasMoreHeadlines ||
+        state.status == EntityDetailsStatus.loadingMore) {
       return;
     }
-    if (state.entity == null || state.entityType == null) return;
+    if (state.entity == null) return;
 
-    emit(state.copyWith(headlinesStatus: EntityHeadlinesStatus.loadingMore));
+    emit(state.copyWith(status: EntityDetailsStatus.loadingMore));
 
     try {
-      final queryParams = <String, dynamic>{};
-      if (state.entityType == EntityType.category) {
-        queryParams['categories'] = (state.entity as Category).id;
-      } else if (state.entityType == EntityType.source) {
-        queryParams['sources'] = (state.entity as Source).id;
-      } else {
-        emit(
-          state.copyWith(
-            headlinesStatus: EntityHeadlinesStatus.failure,
-            errorMessage: 'Cannot load more headlines: Unknown entity type.',
-          ),
-        );
-        return;
+      final filter = <String, dynamic>{};
+      if (state.entity is Topic) {
+        filter['topic.id'] = (state.entity! as Topic).id;
+      } else if (state.entity is Source) {
+        filter['source.id'] = (state.entity! as Source).id;
       }
 
-      final headlineResponse = await _headlinesRepository.readAllByQuery(
-        queryParams,
-        limit: _headlinesLimit,
-        startAfterId: state.headlinesCursor,
+      final headlineResponse = await _headlinesRepository.readAll(
+        filter: filter,
+        pagination: PaginationOptions(
+          limit: _headlinesLimit,
+          cursor: state.headlinesCursor,
+        ),
       );
 
       final currentUser = _appBloc.state.user;
-      final appConfig = _appBloc.state.appConfig;
+      final remoteConfig = _appBloc.state.remoteConfig;
 
-      if (appConfig == null) {
-        emit(
-          state.copyWith(
-            headlinesStatus: EntityHeadlinesStatus.failure,
-            errorMessage: 'App configuration not available for pagination.',
-          ),
+      if (remoteConfig == null) {
+        throw const OperationFailedException(
+          'App configuration not available for pagination.',
         );
-        return;
       }
 
       final newProcessedFeedItems = _feedInjectorService.injectItems(
         headlines: headlineResponse.items,
         user: currentUser,
-        appConfig: appConfig,
+        remoteConfig: remoteConfig,
         currentFeedItemCount: state.feedItems.length,
       );
 
       emit(
         state.copyWith(
+          status: EntityDetailsStatus.success,
           feedItems: List.of(state.feedItems)..addAll(newProcessedFeedItems),
-          headlinesStatus: EntityHeadlinesStatus.success,
           hasMoreHeadlines: headlineResponse.hasMore,
           headlinesCursor: headlineResponse.cursor,
           clearHeadlinesCursor: !headlineResponse.hasMore,
         ),
       );
 
-      // Dispatch event if AccountAction was injected in the newly loaded items
-      if (newProcessedFeedItems.any((item) => item is AccountAction) &&
+      if (newProcessedFeedItems.any((item) => item is FeedAction) &&
           _appBloc.state.user?.id != null) {
         _appBloc.add(
-          AppUserAccountActionShown(userId: _appBloc.state.user!.id),
+          AppUserAccountActionShown(
+            userId: _appBloc.state.user!.id,
+            feedActionType:
+                (newProcessedFeedItems.firstWhere((item) => item is FeedAction)
+                        as FeedAction)
+                    .feedActionType,
+            isCompleted: false,
+          ),
         );
       }
     } on HtHttpException catch (e) {
       emit(
         state.copyWith(
-          headlinesStatus: EntityHeadlinesStatus.failure,
-          errorMessage: e.message,
+          status: EntityDetailsStatus.partialFailure,
+          exception: e,
         ),
       );
     } catch (e) {
       emit(
         state.copyWith(
-          headlinesStatus: EntityHeadlinesStatus.failure,
-          errorMessage: 'An unexpected error occurred: $e',
+          status: EntityDetailsStatus.partialFailure,
+          exception: UnknownException(e.toString()),
         ),
       );
     }
@@ -332,21 +269,19 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     _EntityDetailsUserPreferencesChanged event,
     Emitter<EntityDetailsState> emit,
   ) {
-    if (state.entity == null || state.entityType == null) return;
+    final entity = state.entity;
+    if (entity == null) return;
 
     var isCurrentlyFollowing = false;
     final preferences = event.preferences;
 
-    if (state.entityType == EntityType.category && state.entity is Category) {
-      final currentCategory = state.entity as Category;
-      isCurrentlyFollowing = preferences.followedCategories.any(
-        (cat) => cat.id == currentCategory.id,
+    if (entity is Topic) {
+      isCurrentlyFollowing = preferences.followedTopics.any(
+        (t) => t.id == entity.id,
       );
-    } else if (state.entityType == EntityType.source &&
-        state.entity is Source) {
-      final currentSource = state.entity as Source;
+    } else if (entity is Source) {
       isCurrentlyFollowing = preferences.followedSources.any(
-        (src) => src.id == currentSource.id,
+        (s) => s.id == entity.id,
       );
     }
 

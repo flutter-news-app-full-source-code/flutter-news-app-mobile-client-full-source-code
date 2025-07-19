@@ -1,5 +1,6 @@
 part of 'entity_details_bloc.dart';
 
+/// Base class for all events in the entity details feature.
 abstract class EntityDetailsEvent extends Equatable {
   const EntityDetailsEvent();
 
@@ -7,40 +8,49 @@ abstract class EntityDetailsEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-/// Event to load entity details and initial headlines.
-/// Can be triggered by passing an ID and type, or the full entity.
+/// Event to load entity details and its initial list of headlines.
+///
+/// This can be triggered by providing either a direct [entity] object
+/// or an [entityId] and its corresponding [contentType].
 class EntityDetailsLoadRequested extends EntityDetailsEvent {
   const EntityDetailsLoadRequested({
     this.entityId,
-    this.entityType,
+    this.contentType,
     this.entity,
   }) : assert(
-         (entityId != null && entityType != null) || entity != null,
-         'Either entityId/entityType or entity must be provided.',
+         (entityId != null && contentType != null) || entity != null,
+         'Either entityId/contentType or a full entity object must be provided.',
        );
 
+  /// The unique ID of the entity to load.
   final String? entityId;
-  final EntityType? entityType;
-  final dynamic entity;
+
+  /// The type of the entity to load.
+  final ContentType? contentType;
+
+  /// The full entity object, if already available.
+  final FeedItem? entity;
 
   @override
-  List<Object?> get props => [entityId, entityType, entity];
+  List<Object?> get props => [entityId, contentType, entity];
 }
 
-/// Event to toggle the follow status of the current entity.
+/// Event to toggle the "follow" status of the currently loaded entity.
 class EntityDetailsToggleFollowRequested extends EntityDetailsEvent {
   const EntityDetailsToggleFollowRequested();
 }
 
-/// Event to load more headlines for pagination.
+/// Event to load the next page of headlines for the current entity.
 class EntityDetailsLoadMoreHeadlinesRequested extends EntityDetailsEvent {
   const EntityDetailsLoadMoreHeadlinesRequested();
 }
 
-/// Internal event to notify the BLoC that user preferences have changed.
+/// Internal event to notify the BLoC that the user's content preferences
+/// have changed elsewhere in the app.
 class _EntityDetailsUserPreferencesChanged extends EntityDetailsEvent {
   const _EntityDetailsUserPreferencesChanged(this.preferences);
 
+  /// The updated user content preferences.
   final UserContentPreferences preferences;
 
   @override

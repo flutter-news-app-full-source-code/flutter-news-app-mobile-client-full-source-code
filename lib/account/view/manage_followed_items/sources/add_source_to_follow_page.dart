@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_data_repository/ht_data_repository.dart';
 import 'package:ht_main/account/bloc/account_bloc.dart';
-import 'package:ht_main/headlines-feed/bloc/sources_filter_bloc.dart';
+import 'package:ht_main/account/bloc/available_sources_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_main/shared/constants/app_spacing.dart';
-import 'package:ht_main/shared/widgets/widgets.dart';
 import 'package:ht_shared/ht_shared.dart';
+import 'package:ht_ui_kit/ht_ui_kit.dart';
 
 /// {@template add_source_to_follow_page}
 /// A page that allows users to browse and select sources to follow.
@@ -17,34 +16,34 @@ class AddSourceToFollowPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     return BlocProvider(
-      create: (context) => SourcesFilterBloc(
+      create: (context) => AvailableSourcesBloc(
         sourcesRepository: context.read<HtDataRepository<Source>>(),
-        countriesRepository: context.read<HtDataRepository<Country>>(),
-      )..add(const LoadSourceFilterData()),
+      )..add(const FetchAvailableSources()),
       child: Scaffold(
         appBar: AppBar(title: Text(l10n.addSourcesPageTitle)),
-        body: BlocBuilder<SourcesFilterBloc, SourcesFilterState>(
+        body: BlocBuilder<AvailableSourcesBloc, AvailableSourcesState>(
           builder: (context, sourcesState) {
-            if (sourcesState.dataLoadingStatus ==
-                    SourceFilterDataLoadingStatus.loading ||
-                sourcesState.dataLoadingStatus ==
-                    SourceFilterDataLoadingStatus.initial) {
+            if (sourcesState.status == AvailableSourcesStatus.loading ||
+                sourcesState.status == AvailableSourcesStatus.initial) {
               return const Center(child: CircularProgressIndicator());
             }
-            if (sourcesState.dataLoadingStatus ==
-                SourceFilterDataLoadingStatus.failure) {
+            if (sourcesState.status == AvailableSourcesStatus.failure) {
               return FailureStateWidget(
-                message: sourcesState.errorMessage ?? l10n.sourceFilterError,
-                onRetry: () => context.read<SourcesFilterBloc>().add(
-                  const LoadSourceFilterData(),
+                exception: OperationFailedException(
+                  sourcesState.error ?? l10n.sourceFilterError,
+                ),
+                onRetry: () => context.read<AvailableSourcesBloc>().add(
+                  const FetchAvailableSources(),
                 ),
               );
             }
-            if (sourcesState.allAvailableSources.isEmpty) {
-              return FailureStateWidget(
-                message: l10n.sourceFilterEmptyHeadline,
+            if (sourcesState.availableSources.isEmpty) {
+              return InitialStateWidget(
+                icon: Icons.source_outlined,
+                headline: l10n.sourceFilterEmptyHeadline,
+                subheadline: l10n.sourceFilterEmptySubheadline,
               );
             }
 
@@ -59,9 +58,9 @@ class AddSourceToFollowPage extends StatelessWidget {
 
                 return ListView.builder(
                   padding: const EdgeInsets.all(AppSpacing.md),
-                  itemCount: sourcesState.allAvailableSources.length,
+                  itemCount: sourcesState.availableSources.length,
                   itemBuilder: (context, index) {
-                    final source = sourcesState.allAvailableSources[index];
+                    final source = sourcesState.availableSources[index];
                     final isFollowed = followedSources.any(
                       (fs) => fs.id == source.id,
                     );

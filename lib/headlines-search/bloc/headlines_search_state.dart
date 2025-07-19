@@ -1,11 +1,9 @@
 part of 'headlines_search_bloc.dart';
 
 abstract class HeadlinesSearchState extends Equatable {
-  const HeadlinesSearchState({
-    this.selectedModelType = SearchModelType.headline,
-  });
+  const HeadlinesSearchState({this.selectedModelType = ContentType.headline});
 
-  final SearchModelType selectedModelType;
+  final ContentType selectedModelType;
 
   @override
   List<Object?> get props => [selectedModelType];
@@ -51,7 +49,7 @@ class HeadlinesSearchSuccess extends HeadlinesSearchState {
     String? cursor,
     String? errorMessage,
     String? lastSearchTerm,
-    SearchModelType? selectedModelType,
+    ContentType? selectedModelType,
     bool clearErrorMessage = false,
   }) {
     return HeadlinesSearchSuccess(

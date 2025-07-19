@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/settings/bloc/settings_bloc.dart';
-import 'package:ht_main/shared/constants/app_spacing.dart';
+import 'package:ht_ui_kit/ht_ui_kit.dart';
 
 /// {@template appearance_settings_page}
 /// A menu page for navigating to theme and font appearance settings.
@@ -15,7 +15,7 @@ class AppearanceSettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     // SettingsBloc is watched to ensure settings are loaded,
     // though this page itself doesn't dispatch events.
     final settingsState = context.watch<SettingsBloc>().state;

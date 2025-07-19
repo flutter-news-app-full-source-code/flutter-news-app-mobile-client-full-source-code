@@ -4,7 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ht_data_repository/ht_data_repository.dart';
-import 'package:ht_shared/ht_shared.dart' show Country, HtHttpException;
+import 'package:ht_shared/ht_shared.dart';
 
 part 'countries_filter_event.dart';
 part 'countries_filter_state.dart';
@@ -43,7 +43,6 @@ class CountriesFilterBloc
     CountriesFilterRequested event,
     Emitter<CountriesFilterState> emit,
   ) async {
-    // Prevent fetching if already loading or successful
     if (state.status == CountriesFilterStatus.loading ||
         state.status == CountriesFilterStatus.success) {
       return;
@@ -53,7 +52,7 @@ class CountriesFilterBloc
 
     try {
       final response = await _countriesRepository.readAll(
-        limit: _countriesLimit,
+        pagination: const PaginationOptions(limit: _countriesLimit),
       );
       emit(
         state.copyWith(
@@ -66,9 +65,6 @@ class CountriesFilterBloc
       );
     } on HtHttpException catch (e) {
       emit(state.copyWith(status: CountriesFilterStatus.failure, error: e));
-    } catch (e) {
-      // Catch unexpected errors
-      emit(state.copyWith(status: CountriesFilterStatus.failure, error: e));
     }
   }
 
@@ -77,7 +73,6 @@ class CountriesFilterBloc
     CountriesFilterLoadMoreRequested event,
     Emitter<CountriesFilterState> emit,
   ) async {
-    // Only proceed if currently successful and has more items
     if (state.status != CountriesFilterStatus.success || !state.hasMore) {
       return;
     }
@@ -86,23 +81,20 @@ class CountriesFilterBloc
 
     try {
       final response = await _countriesRepository.readAll(
-        limit: _countriesLimit,
-        startAfterId: state.cursor,
+        pagination: PaginationOptions(
+          limit: _countriesLimit,
+          cursor: state.cursor,
+        ),
       );
       emit(
         state.copyWith(
           status: CountriesFilterStatus.success,
-          // Append new countries to the existing list
           countries: List.of(state.countries)..addAll(response.items),
           hasMore: response.hasMore,
           cursor: response.cursor,
         ),
       );
     } on HtHttpException catch (e) {
-      // Keep existing data but indicate failure
-      emit(state.copyWith(status: CountriesFilterStatus.failure, error: e));
-    } catch (e) {
-      // Catch unexpected errors
       emit(state.copyWith(status: CountriesFilterStatus.failure, error: e));
     }
   }

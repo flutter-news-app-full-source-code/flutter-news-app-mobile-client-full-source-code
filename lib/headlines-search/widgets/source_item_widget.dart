@@ -14,9 +14,9 @@ class SourceItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(source.name),
-      subtitle: source.description != null
+      subtitle: source.description.isNotEmpty
           ? Text(
-              source.description!,
+              source.description,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             )

@@ -6,6 +6,7 @@ import 'package:ht_auth_repository/ht_auth_repository.dart';
 import 'package:ht_data_repository/ht_data_repository.dart';
 import 'package:ht_main/app/config/config.dart' as local_config;
 import 'package:ht_shared/ht_shared.dart';
+import 'package:logging/logging.dart';
 
 part 'account_event.dart';
 part 'account_state.dart';
@@ -16,9 +17,11 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     required HtDataRepository<UserContentPreferences>
     userContentPreferencesRepository,
     required local_config.AppEnvironment environment,
+    Logger? logger,
   }) : _authenticationRepository = authenticationRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
        _environment = environment,
+       _logger = logger ?? Logger('AccountBloc'),
        super(const AccountState()) {
     // Listen to user changes from HtAuthRepository
     _userSubscription = _authenticationRepository.authStateChanges.listen((
@@ -31,9 +34,8 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     on<AccountUserChanged>(_onAccountUserChanged);
     on<AccountLoadUserPreferences>(_onAccountLoadUserPreferences);
     on<AccountSaveHeadlineToggled>(_onAccountSaveHeadlineToggled);
-    on<AccountFollowCategoryToggled>(_onAccountFollowCategoryToggled);
+    on<AccountFollowTopicToggled>(_onAccountFollowTopicToggled);
     on<AccountFollowSourceToggled>(_onAccountFollowSourceToggled);
-    // AccountFollowCountryToggled handler removed
     on<AccountClearUserPreferences>(_onAccountClearUserPreferences);
   }
 
@@ -41,6 +43,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   final HtDataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
   final local_config.AppEnvironment _environment;
+  final Logger _logger;
   late StreamSubscription<User?> _userSubscription;
 
   Future<void> _onAccountUserChanged(
@@ -72,7 +75,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         state.copyWith(
           status: AccountStatus.success,
           preferences: preferences,
-          clearErrorMessage: true,
+          clearError: true,
         ),
       );
     } on NotFoundException {
@@ -86,8 +89,8 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       if (_environment == local_config.AppEnvironment.demo) {
         // ignore: inference_failure_on_instance_creation
         await Future.delayed(const Duration(milliseconds: 50));
-        // After delay, re-attempt to read the preferences.
-        // This is crucial because migration might have completed during the delay.
+        // After delay, re-attempt to read the preferences. This is crucial
+        // because migration might have completed during the delay.
         try {
           final migratedPreferences = await _userContentPreferencesRepository
               .read(id: event.userId, userId: event.userId);
@@ -95,21 +98,27 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
             state.copyWith(
               status: AccountStatus.success,
               preferences: migratedPreferences,
-              clearErrorMessage: true,
+              clearError: true,
             ),
           );
           return; // Exit if successfully read after migration
         } on NotFoundException {
           // Still not found after delay, proceed to create default.
-          print(
+          _logger.info(
             '[AccountBloc] UserContentPreferences still not found after '
             'migration delay. Creating default preferences.',
           );
         }
       }
-      // If preferences not found (either initially or after re-attempt),
-      // create a default one for the user.
-      final defaultPreferences = UserContentPreferences(id: event.userId);
+      // If preferences not found (either initially or after re-attempt), create
+      // a default one for the user.
+      final defaultPreferences = UserContentPreferences(
+        id: event.userId,
+        followedCountries: const [],
+        followedSources: const [],
+        followedTopics: const [],
+        savedHeadlines: const [],
+      );
       try {
         await _userContentPreferencesRepository.create(
           item: defaultPreferences,
@@ -117,17 +126,17 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         );
         emit(
           state.copyWith(
-            status: AccountStatus.success,
             preferences: defaultPreferences,
-            clearErrorMessage: true,
+            clearError: true,
+            status: AccountStatus.success,
           ),
         );
       } on ConflictException {
         // If a conflict occurs during creation (e.g., another process
-        // created it concurrently), attempt to read it again to get the
-        // existing one. This can happen if the migration service
-        // created it right after the second NotFoundException.
-        print(
+        // created it concurrently), attempt to read it again to get the existing
+        // one. This can happen if the migration service created it right after
+        // the second NotFoundException.
+        _logger.info(
           '[AccountBloc] Conflict during creation of UserContentPreferences. '
           'Attempting to re-read.',
         );
@@ -137,26 +146,44 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
           state.copyWith(
             status: AccountStatus.success,
             preferences: existingPreferences,
-            clearErrorMessage: true,
+            clearError: true,
           ),
         );
-      } catch (e) {
+      } on HtHttpException catch (e) {
+        _logger.severe(
+          'Failed to create default preferences with HtHttpException: $e',
+        );
+        emit(state.copyWith(status: AccountStatus.failure, error: e));
+      } catch (e, st) {
+        _logger.severe(
+          'Failed to create default preferences with unexpected error: $e',
+          e,
+          st,
+        );
         emit(
           state.copyWith(
             status: AccountStatus.failure,
-            errorMessage: 'Failed to create default preferences: $e',
+            error: OperationFailedException(
+              'Failed to create default preferences: $e',
+            ),
           ),
         );
       }
     } on HtHttpException catch (e) {
-      emit(
-        state.copyWith(status: AccountStatus.failure, errorMessage: e.message),
+      _logger.severe(
+        'AccountLoadUserPreferences failed with HtHttpException: $e',
       );
-    } catch (e) {
+      emit(state.copyWith(status: AccountStatus.failure, error: e));
+    } catch (e, st) {
+      _logger.severe(
+        'AccountLoadUserPreferences failed with unexpected error: $e',
+        e,
+        st,
+      );
       emit(
         state.copyWith(
           status: AccountStatus.failure,
-          errorMessage: 'An unexpected error occurred.',
+          error: OperationFailedException('An unexpected error occurred: $e'),
         ),
       );
     }
@@ -197,46 +224,51 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         state.copyWith(
           status: AccountStatus.success,
           preferences: updatedPrefs,
-          clearErrorMessage: true,
+          clearError: true,
         ),
       );
     } on HtHttpException catch (e) {
-      emit(
-        state.copyWith(status: AccountStatus.failure, errorMessage: e.message),
+      _logger.severe(
+        'AccountSaveHeadlineToggled failed with HtHttpException: $e',
       );
-    } catch (e) {
+      emit(state.copyWith(status: AccountStatus.failure, error: e));
+    } catch (e, st) {
+      _logger.severe(
+        'AccountSaveHeadlineToggled failed with unexpected error: $e',
+        e,
+        st,
+      );
       emit(
         state.copyWith(
           status: AccountStatus.failure,
-          errorMessage: 'Failed to update saved headlines.',
+          error: OperationFailedException(
+            'Failed to update saved headlines: $e',
+          ),
         ),
       );
     }
   }
 
-  Future<void> _onAccountFollowCategoryToggled(
-    AccountFollowCategoryToggled event,
+  Future<void> _onAccountFollowTopicToggled(
+    AccountFollowTopicToggled event,
     Emitter<AccountState> emit,
   ) async {
     if (state.user == null || state.preferences == null) return;
     emit(state.copyWith(status: AccountStatus.loading));
 
     final currentPrefs = state.preferences!;
-    final isCurrentlyFollowed = currentPrefs.followedCategories.any(
-      (c) => c.id == event.category.id,
+    final isCurrentlyFollowed = currentPrefs.followedTopics.any(
+      (t) => t.id == event.topic.id,
     );
-    final List<Category> updatedFollowedCategories;
+    final List<Topic> updatedFollowedTopics;
 
-    if (isCurrentlyFollowed) {
-      updatedFollowedCategories = List.from(currentPrefs.followedCategories)
-        ..removeWhere((c) => c.id == event.category.id);
-    } else {
-      updatedFollowedCategories = List.from(currentPrefs.followedCategories)
-        ..add(event.category);
-    }
+    updatedFollowedTopics = isCurrentlyFollowed
+        ? (List.from(currentPrefs.followedTopics)
+            ..removeWhere((t) => t.id == event.topic.id))
+        : (List.from(currentPrefs.followedTopics)..add(event.topic));
 
     final updatedPrefs = currentPrefs.copyWith(
-      followedCategories: updatedFollowedCategories,
+      followedTopics: updatedFollowedTopics,
     );
 
     try {
@@ -249,18 +281,26 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         state.copyWith(
           status: AccountStatus.success,
           preferences: updatedPrefs,
-          clearErrorMessage: true,
+          clearError: true,
         ),
       );
     } on HtHttpException catch (e) {
-      emit(
-        state.copyWith(status: AccountStatus.failure, errorMessage: e.message),
+      _logger.severe(
+        'AccountFollowTopicToggled failed with HtHttpException: $e',
       );
-    } catch (e) {
+      emit(state.copyWith(status: AccountStatus.failure, error: e));
+    } catch (e, st) {
+      _logger.severe(
+        'AccountFollowTopicToggled failed with unexpected error: $e',
+        e,
+        st,
+      );
       emit(
         state.copyWith(
           status: AccountStatus.failure,
-          errorMessage: 'Failed to update followed categories.',
+          error: OperationFailedException(
+            'Failed to update followed topics: $e',
+          ),
         ),
       );
     }
@@ -301,24 +341,30 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         state.copyWith(
           status: AccountStatus.success,
           preferences: updatedPrefs,
-          clearErrorMessage: true,
+          clearError: true,
         ),
       );
     } on HtHttpException catch (e) {
-      emit(
-        state.copyWith(status: AccountStatus.failure, errorMessage: e.message),
+      _logger.severe(
+        'AccountFollowSourceToggled failed with HtHttpException: $e',
       );
-    } catch (e) {
+      emit(state.copyWith(status: AccountStatus.failure, error: e));
+    } catch (e, st) {
+      _logger.severe(
+        'AccountFollowSourceToggled failed with unexpected error: $e',
+        e,
+        st,
+      );
       emit(
         state.copyWith(
           status: AccountStatus.failure,
-          errorMessage: 'Failed to update followed sources.',
+          error: OperationFailedException(
+            'Failed to update followed sources: $e',
+          ),
         ),
       );
     }
   }
-
-  // _onAccountFollowCountryToggled method removed
 
   Future<void> _onAccountClearUserPreferences(
     AccountClearUserPreferences event,
@@ -327,7 +373,13 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     emit(state.copyWith(status: AccountStatus.loading));
     try {
       // Create a new default preferences object to "clear" existing ones
-      final defaultPreferences = UserContentPreferences(id: event.userId);
+      final defaultPreferences = UserContentPreferences(
+        id: event.userId,
+        followedCountries: const [],
+        followedSources: const [],
+        followedTopics: const [],
+        savedHeadlines: const [],
+      );
       await _userContentPreferencesRepository.update(
         id: event.userId,
         item: defaultPreferences,
@@ -337,18 +389,26 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         state.copyWith(
           status: AccountStatus.success,
           preferences: defaultPreferences,
-          clearErrorMessage: true,
+          clearError: true,
         ),
       );
     } on HtHttpException catch (e) {
-      emit(
-        state.copyWith(status: AccountStatus.failure, errorMessage: e.message),
+      _logger.severe(
+        'AccountClearUserPreferences failed with HtHttpException: $e',
       );
-    } catch (e) {
+      emit(state.copyWith(status: AccountStatus.failure, error: e));
+    } catch (e, st) {
+      _logger.severe(
+        'AccountClearUserPreferences failed with unexpected error: $e',
+        e,
+        st,
+      );
       emit(
         state.copyWith(
           status: AccountStatus.failure,
-          errorMessage: 'Failed to clear user preferences.',
+          error: OperationFailedException(
+            'Failed to clear user preferences: $e',
+          ),
         ),
       );
     }

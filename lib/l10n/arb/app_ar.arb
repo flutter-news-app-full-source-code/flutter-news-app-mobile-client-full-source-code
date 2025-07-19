@@ -1,9 +1,5 @@
 {
     "@@locale": "ar",
-    "counterAppBarTitle": "[AR] Counter",
-    "@counterAppBarTitle": {
-        "description": "Text shown in the AppBar of the Counter Page"
-    },
     "accountLinkingPageTitle": "ربط حسابك",
     "@accountLinkingPageTitle": {
         "description": "Title for the account linking page"
@@ -602,7 +598,6 @@
     "@headlinesFeedFilterNoSourcesMatch": {
         "description": "Message shown when no sources match the selected filters"
     },
-
     "searchModelTypeHeadline": "العناوين الرئيسية",
     "@searchModelTypeHeadline": {
         "description": "Dropdown display name for Headline search type"
@@ -635,7 +630,6 @@
     "@searchHintTextCountry": {
         "description": "Hint text for searching countries"
     },
-
     "searchPageInitialHeadline": "ابدأ بحثك",
     "@searchPageInitialHeadline": {
         "description": "Generic headline for the initial state of the search page"
@@ -669,6 +663,90 @@
                 "example": "تكنولوجيا"
             }
         }
+    },
+    "addTopicsPageTitle": "متابعة المواضيع",
+    "@addTopicsPageTitle": {
+        "description": "عنوان الصفحة التي يمكن للمستخدمين من خلالها إضافة مواضيع لمتابعتها"
+    },
+    "topicFilterLoadingHeadline": "جارٍ تحميل المواضيع...",
+    "@topicFilterLoadingHeadline": {
+        "description": "عنوان لحالة التحميل في صفحة تصفية المواضيع"
+    },
+    "topicFilterError": "تعذر تحميل المواضيع. يرجى المحاولة مرة أخرى.",
+    "@topicFilterError": {
+        "description": "رسالة خطأ عند فشل تحميل المواضيع في صفحة التصفية/الإضافة"
+    },
+    "topicFilterEmptyHeadline": "لم يتم العثور على مواضيع",
+    "@topicFilterEmptyHeadline": {
+        "description": "عنوان للحالة الفارغة في صفحة تصفية المواضيع"
+    },
+    "topicFilterEmptySubheadline": "لا توجد مواضيع متاحة في الوقت الحالي.",
+    "@topicFilterEmptySubheadline": {
+        "description": "عنوان فرعي للحالة الفارغة في صفحة تصفية المواضيع"
+    },
+    "unfollowTopicTooltip": "إلغاء متابعة {topicName}",
+    "@unfollowTopicTooltip": {
+        "description": "تلميح زر إلغاء متابعة موضوع معين",
+        "placeholders": {
+            "topicName": {
+                "type": "String",
+                "example": "علوم"
+            }
+        }
+    },
+    "followTopicTooltip": "متابعة {topicName}",
+    "@followTopicTooltip": {
+        "description": "تلميح زر متابعة موضوع معين",
+        "placeholders": {
+            "topicName": {
+                "type": "String",
+                "example": "علوم"
+            }
+        }
+    },
+    "followedSourcesLoadingHeadline": "جارٍ تحميل المصادر المتابَعة...",
+    "@followedSourcesLoadingHeadline": {
+        "description": "عنوان لحالة التحميل في صفحة المصادر المتابعة"
+    },
+    "followedSourcesErrorHeadline": "تعذر تحميل المصادر المتابَعة",
+    "@followedSourcesErrorHeadline": {
+        "description": "رسالة خطأ عند فشل تحميل المصادر المتابعة"
+    },
+    "followedSourcesEmptyHeadline": "لا توجد مصادر متابَعة",
+    "@followedSourcesEmptyHeadline": {
+        "description": "عنوان للحالة الفارغة في صفحة المصادر المتابعة"
+    },
+    "followedSourcesEmptySubheadline": "ابدأ بمتابعة المصادر لكي تظهر هنا.",
+    "@followedSourcesEmptySubheadline": {
+        "description": "عنوان فرعي للحالة الفارغة في صفحة المصادر المتابعة"
+    },
+    "headlinesFeedFilterTopicLabel": "الموضوع",
+    "@headlinesFeedFilterTopicLabel": {
+        "description": "Label for the topic filter dropdown"
+    },
+    "followedTopicsPageTitle": "المواضيع المتابَعة",
+    "@followedTopicsPageTitle": {
+        "description": "عنوان صفحة عرض المواضيع المتابعة"
+    },
+    "addTopicsTooltip": "إضافة مواضيع",
+    "@addTopicsTooltip": {
+        "description": "تلميح زر إضافة مواضيع جديدة للمتابعة"
+    },
+    "followedTopicsLoadingHeadline": "جارٍ تحميل المواضيع المتابَعة...",
+    "@followedTopicsLoadingHeadline": {
+        "description": "عنوان لحالة التحميل في صفحة المواضيع المتابعة"
+    },
+    "followedTopicsErrorHeadline": "تعذر تحميل المواضيع المتابَعة",
+    "@followedTopicsErrorHeadline": {
+        "description": "رسالة خطأ عند فشل تحميل المواضيع المتابعة"
+    },
+    "followedTopicsEmptyHeadline": "لا توجد مواضيع متابَعة",
+    "@followedTopicsEmptyHeadline": {
+        "description": "عنوان للحالة الفارغة في صفحة المواضيع المتابعة"
+    },
+    "followedTopicsEmptySubheadline": "ابدأ بمتابعة المواضيع لكي تظهر هنا.",
+    "@followedTopicsEmptySubheadline": {
+        "description": "عنوان فرعي للحالة الفارغة في صفحة المواضيع المتابعة"
     },
     "followedSourcesPageTitle": "المصادر المتابَعة",
     "@followedSourcesPageTitle": {
@@ -872,6 +950,10 @@
     "@entityDetailsSourceTitle": {
         "description": "Title for source entity type"
     },
+    "entityDetailsTopicTitle": "الموضوع",
+    "@entityDetailsTopicTitle": {
+        "description": "Title for topic entity type"
+    },
     "entityDetailsCountryTitle": "الدولة",
     "@entityDetailsCountryTitle": {
         "description": "Title for country entity type"
@@ -896,7 +978,7 @@
     "@savedHeadlinesEmptySubheadline": {
         "description": "Subheadline for empty state on saved headlines page"
     },
-     "demoVerificationCodeMessage": "وضع العرض التوضيحي: استخدم الرمز {code}",
+    "demoVerificationCodeMessage": "وضع العرض التوضيحي: استخدم الرمز {code}",
     "@demoVerificationCodeMessage": {
         "description": "رسالة تظهر في وضع العرض التوضيحي لتوفير رمز التحقق",
         "placeholders": {
@@ -905,5 +987,42 @@
                 "example": "123456"
             }
         }
+    },
+    "contentTypeHeadline": "العناوين الرئيسية",
+    "@contentTypeHeadline": {
+        "description": "Label for Headline content type"
+    },
+    "contentTypeTopic": "المواضيع",
+    "@contentTypeTopic": {
+        "description": "Label for Topic content type"
+    },
+    "contentTypeSource": "المصادر",
+    "@contentTypeSource": {
+        "description": "Label for Source content type"
+    },
+    "contentTypeCountry": "الدول",
+    "@contentTypeCountry": {
+        "description": "Label for Country content type"
+    },
+    "searchingFor": "جار البحث عن {contentType}...",
+    "@searchingFor": {
+        "description": "Subheadline for loading state on search page",
+        "placeholders": {
+            "contentType": {
+                "type": "String"
+            }
+        }
+    },
+    "settingsAppearanceFontWeightLight": "صغير",
+    "@settingsAppearanceFontWeightLight": {
+        "description": "Label for the light font weight option"
+    },
+    "settingsAppearanceFontWeightRegular": "عادي",
+    "@settingsAppearanceFontWeightRegular": {
+        "description": "Label for the regular font weight option"
+    },
+    "settingsAppearanceFontWeightBold": "عريض",
+    "@settingsAppearanceFontWeightBold": {
+        "description": "Label for the bold font weight option"
     }
 }

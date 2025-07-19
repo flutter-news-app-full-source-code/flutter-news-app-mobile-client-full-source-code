@@ -8,6 +8,7 @@ import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/shared.dart';
 import 'package:ht_shared/ht_shared.dart';
+import 'package:ht_ui_kit/ht_ui_kit.dart';
 
 /// {@template saved_headlines_page}
 /// Displays the list of headlines saved by the user.
@@ -21,7 +22,7 @@ class SavedHeadlinesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
@@ -47,7 +48,9 @@ class SavedHeadlinesPage extends StatelessWidget {
           if (state.status == AccountStatus.failure &&
               state.preferences == null) {
             return FailureStateWidget(
-              message: state.errorMessage ?? l10n.savedHeadlinesErrorHeadline,
+              exception:
+                  state.error ??
+                  OperationFailedException(l10n.savedHeadlinesErrorHeadline),
               onRetry: () {
                 if (state.user?.id != null) {
                   context.read<AccountBloc>().add(

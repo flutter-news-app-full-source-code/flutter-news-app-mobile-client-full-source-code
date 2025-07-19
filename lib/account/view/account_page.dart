@@ -5,8 +5,8 @@ import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
-import 'package:ht_main/shared/constants/app_spacing.dart';
-import 'package:ht_shared/ht_shared.dart';
+import 'package:ht_shared/ht_shared.dart' hide AppStatus;
+import 'package:ht_ui_kit/ht_ui_kit.dart';
 
 /// {@template account_view}
 /// Displays the user's account information and actions.
@@ -18,7 +18,7 @@ class AccountPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     // Watch AppBloc for user details and authentication status
     final appState = context.watch<AppBloc>().state;
     final user = appState.user;
@@ -83,7 +83,7 @@ class AccountPage extends StatelessWidget {
   }
 
   Widget _buildUserHeader(BuildContext context, User? user, bool isAnonymous) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
@@ -125,17 +125,6 @@ class AccountPage extends StatelessWidget {
       statusWidget = Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // if (user?.role != null) ...[
-          //   // Show role only if available
-          //   const SizedBox(height: AppSpacing.xs),
-          //   Text(
-          //     l10n.accountRoleLabel(user!.role.name),
-          //     style: textTheme.bodyMedium?.copyWith(
-          //       color: colorScheme.onSurfaceVariant,
-          //     ),
-          //     textAlign: TextAlign.center,
-          //   ),
-          // ],
           const SizedBox(height: AppSpacing.md),
           OutlinedButton.icon(
             // Changed to OutlinedButton.icon
@@ -179,7 +168,7 @@ class AccountPage extends StatelessWidget {
   }
 
   Widget _buildSettingsTile(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
 

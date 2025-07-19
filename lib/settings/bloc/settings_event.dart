@@ -104,19 +104,18 @@ class SettingsAppFontWeightChanged extends SettingsEvent {
 
 // --- Feed Settings Events ---
 
-/// {@template settings_feed_tile_type_changed}
-/// Event added when the user changes the feed list tile type.
+/// {@template settings_headline_image_style_changed}
+/// Event added when the user changes the headline image style in the feed.
 /// {@endtemplate}
-class SettingsFeedTileTypeChanged extends SettingsEvent {
-  /// {@macro settings_feed_tile_type_changed}
-  const SettingsFeedTileTypeChanged(this.tileType);
+class SettingsHeadlineImageStyleChanged extends SettingsEvent {
+  /// {@macro settings_headline_image_style_changed}
+  const SettingsHeadlineImageStyleChanged(this.imageStyle);
 
-  /// The newly selected feed list tile type.
-  // Note: This event might need to be split into density and image style changes.
-  final HeadlineImageStyle tileType;
+  /// The newly selected headline image style.
+  final HeadlineImageStyle imageStyle;
 
   @override
-  List<Object?> get props => [tileType];
+  List<Object?> get props => [imageStyle];
 }
 
 /// {@template settings_language_changed}

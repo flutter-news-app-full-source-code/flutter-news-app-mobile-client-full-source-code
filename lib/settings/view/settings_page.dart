@@ -5,8 +5,8 @@ import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/settings/bloc/settings_bloc.dart';
-import 'package:ht_main/shared/constants/constants.dart';
-import 'package:ht_main/shared/widgets/widgets.dart';
+import 'package:ht_shared/ht_shared.dart';
+import 'package:ht_ui_kit/ht_ui_kit.dart';
 
 /// {@template settings_page}
 /// The main page for accessing different application settings categories.
@@ -20,7 +20,7 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
 
     return Scaffold(
       appBar: AppBar(
@@ -54,7 +54,9 @@ class SettingsPage extends StatelessWidget {
           // Handle error state
           if (state.status == SettingsStatus.failure) {
             return FailureStateWidget(
-              message: state.error?.toString() ?? l10n.settingsErrorDefault,
+              exception:
+                  state.error as HtHttpException? ??
+                  const UnknownException('An unknown error occurred'),
               onRetry: () {
                 // Access AppBloc to get the current user ID for retry
                 final appBloc = context.read<AppBloc>();

@@ -14,7 +14,7 @@ class SourcesFilterState extends Equatable {
     this.displayableSources = const [],
     this.finallySelectedSourceIds = const {},
     this.dataLoadingStatus = SourceFilterDataLoadingStatus.initial,
-    this.errorMessage,
+    this.error,
   });
 
   final List<Country> availableCountries;
@@ -25,7 +25,7 @@ class SourcesFilterState extends Equatable {
   final List<Source> displayableSources;
   final Set<String> finallySelectedSourceIds;
   final SourceFilterDataLoadingStatus dataLoadingStatus;
-  final String? errorMessage;
+  final HtHttpException? error;
 
   SourcesFilterState copyWith({
     List<Country>? availableCountries,
@@ -36,7 +36,7 @@ class SourcesFilterState extends Equatable {
     List<Source>? displayableSources,
     Set<String>? finallySelectedSourceIds,
     SourceFilterDataLoadingStatus? dataLoadingStatus,
-    String? errorMessage,
+    HtHttpException? error,
     bool clearErrorMessage = false,
   }) {
     return SourcesFilterState(
@@ -50,9 +50,7 @@ class SourcesFilterState extends Equatable {
       finallySelectedSourceIds:
           finallySelectedSourceIds ?? this.finallySelectedSourceIds,
       dataLoadingStatus: dataLoadingStatus ?? this.dataLoadingStatus,
-      errorMessage: clearErrorMessage
-          ? null
-          : errorMessage ?? this.errorMessage,
+      error: clearErrorMessage ? null : error ?? this.error,
     );
   }
 
@@ -66,6 +64,6 @@ class SourcesFilterState extends Equatable {
     displayableSources,
     finallySelectedSourceIds,
     dataLoadingStatus,
-    errorMessage,
+    error,
   ];
 }

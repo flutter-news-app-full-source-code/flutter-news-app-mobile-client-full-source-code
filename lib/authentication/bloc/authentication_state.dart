@@ -1,74 +1,73 @@
 part of 'authentication_bloc.dart';
 
+/// Enum representing the different statuses of the authentication process.
+enum AuthenticationStatus {
+  /// The initial state before any authentication has been attempted.
+  initial,
+
+  /// The user is successfully authenticated.
+  authenticated,
+
+  /// The user is not authenticated.
+  unauthenticated,
+
+  /// An authentication operation is in progress (e.g., verifying code, signing out).
+  loading,
+
+  /// A request to send a sign-in code is in progress.
+  requestCodeInProgress,
+
+  /// The sign-in code has been successfully sent.
+  requestCodeSuccess,
+
+  /// An authentication operation has failed.
+  failure,
+}
+
 /// {@template authentication_state}
-/// Base class for authentication states.
+/// Represents the state of the authentication process.
+///
+/// This class uses a status enum [AuthenticationStatus] to represent the
+/// current state, making state management more predictable. It holds the
+/// authenticated user, the email for the code verification flow, and any
+/// exception that occurred during a failure.
 /// {@endtemplate}
-sealed class AuthenticationState extends Equatable {
+class AuthenticationState extends Equatable {
   /// {@macro authentication_state}
-  const AuthenticationState();
+  const AuthenticationState({
+    this.status = AuthenticationStatus.initial,
+    this.user,
+    this.email,
+    this.exception,
+  });
+
+  /// The current status of the authentication process.
+  final AuthenticationStatus status;
+
+  /// The authenticated user. Null if not authenticated.
+  final User? user;
+
+  /// The email address used in the sign-in code flow.
+  final String? email;
+
+  /// The exception that occurred, if any.
+  final HtHttpException? exception;
+
+  /// Creates a copy of the current [AuthenticationState] with updated values.
+  AuthenticationState copyWith({
+    AuthenticationStatus? status,
+    User? user,
+    String? email,
+    HtHttpException? exception,
+  }) {
+    return AuthenticationState(
+      status: status ?? this.status,
+      user: user ?? this.user,
+      email: email ?? this.email,
+      exception: exception ?? this.exception,
+    );
+  }
 
   @override
-  List<Object> get props => [];
-}
-
-/// {@template authentication_initial}
-/// The initial authentication state.
-/// {@endtemplate}
-final class AuthenticationInitial extends AuthenticationState {}
-
-/// {@template authentication_loading}
-/// A state indicating that an authentication operation is in progress.
-/// {@endtemplate}
-final class AuthenticationLoading extends AuthenticationState {}
-
-/// {@template authentication_authenticated}
-/// Represents a successful authentication.
-/// {@endtemplate}
-final class AuthenticationAuthenticated extends AuthenticationState {
-  /// {@macro authentication_authenticated}
-  const AuthenticationAuthenticated({required this.user});
-
-  /// The authenticated [User] object.
-  final User user;
-
-  @override
-  List<Object> get props => [user];
-}
-
-/// {@template authentication_unauthenticated}
-/// Represents an unauthenticated state.
-/// {@endtemplate}
-final class AuthenticationUnauthenticated extends AuthenticationState {}
-
-/// {@template authentication_request_code_loading}
-/// State indicating that the sign-in code is being requested.
-/// {@endtemplate}
-final class AuthenticationRequestCodeLoading extends AuthenticationState {}
-
-/// {@template authentication_code_sent_success}
-/// State indicating that the sign-in code was sent successfully.
-/// {@endtemplate}
-final class AuthenticationCodeSentSuccess extends AuthenticationState {
-  /// {@macro authentication_code_sent_success}
-  const AuthenticationCodeSentSuccess({required this.email});
-
-  /// The email address the code was sent to.
-  final String email;
-
-  @override
-  List<Object> get props => [email];
-}
-
-/// {@template authentication_failure}
-/// Represents an authentication failure.
-/// {@endtemplate}
-final class AuthenticationFailure extends AuthenticationState {
-  /// {@macro authentication_failure}
-  const AuthenticationFailure(this.errorMessage);
-
-  /// The error message describing the authentication failure.
-  final String errorMessage;
-
-  @override
-  List<Object> get props => [errorMessage];
+  List<Object?> get props => [status, user, email, exception];
 }

@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
-import 'package:ht_main/shared/constants/app_spacing.dart';
+import 'package:ht_ui_kit/ht_ui_kit.dart';
 
 /// {@template manage_followed_items_page}
 /// Page for navigating to lists of followed content types like
-/// categories, sources, and countries.
+/// topics, sources, and countries.
 /// {@endtemplate}
 class ManageFollowedItemsPage extends StatelessWidget {
   /// {@macro manage_followed_items_page}
@@ -14,7 +14,7 @@ class ManageFollowedItemsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
@@ -30,14 +30,14 @@ class ManageFollowedItemsPage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.paddingSmall),
         children: [
           ListTile(
-            leading: Icon(Icons.category_outlined, color: colorScheme.primary),
+            leading: Icon(Icons.topic_outlined, color: colorScheme.primary),
             title: Text(
-              l10n.headlinesFeedFilterCategoryLabel,
+              l10n.headlinesFeedFilterTopicLabel,
               style: textTheme.titleMedium,
             ),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              context.goNamed(Routes.followedCategoriesListName);
+              context.goNamed(Routes.followedTopicsListName);
             },
           ),
           const Divider(
@@ -59,7 +59,6 @@ class ManageFollowedItemsPage extends StatelessWidget {
             indent: AppSpacing.paddingMedium,
             endIndent: AppSpacing.paddingMedium,
           ),
-          // ListTile for Followed Countries removed
         ],
       ),
     );

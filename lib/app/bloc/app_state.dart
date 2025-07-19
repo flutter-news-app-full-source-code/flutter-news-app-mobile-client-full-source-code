@@ -39,7 +39,7 @@ class AppState extends Equatable {
     this.status = AppStatus.initial, // Changed from AppStatus
     this.user,
     this.locale,
-    this.appConfig,
+    this.remoteConfig,
     this.environment,
   });
 
@@ -72,7 +72,7 @@ class AppState extends Equatable {
   final Locale? locale;
 
   /// The global application configuration (remote config).
-  final RemoteConfig? appConfig;
+  final RemoteConfig? remoteConfig;
 
   /// The current application environment (e.g., production, development, demo).
   final local_config.AppEnvironment? environment;
@@ -88,7 +88,7 @@ class AppState extends Equatable {
     User? user,
     UserAppSettings? settings,
     Locale? locale,
-    RemoteConfig? appConfig,
+    RemoteConfig? remoteConfig,
     local_config.AppEnvironment? environment,
     bool clearFontFamily = false,
     bool clearLocale = false,
@@ -106,7 +106,7 @@ class AppState extends Equatable {
       user: user ?? this.user,
       settings: settings ?? this.settings,
       locale: clearLocale ? null : locale ?? this.locale,
-      appConfig: clearAppConfig ? null : appConfig ?? this.appConfig,
+      remoteConfig: clearAppConfig ? null : remoteConfig ?? this.remoteConfig,
       environment: clearEnvironment ? null : environment ?? this.environment,
     );
   }
@@ -122,7 +122,7 @@ class AppState extends Equatable {
     user,
     settings,
     locale,
-    appConfig,
+    remoteConfig,
     environment,
   ];
 }

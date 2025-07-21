@@ -44,7 +44,6 @@ Future<Widget> bootstrap(
     httpClient = HtHttpClient(
       baseUrl: appConfig.baseUrl,
       tokenProvider: () => authenticationRepository.getAuthToken(),
-      isWeb: kIsWeb,
       logger: logger,
     );
     authClient = HtAuthApi(httpClient: httpClient);

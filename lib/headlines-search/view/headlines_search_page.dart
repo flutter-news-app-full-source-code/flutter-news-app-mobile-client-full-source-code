@@ -9,6 +9,7 @@ import 'package:ht_main/app/bloc/app_bloc.dart';
 import 'package:ht_main/headlines-search/bloc/headlines_search_bloc.dart';
 // import 'package:ht_main/headlines-search/widgets/country_item_widget.dart';
 import 'package:ht_main/headlines-search/widgets/source_item_widget.dart';
+import 'package:ht_main/headlines-search/widgets/topic_item_widget.dart';
 import 'package:ht_main/l10n/l10n.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_main/shared/extensions/content_type_extensions.dart';
@@ -332,8 +333,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                           }
                           return tile;
                         } else if (feedItem is Topic) {
-                          // TODO(user): Create a TopicItemWidget similar to CategoryItemWidget
-                          return ListTile(title: Text(feedItem.name));
+                          return TopicItemWidget(topic: feedItem);
                         } else if (feedItem is Source) {
                           return SourceItemWidget(source: feedItem);
                         } else if (feedItem is Ad) {

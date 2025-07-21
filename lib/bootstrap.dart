@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ht_auth_api/ht_auth_api.dart';
@@ -16,7 +15,9 @@ import 'package:ht_main/app/config/config.dart' as app_config;
 import 'package:ht_main/app/services/demo_data_migration_service.dart';
 import 'package:ht_main/bloc_observer.dart';
 import 'package:ht_shared/ht_shared.dart';
+import 'package:ht_ui_kit/ht_ui_kit.dart';
 import 'package:logging/logging.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 Future<Widget> bootstrap(
   app_config.AppConfig appConfig,
@@ -24,6 +25,9 @@ Future<Widget> bootstrap(
 ) async {
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = const AppBlocObserver();
+
+  timeago.setLocaleMessages('en', EnTimeagoMessages());
+  timeago.setLocaleMessages('ar', ArTimeagoMessages());
 
   final logger = Logger('bootstrap');
 

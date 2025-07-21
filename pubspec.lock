@@ -416,7 +416,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: abef81e5294d70ace82d3e87f1efc94fca6a8445
+      resolved-ref: "7945773edb4251d294071820c4ce1b6332f032ec"
       url: "https://github.com/headlines-toolkit/ht-data-inmemory.git"
     source: git
     version: "0.0.0"

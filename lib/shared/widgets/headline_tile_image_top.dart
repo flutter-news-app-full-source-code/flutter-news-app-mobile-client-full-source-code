@@ -4,6 +4,7 @@ import 'package:ht_main/entity_details/view/entity_details_page.dart';
 import 'package:ht_main/router/routes.dart';
 import 'package:ht_shared/ht_shared.dart';
 import 'package:ht_ui_kit/ht_ui_kit.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 /// {@template headline_tile_image_top}
 /// A shared widget to display a headline item with a large image at the top.
@@ -147,8 +148,7 @@ class _HeadlineMetadataRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO(anyone): Use a proper timeago library.
-    final formattedDate = headline.createdAt.toString();
+    final formattedDate = timeago.format(headline.createdAt);
 
     // Use bodySmall for a reasonable base size, with muted accent color
     final metadataTextStyle = textTheme.bodySmall?.copyWith(

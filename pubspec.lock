@@ -434,7 +434,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "6484a5641c3d633d286ea5848c5b7cf1e723ebc1"
+      resolved-ref: "3c50cd082406d4cacafe60ad097ba6fa6ba891eb"
       url: "https://github.com/headlines-toolkit/ht-http-client.git"
     source: git
     version: "0.0.0"

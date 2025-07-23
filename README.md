@@ -92,23 +92,22 @@ Get started for free and purchase when you're ready to launch!
     ```
 4.  **Run the app:**
 
-### Running the App
+    To run the app, first select your desired environment in `lib/main.dart`:
 
-To run the app, first select your desired environment in `lib/main.dart`:
+    ```dart
+    // lib/main.dart
 
-```dart
-// lib/main.dart
-
-// Use `AppEnvironment.demo` to run with in-memory data (no API needed).
-// Use `AppEnvironment.development` to connect to a local backend API.
-const appEnvironment = AppEnvironment.demo; 
+    // Use `AppEnvironment.demo` to run with in-memory data (no API needed).
+    // Use `AppEnvironment.development` to connect to a local backend API.
+    // Use `AppEnvironment.production` to connect to a live backend API.
+    const appEnvironment = AppEnvironment.demo; 
 ```
 
 Then, run the app from your terminal:
 ```bash
 flutter run
 ```
-*(Note: For `development` environment, ensure the [backend service](https://github.com/flutter-news-app-full-source-code/flutter-news-app-api-server-full-source-code) is running.)*
+*(Note: For `development/production` environment, ensure the [backend service](https://github.com/flutter-news-app-full-source-code/flutter-news-app-api-server-full-source-code) is running.)*
 
 ---
 

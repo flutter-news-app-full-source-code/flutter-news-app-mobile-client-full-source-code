@@ -30,25 +30,25 @@ class App extends StatelessWidget {
     this.demoDataMigrationService,
     super.key,
   }) : _authenticationRepository = authenticationRepository,
-       _htHeadlinesRepository = headlinesRepository,
-       _htTopicsRepository = topicsRepository,
-       _htCountriesRepository = countriesRepository,
-       _htSourcesRepository = sourcesRepository,
-       _htUserAppSettingsRepository = userAppSettingsRepository,
-       _htUserContentPreferencesRepository = userContentPreferencesRepository,
-       _htAppConfigRepository = remoteConfigRepository,
+       _headlinesRepository = headlinesRepository,
+       _topicsRepository = topicsRepository,
+       _countriesRepository = countriesRepository,
+       _sourcesRepository = sourcesRepository,
+       _userAppSettingsRepository = userAppSettingsRepository,
+       _userContentPreferencesRepository = userContentPreferencesRepository,
+       _appConfigRepository = remoteConfigRepository,
        _kvStorageService = kvStorageService,
        _environment = environment;
 
   final AuthRepository _authenticationRepository;
-  final DataRepository<Headline> _htHeadlinesRepository;
-  final DataRepository<Topic> _htTopicsRepository;
-  final DataRepository<Country> _htCountriesRepository;
-  final DataRepository<Source> _htSourcesRepository;
-  final DataRepository<UserAppSettings> _htUserAppSettingsRepository;
+  final DataRepository<Headline> _headlinesRepository;
+  final DataRepository<Topic> _topicsRepository;
+  final DataRepository<Country> _countriesRepository;
+  final DataRepository<Source> _sourcesRepository;
+  final DataRepository<UserAppSettings> _userAppSettingsRepository;
   final DataRepository<UserContentPreferences>
-  _htUserContentPreferencesRepository;
-  final DataRepository<RemoteConfig> _htAppConfigRepository;
+  _userContentPreferencesRepository;
+  final DataRepository<RemoteConfig> _appConfigRepository;
   final KVStorageService _kvStorageService;
   final AppEnvironment _environment;
   final DemoDataMigrationService? demoDataMigrationService;
@@ -58,13 +58,13 @@ class App extends StatelessWidget {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider.value(value: _authenticationRepository),
-        RepositoryProvider.value(value: _htHeadlinesRepository),
-        RepositoryProvider.value(value: _htTopicsRepository),
-        RepositoryProvider.value(value: _htCountriesRepository),
-        RepositoryProvider.value(value: _htSourcesRepository),
-        RepositoryProvider.value(value: _htUserAppSettingsRepository),
-        RepositoryProvider.value(value: _htUserContentPreferencesRepository),
-        RepositoryProvider.value(value: _htAppConfigRepository),
+        RepositoryProvider.value(value: _headlinesRepository),
+        RepositoryProvider.value(value: _topicsRepository),
+        RepositoryProvider.value(value: _countriesRepository),
+        RepositoryProvider.value(value: _sourcesRepository),
+        RepositoryProvider.value(value: _userAppSettingsRepository),
+        RepositoryProvider.value(value: _userContentPreferencesRepository),
+        RepositoryProvider.value(value: _appConfigRepository),
         RepositoryProvider.value(value: _kvStorageService),
       ],
       child: MultiBlocProvider(
@@ -87,14 +87,14 @@ class App extends StatelessWidget {
         ],
         child: _AppView(
           authenticationRepository: _authenticationRepository,
-          htHeadlinesRepository: _htHeadlinesRepository,
-          htTopicRepository: _htTopicsRepository,
-          htCountriesRepository: _htCountriesRepository,
-          htSourcesRepository: _htSourcesRepository,
-          htUserAppSettingsRepository: _htUserAppSettingsRepository,
-          htUserContentPreferencesRepository:
-              _htUserContentPreferencesRepository,
-          htAppConfigRepository: _htAppConfigRepository,
+          headlinesRepository: _headlinesRepository,
+          topicRepository: _topicsRepository,
+          countriesRepository: _countriesRepository,
+          sourcesRepository: _sourcesRepository,
+          userAppSettingsRepository: _userAppSettingsRepository,
+          userContentPreferencesRepository:
+              _userContentPreferencesRepository,
+          appConfigRepository: _appConfigRepository,
           environment: _environment,
         ),
       ),
@@ -105,25 +105,25 @@ class App extends StatelessWidget {
 class _AppView extends StatefulWidget {
   const _AppView({
     required this.authenticationRepository,
-    required this.htHeadlinesRepository,
-    required this.htTopicRepository,
-    required this.htCountriesRepository,
-    required this.htSourcesRepository,
-    required this.htUserAppSettingsRepository,
-    required this.htUserContentPreferencesRepository,
-    required this.htAppConfigRepository,
+    required this.headlinesRepository,
+    required this.topicRepository,
+    required this.countriesRepository,
+    required this.sourcesRepository,
+    required this.userAppSettingsRepository,
+    required this.userContentPreferencesRepository,
+    required this.appConfigRepository,
     required this.environment,
   });
 
   final AuthRepository authenticationRepository;
-  final DataRepository<Headline> htHeadlinesRepository;
-  final DataRepository<Topic> htTopicRepository;
-  final DataRepository<Country> htCountriesRepository;
-  final DataRepository<Source> htSourcesRepository;
-  final DataRepository<UserAppSettings> htUserAppSettingsRepository;
+  final DataRepository<Headline> headlinesRepository;
+  final DataRepository<Topic> topicRepository;
+  final DataRepository<Country> countriesRepository;
+  final DataRepository<Source> sourcesRepository;
+  final DataRepository<UserAppSettings> userAppSettingsRepository;
   final DataRepository<UserContentPreferences>
-  htUserContentPreferencesRepository;
-  final DataRepository<RemoteConfig> htAppConfigRepository;
+  userContentPreferencesRepository;
+  final DataRepository<RemoteConfig> appConfigRepository;
   final AppEnvironment environment;
 
   @override
@@ -145,14 +145,14 @@ class _AppViewState extends State<_AppView> {
     _router = createRouter(
       authStatusNotifier: _statusNotifier,
       authenticationRepository: widget.authenticationRepository,
-      htHeadlinesRepository: widget.htHeadlinesRepository,
-      htTopicsRepository: widget.htTopicRepository,
-      htCountriesRepository: widget.htCountriesRepository,
-      htSourcesRepository: widget.htSourcesRepository,
-      htUserAppSettingsRepository: widget.htUserAppSettingsRepository,
+      htHeadlinesRepository: widget.headlinesRepository,
+      htTopicsRepository: widget.topicRepository,
+      htCountriesRepository: widget.countriesRepository,
+      htSourcesRepository: widget.sourcesRepository,
+      htUserAppSettingsRepository: widget.userAppSettingsRepository,
       htUserContentPreferencesRepository:
-          widget.htUserContentPreferencesRepository,
-      htRemoteConfigRepository: widget.htAppConfigRepository,
+          widget.userContentPreferencesRepository,
+      htRemoteConfigRepository: widget.appConfigRepository,
       environment: widget.environment,
     );
 

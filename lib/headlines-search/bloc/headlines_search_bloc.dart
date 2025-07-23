@@ -2,11 +2,11 @@
 
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
+import 'package:core/core.dart';
+import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_data_repository/ht_data_repository.dart';
-import 'package:ht_main/app/bloc/app_bloc.dart';
-import 'package:ht_main/shared/services/feed_injector_service.dart';
-import 'package:ht_shared/ht_shared.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_injector_service.dart';
 
 part 'headlines_search_event.dart';
 part 'headlines_search_state.dart';
@@ -14,9 +14,9 @@ part 'headlines_search_state.dart';
 class HeadlinesSearchBloc
     extends Bloc<HeadlinesSearchEvent, HeadlinesSearchState> {
   HeadlinesSearchBloc({
-    required HtDataRepository<Headline> headlinesRepository,
-    required HtDataRepository<Topic> topicRepository,
-    required HtDataRepository<Source> sourceRepository,
+    required DataRepository<Headline> headlinesRepository,
+    required DataRepository<Topic> topicRepository,
+    required DataRepository<Source> sourceRepository,
     required AppBloc appBloc,
     required FeedInjectorService feedInjectorService,
   }) : _headlinesRepository = headlinesRepository,
@@ -32,9 +32,9 @@ class HeadlinesSearchBloc
     );
   }
 
-  final HtDataRepository<Headline> _headlinesRepository;
-  final HtDataRepository<Topic> _topicRepository;
-  final HtDataRepository<Source> _sourceRepository;
+  final DataRepository<Headline> _headlinesRepository;
+  final DataRepository<Topic> _topicRepository;
+  final DataRepository<Source> _sourceRepository;
   final AppBloc _appBloc;
   final FeedInjectorService _feedInjectorService;
   static const _limit = 10;
@@ -174,7 +174,7 @@ class HeadlinesSearchBloc
                 hasMore: false,
               );
           }
-        } on HtHttpException catch (e) {
+        } on HttpException catch (e) {
           emit(successState.copyWith(errorMessage: e.message));
         } catch (e, st) {
           print('Search pagination error ($modelType): $e\n$st');
@@ -267,7 +267,7 @@ class HeadlinesSearchBloc
           ),
         );
       }
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       emit(
         HeadlinesSearchFailure(
           errorMessage: e.message,

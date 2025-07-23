@@ -3,21 +3,21 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:core/core.dart';
+import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_data_repository/ht_data_repository.dart';
-import 'package:ht_main/account/bloc/account_bloc.dart';
-import 'package:ht_main/app/bloc/app_bloc.dart';
-import 'package:ht_main/shared/services/feed_injector_service.dart';
-import 'package:ht_shared/ht_shared.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_injector_service.dart';
 
 part 'entity_details_event.dart';
 part 'entity_details_state.dart';
 
 class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
   EntityDetailsBloc({
-    required HtDataRepository<Headline> headlinesRepository,
-    required HtDataRepository<Topic> topicRepository,
-    required HtDataRepository<Source> sourceRepository,
+    required DataRepository<Headline> headlinesRepository,
+    required DataRepository<Topic> topicRepository,
+    required DataRepository<Source> sourceRepository,
     required AccountBloc accountBloc,
     required AppBloc appBloc,
     required FeedInjectorService feedInjectorService,
@@ -47,9 +47,9 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     });
   }
 
-  final HtDataRepository<Headline> _headlinesRepository;
-  final HtDataRepository<Topic> _topicRepository;
-  final HtDataRepository<Source> _sourceRepository;
+  final DataRepository<Headline> _headlinesRepository;
+  final DataRepository<Topic> _topicRepository;
+  final DataRepository<Source> _sourceRepository;
   final AccountBloc _accountBloc;
   final AppBloc _appBloc;
   final FeedInjectorService _feedInjectorService;
@@ -155,7 +155,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
           ),
         );
       }
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       emit(state.copyWith(status: EntityDetailsStatus.failure, exception: e));
     } catch (e) {
       emit(
@@ -248,7 +248,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
           ),
         );
       }
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       emit(
         state.copyWith(
           status: EntityDetailsStatus.partialFailure,

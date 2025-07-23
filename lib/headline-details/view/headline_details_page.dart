@@ -1,22 +1,22 @@
 //
 // ignore_for_file: avoid_redundant_argument_values
 
+import 'package:core/core.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/view/entity_details_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/headline_details_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/similar_headlines_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/shared.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ht_main/account/bloc/account_bloc.dart';
-import 'package:ht_main/app/bloc/app_bloc.dart';
-import 'package:ht_main/entity_details/view/entity_details_page.dart';
-import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart';
-import 'package:ht_main/headline-details/bloc/similar_headlines_bloc.dart';
-import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_main/router/routes.dart';
-import 'package:ht_main/shared/shared.dart';
-import 'package:ht_shared/ht_shared.dart';
-import 'package:ht_ui_kit/ht_ui_kit.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:ui_kit/ui_kit.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class HeadlineDetailsPage extends StatefulWidget {

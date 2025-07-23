@@ -1,9 +1,15 @@
+<div align="center">
+<img src="https://avatars.githubusercontent.com/u/202675624?s=400&u=2daf23e8872a3b666bcd4f792a21fe2633097e79&v=4" alt="Flutter News App Toolkit Logo" width="220">
+
 # The Complete Flutter News App - Full Source Code
 
-![coverage: percentage](https://img.shields.io/badge/coverage-XX-green)
-[![Demo: Live](https://img.shields.io/badge/Demo-Live-orange)](https://flutter-news-app-full-source-code.github.io/flutter-news-app-mobile-client-full-source-code/)
-[![style: very good analysis](https://img.shields.io/badge/style-very_good_analysis-B22C89.svg)](https://pub.dev/packages/very_good_analysis)
-[![License: PolyForm Free Trial](https://img.shields.io/badge/License-PolyForm%20Free%20Trial-blue)](https://polyformproject.org/licenses/free-trial/1.0.0)
+<p>
+<img src="https://img.shields.io/badge/coverage-XX-green?style=for-the-badge" alt="coverage: percentage">
+<a href="https://flutter-news-app-full-source-code.github.io/flutter-news-app-mobile-client-full-source-code/"><img src="https://img.shields.io/badge/Demo-Live-orange?style=for-the-badge" alt="Demo: Live"></a>
+<a href="https://github.com/sponsors/flutter-news-app-full-source-code"><img src="https://img.shields.io/badge/DOCS-READ-purple?style=for-the-badge" alt="DOCS READ"></a>
+<a href="https://github.com/sponsors/flutter-news-app-full-source-code"><img src="https://img.shields.io/badge/LICENSE-BUY-pink?style=for-the-badge" alt="License: Buy"></a>
+</p>
+</div>
 
 This is a complete and fully-functional Flutter news application. It gives you everything you need to launch your own news app on the App Store and Google Play, right out of the box. It is a key component of the [**Flutter News App - Full Source Code Toolkit**](https://github.com/flutter-news-app-full-source-code), an ecosystem that also includes a dart frog [backend API](https://github.com/flutter-news-app-full-source-code/flutter-news-app-api-server-full-source-code) and a web-based [content dashboard](https://github.com/flutter-news-app-full-source-code/flutter-news-app-web-dashboard-full-source-code).
 
@@ -61,13 +67,15 @@ Fully internationalized with working English and Arabic localizations (`.arb` fi
 
 ---
 
-## 🔑 Licensing
+## 🔑 License: Source-Available with a Free Trial
 
-This app is source-available and licensed under the [PolyForm Free Trial 1.0.0](LICENSE). This lets you try out the full source code before you buy.
+Get started for free and purchase when you're ready to launch!
 
-For a commercial license to build and distribute your app, please visit the main [**Flutter News App - Full Source Code Toolkit**](https://github.com/flutter-news-app-full-source-code) organization.
+*   **TRY IT:** Download and explore the full source code under the [PolyForm Free Trial License](LICENSE). Perfect for evaluation.
+*   **BUY IT:** For commercial use, get a lifetime license with a **one-time payment**. No subscriptions!
+*   **GET YOURS:** [**Purchase via GitHub Sponsors**](https://github.com/sponsors/flutter-news-app-full-source-code).
 
-
+> *<p style="color:grey">Note: Your one-time purchase covers the entire Flutter News App Toolkit, including the mobile app, backend API, and web dashboard repositories in this organization.</p>*
 ---
 
 ## 🚀 Getting Started & Running Locally

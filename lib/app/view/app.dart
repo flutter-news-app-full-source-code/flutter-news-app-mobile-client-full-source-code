@@ -92,8 +92,7 @@ class App extends StatelessWidget {
           countriesRepository: _countriesRepository,
           sourcesRepository: _sourcesRepository,
           userAppSettingsRepository: _userAppSettingsRepository,
-          userContentPreferencesRepository:
-              _userContentPreferencesRepository,
+          userContentPreferencesRepository: _userContentPreferencesRepository,
           appConfigRepository: _appConfigRepository,
           environment: _environment,
         ),
@@ -121,8 +120,7 @@ class _AppView extends StatefulWidget {
   final DataRepository<Country> countriesRepository;
   final DataRepository<Source> sourcesRepository;
   final DataRepository<UserAppSettings> userAppSettingsRepository;
-  final DataRepository<UserContentPreferences>
-  userContentPreferencesRepository;
+  final DataRepository<UserContentPreferences> userContentPreferencesRepository;
   final DataRepository<RemoteConfig> appConfigRepository;
   final AppEnvironment environment;
 

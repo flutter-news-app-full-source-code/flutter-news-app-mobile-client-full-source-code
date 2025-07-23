@@ -1,50 +1,51 @@
+import 'package:auth_repository/auth_repository.dart';
+import 'package:core/core.dart' hide AppStatus;
+import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/account/view/account_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/manage_followed_items_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/sources/add_source_to_follow_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/sources/followed_sources_list_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/topics/add_topic_to_follow_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/topics/followed_topics_list_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/account/view/saved_headlines_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
+    as local_config;
+import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_shell.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/authentication_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/email_code_verification_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/request_code_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/view/entity_details_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/headline_details_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/similar_headlines_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/view/headline_details_page.dart';
+// import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/countries_filter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/sources_filter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/topics_filter_bloc.dart';
+// import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/country_filter_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_feed_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_filter_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_filter_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/topic_filter_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-search/bloc/headlines_search_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-search/view/headlines_search_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/settings/bloc/settings_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/appearance_settings_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/feed_settings_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/font_settings_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/language_settings_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/notification_settings_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/settings_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/theme_settings_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_injector_service.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ht_auth_repository/ht_auth_repository.dart';
-import 'package:ht_data_repository/ht_data_repository.dart';
-import 'package:ht_main/account/bloc/account_bloc.dart';
-import 'package:ht_main/account/view/account_page.dart';
-import 'package:ht_main/account/view/manage_followed_items/manage_followed_items_page.dart';
-import 'package:ht_main/account/view/manage_followed_items/sources/add_source_to_follow_page.dart';
-import 'package:ht_main/account/view/manage_followed_items/sources/followed_sources_list_page.dart';
-import 'package:ht_main/account/view/manage_followed_items/topics/add_topic_to_follow_page.dart';
-import 'package:ht_main/account/view/manage_followed_items/topics/followed_topics_list_page.dart';
-import 'package:ht_main/account/view/saved_headlines_page.dart';
-import 'package:ht_main/app/bloc/app_bloc.dart';
-import 'package:ht_main/app/config/config.dart' as local_config;
-import 'package:ht_main/app/view/app_shell.dart';
-import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
-import 'package:ht_main/authentication/view/authentication_page.dart';
-import 'package:ht_main/authentication/view/email_code_verification_page.dart';
-import 'package:ht_main/authentication/view/request_code_page.dart';
-import 'package:ht_main/entity_details/view/entity_details_page.dart';
-import 'package:ht_main/headline-details/bloc/headline_details_bloc.dart';
-import 'package:ht_main/headline-details/bloc/similar_headlines_bloc.dart';
-import 'package:ht_main/headline-details/view/headline_details_page.dart';
-// import 'package:ht_main/headlines-feed/bloc/countries_filter_bloc.dart';
-import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
-import 'package:ht_main/headlines-feed/bloc/sources_filter_bloc.dart';
-import 'package:ht_main/headlines-feed/bloc/topics_filter_bloc.dart';
-// import 'package:ht_main/headlines-feed/view/country_filter_page.dart';
-import 'package:ht_main/headlines-feed/view/headlines_feed_page.dart';
-import 'package:ht_main/headlines-feed/view/headlines_filter_page.dart';
-import 'package:ht_main/headlines-feed/view/source_filter_page.dart';
-import 'package:ht_main/headlines-feed/view/topic_filter_page.dart';
-import 'package:ht_main/headlines-search/bloc/headlines_search_bloc.dart';
-import 'package:ht_main/headlines-search/view/headlines_search_page.dart';
-import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_main/router/routes.dart';
-import 'package:ht_main/settings/bloc/settings_bloc.dart';
-import 'package:ht_main/settings/view/appearance_settings_page.dart';
-import 'package:ht_main/settings/view/feed_settings_page.dart';
-import 'package:ht_main/settings/view/font_settings_page.dart';
-import 'package:ht_main/settings/view/language_settings_page.dart';
-import 'package:ht_main/settings/view/notification_settings_page.dart';
-import 'package:ht_main/settings/view/settings_page.dart';
-import 'package:ht_main/settings/view/theme_settings_page.dart';
-import 'package:ht_main/shared/services/feed_injector_service.dart';
-import 'package:ht_shared/ht_shared.dart' hide AppStatus;
 
 /// Creates and configures the GoRouter instance for the application.
 ///
@@ -52,20 +53,20 @@ import 'package:ht_shared/ht_shared.dart' hide AppStatus;
 /// authentication state changes.
 GoRouter createRouter({
   required ValueNotifier<AppStatus> authStatusNotifier,
-  required HtAuthRepository htAuthenticationRepository,
-  required HtDataRepository<Headline> htHeadlinesRepository,
-  required HtDataRepository<Topic> htTopicsRepository,
-  required HtDataRepository<Country> htCountriesRepository,
-  required HtDataRepository<Source> htSourcesRepository,
-  required HtDataRepository<UserAppSettings> htUserAppSettingsRepository,
-  required HtDataRepository<UserContentPreferences>
+  required AuthRepository authenticationRepository,
+  required DataRepository<Headline> htHeadlinesRepository,
+  required DataRepository<Topic> htTopicsRepository,
+  required DataRepository<Country> htCountriesRepository,
+  required DataRepository<Source> htSourcesRepository,
+  required DataRepository<UserAppSettings> htUserAppSettingsRepository,
+  required DataRepository<UserContentPreferences>
   htUserContentPreferencesRepository,
-  required HtDataRepository<RemoteConfig> htRemoteConfigRepository,
+  required DataRepository<RemoteConfig> htRemoteConfigRepository,
   required local_config.AppEnvironment environment,
 }) {
   // Instantiate AccountBloc once to be shared
   final accountBloc = AccountBloc(
-    authenticationRepository: htAuthenticationRepository,
+    authenticationRepository: authenticationRepository,
     userContentPreferencesRepository: htUserContentPreferencesRepository,
     environment: environment,
   );
@@ -226,7 +227,7 @@ GoRouter createRouter({
 
           return BlocProvider(
             create: (context) => AuthenticationBloc(
-              authenticationRepository: context.read<HtAuthRepository>(),
+              authenticationRepository: context.read<AuthRepository>(),
             ),
             child: AuthenticationPage(
               headline: headline,
@@ -355,14 +356,12 @@ GoRouter createRouter({
               BlocProvider.value(value: accountBloc),
               BlocProvider(
                 create: (context) => HeadlineDetailsBloc(
-                  headlinesRepository: context
-                      .read<HtDataRepository<Headline>>(),
+                  headlinesRepository: context.read<DataRepository<Headline>>(),
                 ),
               ),
               BlocProvider(
                 create: (context) => SimilarHeadlinesBloc(
-                  headlinesRepository: context
-                      .read<HtDataRepository<Headline>>(),
+                  headlinesRepository: context.read<DataRepository<Headline>>(),
                 ),
               ),
             ],
@@ -386,7 +385,7 @@ GoRouter createRouter({
                   final feedInjectorService = FeedInjectorService();
                   return HeadlinesFeedBloc(
                     headlinesRepository: context
-                        .read<HtDataRepository<Headline>>(),
+                        .read<DataRepository<Headline>>(),
                     feedInjectorService: feedInjectorService,
                     appBloc: context.read<AppBloc>(),
                   )..add(const HeadlinesFeedFetchRequested());
@@ -397,9 +396,9 @@ GoRouter createRouter({
                   final feedInjectorService = FeedInjectorService();
                   return HeadlinesSearchBloc(
                     headlinesRepository: context
-                        .read<HtDataRepository<Headline>>(),
-                    topicRepository: context.read<HtDataRepository<Topic>>(),
-                    sourceRepository: context.read<HtDataRepository<Source>>(),
+                        .read<DataRepository<Headline>>(),
+                    topicRepository: context.read<DataRepository<Topic>>(),
+                    sourceRepository: context.read<DataRepository<Source>>(),
                     appBloc: context.read<AppBloc>(),
                     feedInjectorService: feedInjectorService,
                   );
@@ -433,13 +432,13 @@ GoRouter createRouter({
                           BlocProvider(
                             create: (context) => HeadlineDetailsBloc(
                               headlinesRepository: context
-                                  .read<HtDataRepository<Headline>>(),
+                                  .read<DataRepository<Headline>>(),
                             ),
                           ),
                           BlocProvider(
                             create: (context) => SimilarHeadlinesBloc(
                               headlinesRepository: context
-                                  .read<HtDataRepository<Headline>>(),
+                                  .read<DataRepository<Headline>>(),
                             ),
                           ),
                         ],
@@ -486,7 +485,7 @@ GoRouter createRouter({
                         builder: (context, state) => BlocProvider(
                           create: (context) => TopicsFilterBloc(
                             topicsRepository: context
-                                .read<HtDataRepository<Topic>>(),
+                                .read<DataRepository<Topic>>(),
                           ),
                           child: const TopicFilterPage(),
                         ),
@@ -499,10 +498,10 @@ GoRouter createRouter({
                         builder: (context, state) => BlocProvider(
                           create: (context) => SourcesFilterBloc(
                             sourcesRepository: context
-                                .read<HtDataRepository<Source>>(),
+                                .read<DataRepository<Source>>(),
                             countriesRepository: // Added missing repository
                             context
-                                .read<HtDataRepository<Country>>(),
+                                .read<DataRepository<Country>>(),
                           ),
                           // Pass initialSelectedSources, country ISO codes, and source types from state.extra
                           child: Builder(
@@ -561,13 +560,13 @@ GoRouter createRouter({
                           BlocProvider(
                             create: (context) => HeadlineDetailsBloc(
                               headlinesRepository: context
-                                  .read<HtDataRepository<Headline>>(),
+                                  .read<DataRepository<Headline>>(),
                             ),
                           ),
                           BlocProvider(
                             create: (context) => SimilarHeadlinesBloc(
                               headlinesRepository: context
-                                  .read<HtDataRepository<Headline>>(),
+                                  .read<DataRepository<Headline>>(),
                             ),
                           ),
                         ],
@@ -603,7 +602,7 @@ GoRouter createRouter({
                         create: (context) {
                           final settingsBloc = SettingsBloc(
                             userAppSettingsRepository: context
-                                .read<HtDataRepository<UserAppSettings>>(),
+                                .read<DataRepository<UserAppSettings>>(),
                           );
                           // Only load settings if a userId is available
                           if (userId != null) {
@@ -729,13 +728,13 @@ GoRouter createRouter({
                               BlocProvider(
                                 create: (context) => HeadlineDetailsBloc(
                                   headlinesRepository: context
-                                      .read<HtDataRepository<Headline>>(),
+                                      .read<DataRepository<Headline>>(),
                                 ),
                               ),
                               BlocProvider(
                                 create: (context) => SimilarHeadlinesBloc(
                                   headlinesRepository: context
-                                      .read<HtDataRepository<Headline>>(),
+                                      .read<DataRepository<Headline>>(),
                                 ),
                               ),
                             ],

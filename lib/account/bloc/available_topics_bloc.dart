@@ -1,22 +1,22 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:core/core.dart';
+import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_data_repository/ht_data_repository.dart';
-import 'package:ht_shared/ht_shared.dart';
 
 part 'available_topics_event.dart';
 part 'available_topics_state.dart';
 
 class AvailableTopicsBloc
     extends Bloc<AvailableTopicsEvent, AvailableTopicsState> {
-  AvailableTopicsBloc({required HtDataRepository<Topic> topicsRepository})
+  AvailableTopicsBloc({required DataRepository<Topic> topicsRepository})
     : _topicsRepository = topicsRepository,
       super(const AvailableTopicsState()) {
     on<FetchAvailableTopics>(_onFetchAvailableTopics);
   }
 
-  final HtDataRepository<Topic> _topicsRepository;
+  final DataRepository<Topic> _topicsRepository;
 
   Future<void> _onFetchAvailableTopics(
     FetchAvailableTopics event,
@@ -36,7 +36,7 @@ class AvailableTopicsBloc
           clearError: true,
         ),
       );
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       emit(
         state.copyWith(status: AvailableTopicsStatus.failure, error: e.message),
       );

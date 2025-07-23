@@ -13,13 +13,13 @@ class AccountState extends Equatable {
   final AccountStatus status;
   final User? user;
   final UserContentPreferences? preferences;
-  final HtHttpException? error;
+  final HttpException? error;
 
   AccountState copyWith({
     AccountStatus? status,
     User? user,
     UserContentPreferences? preferences,
-    HtHttpException? error,
+    HttpException? error,
     bool clearUser = false,
     bool clearPreferences = false,
     bool clearError = false,

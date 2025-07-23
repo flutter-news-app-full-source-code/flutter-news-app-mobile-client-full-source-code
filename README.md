@@ -72,7 +72,7 @@ Fully internationalized with working English and Arabic localizations (`.arb` fi
 Get started for free and purchase when you're ready to launch!
 
 *   **TRY IT:** Download and explore the full source code under the polyForm free trial  [license](LICENSE). Perfect for evaluation.
-*   **BUY IT:** For commercial use, get a lifetime license with a **one-time payment**. No subscriptions!
+*   **BUY IT:** Get an unlimited commercial lifetime license with a **one-time payment**. No subscriptions!
 *   **GET YOURS:** [**Purchase via GitHub Sponsors**](https://github.com/sponsors/flutter-news-app-full-source-code).
 
 > *<p style="color:grey">Note: The single purchase provides a comprehensive commercial license covering every repository within the [Flutter News App - Full Source Code Toolkit](https://github.com/flutter-news-app-full-source-code) organization. No separate purchases are needed for the API or dashboard..</p>*

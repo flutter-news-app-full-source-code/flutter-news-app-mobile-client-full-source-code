@@ -1,15 +1,15 @@
 {
   "project_info": {
     "project_number": "420644261437",
-    "project_id": "headlines-toolkit",
-    "storage_bucket": "headlines-toolkit.firebasestorage.app"
+    "project_id": "flutter-news-app-full-source-code",
+    "storage_bucket": "flutter-news-app-full-source-code.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
         "mobilesdk_app_id": "1:420644261437:android:3fa3052f883bf86958a454",
         "android_client_info": {
-          "package_name": "com.example.ht_main"
+          "package_name": "com.example.flutter_news_app_mobile_client_full_source_code"
         }
       },
       "oauth_client": [],

@@ -1,4 +1,4 @@
-import 'package:ht_main/app/config/app_environment.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 
 class AppConfig {
   const AppConfig({

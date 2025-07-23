@@ -1,5 +1,5 @@
-import 'package:ht_data_repository/ht_data_repository.dart';
-import 'package:ht_shared/ht_shared.dart';
+import 'package:core/core.dart';
+import 'package:data_repository/data_repository.dart';
 
 /// {@template demo_data_migration_service}
 /// A service responsible for migrating user data (settings and preferences)
@@ -12,14 +12,14 @@ import 'package:ht_shared/ht_shared.dart';
 class DemoDataMigrationService {
   /// {@macro demo_data_migration_service}
   const DemoDataMigrationService({
-    required HtDataRepository<UserAppSettings> userAppSettingsRepository,
-    required HtDataRepository<UserContentPreferences>
+    required DataRepository<UserAppSettings> userAppSettingsRepository,
+    required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
   }) : _userAppSettingsRepository = userAppSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository;
 
-  final HtDataRepository<UserAppSettings> _userAppSettingsRepository;
-  final HtDataRepository<UserContentPreferences>
+  final DataRepository<UserAppSettings> _userAppSettingsRepository;
+  final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
 
   /// Migrates user settings and content preferences from an old anonymous

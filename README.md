@@ -1,7 +1,7 @@
 <div align="center">
 <img src="https://avatars.githubusercontent.com/u/202675624?s=400&u=2daf23e8872a3b666bcd4f792a21fe2633097e79&v=4" alt="Flutter News App Toolkit Logo" width="220">
 
-# The Complete Flutter News App - Full Source Code
+# Flutter News App - Mobile Client Full Source Code
 
 <p>
 <img src="https://img.shields.io/badge/coverage-XX-green?style=for-the-badge" alt="coverage: percentage">
@@ -11,7 +11,7 @@
 </p>
 </div>
 
-This is a complete and fully-functional Flutter news application. It gives you everything you need to launch your own news app on the App Store and Google Play, right out of the box. It is a key component of the [**Flutter News App - Full Source Code Toolkit**](https://github.com/flutter-news-app-full-source-code), an ecosystem that also includes a dart frog [backend API](https://github.com/flutter-news-app-full-source-code/flutter-news-app-api-server-full-source-code) and a web-based [content dashboard](https://github.com/flutter-news-app-full-source-code/flutter-news-app-web-dashboard-full-source-code).
+This is a complete and fully-functional Flutter news application. It gives you everything you need to launch your own news app on the App Store and Google Play, right out of the box. It is a key component of the [**flutter news app full source code toolkit**](https://github.com/flutter-news-app-full-source-code), an ecosystem that also includes a dart frog [backend API](https://github.com/flutter-news-app-full-source-code/flutter-news-app-api-server-full-source-code) and a web-based [content dashboard](https://github.com/flutter-news-app-full-source-code/flutter-news-app-web-dashboard-full-source-code).
 
 ## ⭐ Everything You Get, Ready to Go
 
@@ -75,7 +75,7 @@ Get started for free and purchase when you're ready to launch!
 *   **BUY IT:** For commercial use, get a lifetime license with a **one-time payment**. No subscriptions!
 *   **GET YOURS:** [**Purchase via GitHub Sponsors**](https://github.com/sponsors/flutter-news-app-full-source-code).
 
-> *<p style="color:grey">Note: Your one-time purchase covers the entire Flutter News App Toolkit, including the mobile app, backend API, and web dashboard repositories in this organization.</p>*
+> *<p style="color:grey">Note: The single purchase provides a comprehensive commercial license covering every repository within the [Flutter News App - Full Source Code Toolkit](https://github.com/flutter-news-app-full-source-code) organization. No separate purchases are needed for the API or dashboard..</p>*
 ---
 
 ## 🚀 Getting Started & Running Locally

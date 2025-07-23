@@ -7,8 +7,35 @@ environment:
   sdk: ^3.8.0
 
 dependencies:
+  auth_api:
+    git:
+      url: https://github.com/flutter-news-app-full-source-code/auth-api.git
+  auth_client:
+    git:
+      url: https://github.com/flutter-news-app-full-source-code/auth-client.git
+  auth_inmemory:
+    git:
+      url: https://github.com/flutter-news-app-full-source-code/auth-inmemory.git
+  auth_repository:
+    git:
+      url: https://github.com/flutter-news-app-full-source-code/auth-repository.git
   bloc: ^9.0.0
   bloc_concurrency: ^0.3.0
+  core:
+    git:
+      url: https://github.com/flutter-news-app-full-source-code/core.git
+  data_api:
+    git:
+      url: https://github.com/flutter-news-app-full-source-code/data-api.git
+  data_client:
+    git:
+      url: https://github.com/flutter-news-app-full-source-code/data-client.git
+  data_inmemory:
+    git:
+      url: https://github.com/flutter-news-app-full-source-code/data-inmemory.git
+  data_repository:
+    git:
+      url: https://github.com/flutter-news-app-full-source-code/data-repository.git
   device_preview: ^1.2.0
   equatable: ^2.0.7
   flex_color_scheme: ^8.2.0
@@ -22,52 +49,25 @@ dependencies:
   flutter_native_splash: ^2.4.5
   go_router: ^16.0.0
   google_fonts: ^6.2.1
-  auth_api:
-    git:
-      url: https://github.com/flutter-news-app-full-source-code/auth-api.git
-  auth_client:
-    git:
-      url: https://github.com/flutter-news-app-full-source-code/auth-client.git
-  auth_inmemory:
-    git:
-      url: https://github.com/flutter-news-app-full-source-code/auth-inmemory.git
-  auth_repository:
-    git:
-      url: https://github.com/flutter-news-app-full-source-code/auth-repository.git
-  data_api:
-    git:
-      url: https://github.com/flutter-news-app-full-source-code/data-api.git
-  data_client:
-    git:
-      url: https://github.com/flutter-news-app-full-source-code/data-client.git
-  data_inmemory:
-    git:
-      url: https://github.com/flutter-news-app-full-source-code/data-inmemory.git
-  data_repository:
-    git:
-      url: https://github.com/flutter-news-app-full-source-code/data-repository.git
   http_client:
     git:
       url: https://github.com/flutter-news-app-full-source-code/http-client.git
+  intl: ^0.20.2
+  js_interop: ^0.0.1
   kv_storage_service:
     git:
       url: https://github.com/flutter-news-app-full-source-code/kv-storage-service.git
   kv_storage_shared_preferences:
     git:
       url: https://github.com/flutter-news-app-full-source-code/kv-storage-shared-preferences.git
-  core:
-    git:
-      url: https://github.com/flutter-news-app-full-source-code/core.git
-  ui_kit:
-    git:
-      url: https://github.com/flutter-news-app-full-source-code/ui-kit.git
-  intl: ^0.20.2
-  js_interop: ^0.0.1
   logging: ^1.3.0
   meta: ^1.16.0
   share_plus: ^11.0.0
   stream_transform: ^2.1.1
   timeago: ^3.7.1
+  ui_kit:
+    git:
+      url: https://github.com/flutter-news-app-full-source-code/ui-kit.git
   url_launcher: ^6.3.1
   uuid: ^4.4.0
 

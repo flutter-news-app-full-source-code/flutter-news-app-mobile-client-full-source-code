@@ -1,21 +1,21 @@
 //
 // ignore_for_file: lines_longer_than_80_chars
 
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import 'package:ht_main/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 // HeadlineItemWidget import removed
-import 'package:ht_main/headlines-search/bloc/headlines_search_bloc.dart';
-// import 'package:ht_main/headlines-search/widgets/country_item_widget.dart';
-import 'package:ht_main/headlines-search/widgets/source_item_widget.dart';
-import 'package:ht_main/headlines-search/widgets/topic_item_widget.dart';
-import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_main/router/routes.dart';
-import 'package:ht_main/shared/extensions/content_type_extensions.dart';
-import 'package:ht_main/shared/shared.dart';
-import 'package:ht_shared/ht_shared.dart';
-import 'package:ht_ui_kit/ht_ui_kit.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-search/bloc/headlines_search_bloc.dart';
+// import 'package:flutter_news_app_mobile_client_full_source_code/headlines-search/widgets/country_item_widget.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-search/widgets/source_item_widget.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-search/widgets/topic_item_widget.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/content_type_extensions.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/shared.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ui_kit/ui_kit.dart';
 
 /// Page widget responsible for providing the BLoC for the headlines search feature.
 class HeadlinesSearchPage extends StatelessWidget {
@@ -56,7 +56,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
         _showClearButton = _textController.text.isNotEmpty;
       });
     });
-    // TODO(user): This logic might need adjustment if not all ContentType values are searchable.
+    // TODO(fulleni): This logic might need adjustment if not all ContentType values are searchable.
     // For now, we default to headline if the current selection is not in the allowed list.
     final searchableTypes = [
       ContentType.headline,
@@ -110,7 +110,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
     final textTheme = theme.textTheme;
     final appBarTheme = theme.appBarTheme;
 
-    // TODO(user): Replace this with a filtered list of searchable content types.
+    // TODO(fulleni): Replace this with a filtered list of searchable content types.
     final availableSearchModelTypes = [
       ContentType.headline,
       ContentType.topic,
@@ -159,7 +159,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                       appBarTheme.iconTheme?.color ??
                       colorScheme.onSurfaceVariant,
                 ),
-                // TODO(user): Use the new localization extension here.
+                // TODO(fulleni): Use the new localization extension here.
                 items: availableSearchModelTypes.map((ContentType type) {
                   return DropdownMenuItem<ContentType>(
                     value: type,
@@ -187,7 +187,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                 controller: _textController,
                 style: appBarTheme.titleTextStyle ?? textTheme.titleMedium,
                 decoration: InputDecoration(
-                  // TODO(user): Create a similar localization extension for hint text.
+                  // TODO(fulleni): Create a similar localization extension for hint text.
                   hintText: 'Search...',
                   hintStyle: textTheme.bodyMedium?.copyWith(
                     color:

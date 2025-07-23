@@ -1,23 +1,24 @@
 import 'dart:async';
 
+import 'package:auth_repository/auth_repository.dart';
 import 'package:bloc/bloc.dart';
+import 'package:core/core.dart';
+import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:ht_auth_repository/ht_auth_repository.dart';
-import 'package:ht_data_repository/ht_data_repository.dart';
-import 'package:ht_main/app/config/config.dart' as local_config;
-import 'package:ht_main/app/services/demo_data_migration_service.dart';
-import 'package:ht_shared/ht_shared.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
+    as local_config;
+import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
 
 part 'app_event.dart';
 part 'app_state.dart';
 
 class AppBloc extends Bloc<AppEvent, AppState> {
   AppBloc({
-    required HtAuthRepository authenticationRepository,
-    required HtDataRepository<UserAppSettings> userAppSettingsRepository,
-    required HtDataRepository<RemoteConfig> appConfigRepository,
+    required AuthRepository authenticationRepository,
+    required DataRepository<UserAppSettings> userAppSettingsRepository,
+    required DataRepository<RemoteConfig> appConfigRepository,
     required local_config.AppEnvironment environment,
     this.demoDataMigrationService,
   }) : _authenticationRepository = authenticationRepository,
@@ -66,9 +67,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     );
   }
 
-  final HtAuthRepository _authenticationRepository;
-  final HtDataRepository<UserAppSettings> _userAppSettingsRepository;
-  final HtDataRepository<RemoteConfig> _appConfigRepository;
+  final AuthRepository _authenticationRepository;
+  final DataRepository<UserAppSettings> _userAppSettingsRepository;
+  final DataRepository<RemoteConfig> _appConfigRepository;
   final local_config.AppEnvironment _environment;
   final DemoDataMigrationService? demoDataMigrationService;
   late final StreamSubscription<User?> _userSubscription;
@@ -449,9 +450,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           status: newStatusBasedOnUser,
         ),
       );
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       print(
-        '[AppBloc] Failed to fetch AppConfig (HtHttpException) for user ${state.user?.id}: ${e.runtimeType} - ${e.message}',
+        '[AppBloc] Failed to fetch AppConfig (HttpException) for user ${state.user?.id}: ${e.runtimeType} - ${e.message}',
       );
       emit(
         state.copyWith(
@@ -505,7 +506,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // Emit the change so UI can react if needed, and other BLoCs get the update.
       emit(state.copyWith(user: updatedUser));
 
-      // TODO: Persist this change to the backend.
+      // TODO(fulleni): Persist this change to the backend.
       // This would typically involve calling a method on a repository, e.g.:
       // try {
       //   await _authenticationRepository.updateUserFeedActionStatus(
@@ -536,7 +537,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       return;
     }
 
-    // TODO(ht-development): Get the current app version from a package like
+    // TODO(fulleni): Get the current app version from a package like
     // package_info_plus and compare it with appStatus.latestAppVersion.
     if (appStatus.isLatestVersionOnly) {
       emit(state.copyWith(status: AppStatus.updateRequired));

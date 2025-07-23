@@ -1,24 +1,23 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:core/core.dart' show Headline, HttpException, UnknownException;
+import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_data_repository/ht_data_repository.dart';
-import 'package:ht_shared/ht_shared.dart'
-    show Headline, HtHttpException, UnknownException;
 
 part 'headline_details_event.dart';
 part 'headline_details_state.dart';
 
 class HeadlineDetailsBloc
     extends Bloc<HeadlineDetailsEvent, HeadlineDetailsState> {
-  HeadlineDetailsBloc({required HtDataRepository<Headline> headlinesRepository})
+  HeadlineDetailsBloc({required DataRepository<Headline> headlinesRepository})
     : _headlinesRepository = headlinesRepository,
       super(HeadlineDetailsInitial()) {
     on<FetchHeadlineById>(_onFetchHeadlineById);
     on<HeadlineProvided>(_onHeadlineProvided);
   }
 
-  final HtDataRepository<Headline> _headlinesRepository;
+  final DataRepository<Headline> _headlinesRepository;
 
   Future<void> _onFetchHeadlineById(
     FetchHeadlineById event,
@@ -28,7 +27,7 @@ class HeadlineDetailsBloc
     try {
       final headline = await _headlinesRepository.read(id: event.headlineId);
       emit(HeadlineDetailsLoaded(headline: headline));
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       emit(HeadlineDetailsFailure(exception: e));
     } catch (e) {
       emit(

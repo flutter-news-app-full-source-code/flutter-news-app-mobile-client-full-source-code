@@ -1,9 +1,9 @@
 import 'dart:async';
 
+import 'package:auth_repository/auth_repository.dart';
 import 'package:bloc/bloc.dart';
+import 'package:core/core.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_auth_repository/ht_auth_repository.dart';
-import 'package:ht_shared/ht_shared.dart';
 
 part 'authentication_event.dart';
 part 'authentication_state.dart';
@@ -14,7 +14,7 @@ part 'authentication_state.dart';
 class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
   /// {@macro authentication_bloc}
-  AuthenticationBloc({required HtAuthRepository authenticationRepository})
+  AuthenticationBloc({required AuthRepository authenticationRepository})
     : _authenticationRepository = authenticationRepository,
       super(const AuthenticationState()) {
     // Listen to authentication state changes from the repository
@@ -33,7 +33,7 @@ class AuthenticationBloc
     on<AuthenticationSignOutRequested>(_onAuthenticationSignOutRequested);
   }
 
-  final HtAuthRepository _authenticationRepository;
+  final AuthRepository _authenticationRepository;
   late final StreamSubscription<User?> _userAuthSubscription;
 
   /// Handles [_AuthenticationUserChanged] events.
@@ -72,7 +72,7 @@ class AuthenticationBloc
           email: event.email,
         ),
       );
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       emit(state.copyWith(status: AuthenticationStatus.failure, exception: e));
     } catch (e) {
       emit(
@@ -94,7 +94,7 @@ class AuthenticationBloc
       await _authenticationRepository.verifySignInCode(event.email, event.code);
       // On success, the _AuthenticationUserChanged listener will handle
       // emitting the authenticated state.
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       emit(state.copyWith(status: AuthenticationStatus.failure, exception: e));
     } catch (e) {
       emit(
@@ -116,7 +116,7 @@ class AuthenticationBloc
       await _authenticationRepository.signInAnonymously();
       // On success, the _AuthenticationUserChanged listener will handle
       // emitting the authenticated state.
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       emit(state.copyWith(status: AuthenticationStatus.failure, exception: e));
     } catch (e) {
       emit(
@@ -138,7 +138,7 @@ class AuthenticationBloc
       await _authenticationRepository.signOut();
       // On success, the _AuthenticationUserChanged listener will handle
       // emitting the unauthenticated state.
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       emit(state.copyWith(status: AuthenticationStatus.failure, exception: e));
     } catch (e) {
       emit(

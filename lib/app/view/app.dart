@@ -1,35 +1,35 @@
+import 'package:auth_repository/auth_repository.dart';
+import 'package:core/core.dart' hide AppStatus;
+import 'package:data_repository/data_repository.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/router/router.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ht_auth_repository/ht_auth_repository.dart';
-import 'package:ht_data_repository/ht_data_repository.dart';
-import 'package:ht_kv_storage_service/ht_kv_storage_service.dart';
-import 'package:ht_main/app/bloc/app_bloc.dart';
-import 'package:ht_main/app/config/app_environment.dart';
-import 'package:ht_main/app/services/demo_data_migration_service.dart';
-import 'package:ht_main/authentication/bloc/authentication_bloc.dart';
-import 'package:ht_main/l10n/app_localizations.dart';
-import 'package:ht_main/router/router.dart';
-import 'package:ht_shared/ht_shared.dart' hide AppStatus;
-import 'package:ht_ui_kit/ht_ui_kit.dart';
+import 'package:kv_storage_service/kv_storage_service.dart';
+import 'package:ui_kit/ui_kit.dart';
 
 class App extends StatelessWidget {
   const App({
-    required HtAuthRepository htAuthenticationRepository,
-    required HtDataRepository<Headline> htHeadlinesRepository,
-    required HtDataRepository<Topic> htTopicsRepository,
-    required HtDataRepository<Country> htCountriesRepository,
-    required HtDataRepository<Source> htSourcesRepository,
-    required HtDataRepository<UserAppSettings> htUserAppSettingsRepository,
-    required HtDataRepository<UserContentPreferences>
+    required AuthRepository authenticationRepository,
+    required DataRepository<Headline> htHeadlinesRepository,
+    required DataRepository<Topic> htTopicsRepository,
+    required DataRepository<Country> htCountriesRepository,
+    required DataRepository<Source> htSourcesRepository,
+    required DataRepository<UserAppSettings> htUserAppSettingsRepository,
+    required DataRepository<UserContentPreferences>
     htUserContentPreferencesRepository,
-    required HtDataRepository<RemoteConfig> htRemoteConfigRepository,
-    required HtKVStorageService kvStorageService,
+    required DataRepository<RemoteConfig> htRemoteConfigRepository,
+    required KVStorageService kvStorageService,
     required AppEnvironment environment,
     this.demoDataMigrationService,
     super.key,
-  }) : _htAuthenticationRepository = htAuthenticationRepository,
+  }) : _authenticationRepository = authenticationRepository,
        _htHeadlinesRepository = htHeadlinesRepository,
        _htTopicsRepository = htTopicsRepository,
        _htCountriesRepository = htCountriesRepository,
@@ -40,16 +40,16 @@ class App extends StatelessWidget {
        _kvStorageService = kvStorageService,
        _environment = environment;
 
-  final HtAuthRepository _htAuthenticationRepository;
-  final HtDataRepository<Headline> _htHeadlinesRepository;
-  final HtDataRepository<Topic> _htTopicsRepository;
-  final HtDataRepository<Country> _htCountriesRepository;
-  final HtDataRepository<Source> _htSourcesRepository;
-  final HtDataRepository<UserAppSettings> _htUserAppSettingsRepository;
-  final HtDataRepository<UserContentPreferences>
+  final AuthRepository _authenticationRepository;
+  final DataRepository<Headline> _htHeadlinesRepository;
+  final DataRepository<Topic> _htTopicsRepository;
+  final DataRepository<Country> _htCountriesRepository;
+  final DataRepository<Source> _htSourcesRepository;
+  final DataRepository<UserAppSettings> _htUserAppSettingsRepository;
+  final DataRepository<UserContentPreferences>
   _htUserContentPreferencesRepository;
-  final HtDataRepository<RemoteConfig> _htAppConfigRepository;
-  final HtKVStorageService _kvStorageService;
+  final DataRepository<RemoteConfig> _htAppConfigRepository;
+  final KVStorageService _kvStorageService;
   final AppEnvironment _environment;
   final DemoDataMigrationService? demoDataMigrationService;
 
@@ -57,7 +57,7 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-        RepositoryProvider.value(value: _htAuthenticationRepository),
+        RepositoryProvider.value(value: _authenticationRepository),
         RepositoryProvider.value(value: _htHeadlinesRepository),
         RepositoryProvider.value(value: _htTopicsRepository),
         RepositoryProvider.value(value: _htCountriesRepository),
@@ -71,23 +71,22 @@ class App extends StatelessWidget {
         providers: [
           BlocProvider(
             create: (context) => AppBloc(
-              authenticationRepository: context.read<HtAuthRepository>(),
+              authenticationRepository: context.read<AuthRepository>(),
               userAppSettingsRepository: context
-                  .read<HtDataRepository<UserAppSettings>>(),
-              appConfigRepository: context
-                  .read<HtDataRepository<RemoteConfig>>(),
+                  .read<DataRepository<UserAppSettings>>(),
+              appConfigRepository: context.read<DataRepository<RemoteConfig>>(),
               environment: _environment,
               demoDataMigrationService: demoDataMigrationService,
             ),
           ),
           BlocProvider(
             create: (context) => AuthenticationBloc(
-              authenticationRepository: context.read<HtAuthRepository>(),
+              authenticationRepository: context.read<AuthRepository>(),
             ),
           ),
         ],
         child: _AppView(
-          htAuthenticationRepository: _htAuthenticationRepository,
+          authenticationRepository: _authenticationRepository,
           htHeadlinesRepository: _htHeadlinesRepository,
           htTopicRepository: _htTopicsRepository,
           htCountriesRepository: _htCountriesRepository,
@@ -105,7 +104,7 @@ class App extends StatelessWidget {
 
 class _AppView extends StatefulWidget {
   const _AppView({
-    required this.htAuthenticationRepository,
+    required this.authenticationRepository,
     required this.htHeadlinesRepository,
     required this.htTopicRepository,
     required this.htCountriesRepository,
@@ -116,15 +115,15 @@ class _AppView extends StatefulWidget {
     required this.environment,
   });
 
-  final HtAuthRepository htAuthenticationRepository;
-  final HtDataRepository<Headline> htHeadlinesRepository;
-  final HtDataRepository<Topic> htTopicRepository;
-  final HtDataRepository<Country> htCountriesRepository;
-  final HtDataRepository<Source> htSourcesRepository;
-  final HtDataRepository<UserAppSettings> htUserAppSettingsRepository;
-  final HtDataRepository<UserContentPreferences>
+  final AuthRepository authenticationRepository;
+  final DataRepository<Headline> htHeadlinesRepository;
+  final DataRepository<Topic> htTopicRepository;
+  final DataRepository<Country> htCountriesRepository;
+  final DataRepository<Source> htSourcesRepository;
+  final DataRepository<UserAppSettings> htUserAppSettingsRepository;
+  final DataRepository<UserContentPreferences>
   htUserContentPreferencesRepository;
-  final HtDataRepository<RemoteConfig> htAppConfigRepository;
+  final DataRepository<RemoteConfig> htAppConfigRepository;
   final AppEnvironment environment;
 
   @override
@@ -145,7 +144,7 @@ class _AppViewState extends State<_AppView> {
     _statusNotifier = ValueNotifier<AppStatus>(appBloc.state.status);
     _router = createRouter(
       authStatusNotifier: _statusNotifier,
-      htAuthenticationRepository: widget.htAuthenticationRepository,
+      authenticationRepository: widget.authenticationRepository,
       htHeadlinesRepository: widget.htHeadlinesRepository,
       htTopicsRepository: widget.htTopicRepository,
       htCountriesRepository: widget.htCountriesRepository,
@@ -205,11 +204,11 @@ class _AppViewState extends State<_AppView> {
                   .themeMode, // Still respect light/dark if available from system
               localizationsDelegates: const [
                 ...AppLocalizations.localizationsDelegates,
-                ...HtUiKitLocalizations.localizationsDelegates,
+                ...UiKitLocalizations.localizationsDelegates,
               ],
               supportedLocales: const [
                 ...AppLocalizations.supportedLocales,
-                ...HtUiKitLocalizations.supportedLocales,
+                ...UiKitLocalizations.supportedLocales,
               ],
               home: Scaffold(
                 body: Builder(
@@ -246,11 +245,11 @@ class _AppViewState extends State<_AppView> {
               themeMode: state.themeMode,
               localizationsDelegates: const [
                 ...AppLocalizations.localizationsDelegates,
-                ...HtUiKitLocalizations.localizationsDelegates,
+                ...UiKitLocalizations.localizationsDelegates,
               ],
               supportedLocales: const [
                 ...AppLocalizations.supportedLocales,
-                ...HtUiKitLocalizations.supportedLocales,
+                ...UiKitLocalizations.supportedLocales,
               ],
               home: Scaffold(
                 body: Builder(
@@ -258,7 +257,7 @@ class _AppViewState extends State<_AppView> {
                   builder: (innerContext) {
                     return FailureStateWidget(
                       exception: const NetworkException(),
-                      retryButtonText: HtUiKitLocalizations.of(
+                      retryButtonText: UiKitLocalizations.of(
                         innerContext,
                       )!.retryButtonText,
                       onRetry: () {
@@ -308,11 +307,11 @@ class _AppViewState extends State<_AppView> {
             locale: state.locale,
             localizationsDelegates: const [
               ...AppLocalizations.localizationsDelegates,
-              ...HtUiKitLocalizations.localizationsDelegates,
+              ...UiKitLocalizations.localizationsDelegates,
             ],
             supportedLocales: const [
               ...AppLocalizations.supportedLocales,
-              ...HtUiKitLocalizations.supportedLocales,
+              ...UiKitLocalizations.supportedLocales,
             ],
           );
         },

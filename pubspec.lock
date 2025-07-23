@@ -13,10 +13,10 @@ packages:
     dependency: transitive
     description:
       name: analyzer
-      sha256: b1ade5707ab7a90dfd519eaac78a7184341d19adb6096c68d499b59c7c6cf880
+      sha256: "974859dc0ff5f37bc4313244b3218c791810d03ab3470a579580279ba971a48d"
       url: "https://pub.dev"
     source: hosted
-    version: "7.7.0"
+    version: "7.7.1"
   ansicolor:
     dependency: transitive
     description:
@@ -49,6 +49,42 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.13.0"
+  auth_api:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "94cf789316c23569b7b7d641a5243848749aa079"
+      url: "https://github.com/flutter-news-app-full-source-code/auth-api.git"
+    source: git
+    version: "0.0.0"
+  auth_client:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "8e331975e2df63e2eb6f06d9059309397375bb19"
+      url: "https://github.com/flutter-news-app-full-source-code/auth-client.git"
+    source: git
+    version: "0.0.0"
+  auth_inmemory:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: f48dc0555b1a28ed3c51215f3a93403dbbc46ea0
+      url: "https://github.com/flutter-news-app-full-source-code/auth-inmemory.git"
+    source: git
+    version: "0.0.0"
+  auth_repository:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "390e33098a8e6cbe30934386f4c0fe5b48783b0a"
+      url: "https://github.com/flutter-news-app-full-source-code/auth-repository.git"
+    source: git
+    version: "0.0.0"
   bloc:
     dependency: "direct main"
     description:
@@ -137,6 +173,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.2"
+  core:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "3022edcb06d7c55ea81f25126b7f8c28c9105d4c"
+      url: "https://github.com/flutter-news-app-full-source-code/core.git"
+    source: git
+    version: "0.0.0"
   coverage:
     dependency: transitive
     description:
@@ -169,6 +214,42 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.2"
+  data_api:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "2b5691784f32b86e5c9d7d9999fa6dc11fb9a3a0"
+      url: "https://github.com/flutter-news-app-full-source-code/data-api.git"
+    source: git
+    version: "0.0.0"
+  data_client:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "8800311dad6e94bff7fb7a738c8583483bee33ca"
+      url: "https://github.com/flutter-news-app-full-source-code/data-client.git"
+    source: git
+    version: "0.0.0"
+  data_inmemory:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: f12b8a78ee3ca0ca18b356e4c89f1d9171e2be61
+      url: "https://github.com/flutter-news-app-full-source-code/data-inmemory.git"
+    source: git
+    version: "0.0.0"
+  data_repository:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "5a7bd9f597e98209bc7f5ac897cf64552306c02f"
+      url: "https://github.com/flutter-news-app-full-source-code/data-repository.git"
+    source: git
+    version: "0.0.0"
   device_frame:
     dependency: transitive
     description:
@@ -345,10 +426,10 @@ packages:
     dependency: "direct main"
     description:
       name: go_router
-      sha256: b453934c36e289cef06525734d1e676c1f91da9e22e2017d9dcab6ce0f999175
+      sha256: c489908a54ce2131f1d1b7cc631af9c1a06fac5ca7c449e959192089f9489431
       url: "https://pub.dev"
     source: hosted
-    version: "15.1.3"
+    version: "16.0.0"
   google_fonts:
     dependency: "direct main"
     description:
@@ -357,123 +438,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.2.1"
-  ht_auth_api:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: a2fc2a651494831a461fff96807141bdba9cc28b
-      url: "https://github.com/headlines-toolkit/ht-auth-api.git"
-    source: git
-    version: "0.0.0"
-  ht_auth_client:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: a003eb493db4fc134db419a721ee2fda0b598032
-      url: "https://github.com/headlines-toolkit/ht-auth-client.git"
-    source: git
-    version: "0.0.0"
-  ht_auth_inmemory:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: ea9ad0361b1e0beab4690959889b7056091d29dc
-      url: "https://github.com/headlines-toolkit/ht-auth-inmemory"
-    source: git
-    version: "0.0.0"
-  ht_auth_repository:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: b7de5cc86d432b17710c83a1bf8de105bb4fa00d
-      url: "https://github.com/headlines-toolkit/ht-auth-repository.git"
-    source: git
-    version: "0.0.0"
-  ht_data_api:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "16630c8717646663e52eee3ebedc4daa35ec4d39"
-      url: "https://github.com/headlines-toolkit/ht-data-api.git"
-    source: git
-    version: "0.0.0"
-  ht_data_client:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: e566ee6eae5261c00d0987972efc77a37a0c4c3a
-      url: "https://github.com/headlines-toolkit/ht-data-client.git"
-    source: git
-    version: "0.0.0"
-  ht_data_inmemory:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "7945773edb4251d294071820c4ce1b6332f032ec"
-      url: "https://github.com/headlines-toolkit/ht-data-inmemory.git"
-    source: git
-    version: "0.0.0"
-  ht_data_repository:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: f19fe64c67a2febdef853b15f6df9c63240ad48e
-      url: "https://github.com/headlines-toolkit/ht-data-repository.git"
-    source: git
-    version: "0.0.0"
-  ht_http_client:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "3c50cd082406d4cacafe60ad097ba6fa6ba891eb"
-      url: "https://github.com/headlines-toolkit/ht-http-client.git"
-    source: git
-    version: "0.0.0"
-  ht_kv_storage_service:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "2378d6698df1cdeb7c5a17470f94fb8a5a99ca01"
-      url: "https://github.com/headlines-toolkit/ht-kv-storage-service.git"
-    source: git
-    version: "0.0.0"
-  ht_kv_storage_shared_preferences:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "3c65be5424cfe155ec0f35f9a61ddf5c3bdae5cf"
-      url: "https://github.com/headlines-toolkit/ht-kv-storage-shared-preferences.git"
-    source: git
-    version: "0.0.0"
-  ht_shared:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "2f78ac83c319242822250088c1edb11324404cb3"
-      url: "https://github.com/headlines-toolkit/ht-shared.git"
-    source: git
-    version: "0.0.0"
-  ht_ui_kit:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "1c13e5accfa5fad7d262fbc5693780eac6f03fd9"
-      url: "https://github.com/headlines-toolkit/ht-ui-kit.git"
-    source: git
-    version: "0.0.0"
   html:
     dependency: transitive
     description:
@@ -490,6 +454,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.0"
+  http_client:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: d4b48d57a441a12450724ff14a9796cc0f701754
+      url: "https://github.com/flutter-news-app-full-source-code/http-client.git"
+    source: git
+    version: "0.0.0"
   http_multi_server:
     dependency: transitive
     description:
@@ -554,6 +527,24 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.9.0"
+  kv_storage_service:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "9ab4ec1467a3e97303f26afe193d29a56e42a8f6"
+      url: "https://github.com/flutter-news-app-full-source-code/kv-storage-service.git"
+    source: git
+    version: "0.0.0"
+  kv_storage_shared_preferences:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: f39ef951681e27eadab926fdcf7ece8fc1319a05
+      url: "https://github.com/flutter-news-app-full-source-code/kv-storage-shared-preferences.git"
+    source: git
+    version: "0.0.0"
   leak_tracker:
     dependency: transitive
     description:
@@ -983,6 +974,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.0"
+  ui_kit:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "21297142a410dd4e0b8af7aa16178ccb3fcdd867"
+      url: "https://github.com/flutter-news-app-full-source-code/ui-kit.git"
+    source: git
+    version: "0.0.0"
   universal_io:
     dependency: transitive
     description:
@@ -1075,10 +1075,10 @@ packages:
     dependency: "direct dev"
     description:
       name: very_good_analysis
-      sha256: "62d2b86d183fb81b2edc22913d9f155d26eb5cf3855173adb1f59fac85035c63"
+      sha256: e479fbc0941009262343db308133e121bf8660c2c81d48dd8e952df7b7e1e382
       url: "https://pub.dev"
     source: hosted
-    version: "7.0.0"
+    version: "9.0.0"
   vm_service:
     dependency: transitive
     description:

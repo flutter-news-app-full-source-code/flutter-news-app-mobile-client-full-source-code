@@ -1,4 +1,4 @@
-import 'package:ht_shared/ht_shared.dart';
+import 'package:core/core.dart';
 import 'package:uuid/uuid.dart';
 
 /// A service responsible for injecting various types of FeedItems (like Ads

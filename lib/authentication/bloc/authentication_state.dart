@@ -51,14 +51,14 @@ class AuthenticationState extends Equatable {
   final String? email;
 
   /// The exception that occurred, if any.
-  final HtHttpException? exception;
+  final HttpException? exception;
 
   /// Creates a copy of the current [AuthenticationState] with updated values.
   AuthenticationState copyWith({
     AuthenticationStatus? status,
     User? user,
     String? email,
-    HtHttpException? exception,
+    HttpException? exception,
   }) {
     return AuthenticationState(
       status: status ?? this.status,

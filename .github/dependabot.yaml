@@ -9,4 +9,16 @@ updates:
     schedule:
       interval: "daily"
     ignore:
-      - dependency-name: "ht_*"
+      - dependency-name: "auth_api"
+      - dependency-name: "auth_client"
+      - dependency-name: "auth_inmemory"
+      - dependency-name: "auth_repository"
+      - dependency-name: "data_api"
+      - dependency-name: "data_client"
+      - dependency-name: "data_inmemory"
+      - dependency-name: "data_repository"
+      - dependency-name: "http_client"
+      - dependency-name: "kv_storage_service"
+      - dependency-name: "kv_storage_shared_preferences"
+      - dependency-name: "core"
+      - dependency-name: "ui_kit"

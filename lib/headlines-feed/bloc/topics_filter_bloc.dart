@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
+import 'package:core/core.dart';
+import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_data_repository/ht_data_repository.dart';
-import 'package:ht_shared/ht_shared.dart';
 
 part 'topics_filter_event.dart';
 part 'topics_filter_state.dart';
@@ -13,13 +13,13 @@ part 'topics_filter_state.dart';
 /// Manages the state for fetching and displaying topics for filtering.
 ///
 /// Handles initial fetching and pagination of topics using the
-/// provided [HtDataRepository].
+/// provided [DataRepository].
 /// {@endtemplate}
 class TopicsFilterBloc extends Bloc<TopicsFilterEvent, TopicsFilterState> {
   /// {@macro topics_filter_bloc}
   ///
-  /// Requires a [HtDataRepository<Topic>] to interact with the data layer.
-  TopicsFilterBloc({required HtDataRepository<Topic> topicsRepository})
+  /// Requires a [DataRepository<Topic>] to interact with the data layer.
+  TopicsFilterBloc({required DataRepository<Topic> topicsRepository})
     : _topicsRepository = topicsRepository,
       super(const TopicsFilterState()) {
     on<TopicsFilterRequested>(
@@ -32,7 +32,7 @@ class TopicsFilterBloc extends Bloc<TopicsFilterEvent, TopicsFilterState> {
     );
   }
 
-  final HtDataRepository<Topic> _topicsRepository;
+  final DataRepository<Topic> _topicsRepository;
 
   /// Number of topics to fetch per page.
   static const _topicsLimit = 20;
@@ -64,7 +64,7 @@ class TopicsFilterBloc extends Bloc<TopicsFilterEvent, TopicsFilterState> {
           clearError: true,
         ),
       );
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       emit(state.copyWith(status: TopicsFilterStatus.failure, error: e));
     }
   }
@@ -97,7 +97,7 @@ class TopicsFilterBloc extends Bloc<TopicsFilterEvent, TopicsFilterState> {
           cursor: response.cursor,
         ),
       );
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       // Keep existing data but indicate failure
       emit(state.copyWith(status: TopicsFilterStatus.failure, error: e));
     }

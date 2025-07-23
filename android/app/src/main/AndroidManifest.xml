@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="ht_main"
+        android:label="flutter_news_app_mobile_client_full_source_code"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity
@@ -30,7 +30,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <!-- Accepts URIs that begin with your dynamic link domain -->
-                <data android:scheme="https" android:host="htmain.page.link" />
+                <data android:scheme="https" android:host="flutter-news-app-full-source-code.page.link" />
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.

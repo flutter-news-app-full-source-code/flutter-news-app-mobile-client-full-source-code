@@ -1,11 +1,12 @@
 import 'dart:async';
 
+import 'package:auth_repository/auth_repository.dart';
 import 'package:bloc/bloc.dart';
+import 'package:core/core.dart';
+import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_auth_repository/ht_auth_repository.dart';
-import 'package:ht_data_repository/ht_data_repository.dart';
-import 'package:ht_main/app/config/config.dart' as local_config;
-import 'package:ht_shared/ht_shared.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
+    as local_config;
 import 'package:logging/logging.dart';
 
 part 'account_event.dart';
@@ -13,8 +14,8 @@ part 'account_state.dart';
 
 class AccountBloc extends Bloc<AccountEvent, AccountState> {
   AccountBloc({
-    required HtAuthRepository authenticationRepository,
-    required HtDataRepository<UserContentPreferences>
+    required AuthRepository authenticationRepository,
+    required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
     required local_config.AppEnvironment environment,
     Logger? logger,
@@ -23,7 +24,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
        _environment = environment,
        _logger = logger ?? Logger('AccountBloc'),
        super(const AccountState()) {
-    // Listen to user changes from HtAuthRepository
+    // Listen to user changes from AuthRepository
     _userSubscription = _authenticationRepository.authStateChanges.listen((
       user,
     ) {
@@ -39,8 +40,8 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     on<AccountClearUserPreferences>(_onAccountClearUserPreferences);
   }
 
-  final HtAuthRepository _authenticationRepository;
-  final HtDataRepository<UserContentPreferences>
+  final AuthRepository _authenticationRepository;
+  final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
   final local_config.AppEnvironment _environment;
   final Logger _logger;
@@ -149,9 +150,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
             clearError: true,
           ),
         );
-      } on HtHttpException catch (e) {
+      } on HttpException catch (e) {
         _logger.severe(
-          'Failed to create default preferences with HtHttpException: $e',
+          'Failed to create default preferences with HttpException: $e',
         );
         emit(state.copyWith(status: AccountStatus.failure, error: e));
       } catch (e, st) {
@@ -169,9 +170,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
           ),
         );
       }
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       _logger.severe(
-        'AccountLoadUserPreferences failed with HtHttpException: $e',
+        'AccountLoadUserPreferences failed with HttpException: $e',
       );
       emit(state.copyWith(status: AccountStatus.failure, error: e));
     } catch (e, st) {
@@ -227,9 +228,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
           clearError: true,
         ),
       );
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       _logger.severe(
-        'AccountSaveHeadlineToggled failed with HtHttpException: $e',
+        'AccountSaveHeadlineToggled failed with HttpException: $e',
       );
       emit(state.copyWith(status: AccountStatus.failure, error: e));
     } catch (e, st) {
@@ -284,10 +285,8 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
           clearError: true,
         ),
       );
-    } on HtHttpException catch (e) {
-      _logger.severe(
-        'AccountFollowTopicToggled failed with HtHttpException: $e',
-      );
+    } on HttpException catch (e) {
+      _logger.severe('AccountFollowTopicToggled failed with HttpException: $e');
       emit(state.copyWith(status: AccountStatus.failure, error: e));
     } catch (e, st) {
       _logger.severe(
@@ -344,9 +343,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
           clearError: true,
         ),
       );
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       _logger.severe(
-        'AccountFollowSourceToggled failed with HtHttpException: $e',
+        'AccountFollowSourceToggled failed with HttpException: $e',
       );
       emit(state.copyWith(status: AccountStatus.failure, error: e));
     } catch (e, st) {
@@ -392,9 +391,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
           clearError: true,
         ),
       );
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       _logger.severe(
-        'AccountClearUserPreferences failed with HtHttpException: $e',
+        'AccountClearUserPreferences failed with HttpException: $e',
       );
       emit(state.copyWith(status: AccountStatus.failure, error: e));
     } catch (e, st) {

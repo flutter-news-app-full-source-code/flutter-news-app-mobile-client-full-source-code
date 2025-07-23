@@ -1,17 +1,17 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:core/core.dart';
+import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_data_repository/ht_data_repository.dart';
-import 'package:ht_shared/ht_shared.dart';
 
 part 'sources_filter_event.dart';
 part 'sources_filter_state.dart';
 
 class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
   SourcesFilterBloc({
-    required HtDataRepository<Source> sourcesRepository,
-    required HtDataRepository<Country> countriesRepository,
+    required DataRepository<Source> sourcesRepository,
+    required DataRepository<Country> countriesRepository,
   }) : _sourcesRepository = sourcesRepository,
        _countriesRepository = countriesRepository,
        super(const SourcesFilterState()) {
@@ -24,8 +24,8 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
     // Removed _FetchFilteredSourcesRequested event listener
   }
 
-  final HtDataRepository<Source> _sourcesRepository;
-  final HtDataRepository<Country> _countriesRepository;
+  final DataRepository<Source> _sourcesRepository;
+  final DataRepository<Country> _countriesRepository;
 
   Future<void> _onLoadSourceFilterData(
     LoadSourceFilterData event,
@@ -68,7 +68,7 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
           clearErrorMessage: true,
         ),
       );
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       emit(
         state.copyWith(
           dataLoadingStatus: SourceFilterDataLoadingStatus.failure,

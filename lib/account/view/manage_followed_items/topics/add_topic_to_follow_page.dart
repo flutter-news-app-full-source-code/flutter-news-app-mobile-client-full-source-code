@@ -1,11 +1,11 @@
+import 'package:core/core.dart';
+import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ht_data_repository/ht_data_repository.dart';
-import 'package:ht_main/account/bloc/account_bloc.dart';
-import 'package:ht_main/account/bloc/available_topics_bloc.dart';
-import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_shared/ht_shared.dart';
-import 'package:ht_ui_kit/ht_ui_kit.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/available_topics_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:ui_kit/ui_kit.dart';
 
 /// {@template add_topic_to_follow_page}
 /// A page that allows users to browse and select topics to follow.
@@ -22,7 +22,7 @@ class AddTopicToFollowPage extends StatelessWidget {
 
     return BlocProvider(
       create: (context) => AvailableTopicsBloc(
-        topicsRepository: context.read<HtDataRepository<Topic>>(),
+        topicsRepository: context.read<DataRepository<Topic>>(),
       )..add(const FetchAvailableTopics()),
       child: Scaffold(
         appBar: AppBar(

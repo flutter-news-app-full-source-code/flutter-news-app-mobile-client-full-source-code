@@ -1,4 +1,4 @@
-name: ht_main
+name: ci
 
 concurrency:
   group: $-$

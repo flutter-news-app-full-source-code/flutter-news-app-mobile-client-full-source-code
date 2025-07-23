@@ -1,24 +1,22 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:core/core.dart' show Headline, HttpException, PaginationOptions;
+import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_data_repository/ht_data_repository.dart';
-import 'package:ht_shared/ht_shared.dart'
-    show Headline, HtHttpException, PaginationOptions;
 
 part 'similar_headlines_event.dart';
 part 'similar_headlines_state.dart';
 
 class SimilarHeadlinesBloc
     extends Bloc<SimilarHeadlinesEvent, SimilarHeadlinesState> {
-  SimilarHeadlinesBloc({
-    required HtDataRepository<Headline> headlinesRepository,
-  }) : _headlinesRepository = headlinesRepository,
-       super(SimilarHeadlinesInitial()) {
+  SimilarHeadlinesBloc({required DataRepository<Headline> headlinesRepository})
+    : _headlinesRepository = headlinesRepository,
+      super(SimilarHeadlinesInitial()) {
     on<FetchSimilarHeadlines>(_onFetchSimilarHeadlines);
   }
 
-  final HtDataRepository<Headline> _headlinesRepository;
+  final DataRepository<Headline> _headlinesRepository;
   static const int _similarHeadlinesLimit = 5;
 
   Future<void> _onFetchSimilarHeadlines(
@@ -55,7 +53,7 @@ class SimilarHeadlinesBloc
       } else {
         emit(SimilarHeadlinesLoaded(similarHeadlines: finalSimilarHeadlines));
       }
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       emit(SimilarHeadlinesError(message: e.message));
     } catch (e) {
       emit(SimilarHeadlinesError(message: 'An unexpected error occurred: $e'));

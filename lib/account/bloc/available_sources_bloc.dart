@@ -1,22 +1,22 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:core/core.dart' show HttpException, Source;
+import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_data_repository/ht_data_repository.dart';
-import 'package:ht_shared/ht_shared.dart' show HtHttpException, Source;
 
 part 'available_sources_event.dart';
 part 'available_sources_state.dart';
 
 class AvailableSourcesBloc
     extends Bloc<AvailableSourcesEvent, AvailableSourcesState> {
-  AvailableSourcesBloc({required HtDataRepository<Source> sourcesRepository})
+  AvailableSourcesBloc({required DataRepository<Source> sourcesRepository})
     : _sourcesRepository = sourcesRepository,
       super(const AvailableSourcesState()) {
     on<FetchAvailableSources>(_onFetchAvailableSources);
   }
 
-  final HtDataRepository<Source> _sourcesRepository;
+  final DataRepository<Source> _sourcesRepository;
   // Consider adding a limit if the number of sources can be very large.
   // static const _sourcesLimit = 50;
 
@@ -46,7 +46,7 @@ class AvailableSourcesBloc
           clearError: true,
         ),
       );
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       emit(
         state.copyWith(
           status: AvailableSourcesStatus.failure,

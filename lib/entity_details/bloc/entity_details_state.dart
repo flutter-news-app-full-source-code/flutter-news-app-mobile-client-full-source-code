@@ -63,7 +63,7 @@ class EntityDetailsState extends Equatable {
   final String? headlinesCursor;
 
   /// The exception that occurred, if any.
-  final HtHttpException? exception;
+  final HttpException? exception;
 
   /// Creates a copy of the current state with updated values.
   EntityDetailsState copyWith({
@@ -74,7 +74,7 @@ class EntityDetailsState extends Equatable {
     List<FeedItem>? feedItems,
     bool? hasMoreHeadlines,
     String? headlinesCursor,
-    HtHttpException? exception,
+    HttpException? exception,
     bool clearEntity = false,
     bool clearHeadlinesCursor = false,
     bool clearException = false,

@@ -23,7 +23,7 @@ class HeadlineDetailsLoaded extends HeadlineDetailsState {
 class HeadlineDetailsFailure extends HeadlineDetailsState {
   const HeadlineDetailsFailure({required this.exception});
 
-  final HtHttpException exception;
+  final HttpException exception;
 
   @override
   List<Object> get props => [exception];

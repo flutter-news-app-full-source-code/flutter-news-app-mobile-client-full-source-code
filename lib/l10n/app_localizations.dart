@@ -455,13 +455,13 @@ abstract class AppLocalizations {
   /// Headline for the authentication page during standard sign-in
   ///
   /// In en, this message translates to:
-  /// **'Headlines Toolkit'**
+  /// **'Veritas'**
   String get authenticationSignInHeadline;
 
   /// Subheadline for the authentication page during standard sign-in
   ///
   /// In en, this message translates to:
-  /// **'Develop News Headlines Apps Rapidly & Reliably.'**
+  /// **'Unfiltered news from trusted sources around the world.'**
   String get authenticationSignInSubheadline;
 
   /// AppBar title for the email sign-in page

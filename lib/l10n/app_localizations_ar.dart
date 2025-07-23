@@ -194,11 +194,11 @@ class AppLocalizationsAr extends AppLocalizations {
       'إحفظ إعداداتك، تفضيلات المحتوى والمزيد عبر مختلف الأجهزة.';
 
   @override
-  String get authenticationSignInHeadline => 'هادلاينز تولكيت';
+  String get authenticationSignInHeadline => 'فيريتاس';
 
   @override
   String get authenticationSignInSubheadline =>
-      'طور التطبيقات الإخبارية بسرعة وبشكل موثوق.';
+      'أخبار غير مصفاة من مصادر موثوقة حول العالم.';
 
   @override
   String get emailSignInPageTitle => 'تسجيل الدخول بالبريد الإلكتروني';

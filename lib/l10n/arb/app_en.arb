@@ -242,11 +242,11 @@
     "@authenticationLinkingSubheadline": {
         "description": "Subheadline explaining the benefit of linking an anonymous account"
     },
-    "authenticationSignInHeadline": "Headlines Toolkit",
+    "authenticationSignInHeadline": "Veritas",
     "@authenticationSignInHeadline": {
         "description": "Headline for the authentication page during standard sign-in"
     },
-    "authenticationSignInSubheadline": "Develop News Headlines Apps Rapidly & Reliably.",
+    "authenticationSignInSubheadline": "Unfiltered news from trusted sources around the world.",
     "@authenticationSignInSubheadline": {
         "description": "Subheadline for the authentication page during standard sign-in"
     },

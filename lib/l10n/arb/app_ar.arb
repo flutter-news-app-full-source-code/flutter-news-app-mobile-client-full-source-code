@@ -242,11 +242,11 @@
     "@authenticationLinkingSubheadline": {
         "description": "عنوان فرعي يشرح فائدة ربط حساب مجهول"
     },
-    "authenticationSignInHeadline": "هادلاينز تولكيت",
+    "authenticationSignInHeadline": "فيريتاس",
     "@authenticationSignInHeadline": {
         "description": "عنوان صفحة المصادقة أثناء تسجيل الدخول القياسي"
     },
-    "authenticationSignInSubheadline": "طور التطبيقات الإخبارية بسرعة وبشكل موثوق.",
+    "authenticationSignInSubheadline": "أخبار غير مصفاة من مصادر موثوقة حول العالم.",
     "@authenticationSignInSubheadline": {
         "description": "عنوان فرعي لصفحة المصادقة أثناء تسجيل الدخول القياسي"
     },

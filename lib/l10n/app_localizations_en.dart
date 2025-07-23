@@ -196,11 +196,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'save your settings, content preferences and more across devices.';
 
   @override
-  String get authenticationSignInHeadline => 'Headlines Toolkit';
+  String get authenticationSignInHeadline => 'Veritas';
 
   @override
   String get authenticationSignInSubheadline =>
-      'Develop News Headlines Apps Rapidly & Reliably.';
+      'Unfiltered news from trusted sources around the world.';
 
   @override
   String get emailSignInPageTitle => 'Sign in with Email';

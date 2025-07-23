@@ -402,39 +402,15 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     final chips = <Widget>[];
 
     final formattedDate = DateFormat('MMM d, yyyy').format(headline.createdAt);
-    chips.add(
-      Chip(
-        avatar: Icon(
-          Icons.calendar_today_outlined,
-          size: chipAvatarSize,
-          color: chipAvatarColor,
-        ),
-        label: Text(formattedDate),
-        labelStyle: chipLabelStyle,
-        backgroundColor: chipBackgroundColor,
-        padding: chipPadding,
-        shape: chipShape,
-        visualDensity: VisualDensity.compact,
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      ),
-    );
-
-    chips.add(
-      InkWell(
-        onTap: () {
-          context.push(
-            Routes.sourceDetails,
-            extra: EntityDetailsPageArguments(entity: headline.source),
-          );
-        },
-        borderRadius: BorderRadius.circular(AppSpacing.sm),
-        child: Chip(
+    chips
+      ..add(
+        Chip(
           avatar: Icon(
-            Icons.source_outlined,
+            Icons.calendar_today_outlined,
             size: chipAvatarSize,
             color: chipAvatarColor,
           ),
-          label: Text(headline.source.name),
+          label: Text(formattedDate),
           labelStyle: chipLabelStyle,
           backgroundColor: chipBackgroundColor,
           padding: chipPadding,
@@ -442,34 +418,57 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           visualDensity: VisualDensity.compact,
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
-      ),
-    );
-
-    chips.add(
-      InkWell(
-        onTap: () {
-          context.push(
-            Routes.topicDetails,
-            extra: EntityDetailsPageArguments(entity: headline.topic),
-          );
-        },
-        borderRadius: BorderRadius.circular(AppSpacing.sm),
-        child: Chip(
-          avatar: Icon(
-            Icons.category_outlined,
-            size: chipAvatarSize,
-            color: chipAvatarColor,
+      )
+      ..add(
+        InkWell(
+          onTap: () {
+            context.push(
+              Routes.sourceDetails,
+              extra: EntityDetailsPageArguments(entity: headline.source),
+            );
+          },
+          borderRadius: BorderRadius.circular(AppSpacing.sm),
+          child: Chip(
+            avatar: Icon(
+              Icons.source_outlined,
+              size: chipAvatarSize,
+              color: chipAvatarColor,
+            ),
+            label: Text(headline.source.name),
+            labelStyle: chipLabelStyle,
+            backgroundColor: chipBackgroundColor,
+            padding: chipPadding,
+            shape: chipShape,
+            visualDensity: VisualDensity.compact,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
-          label: Text(headline.topic.name),
-          labelStyle: chipLabelStyle,
-          backgroundColor: chipBackgroundColor,
-          padding: chipPadding,
-          shape: chipShape,
-          visualDensity: VisualDensity.compact,
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
-      ),
-    );
+      )
+      ..add(
+        InkWell(
+          onTap: () {
+            context.push(
+              Routes.topicDetails,
+              extra: EntityDetailsPageArguments(entity: headline.topic),
+            );
+          },
+          borderRadius: BorderRadius.circular(AppSpacing.sm),
+          child: Chip(
+            avatar: Icon(
+              Icons.category_outlined,
+              size: chipAvatarSize,
+              color: chipAvatarColor,
+            ),
+            label: Text(headline.topic.name),
+            labelStyle: chipLabelStyle,
+            backgroundColor: chipBackgroundColor,
+            padding: chipPadding,
+            shape: chipShape,
+            visualDensity: VisualDensity.compact,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+        ),
+      );
 
     return chips;
   }

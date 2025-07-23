@@ -1,6 +1,6 @@
+import 'package:core/core.dart';
 import 'package:flutter/widgets.dart';
-import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_shared/ht_shared.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 
 /// An extension on [ContentType] to provide localized display names.
 extension ContentTypeX on ContentType {

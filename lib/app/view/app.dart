@@ -143,14 +143,13 @@ class _AppViewState extends State<_AppView> {
     _router = createRouter(
       authStatusNotifier: _statusNotifier,
       authenticationRepository: widget.authenticationRepository,
-      htHeadlinesRepository: widget.headlinesRepository,
-      htTopicsRepository: widget.topicRepository,
-      htCountriesRepository: widget.countriesRepository,
-      htSourcesRepository: widget.sourcesRepository,
-      htUserAppSettingsRepository: widget.userAppSettingsRepository,
-      htUserContentPreferencesRepository:
-          widget.userContentPreferencesRepository,
-      htRemoteConfigRepository: widget.appConfigRepository,
+      headlinesRepository: widget.headlinesRepository,
+      topicsRepository: widget.topicRepository,
+      countriesRepository: widget.countriesRepository,
+      sourcesRepository: widget.sourcesRepository,
+      userAppSettingsRepository: widget.userAppSettingsRepository,
+      userContentPreferencesRepository: widget.userContentPreferencesRepository,
+      remoteConfigRepository: widget.appConfigRepository,
       environment: widget.environment,
     );
 

@@ -54,20 +54,20 @@ import 'package:go_router/go_router.dart';
 GoRouter createRouter({
   required ValueNotifier<AppStatus> authStatusNotifier,
   required AuthRepository authenticationRepository,
-  required DataRepository<Headline> htHeadlinesRepository,
-  required DataRepository<Topic> htTopicsRepository,
-  required DataRepository<Country> htCountriesRepository,
-  required DataRepository<Source> htSourcesRepository,
-  required DataRepository<UserAppSettings> htUserAppSettingsRepository,
+  required DataRepository<Headline> headlinesRepository,
+  required DataRepository<Topic> topicsRepository,
+  required DataRepository<Country> countriesRepository,
+  required DataRepository<Source> sourcesRepository,
+  required DataRepository<UserAppSettings> userAppSettingsRepository,
   required DataRepository<UserContentPreferences>
-  htUserContentPreferencesRepository,
-  required DataRepository<RemoteConfig> htRemoteConfigRepository,
+  userContentPreferencesRepository,
+  required DataRepository<RemoteConfig> remoteConfigRepository,
   required local_config.AppEnvironment environment,
 }) {
   // Instantiate AccountBloc once to be shared
   final accountBloc = AccountBloc(
     authenticationRepository: authenticationRepository,
-    userContentPreferencesRepository: htUserContentPreferencesRepository,
+    userContentPreferencesRepository: userContentPreferencesRepository,
     environment: environment,
   );
 

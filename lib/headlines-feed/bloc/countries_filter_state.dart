@@ -50,7 +50,7 @@ final class CountriesFilterState extends Equatable {
   final String? cursor;
 
   /// An optional error object if the status is [CountriesFilterStatus.failure].
-  final HtHttpException? error;
+  final HttpException? error;
 
   /// Creates a copy of this state with the given fields replaced.
   CountriesFilterState copyWith({
@@ -58,7 +58,7 @@ final class CountriesFilterState extends Equatable {
     List<Country>? countries,
     bool? hasMore,
     String? cursor,
-    HtHttpException? error,
+    HttpException? error,
     bool clearError = false,
     bool clearCursor = false,
   }) {

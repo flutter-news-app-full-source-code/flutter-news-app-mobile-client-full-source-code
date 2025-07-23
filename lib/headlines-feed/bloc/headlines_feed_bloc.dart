@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
+import 'package:core/core.dart';
+import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_data_repository/ht_data_repository.dart';
-import 'package:ht_main/app/bloc/app_bloc.dart';
-import 'package:ht_main/headlines-feed/models/headline_filter.dart';
-import 'package:ht_main/shared/services/feed_injector_service.dart';
-import 'package:ht_shared/ht_shared.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/headline_filter.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_injector_service.dart';
 
 part 'headlines_feed_event.dart';
 part 'headlines_feed_state.dart';
@@ -16,7 +16,7 @@ part 'headlines_feed_state.dart';
 /// Manages the state for the headlines feed feature.
 ///
 /// Handles fetching headlines, applying filters, pagination, and refreshing
-/// the feed using the provided [HtDataRepository]. It uses [FeedInjectorService]
+/// the feed using the provided [DataRepository]. It uses [FeedInjectorService]
 /// to inject ads and account actions into the feed.
 /// {@endtemplate}
 class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
@@ -24,7 +24,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   ///
   /// Requires repositories and services for its operations.
   HeadlinesFeedBloc({
-    required HtDataRepository<Headline> headlinesRepository,
+    required DataRepository<Headline> headlinesRepository,
     required FeedInjectorService feedInjectorService,
     required AppBloc appBloc,
   }) : _headlinesRepository = headlinesRepository,
@@ -49,7 +49,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     );
   }
 
-  final HtDataRepository<Headline> _headlinesRepository;
+  final DataRepository<Headline> _headlinesRepository;
   final FeedInjectorService _feedInjectorService;
   final AppBloc _appBloc;
 
@@ -125,7 +125,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           ),
         );
       }
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       emit(state.copyWith(status: HeadlinesFeedStatus.failure, error: e));
     }
   }
@@ -179,7 +179,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           ),
         );
       }
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       emit(state.copyWith(status: HeadlinesFeedStatus.failure, error: e));
     }
   }
@@ -240,7 +240,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           ),
         );
       }
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       emit(state.copyWith(status: HeadlinesFeedStatus.failure, error: e));
     }
   }
@@ -289,10 +289,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
       if (processedFeedItems.any((item) => item is FeedAction) &&
           currentUser?.id != null) {
-        // TODO(ht-development): Implement correct event dispatching
+        // TODO(fulleni): Implement correct event dispatching
         // _appBloc.add(AppUserFeedActionShown(userId: currentUser!.id));
       }
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       emit(state.copyWith(status: HeadlinesFeedStatus.failure, error: e));
     }
   }

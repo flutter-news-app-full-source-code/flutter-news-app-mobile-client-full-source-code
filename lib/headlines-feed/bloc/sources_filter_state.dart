@@ -25,7 +25,7 @@ class SourcesFilterState extends Equatable {
   final List<Source> displayableSources;
   final Set<String> finallySelectedSourceIds;
   final SourceFilterDataLoadingStatus dataLoadingStatus;
-  final HtHttpException? error;
+  final HttpException? error;
 
   SourcesFilterState copyWith({
     List<Country>? availableCountries,
@@ -36,7 +36,7 @@ class SourcesFilterState extends Equatable {
     List<Source>? displayableSources,
     Set<String>? finallySelectedSourceIds,
     SourceFilterDataLoadingStatus? dataLoadingStatus,
-    HtHttpException? error,
+    HttpException? error,
     bool clearErrorMessage = false,
   }) {
     return SourcesFilterState(

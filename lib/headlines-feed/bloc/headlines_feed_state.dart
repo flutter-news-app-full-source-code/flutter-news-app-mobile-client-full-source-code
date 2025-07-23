@@ -17,7 +17,7 @@ class HeadlinesFeedState extends Equatable {
   final bool hasMore;
   final String? cursor;
   final HeadlineFilter filter;
-  final HtHttpException? error;
+  final HttpException? error;
 
   HeadlinesFeedState copyWith({
     HeadlinesFeedStatus? status,
@@ -25,7 +25,7 @@ class HeadlinesFeedState extends Equatable {
     bool? hasMore,
     String? cursor,
     HeadlineFilter? filter,
-    HtHttpException? error,
+    HttpException? error,
     bool clearCursor = false,
   }) {
     return HeadlinesFeedState(

@@ -1,5 +1,5 @@
+import 'package:core/core.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_shared/ht_shared.dart';
 
 /// {@template headline_filter}
 /// A model representing the filter parameters for headlines.

@@ -1,15 +1,15 @@
 // ignore_for_file: lines_longer_than_80_chars
 
+import 'package:core/core.dart';
+import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ht_data_repository/ht_data_repository.dart';
-import 'package:ht_main/headlines-feed/bloc/sources_filter_bloc.dart';
-import 'package:ht_main/headlines-feed/view/headlines_filter_page.dart'
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/sources_filter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_filter_page.dart'
     show keySelectedCountryIsoCodes, keySelectedSourceTypes, keySelectedSources;
-import 'package:ht_main/l10n/app_localizations.dart';
-import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_shared/ht_shared.dart';
-import 'package:ht_ui_kit/ht_ui_kit.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:ui_kit/ui_kit.dart';
 
 // Keys are defined in headlines_filter_page.dart and imported by router.dart
 // const String keySelectedSources = 'selectedSources';
@@ -33,8 +33,8 @@ class SourceFilterPage extends StatelessWidget {
     return BlocProvider(
       create: (context) =>
           SourcesFilterBloc(
-            sourcesRepository: context.read<HtDataRepository<Source>>(),
-            countriesRepository: context.read<HtDataRepository<Country>>(),
+            sourcesRepository: context.read<DataRepository<Source>>(),
+            countriesRepository: context.read<DataRepository<Country>>(),
           )..add(
             LoadSourceFilterData(
               initialSelectedSources: initialSelectedSources,

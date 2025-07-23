@@ -1,17 +1,17 @@
 //
 // ignore_for_file: lines_longer_than_80_chars, public_member_api_docs, unused_field
 
+import 'package:core/core.dart';
+import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/headline_filter.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ht_data_repository/ht_data_repository.dart';
-import 'package:ht_main/app/bloc/app_bloc.dart';
-import 'package:ht_main/headlines-feed/bloc/headlines_feed_bloc.dart';
-import 'package:ht_main/headlines-feed/models/headline_filter.dart';
-import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_main/router/routes.dart';
-import 'package:ht_shared/ht_shared.dart';
-import 'package:ht_ui_kit/ht_ui_kit.dart';
+import 'package:ui_kit/ui_kit.dart';
 
 // Keys for passing data to/from SourceFilterPage
 const String keySelectedSources = 'selectedSources';
@@ -107,7 +107,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
 
     try {
       final preferencesRepo = context
-          .read<HtDataRepository<UserContentPreferences>>();
+          .read<DataRepository<UserContentPreferences>>();
       final preferences = await preferencesRepo.read(
         id: currentUser.id,
         userId: currentUser.id,
@@ -175,7 +175,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
             ),
           );
       }
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       setState(() {
         _isLoadingFollowedFilters = false;
         _useFollowedFilters = false;

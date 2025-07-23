@@ -48,7 +48,7 @@ final class TopicsFilterState extends Equatable {
   final String? cursor;
 
   /// An optional error object if the status is [TopicsFilterStatus.failure].
-  final HtHttpException? error;
+  final HttpException? error;
 
   /// Creates a copy of this state with the given fields replaced.
   TopicsFilterState copyWith({
@@ -56,7 +56,7 @@ final class TopicsFilterState extends Equatable {
     List<Topic>? topics,
     bool? hasMore,
     String? cursor,
-    HtHttpException? error,
+    HttpException? error,
     bool clearError = false,
     bool clearCursor = false,
   }) {

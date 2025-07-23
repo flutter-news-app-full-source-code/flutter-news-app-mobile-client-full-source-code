@@ -1,13 +1,13 @@
 //
 // ignore_for_file: lines_longer_than_80_chars
 
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/countries_filter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ht_main/headlines-feed/bloc/countries_filter_bloc.dart';
-import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_shared/ht_shared.dart';
-import 'package:ht_ui_kit/ht_ui_kit.dart';
+import 'package:ui_kit/ui_kit.dart';
 
 /// {@template country_filter_page}
 /// A page dedicated to selecting event countries for filtering headlines.

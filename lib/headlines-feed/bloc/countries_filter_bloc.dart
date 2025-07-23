@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
+import 'package:core/core.dart';
+import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_data_repository/ht_data_repository.dart';
-import 'package:ht_shared/ht_shared.dart';
 
 part 'countries_filter_event.dart';
 part 'countries_filter_state.dart';
@@ -13,14 +13,14 @@ part 'countries_filter_state.dart';
 /// Manages the state for fetching and displaying countries for filtering.
 ///
 /// Handles initial fetching and pagination of countries using the
-/// provided [HtDataRepository].
+/// provided [DataRepository].
 /// {@endtemplate}
 class CountriesFilterBloc
     extends Bloc<CountriesFilterEvent, CountriesFilterState> {
   /// {@macro countries_filter_bloc}
   ///
-  /// Requires a [HtDataRepository<Country>] to interact with the data layer.
-  CountriesFilterBloc({required HtDataRepository<Country> countriesRepository})
+  /// Requires a [DataRepository<Country>] to interact with the data layer.
+  CountriesFilterBloc({required DataRepository<Country> countriesRepository})
     : _countriesRepository = countriesRepository,
       super(const CountriesFilterState()) {
     on<CountriesFilterRequested>(
@@ -33,7 +33,7 @@ class CountriesFilterBloc
     );
   }
 
-  final HtDataRepository<Country> _countriesRepository;
+  final DataRepository<Country> _countriesRepository;
 
   /// Number of countries to fetch per page.
   static const _countriesLimit = 20;
@@ -63,7 +63,7 @@ class CountriesFilterBloc
           clearError: true,
         ),
       );
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       emit(state.copyWith(status: CountriesFilterStatus.failure, error: e));
     }
   }
@@ -94,7 +94,7 @@ class CountriesFilterBloc
           cursor: response.cursor,
         ),
       );
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       emit(state.copyWith(status: CountriesFilterStatus.failure, error: e));
     }
   }

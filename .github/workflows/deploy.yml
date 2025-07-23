@@ -25,7 +25,7 @@ jobs:
 
       # 4. Build the Flutter web app
       - name: Build Web App
-        run: flutter build web --release --base-href /ht-main/
+        run: flutter build web --release --base-href /flutter-news-app-mobile-client-full-source-code/
 
       # 5. Deploy the built app to GitHub Pages
       - name: Deploy

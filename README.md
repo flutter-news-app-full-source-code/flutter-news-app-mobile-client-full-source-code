@@ -1,15 +1,15 @@
-# 📱✨ ht_main
+# 📱✨ flutter_news_app_mobile_client_full_source_code
 
 ![coverage: percentage](https://img.shields.io/badge/coverage-XX-green)
-[![Demo: Live](https://img.shields.io/badge/Demo-Live-orange)](https://headlines-toolkit.github.io/ht-main/)
+[![Demo: Live](https://img.shields.io/badge/Demo-Live-orange)](https://flutter-news-app-full-source-code.github.io/flutter-news-app-mobile-client-full-source-code/)
 [![style: very good analysis](https://img.shields.io/badge/style-very_good_analysis-B22C89.svg)](https://pub.dev/packages/very_good_analysis)
 [![License: PolyForm Free Trial](https://img.shields.io/badge/License-PolyForm%20Free%20Trial-blue)](https://polyformproject.org/licenses/free-trial/1.0.0)
 
-`ht_main` is a flutter mobile application that serves as both a powerful, fully functional news application ready for deployment, and an exceptionally robust starter kit, architected for easy extension and customization. It is a key component of the [Headlines Toolkit](https://github.com/headlines-toolkit), an ecosystem that also includes a [Dart Frog backend API](https://github.com/headlines-toolkit/ht-api) and a [web-based content dashboard](https://github.com/headlines-toolkit/ht-dashboard).
+Flutter mobile application that serves as both a powerful, fully functional news application ready for deployment, and an exceptionally robust starter kit, architected for easy extension and customization. It is a key component of the [**Flutter News App - Full Source Code Toolkit**](https://github.com/flutter-news-app-full-source-code), an ecosystem that also includes a [Dart Frog backend API](https://github.com/flutter-news-app-full-source-code/flutter-news-app-api-server-full-source-code) and a [web-based content dashboard](https://github.com/flutter-news-app-full-source-code/flutter-news-app-web-dashboard-full-source-code).
 
 ## ⭐ Features & Benefits
 
-`ht_main` comes packed with features to accelerate your development and delight your users:
+`flutter_news_app_mobile_client_full_source_code` comes packed with features to accelerate your development and delight your users:
 
 #### 📰 **Dynamic & Engaging Headlines Feed**
 Experience a beautifully crafted, infinitely scrolling news feed. It's highly performant and ready for your content.
@@ -39,7 +39,7 @@ Offer users control over their app experience:
 *   **Benefit for you:** Provide a premium, adaptable user experience that caters to individual needs. 🔧
 
 #### 📱 **Adaptive UI for All Screens**
-Built with `flutter_adaptive_scaffold`, `ht_main` offers responsive navigation and layouts that look great on both phones and tablets.
+Built with `flutter_adaptive_scaffold`, `flutter_news_app_mobile_client_full_source_code` offers responsive navigation and layouts that look great on both phones and tablets.
 *   **Benefit for you:** Deliver a consistent and optimized UX across a wide range of devices effortlessly. ↔️
 
 #### 🏗️ **Clean & Modern Architecture**
@@ -59,13 +59,12 @@ Fully internationalized with working English and Arabic localizations (`.arb` fi
 
 ---
 
-## 🔑 Access and Licensing
+## 🔑 Licensing
 
-`ht-main` is source-available as part of the Headlines Toolkit ecosystem.
+This package is source-available and licensed under the [PolyForm Free Trial 1.0.0](LICENSE). Please review the terms before use.
 
-To acquire a commercial license for building unlimited news applications, please visit 
-the [Headlines Toolkit GitHub organization page](https://github.com/headlines-toolkit)
-for more details.
+For commercial licensing options that grant the right to build and distribute unlimited applications, please visit the main [**Flutter News App - Full Source Code Toolkit**](https://github.com/flutter-news-app-full-source-code) organization.
+
 
 ---
 
@@ -74,8 +73,8 @@ for more details.
 1.  **Ensure Flutter is installed.** (See [Flutter documentation](https://flutter.dev/docs/get-started/install))
 2.  **Clone the repository:**
     ```bash
-    git clone https://github.com/headlines-toolkit/ht-main.git
-    cd ht-main
+    git clone https://github.com/flutter-news-app-full-source-code/flutter-news-app-mobile-client-full-source-code.git
+    cd flutter-news-app-mobile-client-full-source-code
     ```
 3.  **Get dependencies:**
     ```bash

@@ -1,7 +1,8 @@
-name: ht_main
-description: main headlines toolkit mobile app.
+name: flutter_news_app_mobile_client_full_source_code
+description: Flutter News App - Mobile Client Full Source Code
+
 publish_to: none
-repository: https://github.com/headlines-toolkit/ht-main
+repository: https://github.com/flutter-news-app-full-source-code/flutter-news-app-mobile-client-full-source-code
 environment:
   sdk: ^3.8.0
 
@@ -19,47 +20,47 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flutter_native_splash: ^2.4.5
-  go_router: ^15.0.0
+  go_router: ^16.0.0
   google_fonts: ^6.2.1
-  ht_auth_api:
+  auth_api:
     git:
-      url: https://github.com/headlines-toolkit/ht-auth-api.git
-  ht_auth_client:
+      url: https://github.com/flutter-news-app-full-source-code/auth-api.git
+  auth_client:
     git:
-      url: https://github.com/headlines-toolkit/ht-auth-client.git
-  ht_auth_inmemory:
+      url: https://github.com/flutter-news-app-full-source-code/auth-client.git
+  auth_inmemory:
     git:
-      url: https://github.com/headlines-toolkit/ht-auth-inmemory
-  ht_auth_repository:
+      url: https://github.com/flutter-news-app-full-source-code/auth-inmemory.git
+  auth_repository:
     git:
-      url: https://github.com/headlines-toolkit/ht-auth-repository.git
-  ht_data_api:
+      url: https://github.com/flutter-news-app-full-source-code/auth-repository.git
+  data_api:
     git:
-      url: https://github.com/headlines-toolkit/ht-data-api.git
-  ht_data_client:
+      url: https://github.com/flutter-news-app-full-source-code/data-api.git
+  data_client:
     git:
-      url: https://github.com/headlines-toolkit/ht-data-client.git
-  ht_data_inmemory:
+      url: https://github.com/flutter-news-app-full-source-code/data-client.git
+  data_inmemory:
     git:
-      url: https://github.com/headlines-toolkit/ht-data-inmemory.git
-  ht_data_repository:
+      url: https://github.com/flutter-news-app-full-source-code/data-inmemory.git
+  data_repository:
     git:
-      url: https://github.com/headlines-toolkit/ht-data-repository.git
-  ht_http_client:
+      url: https://github.com/flutter-news-app-full-source-code/data-repository.git
+  http_client:
     git:
-      url: https://github.com/headlines-toolkit/ht-http-client.git
-  ht_kv_storage_service:
+      url: https://github.com/flutter-news-app-full-source-code/http-client.git
+  kv_storage_service:
     git:
-      url: https://github.com/headlines-toolkit/ht-kv-storage-service.git
-  ht_kv_storage_shared_preferences:
+      url: https://github.com/flutter-news-app-full-source-code/kv-storage-service.git
+  kv_storage_shared_preferences:
     git:
-      url: https://github.com/headlines-toolkit/ht-kv-storage-shared-preferences.git
-  ht_shared:
+      url: https://github.com/flutter-news-app-full-source-code/kv-storage-shared-preferences.git
+  core:
     git:
-      url: https://github.com/headlines-toolkit/ht-shared.git
-  ht_ui_kit:
+      url: https://github.com/flutter-news-app-full-source-code/core.git
+  ui_kit:
     git:
-      url: https://github.com/headlines-toolkit/ht-ui-kit.git
+      url: https://github.com/flutter-news-app-full-source-code/ui-kit.git
   intl: ^0.20.2
   js_interop: ^0.0.1
   logging: ^1.3.0
@@ -75,7 +76,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   mocktail: ^1.0.4
-  very_good_analysis: ^7.0.0
+  very_good_analysis: ^9.0.0
 
 flutter:
   uses-material-design: true

@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
+import 'package:core/core.dart';
+import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ht_data_repository/ht_data_repository.dart';
-import 'package:ht_shared/ht_shared.dart';
 
 part 'settings_event.dart';
 part 'settings_state.dart';
@@ -12,13 +12,13 @@ part 'settings_state.dart';
 /// {@template settings_bloc}
 /// Manages the state for the application settings feature.
 ///
-/// Handles loading [UserAppSettings] from [HtDataRepository] and processing
+/// Handles loading [UserAppSettings] from [DataRepository] and processing
 /// user actions to update these settings.
 /// {@endtemplate}
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   /// {@macro settings_bloc}
   SettingsBloc({
-    required HtDataRepository<UserAppSettings> userAppSettingsRepository,
+    required DataRepository<UserAppSettings> userAppSettingsRepository,
   }) : _userAppSettingsRepository = userAppSettingsRepository,
        super(const SettingsState()) {
     // Register event handlers
@@ -52,7 +52,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     // SettingsNotificationsEnabledChanged event and handler removed.
   }
 
-  final HtDataRepository<UserAppSettings> _userAppSettingsRepository;
+  final DataRepository<UserAppSettings> _userAppSettingsRepository;
 
   Future<void> _persistSettings(
     UserAppSettings settingsToSave,
@@ -74,7 +74,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         item: settingsToSave,
         userId: settingsToSave.id,
       );
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       emit(state.copyWith(status: SettingsStatus.failure, error: e));
     } catch (e) {
       emit(state.copyWith(status: SettingsStatus.failure, error: e));
@@ -124,7 +124,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       );
       // Persist these default settings
       await _persistSettings(defaultSettings, emit);
-    } on HtHttpException catch (e) {
+    } on HttpException catch (e) {
       emit(state.copyWith(status: SettingsStatus.failure, error: e));
     } catch (e) {
       emit(state.copyWith(status: SettingsStatus.failure, error: e));

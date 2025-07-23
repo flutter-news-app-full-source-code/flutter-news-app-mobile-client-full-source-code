@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ht_main/app/bloc/app_bloc.dart';
-import 'package:ht_main/l10n/l10n.dart';
-import 'package:ht_main/settings/bloc/settings_bloc.dart';
-import 'package:ht_ui_kit/ht_ui_kit.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/settings/bloc/settings_bloc.dart';
+import 'package:ui_kit/ui_kit.dart';
 
 // Defines the available languages and their display names.
 // In a real app, this might come from a configuration or be more dynamic.

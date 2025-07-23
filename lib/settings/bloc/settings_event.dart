@@ -3,7 +3,7 @@ part of 'settings_bloc.dart';
 //
 // ignore_for_file: avoid_positional_boolean_parameters
 
-// Import models and enums from ht_shared
+// Import models and enums from core
 
 /// {@template settings_event}
 /// Base class for all events related to the settings feature.

@@ -8,6 +8,8 @@ import 'package:equatable/equatable.dart';
 part 'authentication_event.dart';
 part 'authentication_state.dart';
 
+const _requestCodeCooldownDuration = Duration(seconds: 60);
+
 /// {@template authentication_bloc}
 /// Bloc responsible for managing the authentication state of the application.
 /// {@endtemplate}
@@ -31,6 +33,7 @@ class AuthenticationBloc
       _onAuthenticationAnonymousSignInRequested,
     );
     on<AuthenticationSignOutRequested>(_onAuthenticationSignOutRequested);
+    on<AuthenticationCooldownCompleted>(_onAuthenticationCooldownCompleted);
   }
 
   final AuthRepository _authenticationRepository;
@@ -63,14 +66,26 @@ class AuthenticationBloc
     AuthenticationRequestSignInCodeRequested event,
     Emitter<AuthenticationState> emit,
   ) async {
+    if (state.cooldownEndTime != null &&
+        state.cooldownEndTime!.isAfter(DateTime.now())) {
+      return;
+    }
+
     emit(state.copyWith(status: AuthenticationStatus.requestCodeInProgress));
     try {
       await _authenticationRepository.requestSignInCode(event.email);
+      final cooldownEndTime = DateTime.now().add(_requestCodeCooldownDuration);
       emit(
         state.copyWith(
           status: AuthenticationStatus.requestCodeSuccess,
           email: event.email,
+          cooldownEndTime: cooldownEndTime,
         ),
+      );
+
+      Timer(
+        _requestCodeCooldownDuration,
+        () => add(const AuthenticationCooldownCompleted()),
       );
     } on HttpException catch (e) {
       emit(state.copyWith(status: AuthenticationStatus.failure, exception: e));
@@ -154,5 +169,17 @@ class AuthenticationBloc
   Future<void> close() {
     _userAuthSubscription.cancel();
     return super.close();
+  }
+
+  void _onAuthenticationCooldownCompleted(
+    AuthenticationCooldownCompleted event,
+    Emitter<AuthenticationState> emit,
+  ) {
+    emit(
+      state.copyWith(
+        status: AuthenticationStatus.initial,
+        clearCooldownEndTime: true,
+      ),
+    );
   }
 }

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:pinput/pinput.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template email_code_verification_page}
@@ -130,10 +130,12 @@ class _EmailCodeVerificationFormState
     extends State<_EmailCodeVerificationForm> {
   final _formKey = GlobalKey<FormState>();
   final _codeController = TextEditingController();
+  final _focusNode = FocusNode();
 
   @override
   void dispose() {
     _codeController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -152,39 +154,48 @@ class _EmailCodeVerificationFormState
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
     final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    final defaultPinTheme = PinTheme(
+      width: 56,
+      height: 60,
+      textStyle: textTheme.headlineSmall,
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: colorScheme.onSurface.withOpacity(0.12)),
+      ),
+    );
 
     return Form(
       key: _formKey,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Padding(
-            // No horizontal padding needed if column is stretched
-            // padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-            padding: EdgeInsets.zero,
-            child: TextFormField(
-              controller: _codeController,
-              decoration: InputDecoration(
-                labelText: l10n.emailCodeVerificationHint,
-                // border: const OutlineInputBorder(),
-                counterText: '',
+          Pinput(
+            length: 6,
+            controller: _codeController,
+            focusNode: _focusNode,
+            defaultPinTheme: defaultPinTheme,
+            onCompleted: (pin) => _submitForm(),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return l10n.emailCodeValidationEmptyError;
+              }
+              if (value.length != 6) {
+                return l10n.emailCodeValidationLengthError;
+              }
+              return null;
+            },
+            focusedPinTheme: defaultPinTheme.copyWith(
+              decoration: defaultPinTheme.decoration!.copyWith(
+                border: Border.all(color: colorScheme.primary),
               ),
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              maxLength: 6,
-              textAlign: TextAlign.center,
-              style: textTheme.headlineSmall,
-              enabled: !widget.isLoading,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return l10n.emailCodeValidationEmptyError;
-                }
-                if (value.length != 6) {
-                  return l10n.emailCodeValidationLengthError;
-                }
-                return null;
-              },
-              onFieldSubmitted: widget.isLoading ? null : (_) => _submitForm(),
+            ),
+            errorPinTheme: defaultPinTheme.copyWith(
+              decoration: defaultPinTheme.decoration!.copyWith(
+                border: Border.all(color: colorScheme.error),
+              ),
             ),
           ),
           const SizedBox(height: AppSpacing.xxl),

@@ -726,6 +726,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get requestCodeSendCodeButton => 'إرسال الرمز';
 
   @override
+  String requestCodeResendButtonCooldown(int seconds) {
+    return 'إعادة الإرسال في $seconds ثانية';
+  }
+
+  @override
   String get entityDetailsCategoryTitle => 'الفئة';
 
   @override

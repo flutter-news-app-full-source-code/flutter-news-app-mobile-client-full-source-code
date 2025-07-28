@@ -726,6 +726,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get requestCodeSendCodeButton => 'Send Code';
 
   @override
+  String requestCodeResendButtonCooldown(int seconds) {
+    return 'Resend in ${seconds}s';
+  }
+
+  @override
   String get entityDetailsCategoryTitle => 'Category';
 
   @override

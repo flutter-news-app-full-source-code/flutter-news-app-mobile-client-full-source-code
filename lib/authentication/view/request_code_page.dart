@@ -1,6 +1,8 @@
 //
 // ignore_for_file: lines_longer_than_80_chars
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
@@ -161,20 +163,58 @@ class _EmailLinkForm extends StatefulWidget {
 class _EmailLinkFormState extends State<_EmailLinkForm> {
   final _emailController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  Timer? _cooldownTimer;
+  int _cooldownSeconds = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    final authState = context.read<AuthenticationBloc>().state;
+    if (authState.cooldownEndTime != null &&
+        authState.cooldownEndTime!.isAfter(DateTime.now())) {
+      _startCooldownTimer(authState.cooldownEndTime!);
+    }
+  }
 
   @override
   void dispose() {
     _emailController.dispose();
+    _cooldownTimer?.cancel();
     super.dispose();
+  }
+
+  void _startCooldownTimer(DateTime endTime) {
+    final now = DateTime.now();
+    if (now.isBefore(endTime)) {
+      setState(() {
+        _cooldownSeconds = endTime.difference(now).inSeconds;
+      });
+      _cooldownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        final remaining = endTime.difference(DateTime.now()).inSeconds;
+        if (remaining > 0) {
+          setState(() {
+            _cooldownSeconds = remaining;
+          });
+        } else {
+          timer.cancel();
+          setState(() {
+            _cooldownSeconds = 0;
+          });
+          context
+              .read<AuthenticationBloc>()
+              .add(const AuthenticationCooldownCompleted());
+        }
+      });
+    }
   }
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       context.read<AuthenticationBloc>().add(
-        AuthenticationRequestSignInCodeRequested(
-          email: _emailController.text.trim(),
-        ),
-      );
+            AuthenticationRequestSignInCodeRequested(
+              email: _emailController.text.trim(),
+            ),
+          );
     }
   }
 
@@ -184,49 +224,67 @@ class _EmailLinkFormState extends State<_EmailLinkForm> {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          TextFormField(
-            controller: _emailController,
-            decoration: InputDecoration(
-              labelText: l10n.requestCodeEmailLabel,
-              hintText: l10n.requestCodeEmailHint,
-              // border: const OutlineInputBorder(),
+    return BlocListener<AuthenticationBloc, AuthenticationState>(
+      listenWhen: (previous, current) =>
+          previous.cooldownEndTime != current.cooldownEndTime,
+      listener: (context, state) {
+        if (state.cooldownEndTime != null &&
+            state.cooldownEndTime!.isAfter(DateTime.now())) {
+          _cooldownTimer?.cancel();
+          _startCooldownTimer(state.cooldownEndTime!);
+        }
+      },
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextFormField(
+              controller: _emailController,
+              decoration: InputDecoration(
+                labelText: l10n.requestCodeEmailLabel,
+                hintText: l10n.requestCodeEmailHint,
+              ),
+              keyboardType: TextInputType.emailAddress,
+              autocorrect: false,
+              textInputAction: TextInputAction.done,
+              enabled: !widget.isLoading && _cooldownSeconds == 0,
+              validator: (value) {
+                if (value == null || value.isEmpty || !value.contains('@')) {
+                  return l10n.accountLinkingEmailValidationError;
+                }
+                return null;
+              },
+              onFieldSubmitted:
+                  widget.isLoading || _cooldownSeconds > 0 ? null : (_) => _submitForm(),
             ),
-            keyboardType: TextInputType.emailAddress,
-            autocorrect: false,
-            textInputAction: TextInputAction.done,
-            enabled: !widget.isLoading,
-            validator: (value) {
-              if (value == null || value.isEmpty || !value.contains('@')) {
-                return l10n.accountLinkingEmailValidationError;
-              }
-              return null;
-            },
-            onFieldSubmitted: (_) => _submitForm(),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          ElevatedButton(
-            onPressed: widget.isLoading ? null : _submitForm,
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-              textStyle: textTheme.labelLarge,
+            const SizedBox(height: AppSpacing.lg),
+            ElevatedButton(
+              onPressed:
+                  widget.isLoading || _cooldownSeconds > 0 ? null : _submitForm,
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                textStyle: textTheme.labelLarge,
+              ),
+              child: widget.isLoading
+                  ? SizedBox(
+                      height: AppSpacing.xl,
+                      width: AppSpacing.xl,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: colorScheme.onPrimary,
+                      ),
+                    )
+                  : _cooldownSeconds > 0
+                      ? Text(
+                          l10n.requestCodeResendButtonCooldown(
+                            _cooldownSeconds,
+                          ),
+                        )
+                      : Text(l10n.requestCodeSendCodeButton),
             ),
-            child: widget.isLoading
-                ? SizedBox(
-                    height: AppSpacing.xl,
-                    width: AppSpacing.xl,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: colorScheme.onPrimary,
-                    ),
-                  )
-                : Text(l10n.requestCodeSendCodeButton),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

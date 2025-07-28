@@ -1412,6 +1412,12 @@ abstract class AppLocalizations {
   /// **'Send Code'**
   String get requestCodeSendCodeButton;
 
+  /// Button text shown during the cooldown period for resending a code
+  ///
+  /// In en, this message translates to:
+  /// **'Resend in {seconds}s'**
+  String requestCodeResendButtonCooldown(int seconds);
+
   /// Title for category entity type
   ///
   /// In en, this message translates to:

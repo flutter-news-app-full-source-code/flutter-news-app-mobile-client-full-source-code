@@ -200,9 +200,6 @@ class _EmailLinkFormState extends State<_EmailLinkForm> {
           setState(() {
             _cooldownSeconds = 0;
           });
-          context
-              .read<AuthenticationBloc>()
-              .add(const AuthenticationCooldownCompleted());
         }
       });
     }

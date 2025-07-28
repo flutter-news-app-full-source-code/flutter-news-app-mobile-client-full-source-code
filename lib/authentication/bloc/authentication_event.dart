@@ -76,3 +76,11 @@ final class _AuthenticationUserChanged extends AuthenticationEvent {
   @override
   List<Object?> get props => [user];
 }
+
+/// {@template authentication_cooldown_completed}
+/// Event triggered when the sign-in code request cooldown has completed.
+/// {@endtemplate}
+final class AuthenticationCooldownCompleted extends AuthenticationEvent {
+  /// {@macro authentication_cooldown_completed}
+  const AuthenticationCooldownCompleted();
+}

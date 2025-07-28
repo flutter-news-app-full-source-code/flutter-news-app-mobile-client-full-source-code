@@ -82,7 +82,7 @@ class _RequestCodeView extends StatelessWidget {
             } else if (state.status ==
                 AuthenticationStatus.requestCodeSuccess) {
               // Navigate to the code verification page on success, passing the email
-              context.goNamed(
+              context.pushNamed(
                 isLinkingContext
                     ? Routes.linkingVerifyCodeName
                     : Routes.verifyCodeName,

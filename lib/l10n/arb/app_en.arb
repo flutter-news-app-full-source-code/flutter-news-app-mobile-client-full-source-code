@@ -944,6 +944,16 @@
     "@requestCodeSendCodeButton": {
         "description": "Button text to send the verification code"
     },
+    "requestCodeResendButtonCooldown": "Resend in {seconds}s",
+    "@requestCodeResendButtonCooldown": {
+        "description": "Button text shown during the cooldown period for resending a code",
+        "placeholders": {
+            "seconds": {
+                "type": "int",
+                "example": "60"
+            }
+        }
+    },
     "entityDetailsCategoryTitle": "Category",
     "@entityDetailsCategoryTitle": {
         "description": "Title for category entity type"

@@ -38,6 +38,7 @@ class AuthenticationBloc
 
   final AuthRepository _authenticationRepository;
   late final StreamSubscription<User?> _userAuthSubscription;
+  Timer? _cooldownTimer;
 
   /// Handles [_AuthenticationUserChanged] events.
   Future<void> _onAuthenticationUserChanged(
@@ -83,7 +84,8 @@ class AuthenticationBloc
         ),
       );
 
-      Timer(
+      _cooldownTimer?.cancel();
+      _cooldownTimer = Timer(
         _requestCodeCooldownDuration,
         () => add(const AuthenticationCooldownCompleted()),
       );
@@ -168,6 +170,7 @@ class AuthenticationBloc
   @override
   Future<void> close() {
     _userAuthSubscription.cancel();
+    _cooldownTimer?.cancel();
     return super.close();
   }
 

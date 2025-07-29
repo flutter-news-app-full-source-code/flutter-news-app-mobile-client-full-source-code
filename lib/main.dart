@@ -1,5 +1,5 @@
 import 'package:device_preview/device_preview.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/services/web_splash.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/services/splash_screen_remover/web_splash_remover.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart';

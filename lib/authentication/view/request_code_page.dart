@@ -91,12 +91,7 @@ class _RequestCodeView extends StatelessWidget {
             }
           },
           // BuildWhen prevents unnecessary rebuilds if only listening
-          buildWhen: (previous, current) =>
-              current.status != previous.status &&
-              (current.status == AuthenticationStatus.initial ||
-                  current.status ==
-                      AuthenticationStatus.requestCodeInProgress ||
-                  current.status == AuthenticationStatus.failure),
+          buildWhen: (previous, current) => previous.status != current.status,
           builder: (context, state) {
             final isLoading =
                 state.status == AuthenticationStatus.requestCodeInProgress;

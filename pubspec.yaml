@@ -83,13 +83,16 @@ flutter:
   uses-material-design: true
   generate: true
 
+  assets:
+    - assets/icon/
+
 flutter_native_splash:
   color: "#FFFFFF"
   color_dark: "#212121"
 
   # Optional: Specify an image asset for the splash screen
-  # image: assets/splash_logo_light.png
-  # image_dark: assets/splash_logo_dark.png
+  image: assets/icon/logo.png
+  image_dark: assets/icon/logo.png
 
   # Ensure configuration is applied to both platforms
   android: true

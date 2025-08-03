@@ -84,34 +84,9 @@ Get started for free and purchase when you're ready to launch!
 
 ## 🚀 Getting Started & Running Locally
 
-1.  **Ensure Flutter is installed.** (See [Flutter documentation](https://flutter.dev/docs/get-started/install))
-2.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/flutter-news-app-full-source-code/flutter-news-app-mobile-client-full-source-code.git
-    cd flutter-news-app-mobile-client-full-source-code
-    ```
-3.  **Get dependencies:**
-    ```bash
-    flutter pub get
-    ```
-4.  **Run the app:**
+For a complete guide on setting up your local environment, running the mobile client, and understanding the configuration, please see the **[Local Setup Guide](https://flutter-news-app-full-source-code.github.io/docs/mobile-client/local-setup/)** in our official documentation.
 
-    To run the app, first select your desired environment in `lib/main.dart`:
-
-    ```dart
-    // lib/main.dart
-
-    // Use `AppEnvironment.demo` to run with in-memory data (no API needed).
-    // Use `AppEnvironment.development` to connect to a local backend API.
-    // Use `AppEnvironment.production` to connect to a live backend API.
-    const appEnvironment = AppEnvironment.demo; 
-    ```
-
-    Then, run the app from your terminal:
-    ```bash
-    flutter run -d chrome
-    ```
-    *(Note: For `development/production` environment, ensure the [backend service](https://github.com/flutter-news-app-full-source-code/flutter-news-app-api-server-full-source-code) is running.)*
+Our documentation provides a detailed, step-by-step walkthrough to get you up and running smoothly.
 
 ---
 

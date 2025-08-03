@@ -178,7 +178,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "3022edcb06d7c55ea81f25126b7f8c28c9105d4c"
+      resolved-ref: "7a1b54f8c0f94f6c04af3404c8110181e080b5c4"
       url: "https://github.com/flutter-news-app-full-source-code/core.git"
     source: git
     version: "0.0.0"
@@ -246,7 +246,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "5a7bd9f597e98209bc7f5ac897cf64552306c02f"
+      resolved-ref: d9fbbf33d8bb53724e2dd29d488a0c8eb9cbf6e8
       url: "https://github.com/flutter-news-app-full-source-code/data-repository.git"
     source: git
     version: "0.0.0"
@@ -434,10 +434,10 @@ packages:
     dependency: "direct main"
     description:
       name: google_fonts
-      sha256: b1ac0fe2832c9cc95e5e88b57d627c5e68c223b9657f4b96e1487aa9098c7b82
+      sha256: df9763500dadba0155373e9cb44e202ce21bd9ed5de6bdbd05c5854e86839cb8
       url: "https://pub.dev"
     source: hosted
-    version: "6.2.1"
+    version: "6.3.0"
   html:
     dependency: transitive
     description:

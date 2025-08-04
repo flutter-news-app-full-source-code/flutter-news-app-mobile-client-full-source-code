@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:core/core.dart' show HttpException, Source;
+import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
 
@@ -33,9 +33,9 @@ class AvailableSourcesBloc
     emit(state.copyWith(status: AvailableSourcesStatus.loading));
     try {
       // Assuming readAll without parameters fetches all items.
-      // Add pagination if necessary for very large datasets.
+      // TODO(fulleni): Add pagination if necessary for very large datasets.
       final response = await _sourcesRepository.readAll(
-        // limit: _sourcesLimit,
+        sort: [const SortOption('name')],
       );
       emit(
         state.copyWith(

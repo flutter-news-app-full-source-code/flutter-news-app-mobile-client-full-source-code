@@ -28,7 +28,10 @@ class AvailableTopicsBloc
     }
     emit(state.copyWith(status: AvailableTopicsStatus.loading));
     try {
-      final response = await _topicsRepository.readAll();
+      // TODO(fulleni): Add pagination if necessary for very large datasets.
+      final response = await _topicsRepository.readAll(
+        sort: [const SortOption('name')],
+      );
       emit(
         state.copyWith(
           status: AvailableTopicsStatus.success,

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_status_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
@@ -132,6 +133,8 @@ class _AppViewState extends State<_AppView> {
   late final GoRouter _router;
   // Standard notifier that GoRouter listens to.
   late final ValueNotifier<AppStatus> _statusNotifier;
+  // The service responsible for automated status checks.
+  AppStatusService? _appStatusService;
   // Removed Dynamic Links subscription
 
   @override
@@ -140,6 +143,15 @@ class _AppViewState extends State<_AppView> {
     final appBloc = context.read<AppBloc>();
     // Initialize the notifier with the BLoC's current state
     _statusNotifier = ValueNotifier<AppStatus>(appBloc.state.status);
+
+    // Instantiate and initialize the AppStatusService.
+    // This service will automatically trigger checks when the app is resumed
+    // or at periodic intervals, ensuring the app status is always fresh.
+    _appStatusService = AppStatusService(
+      context: context,
+      checkInterval: const Duration(minutes: 15),
+    );
+
     _router = createRouter(
       authStatusNotifier: _statusNotifier,
       authenticationRepository: widget.authenticationRepository,
@@ -159,6 +171,8 @@ class _AppViewState extends State<_AppView> {
   @override
   void dispose() {
     _statusNotifier.dispose();
+    // Dispose the AppStatusService to cancel timers and remove observers.
+    _appStatusService?.dispose();
     // Removed Dynamic Links subscription cancellation
     super.dispose();
   }

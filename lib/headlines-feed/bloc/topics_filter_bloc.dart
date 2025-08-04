@@ -54,7 +54,7 @@ class TopicsFilterBloc extends Bloc<TopicsFilterEvent, TopicsFilterState> {
     try {
       final response = await _topicsRepository.readAll(
         pagination: const PaginationOptions(limit: _topicsLimit),
-        sort: [const SortOption('name', SortOrder.desc)],
+        sort: [const SortOption('name', SortOrder.asc)],
       );
       emit(
         state.copyWith(
@@ -88,7 +88,7 @@ class TopicsFilterBloc extends Bloc<TopicsFilterEvent, TopicsFilterState> {
           limit: _topicsLimit,
           cursor: state.cursor,
         ),
-        sort: [const SortOption('name', SortOrder.desc)],
+        sort: [const SortOption('name', SortOrder.asc)],
       );
       emit(
         state.copyWith(

@@ -94,6 +94,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           limit: _headlinesFetchLimit,
           cursor: state.cursor,
         ),
+        sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
       final newProcessedFeedItems = _feedInjectorService.injectItems(
@@ -147,6 +148,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       final headlineResponse = await _headlinesRepository.readAll(
         filter: _buildFilter(state.filter),
         pagination: const PaginationOptions(limit: _headlinesFetchLimit),
+        sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
       final processedFeedItems = _feedInjectorService.injectItems(
@@ -209,6 +211,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       final headlineResponse = await _headlinesRepository.readAll(
         filter: _buildFilter(event.filter),
         pagination: const PaginationOptions(limit: _headlinesFetchLimit),
+        sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
       final processedFeedItems = _feedInjectorService.injectItems(
@@ -269,6 +272,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
       final headlineResponse = await _headlinesRepository.readAll(
         pagination: const PaginationOptions(limit: _headlinesFetchLimit),
+        sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
       final processedFeedItems = _feedInjectorService.injectItems(

@@ -35,7 +35,7 @@ class AvailableSourcesBloc
       // Assuming readAll without parameters fetches all items.
       // TODO(fulleni): Add pagination if necessary for very large datasets.
       final response = await _sourcesRepository.readAll(
-        sort: [const SortOption('name')],
+        sort: [const SortOption('name', SortOrder.asc)],
       );
       emit(
         state.copyWith(

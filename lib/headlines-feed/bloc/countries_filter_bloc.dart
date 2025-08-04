@@ -86,7 +86,7 @@ class CountriesFilterBloc
           limit: _countriesLimit,
           cursor: state.cursor,
         ),
-        sort: [const SortOption('updatedAt', SortOrder.desc)],
+        sort: [const SortOption('name', SortOrder.asc)],
       );
       emit(
         state.copyWith(

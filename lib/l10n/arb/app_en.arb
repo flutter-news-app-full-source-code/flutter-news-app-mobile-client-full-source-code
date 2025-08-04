@@ -1052,5 +1052,13 @@
     "settingsAppearanceFontWeightBold": "Bold",
     "@settingsAppearanceFontWeightBold": {
         "description": "Label for the bold font weight option"
+    },
+    "maintenanceHeadline": "Under Maintenance",
+    "@maintenanceHeadline": {
+        "description": "Headline for the maintenance page"
+    },
+    "maintenanceSubheadline": "We are currently performing maintenance. Please check back later.",
+    "@maintenanceSubheadline": {
+        "description": "Subheadline for the maintenance page"
     }
 }

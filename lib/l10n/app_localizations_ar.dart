@@ -804,4 +804,21 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settingsAppearanceFontWeightBold => 'عريض';
+
+  @override
+  String get maintenanceHeadline => 'تحت الصيانة';
+
+  @override
+  String get maintenanceSubheadline =>
+      'نقوم حاليًا بإجراء صيانة. يرجى التحقق مرة أخرى لاحقًا.';
+
+  @override
+  String get updateRequiredHeadline => 'التحديث مطلوب';
+
+  @override
+  String get updateRequiredSubheadline =>
+      'يتوفر إصدار جديد من التطبيق. يرجى التحديث لمتابعة استخدام التطبيق.';
+
+  @override
+  String get updateRequiredButton => 'التحديث الآن';
 }

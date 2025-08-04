@@ -1042,5 +1042,17 @@
     "maintenanceSubheadline": "نقوم حاليًا بإجراء صيانة. يرجى التحقق مرة أخرى لاحقًا.",
     "@maintenanceSubheadline": {
         "description": "Subheadline for the maintenance page"
+    },
+    "updateRequiredHeadline": "التحديث مطلوب",
+    "@updateRequiredHeadline": {
+        "description": "Headline for the force update page"
+    },
+    "updateRequiredSubheadline": "يتوفر إصدار جديد من التطبيق. يرجى التحديث لمتابعة استخدام التطبيق.",
+    "@updateRequiredSubheadline": {
+        "description": "Subheadline for the force update page"
+    },
+    "updateRequiredButton": "التحديث الآن",
+    "@updateRequiredButton": {
+        "description": "Button text for the force update page"
     }
 }

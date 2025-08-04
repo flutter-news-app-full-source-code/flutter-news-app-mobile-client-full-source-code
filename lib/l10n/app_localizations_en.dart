@@ -804,4 +804,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsAppearanceFontWeightBold => 'Bold';
+
+  @override
+  String get maintenanceHeadline => 'Under Maintenance';
+
+  @override
+  String get maintenanceSubheadline =>
+      'We are currently performing maintenance. Please check back later.';
+
+  @override
+  String get updateRequiredHeadline => 'Update Required';
+
+  @override
+  String get updateRequiredSubheadline =>
+      'A new version of the app is available. Please update to continue using the app.';
+
+  @override
+  String get updateRequiredButton => 'Update Now';
 }

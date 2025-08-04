@@ -53,7 +53,7 @@ class CountriesFilterBloc
     try {
       final response = await _countriesRepository.readAll(
         pagination: const PaginationOptions(limit: _countriesLimit),
-        sort: [const SortOption('name', SortOrder.desc)],
+        sort: [const SortOption('name', SortOrder.asc)],
       );
       emit(
         state.copyWith(
@@ -86,7 +86,7 @@ class CountriesFilterBloc
           limit: _countriesLimit,
           cursor: state.cursor,
         ),
-        sort: [const SortOption('updatedAt', SortOrder.desc)],
+        sort: [const SortOption('name', SortOrder.asc)],
       );
       emit(
         state.copyWith(

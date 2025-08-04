@@ -30,7 +30,7 @@ class AvailableTopicsBloc
     try {
       // TODO(fulleni): Add pagination if necessary for very large datasets.
       final response = await _topicsRepository.readAll(
-        sort: [const SortOption('name')],
+        sort: [const SortOption('name', SortOrder.asc)],
       );
       emit(
         state.copyWith(

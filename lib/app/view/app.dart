@@ -11,6 +11,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/services/dem
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/router.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kv_storage_service/kv_storage_service.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -196,6 +197,25 @@ class _AppViewState extends State<_AppView> {
           // Defer l10n access until inside a MaterialApp context
 
           // Handle critical RemoteConfig loading states globally
+          // These checks have the highest priority and will lock the entire UI.
+          //
+          // Check for Maintenance Mode.
+          if (state.status == AppStatus.underMaintenance) {
+            return const MaterialApp(
+              debugShowCheckedModeBanner: false,
+              home: MaintenancePage(),
+            );
+          }
+
+          // Check for a Required Update.
+          if (state.status == AppStatus.updateRequired) {
+            return const MaterialApp(
+              debugShowCheckedModeBanner: false,
+              home: UpdateRequiredPage(),
+            );
+          }
+
+          // Check for Config Fetching state.
           if (state.status == AppStatus.configFetching) {
             return MaterialApp(
               debugShowCheckedModeBanner: false,

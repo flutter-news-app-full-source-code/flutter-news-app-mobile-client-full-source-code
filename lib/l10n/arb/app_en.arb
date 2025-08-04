@@ -1060,5 +1060,17 @@
     "maintenanceSubheadline": "We are currently performing maintenance. Please check back later.",
     "@maintenanceSubheadline": {
         "description": "Subheadline for the maintenance page"
+    },
+    "updateRequiredHeadline": "Update Required",
+    "@updateRequiredHeadline": {
+        "description": "Headline for the force update page"
+    },
+    "updateRequiredSubheadline": "A new version of the app is available. Please update to continue using the app.",
+    "@updateRequiredSubheadline": {
+        "description": "Subheadline for the force update page"
+    },
+    "updateRequiredButton": "Update Now",
+    "@updateRequiredButton": {
+        "description": "Button text for the force update page"
     }
 }

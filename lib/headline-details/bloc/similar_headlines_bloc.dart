@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:core/core.dart' show Headline, HttpException, PaginationOptions;
+import 'package:core/core.dart'
+    show Headline, HttpException, PaginationOptions, SortOption, SortOrder;
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
 
@@ -31,6 +32,7 @@ class SimilarHeadlinesBloc
 
       final response = await _headlinesRepository.readAll(
         filter: filter,
+        sort: [const SortOption('updatedAt', SortOrder.desc)],
         pagination: const PaginationOptions(
           limit:
               _similarHeadlinesLimit +

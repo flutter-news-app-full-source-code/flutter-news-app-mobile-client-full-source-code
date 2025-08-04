@@ -75,7 +75,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       emit(
         state.copyWith(
           status: AccountStatus.success,
-          preferences: preferences,
+          preferences: _sortPreferences(preferences),
           clearError: true,
         ),
       );
@@ -98,7 +98,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
           emit(
             state.copyWith(
               status: AccountStatus.success,
-              preferences: migratedPreferences,
+              preferences: _sortPreferences(migratedPreferences),
               clearError: true,
             ),
           );
@@ -127,7 +127,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         );
         emit(
           state.copyWith(
-            preferences: defaultPreferences,
+            preferences: _sortPreferences(defaultPreferences),
             clearError: true,
             status: AccountStatus.success,
           ),
@@ -146,7 +146,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         emit(
           state.copyWith(
             status: AccountStatus.success,
-            preferences: existingPreferences,
+            preferences: _sortPreferences(existingPreferences),
             clearError: true,
           ),
         );
@@ -216,15 +216,16 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     );
 
     try {
+      final sortedPrefs = _sortPreferences(updatedPrefs);
       await _userContentPreferencesRepository.update(
         id: state.user!.id,
-        item: updatedPrefs,
+        item: sortedPrefs,
         userId: state.user!.id,
       );
       emit(
         state.copyWith(
           status: AccountStatus.success,
-          preferences: updatedPrefs,
+          preferences: sortedPrefs,
           clearError: true,
         ),
       );
@@ -273,15 +274,16 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     );
 
     try {
+      final sortedPrefs = _sortPreferences(updatedPrefs);
       await _userContentPreferencesRepository.update(
         id: state.user!.id,
-        item: updatedPrefs,
+        item: sortedPrefs,
         userId: state.user!.id,
       );
       emit(
         state.copyWith(
           status: AccountStatus.success,
-          preferences: updatedPrefs,
+          preferences: sortedPrefs,
           clearError: true,
         ),
       );
@@ -331,15 +333,16 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     );
 
     try {
+      final sortedPrefs = _sortPreferences(updatedPrefs);
       await _userContentPreferencesRepository.update(
         id: state.user!.id,
-        item: updatedPrefs,
+        item: sortedPrefs,
         userId: state.user!.id,
       );
       emit(
         state.copyWith(
           status: AccountStatus.success,
-          preferences: updatedPrefs,
+          preferences: sortedPrefs,
           clearError: true,
         ),
       );
@@ -411,6 +414,32 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         ),
       );
     }
+  }
+
+  /// Sorts the lists within UserContentPreferences locally.
+  ///
+  /// This client-side sorting is necessary due to a backend limitation that
+  /// does not support sorting for saved or followed content lists. This
+  /// approach remains efficient as these lists are fetched all at once and
+  /// are kept small by user account-type limits.
+  UserContentPreferences _sortPreferences(UserContentPreferences preferences) {
+    // Sort saved headlines by updatedAt descending (newest first)
+    final sortedHeadlines = List<Headline>.from(preferences.savedHeadlines)
+      ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+
+    // Sort followed topics by name ascending
+    final sortedTopics = List<Topic>.from(preferences.followedTopics)
+      ..sort((a, b) => a.name.compareTo(b.name));
+
+    // Sort followed sources by name ascending
+    final sortedSources = List<Source>.from(preferences.followedSources)
+      ..sort((a, b) => a.name.compareTo(b.name));
+
+    return preferences.copyWith(
+      savedHeadlines: sortedHeadlines,
+      followedTopics: sortedTopics,
+      followedSources: sortedSources,
+    );
   }
 
   @override

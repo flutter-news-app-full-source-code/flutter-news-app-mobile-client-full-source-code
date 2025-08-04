@@ -92,6 +92,7 @@ class HeadlinesSearchBloc
                   limit: _limit,
                   cursor: successState.cursor,
                 ),
+                sort: [const SortOption('updatedAt', SortOrder.desc)],
               );
               // Cast to List<Headline> for the injector
               final headlines = response.items.cast<Headline>();
@@ -140,6 +141,7 @@ class HeadlinesSearchBloc
                   limit: _limit,
                   cursor: successState.cursor,
                 ),
+                sort: [const SortOption('name', SortOrder.asc)],
               );
               emit(
                 successState.copyWith(
@@ -157,6 +159,7 @@ class HeadlinesSearchBloc
                   limit: _limit,
                   cursor: successState.cursor,
                 ),
+                sort: [const SortOption('name', SortOrder.asc)],
               );
               emit(
                 successState.copyWith(
@@ -202,6 +205,7 @@ class HeadlinesSearchBloc
           rawResponse = await _headlinesRepository.readAll(
             filter: {'q': searchTerm},
             pagination: const PaginationOptions(limit: _limit),
+            sort: [const SortOption('updatedAt', SortOrder.desc)],
           );
           final headlines = rawResponse.items.cast<Headline>();
           final currentUser = _appBloc.state.user;
@@ -226,12 +230,14 @@ class HeadlinesSearchBloc
           rawResponse = await _topicRepository.readAll(
             filter: {'q': searchTerm},
             pagination: const PaginationOptions(limit: _limit),
+            sort: [const SortOption('name', SortOrder.asc)],
           );
           processedItems = rawResponse.items.cast<FeedItem>();
         case ContentType.source:
           rawResponse = await _sourceRepository.readAll(
             filter: {'q': searchTerm},
             pagination: const PaginationOptions(limit: _limit),
+            sort: [const SortOption('name', SortOrder.asc)],
           );
           processedItems = rawResponse.items.cast<FeedItem>();
         default:

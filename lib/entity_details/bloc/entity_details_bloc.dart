@@ -95,6 +95,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       final headlineResponse = await _headlinesRepository.readAll(
         filter: filter,
         pagination: const PaginationOptions(limit: _headlinesLimit),
+        sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
       final currentUser = _appBloc.state.user;
@@ -207,6 +208,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
           limit: _headlinesLimit,
           cursor: state.headlinesCursor,
         ),
+        sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
       final currentUser = _appBloc.state.user;

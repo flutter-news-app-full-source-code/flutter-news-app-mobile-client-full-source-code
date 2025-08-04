@@ -6,10 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_status_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/router.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kv_storage_service/kv_storage_service.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -132,6 +134,8 @@ class _AppViewState extends State<_AppView> {
   late final GoRouter _router;
   // Standard notifier that GoRouter listens to.
   late final ValueNotifier<AppStatus> _statusNotifier;
+  // The service responsible for automated status checks.
+  AppStatusService? _appStatusService;
   // Removed Dynamic Links subscription
 
   @override
@@ -140,6 +144,15 @@ class _AppViewState extends State<_AppView> {
     final appBloc = context.read<AppBloc>();
     // Initialize the notifier with the BLoC's current state
     _statusNotifier = ValueNotifier<AppStatus>(appBloc.state.status);
+
+    // Instantiate and initialize the AppStatusService.
+    // This service will automatically trigger checks when the app is resumed
+    // or at periodic intervals, ensuring the app status is always fresh.
+    _appStatusService = AppStatusService(
+      context: context,
+      checkInterval: const Duration(minutes: 15),
+    );
+
     _router = createRouter(
       authStatusNotifier: _statusNotifier,
       authenticationRepository: widget.authenticationRepository,
@@ -159,6 +172,8 @@ class _AppViewState extends State<_AppView> {
   @override
   void dispose() {
     _statusNotifier.dispose();
+    // Dispose the AppStatusService to cancel timers and remove observers.
+    _appStatusService?.dispose();
     // Removed Dynamic Links subscription cancellation
     super.dispose();
   }
@@ -182,6 +197,25 @@ class _AppViewState extends State<_AppView> {
           // Defer l10n access until inside a MaterialApp context
 
           // Handle critical RemoteConfig loading states globally
+          // These checks have the highest priority and will lock the entire UI.
+          //
+          // Check for Maintenance Mode.
+          if (state.status == AppStatus.underMaintenance) {
+            return const MaterialApp(
+              debugShowCheckedModeBanner: false,
+              home: MaintenancePage(),
+            );
+          }
+
+          // Check for a Required Update.
+          if (state.status == AppStatus.updateRequired) {
+            return const MaterialApp(
+              debugShowCheckedModeBanner: false,
+              home: UpdateRequiredPage(),
+            );
+          }
+
+          // Check for Config Fetching state.
           if (state.status == AppStatus.configFetching) {
             return MaterialApp(
               debugShowCheckedModeBanner: false,

@@ -1549,6 +1549,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Bold'**
   String get settingsAppearanceFontWeightBold;
+
+  /// Headline for the maintenance page
+  ///
+  /// In en, this message translates to:
+  /// **'Under Maintenance'**
+  String get maintenanceHeadline;
+
+  /// Subheadline for the maintenance page
+  ///
+  /// In en, this message translates to:
+  /// **'We are currently performing maintenance. Please check back later.'**
+  String get maintenanceSubheadline;
+
+  /// Headline for the force update page
+  ///
+  /// In en, this message translates to:
+  /// **'Update Required'**
+  String get updateRequiredHeadline;
+
+  /// Subheadline for the force update page
+  ///
+  /// In en, this message translates to:
+  /// **'A new version of the app is available. Please update to continue using the app.'**
+  String get updateRequiredSubheadline;
+
+  /// Button text for the force update page
+  ///
+  /// In en, this message translates to:
+  /// **'Update Now'**
+  String get updateRequiredButton;
 }
 
 class _AppLocalizationsDelegate

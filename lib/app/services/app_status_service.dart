@@ -71,7 +71,9 @@ class AppStatusService with WidgetsBindingObserver {
         '[AppStatusService] Periodic check triggered. Requesting AppConfig fetch.',
       );
       // Add the event to the AppBloc to fetch the latest config.
-      _context.read<AppBloc>().add(const AppConfigFetchRequested());
+      _context
+          .read<AppBloc>()
+          .add(const AppConfigFetchRequested(isBackgroundCheck: true));
     });
   }
 
@@ -96,7 +98,9 @@ class AppStatusService with WidgetsBindingObserver {
       // When the app comes to the foreground, immediately trigger a check.
       // This is crucial for catching maintenance mode that was enabled
       // while the app was in the background.
-      _context.read<AppBloc>().add(const AppConfigFetchRequested());
+      _context
+          .read<AppBloc>()
+          .add(const AppConfigFetchRequested(isBackgroundCheck: true));
     }
   }
 

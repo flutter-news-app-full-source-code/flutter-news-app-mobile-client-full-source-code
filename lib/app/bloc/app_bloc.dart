@@ -411,16 +411,20 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       return;
     }
 
-    print(
-      '[AppBloc] Attempting to fetch AppConfig for user: ${state.user!.id}...',
-    );
-    emit(
-      state.copyWith(
-        status: AppStatus.configFetching,
-        remoteConfig: null,
-        clearAppConfig: true,
-      ),
-    );
+    // For background checks, we don't want to show a loading screen.
+    // Only for the initial fetch should we set the status to configFetching.
+    if (!event.isBackgroundCheck) {
+      print(
+        '[AppBloc] Initial config fetch. Setting status to configFetching.',
+      );
+      emit(
+        state.copyWith(
+          status: AppStatus.configFetching,
+        ),
+      );
+    } else {
+      print('[AppBloc] Background config fetch. Proceeding silently.');
+    }
 
     try {
       final remoteConfig = await _appConfigRepository.read(id: kRemoteConfigId);
@@ -428,11 +432,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         '[AppBloc] Remote Config fetched successfully. ID: ${remoteConfig.id} for user: ${state.user!.id}',
       );
 
-      // --- CRITICAL STARTUP SEQUENCE EVALUATION ---
-      // After successfully fetching the remote configuration, we must
-      // evaluate the app's status in a specific order before allowing
-      // the main UI to be built.
-
+      // --- CRITICAL STATUS EVALUATION ---
+      // For both initial and background checks, if a critical status is found,
+      // we must update the app status immediately to lock the UI.
+      
       // 1. Check for Maintenance Mode. This has the highest priority.
       if (remoteConfig.appStatus.isUnderMaintenance) {
         emit(
@@ -456,36 +459,43 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
 
-      // 3. If no critical status is active, proceed to the normal app state.
-      // The status is determined by the user's role (authenticated/anonymous).
-      final finalStatus = state.user!.appRole == AppUserRole.standardUser
-          ? AppStatus.authenticated
-          : AppStatus.anonymous;
+      // --- POST-CHECK STATE RESOLUTION ---
+      // If no critical status was found, we resolve the final state.
 
-      emit(state.copyWith(remoteConfig: remoteConfig, status: finalStatus));
+      // For an initial fetch, we transition from configFetching to the correct
+      // authenticated/anonymous state.
+      if (!event.isBackgroundCheck) {
+        final finalStatus = state.user!.appRole == AppUserRole.standardUser
+            ? AppStatus.authenticated
+            : AppStatus.anonymous;
+        emit(state.copyWith(remoteConfig: remoteConfig, status: finalStatus));
+      } else {
+        // For a background check, the status is already correct (e.g., authenticated).
+        // We just need to update the remoteConfig in the state silently.
+        // The status does not need to change, preventing a disruptive UI rebuild.
+        emit(state.copyWith(remoteConfig: remoteConfig));
+      }
     } on HttpException catch (e) {
       print(
         '[AppBloc] Failed to fetch AppConfig (HttpException) for user ${state.user?.id}: ${e.runtimeType} - ${e.message}',
       );
-      emit(
-        state.copyWith(
-          status: AppStatus.configFetchFailed,
-          remoteConfig: null,
-          clearAppConfig: true,
-        ),
-      );
+      // Only show a failure screen on an initial fetch.
+      // For background checks, we fail silently to avoid disruption.
+      if (!event.isBackgroundCheck) {
+        emit(state.copyWith(status: AppStatus.configFetchFailed));
+      } else {
+        print('[AppBloc] Silent failure on background config fetch.');
+      }
     } catch (e, s) {
       print(
         '[AppBloc] Unexpected error fetching AppConfig for user ${state.user?.id}: $e',
       );
       print('[AppBloc] Stacktrace: $s');
-      emit(
-        state.copyWith(
-          status: AppStatus.configFetchFailed,
-          remoteConfig: null,
-          clearAppConfig: true,
-        ),
-      );
+      if (!event.isBackgroundCheck) {
+        emit(state.copyWith(status: AppStatus.configFetchFailed));
+      } else {
+        print('[AppBloc] Silent failure on background config fetch.');
+      }
     }
   }
 

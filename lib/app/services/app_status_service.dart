@@ -30,9 +30,9 @@ class AppStatusService with WidgetsBindingObserver {
     required BuildContext context,
     required Duration checkInterval,
     required AppEnvironment environment,
-  })  : _context = context,
-        _checkInterval = checkInterval,
-        _environment = environment {
+  }) : _context = context,
+       _checkInterval = checkInterval,
+       _environment = environment {
     // Immediately register this service as a lifecycle observer.
     WidgetsBinding.instance.addObserver(this);
     // Start the periodic checks.
@@ -62,18 +62,16 @@ class AppStatusService with WidgetsBindingObserver {
     _timer = Timer.periodic(_checkInterval, (_) {
       // In demo mode, periodic checks are not needed as there's no backend.
       if (_environment == AppEnvironment.demo) {
-        print(
-          '[AppStatusService] Demo mode: Skipping periodic check.',
-        );
+        print('[AppStatusService] Demo mode: Skipping periodic check.');
         return;
       }
       print(
         '[AppStatusService] Periodic check triggered. Requesting AppConfig fetch.',
       );
       // Add the event to the AppBloc to fetch the latest config.
-      _context
-          .read<AppBloc>()
-          .add(const AppConfigFetchRequested(isBackgroundCheck: true));
+      _context.read<AppBloc>().add(
+        const AppConfigFetchRequested(isBackgroundCheck: true),
+      );
     });
   }
 
@@ -92,9 +90,7 @@ class AppStatusService with WidgetsBindingObserver {
 
     // We are only interested in the 'resumed' state.
     if (state == AppLifecycleState.resumed) {
-      print(
-        '[AppStatusService] App resumed. Requesting AppConfig fetch.',
-      );
+      print('[AppStatusService] App resumed. Requesting AppConfig fetch.');
       // When the app comes to the foreground, immediately trigger a check.
       // This is crucial for catching maintenance mode that was enabled
       // while the app was in the background.

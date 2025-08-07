@@ -73,7 +73,10 @@ GoRouter createRouter({
 
   return GoRouter(
     refreshListenable: authStatusNotifier,
-    initialLocation: Routes.feed,
+    // Start at a neutral root path. The redirect logic will immediately
+    // determine the correct path (/feed or /authentication), preventing
+    // an attempt to build a complex page before the app state is ready.
+    initialLocation: '/',
     debugLogDiagnostics: true,
     // --- Redirect Logic ---
     redirect: (BuildContext context, GoRouterState state) {
@@ -87,6 +90,7 @@ GoRouter createRouter({
       );
 
       // --- Define Key Paths ---
+      const rootPath = '/';
       const authenticationPath = Routes.authentication;
       const feedPath = Routes.feed;
       final isGoingToAuth = currentLocation.startsWith(authenticationPath);
@@ -135,6 +139,12 @@ GoRouter createRouter({
             return feedPath;
           }
         }
+
+        // If the user is at the root path, they should be sent to the feed.
+        if (currentLocation == rootPath) {
+          print('    Action: User at root. Redirecting to feed.');
+          return feedPath;
+        }
       }
 
       // --- Fallback ---
@@ -144,6 +154,13 @@ GoRouter createRouter({
     },
     // --- Authentication Routes ---
     routes: [
+      // A neutral root route that the app starts on. The redirect logic will
+      // immediately move the user to the correct location. This route's
+      // builder will never be called in practice.
+      GoRoute(
+        path: '/',
+        builder: (context, state) => const SizedBox.shrink(),
+      ),
       GoRoute(
         path: Routes.authentication,
         name: Routes.authenticationName,

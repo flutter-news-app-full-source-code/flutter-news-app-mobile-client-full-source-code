@@ -411,15 +411,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       return;
     }
 
-    // Avoid refetching if already loaded for the current user session, unless explicitly trying to recover from a failed state.
-    if (state.remoteConfig != null &&
-        state.status != AppStatus.configFetchFailed) {
-      print(
-        '[AppBloc] AppConfig already loaded for user ${state.user?.id} and not in a failed state. Skipping fetch.',
-      );
-      return;
-    }
-
     print(
       '[AppBloc] Attempting to fetch AppConfig for user: ${state.user!.id}...',
     );

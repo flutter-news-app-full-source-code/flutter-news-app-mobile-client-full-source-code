@@ -1,4 +1,4 @@
-import 'package:core/core.dart' hide AppStatus;
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
@@ -24,7 +24,7 @@ class StatusPage extends StatelessWidget {
     return Scaffold(
       body: BlocBuilder<AppBloc, AppState>(
         builder: (context, state) {
-          final l10n = AppLocalizationsX(context).l10n;
+          final l10n = context.l10n;
 
           if (state.status == AppStatus.configFetching) {
             // While fetching configuration, display a clear loading indicator.
@@ -40,7 +40,7 @@ class StatusPage extends StatelessWidget {
           // This allows the user to recover from transient network issues.
           return FailureStateWidget(
             exception: const NetworkException(), // A generic network error
-            retryButtonText: 'l10n.retryButtonText', //TODO(fulleni): localize me.
+            retryButtonText: l10n.retryButtonText,
             onRetry: () {
               // Dispatch the event to AppBloc to re-trigger the fetch.
               context.read<AppBloc>().add(const AppConfigFetchRequested());

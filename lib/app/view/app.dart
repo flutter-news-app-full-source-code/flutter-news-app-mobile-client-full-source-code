@@ -184,17 +184,22 @@ class _AppViewState extends State<_AppView> {
   @override
   Widget build(BuildContext context) {
     // Wrap the part of the tree that needs to react to AppBloc state changes
-    // (specifically for updating the ValueNotifier) with a BlocListener.
-    // The BlocBuilder remains for theme changes.
+    // with a BlocListener and a BlocBuilder.
     return BlocListener<AppBloc, AppState>(
-      // Listen for status changes to update the GoRouter's ValueNotifier
+      // The BlocListener's primary role here is to keep GoRouter's refresh
+      // mechanism informed about authentication status changes.
+      // GoRouter's `redirect` logic depends on this notifier to re-evaluate
+      // routes when the user logs in or out *while the app is running*.
       listenWhen: (previous, current) => previous.status != current.status,
       listener: (context, state) {
         _statusNotifier.value = state.status;
       },
       // The BlocBuilder is the core of the new stable startup architecture.
-      // It acts as a high-level switch that determines which UI to show based
-      // on the application's status.
+      // It functions as a "master switch" for the entire application's UI.
+      // Based on the AppStatus, it decides whether to show a full-screen
+      // status page (like Maintenance or Loading) or to build the main
+      // application UI with its nested router. This approach is fundamental
+      // to fixing the original race conditions and BuildContext instability.
       child: BlocBuilder<AppBloc, AppState>(
         builder: (context, state) {
           // --- Full-Screen Status Pages ---
@@ -205,7 +210,19 @@ class _AppViewState extends State<_AppView> {
 
           if (state.status == AppStatus.underMaintenance) {
             // The app is in maintenance mode. Show the MaintenancePage.
-            // It's wrapped in a basic MaterialApp to provide theme and l10n.
+            //
+            // WHY A SEPARATE MATERIALAPP?
+            // Each status page is wrapped in its own simple MaterialApp to create
+            // a self-contained environment. This provides the necessary
+            // Directionality, theme, and localization context for the page
+            // to render correctly, without needing the main app's router.
+            //
+            // WHY A DEFAULT THEME?
+            // The theme uses hardcoded, sensible defaults (like FlexScheme.material)
+            // because at this early stage, we only need a basic visual structure.
+            // However, we critically use `state.themeMode` and `state.locale`,
+            // which are loaded from user settings *before* the maintenance check,
+            // ensuring the page respects the user's chosen light/dark mode and language.
             return MaterialApp(
               debugShowCheckedModeBanner: false,
               theme: lightTheme(
@@ -223,6 +240,7 @@ class _AppViewState extends State<_AppView> {
               themeMode: state.themeMode,
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
+              locale: state.locale,
               home: const MaintenancePage(),
             );
           }
@@ -246,6 +264,7 @@ class _AppViewState extends State<_AppView> {
               themeMode: state.themeMode,
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
+              locale: state.locale,
               home: const UpdateRequiredPage(),
             );
           }
@@ -272,6 +291,7 @@ class _AppViewState extends State<_AppView> {
               themeMode: state.themeMode,
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
+              locale: state.locale,
               home: const StatusPage(),
             );
           }
@@ -279,11 +299,20 @@ class _AppViewState extends State<_AppView> {
           // --- Main Application UI ---
           // If none of the critical states above are met, the app is ready
           // to display its main UI. We build the MaterialApp.router here.
+          // This is the single, STABLE root widget for the entire main app.
           //
-          // This is the STABLE root of the main application. Because it is
-          // only built when the app is in a "running" state, it will not be
-          // destroyed and rebuilt during startup, which fixes the
-          // `BuildContext` instability and related crashes.
+          // WHY IS THIS SO IMPORTANT?
+          // Because this widget is now built conditionally inside a single
+          // BlocBuilder, it is created only ONCE when the app enters a
+          // "running" state (e.g., authenticated, anonymous). It is no longer
+          // destroyed and rebuilt during startup, which was the root cause of
+          // the `BuildContext` instability and the `l10n` crashes.
+          //
+          // THEME CONFIGURATION:
+          // Unlike the status pages, this MaterialApp is themed using the full,
+          // detailed settings loaded into the AppState (e.g., `state.flexScheme`,
+          // `state.settings.displaySettings...`), providing the complete,
+          // personalized user experience.
           return MaterialApp.router(
             debugShowCheckedModeBanner: false,
             themeMode: state.themeMode,

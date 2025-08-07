@@ -59,7 +59,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppFontFamilyChanged>(_onFontFamilyChanged);
     on<AppTextScaleFactorChanged>(_onAppTextScaleFactorChanged);
     on<AppFontWeightChanged>(_onAppFontWeightChanged);
-    on<AppOpened>(_onAppOpened);
 
     // Listen directly to the auth state changes stream
     _userSubscription = _authenticationRepository.authStateChanges.listen(
@@ -412,25 +411,20 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       return;
     }
 
-    // Avoid refetching if already loaded for the current user session, unless explicitly trying to recover from a failed state.
-    if (state.remoteConfig != null &&
-        state.status != AppStatus.configFetchFailed) {
+    // For background checks, we don't want to show a loading screen.
+    // Only for the initial fetch should we set the status to configFetching.
+    if (!event.isBackgroundCheck) {
       print(
-        '[AppBloc] AppConfig already loaded for user ${state.user?.id} and not in a failed state. Skipping fetch.',
+        '[AppBloc] Initial config fetch. Setting status to configFetching.',
       );
-      return;
+      emit(
+        state.copyWith(
+          status: AppStatus.configFetching,
+        ),
+      );
+    } else {
+      print('[AppBloc] Background config fetch. Proceeding silently.');
     }
-
-    print(
-      '[AppBloc] Attempting to fetch AppConfig for user: ${state.user!.id}...',
-    );
-    emit(
-      state.copyWith(
-        status: AppStatus.configFetching,
-        remoteConfig: null,
-        clearAppConfig: true,
-      ),
-    );
 
     try {
       final remoteConfig = await _appConfigRepository.read(id: kRemoteConfigId);
@@ -438,41 +432,70 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         '[AppBloc] Remote Config fetched successfully. ID: ${remoteConfig.id} for user: ${state.user!.id}',
       );
 
-      // Determine the correct status based on the existing user's role.
-      // This ensures that successfully fetching config doesn't revert auth status to 'initial'.
-      final newStatusBasedOnUser =
-          state.user!.appRole == AppUserRole.standardUser
-          ? AppStatus.authenticated
-          : AppStatus.anonymous;
-      emit(
-        state.copyWith(
-          remoteConfig: remoteConfig,
-          status: newStatusBasedOnUser,
-        ),
-      );
+      // --- CRITICAL STATUS EVALUATION ---
+      // For both initial and background checks, if a critical status is found,
+      // we must update the app status immediately to lock the UI.
+      
+      // 1. Check for Maintenance Mode. This has the highest priority.
+      if (remoteConfig.appStatus.isUnderMaintenance) {
+        emit(
+          state.copyWith(
+            status: AppStatus.underMaintenance,
+            remoteConfig: remoteConfig,
+          ),
+        );
+        return;
+      }
+
+      // 2. Check for a Required Update.
+      // TODO(fulleni): Compare with actual app version from package_info_plus.
+      if (remoteConfig.appStatus.isLatestVersionOnly) {
+        emit(
+          state.copyWith(
+            status: AppStatus.updateRequired,
+            remoteConfig: remoteConfig,
+          ),
+        );
+        return;
+      }
+
+      // --- POST-CHECK STATE RESOLUTION ---
+      // If no critical status was found, we resolve the final state.
+
+      // For an initial fetch, we transition from configFetching to the correct
+      // authenticated/anonymous state.
+      if (!event.isBackgroundCheck) {
+        final finalStatus = state.user!.appRole == AppUserRole.standardUser
+            ? AppStatus.authenticated
+            : AppStatus.anonymous;
+        emit(state.copyWith(remoteConfig: remoteConfig, status: finalStatus));
+      } else {
+        // For a background check, the status is already correct (e.g., authenticated).
+        // We just need to update the remoteConfig in the state silently.
+        // The status does not need to change, preventing a disruptive UI rebuild.
+        emit(state.copyWith(remoteConfig: remoteConfig));
+      }
     } on HttpException catch (e) {
       print(
         '[AppBloc] Failed to fetch AppConfig (HttpException) for user ${state.user?.id}: ${e.runtimeType} - ${e.message}',
       );
-      emit(
-        state.copyWith(
-          status: AppStatus.configFetchFailed,
-          remoteConfig: null,
-          clearAppConfig: true,
-        ),
-      );
+      // Only show a failure screen on an initial fetch.
+      // For background checks, we fail silently to avoid disruption.
+      if (!event.isBackgroundCheck) {
+        emit(state.copyWith(status: AppStatus.configFetchFailed));
+      } else {
+        print('[AppBloc] Silent failure on background config fetch.');
+      }
     } catch (e, s) {
       print(
         '[AppBloc] Unexpected error fetching AppConfig for user ${state.user?.id}: $e',
       );
       print('[AppBloc] Stacktrace: $s');
-      emit(
-        state.copyWith(
-          status: AppStatus.configFetchFailed,
-          remoteConfig: null,
-          clearAppConfig: true,
-        ),
-      );
+      if (!event.isBackgroundCheck) {
+        emit(state.copyWith(status: AppStatus.configFetchFailed));
+      } else {
+        print('[AppBloc] Silent failure on background config fetch.');
+      }
     }
   }
 
@@ -522,26 +545,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         'shown/completed. Status updated locally to $updatedActionStatus. '
         'Backend update pending.',
       );
-    }
-  }
-
-  Future<void> _onAppOpened(AppOpened event, Emitter<AppState> emit) async {
-    if (state.remoteConfig == null) {
-      return;
-    }
-
-    final appStatus = state.remoteConfig!.appStatus;
-
-    if (appStatus.isUnderMaintenance) {
-      emit(state.copyWith(status: AppStatus.underMaintenance));
-      return;
-    }
-
-    // TODO(fulleni): Get the current app version from a package like
-    // package_info_plus and compare it with appStatus.latestAppVersion.
-    if (appStatus.isLatestVersionOnly) {
-      emit(state.copyWith(status: AppStatus.updateRequired));
-      return;
     }
   }
 }

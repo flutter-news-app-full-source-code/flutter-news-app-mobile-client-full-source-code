@@ -7,6 +7,7 @@ abstract class AppEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+/// Dispatched when the authentication state changes (e.g., user logs in/out).
 class AppUserChanged extends AppEvent {
   const AppUserChanged(this.user);
 
@@ -16,122 +17,81 @@ class AppUserChanged extends AppEvent {
   List<Object?> get props => [user];
 }
 
-/// {@template app_settings_refreshed}
-/// Internal event to trigger reloading of settings within AppBloc.
-/// Added when user changes or upon explicit request.
-/// {@endtemplate}
+/// Dispatched to request a refresh of the user's application settings.
 class AppSettingsRefreshed extends AppEvent {
-  /// {@macro app_settings_refreshed}
   const AppSettingsRefreshed();
 }
 
-/// {@template app_logout_requested}
-/// Event to request user logout.
-/// {@endtemplate}
+/// Dispatched to fetch the remote application configuration.
+class AppConfigFetchRequested extends AppEvent {
+  const AppConfigFetchRequested({this.isBackgroundCheck = false});
+
+  /// Whether this fetch is a silent background check.
+  ///
+  /// If `true`, the BLoC will not enter a visible loading state.
+  /// If `false` (default), it's treated as an initial fetch that shows a
+  /// loading UI.
+  final bool isBackgroundCheck;
+
+  @override
+  List<Object> get props => [isBackgroundCheck];
+}
+
+/// Dispatched when the user logs out.
 class AppLogoutRequested extends AppEvent {
-  /// {@macro app_logout_requested}
   const AppLogoutRequested();
 }
 
-/// {@template app_theme_mode_changed}
-/// Event to change the application's theme mode.
-/// {@endtemplate}
+/// Dispatched when the theme mode (light/dark/system) changes.
 class AppThemeModeChanged extends AppEvent {
-  /// {@macro app_theme_mode_changed}
   const AppThemeModeChanged(this.themeMode);
-
   final ThemeMode themeMode;
-
   @override
-  List<Object?> get props => [themeMode];
+  List<Object> get props => [themeMode];
 }
 
-/// {@template app_flex_scheme_changed}
-/// Event to change the application's FlexColorScheme.
-/// {@endtemplate}
+/// Dispatched when the accent color theme changes.
 class AppFlexSchemeChanged extends AppEvent {
-  /// {@macro app_flex_scheme_changed}
   const AppFlexSchemeChanged(this.flexScheme);
-
   final FlexScheme flexScheme;
-
   @override
-  List<Object?> get props => [flexScheme];
+  List<Object> get props => [flexScheme];
 }
 
-/// {@template app_font_family_changed}
-/// Event to change the application's font family.
-/// {@endtemplate}
+/// Dispatched when the font family changes.
 class AppFontFamilyChanged extends AppEvent {
-  /// {@macro app_font_family_changed}
   const AppFontFamilyChanged(this.fontFamily);
-
   final String? fontFamily;
-
   @override
   List<Object?> get props => [fontFamily];
 }
 
-/// {@template app_text_scale_factor_changed}
-/// Event to change the application's text scale factor.
-/// {@endtemplate}
+/// Dispatched when the text scale factor changes.
 class AppTextScaleFactorChanged extends AppEvent {
-  /// {@macro app_text_scale_factor_changed}
   const AppTextScaleFactorChanged(this.appTextScaleFactor);
-
   final AppTextScaleFactor appTextScaleFactor;
-
   @override
-  List<Object?> get props => [appTextScaleFactor];
+  List<Object> get props => [appTextScaleFactor];
 }
 
-/// {@template app_font_weight_changed}
-/// Event to change the application's font weight.
-/// {@endtemplate}
+/// Dispatched when the font weight changes.
 class AppFontWeightChanged extends AppEvent {
-  /// {@macro app_font_weight_changed}
   const AppFontWeightChanged(this.fontWeight);
-
-  /// The new font weight to apply.
   final AppFontWeight fontWeight;
-
   @override
   List<Object> get props => [fontWeight];
 }
 
-/// {@template app_config_fetch_requested}
-/// Event to trigger fetching of the global AppConfig.
-/// {@endtemplate}
-class AppConfigFetchRequested extends AppEvent {
-  /// {@macro app_config_fetch_requested}
-  const AppConfigFetchRequested();
-}
-
-/// {@template app_opened}
-/// Event triggered when the application is opened.
-/// Used to check for required updates or maintenance mode.
-/// {@endtemplate}
-class AppOpened extends AppEvent {
-  /// {@macro app_opened}
-  const AppOpened();
-}
-
-/// {@template app_user_account_action_shown}
-/// Event triggered when an AccountAction has been shown to the user,
-/// prompting an update to their `lastAccountActionShownAt` timestamp.
-/// {@endtemplate}
+/// Dispatched when a one-time user account action has been shown.
 class AppUserAccountActionShown extends AppEvent {
-  /// {@macro app_user_account_action_shown}
   const AppUserAccountActionShown({
     required this.userId,
     required this.feedActionType,
     required this.isCompleted,
   });
-
   final String userId;
   final FeedActionType feedActionType;
   final bool isCompleted;
-
   @override
   List<Object> get props => [userId, feedActionType, isCompleted];
 }

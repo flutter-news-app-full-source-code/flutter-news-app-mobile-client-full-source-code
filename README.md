@@ -48,6 +48,12 @@ Offer users control over their app experience:
 *   **Feed Display:** Customize how headlines are presented.
 > **Your Advantage:** Deliver a premium, adaptable user experience that caters to individual needs without writing any code. 🔧
 
+#### 📡 **Backend-Driven Behavior**
+The app is built to respond to commands from your backend API, allowing for dynamic control over the user experience:
+*   **Maintenance Mode:** Displays a full-screen "kill switch" page when the backend signals that the service is temporarily unavailable.
+*   **Forced Updates:** Shows a non-dismissible "Update Required" screen when a new version is mandatory, guiding users to the app store.
+> **Your Advantage:** The client-side logic to handle critical operational states is already implemented. Your app can gracefully manage server downtime and enforce version updates without you needing to code these complex, full-screen takeover flows. 🛠️
+
 #### 📱 **Adaptive UI for All Screens**
 Built with `flutter_adaptive_scaffold`, the app offers responsive navigation and layouts that look great on both phones and tablets.
 > **Your Advantage:** Deliver a consistent and optimized UX across a wide range of devices effortlessly. ↔️

@@ -151,6 +151,7 @@ class _AppViewState extends State<_AppView> {
     _appStatusService = AppStatusService(
       context: context,
       checkInterval: const Duration(minutes: 15),
+      environment: widget.environment,
     );
 
     _router = createRouter(
@@ -183,82 +184,45 @@ class _AppViewState extends State<_AppView> {
   @override
   Widget build(BuildContext context) {
     // Wrap the part of the tree that needs to react to AppBloc state changes
-    // (specifically for updating the ValueNotifier) with a BlocListener.
-    // The BlocBuilder remains for theme changes.
+    // with a BlocListener and a BlocBuilder.
     return BlocListener<AppBloc, AppState>(
-      // Listen for status changes to update the GoRouter's ValueNotifier
+      // The BlocListener's primary role here is to keep GoRouter's refresh
+      // mechanism informed about authentication status changes.
+      // GoRouter's `redirect` logic depends on this notifier to re-evaluate
+      // routes when the user logs in or out *while the app is running*.
       listenWhen: (previous, current) => previous.status != current.status,
       listener: (context, state) {
         _statusNotifier.value = state.status;
       },
+      // The BlocBuilder is the core of the new stable startup architecture.
+      // It functions as a "master switch" for the entire application's UI.
+      // Based on the AppStatus, it decides whether to show a full-screen
+      // status page (like Maintenance or Loading) or to build the main
+      // application UI with its nested router. This approach is fundamental
+      // to fixing the original race conditions and BuildContext instability.
       child: BlocBuilder<AppBloc, AppState>(
-        // Rebuild the UI based on AppBloc's state (theme, locale, and critical app statuses)
         builder: (context, state) {
-          // Defer l10n access until inside a MaterialApp context
+          // --- Full-Screen Status Pages ---
+          // The following states represent critical, app-wide conditions that
+          // must be handled before the main router and UI are displayed.
+          // By returning a dedicated widget here, we ensure these pages are
+          // full-screen and exist outside the main app's navigation shell.
 
-          // Handle critical RemoteConfig loading states globally
-          // These checks have the highest priority and will lock the entire UI.
-          //
-          // Check for Maintenance Mode.
           if (state.status == AppStatus.underMaintenance) {
-            return const MaterialApp(
-              debugShowCheckedModeBanner: false,
-              home: MaintenancePage(),
-            );
-          }
-
-          // Check for a Required Update.
-          if (state.status == AppStatus.updateRequired) {
-            return const MaterialApp(
-              debugShowCheckedModeBanner: false,
-              home: UpdateRequiredPage(),
-            );
-          }
-
-          // Check for Config Fetching state.
-          if (state.status == AppStatus.configFetching) {
-            return MaterialApp(
-              debugShowCheckedModeBanner: false,
-              theme: lightTheme(
-                scheme: FlexScheme.material,
-                appTextScaleFactor: AppTextScaleFactor.medium,
-                appFontWeight: AppFontWeight.regular,
-                fontFamily: null,
-              ),
-              darkTheme: darkTheme(
-                scheme: FlexScheme.material,
-                appTextScaleFactor: AppTextScaleFactor.medium,
-                appFontWeight: AppFontWeight.regular,
-                fontFamily: null, // System default font
-              ),
-              themeMode: state
-                  .themeMode, // Still respect light/dark if available from system
-              localizationsDelegates: const [
-                ...AppLocalizations.localizationsDelegates,
-                ...UiKitLocalizations.localizationsDelegates,
-              ],
-              supportedLocales: const [
-                ...AppLocalizations.supportedLocales,
-                ...UiKitLocalizations.supportedLocales,
-              ],
-              home: Scaffold(
-                body: Builder(
-                  // Use Builder to get context under MaterialApp
-                  builder: (innerContext) {
-                    return LoadingStateWidget(
-                      icon: Icons.settings_applications_outlined,
-                      headline: AppLocalizations.of(
-                        innerContext,
-                      ).headlinesFeedLoadingHeadline,
-                      subheadline: AppLocalizations.of(innerContext).pleaseWait,
-                    );
-                  },
-                ),
-              ),
-            );
-          }
-
-          if (state.status == AppStatus.configFetchFailed) {
+            // The app is in maintenance mode. Show the MaintenancePage.
+            //
+            // WHY A SEPARATE MATERIALAPP?
+            // Each status page is wrapped in its own simple MaterialApp to create
+            // a self-contained environment. This provides the necessary
+            // Directionality, theme, and localization context for the page
+            // to render correctly, without needing the main app's router.
+            //
+            // WHY A DEFAULT THEME?
+            // The theme uses hardcoded, sensible defaults (like FlexScheme.material)
+            // because at this early stage, we only need a basic visual structure.
+            // However, we critically use `state.themeMode` and `state.locale`,
+            // which are loaded from user settings *before* the maintenance check,
+            // ensuring the page respects the user's chosen light/dark mode and language.
             return MaterialApp(
               debugShowCheckedModeBanner: false,
               theme: lightTheme(
@@ -274,49 +238,81 @@ class _AppViewState extends State<_AppView> {
                 fontFamily: null,
               ),
               themeMode: state.themeMode,
-              localizationsDelegates: const [
-                ...AppLocalizations.localizationsDelegates,
-                ...UiKitLocalizations.localizationsDelegates,
-              ],
-              supportedLocales: const [
-                ...AppLocalizations.supportedLocales,
-                ...UiKitLocalizations.supportedLocales,
-              ],
-              home: Scaffold(
-                body: Builder(
-                  // Use Builder to get context under MaterialApp
-                  builder: (innerContext) {
-                    return FailureStateWidget(
-                      exception: const NetworkException(),
-                      retryButtonText: UiKitLocalizations.of(
-                        innerContext,
-                      )!.retryButtonText,
-                      onRetry: () {
-                        // Use outer context for BLoC access
-                        context.read<AppBloc>().add(
-                          const AppConfigFetchRequested(),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              locale: state.locale,
+              home: const MaintenancePage(),
             );
           }
 
-          // If config is loaded (or not in a failed/fetching state for config), proceed with main app UI
-          // It's safe to access l10n here if needed for print statements,
-          // as this path implies we are about to build the main MaterialApp.router
-          // which provides localizations.
-          // final l10n = context.l10n;
-          print('[_AppViewState] Building MaterialApp.router');
-          print('[_AppViewState] state.fontFamily: ${state.fontFamily}');
-          print(
-            '[_AppViewState] state.settings.displaySettings.fontFamily: ${state.settings.displaySettings.fontFamily}',
-          );
-          print(
-            '[_AppViewState] state.settings.displaySettings.fontWeight: ${state.settings.displaySettings.fontWeight}',
-          );
+          if (state.status == AppStatus.updateRequired) {
+            // A mandatory update is required. Show the UpdateRequiredPage.
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              theme: lightTheme(
+                scheme: FlexScheme.material,
+                appTextScaleFactor: AppTextScaleFactor.medium,
+                appFontWeight: AppFontWeight.regular,
+                fontFamily: null,
+              ),
+              darkTheme: darkTheme(
+                scheme: FlexScheme.material,
+                appTextScaleFactor: AppTextScaleFactor.medium,
+                appFontWeight: AppFontWeight.regular,
+                fontFamily: null,
+              ),
+              themeMode: state.themeMode,
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              locale: state.locale,
+              home: const UpdateRequiredPage(),
+            );
+          }
+
+          if (state.status == AppStatus.configFetching ||
+              state.status == AppStatus.configFetchFailed) {
+            // The app is in the process of fetching its initial remote
+            // configuration or has failed to do so. The StatusPage handles
+            // both the loading indicator and the retry mechanism.
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              theme: lightTheme(
+                scheme: FlexScheme.material,
+                appTextScaleFactor: AppTextScaleFactor.medium,
+                appFontWeight: AppFontWeight.regular,
+                fontFamily: null,
+              ),
+              darkTheme: darkTheme(
+                scheme: FlexScheme.material,
+                appTextScaleFactor: AppTextScaleFactor.medium,
+                appFontWeight: AppFontWeight.regular,
+                fontFamily: null,
+              ),
+              themeMode: state.themeMode,
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              locale: state.locale,
+              home: const StatusPage(),
+            );
+          }
+
+          // --- Main Application UI ---
+          // If none of the critical states above are met, the app is ready
+          // to display its main UI. We build the MaterialApp.router here.
+          // This is the single, STABLE root widget for the entire main app.
+          //
+          // WHY IS THIS SO IMPORTANT?
+          // Because this widget is now built conditionally inside a single
+          // BlocBuilder, it is created only ONCE when the app enters a
+          // "running" state (e.g., authenticated, anonymous). It is no longer
+          // destroyed and rebuilt during startup, which was the root cause of
+          // the `BuildContext` instability and the `l10n` crashes.
+          //
+          // THEME CONFIGURATION:
+          // Unlike the status pages, this MaterialApp is themed using the full,
+          // detailed settings loaded into the AppState (e.g., `state.flexScheme`,
+          // `state.settings.displaySettings...`), providing the complete,
+          // personalized user experience.
           return MaterialApp.router(
             debugShowCheckedModeBanner: false,
             themeMode: state.themeMode,

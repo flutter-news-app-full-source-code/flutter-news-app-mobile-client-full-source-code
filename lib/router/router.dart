@@ -73,134 +73,94 @@ GoRouter createRouter({
 
   return GoRouter(
     refreshListenable: authStatusNotifier,
-    initialLocation: Routes.feed,
+    // Start at a neutral root path. The redirect logic will immediately
+    // determine the correct path (/feed or /authentication), preventing
+    // an attempt to build a complex page before the app state is ready.
+    initialLocation: '/',
     debugLogDiagnostics: true,
     // --- Redirect Logic ---
     redirect: (BuildContext context, GoRouterState state) {
       final appStatus = context.read<AppBloc>().state.status;
-      final appConfig = context.read<AppBloc>().state.remoteConfig;
       final currentLocation = state.matchedLocation;
-      final currentUri = state.uri;
 
       print(
         'GoRouter Redirect Check:\n'
         '  Current Location (Matched): $currentLocation\n'
-        '  Current URI (Full): $currentUri\n'
-        '  AppStatus: $appStatus\n'
-        '  AppConfig isNull: ${appConfig == null}',
+        '  AppStatus: $appStatus',
       );
 
       // --- Define Key Paths ---
+      const rootPath = '/';
       const authenticationPath = Routes.authentication;
       const feedPath = Routes.feed;
       final isGoingToAuth = currentLocation.startsWith(authenticationPath);
 
-      // --- Case 0: App is Initializing or Config is being fetched/failed ---
-      if (appStatus == AppStatus.initial ||
-          appStatus == AppStatus.configFetching ||
-          appStatus == AppStatus.configFetchFailed) {
-        // If AppStatus is initial and trying to go to a non-auth page (e.g. initial /feed)
-        // redirect to auth immediately to settle auth status first.
-        if (appStatus == AppStatus.initial && !isGoingToAuth) {
-          print(
-            '  Redirect Decision: AppStatus is INITIAL and not going to auth. Redirecting to $authenticationPath to settle auth first.',
-          );
-          return authenticationPath;
-        }
-        // For configFetching or configFetchFailed, or initial going to auth,
-        // let the App widget's builder handle the UI (loading/error screen).
-        print(
-          '  Redirect Decision: AppStatus is $appStatus. Allowing App widget to handle display or navigation to auth.',
-        );
-        return null;
-      }
+      // With the new App startup architecture, the router is only active when
+      // the app is in a stable, running state. The `redirect` function's
+      // only responsibility is to handle auth-based route protection.
+      // States like `configFetching`, `underMaintenance`, etc., are now
+      // handled by the root App widget *before* this router is ever built.
 
-      // --- Case 1: Unauthenticated User (after initial phase, config not relevant yet for this decision) ---
+      // --- Case 1: Unauthenticated User ---
+      // If the user is unauthenticated, they should be on an auth path.
+      // If they are trying to access any other part of the app, redirect them.
       if (appStatus == AppStatus.unauthenticated) {
-        print('  Redirect Decision: User is UNauthenticated.');
-        if (!isGoingToAuth) {
-          print(
-            '    Action: Not going to auth. Redirecting to $authenticationPath',
-          );
-          return authenticationPath;
-        }
-        print('    Action: Already going to auth. Allowing navigation.');
-        return null;
+        print('  Redirect: User is unauthenticated.');
+        // If they are already on an auth path, allow it. Otherwise, redirect.
+        return isGoingToAuth ? null : authenticationPath;
       }
 
       // --- Case 2: Anonymous or Authenticated User ---
-      // (Covers AppStatus.anonymous and AppStatus.authenticated)
-      // At this point, AppConfig should be loaded or its loading/error state is handled by App widget.
-      // The main concern here is preventing authenticated users from re-entering basic auth flows.
+      // If a user is anonymous or authenticated, they should not be able to
+      // access the main authentication flows, with an exception for account
+      // linking for anonymous users.
       if (appStatus == AppStatus.anonymous ||
           appStatus == AppStatus.authenticated) {
-        print('  Redirect Decision: User is $appStatus.');
+        print('  Redirect: User is $appStatus.');
 
-        final isLinkingContextQueryPresent =
-            state.uri.queryParameters['context'] == 'linking';
-        final isLinkingPathSegmentPresent = currentLocation.contains(
-          '/linking/',
-        );
-
-        // Determine if the current location is part of any linking flow (either via query or path segment)
-        final isAnyLinkingContext =
-            isLinkingContextQueryPresent || isLinkingPathSegmentPresent;
-
-        // If an authenticated/anonymous user is on any authentication-related path:
-        if (currentLocation.startsWith(authenticationPath)) {
-          print(
-            '    Debug: Auth path detected. Current Location: $currentLocation',
-          );
-          print(
-            '    Debug: URI Query Parameters: ${state.uri.queryParameters}',
-          );
-          print(
-            '    Debug: isLinkingContextQueryPresent: $isLinkingContextQueryPresent',
-          );
-          print(
-            '    Debug: isLinkingPathSegmentPresent: $isLinkingPathSegmentPresent',
-          );
-          print(
-            '    Debug: isAnyLinkingContext evaluated to: $isAnyLinkingContext',
-          );
-
-          // If the user is authenticated, always redirect away from auth paths.
+        // If the user is trying to access an authentication path:
+        if (isGoingToAuth) {
+          // A fully authenticated user should never see auth pages.
           if (appStatus == AppStatus.authenticated) {
-            print(
-              '    Action: Authenticated user on auth path ($currentLocation). Redirecting to $feedPath',
-            );
+            print('    Action: Authenticated user on auth path. Redirecting to feed.');
             return feedPath;
           }
 
-          // If the user is anonymous, allow navigation within auth paths if in a linking context.
-          // Otherwise, redirect anonymous users trying to access non-linking auth paths to feed.
-          if (isAnyLinkingContext) {
-            print(
-              '    Action: Anonymous user on auth linking path ($currentLocation). Allowing navigation.',
-            );
+          // An anonymous user is only allowed on auth paths for account linking.
+          final isLinking =
+              state.uri.queryParameters['context'] == 'linking' ||
+                  currentLocation.contains('/linking/');
+
+          if (isLinking) {
+            print('    Action: Anonymous user on linking path. Allowing.');
             return null;
           } else {
-            print(
-              '    Action: Anonymous user trying to access non-linking auth path ($currentLocation). Redirecting to $feedPath',
-            );
+            print('    Action: Anonymous user on non-linking auth path. Redirecting to feed.');
             return feedPath;
           }
         }
-        // Allow access to other routes (non-auth paths)
-        print(
-          '    Action: Allowing navigation to $currentLocation for $appStatus user (non-auth path).',
-        );
-        return null;
+
+        // If the user is at the root path, they should be sent to the feed.
+        if (currentLocation == rootPath) {
+          print('    Action: User at root. Redirecting to feed.');
+          return feedPath;
+        }
       }
 
-      // Fallback (should ideally not be reached if all statuses are handled)
-      print(
-        '  Redirect Decision: Fallback, no specific condition met for $appStatus. Allowing navigation.',
-      );
+      // --- Fallback ---
+      // For any other case, allow navigation.
+      print('  Redirect: No condition met. Allowing navigation.');
       return null;
     },
     // --- Authentication Routes ---
     routes: [
+      // A neutral root route that the app starts on. The redirect logic will
+      // immediately move the user to the correct location. This route's
+      // builder will never be called in practice.
+      GoRoute(
+        path: '/',
+        builder: (context, state) => const SizedBox.shrink(),
+      ),
       GoRoute(
         path: Routes.authentication,
         name: Routes.authenticationName,

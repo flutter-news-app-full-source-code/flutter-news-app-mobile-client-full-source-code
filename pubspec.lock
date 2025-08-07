@@ -72,7 +72,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: f48dc0555b1a28ed3c51215f3a93403dbbc46ea0
+      resolved-ref: "9c25c6bff76c554e5220368536fcb9370758f48f"
       url: "https://github.com/flutter-news-app-full-source-code/auth-inmemory.git"
     source: git
     version: "0.0.0"
@@ -178,7 +178,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "7a1b54f8c0f94f6c04af3404c8110181e080b5c4"
+      resolved-ref: f648500814ec636a2930498756029d29b363194a
       url: "https://github.com/flutter-news-app-full-source-code/core.git"
     source: git
     version: "0.0.0"
@@ -426,10 +426,10 @@ packages:
     dependency: "direct main"
     description:
       name: go_router
-      sha256: c489908a54ce2131f1d1b7cc631af9c1a06fac5ca7c449e959192089f9489431
+      sha256: "8b1f37dfaf6e958c6b872322db06f946509433bec3de753c3491a42ae9ec2b48"
       url: "https://pub.dev"
     source: hosted
-    version: "16.0.0"
+    version: "16.1.0"
   google_fonts:
     dependency: "direct main"
     description:

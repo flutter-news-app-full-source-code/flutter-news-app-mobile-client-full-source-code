@@ -89,11 +89,23 @@ GoRouter createRouter({
         '  AppStatus: $appStatus',
       );
 
-      // --- Define Key Paths ---
       const rootPath = '/';
       const authenticationPath = Routes.authentication;
       const feedPath = Routes.feed;
       final isGoingToAuth = currentLocation.startsWith(authenticationPath);
+
+      // --- Workaround for Demo Environment ---
+      // In the demo environment, the initial auth state from the in-memory
+      // client might not be emitted before the first redirect check. If the app
+      // is still in the `initial` state, we explicitly redirect to the
+      // authentication page to begin the demo flow, avoiding the black screen.
+      if (appStatus == AppStatus.initial &&
+          environment == local_config.AppEnvironment.demo) {
+        print(
+          '  Redirect (Workaround): In demo mode with initial status. Forcing to authentication.',
+        );
+        return authenticationPath;
+      }
 
       // With the new App startup architecture, the router is only active when
       // the app is in a stable, running state. The `redirect` function's

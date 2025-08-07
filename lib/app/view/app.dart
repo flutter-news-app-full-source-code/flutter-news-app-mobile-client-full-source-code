@@ -9,6 +9,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_e
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_status_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/router.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
@@ -207,8 +208,18 @@ class _AppViewState extends State<_AppView> {
             // It's wrapped in a basic MaterialApp to provide theme and l10n.
             return MaterialApp(
               debugShowCheckedModeBanner: false,
-              theme: lightTheme(),
-              darkTheme: darkTheme(),
+              theme: lightTheme(
+                scheme: FlexScheme.material,
+                appTextScaleFactor: AppTextScaleFactor.medium,
+                appFontWeight: AppFontWeight.regular,
+                fontFamily: null,
+              ),
+              darkTheme: darkTheme(
+                scheme: FlexScheme.material,
+                appTextScaleFactor: AppTextScaleFactor.medium,
+                appFontWeight: AppFontWeight.regular,
+                fontFamily: null,
+              ),
               themeMode: state.themeMode,
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
@@ -220,8 +231,18 @@ class _AppViewState extends State<_AppView> {
             // A mandatory update is required. Show the UpdateRequiredPage.
             return MaterialApp(
               debugShowCheckedModeBanner: false,
-              theme: lightTheme(),
-              darkTheme: darkTheme(),
+              theme: lightTheme(
+                scheme: FlexScheme.material,
+                appTextScaleFactor: AppTextScaleFactor.medium,
+                appFontWeight: AppFontWeight.regular,
+                fontFamily: null,
+              ),
+              darkTheme: darkTheme(
+                scheme: FlexScheme.material,
+                appTextScaleFactor: AppTextScaleFactor.medium,
+                appFontWeight: AppFontWeight.regular,
+                fontFamily: null,
+              ),
               themeMode: state.themeMode,
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
@@ -236,8 +257,18 @@ class _AppViewState extends State<_AppView> {
             // both the loading indicator and the retry mechanism.
             return MaterialApp(
               debugShowCheckedModeBanner: false,
-              theme: lightTheme(),
-              darkTheme: darkTheme(),
+              theme: lightTheme(
+                scheme: FlexScheme.material,
+                appTextScaleFactor: AppTextScaleFactor.medium,
+                appFontWeight: AppFontWeight.regular,
+                fontFamily: null,
+              ),
+              darkTheme: darkTheme(
+                scheme: FlexScheme.material,
+                appTextScaleFactor: AppTextScaleFactor.medium,
+                appFontWeight: AppFontWeight.regular,
+                fontFamily: null,
+              ),
               themeMode: state.themeMode,
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,

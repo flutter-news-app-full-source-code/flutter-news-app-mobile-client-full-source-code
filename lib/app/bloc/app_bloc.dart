@@ -59,7 +59,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppFontFamilyChanged>(_onFontFamilyChanged);
     on<AppTextScaleFactorChanged>(_onAppTextScaleFactorChanged);
     on<AppFontWeightChanged>(_onAppFontWeightChanged);
-    on<AppOpened>(_onAppOpened);
 
     // Listen directly to the auth state changes stream
     _userSubscription = _authenticationRepository.authStateChanges.listen(
@@ -438,18 +437,41 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         '[AppBloc] Remote Config fetched successfully. ID: ${remoteConfig.id} for user: ${state.user!.id}',
       );
 
-      // Determine the correct status based on the existing user's role.
-      // This ensures that successfully fetching config doesn't revert auth status to 'initial'.
-      final newStatusBasedOnUser =
-          state.user!.appRole == AppUserRole.standardUser
+      // --- CRITICAL STARTUP SEQUENCE EVALUATION ---
+      // After successfully fetching the remote configuration, we must
+      // evaluate the app's status in a specific order before allowing
+      // the main UI to be built.
+
+      // 1. Check for Maintenance Mode. This has the highest priority.
+      if (remoteConfig.appStatus.isUnderMaintenance) {
+        emit(
+          state.copyWith(
+            status: AppStatus.underMaintenance,
+            remoteConfig: remoteConfig,
+          ),
+        );
+        return;
+      }
+
+      // 2. Check for a Required Update.
+      // TODO(fulleni): Compare with actual app version from package_info_plus.
+      if (remoteConfig.appStatus.isLatestVersionOnly) {
+        emit(
+          state.copyWith(
+            status: AppStatus.updateRequired,
+            remoteConfig: remoteConfig,
+          ),
+        );
+        return;
+      }
+
+      // 3. If no critical status is active, proceed to the normal app state.
+      // The status is determined by the user's role (authenticated/anonymous).
+      final finalStatus = state.user!.appRole == AppUserRole.standardUser
           ? AppStatus.authenticated
           : AppStatus.anonymous;
-      emit(
-        state.copyWith(
-          remoteConfig: remoteConfig,
-          status: newStatusBasedOnUser,
-        ),
-      );
+
+      emit(state.copyWith(remoteConfig: remoteConfig, status: finalStatus));
     } on HttpException catch (e) {
       print(
         '[AppBloc] Failed to fetch AppConfig (HttpException) for user ${state.user?.id}: ${e.runtimeType} - ${e.message}',
@@ -522,26 +544,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         'shown/completed. Status updated locally to $updatedActionStatus. '
         'Backend update pending.',
       );
-    }
-  }
-
-  Future<void> _onAppOpened(AppOpened event, Emitter<AppState> emit) async {
-    if (state.remoteConfig == null) {
-      return;
-    }
-
-    final appStatus = state.remoteConfig!.appStatus;
-
-    if (appStatus.isUnderMaintenance) {
-      emit(state.copyWith(status: AppStatus.underMaintenance));
-      return;
-    }
-
-    // TODO(fulleni): Get the current app version from a package like
-    // package_info_plus and compare it with appStatus.latestAppVersion.
-    if (appStatus.isLatestVersionOnly) {
-      emit(state.copyWith(status: AppStatus.updateRequired));
-      return;
     }
   }
 }

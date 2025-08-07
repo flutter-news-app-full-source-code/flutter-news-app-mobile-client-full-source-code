@@ -461,20 +461,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
       // --- POST-CHECK STATE RESOLUTION ---
       // If no critical status was found, we resolve the final state.
-
-      // For an initial fetch, we transition from configFetching to the correct
-      // authenticated/anonymous state.
-      if (!event.isBackgroundCheck) {
-        final finalStatus = state.user!.appRole == AppUserRole.standardUser
-            ? AppStatus.authenticated
-            : AppStatus.anonymous;
-        emit(state.copyWith(remoteConfig: remoteConfig, status: finalStatus));
-      } else {
-        // For a background check, the status is already correct (e.g., authenticated).
-        // We just need to update the remoteConfig in the state silently.
-        // The status does not need to change, preventing a disruptive UI rebuild.
-        emit(state.copyWith(remoteConfig: remoteConfig));
-      }
+      // This logic applies to both initial fetches (transitioning from
+      // configFetching) and background checks (transitioning from a state
+      // like underMaintenance back to a running state).
+      final finalStatus = state.user!.appRole == AppUserRole.standardUser
+          ? AppStatus.authenticated
+          : AppStatus.anonymous;
+      emit(state.copyWith(remoteConfig: remoteConfig, status: finalStatus));
     } on HttpException catch (e) {
       print(
         '[AppBloc] Failed to fetch AppConfig (HttpException) for user ${state.user?.id}: ${e.runtimeType} - ${e.message}',

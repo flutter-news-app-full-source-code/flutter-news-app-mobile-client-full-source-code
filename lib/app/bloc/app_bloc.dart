@@ -498,23 +498,25 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   ) async {
     if (state.user != null && state.user!.id == event.userId) {
       final now = DateTime.now();
-      // Create a new UserFeedActionStatus for the specific action
-      final updatedActionStatus = UserFeedActionStatus(
-        isCompleted: event.isCompleted,
-        lastShownAt: now,
-      );
+      // Get the current status for the action, or create a default if not present.
+      final currentStatus = state.user!.feedActionStatus[event.feedActionType] ??
+          const UserFeedActionStatus(isCompleted: false);
 
-      // Create a new map with the updated status for the specific action type
+      // Create an updated status, preserving the `isCompleted` flag and only
+      // updating the `lastShownAt` timestamp.
+      final updatedActionStatus = currentStatus.copyWith(lastShownAt: now);
+
+      // Create a new map with the updated status for the specific action type.
       final newFeedActionStatus =
           Map<FeedActionType, UserFeedActionStatus>.from(
-            state.user!.feedActionStatus,
-          )..update(
-            event.feedActionType,
-            (_) => updatedActionStatus,
-            ifAbsent: () => updatedActionStatus,
-          );
+        state.user!.feedActionStatus,
+      )..update(
+          event.feedActionType,
+          (_) => updatedActionStatus,
+          ifAbsent: () => updatedActionStatus,
+        );
 
-      // Update the user with the new feedActionStatus map
+      // Update the user with the new feedActionStatus map.
       final updatedUser = state.user!.copyWith(
         feedActionStatus: newFeedActionStatus,
       );
@@ -535,7 +537,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // }
       print(
         '[AppBloc] User ${event.userId} FeedAction ${event.feedActionType} '
-        'shown/completed. Status updated locally to $updatedActionStatus. '
+        'shown. Status updated locally to $updatedActionStatus. '
         'Backend update pending.',
       );
     }

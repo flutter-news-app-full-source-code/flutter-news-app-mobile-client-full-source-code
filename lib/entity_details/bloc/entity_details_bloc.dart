@@ -20,14 +20,14 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     required DataRepository<Source> sourceRepository,
     required AccountBloc accountBloc,
     required AppBloc appBloc,
-    required FeedInjectorService feedInjectorService,
-  }) : _headlinesRepository = headlinesRepository,
-       _topicRepository = topicRepository,
-       _sourceRepository = sourceRepository,
-       _accountBloc = accountBloc,
-       _appBloc = appBloc,
-       _feedInjectorService = feedInjectorService,
-       super(const EntityDetailsState()) {
+    required FeedDecoratorService feedDecoratorService,
+  })  : _headlinesRepository = headlinesRepository,
+        _topicRepository = topicRepository,
+        _sourceRepository = sourceRepository,
+        _accountBloc = accountBloc,
+        _appBloc = appBloc,
+        _feedDecoratorService = feedDecoratorService,
+        super(const EntityDetailsState()) {
     on<EntityDetailsLoadRequested>(_onEntityDetailsLoadRequested);
     on<EntityDetailsToggleFollowRequested>(
       _onEntityDetailsToggleFollowRequested,
@@ -52,7 +52,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
   final DataRepository<Source> _sourceRepository;
   final AccountBloc _accountBloc;
   final AppBloc _appBloc;
-  final FeedInjectorService _feedInjectorService;
+  final FeedDecoratorService _feedDecoratorService;
   late final StreamSubscription<AccountState> _accountBlocSubscription;
 
   static const _headlinesLimit = 10;
@@ -107,11 +107,11 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         );
       }
 
-      final processedFeedItems = _feedInjectorService.injectItems(
-        headlines: headlineResponse.items,
+      // For entity details, only inject ads.
+      final processedFeedItems = _feedDecoratorService.injectAds(
+        feedItems: headlineResponse.items,
         user: currentUser,
-        remoteConfig: remoteConfig,
-        currentFeedItemCount: 0,
+        adConfig: remoteConfig.adConfig,
       );
 
       // 3. Determine isFollowing status
@@ -142,20 +142,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         ),
       );
 
-      // Dispatch event if AccountAction was injected in the initial load
-      if (processedFeedItems.any((item) => item is FeedAction) &&
-          _appBloc.state.user?.id != null) {
-        _appBloc.add(
-          AppUserAccountActionShown(
-            userId: _appBloc.state.user!.id,
-            feedActionType:
-                (processedFeedItems.firstWhere((item) => item is FeedAction)
-                        as FeedAction)
-                    .feedActionType,
-            isCompleted: false,
-          ),
-        );
-      }
+      // Feed actions are not injected in entity detail feeds.
     } on HttpException catch (e) {
       emit(state.copyWith(status: EntityDetailsStatus.failure, exception: e));
     } catch (e) {
@@ -220,10 +207,11 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         );
       }
 
-      final newProcessedFeedItems = _feedInjectorService.injectItems(
-        headlines: headlineResponse.items,
+      // For entity details pagination, only inject ads.
+      final newProcessedFeedItems = _feedDecoratorService.injectAds(
+        feedItems: headlineResponse.items,
         user: currentUser,
-        remoteConfig: remoteConfig,
+        adConfig: remoteConfig.adConfig,
         currentFeedItemCount: state.feedItems.length,
       );
 
@@ -236,20 +224,6 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
           clearHeadlinesCursor: !headlineResponse.hasMore,
         ),
       );
-
-      if (newProcessedFeedItems.any((item) => item is FeedAction) &&
-          _appBloc.state.user?.id != null) {
-        _appBloc.add(
-          AppUserAccountActionShown(
-            userId: _appBloc.state.user!.id,
-            feedActionType:
-                (newProcessedFeedItems.firstWhere((item) => item is FeedAction)
-                        as FeedAction)
-                    .feedActionType,
-            isCompleted: false,
-          ),
-        );
-      }
     } on HttpException catch (e) {
       emit(
         state.copyWith(

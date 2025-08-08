@@ -87,11 +87,9 @@ class AppUserAccountActionShown extends AppEvent {
   const AppUserAccountActionShown({
     required this.userId,
     required this.feedActionType,
-    required this.isCompleted,
   });
   final String userId;
   final FeedActionType feedActionType;
-  final bool isCompleted;
   @override
-  List<Object> get props => [userId, feedActionType, isCompleted];
+  List<Object> get props => [userId, feedActionType];
 }

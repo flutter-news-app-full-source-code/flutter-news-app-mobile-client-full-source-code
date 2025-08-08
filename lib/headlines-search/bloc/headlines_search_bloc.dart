@@ -18,13 +18,13 @@ class HeadlinesSearchBloc
     required DataRepository<Topic> topicRepository,
     required DataRepository<Source> sourceRepository,
     required AppBloc appBloc,
-    required FeedInjectorService feedInjectorService,
-  }) : _headlinesRepository = headlinesRepository,
-       _topicRepository = topicRepository,
-       _sourceRepository = sourceRepository,
-       _appBloc = appBloc,
-       _feedInjectorService = feedInjectorService,
-       super(const HeadlinesSearchInitial()) {
+    required FeedDecoratorService feedDecoratorService,
+  })  : _headlinesRepository = headlinesRepository,
+        _topicRepository = topicRepository,
+        _sourceRepository = sourceRepository,
+        _appBloc = appBloc,
+        _feedDecoratorService = feedDecoratorService,
+        super(const HeadlinesSearchInitial()) {
     on<HeadlinesSearchModelTypeChanged>(_onHeadlinesSearchModelTypeChanged);
     on<HeadlinesSearchFetchRequested>(
       _onSearchFetchRequested,
@@ -36,7 +36,7 @@ class HeadlinesSearchBloc
   final DataRepository<Topic> _topicRepository;
   final DataRepository<Source> _sourceRepository;
   final AppBloc _appBloc;
-  final FeedInjectorService _feedInjectorService;
+  final FeedDecoratorService _feedDecoratorService;
   static const _limit = 10;
 
   Future<void> _onHeadlinesSearchModelTypeChanged(
@@ -107,10 +107,11 @@ class HeadlinesSearchBloc
                 );
                 return;
               }
-              final injectedItems = _feedInjectorService.injectItems(
-                headlines: headlines,
+              // For search pagination, only inject ads.
+              final injectedItems = _feedDecoratorService.injectAds(
+                feedItems: headlines,
                 user: currentUser,
-                remoteConfig: appConfig,
+                adConfig: appConfig.adConfig,
                 currentFeedItemCount: successState.items.length,
               );
               emit(
@@ -120,20 +121,6 @@ class HeadlinesSearchBloc
                   cursor: response.cursor,
                 ),
               );
-              // Dispatch event if AccountAction was injected during pagination
-              if (injectedItems.any((item) => item is FeedAction) &&
-                  _appBloc.state.user?.id != null) {
-                final feedAction =
-                    injectedItems.firstWhere((item) => item is FeedAction)
-                        as FeedAction;
-                _appBloc.add(
-                  AppUserAccountActionShown(
-                    userId: _appBloc.state.user!.id,
-                    feedActionType: feedAction.feedActionType,
-                    isCompleted: false,
-                  ),
-                );
-              }
             case ContentType.topic:
               response = await _topicRepository.readAll(
                 filter: {'q': searchTerm},
@@ -220,11 +207,11 @@ class HeadlinesSearchBloc
             );
             return;
           }
-          processedItems = _feedInjectorService.injectItems(
-            headlines: headlines,
+          // For search results, only inject ads.
+          processedItems = _feedDecoratorService.injectAds(
+            feedItems: headlines,
             user: currentUser,
-            remoteConfig: appConfig,
-            currentFeedItemCount: 0,
+            adConfig: appConfig.adConfig,
           );
         case ContentType.topic:
           rawResponse = await _topicRepository.readAll(
@@ -258,21 +245,7 @@ class HeadlinesSearchBloc
           selectedModelType: modelType,
         ),
       );
-      // Dispatch event if Feed Action was injected in new search
-      if (modelType == ContentType.headline &&
-          processedItems.any((item) => item is FeedAction) &&
-          _appBloc.state.user?.id != null) {
-        final feedAction =
-            processedItems.firstWhere((item) => item is FeedAction)
-                as FeedAction;
-        _appBloc.add(
-          AppUserAccountActionShown(
-            userId: _appBloc.state.user!.id,
-            feedActionType: feedAction.feedActionType,
-            isCompleted: false,
-          ),
-        );
-      }
+      // Feed actions are not injected in search results.
     } on HttpException catch (e) {
       emit(
         HeadlinesSearchFailure(

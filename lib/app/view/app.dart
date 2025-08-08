@@ -27,6 +27,7 @@ class App extends StatelessWidget {
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
     required DataRepository<RemoteConfig> remoteConfigRepository,
+    required DataRepository<User> userRepository,
     required KVStorageService kvStorageService,
     required AppEnvironment environment,
     this.demoDataMigrationService,
@@ -39,6 +40,7 @@ class App extends StatelessWidget {
        _userAppSettingsRepository = userAppSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
        _appConfigRepository = remoteConfigRepository,
+       _userRepository = userRepository,
        _kvStorageService = kvStorageService,
        _environment = environment;
 
@@ -51,6 +53,7 @@ class App extends StatelessWidget {
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
   final DataRepository<RemoteConfig> _appConfigRepository;
+  final DataRepository<User> _userRepository;
   final KVStorageService _kvStorageService;
   final AppEnvironment _environment;
   final DemoDataMigrationService? demoDataMigrationService;
@@ -67,6 +70,7 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _userAppSettingsRepository),
         RepositoryProvider.value(value: _userContentPreferencesRepository),
         RepositoryProvider.value(value: _appConfigRepository),
+        RepositoryProvider.value(value: _userRepository),
         RepositoryProvider.value(value: _kvStorageService),
       ],
       child: MultiBlocProvider(
@@ -74,9 +78,11 @@ class App extends StatelessWidget {
           BlocProvider(
             create: (context) => AppBloc(
               authenticationRepository: context.read<AuthRepository>(),
-              userAppSettingsRepository: context
-                  .read<DataRepository<UserAppSettings>>(),
-              appConfigRepository: context.read<DataRepository<RemoteConfig>>(),
+              userAppSettingsRepository:
+                  context.read<DataRepository<UserAppSettings>>(),
+              appConfigRepository:
+                  context.read<DataRepository<RemoteConfig>>(),
+              userRepository: context.read<DataRepository<User>>(),
               environment: _environment,
               demoDataMigrationService: demoDataMigrationService,
             ),
@@ -96,6 +102,7 @@ class App extends StatelessWidget {
           userAppSettingsRepository: _userAppSettingsRepository,
           userContentPreferencesRepository: _userContentPreferencesRepository,
           appConfigRepository: _appConfigRepository,
+          userRepository: _userRepository,
           environment: _environment,
         ),
       ),
@@ -113,6 +120,7 @@ class _AppView extends StatefulWidget {
     required this.userAppSettingsRepository,
     required this.userContentPreferencesRepository,
     required this.appConfigRepository,
+    required this.userRepository,
     required this.environment,
   });
 
@@ -124,6 +132,7 @@ class _AppView extends StatefulWidget {
   final DataRepository<UserAppSettings> userAppSettingsRepository;
   final DataRepository<UserContentPreferences> userContentPreferencesRepository;
   final DataRepository<RemoteConfig> appConfigRepository;
+  final DataRepository<User> userRepository;
   final AppEnvironment environment;
 
   @override
@@ -164,6 +173,7 @@ class _AppViewState extends State<_AppView> {
       userAppSettingsRepository: widget.userAppSettingsRepository,
       userContentPreferencesRepository: widget.userContentPreferencesRepository,
       remoteConfigRepository: widget.appConfigRepository,
+      userRepository: widget.userRepository,
       environment: widget.environment,
     );
 

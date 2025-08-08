@@ -19,13 +19,15 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required AuthRepository authenticationRepository,
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<RemoteConfig> appConfigRepository,
+    required DataRepository<User> userRepository,
     required local_config.AppEnvironment environment,
     this.demoDataMigrationService,
-  }) : _authenticationRepository = authenticationRepository,
-       _userAppSettingsRepository = userAppSettingsRepository,
-       _appConfigRepository = appConfigRepository,
-       _environment = environment,
-       super(
+  })  : _authenticationRepository = authenticationRepository,
+        _userAppSettingsRepository = userAppSettingsRepository,
+        _appConfigRepository = appConfigRepository,
+        _userRepository = userRepository,
+        _environment = environment,
+        super(
          AppState(
            settings: const UserAppSettings(
              id: 'default',
@@ -69,6 +71,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final AuthRepository _authenticationRepository;
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
   final DataRepository<RemoteConfig> _appConfigRepository;
+  final DataRepository<User> _userRepository;
   final local_config.AppEnvironment _environment;
   final DemoDataMigrationService? demoDataMigrationService;
   late final StreamSubscription<User?> _userSubscription;
@@ -524,22 +527,22 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // Emit the change so UI can react if needed, and other BLoCs get the update.
       emit(state.copyWith(user: updatedUser));
 
-      // TODO(fulleni): Persist this change to the backend.
-      // This would typically involve calling a method on a repository, e.g.:
-      // try {
-      //   await _authenticationRepository.updateUserFeedActionStatus(
-      //     event.userId,
-      //     event.feedActionType,
-      //     updatedActionStatus,
-      //   );
-      // } catch (e) {
-      //   print('Failed to update feed action status on backend: $e');
-      // }
-      print(
-        '[AppBloc] User ${event.userId} FeedAction ${event.feedActionType} '
-        'shown. Status updated locally to $updatedActionStatus. '
-        'Backend update pending.',
-      );
+      // Persist this change to the backend.
+      try {
+        await _userRepository.update(
+          id: updatedUser.id,
+          item: updatedUser,
+          userId: updatedUser.id,
+        );
+        print(
+          '[AppBloc] User ${event.userId} FeedAction ${event.feedActionType} '
+          'status successfully updated on the backend.',
+        );
+      } catch (e) {
+        print('Failed to update feed action status on backend: $e');
+        // TODO(fulleni): Optionally, handle the error, e.g., by reverting the state
+        // or scheduling a retry. For now, we just log the error.
+      }
     }
   }
 }

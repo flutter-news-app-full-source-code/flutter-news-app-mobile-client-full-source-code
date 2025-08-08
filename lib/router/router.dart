@@ -62,6 +62,7 @@ GoRouter createRouter({
   required DataRepository<UserContentPreferences>
   userContentPreferencesRepository,
   required DataRepository<RemoteConfig> remoteConfigRepository,
+  required DataRepository<User> userRepository,
   required local_config.AppEnvironment environment,
 }) {
   // Instantiate AccountBloc once to be shared
@@ -354,25 +355,25 @@ GoRouter createRouter({
               BlocProvider(
                 create: (context) {
                   // Instantiate FeedInjectorService here as it's stateless for now
-                  final feedInjectorService = FeedInjectorService();
+                  final feedDecoratorService = FeedDecoratorService();
                   return HeadlinesFeedBloc(
-                    headlinesRepository: context
-                        .read<DataRepository<Headline>>(),
-                    feedInjectorService: feedInjectorService,
+                    headlinesRepository:
+                        context.read<DataRepository<Headline>>(),
+                    feedDecoratorService: feedDecoratorService,
                     appBloc: context.read<AppBloc>(),
                   )..add(const HeadlinesFeedFetchRequested());
                 },
               ),
               BlocProvider(
                 create: (context) {
-                  final feedInjectorService = FeedInjectorService();
+                  final feedDecoratorService = FeedDecoratorService();
                   return HeadlinesSearchBloc(
-                    headlinesRepository: context
-                        .read<DataRepository<Headline>>(),
+                    headlinesRepository:
+                        context.read<DataRepository<Headline>>(),
                     topicRepository: context.read<DataRepository<Topic>>(),
                     sourceRepository: context.read<DataRepository<Source>>(),
                     appBloc: context.read<AppBloc>(),
-                    feedInjectorService: feedInjectorService,
+                    feedDecoratorService: feedDecoratorService,
                   );
                 },
               ),

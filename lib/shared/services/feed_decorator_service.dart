@@ -118,6 +118,26 @@ class FeedDecoratorService {
     );
   }
 
+  /// Injects only [Ad] items into a list of [FeedItem]s.
+  ///
+  /// This method is designed for pagination, where new content is added to an
+  /// existing feed without re-evaluating or injecting new `FeedAction`s.
+  ///
+  /// Returns a new list of [FeedItem] objects, interspersed with ads.
+  List<FeedItem> injectAds({
+    required List<FeedItem> feedItems,
+    required User? user,
+    required AdConfig adConfig,
+    int currentFeedItemCount = 0,
+  }) {
+    return _injectAds(
+      feedItems: feedItems,
+      user: user,
+      adConfig: adConfig,
+      currentFeedItemCount: currentFeedItemCount,
+    );
+  }
+
   /// Determines the single highest-priority feed action that is currently due.
   ///
   /// This method encapsulates the core business logic for action selection.
@@ -178,6 +198,7 @@ class FeedDecoratorService {
     required List<FeedItem> feedItems,
     required User? user,
     required AdConfig adConfig,
+    int currentFeedItemCount = 0,
   }) {
     final userRole = user?.appRole ?? AppUserRole.guestUser;
 
@@ -199,25 +220,24 @@ class FeedDecoratorService {
     }
 
     final result = <FeedItem>[];
-    var contentItemsSinceLastAd = 0;
+    var headlinesInBatch = 0;
 
     for (final item in feedItems) {
       result.add(item);
-      // We only count non-ad items towards the frequency counter.
-      if (item is! Ad) {
-        contentItemsSinceLastAd++;
-      }
+      headlinesInBatch++;
+
+      // Calculate the total number of items processed so far, including
+      // those from previous pages.
+      final totalItemsSoFar = currentFeedItemCount + result.length;
 
       // Check if an ad should be injected.
       // The total number of items must be past the initial placement interval,
-      // AND the number of content items since the last ad must meet the
-      // frequency threshold.
-      if (result.length >= adPlacementInterval &&
-          contentItemsSinceLastAd >= adFrequency) {
+      // AND the number of content items in this batch must meet the frequency.
+      if (totalItemsSoFar >= adPlacementInterval &&
+          headlinesInBatch % adFrequency == 0) {
         final adToInject = _getAdToInject();
         if (adToInject != null) {
           result.add(adToInject);
-          contentItemsSinceLastAd = 0; // Reset counter after injecting an ad.
         }
       }
     }

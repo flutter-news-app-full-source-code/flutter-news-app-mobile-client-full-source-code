@@ -44,7 +44,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/la
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/notification_settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/theme_settings_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_injector_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_decorator_service.dart';
 import 'package:go_router/go_router.dart';
 
 /// Creates and configures the GoRouter instance for the application.

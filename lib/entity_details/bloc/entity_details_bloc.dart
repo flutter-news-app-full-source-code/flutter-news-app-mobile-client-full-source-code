@@ -8,7 +8,7 @@ import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_injector_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_decorator_service.dart';
 
 part 'entity_details_event.dart';
 part 'entity_details_state.dart';

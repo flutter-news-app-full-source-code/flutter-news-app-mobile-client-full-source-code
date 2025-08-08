@@ -45,18 +45,17 @@ class EntityDetailsPage extends StatelessWidget {
     return BlocProvider<EntityDetailsBloc>(
       // Explicitly type BlocProvider
       create: (context) {
-        final feedInjectorService = FeedInjectorService();
-        final entityDetailsBloc =
-            EntityDetailsBloc(
-              headlinesRepository: context.read<DataRepository<Headline>>(),
-              topicRepository: context.read<DataRepository<Topic>>(),
-              sourceRepository: context.read<DataRepository<Source>>(),
-              accountBloc: context.read<AccountBloc>(),
-              appBloc: context.read<AppBloc>(),
-              feedInjectorService: feedInjectorService,
-            )..add(
-              EntityDetailsLoadRequested(
-                entityId: args.entityId,
+        final feedDecoratorService = FeedDecoratorService();
+        final entityDetailsBloc = EntityDetailsBloc(
+          headlinesRepository: context.read<DataRepository<Headline>>(),
+          topicRepository: context.read<DataRepository<Topic>>(),
+          sourceRepository: context.read<DataRepository<Source>>(),
+          accountBloc: context.read<AccountBloc>(),
+          appBloc: context.read<AppBloc>(),
+          feedDecoratorService: feedDecoratorService,
+        )..add(
+            EntityDetailsLoadRequested(
+              entityId: args.entityId,
                 contentType: args.contentType,
                 entity: args.entity,
               ),

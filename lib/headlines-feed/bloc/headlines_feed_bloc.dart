@@ -16,7 +16,7 @@ part 'headlines_feed_state.dart';
 /// Manages the state for the headlines feed feature.
 ///
 /// Handles fetching headlines, applying filters, pagination, and refreshing
-/// the feed using the provided [DataRepository]. It uses [FeedInjectorService]
+/// the feed using the provided [DataRepository]. It uses [FeedDecoratorService]
 /// to inject ads and account actions into the feed.
 /// {@endtemplate}
 class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
@@ -25,12 +25,12 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   /// Requires repositories and services for its operations.
   HeadlinesFeedBloc({
     required DataRepository<Headline> headlinesRepository,
-    required FeedInjectorService feedInjectorService,
+    required FeedDecoratorService feedDecoratorService,
     required AppBloc appBloc,
-  }) : _headlinesRepository = headlinesRepository,
-       _feedInjectorService = feedInjectorService,
-       _appBloc = appBloc,
-       super(const HeadlinesFeedState()) {
+  })  : _headlinesRepository = headlinesRepository,
+        _feedDecoratorService = feedDecoratorService,
+        _appBloc = appBloc,
+        super(const HeadlinesFeedState()) {
     on<HeadlinesFeedFetchRequested>(
       _onHeadlinesFeedFetchRequested,
       transformer: droppable(),
@@ -50,7 +50,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   }
 
   final DataRepository<Headline> _headlinesRepository;
-  final FeedInjectorService _feedInjectorService;
+  final FeedDecoratorService _feedDecoratorService;
   final AppBloc _appBloc;
 
   /// The number of headlines to fetch per page.
@@ -97,10 +97,11 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
-      final newProcessedFeedItems = _feedInjectorService.injectItems(
-        headlines: headlineResponse.items,
+      // For pagination, only inject ads, not feed actions.
+      final newProcessedFeedItems = _feedDecoratorService.injectAds(
+        feedItems: headlineResponse.items,
         user: currentUser,
-        remoteConfig: remoteConfig,
+        adConfig: remoteConfig.adConfig,
         currentFeedItemCount: state.feedItems.length,
       );
 
@@ -108,24 +109,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         state.copyWith(
           status: HeadlinesFeedStatus.success,
           feedItems: List.of(state.feedItems)..addAll(newProcessedFeedItems),
-          hasMore: headlineResponse.cursor != null,
+          hasMore: headlineResponse.hasMore,
           cursor: headlineResponse.cursor,
         ),
       );
-
-      if (newProcessedFeedItems.any((item) => item is FeedAction) &&
-          currentUser?.id != null) {
-        _appBloc.add(
-          AppUserAccountActionShown(
-            userId: currentUser!.id,
-            feedActionType:
-                (newProcessedFeedItems.firstWhere((item) => item is FeedAction)
-                        as FeedAction)
-                    .feedActionType,
-            isCompleted: false,
-          ),
-        );
-      }
     } on HttpException catch (e) {
       emit(state.copyWith(status: HeadlinesFeedStatus.failure, error: e));
     }
@@ -151,33 +138,30 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
-      final processedFeedItems = _feedInjectorService.injectItems(
+      // For a major load, use the full decoration pipeline.
+      final decorationResult = _feedDecoratorService.decorateFeed(
         headlines: headlineResponse.items,
         user: currentUser,
         remoteConfig: appConfig,
-        currentFeedItemCount: 0,
       );
 
       emit(
         state.copyWith(
           status: HeadlinesFeedStatus.success,
-          feedItems: processedFeedItems,
-          hasMore: headlineResponse.cursor != null,
+          feedItems: decorationResult.decoratedItems,
+          hasMore: headlineResponse.hasMore,
           cursor: headlineResponse.cursor,
           filter: state.filter,
         ),
       );
 
-      if (processedFeedItems.any((item) => item is FeedAction) &&
-          currentUser?.id != null) {
+      // If a feed action was injected, notify AppBloc to update its status.
+      final injectedAction = decorationResult.injectedAction;
+      if (injectedAction != null && currentUser?.id != null) {
         _appBloc.add(
           AppUserAccountActionShown(
             userId: currentUser!.id,
-            feedActionType:
-                (processedFeedItems.firstWhere((item) => item is FeedAction)
-                        as FeedAction)
-                    .feedActionType,
-            isCompleted: false,
+            feedActionType: injectedAction.feedActionType,
           ),
         );
       }
@@ -214,32 +198,27 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
-      final processedFeedItems = _feedInjectorService.injectItems(
+      final decorationResult = _feedDecoratorService.decorateFeed(
         headlines: headlineResponse.items,
         user: currentUser,
         remoteConfig: appConfig,
-        currentFeedItemCount: 0,
       );
 
       emit(
         state.copyWith(
           status: HeadlinesFeedStatus.success,
-          feedItems: processedFeedItems,
-          hasMore: headlineResponse.cursor != null,
+          feedItems: decorationResult.decoratedItems,
+          hasMore: headlineResponse.hasMore,
           cursor: headlineResponse.cursor,
         ),
       );
 
-      if (processedFeedItems.any((item) => item is FeedAction) &&
-          currentUser?.id != null) {
+      final injectedAction = decorationResult.injectedAction;
+      if (injectedAction != null && currentUser?.id != null) {
         _appBloc.add(
           AppUserAccountActionShown(
             userId: currentUser!.id,
-            feedActionType:
-                (processedFeedItems.firstWhere((item) => item is FeedAction)
-                        as FeedAction)
-                    .feedActionType,
-            isCompleted: false,
+            feedActionType: injectedAction.feedActionType,
           ),
         );
       }
@@ -275,26 +254,29 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
-      final processedFeedItems = _feedInjectorService.injectItems(
+      final decorationResult = _feedDecoratorService.decorateFeed(
         headlines: headlineResponse.items,
         user: currentUser,
         remoteConfig: appConfig,
-        currentFeedItemCount: 0,
       );
 
       emit(
         state.copyWith(
           status: HeadlinesFeedStatus.success,
-          feedItems: processedFeedItems,
-          hasMore: headlineResponse.cursor != null,
+          feedItems: decorationResult.decoratedItems,
+          hasMore: headlineResponse.hasMore,
           cursor: headlineResponse.cursor,
         ),
       );
 
-      if (processedFeedItems.any((item) => item is FeedAction) &&
-          currentUser?.id != null) {
-        // TODO(fulleni): Implement correct event dispatching
-        // _appBloc.add(AppUserFeedActionShown(userId: currentUser!.id));
+      final injectedAction = decorationResult.injectedAction;
+      if (injectedAction != null && currentUser?.id != null) {
+        _appBloc.add(
+          AppUserAccountActionShown(
+            userId: currentUser!.id,
+            feedActionType: injectedAction.feedActionType,
+          ),
+        );
       }
     } on HttpException catch (e) {
       emit(state.copyWith(status: HeadlinesFeedStatus.failure, error: e));

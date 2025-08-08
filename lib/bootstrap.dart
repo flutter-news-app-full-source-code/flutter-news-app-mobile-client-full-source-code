@@ -66,6 +66,7 @@ Future<Widget> bootstrap(
   DataClient<UserContentPreferences> userContentPreferencesClient;
   DataClient<UserAppSettings> userAppSettingsClient;
   DataClient<RemoteConfig> remoteConfigClient;
+  DataClient<User> userClient;
 
   if (appConfig.environment == app_config.AppEnvironment.demo) {
     headlinesClient = DataInMemory<Headline>(
@@ -106,6 +107,11 @@ Future<Widget> bootstrap(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
       initialData: remoteConfigsFixturesData,
+      logger: logger,
+    );
+    userClient = DataInMemory<User>(
+      toJson: (i) => i.toJson(),
+      getId: (i) => i.id,
       logger: logger,
     );
   } else if (appConfig.environment == app_config.AppEnvironment.development) {
@@ -156,6 +162,13 @@ Future<Widget> bootstrap(
       modelName: 'remote_config',
       fromJson: RemoteConfig.fromJson,
       toJson: (config) => config.toJson(),
+      logger: logger,
+    );
+    userClient = DataApi<User>(
+      httpClient: httpClient,
+      modelName: 'user',
+      fromJson: User.fromJson,
+      toJson: (user) => user.toJson(),
       logger: logger,
     );
   } else {
@@ -209,6 +222,13 @@ Future<Widget> bootstrap(
       toJson: (config) => config.toJson(),
       logger: logger,
     );
+    userClient = DataApi<User>(
+      httpClient: httpClient,
+      modelName: 'user',
+      fromJson: User.fromJson,
+      toJson: (user) => user.toJson(),
+      logger: logger,
+    );
   }
 
   final headlinesRepository = DataRepository<Headline>(
@@ -229,6 +249,7 @@ Future<Widget> bootstrap(
   final remoteConfigRepository = DataRepository<RemoteConfig>(
     dataClient: remoteConfigClient,
   );
+  final userRepository = DataRepository<User>(dataClient: userClient);
 
   // Conditionally instantiate DemoDataMigrationService
   final demoDataMigrationService =
@@ -248,6 +269,7 @@ Future<Widget> bootstrap(
     userAppSettingsRepository: userAppSettingsRepository,
     userContentPreferencesRepository: userContentPreferencesRepository,
     remoteConfigRepository: remoteConfigRepository,
+    userRepository: userRepository,
     kvStorageService: kvStorage,
     environment: environment,
     demoDataMigrationService: demoDataMigrationService,

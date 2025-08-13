@@ -264,12 +264,12 @@ class FeedDecoratorService {
             ),
           // These types are handled by ContentCollection, but must be
           // present in the switch for exhaustiveness.
-          FeedDecoratorType.suggestedTopics:
-          case FeedDecoratorType.suggestedSources:
+          FeedDecoratorType.suggestedTopics ||
+              FeedDecoratorType.suggestedSources =>
             throw StateError(
               'ContentCollection decorator type '
               '$decoratorType used in CallToAction category.',
-            );
+            ),
         };
         return CallToActionItem(
           id: _uuid.v4(),
@@ -313,10 +313,10 @@ class FeedDecoratorService {
             );
           // These types are handled by CallToAction, but must be
           // present in the switch for exhaustiveness.
-          case FeedDecoratorType.linkAccount:
-          case FeedDecoratorType.upgrade:
-          case FeedDecoratorType.rateApp:
-          case FeedDecoratorType.enableNotifications:
+          case FeedDecoratorType.linkAccount ||
+                FeedDecoratorType.upgrade ||
+                FeedDecoratorType.rateApp ||
+                FeedDecoratorType.enableNotifications:
             throw StateError(
               'CallToAction decorator type '
               '$decoratorType used in ContentCollection category.',

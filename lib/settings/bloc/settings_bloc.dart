@@ -40,7 +40,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       transformer: sequential(),
     );
     on<SettingsAppFontWeightChanged>(
-      // Added handler for font weight
       _onAppFontWeightChanged,
       transformer: sequential(),
     );
@@ -49,7 +48,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       transformer: sequential(),
     );
     on<SettingsLanguageChanged>(_onLanguageChanged, transformer: sequential());
-    // SettingsNotificationsEnabledChanged event and handler removed.
   }
 
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
@@ -66,9 +64,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       );
     } on NotFoundException {
       // If settings not found, create them
-      // needed speciically for teh demo mode
+      // needed specifically for the demo mode
       // that uses the ht data in memory impl
-      // as for the api impl, teh backend handle
+      // as for the api impl, the backend handle
       // this use case.
       await _userAppSettingsRepository.create(
         item: settingsToSave,
@@ -99,6 +97,13 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       );
     } on NotFoundException {
       // Settings not found for the user, create and persist defaults
+      final defaultLanguage = languagesFixturesData.firstWhere(
+        (l) => l.code == 'en',
+        orElse: () => throw StateError(
+          'Default language "en" not found in language fixtures.',
+        ),
+      );
+
       final defaultSettings = UserAppSettings(
         id: event.userId,
         displaySettings: const DisplaySettings(
@@ -108,7 +113,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
           textScaleFactor: AppTextScaleFactor.medium,
           fontWeight: AppFontWeight.regular,
         ),
-        language: 'en',
+        language: defaultLanguage,
         feedPreferences: const FeedDisplayPreferences(
           headlineDensity: HeadlineDensity.standard,
           headlineImageStyle: HeadlineImageStyle.largeThumbnail,
@@ -228,7 +233,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     if (state.userAppSettings == null) return;
 
     final updatedSettings = state.userAppSettings!.copyWith(
-      language: event.languageCode,
+      language: event.language,
     );
     emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));
     await _persistSettings(updatedSettings, emit);

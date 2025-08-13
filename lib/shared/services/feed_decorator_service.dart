@@ -7,39 +7,41 @@ import 'package:uuid/uuid.dart';
 ///
 /// This class encapsulates the results of the decoration process, providing
 /// both the final, mixed list of feed items and a reference to the specific
-/// [FeedAction] that was injected during the process. This allows the calling
-/// logic (e.g., a BLoC) to know which action was shown to the user and trigger
-/// necessary side effects, such as updating the `lastShownAt` timestamp.
+/// decorator item that was injected during the process. This allows the calling
+/// logic (e.g., a BLoC) to know which decorator was shown to the user and
+/// trigger necessary side effects, such as updating the `lastShownAt`
+/// timestamp.
 class FeedDecoratorResult {
   /// Creates a [FeedDecoratorResult].
   const FeedDecoratorResult({
     required this.decoratedItems,
-    this.injectedAction,
+    this.injectedDecorator,
   });
 
   /// The final list of [FeedItem]s, including original content (like
-  /// headlines) and any injected items (ads, actions).
+  /// headlines) and any injected items (ads, decorators).
   final List<FeedItem> decoratedItems;
 
-  /// The specific [FeedAction] that was injected into the feed.
+  /// The specific decorator [FeedItem] that was injected into the feed.
   ///
-  /// This is `null` if no action was due or injected during this pass.
-  final FeedAction? injectedAction;
+  /// This can be a [CallToActionItem] or a [ContentCollectionItem].
+  /// It is `null` if no decorator was due or injected during this pass.
+  final FeedItem? injectedDecorator;
 }
 
-/// A private helper class to represent a potential [FeedAction] candidate for
+/// A private helper class to represent a potential decorator candidate for
 /// injection.
 ///
-/// It pairs the [FeedActionType] with a priority score, allowing for a clear
-/// and maintainable way to rank and select the most important action to show
-/// to the user at any given time.
-class _ActionCandidate {
-  const _ActionCandidate(this.actionType, this.priority);
+/// It pairs the [FeedDecoratorType] with a priority score, allowing for a clear
+/// and maintainable way to rank and select the most important decorator to show
+// to the user at any given time.
+class _DecoratorCandidate {
+  const _DecoratorCandidate(this.decoratorType, this.priority);
 
-  /// The type of the feed action (e.g., `linkAccount`, `rateApp`).
-  final FeedActionType actionType;
+  /// The type of the feed decorator (e.g., `linkAccount`, `suggestedTopics`).
+  final FeedDecoratorType decoratorType;
 
-  /// The priority of the action. A lower number indicates a higher priority.
+  /// The priority of the decorator. A lower number indicates a higher priority.
   final int priority;
 }
 
@@ -51,20 +53,20 @@ class _ActionCandidate {
 class FeedDecoratorService {
   final Uuid _uuid = const Uuid();
 
-  // Defines the static priority for each feed action. A lower number is a
-  // higher priority. This list determines which action is chosen when multiple
-  // actions are "due" at the same time.
-  static const _actionPriorities = <FeedActionType, int>{
+  // Defines the static priority for each feed decorator. A lower number is a
+  // higher priority. This list determines which decorator is chosen when
+  // multiple decorators are "due" at the same time.
+  static const _decoratorPriorities = <FeedDecoratorType, int>{
     // Highest priority: encourage anonymous users to create an account.
-    FeedActionType.linkAccount: 1,
+    FeedDecoratorType.linkAccount: 1,
     // High priority: encourage standard users to upgrade.
-    FeedActionType.upgrade: 2,
+    FeedDecoratorType.upgrade: 2,
     // Medium priority: encourage users to follow content to personalize feed.
-    FeedActionType.followTopics: 3,
-    FeedActionType.followSources: 4,
+    FeedDecoratorType.suggestedTopics: 3,
+    FeedDecoratorType.suggestedSources: 4,
     // Lower priority: engagement actions.
-    FeedActionType.enableNotifications: 5,
-    FeedActionType.rateApp: 6,
+    FeedDecoratorType.enableNotifications: 5,
+    FeedDecoratorType.rateApp: 6,
   };
 
   /// Processes a list of [Headline] items and injects a single, high-priority
@@ -138,50 +140,50 @@ class FeedDecoratorService {
     );
   }
 
-  /// Determines the single highest-priority feed action that is currently due.
+  /// Determines the single highest-priority feed decorator that is currently
+  /// due to be shown to the user.
   ///
-  /// This method encapsulates the core business logic for action selection.
-  FeedActionType? _getHighestPriorityDueAction({
+  /// This method encapsulates the core business logic for decorator selection.
+  FeedDecoratorType? _getHighestPriorityDueDecorator({
     required User? user,
     required RemoteConfig remoteConfig,
   }) {
     final userRole = user?.appRole ?? AppUserRole.guestUser;
-    final now = DateTime.now();
-    final actionConfig = remoteConfig.accountActionConfig;
-    final dueCandidates = <_ActionCandidate>[];
+    final dueCandidates = <_DecoratorCandidate>[];
 
-    // Determine the correct set of rules based on user role.
-    final rules = (userRole == AppUserRole.guestUser)
-        ? actionConfig.guestDaysBetweenActions
-        : actionConfig.standardUserDaysBetweenActions;
+    // Iterate through all configured decorators to find which ones are eligible.
+    for (final entry in remoteConfig.feedDecoratorConfig.entries) {
+      final decoratorType = entry.key;
+      final decoratorConfig = entry.value;
 
-    // Iterate through all defined rules to find eligible actions.
-    for (final entry in rules.entries) {
-      final actionType = entry.key;
-      final cooldownDays = entry.value;
-
-      // Get the user's history for this specific action.
-      final status = user?.feedActionStatus[actionType];
-
-      // RULE: Never show an action that the user has already completed.
-      if (status?.isCompleted ?? false) {
+      // RULE 1: The decorator must be globally enabled.
+      if (!decoratorConfig.enabled) {
         continue;
       }
 
-      final lastShown = status?.lastShownAt;
+      // RULE 2: The decorator must be configured to be visible for the
+      // current user's role.
+      final roleConfig = decoratorConfig.visibleTo[userRole];
+      if (roleConfig == null) {
+        continue;
+      }
 
-      // RULE: An action is due if it has never been shown OR if the
-      // cooldown period has passed since it was last shown.
-      if (lastShown == null ||
-          now.difference(lastShown).inDays >= cooldownDays) {
-        final priority = _actionPriorities[actionType];
+      // Get the user's specific status for this decorator.
+      final status = user?.feedDecoratorStatus[decoratorType];
+
+      // RULE 3: The decorator must be eligible to be shown based on the
+      // user's interaction history and the configured cooldown period.
+      // The `canBeShown` method handles completion status and cooldown logic.
+      if (status?.canBeShown(daysBetweenViews: roleConfig.daysBetweenViews) ??
+          true) {
+        final priority = _decoratorPriorities[decoratorType];
         if (priority != null) {
-          dueCandidates.add(_ActionCandidate(actionType, priority));
+          dueCandidates.add(_DecoratorCandidate(decoratorType, priority));
         }
       }
     }
 
-    // If no actions are due, return null.
+    // If no decorators are due, return null.
     if (dueCandidates.isEmpty) {
       return null;
     }
@@ -190,7 +192,7 @@ class FeedDecoratorService {
     dueCandidates.sort((a, b) => a.priority.compareTo(b.priority));
 
     // Return the type of the highest-priority candidate.
-    return dueCandidates.first.actionType;
+    return dueCandidates.first.decoratorType;
   }
 
   /// Injects ads into a list of feed items based on frequency rules.

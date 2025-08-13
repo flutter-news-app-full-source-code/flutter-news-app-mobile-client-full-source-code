@@ -139,7 +139,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       );
 
       // For a major load, use the full decoration pipeline.
-      final decorationResult = _feedDecoratorService.decorateFeed(
+      final decorationResult = await _feedDecoratorService.decorateFeed(
         headlines: headlineResponse.items,
         user: currentUser,
         remoteConfig: appConfig,
@@ -155,15 +155,24 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         ),
       );
 
-      // If a feed action was injected, notify AppBloc to update its status.
-      final injectedAction = decorationResult.injectedAction;
-      if (injectedAction != null && currentUser?.id != null) {
-        _appBloc.add(
-          AppUserFeedDecoratorShown(
-            userId: currentUser!.id,
-            feedActionType: injectedAction.feedActionType,
-          ),
-        );
+      // If a feed decorator was injected, notify AppBloc to update its status.
+      final injectedDecorator = decorationResult.injectedDecorator;
+      if (injectedDecorator != null && currentUser?.id != null) {
+        if (injectedDecorator is CallToActionItem) {
+          _appBloc.add(
+            AppUserFeedDecoratorShown(
+              userId: currentUser!.id,
+              feedDecoratorType: injectedDecorator.decoratorType,
+            ),
+          );
+        } else if (injectedDecorator is ContentCollectionItem) {
+          _appBloc.add(
+            AppUserFeedDecoratorShown(
+              userId: currentUser!.id,
+              feedDecoratorType: injectedDecorator.decoratorType,
+            ),
+          );
+        }
       }
     } on HttpException catch (e) {
       emit(state.copyWith(status: HeadlinesFeedStatus.failure, error: e));
@@ -198,7 +207,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
-      final decorationResult = _feedDecoratorService.decorateFeed(
+      final decorationResult = await _feedDecoratorService.decorateFeed(
         headlines: headlineResponse.items,
         user: currentUser,
         remoteConfig: appConfig,
@@ -213,14 +222,23 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         ),
       );
 
-      final injectedAction = decorationResult.injectedAction;
-      if (injectedAction != null && currentUser?.id != null) {
-        _appBloc.add(
-          AppUserFeedDecoratorShown(
-            userId: currentUser!.id,
-            feedActionType: injectedAction.feedActionType,
-          ),
-        );
+      final injectedDecorator = decorationResult.injectedDecorator;
+      if (injectedDecorator != null && currentUser?.id != null) {
+        if (injectedDecorator is CallToActionItem) {
+          _appBloc.add(
+            AppUserFeedDecoratorShown(
+              userId: currentUser!.id,
+              feedDecoratorType: injectedDecorator.decoratorType,
+            ),
+          );
+        } else if (injectedDecorator is ContentCollectionItem) {
+          _appBloc.add(
+            AppUserFeedDecoratorShown(
+              userId: currentUser!.id,
+              feedDecoratorType: injectedDecorator.decoratorType,
+            ),
+          );
+        }
       }
     } on HttpException catch (e) {
       emit(state.copyWith(status: HeadlinesFeedStatus.failure, error: e));
@@ -254,7 +272,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
-      final decorationResult = _feedDecoratorService.decorateFeed(
+      final decorationResult = await _feedDecoratorService.decorateFeed(
         headlines: headlineResponse.items,
         user: currentUser,
         remoteConfig: appConfig,
@@ -269,14 +287,23 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         ),
       );
 
-      final injectedAction = decorationResult.injectedAction;
-      if (injectedAction != null && currentUser?.id != null) {
-        _appBloc.add(
-          AppUserFeedDecoratorShown(
-            userId: currentUser!.id,
-            feedActionType: injectedAction.feedActionType,
-          ),
-        );
+      final injectedDecorator = decorationResult.injectedDecorator;
+      if (injectedDecorator != null && currentUser?.id != null) {
+        if (injectedDecorator is CallToActionItem) {
+          _appBloc.add(
+            AppUserFeedDecoratorShown(
+              userId: currentUser!.id,
+              feedDecoratorType: injectedDecorator.decoratorType,
+            ),
+          );
+        } else if (injectedDecorator is ContentCollectionItem) {
+          _appBloc.add(
+            AppUserFeedDecoratorShown(
+              userId: currentUser!.id,
+              feedDecoratorType: injectedDecorator.decoratorType,
+            ),
+          );
+        }
       }
     } on HttpException catch (e) {
       emit(state.copyWith(status: HeadlinesFeedStatus.failure, error: e));

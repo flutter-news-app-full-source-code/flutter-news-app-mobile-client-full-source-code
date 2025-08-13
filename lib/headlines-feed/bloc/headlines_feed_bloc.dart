@@ -27,10 +27,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     required DataRepository<Headline> headlinesRepository,
     required FeedDecoratorService feedDecoratorService,
     required AppBloc appBloc,
-  })  : _headlinesRepository = headlinesRepository,
-        _feedDecoratorService = feedDecoratorService,
-        _appBloc = appBloc,
-        super(const HeadlinesFeedState()) {
+  }) : _headlinesRepository = headlinesRepository,
+       _feedDecoratorService = feedDecoratorService,
+       _appBloc = appBloc,
+       super(const HeadlinesFeedState()) {
     on<HeadlinesFeedFetchRequested>(
       _onHeadlinesFeedFetchRequested,
       transformer: droppable(),
@@ -159,7 +159,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       final injectedAction = decorationResult.injectedAction;
       if (injectedAction != null && currentUser?.id != null) {
         _appBloc.add(
-          AppUserAccountActionShown(
+          AppUserFeedDecoratorShown(
             userId: currentUser!.id,
             feedActionType: injectedAction.feedActionType,
           ),
@@ -216,7 +216,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       final injectedAction = decorationResult.injectedAction;
       if (injectedAction != null && currentUser?.id != null) {
         _appBloc.add(
-          AppUserAccountActionShown(
+          AppUserFeedDecoratorShown(
             userId: currentUser!.id,
             feedActionType: injectedAction.feedActionType,
           ),
@@ -272,7 +272,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       final injectedAction = decorationResult.injectedAction;
       if (injectedAction != null && currentUser?.id != null) {
         _appBloc.add(
-          AppUserAccountActionShown(
+          AppUserFeedDecoratorShown(
             userId: currentUser!.id,
             feedActionType: injectedAction.feedActionType,
           ),

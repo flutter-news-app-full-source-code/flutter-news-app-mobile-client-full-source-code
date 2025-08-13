@@ -82,14 +82,14 @@ class AppFontWeightChanged extends AppEvent {
   List<Object> get props => [fontWeight];
 }
 
-/// Dispatched when a one-time user account action has been shown.
-class AppUserAccountActionShown extends AppEvent {
-  const AppUserAccountActionShown({
+/// Dispatched when a one-time user account decorator has been shown.
+class AppUserFeedDecoratorShown extends AppEvent {
+  const AppUserFeedDecoratorShown({
     required this.userId,
-    required this.feedActionType,
+    required this.feedDecoratorType,
   });
   final String userId;
-  final FeedActionType feedActionType;
+  final FeedDecoratorType feedDecoratorType;
   @override
-  List<Object> get props => [userId, feedActionType];
+  List<Object> get props => [userId, feedDecoratorType];
 }

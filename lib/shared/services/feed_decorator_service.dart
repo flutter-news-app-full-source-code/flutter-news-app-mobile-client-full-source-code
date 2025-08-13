@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:core/core.dart';
 import 'package:uuid/uuid.dart';
+import 'package:data_repository/data_repository.dart';
 
 /// A result object returned by the [FeedDecoratorService].
 ///
@@ -51,7 +52,19 @@ class _DecoratorCandidate {
 /// This service implements a multi-stage pipeline to ensure that the most
 /// relevant and timely items are injected in a logical and non-intrusive way.
 class FeedDecoratorService {
+  /// Creates a [FeedDecoratorService].
+  ///
+  /// Requires [DataRepository] instances for [Topic] and [Source] to fetch
+  /// content for collection decorators.
+  FeedDecoratorService({
+    required DataRepository<Topic> topicsRepository,
+    required DataRepository<Source> sourcesRepository,
+  })  : _topicsRepository = topicsRepository,
+        _sourcesRepository = sourcesRepository;
+
   final Uuid _uuid = const Uuid();
+  final DataRepository<Topic> _topicsRepository;
+  final DataRepository<Source> _sourcesRepository;
 
   // Defines the static priority for each feed decorator. A lower number is a
   // higher priority. This list determines which decorator is chosen when
@@ -70,45 +83,53 @@ class FeedDecoratorService {
   };
 
   /// Processes a list of [Headline] items and injects a single, high-priority
-  /// [FeedAction] and multiple [Ad] items based on a robust set of rules.
+  /// [FeedItem] decorator and multiple [Ad] items based on a robust set of rules.
   ///
   /// This method is designed to be called only on a "major" feed load (e.g.,
-  /// initial load or pull-to-refresh) to ensure that a `FeedAction` is
+  /// initial load or pull-to-refresh) to ensure that a decorator is
   /// considered for injection only once per session.
   ///
   /// Returns a [FeedDecoratorResult] containing the decorated list and the
-  /// action that was injected, if any.
-  FeedDecoratorResult decorateFeed({
+  /// decorator that was injected, if any.
+  Future<FeedDecoratorResult> decorateFeed({
     required List<Headline> headlines,
     required User? user,
     required RemoteConfig remoteConfig,
-  }) {
+  }) async {
     // The final list of items to be returned.
-    final feedWithActions = <FeedItem>[...headlines];
-    FeedAction? injectedAction;
+    final feedWithDecorators = <FeedItem>[...headlines];
+    FeedItem? injectedDecorator;
 
-    // --- Step 1: FeedAction Injection ---
-    // Determine the highest-priority, currently-due feed action.
-    final dueActionType = _getHighestPriorityDueAction(
+    // --- Step 1: Feed Decorator Injection ---
+    // Determine the highest-priority, currently-due feed decorator.
+    final dueDecoratorType = _getHighestPriorityDueDecorator(
       user: user,
       remoteConfig: remoteConfig,
     );
 
-    if (dueActionType != null) {
-      // If an action is due, build the full FeedAction object.
-      injectedAction = _buildFeedActionVariant(dueActionType);
+    if (dueDecoratorType != null) {
+      final decoratorConfig = remoteConfig.feedDecoratorConfig[dueDecoratorType];
+      if (decoratorConfig != null) {
+        // If a decorator is due, build the full FeedItem object.
+        injectedDecorator = await _buildDecoratorItem(
+          dueDecoratorType,
+          decoratorConfig,
+        );
 
-      // Inject the action at a fixed, predictable position for consistency.
-      // We use `min` to handle cases where the headline list is very short.
-      const actionInsertionIndex = 3;
-      final safeIndex = min(actionInsertionIndex, feedWithActions.length);
-      feedWithActions.insert(safeIndex, injectedAction);
+        if (injectedDecorator != null) {
+          // Inject the decorator at a fixed, predictable position.
+          // We use `min` to handle cases where the headline list is very short.
+          const decoratorInsertionIndex = 3;
+          final safeIndex = min(decoratorInsertionIndex, feedWithDecorators.length);
+          feedWithDecorators.insert(safeIndex, injectedDecorator);
+        }
+      }
     }
 
     // --- Step 2: Ad Injection ---
-    // Inject ads into the list that may or may not already contain a FeedAction.
+    // Inject ads into the list that may or may not already contain a decorator.
     final finalFeed = _injectAds(
-      feedItems: feedWithActions,
+      feedItems: feedWithDecorators,
       user: user,
       adConfig: remoteConfig.adConfig,
     );
@@ -116,14 +137,14 @@ class FeedDecoratorService {
     // --- Step 3: Return the comprehensive result ---
     return FeedDecoratorResult(
       decoratedItems: finalFeed,
-      injectedAction: injectedAction,
+      injectedDecorator: injectedDecorator,
     );
   }
 
   /// Injects only [Ad] items into a list of [FeedItem]s.
   ///
   /// This method is designed for pagination, where new content is added to an
-  /// existing feed without re-evaluating or injecting new `FeedAction`s.
+  /// existing feed without re-evaluating or injecting new decorators.
   ///
   /// Returns a new list of [FeedItem] objects, interspersed with ads.
   List<FeedItem> injectAds({
@@ -195,6 +216,115 @@ class FeedDecoratorService {
     return dueCandidates.first.decoratorType;
   }
 
+  /// Constructs a [FeedItem] (either a [CallToActionItem] or a
+  /// [ContentCollectionItem]) based on the provided decorator type
+  /// and its configuration.
+  ///
+  /// For content collection types, this method fetches the necessary
+  /// items (topics or sources) from the respective repositories.
+  /// Returns `null` if a content collection cannot be populated
+  /// (e.g., no items found).
+  Future<FeedItem?> _buildDecoratorItem(
+    FeedDecoratorType decoratorType,
+    FeedDecoratorConfig decoratorConfig,
+  ) async {
+    switch (decoratorConfig.category) {
+      case FeedDecoratorCategory.callToAction:
+        final content = switch (decoratorType) {
+          FeedDecoratorType.linkAccount => (
+              title: 'Unlock Your Full Potential!',
+              description:
+                  'Link your account to enjoy expanded content access, '
+                  'keep your preferences synced, and experience a more '
+                  'streamlined ad display.',
+              ctaText: 'Link Account & Explore',
+              ctaUrl: '/authentication?context=linking'
+            ),
+          FeedDecoratorType.upgrade => (
+              title: 'Unlock Our Best Features!',
+              description:
+                  'Go Premium to enjoy our most comprehensive content '
+                  'access, the best ad experience, and many more '
+                  'exclusive perks.',
+              ctaText: 'Upgrade Now',
+              ctaUrl: '/account/upgrade'
+            ),
+          FeedDecoratorType.rateApp => (
+              title: 'Enjoying the App?',
+              description: 'A rating on the app store helps us grow.',
+              ctaText: 'Rate Us',
+              ctaUrl: '/app-store-rating'
+            ),
+          FeedDecoratorType.enableNotifications => (
+              title: 'Stay Updated!',
+              description:
+                  'Enable notifications to get the latest news instantly.',
+              ctaText: 'Enable Notifications',
+              ctaUrl: '/settings/notifications'
+            ),
+          // These types are handled by ContentCollection, but must be
+          // present in the switch for exhaustiveness.
+          FeedDecoratorType.suggestedTopics:
+          case FeedDecoratorType.suggestedSources:
+            throw StateError(
+              'ContentCollection decorator type '
+              '$decoratorType used in CallToAction category.',
+            );
+        };
+        return CallToActionItem(
+          id: _uuid.v4(),
+          title: content.title,
+          description: content.description,
+          decoratorType: decoratorType,
+          callToActionText: content.ctaText,
+          callToActionUrl: content.ctaUrl,
+        );
+      case FeedDecoratorCategory.contentCollection:
+        final itemsToDisplay = decoratorConfig.itemsToDisplay;
+        if (itemsToDisplay == null) {
+          throw StateError(
+            'itemsToDisplay must be set for contentCollection.',
+          );
+        }
+        switch (decoratorType) {
+          case FeedDecoratorType.suggestedTopics:
+            final topics = await _topicsRepository.readAll(
+              pagination: PaginationOptions(limit: itemsToDisplay),
+              sort: [const SortOption('name', SortOrder.asc)],
+            );
+            if (topics.items.isEmpty) return null;
+            return ContentCollectionItem<Topic>(
+              id: _uuid.v4(),
+              decoratorType: decoratorType,
+              title: 'Suggested Topics',
+              items: topics.items,
+            );
+          case FeedDecoratorType.suggestedSources:
+            final sources = await _sourcesRepository.readAll(
+              pagination: PaginationOptions(limit: itemsToDisplay),
+              sort: [const SortOption('name', SortOrder.asc)],
+            );
+            if (sources.items.isEmpty) return null;
+            return ContentCollectionItem<Source>(
+              id: _uuid.v4(),
+              decoratorType: decoratorType,
+              title: 'Suggested Sources',
+              items: sources.items,
+            );
+          // These types are handled by CallToAction, but must be
+          // present in the switch for exhaustiveness.
+          case FeedDecoratorType.linkAccount:
+          case FeedDecoratorType.upgrade:
+          case FeedDecoratorType.rateApp:
+          case FeedDecoratorType.enableNotifications:
+            throw StateError(
+              'CallToAction decorator type '
+              '$decoratorType used in ContentCollection category.',
+            );
+        }
+    }
+  }
+
   /// Injects ads into a list of feed items based on frequency rules.
   List<FeedItem> _injectAds({
     required List<FeedItem> feedItems,
@@ -244,61 +374,6 @@ class FeedDecoratorService {
       }
     }
     return result;
-  }
-
-  /// Constructs a [FeedAction] object with predefined content.
-  ///
-  /// In a real-world app, this content might come from a remote source.
-  FeedAction _buildFeedActionVariant(FeedActionType actionType) {
-    final content = switch (actionType) {
-      FeedActionType.linkAccount => (
-          title: 'Unlock Your Full Potential!',
-          description:
-              'Link your account to enjoy expanded content access, keep your preferences synced, and experience a more streamlined ad display.',
-          ctaText: 'Link Account & Explore',
-          ctaUrl: '/authentication?context=linking'
-        ),
-      FeedActionType.upgrade => (
-          title: 'Unlock Our Best Features!',
-          description:
-              'Go Premium to enjoy our most comprehensive content access, the best ad experience, and many more exclusive perks.',
-          ctaText: 'Upgrade Now',
-          ctaUrl: '/account/upgrade'
-        ),
-      FeedActionType.rateApp => (
-          title: 'Enjoying the App?',
-          description: 'A rating on the app store helps us grow.',
-          ctaText: 'Rate Us',
-          ctaUrl: '/app-store-rating'
-        ),
-      FeedActionType.enableNotifications => (
-          title: 'Stay Updated!',
-          description: 'Enable notifications to get the latest news instantly.',
-          ctaText: 'Enable Notifications',
-          ctaUrl: '/settings/notifications'
-        ),
-      FeedActionType.followTopics => (
-          title: 'Personalize Your Feed',
-          description: 'Follow topics to see more of what you love.',
-          ctaText: 'Follow Topics',
-          ctaUrl: '/account/manage-followed-items/topics'
-        ),
-      FeedActionType.followSources => (
-          title: 'Discover Your Favorite Sources',
-          description: 'Follow sources to get news from who you trust.',
-          ctaText: 'Follow Sources',
-          ctaUrl: '/account/manage-followed-items/sources'
-        ),
-    };
-
-    return FeedAction(
-      id: _uuid.v4(),
-      title: content.title,
-      description: content.description,
-      feedActionType: actionType,
-      callToActionText: content.ctaText,
-      callToActionUrl: content.ctaUrl,
-    );
   }
 
   /// Constructs a placeholder [Ad] object.

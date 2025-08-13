@@ -3,8 +3,6 @@ part of 'settings_bloc.dart';
 //
 // ignore_for_file: avoid_positional_boolean_parameters
 
-// Import models and enums from core
-
 /// {@template settings_event}
 /// Base class for all events related to the settings feature.
 /// {@endtemplate}
@@ -123,19 +121,11 @@ class SettingsHeadlineImageStyleChanged extends SettingsEvent {
 /// {@endtemplate}
 class SettingsLanguageChanged extends SettingsEvent {
   /// {@macro settings_language_changed}
-  const SettingsLanguageChanged(this.languageCode);
+  const SettingsLanguageChanged(this.language);
 
-  /// The newly selected language code (e.g., 'en', 'ar').
-  final AppLanguage languageCode;
+  /// The newly selected language.
+  final Language language;
 
   @override
-  List<Object?> get props => [languageCode];
+  List<Object?> get props => [language];
 }
-
-// --- Notification Settings Events ---
-// SettingsNotificationsEnabledChanged event removed as UserAppSettings
-// does not currently support a general notifications enabled flag.
-
-// TODO(fulleni): Add events for changing followed categories/sources/countries
-// for notifications if needed later. Example:
-// class SettingsNotificationCategoriesChanged extends SettingsEvent { ... }

@@ -71,8 +71,9 @@ class AuthenticationState extends Equatable {
       user: user ?? this.user,
       email: email ?? this.email,
       exception: exception ?? this.exception,
-      cooldownEndTime:
-          clearCooldownEndTime ? null : cooldownEndTime ?? this.cooldownEndTime,
+      cooldownEndTime: clearCooldownEndTime
+          ? null
+          : cooldownEndTime ?? this.cooldownEndTime,
     );
   }
 

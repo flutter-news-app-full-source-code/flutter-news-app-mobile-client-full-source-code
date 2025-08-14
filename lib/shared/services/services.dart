@@ -1,1 +1,1 @@
-export 'feed_injector_service.dart';
+export 'feed_decorator_service.dart';

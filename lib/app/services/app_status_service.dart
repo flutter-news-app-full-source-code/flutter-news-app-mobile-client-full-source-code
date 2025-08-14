@@ -94,9 +94,9 @@ class AppStatusService with WidgetsBindingObserver {
       // When the app comes to the foreground, immediately trigger a check.
       // This is crucial for catching maintenance mode that was enabled
       // while the app was in the background.
-      _context
-          .read<AppBloc>()
-          .add(const AppConfigFetchRequested(isBackgroundCheck: true));
+      _context.read<AppBloc>().add(
+        const AppConfigFetchRequested(isBackgroundCheck: true),
+      );
     }
   }
 

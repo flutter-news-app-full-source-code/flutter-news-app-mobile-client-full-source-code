@@ -38,7 +38,7 @@ class AppState extends Equatable {
     this.fontFamily,
     this.status = AppStatus.initial, // Changed from AppStatus
     this.user,
-    this.locale,
+    this.locale = const Locale('en'), // Default to English
     this.remoteConfig,
     this.environment,
   });
@@ -69,7 +69,7 @@ class AppState extends Equatable {
   final UserAppSettings settings;
 
   /// The current application locale.
-  final Locale? locale;
+  final Locale locale;
 
   /// The global application configuration (remote config).
   final RemoteConfig? remoteConfig;
@@ -91,7 +91,6 @@ class AppState extends Equatable {
     RemoteConfig? remoteConfig,
     local_config.AppEnvironment? environment,
     bool clearFontFamily = false,
-    bool clearLocale = false,
     bool clearAppConfig = false,
     bool clearEnvironment = false,
   }) {
@@ -105,7 +104,7 @@ class AppState extends Equatable {
       status: status ?? this.status,
       user: user ?? this.user,
       settings: settings ?? this.settings,
-      locale: clearLocale ? null : locale ?? this.locale,
+      locale: locale ?? this.locale,
       remoteConfig: clearAppConfig ? null : remoteConfig ?? this.remoteConfig,
       environment: clearEnvironment ? null : environment ?? this.environment,
     );

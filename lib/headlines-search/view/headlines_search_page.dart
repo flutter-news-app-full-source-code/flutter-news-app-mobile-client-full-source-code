@@ -377,68 +377,6 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                               ),
                             ),
                           );
-                        } else if (feedItem is FeedAction) {
-                          return Card(
-                            margin: const EdgeInsets.symmetric(
-                              vertical: AppSpacing.xs,
-                            ),
-                            color: currentColorScheme.secondaryContainer,
-                            child: ListTile(
-                              leading: Icon(
-                                feedItem.feedActionType ==
-                                        FeedActionType.linkAccount
-                                    ? Icons
-                                          .link_outlined // Outlined
-                                    : Icons.upgrade_outlined,
-                                color: currentColorScheme.onSecondaryContainer,
-                              ),
-                              title: Text(
-                                feedItem.title,
-                                style: currentTextTheme.titleMedium?.copyWith(
-                                  color:
-                                      currentColorScheme.onSecondaryContainer,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              subtitle: feedItem.description.isNotEmpty
-                                  ? Text(
-                                      feedItem.description,
-                                      style: currentTextTheme.bodySmall
-                                          ?.copyWith(
-                                            color: currentColorScheme
-                                                .onSecondaryContainer
-                                                .withOpacity(0.85),
-                                          ),
-                                    )
-                                  : null,
-                              trailing: feedItem.callToActionText.isNotEmpty
-                                  ? ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            currentColorScheme.secondary,
-                                        foregroundColor:
-                                            currentColorScheme.onSecondary,
-                                        padding: const EdgeInsets.symmetric(
-                                          // Consistent padding
-                                          horizontal: AppSpacing.md,
-                                          vertical: AppSpacing.sm,
-                                        ),
-                                        textStyle: currentTextTheme.labelLarge,
-                                      ),
-                                      onPressed: () {
-                                        context.push(feedItem.callToActionUrl);
-                                      },
-                                      child: Text(feedItem.callToActionText),
-                                    )
-                                  : null,
-                              isThreeLine: feedItem.description.length > 50,
-                              contentPadding: const EdgeInsets.symmetric(
-                                // Consistent padding
-                                horizontal: AppSpacing.paddingMedium,
-                                vertical: AppSpacing.paddingSmall,
-                              ),
-                            ),
-                          );
                         }
                         return const SizedBox.shrink();
                       },

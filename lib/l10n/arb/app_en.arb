@@ -1072,5 +1072,17 @@
     "updateRequiredButton": "Update Now",
     "@updateRequiredButton": {
         "description": "Button text for the force update page"
+    },
+    "neverShowAgain": "Never show this again",
+    "@neverShowAgain": {
+        "description": "Option to dismiss a feed decorator permanently"
+    },
+    "followButtonText": "Follow",
+    "@followButtonText": {
+        "description": "Text for the follow button on suggestion items"
+    },
+    "unfollowButtonText": "Unfollow",
+    "@unfollowButtonText": {
+        "description": "Text for the unfollow button on suggestion items"
     }
 }

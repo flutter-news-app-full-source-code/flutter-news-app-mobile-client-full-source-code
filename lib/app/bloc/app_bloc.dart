@@ -19,25 +19,32 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required AuthRepository authenticationRepository,
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<RemoteConfig> appConfigRepository,
+    required DataRepository<User> userRepository,
     required local_config.AppEnvironment environment,
     this.demoDataMigrationService,
   }) : _authenticationRepository = authenticationRepository,
        _userAppSettingsRepository = userAppSettingsRepository,
        _appConfigRepository = appConfigRepository,
+       _userRepository = userRepository,
        _environment = environment,
        super(
          AppState(
-           settings: const UserAppSettings(
+           settings: UserAppSettings(
              id: 'default',
-             displaySettings: DisplaySettings(
+             displaySettings: const DisplaySettings(
                baseTheme: AppBaseTheme.system,
                accentTheme: AppAccentTheme.defaultBlue,
                fontFamily: 'SystemDefault',
                textScaleFactor: AppTextScaleFactor.medium,
                fontWeight: AppFontWeight.regular,
              ),
-             language: 'en',
-             feedPreferences: FeedDisplayPreferences(
+             language: languagesFixturesData.firstWhere(
+               (l) => l.code == 'en',
+               orElse: () => throw StateError(
+                 'Default language "en" not found in language fixtures.',
+               ),
+             ),
+             feedPreferences: const FeedDisplayPreferences(
                headlineDensity: HeadlineDensity.standard,
                headlineImageStyle: HeadlineImageStyle.largeThumbnail,
                showSourceInHeadlineFeed: true,
@@ -52,7 +59,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppUserChanged>(_onAppUserChanged);
     on<AppSettingsRefreshed>(_onAppSettingsRefreshed);
     on<AppConfigFetchRequested>(_onAppConfigFetchRequested);
-    on<AppUserAccountActionShown>(_onAppUserAccountActionShown);
+    on<AppUserFeedDecoratorShown>(_onAppUserFeedDecoratorShown);
     on<AppLogoutRequested>(_onLogoutRequested);
     on<AppThemeModeChanged>(_onThemeModeChanged);
     on<AppFlexSchemeChanged>(_onFlexSchemeChanged);
@@ -69,6 +76,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final AuthRepository _authenticationRepository;
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
   final DataRepository<RemoteConfig> _appConfigRepository;
+  final DataRepository<User> _userRepository;
   final local_config.AppEnvironment _environment;
   final DemoDataMigrationService? demoDataMigrationService;
   late final StreamSubscription<User?> _userSubscription;
@@ -181,7 +189,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         userAppSettings.displaySettings.textScaleFactor,
       );
       // Map language code to Locale
-      final newLocale = Locale(userAppSettings.language);
+      final newLocale = Locale(userAppSettings.language.code);
 
       print(
         '[AppBloc] _onAppSettingsRefreshed: userAppSettings.fontFamily: ${userAppSettings.displaySettings.fontFamily}',
@@ -222,7 +230,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
               textScaleFactor: AppTextScaleFactor.medium,
               fontWeight: AppFontWeight.regular,
             ),
-            language: 'en',
+            language: languagesFixturesData.firstWhere(
+              (l) => l.code == 'en',
+              orElse: () => throw StateError(
+                'Default language "en" not found in language fixtures.',
+              ),
+            ),
             feedPreferences: const FeedDisplayPreferences(
               headlineDensity: HeadlineDensity.standard,
               headlineImageStyle: HeadlineImageStyle.largeThumbnail,
@@ -417,11 +430,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       print(
         '[AppBloc] Initial config fetch. Setting status to configFetching.',
       );
-      emit(
-        state.copyWith(
-          status: AppStatus.configFetching,
-        ),
-      );
+      emit(state.copyWith(status: AppStatus.configFetching));
     } else {
       print('[AppBloc] Background config fetch. Proceeding silently.');
     }
@@ -435,7 +444,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // --- CRITICAL STATUS EVALUATION ---
       // For both initial and background checks, if a critical status is found,
       // we must update the app status immediately to lock the UI.
-      
+
       // 1. Check for Maintenance Mode. This has the highest priority.
       if (remoteConfig.appStatus.isUnderMaintenance) {
         emit(
@@ -492,52 +501,61 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     }
   }
 
-  Future<void> _onAppUserAccountActionShown(
-    AppUserAccountActionShown event,
+  Future<void> _onAppUserFeedDecoratorShown(
+    AppUserFeedDecoratorShown event,
     Emitter<AppState> emit,
   ) async {
     if (state.user != null && state.user!.id == event.userId) {
+      final originalUser = state.user!;
       final now = DateTime.now();
-      // Create a new UserFeedActionStatus for the specific action
-      final updatedActionStatus = UserFeedActionStatus(
-        isCompleted: event.isCompleted,
+      // Get the current status for the decorator, or create a default if not present.
+      final currentStatus =
+          originalUser.feedDecoratorStatus[event.feedDecoratorType] ??
+          const UserFeedDecoratorStatus(isCompleted: false);
+
+      // Create an updated status.
+      // It always updates the `lastShownAt` timestamp.
+      // It updates `isCompleted` to true if the event marks it as completed.
+      // Once completed, it should stay completed.
+      final updatedDecoratorStatus = currentStatus.copyWith(
         lastShownAt: now,
+        isCompleted: event.isCompleted || currentStatus.isCompleted,
       );
 
-      // Create a new map with the updated status for the specific action type
-      final newFeedActionStatus =
-          Map<FeedActionType, UserFeedActionStatus>.from(
-            state.user!.feedActionStatus,
+      // Create a new map with the updated status for the specific decorator type.
+      final newFeedDecoratorStatus =
+          Map<FeedDecoratorType, UserFeedDecoratorStatus>.from(
+            originalUser.feedDecoratorStatus,
           )..update(
-            event.feedActionType,
-            (_) => updatedActionStatus,
-            ifAbsent: () => updatedActionStatus,
+            event.feedDecoratorType,
+            (_) => updatedDecoratorStatus,
+            ifAbsent: () => updatedDecoratorStatus,
           );
 
-      // Update the user with the new feedActionStatus map
-      final updatedUser = state.user!.copyWith(
-        feedActionStatus: newFeedActionStatus,
+      // Update the user with the new feedDecoratorStatus map.
+      final updatedUser = originalUser.copyWith(
+        feedDecoratorStatus: newFeedDecoratorStatus,
       );
 
       // Emit the change so UI can react if needed, and other BLoCs get the update.
       emit(state.copyWith(user: updatedUser));
 
-      // TODO(fulleni): Persist this change to the backend.
-      // This would typically involve calling a method on a repository, e.g.:
-      // try {
-      //   await _authenticationRepository.updateUserFeedActionStatus(
-      //     event.userId,
-      //     event.feedActionType,
-      //     updatedActionStatus,
-      //   );
-      // } catch (e) {
-      //   print('Failed to update feed action status on backend: $e');
-      // }
-      print(
-        '[AppBloc] User ${event.userId} FeedAction ${event.feedActionType} '
-        'shown/completed. Status updated locally to $updatedActionStatus. '
-        'Backend update pending.',
-      );
+      // Persist this change to the backend.
+      try {
+        await _userRepository.update(
+          id: updatedUser.id,
+          item: updatedUser,
+          userId: updatedUser.id,
+        );
+        print(
+          '[AppBloc] User ${event.userId} FeedDecorator ${event.feedDecoratorType} '
+          'status successfully updated on the backend.',
+        );
+      } catch (e) {
+        print('Failed to update feed decorator status on backend: $e');
+        // Revert the state on failure to maintain consistency.
+        emit(state.copyWith(user: originalUser));
+      }
     }
   }
 }

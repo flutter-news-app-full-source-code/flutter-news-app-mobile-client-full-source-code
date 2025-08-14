@@ -44,7 +44,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/la
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/notification_settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/theme_settings_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_injector_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_decorator_service.dart';
 import 'package:go_router/go_router.dart';
 
 /// Creates and configures the GoRouter instance for the application.
@@ -62,6 +62,7 @@ GoRouter createRouter({
   required DataRepository<UserContentPreferences>
   userContentPreferencesRepository,
   required DataRepository<RemoteConfig> remoteConfigRepository,
+  required DataRepository<User> userRepository,
   required local_config.AppEnvironment environment,
 }) {
   // Instantiate AccountBloc once to be shared
@@ -69,6 +70,12 @@ GoRouter createRouter({
     authenticationRepository: authenticationRepository,
     userContentPreferencesRepository: userContentPreferencesRepository,
     environment: environment,
+  );
+
+  // Instantiate FeedDecoratorService once to be shared
+  final feedDecoratorService = FeedDecoratorService(
+    topicsRepository: topicsRepository,
+    sourcesRepository: sourcesRepository,
   );
 
   return GoRouter(
@@ -134,20 +141,24 @@ GoRouter createRouter({
         if (isGoingToAuth) {
           // A fully authenticated user should never see auth pages.
           if (appStatus == AppStatus.authenticated) {
-            print('    Action: Authenticated user on auth path. Redirecting to feed.');
+            print(
+              '    Action: Authenticated user on auth path. Redirecting to feed.',
+            );
             return feedPath;
           }
 
           // An anonymous user is only allowed on auth paths for account linking.
           final isLinking =
               state.uri.queryParameters['context'] == 'linking' ||
-                  currentLocation.contains('/linking/');
+              currentLocation.contains('/linking/');
 
           if (isLinking) {
             print('    Action: Anonymous user on linking path. Allowing.');
             return null;
           } else {
-            print('    Action: Anonymous user on non-linking auth path. Redirecting to feed.');
+            print(
+              '    Action: Anonymous user on non-linking auth path. Redirecting to feed.',
+            );
             return feedPath;
           }
         }
@@ -169,10 +180,7 @@ GoRouter createRouter({
       // A neutral root route that the app starts on. The redirect logic will
       // immediately move the user to the correct location. This route's
       // builder will never be called in practice.
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const SizedBox.shrink(),
-      ),
+      GoRoute(path: '/', builder: (context, state) => const SizedBox.shrink()),
       GoRoute(
         path: Routes.authentication,
         name: Routes.authenticationName,
@@ -353,26 +361,25 @@ GoRouter createRouter({
               BlocProvider.value(value: accountBloc),
               BlocProvider(
                 create: (context) {
-                  // Instantiate FeedInjectorService here as it's stateless for now
-                  final feedInjectorService = FeedInjectorService();
                   return HeadlinesFeedBloc(
                     headlinesRepository: context
                         .read<DataRepository<Headline>>(),
-                    feedInjectorService: feedInjectorService,
+                    userContentPreferencesRepository: context
+                        .read<DataRepository<UserContentPreferences>>(),
+                    feedDecoratorService: feedDecoratorService,
                     appBloc: context.read<AppBloc>(),
                   )..add(const HeadlinesFeedFetchRequested());
                 },
               ),
               BlocProvider(
                 create: (context) {
-                  final feedInjectorService = FeedInjectorService();
                   return HeadlinesSearchBloc(
                     headlinesRepository: context
                         .read<DataRepository<Headline>>(),
                     topicRepository: context.read<DataRepository<Topic>>(),
                     sourceRepository: context.read<DataRepository<Source>>(),
                     appBloc: context.read<AppBloc>(),
-                    feedInjectorService: feedInjectorService,
+                    feedDecoratorService: feedDecoratorService,
                   );
                 },
               ),

@@ -60,3 +60,37 @@ final class HeadlinesFeedFiltersApplied extends HeadlinesFeedEvent {
 /// and view the unfiltered headlines feed.
 /// {@endtemplate}
 final class HeadlinesFeedFiltersCleared extends HeadlinesFeedEvent {}
+
+/// {@template feed_decorator_dismissed}
+/// Event triggered when a user dismisses a feed decorator.
+/// {@endtemplate}
+final class FeedDecoratorDismissed extends HeadlinesFeedEvent {
+  /// {@macro feed_decorator_dismissed}
+  const FeedDecoratorDismissed({required this.feedDecoratorType});
+
+  /// The type of the decorator that was dismissed.
+  final FeedDecoratorType feedDecoratorType;
+
+  @override
+  List<Object> get props => [feedDecoratorType];
+}
+
+/// {@template call_to_action_tapped}
+/// Event triggered when a user taps the call-to-action button on a decorator.
+/// {@endtemplate}
+final class CallToActionTapped extends HeadlinesFeedEvent {
+  /// {@macro call_to_action_tapped}
+  const CallToActionTapped({required this.url});
+
+  /// The URL associated with the call-to-action.
+  final String url;
+
+  @override
+  List<Object> get props => [url];
+}
+
+/// {@template navigation_handled}
+/// Event triggered after a navigation action has been handled by the UI.
+/// This is used to clear the navigationUrl from the state.
+/// {@endtemplate}
+final class NavigationHandled extends HeadlinesFeedEvent {}

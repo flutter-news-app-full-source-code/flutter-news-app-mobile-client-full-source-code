@@ -60,7 +60,7 @@ GoRouter createRouter({
   required DataRepository<Source> sourcesRepository,
   required DataRepository<UserAppSettings> userAppSettingsRepository,
   required DataRepository<UserContentPreferences>
-  userContentPreferencesRepository,
+      userContentPreferencesRepository,
   required DataRepository<RemoteConfig> remoteConfigRepository,
   required DataRepository<User> userRepository,
   required local_config.AppEnvironment environment,
@@ -70,6 +70,12 @@ GoRouter createRouter({
     authenticationRepository: authenticationRepository,
     userContentPreferencesRepository: userContentPreferencesRepository,
     environment: environment,
+  );
+
+  // Instantiate FeedDecoratorService once to be shared
+  final feedDecoratorService = FeedDecoratorService(
+    topicsRepository: topicsRepository,
+    sourcesRepository: sourcesRepository,
   );
 
   return GoRouter(
@@ -354,11 +360,11 @@ GoRouter createRouter({
               BlocProvider.value(value: accountBloc),
               BlocProvider(
                 create: (context) {
-                  // Instantiate FeedInjectorService here as it's stateless for now
-                  final feedDecoratorService = FeedDecoratorService();
                   return HeadlinesFeedBloc(
                     headlinesRepository:
                         context.read<DataRepository<Headline>>(),
+                    userContentPreferencesRepository: context
+                        .read<DataRepository<UserContentPreferences>>(),
                     feedDecoratorService: feedDecoratorService,
                     appBloc: context.read<AppBloc>(),
                   )..add(const HeadlinesFeedFetchRequested());
@@ -366,7 +372,6 @@ GoRouter createRouter({
               ),
               BlocProvider(
                 create: (context) {
-                  final feedDecoratorService = FeedDecoratorService();
                   return HeadlinesSearchBloc(
                     headlinesRepository:
                         context.read<DataRepository<Headline>>(),
@@ -473,8 +478,8 @@ GoRouter createRouter({
                             sourcesRepository: context
                                 .read<DataRepository<Source>>(),
                             countriesRepository: // Added missing repository
-                            context
-                                .read<DataRepository<Country>>(),
+                                context
+                                    .read<DataRepository<Country>>(),
                           ),
                           // Pass initialSelectedSources, country ISO codes, and source types from state.extra
                           child: Builder(

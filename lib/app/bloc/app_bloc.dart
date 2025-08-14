@@ -506,10 +506,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     Emitter<AppState> emit,
   ) async {
     if (state.user != null && state.user!.id == event.userId) {
+      final originalUser = state.user!;
       final now = DateTime.now();
       // Get the current status for the decorator, or create a default if not present.
       final currentStatus =
-          state.user!.feedDecoratorStatus[event.feedDecoratorType] ??
+          originalUser.feedDecoratorStatus[event.feedDecoratorType] ??
           const UserFeedDecoratorStatus(isCompleted: false);
 
       // Create an updated status.
@@ -524,7 +525,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // Create a new map with the updated status for the specific decorator type.
       final newFeedDecoratorStatus =
           Map<FeedDecoratorType, UserFeedDecoratorStatus>.from(
-            state.user!.feedDecoratorStatus,
+            originalUser.feedDecoratorStatus,
           )..update(
             event.feedDecoratorType,
             (_) => updatedDecoratorStatus,
@@ -532,7 +533,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           );
 
       // Update the user with the new feedDecoratorStatus map.
-      final updatedUser = state.user!.copyWith(
+      final updatedUser = originalUser.copyWith(
         feedDecoratorStatus: newFeedDecoratorStatus,
       );
 
@@ -552,8 +553,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         );
       } catch (e) {
         print('Failed to update feed decorator status on backend: $e');
-        // TODO(fulleni): handle the error, e.g., by reverting the state
-        // or scheduling a retry. For now, we just log the error.
+        // Revert the state on failure to maintain consistency.
+        emit(state.copyWith(user: originalUser));
       }
     }
   }

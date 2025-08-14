@@ -61,6 +61,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       _onCallToActionTapped,
       transformer: sequential(),
     );
+    on<NavigationHandled>(
+      _onNavigationHandled,
+      transformer: sequential(),
+    );
   }
 
   final DataRepository<Headline> _headlinesRepository;
@@ -460,5 +464,13 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     // Emit a state that contains the URL. The UI will listen for this
     // change, trigger navigation, and then dispatch an event to clear the URL.
     emit(state.copyWith(navigationUrl: event.url));
+  }
+
+  void _onNavigationHandled(
+    NavigationHandled event,
+    Emitter<HeadlinesFeedState> emit,
+  ) {
+    // Clear the navigationUrl from the state after it has been handled by the UI.
+    emit(state.copyWith(clearNavigationUrl: true));
   }
 }

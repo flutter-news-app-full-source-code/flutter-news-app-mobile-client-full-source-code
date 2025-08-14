@@ -70,6 +70,7 @@ class FeedDecoratorService {
   // The zero-based index in the feed where the decorator will be inserted.
   // A value of 3 places it after the third headline, which is a common
   // position for in-feed promotional content.
+  // TODO(fulleni): Make this configurable throu the remote config.
   static const _decoratorInsertionIndex = 3;
 
   // Defines the static priority for each feed decorator. A lower number is a

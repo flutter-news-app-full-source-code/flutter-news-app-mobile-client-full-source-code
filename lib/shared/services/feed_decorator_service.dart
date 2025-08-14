@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:uuid/uuid.dart';
 
 /// A result object returned by the [FeedDecoratorService].
@@ -236,21 +237,53 @@ class FeedDecoratorService {
   }) async {
     switch (decoratorConfig.category) {
       case FeedDecoratorCategory.callToAction:
-        // Ensure the decoratorConfig has the necessary content for CallToAction
-        // TODO(fulleni): receive the data from the  RemoteConfig
-        final title = 'Call to Action Title for $decoratorType';
-        final description = 'Description for $decoratorType. This content '
-            'should ideally come from remote configuration.';
-        final ctaText = 'Action for $decoratorType';
-        final ctaUrl = '/default-url-for-$decoratorType';
+        // TODO(fulleni): This is a temporary measure until the content is fully driven by
+        // the RemoteConfig model. Using a map centralizes the placeholder
+        // content for now.
+        const ctaContent = {
+          FeedDecoratorType.linkAccount: (
+            title: 'Create an Account',
+            description:
+                'Save your preferences and followed items by creating a free account.',
+            ctaText: 'Get Started',
+            ctaUrl: '${Routes.authentication}/${Routes.accountLinking}',
+          ),
+          FeedDecoratorType.upgrade: (
+            title: 'Upgrade to Premium',
+            description:
+                'Unlock unlimited access to all features and content.',
+            ctaText: 'Upgrade Now',
+            ctaUrl: '/upgrade', // Placeholder URL
+          ),
+          FeedDecoratorType.rateApp: (
+            title: 'Enjoying the App?',
+            description: 'Let us know what you think by leaving a rating.',
+            ctaText: 'Rate App',
+            ctaUrl: '/rate-app', // Placeholder URL
+          ),
+          FeedDecoratorType.enableNotifications: (
+            title: 'Stay Up to Date',
+            description:
+                'Enable notifications to get the latest headlines delivered to you.',
+            ctaText: 'Enable',
+            ctaUrl: '/enable-notifications', // Placeholder URL
+          ),
+        };
+
+        final content = ctaContent[decoratorType];
+
+        // If content for the decorator type is not defined, return null.
+        if (content == null) {
+          return null;
+        }
 
         return CallToActionItem(
           id: _uuid.v4(),
-          title: title,
-          description: description,
+          title: content.title,
+          description: content.description,
           decoratorType: decoratorType,
-          callToActionText: ctaText,
-          callToActionUrl: ctaUrl,
+          callToActionText: content.ctaText,
+          callToActionUrl: content.ctaUrl,
         );
       case FeedDecoratorCategory.contentCollection:
         final itemsToDisplay = decoratorConfig.itemsToDisplay;
@@ -361,7 +394,7 @@ class FeedDecoratorService {
 
   /// Constructs a placeholder [Ad] object.
   ///
-  /// In a real scenario, this would fetch from an ad network SDK.
+  /// TODO(fulleni): fetch from an ad network SDK.
   Ad? _getAdToInject() {
     // A small, predefined list of mock ads to simulate variety.
     final mockAds = <Ad>[

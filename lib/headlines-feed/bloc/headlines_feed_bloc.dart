@@ -370,9 +370,20 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         feedDecoratorType: event.feedDecoratorType,
       ),
     );
-    // TODO(fulleni): you might want to remove the dismissed decorator from the
-    // current feedItems list in the state to immediately update the UI.
-    // This would require filtering the list and emitting a new state.
+    // Remove the dismissed decorator from the current feedItems list to
+    // immediately update the UI.
+    final newFeedItems = List<FeedItem>.from(state.feedItems)
+      ..removeWhere((item) {
+        if (item is CallToActionItem) {
+          return item.decoratorType == event.feedDecoratorType;
+        }
+        if (item is ContentCollectionItem) {
+          return item.decoratorType == event.feedDecoratorType;
+        }
+        return false;
+      });
+
+    emit(state.copyWith(feedItems: newFeedItems));
   }
 
   /// Handles the toggling of follow status for a suggested topic or source.
@@ -446,11 +457,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     CallToActionTapped event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
-    // TODO(fulleni): emit a state that contains the URL
-    // and the UI would then use a package like `url_launcher` to open it.
-    // For now, we'll just print the URL.
-    print('Call to action tapped! Navigating to: ${event.url}');
-    // Example: emit(state.copyWith(navigationUrl: event.url));
-    // The UI would then listen for `navigationUrl` changes and navigate.
+    // Emit a state that contains the URL. The UI will listen for this
+    // change, trigger navigation, and then dispatch an event to clear the URL.
+    emit(state.copyWith(navigationUrl: event.url));
   }
 }

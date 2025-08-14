@@ -54,10 +54,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       _onFeedDecoratorDismissed,
       transformer: sequential(),
     );
-    on<SuggestedItemFollowToggled>(
-      _onSuggestedItemFollowToggled,
-      transformer: sequential(),
-    );
     on<CallToActionTapped>(_onCallToActionTapped, transformer: sequential());
     on<NavigationHandled>(_onNavigationHandled, transformer: sequential());
   }
@@ -391,74 +387,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       });
 
     emit(state.copyWith(feedItems: newFeedItems));
-  }
-
-  /// Handles the toggling of follow status for a suggested topic or source.
-  ///
-  /// Updates the user's content preferences in the repository.
-  Future<void> _onSuggestedItemFollowToggled(
-    SuggestedItemFollowToggled event,
-    Emitter<HeadlinesFeedState> emit,
-  ) async {
-    final currentUser = _appBloc.state.user;
-    if (currentUser == null) return;
-
-    try {
-      // Fetch current user preferences
-      final currentPreferences = await _userContentPreferencesRepository.read(
-        id: currentUser.id,
-        userId: currentUser.id,
-      );
-
-      UserContentPreferences updatedPreferences;
-      if (event.item is Topic) {
-        final topic = event.item as Topic;
-        final currentTopics = List<Topic>.from(
-          currentPreferences.followedTopics,
-        );
-        if (event.isFollowing) {
-          currentTopics.add(topic);
-        } else {
-          currentTopics.removeWhere((t) => t.id == topic.id);
-        }
-        updatedPreferences = currentPreferences.copyWith(
-          followedTopics: currentTopics,
-        );
-      } else if (event.item is Source) {
-        final source = event.item as Source;
-        final currentSources = List<Source>.from(
-          currentPreferences.followedSources,
-        );
-        if (event.isFollowing) {
-          currentSources.add(source);
-        } else {
-          currentSources.removeWhere((s) => s.id == source.id);
-        }
-        updatedPreferences = currentPreferences.copyWith(
-          followedSources: currentSources,
-        );
-      } else {
-        // Should not happen given the event's item type constraint
-        return;
-      }
-
-      // Persist updated preferences
-      await _userContentPreferencesRepository.update(
-        id: updatedPreferences.id,
-        item: updatedPreferences,
-        userId: updatedPreferences.id,
-      );
-
-      // After persisting the change, emit a state copy to trigger a UI
-      // rebuild. The UI will then get the latest follow status from the
-      // updated AccountBloc state.
-      emit(state.copyWith());
-    } on HttpException catch (e) {
-      // Handle error, e.g., show a snackbar or log
-      print('Error toggling follow status: $e');
-      // Emit a failure state if necessary, but for a minor interaction,
-      // logging might be sufficient.
-    }
   }
 
   /// Handles a tap on a call-to-action decorator.

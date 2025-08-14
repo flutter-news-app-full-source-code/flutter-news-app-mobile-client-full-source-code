@@ -510,17 +510,22 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // Get the current status for the decorator, or create a default if not present.
       final currentStatus =
           state.user!.feedDecoratorStatus[event.feedDecoratorType] ??
-          const UserFeedDecoratorStatus(isCompleted: false);
+              const UserFeedDecoratorStatus(isCompleted: false);
 
-      // Create an updated status, preserving the `isCompleted` flag and only
-      // updating the `lastShownAt` timestamp.
-      final updatedDecoratorStatus = currentStatus.copyWith(lastShownAt: now);
+      // Create an updated status.
+      // It always updates the `lastShownAt` timestamp.
+      // It updates `isCompleted` to true if the event marks it as completed.
+      // Once completed, it should stay completed.
+      final updatedDecoratorStatus = currentStatus.copyWith(
+        lastShownAt: now,
+        isCompleted: event.isCompleted || currentStatus.isCompleted,
+      );
 
       // Create a new map with the updated status for the specific decorator type.
       final newFeedDecoratorStatus =
           Map<FeedDecoratorType, UserFeedDecoratorStatus>.from(
-            state.user!.feedDecoratorStatus,
-          )..update(
+        state.user!.feedDecoratorStatus,
+      )..update(
             event.feedDecoratorType,
             (_) => updatedDecoratorStatus,
             ifAbsent: () => updatedDecoratorStatus,

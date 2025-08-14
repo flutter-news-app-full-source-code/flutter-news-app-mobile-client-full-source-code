@@ -4,6 +4,7 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
@@ -98,264 +99,282 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
         appBar: AppBar(
           title: Text(
             l10n.headlinesFeedAppBarTitle,
-          style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        actions: [
-          // IconButton(
-          //   icon: const Icon(Icons.notifications_outlined),
-          //   tooltip: l10n.notificationsTooltip,
-          //   onPressed: () {
-          //     context.goNamed(
-          //       Routes.notificationsName,
-          //     );
-          //   },
-          // ),
-          BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
-            builder: (context, state) {
-              final isFilterApplied =
-                  (state.filter.topics?.isNotEmpty ?? false) ||
-                  (state.filter.sources?.isNotEmpty ?? false) ||
-                  state.filter.isFromFollowedItems;
-              return Stack(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.filter_list),
-                    tooltip: l10n.headlinesFeedFilterTooltip,
-                    onPressed: () {
-                      // Navigate to the filter page route
-                      final headlinesFeedBloc = context
-                          .read<HeadlinesFeedBloc>();
-                      context.goNamed(
-                        Routes.feedFilterName,
-                        extra: headlinesFeedBloc,
-                      );
-                    },
-                  ),
-                  if (isFilterApplied)
-                    Positioned(
-                      top: AppSpacing.sm,
-                      right: AppSpacing.sm,
-                      child: Container(
-                        width: AppSpacing.sm,
-                        height: AppSpacing.sm,
-                        decoration: BoxDecoration(
-                          color: colorScheme.primary,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    ),
-                ],
-              );
-            },
+            style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
-        ],
-      ),
-      body: BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
-        builder: (context, state) {
-          if (state.status == HeadlinesFeedStatus.initial ||
-              (state.status == HeadlinesFeedStatus.loading &&
-                  state.feedItems.isEmpty)) {
-            return LoadingStateWidget(
-              icon: Icons.newspaper,
-              headline: l10n.headlinesFeedLoadingHeadline,
-              subheadline: l10n.headlinesFeedLoadingSubheadline,
-            );
-          }
-
-          if (state.status == HeadlinesFeedStatus.failure &&
-              state.feedItems.isEmpty) {
-            return FailureStateWidget(
-              exception: state.error!,
-              onRetry: () => context.read<HeadlinesFeedBloc>().add(
-                HeadlinesFeedRefreshRequested(),
-              ),
-            );
-          }
-
-          if (state.status == HeadlinesFeedStatus.success &&
-              state.feedItems.isEmpty) {
-            return FailureStateWidget(
-              exception: const UnknownException(
-                'No headlines found matching your criteria.',
-              ),
-              onRetry: () => context.read<HeadlinesFeedBloc>().add(
-                HeadlinesFeedFiltersCleared(),
-              ),
-              retryButtonText: l10n.headlinesFeedClearFiltersButton,
-            );
-          }
-
-          return RefreshIndicator(
-            onRefresh: () async {
-              context.read<HeadlinesFeedBloc>().add(
-                HeadlinesFeedRefreshRequested(),
-              );
-            },
-            child: ListView.separated(
-              controller: _scrollController,
-              padding: const EdgeInsets.only(
-                top: AppSpacing.md,
-                bottom: AppSpacing.xxl,
-              ),
-              itemCount: state.hasMore
-                  ? state.feedItems.length + 1
-                  : state.feedItems.length,
-              separatorBuilder: (context, index) {
-                if (index < state.feedItems.length - 1) {
-                  final currentItem = state.feedItems[index];
-                  final nextItem = state.feedItems[index + 1];
-                  // Adjust spacing around any decorator or ad
-                  if (currentItem is! Headline || nextItem is! Headline) {
-                    return const SizedBox(height: AppSpacing.md);
-                  }
-                }
-                return const SizedBox(height: AppSpacing.lg);
-              },
-              itemBuilder: (context, index) {
-                if (index >= state.feedItems.length) {
-                  return state.status == HeadlinesFeedStatus.loadingMore
-                      ? const Padding(
-                          padding: EdgeInsets.symmetric(
-                            vertical: AppSpacing.lg,
-                          ),
-                          child: Center(child: CircularProgressIndicator()),
-                        )
-                      : const SizedBox.shrink();
-                }
-                final item = state.feedItems[index];
-
-                if (item is Headline) {
-                  final imageStyle = context
-                      .watch<AppBloc>()
-                      .state
-                      .settings
-                      .feedPreferences
-                      .headlineImageStyle;
-                  Widget tile;
-                  switch (imageStyle) {
-                    case HeadlineImageStyle.hidden:
-                      tile = HeadlineTileTextOnly(
-                        headline: item,
-                        onHeadlineTap: () => context.goNamed(
-                          Routes.articleDetailsName,
-                          pathParameters: {'id': item.id},
-                          extra: item,
-                        ),
-                      );
-                    case HeadlineImageStyle.smallThumbnail:
-                      tile = HeadlineTileImageStart(
-                        headline: item,
-                        onHeadlineTap: () => context.goNamed(
-                          Routes.articleDetailsName,
-                          pathParameters: {'id': item.id},
-                          extra: item,
-                        ),
-                      );
-                    case HeadlineImageStyle.largeThumbnail:
-                      tile = HeadlineTileImageTop(
-                        headline: item,
-                        onHeadlineTap: () => context.goNamed(
-                          Routes.articleDetailsName,
-                          pathParameters: {'id': item.id},
-                          extra: item,
-                        ),
-                      );
-                  }
-                  return tile;
-                } else if (item is Ad) {
-                  return Card(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.paddingMedium,
-                      vertical: AppSpacing.xs,
+          actions: [
+            // IconButton(
+            //   icon: const Icon(Icons.notifications_outlined),
+            //   tooltip: l10n.notificationsTooltip,
+            //   onPressed: () {
+            //     context.goNamed(
+            //       Routes.notificationsName,
+            //     );
+            //   },
+            // ),
+            BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
+              builder: (context, state) {
+                final isFilterApplied =
+                    (state.filter.topics?.isNotEmpty ?? false) ||
+                    (state.filter.sources?.isNotEmpty ?? false) ||
+                    state.filter.isFromFollowedItems;
+                return Stack(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.filter_list),
+                      tooltip: l10n.headlinesFeedFilterTooltip,
+                      onPressed: () {
+                        // Navigate to the filter page route
+                        final headlinesFeedBloc = context
+                            .read<HeadlinesFeedBloc>();
+                        context.goNamed(
+                          Routes.feedFilterName,
+                          extra: headlinesFeedBloc,
+                        );
+                      },
                     ),
-                    color: colorScheme.surfaceContainerHighest,
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      child: Column(
-                        children: [
-                          if (item.imageUrl.isNotEmpty)
-                            Image.network(
-                              item.imageUrl,
-                              height: 100,
-                              errorBuilder: (ctx, err, st) =>
-                                  const Icon(Icons.broken_image, size: 50),
-                            ),
-                          const SizedBox(height: AppSpacing.sm),
-                          Text(
-                            'Placeholder Ad: ${item.adType}',
-                            style: textTheme.titleSmall,
+                    if (isFilterApplied)
+                      Positioned(
+                        top: AppSpacing.sm,
+                        right: AppSpacing.sm,
+                        child: Container(
+                          width: AppSpacing.sm,
+                          height: AppSpacing.sm,
+                          decoration: BoxDecoration(
+                            color: colorScheme.primary,
+                            shape: BoxShape.circle,
                           ),
-                          Text(
-                            'Placement: ${item.placement}',
-                            style: textTheme.bodySmall,
-                          ),
-                          if (item.targetUrl.isNotEmpty)
-                            TextButton(
-                              onPressed: () {
-                                // TODO(fulleni): Launch URL
-                              },
-                              child: const Text('Visit Advertiser'),
-                            ),
-                        ],
+                        ),
                       ),
-                    ),
-                  );
-                } else if (item is CallToActionItem) {
-                  return CallToActionDecoratorWidget(
-                    item: item,
-                    onCallToAction: (url) {
-                      context.read<HeadlinesFeedBloc>().add(
-                        CallToActionTapped(url: url),
-                      );
-                    },
-                    onDismiss: (decoratorType) {
-                      context.read<HeadlinesFeedBloc>().add(
-                        FeedDecoratorDismissed(
-                          feedDecoratorType: decoratorType,
-                        ),
-                      );
-                    },
-                  );
-                } else if (item is ContentCollectionItem) {
-                  final userState = context.watch<AppBloc>().state;
-                  final followedTopicIds = userState.user?.feedDecoratorStatus
-                      .keys
-                      .whereType<Topic>()
-                      .map((t) => t.id)
-                      .toList() ??
-                      [];
-                  final followedSourceIds = userState.user?.feedDecoratorStatus
-                      .keys
-                      .whereType<Source>()
-                      .map((s) => s.id)
-                      .toList() ??
-                      [];
-
-                  return ContentCollectionDecoratorWidget(
-                    item: item,
-                    followedTopicIds: followedTopicIds,
-                    followedSourceIds: followedSourceIds,
-                    onFollowToggle: (toggledItem) {
-                      // TODO(fulleni): This requires more complex logic to determine the new
-                      // `isFollowing` state, which is best handled in the BLoC.
-                      // For now, we can pass a simplified event.
-                      // A more robust implementation might pass the current
-                      // `isFollowing` state from the widget.
-                    },
-                    onDismiss: (decoratorType) {
-                      context.read<HeadlinesFeedBloc>().add(
-                        FeedDecoratorDismissed(
-                          feedDecoratorType: decoratorType,
-                        ),
-                      );
-                    },
-                  );
-                }
-                return const SizedBox.shrink();
+                  ],
+                );
               },
             ),
-          );
-        },
+          ],
+        ),
+        body: BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
+          builder: (context, state) {
+            if (state.status == HeadlinesFeedStatus.initial ||
+                (state.status == HeadlinesFeedStatus.loading &&
+                    state.feedItems.isEmpty)) {
+              return LoadingStateWidget(
+                icon: Icons.newspaper,
+                headline: l10n.headlinesFeedLoadingHeadline,
+                subheadline: l10n.headlinesFeedLoadingSubheadline,
+              );
+            }
+
+            if (state.status == HeadlinesFeedStatus.failure &&
+                state.feedItems.isEmpty) {
+              return FailureStateWidget(
+                exception: state.error!,
+                onRetry: () => context.read<HeadlinesFeedBloc>().add(
+                  HeadlinesFeedRefreshRequested(),
+                ),
+              );
+            }
+
+            if (state.status == HeadlinesFeedStatus.success &&
+                state.feedItems.isEmpty) {
+              return FailureStateWidget(
+                exception: const UnknownException(
+                  'No headlines found matching your criteria.',
+                ),
+                onRetry: () => context.read<HeadlinesFeedBloc>().add(
+                  HeadlinesFeedFiltersCleared(),
+                ),
+                retryButtonText: l10n.headlinesFeedClearFiltersButton,
+              );
+            }
+
+            return RefreshIndicator(
+              onRefresh: () async {
+                context.read<HeadlinesFeedBloc>().add(
+                  HeadlinesFeedRefreshRequested(),
+                );
+              },
+              child: ListView.separated(
+                controller: _scrollController,
+                padding: const EdgeInsets.only(
+                  top: AppSpacing.md,
+                  bottom: AppSpacing.xxl,
+                ),
+                itemCount: state.hasMore
+                    ? state.feedItems.length + 1
+                    : state.feedItems.length,
+                separatorBuilder: (context, index) {
+                  if (index < state.feedItems.length - 1) {
+                    final currentItem = state.feedItems[index];
+                    final nextItem = state.feedItems[index + 1];
+                    // Adjust spacing around any decorator or ad
+                    if (currentItem is! Headline || nextItem is! Headline) {
+                      return const SizedBox(height: AppSpacing.md);
+                    }
+                  }
+                  return const SizedBox(height: AppSpacing.lg);
+                },
+                itemBuilder: (context, index) {
+                  if (index >= state.feedItems.length) {
+                    return state.status == HeadlinesFeedStatus.loadingMore
+                        ? const Padding(
+                            padding: EdgeInsets.symmetric(
+                              vertical: AppSpacing.lg,
+                            ),
+                            child: Center(child: CircularProgressIndicator()),
+                          )
+                        : const SizedBox.shrink();
+                  }
+                  final item = state.feedItems[index];
+
+                  if (item is Headline) {
+                    final imageStyle = context
+                        .watch<AppBloc>()
+                        .state
+                        .settings
+                        .feedPreferences
+                        .headlineImageStyle;
+                    Widget tile;
+                    switch (imageStyle) {
+                      case HeadlineImageStyle.hidden:
+                        tile = HeadlineTileTextOnly(
+                          headline: item,
+                          onHeadlineTap: () => context.goNamed(
+                            Routes.articleDetailsName,
+                            pathParameters: {'id': item.id},
+                            extra: item,
+                          ),
+                        );
+                      case HeadlineImageStyle.smallThumbnail:
+                        tile = HeadlineTileImageStart(
+                          headline: item,
+                          onHeadlineTap: () => context.goNamed(
+                            Routes.articleDetailsName,
+                            pathParameters: {'id': item.id},
+                            extra: item,
+                          ),
+                        );
+                      case HeadlineImageStyle.largeThumbnail:
+                        tile = HeadlineTileImageTop(
+                          headline: item,
+                          onHeadlineTap: () => context.goNamed(
+                            Routes.articleDetailsName,
+                            pathParameters: {'id': item.id},
+                            extra: item,
+                          ),
+                        );
+                    }
+                    return tile;
+                  } else if (item is Ad) {
+                    return Card(
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.paddingMedium,
+                        vertical: AppSpacing.xs,
+                      ),
+                      color: colorScheme.surfaceContainerHighest,
+                      child: Padding(
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        child: Column(
+                          children: [
+                            if (item.imageUrl.isNotEmpty)
+                              Image.network(
+                                item.imageUrl,
+                                height: 100,
+                                errorBuilder: (ctx, err, st) =>
+                                    const Icon(Icons.broken_image, size: 50),
+                              ),
+                            const SizedBox(height: AppSpacing.sm),
+                            Text(
+                              'Placeholder Ad: ${item.adType}',
+                              style: textTheme.titleSmall,
+                            ),
+                            Text(
+                              'Placement: ${item.placement}',
+                              style: textTheme.bodySmall,
+                            ),
+                            if (item.targetUrl.isNotEmpty)
+                              TextButton(
+                                onPressed: () {
+                                  // TODO(fulleni): Launch URL
+                                },
+                                child: const Text('Visit Advertiser'),
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  } else if (item is CallToActionItem) {
+                    return CallToActionDecoratorWidget(
+                      item: item,
+                      onCallToAction: (url) {
+                        context.read<HeadlinesFeedBloc>().add(
+                          CallToActionTapped(url: url),
+                        );
+                      },
+                      onDismiss: (decoratorType) {
+                        context.read<HeadlinesFeedBloc>().add(
+                          FeedDecoratorDismissed(
+                            feedDecoratorType: decoratorType,
+                          ),
+                        );
+                      },
+                    );
+                  } else if (item is ContentCollectionItem) {
+                    // Access AccountBloc to get the user's content preferences,
+                    // which is the source of truth for followed items.
+                    final accountState = context.watch<AccountBloc>().state;
+                    final followedTopics =
+                        accountState.preferences?.followedTopics ?? [];
+                    final followedSources =
+                        accountState.preferences?.followedSources ?? [];
+
+                    final followedTopicIds = followedTopics
+                        .map((t) => t.id)
+                        .toList();
+                    final followedSourceIds = followedSources
+                        .map((s) => s.id)
+                        .toList();
+
+                    return ContentCollectionDecoratorWidget(
+                      item: item,
+                      followedTopicIds: followedTopicIds,
+                      followedSourceIds: followedSourceIds,
+                      onFollowToggle: (toggledItem) {
+                        // Determine the current following status to toggle it.
+                        final bool isCurrentlyFollowing;
+                        if (toggledItem is Topic) {
+                          isCurrentlyFollowing = followedTopicIds.contains(
+                            toggledItem.id,
+                          );
+                        } else if (toggledItem is Source) {
+                          isCurrentlyFollowing = followedSourceIds.contains(
+                            toggledItem.id,
+                          );
+                        } else {
+                          return; // Should not happen
+                        }
+
+                        // Dispatch the event with the NEW following status.
+                        context.read<HeadlinesFeedBloc>().add(
+                          SuggestedItemFollowToggled(
+                            item: toggledItem,
+                            isFollowing: !isCurrentlyFollowing,
+                          ),
+                        );
+                      },
+                      onDismiss: (decoratorType) {
+                        context.read<HeadlinesFeedBloc>().add(
+                          FeedDecoratorDismissed(
+                            feedDecoratorType: decoratorType,
+                          ),
+                        );
+                      },
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+            );
+          },
+        ),
       ),
     );
   }

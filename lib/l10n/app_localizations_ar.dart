@@ -821,4 +821,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get updateRequiredButton => 'التحديث الآن';
+
+  @override
+  String get neverShowAgain => 'لا تظهر هذا مرة أخرى';
+
+  @override
+  String get followButtonText => 'متابعة';
+
+  @override
+  String get unfollowButtonText => 'إلغاء المتابعة';
 }

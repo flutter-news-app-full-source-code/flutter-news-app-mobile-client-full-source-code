@@ -1579,6 +1579,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Update Now'**
   String get updateRequiredButton;
+
+  /// Option to dismiss a feed decorator permanently
+  ///
+  /// In en, this message translates to:
+  /// **'Never show this again'**
+  String get neverShowAgain;
+
+  /// Text for the follow button on suggestion items
+  ///
+  /// In en, this message translates to:
+  /// **'Follow'**
+  String get followButtonText;
+
+  /// Text for the unfollow button on suggestion items
+  ///
+  /// In en, this message translates to:
+  /// **'Unfollow'**
+  String get unfollowButtonText;
 }
 
 class _AppLocalizationsDelegate

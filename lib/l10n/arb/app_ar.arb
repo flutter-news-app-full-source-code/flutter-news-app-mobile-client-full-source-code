@@ -1054,5 +1054,17 @@
     "updateRequiredButton": "التحديث الآن",
     "@updateRequiredButton": {
         "description": "Button text for the force update page"
+    },
+    "neverShowAgain": "لا تظهر هذا مرة أخرى",
+    "@neverShowAgain": {
+        "description": "Option to dismiss a feed decorator permanently"
+    },
+    "followButtonText": "متابعة",
+    "@followButtonText": {
+        "description": "Text for the follow button on suggestion items"
+    },
+    "unfollowButtonText": "إلغاء المتابعة",
+    "@unfollowButtonText": {
+        "description": "Text for the unfollow button on suggestion items"
     }
 }

@@ -230,54 +230,21 @@ class FeedDecoratorService {
   ) async {
     switch (decoratorConfig.category) {
       case FeedDecoratorCategory.callToAction:
-        final content = switch (decoratorType) {
-          FeedDecoratorType.linkAccount => (
-              title: 'Unlock Your Full Potential!',
-              description:
-                  'Link your account to enjoy expanded content access, '
-                  'keep your preferences synced, and experience a more '
-                  'streamlined ad display.',
-              ctaText: 'Link Account & Explore',
-              ctaUrl: '/authentication?context=linking'
-            ),
-          FeedDecoratorType.upgrade => (
-              title: 'Unlock Our Best Features!',
-              description:
-                  'Go Premium to enjoy our most comprehensive content '
-                  'access, the best ad experience, and many more '
-                  'exclusive perks.',
-              ctaText: 'Upgrade Now',
-              ctaUrl: '/account/upgrade'
-            ),
-          FeedDecoratorType.rateApp => (
-              title: 'Enjoying the App?',
-              description: 'A rating on the app store helps us grow.',
-              ctaText: 'Rate Us',
-              ctaUrl: '/app-store-rating'
-            ),
-          FeedDecoratorType.enableNotifications => (
-              title: 'Stay Updated!',
-              description:
-                  'Enable notifications to get the latest news instantly.',
-              ctaText: 'Enable Notifications',
-              ctaUrl: '/settings/notifications'
-            ),
-          // These types are handled by ContentCollection, but must be
-          // present in the switch for exhaustiveness.
-          FeedDecoratorType.suggestedTopics ||
-              FeedDecoratorType.suggestedSources =>
-            throw StateError(
-              'ContentCollection decorator type '
-              '$decoratorType used in CallToAction category.',
-            ),
-        };
+        // Ensure the decoratorConfig has the necessary content for CallToAction
+        // TODO(fulleni): receive the data from the  RemoteConfig
+        final title = 'Call to Action Title for $decoratorType';
+        final description = 'Description for $decoratorType. This content '
+            'should ideally come from remote configuration.';
+        final ctaText = 'Action for $decoratorType';
+        final ctaUrl = '/default-url-for-$decoratorType';
+
         return CallToActionItem(
           id: _uuid.v4(),
-          title: content.title,
-          description: content.description,
+          title: title,
+          description: description,
           decoratorType: decoratorType,
-          callToActionText: content.ctaText,
-          callToActionUrl: content.ctaUrl,
+          callToActionText: ctaText,
+          callToActionUrl: ctaUrl,
         );
       case FeedDecoratorCategory.contentCollection:
         final itemsToDisplay = decoratorConfig.itemsToDisplay;

@@ -84,10 +84,20 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          l10n.headlinesFeedAppBarTitle,
+    return BlocListener<HeadlinesFeedBloc, HeadlinesFeedState>(
+      listener: (context, state) {
+        if (state.navigationUrl != null) {
+          // Use context.push for navigation to allow returning.
+          // This is suitable for call-to-action flows like linking an account.
+          context.push(state.navigationUrl!);
+          // Notify the BLoC that navigation has been handled to clear the URL.
+          context.read<HeadlinesFeedBloc>().add(NavigationHandled());
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            l10n.headlinesFeedAppBarTitle,
           style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         actions: [

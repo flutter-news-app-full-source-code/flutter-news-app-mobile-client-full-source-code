@@ -25,9 +25,11 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   /// Requires repositories and services for its operations.
   HeadlinesFeedBloc({
     required DataRepository<Headline> headlinesRepository,
+    required DataRepository<UserContentPreferences> userContentPreferencesRepository,
     required FeedDecoratorService feedDecoratorService,
     required AppBloc appBloc,
   }) : _headlinesRepository = headlinesRepository,
+       _userContentPreferencesRepository = userContentPreferencesRepository,
        _feedDecoratorService = feedDecoratorService,
        _appBloc = appBloc,
        super(const HeadlinesFeedState()) {
@@ -50,6 +52,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   }
 
   final DataRepository<Headline> _headlinesRepository;
+  final DataRepository<UserContentPreferences> _userContentPreferencesRepository;
   final FeedDecoratorService _feedDecoratorService;
   final AppBloc _appBloc;
 
@@ -138,11 +141,18 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
+      // Fetch user content preferences to get followed items for filtering suggestions.
+      final userPreferences = currentUser?.id != null
+          ? await _userContentPreferencesRepository.read(id: currentUser!.id)
+          : null;
+
       // For a major load, use the full decoration pipeline.
       final decorationResult = await _feedDecoratorService.decorateFeed(
         headlines: headlineResponse.items,
         user: currentUser,
         remoteConfig: appConfig,
+        followedTopicIds: userPreferences?.followedTopics.map((t) => t.id).toList() ?? [],
+        followedSourceIds: userPreferences?.followedSources.map((s) => s.id).toList() ?? [],
       );
 
       emit(
@@ -207,10 +217,17 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
+      // Fetch user content preferences to get followed items for filtering suggestions.
+      final userPreferences = currentUser?.id != null
+          ? await _userContentPreferencesRepository.read(id: currentUser!.id)
+          : null;
+
       final decorationResult = await _feedDecoratorService.decorateFeed(
         headlines: headlineResponse.items,
         user: currentUser,
         remoteConfig: appConfig,
+        followedTopicIds: userPreferences?.followedTopics.map((t) => t.id).toList() ?? [],
+        followedSourceIds: userPreferences?.followedSources.map((s) => s.id).toList() ?? [],
       );
 
       emit(
@@ -272,10 +289,17 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
+      // Fetch user content preferences to get followed items for filtering suggestions.
+      final userPreferences = currentUser?.id != null
+          ? await _userContentPreferencesRepository.read(id: currentUser!.id)
+          : null;
+
       final decorationResult = await _feedDecoratorService.decorateFeed(
         headlines: headlineResponse.items,
         user: currentUser,
         remoteConfig: appConfig,
+        followedTopicIds: userPreferences?.followedTopics.map((t) => t.id).toList() ?? [],
+        followedSourceIds: userPreferences?.followedSources.map((s) => s.id).toList() ?? [],
       );
 
       emit(

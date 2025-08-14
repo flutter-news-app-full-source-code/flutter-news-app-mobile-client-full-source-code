@@ -49,6 +49,18 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       _onHeadlinesFeedFiltersCleared,
       transformer: restartable(),
     );
+    on<FeedDecoratorDismissed>(
+      _onFeedDecoratorDismissed,
+      transformer: sequential(),
+    );
+    on<SuggestedItemFollowToggled>(
+      _onSuggestedItemFollowToggled,
+      transformer: sequential(),
+    );
+    on<CallToActionTapped>(
+      _onCallToActionTapped,
+      transformer: sequential(),
+    );
   }
 
   final DataRepository<Headline> _headlinesRepository;
@@ -168,6 +180,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       // If a feed decorator was injected, notify AppBloc to update its status.
       final injectedDecorator = decorationResult.injectedDecorator;
       if (injectedDecorator != null && currentUser?.id != null) {
+        // Notify AppBloc that a decorator was shown, so its status can be persisted.
+        // Safely cast to access decoratorType, as it's guaranteed to be one of these types.
         if (injectedDecorator is CallToActionItem) {
           _appBloc.add(
             AppUserFeedDecoratorShown(
@@ -241,6 +255,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
       final injectedDecorator = decorationResult.injectedDecorator;
       if (injectedDecorator != null && currentUser?.id != null) {
+        // Notify AppBloc that a decorator was shown, so its status can be persisted.
+        // Safely cast to access decoratorType, as it's guaranteed to be one of these types.
         if (injectedDecorator is CallToActionItem) {
           _appBloc.add(
             AppUserFeedDecoratorShown(
@@ -313,6 +329,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
       final injectedDecorator = decorationResult.injectedDecorator;
       if (injectedDecorator != null && currentUser?.id != null) {
+        // Notify AppBloc that a decorator was shown, so its status can be persisted.
+        // Safely cast to access decoratorType, as it's guaranteed to be one of these types.
         if (injectedDecorator is CallToActionItem) {
           _appBloc.add(
             AppUserFeedDecoratorShown(
@@ -332,5 +350,107 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     } on HttpException catch (e) {
       emit(state.copyWith(status: HeadlinesFeedStatus.failure, error: e));
     }
+  }
+
+  /// Handles the dismissal of a feed decorator.
+  ///
+  /// Notifies the [AppBloc] to update the user's feed decorator status,
+  /// marking it as completed so it won't be shown again.
+  Future<void> _onFeedDecoratorDismissed(
+    FeedDecoratorDismissed event,
+    Emitter<HeadlinesFeedState> emit,
+  ) async {
+    final currentUser = _appBloc.state.user;
+    if (currentUser == null) return;
+
+    // Notify AppBloc to mark the decorator as completed for the user.
+    _appBloc.add(
+      AppUserFeedDecoratorShown(
+        userId: currentUser.id,
+        feedDecoratorType: event.feedDecoratorType,
+      ),
+    );
+    // TODO(fulleni): you might want to remove the dismissed decorator from the
+    // current feedItems list in the state to immediately update the UI.
+    // This would require filtering the list and emitting a new state.
+  }
+
+  /// Handles the toggling of follow status for a suggested topic or source.
+  ///
+  /// Updates the user's content preferences in the repository.
+  Future<void> _onSuggestedItemFollowToggled(
+    SuggestedItemFollowToggled event,
+    Emitter<HeadlinesFeedState> emit,
+  ) async {
+    final currentUser = _appBloc.state.user;
+    if (currentUser == null) return;
+
+    try {
+      // Fetch current user preferences
+      final currentPreferences = await _userContentPreferencesRepository.read(
+        id: currentUser.id,
+        userId: currentUser.id,
+      );
+
+      UserContentPreferences updatedPreferences;
+      if (event.item is Topic) {
+        final topic = event.item as Topic;
+        final currentTopics = List<Topic>.from(currentPreferences.followedTopics);
+        if (event.isFollowing) {
+          currentTopics.add(topic);
+        } else {
+          currentTopics.removeWhere((t) => t.id == topic.id);
+        }
+        updatedPreferences = currentPreferences.copyWith(
+          followedTopics: currentTopics,
+        );
+      } else if (event.item is Source) {
+        final source = event.item as Source;
+        final currentSources = List<Source>.from(currentPreferences.followedSources);
+        if (event.isFollowing) {
+          currentSources.add(source);
+        } else {
+          currentSources.removeWhere((s) => s.id == source.id);
+        }
+        updatedPreferences = currentPreferences.copyWith(
+          followedSources: currentSources,
+        );
+      } else {
+        // Should not happen given the event's item type constraint
+        return;
+      }
+
+      // Persist updated preferences
+      await _userContentPreferencesRepository.update(
+        id: updatedPreferences.id,
+        item: updatedPreferences,
+        userId: updatedPreferences.id,
+      );
+
+      // Optionally, refresh the feed to reflect changes in suggestions
+      // (e.g., if a followed item should no longer appear as a suggestion).
+      // add(HeadlinesFeedRefreshRequested());
+    } on HttpException catch (e) {
+      // Handle error, e.g., show a snackbar or log
+      print('Error toggling follow status: $e');
+      // Emit a failure state if necessary, but for a minor interaction,
+      // logging might be sufficient.
+    }
+  }
+
+  /// Handles a tap on a call-to-action decorator.
+  ///
+  /// This typically involves navigating to an external URL or an internal route.
+  /// The BLoC emits a state that the UI can listen to for navigation.
+  Future<void> _onCallToActionTapped(
+    CallToActionTapped event,
+    Emitter<HeadlinesFeedState> emit,
+  ) async {
+    // TODO(fulleni): emit a state that contains the URL
+    // and the UI would then use a package like `url_launcher` to open it.
+    // For now, we'll just print the URL.
+    print('Call to action tapped! Navigating to: ${event.url}');
+    // Example: emit(state.copyWith(navigationUrl: event.url));
+    // The UI would then listen for `navigationUrl` changes and navigate.
   }
 }

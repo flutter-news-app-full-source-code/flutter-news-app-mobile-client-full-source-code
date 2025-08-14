@@ -10,6 +10,7 @@ class HeadlinesFeedState extends Equatable {
     this.cursor,
     this.filter = const HeadlineFilter(),
     this.error,
+    this.navigationUrl,
   });
 
   final HeadlinesFeedStatus status;
@@ -19,6 +20,10 @@ class HeadlinesFeedState extends Equatable {
   final HeadlineFilter filter;
   final HttpException? error;
 
+  /// A URL to navigate to, typically set when a call-to-action is tapped.
+  /// The UI should consume this and then clear it.
+  final String? navigationUrl;
+
   HeadlinesFeedState copyWith({
     HeadlinesFeedStatus? status,
     List<FeedItem>? feedItems,
@@ -26,7 +31,9 @@ class HeadlinesFeedState extends Equatable {
     String? cursor,
     HeadlineFilter? filter,
     HttpException? error,
+    String? navigationUrl,
     bool clearCursor = false,
+    bool clearNavigationUrl = false,
   }) {
     return HeadlinesFeedState(
       status: status ?? this.status,
@@ -35,6 +42,7 @@ class HeadlinesFeedState extends Equatable {
       cursor: clearCursor ? null : cursor ?? this.cursor,
       filter: filter ?? this.filter,
       error: error ?? this.error,
+      navigationUrl: clearNavigationUrl ? null : navigationUrl ?? this.navigationUrl,
     );
   }
 
@@ -46,5 +54,6 @@ class HeadlinesFeedState extends Equatable {
     cursor,
     filter,
     error,
+    navigationUrl,
   ];
 }

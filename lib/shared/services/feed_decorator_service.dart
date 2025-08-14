@@ -95,6 +95,8 @@ class FeedDecoratorService {
     required List<Headline> headlines,
     required User? user,
     required RemoteConfig remoteConfig,
+    required List<String> followedTopicIds,
+    required List<String> followedSourceIds,
   }) async {
     // The final list of items to be returned.
     final feedWithDecorators = <FeedItem>[...headlines];
@@ -114,6 +116,8 @@ class FeedDecoratorService {
         injectedDecorator = await _buildDecoratorItem(
           dueDecoratorType,
           decoratorConfig,
+          followedTopicIds: followedTopicIds,
+          followedSourceIds: followedSourceIds,
         );
 
         if (injectedDecorator != null) {
@@ -226,8 +230,10 @@ class FeedDecoratorService {
   /// (e.g., no items found).
   Future<FeedItem?> _buildDecoratorItem(
     FeedDecoratorType decoratorType,
-    FeedDecoratorConfig decoratorConfig,
-  ) async {
+    FeedDecoratorConfig decoratorConfig, {
+    required List<String> followedTopicIds,
+    required List<String> followedSourceIds,
+  }) async {
     switch (decoratorConfig.category) {
       case FeedDecoratorCategory.callToAction:
         // Ensure the decoratorConfig has the necessary content for CallToAction
@@ -258,6 +264,11 @@ class FeedDecoratorService {
             final topics = await _topicsRepository.readAll(
               pagination: PaginationOptions(limit: itemsToDisplay),
               sort: [const SortOption('name', SortOrder.asc)],
+              filter: {
+                '_id': {
+                  r'$nin': followedTopicIds,
+                },
+              },
             );
             if (topics.items.isEmpty) return null;
             return ContentCollectionItem<Topic>(
@@ -270,6 +281,11 @@ class FeedDecoratorService {
             final sources = await _sourcesRepository.readAll(
               pagination: PaginationOptions(limit: itemsToDisplay),
               sort: [const SortOption('name', SortOrder.asc)],
+              filter: {
+                '_id': {
+                  r'$nin': followedSourceIds,
+                },
+              },
             );
             if (sources.items.isEmpty) return null;
             return ContentCollectionItem<Source>(

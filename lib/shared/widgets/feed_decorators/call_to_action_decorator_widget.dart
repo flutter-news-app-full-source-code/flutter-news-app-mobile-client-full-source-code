@@ -1,5 +1,6 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template call_to_action_decorator_widget}
@@ -28,7 +29,8 @@ class CallToActionDecoratorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    // final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
 
     return Card(

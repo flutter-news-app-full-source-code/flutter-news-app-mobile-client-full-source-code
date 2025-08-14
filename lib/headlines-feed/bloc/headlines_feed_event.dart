@@ -75,26 +75,6 @@ final class FeedDecoratorDismissed extends HeadlinesFeedEvent {
   List<Object> get props => [feedDecoratorType];
 }
 
-/// {@template suggested_item_follow_toggled}
-/// Event triggered when a user toggles the follow status of a suggested item.
-/// {@endtemplate}
-final class SuggestedItemFollowToggled extends HeadlinesFeedEvent {
-  /// {@macro suggested_item_follow_toggled}
-  const SuggestedItemFollowToggled({
-    required this.item,
-    required this.isFollowing,
-  });
-
-  /// The [FeedItem] (Topic or Source) whose follow status was toggled.
-  final FeedItem item;
-
-  /// The new follow status (true if now following, false if now unfollowing).
-  final bool isFollowing;
-
-  @override
-  List<Object> get props => [item, isFollowing];
-}
-
 /// {@template call_to_action_tapped}
 /// Event triggered when a user taps the call-to-action button on a decorator.
 /// {@endtemplate}

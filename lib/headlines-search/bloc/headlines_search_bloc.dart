@@ -19,12 +19,12 @@ class HeadlinesSearchBloc
     required DataRepository<Source> sourceRepository,
     required AppBloc appBloc,
     required FeedDecoratorService feedDecoratorService,
-  })  : _headlinesRepository = headlinesRepository,
-        _topicRepository = topicRepository,
-        _sourceRepository = sourceRepository,
-        _appBloc = appBloc,
-        _feedDecoratorService = feedDecoratorService,
-        super(const HeadlinesSearchInitial()) {
+  }) : _headlinesRepository = headlinesRepository,
+       _topicRepository = topicRepository,
+       _sourceRepository = sourceRepository,
+       _appBloc = appBloc,
+       _feedDecoratorService = feedDecoratorService,
+       super(const HeadlinesSearchInitial()) {
     on<HeadlinesSearchModelTypeChanged>(_onHeadlinesSearchModelTypeChanged);
     on<HeadlinesSearchFetchRequested>(
       _onSearchFetchRequested,

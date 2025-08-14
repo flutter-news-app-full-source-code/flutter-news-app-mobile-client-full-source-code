@@ -51,16 +51,17 @@ class EntityDetailsPage extends StatelessWidget {
           topicsRepository: topicsRepository,
           sourcesRepository: sourcesRepository,
         );
-        final entityDetailsBloc = EntityDetailsBloc(
-          headlinesRepository: context.read<DataRepository<Headline>>(),
-          topicRepository: topicsRepository,
-          sourceRepository: sourcesRepository,
-          accountBloc: context.read<AccountBloc>(),
-          appBloc: context.read<AppBloc>(),
-          feedDecoratorService: feedDecoratorService,
-        )..add(
-            EntityDetailsLoadRequested(
-              entityId: args.entityId,
+        final entityDetailsBloc =
+            EntityDetailsBloc(
+              headlinesRepository: context.read<DataRepository<Headline>>(),
+              topicRepository: topicsRepository,
+              sourceRepository: sourcesRepository,
+              accountBloc: context.read<AccountBloc>(),
+              appBloc: context.read<AppBloc>(),
+              feedDecoratorService: feedDecoratorService,
+            )..add(
+              EntityDetailsLoadRequested(
+                entityId: args.entityId,
                 contentType: args.contentType,
                 entity: args.entity,
               ),

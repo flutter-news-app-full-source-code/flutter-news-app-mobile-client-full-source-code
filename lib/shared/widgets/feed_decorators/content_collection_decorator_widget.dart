@@ -87,7 +87,8 @@ class ContentCollectionDecoratorWidget extends StatelessWidget {
                 itemCount: item.items.length,
                 itemBuilder: (context, index) {
                   final suggestion = item.items[index];
-                  final isFollowing = (suggestion is Topic &&
+                  final isFollowing =
+                      (suggestion is Topic &&
                           followedTopicIds.contains(suggestion.id)) ||
                       (suggestion is Source &&
                           followedSourceIds.contains(suggestion.id));

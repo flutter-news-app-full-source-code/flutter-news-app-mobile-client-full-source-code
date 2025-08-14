@@ -25,7 +25,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   /// Requires repositories and services for its operations.
   HeadlinesFeedBloc({
     required DataRepository<Headline> headlinesRepository,
-    required DataRepository<UserContentPreferences> userContentPreferencesRepository,
+    required DataRepository<UserContentPreferences>
+    userContentPreferencesRepository,
     required FeedDecoratorService feedDecoratorService,
     required AppBloc appBloc,
   }) : _headlinesRepository = headlinesRepository,
@@ -57,18 +58,13 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       _onSuggestedItemFollowToggled,
       transformer: sequential(),
     );
-    on<CallToActionTapped>(
-      _onCallToActionTapped,
-      transformer: sequential(),
-    );
-    on<NavigationHandled>(
-      _onNavigationHandled,
-      transformer: sequential(),
-    );
+    on<CallToActionTapped>(_onCallToActionTapped, transformer: sequential());
+    on<NavigationHandled>(_onNavigationHandled, transformer: sequential());
   }
 
   final DataRepository<Headline> _headlinesRepository;
-  final DataRepository<UserContentPreferences> _userContentPreferencesRepository;
+  final DataRepository<UserContentPreferences>
+  _userContentPreferencesRepository;
   final FeedDecoratorService _feedDecoratorService;
   final AppBloc _appBloc;
 
@@ -167,8 +163,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         headlines: headlineResponse.items,
         user: currentUser,
         remoteConfig: appConfig,
-        followedTopicIds: userPreferences?.followedTopics.map((t) => t.id).toList() ?? [],
-        followedSourceIds: userPreferences?.followedSources.map((s) => s.id).toList() ?? [],
+        followedTopicIds:
+            userPreferences?.followedTopics.map((t) => t.id).toList() ?? [],
+        followedSourceIds:
+            userPreferences?.followedSources.map((s) => s.id).toList() ?? [],
       );
 
       emit(
@@ -244,8 +242,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         headlines: headlineResponse.items,
         user: currentUser,
         remoteConfig: appConfig,
-        followedTopicIds: userPreferences?.followedTopics.map((t) => t.id).toList() ?? [],
-        followedSourceIds: userPreferences?.followedSources.map((s) => s.id).toList() ?? [],
+        followedTopicIds:
+            userPreferences?.followedTopics.map((t) => t.id).toList() ?? [],
+        followedSourceIds:
+            userPreferences?.followedSources.map((s) => s.id).toList() ?? [],
       );
 
       emit(
@@ -318,8 +318,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         headlines: headlineResponse.items,
         user: currentUser,
         remoteConfig: appConfig,
-        followedTopicIds: userPreferences?.followedTopics.map((t) => t.id).toList() ?? [],
-        followedSourceIds: userPreferences?.followedSources.map((s) => s.id).toList() ?? [],
+        followedTopicIds:
+            userPreferences?.followedTopics.map((t) => t.id).toList() ?? [],
+        followedSourceIds:
+            userPreferences?.followedSources.map((s) => s.id).toList() ?? [],
       );
 
       emit(
@@ -410,7 +412,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       UserContentPreferences updatedPreferences;
       if (event.item is Topic) {
         final topic = event.item as Topic;
-        final currentTopics = List<Topic>.from(currentPreferences.followedTopics);
+        final currentTopics = List<Topic>.from(
+          currentPreferences.followedTopics,
+        );
         if (event.isFollowing) {
           currentTopics.add(topic);
         } else {
@@ -421,7 +425,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         );
       } else if (event.item is Source) {
         final source = event.item as Source;
-        final currentSources = List<Source>.from(currentPreferences.followedSources);
+        final currentSources = List<Source>.from(
+          currentPreferences.followedSources,
+        );
         if (event.isFollowing) {
           currentSources.add(source);
         } else {

@@ -21,13 +21,13 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     required AccountBloc accountBloc,
     required AppBloc appBloc,
     required FeedDecoratorService feedDecoratorService,
-  })  : _headlinesRepository = headlinesRepository,
-        _topicRepository = topicRepository,
-        _sourceRepository = sourceRepository,
-        _accountBloc = accountBloc,
-        _appBloc = appBloc,
-        _feedDecoratorService = feedDecoratorService,
-        super(const EntityDetailsState()) {
+  }) : _headlinesRepository = headlinesRepository,
+       _topicRepository = topicRepository,
+       _sourceRepository = sourceRepository,
+       _accountBloc = accountBloc,
+       _appBloc = appBloc,
+       _feedDecoratorService = feedDecoratorService,
+       super(const EntityDetailsState()) {
     on<EntityDetailsLoadRequested>(_onEntityDetailsLoadRequested);
     on<EntityDetailsToggleFollowRequested>(
       _onEntityDetailsToggleFollowRequested,

@@ -78,10 +78,9 @@ class App extends StatelessWidget {
           BlocProvider(
             create: (context) => AppBloc(
               authenticationRepository: context.read<AuthRepository>(),
-              userAppSettingsRepository:
-                  context.read<DataRepository<UserAppSettings>>(),
-              appConfigRepository:
-                  context.read<DataRepository<RemoteConfig>>(),
+              userAppSettingsRepository: context
+                  .read<DataRepository<UserAppSettings>>(),
+              appConfigRepository: context.read<DataRepository<RemoteConfig>>(),
               userRepository: context.read<DataRepository<User>>(),
               environment: _environment,
               demoDataMigrationService: demoDataMigrationService,

@@ -60,8 +60,8 @@ class FeedDecoratorService {
   FeedDecoratorService({
     required DataRepository<Topic> topicsRepository,
     required DataRepository<Source> sourcesRepository,
-  })  : _topicsRepository = topicsRepository,
-        _sourcesRepository = sourcesRepository;
+  }) : _topicsRepository = topicsRepository,
+       _sourcesRepository = sourcesRepository;
 
   final Uuid _uuid = const Uuid();
   final DataRepository<Topic> _topicsRepository;
@@ -111,7 +111,8 @@ class FeedDecoratorService {
     );
 
     if (dueDecoratorType != null) {
-      final decoratorConfig = remoteConfig.feedDecoratorConfig[dueDecoratorType];
+      final decoratorConfig =
+          remoteConfig.feedDecoratorConfig[dueDecoratorType];
       if (decoratorConfig != null) {
         // If a decorator is due, build the full FeedItem object.
         injectedDecorator = await _buildDecoratorItem(
@@ -125,7 +126,10 @@ class FeedDecoratorService {
           // Inject the decorator at a fixed, predictable position.
           // We use `min` to handle cases where the headline list is very short.
           const decoratorInsertionIndex = 3;
-          final safeIndex = min(decoratorInsertionIndex, feedWithDecorators.length);
+          final safeIndex = min(
+            decoratorInsertionIndex,
+            feedWithDecorators.length,
+          );
           feedWithDecorators.insert(safeIndex, injectedDecorator);
         }
       }
@@ -250,8 +254,7 @@ class FeedDecoratorService {
           ),
           FeedDecoratorType.upgrade: (
             title: 'Upgrade to Premium',
-            description:
-                'Unlock unlimited access to all features and content.',
+            description: 'Unlock unlimited access to all features and content.',
             ctaText: 'Upgrade Now',
             ctaUrl: '/upgrade', // Placeholder URL
           ),
@@ -288,9 +291,7 @@ class FeedDecoratorService {
       case FeedDecoratorCategory.contentCollection:
         final itemsToDisplay = decoratorConfig.itemsToDisplay;
         if (itemsToDisplay == null) {
-          throw StateError(
-            'itemsToDisplay must be set for contentCollection.',
-          );
+          throw StateError('itemsToDisplay must be set for contentCollection.');
         }
         switch (decoratorType) {
           case FeedDecoratorType.suggestedTopics:
@@ -298,9 +299,7 @@ class FeedDecoratorService {
               pagination: PaginationOptions(limit: itemsToDisplay),
               sort: [const SortOption('name', SortOrder.asc)],
               filter: {
-                '_id': {
-                  r'$nin': followedTopicIds,
-                },
+                '_id': {r'$nin': followedTopicIds},
               },
             );
             if (topics.items.isEmpty) return null;
@@ -315,9 +314,7 @@ class FeedDecoratorService {
               pagination: PaginationOptions(limit: itemsToDisplay),
               sort: [const SortOption('name', SortOrder.asc)],
               filter: {
-                '_id': {
-                  r'$nin': followedSourceIds,
-                },
+                '_id': {r'$nin': followedSourceIds},
               },
             );
             if (sources.items.isEmpty) return null;
@@ -330,9 +327,9 @@ class FeedDecoratorService {
           // These types are handled by CallToAction, but must be
           // present in the switch for exhaustiveness.
           case FeedDecoratorType.linkAccount ||
-                FeedDecoratorType.upgrade ||
-                FeedDecoratorType.rateApp ||
-                FeedDecoratorType.enableNotifications:
+              FeedDecoratorType.upgrade ||
+              FeedDecoratorType.rateApp ||
+              FeedDecoratorType.enableNotifications:
             throw StateError(
               'CallToAction decorator type '
               '$decoratorType used in ContentCollection category.',
@@ -352,14 +349,18 @@ class FeedDecoratorService {
 
     // Determine ad frequency rules based on user role.
     final (adFrequency, adPlacementInterval) = switch (userRole) {
-      AppUserRole.guestUser =>
-        (adConfig.guestAdFrequency, adConfig.guestAdPlacementInterval),
+      AppUserRole.guestUser => (
+        adConfig.guestAdFrequency,
+        adConfig.guestAdPlacementInterval,
+      ),
       AppUserRole.standardUser => (
-          adConfig.authenticatedAdFrequency,
-          adConfig.authenticatedAdPlacementInterval
-        ),
-      AppUserRole.premiumUser =>
-        (adConfig.premiumAdFrequency, adConfig.premiumAdPlacementInterval),
+        adConfig.authenticatedAdFrequency,
+        adConfig.authenticatedAdPlacementInterval,
+      ),
+      AppUserRole.premiumUser => (
+        adConfig.premiumAdFrequency,
+        adConfig.premiumAdPlacementInterval,
+      ),
     };
 
     // If ad frequency is zero or less, no ads should be injected.

@@ -42,7 +42,9 @@ class HeadlinesFeedState extends Equatable {
       cursor: clearCursor ? null : cursor ?? this.cursor,
       filter: filter ?? this.filter,
       error: error ?? this.error,
-      navigationUrl: clearNavigationUrl ? null : navigationUrl ?? this.navigationUrl,
+      navigationUrl: clearNavigationUrl
+          ? null
+          : navigationUrl ?? this.navigationUrl,
     );
   }
 

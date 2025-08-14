@@ -203,10 +203,10 @@ class _EmailLinkFormState extends State<_EmailLinkForm> {
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       context.read<AuthenticationBloc>().add(
-            AuthenticationRequestSignInCodeRequested(
-              email: _emailController.text.trim(),
-            ),
-          );
+        AuthenticationRequestSignInCodeRequested(
+          email: _emailController.text.trim(),
+        ),
+      );
     }
   }
 
@@ -247,13 +247,15 @@ class _EmailLinkFormState extends State<_EmailLinkForm> {
                 }
                 return null;
               },
-              onFieldSubmitted:
-                  widget.isLoading || _cooldownSeconds > 0 ? null : (_) => _submitForm(),
+              onFieldSubmitted: widget.isLoading || _cooldownSeconds > 0
+                  ? null
+                  : (_) => _submitForm(),
             ),
             const SizedBox(height: AppSpacing.lg),
             ElevatedButton(
-              onPressed:
-                  widget.isLoading || _cooldownSeconds > 0 ? null : _submitForm,
+              onPressed: widget.isLoading || _cooldownSeconds > 0
+                  ? null
+                  : _submitForm,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                 textStyle: textTheme.labelLarge,
@@ -268,12 +270,8 @@ class _EmailLinkFormState extends State<_EmailLinkForm> {
                       ),
                     )
                   : _cooldownSeconds > 0
-                      ? Text(
-                          l10n.requestCodeResendButtonCooldown(
-                            _cooldownSeconds,
-                          ),
-                        )
-                      : Text(l10n.requestCodeSendCodeButton),
+                  ? Text(l10n.requestCodeResendButtonCooldown(_cooldownSeconds))
+                  : Text(l10n.requestCodeSendCodeButton),
             ),
           ],
         ),

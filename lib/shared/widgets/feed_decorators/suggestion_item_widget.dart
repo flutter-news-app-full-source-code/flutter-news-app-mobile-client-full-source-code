@@ -1,5 +1,6 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template suggestion_item_widget}
@@ -29,7 +30,7 @@ class SuggestionItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
 
     String imageUrl;
@@ -40,7 +41,8 @@ class SuggestionItemWidget extends StatelessWidget {
       name = topic.name;
     } else if (item is Source) {
       final source = item as Source;
-      imageUrl = ''; // TODO(fulleni): add image to teh source model.
+      // TODO(fulleni): Add imageUrl to the Source model for a richer UI.
+      imageUrl = '';
       name = source.name;
     } else {
       // Fallback for unexpected types, though type checking should prevent this
@@ -78,7 +80,8 @@ class SuggestionItemWidget extends StatelessWidget {
                         ),
                       )
                     : Icon(
-                        Icons.category, // Default icon if no image
+                        // Use a more specific icon for sources as a fallback.
+                        item is Source ? Icons.source : Icons.category,
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
               ),

@@ -9,6 +9,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/b
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/shared.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_decorators/call_to_action_decorator_widget.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_decorators/content_collection_decorator_widget.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -192,10 +194,8 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                 if (index < state.feedItems.length - 1) {
                   final currentItem = state.feedItems[index];
                   final nextItem = state.feedItems[index + 1];
-                  if ((currentItem is Headline &&
-                          (nextItem is Ad || nextItem is FeedAction)) ||
-                      ((currentItem is Ad || currentItem is FeedAction) &&
-                          nextItem is Headline)) {
+                  // Adjust spacing around any decorator or ad
+                  if (currentItem is! Headline || nextItem is! Headline) {
                     return const SizedBox(height: AppSpacing.md);
                   }
                 }
@@ -290,49 +290,55 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                       ),
                     ),
                   );
-                } else if (item is FeedAction) {
-                  return Card(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.paddingMedium,
-                      vertical: AppSpacing.xs,
-                    ),
-                    color: colorScheme.secondaryContainer,
-                    child: ListTile(
-                      leading: Icon(
-                        item.feedActionType == FeedActionType.linkAccount
-                            ? Icons.link
-                            : Icons.upgrade,
-                        color: colorScheme.onSecondaryContainer,
-                      ),
-                      title: Text(
-                        item.title,
-                        style: textTheme.titleMedium?.copyWith(
-                          color: colorScheme.onSecondaryContainer,
-                          fontWeight: FontWeight.bold,
+                } else if (item is CallToActionItem) {
+                  return CallToActionDecoratorWidget(
+                    item: item,
+                    onCallToAction: (url) {
+                      context.read<HeadlinesFeedBloc>().add(
+                        CallToActionTapped(url: url),
+                      );
+                    },
+                    onDismiss: (decoratorType) {
+                      context.read<HeadlinesFeedBloc>().add(
+                        FeedDecoratorDismissed(
+                          feedDecoratorType: decoratorType,
                         ),
-                      ),
-                      subtitle: Text(
-                        item.description,
-                        style: textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSecondaryContainer.withOpacity(
-                            0.8,
-                          ),
+                      );
+                    },
+                  );
+                } else if (item is ContentCollectionItem) {
+                  final userState = context.watch<AppBloc>().state;
+                  final followedTopicIds = userState.user?.feedDecoratorStatus
+                      .keys
+                      .whereType<Topic>()
+                      .map((t) => t.id)
+                      .toList() ??
+                      [];
+                  final followedSourceIds = userState.user?.feedDecoratorStatus
+                      .keys
+                      .whereType<Source>()
+                      .map((s) => s.id)
+                      .toList() ??
+                      [];
+
+                  return ContentCollectionDecoratorWidget(
+                    item: item,
+                    followedTopicIds: followedTopicIds,
+                    followedSourceIds: followedSourceIds,
+                    onFollowToggle: (toggledItem) {
+                      // TODO(fulleni): This requires more complex logic to determine the new
+                      // `isFollowing` state, which is best handled in the BLoC.
+                      // For now, we can pass a simplified event.
+                      // A more robust implementation might pass the current
+                      // `isFollowing` state from the widget.
+                    },
+                    onDismiss: (decoratorType) {
+                      context.read<HeadlinesFeedBloc>().add(
+                        FeedDecoratorDismissed(
+                          feedDecoratorType: decoratorType,
                         ),
-                      ),
-                      trailing: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colorScheme.secondary,
-                          foregroundColor: colorScheme.onSecondary,
-                        ),
-                        onPressed: () {
-                          if (item.callToActionUrl.isNotEmpty) {
-                            context.push(item.callToActionUrl);
-                          }
-                        },
-                        child: Text(item.callToActionText),
-                      ),
-                      isThreeLine: item.description.length > 50,
-                    ),
+                      );
+                    },
                   );
                 }
                 return const SizedBox.shrink();

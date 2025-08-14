@@ -1,8 +1,8 @@
 import 'dart:math';
 
 import 'package:core/core.dart';
-import 'package:uuid/uuid.dart';
 import 'package:data_repository/data_repository.dart';
+import 'package:uuid/uuid.dart';
 
 /// A result object returned by the [FeedDecoratorService].
 ///
@@ -363,13 +363,35 @@ class FeedDecoratorService {
   ///
   /// In a real scenario, this would fetch from an ad network SDK.
   Ad? _getAdToInject() {
-    return Ad(
-      id: _uuid.v4(),
-      imageUrl:
-          'https://via.placeholder.com/300x100.png/000000/FFFFFF?Text=Native+Placeholder+Ad',
-      targetUrl: 'https://example.com/adtarget',
-      adType: AdType.native,
-      placement: AdPlacement.feedInlineNativeBanner,
-    );
+    // A small, predefined list of mock ads to simulate variety.
+    final mockAds = <Ad>[
+      Ad(
+        id: _uuid.v4(),
+        imageUrl:
+            'https://via.placeholder.com/300x100.png/0000FF/FFFFFF?Text=Tech+Gadget+Ad',
+        targetUrl: 'https://example.com/ad-tech',
+        adType: AdType.native,
+        placement: AdPlacement.feedInlineNativeBanner,
+      ),
+      Ad(
+        id: _uuid.v4(),
+        imageUrl:
+            'https://via.placeholder.com/300x100.png/FF0000/FFFFFF?Text=Fashion+Sale+Ad',
+        targetUrl: 'https://example.com/ad-fashion',
+        adType: AdType.banner,
+        placement: AdPlacement.feedInlineStandardBanner,
+      ),
+      Ad(
+        id: _uuid.v4(),
+        imageUrl:
+            'https://via.placeholder.com/300x100.png/008000/FFFFFF?Text=Travel+Deals+Ad',
+        targetUrl: 'https://example.com/ad-travel',
+        adType: AdType.native,
+        placement: AdPlacement.feedInlineNativeBanner,
+      ),
+    ];
+
+    // Return a random ad from the list.
+    return mockAds[Random().nextInt(mockAds.length)];
   }
 }

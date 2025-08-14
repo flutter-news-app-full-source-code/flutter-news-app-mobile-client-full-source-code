@@ -67,6 +67,11 @@ class FeedDecoratorService {
   final DataRepository<Topic> _topicsRepository;
   final DataRepository<Source> _sourcesRepository;
 
+  // The zero-based index in the feed where the decorator will be inserted.
+  // A value of 3 places it after the third headline, which is a common
+  // position for in-feed promotional content.
+  static const _decoratorInsertionIndex = 3;
+
   // Defines the static priority for each feed decorator. A lower number is a
   // higher priority. This list determines which decorator is chosen when
   // multiple decorators are "due" at the same time.
@@ -125,9 +130,8 @@ class FeedDecoratorService {
         if (injectedDecorator != null) {
           // Inject the decorator at a fixed, predictable position.
           // We use `min` to handle cases where the headline list is very short.
-          const decoratorInsertionIndex = 3;
           final safeIndex = min(
-            decoratorInsertionIndex,
+            _decoratorInsertionIndex,
             feedWithDecorators.length,
           );
           feedWithDecorators.insert(safeIndex, injectedDecorator);

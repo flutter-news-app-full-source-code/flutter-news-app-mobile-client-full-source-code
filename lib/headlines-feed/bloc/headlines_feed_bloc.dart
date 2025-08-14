@@ -374,6 +374,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       AppUserFeedDecoratorShown(
         userId: currentUser.id,
         feedDecoratorType: event.feedDecoratorType,
+        isCompleted: true,
       ),
     );
     // Remove the dismissed decorator from the current feedItems list to

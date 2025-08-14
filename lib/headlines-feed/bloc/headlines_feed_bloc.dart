@@ -442,9 +442,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         userId: updatedPreferences.id,
       );
 
-      // Optionally, refresh the feed to reflect changes in suggestions
-      // (e.g., if a followed item should no longer appear as a suggestion).
-      // add(HeadlinesFeedRefreshRequested());
+      // After persisting the change, emit a state copy to trigger a UI
+      // rebuild. The UI will then get the latest follow status from the
+      // updated AccountBloc state.
+      emit(state.copyWith());
     } on HttpException catch (e) {
       // Handle error, e.g., show a snackbar or log
       print('Error toggling follow status: $e');

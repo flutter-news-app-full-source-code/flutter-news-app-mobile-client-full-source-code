@@ -60,3 +60,51 @@ final class HeadlinesFeedFiltersApplied extends HeadlinesFeedEvent {
 /// and view the unfiltered headlines feed.
 /// {@endtemplate}
 final class HeadlinesFeedFiltersCleared extends HeadlinesFeedEvent {}
+
+/// {@template feed_decorator_dismissed}
+/// Event triggered when a user dismisses a feed decorator.
+/// {@endtemplate}
+final class FeedDecoratorDismissed extends HeadlinesFeedEvent {
+  /// {@macro feed_decorator_dismissed}
+  const FeedDecoratorDismissed({required this.feedDecoratorType});
+
+  /// The type of the decorator that was dismissed.
+  final FeedDecoratorType feedDecoratorType;
+
+  @override
+  List<Object> get props => [feedDecoratorType];
+}
+
+/// {@template suggested_item_follow_toggled}
+/// Event triggered when a user toggles the follow status of a suggested item.
+/// {@endtemplate}
+final class SuggestedItemFollowToggled extends HeadlinesFeedEvent {
+  /// {@macro suggested_item_follow_toggled}
+  const SuggestedItemFollowToggled({
+    required this.item,
+    required this.isFollowing,
+  });
+
+  /// The [FeedItem] (Topic or Source) whose follow status was toggled.
+  final FeedItem item;
+
+  /// The new follow status (true if now following, false if now unfollowing).
+  final bool isFollowing;
+
+  @override
+  List<Object> get props => [item, isFollowing];
+}
+
+/// {@template call_to_action_tapped}
+/// Event triggered when a user taps the call-to-action button on a decorator.
+/// {@endtemplate}
+final class CallToActionTapped extends HeadlinesFeedEvent {
+  /// {@macro call_to_action_tapped}
+  const CallToActionTapped({required this.url});
+
+  /// The URL associated with the call-to-action.
+  final String url;
+
+  @override
+  List<Object> get props => [url];
+}

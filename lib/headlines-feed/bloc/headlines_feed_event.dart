@@ -108,3 +108,9 @@ final class CallToActionTapped extends HeadlinesFeedEvent {
   @override
   List<Object> get props => [url];
 }
+
+/// {@template navigation_handled}
+/// Event triggered after a navigation action has been handled by the UI.
+/// This is used to clear the navigationUrl from the state.
+/// {@endtemplate}
+final class NavigationHandled extends HeadlinesFeedEvent {}

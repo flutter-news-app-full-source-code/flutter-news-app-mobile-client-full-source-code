@@ -87,9 +87,11 @@ class AppUserFeedDecoratorShown extends AppEvent {
   const AppUserFeedDecoratorShown({
     required this.userId,
     required this.feedDecoratorType,
+    this.isCompleted = false,
   });
   final String userId;
   final FeedDecoratorType feedDecoratorType;
+  final bool isCompleted;
   @override
-  List<Object> get props => [userId, feedDecoratorType];
+  List<Object> get props => [userId, feedDecoratorType, isCompleted];
 }

@@ -339,26 +339,29 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                       followedSourceIds: followedSourceIds,
                       onFollowToggle: (toggledItem) {
                         // Determine the current following status to toggle it.
+                        // ignore: unused_local_variable
                         final bool isCurrentlyFollowing;
                         if (toggledItem is Topic) {
                           isCurrentlyFollowing = followedTopicIds.contains(
                             toggledItem.id,
                           );
+                          context.read<AccountBloc>().add(
+                            AccountFollowTopicToggled(
+                              topic: toggledItem,
+                            ),
+                          );
                         } else if (toggledItem is Source) {
                           isCurrentlyFollowing = followedSourceIds.contains(
                             toggledItem.id,
                           );
+                          context.read<AccountBloc>().add(
+                            AccountFollowSourceToggled(
+                              source: toggledItem,
+                            ),
+                          );
                         } else {
                           return; // Should not happen
                         }
-
-                        // Dispatch the event with the NEW following status.
-                        context.read<HeadlinesFeedBloc>().add(
-                          SuggestedItemFollowToggled(
-                            item: toggledItem,
-                            isFollowing: !isCurrentlyFollowing,
-                          ),
-                        );
                       },
                       onDismiss: (decoratorType) {
                         context.read<HeadlinesFeedBloc>().add(

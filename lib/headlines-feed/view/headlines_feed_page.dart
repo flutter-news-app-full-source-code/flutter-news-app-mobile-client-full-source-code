@@ -346,18 +346,14 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                             toggledItem.id,
                           );
                           context.read<AccountBloc>().add(
-                            AccountFollowTopicToggled(
-                              topic: toggledItem,
-                            ),
+                            AccountFollowTopicToggled(topic: toggledItem),
                           );
                         } else if (toggledItem is Source) {
                           isCurrentlyFollowing = followedSourceIds.contains(
                             toggledItem.id,
                           );
                           context.read<AccountBloc>().add(
-                            AccountFollowSourceToggled(
-                              source: toggledItem,
-                            ),
+                            AccountFollowSourceToggled(source: toggledItem),
                           );
                         } else {
                           return; // Should not happen

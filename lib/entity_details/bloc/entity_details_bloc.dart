@@ -212,7 +212,10 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         feedItems: headlineResponse.items,
         user: currentUser,
         adConfig: remoteConfig.adConfig,
-        currentFeedItemCount: state.feedItems.length,
+        // Calculate the count of actual content items (headlines) already in the
+        // feed. This is crucial for the FeedDecoratorService to correctly apply
+        // ad placement rules across paginated loads.
+        processedContentItemCount: state.feedItems.whereType<Headline>().length,
       );
 
       emit(

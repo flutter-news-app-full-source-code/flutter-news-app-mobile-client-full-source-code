@@ -619,6 +619,10 @@
     "@searchHintTextHeadline": {
         "description": "Hint text for searching headlines"
     },
+    "searchHintTextGeneric": "Search...",
+    "@searchHintTextGeneric": {
+        "description": "Generic hint text for search input fields"
+    },
     "searchHintTextCategory": "e.g., Technology, Sports, Finance...",
     "@searchHintTextCategory": {
         "description": "Hint text for searching categories"

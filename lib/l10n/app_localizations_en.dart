@@ -489,6 +489,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchHintTextHeadline => 'e.g., AI advancements, Mars rover...';
 
   @override
+  String get searchHintTextGeneric => 'Search...';
+
+  @override
   String get searchHintTextCategory => 'e.g., Technology, Sports, Finance...';
 
   @override

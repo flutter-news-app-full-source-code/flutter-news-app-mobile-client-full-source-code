@@ -112,7 +112,11 @@ class HeadlinesSearchBloc
                 feedItems: headlines,
                 user: currentUser,
                 adConfig: appConfig.adConfig,
-                currentFeedItemCount: successState.items.length,
+                // Calculate the count of actual content items (headlines) already in the
+                // feed. This is crucial for the FeedDecoratorService to correctly apply
+                // ad placement rules across paginated loads.
+                processedContentItemCount:
+                    successState.items.whereType<Headline>().length,
               );
               emit(
                 successState.copyWith(

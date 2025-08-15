@@ -153,6 +153,20 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
         ),
         body: BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
           builder: (context, state) {
+            // Access the AppBloc to check for remoteConfig availability.
+            final appBlocState = context.watch<AppBloc>().state;
+
+            // If remoteConfig is not yet loaded, show a loading indicator.
+            // This handles the brief period after authentication but before
+            // the remote config is fetched, preventing null access errors.
+            if (appBlocState.remoteConfig == null) {
+              return LoadingStateWidget(
+                icon: Icons.settings_applications_outlined,
+                headline: l10n.headlinesFeedLoadingHeadline,
+                subheadline: l10n.pleaseWait,
+              );
+            }
+
             if (state.status == HeadlinesFeedStatus.initial ||
                 (state.status == HeadlinesFeedStatus.loading &&
                     state.feedItems.isEmpty)) {
@@ -175,14 +189,24 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
 
             if (state.status == HeadlinesFeedStatus.success &&
                 state.feedItems.isEmpty) {
-              return FailureStateWidget(
-                exception: const UnknownException(
-                  'No headlines found matching your criteria.',
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    InitialStateWidget(
+                      icon: Icons.search_off,
+                      headline: l10n.headlinesFeedEmptyFilteredHeadline,
+                      subheadline: l10n.headlinesFeedEmptyFilteredSubheadline,
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    ElevatedButton(
+                      onPressed: () => context.read<HeadlinesFeedBloc>().add(
+                        HeadlinesFeedFiltersCleared(),
+                      ),
+                      child: Text(l10n.headlinesFeedClearFiltersButton),
+                    ),
+                  ],
                 ),
-                onRetry: () => context.read<HeadlinesFeedBloc>().add(
-                  HeadlinesFeedFiltersCleared(),
-                ),
-                retryButtonText: l10n.headlinesFeedClearFiltersButton,
               );
             }
 

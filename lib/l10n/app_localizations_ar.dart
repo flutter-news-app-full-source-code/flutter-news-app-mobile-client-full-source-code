@@ -488,6 +488,9 @@ class AppLocalizationsAr extends AppLocalizations {
       'مثال: تطورات الذكاء الاصطناعي, مركبة المريخ...';
 
   @override
+  String get searchHintTextGeneric => 'بحث...';
+
+  @override
   String get searchHintTextCategory => 'مثال: تكنولوجيا, رياضة, مالية...';
 
   @override

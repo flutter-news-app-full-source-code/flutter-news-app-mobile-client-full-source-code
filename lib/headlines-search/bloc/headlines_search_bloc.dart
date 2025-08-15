@@ -112,7 +112,7 @@ class HeadlinesSearchBloc
                 feedItems: headlines,
                 user: currentUser,
                 adConfig: appConfig.adConfig,
-                currentFeedItemCount: successState.items.length,
+                processedContentItemCount: successState.items.length,
               );
               emit(
                 successState.copyWith(

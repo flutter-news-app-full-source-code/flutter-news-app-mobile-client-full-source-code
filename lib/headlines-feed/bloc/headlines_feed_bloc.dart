@@ -113,7 +113,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         feedItems: headlineResponse.items,
         user: currentUser,
         adConfig: remoteConfig.adConfig,
-        currentFeedItemCount: state.feedItems.length,
+        processedContentItemCount: state.feedItems.length,
       );
 
       emit(

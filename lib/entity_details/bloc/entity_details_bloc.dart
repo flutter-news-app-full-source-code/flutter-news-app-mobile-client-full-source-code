@@ -212,7 +212,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         feedItems: headlineResponse.items,
         user: currentUser,
         adConfig: remoteConfig.adConfig,
-        currentFeedItemCount: state.feedItems.length,
+        processedContentItemCount: state.feedItems.length,
       );
 
       emit(

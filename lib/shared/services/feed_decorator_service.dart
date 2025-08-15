@@ -165,13 +165,13 @@ class FeedDecoratorService {
     required List<FeedItem> feedItems,
     required User? user,
     required AdConfig adConfig,
-    int currentFeedItemCount = 0,
+    int processedContentItemCount = 0,
   }) {
     return _injectAds(
       feedItems: feedItems,
       user: user,
       adConfig: adConfig,
-      currentFeedItemCount: currentFeedItemCount,
+      processedContentItemCount: processedContentItemCount,
     );
   }
 
@@ -343,12 +343,26 @@ class FeedDecoratorService {
     }
   }
 
-  /// Injects ads into a list of feed items based on frequency rules.
+  /// Injects ads into a list of [FeedItem]s based on frequency rules.
+  ///
+  /// This method ensures that ads are placed according to the `adPlacementInterval`
+  /// (initial buffer before the first ad) and `adFrequency` (subsequent ad spacing).
+  /// It correctly accounts for content items only, ignoring previously injected ads
+  /// when calculating placement.
+  ///
+  /// [feedItems]: The list of feed items (headlines, decorators) to inject ads into.
+  /// [user]: The current authenticated user, used to determine ad configuration.
+  /// [adConfig]: The remote configuration for ad display rules.
+  /// [processedContentItemCount]: The count of *content items* (non-ad, non-decorator)
+  ///   that have already been processed in previous feed loads/pages. This is
+  ///   crucial for maintaining correct ad placement across pagination.
+  ///
+  /// Returns a new list of [FeedItem] objects, interspersed with ads.
   List<FeedItem> _injectAds({
     required List<FeedItem> feedItems,
     required User? user,
     required AdConfig adConfig,
-    int currentFeedItemCount = 0,
+    int processedContentItemCount = 0,
   }) {
     final userRole = user?.appRole ?? AppUserRole.guestUser;
 
@@ -374,21 +388,31 @@ class FeedDecoratorService {
     }
 
     final result = <FeedItem>[];
-    var headlinesInBatch = 0;
+    // This counter tracks the absolute number of *content items* (headlines,
+    // topics, sources, countries) processed so far, including those from
+    // previous pages. This is key for accurate ad placement.
+    var currentContentItemCount = processedContentItemCount;
 
     for (final item in feedItems) {
       result.add(item);
-      headlinesInBatch++;
 
-      // Calculate the total number of items processed so far, including
-      // those from previous pages.
-      final totalItemsSoFar = currentFeedItemCount + result.length;
+      // Only increment the content item counter if the current item is
+      // a primary content type (not an ad or a decorator).
+      // This ensures ad placement is based purely on content density.
+      if (item is Headline ||
+          item is Topic ||
+          item is Source ||
+          item is Country) {
+        currentContentItemCount++;
+      }
 
-      // Check if an ad should be injected.
-      // The total number of items must be past the initial placement interval,
-      // AND the number of content items in this batch must meet the frequency.
-      if (totalItemsSoFar >= adPlacementInterval &&
-          headlinesInBatch % adFrequency == 0) {
+      // Check if an ad should be injected at the current position.
+      // An ad is injected if:
+      // 1. We have passed the initial placement interval.
+      // 2. The number of content items *after* the initial interval is a
+      //    multiple of the ad frequency.
+      if (currentContentItemCount > adPlacementInterval &&
+          (currentContentItemCount - adPlacementInterval) % adFrequency == 0) {
         final adToInject = _getAdToInject();
         if (adToInject != null) {
           result.add(adToInject);

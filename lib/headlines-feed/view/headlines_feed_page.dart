@@ -175,14 +175,24 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
 
             if (state.status == HeadlinesFeedStatus.success &&
                 state.feedItems.isEmpty) {
-              return FailureStateWidget(
-                exception: const UnknownException(
-                  'No headlines found matching your criteria.',
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    InitialStateWidget(
+                      icon: Icons.search_off,
+                      headline: l10n.headlinesFeedEmptyFilteredHeadline,
+                      subheadline: l10n.headlinesFeedEmptyFilteredSubheadline,
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    ElevatedButton(
+                      onPressed: () => context.read<HeadlinesFeedBloc>().add(
+                            HeadlinesFeedFiltersCleared(),
+                          ),
+                      child: Text(l10n.headlinesFeedClearFiltersButton),
+                    ),
+                  ],
                 ),
-                onRetry: () => context.read<HeadlinesFeedBloc>().add(
-                  HeadlinesFeedFiltersCleared(),
-                ),
-                retryButtonText: l10n.headlinesFeedClearFiltersButton,
               );
             }
 

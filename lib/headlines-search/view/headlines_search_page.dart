@@ -187,8 +187,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                 controller: _textController,
                 style: appBarTheme.titleTextStyle ?? textTheme.titleMedium,
                 decoration: InputDecoration(
-                  // TODO(fulleni): Create a similar localization extension for hint text.
-                  hintText: 'Search...',
+                  hintText: l10n.searchHintTextGeneric,
                   hintStyle: textTheme.bodyMedium?.copyWith(
                     color:
                         (appBarTheme.titleTextStyle?.color ??

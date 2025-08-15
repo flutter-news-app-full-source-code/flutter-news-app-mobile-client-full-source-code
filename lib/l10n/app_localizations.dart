@@ -998,6 +998,12 @@ abstract class AppLocalizations {
   /// **'e.g., AI advancements, Mars rover...'**
   String get searchHintTextHeadline;
 
+  /// Generic hint text for search input fields
+  ///
+  /// In en, this message translates to:
+  /// **'Search...'**
+  String get searchHintTextGeneric;
+
   /// Hint text for searching categories
   ///
   /// In en, this message translates to:

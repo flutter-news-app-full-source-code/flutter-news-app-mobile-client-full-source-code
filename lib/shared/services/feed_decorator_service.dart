@@ -411,7 +411,7 @@ class FeedDecoratorService {
       // 1. We have passed the initial placement interval.
       // 2. The number of content items *after* the initial interval is a
       //    multiple of the ad frequency.
-      if (currentContentItemCount > adPlacementInterval &&
+      if (currentContentItemCount >= adPlacementInterval &&
           (currentContentItemCount - adPlacementInterval) % adFrequency == 0) {
         final adToInject = _getAdToInject();
         if (adToInject != null) {

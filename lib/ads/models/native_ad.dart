@@ -11,10 +11,7 @@ import 'package:flutter/foundation.dart';
 @immutable
 class NativeAd extends Equatable {
   /// {@macro native_ad}
-  const NativeAd({
-    required this.id,
-    required this.adObject,
-  });
+  const NativeAd({required this.id, required this.adObject});
 
   /// A unique identifier for this specific native ad instance.
   final String id;
@@ -27,8 +24,5 @@ class NativeAd extends Equatable {
   final Object adObject;
 
   @override
-  List<Object?> get props => [
-        id,
-        adObject,
-      ];
+  List<Object?> get props => [id, adObject];
 }

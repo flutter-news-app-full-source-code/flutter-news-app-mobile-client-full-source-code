@@ -17,8 +17,8 @@ class AdService {
   /// Requires an [AdProvider] to be injected, which will be used to
   /// load ads from a specific ad network.
   AdService({required AdProvider adProvider, Logger? logger})
-      : _adProvider = adProvider,
-        _logger = logger ?? Logger('AdService');
+    : _adProvider = adProvider,
+      _logger = logger ?? Logger('AdService');
 
   final AdProvider _adProvider;
   final Logger _logger;

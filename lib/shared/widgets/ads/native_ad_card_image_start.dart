@@ -11,10 +11,7 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class NativeAdCardImageStart extends StatelessWidget {
   /// {@macro native_ad_card_image_start}
-  const NativeAdCardImageStart({
-    required this.nativeAd,
-    super.key,
-  });
+  const NativeAdCardImageStart({required this.nativeAd, super.key});
 
   /// The generic native ad data to display.
   final app_native_ad.NativeAd nativeAd;

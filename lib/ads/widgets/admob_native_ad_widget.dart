@@ -13,10 +13,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
 /// {@endtemplate}
 class AdMobNativeAdWidget extends StatefulWidget {
   /// {@macro admob_native_ad_widget}
-  const AdMobNativeAdWidget({
-    required this.nativeAd,
-    super.key,
-  });
+  const AdMobNativeAdWidget({required this.nativeAd, super.key});
 
   /// The generic native ad data containing the AdMob-specific ad object.
   final app_native_ad.NativeAd nativeAd;

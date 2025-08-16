@@ -12,10 +12,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/nativ
 /// {@endtemplate}
 class AdFeedItem extends FeedItem with EquatableMixin {
   /// {@macro ad_feed_item}
-  const AdFeedItem({
-    required this.id,
-    required this.nativeAd,
-  }) : super(type: 'ad_feed_item');
+  const AdFeedItem({required this.id, required this.nativeAd})
+    : super(type: 'ad_feed_item');
 
   /// A unique identifier for this specific ad instance in the feed.
   ///

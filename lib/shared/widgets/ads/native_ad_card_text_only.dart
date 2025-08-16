@@ -11,10 +11,7 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class NativeAdCardTextOnly extends StatelessWidget {
   /// {@macro native_ad_card_text_only}
-  const NativeAdCardTextOnly({
-    required this.nativeAd,
-    super.key,
-  });
+  const NativeAdCardTextOnly({required this.nativeAd, super.key});
 
   /// The generic native ad data to display.
   final app_native_ad.NativeAd nativeAd;

@@ -1,3 +1,4 @@
+import 'package:core/core.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_feed_item.dart';
 import 'package:logging/logging.dart';
@@ -35,15 +36,18 @@ class AdService {
 
   /// Retrieves a loaded native ad wrapped as an [AdFeedItem].
   ///
-  /// This method delegates the ad loading to the injected [AdProvider].
+  /// This method delegates the ad loading to the injected [AdProvider],
+  /// passing along the desired [imageStyle] to select the correct template.
   /// If an ad is successfully loaded, it's wrapped in an [AdFeedItem]
   /// with a unique ID.
   ///
   /// Returns an [AdFeedItem] if an ad is available, otherwise `null`.
-  Future<AdFeedItem?> getAd() async {
+  Future<AdFeedItem?> getAd({
+    required HeadlineImageStyle imageStyle,
+  }) async {
     _logger.info('Requesting native ad from AdProvider...');
     try {
-      final nativeAd = await _adProvider.loadNativeAd();
+      final nativeAd = await _adProvider.loadNativeAd(imageStyle: imageStyle);
       if (nativeAd != null) {
         _logger.info('Native ad successfully loaded and wrapped.');
         return AdFeedItem(id: _uuid.v4(), nativeAd: nativeAd);

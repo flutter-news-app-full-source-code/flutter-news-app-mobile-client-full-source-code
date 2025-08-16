@@ -157,9 +157,9 @@ class AdMobAdProvider implements AdProvider {
     }
 
     // Map the Google Mobile Ads NativeAd to our generic NativeAd model.
-    // Only the ID and the raw adObject are stored, as per the simplified model.
     return app_native_ad.NativeAd(
       id: _uuid.v4(), // Generate a unique ID for our internal model
+      provider: app_native_ad.AdProviderType.admob, // Set the provider
       adObject: googleNativeAd, // Store the original AdMob object
     );
   }

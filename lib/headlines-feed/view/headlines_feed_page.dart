@@ -5,11 +5,13 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_feed_item.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/shared.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/ads/ad_feed_item_widget.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/feed_core.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_decorators/call_to_action_decorator_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_decorators/content_collection_decorator_widget.dart';
 import 'package:go_router/go_router.dart';
@@ -287,43 +289,16 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                         );
                     }
                     return tile;
-                  } else if (item is Ad) {
-                    return Card(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.paddingMedium,
-                        vertical: AppSpacing.xs,
-                      ),
-                      color: colorScheme.surfaceContainerHighest,
-                      child: Padding(
-                        padding: const EdgeInsets.all(AppSpacing.md),
-                        child: Column(
-                          children: [
-                            if (item.imageUrl.isNotEmpty)
-                              Image.network(
-                                item.imageUrl,
-                                height: 100,
-                                errorBuilder: (ctx, err, st) =>
-                                    const Icon(Icons.broken_image, size: 50),
-                              ),
-                            const SizedBox(height: AppSpacing.sm),
-                            Text(
-                              'Placeholder Ad: ${item.adType}',
-                              style: textTheme.titleSmall,
-                            ),
-                            Text(
-                              'Placement: ${item.placement}',
-                              style: textTheme.bodySmall,
-                            ),
-                            if (item.targetUrl.isNotEmpty)
-                              TextButton(
-                                onPressed: () {
-                                  // TODO(fulleni): Launch URL
-                                },
-                                child: const Text('Visit Advertiser'),
-                              ),
-                          ],
-                        ),
-                      ),
+                  } else if (item is AdFeedItem) {
+                    final imageStyle = context
+                        .watch<AppBloc>()
+                        .state
+                        .settings
+                        .feedPreferences
+                        .headlineImageStyle;
+                    return AdFeedItemWidget(
+                      adFeedItem: item,
+                      headlineImageStyle: imageStyle,
                     );
                   } else if (item is CallToActionItem) {
                     return CallToActionDecoratorWidget(

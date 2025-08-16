@@ -5,6 +5,7 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/headline_filter.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_decorator_service.dart';
@@ -115,6 +116,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         adConfig: remoteConfig.adConfig,
         imageStyle:
             _appBloc.state.settings.feedPreferences.headlineImageStyle,
+        theme: event.theme,
         // Calculate the count of actual content items (headlines) already in the
         // feed. This is crucial for the FeedDecoratorService to correctly apply
         // ad placement rules across paginated loads.
@@ -170,6 +172,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
             userPreferences?.followedSources.map((s) => s.id).toList() ?? [],
         imageStyle:
             _appBloc.state.settings.feedPreferences.headlineImageStyle,
+        theme: event.theme,
       );
 
       emit(
@@ -251,6 +254,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
             userPreferences?.followedSources.map((s) => s.id).toList() ?? [],
         imageStyle:
             _appBloc.state.settings.feedPreferences.headlineImageStyle,
+        theme: event.theme,
       );
 
       emit(
@@ -329,6 +333,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
             userPreferences?.followedSources.map((s) => s.id).toList() ?? [],
         imageStyle:
             _appBloc.state.settings.feedPreferences.headlineImageStyle,
+        theme: event.theme,
       );
 
       emit(

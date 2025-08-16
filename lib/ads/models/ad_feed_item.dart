@@ -1,12 +1,13 @@
 import 'package:core/core.dart';
 import 'package:equatable/equatable.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'
+    as app_native_ad;
 
 /// {@template ad_feed_item}
 /// A [FeedItem] that wraps a loaded native ad object from an ad network SDK.
 ///
-/// This class allows actual, displayable ad objects (like [NativeAd] from
-/// Google Mobile Ads) to be seamlessly integrated into the application's
+/// This class allows actual, displayable ad objects (like [app_native_ad.NativeAd]
+/// from our generic ad model) to be seamlessly integrated into the application's
 /// generic feed structure alongside other content types (e.g., [Headline]).
 /// {@endtemplate}
 class AdFeedItem extends FeedItem with EquatableMixin {
@@ -22,10 +23,10 @@ class AdFeedItem extends FeedItem with EquatableMixin {
   /// the ad within the feed.
   final String id;
 
-  /// The loaded native ad object from the ad network SDK.
+  /// The loaded native ad object, represented by our generic [app_native_ad.NativeAd] model.
   ///
   /// This object contains the actual ad content and is ready for display.
-  final NativeAd nativeAd;
+  final app_native_ad.NativeAd nativeAd;
 
   @override
   List<Object?> get props => [id, nativeAd, type];

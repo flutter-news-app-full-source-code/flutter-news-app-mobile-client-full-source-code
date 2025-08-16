@@ -1,3 +1,4 @@
+import 'package:core/core.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'
     as app_native_ad;
 
@@ -18,11 +19,16 @@ abstract class AdProvider {
   /// It handles any necessary setup for the specific ad network.
   Future<void> initialize();
 
-  /// Loads a native ad.
+  /// Loads a native ad, optionally tailoring it to a specific style.
   ///
   /// Returns a [app_native_ad.NativeAd] object if an ad is successfully loaded,
   /// otherwise returns `null`.
-  Future<app_native_ad.NativeAd?> loadNativeAd();
+  ///
+  /// The [imageStyle] is used to select an appropriate native ad template
+  /// that best matches the visual density of the surrounding content.
+  Future<app_native_ad.NativeAd?> loadNativeAd({
+    required HeadlineImageStyle imageStyle,
+  });
 
   // Future methods for other ad types (e.g., interstitial, banner)
   // can be added here as needed in the future.

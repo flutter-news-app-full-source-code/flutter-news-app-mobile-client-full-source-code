@@ -14,6 +14,7 @@ abstract class EntityDetailsEvent extends Equatable {
 /// or an [entityId] and its corresponding [contentType].
 class EntityDetailsLoadRequested extends EntityDetailsEvent {
   const EntityDetailsLoadRequested({
+    required this.theme,
     this.entityId,
     this.contentType,
     this.entity,
@@ -30,6 +31,9 @@ class EntityDetailsLoadRequested extends EntityDetailsEvent {
 
   /// The full entity object, if already available.
   final FeedItem? entity;
+
+  /// The current theme data, required for ad injection.
+  final ThemeData theme;
 
   @override
   List<Object?> get props => [entityId, contentType, entity];

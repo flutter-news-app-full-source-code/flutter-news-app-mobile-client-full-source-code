@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:core/core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'
     as app_native_ad;
 import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
 import 'package:logging/logging.dart';
+import 'package:ui_kit/ui_kit.dart';
 import 'package:uuid/uuid.dart';
 
 /// {@template admob_ad_provider}
@@ -73,7 +75,9 @@ class AdMobAdProvider implements AdProvider {
   }
 
   @override
-  Future<app_native_ad.NativeAd?> loadNativeAd() async {
+  Future<app_native_ad.NativeAd?> loadNativeAd({
+    required HeadlineImageStyle imageStyle,
+  }) async {
     if (_nativeAdUnitId.isEmpty) {
       _logger.warning('No native ad unit ID configured for this platform.');
       return null;
@@ -81,12 +85,27 @@ class AdMobAdProvider implements AdProvider {
 
     _logger.info('Attempting to load native ad from unit ID: $_nativeAdUnitId');
 
+    final templateType = switch (imageStyle) {
+      HeadlineImageStyle.largeThumbnail => admob.TemplateType.medium,
+      _ => admob.TemplateType.small,
+    };
+
     final completer = Completer<admob.NativeAd?>();
 
     final ad = admob.NativeAd(
       adUnitId: _nativeAdUnitId,
-      factoryId: 'listTile', // This ID must match a factory in your native code
       request: const admob.AdRequest(),
+      // Use the NativeTemplateStyle API instead of a factoryId.
+      nativeTemplateStyle: admob.NativeTemplateStyle(
+        templateType: templateType,
+        // TODO(fulleni): Customize the ad's style to match the app's theme.
+        // These values can be expanded based on the app's ThemeData.
+        cornerRadius: AppSpacing.sm, // 8.0
+        // Example of text styling (can be tied to the app's text theme)
+        primaryTextStyle: admob.NativeTemplateTextStyle(
+          style: admob.NativeTemplateFontStyle.bold,
+        ),
+      ),
       listener: admob.NativeAdListener(
         onAdLoaded: (ad) {
           _logger.info('Native Ad loaded successfully.');

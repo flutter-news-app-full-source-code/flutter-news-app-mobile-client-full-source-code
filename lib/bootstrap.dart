@@ -281,6 +281,6 @@ Future<Widget> bootstrap(
     kvStorageService: kvStorage,
     environment: environment,
     demoDataMigrationService: demoDataMigrationService,
-    adService: adService, // Provide the AdService
+    adService: adService,
   );
 }

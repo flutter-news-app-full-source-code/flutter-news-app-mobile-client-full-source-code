@@ -273,7 +273,7 @@ Future<Widget> bootstrap(
     headlinesRepository: headlinesRepository,
     topicsRepository: topicsRepository,
     countriesRepository: countriesRepository,
-    sourcesRepository: sourcesClient,
+    sourcesRepository: sourcesRepository,
     userAppSettingsRepository: userAppSettingsRepository,
     userContentPreferencesRepository: userContentPreferencesRepository,
     remoteConfigRepository: remoteConfigRepository,

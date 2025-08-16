@@ -20,14 +20,17 @@ final class HeadlinesFeedFetchRequested extends HeadlinesFeedEvent {
   ///
   /// Optionally includes a [cursor] to fetch the next page. If [cursor] is null,
   /// it typically indicates an initial fetch request.
-  const HeadlinesFeedFetchRequested({this.cursor});
+  const HeadlinesFeedFetchRequested({required this.theme, this.cursor});
 
   /// The cursor indicating the starting point for the next page of headlines.
   /// If null, fetches the first page.
   final String? cursor;
 
+  /// The current theme data of the application.
+  final ThemeData theme;
+
   @override
-  List<Object?> get props => [cursor];
+  List<Object?> get props => [cursor, theme];
 }
 
 /// {@template headlines_feed_refresh_requested}
@@ -35,7 +38,15 @@ final class HeadlinesFeedFetchRequested extends HeadlinesFeedEvent {
 /// (e.g., via pull-to-refresh). This should fetch the first page using the
 /// currently active filters.
 /// {@endtemplate}
-final class HeadlinesFeedRefreshRequested extends HeadlinesFeedEvent {}
+final class HeadlinesFeedRefreshRequested extends HeadlinesFeedEvent {
+  const HeadlinesFeedRefreshRequested({required this.theme});
+
+  /// The current theme data of the application.
+  final ThemeData theme;
+
+  @override
+  List<Object> get props => [theme];
+}
 
 /// {@template headlines_feed_filters_applied}
 /// Event triggered when a new set of filters, selected by the user,
@@ -45,21 +56,35 @@ final class HeadlinesFeedFiltersApplied extends HeadlinesFeedEvent {
   /// {@macro headlines_feed_filters_applied}
   ///
   /// Contains the complete [HeadlineFilter] configuration to be applied.
-  const HeadlinesFeedFiltersApplied({required this.filter});
+  const HeadlinesFeedFiltersApplied({
+    required this.filter,
+    required this.theme,
+  });
 
   /// The [HeadlineFilter] containing the selected categories, sources,
   /// and/or countries.
   final HeadlineFilter filter;
 
+  /// The current theme data of the application.
+  final ThemeData theme;
+
   @override
-  List<Object?> get props => [filter];
+  List<Object?> get props => [filter, theme];
 }
 
 /// {@template headlines_feed_filters_cleared}
 /// Event triggered when the user requests to clear all active filters
 /// and view the unfiltered headlines feed.
 /// {@endtemplate}
-final class HeadlinesFeedFiltersCleared extends HeadlinesFeedEvent {}
+final class HeadlinesFeedFiltersCleared extends HeadlinesFeedEvent {
+  const HeadlinesFeedFiltersCleared({required this.theme});
+
+  /// The current theme data of the application.
+  final ThemeData theme;
+
+  @override
+  List<Object> get props => [theme];
+}
 
 /// {@template feed_decorator_dismissed}
 /// Event triggered when a user dismisses a feed decorator.

@@ -270,7 +270,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
             tooltip: l10n.headlinesFeedFilterResetButton,
             onPressed: () {
               context.read<HeadlinesFeedBloc>().add(
-                HeadlinesFeedFiltersCleared(),
+                HeadlinesFeedFiltersCleared(theme: Theme.of(context)),
               );
               // Also reset local state for the checkbox
               setState(() {
@@ -304,7 +304,10 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
                 isFromFollowedItems: _useFollowedFilters,
               );
               context.read<HeadlinesFeedBloc>().add(
-                HeadlinesFeedFiltersApplied(filter: newFilter),
+                HeadlinesFeedFiltersApplied(
+                  filter: newFilter,
+                  theme: Theme.of(context),
+                ),
               );
               context.pop();
             },

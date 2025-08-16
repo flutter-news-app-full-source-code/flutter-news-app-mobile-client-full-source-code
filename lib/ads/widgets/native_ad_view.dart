@@ -10,7 +10,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/nativ
 /// This abstraction ensures that the higher-level UI components remain
 /// provider-agnostic.
 /// {@endtemplate}
-abstract class NativeAdView extends StatelessWidget {
+abstract class NativeAdView extends StatefulWidget {
   /// {@macro native_ad_view}
   const NativeAdView({required this.nativeAd, super.key});
 
@@ -19,4 +19,9 @@ abstract class NativeAdView extends StatelessWidget {
   /// This object contains the original, SDK-specific ad object, which concrete
   /// implementations will cast and render.
   final app_native_ad.NativeAd nativeAd;
+
+  // StatefulWidget requires a createState method, which will be implemented
+  // by concrete subclasses.
+  @override
+  State<NativeAdView> createState();
 }

@@ -109,10 +109,12 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       );
 
       // For pagination, only inject ads, not feed actions.
-      final newProcessedFeedItems = _feedDecoratorService.injectAds(
+      final newProcessedFeedItems = await _feedDecoratorService.injectAds(
         feedItems: headlineResponse.items,
         user: currentUser,
         adConfig: remoteConfig.adConfig,
+        imageStyle:
+            _appBloc.state.settings.feedPreferences.headlineImageStyle,
         // Calculate the count of actual content items (headlines) already in the
         // feed. This is crucial for the FeedDecoratorService to correctly apply
         // ad placement rules across paginated loads.
@@ -166,6 +168,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
             userPreferences?.followedTopics.map((t) => t.id).toList() ?? [],
         followedSourceIds:
             userPreferences?.followedSources.map((s) => s.id).toList() ?? [],
+        imageStyle:
+            _appBloc.state.settings.feedPreferences.headlineImageStyle,
       );
 
       emit(
@@ -245,6 +249,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
             userPreferences?.followedTopics.map((t) => t.id).toList() ?? [],
         followedSourceIds:
             userPreferences?.followedSources.map((s) => s.id).toList() ?? [],
+        imageStyle:
+            _appBloc.state.settings.feedPreferences.headlineImageStyle,
       );
 
       emit(
@@ -321,6 +327,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
             userPreferences?.followedTopics.map((t) => t.id).toList() ?? [],
         followedSourceIds:
             userPreferences?.followedSources.map((s) => s.id).toList() ?? [],
+        imageStyle:
+            _appBloc.state.settings.feedPreferences.headlineImageStyle,
       );
 
       emit(

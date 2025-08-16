@@ -1,7 +1,7 @@
 import 'package:core/core.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_feed_item.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
 
@@ -45,13 +45,13 @@ class AdService {
   /// Returns an [AdFeedItem] if an ad is available, otherwise `null`.
   Future<AdFeedItem?> getAd({
     required HeadlineImageStyle imageStyle,
-    required ThemeData theme,
+    required AdThemeStyle adThemeStyle,
   }) async {
     _logger.info('Requesting native ad from AdProvider...');
     try {
       final nativeAd = await _adProvider.loadNativeAd(
         imageStyle: imageStyle,
-        theme: theme,
+        adThemeStyle: adThemeStyle,
       );
       if (nativeAd != null) {
         _logger.info('Native ad successfully loaded and wrapped.');

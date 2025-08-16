@@ -290,16 +290,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                     }
                     return tile;
                   } else if (item is AdFeedItem) {
-                    final imageStyle = context
-                        .watch<AppBloc>()
-                        .state
-                        .settings
-                        .feedPreferences
-                        .headlineImageStyle;
-                    return AdFeedItemWidget(
-                      adFeedItem: item,
-                      headlineImageStyle: imageStyle,
-                    );
+                    return AdFeedItemWidget(adFeedItem: item);
                   } else if (item is CallToActionItem) {
                     return CallToActionDecoratorWidget(
                       item: item,

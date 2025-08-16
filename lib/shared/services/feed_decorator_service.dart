@@ -154,6 +154,7 @@ class FeedDecoratorService {
       user: user,
       adConfig: remoteConfig.adConfig,
       imageStyle: imageStyle,
+      theme: theme,
     );
 
     // --- Step 3: Return the comprehensive result ---

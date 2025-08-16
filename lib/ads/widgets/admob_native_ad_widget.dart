@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'
     as app_native_ad;
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/native_ad_view.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
 
 /// {@template admob_native_ad_widget}
@@ -11,12 +12,9 @@ import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
 /// [admob.AdWidget] to display it. It also handles the lifecycle
 /// management of the native ad object.
 /// {@endtemplate}
-class AdMobNativeAdWidget extends StatefulWidget {
+class AdMobNativeAdWidget extends NativeAdView {
   /// {@macro admob_native_ad_widget}
-  const AdMobNativeAdWidget({required this.nativeAd, super.key});
-
-  /// The generic native ad data containing the AdMob-specific ad object.
-  final app_native_ad.NativeAd nativeAd;
+  const AdMobNativeAdWidget({required super.nativeAd, super.key});
 
   @override
   State<AdMobNativeAdWidget> createState() => _AdMobNativeAdWidgetState();

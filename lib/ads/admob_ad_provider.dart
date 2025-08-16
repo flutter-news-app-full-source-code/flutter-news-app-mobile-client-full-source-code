@@ -24,6 +24,8 @@ class AdMobAdProvider implements AdProvider {
   final Logger _logger;
   final Uuid _uuid = const Uuid();
 
+  static const _nativeAdLoadTimeout = 15;
+
   /// The AdMob Native Ad Unit ID for Android.
   ///
   /// This should be replaced with your production Ad Unit ID.
@@ -123,7 +125,7 @@ class AdMobAdProvider implements AdProvider {
 
     // Add a timeout to the future to prevent hanging if callbacks are not called.
     final googleNativeAd = await completer.future.timeout(
-      const Duration(seconds: 15),
+      const Duration(seconds: _nativeAdLoadTimeout),
       onTimeout: () {
         _logger.warning('Native ad loading timed out.');
         ad.dispose(); // Dispose the ad if it timed out

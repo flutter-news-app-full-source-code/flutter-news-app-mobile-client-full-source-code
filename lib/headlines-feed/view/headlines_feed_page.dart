@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_feed_item.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/widgets.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/ads/ad_feed_item_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/feed_core.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_decorators/call_to_action_decorator_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_decorators/content_collection_decorator_widget.dart';
@@ -64,7 +64,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
         state.hasMore &&
         state.status != HeadlinesFeedStatus.loadingMore) {
       context.read<HeadlinesFeedBloc>().add(
-        const HeadlinesFeedFetchRequested(),
+        HeadlinesFeedFetchRequested(theme: Theme.of(context)),
       );
     }
   }
@@ -184,7 +184,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
               return FailureStateWidget(
                 exception: state.error!,
                 onRetry: () => context.read<HeadlinesFeedBloc>().add(
-                  HeadlinesFeedRefreshRequested(),
+                  HeadlinesFeedRefreshRequested(theme: Theme.of(context)),
                 ),
               );
             }
@@ -203,7 +203,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                     const SizedBox(height: AppSpacing.lg),
                     ElevatedButton(
                       onPressed: () => context.read<HeadlinesFeedBloc>().add(
-                        HeadlinesFeedFiltersCleared(),
+                        HeadlinesFeedFiltersCleared(theme: Theme.of(context)),
                       ),
                       child: Text(l10n.headlinesFeedClearFiltersButton),
                     ),
@@ -215,7 +215,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
             return RefreshIndicator(
               onRefresh: () async {
                 context.read<HeadlinesFeedBloc>().add(
-                  HeadlinesFeedRefreshRequested(),
+                  HeadlinesFeedRefreshRequested(theme: Theme.of(context)),
                 );
               },
               child: ListView.separated(

@@ -29,6 +29,12 @@ This app comes packed with all the features you need to launch a professional ne
 *   Includes a dedicated search page to help users find specific content quickly.
 > **Your Advantage:** Give your users powerful content discovery tools that keep them engaged and coming back for more. 🎯
 
+#### 💰 **Extensible Monetization with In-Feed Ads**
+*   Built with a clean, provider-agnostic ad architecture that makes monetization simple and flexible.
+*   Features a decoupled design, allowing easy integration and swapping of various ad networks (e.g., Google AdMob, Meta Audience Network) without rewriting core logic.
+*   Comes with a ready-to-go Google AdMob integration for native ads in the feed.
+> **Your Advantage:** Start generating revenue from day one with a highly extensible and robust ad system that’s built to scale with your business. 💸
+
 #### 🔐 **Robust User Authentication**
 Secure and flexible authentication flows are built-in:
 *   📧 **Email + Code (Passwordless) Sign-In:** Modern and secure.
@@ -72,12 +78,6 @@ Easily switch between development (in-memory data or local API) and production e
 #### 🌍 **Localization Ready**
 Fully internationalized with working English and Arabic localizations (`.arb` files). Adding more languages is straightforward.
 > **Your Advantage:** Easily adapt your application for a global audience and tap into new markets. 🌐
-
-#### 💰 **Extensible Monetization with In-Feed Ads**
-*   Built with a clean, provider-based ad architecture that makes monetization simple and flexible.
-*   Comes with a ready-to-go Google AdMob integration for native ads in the feed.
-*   The decoupled design means you can easily swap in or add other ad networks (like Meta Audience Network) in the future without rewriting your core logic.
-> **Your Advantage:** Start generating revenue from day one with a robust ad system that’s built to scale with your business. 💸
 
 ---
 

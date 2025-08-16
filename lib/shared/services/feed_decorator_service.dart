@@ -62,9 +62,9 @@ class FeedDecoratorService {
     required DataRepository<Topic> topicsRepository,
     required DataRepository<Source> sourcesRepository,
     required AdService adService,
-  })  : _topicsRepository = topicsRepository,
-        _sourcesRepository = sourcesRepository,
-        _adService = adService;
+  }) : _topicsRepository = topicsRepository,
+       _sourcesRepository = sourcesRepository,
+       _adService = adService;
 
   final Uuid _uuid = const Uuid();
   final DataRepository<Topic> _topicsRepository;

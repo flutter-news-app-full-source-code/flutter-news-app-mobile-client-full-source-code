@@ -1,4 +1,5 @@
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'
+    as app_native_ad;
 
 /// {@template ad_provider}
 /// An abstract class defining the interface for any ad network provider.
@@ -19,9 +20,9 @@ abstract class AdProvider {
 
   /// Loads a native ad.
   ///
-  /// Returns a [NativeAd] object if an ad is successfully loaded,
+  /// Returns a [app_native_ad.NativeAd] object if an ad is successfully loaded,
   /// otherwise returns `null`.
-  Future<NativeAd?> loadNativeAd();
+  Future<app_native_ad.NativeAd?> loadNativeAd();
 
   // Future methods for other ad types (e.g., interstitial, banner)
   // can be added here as needed in the future.

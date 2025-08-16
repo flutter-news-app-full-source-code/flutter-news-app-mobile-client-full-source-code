@@ -170,6 +170,7 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                   entityId: widget.args.entityId,
                   contentType: widget.args.contentType,
                   entity: widget.args.entity,
+                  theme: theme,
                 ),
               ),
             );

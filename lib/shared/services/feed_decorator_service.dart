@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:uuid/uuid.dart';
@@ -109,6 +110,7 @@ class FeedDecoratorService {
     required List<String> followedTopicIds,
     required List<String> followedSourceIds,
     required HeadlineImageStyle imageStyle,
+    required ThemeData theme,
   }) async {
     // The final list of items to be returned.
     final feedWithDecorators = <FeedItem>[...headlines];
@@ -172,6 +174,7 @@ class FeedDecoratorService {
     required User? user,
     required AdConfig adConfig,
     required HeadlineImageStyle imageStyle,
+    required ThemeData theme,
     int processedContentItemCount = 0,
   }) async {
     return _injectAds(
@@ -180,6 +183,7 @@ class FeedDecoratorService {
       adConfig: adConfig,
       processedContentItemCount: processedContentItemCount,
       imageStyle: imageStyle,
+      theme: theme,
     );
   }
 
@@ -371,6 +375,7 @@ class FeedDecoratorService {
     required User? user,
     required AdConfig adConfig,
     required HeadlineImageStyle imageStyle,
+    required ThemeData theme,
     int processedContentItemCount = 0,
   }) async {
     final userRole = user?.appRole ?? AppUserRole.guestUser;
@@ -423,7 +428,10 @@ class FeedDecoratorService {
       if (currentContentItemCount >= adPlacementInterval &&
           (currentContentItemCount - adPlacementInterval) % adFrequency == 0) {
         // Request an ad from the AdService.
-        final adToInject = await _adService.getAd(imageStyle: imageStyle);
+        final adToInject = await _adService.getAd(
+          imageStyle: imageStyle,
+          theme: theme,
+        );
         if (adToInject != null) {
           result.add(adToInject);
         }

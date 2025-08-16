@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:uuid/uuid.dart';
 
@@ -56,16 +57,19 @@ class FeedDecoratorService {
   /// Creates a [FeedDecoratorService].
   ///
   /// Requires [DataRepository] instances for [Topic] and [Source] to fetch
-  /// content for collection decorators.
+  /// content for collection decorators, and an [AdService] to inject ads.
   FeedDecoratorService({
     required DataRepository<Topic> topicsRepository,
     required DataRepository<Source> sourcesRepository,
-  }) : _topicsRepository = topicsRepository,
-       _sourcesRepository = sourcesRepository;
+    required AdService adService,
+  })  : _topicsRepository = topicsRepository,
+        _sourcesRepository = sourcesRepository,
+        _adService = adService;
 
   final Uuid _uuid = const Uuid();
   final DataRepository<Topic> _topicsRepository;
   final DataRepository<Source> _sourcesRepository;
+  final AdService _adService;
 
   // The zero-based index in the feed where the decorator will be inserted.
   // A value of 3 places it after the third headline, which is a common
@@ -142,7 +146,7 @@ class FeedDecoratorService {
 
     // --- Step 2: Ad Injection ---
     // Inject ads into the list that may or may not already contain a decorator.
-    final finalFeed = _injectAds(
+    final finalFeed = await _injectAds(
       feedItems: feedWithDecorators,
       user: user,
       adConfig: remoteConfig.adConfig,
@@ -161,12 +165,12 @@ class FeedDecoratorService {
   /// existing feed without re-evaluating or injecting new decorators.
   ///
   /// Returns a new list of [FeedItem] objects, interspersed with ads.
-  List<FeedItem> injectAds({
+  Future<List<FeedItem>> injectAds({
     required List<FeedItem> feedItems,
     required User? user,
     required AdConfig adConfig,
     int processedContentItemCount = 0,
-  }) {
+  }) async {
     return _injectAds(
       feedItems: feedItems,
       user: user,
@@ -358,12 +362,12 @@ class FeedDecoratorService {
   ///   crucial for maintaining correct ad placement across pagination.
   ///
   /// Returns a new list of [FeedItem] objects, interspersed with ads.
-  List<FeedItem> _injectAds({
+  Future<List<FeedItem>> _injectAds({
     required List<FeedItem> feedItems,
     required User? user,
     required AdConfig adConfig,
     int processedContentItemCount = 0,
-  }) {
+  }) async {
     final userRole = user?.appRole ?? AppUserRole.guestUser;
 
     // Determine ad frequency rules based on user role.
@@ -413,48 +417,13 @@ class FeedDecoratorService {
       //    multiple of the ad frequency.
       if (currentContentItemCount >= adPlacementInterval &&
           (currentContentItemCount - adPlacementInterval) % adFrequency == 0) {
-        final adToInject = _getAdToInject();
+        // Request an ad from the AdService.
+        final adToInject = await _adService.getAd();
         if (adToInject != null) {
           result.add(adToInject);
         }
       }
     }
     return result;
-  }
-
-  /// Constructs a placeholder [Ad] object.
-  ///
-  /// TODO(fulleni): fetch from an ad network SDK.
-  Ad? _getAdToInject() {
-    // A small, predefined list of mock ads to simulate variety.
-    final mockAds = <Ad>[
-      Ad(
-        id: _uuid.v4(),
-        imageUrl:
-            'https://via.placeholder.com/300x100.png/0000FF/FFFFFF?Text=Tech+Gadget+Ad',
-        targetUrl: 'https://example.com/ad-tech',
-        adType: AdType.native,
-        placement: AdPlacement.feedInlineNativeBanner,
-      ),
-      Ad(
-        id: _uuid.v4(),
-        imageUrl:
-            'https://via.placeholder.com/300x100.png/FF0000/FFFFFF?Text=Fashion+Sale+Ad',
-        targetUrl: 'https://example.com/ad-fashion',
-        adType: AdType.banner,
-        placement: AdPlacement.feedInlineStandardBanner,
-      ),
-      Ad(
-        id: _uuid.v4(),
-        imageUrl:
-            'https://via.placeholder.com/300x100.png/008000/FFFFFF?Text=Travel+Deals+Ad',
-        targetUrl: 'https://example.com/ad-travel',
-        adType: AdType.native,
-        placement: AdPlacement.feedInlineNativeBanner,
-      ),
-    ];
-
-    // Return a random ad from the list.
-    return mockAds[Random().nextInt(mockAds.length)];
   }
 }

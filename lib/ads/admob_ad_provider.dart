@@ -2,20 +2,27 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'
+    as app_native_ad;
+import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
 import 'package:logging/logging.dart';
+import 'package:uuid/uuid.dart';
 
 /// {@template admob_ad_provider}
 /// A concrete implementation of [AdProvider] for Google AdMob.
 ///
 /// This class handles the initialization of the Google Mobile Ads SDK
-/// and the loading of native ads specifically for AdMob.
+/// and the loading of native ads specifically for AdMob. It adapts the
+/// AdMob-specific [admob.NativeAd] object into our generic [app_native_ad.NativeAd]
+/// model.
 /// {@endtemplate}
 class AdMobAdProvider implements AdProvider {
   /// {@macro admob_ad_provider}
-  AdMobAdProvider({Logger? logger}) : _logger = logger ?? Logger('AdMobAdProvider');
+  AdMobAdProvider({Logger? logger})
+    : _logger = logger ?? Logger('AdMobAdProvider');
 
   final Logger _logger;
+  final Uuid _uuid = const Uuid();
 
   /// The AdMob Native Ad Unit ID for Android.
   ///
@@ -54,7 +61,7 @@ class AdMobAdProvider implements AdProvider {
   Future<void> initialize() async {
     _logger.info('Initializing Google Mobile Ads SDK...');
     try {
-      await MobileAds.instance.initialize();
+      await admob.MobileAds.instance.initialize();
       _logger.info('Google Mobile Ads SDK initialized successfully.');
     } catch (e) {
       _logger.severe('Failed to initialize Google Mobile Ads SDK: $e');
@@ -64,7 +71,7 @@ class AdMobAdProvider implements AdProvider {
   }
 
   @override
-  Future<NativeAd?> loadNativeAd() async {
+  Future<app_native_ad.NativeAd?> loadNativeAd() async {
     if (_nativeAdUnitId.isEmpty) {
       _logger.warning('No native ad unit ID configured for this platform.');
       return null;
@@ -72,16 +79,16 @@ class AdMobAdProvider implements AdProvider {
 
     _logger.info('Attempting to load native ad from unit ID: $_nativeAdUnitId');
 
-    final completer = Completer<NativeAd?>();
+    final completer = Completer<admob.NativeAd?>();
 
-    final ad = NativeAd(
+    final ad = admob.NativeAd(
       adUnitId: _nativeAdUnitId,
       factoryId: 'listTile', // This ID must match a factory in your native code
-      request: const AdRequest(),
-      listener: NativeAdListener(
+      request: const admob.AdRequest(),
+      listener: admob.NativeAdListener(
         onAdLoaded: (ad) {
           _logger.info('Native Ad loaded successfully.');
-          completer.complete(ad as NativeAd);
+          completer.complete(ad as admob.NativeAd);
         },
         onAdFailedToLoad: (ad, error) {
           _logger.severe('Native Ad failed to load: $error');
@@ -114,6 +121,25 @@ class AdMobAdProvider implements AdProvider {
       completer.complete(null);
     }
 
-    return completer.future;
+    // Add a timeout to the future to prevent hanging if callbacks are not called.
+    final googleNativeAd = await completer.future.timeout(
+      const Duration(seconds: 15),
+      onTimeout: () {
+        _logger.warning('Native ad loading timed out.');
+        ad.dispose(); // Dispose the ad if it timed out
+        return null;
+      },
+    );
+
+    if (googleNativeAd == null) {
+      return null;
+    }
+
+    // Map the Google Mobile Ads NativeAd to our generic NativeAd model.
+    // Only the ID and the raw adObject are stored, as per the simplified model.
+    return app_native_ad.NativeAd(
+      id: _uuid.v4(), // Generate a unique ID for our internal model
+      adObject: googleNativeAd, // Store the original AdMob object
+    );
   }
 }

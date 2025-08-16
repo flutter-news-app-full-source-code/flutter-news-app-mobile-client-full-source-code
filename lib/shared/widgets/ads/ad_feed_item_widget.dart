@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_feed_item.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/models.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/widgets.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template ad_feed_item_widget}
-/// A widget responsible for rendering a native ad within the feed using
-/// the `AdWidget` from the `google_mobile_ads` package.
+/// A widget that acts as a dispatcher for rendering native ads from different
+/// providers.
 ///
-/// This widget takes an [AdFeedItem] and renders the underlying native ad
-/// object, which is expected to be a pre-styled template ad.
+/// This widget inspects the [AdFeedItem]'s underlying [NativeAd] to determine
+/// its [AdProviderType]. It then delegates the rendering to the appropriate
+/// provider-specific widget (e.g., [AdmobNativeAdWidget]).
+///
+/// This approach ensures that the ad rendering logic is decoupled from the
+/// main feed UI, making the system extensible to support multiple ad networks.
 /// {@endtemplate}
 class AdFeedItemWidget extends StatelessWidget {
   /// {@macro ad_feed_item_widget}
@@ -23,19 +27,7 @@ class AdFeedItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final nativeAd = adFeedItem.nativeAd.adObject;
-
-    // Check if the ad object is of the expected type.
-    if (nativeAd is! admob.NativeAd) {
-      Logger('AdFeedItemWidget').warning(
-        'Unsupported native ad type: ${nativeAd.runtimeType}. '
-        'Ad will not be displayed.',
-      );
-      return const SizedBox.shrink();
-    }
-
-    // The AdWidget will render the pre-defined template (small or medium)
-    // that was selected when the ad was loaded.
+    // The main container for the ad, styled to look like other feed items.
     return Card(
       margin: const EdgeInsets.symmetric(
         horizontal: AppSpacing.paddingMedium,
@@ -43,11 +35,32 @@ class AdFeedItemWidget extends StatelessWidget {
       ),
       child: ConstrainedBox(
         constraints: const BoxConstraints(
-          minWidth: 320, // Minimum recommended width
-          minHeight: 90, // Minimum height for small template
+          minWidth: 320, // Minimum recommended width for ads
+          minHeight: 90, // Minimum height for a small template ad
         ),
-        child: admob.AdWidget(ad: nativeAd),
+        // The _AdDispatcher is responsible for selecting the correct
+        // provider-specific widget.
+        child: _AdDispatcher(nativeAd: adFeedItem.nativeAd),
       ),
     );
+  }
+}
+
+/// A private helper widget that selects the correct ad rendering widget
+/// based on the [NativeAd.provider].
+class _AdDispatcher extends StatelessWidget {
+  const _AdDispatcher({required this.nativeAd});
+
+  final NativeAd nativeAd;
+
+  @override
+  Widget build(BuildContext context) {
+    // Use a switch statement on the provider to determine which widget to build.
+    // This is the core of the platform-agnostic rendering logic.
+    switch (nativeAd.provider) {
+      case AdProviderType.admob:
+        // If the provider is AdMob, render the AdmobNativeAdWidget.
+        return AdmobNativeAdWidget(nativeAd: nativeAd);
+      }
   }
 }

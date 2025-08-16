@@ -1,5 +1,5 @@
 import 'package:core/core.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'
     as app_native_ad;
 
@@ -29,7 +29,7 @@ abstract class AdProvider {
   /// that best matches the visual density of the surrounding content.
   Future<app_native_ad.NativeAd?> loadNativeAd({
     required HeadlineImageStyle imageStyle,
-    required ThemeData theme,
+    required AdThemeStyle adThemeStyle,
   });
 
   // Future methods for other ad types (e.g., interstitial, banner)

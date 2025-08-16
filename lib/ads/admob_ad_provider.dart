@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:core/core.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'
     as app_native_ad;
@@ -75,8 +76,10 @@ class AdMobAdProvider implements AdProvider {
   }
 
   @override
+  @override
   Future<app_native_ad.NativeAd?> loadNativeAd({
     required HeadlineImageStyle imageStyle,
+    required ThemeData theme,
   }) async {
     if (_nativeAdUnitId.isEmpty) {
       _logger.warning('No native ad unit ID configured for this platform.');
@@ -95,16 +98,9 @@ class AdMobAdProvider implements AdProvider {
     final ad = admob.NativeAd(
       adUnitId: _nativeAdUnitId,
       request: const admob.AdRequest(),
-      // Use the NativeTemplateStyle API instead of a factoryId.
-      nativeTemplateStyle: admob.NativeTemplateStyle(
+      nativeTemplateStyle: _createNativeTemplateStyle(
         templateType: templateType,
-        // TODO(fulleni): Customize the ad's style to match the app's theme.
-        // These values can be expanded based on the app's ThemeData.
-        cornerRadius: AppSpacing.sm, // 8.0
-        // Example of text styling (can be tied to the app's text theme)
-        primaryTextStyle: admob.NativeTemplateTextStyle(
-          style: admob.NativeTemplateFontStyle.bold,
-        ),
+        theme: theme,
       ),
       listener: admob.NativeAdListener(
         onAdLoaded: (ad) {
@@ -161,6 +157,48 @@ class AdMobAdProvider implements AdProvider {
       id: _uuid.v4(), // Generate a unique ID for our internal model
       provider: app_native_ad.AdProviderType.admob, // Set the provider
       adObject: googleNativeAd, // Store the original AdMob object
+    );
+  }
+
+  /// Creates a [NativeTemplateStyle] based on the app's current theme.
+  ///
+  /// This method maps the application's theme properties (colors, text styles)
+  /// to the AdMob native ad styling options, ensuring a consistent look and feel.
+  admob.NativeTemplateStyle _createNativeTemplateStyle({
+    required admob.TemplateType templateType,
+    required ThemeData theme,
+  }) {
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    return admob.NativeTemplateStyle(
+      templateType: templateType,
+      mainBackgroundColor: colorScheme.surface,
+      cornerRadius: AppSpacing.sm, // 8.0
+      callToActionTextStyle: admob.NativeTemplateTextStyle(
+        textColor: colorScheme.onPrimary,
+        backgroundColor: colorScheme.primary,
+        style: admob.NativeTemplateFontStyle.normal,
+        size: textTheme.labelLarge?.fontSize,
+      ),
+      primaryTextStyle: admob.NativeTemplateTextStyle(
+        textColor: colorScheme.onSurface,
+        backgroundColor: colorScheme.surface,
+        style: admob.NativeTemplateFontStyle.bold,
+        size: textTheme.titleMedium?.fontSize,
+      ),
+      secondaryTextStyle: admob.NativeTemplateTextStyle(
+        textColor: colorScheme.onSurfaceVariant,
+        backgroundColor: colorScheme.surface,
+        style: admob.NativeTemplateFontStyle.normal,
+        size: textTheme.bodyMedium?.fontSize,
+      ),
+      tertiaryTextStyle: admob.NativeTemplateTextStyle(
+        textColor: colorScheme.onSurfaceVariant,
+        backgroundColor: colorScheme.surface,
+        style: admob.NativeTemplateFontStyle.normal,
+        size: textTheme.labelSmall?.fontSize,
+      ),
     );
   }
 }

@@ -2,8 +2,8 @@ import 'dart:math';
 
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:uuid/uuid.dart';
 
@@ -110,7 +110,7 @@ class FeedDecoratorService {
     required List<String> followedTopicIds,
     required List<String> followedSourceIds,
     required HeadlineImageStyle imageStyle,
-    required ThemeData theme,
+    required AdThemeStyle adThemeStyle,
   }) async {
     // The final list of items to be returned.
     final feedWithDecorators = <FeedItem>[...headlines];
@@ -154,7 +154,7 @@ class FeedDecoratorService {
       user: user,
       adConfig: remoteConfig.adConfig,
       imageStyle: imageStyle,
-      theme: theme,
+      adThemeStyle: adThemeStyle,
     );
 
     // --- Step 3: Return the comprehensive result ---
@@ -175,7 +175,7 @@ class FeedDecoratorService {
     required User? user,
     required AdConfig adConfig,
     required HeadlineImageStyle imageStyle,
-    required ThemeData theme,
+    required AdThemeStyle adThemeStyle,
     int processedContentItemCount = 0,
   }) async {
     return _injectAds(
@@ -184,7 +184,7 @@ class FeedDecoratorService {
       adConfig: adConfig,
       processedContentItemCount: processedContentItemCount,
       imageStyle: imageStyle,
-      theme: theme,
+      adThemeStyle: adThemeStyle,
     );
   }
 
@@ -376,7 +376,7 @@ class FeedDecoratorService {
     required User? user,
     required AdConfig adConfig,
     required HeadlineImageStyle imageStyle,
-    required ThemeData theme,
+    required AdThemeStyle adThemeStyle,
     int processedContentItemCount = 0,
   }) async {
     final userRole = user?.appRole ?? AppUserRole.guestUser;
@@ -428,11 +428,11 @@ class FeedDecoratorService {
       //    multiple of the ad frequency.
       if (currentContentItemCount >= adPlacementInterval &&
           (currentContentItemCount - adPlacementInterval) % adFrequency == 0) {
-        // Request an ad from the AdService.
-        final adToInject = await _adService.getAd(
-          imageStyle: imageStyle,
-          theme: theme,
-        );
+      // Request an ad from the AdService.
+      final adToInject = await _adService.getAd(
+        imageStyle: imageStyle,
+        adThemeStyle: adThemeStyle,
+      );
         if (adToInject != null) {
           result.add(adToInject);
         }

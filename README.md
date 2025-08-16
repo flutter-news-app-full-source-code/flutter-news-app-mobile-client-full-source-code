@@ -73,6 +73,12 @@ Easily switch between development (in-memory data or local API) and production e
 Fully internationalized with working English and Arabic localizations (`.arb` files). Adding more languages is straightforward.
 > **Your Advantage:** Easily adapt your application for a global audience and tap into new markets. 🌐
 
+#### 💰 **Extensible Monetization with In-Feed Ads**
+*   Built with a clean, provider-based ad architecture that makes monetization simple and flexible.
+*   Comes with a ready-to-go Google AdMob integration for native ads in the feed.
+*   The decoupled design means you can easily swap in or add other ad networks (like Meta Audience Network) in the future without rewriting your core logic.
+> **Your Advantage:** Start generating revenue from day one with a robust ad system that’s built to scale with your business. 💸
+
 ---
 
 ## 🔑 License: Source-Available with a Free Trial

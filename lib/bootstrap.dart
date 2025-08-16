@@ -9,6 +9,9 @@ import 'package:data_inmemory/data_inmemory.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/admob_ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/app.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
     as app_config;
@@ -37,6 +40,11 @@ Future<Widget> bootstrap(
   late final AuthClient authClient;
   late final AuthRepository authenticationRepository;
   HttpClient? httpClient;
+
+  // Initialize AdProvider and AdService
+  final AdProvider adProvider = AdMobAdProvider(logger: logger);
+  final AdService adService = AdService(adProvider: adProvider, logger: logger);
+  await adService.initialize(); // Initialize AdMob SDK early
 
   if (appConfig.environment == app_config.AppEnvironment.demo) {
     authClient = AuthInmemory();
@@ -273,5 +281,6 @@ Future<Widget> bootstrap(
     kvStorageService: kvStorage,
     environment: environment,
     demoDataMigrationService: demoDataMigrationService,
+    adService: adService,
   );
 }

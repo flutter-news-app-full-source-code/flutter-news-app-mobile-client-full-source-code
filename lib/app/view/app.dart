@@ -4,6 +4,7 @@ import 'package:data_repository/data_repository.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_status_service.dart';
@@ -25,24 +26,26 @@ class App extends StatelessWidget {
     required DataRepository<Source> sourcesRepository,
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<UserContentPreferences>
-    userContentPreferencesRepository,
+        userContentPreferencesRepository,
     required DataRepository<RemoteConfig> remoteConfigRepository,
     required DataRepository<User> userRepository,
     required KVStorageService kvStorageService,
     required AppEnvironment environment,
+    required AdService adService,
     this.demoDataMigrationService,
     super.key,
-  }) : _authenticationRepository = authenticationRepository,
-       _headlinesRepository = headlinesRepository,
-       _topicsRepository = topicsRepository,
-       _countriesRepository = countriesRepository,
-       _sourcesRepository = sourcesRepository,
-       _userAppSettingsRepository = userAppSettingsRepository,
-       _userContentPreferencesRepository = userContentPreferencesRepository,
-       _appConfigRepository = remoteConfigRepository,
-       _userRepository = userRepository,
-       _kvStorageService = kvStorageService,
-       _environment = environment;
+  })  : _authenticationRepository = authenticationRepository,
+        _headlinesRepository = headlinesRepository,
+        _topicsRepository = topicsRepository,
+        _countriesRepository = countriesRepository,
+        _sourcesRepository = sourcesRepository,
+        _userAppSettingsRepository = userAppSettingsRepository,
+        _userContentPreferencesRepository = userContentPreferencesRepository,
+        _appConfigRepository = remoteConfigRepository,
+        _userRepository = userRepository,
+        _kvStorageService = kvStorageService,
+        _environment = environment,
+        _adService = adService;
 
   final AuthRepository _authenticationRepository;
   final DataRepository<Headline> _headlinesRepository;
@@ -51,11 +54,12 @@ class App extends StatelessWidget {
   final DataRepository<Source> _sourcesRepository;
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
   final DataRepository<UserContentPreferences>
-  _userContentPreferencesRepository;
+      _userContentPreferencesRepository;
   final DataRepository<RemoteConfig> _appConfigRepository;
   final DataRepository<User> _userRepository;
   final KVStorageService _kvStorageService;
   final AppEnvironment _environment;
+  final AdService _adService;
   final DemoDataMigrationService? demoDataMigrationService;
 
   @override
@@ -72,15 +76,17 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _appConfigRepository),
         RepositoryProvider.value(value: _userRepository),
         RepositoryProvider.value(value: _kvStorageService),
+        RepositoryProvider.value(value: _adService),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
             create: (context) => AppBloc(
               authenticationRepository: context.read<AuthRepository>(),
-              userAppSettingsRepository: context
-                  .read<DataRepository<UserAppSettings>>(),
-              appConfigRepository: context.read<DataRepository<RemoteConfig>>(),
+              userAppSettingsRepository:
+                  context.read<DataRepository<UserAppSettings>>(),
+              appConfigRepository:
+                  context.read<DataRepository<RemoteConfig>>(),
               userRepository: context.read<DataRepository<User>>(),
               environment: _environment,
               demoDataMigrationService: demoDataMigrationService,
@@ -103,6 +109,7 @@ class App extends StatelessWidget {
           appConfigRepository: _appConfigRepository,
           userRepository: _userRepository,
           environment: _environment,
+          adService: _adService,
         ),
       ),
     );
@@ -121,6 +128,7 @@ class _AppView extends StatefulWidget {
     required this.appConfigRepository,
     required this.userRepository,
     required this.environment,
+    required this.adService,
   });
 
   final AuthRepository authenticationRepository;
@@ -133,6 +141,7 @@ class _AppView extends StatefulWidget {
   final DataRepository<RemoteConfig> appConfigRepository;
   final DataRepository<User> userRepository;
   final AppEnvironment environment;
+  final AdService adService;
 
   @override
   State<_AppView> createState() => _AppViewState();
@@ -174,6 +183,7 @@ class _AppViewState extends State<_AppView> {
       remoteConfigRepository: widget.appConfigRepository,
       userRepository: widget.userRepository,
       environment: widget.environment,
+      adService: widget.adService,
     );
 
     // Removed Dynamic Link Initialization

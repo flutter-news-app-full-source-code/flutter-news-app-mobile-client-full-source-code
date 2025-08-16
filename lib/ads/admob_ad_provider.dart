@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:core/core.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'
     as app_native_ad;
 import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
@@ -79,7 +79,7 @@ class AdMobAdProvider implements AdProvider {
   @override
   Future<app_native_ad.NativeAd?> loadNativeAd({
     required HeadlineImageStyle imageStyle,
-    required ThemeData theme,
+    required AdThemeStyle adThemeStyle,
   }) async {
     if (_nativeAdUnitId.isEmpty) {
       _logger.warning('No native ad unit ID configured for this platform.');
@@ -100,7 +100,7 @@ class AdMobAdProvider implements AdProvider {
       request: const admob.AdRequest(),
       nativeTemplateStyle: _createNativeTemplateStyle(
         templateType: templateType,
-        theme: theme,
+        adThemeStyle: adThemeStyle,
       ),
       listener: admob.NativeAdListener(
         onAdLoaded: (ad) {
@@ -166,38 +166,35 @@ class AdMobAdProvider implements AdProvider {
   /// to the AdMob native ad styling options, ensuring a consistent look and feel.
   admob.NativeTemplateStyle _createNativeTemplateStyle({
     required admob.TemplateType templateType,
-    required ThemeData theme,
+    required AdThemeStyle adThemeStyle,
   }) {
-    final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
-
     return admob.NativeTemplateStyle(
       templateType: templateType,
-      mainBackgroundColor: colorScheme.surface,
-      cornerRadius: AppSpacing.sm, // 8.0
+      mainBackgroundColor: adThemeStyle.mainBackgroundColor,
+      cornerRadius: adThemeStyle.cornerRadius,
       callToActionTextStyle: admob.NativeTemplateTextStyle(
-        textColor: colorScheme.onPrimary,
-        backgroundColor: colorScheme.primary,
+        textColor: adThemeStyle.callToActionTextColor,
+        backgroundColor: adThemeStyle.callToActionBackgroundColor,
         style: admob.NativeTemplateFontStyle.normal,
-        size: textTheme.labelLarge?.fontSize,
+        size: adThemeStyle.callToActionTextSize,
       ),
       primaryTextStyle: admob.NativeTemplateTextStyle(
-        textColor: colorScheme.onSurface,
-        backgroundColor: colorScheme.surface,
+        textColor: adThemeStyle.primaryTextColor,
+        backgroundColor: adThemeStyle.primaryBackgroundColor,
         style: admob.NativeTemplateFontStyle.bold,
-        size: textTheme.titleMedium?.fontSize,
+        size: adThemeStyle.primaryTextSize,
       ),
       secondaryTextStyle: admob.NativeTemplateTextStyle(
-        textColor: colorScheme.onSurfaceVariant,
-        backgroundColor: colorScheme.surface,
+        textColor: adThemeStyle.secondaryTextColor,
+        backgroundColor: adThemeStyle.secondaryBackgroundColor,
         style: admob.NativeTemplateFontStyle.normal,
-        size: textTheme.bodyMedium?.fontSize,
+        size: adThemeStyle.secondaryTextSize,
       ),
       tertiaryTextStyle: admob.NativeTemplateTextStyle(
-        textColor: colorScheme.onSurfaceVariant,
-        backgroundColor: colorScheme.surface,
+        textColor: adThemeStyle.tertiaryTextColor,
+        backgroundColor: adThemeStyle.tertiaryBackgroundColor,
         style: admob.NativeTemplateFontStyle.normal,
-        size: textTheme.labelSmall?.fontSize,
+        size: adThemeStyle.tertiaryTextSize,
       ),
     );
   }

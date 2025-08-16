@@ -6,6 +6,7 @@ import 'package:bloc/bloc.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_decorator_service.dart';
@@ -108,10 +109,12 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       }
 
       // For entity details, only inject ads.
-      final processedFeedItems = _feedDecoratorService.injectAds(
+      final processedFeedItems = await _feedDecoratorService.injectAds(
         feedItems: headlineResponse.items,
         user: currentUser,
         adConfig: remoteConfig.adConfig,
+        imageStyle: _appBloc.state.settings.feedPreferences.headlineImageStyle,
+        theme: event.theme,
       );
 
       // 3. Determine isFollowing status
@@ -208,10 +211,14 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       }
 
       // For entity details pagination, only inject ads.
-      final newProcessedFeedItems = _feedDecoratorService.injectAds(
+      final newProcessedFeedItems = await _feedDecoratorService.injectAds(
         feedItems: headlineResponse.items,
         user: currentUser,
         adConfig: remoteConfig.adConfig,
+        imageStyle: _appBloc.state.settings.feedPreferences.headlineImageStyle,
+        theme: _appBloc.state.themeMode == ThemeMode.dark
+            ? ThemeData.dark()
+            : ThemeData.light(), // Use a default theme for pagination if not passed
         // Calculate the count of actual content items (headlines) already in the
         // feed. This is crucial for the FeedDecoratorService to correctly apply
         // ad placement rules across paginated loads.

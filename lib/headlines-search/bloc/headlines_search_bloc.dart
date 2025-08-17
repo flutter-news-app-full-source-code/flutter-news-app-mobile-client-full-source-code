@@ -116,7 +116,7 @@ class HeadlinesSearchBloc
                 adConfig: appConfig.adConfig,
                 imageStyle:
                     _appBloc.state.settings.feedPreferences.headlineImageStyle,
-                theme: event.theme,
+                adThemeStyle: event.adThemeStyle,
                 // Calculate the count of actual content items (headlines) already in the
                 // feed. This is crucial for the FeedDecoratorService to correctly apply
                 // ad placement rules across paginated loads.
@@ -224,7 +224,7 @@ class HeadlinesSearchBloc
             adConfig: appConfig.adConfig,
             imageStyle:
                 _appBloc.state.settings.feedPreferences.headlineImageStyle,
-            theme: event.theme,
+            adThemeStyle: event.adThemeStyle,
           );
         case ContentType.topic:
           rawResponse = await _topicRepository.readAll(

@@ -14,7 +14,7 @@ abstract class EntityDetailsEvent extends Equatable {
 /// or an [entityId] and its corresponding [contentType].
 class EntityDetailsLoadRequested extends EntityDetailsEvent {
   const EntityDetailsLoadRequested({
-    required this.theme,
+    required this.adThemeStyle,
     this.entityId,
     this.contentType,
     this.entity,
@@ -32,11 +32,11 @@ class EntityDetailsLoadRequested extends EntityDetailsEvent {
   /// The full entity object, if already available.
   final FeedItem? entity;
 
-  /// The current theme data, required for ad injection.
-  final ThemeData theme;
+  /// The current ad theme style, required for ad injection.
+  final AdThemeStyle adThemeStyle;
 
   @override
-  List<Object?> get props => [entityId, contentType, entity];
+  List<Object?> get props => [entityId, contentType, entity, adThemeStyle];
 }
 
 /// Event to toggle the "follow" status of the currently loaded entity.

@@ -18,8 +18,8 @@ sealed class HeadlinesFeedEvent extends Equatable {
 final class HeadlinesFeedFetchRequested extends HeadlinesFeedEvent {
   /// {@macro headlines_feed_fetch_requested}
   ///
-/// Optionally includes a [cursor] to fetch the next page. If [cursor] is null,
-/// it typically indicates an initial fetch request.
+  /// Optionally includes a [cursor] to fetch the next page. If [cursor] is null,
+  /// it typically indicates an initial fetch request.
   const HeadlinesFeedFetchRequested({required this.adThemeStyle, this.cursor});
 
   /// The cursor indicating the starting point for the next page of headlines.

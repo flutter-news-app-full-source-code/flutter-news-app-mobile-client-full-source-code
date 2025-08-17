@@ -16,10 +16,7 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class AdFeedItemWidget extends StatelessWidget {
   /// {@macro ad_feed_item_widget}
-  const AdFeedItemWidget({
-    required this.adFeedItem,
-    super.key,
-  });
+  const AdFeedItemWidget({required this.adFeedItem, super.key});
 
   /// The ad feed item containing the loaded native ad to be displayed.
   final AdFeedItem adFeedItem;
@@ -60,6 +57,6 @@ class _AdDispatcher extends StatelessWidget {
       case AdProviderType.admob:
         // If the provider is AdMob, render the AdmobNativeAdWidget.
         return AdmobNativeAdWidget(nativeAd: nativeAd);
-      }
+    }
   }
 }

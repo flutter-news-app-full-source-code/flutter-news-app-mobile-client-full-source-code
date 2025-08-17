@@ -271,7 +271,9 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
             tooltip: l10n.headlinesFeedFilterResetButton,
             onPressed: () {
               context.read<HeadlinesFeedBloc>().add(
-                HeadlinesFeedFiltersCleared(adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context))),
+                HeadlinesFeedFiltersCleared(
+                  adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+                ),
               );
               // Also reset local state for the checkbox
               setState(() {

@@ -14,10 +14,7 @@ import 'package:logging/logging.dart';
 /// {@endtemplate}
 class AdmobNativeAdWidget extends StatelessWidget {
   /// {@macro admob_native_ad_widget}
-  const AdmobNativeAdWidget({
-    required this.nativeAd,
-    super.key,
-  });
+  const AdmobNativeAdWidget({required this.nativeAd, super.key});
 
   /// The generic native ad model which contains the provider-specific ad object.
   final app_ad_models.NativeAd nativeAd;

@@ -218,7 +218,11 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         adConfig: remoteConfig.adConfig,
         imageStyle: _appBloc.state.settings.feedPreferences.headlineImageStyle,
         adThemeStyle: AdThemeStyle.fromTheme(
-          ThemeData(brightness: _appBloc.state.themeMode == ThemeMode.dark ? Brightness.dark : Brightness.light),
+          ThemeData(
+            brightness: _appBloc.state.themeMode == ThemeMode.dark
+                ? Brightness.dark
+                : Brightness.light,
+          ),
         ), // Use a default AdThemeStyle for pagination if not passed
         // Calculate the count of actual content items (headlines) already in the
         // feed. This is crucial for the FeedDecoratorService to correctly apply

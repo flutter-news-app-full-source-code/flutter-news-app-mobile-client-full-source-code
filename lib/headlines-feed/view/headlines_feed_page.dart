@@ -65,7 +65,9 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
         state.hasMore &&
         state.status != HeadlinesFeedStatus.loadingMore) {
       context.read<HeadlinesFeedBloc>().add(
-        HeadlinesFeedFetchRequested(adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context))),
+        HeadlinesFeedFetchRequested(
+          adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+        ),
       );
     }
   }
@@ -185,7 +187,9 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
               return FailureStateWidget(
                 exception: state.error!,
                 onRetry: () => context.read<HeadlinesFeedBloc>().add(
-                  HeadlinesFeedRefreshRequested(adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context))),
+                  HeadlinesFeedRefreshRequested(
+                    adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+                  ),
                 ),
               );
             }
@@ -204,7 +208,11 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                     const SizedBox(height: AppSpacing.lg),
                     ElevatedButton(
                       onPressed: () => context.read<HeadlinesFeedBloc>().add(
-                        HeadlinesFeedFiltersCleared(adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context))),
+                        HeadlinesFeedFiltersCleared(
+                          adThemeStyle: AdThemeStyle.fromTheme(
+                            Theme.of(context),
+                          ),
+                        ),
                       ),
                       child: Text(l10n.headlinesFeedClearFiltersButton),
                     ),
@@ -216,7 +224,9 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
             return RefreshIndicator(
               onRefresh: () async {
                 context.read<HeadlinesFeedBloc>().add(
-                  HeadlinesFeedRefreshRequested(adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context))),
+                  HeadlinesFeedRefreshRequested(
+                    adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+                  ),
                 );
               },
               child: ListView.separated(

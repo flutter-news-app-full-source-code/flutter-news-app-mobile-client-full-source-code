@@ -428,11 +428,11 @@ class FeedDecoratorService {
       //    multiple of the ad frequency.
       if (currentContentItemCount >= adPlacementInterval &&
           (currentContentItemCount - adPlacementInterval) % adFrequency == 0) {
-      // Request an ad from the AdService.
-      final adToInject = await _adService.getAd(
-        imageStyle: imageStyle,
-        adThemeStyle: adThemeStyle,
-      );
+        // Request an ad from the AdService.
+        final adToInject = await _adService.getAd(
+          imageStyle: imageStyle,
+          adThemeStyle: adThemeStyle,
+        );
         if (adToInject != null) {
           result.add(adToInject);
         }

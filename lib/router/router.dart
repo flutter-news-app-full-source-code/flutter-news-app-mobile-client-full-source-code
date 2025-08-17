@@ -373,10 +373,10 @@ GoRouter createRouter({
                     feedDecoratorService: feedDecoratorService,
                     appBloc: context.read<AppBloc>(),
                   )..add(
-                      HeadlinesFeedFetchRequested(
-                        adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
-                      ),
-                    );
+                    HeadlinesFeedFetchRequested(
+                      adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+                    ),
+                  );
                 },
               ),
               BlocProvider(

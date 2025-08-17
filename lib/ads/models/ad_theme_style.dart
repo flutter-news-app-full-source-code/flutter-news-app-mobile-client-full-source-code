@@ -39,7 +39,7 @@ class AdThemeStyle extends Equatable {
 
     return AdThemeStyle(
       mainBackgroundColor: colorScheme.surface,
-      cornerRadius: AppSpacing.sm, 
+      cornerRadius: AppSpacing.sm,
       callToActionTextColor: colorScheme.onPrimary,
       callToActionBackgroundColor: colorScheme.primary,
       callToActionTextSize: textTheme.labelLarge?.fontSize,
@@ -99,19 +99,19 @@ class AdThemeStyle extends Equatable {
 
   @override
   List<Object?> get props => [
-        mainBackgroundColor,
-        cornerRadius,
-        callToActionTextColor,
-        callToActionBackgroundColor,
-        callToActionTextSize,
-        primaryTextColor,
-        primaryBackgroundColor,
-        primaryTextSize,
-        secondaryTextColor,
-        secondaryBackgroundColor,
-        secondaryTextSize,
-        tertiaryTextColor,
-        tertiaryBackgroundColor,
-        tertiaryTextSize,
-      ];
+    mainBackgroundColor,
+    cornerRadius,
+    callToActionTextColor,
+    callToActionBackgroundColor,
+    callToActionTextSize,
+    primaryTextColor,
+    primaryBackgroundColor,
+    primaryTextSize,
+    secondaryTextColor,
+    secondaryBackgroundColor,
+    secondaryTextSize,
+    tertiaryTextColor,
+    tertiaryBackgroundColor,
+    tertiaryTextSize,
+  ];
 }

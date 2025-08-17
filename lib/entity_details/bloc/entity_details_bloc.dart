@@ -115,7 +115,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         user: currentUser,
         adConfig: remoteConfig.adConfig,
         imageStyle: _appBloc.state.settings.feedPreferences.headlineImageStyle,
-        theme: event.theme,
+        adThemeStyle: event.adThemeStyle,
       );
 
       // 3. Determine isFollowing status
@@ -217,9 +217,9 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         user: currentUser,
         adConfig: remoteConfig.adConfig,
         imageStyle: _appBloc.state.settings.feedPreferences.headlineImageStyle,
-        theme: _appBloc.state.themeMode == ThemeMode.dark
-            ? ThemeData.dark()
-            : ThemeData.light(), // Use a default theme for pagination if not passed
+        adThemeStyle: AdThemeStyle.fromTheme(
+          ThemeData(brightness: _appBloc.state.themeMode == ThemeMode.dark ? Brightness.dark : Brightness.light),
+        ), // Use a default AdThemeStyle for pagination if not passed
         // Calculate the count of actual content items (headlines) already in the
         // feed. This is crucial for the FeedDecoratorService to correctly apply
         // ad placement rules across paginated loads.

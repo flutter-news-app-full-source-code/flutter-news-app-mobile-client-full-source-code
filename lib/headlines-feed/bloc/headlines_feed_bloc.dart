@@ -117,7 +117,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         adConfig: remoteConfig.adConfig,
         imageStyle:
             _appBloc.state.settings.feedPreferences.headlineImageStyle,
-        theme: event.theme,
+        adThemeStyle: event.adThemeStyle,
         // Calculate the count of actual content items (headlines) already in the
         // feed. This is crucial for the FeedDecoratorService to correctly apply
         // ad placement rules across paginated loads.
@@ -173,7 +173,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
             userPreferences?.followedSources.map((s) => s.id).toList() ?? [],
         imageStyle:
             _appBloc.state.settings.feedPreferences.headlineImageStyle,
-        theme: event.theme,
+        adThemeStyle: event.adThemeStyle,
       );
 
       emit(
@@ -255,7 +255,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
             userPreferences?.followedSources.map((s) => s.id).toList() ?? [],
         imageStyle:
             _appBloc.state.settings.feedPreferences.headlineImageStyle,
-        theme: event.theme,
+        adThemeStyle: event.adThemeStyle,
       );
 
       emit(
@@ -334,7 +334,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
             userPreferences?.followedSources.map((s) => s.id).toList() ?? [],
         imageStyle:
             _appBloc.state.settings.feedPreferences.headlineImageStyle,
-        theme: event.theme,
+        adThemeStyle: event.adThemeStyle,
       );
 
       emit(

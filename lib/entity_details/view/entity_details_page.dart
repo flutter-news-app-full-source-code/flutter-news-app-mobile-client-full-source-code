@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/bloc/entity_details_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
@@ -68,7 +69,7 @@ class EntityDetailsPage extends StatelessWidget {
                 entityId: args.entityId,
                 contentType: args.contentType,
                 entity: args.entity,
-                theme: Theme.of(context), // Pass the current theme
+                adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
               ),
             );
         return entityDetailsBloc;
@@ -170,7 +171,7 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                   entityId: widget.args.entityId,
                   contentType: widget.args.contentType,
                   entity: widget.args.entity,
-                  theme: theme,
+                  adThemeStyle: AdThemeStyle.fromTheme(theme),
                 ),
               ),
             );

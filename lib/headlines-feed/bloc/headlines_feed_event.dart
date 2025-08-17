@@ -18,19 +18,19 @@ sealed class HeadlinesFeedEvent extends Equatable {
 final class HeadlinesFeedFetchRequested extends HeadlinesFeedEvent {
   /// {@macro headlines_feed_fetch_requested}
   ///
-  /// Optionally includes a [cursor] to fetch the next page. If [cursor] is null,
-  /// it typically indicates an initial fetch request.
-  const HeadlinesFeedFetchRequested({required this.theme, this.cursor});
+/// Optionally includes a [cursor] to fetch the next page. If [cursor] is null,
+/// it typically indicates an initial fetch request.
+  const HeadlinesFeedFetchRequested({required this.adThemeStyle, this.cursor});
 
   /// The cursor indicating the starting point for the next page of headlines.
   /// If null, fetches the first page.
   final String? cursor;
 
-  /// The current theme data of the application.
-  final ThemeData theme;
+  /// The current ad theme style of the application.
+  final AdThemeStyle adThemeStyle;
 
   @override
-  List<Object?> get props => [cursor, theme];
+  List<Object?> get props => [cursor, adThemeStyle];
 }
 
 /// {@template headlines_feed_refresh_requested}
@@ -39,13 +39,13 @@ final class HeadlinesFeedFetchRequested extends HeadlinesFeedEvent {
 /// currently active filters.
 /// {@endtemplate}
 final class HeadlinesFeedRefreshRequested extends HeadlinesFeedEvent {
-  const HeadlinesFeedRefreshRequested({required this.theme});
+  const HeadlinesFeedRefreshRequested({required this.adThemeStyle});
 
-  /// The current theme data of the application.
-  final ThemeData theme;
+  /// The current ad theme style of the application.
+  final AdThemeStyle adThemeStyle;
 
   @override
-  List<Object> get props => [theme];
+  List<Object> get props => [adThemeStyle];
 }
 
 /// {@template headlines_feed_filters_applied}
@@ -58,18 +58,18 @@ final class HeadlinesFeedFiltersApplied extends HeadlinesFeedEvent {
   /// Contains the complete [HeadlineFilter] configuration to be applied.
   const HeadlinesFeedFiltersApplied({
     required this.filter,
-    required this.theme,
+    required this.adThemeStyle,
   });
 
   /// The [HeadlineFilter] containing the selected categories, sources,
   /// and/or countries.
   final HeadlineFilter filter;
 
-  /// The current theme data of the application.
-  final ThemeData theme;
+  /// The current ad theme style of the application.
+  final AdThemeStyle adThemeStyle;
 
   @override
-  List<Object?> get props => [filter, theme];
+  List<Object?> get props => [filter, adThemeStyle];
 }
 
 /// {@template headlines_feed_filters_cleared}
@@ -77,13 +77,13 @@ final class HeadlinesFeedFiltersApplied extends HeadlinesFeedEvent {
 /// and view the unfiltered headlines feed.
 /// {@endtemplate}
 final class HeadlinesFeedFiltersCleared extends HeadlinesFeedEvent {
-  const HeadlinesFeedFiltersCleared({required this.theme});
+  const HeadlinesFeedFiltersCleared({required this.adThemeStyle});
 
-  /// The current theme data of the application.
-  final ThemeData theme;
+  /// The current ad theme style of the application.
+  final AdThemeStyle adThemeStyle;
 
   @override
-  List<Object> get props => [theme];
+  List<Object> get props => [adThemeStyle];
 }
 
 /// {@template feed_decorator_dismissed}

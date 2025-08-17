@@ -11,7 +11,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/admob_ad_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/no_op_ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/app.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
     as app_config;
@@ -42,9 +44,15 @@ Future<Widget> bootstrap(
   HttpClient? httpClient;
 
   // Initialize AdProvider and AdService
-  final AdProvider adProvider = AdMobAdProvider(logger: logger);
+  // Initialize AdProvider based on platform.
+  // On web, use a No-Op provider to prevent MissingPluginException,
+  // as Google Mobile Ads SDK does not support native ads on web.
+  final AdProvider adProvider = kIsWeb
+      ? NoOpAdProvider(logger: logger)
+      : AdMobAdProvider(logger: logger);
+
   final adService = AdService(adProvider: adProvider, logger: logger);
-  await adService.initialize(); // Initialize AdMob SDK early
+  await adService.initialize(); // Initialize the selected AdProvider early
 
   if (appConfig.environment == app_config.AppEnvironment.demo) {
     authClient = AuthInmemory();

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/models.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/placeholder_ad_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/widgets.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -57,6 +58,10 @@ class _AdDispatcher extends StatelessWidget {
       case AdProviderType.admob:
         // If the provider is AdMob, render the AdmobNativeAdWidget.
         return AdmobNativeAdWidget(nativeAd: nativeAd);
+      case AdProviderType.placeholder:
+        // If the provider is a placeholder, render the PlaceholderAdWidget.
+        // This is used for web or other unsupported platforms to maintain UI.
+        return const PlaceholderAdWidget();
     }
   }
 }

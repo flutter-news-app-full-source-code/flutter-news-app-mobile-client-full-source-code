@@ -27,6 +27,7 @@ abstract class AdProvider {
   ///
   /// The [imageStyle] is used to select an appropriate native ad template
   /// that best matches the visual density of the surrounding content.
+  /// The [adThemeStyle] provides UI-agnostic theme properties for ad styling.
   Future<app_native_ad.NativeAd?> loadNativeAd({
     required HeadlineImageStyle imageStyle,
     required AdThemeStyle adThemeStyle,

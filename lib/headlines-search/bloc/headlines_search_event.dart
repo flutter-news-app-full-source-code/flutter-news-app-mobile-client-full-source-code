@@ -17,10 +17,14 @@ final class HeadlinesSearchModelTypeChanged extends HeadlinesSearchEvent {
 }
 
 final class HeadlinesSearchFetchRequested extends HeadlinesSearchEvent {
-  const HeadlinesSearchFetchRequested({required this.searchTerm});
+  const HeadlinesSearchFetchRequested({
+    required this.searchTerm,
+    required this.adThemeStyle,
+  });
 
   final String searchTerm;
+  final AdThemeStyle adThemeStyle;
 
   @override
-  List<Object> get props => [searchTerm];
+  List<Object> get props => [searchTerm, adThemeStyle];
 }

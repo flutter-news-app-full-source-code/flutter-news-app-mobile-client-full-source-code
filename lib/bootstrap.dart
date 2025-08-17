@@ -43,7 +43,7 @@ Future<Widget> bootstrap(
 
   // Initialize AdProvider and AdService
   final AdProvider adProvider = AdMobAdProvider(logger: logger);
-  final AdService adService = AdService(adProvider: adProvider, logger: logger);
+  final adService = AdService(adProvider: adProvider, logger: logger);
   await adService.initialize(); // Initialize AdMob SDK early
 
   if (appConfig.environment == app_config.AppEnvironment.demo) {

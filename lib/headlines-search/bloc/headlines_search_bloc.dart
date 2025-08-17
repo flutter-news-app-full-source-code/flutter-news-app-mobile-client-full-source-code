@@ -5,6 +5,7 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_decorator_service.dart';
 
@@ -108,10 +109,13 @@ class HeadlinesSearchBloc
                 return;
               }
               // For search pagination, only inject ads.
-              final injectedItems = _feedDecoratorService.injectAds(
+              final injectedItems = await _feedDecoratorService.injectAds(
                 feedItems: headlines,
                 user: currentUser,
                 adConfig: appConfig.adConfig,
+                imageStyle:
+                    _appBloc.state.settings.feedPreferences.headlineImageStyle,
+                adThemeStyle: event.adThemeStyle,
                 // Calculate the count of actual content items (headlines) already in the
                 // feed. This is crucial for the FeedDecoratorService to correctly apply
                 // ad placement rules across paginated loads.
@@ -213,10 +217,13 @@ class HeadlinesSearchBloc
             return;
           }
           // For search results, only inject ads.
-          processedItems = _feedDecoratorService.injectAds(
+          processedItems = await _feedDecoratorService.injectAds(
             feedItems: headlines,
             user: currentUser,
             adConfig: appConfig.adConfig,
+            imageStyle:
+                _appBloc.state.settings.feedPreferences.headlineImageStyle,
+            adThemeStyle: event.adThemeStyle,
           );
         case ContentType.topic:
           rawResponse = await _topicRepository.readAll(

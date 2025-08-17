@@ -5,6 +5,7 @@ import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/headline_filter.dart';
@@ -270,7 +271,9 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
             tooltip: l10n.headlinesFeedFilterResetButton,
             onPressed: () {
               context.read<HeadlinesFeedBloc>().add(
-                HeadlinesFeedFiltersCleared(),
+                HeadlinesFeedFiltersCleared(
+                  adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+                ),
               );
               // Also reset local state for the checkbox
               setState(() {
@@ -304,7 +307,10 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
                 isFromFollowedItems: _useFollowedFilters,
               );
               context.read<HeadlinesFeedBloc>().add(
-                HeadlinesFeedFiltersApplied(filter: newFilter),
+                HeadlinesFeedFiltersApplied(
+                  filter: newFilter,
+                  adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+                ),
               );
               context.pop();
             },

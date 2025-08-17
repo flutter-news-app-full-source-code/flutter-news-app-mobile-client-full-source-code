@@ -4,6 +4,7 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 // HeadlineItemWidget import removed
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-search/bloc/headlines_search_bloc.dart';
@@ -14,6 +15,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/content_type_extensions.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/shared.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/feed_core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -84,7 +86,10 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
     final state = context.read<HeadlinesSearchBloc>().state;
     if (_isBottom && state is HeadlinesSearchSuccess && state.hasMore) {
       context.read<HeadlinesSearchBloc>().add(
-        HeadlinesSearchFetchRequested(searchTerm: state.lastSearchTerm),
+        HeadlinesSearchFetchRequested(
+          searchTerm: state.lastSearchTerm,
+          adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+        ),
       );
     }
   }
@@ -98,7 +103,10 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
 
   void _performSearch() {
     context.read<HeadlinesSearchBloc>().add(
-      HeadlinesSearchFetchRequested(searchTerm: _textController.text),
+      HeadlinesSearchFetchRequested(
+        searchTerm: _textController.text,
+        adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+      ),
     );
   }
 
@@ -261,6 +269,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                       onRetry: () => context.read<HeadlinesSearchBloc>().add(
                         HeadlinesSearchFetchRequested(
                           searchTerm: lastSearchTerm,
+                          adThemeStyle: AdThemeStyle.fromTheme(theme),
                         ),
                       ),
                     )
@@ -390,7 +399,10 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                   'Failed to search "$lastSearchTerm" in ${failedModelType.displayName(context).toLowerCase()}:\n$errorMessage',
                 ),
                 onRetry: () => context.read<HeadlinesSearchBloc>().add(
-                  HeadlinesSearchFetchRequested(searchTerm: lastSearchTerm),
+                  HeadlinesSearchFetchRequested(
+                    searchTerm: lastSearchTerm,
+                    adThemeStyle: AdThemeStyle.fromTheme(theme),
+                  ),
                 ),
               ),
             _ => const SizedBox.shrink(),

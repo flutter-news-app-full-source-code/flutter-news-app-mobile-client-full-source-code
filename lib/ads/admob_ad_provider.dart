@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:core/core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'
     as app_native_ad;
 import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
@@ -73,7 +75,11 @@ class AdMobAdProvider implements AdProvider {
   }
 
   @override
-  Future<app_native_ad.NativeAd?> loadNativeAd() async {
+  @override
+  Future<app_native_ad.NativeAd?> loadNativeAd({
+    required HeadlineImageStyle imageStyle,
+    required AdThemeStyle adThemeStyle,
+  }) async {
     if (_nativeAdUnitId.isEmpty) {
       _logger.warning('No native ad unit ID configured for this platform.');
       return null;
@@ -81,12 +87,20 @@ class AdMobAdProvider implements AdProvider {
 
     _logger.info('Attempting to load native ad from unit ID: $_nativeAdUnitId');
 
+    final templateType = switch (imageStyle) {
+      HeadlineImageStyle.largeThumbnail => admob.TemplateType.medium,
+      _ => admob.TemplateType.small,
+    };
+
     final completer = Completer<admob.NativeAd?>();
 
     final ad = admob.NativeAd(
       adUnitId: _nativeAdUnitId,
-      factoryId: 'listTile', // This ID must match a factory in your native code
       request: const admob.AdRequest(),
+      nativeTemplateStyle: _createNativeTemplateStyle(
+        templateType: templateType,
+        adThemeStyle: adThemeStyle,
+      ),
       listener: admob.NativeAdListener(
         onAdLoaded: (ad) {
           _logger.info('Native Ad loaded successfully.');
@@ -138,10 +152,49 @@ class AdMobAdProvider implements AdProvider {
     }
 
     // Map the Google Mobile Ads NativeAd to our generic NativeAd model.
-    // Only the ID and the raw adObject are stored, as per the simplified model.
     return app_native_ad.NativeAd(
       id: _uuid.v4(), // Generate a unique ID for our internal model
+      provider: app_native_ad.AdProviderType.admob, // Set the provider
       adObject: googleNativeAd, // Store the original AdMob object
+    );
+  }
+
+  /// Creates a [NativeTemplateStyle] based on the app's current theme.
+  ///
+  /// This method maps the application's theme properties (colors, text styles)
+  /// to the AdMob native ad styling options, ensuring a consistent look and feel.
+  admob.NativeTemplateStyle _createNativeTemplateStyle({
+    required admob.TemplateType templateType,
+    required AdThemeStyle adThemeStyle,
+  }) {
+    return admob.NativeTemplateStyle(
+      templateType: templateType,
+      mainBackgroundColor: adThemeStyle.mainBackgroundColor,
+      cornerRadius: adThemeStyle.cornerRadius,
+      callToActionTextStyle: admob.NativeTemplateTextStyle(
+        textColor: adThemeStyle.callToActionTextColor,
+        backgroundColor: adThemeStyle.callToActionBackgroundColor,
+        style: admob.NativeTemplateFontStyle.normal,
+        size: adThemeStyle.callToActionTextSize,
+      ),
+      primaryTextStyle: admob.NativeTemplateTextStyle(
+        textColor: adThemeStyle.primaryTextColor,
+        backgroundColor: adThemeStyle.primaryBackgroundColor,
+        style: admob.NativeTemplateFontStyle.bold,
+        size: adThemeStyle.primaryTextSize,
+      ),
+      secondaryTextStyle: admob.NativeTemplateTextStyle(
+        textColor: adThemeStyle.secondaryTextColor,
+        backgroundColor: adThemeStyle.secondaryBackgroundColor,
+        style: admob.NativeTemplateFontStyle.normal,
+        size: adThemeStyle.secondaryTextSize,
+      ),
+      tertiaryTextStyle: admob.NativeTemplateTextStyle(
+        textColor: adThemeStyle.tertiaryTextColor,
+        backgroundColor: adThemeStyle.tertiaryBackgroundColor,
+        style: admob.NativeTemplateFontStyle.normal,
+        size: adThemeStyle.tertiaryTextSize,
+      ),
     );
   }
 }

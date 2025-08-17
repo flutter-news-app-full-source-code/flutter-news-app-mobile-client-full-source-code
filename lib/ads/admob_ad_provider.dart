@@ -8,7 +8,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/nativ
     as app_native_ad;
 import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
 import 'package:logging/logging.dart';
-import 'package:ui_kit/ui_kit.dart';
 import 'package:uuid/uuid.dart';
 
 /// {@template admob_ad_provider}

@@ -10,7 +10,12 @@ import 'package:flutter/foundation.dart';
 enum AdProviderType {
   /// Google AdMob provider.
   admob,
-  // Add other providers here in the future, e.g., meta, appLovin
+
+  /// A placeholder provider for platforms where native ads are not supported.
+  ///
+  /// This is primarily used for the web demo environment to maintain UI
+  /// consistency without relying on native SDKs.
+  placeholder,
 }
 
 /// {@template native_ad}

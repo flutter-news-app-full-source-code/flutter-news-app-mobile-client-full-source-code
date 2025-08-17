@@ -11,7 +11,7 @@ plugins {
 android {
     namespace = "com.example.flutter_news_app_mobile_client_full_source_code"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "29.0.13113456"
+    ndkVersion = "29.0.13846066"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

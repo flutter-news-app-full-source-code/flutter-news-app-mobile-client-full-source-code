@@ -46,7 +46,13 @@ class EntityDetailsToggleFollowRequested extends EntityDetailsEvent {
 
 /// Event to load the next page of headlines for the current entity.
 class EntityDetailsLoadMoreHeadlinesRequested extends EntityDetailsEvent {
-  const EntityDetailsLoadMoreHeadlinesRequested();
+  const EntityDetailsLoadMoreHeadlinesRequested({required this.adThemeStyle});
+
+  /// The current ad theme style, required for ad injection.
+  final AdThemeStyle adThemeStyle;
+
+  @override
+  List<Object> get props => [adThemeStyle];
 }
 
 /// Internal event to notify the BLoC that the user's content preferences

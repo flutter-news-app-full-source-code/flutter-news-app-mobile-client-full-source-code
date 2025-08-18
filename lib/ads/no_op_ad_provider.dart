@@ -52,6 +52,10 @@ class NoOpAdProvider implements AdProvider {
       id: _uuid.v4(),
       provider: AdProviderType.placeholder,
       adObject: Object(), // Dummy object
+      templateType: switch (imageStyle) {
+        HeadlineImageStyle.largeThumbnail => NativeAdTemplateType.medium,
+        _ => NativeAdTemplateType.small,
+      },
     );
   }
 }

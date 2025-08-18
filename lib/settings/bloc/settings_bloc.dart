@@ -36,10 +36,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       _onAppFontSizeChanged,
       transformer: sequential(),
     );
-    on<SettingsHeadlineImageStyleChanged>(
-      _onHeadlineImageStyleChanged,
-      transformer: sequential(),
-    );
     on<SettingsAppFontTypeChanged>(
       _onAppFontTypeChanged,
       transformer: sequential(),
@@ -168,9 +164,11 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       ),
     );
     emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));
-    await _persistSettings(updatedSettings, emit);
-    // Clear ad cache when theme accent changes to ensure new ads are styled correctly.
+    // When the theme's accent color changes, ads must be reloaded to reflect
+    // the new styling. Clearing the cache ensures that any visible or
+    // soon-to-be-visible ads are fetched again with the updated theme.
     AdCacheService().clearAllAds();
+    await _persistSettings(updatedSettings, emit);
   }
 
   Future<void> _onAppFontSizeChanged(
@@ -186,24 +184,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     );
     emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));
     await _persistSettings(updatedSettings, emit);
-  }
-
-  Future<void> _onHeadlineImageStyleChanged(
-    SettingsHeadlineImageStyleChanged event,
-    Emitter<SettingsState> emit,
-  ) async {
-    if (state.userAppSettings == null) return;
-
-    final updatedSettings = state.userAppSettings!.copyWith(
-      feedPreferences: state.userAppSettings!.feedPreferences.copyWith(
-        headlineImageStyle: event.imageStyle,
-      ),
-    );
-    emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));
-    await _persistSettings(updatedSettings, emit);
-    // Clear ad cache when headline image style changes to ensure new ads are
-    // loaded with the correct template type (small/medium).
-    AdCacheService().clearAllAds();
   }
 
   Future<void> _onAppFontTypeChanged(
@@ -248,6 +228,11 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       ),
     );
     emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));
+    // The headline image style directly influences which native ad template
+    // (small or medium) is requested. To ensure the correct ad format is
+    // displayed, the cache must be cleared, forcing a new ad load with the
+    // appropriate template.
+    AdCacheService().clearAllAds();
     await _persistSettings(updatedSettings, emit);
   }
 

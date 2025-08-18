@@ -16,14 +16,15 @@ import 'package:logging/logging.dart';
 /// the cache is cleared (e.g., on a full feed refresh).
 /// {@endtemplate}
 class AdCacheService {
+
+  /// Factory constructor to provide the singleton instance.
+  factory AdCacheService() => _instance;
+  
   /// Private constructor for the singleton pattern.
   AdCacheService._internal() : _logger = Logger('AdCacheService');
 
   /// The single instance of [AdCacheService].
   static final AdCacheService _instance = AdCacheService._internal();
-
-  /// Factory constructor to provide the singleton instance.
-  factory AdCacheService() => _instance;
 
   final Logger _logger;
 

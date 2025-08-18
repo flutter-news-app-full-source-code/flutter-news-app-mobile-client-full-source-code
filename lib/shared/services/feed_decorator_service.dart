@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart'; // Import the new AdPlaceholder model
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:uuid/uuid.dart';
@@ -164,29 +165,25 @@ class FeedDecoratorService {
     );
   }
 
-  /// Injects only [Ad] items into a list of [FeedItem]s.
-  ///
-  /// This method is designed for pagination, where new content is added to an
-  /// existing feed without re-evaluating or injecting new decorators.
-  ///
-  /// Returns a new list of [FeedItem] objects, interspersed with ads.
-  Future<List<FeedItem>> injectAds({
-    required List<FeedItem> feedItems,
-    required User? user,
-    required AdConfig adConfig,
-    required HeadlineImageStyle imageStyle,
-    required AdThemeStyle adThemeStyle,
-    int processedContentItemCount = 0,
-  }) async {
-    return _injectAds(
-      feedItems: feedItems,
-      user: user,
-      adConfig: adConfig,
-      processedContentItemCount: processedContentItemCount,
-      imageStyle: imageStyle,
-      adThemeStyle: adThemeStyle,
-    );
-  }
+  // The public `injectAds` method has been removed.
+  //
+  // Rationale for removal:
+  // In the new architecture, the responsibility for loading and managing
+  // native ads has been completely decoupled from the FeedDecoratorService
+  // and the BLoC. Instead of injecting fully loaded `AdFeedItem` objects,
+  // this service now only injects stateless `AdPlaceholder` markers.
+  //
+  // The actual ad loading and lifecycle management (including caching and
+  // disposal) is now handled by the new `AdLoaderWidget` in the UI layer.
+  // This simplifies the FeedDecoratorService's role and prevents the BLoC
+  // from holding onto stateful native ad objects, which was the root cause
+  // of previous crashes and performance issues during scrolling.
+  //
+  // Therefore, the `_injectAds` private method is now only called internally
+  // by `decorateFeed` to place placeholders, and there is no longer a need
+  // for a public method to inject already-loaded ads for pagination.
+  // Pagination now simply adds more content, and the `AdLoaderWidget`
+  // handles ad loading on demand.
 
   /// Determines the single highest-priority feed decorator that is currently
   /// due to be shown to the user.
@@ -428,14 +425,15 @@ class FeedDecoratorService {
       //    multiple of the ad frequency.
       if (currentContentItemCount >= adPlacementInterval &&
           (currentContentItemCount - adPlacementInterval) % adFrequency == 0) {
-        // Request an ad from the AdService.
-        final adToInject = await _adService.getAd(
-          imageStyle: imageStyle,
-          adThemeStyle: adThemeStyle,
-        );
-        if (adToInject != null) {
-          result.add(adToInject);
-        }
+        // Instead of injecting a fully loaded ad, inject an AdPlaceholder.
+        // This is a crucial change: the FeedDecoratorService no longer loads
+        // the actual ad. It only marks a spot for an ad.
+        //
+        // The actual ad loading will be handled by a dedicated `AdLoaderWidget`
+        // in the UI layer when this placeholder scrolls into view. This
+        // decouples ad loading from the BLoC's state and allows for efficient
+        // caching and disposal of native ad resources.
+        result.add(AdPlaceholder(id: _uuid.v4()));
       }
     }
     return result;

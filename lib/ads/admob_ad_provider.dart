@@ -119,7 +119,9 @@ class AdMobAdProvider implements AdProvider {
         },
         onAdClosed: (ad) {
           _logger.info('Native Ad closed.');
-          ad.dispose();
+          // The ad object is now disposed by the AdmobNativeAdWidget (StatefulWidget)
+          // when it is removed from the widget tree. Removing this dispose call
+          // here prevents premature disposal and potential crashes.
         },
         onAdOpened: (ad) {
           _logger.info('Native Ad opened.');

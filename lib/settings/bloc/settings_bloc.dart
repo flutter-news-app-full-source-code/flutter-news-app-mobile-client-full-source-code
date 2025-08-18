@@ -5,6 +5,7 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_cache_service.dart';
 
 part 'settings_event.dart';
 part 'settings_state.dart';
@@ -33,6 +34,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     );
     on<SettingsAppFontSizeChanged>(
       _onAppFontSizeChanged,
+      transformer: sequential(),
+    );
+    on<SettingsHeadlineImageStyleChanged>(
+      _onHeadlineImageStyleChanged,
       transformer: sequential(),
     );
     on<SettingsAppFontTypeChanged>(
@@ -164,6 +169,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     );
     emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));
     await _persistSettings(updatedSettings, emit);
+    // Clear ad cache when theme accent changes to ensure new ads are styled correctly.
+    AdCacheService().clearAllAds();
   }
 
   Future<void> _onAppFontSizeChanged(
@@ -179,6 +186,24 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     );
     emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));
     await _persistSettings(updatedSettings, emit);
+  }
+
+  Future<void> _onHeadlineImageStyleChanged(
+    SettingsHeadlineImageStyleChanged event,
+    Emitter<SettingsState> emit,
+  ) async {
+    if (state.userAppSettings == null) return;
+
+    final updatedSettings = state.userAppSettings!.copyWith(
+      feedPreferences: state.userAppSettings!.feedPreferences.copyWith(
+        headlineImageStyle: event.imageStyle,
+      ),
+    );
+    emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));
+    await _persistSettings(updatedSettings, emit);
+    // Clear ad cache when headline image style changes to ensure new ads are
+    // loaded with the correct template type (small/medium).
+    AdCacheService().clearAllAds();
   }
 
   Future<void> _onAppFontTypeChanged(

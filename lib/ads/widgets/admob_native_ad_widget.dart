@@ -36,6 +36,17 @@ class AdmobNativeAdWidget extends StatelessWidget {
 
     // The AdWidget from the google_mobile_ads package handles the rendering
     // of the pre-loaded native ad.
-    return admob.AdWidget(ad: adObject);
+    // We wrap it in a SizedBox to provide explicit height constraints,
+    // which is crucial for platform views (like native ads) within scrollable
+    // lists to prevent "unbounded height" errors.
+    final adHeight = switch (nativeAd.templateType) {
+      app_ad_models.NativeAdTemplateType.small => 120, // Example height for small template
+      app_ad_models.NativeAdTemplateType.medium => 340, // Example height for medium template
+    };
+
+    return SizedBox(
+      height: adHeight.toDouble(),
+      child: admob.AdWidget(ad: adObject),
+    );
   }
 }

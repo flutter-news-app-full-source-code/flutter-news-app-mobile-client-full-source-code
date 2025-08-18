@@ -11,8 +11,11 @@ import 'package:logging/logging.dart';
 /// and rendering it using the `AdWidget` from the `google_mobile_ads` package.
 /// It expects the `adObject` within the [app_ad_models.NativeAd] to be a fully
 /// loaded [admob.NativeAd] instance.
+///
+/// This is a [StatefulWidget] to properly manage the lifecycle of the native
+/// ad object, ensuring it is disposed when the widget is removed from the tree.
 /// {@endtemplate}
-class AdmobNativeAdWidget extends StatelessWidget {
+class AdmobNativeAdWidget extends StatefulWidget {
   /// {@macro admob_native_ad_widget}
   const AdmobNativeAdWidget({required this.nativeAd, super.key});
 
@@ -20,33 +23,51 @@ class AdmobNativeAdWidget extends StatelessWidget {
   final app_ad_models.NativeAd nativeAd;
 
   @override
-  Widget build(BuildContext context) {
-    final adObject = nativeAd.adObject;
+  State<AdmobNativeAdWidget> createState() => _AdmobNativeAdWidgetState();
+}
 
-    // Safely cast the generic ad object to the expected AdMob native ad type.
-    if (adObject is! admob.NativeAd) {
-      Logger('AdmobNativeAdWidget').severe(
+class _AdmobNativeAdWidgetState extends State<AdmobNativeAdWidget> {
+  admob.NativeAd? _ad;
+  final Logger _logger = Logger('AdmobNativeAdWidget');
+
+  @override
+  void initState() {
+    super.initState();
+    // Ensure the adObject is of the correct type and assign it.
+    if (widget.nativeAd.adObject is admob.NativeAd) {
+      _ad = widget.nativeAd.adObject as admob.NativeAd;
+    } else {
+      _logger.severe(
         'The provided ad object is not of type admob.NativeAd. '
-        'Received: ${adObject.runtimeType}. Ad will not be displayed.',
+        'Received: ${widget.nativeAd.adObject.runtimeType}. Ad will not be displayed.',
       );
-      // Return an empty widget if the ad object is not of the correct type
-      // to prevent runtime errors.
+    }
+  }
+
+  @override
+  void dispose() {
+    // Dispose the native ad when the widget is removed from the tree.
+    // This is crucial for releasing native resources and preventing crashes.
+    _ad?.dispose();
+    _logger.info('AdmobNativeAdWidget disposed and native ad released.');
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_ad == null) {
       return const SizedBox.shrink();
     }
 
-    // The AdWidget from the google_mobile_ads package handles the rendering
-    // of the pre-loaded native ad.
-    // We wrap it in a SizedBox to provide explicit height constraints,
-    // which is crucial for platform views (like native ads) within scrollable
-    // lists to prevent "unbounded height" errors.
-    final adHeight = switch (nativeAd.templateType) {
-      app_ad_models.NativeAdTemplateType.small => 120, // Example height for small template
-      app_ad_models.NativeAdTemplateType.medium => 340, // Example height for medium template
+    // Determine the height based on the native ad template type.
+    final adHeight = switch (widget.nativeAd.templateType) {
+      app_ad_models.NativeAdTemplateType.small => 120,
+      app_ad_models.NativeAdTemplateType.medium => 340,
     };
 
     return SizedBox(
       height: adHeight.toDouble(),
-      child: admob.AdWidget(ad: adObject),
+      child: admob.AdWidget(ad: _ad!),
     );
   }
 }

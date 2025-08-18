@@ -33,6 +33,8 @@ This app comes packed with all the features you need to launch a professional ne
 *   Built with a clean, provider-agnostic ad architecture that makes monetization simple and flexible.
 *   Features a decoupled design, allowing easy integration and swapping of various ad networks (e.g., Google AdMob, Meta Audience Network) without rewriting core logic.
 *   Comes with a ready-to-go Google AdMob integration for native ads in the feed.
+*   **Theme-Aware Ads:** Native ads automatically adapt their appearance to match the user's selected theme, including light/dark modes and accent colors, ensuring a seamless and visually consistent user experience.
+*   **Format-Aware Ads:** The ad system intelligently requests the appropriate native ad format (e.g., small or large template) based on the user's feed display preferences, ensuring ads always fit perfectly within the surrounding content.
 > **Your Advantage:** Start generating revenue from day one with a highly extensible and robust ad system that’s built to scale with your business. 💸
 
 #### 🔐 **Robust User Authentication**

@@ -345,12 +345,22 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                         } else if (feedItem is Source) {
                           return SourceItemWidget(source: feedItem);
                         } else if (feedItem is AdPlaceholder) {
+                          // Retrieve the user's preferred headline image style from the AppBloc.
+                          // This is the single source of truth for this setting.
+                          final imageStyle = context
+                              .watch<AppBloc>()
+                              .state
+                              .settings
+                              .feedPreferences
+                              .headlineImageStyle;
+
                           return AdLoaderWidget(
                             adPlaceholder: feedItem,
                             adService: context.read<AdService>(),
                             adThemeStyle: AdThemeStyle.fromTheme(
                               Theme.of(context),
                             ),
+                            imageStyle: imageStyle,
                           );
                         }
                         return const SizedBox.shrink();

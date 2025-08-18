@@ -97,19 +97,16 @@ class FeedDecoratorService {
   /// Creates a [FeedDecoratorService].
   ///
   /// Requires [DataRepository] instances for [Topic] and [Source] to fetch
-  /// content for collection decorators, and an [AdService] to inject ads.
+  /// content for collection decorators.
   FeedDecoratorService({
     required DataRepository<Topic> topicsRepository,
     required DataRepository<Source> sourcesRepository,
-    required AdService adService,
   }) : _topicsRepository = topicsRepository,
-       _sourcesRepository = sourcesRepository,
-       _adService = adService;
+       _sourcesRepository = sourcesRepository;
 
   final Uuid _uuid = const Uuid();
   final DataRepository<Topic> _topicsRepository;
   final DataRepository<Source> _sourcesRepository;
-  final AdService _adService;
 
   // The zero-based index in the feed where the decorator will be inserted.
   // A value of 3 places it after the third headline, which is a common

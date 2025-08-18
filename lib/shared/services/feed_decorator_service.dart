@@ -56,17 +56,43 @@ class _DecoratorCandidate {
 /// This service implements a multi-stage pipeline to ensure that the most
 /// relevant and timely items are injected in a logical and non-intrusive way.
 ///
-/// **Ad Injection Architecture:**
-/// In the current architecture, the responsibility for loading and managing
-/// native ads is completely decoupled from this service and the BLoC layer.
-/// Instead of injecting fully loaded `AdFeedItem` objects, this service now
-/// only injects stateless `AdPlaceholder` markers into the feed.
+/// ### Ad Injection Architecture Explained
 ///
-/// The actual ad loading and lifecycle management (including caching and
-/// disposal) is handled by the `AdLoaderWidget` in the UI layer. This
-/// simplifies this service's role and prevents the BLoC from holding onto
-/// stateful native ad objects, which was the root cause of previous crashes
-/// and performance issues during scrolling.
+/// To solve lifecycle-related crashes and improve performance, the responsibility
+/// for loading and managing native ads is completely decoupled from this service
+/// and the BLoC layer. The architecture follows this robust, multi-step flow:
+///
+/// 1.  **`FeedDecoratorService` (This Class):**
+///     Instead of loading and injecting fully-loaded, stateful native ad
+///     objects, this service's only role is to inject simple, stateless
+///     `AdPlaceholder` markers into the feed list at appropriate intervals.
+///     This keeps the BLoC's state clean and lightweight.
+///
+/// 2.  **`HeadlinesFeedPage` (UI Layer):**
+///     The `ListView` in the UI receives the mixed list of content and
+///     placeholders from the BLoC. When it encounters an `AdPlaceholder`, it
+///     renders an `AdLoaderWidget`.
+///
+/// 3.  **`AdLoaderWidget` (The Ad Loader):**
+///     This stateful widget is responsible for the entire lifecycle of a single
+///     ad slot. It first checks the `AdCacheService` for a valid, pre-loaded
+///     ad. If not found, it requests a new one from the `AdService`.
+///
+/// 4.  **`AdFeedItemWidget` (The Dispatcher):**
+///     Once the `AdLoaderWidget` has a successfully loaded `NativeAd` object,
+///     it passes this ad to the `AdFeedItemWidget`. This widget acts as a
+///     dispatcher, inspecting the ad's provider type (`admob`, `placeholder`,
+///     etc.) and selecting the correct rendering widget.
+///
+/// 5.  **`AdmobNativeAdWidget` (The Renderer):**
+///     This is the final widget in the chain, responsible for rendering the
+///     actual AdMob native ad. Crucially, it no longer contains any disposal
+///     logic. Its lifecycle is now entirely managed by the `AdCacheService`,
+///     which prevents the ad from being disposed of when it scrolls out of
+///     view, thus fixing the crash.
+///
+/// This architecture ensures a clean separation of concerns, improves stability,
+/// and makes the ad system more maintainable and extensible.
 class FeedDecoratorService {
   /// Creates a [FeedDecoratorService].
   ///

@@ -16,10 +16,9 @@ import 'package:logging/logging.dart';
 /// the cache is cleared (e.g., on a full feed refresh).
 /// {@endtemplate}
 class AdCacheService {
-
   /// Factory constructor to provide the singleton instance.
   factory AdCacheService() => _instance;
-  
+
   /// Private constructor for the singleton pattern.
   AdCacheService._internal() : _logger = Logger('AdCacheService');
 
@@ -87,7 +86,9 @@ class AdCacheService {
       _logger.info('  Cache is empty.');
     } else {
       _cache.forEach((id, ad) {
-        _logger.info('  ID: $id, Provider: ${ad?.provider}, Template: ${ad?.templateType}');
+        _logger.info(
+          '  ID: $id, Provider: ${ad?.provider}, Template: ${ad?.templateType}',
+        );
       });
     }
   }

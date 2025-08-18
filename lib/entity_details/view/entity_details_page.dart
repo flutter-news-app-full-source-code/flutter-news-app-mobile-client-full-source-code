@@ -52,11 +52,9 @@ class EntityDetailsPage extends StatelessWidget {
       create: (context) {
         final topicsRepository = context.read<DataRepository<Topic>>();
         final sourcesRepository = context.read<DataRepository<Source>>();
-        final adService = context.read<AdService>();
         final feedDecoratorService = FeedDecoratorService(
           topicsRepository: topicsRepository,
           sourcesRepository: sourcesRepository,
-          adService: adService,
         );
         final entityDetailsBloc =
             EntityDetailsBloc(
@@ -387,8 +385,9 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                         return AdLoaderWidget(
                           adPlaceholder: item,
                           adService: context.read<AdService>(),
-                          adThemeStyle:
-                              AdThemeStyle.fromTheme(Theme.of(context)),
+                          adThemeStyle: AdThemeStyle.fromTheme(
+                            Theme.of(context),
+                          ),
                         );
                       }
                       return const SizedBox.shrink();

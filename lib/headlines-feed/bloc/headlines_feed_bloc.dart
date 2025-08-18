@@ -111,8 +111,11 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       );
 
       // For pagination, only inject ad placeholders, not feed actions.
-      final newProcessedFeedItems =
-          await _feedDecoratorService.injectAdPlaceholders(
+      //
+      // This method injects stateless `AdPlaceholder` markers into the feed.
+      // The full ad loading and lifecycle is managed by the UI layer.
+      // See `FeedDecoratorService` for a detailed explanation.
+      final newProcessedFeedItems = await _feedDecoratorService.injectAdPlaceholders(
         feedItems: headlineResponse.items,
         user: currentUser,
         adConfig: remoteConfig.adConfig,
@@ -164,7 +167,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           ? await _userContentPreferencesRepository.read(id: currentUser!.id)
           : null;
 
-      // For a major load, use the full decoration pipeline.
+      // For a major load, use the full decoration pipeline, which includes
+      // injecting a high-priority decorator and stateless ad placeholders.
+      // See `FeedDecoratorService` for a detailed explanation of the ad architecture.
       final decorationResult = await _feedDecoratorService.decorateFeed(
         headlines: headlineResponse.items,
         user: currentUser,
@@ -249,6 +254,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           ? await _userContentPreferencesRepository.read(id: currentUser!.id)
           : null;
 
+      // Use the full decoration pipeline, which includes injecting a
+      // high-priority decorator and stateless ad placeholders.
+      // See `FeedDecoratorService` for a detailed explanation of the ad architecture.
       final decorationResult = await _feedDecoratorService.decorateFeed(
         headlines: headlineResponse.items,
         user: currentUser,
@@ -329,6 +337,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           ? await _userContentPreferencesRepository.read(id: currentUser!.id)
           : null;
 
+      // Use the full decoration pipeline, which includes injecting a
+      // high-priority decorator and stateless ad placeholders.
+      // See `FeedDecoratorService` for a detailed explanation of the ad architecture.
       final decorationResult = await _feedDecoratorService.decorateFeed(
         headlines: headlineResponse.items,
         user: currentUser,

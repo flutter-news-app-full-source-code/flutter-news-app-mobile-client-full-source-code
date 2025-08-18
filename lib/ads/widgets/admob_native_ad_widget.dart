@@ -42,19 +42,22 @@ class _AdmobNativeAdWidgetState extends State<AdmobNativeAdWidget> {
   void didUpdateWidget(covariant AdmobNativeAdWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     // If the nativeAd object itself has changed (e.g., a new ad was loaded
-    // for the same placeholder ID), dispose the old ad and set the new one.
+    // for the same placeholder ID), set the new one.
+    // The disposal of the old ad is now handled by the AdCacheService when
+    // the cache is cleared, preventing premature disposal of cached ads.
     if (widget.nativeAd.id != oldWidget.nativeAd.id) {
-      _ad?.dispose();
       _setAd();
     }
   }
 
   @override
   void dispose() {
-    // Dispose the native ad when the widget is removed from the tree.
-    // This is crucial for releasing native resources and preventing crashes.
-    _ad?.dispose();
-    _logger.info('AdmobNativeAdWidget disposed and native ad released.');
+    // The native ad object is no longer disposed here.
+    // Its lifecycle is managed by the AdCacheService to prevent crashes
+    // when the widget is scrolled out of view and then back in.
+    // The ad will be disposed when AdCacheService.clearAllAds() is called,
+    // typically on a full feed refresh.
+    _logger.info('AdmobNativeAdWidget disposed.');
     super.dispose();
   }
 
@@ -88,7 +91,7 @@ class _AdmobNativeAdWidgetState extends State<AdmobNativeAdWidget> {
     // We wrap it in a SizedBox to provide explicit height constraints,
     // which is crucial for platform views (like native ads) within scrollable
     // lists to prevent "unbounded height" errors.
-    
+
     final adHeight = switch (widget.nativeAd.templateType) {
       app_ad_models.NativeAdTemplateType.small => 120,
       app_ad_models.NativeAdTemplateType.medium => 340,

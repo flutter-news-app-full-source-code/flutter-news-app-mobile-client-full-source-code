@@ -2,10 +2,11 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_feed_item.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/admob_native_ad_widget.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/ad_feed_item_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/placeholder_ad_widget.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -71,7 +72,9 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
     final cachedAd = _adCacheService.getAd(widget.adPlaceholder.id);
 
     if (cachedAd != null) {
-      _logger.info('Using cached ad for placeholder ID: ${widget.adPlaceholder.id}');
+      _logger.info(
+        'Using cached ad for placeholder ID: ${widget.adPlaceholder.id}',
+      );
       setState(() {
         _loadedAd = cachedAd;
         _isLoading = false;
@@ -79,7 +82,9 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
       return;
     }
 
-    _logger.info('Loading new ad for placeholder ID: ${widget.adPlaceholder.id}');
+    _logger.info(
+      'Loading new ad for placeholder ID: ${widget.adPlaceholder.id}',
+    );
     try {
       // Request a new native ad from the AdService.
       // The imageStyle is hardcoded to largeThumbnail for now, but could be
@@ -90,7 +95,9 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
       );
 
       if (adFeedItem != null) {
-        _logger.info('New ad loaded for placeholder ID: ${widget.adPlaceholder.id}');
+        _logger.info(
+          'New ad loaded for placeholder ID: ${widget.adPlaceholder.id}',
+        );
         // Store the newly loaded ad in the cache.
         _adCacheService.setAd(widget.adPlaceholder.id, adFeedItem.nativeAd);
         setState(() {
@@ -98,7 +105,9 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
           _isLoading = false;
         });
       } else {
-        _logger.warning('Failed to load ad for placeholder ID: ${widget.adPlaceholder.id}. No ad returned.');
+        _logger.warning(
+          'Failed to load ad for placeholder ID: ${widget.adPlaceholder.id}. No ad returned.',
+        );
         setState(() {
           _hasError = true;
           _isLoading = false;
@@ -129,9 +138,7 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
         child: AspectRatio(
           aspectRatio: 16 / 9, // Common aspect ratio for ads
           child: Card(
-            child: Center(
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
+            child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
           ),
         ),
       );
@@ -139,9 +146,16 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
       // Show a placeholder or error message if ad loading failed.
       return const PlaceholderAdWidget();
     } else {
-      // If an ad is successfully loaded, display it using the appropriate widget.
-      // The AdmobNativeAdWidget is responsible for rendering the native ad object.
-      return AdmobNativeAdWidget(nativeAd: _loadedAd!);
+      // If an ad is successfully loaded, wrap it in an AdFeedItem
+      // and pass it to the AdFeedItemWidget for rendering.
+      // This improves separation of concerns, as AdLoaderWidget is now
+      // only responsible for loading, not rendering logic.
+      return AdFeedItemWidget(
+        adFeedItem: AdFeedItem(
+          id: widget.adPlaceholder.id,
+          nativeAd: _loadedAd!,
+        ),
+      );
     }
   }
 }

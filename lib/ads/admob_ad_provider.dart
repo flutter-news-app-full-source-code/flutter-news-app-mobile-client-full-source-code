@@ -108,7 +108,8 @@ class AdMobAdProvider implements AdProvider {
         },
         onAdFailedToLoad: (ad, error) {
           _logger.severe('Native Ad failed to load: $error');
-          ad.dispose();
+          // The ad object is automatically disposed by the SDK on failure.
+          // Calling dispose here can lead to race conditions and errors.
           completer.complete(null);
         },
         onAdClicked: (ad) {

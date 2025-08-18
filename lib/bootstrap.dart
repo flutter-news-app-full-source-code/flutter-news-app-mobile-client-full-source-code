@@ -7,11 +7,10 @@ import 'package:data_api/data_api.dart';
 import 'package:data_client/data_client.dart';
 import 'package:data_inmemory/data_inmemory.dart';
 import 'package:data_repository/data_repository.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/admob_ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/no_op_ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/app.dart';
@@ -47,7 +46,7 @@ Future<Widget> bootstrap(
   // Initialize AdProvider based on platform.
   // On web, use a No-Op provider to prevent MissingPluginException,
   // as Google Mobile Ads SDK does not support native ads on web.
-  final AdProvider adProvider = kIsWeb
+  final adProvider = kIsWeb
       ? NoOpAdProvider(logger: logger)
       : AdMobAdProvider(logger: logger);
 

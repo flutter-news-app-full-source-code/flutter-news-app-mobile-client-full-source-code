@@ -6,7 +6,6 @@ import 'package:bloc/bloc.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
@@ -226,8 +225,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       // This method injects stateless `AdPlaceholder` markers into the feed.
       // The full ad loading and lifecycle is managed by the UI layer.
       // See `FeedDecoratorService` for a detailed explanation.
-      final newProcessedFeedItems =
-          await _feedDecoratorService.injectAdPlaceholders(
+      final newProcessedFeedItems = await _feedDecoratorService.injectAdPlaceholders(
         feedItems: headlineResponse.items,
         user: currentUser,
         adConfig: remoteConfig.adConfig,

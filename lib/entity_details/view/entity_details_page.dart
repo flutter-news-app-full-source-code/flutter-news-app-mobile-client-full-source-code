@@ -108,10 +108,10 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
   void _onScroll() {
     if (_isBottom) {
       context.read<EntityDetailsBloc>().add(
-            EntityDetailsLoadMoreHeadlinesRequested(
-              adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
-            ),
-          );
+        EntityDetailsLoadMoreHeadlinesRequested(
+          adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+        ),
+      );
     }
   }
 
@@ -392,7 +392,7 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                             .settings
                             .feedPreferences
                             .headlineImageStyle;
-                            
+
                         return AdLoaderWidget(
                           adPlaceholder: item,
                           adService: context.read<AdService>(),

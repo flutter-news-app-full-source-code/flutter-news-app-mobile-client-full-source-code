@@ -11,14 +11,6 @@ import 'package:logging/logging.dart';
 /// and rendering it using the `AdWidget` from the `google_mobile_ads` package.
 /// It expects the `adObject` within the [app_ad_models.NativeAd] to be a fully
 /// loaded [admob.NativeAd] instance.
-/// {@endtemplate}
-/// {@template admob_native_ad_widget}
-/// A widget that specifically renders a Google AdMob native ad.
-///
-/// This widget is responsible for taking the generic [app_ad_models.NativeAd]
-/// and rendering it using the `AdWidget` from the `google_mobile_ads` package.
-/// It expects the `adObject` within the [app_ad_models.NativeAd] to be a fully
-/// loaded [admob.NativeAd] instance.
 ///
 /// This is a [StatefulWidget] to properly manage the lifecycle of the native
 /// ad object, ensuring it is disposed when the widget is removed from the tree

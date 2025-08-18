@@ -108,8 +108,10 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
   void _onScroll() {
     if (_isBottom) {
       context.read<EntityDetailsBloc>().add(
-        const EntityDetailsLoadMoreHeadlinesRequested(),
-      );
+            EntityDetailsLoadMoreHeadlinesRequested(
+              adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+            ),
+          );
     }
   }
 

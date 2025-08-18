@@ -5,9 +5,10 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_feed_item.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/widgets.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/ad_loader_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
@@ -54,10 +55,10 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         context.read<HeadlinesFeedBloc>().add(
-              HeadlinesFeedFetchRequested(
-                adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
-              ),
-            );
+          HeadlinesFeedFetchRequested(
+            adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+          ),
+        );
       }
     });
   }
@@ -317,8 +318,12 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                         );
                     }
                     return tile;
-                  } else if (item is AdFeedItem) {
-                    return AdFeedItemWidget(adFeedItem: item);
+                  } else if (item is AdPlaceholder) {
+                    return AdLoaderWidget(
+                      adPlaceholder: item,
+                      adService: context.read<AdService>(),
+                      adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+                    );
                   } else if (item is CallToActionItem) {
                     return CallToActionDecoratorWidget(
                       item: item,

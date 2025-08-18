@@ -28,6 +28,7 @@ class AdLoaderWidget extends StatefulWidget {
     required this.adPlaceholder,
     required this.adService,
     required this.adThemeStyle,
+    required this.imageStyle,
     super.key,
   });
 
@@ -39,6 +40,9 @@ class AdLoaderWidget extends StatefulWidget {
 
   /// The current theme style for ads, used during ad loading.
   final AdThemeStyle adThemeStyle;
+
+  /// The desired image style for the ad, which determines the native template.
+  final HeadlineImageStyle imageStyle;
 
   @override
   State<AdLoaderWidget> createState() => _AdLoaderWidgetState();
@@ -86,11 +90,12 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
       'Loading new ad for placeholder ID: ${widget.adPlaceholder.id}',
     );
     try {
-      // Request a new native ad from the AdService.
-      // The imageStyle is hardcoded to largeThumbnail for now, but could be
-      // made configurable based on the feed's display preferences.
+      // Request a new native ad from the AdService, passing the dynamically
+      // provided imageStyle. This ensures that the correct native ad template
+      // (small or medium) is requested based on the user's current feed
+      // display settings.
       final adFeedItem = await widget.adService.getAd(
-        imageStyle: HeadlineImageStyle.largeThumbnail,
+        imageStyle: widget.imageStyle,
         adThemeStyle: widget.adThemeStyle,
       );
 

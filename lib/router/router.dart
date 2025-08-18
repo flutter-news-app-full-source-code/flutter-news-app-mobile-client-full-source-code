@@ -372,10 +372,6 @@ GoRouter createRouter({
                         .read<DataRepository<UserContentPreferences>>(),
                     feedDecoratorService: feedDecoratorService,
                     appBloc: context.read<AppBloc>(),
-                  )..add(
-                    HeadlinesFeedFetchRequested(
-                      adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
-                    ),
                   );
                 },
               ),

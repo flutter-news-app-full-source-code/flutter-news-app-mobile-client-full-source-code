@@ -111,6 +111,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       );
 
       // For pagination, only inject ad placeholders, not feed actions.
+      // 
       // This method injects stateless `AdPlaceholder` markers into the feed.
       // The full ad loading and lifecycle is managed by the UI layer.
       // See `FeedDecoratorService` for a detailed explanation.

@@ -15,6 +15,7 @@ import 'package:logging/logging.dart';
 /// This is a [StatefulWidget] to properly manage the lifecycle of the native
 /// ad object, ensuring it is disposed when the widget is removed from the tree
 /// or when the underlying ad object changes.
+
 /// {@endtemplate}
 class AdmobNativeAdWidget extends StatefulWidget {
   /// {@macro admob_native_ad_widget}
@@ -66,6 +67,7 @@ class _AdmobNativeAdWidgetState extends State<AdmobNativeAdWidget> {
       _ad = widget.nativeAd.adObject as admob.NativeAd;
     } else {
       _ad = null; // Ensure _ad is null if the type is incorrect
+
       _logger.severe(
         'The provided ad object is not of type admob.NativeAd. '
         'Received: ${widget.nativeAd.adObject.runtimeType}. Ad will not be displayed.',
@@ -86,6 +88,7 @@ class _AdmobNativeAdWidgetState extends State<AdmobNativeAdWidget> {
     // We wrap it in a SizedBox to provide explicit height constraints,
     // which is crucial for platform views (like native ads) within scrollable
     // lists to prevent "unbounded height" errors.
+    
     final adHeight = switch (widget.nativeAd.templateType) {
       app_ad_models.NativeAdTemplateType.small => 120,
       app_ad_models.NativeAdTemplateType.medium => 340,

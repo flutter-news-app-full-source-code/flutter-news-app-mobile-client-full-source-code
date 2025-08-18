@@ -8,6 +8,7 @@ import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_decorator_service.dart';
@@ -63,6 +64,9 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     EntityDetailsLoadRequested event,
     Emitter<EntityDetailsState> emit,
   ) async {
+    // When loading a new entity's details, clear any previously cached ads
+    // to ensure a fresh set of ads is displayed for the new content.
+    AdCacheService().clearAllAds();
     emit(
       state.copyWith(status: EntityDetailsStatus.loading, clearEntity: true),
     );
@@ -109,8 +113,9 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         );
       }
 
-      // For entity details, only inject ads.
-      final processedFeedItems = await _feedDecoratorService.injectAds(
+      // For entity details, only inject ad placeholders.
+      final processedFeedItems =
+          await _feedDecoratorService.injectAdPlaceholders(
         feedItems: headlineResponse.items,
         user: currentUser,
         adConfig: remoteConfig.adConfig,
@@ -211,8 +216,9 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         );
       }
 
-      // For entity details pagination, only inject ads.
-      final newProcessedFeedItems = await _feedDecoratorService.injectAds(
+      // For entity details pagination, only inject ad placeholders.
+      final newProcessedFeedItems =
+          await _feedDecoratorService.injectAdPlaceholders(
         feedItems: headlineResponse.items,
         user: currentUser,
         adConfig: remoteConfig.adConfig,

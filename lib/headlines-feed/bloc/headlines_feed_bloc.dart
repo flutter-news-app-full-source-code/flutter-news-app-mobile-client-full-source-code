@@ -5,6 +5,7 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/headline_filter.dart';
@@ -109,8 +110,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
-      // For pagination, only inject ads, not feed actions.
-      final newProcessedFeedItems = await _feedDecoratorService.injectAds(
+      // For pagination, only inject ad placeholders, not feed actions.
+      final newProcessedFeedItems =
+          await _feedDecoratorService.injectAdPlaceholders(
         feedItems: headlineResponse.items,
         user: currentUser,
         adConfig: remoteConfig.adConfig,
@@ -139,6 +141,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     HeadlinesFeedRefreshRequested event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
+    // On a full refresh, clear the ad cache to ensure fresh ads are loaded.
+    AdCacheService().clearAllAds();
     emit(state.copyWith(status: HeadlinesFeedStatus.loading));
     try {
       final currentUser = _appBloc.state.user;
@@ -213,6 +217,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     HeadlinesFeedFiltersApplied event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
+    // When applying new filters, this is considered a major feed change,
+    // so we clear the ad cache to get a fresh set of relevant ads.
+    AdCacheService().clearAllAds();
     emit(
       state.copyWith(
         status: HeadlinesFeedStatus.loading,
@@ -292,6 +299,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     HeadlinesFeedFiltersCleared event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
+    // Clearing filters is a major feed change, so clear the ad cache.
+    AdCacheService().clearAllAds();
     emit(
       state.copyWith(
         status: HeadlinesFeedStatus.loading,

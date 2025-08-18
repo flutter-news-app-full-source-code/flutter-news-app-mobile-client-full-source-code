@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/ad_loader_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/bloc/entity_details_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
@@ -381,6 +383,13 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                             );
                         }
                         return tile;
+                      } else if (item is AdPlaceholder) {
+                        return AdLoaderWidget(
+                          adPlaceholder: item,
+                          adService: context.read<AdService>(),
+                          adThemeStyle:
+                              AdThemeStyle.fromTheme(Theme.of(context)),
+                        );
                       }
                       return const SizedBox.shrink();
                     },

@@ -118,14 +118,15 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       // This method injects stateless `AdPlaceholder` markers into the feed.
       // The full ad loading and lifecycle is managed by the UI layer.
       // See `FeedDecoratorService` for a detailed explanation.
-      final processedFeedItems =
-          await _feedDecoratorService.injectAdPlaceholders(
-        feedItems: headlineResponse.items,
-        user: currentUser,
-        adConfig: remoteConfig.adConfig,
-        imageStyle: _appBloc.state.settings.feedPreferences.headlineImageStyle,
-        adThemeStyle: event.adThemeStyle,
-      );
+      final processedFeedItems = await _feedDecoratorService
+          .injectAdPlaceholders(
+            feedItems: headlineResponse.items,
+            user: currentUser,
+            adConfig: remoteConfig.adConfig,
+            imageStyle:
+                _appBloc.state.settings.feedPreferences.headlineImageStyle,
+            adThemeStyle: event.adThemeStyle,
+          );
 
       // 3. Determine isFollowing status
       var isCurrentlyFollowing = false;
@@ -225,8 +226,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       // This method injects stateless `AdPlaceholder` markers into the feed.
       // The full ad loading and lifecycle is managed by the UI layer.
       // See `FeedDecoratorService` for a detailed explanation.
-      final newProcessedFeedItems =
-          await _feedDecoratorService.injectAdPlaceholders(
+      final newProcessedFeedItems = await _feedDecoratorService.injectAdPlaceholders(
         feedItems: headlineResponse.items,
         user: currentUser,
         adConfig: remoteConfig.adConfig,

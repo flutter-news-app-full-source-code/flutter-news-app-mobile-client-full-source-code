@@ -91,7 +91,7 @@ class _AdmobNativeAdWidgetState extends State<AdmobNativeAdWidget> {
     // We wrap it in a SizedBox to provide explicit height constraints,
     // which is crucial for platform views (like native ads) within scrollable
     // lists to prevent "unbounded height" errors.
-    
+
     final adHeight = switch (widget.nativeAd.templateType) {
       app_ad_models.NativeAdTemplateType.small => 120,
       app_ad_models.NativeAdTemplateType.medium => 340,

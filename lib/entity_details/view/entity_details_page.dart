@@ -385,8 +385,9 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                         return AdLoaderWidget(
                           adPlaceholder: item,
                           adService: context.read<AdService>(),
-                          adThemeStyle:
-                              AdThemeStyle.fromTheme(Theme.of(context)),
+                          adThemeStyle: AdThemeStyle.fromTheme(
+                            Theme.of(context),
+                          ),
                         );
                       }
                       return const SizedBox.shrink();

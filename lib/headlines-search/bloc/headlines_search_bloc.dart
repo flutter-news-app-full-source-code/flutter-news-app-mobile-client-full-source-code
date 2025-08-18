@@ -110,8 +110,11 @@ class HeadlinesSearchBloc
                 return;
               }
               // For search pagination, only inject ad placeholders.
-              final injectedItems =
-                  await _feedDecoratorService.injectAdPlaceholders(
+              //
+              // This method injects stateless `AdPlaceholder` markers into the feed.
+              // The full ad loading and lifecycle is managed by the UI layer.
+              // See `FeedDecoratorService` for a detailed explanation.
+              final injectedItems = await _feedDecoratorService.injectAdPlaceholders(
                 feedItems: headlines,
                 user: currentUser,
                 adConfig: appConfig.adConfig,
@@ -220,6 +223,10 @@ class HeadlinesSearchBloc
             return;
           }
           // For search results, only inject ad placeholders.
+          //
+          // This method injects stateless `AdPlaceholder` markers into the feed.
+          // The full ad loading and lifecycle is managed by the UI layer.
+          // See `FeedDecoratorService` for a detailed explanation.
           processedItems = await _feedDecoratorService.injectAdPlaceholders(
             feedItems: headlines,
             user: currentUser,

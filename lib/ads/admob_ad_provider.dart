@@ -156,6 +156,10 @@ class AdMobAdProvider implements AdProvider {
       id: _uuid.v4(), // Generate a unique ID for our internal model
       provider: app_native_ad.AdProviderType.admob, // Set the provider
       adObject: googleNativeAd, // Store the original AdMob object
+      templateType: switch (templateType) {
+        admob.TemplateType.small => app_native_ad.NativeAdTemplateType.small,
+        admob.TemplateType.medium => app_native_ad.NativeAdTemplateType.medium,
+      },
     );
   }
 

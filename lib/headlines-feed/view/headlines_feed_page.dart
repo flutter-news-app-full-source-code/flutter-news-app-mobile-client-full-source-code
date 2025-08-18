@@ -319,10 +319,19 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                     }
                     return tile;
                   } else if (item is AdPlaceholder) {
+                    // Retrieve the user's preferred headline image style from the AppBloc.
+                    // This is the single source of truth for this setting.
+                    final imageStyle = context
+                        .watch<AppBloc>()
+                        .state
+                        .settings
+                        .feedPreferences
+                        .headlineImageStyle;
                     return AdLoaderWidget(
                       adPlaceholder: item,
                       adService: context.read<AdService>(),
                       adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+                      imageStyle: imageStyle,
                     );
                   } else if (item is CallToActionItem) {
                     return CallToActionDecoratorWidget(

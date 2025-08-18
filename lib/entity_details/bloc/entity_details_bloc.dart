@@ -226,18 +226,16 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       // This method injects stateless `AdPlaceholder` markers into the feed.
       // The full ad loading and lifecycle is managed by the UI layer.
       // See `FeedDecoratorService` for a detailed explanation.
-      final newProcessedFeedItems = await _feedDecoratorService.injectAdPlaceholders(
+      final newProcessedFeedItems =
+          await _feedDecoratorService.injectAdPlaceholders(
         feedItems: headlineResponse.items,
         user: currentUser,
         adConfig: remoteConfig.adConfig,
         imageStyle: _appBloc.state.settings.feedPreferences.headlineImageStyle,
-        adThemeStyle: AdThemeStyle.fromTheme(
-          ThemeData(
-            brightness: _appBloc.state.themeMode == ThemeMode.dark
-                ? Brightness.dark
-                : Brightness.light,
-          ),
-        ), // Use a default AdThemeStyle for pagination if not passed
+        // Use the AdThemeStyle passed directly from the UI via the event.
+        // This ensures that ads are styled consistently with the current,
+        // fully-resolved theme of the widget, preventing visual discrepancies.
+        adThemeStyle: event.adThemeStyle,
         // Calculate the count of actual content items (headlines) already in the
         // feed. This is crucial for the FeedDecoratorService to correctly apply
         // ad placement rules across paginated loads.

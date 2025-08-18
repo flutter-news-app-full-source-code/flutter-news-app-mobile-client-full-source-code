@@ -108,7 +108,8 @@ class AdMobAdProvider implements AdProvider {
         },
         onAdFailedToLoad: (ad, error) {
           _logger.severe('Native Ad failed to load: $error');
-          ad.dispose();
+          // The ad object is automatically disposed by the SDK on failure.
+          // Calling dispose here can lead to race conditions and errors.
           completer.complete(null);
         },
         onAdClicked: (ad) {
@@ -119,7 +120,9 @@ class AdMobAdProvider implements AdProvider {
         },
         onAdClosed: (ad) {
           _logger.info('Native Ad closed.');
-          ad.dispose();
+          // The ad object is now disposed by the AdmobNativeAdWidget (StatefulWidget)
+          // when it is removed from the widget tree. Removing this dispose call
+          // here prevents premature disposal and potential crashes.
         },
         onAdOpened: (ad) {
           _logger.info('Native Ad opened.');
@@ -156,6 +159,10 @@ class AdMobAdProvider implements AdProvider {
       id: _uuid.v4(), // Generate a unique ID for our internal model
       provider: app_native_ad.AdProviderType.admob, // Set the provider
       adObject: googleNativeAd, // Store the original AdMob object
+      templateType: switch (templateType) {
+        admob.TemplateType.small => app_native_ad.NativeAdTemplateType.small,
+        admob.TemplateType.medium => app_native_ad.NativeAdTemplateType.medium,
+      },
     );
   }
 

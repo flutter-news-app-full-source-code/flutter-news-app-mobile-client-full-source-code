@@ -18,7 +18,7 @@ import 'package:uuid/uuid.dart';
 class NoOpAdProvider implements AdProvider {
   /// {@macro no_op_ad_provider}
   NoOpAdProvider({Logger? logger})
-      : _logger = logger ?? Logger('NoOpAdProvider');
+    : _logger = logger ?? Logger('NoOpAdProvider');
 
   final Logger _logger;
   final Uuid _uuid = const Uuid();
@@ -52,6 +52,10 @@ class NoOpAdProvider implements AdProvider {
       id: _uuid.v4(),
       provider: AdProviderType.placeholder,
       adObject: Object(), // Dummy object
+      templateType: switch (imageStyle) {
+        HeadlineImageStyle.largeThumbnail => NativeAdTemplateType.medium,
+        _ => NativeAdTemplateType.small,
+      },
     );
   }
 }

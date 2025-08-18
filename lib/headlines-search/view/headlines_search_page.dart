@@ -1,10 +1,14 @@
 //
+//
 // ignore_for_file: lines_longer_than_80_chars
 
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/ad_loader_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 // HeadlineItemWidget import removed
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-search/bloc/headlines_search_bloc.dart';
@@ -238,10 +242,6 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
       ),
       body: BlocBuilder<HeadlinesSearchBloc, HeadlinesSearchState>(
         builder: (context, state) {
-          // Ensure textTheme and colorScheme are available in this scope
-          final currentTextTheme = Theme.of(context).textTheme;
-          final currentColorScheme = Theme.of(context).colorScheme;
-
           return switch (state) {
             HeadlinesSearchInitial() => InitialStateWidget(
               icon: Icons.search_outlined,
@@ -344,45 +344,12 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                           return TopicItemWidget(topic: feedItem);
                         } else if (feedItem is Source) {
                           return SourceItemWidget(source: feedItem);
-                        } else if (feedItem is Ad) {
-                          return Card(
-                            margin: const EdgeInsets.symmetric(
-                              vertical: AppSpacing.xs,
-                            ),
-                            color: currentColorScheme.surfaceContainerHighest,
-                            child: Padding(
-                              padding: const EdgeInsets.all(AppSpacing.md),
-                              child: Column(
-                                children: [
-                                  if (feedItem.imageUrl.isNotEmpty)
-                                    ClipRRect(
-                                      // Add ClipRRect for consistency
-                                      borderRadius: BorderRadius.circular(
-                                        AppSpacing.xs,
-                                      ),
-                                      child: Image.network(
-                                        feedItem.imageUrl,
-                                        height: 100,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (ctx, err, st) => Icon(
-                                          Icons.broken_image_outlined,
-                                          size: AppSpacing.xxl,
-                                          color: currentColorScheme
-                                              .onSurfaceVariant,
-                                        ),
-                                      ),
-                                    ),
-                                  const SizedBox(height: AppSpacing.sm),
-                                  Text(
-                                    'Placeholder Ad: ${feedItem.adType.name}',
-                                    style: currentTextTheme.titleSmall,
-                                  ),
-                                  Text(
-                                    'Placement: ${feedItem.placement.name}',
-                                    style: currentTextTheme.bodySmall,
-                                  ),
-                                ],
-                              ),
+                        } else if (feedItem is AdPlaceholder) {
+                          return AdLoaderWidget(
+                            adPlaceholder: feedItem,
+                            adService: context.read<AdService>(),
+                            adThemeStyle: AdThemeStyle.fromTheme(
+                              Theme.of(context),
                             ),
                           );
                         }

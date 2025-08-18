@@ -22,7 +22,7 @@ void main() async {
     removeSplashFromWeb();
   }
 
-  if (appConfig.environment == AppEnvironment.demo) {
+  if (appConfig.environment == AppEnvironment.demo && kIsWeb) {
     runApp(
       DevicePreview(
         enabled: true,

@@ -12,7 +12,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/account/view/man
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/topics/followed_topics_list_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/saved_headlines_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
     as local_config;
@@ -79,7 +78,6 @@ GoRouter createRouter({
   final feedDecoratorService = FeedDecoratorService(
     topicsRepository: topicsRepository,
     sourcesRepository: sourcesRepository,
-    adService: adService,
   );
 
   return GoRouter(
@@ -372,10 +370,6 @@ GoRouter createRouter({
                         .read<DataRepository<UserContentPreferences>>(),
                     feedDecoratorService: feedDecoratorService,
                     appBloc: context.read<AppBloc>(),
-                  )..add(
-                    HeadlinesFeedFetchRequested(
-                      adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
-                    ),
                   );
                 },
               ),

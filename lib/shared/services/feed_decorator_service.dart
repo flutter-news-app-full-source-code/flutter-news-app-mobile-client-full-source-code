@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart'; // Import the new AdPlaceholder model
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:uuid/uuid.dart';
@@ -50,27 +50,62 @@ class _DecoratorCandidate {
 }
 
 /// A service responsible for decorating a primary list of feed content (e.g.,
-/// headlines) with secondary items like in-feed calls-to-action and ads.
+/// headlines) with secondary items like in-feed calls-to-action and ad placeholders.
 ///
 /// This service implements a multi-stage pipeline to ensure that the most
 /// relevant and timely items are injected in a logical and non-intrusive way.
+///
+/// ### Ad Injection Architecture Explained
+///
+/// To solve lifecycle-related crashes and improve performance, the responsibility
+/// for loading and managing native ads is completely decoupled from this service
+/// and the BLoC layer. The architecture follows this robust, multi-step flow:
+///
+/// 1.  **`FeedDecoratorService` (This Class):**
+///     Instead of loading and injecting fully-loaded, stateful native ad
+///     objects, this service's only role is to inject simple, stateless
+///     `AdPlaceholder` markers into the feed list at appropriate intervals.
+///     This keeps the BLoC's state clean and lightweight.
+///
+/// 2.  **`HeadlinesFeedPage` (UI Layer):**
+///     The `ListView` in the UI receives the mixed list of content and
+///     placeholders from the BLoC. When it encounters an `AdPlaceholder`, it
+///     renders an `AdLoaderWidget`.
+///
+/// 3.  **`AdLoaderWidget` (The Ad Loader):**
+///     This stateful widget is responsible for the entire lifecycle of a single
+///     ad slot. It first checks the `AdCacheService` for a valid, pre-loaded
+///     ad. If not found, it requests a new one from the `AdService`.
+///
+/// 4.  **`AdFeedItemWidget` (The Dispatcher):**
+///     Once the `AdLoaderWidget` has a successfully loaded `NativeAd` object,
+///     it passes this ad to the `AdFeedItemWidget`. This widget acts as a
+///     dispatcher, inspecting the ad's provider type (`admob`, `placeholder`,
+///     etc.) and selecting the correct rendering widget.
+///
+/// 5.  **`AdmobNativeAdWidget` (The Renderer):**
+///     This is the final widget in the chain, responsible for rendering the
+///     actual AdMob native ad. Crucially, it no longer contains any disposal
+///     logic. Its lifecycle is now entirely managed by the `AdCacheService`,
+///     which prevents the ad from being disposed of when it scrolls out of
+///     view, thus fixing the crash.
+///
+/// This architecture ensures a clean separation of concerns, improves stability,
+/// and makes the ad system more maintainable and extensible.
 class FeedDecoratorService {
   /// Creates a [FeedDecoratorService].
   ///
   /// Requires [DataRepository] instances for [Topic] and [Source] to fetch
-  /// content for collection decorators, and an [AdService] to inject ads.
+  /// content for collection decorators.
   FeedDecoratorService({
     required DataRepository<Topic> topicsRepository,
     required DataRepository<Source> sourcesRepository,
-    required AdService adService,
   }) : _topicsRepository = topicsRepository,
-       _sourcesRepository = sourcesRepository,
-       _adService = adService;
+       _sourcesRepository = sourcesRepository;
 
   final Uuid _uuid = const Uuid();
   final DataRepository<Topic> _topicsRepository;
   final DataRepository<Source> _sourcesRepository;
-  final AdService _adService;
 
   // The zero-based index in the feed where the decorator will be inserted.
   // A value of 3 places it after the third headline, which is a common
@@ -147,9 +182,9 @@ class FeedDecoratorService {
       }
     }
 
-    // --- Step 2: Ad Injection ---
-    // Inject ads into the list that may or may not already contain a decorator.
-    final finalFeed = await _injectAds(
+    // --- Step 2: Ad Placeholder Injection ---
+    // Inject ad placeholders into the list that may or may not already contain a decorator.
+    final finalFeed = await injectAdPlaceholders(
       feedItems: feedWithDecorators,
       user: user,
       adConfig: remoteConfig.adConfig,
@@ -161,30 +196,6 @@ class FeedDecoratorService {
     return FeedDecoratorResult(
       decoratedItems: finalFeed,
       injectedDecorator: injectedDecorator,
-    );
-  }
-
-  /// Injects only [Ad] items into a list of [FeedItem]s.
-  ///
-  /// This method is designed for pagination, where new content is added to an
-  /// existing feed without re-evaluating or injecting new decorators.
-  ///
-  /// Returns a new list of [FeedItem] objects, interspersed with ads.
-  Future<List<FeedItem>> injectAds({
-    required List<FeedItem> feedItems,
-    required User? user,
-    required AdConfig adConfig,
-    required HeadlineImageStyle imageStyle,
-    required AdThemeStyle adThemeStyle,
-    int processedContentItemCount = 0,
-  }) async {
-    return _injectAds(
-      feedItems: feedItems,
-      user: user,
-      adConfig: adConfig,
-      processedContentItemCount: processedContentItemCount,
-      imageStyle: imageStyle,
-      adThemeStyle: adThemeStyle,
     );
   }
 
@@ -356,22 +367,30 @@ class FeedDecoratorService {
     }
   }
 
-  /// Injects ads into a list of [FeedItem]s based on frequency rules.
+  /// Injects stateless [AdPlaceholder] markers into a list of [FeedItem]s
+  /// based on configured ad frequency rules.
   ///
-  /// This method ensures that ads are placed according to the `adPlacementInterval`
-  /// (initial buffer before the first ad) and `adFrequency` (subsequent ad spacing).
-  /// It correctly accounts for content items only, ignoring previously injected ads
-  /// when calculating placement.
+  /// This method ensures that ad placeholders are placed according to the
+  /// `adPlacementInterval` (initial buffer before the first ad) and
+  /// `adFrequency` (subsequent ad spacing). It correctly accounts for
+  /// content items only, ignoring previously injected decorators when
+  /// calculating placement.
   ///
-  /// [feedItems]: The list of feed items (headlines, decorators) to inject ads into.
+  /// [feedItems]: The list of feed items (headlines, other decorators)
+  ///   to inject ad placeholders into.
   /// [user]: The current authenticated user, used to determine ad configuration.
   /// [adConfig]: The remote configuration for ad display rules.
-  /// [processedContentItemCount]: The count of *content items* (non-ad, non-decorator)
-  ///   that have already been processed in previous feed loads/pages. This is
-  ///   crucial for maintaining correct ad placement across pagination.
+  /// [imageStyle]: The desired image style for the ad, used to determine
+  ///   the placeholder's template type.
+  /// [adThemeStyle]: The current theme style for ads, passed through to the
+  ///   AdLoaderWidget for consistent styling.
+  /// [processedContentItemCount]: The count of *content items* (non-ad,
+  ///   non-decorator) that have already been processed in previous feed
+  ///   loads/pages. This is crucial for maintaining correct ad placement
+  ///   across pagination.
   ///
-  /// Returns a new list of [FeedItem] objects, interspersed with ads.
-  Future<List<FeedItem>> _injectAds({
+  /// Returns a new list of [FeedItem] objects, interspersed with ad placeholders.
+  Future<List<FeedItem>> injectAdPlaceholders({
     required List<FeedItem> feedItems,
     required User? user,
     required AdConfig adConfig,
@@ -428,14 +447,15 @@ class FeedDecoratorService {
       //    multiple of the ad frequency.
       if (currentContentItemCount >= adPlacementInterval &&
           (currentContentItemCount - adPlacementInterval) % adFrequency == 0) {
-        // Request an ad from the AdService.
-        final adToInject = await _adService.getAd(
-          imageStyle: imageStyle,
-          adThemeStyle: adThemeStyle,
-        );
-        if (adToInject != null) {
-          result.add(adToInject);
-        }
+        // Instead of injecting a fully loaded ad, inject an AdPlaceholder.
+        // This is a crucial change: the FeedDecoratorService no longer loads
+        // the actual ad. It only marks a spot for an ad.
+        //
+        // The actual ad loading will be handled by a dedicated `AdLoaderWidget`
+        // in the UI layer when this placeholder scrolls into view. This
+        // decouples ad loading from the BLoC's state and allows for efficient
+        // caching and disposal of native ad resources.
+        result.add(AdPlaceholder(id: _uuid.v4()));
       }
     }
     return result;

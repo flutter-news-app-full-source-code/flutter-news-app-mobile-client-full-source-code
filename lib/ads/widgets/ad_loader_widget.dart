@@ -2,10 +2,11 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_feed_item.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/admob_native_ad_widget.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/ad_feed_item_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/placeholder_ad_widget.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -139,9 +140,16 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
       // Show a placeholder or error message if ad loading failed.
       return const PlaceholderAdWidget();
     } else {
-      // If an ad is successfully loaded, display it using the appropriate widget.
-      // The AdmobNativeAdWidget is responsible for rendering the native ad object.
-      return AdmobNativeAdWidget(nativeAd: _loadedAd!);
+      // If an ad is successfully loaded, wrap it in an AdFeedItem
+      // and pass it to the AdFeedItemWidget for rendering.
+      // This improves separation of concerns, as AdLoaderWidget is now
+      // only responsible for loading, not rendering logic.
+      return AdFeedItemWidget(
+        adFeedItem: AdFeedItem(
+          id: widget.adPlaceholder.id,
+          nativeAd: _loadedAd!,
+        ),
+      );
     }
   }
 }

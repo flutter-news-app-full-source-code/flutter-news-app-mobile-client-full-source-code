@@ -37,7 +37,13 @@ class AdFeedItemWidget extends StatelessWidget {
         ),
         // The _AdDispatcher is responsible for selecting the correct
         // provider-specific widget.
-        child: _AdDispatcher(nativeAd: adFeedItem.nativeAd),
+        // Use a ValueKey to ensure that when the adFeedItem changes (e.g., a new
+        // ad is loaded for the same slot), the _AdDispatcher and its child
+        // (AdmobNativeAdWidget) are rebuilt, triggering the new ad's lifecycle.
+        child: _AdDispatcher(
+          key: ValueKey(adFeedItem.id), // Use adFeedItem.id as the key
+          nativeAd: adFeedItem.nativeAd,
+        ),
       ),
     );
   }
@@ -46,7 +52,7 @@ class AdFeedItemWidget extends StatelessWidget {
 /// A private helper widget that selects the correct ad rendering widget
 /// based on the [NativeAd.provider].
 class _AdDispatcher extends StatelessWidget {
-  const _AdDispatcher({required this.nativeAd});
+  const _AdDispatcher({required this.nativeAd, super.key}); // Add super.key
 
   final NativeAd nativeAd;
 
@@ -57,6 +63,8 @@ class _AdDispatcher extends StatelessWidget {
     switch (nativeAd.provider) {
       case AdProviderType.admob:
         // If the provider is AdMob, render the AdmobNativeAdWidget.
+        // Pass the nativeAd object directly. The AdmobNativeAdWidget is now
+        // stateful and will manage its own lifecycle.
         return AdmobNativeAdWidget(nativeAd: nativeAd);
       case AdProviderType.placeholder:
         // If the provider is a placeholder, render the PlaceholderAdWidget.

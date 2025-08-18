@@ -114,6 +114,10 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       }
 
       // For entity details, only inject ad placeholders.
+      //
+      // This method injects stateless `AdPlaceholder` markers into the feed.
+      // The full ad loading and lifecycle is managed by the UI layer.
+      // See `FeedDecoratorService` for a detailed explanation.
       final processedFeedItems =
           await _feedDecoratorService.injectAdPlaceholders(
         feedItems: headlineResponse.items,
@@ -217,6 +221,10 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       }
 
       // For entity details pagination, only inject ad placeholders.
+      //
+      // This method injects stateless `AdPlaceholder` markers into the feed.
+      // The full ad loading and lifecycle is managed by the UI layer.
+      // See `FeedDecoratorService` for a detailed explanation.
       final newProcessedFeedItems =
           await _feedDecoratorService.injectAdPlaceholders(
         feedItems: headlineResponse.items,

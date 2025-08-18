@@ -78,7 +78,6 @@ GoRouter createRouter({
   final feedDecoratorService = FeedDecoratorService(
     topicsRepository: topicsRepository,
     sourcesRepository: sourcesRepository,
-    adService: adService,
   );
 
   return GoRouter(

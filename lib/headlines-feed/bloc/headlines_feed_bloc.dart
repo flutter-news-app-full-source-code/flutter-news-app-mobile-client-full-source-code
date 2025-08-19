@@ -164,7 +164,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
       // Fetch user content preferences to get followed items for filtering suggestions.
       final userPreferences = currentUser?.id != null
-          ? await _userContentPreferencesRepository.read(id: currentUser!.id)
+          ? await _userContentPreferencesRepository.read(
+              id: currentUser!.id,
+              userId: currentUser.id,
+            )
           : null;
 
       // For a major load, use the full decoration pipeline, which includes
@@ -251,7 +254,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
       // Fetch user content preferences to get followed items for filtering suggestions.
       final userPreferences = currentUser?.id != null
-          ? await _userContentPreferencesRepository.read(id: currentUser!.id)
+          ? await _userContentPreferencesRepository.read(
+              id: currentUser!.id,
+              userId: currentUser.id,
+            )
           : null;
 
       // Use the full decoration pipeline, which includes injecting a

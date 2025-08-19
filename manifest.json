@@ -1,11 +1,11 @@
 {
-    "name": "Headlines Toolkit",
-    "short_name": "Headlines Toolkit",
+    "name": "Veritas",
+    "short_name": "Veritas",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#FFFFFF",
     "theme_color": "#FFFFFF",
-    "description": "Develop News Headlines Apps Rapidly & Reliably.",
+    "description": "Unfiltered news from trusted sources around the world.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

@@ -35,7 +35,9 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
       state.copyWith(dataLoadingStatus: SourceFilterDataLoadingStatus.loading),
     );
     try {
-      final availableCountries = (await _countriesRepository.readAll()).items;
+      final availableCountries = (await _countriesRepository.readAll(
+        filter: {'usage': 'headquarters'},
+      )).items;
       final initialSelectedSourceIds = event.initialSelectedSources
           .map((s) => s.id)
           .toSet();

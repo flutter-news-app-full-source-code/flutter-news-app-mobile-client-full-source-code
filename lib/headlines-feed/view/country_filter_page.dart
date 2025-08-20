@@ -18,7 +18,18 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class CountryFilterPage extends StatefulWidget {
   /// {@macro country_filter_page}
-  const CountryFilterPage({super.key});
+  const CountryFilterPage({
+    required this.title,
+    this.usage,
+    super.key,
+  });
+
+  /// The title to display in the app bar for this filter page.
+  final String title;
+
+  /// The usage context for filtering countries (e.g., 'eventCountry', 'headquarters').
+  /// If null, fetches all countries (though this is not the primary use case for this page).
+  final String? usage;
 
   @override
   State<CountryFilterPage> createState() => _CountryFilterPageState();
@@ -27,7 +38,7 @@ class CountryFilterPage extends StatefulWidget {
 /// State for the [CountryFilterPage].
 ///
 /// Manages the local selection state ([_pageSelectedCountries]) and interacts
-/// with [CountriesFilterBloc] for data fetching and pagination.
+/// with [CountriesFilterBloc] for data fetching.
 class _CountryFilterPageState extends State<CountryFilterPage> {
   /// Stores the countries selected by the user *on this specific page*.
   /// This state is local to the `CountryFilterPage` lifecycle.
@@ -36,10 +47,6 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
   /// `HeadlinesFilterPage`. This ensures the checkboxes reflect the state
   /// from the main filter page when this page loads.
   late Set<Country> _pageSelectedCountries;
-
-  /// Scroll controller to detect when the user reaches the end of the list
-  /// for pagination.
-  final _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -61,37 +68,16 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
 
       // 3. Trigger the page-specific BLoC (CountriesFilterBloc) to start
       //    fetching the list of *all available* countries that the user can
-      //    potentially select from. The BLoC handles fetching, pagination,
-      //    loading states, and errors for the *list of options*.
-      context.read<CountriesFilterBloc>().add(CountriesFilterRequested());
+      //    potentially select from, using the specified usage filter.
+      context
+          .read<CountriesFilterBloc>()
+          .add(CountriesFilterRequested(usage: widget.usage));
     });
-    // Add listener for pagination logic.
-    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
-    _scrollController
-      ..removeListener(_onScroll)
-      ..dispose();
     super.dispose();
-  }
-
-  /// Callback function for scroll events.
-  ///
-  /// Checks if the user has scrolled near the bottom of the list and triggers
-  /// fetching more countries via the BLoC if available.
-  void _onScroll() {
-    if (!_scrollController.hasClients) return;
-    final maxScroll = _scrollController.position.maxScrollExtent;
-    final currentScroll = _scrollController.offset;
-    final bloc = context.read<CountriesFilterBloc>();
-    // Fetch more when nearing the bottom, if BLoC has more and isn't already loading more
-    if (currentScroll >= (maxScroll * 0.9) &&
-        bloc.state.hasMore &&
-        bloc.state.status != CountriesFilterStatus.loadingMore) {
-      bloc.add(CountriesFilterLoadMoreRequested());
-    }
   }
 
   @override
@@ -103,7 +89,7 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          l10n.headlinesFeedFilterEventCountryLabel,
+          widget.title, // Use the dynamic title
           style: textTheme.titleLarge,
         ),
         actions: [
@@ -148,8 +134,9 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
         state.countries.isEmpty) {
       return FailureStateWidget(
         exception: state.error ?? const UnknownException('Unknown error'),
-        onRetry: () =>
-            context.read<CountriesFilterBloc>().add(CountriesFilterRequested()),
+        onRetry: () => context
+            .read<CountriesFilterBloc>()
+            .add(CountriesFilterRequested(usage: widget.usage)),
       );
     }
 
@@ -163,45 +150,13 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
       );
     }
 
-    // Handle loaded state (success or loading more)
+    // Handle loaded state (success)
     return ListView.builder(
-      controller: _scrollController,
       padding: const EdgeInsets.symmetric(
         vertical: AppSpacing.paddingSmall,
       ).copyWith(bottom: AppSpacing.xxl),
-      itemCount:
-          state.countries.length +
-          ((state.status == CountriesFilterStatus.loadingMore ||
-                  (state.status == CountriesFilterStatus.failure &&
-                      state.countries.isNotEmpty))
-              ? 1
-              : 0),
+      itemCount: state.countries.length,
       itemBuilder: (context, index) {
-        if (index >= state.countries.length) {
-          if (state.status == CountriesFilterStatus.loadingMore) {
-            return const Padding(
-              padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
-              child: Center(child: CircularProgressIndicator()),
-            );
-          } else if (state.status == CountriesFilterStatus.failure) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: AppSpacing.md,
-                horizontal: AppSpacing.lg,
-              ),
-              child: Center(
-                child: Text(
-                  l10n.loadMoreError,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: colorScheme.error,
-                  ),
-                ),
-              ),
-            );
-          }
-          return const SizedBox.shrink();
-        }
-
         final country = state.countries[index];
         final isSelected = _pageSelectedCountries.contains(country);
 

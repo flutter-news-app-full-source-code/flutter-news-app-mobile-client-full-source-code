@@ -8,15 +8,22 @@ sealed class CountriesFilterEvent extends Equatable {
   const CountriesFilterEvent();
 
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
 /// {@template countries_filter_requested}
 /// Event triggered to request the initial list of countries.
 /// {@endtemplate}
-final class CountriesFilterRequested extends CountriesFilterEvent {}
+final class CountriesFilterRequested extends CountriesFilterEvent {
+  /// {@macro countries_filter_requested}
+  ///
+  /// Optionally includes a [usage] context to filter countries by their
+  /// relevance to headlines (e.g., 'eventCountry' or 'headquarters').
+  const CountriesFilterRequested({this.usage});
 
-/// {@template countries_filter_load_more_requested}
-/// Event triggered to request the next page of countries for pagination.
-/// {@endtemplate}
-final class CountriesFilterLoadMoreRequested extends CountriesFilterEvent {}
+  /// The usage context for filtering countries (e.g., 'eventCountry', 'headquarters').
+  final String? usage;
+
+  @override
+  List<Object?> get props => [usage];
+}

@@ -73,4 +73,3 @@ class HeadlineFilter extends Equatable {
     );
   }
 }
-}

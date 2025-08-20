@@ -154,6 +154,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get headlinesFeedFilterEventCountryLabel => 'Event Country';
 
   @override
+  String get headlinesFeedFilterSourceCountryLabel => 'Source Headquarter';
+
+  @override
   String get headlinesFeedFilterCountryUS => 'United States';
 
   @override

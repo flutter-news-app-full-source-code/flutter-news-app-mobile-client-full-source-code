@@ -153,6 +153,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get headlinesFeedFilterEventCountryLabel => 'بلد الحدث';
 
   @override
+  String get headlinesFeedFilterSourceCountryLabel => 'مقر المصدر';
+
+  @override
   String get headlinesFeedFilterCountryUS => 'الولايات المتحدة';
 
   @override

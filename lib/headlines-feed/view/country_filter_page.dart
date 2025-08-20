@@ -18,11 +18,7 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class CountryFilterPage extends StatefulWidget {
   /// {@macro country_filter_page}
-  const CountryFilterPage({
-    required this.title,
-    this.usage,
-    super.key,
-  });
+  const CountryFilterPage({required this.title, this.usage, super.key});
 
   /// The title to display in the app bar for this filter page.
   final String title;
@@ -69,9 +65,9 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
       // 3. Trigger the page-specific BLoC (CountriesFilterBloc) to start
       //    fetching the list of *all available* countries that the user can
       //    potentially select from, using the specified usage filter.
-      context
-          .read<CountriesFilterBloc>()
-          .add(CountriesFilterRequested(usage: widget.usage));
+      context.read<CountriesFilterBloc>().add(
+        CountriesFilterRequested(usage: widget.usage),
+      );
     });
   }
 
@@ -134,9 +130,9 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
         state.countries.isEmpty) {
       return FailureStateWidget(
         exception: state.error ?? const UnknownException('Unknown error'),
-        onRetry: () => context
-            .read<CountriesFilterBloc>()
-            .add(CountriesFilterRequested(usage: widget.usage)),
+        onRetry: () => context.read<CountriesFilterBloc>().add(
+          CountriesFilterRequested(usage: widget.usage),
+        ),
       );
     }
 

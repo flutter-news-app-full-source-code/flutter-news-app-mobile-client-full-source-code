@@ -70,7 +70,9 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       currentFilter.selectedSourceSourceTypes ?? {},
     );
     _tempSelectedEventCountries = List.from(currentFilter.eventCountries ?? []);
-    _tempSelectedSourceCountries = List.from(currentFilter.sourceCountries ?? []);
+    _tempSelectedSourceCountries = List.from(
+      currentFilter.sourceCountries ?? [],
+    );
 
     _useFollowedFilters = currentFilter.isFromFollowedItems;
     _isLoadingFollowedFilters = false;

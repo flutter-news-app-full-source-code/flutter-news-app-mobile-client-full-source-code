@@ -526,11 +526,12 @@ GoRouter createRouter({
                             fullscreenDialog: true,
                             child: BlocProvider(
                               create: (context) => CountriesFilterBloc(
-                                countriesRepository:
-                                    context.read<DataRepository<Country>>(),
+                                countriesRepository: context
+                                    .read<DataRepository<Country>>(),
                               ),
                               child: CountryFilterPage(
-                                title: l10n.headlinesFeedFilterEventCountryLabel,
+                                title:
+                                    l10n.headlinesFeedFilterEventCountryLabel,
                                 usage: 'eventCountry',
                                 key: ValueKey(initialSelection.hashCode),
                               ),
@@ -550,11 +551,12 @@ GoRouter createRouter({
                             fullscreenDialog: true,
                             child: BlocProvider(
                               create: (context) => CountriesFilterBloc(
-                                countriesRepository:
-                                    context.read<DataRepository<Country>>(),
+                                countriesRepository: context
+                                    .read<DataRepository<Country>>(),
                               ),
                               child: CountryFilterPage(
-                                title: l10n.headlinesFeedFilterSourceCountryLabel,
+                                title:
+                                    l10n.headlinesFeedFilterSourceCountryLabel,
                                 usage: 'headquarters',
                                 key: ValueKey(initialSelection.hashCode),
                               ),

@@ -539,31 +539,6 @@ GoRouter createRouter({
                           );
                         },
                       ),
-                      GoRoute(
-                        path: Routes.feedFilterSourceCountries,
-                        name: Routes.feedFilterSourceCountriesName,
-                        pageBuilder: (context, state) {
-                          final l10n = context.l10n;
-
-                          final initialSelection =
-                              state.extra as List<Country>?;
-                          return MaterialPage(
-                            fullscreenDialog: true,
-                            child: BlocProvider(
-                              create: (context) => CountriesFilterBloc(
-                                countriesRepository: context
-                                    .read<DataRepository<Country>>(),
-                              ),
-                              child: CountryFilterPage(
-                                title:
-                                    l10n.headlinesFeedFilterSourceCountryLabel,
-                                usage: 'headquarters',
-                                key: ValueKey(initialSelection.hashCode),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
                     ],
                   ),
                 ],

@@ -519,6 +519,7 @@ GoRouter createRouter({
                         path: Routes.feedFilterEventCountries,
                         name: Routes.feedFilterEventCountriesName,
                         pageBuilder: (context, state) {
+                          final l10n = context.l10n;
                           final initialSelection =
                               state.extra as List<Country>?;
                           return MaterialPage(
@@ -541,6 +542,8 @@ GoRouter createRouter({
                         path: Routes.feedFilterSourceCountries,
                         name: Routes.feedFilterSourceCountriesName,
                         pageBuilder: (context, state) {
+                          final l10n = context.l10n;
+
                           final initialSelection =
                               state.extra as List<Country>?;
                           return MaterialPage(

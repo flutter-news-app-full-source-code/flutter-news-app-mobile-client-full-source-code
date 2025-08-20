@@ -429,19 +429,6 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
               }
             },
           ),
-          _buildFilterTile(
-            context: context,
-            title: l10n.headlinesFeedFilterSourceCountryLabel,
-            enabled: !_useFollowedFilters && !_isLoadingFollowedFilters,
-            selectedCount: _tempSelectedSourceCountries.length,
-            routeName: Routes.feedFilterSourceCountriesName,
-            currentSelectionData: _tempSelectedSourceCountries,
-            onResult: (result) {
-              if (result is List<Country>) {
-                setState(() => _tempSelectedSourceCountries = result);
-              }
-            },
-          ),
         ],
       ),
     );

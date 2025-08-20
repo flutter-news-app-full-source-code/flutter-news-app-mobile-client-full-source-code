@@ -162,7 +162,7 @@ class _SourceFilterView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            l10n.headlinesFeedFilterCountryLabel,
+            l10n.headlinesFeedFilterSourceCountryLabel,
             style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: AppSpacing.sm),

@@ -44,6 +44,8 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
   late List<Source> _tempSelectedSources;
   late Set<String> _tempSelectedSourceCountryIsoCodes;
   late Set<SourceType> _tempSelectedSourceSourceTypes;
+  late List<Country> _tempSelectedEventCountries;
+  late List<Country> _tempSelectedSourceCountries;
 
   // New state variables for the "Apply my followed items" feature
   bool _useFollowedFilters = false;
@@ -67,6 +69,8 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
     _tempSelectedSourceSourceTypes = Set.from(
       currentFilter.selectedSourceSourceTypes ?? {},
     );
+    _tempSelectedEventCountries = List.from(currentFilter.eventCountries ?? []);
+    _tempSelectedSourceCountries = List.from(currentFilter.sourceCountries ?? []);
 
     _useFollowedFilters = currentFilter.isFromFollowedItems;
     _isLoadingFollowedFilters = false;
@@ -122,6 +126,8 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
           _useFollowedFilters = false;
           _tempSelectedTopics = [];
           _tempSelectedSources = [];
+          _tempSelectedEventCountries = [];
+          _tempSelectedSourceCountries = [];
         });
         if (mounted) {
           ScaffoldMessenger.of(context)
@@ -159,6 +165,8 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
         );
         _tempSelectedTopics = [];
         _tempSelectedSources = [];
+        _tempSelectedEventCountries = [];
+        _tempSelectedSourceCountries = [];
         _isLoadingFollowedFilters = false;
         _useFollowedFilters = false;
       });
@@ -197,6 +205,8 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
     setState(() {
       _tempSelectedTopics = [];
       _tempSelectedSources = [];
+      _tempSelectedEventCountries = [];
+      _tempSelectedSourceCountries = [];
       // Keep source country/type filters as they are not part of this quick filter
       // _tempSelectedSourceCountryIsoCodes = {};
       // _tempSelectedSourceSourceTypes = {};
@@ -304,6 +314,12 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
                     _tempSelectedSourceSourceTypes.isNotEmpty
                     ? _tempSelectedSourceSourceTypes
                     : null,
+                eventCountries: _tempSelectedEventCountries.isNotEmpty
+                    ? _tempSelectedEventCountries
+                    : null,
+                sourceCountries: _tempSelectedSourceCountries.isNotEmpty
+                    ? _tempSelectedSourceCountries
+                    : null,
                 isFromFollowedItems: _useFollowedFilters,
               );
               context.read<HeadlinesFeedBloc>().add(
@@ -395,6 +411,32 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
                   _tempSelectedSourceSourceTypes =
                       result[keySelectedSourceTypes] as Set<SourceType>? ?? {};
                 });
+              }
+            },
+          ),
+          _buildFilterTile(
+            context: context,
+            title: l10n.headlinesFeedFilterEventCountryLabel,
+            enabled: !_useFollowedFilters && !_isLoadingFollowedFilters,
+            selectedCount: _tempSelectedEventCountries.length,
+            routeName: Routes.feedFilterEventCountriesName,
+            currentSelectionData: _tempSelectedEventCountries,
+            onResult: (result) {
+              if (result is List<Country>) {
+                setState(() => _tempSelectedEventCountries = result);
+              }
+            },
+          ),
+          _buildFilterTile(
+            context: context,
+            title: l10n.headlinesFeedFilterSourceCountryLabel,
+            enabled: !_useFollowedFilters && !_isLoadingFollowedFilters,
+            selectedCount: _tempSelectedSourceCountries.length,
+            routeName: Routes.feedFilterSourceCountriesName,
+            currentSelectionData: _tempSelectedSourceCountries,
+            onResult: (result) {
+              if (result is List<Country>) {
+                setState(() => _tempSelectedSourceCountries = result);
               }
             },
           ),

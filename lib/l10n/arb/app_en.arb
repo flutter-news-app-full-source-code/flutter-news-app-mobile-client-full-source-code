@@ -188,7 +188,11 @@
     },
     "headlinesFeedFilterEventCountryLabel": "Event Country",
     "@headlinesFeedFilterEventCountryLabel": {
-        "description": "Label for the event country filter dropdown"
+        "description": "Filter page label indication where the hadline event has took place"
+    },
+    "headlinesFeedFilterSourceCountryLabel": "Source Headquarter",
+    "@headlinesFeedFilterSourceCountryLabel": {
+        "description": "Filter page label indication where the headline source is located"
     },
     "headlinesFeedFilterCountryUS": "United States",
     "@headlinesFeedFilterCountryUS": {

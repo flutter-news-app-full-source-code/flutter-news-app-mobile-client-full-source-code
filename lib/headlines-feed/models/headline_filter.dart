@@ -11,24 +11,31 @@ class HeadlineFilter extends Equatable {
     this.sources,
     this.selectedSourceCountryIsoCodes,
     this.selectedSourceSourceTypes,
+    this.eventCountries,
+    this.sourceCountries,
     this.isFromFollowedItems = false,
   });
 
-  /// The list of selected topic filters.
-  /// Headlines matching *any* of these topics will be included (OR logic).
+  /// The list of selected topics to filter headlines by.
   final List<Topic>? topics;
 
-  /// The list of selected source filters.
-  /// Headlines matching *any* of these sources will be included (OR logic).
+  /// The list of selected sources to filter headlines by.
   final List<Source>? sources;
 
-  /// The set of selected country ISO codes for source filtering.
+  /// The set of ISO codes for countries selected to filter sources by their
+  /// headquarters.
   final Set<String>? selectedSourceCountryIsoCodes;
 
-  /// The set of selected source types for source filtering.
+  /// The set of source types selected to filter sources by.
   final Set<SourceType>? selectedSourceSourceTypes;
 
-  /// Indicates if this filter was generated from the user's followed items.
+  /// The list of selected event countries to filter headlines by.
+  final List<Country>? eventCountries;
+
+  /// The list of selected source headquarters countries to filter headlines by.
+  final List<Country>? sourceCountries;
+
+  /// Whether the filter is based on the user's followed items.
   final bool isFromFollowedItems;
 
   @override
@@ -37,16 +44,20 @@ class HeadlineFilter extends Equatable {
     sources,
     selectedSourceCountryIsoCodes,
     selectedSourceSourceTypes,
+    eventCountries,
+    sourceCountries,
     isFromFollowedItems,
   ];
 
-  /// Creates a copy of this [HeadlineFilter] with the given fields
+  /// Creates a copy of this [HeadlineFilter] but with the given fields
   /// replaced with the new values.
   HeadlineFilter copyWith({
     List<Topic>? topics,
     List<Source>? sources,
     Set<String>? selectedSourceCountryIsoCodes,
     Set<SourceType>? selectedSourceSourceTypes,
+    List<Country>? eventCountries,
+    List<Country>? sourceCountries,
     bool? isFromFollowedItems,
   }) {
     return HeadlineFilter(
@@ -56,6 +67,8 @@ class HeadlineFilter extends Equatable {
           selectedSourceCountryIsoCodes ?? this.selectedSourceCountryIsoCodes,
       selectedSourceSourceTypes:
           selectedSourceSourceTypes ?? this.selectedSourceSourceTypes,
+      eventCountries: eventCountries ?? this.eventCountries,
+      sourceCountries: sourceCountries ?? this.sourceCountries,
       isFromFollowedItems: isFromFollowedItems ?? this.isFromFollowedItems,
     );
   }

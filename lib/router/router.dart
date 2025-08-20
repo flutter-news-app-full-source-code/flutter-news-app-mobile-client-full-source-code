@@ -24,10 +24,12 @@ import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/v
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/headline_details_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/similar_headlines_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/view/headline_details_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/countries_filter_bloc.dart';
 // import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/countries_filter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/sources_filter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/topics_filter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/country_filter_page.dart';
 // import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/country_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_feed_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_filter_page.dart';
@@ -513,7 +515,55 @@ GoRouter createRouter({
                           ),
                         ),
                       ),
-                      // Sub-route for country selection REMOVED
+                      GoRoute(
+                        path: Routes.feedFilterEventCountries,
+                        name: Routes.feedFilterEventCountriesName,
+                        pageBuilder: (context, state) {
+                          final l10n = context.l10n;
+                          final initialSelection =
+                              state.extra as List<Country>?;
+                          return MaterialPage(
+                            fullscreenDialog: true,
+                            child: BlocProvider(
+                              create: (context) => CountriesFilterBloc(
+                                countriesRepository: context
+                                    .read<DataRepository<Country>>(),
+                              ),
+                              child: CountryFilterPage(
+                                title:
+                                    l10n.headlinesFeedFilterEventCountryLabel,
+                                usage: 'eventCountry',
+                                key: ValueKey(initialSelection.hashCode),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      GoRoute(
+                        path: Routes.feedFilterSourceCountries,
+                        name: Routes.feedFilterSourceCountriesName,
+                        pageBuilder: (context, state) {
+                          final l10n = context.l10n;
+
+                          final initialSelection =
+                              state.extra as List<Country>?;
+                          return MaterialPage(
+                            fullscreenDialog: true,
+                            child: BlocProvider(
+                              create: (context) => CountriesFilterBloc(
+                                countriesRepository: context
+                                    .read<DataRepository<Country>>(),
+                              ),
+                              child: CountryFilterPage(
+                                title:
+                                    l10n.headlinesFeedFilterSourceCountryLabel,
+                                usage: 'headquarters',
+                                key: ValueKey(initialSelection.hashCode),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ],

@@ -368,11 +368,17 @@ abstract class AppLocalizations {
   /// **'Reuters'**
   String get headlinesFeedFilterSourceReuters;
 
-  /// Label for the event country filter dropdown
+  /// Filter page label indication where the hadline event has took place
   ///
   /// In en, this message translates to:
   /// **'Event Country'**
   String get headlinesFeedFilterEventCountryLabel;
+
+  /// Filter page label indication where the headline source is located
+  ///
+  /// In en, this message translates to:
+  /// **'Source Headquarter'**
+  String get headlinesFeedFilterSourceCountryLabel;
 
   /// Filter option for United States
   ///

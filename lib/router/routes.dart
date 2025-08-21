@@ -19,7 +19,7 @@ abstract final class Routes {
   // New routes for country filtering
   static const feedFilterEventCountries = 'event-countries';
   static const feedFilterEventCountriesName = 'feedFilterEventCountries';
-  
+
   static const search = '/search';
   static const searchName = 'search';
   static const account = '/account';

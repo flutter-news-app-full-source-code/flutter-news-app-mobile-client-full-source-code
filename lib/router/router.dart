@@ -49,7 +49,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/se
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/theme_settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_decorator_service.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_filter_page.dart' show keySelectedSources;
 
 /// Creates and configures the GoRouter instance for the application.
 ///

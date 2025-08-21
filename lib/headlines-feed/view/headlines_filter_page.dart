@@ -39,8 +39,8 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
   /// They are initialized from the main [HeadlinesFeedBloc]'s current filter
   /// and are only applied back to the BLoC when the user taps 'Apply'.
   late List<Topic> _tempSelectedTopics;
-    late List<Source> _tempSelectedSources;
-    late List<Country> _tempSelectedEventCountries;
+  late List<Source> _tempSelectedSources;
+  late List<Country> _tempSelectedEventCountries;
 
   // New state variables for the "Apply my followed items" feature
   bool _useFollowedFilters = false;

@@ -19,11 +19,13 @@ class HeadlinesSearchBloc
     required DataRepository<Headline> headlinesRepository,
     required DataRepository<Topic> topicRepository,
     required DataRepository<Source> sourceRepository,
+    required DataRepository<Country> countryRepository,
     required AppBloc appBloc,
     required FeedDecoratorService feedDecoratorService,
   }) : _headlinesRepository = headlinesRepository,
        _topicRepository = topicRepository,
        _sourceRepository = sourceRepository,
+       _countryRepository = countryRepository,
        _appBloc = appBloc,
        _feedDecoratorService = feedDecoratorService,
        super(const HeadlinesSearchInitial()) {
@@ -37,6 +39,7 @@ class HeadlinesSearchBloc
   final DataRepository<Headline> _headlinesRepository;
   final DataRepository<Topic> _topicRepository;
   final DataRepository<Source> _sourceRepository;
+  final DataRepository<Country> _countryRepository;
   final AppBloc _appBloc;
   final FeedDecoratorService _feedDecoratorService;
   static const _limit = 10;
@@ -170,12 +173,22 @@ class HeadlinesSearchBloc
                   cursor: response.cursor,
                 ),
               );
-            // Added break
-            default:
-              response = const PaginatedResponse(
-                items: [],
-                cursor: null,
-                hasMore: false,
+            case ContentType.country:
+              response = await _countryRepository.readAll(
+                filter: {'q': searchTerm},
+                pagination: PaginationOptions(
+                  limit: _limit,
+                  cursor: successState.cursor,
+                ),
+                sort: [const SortOption('name', SortOrder.asc)],
+              );
+              emit(
+                successState.copyWith(
+                  items: List.of(successState.items)
+                    ..addAll(response.items.cast<FeedItem>()),
+                  hasMore: response.hasMore,
+                  cursor: response.cursor,
+                ),
               );
           }
         } on HttpException catch (e) {
@@ -249,14 +262,13 @@ class HeadlinesSearchBloc
             sort: [const SortOption('name', SortOrder.asc)],
           );
           processedItems = rawResponse.items.cast<FeedItem>();
-        default:
-          // Handle unexpected content types if necessary
-          rawResponse = const PaginatedResponse(
-            items: [],
-            cursor: null,
-            hasMore: false,
+        case ContentType.country:
+          rawResponse = await _countryRepository.readAll(
+            filter: {'q': searchTerm},
+            pagination: const PaginationOptions(limit: _limit),
+            sort: [const SortOption('name', SortOrder.asc)],
           );
-          processedItems = [];
+          processedItems = rawResponse.items.cast<FeedItem>();
       }
       emit(
         HeadlinesSearchSuccess(

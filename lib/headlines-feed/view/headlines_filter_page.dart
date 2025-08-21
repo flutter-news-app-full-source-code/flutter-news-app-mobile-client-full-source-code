@@ -16,8 +16,6 @@ import 'package:ui_kit/ui_kit.dart';
 
 // Keys for passing data to/from SourceFilterPage
 const String keySelectedSources = 'selectedSources';
-const String keySelectedCountryIsoCodes = 'selectedCountryIsoCodes';
-const String keySelectedSourceTypes = 'selectedSourceTypes';
 
 /// {@template headlines_filter_page}
 /// A full-screen dialog page for selecting headline filters.
@@ -208,14 +206,13 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
   /// (e.g., `SourceFilterPage`) via the `extra` parameter of `context.pushNamed`.
   /// Updates the temporary state via the [onResult] callback when the
   /// criterion page pops with a result (the user tapped 'Apply' on that page).
-  Widget _buildFilterTile({
+  Widget _buildFilterTile<T>({
     required BuildContext context,
     required String title,
     required int selectedCount,
     required String routeName,
-    // For sources, currentSelection will be a Map
-    required List<Source> currentSelectionData,
-    required void Function(List<Source>)? onResult,
+    required List<T> currentSelectionData,
+    required void Function(List<T>)? onResult,
     bool enabled = true,
   }) {
     final l10n = AppLocalizationsX(context).l10n;
@@ -234,7 +231,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       onTap:
           enabled // Only allow tap if enabled
           ? () async {
-              final result = await context.pushNamed<List<Source>>(
+              final result = await context.pushNamed<List<T>>(
                 routeName,
                 extra: currentSelectionData,
               );
@@ -289,14 +286,6 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
                     : null,
                 sources: _tempSelectedSources.isNotEmpty
                     ? _tempSelectedSources
-                    : null,
-                selectedSourceCountryIsoCodes:
-                    _tempSelectedSourceCountryIsoCodes.isNotEmpty
-                    ? _tempSelectedSourceCountryIsoCodes
-                    : null,
-                selectedSourceSourceTypes:
-                    _tempSelectedSourceSourceTypes.isNotEmpty
-                    ? _tempSelectedSourceSourceTypes
                     : null,
                 eventCountries: _tempSelectedEventCountries.isNotEmpty
                     ? _tempSelectedEventCountries
@@ -358,7 +347,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
               ),
             ),
           const Divider(),
-          _buildFilterTile(
+          _buildFilterTile<Topic>(
             context: context,
             title: l10n.headlinesFeedFilterTopicLabel,
             enabled: !_useFollowedFilters && !_isLoadingFollowedFilters,
@@ -366,12 +355,10 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
             routeName: Routes.feedFilterTopicsName,
             currentSelectionData: _tempSelectedTopics,
             onResult: (result) {
-              if (result is List<Topic>) {
-                setState(() => _tempSelectedTopics = result);
-              }
+              setState(() => _tempSelectedTopics = result);
             },
           ),
-          _buildFilterTile(
+          _buildFilterTile<Source>(
             context: context,
             title: l10n.headlinesFeedFilterSourceLabel,
             enabled: !_useFollowedFilters && !_isLoadingFollowedFilters,
@@ -382,7 +369,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
               setState(() => _tempSelectedSources = result);
             },
           ),
-          _buildFilterTile(
+          _buildFilterTile<Country>(
             context: context,
             title: l10n.headlinesFeedFilterEventCountryLabel,
             enabled: !_useFollowedFilters && !_isLoadingFollowedFilters,
@@ -390,9 +377,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
             routeName: Routes.feedFilterEventCountriesName,
             currentSelectionData: _tempSelectedEventCountries,
             onResult: (result) {
-              if (result is List<Country>) {
-                setState(() => _tempSelectedEventCountries = result);
-              }
+              setState(() => _tempSelectedEventCountries = result);
             },
           ),
         ],

@@ -49,6 +49,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/se
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/theme_settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_decorator_service.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_filter_page.dart' show keySelectedSources;
 
 /// Creates and configures the GoRouter instance for the application.
 ///
@@ -486,30 +487,14 @@ GoRouter createRouter({
                             context
                                 .read<DataRepository<Country>>(),
                           ),
-                          // Pass initialSelectedSources, country ISO codes, and source types from state.extra
+                          // Pass initialSelectedSources from state.extra
                           child: Builder(
                             builder: (context) {
-                              final extraData =
-                                  state.extra as Map<String, dynamic>? ??
-                                  const {};
                               final initialSources =
-                                  extraData[keySelectedSources]
-                                      as List<Source>? ??
-                                  const [];
-                              final initialCountryIsoCodes =
-                                  extraData[keySelectedCountryIsoCodes]
-                                      as Set<String>? ??
-                                  const {};
-                              final initialSourceTypes =
-                                  extraData[keySelectedSourceTypes]
-                                      as Set<SourceType>? ??
-                                  const {};
+                                  state.extra as List<Source>? ?? const [];
 
                               return SourceFilterPage(
                                 initialSelectedSources: initialSources,
-                                initialSelectedCountryIsoCodes:
-                                    initialCountryIsoCodes,
-                                initialSelectedSourceTypes: initialSourceTypes,
                               );
                             },
                           ),

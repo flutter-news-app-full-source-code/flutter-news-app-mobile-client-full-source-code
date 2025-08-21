@@ -42,16 +42,17 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
           .map((s) => s.id)
           .toSet();
 
-      // Use the passed-in initial capsule selections directly
-      final initialSelectedCountryIsoCodes =
-          event.initialSelectedCountryIsoCodes;
-      final initialSelectedSourceTypes = event.initialSelectedSourceTypes;
+      // The initial country and source type capsule selections are ephemeral
+      // to the UI of the SourceFilterPage and are not passed via the event.
+      // They are initialized as empty sets here, meaning the filter starts
+      // with all countries and source types selected by default in the UI.
+      final initialSelectedCountryIsoCodes = <String>{};
+      final initialSelectedSourceTypes = <SourceType>{};
 
       final allAvailableSources = (await _sourcesRepository.readAll()).items;
 
       // Initially, display all sources. Capsules are visually set but don't filter the list yet.
       // Filtering will occur if a capsule is manually toggled.
-      // However, if initial capsule filters ARE provided, we should respect them for the initial display.
       final displayableSources = _getFilteredSources(
         allSources: allAvailableSources,
         selectedCountries: initialSelectedCountryIsoCodes,

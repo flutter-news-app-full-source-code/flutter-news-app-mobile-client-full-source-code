@@ -486,30 +486,14 @@ GoRouter createRouter({
                             context
                                 .read<DataRepository<Country>>(),
                           ),
-                          // Pass initialSelectedSources, country ISO codes, and source types from state.extra
+                          // Pass initialSelectedSources from state.extra
                           child: Builder(
                             builder: (context) {
-                              final extraData =
-                                  state.extra as Map<String, dynamic>? ??
-                                  const {};
                               final initialSources =
-                                  extraData[keySelectedSources]
-                                      as List<Source>? ??
-                                  const [];
-                              final initialCountryIsoCodes =
-                                  extraData[keySelectedCountryIsoCodes]
-                                      as Set<String>? ??
-                                  const {};
-                              final initialSourceTypes =
-                                  extraData[keySelectedSourceTypes]
-                                      as Set<SourceType>? ??
-                                  const {};
+                                  state.extra as List<Source>? ?? const [];
 
                               return SourceFilterPage(
                                 initialSelectedSources: initialSources,
-                                initialSelectedCountryIsoCodes:
-                                    initialCountryIsoCodes,
-                                initialSelectedSourceTypes: initialSourceTypes,
                               );
                             },
                           ),

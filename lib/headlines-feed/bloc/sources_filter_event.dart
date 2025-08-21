@@ -9,22 +9,27 @@ abstract class SourcesFilterEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+/// {@template load_source_filter_data}
+/// Event triggered to load the initial data for the source filter page.
+///
+/// This event is dispatched when the `SourceFilterPage` is initialized.
+/// It fetches all available countries and sources, and initializes the
+/// internal state with any `initialSelectedSources` passed from the
+/// `HeadlinesFilterPage`. The country and source type capsule selections
+/// are ephemeral to the `SourceFilterPage` and are not passed via this event.
+/// {@endtemplate}
 class LoadSourceFilterData extends SourcesFilterEvent {
+  /// {@macro load_source_filter_data}
   const LoadSourceFilterData({
     this.initialSelectedSources = const [],
-    this.initialSelectedCountryIsoCodes = const {},
-    this.initialSelectedSourceTypes = const {},
   });
 
+  /// The list of sources that were initially selected on the previous page.
   final List<Source> initialSelectedSources;
-  final Set<String> initialSelectedCountryIsoCodes;
-  final Set<SourceType> initialSelectedSourceTypes;
 
   @override
   List<Object?> get props => [
     initialSelectedSources,
-    initialSelectedCountryIsoCodes,
-    initialSelectedSourceTypes,
   ];
 }
 

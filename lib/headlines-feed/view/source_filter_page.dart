@@ -5,28 +5,29 @@ import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/sources_filter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_filter_page.dart'
-    show keySelectedCountryIsoCodes, keySelectedSourceTypes, keySelectedSources;
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 // Keys are defined in headlines_filter_page.dart and imported by router.dart
-// const String keySelectedSources = 'selectedSources';
-// const String keySelectedCountryIsoCodes = 'selectedCountryIsoCodes';
-// const String keySelectedSourceTypes = 'selectedSourceTypes';
-
+/// {@template source_filter_page}
+/// A page dedicated to selecting news sources for filtering headlines.
+///
+/// This page allows users to refine the displayed list of sources using
+/// country and source type capsules. However, these internal UI filter
+/// selections (country and source type) are *not* returned or persisted
+/// outside this page. Its sole purpose is to return the list of
+/// *explicitly checked* [Source] items.
+/// {@endtemplate}
 class SourceFilterPage extends StatelessWidget {
+  /// {@macro source_filter_page}
   const SourceFilterPage({
     super.key,
     this.initialSelectedSources = const [],
-    this.initialSelectedCountryIsoCodes = const {},
-    this.initialSelectedSourceTypes = const {},
   });
 
+  /// The list of sources that were initially selected on the previous page.
   final List<Source> initialSelectedSources;
-  final Set<String> initialSelectedCountryIsoCodes;
-  final Set<SourceType> initialSelectedSourceTypes;
 
   @override
   Widget build(BuildContext context) {
@@ -38,8 +39,6 @@ class SourceFilterPage extends StatelessWidget {
           )..add(
             LoadSourceFilterData(
               initialSelectedSources: initialSelectedSources,
-              initialSelectedCountryIsoCodes: initialSelectedCountryIsoCodes,
-              initialSelectedSourceTypes: initialSelectedSourceTypes,
             ),
           ),
       child: const _SourceFilterView(),
@@ -81,11 +80,7 @@ class _SourceFilterView extends StatelessWidget {
                   .where((s) => state.finallySelectedSourceIds.contains(s.id))
                   .toList();
               // Pop with a map containing all relevant filter state
-              Navigator.of(context).pop({
-                keySelectedSources: selectedSources,
-                keySelectedCountryIsoCodes: state.selectedCountryIsoCodes,
-                keySelectedSourceTypes: state.selectedSourceTypes,
-              });
+              Navigator.of(context).pop(selectedSources);
             },
           ),
         ],

@@ -16,8 +16,6 @@ import 'package:ui_kit/ui_kit.dart';
 
 // Keys for passing data to/from SourceFilterPage
 const String keySelectedSources = 'selectedSources';
-const String keySelectedCountryIsoCodes = 'selectedCountryIsoCodes';
-const String keySelectedSourceTypes = 'selectedSourceTypes';
 
 /// {@template headlines_filter_page}
 /// A full-screen dialog page for selecting headline filters.
@@ -42,10 +40,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
   /// and are only applied back to the BLoC when the user taps 'Apply'.
   late List<Topic> _tempSelectedTopics;
   late List<Source> _tempSelectedSources;
-  late Set<String> _tempSelectedSourceCountryIsoCodes;
-  late Set<SourceType> _tempSelectedSourceSourceTypes;
   late List<Country> _tempSelectedEventCountries;
-  late List<Country> _tempSelectedSourceCountries;
 
   // New state variables for the "Apply my followed items" feature
   bool _useFollowedFilters = false;
@@ -63,16 +58,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
     final currentFilter = headlinesFeedState.filter;
     _tempSelectedTopics = List.from(currentFilter.topics ?? []);
     _tempSelectedSources = List.from(currentFilter.sources ?? []);
-    _tempSelectedSourceCountryIsoCodes = Set.from(
-      currentFilter.selectedSourceCountryIsoCodes ?? {},
-    );
-    _tempSelectedSourceSourceTypes = Set.from(
-      currentFilter.selectedSourceSourceTypes ?? {},
-    );
     _tempSelectedEventCountries = List.from(currentFilter.eventCountries ?? []);
-    _tempSelectedSourceCountries = List.from(
-      currentFilter.sourceCountries ?? [],
-    );
 
     _useFollowedFilters = currentFilter.isFromFollowedItems;
     _isLoadingFollowedFilters = false;
@@ -129,7 +115,6 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
           _tempSelectedTopics = [];
           _tempSelectedSources = [];
           _tempSelectedEventCountries = [];
-          _tempSelectedSourceCountries = [];
         });
         if (mounted) {
           ScaffoldMessenger.of(context)
@@ -168,7 +153,6 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
         _tempSelectedTopics = [];
         _tempSelectedSources = [];
         _tempSelectedEventCountries = [];
-        _tempSelectedSourceCountries = [];
         _isLoadingFollowedFilters = false;
         _useFollowedFilters = false;
       });
@@ -208,10 +192,6 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       _tempSelectedTopics = [];
       _tempSelectedSources = [];
       _tempSelectedEventCountries = [];
-      _tempSelectedSourceCountries = [];
-      // Keep source country/type filters as they are not part of this quick filter
-      // _tempSelectedSourceCountryIsoCodes = {};
-      // _tempSelectedSourceSourceTypes = {};
     });
   }
 
@@ -226,14 +206,13 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
   /// (e.g., `SourceFilterPage`) via the `extra` parameter of `context.pushNamed`.
   /// Updates the temporary state via the [onResult] callback when the
   /// criterion page pops with a result (the user tapped 'Apply' on that page).
-  Widget _buildFilterTile({
+  Widget _buildFilterTile<T>({
     required BuildContext context,
     required String title,
     required int selectedCount,
     required String routeName,
-    // For sources, currentSelection will be a Map
-    required dynamic currentSelectionData,
-    required void Function(dynamic)? onResult,
+    required List<T> currentSelectionData,
+    required void Function(List<T>)? onResult,
     bool enabled = true,
   }) {
     final l10n = AppLocalizationsX(context).l10n;
@@ -252,7 +231,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       onTap:
           enabled // Only allow tap if enabled
           ? () async {
-              final result = await context.pushNamed<dynamic>(
+              final result = await context.pushNamed<List<T>>(
                 routeName,
                 extra: currentSelectionData,
               );
@@ -308,19 +287,8 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
                 sources: _tempSelectedSources.isNotEmpty
                     ? _tempSelectedSources
                     : null,
-                selectedSourceCountryIsoCodes:
-                    _tempSelectedSourceCountryIsoCodes.isNotEmpty
-                    ? _tempSelectedSourceCountryIsoCodes
-                    : null,
-                selectedSourceSourceTypes:
-                    _tempSelectedSourceSourceTypes.isNotEmpty
-                    ? _tempSelectedSourceSourceTypes
-                    : null,
                 eventCountries: _tempSelectedEventCountries.isNotEmpty
                     ? _tempSelectedEventCountries
-                    : null,
-                sourceCountries: _tempSelectedSourceCountries.isNotEmpty
-                    ? _tempSelectedSourceCountries
                     : null,
                 isFromFollowedItems: _useFollowedFilters,
               );
@@ -379,7 +347,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
               ),
             ),
           const Divider(),
-          _buildFilterTile(
+          _buildFilterTile<Topic>(
             context: context,
             title: l10n.headlinesFeedFilterTopicLabel,
             enabled: !_useFollowedFilters && !_isLoadingFollowedFilters,
@@ -387,36 +355,21 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
             routeName: Routes.feedFilterTopicsName,
             currentSelectionData: _tempSelectedTopics,
             onResult: (result) {
-              if (result is List<Topic>) {
-                setState(() => _tempSelectedTopics = result);
-              }
+              setState(() => _tempSelectedTopics = result);
             },
           ),
-          _buildFilterTile(
+          _buildFilterTile<Source>(
             context: context,
             title: l10n.headlinesFeedFilterSourceLabel,
             enabled: !_useFollowedFilters && !_isLoadingFollowedFilters,
             selectedCount: _tempSelectedSources.length,
             routeName: Routes.feedFilterSourcesName,
-            currentSelectionData: {
-              keySelectedSources: _tempSelectedSources,
-              keySelectedCountryIsoCodes: _tempSelectedSourceCountryIsoCodes,
-              keySelectedSourceTypes: _tempSelectedSourceSourceTypes,
-            },
+            currentSelectionData: _tempSelectedSources,
             onResult: (result) {
-              if (result is Map<String, dynamic>) {
-                setState(() {
-                  _tempSelectedSources =
-                      result[keySelectedSources] as List<Source>? ?? [];
-                  _tempSelectedSourceCountryIsoCodes =
-                      result[keySelectedCountryIsoCodes] as Set<String>? ?? {};
-                  _tempSelectedSourceSourceTypes =
-                      result[keySelectedSourceTypes] as Set<SourceType>? ?? {};
-                });
-              }
+              setState(() => _tempSelectedSources = result);
             },
           ),
-          _buildFilterTile(
+          _buildFilterTile<Country>(
             context: context,
             title: l10n.headlinesFeedFilterEventCountryLabel,
             enabled: !_useFollowedFilters && !_isLoadingFollowedFilters,
@@ -424,9 +377,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
             routeName: Routes.feedFilterEventCountriesName,
             currentSelectionData: _tempSelectedEventCountries,
             onResult: (result) {
-              if (result is List<Country>) {
-                setState(() => _tempSelectedEventCountries = result);
-              }
+              setState(() => _tempSelectedEventCountries = result);
             },
           ),
         ],

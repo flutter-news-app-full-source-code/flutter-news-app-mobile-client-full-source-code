@@ -86,16 +86,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         r'$in': filter.eventCountries!.map((c) => c.id).toList(),
       };
     }
-    if (filter.selectedSourceCountryIsoCodes?.isNotEmpty ?? false) {
-      queryFilter['source.headquarters.isoCode'] = {
-        r'$in': filter.selectedSourceCountryIsoCodes!.toList(),
-      };
-    }
-    if (filter.selectedSourceSourceTypes?.isNotEmpty ?? false) {
-      queryFilter['source.type'] = {
-        r'$in': filter.selectedSourceSourceTypes!.map((t) => t.name).toList(),
-      };
-    }
+    // Note: The `selectedSourceCountryIsoCodes` and `selectedSourceSourceTypes`
+    // fields are used exclusively for UI-side filtering on the `SourceFilterPage`
+    // and are not included in the backend query for headlines. Source filtering
+    // is performed solely by `source.id` when specific sources are selected.
     return queryFilter;
   }
 

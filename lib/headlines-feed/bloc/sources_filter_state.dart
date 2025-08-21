@@ -15,6 +15,8 @@ class SourcesFilterState extends Equatable {
     this.finallySelectedSourceIds = const {},
     this.dataLoadingStatus = SourceFilterDataLoadingStatus.initial,
     this.error,
+    this.followedSourcesStatus = SourceFilterDataLoadingStatus.initial,
+    this.followedSources = const [],
   });
 
   final List<Country> availableCountries;
@@ -27,6 +29,12 @@ class SourcesFilterState extends Equatable {
   final SourceFilterDataLoadingStatus dataLoadingStatus;
   final HttpException? error;
 
+  /// The current status of fetching followed sources.
+  final SourceFilterDataLoadingStatus followedSourcesStatus;
+
+  /// The list of [Source] objects representing the user's followed sources.
+  final List<Source> followedSources;
+
   SourcesFilterState copyWith({
     List<Country>? availableCountries,
     Set<String>? selectedCountryIsoCodes,
@@ -37,7 +45,10 @@ class SourcesFilterState extends Equatable {
     Set<String>? finallySelectedSourceIds,
     SourceFilterDataLoadingStatus? dataLoadingStatus,
     HttpException? error,
+    SourceFilterDataLoadingStatus? followedSourcesStatus,
+    List<Source>? followedSources,
     bool clearErrorMessage = false,
+    bool clearFollowedSourcesError = false,
   }) {
     return SourcesFilterState(
       availableCountries: availableCountries ?? this.availableCountries,
@@ -51,6 +62,9 @@ class SourcesFilterState extends Equatable {
           finallySelectedSourceIds ?? this.finallySelectedSourceIds,
       dataLoadingStatus: dataLoadingStatus ?? this.dataLoadingStatus,
       error: clearErrorMessage ? null : error ?? this.error,
+      followedSourcesStatus:
+          followedSourcesStatus ?? this.followedSourcesStatus,
+      followedSources: followedSources ?? this.followedSources,
     );
   }
 
@@ -65,5 +79,7 @@ class SourcesFilterState extends Equatable {
     finallySelectedSourceIds,
     dataLoadingStatus,
     error,
+    followedSourcesStatus,
+    followedSources,
   ];
 }

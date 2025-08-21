@@ -81,11 +81,7 @@ class _SourceFilterView extends StatelessWidget {
                   .where((s) => state.finallySelectedSourceIds.contains(s.id))
                   .toList();
               // Pop with a map containing all relevant filter state
-              Navigator.of(context).pop({
-                keySelectedSources: selectedSources,
-                keySelectedCountryIsoCodes: state.selectedCountryIsoCodes,
-                keySelectedSourceTypes: state.selectedSourceTypes,
-              });
+              Navigator.of(context).pop(selectedSources);
             },
           ),
         ],

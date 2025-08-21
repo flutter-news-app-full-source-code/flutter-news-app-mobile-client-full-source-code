@@ -97,7 +97,7 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
                   _pageSelectedCountries.length ==
                       followedCountriesSet.length &&
                   _pageSelectedCountries.containsAll(followedCountriesSet);
-                  
+
               return IconButton(
                 icon: isFollowedFilterActive
                     ? const Icon(Icons.favorite)

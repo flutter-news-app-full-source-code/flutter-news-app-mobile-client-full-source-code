@@ -12,7 +12,6 @@ class HeadlineFilter extends Equatable {
     this.selectedSourceCountryIsoCodes,
     this.selectedSourceSourceTypes,
     this.eventCountries,
-    this.sourceCountries,
     this.isFromFollowedItems = false,
   });
 
@@ -32,9 +31,6 @@ class HeadlineFilter extends Equatable {
   /// The list of selected event countries to filter headlines by.
   final List<Country>? eventCountries;
 
-  /// The list of selected source headquarters countries to filter headlines by.
-  final List<Country>? sourceCountries;
-
   /// Whether the filter is based on the user's followed items.
   final bool isFromFollowedItems;
 
@@ -45,7 +41,6 @@ class HeadlineFilter extends Equatable {
     selectedSourceCountryIsoCodes,
     selectedSourceSourceTypes,
     eventCountries,
-    sourceCountries,
     isFromFollowedItems,
   ];
 
@@ -57,7 +52,6 @@ class HeadlineFilter extends Equatable {
     Set<String>? selectedSourceCountryIsoCodes,
     Set<SourceType>? selectedSourceSourceTypes,
     List<Country>? eventCountries,
-    List<Country>? sourceCountries,
     bool? isFromFollowedItems,
   }) {
     return HeadlineFilter(
@@ -68,7 +62,6 @@ class HeadlineFilter extends Equatable {
       selectedSourceSourceTypes:
           selectedSourceSourceTypes ?? this.selectedSourceSourceTypes,
       eventCountries: eventCountries ?? this.eventCountries,
-      sourceCountries: sourceCountries ?? this.sourceCountries,
       isFromFollowedItems: isFromFollowedItems ?? this.isFromFollowedItems,
     );
   }

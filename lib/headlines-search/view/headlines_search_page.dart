@@ -12,7 +12,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/ad_l
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 // HeadlineItemWidget import removed
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-search/bloc/headlines_search_bloc.dart';
-// import 'package:flutter_news_app_mobile_client_full_source_code/headlines-search/widgets/country_item_widget.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-search/widgets/country_item_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-search/widgets/source_item_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-search/widgets/topic_item_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
@@ -62,12 +62,11 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
         _showClearButton = _textController.text.isNotEmpty;
       });
     });
-    // TODO(fulleni): This logic might need adjustment if not all ContentType values are searchable.
-    // For now, we default to headline if the current selection is not in the allowed list.
     final searchableTypes = [
       ContentType.headline,
       ContentType.topic,
       ContentType.source,
+      ContentType.country,
     ];
     if (!searchableTypes.contains(_selectedModelType)) {
       _selectedModelType = ContentType.headline;
@@ -122,11 +121,11 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
     final textTheme = theme.textTheme;
     final appBarTheme = theme.appBarTheme;
 
-    // TODO(fulleni): Replace this with a filtered list of searchable content types.
     final availableSearchModelTypes = [
       ContentType.headline,
       ContentType.topic,
       ContentType.source,
+      ContentType.country,
     ];
 
     if (!availableSearchModelTypes.contains(_selectedModelType)) {
@@ -344,6 +343,8 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                           return TopicItemWidget(topic: feedItem);
                         } else if (feedItem is Source) {
                           return SourceItemWidget(source: feedItem);
+                        } else if (feedItem is Country) {
+                          return CountryItemWidget(country: feedItem);
                         } else if (feedItem is AdPlaceholder) {
                           // Retrieve the user's preferred headline image style from the AppBloc.
                           // This is the single source of truth for this setting.

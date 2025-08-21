@@ -91,14 +91,13 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
           BlocBuilder<CountriesFilterBloc, CountriesFilterState>(
             builder: (context, state) {
               // Determine if the "Apply My Followed" icon should be filled
+              final followedCountriesSet = state.followedCountries.toSet();
               final isFollowedFilterActive =
-                  state.followedCountries.isNotEmpty &&
+                  followedCountriesSet.isNotEmpty &&
                   _pageSelectedCountries.length ==
-                      state.followedCountries.length &&
-                  _pageSelectedCountries.every(
-                    state.followedCountries.contains,
-                  );
-
+                      followedCountriesSet.length &&
+                  _pageSelectedCountries.containsAll(followedCountriesSet);
+                  
               return IconButton(
                 icon: isFollowedFilterActive
                     ? const Icon(Icons.favorite)

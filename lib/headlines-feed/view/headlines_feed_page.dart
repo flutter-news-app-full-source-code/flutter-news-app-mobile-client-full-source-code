@@ -140,8 +140,10 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                     (state.filter.topics?.isNotEmpty ?? false) ||
                     (state.filter.sources?.isNotEmpty ?? false) ||
                     (state.filter.eventCountries?.isNotEmpty ?? false) ||
-                    (state.filter.selectedSourceCountryIsoCodes?.isNotEmpty ?? false) ||
-                    (state.filter.selectedSourceSourceTypes?.isNotEmpty ?? false) ||
+                    (state.filter.selectedSourceCountryIsoCodes?.isNotEmpty ??
+                        false) ||
+                    (state.filter.selectedSourceSourceTypes?.isNotEmpty ??
+                        false) ||
                     state.filter.isFromFollowedItems;
                 return Stack(
                   children: [
@@ -206,7 +208,10 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
             if (state.status == HeadlinesFeedStatus.failure &&
                 state.feedItems.isEmpty) {
               return FailureStateWidget(
-                exception: state.error ?? const UnknownException('An unknown error occurred.'),
+                //TODO(fulleni): l10n.
+                exception:
+                    state.error ??
+                    const UnknownException('Failed to load headlines feed.'),
                 onRetry: () => context.read<HeadlinesFeedBloc>().add(
                   HeadlinesFeedRefreshRequested(
                     adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),

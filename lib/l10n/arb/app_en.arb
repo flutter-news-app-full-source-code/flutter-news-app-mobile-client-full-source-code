@@ -920,7 +920,7 @@
     "@headlinesSectionTitle": {
         "description": "Title for the headlines section on details page"
     },
-    "headlinesFeedFilterApplyFollowedLabel": "Apply my followed categories & sources",
+    "headlinesFeedFilterApplyFollowedLabel": "Apply my followed items as filters",
     "@headlinesFeedFilterApplyFollowedLabel": {
         "description": "Label for the checkbox to apply followed items as filters"
     },

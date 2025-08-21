@@ -918,7 +918,7 @@
     "@headlinesSectionTitle": {
         "description": "Title for the headlines section on details page"
     },
-    "headlinesFeedFilterApplyFollowedLabel": "تطبيق الفئات والمصادر المتابَعة",
+    "headlinesFeedFilterApplyFollowedLabel": "تطبيق العناصر التي أتابعها كمرشحات.",
     "@headlinesFeedFilterApplyFollowedLabel": {
         "description": "Label for the checkbox to apply followed items as filters"
     },

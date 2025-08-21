@@ -705,7 +705,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get headlinesFeedFilterApplyFollowedLabel =>
-      'Apply my followed categories & sources';
+      'Apply my followed items as filters';
 
   @override
   String get mustBeLoggedInToUseFeatureError =>

@@ -705,7 +705,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get headlinesFeedFilterApplyFollowedLabel =>
-      'تطبيق الفئات والمصادر المتابَعة';
+      'تطبيق العناصر التي أتابعها كمرشحات.';
 
   @override
   String get mustBeLoggedInToUseFeatureError =>

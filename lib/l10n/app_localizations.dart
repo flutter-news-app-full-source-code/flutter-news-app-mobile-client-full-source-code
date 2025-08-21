@@ -1379,7 +1379,7 @@ abstract class AppLocalizations {
   /// Label for the checkbox to apply followed items as filters
   ///
   /// In en, this message translates to:
-  /// **'Apply my followed categories & sources'**
+  /// **'Apply my followed items as filters'**
   String get headlinesFeedFilterApplyFollowedLabel;
 
   /// Error message shown when a logged-in user is required for a feature

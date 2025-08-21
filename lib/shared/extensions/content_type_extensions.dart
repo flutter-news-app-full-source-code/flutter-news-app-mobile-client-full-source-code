@@ -14,7 +14,6 @@ extension ContentTypeX on ContentType {
       case ContentType.source:
         return context.l10n.contentTypeSource;
       case ContentType.country:
-        // While not searchable, providing a name is good practice.
         return context.l10n.contentTypeCountry;
     }
   }

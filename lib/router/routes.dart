@@ -42,6 +42,8 @@ abstract final class Routes {
   static const topicDetailsName = 'topicDetails';
   static const sourceDetails = '/source-details';
   static const sourceDetailsName = 'sourceDetails';
+  static const countryDetails = '/country-details';
+  static const countryDetailsName = 'countryDetails';
 
   // --- Authentication Routes ---
   static const authentication = '/authentication';

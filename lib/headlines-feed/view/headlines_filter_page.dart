@@ -45,7 +45,6 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
   late Set<String> _tempSelectedSourceCountryIsoCodes;
   late Set<SourceType> _tempSelectedSourceSourceTypes;
   late List<Country> _tempSelectedEventCountries;
-  late List<Country> _tempSelectedSourceCountries;
 
   // New state variables for the "Apply my followed items" feature
   bool _useFollowedFilters = false;
@@ -70,9 +69,6 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       currentFilter.selectedSourceSourceTypes ?? {},
     );
     _tempSelectedEventCountries = List.from(currentFilter.eventCountries ?? []);
-    _tempSelectedSourceCountries = List.from(
-      currentFilter.sourceCountries ?? [],
-    );
 
     _useFollowedFilters = currentFilter.isFromFollowedItems;
     _isLoadingFollowedFilters = false;
@@ -129,7 +125,6 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
           _tempSelectedTopics = [];
           _tempSelectedSources = [];
           _tempSelectedEventCountries = [];
-          _tempSelectedSourceCountries = [];
         });
         if (mounted) {
           ScaffoldMessenger.of(context)
@@ -168,7 +163,6 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
         _tempSelectedTopics = [];
         _tempSelectedSources = [];
         _tempSelectedEventCountries = [];
-        _tempSelectedSourceCountries = [];
         _isLoadingFollowedFilters = false;
         _useFollowedFilters = false;
       });
@@ -208,7 +202,6 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       _tempSelectedTopics = [];
       _tempSelectedSources = [];
       _tempSelectedEventCountries = [];
-      _tempSelectedSourceCountries = [];
       // Keep source country/type filters as they are not part of this quick filter
       // _tempSelectedSourceCountryIsoCodes = {};
       // _tempSelectedSourceSourceTypes = {};
@@ -318,9 +311,6 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
                     : null,
                 eventCountries: _tempSelectedEventCountries.isNotEmpty
                     ? _tempSelectedEventCountries
-                    : null,
-                sourceCountries: _tempSelectedSourceCountries.isNotEmpty
-                    ? _tempSelectedSourceCountries
                     : null,
                 isFromFollowedItems: _useFollowedFilters,
               );

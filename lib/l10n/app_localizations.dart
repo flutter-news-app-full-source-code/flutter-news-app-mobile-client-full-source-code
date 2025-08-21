@@ -371,7 +371,7 @@ abstract class AppLocalizations {
   /// Filter page label indication where the hadline event has took place
   ///
   /// In en, this message translates to:
-  /// **'Event Country'**
+  /// **'Country of Event'**
   String get headlinesFeedFilterEventCountryLabel;
 
   /// Filter page label indication where the headline source is located
@@ -1391,7 +1391,7 @@ abstract class AppLocalizations {
   /// Snackbar message shown when user tries to apply followed filters but has none.
   ///
   /// In en, this message translates to:
-  /// **'You are not following any categories or sources to apply as a filter.'**
+  /// **'You are not following any items to use as a filter.'**
   String get noFollowedItemsForFilterSnackbar;
 
   /// Headline for the request code page

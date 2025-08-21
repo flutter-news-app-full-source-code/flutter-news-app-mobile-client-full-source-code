@@ -713,7 +713,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get noFollowedItemsForFilterSnackbar =>
-      'أنت لا تتابع أي فئات أو مصادر لتطبيقها كفلتر.';
+      'أنت لا تتبع أي عناصر لتطبيقها كفلتر.';
 
   @override
   String get requestCodePageHeadline => 'أدخل بريدك الإلكتروني';

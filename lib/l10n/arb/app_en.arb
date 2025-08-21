@@ -186,7 +186,7 @@
     "@headlinesFeedFilterSourceReuters": {
         "description": "Filter option for Reuters source"
     },
-    "headlinesFeedFilterEventCountryLabel": "Event Country",
+    "headlinesFeedFilterEventCountryLabel": "Country of Event",
     "@headlinesFeedFilterEventCountryLabel": {
         "description": "Filter page label indication where the hadline event has took place"
     },
@@ -928,7 +928,7 @@
     "@mustBeLoggedInToUseFeatureError": {
         "description": "Error message shown when a logged-in user is required for a feature"
     },
-    "noFollowedItemsForFilterSnackbar": "You are not following any categories or sources to apply as a filter.",
+    "noFollowedItemsForFilterSnackbar": "You are not following any items to use as a filter.",
     "@noFollowedItemsForFilterSnackbar": {
         "description": "Snackbar message shown when user tries to apply followed filters but has none."
     },

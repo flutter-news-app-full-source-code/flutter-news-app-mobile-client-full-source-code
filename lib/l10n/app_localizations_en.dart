@@ -151,7 +151,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get headlinesFeedFilterSourceReuters => 'Reuters';
 
   @override
-  String get headlinesFeedFilterEventCountryLabel => 'Event Country';
+  String get headlinesFeedFilterEventCountryLabel => 'Country of Event';
 
   @override
   String get headlinesFeedFilterSourceCountryLabel => 'Source Headquarter';
@@ -713,7 +713,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noFollowedItemsForFilterSnackbar =>
-      'You are not following any categories or sources to apply as a filter.';
+      'You are not following any items to use as a filter.';
 
   @override
   String get requestCodePageHeadline => 'Enter Your Email';

@@ -98,19 +98,7 @@ class CountriesFilterBloc
       state.copyWith(followedCountriesStatus: CountriesFilterStatus.loading),
     );
 
-    final currentUser = _appBloc.state.user;
-
-    if (currentUser == null) {
-      emit(
-        state.copyWith(
-          followedCountriesStatus: CountriesFilterStatus.failure,
-          error: const UnauthorizedException(
-            'User must be logged in to apply followed countries.',
-          ),
-        ),
-      );
-      return;
-    }
+    final currentUser = _appBloc.state.user!;
 
     try {
       final preferences = await _userContentPreferencesRepository.read(

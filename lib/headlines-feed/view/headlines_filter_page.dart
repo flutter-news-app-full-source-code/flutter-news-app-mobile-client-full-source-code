@@ -88,18 +88,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
     });
 
     final appState = context.read<AppBloc>().state;
-    final currentUser = appState.user;
-
-    if (currentUser == null) {
-      setState(() {
-        _isLoadingFollowedFilters = false;
-        _useFollowedFilters = false;
-        _loadFollowedFiltersError = AppLocalizationsX(
-          context,
-        ).l10n.mustBeLoggedInToUseFeatureError;
-      });
-      return;
-    }
+    final currentUser = appState.user!;
 
     try {
       final preferencesRepo = context

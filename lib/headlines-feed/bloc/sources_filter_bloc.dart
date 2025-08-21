@@ -204,19 +204,7 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
       ),
     );
 
-    final currentUser = _appBloc.state.user;
-
-    if (currentUser == null) {
-      emit(
-        state.copyWith(
-          followedSourcesStatus: SourceFilterDataLoadingStatus.failure,
-          error: const UnauthorizedException(
-            'User must be logged in to apply followed sources.',
-          ),
-        ),
-      );
-      return;
-    }
+    final currentUser = _appBloc.state.user!;
 
     try {
       final preferences = await _userContentPreferencesRepository.read(

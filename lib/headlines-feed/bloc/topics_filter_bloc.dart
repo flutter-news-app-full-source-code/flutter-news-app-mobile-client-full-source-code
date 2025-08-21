@@ -126,19 +126,7 @@ class TopicsFilterBloc extends Bloc<TopicsFilterEvent, TopicsFilterState> {
   ) async {
     emit(state.copyWith(followedTopicsStatus: TopicsFilterStatus.loading));
 
-    final currentUser = _appBloc.state.user;
-
-    if (currentUser == null) {
-      emit(
-        state.copyWith(
-          followedTopicsStatus: TopicsFilterStatus.failure,
-          error: const UnauthorizedException(
-            'User must be logged in to apply followed topics.',
-          ),
-        ),
-      );
-      return;
-    }
+    final currentUser = _appBloc.state.user!;
 
     try {
       final preferences = await _userContentPreferencesRepository.read(

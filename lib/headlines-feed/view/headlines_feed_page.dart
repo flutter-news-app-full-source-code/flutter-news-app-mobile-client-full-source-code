@@ -140,10 +140,6 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                     (state.filter.topics?.isNotEmpty ?? false) ||
                     (state.filter.sources?.isNotEmpty ?? false) ||
                     (state.filter.eventCountries?.isNotEmpty ?? false) ||
-                    (state.filter.selectedSourceCountryIsoCodes?.isNotEmpty ??
-                        false) ||
-                    (state.filter.selectedSourceSourceTypes?.isNotEmpty ??
-                        false) ||
                     state.filter.isFromFollowedItems;
                 return Stack(
                   children: [

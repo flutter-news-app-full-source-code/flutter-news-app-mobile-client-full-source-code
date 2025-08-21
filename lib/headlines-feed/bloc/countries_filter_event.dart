@@ -31,4 +31,5 @@ final class CountriesFilterRequested extends CountriesFilterEvent {
 /// {@template countries_filter_apply_followed_requested}
 /// Event triggered to request applying the user's followed countries as filters.
 /// {@endtemplate}
-final class CountriesFilterApplyFollowedRequested extends CountriesFilterEvent {}
+final class CountriesFilterApplyFollowedRequested
+    extends CountriesFilterEvent {}

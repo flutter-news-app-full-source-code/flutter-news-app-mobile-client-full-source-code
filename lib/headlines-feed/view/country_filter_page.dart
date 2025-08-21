@@ -91,7 +91,7 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
           BlocBuilder<CountriesFilterBloc, CountriesFilterState>(
             builder: (context, state) {
               // Determine if the "Apply My Followed" icon should be filled
-              final bool isFollowedFilterActive =
+              final isFollowedFilterActive =
                   state.followedCountries.isNotEmpty &&
                   _pageSelectedCountries.length ==
                       state.followedCountries.length &&
@@ -171,11 +171,11 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
         child: BlocBuilder<CountriesFilterBloc, CountriesFilterState>(
           builder: (context, state) {
             // Determine overall loading status for the main list
-            final bool isLoadingMainList =
+            final isLoadingMainList =
                 state.status == CountriesFilterStatus.loading;
 
             // Determine if followed countries are currently loading
-            final bool isLoadingFollowedCountries =
+            final isLoadingFollowedCountries =
                 state.followedCountriesStatus == CountriesFilterStatus.loading;
 
             // Handle initial loading state
@@ -275,7 +275,7 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
                 // Show loading overlay if followed countries are being fetched
                 if (isLoadingFollowedCountries)
                   Positioned.fill(
-                    child: Container(
+                    child: ColoredBox(
                       color: Colors.black54, // Semi-transparent overlay
                       child: Center(
                         child: Column(

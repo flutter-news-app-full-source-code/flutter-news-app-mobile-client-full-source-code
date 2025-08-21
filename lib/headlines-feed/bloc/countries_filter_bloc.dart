@@ -24,12 +24,12 @@ class CountriesFilterBloc
   CountriesFilterBloc({
     required DataRepository<Country> countriesRepository,
     required DataRepository<UserContentPreferences>
-        userContentPreferencesRepository, // Inject UserContentPreferencesRepository
+    userContentPreferencesRepository, // Inject UserContentPreferencesRepository
     required AppBloc appBloc, // Inject AppBloc
-  })  : _countriesRepository = countriesRepository,
-        _userContentPreferencesRepository = userContentPreferencesRepository,
-        _appBloc = appBloc,
-        super(const CountriesFilterState()) {
+  }) : _countriesRepository = countriesRepository,
+       _userContentPreferencesRepository = userContentPreferencesRepository,
+       _appBloc = appBloc,
+       super(const CountriesFilterState()) {
     on<CountriesFilterRequested>(
       _onCountriesFilterRequested,
       transformer: restartable(),
@@ -41,7 +41,8 @@ class CountriesFilterBloc
   }
 
   final DataRepository<Country> _countriesRepository;
-  final DataRepository<UserContentPreferences> _userContentPreferencesRepository;
+  final DataRepository<UserContentPreferences>
+  _userContentPreferencesRepository;
   final AppBloc _appBloc;
 
   /// Handles the request to fetch countries based on a specific usage.
@@ -93,7 +94,9 @@ class CountriesFilterBloc
     CountriesFilterApplyFollowedRequested event,
     Emitter<CountriesFilterState> emit,
   ) async {
-    emit(state.copyWith(followedCountriesStatus: CountriesFilterStatus.loading));
+    emit(
+      state.copyWith(followedCountriesStatus: CountriesFilterStatus.loading),
+    );
 
     final currentUser = _appBloc.state.user;
 
@@ -120,7 +123,9 @@ class CountriesFilterBloc
           state.copyWith(
             followedCountriesStatus: CountriesFilterStatus.success,
             followedCountries: const [],
-            error: const OperationFailedException('No followed countries found.'),
+            error: const OperationFailedException(
+              'No followed countries found.',
+            ),
             clearFollowedCountriesError: true,
           ),
         );
@@ -135,7 +140,12 @@ class CountriesFilterBloc
         ),
       );
     } on HttpException catch (e) {
-      emit(state.copyWith(followedCountriesStatus: CountriesFilterStatus.failure, error: e));
+      emit(
+        state.copyWith(
+          followedCountriesStatus: CountriesFilterStatus.failure,
+          error: e,
+        ),
+      );
     } catch (e) {
       emit(
         state.copyWith(

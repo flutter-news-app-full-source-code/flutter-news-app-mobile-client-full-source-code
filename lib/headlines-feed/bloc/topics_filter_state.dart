@@ -79,8 +79,7 @@ final class TopicsFilterState extends Equatable {
       cursor: clearCursor ? null : (cursor ?? this.cursor),
       // Clear error if requested, otherwise keep existing or use new one
       error: clearError ? null : error ?? this.error,
-      followedTopicsStatus:
-          followedTopicsStatus ?? this.followedTopicsStatus,
+      followedTopicsStatus: followedTopicsStatus ?? this.followedTopicsStatus,
       followedTopics: followedTopics ?? this.followedTopics,
     );
   }

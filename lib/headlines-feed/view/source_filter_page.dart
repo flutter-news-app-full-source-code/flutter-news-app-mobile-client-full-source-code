@@ -22,10 +22,7 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class SourceFilterPage extends StatelessWidget {
   /// {@macro source_filter_page}
-  const SourceFilterPage({
-    super.key,
-    this.initialSelectedSources = const [],
-  });
+  const SourceFilterPage({super.key, this.initialSelectedSources = const []});
 
   /// The list of sources that were initially selected on the previous page.
   final List<Source> initialSelectedSources;
@@ -33,17 +30,18 @@ class SourceFilterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => SourcesFilterBloc(
-        sourcesRepository: context.read<DataRepository<Source>>(),
-        countriesRepository: context.read<DataRepository<Country>>(),
-        userContentPreferencesRepository:
-            context.read<DataRepository<UserContentPreferences>>(),
-        appBloc: context.read<AppBloc>(),
-      )..add(
-          LoadSourceFilterData(
-            initialSelectedSources: initialSelectedSources,
+      create: (context) =>
+          SourcesFilterBloc(
+            sourcesRepository: context.read<DataRepository<Source>>(),
+            countriesRepository: context.read<DataRepository<Country>>(),
+            userContentPreferencesRepository: context
+                .read<DataRepository<UserContentPreferences>>(),
+            appBloc: context.read<AppBloc>(),
+          )..add(
+            LoadSourceFilterData(
+              initialSelectedSources: initialSelectedSources,
+            ),
           ),
-        ),
       child: const _SourceFilterView(),
     );
   }
@@ -70,29 +68,32 @@ class _SourceFilterView extends StatelessWidget {
           BlocBuilder<SourcesFilterBloc, SourcesFilterState>(
             builder: (context, state) {
               // Determine if the "Apply My Followed" icon should be filled
-              final bool isFollowedFilterActive =
+              final isFollowedFilterActive =
                   state.followedSources.isNotEmpty &&
-                      state.finallySelectedSourceIds.length ==
-                          state.followedSources.length &&
-                      state.followedSources.every(
-                        (source) =>
-                            state.finallySelectedSourceIds.contains(source.id),
-                      );
+                  state.finallySelectedSourceIds.length ==
+                      state.followedSources.length &&
+                  state.followedSources.every(
+                    (source) =>
+                        state.finallySelectedSourceIds.contains(source.id),
+                  );
 
               return IconButton(
                 icon: isFollowedFilterActive
                     ? const Icon(Icons.favorite)
                     : const Icon(Icons.favorite_border),
-                color: isFollowedFilterActive ? theme.colorScheme.primary : null,
+                color: isFollowedFilterActive
+                    ? theme.colorScheme.primary
+                    : null,
                 tooltip: l10n.headlinesFeedFilterApplyFollowedLabel,
-                onPressed: state.followedSourcesStatus ==
+                onPressed:
+                    state.followedSourcesStatus ==
                         SourceFilterDataLoadingStatus.loading
                     ? null // Disable while loading
                     : () {
                         // Dispatch event to BLoC to fetch and apply followed sources
                         context.read<SourcesFilterBloc>().add(
-                              SourcesFilterApplyFollowedRequested(),
-                            );
+                          SourcesFilterApplyFollowedRequested(),
+                        );
                       },
               );
             },
@@ -102,8 +103,8 @@ class _SourceFilterView extends StatelessWidget {
             tooltip: l10n.headlinesFeedFilterResetButton,
             onPressed: () {
               context.read<SourcesFilterBloc>().add(
-                    const ClearSourceFiltersRequested(),
-                  );
+                const ClearSourceFiltersRequested(),
+              );
             },
           ),
           IconButton(
@@ -124,7 +125,8 @@ class _SourceFilterView extends StatelessWidget {
             previous.followedSourcesStatus != current.followedSourcesStatus ||
             previous.followedSources != current.followedSources,
         listener: (context, state) {
-          if (state.followedSourcesStatus == SourceFilterDataLoadingStatus.success) {
+          if (state.followedSourcesStatus ==
+              SourceFilterDataLoadingStatus.success) {
             if (state.followedSources.isEmpty) {
               ScaffoldMessenger.of(context)
                 ..hideCurrentSnackBar()
@@ -135,7 +137,8 @@ class _SourceFilterView extends StatelessWidget {
                   ),
                 );
             }
-          } else if (state.followedSourcesStatus == SourceFilterDataLoadingStatus.failure) {
+          } else if (state.followedSourcesStatus ==
+              SourceFilterDataLoadingStatus.failure) {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(
@@ -148,11 +151,13 @@ class _SourceFilterView extends StatelessWidget {
         },
         child: BlocBuilder<SourcesFilterBloc, SourcesFilterState>(
           builder: (context, state) {
-            final bool isLoadingMainList =
-                state.dataLoadingStatus == SourceFilterDataLoadingStatus.loading &&
-                    state.allAvailableSources.isEmpty;
-            final bool isLoadingFollowedSources =
-                state.followedSourcesStatus == SourceFilterDataLoadingStatus.loading;
+            final isLoadingMainList =
+                state.dataLoadingStatus ==
+                    SourceFilterDataLoadingStatus.loading &&
+                state.allAvailableSources.isEmpty;
+            final isLoadingFollowedSources =
+                state.followedSourcesStatus ==
+                SourceFilterDataLoadingStatus.loading;
 
             if (isLoadingMainList) {
               return LoadingStateWidget(
@@ -161,13 +166,19 @@ class _SourceFilterView extends StatelessWidget {
                 subheadline: l10n.sourceFilterLoadingSubheadline,
               );
             }
-            if (state.dataLoadingStatus == SourceFilterDataLoadingStatus.failure &&
+            if (state.dataLoadingStatus ==
+                    SourceFilterDataLoadingStatus.failure &&
                 state.allAvailableSources.isEmpty) {
               return FailureStateWidget(
-                exception: state.error ??
-                    const UnknownException('Failed to load source filter data.'),
+                exception:
+                    state.error ??
+                    const UnknownException(
+                      'Failed to load source filter data.',
+                    ),
                 onRetry: () {
-                  context.read<SourcesFilterBloc>().add(const LoadSourceFilterData());
+                  context.read<SourcesFilterBloc>().add(
+                    const LoadSourceFilterData(),
+                  );
                 },
               );
             }
@@ -187,8 +198,9 @@ class _SourceFilterView extends StatelessWidget {
                       ),
                       child: Text(
                         l10n.headlinesFeedFilterSourceLabel,
-                        style: textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.bold),
+                        style: textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.sm),
@@ -200,7 +212,7 @@ class _SourceFilterView extends StatelessWidget {
                 // Show loading overlay if followed sources are being fetched
                 if (isLoadingFollowedSources)
                   Positioned.fill(
-                    child: Container(
+                    child: ColoredBox(
                       color: Colors.black54, // Semi-transparent overlay
                       child: Center(
                         child: Column(
@@ -260,8 +272,8 @@ class _SourceFilterView extends StatelessWidget {
                     selected: state.selectedCountryIsoCodes.isEmpty,
                     onSelected: (_) {
                       context.read<SourcesFilterBloc>().add(
-                            const CountryCapsuleToggled(''),
-                          );
+                        const CountryCapsuleToggled(''),
+                      );
                     },
                   );
                 }
@@ -280,8 +292,8 @@ class _SourceFilterView extends StatelessWidget {
                   ),
                   onSelected: (_) {
                     context.read<SourcesFilterBloc>().add(
-                          CountryCapsuleToggled(country.isoCode),
-                        );
+                      CountryCapsuleToggled(country.isoCode),
+                    );
                   },
                 );
               },
@@ -323,8 +335,8 @@ class _SourceFilterView extends StatelessWidget {
                     selected: state.selectedSourceTypes.isEmpty,
                     onSelected: (_) {
                       context.read<SourcesFilterBloc>().add(
-                            const AllSourceTypesCapsuleToggled(),
-                          );
+                        const AllSourceTypesCapsuleToggled(),
+                      );
                     },
                   );
                 }
@@ -335,8 +347,8 @@ class _SourceFilterView extends StatelessWidget {
                   selected: state.selectedSourceTypes.contains(sourceType),
                   onSelected: (_) {
                     context.read<SourcesFilterBloc>().add(
-                          SourceTypeCapsuleToggled(sourceType),
-                        );
+                      SourceTypeCapsuleToggled(sourceType),
+                    );
                   },
                 );
               },
@@ -360,7 +372,8 @@ class _SourceFilterView extends StatelessWidget {
     if (state.dataLoadingStatus == SourceFilterDataLoadingStatus.failure &&
         state.displayableSources.isEmpty) {
       return FailureStateWidget(
-        exception: state.error ??
+        exception:
+            state.error ??
             const UnknownException('Failed to load displayable sources.'),
         onRetry: () {
           context.read<SourcesFilterBloc>().add(const LoadSourceFilterData());
@@ -394,8 +407,8 @@ class _SourceFilterView extends StatelessWidget {
           onChanged: (bool? value) {
             if (value != null) {
               context.read<SourcesFilterBloc>().add(
-                    SourceCheckboxToggled(source.id, value),
-                  );
+                SourceCheckboxToggled(source.id, value),
+              );
             }
           },
           controlAffinity: ListTileControlAffinity.leading,

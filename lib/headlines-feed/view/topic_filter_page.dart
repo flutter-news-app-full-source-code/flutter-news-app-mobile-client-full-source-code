@@ -1,7 +1,6 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/topics_filter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:go_router/go_router.dart';
@@ -74,7 +73,8 @@ class _TopicFilterPageState extends State<TopicFilterPage> {
               // Determine if the "Apply My Followed" icon should be filled
               // This logic checks if all currently selected topics are
               // also present in the fetched followed topics list.
-              final bool isFollowedFilterActive = state.followedTopics.isNotEmpty &&
+              final isFollowedFilterActive =
+                  state.followedTopics.isNotEmpty &&
                   _pageSelectedTopics.length == state.followedTopics.length &&
                   _pageSelectedTopics.every(state.followedTopics.contains);
 
@@ -82,9 +82,12 @@ class _TopicFilterPageState extends State<TopicFilterPage> {
                 icon: isFollowedFilterActive
                     ? const Icon(Icons.favorite)
                     : const Icon(Icons.favorite_border),
-                color: isFollowedFilterActive ? theme.colorScheme.primary : null,
+                color: isFollowedFilterActive
+                    ? theme.colorScheme.primary
+                    : null,
                 tooltip: l10n.headlinesFeedFilterApplyFollowedLabel,
-                onPressed: state.followedTopicsStatus == TopicsFilterStatus.loading
+                onPressed:
+                    state.followedTopicsStatus == TopicsFilterStatus.loading
                     ? null // Disable while loading
                     : () {
                         // Dispatch event to BLoC to fetch and apply followed topics
@@ -141,11 +144,12 @@ class _TopicFilterPageState extends State<TopicFilterPage> {
         child: BlocBuilder<TopicsFilterBloc, TopicsFilterState>(
           builder: (context, state) {
             // Determine overall loading status for the main list
-            final bool isLoadingMainList = state.status == TopicsFilterStatus.initial ||
+            final isLoadingMainList =
+                state.status == TopicsFilterStatus.initial ||
                 state.status == TopicsFilterStatus.loading;
 
             // Determine if followed topics are currently loading
-            final bool isLoadingFollowedTopics =
+            final isLoadingFollowedTopics =
                 state.followedTopicsStatus == TopicsFilterStatus.loading;
 
             if (isLoadingMainList) {
@@ -156,10 +160,12 @@ class _TopicFilterPageState extends State<TopicFilterPage> {
               );
             }
 
-            if (state.status == TopicsFilterStatus.failure && state.topics.isEmpty) {
+            if (state.status == TopicsFilterStatus.failure &&
+                state.topics.isEmpty) {
               return Center(
                 child: FailureStateWidget(
-                  exception: state.error ??
+                  exception:
+                      state.error ??
                       const UnknownException(
                         'An unknown error occurred while fetching topics.',
                       ),
@@ -207,7 +213,7 @@ class _TopicFilterPageState extends State<TopicFilterPage> {
                 // Show loading overlay if followed topics are being fetched
                 if (isLoadingFollowedTopics)
                   Positioned.fill(
-                    child: Container(
+                    child: ColoredBox(
                       color: Colors.black54, // Semi-transparent overlay
                       child: Center(
                         child: Column(

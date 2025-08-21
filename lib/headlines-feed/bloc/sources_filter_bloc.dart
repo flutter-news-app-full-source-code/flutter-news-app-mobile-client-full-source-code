@@ -14,13 +14,13 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
     required DataRepository<Source> sourcesRepository,
     required DataRepository<Country> countriesRepository,
     required DataRepository<UserContentPreferences>
-        userContentPreferencesRepository, 
+    userContentPreferencesRepository,
     required AppBloc appBloc,
-  })  : _sourcesRepository = sourcesRepository,
-        _countriesRepository = countriesRepository,
-        _userContentPreferencesRepository = userContentPreferencesRepository,
-        _appBloc = appBloc,
-        super(const SourcesFilterState()) {
+  }) : _sourcesRepository = sourcesRepository,
+       _countriesRepository = countriesRepository,
+       _userContentPreferencesRepository = userContentPreferencesRepository,
+       _appBloc = appBloc,
+       super(const SourcesFilterState()) {
     on<LoadSourceFilterData>(_onLoadSourceFilterData);
     on<CountryCapsuleToggled>(_onCountryCapsuleToggled);
     on<AllSourceTypesCapsuleToggled>(_onAllSourceTypesCapsuleToggled);
@@ -34,7 +34,8 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
 
   final DataRepository<Source> _sourcesRepository;
   final DataRepository<Country> _countriesRepository;
-  final DataRepository<UserContentPreferences> _userContentPreferencesRepository;
+  final DataRepository<UserContentPreferences>
+  _userContentPreferencesRepository;
   final AppBloc _appBloc;
 
   Future<void> _onLoadSourceFilterData(
@@ -197,7 +198,11 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
     SourcesFilterApplyFollowedRequested event,
     Emitter<SourcesFilterState> emit,
   ) async {
-    emit(state.copyWith(followedSourcesStatus: SourceFilterDataLoadingStatus.loading));
+    emit(
+      state.copyWith(
+        followedSourcesStatus: SourceFilterDataLoadingStatus.loading,
+      ),
+    );
 
     final currentUser = _appBloc.state.user;
 
@@ -235,12 +240,19 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
         state.copyWith(
           followedSourcesStatus: SourceFilterDataLoadingStatus.success,
           followedSources: preferences.followedSources,
-          finallySelectedSourceIds: preferences.followedSources.map((s) => s.id).toSet(),
+          finallySelectedSourceIds: preferences.followedSources
+              .map((s) => s.id)
+              .toSet(),
           clearFollowedSourcesError: true,
         ),
       );
     } on HttpException catch (e) {
-      emit(state.copyWith(followedSourcesStatus: SourceFilterDataLoadingStatus.failure, error: e));
+      emit(
+        state.copyWith(
+          followedSourcesStatus: SourceFilterDataLoadingStatus.failure,
+          error: e,
+        ),
+      );
     } catch (e) {
       emit(
         state.copyWith(

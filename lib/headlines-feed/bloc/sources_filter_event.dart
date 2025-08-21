@@ -20,17 +20,13 @@ abstract class SourcesFilterEvent extends Equatable {
 /// {@endtemplate}
 class LoadSourceFilterData extends SourcesFilterEvent {
   /// {@macro load_source_filter_data}
-  const LoadSourceFilterData({
-    this.initialSelectedSources = const [],
-  });
+  const LoadSourceFilterData({this.initialSelectedSources = const []});
 
   /// The list of sources that were initially selected on the previous page.
   final List<Source> initialSelectedSources;
 
   @override
-  List<Object?> get props => [
-    initialSelectedSources,
-  ];
+  List<Object?> get props => [initialSelectedSources];
 }
 
 class CountryCapsuleToggled extends SourcesFilterEvent {

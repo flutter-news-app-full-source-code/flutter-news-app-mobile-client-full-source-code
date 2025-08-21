@@ -140,7 +140,9 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
           _currentUserPreferences = preferences;
           _tempSelectedTopics = List.from(preferences.followedTopics);
           _tempSelectedSources = List.from(preferences.followedSources);
-          _tempSelectedEventCountries = List.from(preferences.followedCountries);
+          _tempSelectedEventCountries = List.from(
+            preferences.followedCountries,
+          );
           _isLoadingFollowedFilters = false;
         });
       }
@@ -254,7 +256,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
 
     // Determine if the "Apply my followed items" feature is active and loading.
     // This will disable the individual filter tiles.
-    final bool isFollowedFilterActiveOrLoading =
+    final isFollowedFilterActiveOrLoading =
         _useFollowedFilters || _isLoadingFollowedFilters;
 
     return Scaffold(

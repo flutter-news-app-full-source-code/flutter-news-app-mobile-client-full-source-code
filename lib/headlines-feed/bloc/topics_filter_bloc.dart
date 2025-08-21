@@ -23,12 +23,12 @@ class TopicsFilterBloc extends Bloc<TopicsFilterEvent, TopicsFilterState> {
   TopicsFilterBloc({
     required DataRepository<Topic> topicsRepository,
     required DataRepository<UserContentPreferences>
-        userContentPreferencesRepository, 
-    required AppBloc appBloc, 
-  })  : _topicsRepository = topicsRepository,
-        _userContentPreferencesRepository = userContentPreferencesRepository,
-        _appBloc = appBloc,
-        super(const TopicsFilterState()) {
+    userContentPreferencesRepository,
+    required AppBloc appBloc,
+  }) : _topicsRepository = topicsRepository,
+       _userContentPreferencesRepository = userContentPreferencesRepository,
+       _appBloc = appBloc,
+       super(const TopicsFilterState()) {
     on<TopicsFilterRequested>(
       _onTopicsFilterRequested,
       transformer: restartable(),
@@ -40,11 +40,12 @@ class TopicsFilterBloc extends Bloc<TopicsFilterEvent, TopicsFilterState> {
     on<TopicsFilterApplyFollowedRequested>(
       _onTopicsFilterApplyFollowedRequested,
       transformer: restartable(),
-    ); 
+    );
   }
 
   final DataRepository<Topic> _topicsRepository;
-  final DataRepository<UserContentPreferences> _userContentPreferencesRepository;
+  final DataRepository<UserContentPreferences>
+  _userContentPreferencesRepository;
   final AppBloc _appBloc;
 
   /// Number of topics to fetch per page.
@@ -165,7 +166,12 @@ class TopicsFilterBloc extends Bloc<TopicsFilterEvent, TopicsFilterState> {
         ),
       );
     } on HttpException catch (e) {
-      emit(state.copyWith(followedTopicsStatus: TopicsFilterStatus.failure, error: e));
+      emit(
+        state.copyWith(
+          followedTopicsStatus: TopicsFilterStatus.failure,
+          error: e,
+        ),
+      );
     } catch (e) {
       emit(
         state.copyWith(

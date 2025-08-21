@@ -464,11 +464,14 @@ GoRouter createRouter({
                       GoRoute(
                         path: Routes.feedFilterTopics,
                         name: Routes.feedFilterTopicsName,
-                        // Wrap with BlocProvider
+                        // Wrap with BlocProviderUserContentPreferencesRepository
                         builder: (context, state) => BlocProvider(
                           create: (context) => TopicsFilterBloc(
                             topicsRepository: context
                                 .read<DataRepository<Topic>>(),
+                            userContentPreferencesRepository: context
+                                .read<DataRepository<UserContentPreferences>>(),
+                            appBloc: context.read<AppBloc>(),
                           ),
                           child: const TopicFilterPage(),
                         ),
@@ -485,6 +488,9 @@ GoRouter createRouter({
                             countriesRepository: // Added missing repository
                             context
                                 .read<DataRepository<Country>>(),
+                            userContentPreferencesRepository: context
+                                .read<DataRepository<UserContentPreferences>>(),
+                            appBloc: context.read<AppBloc>(),
                           ),
                           // Pass initialSelectedSources from state.extra
                           child: Builder(
@@ -512,6 +518,11 @@ GoRouter createRouter({
                               create: (context) => CountriesFilterBloc(
                                 countriesRepository: context
                                     .read<DataRepository<Country>>(),
+                                userContentPreferencesRepository: context
+                                    .read<
+                                      DataRepository<UserContentPreferences>
+                                    >(),
+                                appBloc: context.read<AppBloc>(),
                               ),
                               child: CountryFilterPage(
                                 title:

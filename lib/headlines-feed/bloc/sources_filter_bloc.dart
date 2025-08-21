@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart'; // Import AppBloc
 
 part 'sources_filter_event.dart';
 part 'sources_filter_state.dart';
@@ -12,8 +13,13 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
   SourcesFilterBloc({
     required DataRepository<Source> sourcesRepository,
     required DataRepository<Country> countriesRepository,
+    required DataRepository<UserContentPreferences>
+    userContentPreferencesRepository,
+    required AppBloc appBloc,
   }) : _sourcesRepository = sourcesRepository,
        _countriesRepository = countriesRepository,
+       _userContentPreferencesRepository = userContentPreferencesRepository,
+       _appBloc = appBloc,
        super(const SourcesFilterState()) {
     on<LoadSourceFilterData>(_onLoadSourceFilterData);
     on<CountryCapsuleToggled>(_onCountryCapsuleToggled);
@@ -21,11 +27,16 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
     on<SourceTypeCapsuleToggled>(_onSourceTypeCapsuleToggled);
     on<SourceCheckboxToggled>(_onSourceCheckboxToggled);
     on<ClearSourceFiltersRequested>(_onClearSourceFiltersRequested);
-    // Removed _FetchFilteredSourcesRequested event listener
+    on<SourcesFilterApplyFollowedRequested>(
+      _onSourcesFilterApplyFollowedRequested,
+    );
   }
 
   final DataRepository<Source> _sourcesRepository;
   final DataRepository<Country> _countriesRepository;
+  final DataRepository<UserContentPreferences>
+  _userContentPreferencesRepository;
+  final AppBloc _appBloc;
 
   Future<void> _onLoadSourceFilterData(
     LoadSourceFilterData event,
@@ -180,6 +191,63 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
         clearErrorMessage: true,
       ),
     );
+  }
+
+  /// Handles the request to apply the user's followed sources as filters.
+  Future<void> _onSourcesFilterApplyFollowedRequested(
+    SourcesFilterApplyFollowedRequested event,
+    Emitter<SourcesFilterState> emit,
+  ) async {
+    emit(
+      state.copyWith(
+        followedSourcesStatus: SourceFilterDataLoadingStatus.loading,
+      ),
+    );
+
+    final currentUser = _appBloc.state.user!;
+
+    try {
+      final preferences = await _userContentPreferencesRepository.read(
+        id: currentUser.id,
+        userId: currentUser.id,
+      );
+
+      if (preferences.followedSources.isEmpty) {
+        emit(
+          state.copyWith(
+            followedSourcesStatus: SourceFilterDataLoadingStatus.success,
+            followedSources: const [],
+            clearErrorMessage: true,
+          ),
+        );
+        return;
+      }
+
+      emit(
+        state.copyWith(
+          followedSourcesStatus: SourceFilterDataLoadingStatus.success,
+          followedSources: preferences.followedSources,
+          finallySelectedSourceIds: preferences.followedSources
+              .map((s) => s.id)
+              .toSet(),
+          clearFollowedSourcesError: true,
+        ),
+      );
+    } on HttpException catch (e) {
+      emit(
+        state.copyWith(
+          followedSourcesStatus: SourceFilterDataLoadingStatus.failure,
+          error: e,
+        ),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          followedSourcesStatus: SourceFilterDataLoadingStatus.failure,
+          error: UnknownException(e.toString()),
+        ),
+      );
+    }
   }
 
   // Helper method to filter sources based on selected countries and types

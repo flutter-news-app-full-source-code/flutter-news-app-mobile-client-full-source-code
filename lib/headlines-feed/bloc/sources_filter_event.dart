@@ -20,17 +20,13 @@ abstract class SourcesFilterEvent extends Equatable {
 /// {@endtemplate}
 class LoadSourceFilterData extends SourcesFilterEvent {
   /// {@macro load_source_filter_data}
-  const LoadSourceFilterData({
-    this.initialSelectedSources = const [],
-  });
+  const LoadSourceFilterData({this.initialSelectedSources = const []});
 
   /// The list of sources that were initially selected on the previous page.
   final List<Source> initialSelectedSources;
 
   @override
-  List<Object?> get props => [
-    initialSelectedSources,
-  ];
+  List<Object?> get props => [initialSelectedSources];
 }
 
 class CountryCapsuleToggled extends SourcesFilterEvent {
@@ -69,3 +65,8 @@ class SourceCheckboxToggled extends SourcesFilterEvent {
 class ClearSourceFiltersRequested extends SourcesFilterEvent {
   const ClearSourceFiltersRequested();
 }
+
+/// {@template sources_filter_apply_followed_requested}
+/// Event triggered to request applying the user's followed sources as filters.
+/// {@endtemplate}
+final class SourcesFilterApplyFollowedRequested extends SourcesFilterEvent {}

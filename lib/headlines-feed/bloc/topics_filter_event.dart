@@ -20,3 +20,8 @@ final class TopicsFilterRequested extends TopicsFilterEvent {}
 /// Event triggered to request the next page of topics for pagination.
 /// {@endtemplate}
 final class TopicsFilterLoadMoreRequested extends TopicsFilterEvent {}
+
+/// {@template topics_filter_apply_followed_requested}
+/// Event triggered to request applying the user's followed topics as filters.
+/// {@endtemplate}
+final class TopicsFilterApplyFollowedRequested extends TopicsFilterEvent {}

@@ -50,6 +50,12 @@ final class TopicsFilterState extends Equatable {
   /// An optional error object if the status is [TopicsFilterStatus.failure].
   final HttpException? error;
 
+  /// The current status of fetching followed topics.
+  final TopicsFilterStatus followedTopicsStatus;
+
+  /// The list of [Topic] objects representing the user's followed topics.
+  final List<Topic> followedTopics;
+
   /// Creates a copy of this state with the given fields replaced.
   TopicsFilterState copyWith({
     TopicsFilterStatus? status,
@@ -57,8 +63,11 @@ final class TopicsFilterState extends Equatable {
     bool? hasMore,
     String? cursor,
     HttpException? error,
+    TopicsFilterStatus? followedTopicsStatus,
+    List<Topic>? followedTopics,
     bool clearError = false,
     bool clearCursor = false,
+    bool clearFollowedTopicsError = false,
   }) {
     return TopicsFilterState(
       status: status ?? this.status,
@@ -68,9 +77,19 @@ final class TopicsFilterState extends Equatable {
       cursor: clearCursor ? null : (cursor ?? this.cursor),
       // Clear error if requested, otherwise keep existing or use new one
       error: clearError ? null : error ?? this.error,
+      followedTopicsStatus: followedTopicsStatus ?? this.followedTopicsStatus,
+      followedTopics: followedTopics ?? this.followedTopics,
     );
   }
 
   @override
-  List<Object?> get props => [status, topics, hasMore, cursor, error];
+  List<Object?> get props => [
+    status,
+    topics,
+    hasMore,
+    cursor,
+    error,
+    followedTopicsStatus,
+    followedTopics,
+  ];
 }

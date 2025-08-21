@@ -123,10 +123,7 @@ class CountriesFilterBloc
           state.copyWith(
             followedCountriesStatus: CountriesFilterStatus.success,
             followedCountries: const [],
-            error: const OperationFailedException(
-              'No followed countries found.',
-            ),
-            clearFollowedCountriesError: true,
+            clearError: true,
           ),
         );
         return;

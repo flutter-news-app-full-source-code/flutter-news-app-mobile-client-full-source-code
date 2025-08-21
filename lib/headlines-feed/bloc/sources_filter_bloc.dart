@@ -26,7 +26,6 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
     on<AllSourceTypesCapsuleToggled>(_onAllSourceTypesCapsuleToggled);
     on<SourceTypeCapsuleToggled>(_onSourceTypeCapsuleToggled);
     on<SourceCheckboxToggled>(_onSourceCheckboxToggled);
-    on<ClearSourceFiltersRequested>(_onClearSourceFiltersRequested);
     on<SourcesFilterApplyFollowedRequested>(
       _onSourcesFilterApplyFollowedRequested,
     );
@@ -175,22 +174,6 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
       currentSelected.remove(event.sourceId);
     }
     emit(state.copyWith(finallySelectedSourceIds: currentSelected));
-  }
-
-  Future<void> _onClearSourceFiltersRequested(
-    ClearSourceFiltersRequested event,
-    Emitter<SourcesFilterState> emit,
-  ) async {
-    emit(
-      state.copyWith(
-        selectedCountryIsoCodes: {},
-        selectedSourceTypes: {},
-        finallySelectedSourceIds: {},
-        displayableSources: List.from(state.allAvailableSources),
-        dataLoadingStatus: SourceFilterDataLoadingStatus.success,
-        clearErrorMessage: true,
-      ),
-    );
   }
 
   /// Handles the request to apply the user's followed sources as filters.

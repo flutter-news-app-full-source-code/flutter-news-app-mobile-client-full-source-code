@@ -98,15 +98,7 @@ class _SourceFilterView extends StatelessWidget {
               );
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.clear_all_outlined),
-            tooltip: l10n.headlinesFeedFilterResetButton,
-            onPressed: () {
-              context.read<SourcesFilterBloc>().add(
-                const ClearSourceFiltersRequested(),
-              );
-            },
-          ),
+
           IconButton(
             icon: const Icon(Icons.check),
             tooltip: l10n.headlinesFeedFilterApplyButton,

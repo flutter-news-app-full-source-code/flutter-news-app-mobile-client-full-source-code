@@ -62,10 +62,6 @@ class SourceCheckboxToggled extends SourcesFilterEvent {
   List<Object> get props => [sourceId, isSelected];
 }
 
-class ClearSourceFiltersRequested extends SourcesFilterEvent {
-  const ClearSourceFiltersRequested();
-}
-
 /// {@template sources_filter_apply_followed_requested}
 /// Event triggered to request applying the user's followed sources as filters.
 /// {@endtemplate}

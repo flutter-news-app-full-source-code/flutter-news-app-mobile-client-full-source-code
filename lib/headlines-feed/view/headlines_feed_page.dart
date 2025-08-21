@@ -204,7 +204,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
             if (state.status == HeadlinesFeedStatus.failure &&
                 state.feedItems.isEmpty) {
               return FailureStateWidget(
-                exception: state.error!,
+                exception: state.error ?? const UnknownException('An unknown error occurred.'),
                 onRetry: () => context.read<HeadlinesFeedBloc>().add(
                   HeadlinesFeedRefreshRequested(
                     adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),

@@ -41,10 +41,8 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
   /// They are initialized from the main [HeadlinesFeedBloc]'s current filter
   /// and are only applied back to the BLoC when the user taps 'Apply'.
   late List<Topic> _tempSelectedTopics;
-  late List<Source> _tempSelectedSources;
-  late Set<String> _tempSelectedSourceCountryIsoCodes;
-  late Set<SourceType> _tempSelectedSourceSourceTypes;
-  late List<Country> _tempSelectedEventCountries;
+    late List<Source> _tempSelectedSources;
+    late List<Country> _tempSelectedEventCountries;
 
   // New state variables for the "Apply my followed items" feature
   bool _useFollowedFilters = false;
@@ -62,12 +60,6 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
     final currentFilter = headlinesFeedState.filter;
     _tempSelectedTopics = List.from(currentFilter.topics ?? []);
     _tempSelectedSources = List.from(currentFilter.sources ?? []);
-    _tempSelectedSourceCountryIsoCodes = Set.from(
-      currentFilter.selectedSourceCountryIsoCodes ?? {},
-    );
-    _tempSelectedSourceSourceTypes = Set.from(
-      currentFilter.selectedSourceSourceTypes ?? {},
-    );
     _tempSelectedEventCountries = List.from(currentFilter.eventCountries ?? []);
 
     _useFollowedFilters = currentFilter.isFromFollowedItems;
@@ -202,9 +194,6 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       _tempSelectedTopics = [];
       _tempSelectedSources = [];
       _tempSelectedEventCountries = [];
-      // Keep source country/type filters as they are not part of this quick filter
-      // _tempSelectedSourceCountryIsoCodes = {};
-      // _tempSelectedSourceSourceTypes = {};
     });
   }
 
@@ -225,8 +214,8 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
     required int selectedCount,
     required String routeName,
     // For sources, currentSelection will be a Map
-    required dynamic currentSelectionData,
-    required void Function(dynamic)? onResult,
+    required List<Source> currentSelectionData,
+    required void Function(List<Source>)? onResult,
     bool enabled = true,
   }) {
     final l10n = AppLocalizationsX(context).l10n;
@@ -245,7 +234,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       onTap:
           enabled // Only allow tap if enabled
           ? () async {
-              final result = await context.pushNamed<dynamic>(
+              final result = await context.pushNamed<List<Source>>(
                 routeName,
                 extra: currentSelectionData,
               );
@@ -388,22 +377,9 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
             enabled: !_useFollowedFilters && !_isLoadingFollowedFilters,
             selectedCount: _tempSelectedSources.length,
             routeName: Routes.feedFilterSourcesName,
-            currentSelectionData: {
-              keySelectedSources: _tempSelectedSources,
-              keySelectedCountryIsoCodes: _tempSelectedSourceCountryIsoCodes,
-              keySelectedSourceTypes: _tempSelectedSourceSourceTypes,
-            },
+            currentSelectionData: _tempSelectedSources,
             onResult: (result) {
-              if (result is Map<String, dynamic>) {
-                setState(() {
-                  _tempSelectedSources =
-                      result[keySelectedSources] as List<Source>? ?? [];
-                  _tempSelectedSourceCountryIsoCodes =
-                      result[keySelectedCountryIsoCodes] as Set<String>? ?? {};
-                  _tempSelectedSourceSourceTypes =
-                      result[keySelectedSourceTypes] as Set<SourceType>? ?? {};
-                });
-              }
+              setState(() => _tempSelectedSources = result);
             },
           ),
           _buildFilterTile(

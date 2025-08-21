@@ -513,7 +513,7 @@ GoRouter createRouter({
                           final initialSelection =
                               state.extra as List<Country>?;
                           return MaterialPage(
-                            fullscreenDialog: true,
+                            // fullscreenDialog: true,
                             child: BlocProvider(
                               create: (context) => CountriesFilterBloc(
                                 countriesRepository: context

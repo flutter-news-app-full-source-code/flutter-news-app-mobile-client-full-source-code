@@ -229,8 +229,7 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
           state.copyWith(
             followedSourcesStatus: SourceFilterDataLoadingStatus.success,
             followedSources: const [],
-            error: const OperationFailedException('No followed sources found.'),
-            clearFollowedSourcesError: true,
+            clearErrorMessage: true,
           ),
         );
         return;

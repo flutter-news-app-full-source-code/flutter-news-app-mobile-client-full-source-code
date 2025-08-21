@@ -65,12 +65,10 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
     _loadFollowedFiltersError = null;
     _currentUserPreferences = null;
 
-    // If the checkbox should be initially checked, fetch the followed items
-    // to ensure the _temp lists are correctly populated with the *latest*
-    // followed items, and to correctly disable the manual filter tiles.
+    // If the "Apply my followed items" feature is initially active,
+    // fetch the followed items to populate the temporary filter lists.
     if (_useFollowedFilters) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        // Ensure context is available for l10n and BLoC access
         if (mounted) {
           _fetchAndApplyFollowedFilters();
         }
@@ -78,6 +76,11 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
     }
   }
 
+  /// Fetches the user's followed items (topics, sources, countries) and
+  /// applies them to the temporary filter state.
+  ///
+  /// This method is called when the "Apply my followed items" toggle is
+  /// activated. It handles loading states, errors, and updates the UI.
   Future<void> _fetchAndApplyFollowedFilters() async {
     setState(() {
       _isLoadingFollowedFilters = true;
@@ -106,9 +109,10 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
         userId: currentUser.id,
       );
 
-      // NEW: Check if followed items are empty
+      // Check if followed items are empty across all categories
       if (preferences.followedTopics.isEmpty &&
-          preferences.followedSources.isEmpty) {
+          preferences.followedSources.isEmpty &&
+          preferences.followedCountries.isEmpty) {
         setState(() {
           _isLoadingFollowedFilters = false;
           _useFollowedFilters = false;
@@ -136,12 +140,12 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
           _currentUserPreferences = preferences;
           _tempSelectedTopics = List.from(preferences.followedTopics);
           _tempSelectedSources = List.from(preferences.followedSources);
-          // We don't auto-apply source country/type filters from user preferences here
-          // as the "Apply my followed" checkbox is primarily for topics/sources.
+          _tempSelectedEventCountries = List.from(preferences.followedCountries);
           _isLoadingFollowedFilters = false;
         });
       }
     } on NotFoundException {
+      // If user preferences are not found, treat as empty followed items.
       setState(() {
         _currentUserPreferences = UserContentPreferences(
           id: currentUser.id,
@@ -187,6 +191,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
     }
   }
 
+  /// Clears all temporary filter selections.
   void _clearTemporaryFilters() {
     setState(() {
       _tempSelectedTopics = [];
@@ -228,8 +233,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       subtitle: Text(subtitle),
       trailing: const Icon(Icons.chevron_right),
       enabled: enabled,
-      onTap:
-          enabled // Only allow tap if enabled
+      onTap: enabled
           ? () async {
               final result = await context.pushNamed<List<T>>(
                 routeName,
@@ -248,6 +252,11 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
     final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
 
+    // Determine if the "Apply my followed items" feature is active and loading.
+    // This will disable the individual filter tiles.
+    final bool isFollowedFilterActiveOrLoading =
+        _useFollowedFilters || _isLoadingFollowedFilters;
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -257,6 +266,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
         ),
         title: Text(l10n.headlinesFeedFilterTitle),
         actions: [
+          // Reset All Filters Button
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: l10n.headlinesFeedFilterResetButton,
@@ -266,7 +276,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
                   adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
                 ),
               );
-              // Also reset local state for the checkbox
+              // Also reset local state for the "Apply my followed items"
               setState(() {
                 _useFollowedFilters = false;
                 _isLoadingFollowedFilters = false;
@@ -276,6 +286,29 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
               context.pop();
             },
           ),
+          // Apply My Followed Items Button
+          IconButton(
+            icon: _useFollowedFilters
+                ? const Icon(Icons.favorite)
+                : const Icon(Icons.favorite_border),
+            color: _useFollowedFilters ? theme.colorScheme.primary : null,
+            tooltip: l10n.headlinesFeedFilterApplyFollowedLabel,
+            onPressed: _isLoadingFollowedFilters
+                ? null // Disable while loading
+                : () {
+                    setState(() {
+                      _useFollowedFilters = !_useFollowedFilters;
+                      if (_useFollowedFilters) {
+                        _fetchAndApplyFollowedFilters();
+                      } else {
+                        _isLoadingFollowedFilters = false;
+                        _loadFollowedFiltersError = null;
+                        _clearTemporaryFilters();
+                      }
+                    });
+                  },
+          ),
+          // Apply Filters Button
           IconButton(
             icon: const Icon(Icons.check),
             tooltip: l10n.headlinesFeedFilterApplyButton,
@@ -306,35 +339,25 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.paddingSmall,
+          if (_isLoadingFollowedFilters)
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.paddingLarge,
+                vertical: AppSpacing.sm,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Text(l10n.headlinesFeedLoadingHeadline),
+                ],
+              ),
             ),
-            child: CheckboxListTile(
-              title: Text(l10n.headlinesFeedFilterApplyFollowedLabel),
-              value: _useFollowedFilters,
-              onChanged: (bool? newValue) {
-                setState(() {
-                  _useFollowedFilters = newValue ?? false;
-                  if (_useFollowedFilters) {
-                    _fetchAndApplyFollowedFilters();
-                  } else {
-                    _isLoadingFollowedFilters = false;
-                    _loadFollowedFiltersError = null;
-                    _clearTemporaryFilters();
-                  }
-                });
-              },
-              secondary: _isLoadingFollowedFilters
-                  ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : null,
-              controlAffinity: ListTileControlAffinity.leading,
-            ),
-          ),
           if (_loadFollowedFiltersError != null)
             Padding(
               padding: const EdgeInsets.symmetric(
@@ -350,7 +373,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
           _buildFilterTile<Topic>(
             context: context,
             title: l10n.headlinesFeedFilterTopicLabel,
-            enabled: !_useFollowedFilters && !_isLoadingFollowedFilters,
+            enabled: !isFollowedFilterActiveOrLoading,
             selectedCount: _tempSelectedTopics.length,
             routeName: Routes.feedFilterTopicsName,
             currentSelectionData: _tempSelectedTopics,
@@ -361,7 +384,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
           _buildFilterTile<Source>(
             context: context,
             title: l10n.headlinesFeedFilterSourceLabel,
-            enabled: !_useFollowedFilters && !_isLoadingFollowedFilters,
+            enabled: !isFollowedFilterActiveOrLoading,
             selectedCount: _tempSelectedSources.length,
             routeName: Routes.feedFilterSourcesName,
             currentSelectionData: _tempSelectedSources,
@@ -372,7 +395,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
           _buildFilterTile<Country>(
             context: context,
             title: l10n.headlinesFeedFilterEventCountryLabel,
-            enabled: !_useFollowedFilters && !_isLoadingFollowedFilters,
+            enabled: !isFollowedFilterActiveOrLoading,
             selectedCount: _tempSelectedEventCountries.length,
             routeName: Routes.feedFilterEventCountriesName,
             currentSelectionData: _tempSelectedEventCountries,

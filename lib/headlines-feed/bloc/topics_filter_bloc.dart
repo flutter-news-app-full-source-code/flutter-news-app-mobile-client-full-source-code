@@ -151,8 +151,7 @@ class TopicsFilterBloc extends Bloc<TopicsFilterEvent, TopicsFilterState> {
           state.copyWith(
             followedTopicsStatus: TopicsFilterStatus.success,
             followedTopics: const [],
-            error: const OperationFailedException('No followed topics found.'),
-            clearFollowedTopicsError: true,
+            clearError: true,
           ),
         );
         return;

@@ -382,6 +382,7 @@ GoRouter createRouter({
                         .read<DataRepository<Headline>>(),
                     topicRepository: context.read<DataRepository<Topic>>(),
                     sourceRepository: context.read<DataRepository<Source>>(),
+                    countryRepository: context.read<DataRepository<Country>>(),
                     appBloc: context.read<AppBloc>(),
                     feedDecoratorService: feedDecoratorService,
                   );

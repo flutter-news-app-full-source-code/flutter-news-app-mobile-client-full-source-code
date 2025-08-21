@@ -73,10 +73,11 @@ class _TopicFilterPageState extends State<TopicFilterPage> {
               // Determine if the "Apply My Followed" icon should be filled
               // This logic checks if all currently selected topics are
               // also present in the fetched followed topics list.
+              final followedTopicsSet = state.followedTopics.toSet();
               final isFollowedFilterActive =
-                  state.followedTopics.isNotEmpty &&
-                  _pageSelectedTopics.length == state.followedTopics.length &&
-                  _pageSelectedTopics.every(state.followedTopics.contains);
+                  followedTopicsSet.isNotEmpty &&
+                  _pageSelectedTopics.length == followedTopicsSet.length &&
+                  _pageSelectedTopics.containsAll(followedTopicsSet);
 
               return IconButton(
                 icon: isFollowedFilterActive

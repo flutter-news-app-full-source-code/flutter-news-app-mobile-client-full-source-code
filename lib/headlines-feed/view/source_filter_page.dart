@@ -39,8 +39,6 @@ class SourceFilterPage extends StatelessWidget {
           )..add(
             LoadSourceFilterData(
               initialSelectedSources: initialSelectedSources,
-              initialSelectedCountryIsoCodes: initialSelectedCountryIsoCodes,
-              initialSelectedSourceTypes: initialSelectedSourceTypes,
             ),
           ),
       child: const _SourceFilterView(),

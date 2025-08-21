@@ -9,8 +9,6 @@ class HeadlineFilter extends Equatable {
   const HeadlineFilter({
     this.topics,
     this.sources,
-    this.selectedSourceCountryIsoCodes,
-    this.selectedSourceSourceTypes,
     this.eventCountries,
     this.isFromFollowedItems = false,
   });
@@ -19,27 +17,30 @@ class HeadlineFilter extends Equatable {
   final List<Topic>? topics;
 
   /// The list of selected sources to filter headlines by.
+  ///
+  /// Note: The `SourceFilterPage` uses internal UI state (country and source
+  /// type capsules) to refine the list of sources presented to the user.
+  /// However, only the *explicitly selected* sources from that refined list
+  /// are passed back and stored here. The country and source type selections
+  /// themselves are *not* part of this filter model, as they are purely for
+  /// UI-side filtering on the `SourceFilterPage` and should not affect the
+  /// backend query for headlines.
   final List<Source>? sources;
-
-  /// The set of ISO codes for countries selected to filter sources by their
-  /// headquarters.
-  final Set<String>? selectedSourceCountryIsoCodes;
-
-  /// The set of source types selected to filter sources by.
-  final Set<SourceType>? selectedSourceSourceTypes;
 
   /// The list of selected event countries to filter headlines by.
   final List<Country>? eventCountries;
 
   /// Whether the filter is based on the user's followed items.
+  ///
+  /// When `true`, the `topics` and `sources` fields will be populated based
+  /// on the user's followed items, and manual selections for these categories
+  /// will be ignored.
   final bool isFromFollowedItems;
 
   @override
   List<Object?> get props => [
     topics,
     sources,
-    selectedSourceCountryIsoCodes,
-    selectedSourceSourceTypes,
     eventCountries,
     isFromFollowedItems,
   ];
@@ -49,18 +50,12 @@ class HeadlineFilter extends Equatable {
   HeadlineFilter copyWith({
     List<Topic>? topics,
     List<Source>? sources,
-    Set<String>? selectedSourceCountryIsoCodes,
-    Set<SourceType>? selectedSourceSourceTypes,
     List<Country>? eventCountries,
     bool? isFromFollowedItems,
   }) {
     return HeadlineFilter(
       topics: topics ?? this.topics,
       sources: sources ?? this.sources,
-      selectedSourceCountryIsoCodes:
-          selectedSourceCountryIsoCodes ?? this.selectedSourceCountryIsoCodes,
-      selectedSourceSourceTypes:
-          selectedSourceSourceTypes ?? this.selectedSourceSourceTypes,
       eventCountries: eventCountries ?? this.eventCountries,
       isFromFollowedItems: isFromFollowedItems ?? this.isFromFollowedItems,
     );

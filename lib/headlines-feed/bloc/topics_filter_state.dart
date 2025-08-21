@@ -32,6 +32,8 @@ final class TopicsFilterState extends Equatable {
     this.hasMore = true,
     this.cursor,
     this.error,
+    this.followedTopicsStatus = TopicsFilterStatus.initial,
+    this.followedTopics = const [],
   });
 
   /// The current status of fetching topics.
@@ -77,7 +79,8 @@ final class TopicsFilterState extends Equatable {
       cursor: clearCursor ? null : (cursor ?? this.cursor),
       // Clear error if requested, otherwise keep existing or use new one
       error: clearError ? null : error ?? this.error,
-      followedTopicsStatus: followedTopicsStatus ?? this.followedTopicsStatus,
+      followedTopicsStatus:
+          followedTopicsStatus ?? this.followedTopicsStatus,
       followedTopics: followedTopics ?? this.followedTopics,
     );
   }

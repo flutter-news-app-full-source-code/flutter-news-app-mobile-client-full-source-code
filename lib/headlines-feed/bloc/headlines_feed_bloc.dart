@@ -91,6 +91,11 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         r'$in': filter.selectedSourceCountryIsoCodes!.toList(),
       };
     }
+    if (filter.selectedSourceSourceTypes?.isNotEmpty ?? false) {
+      queryFilter['source.type'] = {
+        r'$in': filter.selectedSourceSourceTypes!.map((t) => t.name).toList(),
+      };
+    }
     return queryFilter;
   }
 

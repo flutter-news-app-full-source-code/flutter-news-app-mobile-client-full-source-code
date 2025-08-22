@@ -179,7 +179,7 @@ class HeadlinesSearchBloc
               // of 'eventCountry'. This ensures that only countries for which
               // there are associated headlines are returned.
               response = await _countryRepository.readAll(
-                filter: {'name': searchTerm, 'usage': 'eventCountry'},
+                filter: {'q': searchTerm, 'usage': 'eventCountry'},
                 pagination: PaginationOptions(
                   limit: _limit,
                   cursor: successState.cursor,
@@ -272,7 +272,7 @@ class HeadlinesSearchBloc
           // of 'eventCountry'. This ensures that only countries for which
           // there are associated headlines are returned.
           rawResponse = await _countryRepository.readAll(
-            filter: {'name': searchTerm, 'usage': 'eventCountry'},
+            filter: {'q': searchTerm, 'usage': 'eventCountry'},
             pagination: const PaginationOptions(limit: _limit),
             sort: [const SortOption('name', SortOrder.asc)],
           );

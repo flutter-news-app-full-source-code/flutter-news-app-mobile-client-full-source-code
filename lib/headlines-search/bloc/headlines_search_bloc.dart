@@ -174,14 +174,8 @@ class HeadlinesSearchBloc
                 ),
               );
             case ContentType.country:
-              // When searching for countries, apply a filter that includes
-              // both the search term for the country's name and a 'usage'
-              // of 'eventCountry'. This ensures that only countries for which
-              // there are associated headlines are returned.
-              //
-              // whene usage is set, pagination is not supported by the backend.
               response = await _countryRepository.readAll(
-                filter: {'q': searchTerm, 'usage': 'eventCountry'},
+                filter: {'q': searchTerm},
                 sort: [const SortOption('name', SortOrder.asc)],
               );
               emit(
@@ -265,14 +259,8 @@ class HeadlinesSearchBloc
           );
           processedItems = rawResponse.items.cast<FeedItem>();
         case ContentType.country:
-          // When searching for countries, apply a filter that includes
-          // both the search term for the country's name and a 'usage'
-          // of 'eventCountry'. This ensures that only countries for which
-          // there are associated headlines are returned.
-          //
-          // whene usage is set, pagination is not supported by the backend.
           rawResponse = await _countryRepository.readAll(
-            filter: {'q': searchTerm, 'usage': 'eventCountry'},
+            filter: {'q': searchTerm},
             sort: [const SortOption('name', SortOrder.asc)],
           );
           processedItems = rawResponse.items.cast<FeedItem>();

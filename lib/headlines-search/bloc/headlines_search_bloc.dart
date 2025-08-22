@@ -178,12 +178,10 @@ class HeadlinesSearchBloc
               // both the search term for the country's name and a 'usage'
               // of 'eventCountry'. This ensures that only countries for which
               // there are associated headlines are returned.
+              //
+              // whene usage is set, pagination is not supported by the backend.
               response = await _countryRepository.readAll(
                 filter: {'q': searchTerm, 'usage': 'eventCountry'},
-                pagination: PaginationOptions(
-                  limit: _limit,
-                  cursor: successState.cursor,
-                ),
                 sort: [const SortOption('name', SortOrder.asc)],
               );
               emit(
@@ -271,9 +269,10 @@ class HeadlinesSearchBloc
           // both the search term for the country's name and a 'usage'
           // of 'eventCountry'. This ensures that only countries for which
           // there are associated headlines are returned.
+          //
+          // whene usage is set, pagination is not supported by the backend.
           rawResponse = await _countryRepository.readAll(
             filter: {'q': searchTerm, 'usage': 'eventCountry'},
-            pagination: const PaginationOptions(limit: _limit),
             sort: [const SortOption('name', SortOrder.asc)],
           );
           processedItems = rawResponse.items.cast<FeedItem>();

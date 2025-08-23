@@ -63,7 +63,7 @@ class FollowedCountriesListPage extends StatelessWidget {
 
           if (followedCountries.isEmpty) {
             return InitialStateWidget(
-              icon: Icons.public_off_outlined,
+              icon: Icons.location_off_outlined,
               headline: l10n.followedCountriesEmptyHeadline,
               subheadline: l10n.followedCountriesEmptySubheadline,
             );

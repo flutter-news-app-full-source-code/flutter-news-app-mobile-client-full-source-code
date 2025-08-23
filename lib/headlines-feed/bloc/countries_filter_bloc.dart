@@ -66,7 +66,7 @@ class CountriesFilterBloc
     try {
       // Build the filter map based on the provided usage.
       final filter = event.usage != null
-          ? <String, dynamic>{'usage': event.usage}
+          ? <String, dynamic>{event.usage!.name: true}
           : null;
 
       // Fetch countries. The API for 'usage' filters is not paginated,

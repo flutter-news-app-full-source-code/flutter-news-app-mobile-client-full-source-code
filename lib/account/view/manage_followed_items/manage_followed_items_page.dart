@@ -61,7 +61,7 @@ class ManageFollowedItemsPage extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(
-              Icons.add_location_alt_outlined,
+              Icons.location_on_outlined,
               color: colorScheme.primary,
             ),
             title: Text(

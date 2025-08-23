@@ -49,7 +49,13 @@ class AccountFollowSourceToggled extends AccountEvent {
   List<Object> get props => [source];
 }
 
-// AccountFollowCountryToggled event correctly removed previously
+class AccountFollowCountryToggled extends AccountEvent {
+  const AccountFollowCountryToggled({required this.country});
+  final Country country;
+
+  @override
+  List<Object> get props => [country];
+}
 
 class AccountClearUserPreferences extends AccountEvent {
   const AccountClearUserPreferences({required this.userId});

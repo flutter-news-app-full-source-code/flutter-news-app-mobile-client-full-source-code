@@ -28,7 +28,9 @@ class AvailableCountriesBloc
     }
     emit(state.copyWith(status: AvailableCountriesStatus.loading));
     try {
+      // TODO(fulleni): Add pagination if necessary for very large datasets.
       final response = await _countriesRepository.readAll(
+        filter: {'hasActiveHeadlines': true},
         sort: [const SortOption('name', SortOrder.asc)],
       );
       emit(

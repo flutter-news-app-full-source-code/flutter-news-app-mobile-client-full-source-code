@@ -1,10 +1,6 @@
-<!--
-  Thanks for contributing!
+## Status
 
-  Provide a description of your changes below and a general summary in the title
-
-  Please look at the following checklist to ensure that your PR can be accepted quickly:
--->
+**READY/IN DEVELOPMENT/HOLD**
 
 ## Description
 

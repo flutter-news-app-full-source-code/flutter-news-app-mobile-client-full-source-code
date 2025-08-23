@@ -998,6 +998,30 @@
     "@savedHeadlinesEmptySubheadline": {
         "description": "Subheadline for empty state on saved headlines page"
     },
+    "accountFollowedCountriesTile": "Followed Countries",
+    "@accountFollowedCountriesTile": {
+        "description": "Title for the followed countries navigation tile in the account page"
+    },
+    "followedCountriesLoadingHeadline": "Loading Followed Countries...",
+    "@followedCountriesLoadingHeadline": {
+        "description": "Headline for loading state on followed countries page"
+    },
+    "followedCountriesErrorHeadline": "Could Not Load Followed Countries",
+    "@followedCountriesErrorHeadline": {
+        "description": "Error message when followed countries fail to load"
+    },
+    "followedCountriesEmptyHeadline": "No Followed Countries",
+    "@followedCountriesEmptyHeadline": {
+        "description": "Headline for empty state on followed countries page"
+    },
+    "followedCountriesEmptySubheadline": "Start following countries to see them here.",
+    "@followedCountriesEmptySubheadline": {
+        "description": "Subheadline for empty state on followed countries page"
+    },
+    "countryFilterError": "Could not load countries. Please try again.",
+    "@countryFilterError": {
+        "description": "Error message when countries fail to load on the filter/add page"
+    },
     "followedCategoriesLoadingHeadline": "Loading Followed Categories...",
     "@followedCategoriesLoadingHeadline": {
         "description": "Headline for loading state on followed categories page"

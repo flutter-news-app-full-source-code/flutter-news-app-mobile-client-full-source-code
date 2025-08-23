@@ -1484,6 +1484,42 @@ abstract class AppLocalizations {
   /// **'You haven\'t saved any articles yet. Start exploring!'**
   String get savedHeadlinesEmptySubheadline;
 
+  /// Title for the followed countries navigation tile in the account page
+  ///
+  /// In en, this message translates to:
+  /// **'Followed Countries'**
+  String get accountFollowedCountriesTile;
+
+  /// Headline for loading state on followed countries page
+  ///
+  /// In en, this message translates to:
+  /// **'Loading Followed Countries...'**
+  String get followedCountriesLoadingHeadline;
+
+  /// Error message when followed countries fail to load
+  ///
+  /// In en, this message translates to:
+  /// **'Could Not Load Followed Countries'**
+  String get followedCountriesErrorHeadline;
+
+  /// Headline for empty state on followed countries page
+  ///
+  /// In en, this message translates to:
+  /// **'No Followed Countries'**
+  String get followedCountriesEmptyHeadline;
+
+  /// Subheadline for empty state on followed countries page
+  ///
+  /// In en, this message translates to:
+  /// **'Start following countries to see them here.'**
+  String get followedCountriesEmptySubheadline;
+
+  /// Error message when countries fail to load on the filter/add page
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load countries. Please try again.'**
+  String get countryFilterError;
+
   /// Headline for loading state on followed categories page
   ///
   /// In en, this message translates to:

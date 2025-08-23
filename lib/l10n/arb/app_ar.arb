@@ -996,6 +996,46 @@
     "@savedHeadlinesEmptySubheadline": {
         "description": "Subheadline for empty state on saved headlines page"
     },
+    "followedCategoriesLoadingHeadline": "جارٍ تحميل الفئات المتابَعة...",
+    "@followedCategoriesLoadingHeadline": {
+        "description": "Headline for loading state on followed categories page"
+    },
+    "followedCategoriesErrorHeadline": "تعذر تحميل الفئات المتابَعة",
+    "@followedCategoriesErrorHeadline": {
+        "description": "Error message when followed categories fail to load"
+    },
+    "followedCategoriesEmptyHeadline": "لا توجد فئات متابَعة",
+    "@followedCategoriesEmptyHeadline": {
+        "description": "Headline for empty state on followed categories page"
+    },
+    "followedCategoriesEmptySubheadline": "ابدأ بمتابعة الفئات لكي تظهر هنا.",
+    "@followedCategoriesEmptySubheadline": {
+        "description": "Subheadline for empty state on followed categories page"
+    },
+    "accountFollowedCountriesTile": "الدول المتابَعة",
+    "@accountFollowedCountriesTile": {
+        "description": "Title for the followed countries navigation tile in the account page"
+    },
+    "followedCountriesLoadingHeadline": "جارٍ تحميل الدول المتابَعة...",
+    "@followedCountriesLoadingHeadline": {
+        "description": "Headline for loading state on followed countries page"
+    },
+    "followedCountriesErrorHeadline": "تعذر تحميل الدول المتابَعة",
+    "@followedCountriesErrorHeadline": {
+        "description": "Error message when followed countries fail to load"
+    },
+    "followedCountriesEmptyHeadline": "لا توجد دول متابَعة",
+    "@followedCountriesEmptyHeadline": {
+        "description": "Headline for empty state on followed countries page"
+    },
+    "followedCountriesEmptySubheadline": "ابدأ بمتابعة الدول لكي تظهر هنا.",
+    "@followedCountriesEmptySubheadline": {
+        "description": "Subheadline for empty state on followed countries page"
+    },
+    "countryFilterError": "تعذر تحميل الدول. يرجى المحاولة مرة أخرى.",
+    "@countryFilterError": {
+        "description": "Error message when countries fail to load on the filter/add page"
+    },
     "demoVerificationCodeMessage": "وضع العرض التوضيحي: استخدم الرمز {code}",
     "@demoVerificationCodeMessage": {
         "description": "رسالة تظهر في وضع العرض التوضيحي لتوفير رمز التحقق",

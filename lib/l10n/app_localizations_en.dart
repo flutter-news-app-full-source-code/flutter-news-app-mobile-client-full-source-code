@@ -766,6 +766,28 @@ class AppLocalizationsEn extends AppLocalizations {
       'You haven\'t saved any articles yet. Start exploring!';
 
   @override
+  String get accountFollowedCountriesTile => 'Followed Countries';
+
+  @override
+  String get followedCountriesLoadingHeadline =>
+      'Loading Followed Countries...';
+
+  @override
+  String get followedCountriesErrorHeadline =>
+      'Could Not Load Followed Countries';
+
+  @override
+  String get followedCountriesEmptyHeadline => 'No Followed Countries';
+
+  @override
+  String get followedCountriesEmptySubheadline =>
+      'Start following countries to see them here.';
+
+  @override
+  String get countryFilterError =>
+      'Could not load countries. Please try again.';
+
+  @override
   String get followedCategoriesLoadingHeadline =>
       'Loading Followed Categories...';
 

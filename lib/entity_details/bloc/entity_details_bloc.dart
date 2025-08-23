@@ -20,12 +20,14 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     required DataRepository<Headline> headlinesRepository,
     required DataRepository<Topic> topicRepository,
     required DataRepository<Source> sourceRepository,
+    required DataRepository<Country> countryRepository,
     required AccountBloc accountBloc,
     required AppBloc appBloc,
     required FeedDecoratorService feedDecoratorService,
   }) : _headlinesRepository = headlinesRepository,
        _topicRepository = topicRepository,
        _sourceRepository = sourceRepository,
+       _countryRepository = countryRepository,
        _accountBloc = accountBloc,
        _appBloc = appBloc,
        _feedDecoratorService = feedDecoratorService,
@@ -52,6 +54,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
   final DataRepository<Headline> _headlinesRepository;
   final DataRepository<Topic> _topicRepository;
   final DataRepository<Source> _sourceRepository;
+  final DataRepository<Country> _countryRepository;
   final AccountBloc _accountBloc;
   final AppBloc _appBloc;
   final FeedDecoratorService _feedDecoratorService;

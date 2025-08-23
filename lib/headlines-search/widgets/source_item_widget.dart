@@ -24,7 +24,10 @@ class SourceItemWidget extends StatelessWidget {
       onTap: () {
         context.push(
           Routes.sourceDetails,
-          extra: EntityDetailsPageArguments(entity: source),
+          extra: EntityDetailsPageArguments(
+            entityId: source.id,
+            contentType: ContentType.source,
+          ),
         );
       },
     );

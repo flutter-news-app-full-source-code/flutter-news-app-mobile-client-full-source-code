@@ -82,13 +82,22 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         entityToLoad = event.entity!;
         contentTypeToLoad = event.entity is Topic
             ? ContentType.topic
-            : ContentType.source;
+            : event.entity is Country
+                ? ContentType.country
+                : ContentType.source;
       } else {
         contentTypeToLoad = event.contentType!;
-        if (contentTypeToLoad == ContentType.topic) {
-          entityToLoad = await _topicRepository.read(id: event.entityId!);
-        } else {
-          entityToLoad = await _sourceRepository.read(id: event.entityId!);
+        switch (contentTypeToLoad) {
+          case ContentType.topic:
+            entityToLoad = await _topicRepository.read(id: event.entityId!);
+          case ContentType.source:
+            entityToLoad = await _sourceRepository.read(id: event.entityId!);
+          case ContentType.country:
+            entityToLoad = await _countryRepository.read(id: event.entityId!);
+          default:
+            throw const OperationFailedException(
+              'Unsupported ContentType for EntityDetails.',
+            );
         }
       }
 
@@ -96,8 +105,10 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       final filter = <String, dynamic>{};
       if (contentTypeToLoad == ContentType.topic) {
         filter['topic.id'] = (entityToLoad as Topic).id;
-      } else {
+      } else if (contentTypeToLoad == ContentType.source) {
         filter['source.id'] = (entityToLoad as Source).id;
+      } else if (contentTypeToLoad == ContentType.country) {
+        filter['eventCountry.id'] = (entityToLoad as Country).id;
       }
 
       final headlineResponse = await _headlinesRepository.readAll(
@@ -141,6 +152,10 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         } else if (entityToLoad is Source) {
           isCurrentlyFollowing = preferences.followedSources.any(
             (s) => s.id == (entityToLoad as Source).id,
+          );
+        } else if (entityToLoad is Country) {
+          isCurrentlyFollowing = preferences.followedCountries.any(
+            (c) => c.id == (entityToLoad as Country).id,
           );
         }
       }

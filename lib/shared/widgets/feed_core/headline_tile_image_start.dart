@@ -179,7 +179,7 @@ class _HeadlineMetadataRow extends StatelessWidget {
               context.push(
                 Routes.topicDetails,
                 extra: EntityDetailsPageArguments(
-                  entity: headline.topic,
+                  entityId: headline.topic.id,
                   contentType: ContentType.topic,
                 ),
               );
@@ -203,7 +203,7 @@ class _HeadlineMetadataRow extends StatelessWidget {
               context.push(
                 Routes.sourceDetails,
                 extra: EntityDetailsPageArguments(
-                  entity: headline.source,
+                  entityId: headline.source.id,
                   contentType: ContentType.source,
                 ),
               );

@@ -24,7 +24,10 @@ class TopicItemWidget extends StatelessWidget {
       onTap: () {
         context.push(
           Routes.topicDetails,
-          extra: EntityDetailsPageArguments(entity: topic),
+          extra: EntityDetailsPageArguments(
+            entityId: topic.id,
+            contentType: ContentType.topic,
+          ),
         );
       },
     );

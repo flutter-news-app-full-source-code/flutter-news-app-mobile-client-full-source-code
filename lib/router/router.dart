@@ -7,6 +7,9 @@ import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/acc
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/account_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/manage_followed_items_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/sources/add_source_to_follow_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/available_countries_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/countries/add_country_to_follow_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/countries/followed_countries_list_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/sources/followed_sources_list_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/topics/add_topic_to_follow_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/topics/followed_topics_list_page.dart';
@@ -25,12 +28,10 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headline-details
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/similar_headlines_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/view/headline_details_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/countries_filter_bloc.dart';
-// import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/countries_filter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/sources_filter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/topics_filter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/country_filter_page.dart';
-// import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/country_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_feed_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_filter_page.dart';
@@ -726,7 +727,20 @@ GoRouter createRouter({
                           ),
                         ],
                       ),
-                      // GoRoute for followedCountriesList removed
+                      GoRoute(
+                        path: Routes.followedCountriesList,
+                        name: Routes.followedCountriesListName,
+                        builder: (context, state) =>
+                            const FollowedCountriesListPage(),
+                        routes: [
+                          GoRoute(
+                            path: Routes.addCountryToFollow,
+                            name: Routes.addCountryToFollowName,
+                            builder: (context, state) =>
+                                const AddCountryToFollowPage(),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                   GoRoute(

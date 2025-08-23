@@ -120,8 +120,8 @@ abstract final class Routes {
   static const addSourceToFollow = 'add-source';
   static const addSourceToFollowName = 'addSourceToFollow';
 
-  // static const followedCountriesList = 'countries';
-  // static const followedCountriesListName = 'followedCountriesList';
-  // static const addCountryToFollow = 'add-country';
-  // static const addCountryToFollowName = 'addCountryToFollow';
+  static const followedCountriesList = 'countries';
+  static const followedCountriesListName = 'followedCountriesList';
+  static const addCountryToFollow = 'add-country';
+  static const addCountryToFollowName = 'addCountryToFollow';
 }

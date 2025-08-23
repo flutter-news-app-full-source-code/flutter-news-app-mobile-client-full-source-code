@@ -200,7 +200,8 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
               : state.entity is Source
               ? (state.entity! as Source).description
               : state.entity is Country
-              ? (state.entity! as Country).name // Using name as description for country
+              ? (state.entity! as Country)
+                    .name // Using name as description for country
               : null;
 
           final followButton = IconButton(
@@ -221,8 +222,8 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
           final entityIconUrl = (state.entity is Topic)
               ? (state.entity! as Topic).iconUrl
               : (state.entity is Country)
-                  ? (state.entity! as Country).flagUrl
-                  : null;
+              ? (state.entity! as Country).flagUrl
+              : null;
 
           final Widget appBarTitleWidget = Row(
             mainAxisSize: MainAxisSize.min,

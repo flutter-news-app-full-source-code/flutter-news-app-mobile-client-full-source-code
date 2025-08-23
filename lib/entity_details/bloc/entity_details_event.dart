@@ -17,10 +17,7 @@ class EntityDetailsLoadRequested extends EntityDetailsEvent {
     required this.adThemeStyle,
     required this.entityId,
     required this.contentType,
-  }) : assert(
-         entityId != null && contentType != null,
-         'Both entityId and contentType must be provided.',
-       );
+  });
 
   /// The unique ID of the entity to load.
   final String entityId;

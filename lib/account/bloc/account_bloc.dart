@@ -37,6 +37,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     on<AccountSaveHeadlineToggled>(_onAccountSaveHeadlineToggled);
     on<AccountFollowTopicToggled>(_onAccountFollowTopicToggled);
     on<AccountFollowSourceToggled>(_onAccountFollowSourceToggled);
+    on<AccountFollowCountryToggled>(_onAccountFollowCountryToggled);
     on<AccountClearUserPreferences>(_onAccountClearUserPreferences);
   }
 
@@ -185,6 +186,64 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         state.copyWith(
           status: AccountStatus.failure,
           error: OperationFailedException('An unexpected error occurred: $e'),
+        ),
+      );
+    }
+  }
+
+  Future<void> _onAccountFollowCountryToggled(
+    AccountFollowCountryToggled event,
+    Emitter<AccountState> emit,
+  ) async {
+    if (state.user == null || state.preferences == null) return;
+    emit(state.copyWith(status: AccountStatus.loading));
+
+    final currentPrefs = state.preferences!;
+    final isCurrentlyFollowed = currentPrefs.followedCountries.any(
+      (c) => c.id == event.country.id,
+    );
+    final List<Country> updatedFollowedCountries;
+
+    updatedFollowedCountries = isCurrentlyFollowed
+        ? (List.from(currentPrefs.followedCountries)
+            ..removeWhere((c) => c.id == event.country.id))
+        : (List.from(currentPrefs.followedCountries)..add(event.country));
+
+    final updatedPrefs = currentPrefs.copyWith(
+      followedCountries: updatedFollowedCountries,
+    );
+
+    try {
+      final sortedPrefs = _sortPreferences(updatedPrefs);
+      await _userContentPreferencesRepository.update(
+        id: state.user!.id,
+        item: sortedPrefs,
+        userId: state.user!.id,
+      );
+      emit(
+        state.copyWith(
+          status: AccountStatus.success,
+          preferences: sortedPrefs,
+          clearError: true,
+        ),
+      );
+    } on HttpException catch (e) {
+      _logger.severe(
+        'AccountFollowCountryToggled failed with HttpException: $e',
+      );
+      emit(state.copyWith(status: AccountStatus.failure, error: e));
+    } catch (e, st) {
+      _logger.severe(
+        'AccountFollowCountryToggled failed with unexpected error: $e',
+        e,
+        st,
+      );
+      emit(
+        state.copyWith(
+          status: AccountStatus.failure,
+          error: OperationFailedException(
+            'Failed to update followed countries: $e',
+          ),
         ),
       );
     }
@@ -434,11 +493,16 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     // Sort followed sources by name ascending
     final sortedSources = List<Source>.from(preferences.followedSources)
       ..sort((a, b) => a.name.compareTo(b.name));
+      
+    // Sort followed countries by name ascending
+    final sortedCountries = List<Country>.from(preferences.followedCountries)
+      ..sort((a, b) => a.name.compareTo(b.name));
 
     return preferences.copyWith(
       savedHeadlines: sortedHeadlines,
       followedTopics: sortedTopics,
       followedSources: sortedSources,
+      followedCountries: sortedCountries,
     );
   }
 

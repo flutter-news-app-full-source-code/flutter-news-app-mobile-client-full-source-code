@@ -46,7 +46,7 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
     );
     try {
       final countriesWithActiveSources = (await _countriesRepository.readAll(
-        filter: {'hasActiveSources': 'true'},
+        filter: {'hasActiveSources': true},
       )).items;
       final initialSelectedSourceIds = event.initialSelectedSources
           .map((s) => s.id)

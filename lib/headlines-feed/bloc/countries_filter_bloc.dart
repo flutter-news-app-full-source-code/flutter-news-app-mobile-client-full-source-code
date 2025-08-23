@@ -5,7 +5,8 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart'; // Import AppBloc
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/country_filter_page.dart'; // Import AppBloc
 
 part 'countries_filter_event.dart';
 part 'countries_filter_state.dart';
@@ -48,7 +49,7 @@ class CountriesFilterBloc
   /// Handles the request to fetch countries based on a specific usage.
   ///
   /// This method fetches a non-paginated list of countries, filtered by
-  /// the provided [usage] (e.g., 'eventCountry', 'headquarters').
+  /// the provided [usage] (e.g., 'hasActiveSources', 'hasActiveHeadlines').
   Future<void> _onCountriesFilterRequested(
     CountriesFilterRequested event,
     Emitter<CountriesFilterState> emit,

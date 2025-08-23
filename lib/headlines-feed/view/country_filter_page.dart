@@ -6,6 +6,14 @@ import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
+enum CountryFilterUsage {
+  // countries with active sources
+  hasActiveSources,
+
+  // countries with active headlines
+  hasActiveHeadlines,
+}
+
 /// {@template country_filter_page}
 /// A page dedicated to selecting event countries for filtering headlines.
 ///
@@ -15,14 +23,14 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class CountryFilterPage extends StatefulWidget {
   /// {@macro country_filter_page}
-  const CountryFilterPage({required this.title, this.usage, super.key});
+  const CountryFilterPage({required this.title, this.filter, super.key});
 
   /// The title to display in the app bar for this filter page.
   final String title;
 
-  /// The usage context for filtering countries (e.g., 'eventCountry', 'headquarters').
+  /// The usage context for filtering countries (e.g., 'hasActiveSources', 'hasActiveHeadlines').
   /// If null, fetches all countries (though this is not the primary use case for this page).
-  final String? usage;
+  final CountryFilterUsage? filter;
 
   @override
   State<CountryFilterPage> createState() => _CountryFilterPageState();
@@ -65,7 +73,7 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
       // 3. Trigger the page-specific BLoC (CountriesFilterBloc) to start
       //    fetching the list of *all available* countries that the user can
       //    potentially select from, using the specified usage filter.
-      _countriesFilterBloc.add(CountriesFilterRequested(usage: widget.usage));
+      _countriesFilterBloc.add(CountriesFilterRequested(usage: widget.filter));
     });
   }
 
@@ -193,7 +201,7 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
                 exception:
                     state.error ?? const UnknownException('Unknown error'),
                 onRetry: () => _countriesFilterBloc.add(
-                  CountriesFilterRequested(usage: widget.usage),
+                  CountriesFilterRequested(usage: widget.filter),
                 ),
               );
             }

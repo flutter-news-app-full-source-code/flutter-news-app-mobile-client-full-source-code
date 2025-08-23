@@ -493,7 +493,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     // Sort followed sources by name ascending
     final sortedSources = List<Source>.from(preferences.followedSources)
       ..sort((a, b) => a.name.compareTo(b.name));
-      
+
     // Sort followed countries by name ascending
     final sortedCountries = List<Country>.from(preferences.followedCountries)
       ..sort((a, b) => a.name.compareTo(b.name));

@@ -15,16 +15,10 @@ class CountryItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: CircleAvatar(
-        backgroundImage: NetworkImage(country.flagUrl),
-      ),
+      leading: CircleAvatar(backgroundImage: NetworkImage(country.flagUrl)),
       title: Text(country.name),
       subtitle: country.isoCode.isNotEmpty
-          ? Text(
-              country.isoCode,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            )
+          ? Text(country.isoCode, maxLines: 1, overflow: TextOverflow.ellipsis)
           : null,
       onTap: () {
         context.push(

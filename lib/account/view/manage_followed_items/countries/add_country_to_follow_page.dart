@@ -94,32 +94,29 @@ class AddCountryToFollowPage extends StatelessWidget {
                           height: AppSpacing.xl + AppSpacing.xs,
                           child:
                               Uri.tryParse(country.flagUrl)?.isAbsolute == true
-                                  ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(
-                                        AppSpacing.xs,
-                                      ),
-                                      child: Image.network(
-                                        country.flagUrl,
-                                        fit: BoxFit.contain,
-                                        errorBuilder:
-                                            (context, error, stackTrace) =>
-                                                Icon(
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(
+                                    AppSpacing.xs,
+                                  ),
+                                  child: Image.network(
+                                    country.flagUrl,
+                                    fit: BoxFit.contain,
+                                    errorBuilder:
+                                        (context, error, stackTrace) => Icon(
                                           Icons.flag_outlined,
                                           color: colorScheme.onSurfaceVariant,
                                           size: AppSpacing.lg,
                                         ),
-                                        loadingBuilder: (
-                                          context,
-                                          child,
-                                          loadingProgress,
-                                        ) {
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
                                           if (loadingProgress == null) {
                                             return child;
                                           }
                                           return Center(
                                             child: CircularProgressIndicator(
                                               strokeWidth: 2,
-                                              value: loadingProgress
+                                              value:
+                                                  loadingProgress
                                                           .expectedTotalBytes !=
                                                       null
                                                   ? loadingProgress
@@ -130,13 +127,13 @@ class AddCountryToFollowPage extends StatelessWidget {
                                             ),
                                           );
                                         },
-                                      ),
-                                    )
-                                  : Icon(
-                                      Icons.flag_outlined,
-                                      color: colorScheme.onSurfaceVariant,
-                                      size: AppSpacing.lg,
-                                    ),
+                                  ),
+                                )
+                              : Icon(
+                                  Icons.flag_outlined,
+                                  color: colorScheme.onSurfaceVariant,
+                                  size: AppSpacing.lg,
+                                ),
                         ),
                         title: Text(country.name, style: textTheme.titleMedium),
                         trailing: IconButton(

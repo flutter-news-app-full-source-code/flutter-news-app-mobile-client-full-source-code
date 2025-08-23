@@ -60,7 +60,10 @@ class ManageFollowedItemsPage extends StatelessWidget {
             endIndent: AppSpacing.paddingMedium,
           ),
           ListTile(
-            leading: Icon(Icons.add_location_alt_outlined, color: colorScheme.primary),
+            leading: Icon(
+              Icons.add_location_alt_outlined,
+              color: colorScheme.primary,
+            ),
             title: Text(
               l10n.accountFollowedCountriesTile,
               style: textTheme.titleMedium,

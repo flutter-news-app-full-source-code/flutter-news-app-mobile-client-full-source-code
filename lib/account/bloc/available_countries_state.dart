@@ -27,9 +27,5 @@ class AvailableCountriesState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [
-    status,
-    availableCountries,
-    error,
-  ];
+  List<Object?> get props => [status, availableCountries, error];
 }

@@ -23,10 +23,7 @@ class EntityDetailsPageArguments {
   const EntityDetailsPageArguments({
     required this.entityId,
     required this.contentType,
-  }) : assert(
-         entityId != null && contentType != null,
-         'Both entityId and contentType must be provided.',
-       );
+  });
 
   final String entityId;
   final ContentType contentType;
@@ -68,7 +65,6 @@ class EntityDetailsPage extends StatelessWidget {
               EntityDetailsLoadRequested(
                 entityId: args.entityId,
                 contentType: args.contentType,
-                entity: args.entity,
                 adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
               ),
             );
@@ -174,7 +170,6 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                 EntityDetailsLoadRequested(
                   entityId: widget.args.entityId,
                   contentType: widget.args.contentType,
-                  entity: widget.args.entity,
                   adThemeStyle: AdThemeStyle.fromTheme(theme),
                 ),
               ),

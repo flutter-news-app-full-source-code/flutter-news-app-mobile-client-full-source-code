@@ -298,6 +298,24 @@ GoRouter createRouter({
           );
         },
       ),
+      GoRoute(
+        path: Routes.countryDetails,
+        name: Routes.countryDetailsName,
+        builder: (context, state) {
+          final args = state.extra as EntityDetailsPageArguments?;
+          if (args == null) {
+            return const Scaffold(
+              body: Center(
+                child: Text('Error: Missing country details arguments'),
+              ),
+            );
+          }
+          return BlocProvider.value(
+            value: accountBloc,
+            child: EntityDetailsPage(args: args),
+          );
+        },
+      ),
       // --- Global Article Details Route (Top Level) ---
       // This GoRoute provides a top-level, globally accessible way to view the
       // HeadlineDetailsPage.
@@ -382,6 +400,7 @@ GoRouter createRouter({
                         .read<DataRepository<Headline>>(),
                     topicRepository: context.read<DataRepository<Topic>>(),
                     sourceRepository: context.read<DataRepository<Source>>(),
+                    countryRepository: context.read<DataRepository<Country>>(),
                     appBloc: context.read<AppBloc>(),
                     feedDecoratorService: feedDecoratorService,
                   );
@@ -527,7 +546,7 @@ GoRouter createRouter({
                               child: CountryFilterPage(
                                 title:
                                     l10n.headlinesFeedFilterEventCountryLabel,
-                                usage: 'eventCountry',
+                                filter: CountryFilterUsage.hasActiveHeadlines,
                                 key: ValueKey(initialSelection.hashCode),
                               ),
                             ),

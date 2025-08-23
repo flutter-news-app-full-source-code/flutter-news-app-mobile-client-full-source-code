@@ -18,11 +18,11 @@ final class CountriesFilterRequested extends CountriesFilterEvent {
   /// {@macro countries_filter_requested}
   ///
   /// Optionally includes a [usage] context to filter countries by their
-  /// relevance to headlines (e.g., 'eventCountry' or 'headquarters').
+  /// relevance to headlines (e.g., 'hasActiveSources' or 'hasActiveHeadlines').
   const CountriesFilterRequested({this.usage});
 
-  /// The usage context for filtering countries (e.g., 'eventCountry', 'headquarters').
-  final String? usage;
+  /// The usage context for filtering countries (e.g., 'hasActiveSources', 'hasActiveHeadlines').
+  final CountryFilterUsage? usage;
 
   @override
   List<Object?> get props => [usage];

@@ -6,7 +6,7 @@ enum SourceFilterDataLoadingStatus { initial, loading, success, failure }
 
 class SourcesFilterState extends Equatable {
   const SourcesFilterState({
-    this.availableCountries = const [],
+    this.countriesWithActiveSources = const [],
     this.selectedCountryIsoCodes = const {},
     this.availableSourceTypes = SourceType.values,
     this.selectedSourceTypes = const {},
@@ -19,7 +19,7 @@ class SourcesFilterState extends Equatable {
     this.followedSources = const [],
   });
 
-  final List<Country> availableCountries;
+  final List<Country> countriesWithActiveSources;
   final Set<String> selectedCountryIsoCodes;
   final List<SourceType> availableSourceTypes;
   final Set<SourceType> selectedSourceTypes;
@@ -36,7 +36,7 @@ class SourcesFilterState extends Equatable {
   final List<Source> followedSources;
 
   SourcesFilterState copyWith({
-    List<Country>? availableCountries,
+    List<Country>? countriesWithActiveSources,
     Set<String>? selectedCountryIsoCodes,
     List<SourceType>? availableSourceTypes,
     Set<SourceType>? selectedSourceTypes,
@@ -51,7 +51,8 @@ class SourcesFilterState extends Equatable {
     bool clearFollowedSourcesError = false,
   }) {
     return SourcesFilterState(
-      availableCountries: availableCountries ?? this.availableCountries,
+      countriesWithActiveSources:
+          countriesWithActiveSources ?? this.countriesWithActiveSources,
       selectedCountryIsoCodes:
           selectedCountryIsoCodes ?? this.selectedCountryIsoCodes,
       availableSourceTypes: availableSourceTypes ?? this.availableSourceTypes,
@@ -70,7 +71,7 @@ class SourcesFilterState extends Equatable {
 
   @override
   List<Object?> get props => [
-    availableCountries,
+    countriesWithActiveSources,
     selectedCountryIsoCodes,
     availableSourceTypes,
     selectedSourceTypes,

@@ -546,7 +546,7 @@ GoRouter createRouter({
                               child: CountryFilterPage(
                                 title:
                                     l10n.headlinesFeedFilterEventCountryLabel,
-                                usage: 'eventCountry',
+                                filter: CountryFilterUsage.hasActiveHeadlines,
                                 key: ValueKey(initialSelection.hashCode),
                               ),
                             ),

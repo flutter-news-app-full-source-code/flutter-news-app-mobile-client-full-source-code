@@ -253,7 +253,7 @@ class _SourceFilterView extends StatelessWidget {
             height: AppSpacing.xl + AppSpacing.md,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              itemCount: state.availableCountries.length + 1,
+              itemCount: state.countriesWithActiveSources.length + 1,
               separatorBuilder: (context, index) =>
                   const SizedBox(width: AppSpacing.sm),
               itemBuilder: (context, index) {
@@ -269,7 +269,7 @@ class _SourceFilterView extends StatelessWidget {
                     },
                   );
                 }
-                final country = state.availableCountries[index - 1];
+                final country = state.countriesWithActiveSources[index - 1];
                 return ChoiceChip(
                   avatar: country.flagUrl.isNotEmpty
                       ? CircleAvatar(

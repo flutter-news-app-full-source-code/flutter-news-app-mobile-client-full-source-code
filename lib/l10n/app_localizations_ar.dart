@@ -766,19 +766,38 @@ class AppLocalizationsAr extends AppLocalizations {
       'لم تقم بحفظ أي مقالات بعد. ابدأ الاستكشاف!';
 
   @override
+  String get accountFollowedCountriesTile => 'الدول المتابَعة';
+
+  @override
+  String get followedCountriesLoadingHeadline =>
+      'جارٍ تحميل الدول المتابَعة...';
+
+  @override
+  String get followedCountriesErrorHeadline => 'تعذر تحميل الدول المتابَعة';
+
+  @override
+  String get followedCountriesEmptyHeadline => 'لا توجد دول متابَعة';
+
+  @override
+  String get followedCountriesEmptySubheadline =>
+      'ابدأ بمتابعة الدول لكي تظهر هنا.';
+
+  @override
+  String get countryFilterError => 'تعذر تحميل الدول. يرجى المحاولة مرة أخرى.';
+
+  @override
   String get followedCategoriesLoadingHeadline =>
-      'Loading Followed Categories...';
+      'جارٍ تحميل الفئات المتابَعة...';
 
   @override
-  String get followedCategoriesErrorHeadline =>
-      'Could Not Load Followed Categories';
+  String get followedCategoriesErrorHeadline => 'تعذر تحميل الفئات المتابَعة';
 
   @override
-  String get followedCategoriesEmptyHeadline => 'No Followed Categories';
+  String get followedCategoriesEmptyHeadline => 'لا توجد فئات متابَعة';
 
   @override
   String get followedCategoriesEmptySubheadline =>
-      'Start following categories to see them here.';
+      'ابدأ بمتابعة الفئات لكي تظهر هنا.';
 
   @override
   String demoVerificationCodeMessage(String code) {

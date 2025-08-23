@@ -30,7 +30,7 @@ class ManageFollowedItemsPage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.paddingSmall),
         children: [
           ListTile(
-            leading: Icon(Icons.topic_outlined, color: colorScheme.primary),
+            leading: Icon(Icons.category_outlined, color: colorScheme.primary),
             title: Text(
               l10n.headlinesFeedFilterTopicLabel,
               style: textTheme.titleMedium,
@@ -53,6 +53,24 @@ class ManageFollowedItemsPage extends StatelessWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
               context.goNamed(Routes.followedSourcesListName);
+            },
+          ),
+          const Divider(
+            indent: AppSpacing.paddingMedium,
+            endIndent: AppSpacing.paddingMedium,
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.add_location_alt_outlined,
+              color: colorScheme.primary,
+            ),
+            title: Text(
+              l10n.headlinesFeedFilterCountryLabel,
+              style: textTheme.titleMedium,
+            ),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              context.goNamed(Routes.followedCountriesListName);
             },
           ),
           const Divider(

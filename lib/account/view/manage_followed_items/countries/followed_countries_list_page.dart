@@ -8,28 +8,28 @@ import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.da
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
-/// {@template followed_sources_list_page}
-/// Page to display and manage sources followed by the user.
+/// {@template followed_countries_list_page}
+/// Page to display and manage countries followed by the user.
 /// {@endtemplate}
-class FollowedSourcesListPage extends StatelessWidget {
-  /// {@macro followed_sources_list_page}
-  const FollowedSourcesListPage({super.key});
+class FollowedCountriesListPage extends StatelessWidget {
+  /// {@macro followed_countries_list_page}
+  const FollowedCountriesListPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
-    final followedSources =
-        context.watch<AccountBloc>().state.preferences?.followedSources ?? [];
+    final followedCountries =
+        context.watch<AccountBloc>().state.preferences?.followedCountries ?? [];
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.followedSourcesPageTitle),
+        title: Text(l10n.followedCountriesPageTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.add_circle_outline),
-            tooltip: l10n.addSourcesTooltip,
+            tooltip: l10n.addCountriesTooltip,
             onPressed: () {
-              context.goNamed(Routes.addSourceToFollowName);
+              context.goNamed(Routes.addCountryToFollowName);
             },
           ),
         ],
@@ -39,8 +39,8 @@ class FollowedSourcesListPage extends StatelessWidget {
           if (state.status == AccountStatus.loading &&
               state.preferences == null) {
             return LoadingStateWidget(
-              icon: Icons.source_outlined,
-              headline: l10n.followedSourcesLoadingHeadline,
+              icon: Icons.flag_outlined,
+              headline: l10n.followedCountriesLoadingHeadline,
               subheadline: l10n.pleaseWait,
             );
           }
@@ -50,7 +50,7 @@ class FollowedSourcesListPage extends StatelessWidget {
             return FailureStateWidget(
               exception:
                   state.error ??
-                  OperationFailedException(l10n.followedSourcesErrorHeadline),
+                  OperationFailedException(l10n.followedCountriesErrorHeadline),
               onRetry: () {
                 if (state.user?.id != null) {
                   context.read<AccountBloc>().add(
@@ -61,42 +61,45 @@ class FollowedSourcesListPage extends StatelessWidget {
             );
           }
 
-          if (followedSources.isEmpty) {
+          if (followedCountries.isEmpty) {
             return InitialStateWidget(
-              icon: Icons.no_sim_outlined,
-              headline: l10n.followedSourcesEmptyHeadline,
-              subheadline: l10n.followedSourcesEmptySubheadline,
+              icon: Icons.location_off_outlined,
+              headline: l10n.followedCountriesEmptyHeadline,
+              subheadline: l10n.followedCountriesEmptySubheadline,
             );
           }
 
           return ListView.builder(
-            itemCount: followedSources.length,
+            itemCount: followedCountries.length,
             itemBuilder: (context, index) {
-              final source = followedSources[index];
+              final country = followedCountries[index];
               return ListTile(
-                leading: const Icon(Icons.source_outlined),
-                title: Text(source.name),
-                subtitle: Text(
-                  source.description,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                leading: SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: Image.network(
+                    country.flagUrl,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.flag_outlined),
+                  ),
                 ),
+                title: Text(country.name),
                 trailing: IconButton(
                   icon: Icon(
                     Icons.remove_circle_outline,
                     color: Theme.of(context).colorScheme.error,
                   ),
-                  tooltip: l10n.unfollowSourceTooltip(source.name),
+                  tooltip: l10n.unfollowCountryTooltip(country.name),
                   onPressed: () {
                     context.read<AccountBloc>().add(
-                      AccountFollowSourceToggled(source: source),
+                      AccountFollowCountryToggled(country: country),
                     );
                   },
                 ),
                 onTap: () {
                   context.push(
-                    Routes.sourceDetails,
-                    extra: EntityDetailsPageArguments(entity: source),
+                    Routes.countryDetails,
+                    extra: EntityDetailsPageArguments(entity: country),
                   );
                 },
               );

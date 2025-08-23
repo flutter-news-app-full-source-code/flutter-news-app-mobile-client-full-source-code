@@ -15,28 +15,21 @@ abstract class EntityDetailsEvent extends Equatable {
 class EntityDetailsLoadRequested extends EntityDetailsEvent {
   const EntityDetailsLoadRequested({
     required this.adThemeStyle,
-    this.entityId,
-    this.contentType,
-    this.entity,
-  }) : assert(
-         (entityId != null && contentType != null) || entity != null,
-         'Either entityId/contentType or a full entity object must be provided.',
-       );
+    required this.entityId,
+    required this.contentType,
+  });
 
   /// The unique ID of the entity to load.
-  final String? entityId;
+  final String entityId;
 
   /// The type of the entity to load.
-  final ContentType? contentType;
-
-  /// The full entity object, if already available.
-  final FeedItem? entity;
+  final ContentType contentType;
 
   /// The current ad theme style, required for ad injection.
   final AdThemeStyle adThemeStyle;
 
   @override
-  List<Object?> get props => [entityId, contentType, entity, adThemeStyle];
+  List<Object?> get props => [entityId, contentType, adThemeStyle];
 }
 
 /// Event to toggle the "follow" status of the currently loaded entity.

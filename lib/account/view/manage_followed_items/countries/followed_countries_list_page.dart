@@ -99,7 +99,10 @@ class FollowedCountriesListPage extends StatelessWidget {
                 onTap: () {
                   context.push(
                     Routes.countryDetails,
-                    extra: EntityDetailsPageArguments(entity: country),
+                    extra: EntityDetailsPageArguments(
+                      entityId: country.id,
+                      contentType: ContentType.country,
+                    ),
                   );
                 },
               );

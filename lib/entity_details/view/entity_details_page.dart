@@ -21,17 +21,12 @@ import 'package:ui_kit/ui_kit.dart';
 
 class EntityDetailsPageArguments {
   const EntityDetailsPageArguments({
-    this.entityId,
-    this.contentType,
-    this.entity,
-  }) : assert(
-         (entityId != null && contentType != null) || entity != null,
-         'Either entityId/contentType or a full entity object must be provided.',
-       );
+    required this.entityId,
+    required this.contentType,
+  });
 
-  final String? entityId;
-  final ContentType? contentType;
-  final FeedItem? entity;
+  final String entityId;
+  final ContentType contentType;
 }
 
 class EntityDetailsPage extends StatelessWidget {
@@ -70,7 +65,6 @@ class EntityDetailsPage extends StatelessWidget {
               EntityDetailsLoadRequested(
                 entityId: args.entityId,
                 contentType: args.contentType,
-                entity: args.entity,
                 adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
               ),
             );
@@ -176,7 +170,6 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                 EntityDetailsLoadRequested(
                   entityId: widget.args.entityId,
                   contentType: widget.args.contentType,
-                  entity: widget.args.entity,
                   adThemeStyle: AdThemeStyle.fromTheme(theme),
                 ),
               ),
@@ -207,7 +200,8 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
               : state.entity is Source
               ? (state.entity! as Source).description
               : state.entity is Country
-              ? (state.entity! as Country).name // Using name as description for country
+              ? (state.entity! as Country)
+                    .name // Using name as description for country
               : null;
 
           final followButton = IconButton(
@@ -228,8 +222,8 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
           final entityIconUrl = (state.entity is Topic)
               ? (state.entity! as Topic).iconUrl
               : (state.entity is Country)
-                  ? (state.entity! as Country).flagUrl
-                  : null;
+              ? (state.entity! as Country).flagUrl
+              : null;
 
           final Widget appBarTitleWidget = Row(
             mainAxisSize: MainAxisSize.min,

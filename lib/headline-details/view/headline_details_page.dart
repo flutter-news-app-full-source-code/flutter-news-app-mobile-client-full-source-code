@@ -424,7 +424,10 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           onTap: () {
             context.push(
               Routes.sourceDetails,
-              extra: EntityDetailsPageArguments(entity: headline.source),
+              extra: EntityDetailsPageArguments(
+                entityId: headline.id,
+                contentType: ContentType.headline,
+              ),
             );
           },
           borderRadius: BorderRadius.circular(AppSpacing.sm),
@@ -449,7 +452,10 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           onTap: () {
             context.push(
               Routes.topicDetails,
-              extra: EntityDetailsPageArguments(entity: headline.topic),
+              extra: EntityDetailsPageArguments(
+                entityId: headline.topic.id,
+                contentType: ContentType.topic,
+              ),
             );
           },
           borderRadius: BorderRadius.circular(AppSpacing.sm),

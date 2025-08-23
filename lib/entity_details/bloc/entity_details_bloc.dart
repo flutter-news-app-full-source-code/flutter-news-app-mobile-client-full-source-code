@@ -76,29 +76,20 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     try {
       // 1. Determine/Fetch Entity
       FeedItem entityToLoad;
-      ContentType contentTypeToLoad;
+      final contentTypeToLoad = event.contentType;
 
-      if (event.entity != null) {
-        entityToLoad = event.entity!;
-        contentTypeToLoad = event.entity is Topic
-            ? ContentType.topic
-            : event.entity is Country
-                ? ContentType.country
-                : ContentType.source;
-      } else {
-        contentTypeToLoad = event.contentType!;
-        switch (contentTypeToLoad) {
-          case ContentType.topic:
-            entityToLoad = await _topicRepository.read(id: event.entityId!);
-          case ContentType.source:
-            entityToLoad = await _sourceRepository.read(id: event.entityId!);
-          case ContentType.country:
-            entityToLoad = await _countryRepository.read(id: event.entityId!);
-          default:
-            throw const OperationFailedException(
-              'Unsupported ContentType for EntityDetails.',
-            );
-        }
+      switch (contentTypeToLoad) {
+        case ContentType.topic:
+          entityToLoad = await _topicRepository.read(id: event.entityId);
+        case ContentType.source:
+          entityToLoad = await _sourceRepository.read(id: event.entityId);
+        case ContentType.country:
+          entityToLoad = await _countryRepository.read(id: event.entityId);
+        // ignore: no_default_cases
+        default:
+          throw const OperationFailedException(
+            'Unsupported ContentType for EntityDetails.',
+          );
       }
 
       // 2. Fetch Initial Headlines

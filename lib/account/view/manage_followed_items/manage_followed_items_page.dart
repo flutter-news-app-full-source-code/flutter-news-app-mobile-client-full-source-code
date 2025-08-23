@@ -65,7 +65,7 @@ class ManageFollowedItemsPage extends StatelessWidget {
               color: colorScheme.primary,
             ),
             title: Text(
-              l10n.accountFollowedCountriesTile,
+              l10n.headlinesFeedFilterCountryLabel,
               style: textTheme.titleMedium,
             ),
             trailing: const Icon(Icons.chevron_right),

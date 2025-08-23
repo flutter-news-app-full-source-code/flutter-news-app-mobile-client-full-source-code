@@ -45,8 +45,8 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
       state.copyWith(dataLoadingStatus: SourceFilterDataLoadingStatus.loading),
     );
     try {
-      final availableCountries = (await _countriesRepository.readAll(
-        filter: {'usage': 'hasActiveHeadlines'},
+      final countriesWithActiveSources = (await _countriesRepository.readAll(
+        filter: {'hasActiveSources': 'true'},
       )).items;
       final initialSelectedSourceIds = event.initialSelectedSources
           .map((s) => s.id)
@@ -71,7 +71,7 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
 
       emit(
         state.copyWith(
-          availableCountries: availableCountries,
+          countriesWithActiveSources: countriesWithActiveSources,
           allAvailableSources: allAvailableSources,
           displayableSources: displayableSources,
           finallySelectedSourceIds: initialSelectedSourceIds,

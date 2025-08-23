@@ -197,6 +197,8 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       _accountBloc.add(AccountFollowTopicToggled(topic: entity));
     } else if (entity is Source) {
       _accountBloc.add(AccountFollowSourceToggled(source: entity));
+    } else if (entity is Country) {
+      _accountBloc.add(AccountFollowCountryToggled(country: entity));
     }
   }
 
@@ -218,6 +220,8 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         filter['topic.id'] = (state.entity! as Topic).id;
       } else if (state.entity is Source) {
         filter['source.id'] = (state.entity! as Source).id;
+      } else if (state.entity is Country) {
+        filter['eventCountry.id'] = (state.entity! as Country).id;
       }
 
       final headlineResponse = await _headlinesRepository.readAll(
@@ -301,6 +305,10 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     } else if (entity is Source) {
       isCurrentlyFollowing = preferences.followedSources.any(
         (s) => s.id == entity.id,
+      );
+    } else if (entity is Country) {
+      isCurrentlyFollowing = preferences.followedCountries.any(
+        (c) => c.id == entity.id,
       );
     }
 

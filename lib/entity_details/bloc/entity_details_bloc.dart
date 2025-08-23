@@ -20,12 +20,14 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     required DataRepository<Headline> headlinesRepository,
     required DataRepository<Topic> topicRepository,
     required DataRepository<Source> sourceRepository,
+    required DataRepository<Country> countryRepository,
     required AccountBloc accountBloc,
     required AppBloc appBloc,
     required FeedDecoratorService feedDecoratorService,
   }) : _headlinesRepository = headlinesRepository,
        _topicRepository = topicRepository,
        _sourceRepository = sourceRepository,
+       _countryRepository = countryRepository,
        _accountBloc = accountBloc,
        _appBloc = appBloc,
        _feedDecoratorService = feedDecoratorService,
@@ -52,6 +54,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
   final DataRepository<Headline> _headlinesRepository;
   final DataRepository<Topic> _topicRepository;
   final DataRepository<Source> _sourceRepository;
+  final DataRepository<Country> _countryRepository;
   final AccountBloc _accountBloc;
   final AppBloc _appBloc;
   final FeedDecoratorService _feedDecoratorService;
@@ -79,13 +82,22 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         entityToLoad = event.entity!;
         contentTypeToLoad = event.entity is Topic
             ? ContentType.topic
-            : ContentType.source;
+            : event.entity is Country
+                ? ContentType.country
+                : ContentType.source;
       } else {
         contentTypeToLoad = event.contentType!;
-        if (contentTypeToLoad == ContentType.topic) {
-          entityToLoad = await _topicRepository.read(id: event.entityId!);
-        } else {
-          entityToLoad = await _sourceRepository.read(id: event.entityId!);
+        switch (contentTypeToLoad) {
+          case ContentType.topic:
+            entityToLoad = await _topicRepository.read(id: event.entityId!);
+          case ContentType.source:
+            entityToLoad = await _sourceRepository.read(id: event.entityId!);
+          case ContentType.country:
+            entityToLoad = await _countryRepository.read(id: event.entityId!);
+          default:
+            throw const OperationFailedException(
+              'Unsupported ContentType for EntityDetails.',
+            );
         }
       }
 
@@ -93,8 +105,10 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       final filter = <String, dynamic>{};
       if (contentTypeToLoad == ContentType.topic) {
         filter['topic.id'] = (entityToLoad as Topic).id;
-      } else {
+      } else if (contentTypeToLoad == ContentType.source) {
         filter['source.id'] = (entityToLoad as Source).id;
+      } else if (contentTypeToLoad == ContentType.country) {
+        filter['eventCountry.id'] = (entityToLoad as Country).id;
       }
 
       final headlineResponse = await _headlinesRepository.readAll(
@@ -139,6 +153,10 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
           isCurrentlyFollowing = preferences.followedSources.any(
             (s) => s.id == (entityToLoad as Source).id,
           );
+        } else if (entityToLoad is Country) {
+          isCurrentlyFollowing = preferences.followedCountries.any(
+            (c) => c.id == (entityToLoad as Country).id,
+          );
         }
       }
 
@@ -179,6 +197,8 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       _accountBloc.add(AccountFollowTopicToggled(topic: entity));
     } else if (entity is Source) {
       _accountBloc.add(AccountFollowSourceToggled(source: entity));
+    } else if (entity is Country) {
+      _accountBloc.add(AccountFollowCountryToggled(country: entity));
     }
   }
 
@@ -200,6 +220,8 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         filter['topic.id'] = (state.entity! as Topic).id;
       } else if (state.entity is Source) {
         filter['source.id'] = (state.entity! as Source).id;
+      } else if (state.entity is Country) {
+        filter['eventCountry.id'] = (state.entity! as Country).id;
       }
 
       final headlineResponse = await _headlinesRepository.readAll(
@@ -283,6 +305,10 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     } else if (entity is Source) {
       isCurrentlyFollowing = preferences.followedSources.any(
         (s) => s.id == entity.id,
+      );
+    } else if (entity is Country) {
+      isCurrentlyFollowing = preferences.followedCountries.any(
+        (c) => c.id == entity.id,
       );
     }
 

@@ -52,6 +52,7 @@ class EntityDetailsPage extends StatelessWidget {
       create: (context) {
         final topicsRepository = context.read<DataRepository<Topic>>();
         final sourcesRepository = context.read<DataRepository<Source>>();
+        final countriesRepository = context.read<DataRepository<Country>>();
         final feedDecoratorService = FeedDecoratorService(
           topicsRepository: topicsRepository,
           sourcesRepository: sourcesRepository,
@@ -61,6 +62,7 @@ class EntityDetailsPage extends StatelessWidget {
               headlinesRepository: context.read<DataRepository<Headline>>(),
               topicRepository: topicsRepository,
               sourceRepository: sourcesRepository,
+              countryRepository: countriesRepository,
               accountBloc: context.read<AccountBloc>(),
               appBloc: context.read<AppBloc>(),
               feedDecoratorService: feedDecoratorService,
@@ -131,6 +133,8 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
         name = l10n.entityDetailsTopicTitle;
       case ContentType.source:
         name = l10n.entityDetailsSourceTitle;
+      case ContentType.country:
+        name = l10n.entityDetailsCountryTitle;
       default:
         name = l10n.detailsPageTitle;
     }
@@ -190,6 +194,10 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
             final src = state.entity! as Source;
             appBarTitleText = src.name;
             appBarIconData = Icons.source_outlined;
+          } else if (state.entity is Country) {
+            final country = state.entity! as Country;
+            appBarTitleText = country.name;
+            appBarIconData = Icons.flag_outlined;
           } else {
             appBarTitleText = l10n.detailsPageTitle;
           }
@@ -198,10 +206,8 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
               ? (state.entity! as Topic).description
               : state.entity is Source
               ? (state.entity! as Source).description
-              : null;
-
-          final entityIconUrl = (state.entity is Topic)
-              ? (state.entity! as Topic).iconUrl
+              : state.entity is Country
+              ? (state.entity! as Country).name // Using name as description for country
               : null;
 
           final followButton = IconButton(
@@ -218,6 +224,12 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
               );
             },
           );
+
+          final entityIconUrl = (state.entity is Topic)
+              ? (state.entity! as Topic).iconUrl
+              : (state.entity is Country)
+                  ? (state.entity! as Country).flagUrl
+                  : null;
 
           final Widget appBarTitleWidget = Row(
             mainAxisSize: MainAxisSize.min,

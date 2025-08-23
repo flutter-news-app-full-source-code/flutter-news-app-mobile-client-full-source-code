@@ -85,9 +85,9 @@ class FollowedCountriesListPage extends StatelessWidget {
                 ),
                 title: Text(country.name),
                 trailing: IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.remove_circle_outline,
-                    color: Colors.red,
+                    color: Theme.of(context).colorScheme.error,
                   ),
                   tooltip: l10n.unfollowCountryTooltip(country.name),
                   onPressed: () {

@@ -82,9 +82,9 @@ class FollowedSourcesListPage extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 trailing: IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.remove_circle_outline,
-                    color: Colors.red,
+                    color: Theme.of(context).colorScheme.error,
                   ),
                   tooltip: l10n.unfollowSourceTooltip(source.name),
                   onPressed: () {

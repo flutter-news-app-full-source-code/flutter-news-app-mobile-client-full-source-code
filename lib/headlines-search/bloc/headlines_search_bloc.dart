@@ -175,7 +175,7 @@ class HeadlinesSearchBloc
               );
             case ContentType.country:
               response = await _countryRepository.readAll(
-                filter: {'q': searchTerm, 'usage': 'hasActiveHeadlines'},
+                filter: {'q': searchTerm, 'hasActiveHeadlines': true},
                 pagination: const PaginationOptions(limit: _limit),
                 sort: [const SortOption('name', SortOrder.asc)],
               );
@@ -261,7 +261,7 @@ class HeadlinesSearchBloc
           processedItems = rawResponse.items.cast<FeedItem>();
         case ContentType.country:
           rawResponse = await _countryRepository.readAll(
-            filter: {'q': searchTerm, 'usage': 'hasActiveHeadlines'},
+            filter: {'q': searchTerm, 'hasActiveHeadlines': true},
             pagination: const PaginationOptions(limit: _limit),
             sort: [const SortOption('name', SortOrder.asc)],
           );

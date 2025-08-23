@@ -21,17 +21,15 @@ import 'package:ui_kit/ui_kit.dart';
 
 class EntityDetailsPageArguments {
   const EntityDetailsPageArguments({
-    this.entityId,
-    this.contentType,
-    this.entity,
+    required this.entityId,
+    required this.contentType,
   }) : assert(
-         (entityId != null && contentType != null) || entity != null,
-         'Either entityId/contentType or a full entity object must be provided.',
+         entityId != null && contentType != null,
+         'Both entityId and contentType must be provided.',
        );
 
-  final String? entityId;
-  final ContentType? contentType;
-  final FeedItem? entity;
+  final String entityId;
+  final ContentType contentType;
 }
 
 class EntityDetailsPage extends StatelessWidget {

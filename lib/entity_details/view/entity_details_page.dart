@@ -42,36 +42,7 @@ class EntityDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<EntityDetailsBloc>(
-      // Explicitly type BlocProvider
-      create: (context) {
-        final topicsRepository = context.read<DataRepository<Topic>>();
-        final sourcesRepository = context.read<DataRepository<Source>>();
-        final countriesRepository = context.read<DataRepository<Country>>();
-        final feedDecoratorService = FeedDecoratorService(
-          topicsRepository: topicsRepository,
-          sourcesRepository: sourcesRepository,
-        );
-        final entityDetailsBloc =
-            EntityDetailsBloc(
-              headlinesRepository: context.read<DataRepository<Headline>>(),
-              topicRepository: topicsRepository,
-              sourceRepository: sourcesRepository,
-              countryRepository: countriesRepository,
-              accountBloc: context.read<AccountBloc>(),
-              appBloc: context.read<AppBloc>(),
-              feedDecoratorService: feedDecoratorService,
-            )..add(
-              EntityDetailsLoadRequested(
-                entityId: args.entityId,
-                contentType: args.contentType,
-                adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
-              ),
-            );
-        return entityDetailsBloc;
-      },
-      child: EntityDetailsView(args: args),
-    );
+    return EntityDetailsView(args: args);
   }
 }
 
@@ -104,10 +75,10 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
   void _onScroll() {
     if (_isBottom) {
       context.read<EntityDetailsBloc>().add(
-        EntityDetailsLoadMoreHeadlinesRequested(
-          adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
-        ),
-      );
+            EntityDetailsLoadMoreHeadlinesRequested(
+              adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+            ),
+          );
     }
   }
 
@@ -167,12 +138,12 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
             return FailureStateWidget(
               exception: state.exception!,
               onRetry: () => context.read<EntityDetailsBloc>().add(
-                EntityDetailsLoadRequested(
-                  entityId: widget.args.entityId,
-                  contentType: widget.args.contentType,
-                  adThemeStyle: AdThemeStyle.fromTheme(theme),
-                ),
-              ),
+                    EntityDetailsLoadRequested(
+                      entityId: widget.args.entityId,
+                      contentType: widget.args.contentType,
+                      adThemeStyle: AdThemeStyle.fromTheme(theme),
+                    ),
+                  ),
             );
           }
 
@@ -198,11 +169,11 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
           final description = state.entity is Topic
               ? (state.entity! as Topic).description
               : state.entity is Source
-              ? (state.entity! as Source).description
-              : state.entity is Country
-              ? (state.entity! as Country)
-                    .name // Using name as description for country
-              : null;
+                  ? (state.entity! as Source).description
+                  : state.entity is Country
+                      ? (state.entity! as Country)
+                          .name // Using name as description for country
+                      : null;
 
           final followButton = IconButton(
             icon: Icon(
@@ -214,16 +185,16 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                 : l10n.followButtonLabel,
             onPressed: () {
               context.read<EntityDetailsBloc>().add(
-                const EntityDetailsToggleFollowRequested(),
-              );
+                    const EntityDetailsToggleFollowRequested(),
+                  );
             },
           );
 
           final entityIconUrl = (state.entity is Topic)
               ? (state.entity! as Topic).iconUrl
               : (state.entity is Country)
-              ? (state.entity! as Country).flagUrl
-              : null;
+                  ? (state.entity! as Country).flagUrl
+                  : null;
 
           final Widget appBarTitleWidget = Row(
             mainAxisSize: MainAxisSize.min,
@@ -330,8 +301,7 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                     horizontal: AppSpacing.paddingMedium,
                   ),
                   sliver: SliverList.separated(
-                    itemCount:
-                        state.feedItems.length +
+                    itemCount: state.feedItems.length +
                         (state.hasMoreHeadlines &&
                                 state.status == EntityDetailsStatus.loadingMore
                             ? 1

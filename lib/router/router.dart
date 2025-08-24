@@ -22,6 +22,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/authentication/b
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/authentication_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/email_code_verification_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/request_code_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/bloc/entity_details_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/view/entity_details_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/headline_details_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/similar_headlines_bloc.dart';
@@ -274,8 +276,27 @@ GoRouter createRouter({
               ),
             );
           }
-          return BlocProvider.value(
-            value: accountBloc,
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider.value(value: accountBloc),
+              BlocProvider(
+                create: (context) => EntityDetailsBloc(
+                  headlinesRepository: context.read<DataRepository<Headline>>(),
+                  topicRepository: context.read<DataRepository<Topic>>(),
+                  sourceRepository: context.read<DataRepository<Source>>(),
+                  countryRepository: context.read<DataRepository<Country>>(),
+                  accountBloc: accountBloc,
+                  appBloc: context.read<AppBloc>(),
+                  feedDecoratorService: feedDecoratorService,
+                )..add(
+                    EntityDetailsLoadRequested(
+                      entityId: args.entityId,
+                      contentType: args.contentType,
+                      adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+                    ),
+                  ),
+              ),
+            ],
             child: EntityDetailsPage(args: args),
           );
         },
@@ -292,8 +313,27 @@ GoRouter createRouter({
               ),
             );
           }
-          return BlocProvider.value(
-            value: accountBloc,
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider.value(value: accountBloc),
+              BlocProvider(
+                create: (context) => EntityDetailsBloc(
+                  headlinesRepository: context.read<DataRepository<Headline>>(),
+                  topicRepository: context.read<DataRepository<Topic>>(),
+                  sourceRepository: context.read<DataRepository<Source>>(),
+                  countryRepository: context.read<DataRepository<Country>>(),
+                  accountBloc: accountBloc,
+                  appBloc: context.read<AppBloc>(),
+                  feedDecoratorService: feedDecoratorService,
+                )..add(
+                    EntityDetailsLoadRequested(
+                      entityId: args.entityId,
+                      contentType: args.contentType,
+                      adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+                    ),
+                  ),
+              ),
+            ],
             child: EntityDetailsPage(args: args),
           );
         },
@@ -310,8 +350,27 @@ GoRouter createRouter({
               ),
             );
           }
-          return BlocProvider.value(
-            value: accountBloc,
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider.value(value: accountBloc),
+              BlocProvider(
+                create: (context) => EntityDetailsBloc(
+                  headlinesRepository: context.read<DataRepository<Headline>>(),
+                  topicRepository: context.read<DataRepository<Topic>>(),
+                  sourceRepository: context.read<DataRepository<Source>>(),
+                  countryRepository: context.read<DataRepository<Country>>(),
+                  accountBloc: accountBloc,
+                  appBloc: context.read<AppBloc>(),
+                  feedDecoratorService: feedDecoratorService,
+                )..add(
+                    EntityDetailsLoadRequested(
+                      entityId: args.entityId,
+                      contentType: args.contentType,
+                      adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+                    ),
+                  ),
+              ),
+            ],
             child: EntityDetailsPage(args: args),
           );
         },

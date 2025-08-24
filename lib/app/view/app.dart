@@ -33,6 +33,7 @@ class App extends StatelessWidget {
     required AppEnvironment environment,
     required AdService adService,
     this.demoDataMigrationService,
+    this.initialUser,
     super.key,
   }) : _authenticationRepository = authenticationRepository,
        _headlinesRepository = headlinesRepository,
@@ -61,6 +62,7 @@ class App extends StatelessWidget {
   final AppEnvironment _environment;
   final AdService _adService;
   final DemoDataMigrationService? demoDataMigrationService;
+  final User? initialUser;
 
   @override
   Widget build(BuildContext context) {
@@ -89,6 +91,7 @@ class App extends StatelessWidget {
               userRepository: context.read<DataRepository<User>>(),
               environment: _environment,
               demoDataMigrationService: demoDataMigrationService,
+              initialUser: initialUser,
             ),
           ),
           BlocProvider(

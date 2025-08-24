@@ -5,6 +5,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
@@ -130,6 +132,33 @@ class _RequestCodeView extends StatelessWidget {
                         ),
                         textAlign: TextAlign.center,
                       ),
+
+                      // NOT NEEDED; any email is accepted in demo mode
+                      //
+                      //Display demo email suggestion if in demo environment
+                      // BlocSelector<AppBloc, AppState, AppEnvironment?>(
+                      //   selector: (state) => state.environment,
+                      //   builder: (context, environment) {
+                      //     if (environment == AppEnvironment.demo) {
+                      //       return Column(
+                      //         children: [
+                      //           const SizedBox(height: AppSpacing.md),
+                      //           Text(
+                      //             l10n.demoEmailSuggestionMessage(
+                      //               'admin@mail.com',
+                      //             ),
+                      //             style: textTheme.bodyMedium?.copyWith(
+                      //               color: colorScheme.secondary,
+                      //               fontWeight: FontWeight.bold,
+                      //             ),
+                      //             textAlign: TextAlign.center,
+                      //           ),
+                      //         ],
+                      //       );
+                      //     }
+                      //     return const SizedBox.shrink();
+                      //   },
+                      // ),
                       const SizedBox(height: AppSpacing.xxl),
                       _EmailLinkForm(isLoading: isLoading),
                     ],

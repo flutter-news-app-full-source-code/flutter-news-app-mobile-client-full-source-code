@@ -602,7 +602,6 @@
     "@headlinesFeedFilterNoSourcesMatch": {
         "description": "Message shown when no sources match the selected filters"
     },
-
     "searchModelTypeHeadline": "Headlines",
     "@searchModelTypeHeadline": {
         "description": "Dropdown display name for Headline search type"
@@ -639,7 +638,6 @@
     "@searchHintTextCountry": {
         "description": "Hint text for searching countries"
     },
-
     "searchPageInitialHeadline": "Start Your Search",
     "@searchPageInitialHeadline": {
         "description": "Generic headline for the initial state of the search page"
@@ -1038,13 +1036,23 @@
     "@followedCategoriesEmptySubheadline": {
         "description": "Subheadline for empty state on followed categories page"
     },
-     "demoVerificationCodeMessage": "Demo Mode: Use code {code}",
+    "demoVerificationCodeMessage": "Demo Mode: Use code {code}",
     "@demoVerificationCodeMessage": {
         "description": "Message shown in demo mode to provide the verification code",
         "placeholders": {
             "code": {
                 "type": "String",
                 "example": "123456"
+            }
+        }
+    },
+    "demoEmailSuggestionMessage": "Demo Mode: Use email {email}",
+    "@demoEmailSuggestionMessage": {
+        "description": "Message shown in demo mode to suggest an email for sign-in",
+        "placeholders": {
+            "email": {
+                "type": "String",
+                "example": "demo@example.com"
             }
         }
     },

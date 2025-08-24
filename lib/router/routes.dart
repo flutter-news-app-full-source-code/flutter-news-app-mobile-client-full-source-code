@@ -38,12 +38,8 @@ abstract final class Routes {
   static const notificationsName = 'notifications';
 
   // --- Entity Details Routes (can be accessed from multiple places) ---
-  static const topicDetails = '/topic-details';
-  static const topicDetailsName = 'topicDetails';
-  static const sourceDetails = '/source-details';
-  static const sourceDetailsName = 'sourceDetails';
-  static const countryDetails = '/country-details';
-  static const countryDetailsName = 'countryDetails';
+  static const entityDetails = '/entity-details/:type/:id';
+  static const entityDetailsName = 'entityDetails';
 
   // --- Authentication Routes ---
   static const authentication = '/authentication';

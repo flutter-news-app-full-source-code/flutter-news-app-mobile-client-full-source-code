@@ -1,10 +1,8 @@
 // ignore_for_file: no_default_cases
 
 import 'package:core/core.dart';
-import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
@@ -14,7 +12,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/b
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/shared.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/feed_core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -31,47 +28,11 @@ class EntityDetailsPageArguments {
 
 class EntityDetailsPage extends StatelessWidget {
   const EntityDetailsPage({required this.args, super.key});
-
   final EntityDetailsPageArguments args;
-
-  static Route<void> route({required EntityDetailsPageArguments args}) {
-    return MaterialPageRoute<void>(
-      builder: (_) => EntityDetailsPage(args: args),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<EntityDetailsBloc>(
-      // Explicitly type BlocProvider
-      create: (context) {
-        final topicsRepository = context.read<DataRepository<Topic>>();
-        final sourcesRepository = context.read<DataRepository<Source>>();
-        final countriesRepository = context.read<DataRepository<Country>>();
-        final feedDecoratorService = FeedDecoratorService(
-          topicsRepository: topicsRepository,
-          sourcesRepository: sourcesRepository,
-        );
-        final entityDetailsBloc =
-            EntityDetailsBloc(
-              headlinesRepository: context.read<DataRepository<Headline>>(),
-              topicRepository: topicsRepository,
-              sourceRepository: sourcesRepository,
-              countryRepository: countriesRepository,
-              accountBloc: context.read<AccountBloc>(),
-              appBloc: context.read<AppBloc>(),
-              feedDecoratorService: feedDecoratorService,
-            )..add(
-              EntityDetailsLoadRequested(
-                entityId: args.entityId,
-                contentType: args.contentType,
-                adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
-              ),
-            );
-        return entityDetailsBloc;
-      },
-      child: EntityDetailsView(args: args),
-    );
+    return EntityDetailsView(args: args);
   }
 }
 

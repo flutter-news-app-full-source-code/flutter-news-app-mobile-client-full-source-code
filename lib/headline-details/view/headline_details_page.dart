@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/view/entity_details_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/headline_details_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/similar_headlines_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
@@ -422,12 +421,12 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       ..add(
         InkWell(
           onTap: () {
-            context.push(
-              Routes.sourceDetails,
-              extra: EntityDetailsPageArguments(
-                entityId: headline.id,
-                contentType: ContentType.headline,
-              ),
+            context.pushNamed(
+              Routes.entityDetailsName,
+              pathParameters: {
+                'type': ContentType.source.name,
+                'id': headline.source.id,
+              },
             );
           },
           borderRadius: BorderRadius.circular(AppSpacing.sm),
@@ -450,12 +449,12 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       ..add(
         InkWell(
           onTap: () {
-            context.push(
-              Routes.topicDetails,
-              extra: EntityDetailsPageArguments(
-                entityId: headline.topic.id,
-                contentType: ContentType.topic,
-              ),
+            context.pushNamed(
+              Routes.entityDetailsName,
+              pathParameters: {
+                'type': ContentType.topic.name,
+                'id': headline.topic.id,
+              },
             );
           },
           borderRadius: BorderRadius.circular(AppSpacing.sm),
@@ -466,6 +465,34 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
               color: chipAvatarColor,
             ),
             label: Text(headline.topic.name),
+            labelStyle: chipLabelStyle,
+            backgroundColor: chipBackgroundColor,
+            padding: chipPadding,
+            shape: chipShape,
+            visualDensity: VisualDensity.compact,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+        ),
+      )
+      ..add(
+        InkWell(
+          onTap: () {
+            context.pushNamed(
+              Routes.entityDetailsName,
+              pathParameters: {
+                'type': ContentType.country.name,
+                'id': headline.eventCountry.id,
+              },
+            );
+          },
+          borderRadius: BorderRadius.circular(AppSpacing.sm),
+          child: Chip(
+            avatar: Icon(
+              Icons.location_city_outlined,
+              size: chipAvatarSize,
+              color: chipAvatarColor,
+            ),
+            label: Text(headline.eventCountry.name),
             labelStyle: chipLabelStyle,
             backgroundColor: chipBackgroundColor,
             padding: chipPadding,

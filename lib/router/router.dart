@@ -263,101 +263,33 @@ GoRouter createRouter({
           ),
         ],
       ),
-      // --- Entity Details Routes (Top Level) ---
+      // --- Entity Details Route (Top Level) ---
+      // This route handles displaying details for various content entities
+      // (Topic, Source, Country) based on path parameters.
       GoRoute(
-        path: Routes.topicDetails,
-        name: Routes.topicDetailsName,
+        path: Routes.entityDetails,
+        name: Routes.entityDetailsName,
         builder: (context, state) {
-          final args = state.extra as EntityDetailsPageArguments?;
-          if (args == null) {
+          final entityTypeString = state.pathParameters['type'];
+          final entityId = state.pathParameters['id'];
+
+          if (entityTypeString == null || entityId == null) {
             return const Scaffold(
-              body: Center(
-                child: Text('Error: Missing topic details arguments'),
-              ),
+              body: Center(child: Text('entity Details Missing Arguments')),
             );
           }
-          final adThemeStyle = AdThemeStyle.fromTheme(Theme.of(context));
-          return MultiBlocProvider(
-            providers: [
-              BlocProvider.value(value: accountBloc),
-              BlocProvider(
-                create: (context) =>
-                    EntityDetailsBloc(
-                      headlinesRepository: context
-                          .read<DataRepository<Headline>>(),
-                      topicRepository: context.read<DataRepository<Topic>>(),
-                      sourceRepository: context.read<DataRepository<Source>>(),
-                      countryRepository: context
-                          .read<DataRepository<Country>>(),
-                      accountBloc: accountBloc,
-                      appBloc: context.read<AppBloc>(),
-                      feedDecoratorService: feedDecoratorService,
-                    )..add(
-                      EntityDetailsLoadRequested(
-                        entityId: args.entityId,
-                        contentType: args.contentType,
-                        adThemeStyle: adThemeStyle,
-                      ),
-                    ),
-              ),
-            ],
-            child: EntityDetailsPage(args: args),
+
+          final contentType = ContentType.values.firstWhere(
+            (e) => e.name == entityTypeString,
+            orElse: () =>
+                throw FormatException('Unknown ContentType: $entityTypeString'),
           );
-        },
-      ),
-      GoRoute(
-        path: Routes.sourceDetails,
-        name: Routes.sourceDetailsName,
-        builder: (context, state) {
-          final args = state.extra as EntityDetailsPageArguments?;
-          if (args == null) {
-            return const Scaffold(
-              body: Center(
-                child: Text('Error: Missing source details arguments'),
-              ),
-            );
-          }
-          final adThemeStyle = AdThemeStyle.fromTheme(Theme.of(context));
-          return MultiBlocProvider(
-            providers: [
-              BlocProvider.value(value: accountBloc),
-              BlocProvider(
-                create: (context) =>
-                    EntityDetailsBloc(
-                      headlinesRepository: context
-                          .read<DataRepository<Headline>>(),
-                      topicRepository: context.read<DataRepository<Topic>>(),
-                      sourceRepository: context.read<DataRepository<Source>>(),
-                      countryRepository: context
-                          .read<DataRepository<Country>>(),
-                      accountBloc: accountBloc,
-                      appBloc: context.read<AppBloc>(),
-                      feedDecoratorService: feedDecoratorService,
-                    )..add(
-                      EntityDetailsLoadRequested(
-                        entityId: args.entityId,
-                        contentType: args.contentType,
-                        adThemeStyle: adThemeStyle,
-                      ),
-                    ),
-              ),
-            ],
-            child: EntityDetailsPage(args: args),
+
+          final args = EntityDetailsPageArguments(
+            entityId: entityId,
+            contentType: contentType,
           );
-        },
-      ),
-      GoRoute(
-        path: Routes.countryDetails,
-        name: Routes.countryDetailsName,
-        builder: (context, state) {
-          final args = state.extra as EntityDetailsPageArguments?;
-          if (args == null) {
-            return const Scaffold(
-              body: Center(
-                child: Text('Error: Missing country details arguments'),
-              ),
-            );
-          }
+
           final adThemeStyle = AdThemeStyle.fromTheme(Theme.of(context));
           return MultiBlocProvider(
             providers: [

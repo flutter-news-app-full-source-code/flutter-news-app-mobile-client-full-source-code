@@ -1,6 +1,5 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/view/entity_details_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:go_router/go_router.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -148,12 +147,12 @@ class _HeadlineMetadataRow extends StatelessWidget {
             ),
           GestureDetector(
             onTap: () {
-              context.push(
-                Routes.topicDetails,
-                extra: EntityDetailsPageArguments(
-                  entityId: headline.topic.id,
-                  contentType: ContentType.topic,
-                ),
+              context.pushNamed(
+                Routes.entityDetailsName,
+                pathParameters: {
+                  'type': ContentType.topic.name,
+                  'id': headline.topic.id,
+                },
               );
             },
             child: Text(headline.topic.name, style: metadataTextStyle),
@@ -172,12 +171,12 @@ class _HeadlineMetadataRow extends StatelessWidget {
             ),
           GestureDetector(
             onTap: () {
-              context.push(
-                Routes.sourceDetails,
-                extra: EntityDetailsPageArguments(
-                  entityId: headline.source.id,
-                  contentType: ContentType.source,
-                ),
+              context.pushNamed(
+                Routes.entityDetailsName,
+                pathParameters: {
+                  'type': ContentType.source.name,
+                  'id': headline.source.id,
+                },
               );
             },
             child: Text(headline.source.name, style: metadataTextStyle),

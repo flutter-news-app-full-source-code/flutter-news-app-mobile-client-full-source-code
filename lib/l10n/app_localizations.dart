@@ -1550,6 +1550,12 @@ abstract class AppLocalizations {
   /// **'Demo Mode: Use code {code}'**
   String demoVerificationCodeMessage(String code);
 
+  /// Message shown in demo mode to suggest an email for sign-in
+  ///
+  /// In en, this message translates to:
+  /// **'Demo Mode: Use email {email}'**
+  String demoEmailSuggestionMessage(String email);
+
   /// Label for Headline content type
   ///
   /// In en, this message translates to:

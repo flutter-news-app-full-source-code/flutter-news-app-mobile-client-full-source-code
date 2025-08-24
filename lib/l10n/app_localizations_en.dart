@@ -808,6 +808,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String demoEmailSuggestionMessage(String email) {
+    return 'Demo Mode: Use email $email';
+  }
+
+  @override
   String get contentTypeHeadline => 'Headlines';
 
   @override

@@ -805,6 +805,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String demoEmailSuggestionMessage(String email) {
+    return 'وضع العرض التوضيحي: استخدم البريد الإلكتروني $email';
+  }
+
+  @override
   String get contentTypeHeadline => 'العناوين الرئيسية';
 
   @override

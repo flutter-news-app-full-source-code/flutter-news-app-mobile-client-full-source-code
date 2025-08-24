@@ -1,6 +1,5 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/view/entity_details_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:go_router/go_router.dart';
 
@@ -21,12 +20,9 @@ class CountryItemWidget extends StatelessWidget {
           ? Text(country.isoCode, maxLines: 1, overflow: TextOverflow.ellipsis)
           : null,
       onTap: () {
-        context.push(
-          Routes.countryDetails,
-          extra: EntityDetailsPageArguments(
-            entityId: country.id,
-            contentType: ContentType.country,
-          ),
+        context.pushNamed(
+          Routes.entityDetailsName,
+          pathParameters: {'type': ContentType.country.name, 'id': country.id},
         );
       },
     );

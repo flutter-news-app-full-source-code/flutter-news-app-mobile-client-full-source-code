@@ -28,14 +28,7 @@ class EntityDetailsPageArguments {
 
 class EntityDetailsPage extends StatelessWidget {
   const EntityDetailsPage({required this.args, super.key});
-
   final EntityDetailsPageArguments args;
-
-  static Route<void> route({required EntityDetailsPageArguments args}) {
-    return MaterialPageRoute<void>(
-      builder: (_) => EntityDetailsPage(args: args),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {

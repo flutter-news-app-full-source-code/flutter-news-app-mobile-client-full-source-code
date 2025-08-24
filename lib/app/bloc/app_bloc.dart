@@ -22,6 +22,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required DataRepository<User> userRepository,
     required local_config.AppEnvironment environment,
     this.demoDataMigrationService,
+    this.initialUser,
   }) : _authenticationRepository = authenticationRepository,
        _userAppSettingsRepository = userAppSettingsRepository,
        _appConfigRepository = appConfigRepository,
@@ -54,6 +55,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
            selectedBottomNavigationIndex: 0,
            remoteConfig: null,
            environment: environment,
+           // Initialize status and user based on initialUser
+           status: initialUser != null
+               ? (initialUser.appRole == AppUserRole.standardUser
+                   ? AppStatus.authenticated
+                   : AppStatus.anonymous)
+               : AppStatus.unauthenticated,
+           user: initialUser,
          ),
        ) {
     on<AppUserChanged>(_onAppUserChanged);
@@ -79,6 +87,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final DataRepository<User> _userRepository;
   final local_config.AppEnvironment _environment;
   final DemoDataMigrationService? demoDataMigrationService;
+  final User? initialUser;
   late final StreamSubscription<User?> _userSubscription;
 
   /// Handles user changes and loads initial settings once user is available.

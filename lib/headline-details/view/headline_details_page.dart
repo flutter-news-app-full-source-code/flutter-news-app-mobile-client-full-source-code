@@ -425,8 +425,8 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
             context.push(
               Routes.sourceDetails,
               extra: EntityDetailsPageArguments(
-                entityId: headline.id,
-                contentType: ContentType.headline,
+                entityId: headline.source.id,
+                contentType: ContentType.source,
               ),
             );
           },
@@ -466,6 +466,34 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
               color: chipAvatarColor,
             ),
             label: Text(headline.topic.name),
+            labelStyle: chipLabelStyle,
+            backgroundColor: chipBackgroundColor,
+            padding: chipPadding,
+            shape: chipShape,
+            visualDensity: VisualDensity.compact,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+        ),
+      )
+      ..add(
+        InkWell(
+          onTap: () {
+            context.push(
+              Routes.countryDetails,
+              extra: EntityDetailsPageArguments(
+                entityId: headline.eventCountry.id,
+                contentType: ContentType.country,
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(AppSpacing.sm),
+          child: Chip(
+            avatar: Icon(
+              Icons.location_city_outlined,
+              size: chipAvatarSize,
+              color: chipAvatarColor,
+            ),
+            label: Text(headline.eventCountry.name),
             labelStyle: chipLabelStyle,
             backgroundColor: chipBackgroundColor,
             padding: chipPadding,

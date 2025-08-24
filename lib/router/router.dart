@@ -276,6 +276,7 @@ GoRouter createRouter({
               ),
             );
           }
+          final adThemeStyle = AdThemeStyle.fromTheme(Theme.of(context));
           return MultiBlocProvider(
             providers: [
               BlocProvider.value(value: accountBloc),
@@ -295,7 +296,7 @@ GoRouter createRouter({
                       EntityDetailsLoadRequested(
                         entityId: args.entityId,
                         contentType: args.contentType,
-                        adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+                        adThemeStyle: adThemeStyle,
                       ),
                     ),
               ),
@@ -316,6 +317,7 @@ GoRouter createRouter({
               ),
             );
           }
+          final adThemeStyle = AdThemeStyle.fromTheme(Theme.of(context));
           return MultiBlocProvider(
             providers: [
               BlocProvider.value(value: accountBloc),
@@ -335,7 +337,7 @@ GoRouter createRouter({
                       EntityDetailsLoadRequested(
                         entityId: args.entityId,
                         contentType: args.contentType,
-                        adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+                        adThemeStyle: adThemeStyle,
                       ),
                     ),
               ),
@@ -356,6 +358,7 @@ GoRouter createRouter({
               ),
             );
           }
+          final adThemeStyle = AdThemeStyle.fromTheme(Theme.of(context));
           return MultiBlocProvider(
             providers: [
               BlocProvider.value(value: accountBloc),
@@ -375,7 +378,7 @@ GoRouter createRouter({
                       EntityDetailsLoadRequested(
                         entityId: args.entityId,
                         contentType: args.contentType,
-                        adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+                        adThemeStyle: adThemeStyle,
                       ),
                     ),
               ),

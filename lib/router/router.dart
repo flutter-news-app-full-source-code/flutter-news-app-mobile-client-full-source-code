@@ -14,6 +14,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/account/view/man
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/topics/followed_topics_list_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/saved_headlines_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
     as local_config;
@@ -22,7 +23,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/authentication/b
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/authentication_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/email_code_verification_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/request_code_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/bloc/entity_details_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/view/entity_details_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/headline_details_bloc.dart';
@@ -280,21 +280,24 @@ GoRouter createRouter({
             providers: [
               BlocProvider.value(value: accountBloc),
               BlocProvider(
-                create: (context) => EntityDetailsBloc(
-                  headlinesRepository: context.read<DataRepository<Headline>>(),
-                  topicRepository: context.read<DataRepository<Topic>>(),
-                  sourceRepository: context.read<DataRepository<Source>>(),
-                  countryRepository: context.read<DataRepository<Country>>(),
-                  accountBloc: accountBloc,
-                  appBloc: context.read<AppBloc>(),
-                  feedDecoratorService: feedDecoratorService,
-                )..add(
-                    EntityDetailsLoadRequested(
-                      entityId: args.entityId,
-                      contentType: args.contentType,
-                      adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+                create: (context) =>
+                    EntityDetailsBloc(
+                      headlinesRepository: context
+                          .read<DataRepository<Headline>>(),
+                      topicRepository: context.read<DataRepository<Topic>>(),
+                      sourceRepository: context.read<DataRepository<Source>>(),
+                      countryRepository: context
+                          .read<DataRepository<Country>>(),
+                      accountBloc: accountBloc,
+                      appBloc: context.read<AppBloc>(),
+                      feedDecoratorService: feedDecoratorService,
+                    )..add(
+                      EntityDetailsLoadRequested(
+                        entityId: args.entityId,
+                        contentType: args.contentType,
+                        adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+                      ),
                     ),
-                  ),
               ),
             ],
             child: EntityDetailsPage(args: args),
@@ -317,21 +320,24 @@ GoRouter createRouter({
             providers: [
               BlocProvider.value(value: accountBloc),
               BlocProvider(
-                create: (context) => EntityDetailsBloc(
-                  headlinesRepository: context.read<DataRepository<Headline>>(),
-                  topicRepository: context.read<DataRepository<Topic>>(),
-                  sourceRepository: context.read<DataRepository<Source>>(),
-                  countryRepository: context.read<DataRepository<Country>>(),
-                  accountBloc: accountBloc,
-                  appBloc: context.read<AppBloc>(),
-                  feedDecoratorService: feedDecoratorService,
-                )..add(
-                    EntityDetailsLoadRequested(
-                      entityId: args.entityId,
-                      contentType: args.contentType,
-                      adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+                create: (context) =>
+                    EntityDetailsBloc(
+                      headlinesRepository: context
+                          .read<DataRepository<Headline>>(),
+                      topicRepository: context.read<DataRepository<Topic>>(),
+                      sourceRepository: context.read<DataRepository<Source>>(),
+                      countryRepository: context
+                          .read<DataRepository<Country>>(),
+                      accountBloc: accountBloc,
+                      appBloc: context.read<AppBloc>(),
+                      feedDecoratorService: feedDecoratorService,
+                    )..add(
+                      EntityDetailsLoadRequested(
+                        entityId: args.entityId,
+                        contentType: args.contentType,
+                        adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+                      ),
                     ),
-                  ),
               ),
             ],
             child: EntityDetailsPage(args: args),
@@ -354,21 +360,24 @@ GoRouter createRouter({
             providers: [
               BlocProvider.value(value: accountBloc),
               BlocProvider(
-                create: (context) => EntityDetailsBloc(
-                  headlinesRepository: context.read<DataRepository<Headline>>(),
-                  topicRepository: context.read<DataRepository<Topic>>(),
-                  sourceRepository: context.read<DataRepository<Source>>(),
-                  countryRepository: context.read<DataRepository<Country>>(),
-                  accountBloc: accountBloc,
-                  appBloc: context.read<AppBloc>(),
-                  feedDecoratorService: feedDecoratorService,
-                )..add(
-                    EntityDetailsLoadRequested(
-                      entityId: args.entityId,
-                      contentType: args.contentType,
-                      adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+                create: (context) =>
+                    EntityDetailsBloc(
+                      headlinesRepository: context
+                          .read<DataRepository<Headline>>(),
+                      topicRepository: context.read<DataRepository<Topic>>(),
+                      sourceRepository: context.read<DataRepository<Source>>(),
+                      countryRepository: context
+                          .read<DataRepository<Country>>(),
+                      accountBloc: accountBloc,
+                      appBloc: context.read<AppBloc>(),
+                      feedDecoratorService: feedDecoratorService,
+                    )..add(
+                      EntityDetailsLoadRequested(
+                        entityId: args.entityId,
+                        contentType: args.contentType,
+                        adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+                      ),
                     ),
-                  ),
               ),
             ],
             child: EntityDetailsPage(args: args),

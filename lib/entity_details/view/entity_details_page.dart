@@ -1,10 +1,8 @@
 // ignore_for_file: no_default_cases
 
 import 'package:core/core.dart';
-import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
@@ -14,7 +12,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/b
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/shared.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/feed_core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -75,10 +72,10 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
   void _onScroll() {
     if (_isBottom) {
       context.read<EntityDetailsBloc>().add(
-            EntityDetailsLoadMoreHeadlinesRequested(
-              adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
-            ),
-          );
+        EntityDetailsLoadMoreHeadlinesRequested(
+          adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+        ),
+      );
     }
   }
 
@@ -138,12 +135,12 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
             return FailureStateWidget(
               exception: state.exception!,
               onRetry: () => context.read<EntityDetailsBloc>().add(
-                    EntityDetailsLoadRequested(
-                      entityId: widget.args.entityId,
-                      contentType: widget.args.contentType,
-                      adThemeStyle: AdThemeStyle.fromTheme(theme),
-                    ),
-                  ),
+                EntityDetailsLoadRequested(
+                  entityId: widget.args.entityId,
+                  contentType: widget.args.contentType,
+                  adThemeStyle: AdThemeStyle.fromTheme(theme),
+                ),
+              ),
             );
           }
 
@@ -169,11 +166,11 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
           final description = state.entity is Topic
               ? (state.entity! as Topic).description
               : state.entity is Source
-                  ? (state.entity! as Source).description
-                  : state.entity is Country
-                      ? (state.entity! as Country)
-                          .name // Using name as description for country
-                      : null;
+              ? (state.entity! as Source).description
+              : state.entity is Country
+              ? (state.entity! as Country)
+                    .name // Using name as description for country
+              : null;
 
           final followButton = IconButton(
             icon: Icon(
@@ -185,16 +182,16 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                 : l10n.followButtonLabel,
             onPressed: () {
               context.read<EntityDetailsBloc>().add(
-                    const EntityDetailsToggleFollowRequested(),
-                  );
+                const EntityDetailsToggleFollowRequested(),
+              );
             },
           );
 
           final entityIconUrl = (state.entity is Topic)
               ? (state.entity! as Topic).iconUrl
               : (state.entity is Country)
-                  ? (state.entity! as Country).flagUrl
-                  : null;
+              ? (state.entity! as Country).flagUrl
+              : null;
 
           final Widget appBarTitleWidget = Row(
             mainAxisSize: MainAxisSize.min,
@@ -301,7 +298,8 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                     horizontal: AppSpacing.paddingMedium,
                   ),
                   sliver: SliverList.separated(
-                    itemCount: state.feedItems.length +
+                    itemCount:
+                        state.feedItems.length +
                         (state.hasMoreHeadlines &&
                                 state.status == EntityDetailsStatus.loadingMore
                             ? 1

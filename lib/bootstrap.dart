@@ -73,6 +73,10 @@ Future<Widget> bootstrap(
     );
   }
 
+  // Fetch the initial user from the authentication repository.
+  // This ensures the AppBloc starts with an accurate authentication status.
+  final initialUser = await authenticationRepository.getCurrentUser();
+
   // Conditional data client instantiation based on environment
   DataClient<Headline> headlinesClient;
   DataClient<Topic> topicsClient;
@@ -289,5 +293,6 @@ Future<Widget> bootstrap(
     environment: environment,
     demoDataMigrationService: demoDataMigrationService,
     adService: adService,
+    initialUser: initialUser,
   );
 }

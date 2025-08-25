@@ -237,7 +237,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: b87e8f8dc8645ab1951c2608c61f7491ecda829f
+      resolved-ref: b19952348566a27277160279d84a66eb3d773306
       url: "https://github.com/flutter-news-app-full-source-code/data-inmemory.git"
     source: git
     version: "0.0.0"

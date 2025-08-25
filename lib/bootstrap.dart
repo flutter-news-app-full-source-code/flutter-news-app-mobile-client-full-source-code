@@ -18,6 +18,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/config/confi
     as app_config;
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/bloc_observer.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/data/clients/country_inmemory_client.dart';
 import 'package:http_client/http_client.dart';
 import 'package:kv_storage_shared_preferences/kv_storage_shared_preferences.dart';
 import 'package:logging/logging.dart';
@@ -105,6 +106,13 @@ Future<Widget> bootstrap(
       getId: (i) => i.id,
       initialData: countriesFixturesData,
       logger: logger,
+    );
+    // Wrap the generic DataInMemory<Country> with CountryInMemoryClient
+    // to add specialized filtering like 'hasActiveSources' and 'hasActiveHeadlines'.
+    countriesClient = CountryInMemoryClient(
+      decoratedClient: countriesClient,
+      allSources: sourcesFixturesData,
+      allHeadlines: headlinesFixturesData,
     );
     sourcesClient = DataInMemory<Source>(
       toJson: (i) => i.toJson(),

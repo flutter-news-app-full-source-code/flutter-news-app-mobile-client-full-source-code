@@ -9,6 +9,7 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
     as local_config;
+import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_initializer_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
 
 part 'app_event.dart';
@@ -22,6 +23,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required DataRepository<User> userRepository,
     required local_config.AppEnvironment environment,
     this.demoDataMigrationService,
+    this.demoDataInitializerService,
     this.initialUser,
   }) : _authenticationRepository = authenticationRepository,
        _userAppSettingsRepository = userAppSettingsRepository,
@@ -87,6 +89,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final DataRepository<User> _userRepository;
   final local_config.AppEnvironment _environment;
   final DemoDataMigrationService? demoDataMigrationService;
+  final DemoDataInitializerService? demoDataInitializerService;
   final User? initialUser;
   late final StreamSubscription<User?> _userSubscription;
 
@@ -116,6 +119,22 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     if (event.user != null) {
       // User is present (authenticated or anonymous)
+      // In demo mode, ensure user-specific data is initialized
+      if (_environment == local_config.AppEnvironment.demo &&
+          demoDataInitializerService != null) {
+        print(
+          '[AppBloc] Demo mode: Initializing user-specific data for '
+          'user ${event.user!.id}.',
+        );
+        await demoDataInitializerService!.initializeUserSpecificData(
+          event.user!,
+        );
+        print(
+          '[AppBloc] Demo mode: User-specific data initialization completed '
+          'for user ${event.user!.id}.',
+        );
+      }
+
       add(const AppSettingsRefreshed());
       add(const AppConfigFetchRequested());
 
@@ -218,40 +237,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           fontFamily: newFontFamily,
           settings: userAppSettings,
           locale: newLocale,
-        ),
-      );
-    } on NotFoundException {
-      // User settings not found (e.g., first time user), use defaults
-      print('User app settings not found, using defaults.');
-      // Emit state with default settings
-      emit(
-        state.copyWith(
-          themeMode: ThemeMode.system,
-          flexScheme: FlexScheme.material,
-          appTextScaleFactor: AppTextScaleFactor.medium,
-          locale: const Locale('en'),
-          settings: UserAppSettings(
-            id: state.user!.id,
-            displaySettings: const DisplaySettings(
-              baseTheme: AppBaseTheme.system,
-              accentTheme: AppAccentTheme.defaultBlue,
-              fontFamily: 'SystemDefault',
-              textScaleFactor: AppTextScaleFactor.medium,
-              fontWeight: AppFontWeight.regular,
-            ),
-            language: languagesFixturesData.firstWhere(
-              (l) => l.code == 'en',
-              orElse: () => throw StateError(
-                'Default language "en" not found in language fixtures.',
-              ),
-            ),
-            feedPreferences: const FeedDisplayPreferences(
-              headlineDensity: HeadlineDensity.standard,
-              headlineImageStyle: HeadlineImageStyle.largeThumbnail,
-              showSourceInHeadlineFeed: true,
-              showPublishDateInHeadlineFeed: true,
-            ),
-          ),
         ),
       );
     } catch (e) {

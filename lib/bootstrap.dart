@@ -107,13 +107,35 @@ Future<Widget> bootstrap(
       initialData: countriesFixturesData,
       logger: logger,
     );
-    // Wrap the generic DataInMemory<Country> with CountryInMemoryClient
-    // to add specialized filtering like 'hasActiveSources' and 'hasActiveHeadlines'.
+    
+    // Wrap the generic DataInMemory<Country> with CountryInMemoryClient.
+    // This decorator adds specialized filtering for 'hasActiveSources' and
+    // 'hasActiveHeadlines' which are specific to the application's needs
+    // in the demo environment.
+    //
+    // Rationale:
+    // 1.  **Demo Environment Specific:** This client-side decorator is only
+    //     applied in the `demo` environment. In this mode, data is served
+    //     from static in-memory fixtures, and this decorator enables complex
+    //     filtering on that local data.
+    // 2.  **API Environments (Development/Production):** For `development`
+    //     and `production` environments, the `countriesClient` is an instance
+    //     of `DataApi<Country>`. In these environments, the backend API
+    //     (which includes services like `CountryQueryService`) is responsible
+    //     for handling all advanced filtering and aggregation logic. Therefore,
+    //     this client-side decorator is not needed.
+    // 3.  **Preserving Genericity:** The core `DataInMemory<T>` client (from
+    //     the `data-inmemory` package) is designed to be generic and reusable
+    //     across various projects. Modifying it directly with application-specific
+    //     logic would violate the Single Responsibility Principle and reduce
+    //     its reusability. The Decorator Pattern allows us to extend its
+    //     functionality for `Country` models without altering the generic base.
     countriesClient = CountryInMemoryClient(
       decoratedClient: countriesClient,
       allSources: sourcesFixturesData,
       allHeadlines: headlinesFixturesData,
     );
+    //
     sourcesClient = DataInMemory<Source>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,

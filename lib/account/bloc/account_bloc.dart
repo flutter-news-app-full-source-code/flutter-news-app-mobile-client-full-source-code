@@ -31,6 +31,19 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       add(AccountUserChanged(user));
     });
 
+    // Listen to changes in UserContentPreferences from the repository.
+    // This ensures the AccountBloc's state is updated whenever preferences
+    // are created, updated, or deleted, resolving any synchronization issue.
+    _userContentPreferencesSubscription = _userContentPreferencesRepository
+        .entityUpdated
+        .where((type) => type == UserContentPreferences)
+        .listen((_) {
+      // If there's a current user, reload their preferences.
+      if (state.user?.id != null) {
+        add(AccountLoadUserPreferences(userId: state.user!.id));
+      }
+    });
+
     // Register event handlers
     on<AccountUserChanged>(_onAccountUserChanged);
     on<AccountLoadUserPreferences>(_onAccountLoadUserPreferences);
@@ -47,6 +60,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   final local_config.AppEnvironment _environment;
   final Logger _logger;
   late StreamSubscription<User?> _userSubscription;
+  late StreamSubscription<Type> _userContentPreferencesSubscription;
 
   Future<void> _onAccountUserChanged(
     AccountUserChanged event,
@@ -81,39 +95,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         ),
       );
     } on NotFoundException {
-      // In demo mode, a short delay is introduced here to mitigate a race
-      // condition during anonymous to authenticated data migration.
-      // This ensures that the DemoDataMigrationService has a chance to
-      // complete its migration of UserContentPreferences before AccountBloc
-      // attempts to create a new default preference for the authenticated user.
-      // This is a temporary stub for the demo environment only and is not
-      // needed in production/development where backend handles migration.
-      if (_environment == local_config.AppEnvironment.demo) {
-        // ignore: inference_failure_on_instance_creation
-        await Future.delayed(const Duration(milliseconds: 50));
-        // After delay, re-attempt to read the preferences. This is crucial
-        // because migration might have completed during the delay.
-        try {
-          final migratedPreferences = await _userContentPreferencesRepository
-              .read(id: event.userId, userId: event.userId);
-          emit(
-            state.copyWith(
-              status: AccountStatus.success,
-              preferences: _sortPreferences(migratedPreferences),
-              clearError: true,
-            ),
-          );
-          return; // Exit if successfully read after migration
-        } on NotFoundException {
-          // Still not found after delay, proceed to create default.
-          _logger.info(
-            '[AccountBloc] UserContentPreferences still not found after '
-            'migration delay. Creating default preferences.',
-          );
-        }
-      }
-      // If preferences not found (either initially or after re-attempt), create
-      // a default one for the user.
+      // If preferences not found, create a default one for the user.
       final defaultPreferences = UserContentPreferences(
         id: event.userId,
         followedCountries: const [],
@@ -509,6 +491,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   @override
   Future<void> close() {
     _userSubscription.cancel();
+    _userContentPreferencesSubscription.cancel();
     return super.close();
   }
 }

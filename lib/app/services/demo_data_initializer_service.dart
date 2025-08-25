@@ -44,14 +44,11 @@ class DemoDataInitializerService {
       'user ID: ${user.id}',
     );
 
-    // Ensure UserAppSettings exist
-    await _ensureUserAppSettingsExist(user.id);
-
-    // Ensure UserContentPreferences exist
-    await _ensureUserContentPreferencesExist(user.id);
-
-    // Ensure the User object itself is up-to-date in the user client
-    await _ensureUserClientUserExists(user);
+    await Future.wait([
+      _ensureUserAppSettingsExist(user.id),
+      _ensureUserContentPreferencesExist(user.id),
+      _ensureUserClientUserExists(user),
+    ]);
 
     print(
       '[DemoDataInitializerService] User-specific data initialization '

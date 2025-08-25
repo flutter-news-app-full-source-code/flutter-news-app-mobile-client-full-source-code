@@ -21,17 +21,17 @@ class CountryInMemoryClient implements DataClient<Country> {
     required DataClient<Country> decoratedClient,
     required List<Source> allSources,
     required List<Headline> allHeadlines,
-  })  : _decoratedClient = decoratedClient,
-        // Pre-calculate sets of country IDs with active sources/headlines
-        // once in the constructor for performance optimization.
-        _countryIdsWithActiveSources = allSources
-            .where((s) => s.status == ContentStatus.active)
-            .map((s) => s.headquarters.id)
-            .toSet(),
-        _countryIdsWithActiveHeadlines = allHeadlines
-            .where((h) => h.status == ContentStatus.active)
-            .map((h) => h.eventCountry.id)
-            .toSet();
+  }) : _decoratedClient = decoratedClient,
+       // Pre-calculate sets of country IDs with active sources/headlines
+       // once in the constructor for performance optimization.
+       _countryIdsWithActiveSources = allSources
+           .where((s) => s.status == ContentStatus.active)
+           .map((s) => s.headquarters.id)
+           .toSet(),
+       _countryIdsWithActiveHeadlines = allHeadlines
+           .where((h) => h.status == ContentStatus.active)
+           .map((h) => h.eventCountry.id)
+           .toSet();
 
   final DataClient<Country> _decoratedClient;
   final Set<String> _countryIdsWithActiveSources;
@@ -92,7 +92,9 @@ class CountryInMemoryClient implements DataClient<Country> {
     // Create a base filter by copying the original and removing custom keys.
     // This prevents the decorated client from attempting to filter on properties
     // that do not exist on the Country model.
-    final baseFilter = filter != null ? Map<String, dynamic>.from(filter) : null;
+    final baseFilter = filter != null
+        ? Map<String, dynamic>.from(filter)
+        : null;
     baseFilter?.remove(hasActiveSourcesFilter);
     baseFilter?.remove(hasActiveHeadlinesFilter);
 

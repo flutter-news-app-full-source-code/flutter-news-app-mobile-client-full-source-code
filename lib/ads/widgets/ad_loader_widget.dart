@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_cache_service.dart';
@@ -55,10 +57,63 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
   final Logger _logger = Logger('AdLoaderWidget');
   final AdCacheService _adCacheService = AdCacheService();
 
+  // Completer to manage the lifecycle of the ad loading future.
+  // This helps in cancelling pending operations if the widget is disposed
+  // or updated, preventing `setState` calls on an unmounted widget
+  // and avoiding `StateError` from completing a completer multiple times.
+  Completer<void>? _loadAdCompleter;
+
   @override
   void initState() {
     super.initState();
     _loadAd();
+  }
+
+  @override
+  void didUpdateWidget(covariant AdLoaderWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If the adPlaceholder ID changes, it means this widget is being reused
+    // for a different ad slot. We need to cancel any ongoing load for the old
+    // ad and initiate a new load for the new ad.
+    if (widget.adPlaceholder.id != oldWidget.adPlaceholder.id) {
+      _logger.info(
+        'AdLoaderWidget updated for new placeholder ID: '
+        '${widget.adPlaceholder.id}. Re-loading ad.',
+      );
+      // Cancel the previous loading operation if it's still active and not yet
+      // completed. This prevents a race condition if a new load is triggered
+      // while an old one is still in progress.
+      if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
+        _loadAdCompleter?.completeError(
+          StateError('Ad loading cancelled: Widget updated with new ID.'),
+        );
+      }
+      _loadAdCompleter = null; // Clear the old completer for the new load
+
+      // Immediately set the widget to a loading state to prevent UI flicker.
+      // This ensures a smooth transition from the old ad (or no ad) to the
+      // loading indicator for the new ad.
+      setState(() {
+        _loadedAd = null;
+        _isLoading = true;
+        _hasError = false;
+      });
+      _loadAd(); // Start loading the new ad
+    }
+  }
+
+  @override
+  void dispose() {
+    // Cancel any pending ad loading operation when the widget is disposed.
+    // This prevents `setState()` calls on a disposed widget.
+    // Ensure the completer is not already completed before attempting to complete it.
+    if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
+      _loadAdCompleter?.completeError(
+        StateError('Ad loading cancelled: Widget disposed.'),
+      );
+    }
+    _loadAdCompleter = null;
+    super.dispose();
   }
 
   /// Loads the native ad for this slot.
@@ -67,11 +122,14 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
   /// If found, it uses the cached ad. Otherwise, it requests a new ad
   /// from the [AdService] and stores it in the cache upon success.
   Future<void> _loadAd() async {
-    setState(() {
-      _isLoading = true;
-      _hasError = false;
-    });
+    // Initialize a new completer for this loading operation.
+    _loadAdCompleter = Completer<void>();
 
+    // Ensure the widget is still mounted before calling setState.
+    // This prevents the "setState() called after dispose()" error
+    // if the widget is removed from the tree while the async operation
+    // is still in progress.
+    if (!mounted) return;
     // Attempt to retrieve the ad from the cache first.
     final cachedAd = _adCacheService.getAd(widget.adPlaceholder.id);
 
@@ -79,10 +137,17 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
       _logger.info(
         'Using cached ad for placeholder ID: ${widget.adPlaceholder.id}',
       );
+      // Ensure the widget is still mounted before calling setState.
+      if (!mounted) return;
       setState(() {
         _loadedAd = cachedAd;
         _isLoading = false;
       });
+      // Complete the completer only if it hasn't been completed already
+      // (e.g., by dispose() or didUpdateWidget() cancelling an old load).
+      if (_loadAdCompleter?.isCompleted == false) {
+        _loadAdCompleter!.complete(); // Complete the completer on success
+      }
       return;
     }
 
@@ -105,18 +170,32 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
         );
         // Store the newly loaded ad in the cache.
         _adCacheService.setAd(widget.adPlaceholder.id, adFeedItem.nativeAd);
+        // Ensure the widget is still mounted before calling setState.
+        if (!mounted) return;
         setState(() {
           _loadedAd = adFeedItem.nativeAd;
           _isLoading = false;
         });
+        // Complete the completer only if it hasn't been completed already.
+        if (_loadAdCompleter?.isCompleted == false) {
+          _loadAdCompleter!.complete(); // Complete the completer on success
+        }
       } else {
         _logger.warning(
           'Failed to load ad for placeholder ID: ${widget.adPlaceholder.id}. No ad returned.',
         );
+        // Ensure the widget is still mounted before calling setState.
+        if (!mounted) return;
         setState(() {
           _hasError = true;
           _isLoading = false;
         });
+        // Complete the completer with an error only if it hasn't been completed already.
+        if (_loadAdCompleter?.isCompleted == false) {
+          _loadAdCompleter?.completeError(
+            StateError('Failed to load ad: No ad returned.'),
+          ); // Complete with error
+        }
       }
     } catch (e, s) {
       _logger.severe(
@@ -124,10 +203,16 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
         e,
         s,
       );
+      // Ensure the widget is still mounted before calling setState.
+      if (!mounted) return;
       setState(() {
         _hasError = true;
         _isLoading = false;
       });
+      // Complete the completer with an error only if it hasn't been completed already.
+      if (_loadAdCompleter?.isCompleted == false) {
+        _loadAdCompleter?.completeError(e); // Complete with error
+      }
     }
   }
 

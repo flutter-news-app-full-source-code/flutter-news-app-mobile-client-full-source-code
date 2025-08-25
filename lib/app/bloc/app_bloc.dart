@@ -58,8 +58,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
            // Initialize status and user based on initialUser
            status: initialUser != null
                ? (initialUser.appRole == AppUserRole.standardUser
-                   ? AppStatus.authenticated
-                   : AppStatus.anonymous)
+                     ? AppStatus.authenticated
+                     : AppStatus.anonymous)
                : AppStatus.unauthenticated,
            user: initialUser,
          ),

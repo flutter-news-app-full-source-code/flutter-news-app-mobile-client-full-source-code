@@ -107,7 +107,7 @@ Future<Widget> bootstrap(
       initialData: countriesFixturesData,
       logger: logger,
     );
-    
+
     // Wrap the generic DataInMemory<Country> with CountryInMemoryClient.
     // This decorator adds specialized filtering for 'hasActiveSources' and
     // 'hasActiveHeadlines' which are specific to the application's needs

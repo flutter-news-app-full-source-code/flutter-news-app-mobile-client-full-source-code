@@ -68,6 +68,27 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
   }
 
   @override
+  void didUpdateWidget(covariant AdLoaderWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If the adPlaceholder ID changes, it means this widget is being reused
+    // for a different ad slot. We need to cancel any ongoing load for the old
+    // ad and initiate a new load for the new ad.
+    if (widget.adPlaceholder.id != oldWidget.adPlaceholder.id) {
+      _logger.info(
+        'AdLoaderWidget updated for new placeholder ID: '
+        '${widget.adPlaceholder.id}. Re-loading ad.',
+      );
+      // Cancel the previous loading operation if it's still active.
+      _loadAdCompleter?.completeError(
+        StateError('Ad loading cancelled: Widget updated with new ID.'),
+      );
+      _loadAdCompleter = null; // Clear the old completer
+      _loadedAd = null; // Clear the old ad
+      _loadAd(); // Start loading the new ad
+    }
+  }
+
+  @override
   void dispose() {
     // Cancel any pending ad loading operation when the widget is disposed.
     // This prevents `setState()` calls on a disposed widget.

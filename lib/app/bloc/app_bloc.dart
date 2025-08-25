@@ -32,6 +32,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _environment = environment,
        super(
          AppState(
+           // Initialize with default settings and preferences.
+           // This is crucial for immediate UI rendering and provides a safe
+           // fallback before user-specific settings are loaded.
+           // The `AppSettingsRefreshed` event will later replace these
+           // with actual user data.
            settings: UserAppSettings(
              id: 'default',
              displaySettings: const DisplaySettings(

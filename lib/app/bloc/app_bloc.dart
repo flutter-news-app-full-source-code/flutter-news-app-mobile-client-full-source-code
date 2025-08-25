@@ -127,17 +127,23 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // In demo mode, ensure user-specific data is initialized
       if (_environment == local_config.AppEnvironment.demo &&
           demoDataInitializerService != null) {
-        print(
-          '[AppBloc] Demo mode: Initializing user-specific data for '
-          'user ${event.user!.id}.',
-        );
-        await demoDataInitializerService!.initializeUserSpecificData(
-          event.user!,
-        );
-        print(
-          '[AppBloc] Demo mode: User-specific data initialization completed '
-          'for user ${event.user!.id}.',
-        );
+        try {
+          print(
+            '[AppBloc] Demo mode: Initializing user-specific data for '
+            'user ${event.user!.id}.',
+          );
+          await demoDataInitializerService!.initializeUserSpecificData(
+            event.user!,
+          );
+          print(
+            '[AppBloc] Demo mode: User-specific data initialization completed '
+            'for user ${event.user!.id}.',
+          );
+        } catch (e, s) {
+          // It's important to handle failures here to avoid crashing the app.
+          // Consider emitting a specific failure state if this is critical.
+          print('[AppBloc] ERROR: Failed to initialize demo user data: $e\n$s');
+        }
       }
 
       add(const AppSettingsRefreshed());

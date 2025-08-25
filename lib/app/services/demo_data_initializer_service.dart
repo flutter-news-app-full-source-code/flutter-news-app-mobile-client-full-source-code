@@ -1,6 +1,6 @@
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
-import 'package:flutter/material.dart'; // Required for ThemeMode, AppBaseTheme, etc.
+// Required for ThemeMode, AppBaseTheme, etc.
 
 /// {@template demo_data_initializer_service}
 /// A service responsible for ensuring that essential user-specific data
@@ -17,15 +17,15 @@ class DemoDataInitializerService {
   const DemoDataInitializerService({
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<UserContentPreferences>
-        userContentPreferencesRepository,
+    userContentPreferencesRepository,
     required DataRepository<User> userRepository,
-  })  : _userAppSettingsRepository = userAppSettingsRepository,
-        _userContentPreferencesRepository = userContentPreferencesRepository,
-        _userRepository = userRepository;
+  }) : _userAppSettingsRepository = userAppSettingsRepository,
+       _userContentPreferencesRepository = userContentPreferencesRepository,
+       _userRepository = userRepository;
 
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
   final DataRepository<UserContentPreferences>
-      _userContentPreferencesRepository;
+  _userContentPreferencesRepository;
   final DataRepository<User> _userRepository;
 
   /// Initializes essential user-specific data in the in-memory clients
@@ -94,7 +94,10 @@ class DemoDataInitializerService {
           showPublishDateInHeadlineFeed: true,
         ),
       );
-      await _userAppSettingsRepository.create(item: defaultSettings, userId: userId);
+      await _userAppSettingsRepository.create(
+        item: defaultSettings,
+        userId: userId,
+      );
       print(
         '[DemoDataInitializerService] Default UserAppSettings created for '
         'user ID: $userId.',

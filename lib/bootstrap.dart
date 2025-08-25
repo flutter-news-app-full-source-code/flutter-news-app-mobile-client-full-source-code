@@ -304,21 +304,21 @@ Future<Widget> bootstrap(
   // Conditionally instantiate DemoDataMigrationService
   final demoDataMigrationService =
       appConfig.environment == app_config.AppEnvironment.demo
-          ? DemoDataMigrationService(
-              userAppSettingsRepository: userAppSettingsRepository,
-              userContentPreferencesRepository: userContentPreferencesRepository,
-            )
-          : null;
+      ? DemoDataMigrationService(
+          userAppSettingsRepository: userAppSettingsRepository,
+          userContentPreferencesRepository: userContentPreferencesRepository,
+        )
+      : null;
 
   // Conditionally instantiate DemoDataInitializerService
   final demoDataInitializerService =
       appConfig.environment == app_config.AppEnvironment.demo
-          ? DemoDataInitializerService(
-              userAppSettingsRepository: userAppSettingsRepository,
-              userContentPreferencesRepository: userContentPreferencesRepository,
-              userRepository: userRepository,
-            )
-          : null;
+      ? DemoDataInitializerService(
+          userAppSettingsRepository: userAppSettingsRepository,
+          userContentPreferencesRepository: userContentPreferencesRepository,
+          userRepository: userRepository,
+        )
+      : null;
 
   return App(
     authenticationRepository: authenticationRepository,

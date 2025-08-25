@@ -21,13 +21,19 @@ class CountryInMemoryClient implements DataClient<Country> {
     required DataClient<Country> decoratedClient,
     required List<Source> allSources,
     required List<Headline> allHeadlines,
-  })  : _decoratedClient = decoratedClient,
-        _allSources = allSources,
-        _allHeadlines = allHeadlines;
+  }) : _decoratedClient = decoratedClient,
+       _allSources = allSources,
+       _allHeadlines = allHeadlines;
 
   final DataClient<Country> _decoratedClient;
   final List<Source> _allSources;
   final List<Headline> _allHeadlines;
+
+  /// Filter key for checking if a country has active sources.
+  static const String hasActiveSourcesFilter = 'hasActiveSources';
+
+  /// Filter key for checking if a country has active headlines.
+  static const String hasActiveHeadlinesFilter = 'hasActiveHeadlines';
 
   @override
   Future<SuccessApiResponse<List<Map<String, dynamic>>>> aggregate({
@@ -73,20 +79,23 @@ class CountryInMemoryClient implements DataClient<Country> {
     PaginationOptions? pagination,
     List<SortOption>? sort,
   }) async {
-    // First, get the initial list of countries from the decorated client.
-    // This handles generic filters, sorting, and pagination.
-    final response = await _decoratedClient.readAll(
+    // Fetch ALL items from the decorated client first,
+    // then apply custom filters, and finally apply pagination.
+    // This ensures correct pagination behavior with custom filters.
+    final allItemsResponse = await _decoratedClient.readAll(
       userId: userId,
       filter: filter,
-      pagination: pagination,
+      // Pass null for pagination to get all items, as custom filters
+      // need to operate on the complete dataset before pagination.
+      pagination: null,
       sort: sort,
     );
 
-    var filteredCountries = response.data.items;
+    Iterable<Country> filteredCountriesIterable = allItemsResponse.data.items;
 
     // Apply custom filters if present
-    final hasActiveSources = filter?['hasActiveSources'] == true;
-    final hasActiveHeadlines = filter?['hasActiveHeadlines'] == true;
+    final hasActiveSources = filter?[hasActiveSourcesFilter] == true;
+    final hasActiveHeadlines = filter?[hasActiveHeadlinesFilter] == true;
 
     if (hasActiveSources) {
       final countriesWithActiveSources = _allSources
@@ -94,11 +103,9 @@ class CountryInMemoryClient implements DataClient<Country> {
           .map((source) => source.headquarters.id)
           .toSet();
 
-      filteredCountries = filteredCountries
-          .where(
-            (country) => countriesWithActiveSources.contains(country.id),
-          )
-          .toList();
+      filteredCountriesIterable = filteredCountriesIterable.where(
+        (country) => countriesWithActiveSources.contains(country.id),
+      );
     }
 
     if (hasActiveHeadlines) {
@@ -107,19 +114,33 @@ class CountryInMemoryClient implements DataClient<Country> {
           .map((headline) => headline.eventCountry.id)
           .toSet();
 
-      filteredCountries = filteredCountries
-          .where(
-            (country) => countriesWithActiveHeadlines.contains(country.id),
-          )
-          .toList();
+      filteredCountriesIterable = filteredCountriesIterable.where(
+        (country) => countriesWithActiveHeadlines.contains(country.id),
+      );
     }
 
-    // Return a new PaginatedResponse with the potentially further filtered items.
-    // The cursor and hasMore logic from the original response are preserved,
-    // but the items list is updated.
+    // Manually apply pagination to the filtered list.
+    final offset = pagination?.cursor != null
+        ? int.tryParse(pagination!.cursor!) ?? 0
+        : 0;
+    final limit = pagination?.limit ?? filteredCountriesIterable.length;
+
+    final paginatedItems = filteredCountriesIterable
+        .skip(offset)
+        .take(limit)
+        .toList();
+
+    final hasMore = (offset + limit) < filteredCountriesIterable.length;
+    final nextCursor = hasMore ? (offset + limit).toString() : null;
+
+    // Return a new PaginatedResponse with the correctly filtered and paginated items.
     return SuccessApiResponse(
-      data: response.data.copyWith(items: filteredCountries),
-      metadata: response.metadata,
+      data: PaginatedResponse(
+        items: paginatedItems,
+        cursor: nextCursor,
+        hasMore: hasMore,
+      ),
+      metadata: allItemsResponse.metadata,
     );
   }
 

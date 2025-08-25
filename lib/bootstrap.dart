@@ -16,6 +16,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/no_op_ad_pro
 import 'package:flutter_news_app_mobile_client_full_source_code/app/app.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
     as app_config;
+import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_initializer_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/bloc_observer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/data/clients/country_inmemory_client.dart';
@@ -303,11 +304,21 @@ Future<Widget> bootstrap(
   // Conditionally instantiate DemoDataMigrationService
   final demoDataMigrationService =
       appConfig.environment == app_config.AppEnvironment.demo
-      ? DemoDataMigrationService(
-          userAppSettingsRepository: userAppSettingsRepository,
-          userContentPreferencesRepository: userContentPreferencesRepository,
-        )
-      : null;
+          ? DemoDataMigrationService(
+              userAppSettingsRepository: userAppSettingsRepository,
+              userContentPreferencesRepository: userContentPreferencesRepository,
+            )
+          : null;
+
+  // Conditionally instantiate DemoDataInitializerService
+  final demoDataInitializerService =
+      appConfig.environment == app_config.AppEnvironment.demo
+          ? DemoDataInitializerService(
+              userAppSettingsRepository: userAppSettingsRepository,
+              userContentPreferencesRepository: userContentPreferencesRepository,
+              userRepository: userRepository,
+            )
+          : null;
 
   return App(
     authenticationRepository: authenticationRepository,
@@ -322,6 +333,7 @@ Future<Widget> bootstrap(
     kvStorageService: kvStorage,
     environment: environment,
     demoDataMigrationService: demoDataMigrationService,
+    demoDataInitializerService: demoDataInitializerService,
     adService: adService,
     initialUser: initialUser,
   );

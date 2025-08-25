@@ -78,10 +78,12 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
         'AdLoaderWidget updated for new placeholder ID: '
         '${widget.adPlaceholder.id}. Re-loading ad.',
       );
-      // Cancel the previous loading operation if it's still active.
-      _loadAdCompleter?.completeError(
-        StateError('Ad loading cancelled: Widget updated with new ID.'),
-      );
+      // Cancel the previous loading operation if it's still active and not yet completed.
+      if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
+        _loadAdCompleter?.completeError(
+          StateError('Ad loading cancelled: Widget updated with new ID.'),
+        );
+      }
       _loadAdCompleter = null; // Clear the old completer
       _loadedAd = null; // Clear the old ad
       _loadAd(); // Start loading the new ad
@@ -92,9 +94,12 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
   void dispose() {
     // Cancel any pending ad loading operation when the widget is disposed.
     // This prevents `setState()` calls on a disposed widget.
-    _loadAdCompleter?.completeError(
-      StateError('Ad loading cancelled: Widget disposed.'),
-    );
+    // Ensure the completer is not already completed before attempting to complete it.
+    if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
+      _loadAdCompleter?.completeError(
+        StateError('Ad loading cancelled: Widget disposed.'),
+      );
+    }
     _loadAdCompleter = null;
     super.dispose();
   }

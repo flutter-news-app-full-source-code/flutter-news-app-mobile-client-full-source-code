@@ -8,6 +8,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.d
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_status_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_initializer_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
@@ -33,6 +34,7 @@ class App extends StatelessWidget {
     required AppEnvironment environment,
     required AdService adService,
     this.demoDataMigrationService,
+    this.demoDataInitializerService,
     this.initialUser,
     super.key,
   }) : _authenticationRepository = authenticationRepository,
@@ -62,6 +64,7 @@ class App extends StatelessWidget {
   final AppEnvironment _environment;
   final AdService _adService;
   final DemoDataMigrationService? demoDataMigrationService;
+  final DemoDataInitializerService? demoDataInitializerService;
   final User? initialUser;
 
   @override
@@ -91,6 +94,7 @@ class App extends StatelessWidget {
               userRepository: context.read<DataRepository<User>>(),
               environment: _environment,
               demoDataMigrationService: demoDataMigrationService,
+              demoDataInitializerService: demoDataInitializerService,
               initialUser: initialUser,
             ),
           ),

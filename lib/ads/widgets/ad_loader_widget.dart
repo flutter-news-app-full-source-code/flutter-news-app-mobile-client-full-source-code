@@ -67,11 +67,15 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
   /// If found, it uses the cached ad. Otherwise, it requests a new ad
   /// from the [AdService] and stores it in the cache upon success.
   Future<void> _loadAd() async {
+    // Ensure the widget is still mounted before calling setState.
+    // This prevents the "setState() called after dispose()" error
+    // if the widget is removed from the tree while the async operation
+    // is still in progress.
+    if (!mounted) return;
     setState(() {
       _isLoading = true;
       _hasError = false;
     });
-
     // Attempt to retrieve the ad from the cache first.
     final cachedAd = _adCacheService.getAd(widget.adPlaceholder.id);
 
@@ -79,6 +83,8 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
       _logger.info(
         'Using cached ad for placeholder ID: ${widget.adPlaceholder.id}',
       );
+      // Ensure the widget is still mounted before calling setState.
+      if (!mounted) return;
       setState(() {
         _loadedAd = cachedAd;
         _isLoading = false;
@@ -105,6 +111,8 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
         );
         // Store the newly loaded ad in the cache.
         _adCacheService.setAd(widget.adPlaceholder.id, adFeedItem.nativeAd);
+        // Ensure the widget is still mounted before calling setState.
+        if (!mounted) return;
         setState(() {
           _loadedAd = adFeedItem.nativeAd;
           _isLoading = false;
@@ -113,6 +121,8 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
         _logger.warning(
           'Failed to load ad for placeholder ID: ${widget.adPlaceholder.id}. No ad returned.',
         );
+        // Ensure the widget is still mounted before calling setState.
+        if (!mounted) return;
         setState(() {
           _hasError = true;
           _isLoading = false;
@@ -124,6 +134,8 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
         e,
         s,
       );
+      // Ensure the widget is still mounted before calling setState.
+      if (!mounted) return;
       setState(() {
         _hasError = true;
         _isLoading = false;

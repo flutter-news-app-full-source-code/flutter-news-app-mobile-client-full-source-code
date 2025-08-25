@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_cache_service.dart';
@@ -55,10 +57,25 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
   final Logger _logger = Logger('AdLoaderWidget');
   final AdCacheService _adCacheService = AdCacheService();
 
+  // Completer to manage the lifecycle of the ad loading future.
+  // This helps in cancelling pending operations if the widget is disposed.
+  Completer<void>? _loadAdCompleter;
+
   @override
   void initState() {
     super.initState();
     _loadAd();
+  }
+
+  @override
+  void dispose() {
+    // Cancel any pending ad loading operation when the widget is disposed.
+    // This prevents `setState()` calls on a disposed widget.
+    _loadAdCompleter?.completeError(
+      StateError('Ad loading cancelled: Widget disposed.'),
+    );
+    _loadAdCompleter = null;
+    super.dispose();
   }
 
   /// Loads the native ad for this slot.
@@ -67,6 +84,9 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
   /// If found, it uses the cached ad. Otherwise, it requests a new ad
   /// from the [AdService] and stores it in the cache upon success.
   Future<void> _loadAd() async {
+    // Initialize a new completer for this loading operation.
+    _loadAdCompleter = Completer<void>();
+
     // Ensure the widget is still mounted before calling setState.
     // This prevents the "setState() called after dispose()" error
     // if the widget is removed from the tree while the async operation
@@ -89,6 +109,7 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
         _loadedAd = cachedAd;
         _isLoading = false;
       });
+      _loadAdCompleter?.complete(); // Complete the completer on success
       return;
     }
 
@@ -117,6 +138,7 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
           _loadedAd = adFeedItem.nativeAd;
           _isLoading = false;
         });
+        _loadAdCompleter?.complete(); // Complete the completer on success
       } else {
         _logger.warning(
           'Failed to load ad for placeholder ID: ${widget.adPlaceholder.id}. No ad returned.',
@@ -127,6 +149,9 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
           _hasError = true;
           _isLoading = false;
         });
+        _loadAdCompleter?.completeError(
+          StateError('Failed to load ad: No ad returned.'),
+        ); // Complete with error
       }
     } catch (e, s) {
       _logger.severe(
@@ -140,6 +165,7 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
         _hasError = true;
         _isLoading = false;
       });
+      _loadAdCompleter?.completeError(e); // Complete with error
     }
   }
 

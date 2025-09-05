@@ -1,20 +1,26 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart'; // Import BannerAd
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart'; // Import InlineAd
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'; // Import NativeAd
 import 'package:logging/logging.dart';
 import 'package:core/core.dart'; // Import core for AdPlatformType
+import 'package:google_mobile_ads/google_mobile_ads.dart' as admob; // Import AdMob for disposal
 
 /// {@template ad_cache_service}
-/// A singleton service for caching loaded native ad objects.
+/// A singleton service for caching loaded inline ad objects (native and banner).
 ///
-/// This service helps to prevent unnecessary re-loading of native ads
+/// This service helps to prevent unnecessary re-loading of inline ads
 /// when they scroll out of view and then back into view in a scrollable list.
-/// It stores [NativeAd] objects by a unique ID (typically the [AdPlaceholder.id])
+/// It stores [InlineAd] objects by a unique ID (typically the [AdPlaceholder.id])
 /// and allows for retrieval and clearing of cached ads.
 ///
-/// Native ad objects (like `google_mobile_ads.NativeAd`) are stateful and
-/// resource-intensive. Caching them allows for smoother scrolling and
-/// reduces network requests, while still ensuring proper disposal when
+/// Inline ad objects (like `google_mobile_ads.NativeAd` and `google_mobile_ads.BannerAd`)
+/// are stateful and resource-intensive. Caching them allows for smoother scrolling
+/// and reduces network requests, while still ensuring proper disposal when
 /// the cache is cleared (e.g., on a full feed refresh).
+///
+/// Interstitial ads are not cached by this service as their lifecycle is
+/// managed differently (typically shown once on navigation and then disposed).
 /// {@endtemplate}
 class AdCacheService {
   /// Factory constructor to provide the singleton instance.
@@ -28,55 +34,57 @@ class AdCacheService {
 
   final Logger _logger;
 
-  /// A map to store loaded native ad objects, keyed by their unique ID.
+  /// A map to store loaded inline ad objects, keyed by their unique ID.
   ///
   /// The value is nullable to allow for explicit removal of an ad from the cache.
-  final Map<String, NativeAd?> _cache = {};
+  final Map<String, InlineAd?> _cache = {};
 
-  /// Retrieves a [NativeAd] from the cache using its [id].
+  /// Retrieves an [InlineAd] from the cache using its [id].
   ///
-  /// Returns the cached [NativeAd] if found, otherwise `null`.
-  NativeAd? getAd(String id) {
+  /// Returns the cached [InlineAd] if found, otherwise `null`.
+  InlineAd? getAd(String id) {
     final ad = _cache[id];
     if (ad != null) {
-      _logger.info('Retrieved ad with ID "$id" from cache.');
+      _logger.info('Retrieved inline ad with ID "$id" from cache.');
     } else {
-      _logger.info('Ad with ID "$id" not found in cache.');
+      _logger.info('Inline ad with ID "$id" not found in cache.');
     }
     return ad;
   }
 
-  /// Adds or updates a [NativeAd] in the cache.
+  /// Adds or updates an [InlineAd] in the cache.
   ///
   /// If [ad] is `null`, it effectively removes the entry for [id].
-  void setAd(String id, NativeAd? ad) {
+  void setAd(String id, InlineAd? ad) {
     if (ad != null) {
       _cache[id] = ad;
-      _logger.info('Cached ad with ID "$id".');
+      _logger.info('Cached inline ad with ID "$id".');
     } else {
       _cache.remove(id);
-      _logger.info('Removed ad with ID "$id" from cache.');
+      _logger.info('Removed inline ad with ID "$id" from cache.');
     }
   }
 
-  /// Clears all cached native ad objects and disposes their native resources.
+  /// Clears all cached inline ad objects and disposes their native resources.
   ///
   /// This method should be called when the feed is fully refreshed or
   /// when the application is closing to ensure all native ad resources
   /// are released.
   void clearAllAds() {
-    _logger.info('Clearing all cached ads and disposing native resources.');
+    _logger.info('Clearing all cached inline ads and disposing native resources.');
     for (final ad in _cache.values) {
-      // Only dispose if the ad is an AdMob native ad.
-      // Placeholder ads do not have native resources to dispose.
       if (ad?.provider == AdPlatformType.admob) {
-        // Cast to the specific AdMob NativeAd type to call dispose.
+        // Dispose AdMob native and banner ad objects.
         // This is safe because we check the provider type.
-        (ad!.adObject as dynamic).dispose();
+        if (ad is NativeAd && ad.adObject is admob.NativeAd) {
+          (ad.adObject as admob.NativeAd).dispose();
+        } else if (ad is BannerAd && ad.adObject is admob.BannerAd) {
+          (ad.adObject as admob.BannerAd).dispose();
+        }
       }
     }
     _cache.clear();
-    _logger.info('All cached ads cleared.');
+    _logger.info('All cached inline ads cleared.');
   }
 
   /// For debugging: prints the current state of the cache.
@@ -88,7 +96,7 @@ class AdCacheService {
     } else {
       _cache.forEach((id, ad) {
         _logger.info(
-          '  ID: $id, Provider: ${ad?.provider}, Template: ${ad?.templateType}',
+          '  ID: $id, Provider: ${ad?.provider}, Type: ${ad.runtimeType}',
         );
       });
     }

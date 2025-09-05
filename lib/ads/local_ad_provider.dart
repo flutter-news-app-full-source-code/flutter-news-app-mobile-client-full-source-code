@@ -2,6 +2,7 @@ import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'
     as app_native_ad;
 import 'package:logging/logging.dart';
@@ -12,8 +13,8 @@ import 'package:uuid/uuid.dart';
 ///
 /// This provider uses a [DataRepository<LocalAd>] to retrieve [LocalAd] objects
 /// from a backend or local data source. It adapts these [LocalAd] objects
-/// into our generic [app_native_ad.NativeAd] model for consistent handling
-/// within the application.
+/// into our generic [app_native_ad.NativeAd] and [InterstitialAd] models for
+/// consistent handling within the application.
 /// {@endtemplate}
 class LocalAdProvider implements AdProvider {
   /// {@macro local_ad_provider}
@@ -27,6 +28,9 @@ class LocalAdProvider implements AdProvider {
   final Logger _logger;
   final Uuid _uuid = const Uuid();
 
+  /// Initializes the local ad provider.
+  ///
+  /// This implementation does not require any specific SDK initialization.
   @override
   Future<void> initialize() async {
     _logger.info('Local Ad Provider initialized (no specific SDK to init).');
@@ -36,17 +40,8 @@ class LocalAdProvider implements AdProvider {
   Future<app_native_ad.NativeAd?> loadNativeAd({
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
-    required AdType adType,
     required AdThemeStyle adThemeStyle,
   }) async {
-    if (adType != AdType.native) {
-      _logger.warning(
-        'LocalAdProvider.loadNativeAd called with incorrect AdType: $adType. '
-        'Expected AdType.native.',
-      );
-      return null;
-    }
-
     if (adId == null || adId.isEmpty) {
       _logger.warning('No local native ad ID provided.');
       return null;
@@ -89,17 +84,8 @@ class LocalAdProvider implements AdProvider {
   Future<app_native_ad.NativeAd?> loadBannerAd({
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
-    required AdType adType,
     required AdThemeStyle adThemeStyle,
   }) async {
-    if (adType != AdType.banner) {
-      _logger.warning(
-        'LocalAdProvider.loadBannerAd called with incorrect AdType: $adType. '
-        'Expected AdType.banner.',
-      );
-      return null;
-    }
-
     if (adId == null || adId.isEmpty) {
       _logger.warning('No local banner ad ID provided.');
       return null;
@@ -139,20 +125,11 @@ class LocalAdProvider implements AdProvider {
   }
 
   @override
-  Future<app_native_ad.NativeAd?> loadInterstitialAd({
+  Future<InterstitialAd?> loadInterstitialAd({
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
-    required AdType adType,
     required AdThemeStyle adThemeStyle,
   }) async {
-    if (adType != AdType.interstitial) {
-      _logger.warning(
-        'LocalAdProvider.loadInterstitialAd called with incorrect AdType: '
-        '$adType. Expected AdType.interstitial.',
-      );
-      return null;
-    }
-
     if (adId == null || adId.isEmpty) {
       _logger.warning('No local interstitial ad ID provided.');
       return null;
@@ -167,11 +144,10 @@ class LocalAdProvider implements AdProvider {
         _logger.info(
           'Local interstitial ad loaded successfully: ${localInterstitialAd.id}',
         );
-        return app_native_ad.NativeAd(
+        return InterstitialAd(
           id: _uuid.v4(),
           provider: AdPlatformType.local,
           adObject: localInterstitialAd,
-          templateType: app_native_ad.NativeAdTemplateType.medium, // Arbitrary for interstitial
         );
       } else {
         _logger.warning(

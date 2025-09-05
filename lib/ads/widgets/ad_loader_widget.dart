@@ -30,7 +30,6 @@ class AdLoaderWidget extends StatefulWidget {
     required this.adPlaceholder,
     required this.adService,
     required this.adThemeStyle,
-    required this.imageStyle,
     super.key,
   });
 
@@ -42,9 +41,6 @@ class AdLoaderWidget extends StatefulWidget {
 
   /// The current theme style for ads, used during ad loading.
   final AdThemeStyle adThemeStyle;
-
-  /// The desired image style for the ad, which determines the native template.
-  final HeadlineImageStyle imageStyle;
 
   @override
   State<AdLoaderWidget> createState() => _AdLoaderWidgetState();
@@ -155,12 +151,58 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
       'Loading new ad for placeholder ID: ${widget.adPlaceholder.id}',
     );
     try {
-      // Request a new native ad from the AdService, passing the dynamically
-      // provided imageStyle. This ensures that the correct native ad template
-      // (small or medium) is requested based on the user's current feed
-      // display settings.
+      String? currentAdId;
+      if (widget.adPlaceholder.adPlatformType == AdPlatformType.admob) {
+        currentAdId = widget.adPlaceholder.adUnitId;
+      } else if (widget.adPlaceholder.adPlatformType == AdPlatformType.local) {
+        currentAdId = widget.adPlaceholder.localAdId;
+      }
+
+      final adPlatformIdentifiers = AdPlatformIdentifiers(
+        feedNativeAdId: widget.adPlaceholder.adType == AdType.native ? currentAdId : null,
+        feedBannerAdId: widget.adPlaceholder.adType == AdType.banner ? currentAdId : null,
+        feedToArticleInterstitialAdId: widget.adPlaceholder.adType == AdType.interstitial ? currentAdId : null,
+        inArticleNativeAdId: null,
+        inArticleBannerAdId: null,
+      );
+
+      // Construct a minimal AdConfig for the AdService call
+      final adConfig = AdConfig(
+        enabled: true, // Assuming ads are enabled if we're trying to load one
+        primaryAdPlatform: widget.adPlaceholder.adPlatformType,
+        platformAdIdentifiers: {
+          widget.adPlaceholder.adPlatformType: adPlatformIdentifiers,
+        },
+        feedAdConfiguration: FeedAdConfiguration(
+          enabled: true, // Assuming feed ads are enabled
+          adType: widget.adPlaceholder.adType,
+          frequencyConfig: const FeedAdFrequencyConfig(
+            guestAdFrequency: 0,
+            guestAdPlacementInterval: 0,
+            authenticatedAdFrequency: 0,
+            authenticatedAdPlacementInterval: 0,
+            premiumAdFrequency: 0,
+            premiumAdPlacementInterval: 0,
+          ),
+        ),
+        articleAdConfiguration: const ArticleAdConfiguration(
+          enabled: false, // Not relevant for feed ads
+          defaultInArticleAdType: AdType.native,
+          inArticleAdSlotConfigurations: [],
+        ),
+        interstitialAdConfiguration: const InterstitialAdConfiguration(
+          enabled: false, // Not relevant for feed ads
+          feedInterstitialAdFrequencyConfig: InterstitialAdFrequencyConfig(
+            guestTransitionsBeforeShowingInterstitialAds: 0,
+            standardUserTransitionsBeforeShowingInterstitialAds: 0,
+            premiumUserTransitionsBeforeShowingInterstitialAds: 0,
+          ),
+        ),
+      );
+
       final adFeedItem = await widget.adService.getAd(
-        imageStyle: widget.imageStyle,
+        adConfig: adConfig,
+        adType: widget.adPlaceholder.adType,
         adThemeStyle: widget.adThemeStyle,
       );
 

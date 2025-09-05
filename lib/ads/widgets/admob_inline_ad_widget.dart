@@ -1,35 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/models.dart'
-    as app_ad_models;
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart'; // Import BannerAd
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart'; // Import InlineAd
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'; // Import NativeAd
 import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
 import 'package:logging/logging.dart';
 
-/// {@template admob_native_ad_widget}
-/// A widget that specifically renders an inline Google AdMob native ad.
+/// {@template admob_inline_ad_widget}
+/// A widget that specifically renders an inline Google AdMob ad,
+/// supporting both native and banner ad formats.
 ///
-/// This widget is responsible for taking the generic [app_ad_models.NativeAd]
-/// (which represents an inline ad) and rendering it using the `AdWidget`
-/// from the `google_mobile_ads` package. It expects the `adObject` within
-/// the [app_ad_models.NativeAd] to be a fully loaded [admob.NativeAd] instance.
+/// This widget is responsible for taking a generic [InlineAd]
+/// and rendering it using the `AdWidget` from the `google_mobile_ads` package.
+/// It dynamically determines if the underlying `adObject` is an `admob.NativeAd`
+/// or an `admob.BannerAd` and adjusts its rendering and size accordingly.
 ///
-/// This is a [StatefulWidget] to properly manage the lifecycle of the native
+/// This is a [StatefulWidget] to properly manage the lifecycle of the AdMob
 /// ad object, ensuring it is disposed when the widget is removed from the tree
 /// or when the underlying ad object changes.
 /// {@endtemplate}
-class AdmobNativeAdWidget extends StatefulWidget {
-  /// {@macro admob_native_ad_widget}
-  const AdmobNativeAdWidget({required this.nativeAd, super.key});
+class AdmobInlineAdWidget extends StatefulWidget {
+  /// {@macro admob_inline_ad_widget}
+  const AdmobInlineAdWidget({required this.inlineAd, super.key});
 
-  /// The generic native ad model which contains the provider-specific ad object.
-  final app_ad_models.NativeAd nativeAd;
+  /// The generic inline ad model which contains the provider-specific AdMob ad object.
+  final InlineAd inlineAd;
 
   @override
-  State<AdmobNativeAdWidget> createState() => _AdmobNativeAdWidgetState();
+  State<AdmobInlineAdWidget> createState() => _AdmobInlineAdWidgetState();
 }
 
-class _AdmobNativeAdWidgetState extends State<AdmobNativeAdWidget> {
-  admob.NativeAd? _ad;
-  final Logger _logger = Logger('AdmobNativeAdWidget');
+class _AdmobInlineAdWidgetState extends State<AdmobInlineAdWidget> {
+  admob.Ad? _ad; // Can be NativeAd or BannerAd
+  final Logger _logger = Logger('AdmobInlineAdWidget');
 
   @override
   void initState() {
@@ -38,41 +40,44 @@ class _AdmobNativeAdWidgetState extends State<AdmobNativeAdWidget> {
   }
 
   @override
-  void didUpdateWidget(covariant AdmobNativeAdWidget oldWidget) {
+  void didUpdateWidget(covariant AdmobInlineAdWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // If the nativeAd object itself has changed (e.g., a new ad was loaded
+    // If the inlineAd object itself has changed (e.g., a new ad was loaded
     // for the same placeholder ID), set the new one.
     // The disposal of the old ad is now handled by the AdCacheService when
     // the cache is cleared, preventing premature disposal of cached ads.
-    if (widget.nativeAd.id != oldWidget.nativeAd.id) {
+    if (widget.inlineAd.id != oldWidget.inlineAd.id) {
       _setAd();
     }
   }
 
   @override
   void dispose() {
-    // The native ad object is no longer disposed here.
+    // The AdMob ad object is no longer disposed here.
     // Its lifecycle is managed by the AdCacheService to prevent crashes
     // when the widget is scrolled out of view and then back in.
     // The ad will be disposed when AdCacheService.clearAllAds() is called,
     // typically on a full feed refresh.
-    _logger.info('AdmobNativeAdWidget disposed.');
+    _logger.info('AdmobInlineAdWidget disposed.');
     super.dispose();
   }
 
-  /// Sets the internal [_ad] object from the widget's [nativeAd].
+  /// Sets the internal [_ad] object from the widget's [inlineAd].
   ///
-  /// This method ensures that the adObject is of the correct type and
-  /// logs an error if it's not.
+  /// This method ensures that the adObject is of the correct AdMob type
+  /// (NativeAd or BannerAd) and logs an error if it's not.
   void _setAd() {
-    if (widget.nativeAd.adObject is admob.NativeAd) {
-      _ad = widget.nativeAd.adObject as admob.NativeAd;
+    if (widget.inlineAd.adObject is admob.NativeAd) {
+      _ad = widget.inlineAd.adObject as admob.NativeAd;
+    } else if (widget.inlineAd.adObject is admob.BannerAd) {
+      _ad = widget.inlineAd.adObject as admob.BannerAd;
     } else {
       _ad = null; // Ensure _ad is null if the type is incorrect
 
       _logger.severe(
-        'The provided ad object for AdMob native ad is not of type admob.NativeAd. '
-        'Received: ${widget.nativeAd.adObject.runtimeType}. Ad will not be displayed.',
+        'The provided ad object for AdMob inline ad is not of type '
+        'admob.NativeAd or admob.BannerAd. Received: '
+        '${widget.inlineAd.adObject.runtimeType}. Ad will not be displayed.',
       );
     }
   }
@@ -85,20 +90,30 @@ class _AdmobNativeAdWidgetState extends State<AdmobNativeAdWidget> {
       return const SizedBox.shrink();
     }
 
+    // Determine the height based on the actual ad type.
+    double adHeight;
+    if (widget.inlineAd is NativeAd) {
+      final nativeAd = widget.inlineAd as NativeAd;
+      adHeight = switch (nativeAd.templateType) {
+        NativeAdTemplateType.small => 120,
+        NativeAdTemplateType.medium => 340,
+      };
+    } else if (widget.inlineAd is BannerAd) {
+      // Standard banner ad height.
+      adHeight = 50; // AdSize.banner.height
+    } else {
+      // Fallback height for unknown inline ad types.
+      adHeight = 100;
+    }
+
     // The AdWidget from the google_mobile_ads package handles the rendering
-    // of the pre-loaded native ad.
+    // of the pre-loaded AdMob ad.
     // We wrap it in a SizedBox to provide explicit height constraints,
     // which is crucial for platform views (like native ads) within scrollable
     // lists to prevent "unbounded height" errors.
-
-    final adHeight = switch (widget.nativeAd.templateType) {
-      app_ad_models.NativeAdTemplateType.small => 120,
-      app_ad_models.NativeAdTemplateType.medium => 340,
-    };
-
     return SizedBox(
-      height: adHeight.toDouble(),
-      child: admob.AdWidget(ad: _ad!),
+      height: adHeight,
+      child: admob.AdWidget(ad: _ad! as admob.AdWithView), // Cast to AdWithView
     );
   }
 }

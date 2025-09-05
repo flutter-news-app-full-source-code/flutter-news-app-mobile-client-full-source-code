@@ -4,9 +4,9 @@ import 'package:core/core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart'; // Import the new BannerAd model
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'
-    as app_native_ad;
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'; // Import the refactored NativeAd model
 import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
 import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
@@ -16,8 +16,8 @@ import 'package:uuid/uuid.dart';
 ///
 /// This class handles the initialization of the Google Mobile Ads SDK
 /// and the loading of native, banner, and interstitial ads specifically for AdMob.
-/// It adapts the AdMob-specific ad objects into our generic [app_native_ad.NativeAd]
-/// and [InterstitialAd] models.
+/// It adapts the AdMob-specific ad objects into our generic [NativeAd],
+/// [BannerAd], and [InterstitialAd] models.
 /// {@endtemplate}
 class AdMobAdProvider implements AdProvider {
   /// {@macro admob_ad_provider}
@@ -43,7 +43,7 @@ class AdMobAdProvider implements AdProvider {
   }
 
   @override
-  Future<app_native_ad.NativeAd?> loadNativeAd({
+  Future<NativeAd?> loadNativeAd({
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
     required AdThemeStyle adThemeStyle,
@@ -55,7 +55,7 @@ class AdMobAdProvider implements AdProvider {
 
     _logger.info('Attempting to load native ad from unit ID: $adId');
 
-    final templateType = app_native_ad.NativeAdTemplateType.medium; // Default to medium for native
+    final templateType = NativeAdTemplateType.medium; // Default to medium for native
 
     final completer = Completer<admob.NativeAd?>();
 
@@ -64,8 +64,8 @@ class AdMobAdProvider implements AdProvider {
       request: const admob.AdRequest(),
       nativeTemplateStyle: _createNativeTemplateStyle(
         templateType: switch (templateType) {
-          app_native_ad.NativeAdTemplateType.small => admob.TemplateType.small,
-          app_native_ad.NativeAdTemplateType.medium => admob.TemplateType.medium,
+          NativeAdTemplateType.small => admob.TemplateType.small,
+          NativeAdTemplateType.medium => admob.TemplateType.medium,
         },
         adThemeStyle: adThemeStyle,
       ),
@@ -116,7 +116,7 @@ class AdMobAdProvider implements AdProvider {
       return null;
     }
 
-    return app_native_ad.NativeAd(
+    return NativeAd(
       id: _uuid.v4(),
       provider: AdPlatformType.admob,
       adObject: googleNativeAd,
@@ -125,7 +125,7 @@ class AdMobAdProvider implements AdProvider {
   }
 
   @override
-  Future<app_native_ad.NativeAd?> loadBannerAd({
+  Future<BannerAd?> loadBannerAd({
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
     required AdThemeStyle adThemeStyle,
@@ -185,11 +185,11 @@ class AdMobAdProvider implements AdProvider {
       return null;
     }
 
-    return app_native_ad.NativeAd(
+    // Wrap the loaded AdMob BannerAd in our generic BannerAd model.
+    return BannerAd(
       id: _uuid.v4(),
       provider: AdPlatformType.admob,
       adObject: googleBannerAd,
-      templateType: app_native_ad.NativeAdTemplateType.small, // Banner ads don't have native templates
     );
   }
 
@@ -250,6 +250,7 @@ class AdMobAdProvider implements AdProvider {
   ///
   /// This method maps the application's theme properties (colors, text styles)
   /// to the AdMob native ad styling options, ensuring a consistent look and feel.
+  /// This is specifically for native ads.
   admob.NativeTemplateStyle _createNativeTemplateStyle({
     required admob.TemplateType templateType,
     required AdThemeStyle adThemeStyle,

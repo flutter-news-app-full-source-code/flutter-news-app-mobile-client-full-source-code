@@ -18,11 +18,13 @@ class AdService {
   ///
   /// Requires an [AdProvider] to be injected, which will be used to
   /// load ads from a specific ad network.
-  AdService({required AdProvider adProvider, Logger? logger})
-    : _adProvider = adProvider,
-      _logger = logger ?? Logger('AdService');
+  AdService({
+    required Map<AdPlatformType, AdProvider> adProviders,
+    Logger? logger,
+  })  : _adProviders = adProviders,
+        _logger = logger ?? Logger('AdService');
 
-  final AdProvider _adProvider;
+  final Map<AdPlatformType, AdProvider> _adProviders;
   final Logger _logger;
   final Uuid _uuid = const Uuid();
 
@@ -31,7 +33,9 @@ class AdService {
   /// This should be called once at application startup.
   Future<void> initialize() async {
     _logger.info('Initializing AdService...');
-    await _adProvider.initialize();
+    for (final provider in _adProviders.values) {
+      await provider.initialize();
+    }
     _logger.info('AdService initialized.');
   }
 
@@ -44,24 +48,82 @@ class AdService {
   ///
   /// Returns an [AdFeedItem] if an ad is available, otherwise `null`.
   Future<AdFeedItem?> getAd({
-    required HeadlineImageStyle imageStyle,
+    required AdConfig adConfig,
+    required AdType adType,
     required AdThemeStyle adThemeStyle,
   }) async {
-    _logger.info('Requesting native ad from AdProvider...');
-    try {
-      final nativeAd = await _adProvider.loadNativeAd(
-        imageStyle: imageStyle,
-        adThemeStyle: adThemeStyle,
+    if (!adConfig.enabled) {
+      _logger.info('Ads are globally disabled in RemoteConfig.');
+      return null;
+    }
+
+    final primaryAdPlatform = adConfig.primaryAdPlatform;
+    final adProvider = _adProviders[primaryAdPlatform];
+
+    if (adProvider == null) {
+      _logger.warning('No AdProvider found for platform: $primaryAdPlatform');
+      return null;
+    }
+
+    final platformAdIdentifiers = adConfig.platformAdIdentifiers[primaryAdPlatform];
+    if (platformAdIdentifiers == null) {
+      _logger.warning(
+        'No AdPlatformIdentifiers found for platform: $primaryAdPlatform',
       );
+      return null;
+    }
+
+    String? adId;
+    switch (adType) {
+      case AdType.native:
+        adId = platformAdIdentifiers.feedNativeAdId;
+      case AdType.banner:
+        adId = platformAdIdentifiers.feedBannerAdId;
+      case AdType.interstitial:
+        adId = platformAdIdentifiers.feedToArticleInterstitialAdId;
+      case AdType.video:
+        // TODO(fulleni): Implement video ad ID if needed
+        _logger.warning('Video ad type not yet supported.');
+        return null;
+    }
+
+    if (adId == null || adId.isEmpty) {
+      _logger.warning(
+        'No ad ID configured for platform $primaryAdPlatform and ad type $adType',
+      );
+      return null;
+    }
+
+    _logger.info(
+      'Requesting $adType ad from $primaryAdPlatform AdProvider with ID: $adId',
+    );
+    try {
+      app_native_ad.NativeAd? nativeAd;
+      if (adType == AdType.native) {
+        nativeAd = await adProvider.loadNativeAd(
+          adPlatformIdentifiers: platformAdIdentifiers,
+          adId: adId,
+          adType: adType,
+          adThemeStyle: adThemeStyle,
+        );
+      } else if (adType == AdType.banner) {
+        nativeAd = await adProvider.loadBannerAd(
+          adPlatformIdentifiers: platformAdIdentifiers,
+          adId: adId,
+          adType: adType,
+          adThemeStyle: adThemeStyle,
+        );
+      }
+
       if (nativeAd != null) {
-        _logger.info('Native ad successfully loaded and wrapped.');
+        _logger.info('$adType ad successfully loaded and wrapped.');
         return AdFeedItem(id: _uuid.v4(), nativeAd: nativeAd);
       } else {
-        _logger.info('No native ad loaded by AdProvider.');
+        _logger.info('No $adType ad loaded by AdProvider.');
         return null;
       }
     } catch (e) {
-      _logger.severe('Error getting ad from AdProvider: $e');
+      _logger.severe('Error getting $adType ad from AdProvider: $e');
       return null;
     }
   }

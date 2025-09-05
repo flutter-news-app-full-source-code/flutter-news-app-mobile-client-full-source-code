@@ -15,8 +15,7 @@ class AdPlaceholder extends FeedItem with EquatableMixin {
     required this.id,
     required this.adPlatformType,
     required this.adType,
-    this.adUnitId,
-    this.localAdId,
+    this.adId,
   }) : super(type: 'ad_placeholder');
 
   /// A unique identifier for this specific ad placeholder instance.
@@ -31,12 +30,9 @@ class AdPlaceholder extends FeedItem with EquatableMixin {
   /// The type of the ad (e.g., native, banner).
   final AdType adType;
 
-  /// The ad unit ID for platforms like AdMob.
-  final String? adUnitId;
-
-  /// The ID for local ads, used to fetch from a data client.
-  final String? localAdId;
+  /// The platform-specific ad identifier (e.g., AdMob unit ID, Local ad ID).
+  final String? adId;
 
   @override
-  List<Object?> get props => [id, adPlatformType, adType, adUnitId, localAdId, type];
+  List<Object?> get props => [id, adPlatformType, adType, adId, type];
 }

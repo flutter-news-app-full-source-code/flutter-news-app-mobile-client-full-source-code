@@ -28,39 +28,6 @@ class AdMobAdProvider implements AdProvider {
 
   static const _nativeAdLoadTimeout = 15;
 
-  /// The AdMob Native Ad Unit ID for Android.
-  ///
-  /// This should be replaced with your production Ad Unit ID.
-  /// For testing, use `ca-app-pub-3940256099942544/2247696110`.
-  static const String _androidNativeAdUnitId =
-      'ca-app-pub-3940256099942544/2247696110';
-
-  /// The AdMob Native Ad Unit ID for iOS.
-  ///
-  /// This should be replaced with your production Ad Unit ID.
-  /// For testing, use `ca-app-pub-3940256099942544/3986624511`.
-  static const String _iosNativeAdUnitId =
-      'ca-app-pub-3940256099942544/3986624511';
-
-  /// The AdMob Native Ad Unit ID for Web.
-  ///
-  /// AdMob does not officially support native ads on web. This is a placeholder.
-  /// For testing, use `ca-app-pub-3940256099942544/2247696110` (Android test ID).
-  static const String _webNativeAdUnitId =
-      'ca-app-pub-3940256099942544/2247696110';
-
-  /// Returns the appropriate native ad unit ID based on the platform.
-  String get _nativeAdUnitId {
-    if (kIsWeb) {
-      return _webNativeAdUnitId;
-    } else if (defaultTargetPlatform == TargetPlatform.android) {
-      return _androidNativeAdUnitId;
-    } else if (defaultTargetPlatform == TargetPlatform.iOS) {
-      return _iosNativeAdUnitId;
-    }
-    return ''; // Fallback for unsupported platforms
-  }
-
   @override
   Future<void> initialize() async {
     _logger.info('Initializing Google Mobile Ads SDK...');
@@ -75,30 +42,39 @@ class AdMobAdProvider implements AdProvider {
   }
 
   @override
-  @override
   Future<app_native_ad.NativeAd?> loadNativeAd({
-    required HeadlineImageStyle imageStyle,
+    required AdPlatformIdentifiers adPlatformIdentifiers,
+    required String adId,
+    required AdType adType,
     required AdThemeStyle adThemeStyle,
   }) async {
-    if (_nativeAdUnitId.isEmpty) {
-      _logger.warning('No native ad unit ID configured for this platform.');
+    if (adType != AdType.native) {
+      _logger.warning(
+        'AdMobAdProvider.loadNativeAd called with incorrect AdType: $adType. '
+        'Expected AdType.native.',
+      );
       return null;
     }
 
-    _logger.info('Attempting to load native ad from unit ID: $_nativeAdUnitId');
+    if (adId.isEmpty) {
+      _logger.warning('No native ad unit ID provided for AdMob.');
+      return null;
+    }
 
-    final templateType = switch (imageStyle) {
-      HeadlineImageStyle.largeThumbnail => admob.TemplateType.medium,
-      _ => admob.TemplateType.small,
-    };
+    _logger.info('Attempting to load native ad from unit ID: $adId');
+
+    final templateType = app_native_ad.NativeAdTemplateType.medium; // Default to medium for native
 
     final completer = Completer<admob.NativeAd?>();
 
     final ad = admob.NativeAd(
-      adUnitId: _nativeAdUnitId,
+      adUnitId: adId,
       request: const admob.AdRequest(),
       nativeTemplateStyle: _createNativeTemplateStyle(
-        templateType: templateType,
+        templateType: switch (templateType) {
+          app_native_ad.NativeAdTemplateType.small => admob.TemplateType.small,
+          app_native_ad.NativeAdTemplateType.medium => admob.TemplateType.medium,
+        },
         adThemeStyle: adThemeStyle,
       ),
       listener: admob.NativeAdListener(
@@ -108,8 +84,6 @@ class AdMobAdProvider implements AdProvider {
         },
         onAdFailedToLoad: (ad, error) {
           _logger.severe('Native Ad failed to load: $error');
-          // The ad object is automatically disposed by the SDK on failure.
-          // Calling dispose here can lead to race conditions and errors.
           completer.complete(null);
         },
         onAdClicked: (ad) {
@@ -120,9 +94,6 @@ class AdMobAdProvider implements AdProvider {
         },
         onAdClosed: (ad) {
           _logger.info('Native Ad closed.');
-          // The ad object is now disposed by the AdmobNativeAdWidget (StatefulWidget)
-          // when it is removed from the widget tree. Removing this dispose call
-          // here prevents premature disposal and potential crashes.
         },
         onAdOpened: (ad) {
           _logger.info('Native Ad opened.');
@@ -140,12 +111,11 @@ class AdMobAdProvider implements AdProvider {
       completer.complete(null);
     }
 
-    // Add a timeout to the future to prevent hanging if callbacks are not called.
     final googleNativeAd = await completer.future.timeout(
       const Duration(seconds: _nativeAdLoadTimeout),
       onTimeout: () {
         _logger.warning('Native ad loading timed out.');
-        ad.dispose(); // Dispose the ad if it timed out
+        ad.dispose();
         return null;
       },
     );
@@ -154,15 +124,89 @@ class AdMobAdProvider implements AdProvider {
       return null;
     }
 
-    // Map the Google Mobile Ads NativeAd to our generic NativeAd model.
     return app_native_ad.NativeAd(
-      id: _uuid.v4(), // Generate a unique ID for our internal model
-      provider: app_native_ad.AdProviderType.admob, // Set the provider
-      adObject: googleNativeAd, // Store the original AdMob object
-      templateType: switch (templateType) {
-        admob.TemplateType.small => app_native_ad.NativeAdTemplateType.small,
-        admob.TemplateType.medium => app_native_ad.NativeAdTemplateType.medium,
+      id: _uuid.v4(),
+      provider: AdPlatformType.admob, // Changed from app_native_ad.AdProviderType.admob
+      adObject: googleNativeAd,
+      templateType: templateType,
+    );
+  }
+
+  @override
+  Future<app_native_ad.NativeAd?> loadBannerAd({
+    required AdPlatformIdentifiers adPlatformIdentifiers,
+    required String adId,
+    required AdType adType,
+    required AdThemeStyle adThemeStyle,
+  }) async {
+    if (adType != AdType.banner) {
+      _logger.warning(
+        'AdMobAdProvider.loadBannerAd called with incorrect AdType: $adType. '
+        'Expected AdType.banner.',
+      );
+      return null;
+    }
+
+    if (adId.isEmpty) {
+      _logger.warning('No banner ad unit ID provided for AdMob.');
+      return null;
+    }
+
+    _logger.info('Attempting to load banner ad from unit ID: $adId');
+
+    final completer = Completer<admob.BannerAd?>();
+
+    final ad = admob.BannerAd(
+      adUnitId: adId,
+      size: admob.AdSize.banner, // Default banner size
+      request: const admob.AdRequest(),
+      listener: admob.BannerAdListener(
+        onAdLoaded: (ad) {
+          _logger.info('Banner Ad loaded successfully.');
+          completer.complete(ad as admob.BannerAd);
+        },
+        onAdFailedToLoad: (ad, error) {
+          _logger.severe('Banner Ad failed to load: $error');
+          ad.dispose();
+          completer.complete(null);
+        },
+        onAdOpened: (ad) {
+          _logger.info('Banner Ad opened.');
+        },
+        onAdClosed: (ad) {
+          _logger.info('Banner Ad closed.');
+        },
+        onAdImpression: (ad) {
+          _logger.info('Banner Ad impression recorded.');
+        },
+      ),
+    );
+
+    try {
+      await ad.load();
+    } catch (e) {
+      _logger.severe('Error during banner ad load: $e');
+      completer.complete(null);
+    }
+
+    final googleBannerAd = await completer.future.timeout(
+      const Duration(seconds: _nativeAdLoadTimeout), // Reusing native ad timeout
+      onTimeout: () {
+        _logger.warning('Banner ad loading timed out.');
+        ad.dispose();
+        return null;
       },
+    );
+
+    if (googleBannerAd == null) {
+      return null;
+    }
+
+    return app_native_ad.NativeAd(
+      id: _uuid.v4(),
+      provider: AdPlatformType.admob, // Changed from app_native_ad.AdProviderType.admob
+      adObject: googleBannerAd,
+      templateType: app_native_ad.NativeAdTemplateType.small, // Banner ads don't have native templates
     );
   }
 

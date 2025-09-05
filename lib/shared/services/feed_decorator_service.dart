@@ -497,7 +497,15 @@ class FeedDecoratorService {
           };
         }
 
-        if (adUnitId != null || localAdId != null) {
+        final String? adIdentifier = switch (feedAdType) {
+          AdType.native => platformAdIdentifiers.feedNativeAdId,
+          AdType.banner => platformAdIdentifiers.feedBannerAdId,
+          AdType.interstitial =>
+            platformAdIdentifiers.feedToArticleInterstitialAdId,
+          _ => null, // Video not expected in feed
+        };
+
+        if (adIdentifier != null) {
           // Instead of injecting a fully loaded ad, inject an AdPlaceholder.
           // This is a crucial change: the FeedDecoratorService no longer loads
           // the actual ad. It only marks a spot for an ad.
@@ -511,14 +519,13 @@ class FeedDecoratorService {
               id: _uuid.v4(),
               adPlatformType: primaryAdPlatform,
               adType: feedAdType,
-              adUnitId: adUnitId,
-              localAdId: localAdId,
+              adId: adIdentifier,
             ),
           );
         } else {
           _logger.warning(
-            'No valid ad ID found for platform $primaryAdPlatform and type $feedAdType. '
-            'Ad placeholder not injected.',
+            'No valid ad ID found for platform $primaryAdPlatform and type '
+            '$feedAdType. Ad placeholder not injected.',
           );
         }
       }

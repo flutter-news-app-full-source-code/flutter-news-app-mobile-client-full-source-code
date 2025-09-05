@@ -4,6 +4,7 @@ import 'package:core/core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'
     as app_native_ad;
 import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
@@ -14,9 +15,9 @@ import 'package:uuid/uuid.dart';
 /// A concrete implementation of [AdProvider] for Google AdMob.
 ///
 /// This class handles the initialization of the Google Mobile Ads SDK
-/// and the loading of native ads specifically for AdMob. It adapts the
-/// AdMob-specific [admob.NativeAd] object into our generic [app_native_ad.NativeAd]
-/// model.
+/// and the loading of native, banner, and interstitial ads specifically for AdMob.
+/// It adapts the AdMob-specific ad objects into our generic [app_native_ad.NativeAd]
+/// and [InterstitialAd] models.
 /// {@endtemplate}
 class AdMobAdProvider implements AdProvider {
   /// {@macro admob_ad_provider}
@@ -36,7 +37,7 @@ class AdMobAdProvider implements AdProvider {
       _logger.info('Google Mobile Ads SDK initialized successfully.');
     } catch (e) {
       _logger.severe('Failed to initialize Google Mobile Ads SDK: $e');
-      // TODO(fulleni): Depending on requirements, you might want to rethrow or handle this more gracefully.
+      // Depending on requirements, you might want to rethrow or handle this more gracefully.
       // For now, we log and continue, as ad loading might still work in some cases.
     }
   }
@@ -45,17 +46,8 @@ class AdMobAdProvider implements AdProvider {
   Future<app_native_ad.NativeAd?> loadNativeAd({
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
-    required AdType adType,
     required AdThemeStyle adThemeStyle,
   }) async {
-    if (adType != AdType.native) {
-      _logger.warning(
-        'AdMobAdProvider.loadNativeAd called with incorrect AdType: $adType. '
-        'Expected AdType.native.',
-      );
-      return null;
-    }
-
     if (adId == null || adId.isEmpty) {
       _logger.warning('No native ad unit ID provided for AdMob.');
       return null;
@@ -136,17 +128,8 @@ class AdMobAdProvider implements AdProvider {
   Future<app_native_ad.NativeAd?> loadBannerAd({
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
-    required AdType adType,
     required AdThemeStyle adThemeStyle,
   }) async {
-    if (adType != AdType.banner) {
-      _logger.warning(
-        'AdMobAdProvider.loadBannerAd called with incorrect AdType: $adType. '
-        'Expected AdType.banner.',
-      );
-      return null;
-    }
-
     if (adId == null || adId.isEmpty) {
       _logger.warning('No banner ad unit ID provided for AdMob.');
       return null;
@@ -211,20 +194,11 @@ class AdMobAdProvider implements AdProvider {
   }
 
   @override
-  Future<app_native_ad.NativeAd?> loadInterstitialAd({
+  Future<InterstitialAd?> loadInterstitialAd({
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
-    required AdType adType,
     required AdThemeStyle adThemeStyle,
   }) async {
-    if (adType != AdType.interstitial) {
-      _logger.warning(
-        'AdMobAdProvider.loadInterstitialAd called with incorrect AdType: '
-        '$adType. Expected AdType.interstitial.',
-      );
-      return null;
-    }
-
     if (adId == null || adId.isEmpty) {
       _logger.warning('No interstitial ad unit ID provided for AdMob.');
       return null;
@@ -262,14 +236,13 @@ class AdMobAdProvider implements AdProvider {
     }
 
     // Interstitial ads are typically shown immediately or on demand,
-    // not rendered as a widget in a feed. We wrap it as a NativeAd
+    // not rendered as a widget in a feed. We wrap it as a InterstitialAd
     // for consistency in the AdService return type, but its `adObject`
     // will be an `InterstitialAd` which can be shown.
-    return app_native_ad.NativeAd(
+    return InterstitialAd(
       id: _uuid.v4(),
       provider: AdPlatformType.admob,
       adObject: googleInterstitialAd,
-      templateType: app_native_ad.NativeAdTemplateType.medium, // Arbitrary for interstitial
     );
   }
 

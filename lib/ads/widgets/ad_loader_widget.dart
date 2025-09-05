@@ -151,30 +151,55 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
       'Loading new ad for placeholder ID: ${widget.adPlaceholder.id}',
     );
     try {
-      String? currentAdId;
-      if (widget.adPlaceholder.adPlatformType == AdPlatformType.admob) {
-        currentAdId = widget.adPlaceholder.adUnitId;
-      } else if (widget.adPlaceholder.adPlatformType == AdPlatformType.local) {
-        currentAdId = widget.adPlaceholder.localAdId;
+      // The adId is now directly available from the placeholder.
+      final String? adIdentifier = widget.adPlaceholder.adId;
+
+      if (adIdentifier == null || adIdentifier.isEmpty) {
+        _logger.warning(
+          'Ad placeholder ID ${widget.adPlaceholder.id} has no adIdentifier. '
+          'Cannot load ad.',
+        );
+        if (!mounted) return;
+        setState(() {
+          _hasError = true;
+          _isLoading = false;
+        });
+        if (_loadAdCompleter?.isCompleted == false) {
+          _loadAdCompleter?.completeError(
+            StateError('Failed to load ad: No ad identifier.'),
+          );
+        }
+        return;
       }
 
+      // Construct AdPlatformIdentifiers using the adId from the placeholder.
+      // This ensures the AdService receives the correct ID for the specific adType.
       final adPlatformIdentifiers = AdPlatformIdentifiers(
-        feedNativeAdId: widget.adPlaceholder.adType == AdType.native ? currentAdId : null,
-        feedBannerAdId: widget.adPlaceholder.adType == AdType.banner ? currentAdId : null,
-        feedToArticleInterstitialAdId: widget.adPlaceholder.adType == AdType.interstitial ? currentAdId : null,
-        inArticleNativeAdId: null,
-        inArticleBannerAdId: null,
+        feedNativeAdId:
+            widget.adPlaceholder.adType == AdType.native ? adIdentifier : null,
+        feedBannerAdId:
+            widget.adPlaceholder.adType == AdType.banner ? adIdentifier : null,
+        feedToArticleInterstitialAdId:
+            widget.adPlaceholder.adType == AdType.interstitial
+                ? adIdentifier
+                : null,
+        inArticleNativeAdId: null, // Not relevant for feed ads
+        inArticleBannerAdId: null, // Not relevant for feed ads
       );
 
-      // Construct a minimal AdConfig for the AdService call
+      // Construct a minimal AdConfig for the AdService call.
+      // This is still necessary because AdService.getAd expects a full AdConfig,
+      // but we are only interested in the primaryAdPlatform and the specific
+      // ad identifiers for this placeholder.
       final adConfig = AdConfig(
-        enabled: true, // Assuming ads are enabled if we're trying to load one
+        enabled: true, // Assume enabled if we're trying to load
         primaryAdPlatform: widget.adPlaceholder.adPlatformType,
         platformAdIdentifiers: {
           widget.adPlaceholder.adPlatformType: adPlatformIdentifiers,
         },
+        // Provide dummy configurations for other ad types not relevant to this loader.
         feedAdConfiguration: FeedAdConfiguration(
-          enabled: true, // Assuming feed ads are enabled
+          enabled: true,
           adType: widget.adPlaceholder.adType,
           frequencyConfig: const FeedAdFrequencyConfig(
             guestAdFrequency: 0,
@@ -186,12 +211,12 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
           ),
         ),
         articleAdConfiguration: const ArticleAdConfiguration(
-          enabled: false, // Not relevant for feed ads
+          enabled: false,
           defaultInArticleAdType: AdType.native,
           inArticleAdSlotConfigurations: [],
         ),
         interstitialAdConfiguration: const InterstitialAdConfiguration(
-          enabled: false, // Not relevant for feed ads
+          enabled: false,
           feedInterstitialAdFrequencyConfig: InterstitialAdFrequencyConfig(
             guestTransitionsBeforeShowingInterstitialAds: 0,
             standardUserTransitionsBeforeShowingInterstitialAds: 0,
@@ -224,7 +249,8 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
         }
       } else {
         _logger.warning(
-          'Failed to load ad for placeholder ID: ${widget.adPlaceholder.id}. No ad returned.',
+          'Failed to load ad for placeholder ID: ${widget.adPlaceholder.id}. '
+          'No ad returned.',
         );
         // Ensure the widget is still mounted before calling setState.
         if (!mounted) return;

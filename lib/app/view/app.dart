@@ -33,6 +33,7 @@ class App extends StatelessWidget {
     required KVStorageService kvStorageService,
     required AppEnvironment environment,
     required AdService adService,
+    required DataRepository<LocalAd> localAdRepository,
     this.demoDataMigrationService,
     this.demoDataInitializerService,
     this.initialUser,
@@ -48,7 +49,8 @@ class App extends StatelessWidget {
        _userRepository = userRepository,
        _kvStorageService = kvStorageService,
        _environment = environment,
-       _adService = adService;
+       _adService = adService,
+       _localAdRepository = localAdRepository;
 
   final AuthRepository _authenticationRepository;
   final DataRepository<Headline> _headlinesRepository;
@@ -63,6 +65,7 @@ class App extends StatelessWidget {
   final KVStorageService _kvStorageService;
   final AppEnvironment _environment;
   final AdService _adService;
+  final DataRepository<LocalAd> _localAdRepository;
   final DemoDataMigrationService? demoDataMigrationService;
   final DemoDataInitializerService? demoDataInitializerService;
   final User? initialUser;
@@ -82,6 +85,7 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _userRepository),
         RepositoryProvider.value(value: _kvStorageService),
         RepositoryProvider.value(value: _adService),
+        RepositoryProvider.value(value: _localAdRepository),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -96,6 +100,7 @@ class App extends StatelessWidget {
               demoDataMigrationService: demoDataMigrationService,
               demoDataInitializerService: demoDataInitializerService,
               initialUser: initialUser,
+              adService: context.read<AdService>(),
             ),
           ),
           BlocProvider(
@@ -116,6 +121,7 @@ class App extends StatelessWidget {
           userRepository: _userRepository,
           environment: _environment,
           adService: _adService,
+          localAdRepository: _localAdRepository,
         ),
       ),
     );
@@ -135,6 +141,7 @@ class _AppView extends StatefulWidget {
     required this.userRepository,
     required this.environment,
     required this.adService,
+    required this.localAdRepository,
   });
 
   final AuthRepository authenticationRepository;
@@ -148,6 +155,7 @@ class _AppView extends StatefulWidget {
   final DataRepository<User> userRepository;
   final AppEnvironment environment;
   final AdService adService;
+  final DataRepository<LocalAd> localAdRepository;
 
   @override
   State<_AppView> createState() => _AppViewState();
@@ -190,6 +198,7 @@ class _AppViewState extends State<_AppView> {
       userRepository: widget.userRepository,
       environment: widget.environment,
       adService: widget.adService,
+      localAdRepository: widget.localAdRepository,
     );
 
     // Removed Dynamic Link Initialization

@@ -26,7 +26,7 @@ class AdMobAdProvider implements AdProvider {
   final Logger _logger;
   final Uuid _uuid = const Uuid();
 
-  static const _nativeAdLoadTimeout = 15;
+  static const _adLoadTimeout = 15; // Unified timeout for all ad types
 
   @override
   Future<void> initialize() async {
@@ -44,7 +44,7 @@ class AdMobAdProvider implements AdProvider {
   @override
   Future<app_native_ad.NativeAd?> loadNativeAd({
     required AdPlatformIdentifiers adPlatformIdentifiers,
-    required String adId,
+    required String? adId,
     required AdType adType,
     required AdThemeStyle adThemeStyle,
   }) async {
@@ -56,7 +56,7 @@ class AdMobAdProvider implements AdProvider {
       return null;
     }
 
-    if (adId.isEmpty) {
+    if (adId == null || adId.isEmpty) {
       _logger.warning('No native ad unit ID provided for AdMob.');
       return null;
     }
@@ -112,7 +112,7 @@ class AdMobAdProvider implements AdProvider {
     }
 
     final googleNativeAd = await completer.future.timeout(
-      const Duration(seconds: _nativeAdLoadTimeout),
+      const Duration(seconds: _adLoadTimeout),
       onTimeout: () {
         _logger.warning('Native ad loading timed out.');
         ad.dispose();
@@ -126,7 +126,7 @@ class AdMobAdProvider implements AdProvider {
 
     return app_native_ad.NativeAd(
       id: _uuid.v4(),
-      provider: AdPlatformType.admob, // Changed from app_native_ad.AdProviderType.admob
+      provider: AdPlatformType.admob,
       adObject: googleNativeAd,
       templateType: templateType,
     );
@@ -135,7 +135,7 @@ class AdMobAdProvider implements AdProvider {
   @override
   Future<app_native_ad.NativeAd?> loadBannerAd({
     required AdPlatformIdentifiers adPlatformIdentifiers,
-    required String adId,
+    required String? adId,
     required AdType adType,
     required AdThemeStyle adThemeStyle,
   }) async {
@@ -147,7 +147,7 @@ class AdMobAdProvider implements AdProvider {
       return null;
     }
 
-    if (adId.isEmpty) {
+    if (adId == null || adId.isEmpty) {
       _logger.warning('No banner ad unit ID provided for AdMob.');
       return null;
     }
@@ -190,7 +190,7 @@ class AdMobAdProvider implements AdProvider {
     }
 
     final googleBannerAd = await completer.future.timeout(
-      const Duration(seconds: _nativeAdLoadTimeout), // Reusing native ad timeout
+      const Duration(seconds: _adLoadTimeout),
       onTimeout: () {
         _logger.warning('Banner ad loading timed out.');
         ad.dispose();
@@ -204,9 +204,72 @@ class AdMobAdProvider implements AdProvider {
 
     return app_native_ad.NativeAd(
       id: _uuid.v4(),
-      provider: AdPlatformType.admob, // Changed from app_native_ad.AdProviderType.admob
+      provider: AdPlatformType.admob,
       adObject: googleBannerAd,
       templateType: app_native_ad.NativeAdTemplateType.small, // Banner ads don't have native templates
+    );
+  }
+
+  @override
+  Future<app_native_ad.NativeAd?> loadInterstitialAd({
+    required AdPlatformIdentifiers adPlatformIdentifiers,
+    required String? adId,
+    required AdType adType,
+    required AdThemeStyle adThemeStyle,
+  }) async {
+    if (adType != AdType.interstitial) {
+      _logger.warning(
+        'AdMobAdProvider.loadInterstitialAd called with incorrect AdType: '
+        '$adType. Expected AdType.interstitial.',
+      );
+      return null;
+    }
+
+    if (adId == null || adId.isEmpty) {
+      _logger.warning('No interstitial ad unit ID provided for AdMob.');
+      return null;
+    }
+
+    _logger.info('Attempting to load interstitial ad from unit ID: $adId');
+
+    final completer = Completer<admob.InterstitialAd?>();
+
+    await admob.InterstitialAd.load(
+      adUnitId: adId,
+      request: const admob.AdRequest(),
+      adLoadCallback: admob.InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          _logger.info('Interstitial Ad loaded successfully.');
+          completer.complete(ad);
+        },
+        onAdFailedToLoad: (error) {
+          _logger.severe('Interstitial Ad failed to load: $error');
+          completer.complete(null);
+        },
+      ),
+    );
+
+    final googleInterstitialAd = await completer.future.timeout(
+      const Duration(seconds: _adLoadTimeout),
+      onTimeout: () {
+        _logger.warning('Interstitial ad loading timed out.');
+        return null;
+      },
+    );
+
+    if (googleInterstitialAd == null) {
+      return null;
+    }
+
+    // Interstitial ads are typically shown immediately or on demand,
+    // not rendered as a widget in a feed. We wrap it as a NativeAd
+    // for consistency in the AdService return type, but its `adObject`
+    // will be an `InterstitialAd` which can be shown.
+    return app_native_ad.NativeAd(
+      id: _uuid.v4(),
+      provider: AdPlatformType.admob,
+      adObject: googleInterstitialAd,
+      templateType: app_native_ad.NativeAdTemplateType.medium, // Arbitrary for interstitial
     );
   }
 

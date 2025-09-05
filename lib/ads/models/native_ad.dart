@@ -1,9 +1,6 @@
-import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
-import 'package:json_annotation/json_annotation.dart';
 import 'package:core/core.dart'; // Import core for AdPlatformType
-
-part 'native_ad.g.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart';
 
 /// {@template native_ad_template_type}
 /// Defines the visual template type for an inline native ad.
@@ -20,50 +17,33 @@ enum NativeAdTemplateType {
 }
 
 /// {@template native_ad}
-/// A generic, provider-agnostic model representing an inline native or banner advertisement.
+/// A generic, provider-agnostic model representing an inline native advertisement.
 ///
 /// This model decouples the application's core logic from specific ad network
 /// SDKs (e.g., Google Mobile Ads). It holds a reference to the original,
 /// SDK-specific ad object for rendering purposes and a [provider] type
-/// to identify its origin. This model is intended for ads displayed directly
-/// within content feeds or other UI elements, not for full-screen interstitials.
+/// to identify its origin. This model is intended for native ads displayed
+/// directly within content feeds or other UI elements.
 /// {@endtemplate}
 @immutable
-@JsonSerializable(explicitToJson: true, includeIfNull: true, checked: true)
-class NativeAd extends Equatable {
+class NativeAd extends InlineAd {
   /// {@macro native_ad}
   const NativeAd({
-    required this.id,
-    required this.provider,
-    required this.adObject,
+    required super.id,
+    required super.provider,
+    required super.adObject,
     required this.templateType,
   });
-
-  /// A unique identifier for this specific inline ad instance.
-  final String id;
-
-  /// The ad provider that this ad belongs to.
-  ///
-  /// This is used by the UI to determine which rendering widget to use.
-  final AdPlatformType provider;
-
-  /// The original, SDK-specific ad object.
-  ///
-  /// This object is passed directly to the ad network's UI widget for rendering.
-  /// It should be cast back to its specific type (e.g., `google_mobile_ads.NativeAd`
-  /// or `google_mobile_ads.BannerAd`) only within the dedicated ad rendering
-  /// widget for that provider.
-  final Object adObject;
 
   /// The template type of the native ad, indicating its expected size and layout.
   ///
   /// This is relevant for native ads and can be used to determine the visual
-  /// presentation in the UI. For banner ads, this might default to a small
-  /// template type or be ignored by the rendering widget.
+  /// presentation in the UI.
   final NativeAdTemplateType templateType;
 
   /// Creates a copy of this [NativeAd] but with the given fields replaced with
   /// the new values.
+  @override
   NativeAd copyWith({
     String? id,
     AdPlatformType? provider,
@@ -80,11 +60,4 @@ class NativeAd extends Equatable {
 
   @override
   List<Object?> get props => [id, provider, adObject, templateType];
-
-  /// Converts this [NativeAd] instance to JSON data.
-  Map<String, dynamic> toJson() => _$NativeAdToJson(this);
-
-  /// Creates an [NativeAd] from JSON data.
-  factory NativeAd.fromJson(Map<String, dynamic> json) =>
-      _$NativeAdFromJson(json);
 }

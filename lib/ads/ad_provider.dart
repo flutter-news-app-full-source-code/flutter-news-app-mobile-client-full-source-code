@@ -1,5 +1,6 @@
 import 'package:core/core.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart'; // Import the new BannerAd model
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart';
 
@@ -37,14 +38,14 @@ abstract class AdProvider {
 
   /// Loads an inline banner ad.
   ///
-  /// Returns a [NativeAd] object if an ad is successfully loaded,
+  /// Returns a [BannerAd] object if an ad is successfully loaded,
   /// otherwise returns `null`. This method is intended for banner ads
   /// that are displayed directly within content feeds.
   ///
   /// The [adPlatformIdentifiers] provides the platform-specific ad unit IDs.
   /// The [adId] is the specific identifier for the ad slot (e.g., banner ad unit ID).
   /// The [adThemeStyle] provides UI-agnostic theme properties for ad styling.
-  Future<NativeAd?> loadBannerAd({
+  Future<BannerAd?> loadBannerAd({
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
     required AdThemeStyle adThemeStyle,

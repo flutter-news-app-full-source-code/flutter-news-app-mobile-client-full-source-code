@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart';
 import 'package:logging/logging.dart';
+import 'package:core/core.dart'; // Import core for AdPlatformType
 
 /// {@template ad_cache_service}
 /// A singleton service for caching loaded native ad objects.
@@ -68,7 +69,7 @@ class AdCacheService {
     for (final ad in _cache.values) {
       // Only dispose if the ad is an AdMob native ad.
       // Placeholder ads do not have native resources to dispose.
-      if (ad?.provider == AdProviderType.admob) {
+      if (ad?.provider == AdPlatformType.admob) {
         // Cast to the specific AdMob NativeAd type to call dispose.
         // This is safe because we check the provider type.
         (ad!.adObject as dynamic).dispose();

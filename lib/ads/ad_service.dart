@@ -73,19 +73,12 @@ class AdService {
       return null;
     }
 
-    String? adId;
-    switch (adType) {
-      case AdType.native:
-        adId = platformAdIdentifiers.feedNativeAdId;
-      case AdType.banner:
-        adId = platformAdIdentifiers.feedBannerAdId;
-      case AdType.interstitial:
-        adId = platformAdIdentifiers.feedToArticleInterstitialAdId;
-      case AdType.video:
-        // TODO(fulleni): Implement video ad ID if needed
-        _logger.warning('Video ad type not yet supported.');
-        return null;
-    }
+    final String? adId = switch (adType) {
+      AdType.native => platformAdIdentifiers.feedNativeAdId,
+      AdType.banner => platformAdIdentifiers.feedBannerAdId,
+      AdType.interstitial => platformAdIdentifiers.feedToArticleInterstitialAdId,
+      AdType.video => null, // Video ad type not yet supported
+    };
 
     if (adId == null || adId.isEmpty) {
       _logger.warning(
@@ -98,26 +91,37 @@ class AdService {
       'Requesting $adType ad from $primaryAdPlatform AdProvider with ID: $adId',
     );
     try {
-      app_native_ad.NativeAd? nativeAd;
-      if (adType == AdType.native) {
-        nativeAd = await adProvider.loadNativeAd(
-          adPlatformIdentifiers: platformAdIdentifiers,
-          adId: adId,
-          adType: adType,
-          adThemeStyle: adThemeStyle,
-        );
-      } else if (adType == AdType.banner) {
-        nativeAd = await adProvider.loadBannerAd(
-          adPlatformIdentifiers: platformAdIdentifiers,
-          adId: adId,
-          adType: adType,
-          adThemeStyle: adThemeStyle,
-        );
+      app_native_ad.NativeAd? loadedAd;
+      switch (adType) {
+        case AdType.native:
+          loadedAd = await adProvider.loadNativeAd(
+            adPlatformIdentifiers: platformAdIdentifiers,
+            adId: adId,
+            adType: adType,
+            adThemeStyle: adThemeStyle,
+          );
+        case AdType.banner:
+          loadedAd = await adProvider.loadBannerAd(
+            adPlatformIdentifiers: platformAdIdentifiers,
+            adId: adId,
+            adType: adType,
+            adThemeStyle: adThemeStyle,
+          );
+        case AdType.interstitial:
+          loadedAd = await adProvider.loadInterstitialAd(
+            adPlatformIdentifiers: platformAdIdentifiers,
+            adId: adId,
+            adType: adType,
+            adThemeStyle: adThemeStyle,
+          );
+        case AdType.video:
+          _logger.warning('Video ad type not yet supported.');
+          return null;
       }
 
-      if (nativeAd != null) {
+      if (loadedAd != null) {
         _logger.info('$adType ad successfully loaded and wrapped.');
-        return AdFeedItem(id: _uuid.v4(), nativeAd: nativeAd);
+        return AdFeedItem(id: _uuid.v4(), nativeAd: loadedAd);
       } else {
         _logger.info('No $adType ad loaded by AdProvider.');
         return null;

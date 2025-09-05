@@ -1,5 +1,8 @@
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/models.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/local_banner_ad_widget.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/local_native_ad_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/placeholder_ad_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/widgets.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -9,7 +12,7 @@ import 'package:ui_kit/ui_kit.dart';
 /// providers.
 ///
 /// This widget inspects the [AdFeedItem]'s underlying [NativeAd] to determine
-/// its [AdProviderType]. It then delegates the rendering to the appropriate
+/// its [AdPlatformType]. It then delegates the rendering to the appropriate
 /// provider-specific widget (e.g., [AdmobNativeAdWidget]).
 ///
 /// This approach ensures that the ad rendering logic is decoupled from the
@@ -61,12 +64,22 @@ class _AdDispatcher extends StatelessWidget {
     // Use a switch statement on the provider to determine which widget to build.
     // This is the core of the platform-agnostic rendering logic.
     switch (nativeAd.provider) {
-      case AdProviderType.admob:
+      case AdPlatformType.admob:
         // If the provider is AdMob, render the AdmobNativeAdWidget.
         // Pass the nativeAd object directly. The AdmobNativeAdWidget is now
         // stateful and will manage its own lifecycle.
         return AdmobNativeAdWidget(nativeAd: nativeAd);
-      case AdProviderType.placeholder:
+      case AdPlatformType.local:
+        // If the provider is local, dispatch based on the actual LocalAd type.
+        final localAd = nativeAd.adObject;
+        if (localAd is LocalNativeAd) {
+          return LocalNativeAdWidget(localNativeAd: localAd);
+        } else if (localAd is LocalBannerAd) {
+          return LocalBannerAdWidget(localBannerAd: localAd);
+        }
+        // Fallback for unsupported local ad types or errors
+        return const PlaceholderAdWidget();
+      case AdPlatformType.local: // Placeholder for local ads
         // If the provider is a placeholder, render the PlaceholderAdWidget.
         // This is used for web or other unsupported platforms to maintain UI.
         return const PlaceholderAdWidget();

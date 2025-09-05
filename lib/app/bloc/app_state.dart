@@ -41,6 +41,8 @@ class AppState extends Equatable {
     this.locale = const Locale('en'), // Default to English
     this.remoteConfig,
     this.environment,
+    this.pageTransitionCount = 0, // New field for tracking page transitions
+    required this.showInterstitialAdStream, // New stream for interstitial ad signals
   });
 
   /// The index of the currently selected item in the bottom navigation bar.
@@ -77,6 +79,16 @@ class AppState extends Equatable {
   /// The current application environment (e.g., production, development, demo).
   final local_config.AppEnvironment? environment;
 
+  /// Tracks the number of page transitions since the last interstitial ad was shown.
+  /// This count is used to determine when to display an interstitial ad.
+  final int pageTransitionCount;
+
+  /// A stream that emits a signal when an interstitial ad should be shown.
+  ///
+  /// This stream is used by the [AdNavigatorObserver] to trigger the display
+  /// of interstitial ads based on the [AppBloc]'s logic.
+  final Stream<void> showInterstitialAdStream;
+
   /// Creates a copy of the current state with updated values.
   AppState copyWith({
     int? selectedBottomNavigationIndex,
@@ -90,6 +102,8 @@ class AppState extends Equatable {
     Locale? locale,
     RemoteConfig? remoteConfig,
     local_config.AppEnvironment? environment,
+    int? pageTransitionCount, // New parameter for pageTransitionCount
+    Stream<void>? showInterstitialAdStream, // New parameter for the stream
     bool clearFontFamily = false,
     bool clearAppConfig = false,
     bool clearEnvironment = false,
@@ -107,6 +121,9 @@ class AppState extends Equatable {
       locale: locale ?? this.locale,
       remoteConfig: clearAppConfig ? null : remoteConfig ?? this.remoteConfig,
       environment: clearEnvironment ? null : environment ?? this.environment,
+      pageTransitionCount: pageTransitionCount ?? this.pageTransitionCount,
+      showInterstitialAdStream:
+          showInterstitialAdStream ?? this.showInterstitialAdStream,
     );
   }
 
@@ -123,5 +140,7 @@ class AppState extends Equatable {
     locale,
     remoteConfig,
     environment,
+    pageTransitionCount,
+    showInterstitialAdStream, // Include in props
   ];
 }

@@ -95,3 +95,8 @@ class AppUserFeedDecoratorShown extends AppEvent {
   @override
   List<Object> get props => [userId, feedDecoratorType, isCompleted];
 }
+
+/// Dispatched when a page transition occurs, used for tracking interstitial ad frequency.
+class AppPageTransitioned extends AppEvent {
+  const AppPageTransitioned();
+}

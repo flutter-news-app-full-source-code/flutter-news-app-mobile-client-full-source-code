@@ -7,10 +7,13 @@ import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart'; // Import AdService
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart'; // Import AdThemeStyle
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
     as local_config;
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_initializer_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
+import 'package:logging/logging.dart'; // Import Logger
 
 part 'app_event.dart';
 part 'app_state.dart';
@@ -22,55 +25,61 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required DataRepository<RemoteConfig> appConfigRepository,
     required DataRepository<User> userRepository,
     required local_config.AppEnvironment environment,
+    required AdService adService, // Inject AdService
     this.demoDataMigrationService,
     this.demoDataInitializerService,
     this.initialUser,
-  }) : _authenticationRepository = authenticationRepository,
-       _userAppSettingsRepository = userAppSettingsRepository,
-       _appConfigRepository = appConfigRepository,
-       _userRepository = userRepository,
-       _environment = environment,
-       super(
-         AppState(
-           // Initialize with default settings and preferences.
-           // This is crucial for immediate UI rendering and provides a safe
-           // fallback before user-specific settings are loaded.
-           // The `AppSettingsRefreshed` event will later replace these
-           // with actual user data.
-           settings: UserAppSettings(
-             id: 'default',
-             displaySettings: const DisplaySettings(
-               baseTheme: AppBaseTheme.system,
-               accentTheme: AppAccentTheme.defaultBlue,
-               fontFamily: 'SystemDefault',
-               textScaleFactor: AppTextScaleFactor.medium,
-               fontWeight: AppFontWeight.regular,
-             ),
-             language: languagesFixturesData.firstWhere(
-               (l) => l.code == 'en',
-               orElse: () => throw StateError(
-                 'Default language "en" not found in language fixtures.',
-               ),
-             ),
-             feedPreferences: const FeedDisplayPreferences(
-               headlineDensity: HeadlineDensity.standard,
-               headlineImageStyle: HeadlineImageStyle.largeThumbnail,
-               showSourceInHeadlineFeed: true,
-               showPublishDateInHeadlineFeed: true,
-             ),
-           ),
-           selectedBottomNavigationIndex: 0,
-           remoteConfig: null,
-           environment: environment,
-           // Initialize status and user based on initialUser
-           status: initialUser != null
-               ? (initialUser.appRole == AppUserRole.standardUser
-                     ? AppStatus.authenticated
-                     : AppStatus.anonymous)
-               : AppStatus.unauthenticated,
-           user: initialUser,
-         ),
-       ) {
+  })  : _authenticationRepository = authenticationRepository,
+        _userAppSettingsRepository = userAppSettingsRepository,
+        _appConfigRepository = appConfigRepository,
+        _userRepository = userRepository,
+        _environment = environment,
+        _adService = adService, // Initialize AdService
+        _logger = Logger('AppBloc'), // Initialize Logger
+        _showInterstitialAdController = StreamController<void>.broadcast(), // Initialize the stream controller
+        super(
+          AppState(
+            // Initialize with default settings and preferences.
+            // This is crucial for immediate UI rendering and provides a safe
+            // fallback before user-specific settings are loaded.
+            // The `AppSettingsRefreshed` event will later replace these
+            // with actual user data.
+            settings: UserAppSettings(
+              id: 'default',
+              displaySettings: const DisplaySettings(
+                baseTheme: AppBaseTheme.system,
+                accentTheme: AppAccentTheme.defaultBlue,
+                fontFamily: 'SystemDefault',
+                textScaleFactor: AppTextScaleFactor.medium,
+                fontWeight: AppFontWeight.regular,
+              ),
+              language: languagesFixturesData.firstWhere(
+                (l) => l.code == 'en',
+                orElse: () => throw StateError(
+                  'Default language "en" not found in language fixtures.',
+                ),
+              ),
+              feedPreferences: const FeedDisplayPreferences(
+                headlineDensity: HeadlineDensity.standard,
+                headlineImageStyle: HeadlineImageStyle.largeThumbnail,
+                showSourceInHeadlineFeed: true,
+                showPublishDateInHeadlineFeed: true,
+              ),
+            ),
+            selectedBottomNavigationIndex: 0,
+            remoteConfig: null,
+            environment: environment,
+            // Initialize status and user based on initialUser
+            status: initialUser != null
+                ? (initialUser.appRole == AppUserRole.standardUser
+                    ? AppStatus.authenticated
+                    : AppStatus.anonymous)
+                : AppStatus.unauthenticated,
+            user: initialUser,
+            pageTransitionCount: 0, // Initialize page transition count
+            showInterstitialAdStream: _showInterstitialAdController.stream, // Provide the stream
+          ),
+        ) {
     on<AppUserChanged>(_onAppUserChanged);
     on<AppSettingsRefreshed>(_onAppSettingsRefreshed);
     on<AppConfigFetchRequested>(_onAppConfigFetchRequested);
@@ -81,6 +90,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppFontFamilyChanged>(_onFontFamilyChanged);
     on<AppTextScaleFactorChanged>(_onAppTextScaleFactorChanged);
     on<AppFontWeightChanged>(_onAppFontWeightChanged);
+    on<AppPageTransitioned>(_onAppPageTransitioned); // New event handler
 
     // Listen directly to the auth state changes stream
     _userSubscription = _authenticationRepository.authStateChanges.listen(
@@ -93,6 +103,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final DataRepository<RemoteConfig> _appConfigRepository;
   final DataRepository<User> _userRepository;
   final local_config.AppEnvironment _environment;
+  final AdService _adService; // AdService instance
+  final Logger _logger; // Logger instance
+  final StreamController<void> _showInterstitialAdController; // Stream controller for interstitial ads
   final DemoDataMigrationService? demoDataMigrationService;
   final DemoDataInitializerService? demoDataInitializerService;
   final User? initialUser;
@@ -128,21 +141,21 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       if (_environment == local_config.AppEnvironment.demo &&
           demoDataInitializerService != null) {
         try {
-          print(
-            '[AppBloc] Demo mode: Initializing user-specific data for '
+          _logger.info(
+            'Demo mode: Initializing user-specific data for '
             'user ${event.user!.id}.',
           );
           await demoDataInitializerService!.initializeUserSpecificData(
             event.user!,
           );
-          print(
-            '[AppBloc] Demo mode: User-specific data initialization completed '
+          _logger.info(
+            'Demo mode: User-specific data initialization completed '
             'for user ${event.user!.id}.',
           );
         } catch (e, s) {
           // It's important to handle failures here to avoid crashing the app.
           // Consider emitting a specific failure state if this is critical.
-          print('[AppBloc] ERROR: Failed to initialize demo user data: $e\n$s');
+          _logger.severe('ERROR: Failed to initialize demo user data: $e\n$s');
         }
       }
 
@@ -153,16 +166,16 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       if (oldUser != null &&
           oldUser.appRole == AppUserRole.guestUser &&
           event.user!.appRole == AppUserRole.standardUser) {
-        print(
-          '[AppBloc] Anonymous user ${oldUser.id} transitioned to '
+        _logger.info(
+          'Anonymous user ${oldUser.id} transitioned to '
           'authenticated user ${event.user!.id}. Attempting data migration.',
         );
         // This block handles data migration specifically for the demo environment.
         // In production/development, this logic is typically handled by the backend.
         if (demoDataMigrationService != null &&
             _environment == local_config.AppEnvironment.demo) {
-          print(
-            '[AppBloc] Demo mode: Awaiting data migration from anonymous '
+          _logger.info(
+            'Demo mode: Awaiting data migration from anonymous '
             'user ${oldUser.id} to authenticated user ${event.user!.id}.',
           );
           // Await the migration to ensure it completes before refreshing settings.
@@ -173,13 +186,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           // After successful migration, explicitly refresh app settings
           // to load the newly migrated data into the AppBloc's state.
           add(const AppSettingsRefreshed());
-          print(
-            '[AppBloc] Demo mode: Data migration completed and settings '
+          _logger.info(
+            'Demo mode: Data migration completed and settings '
             'refresh triggered for user ${event.user!.id}.',
           );
         } else {
-          print(
-            '[AppBloc] DemoDataMigrationService not available or not in demo '
+          _logger.info(
+            'DemoDataMigrationService not available or not in demo '
             'environment. Skipping client-side data migration.',
           );
         }
@@ -191,6 +204,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           remoteConfig: null,
           clearAppConfig: true,
           status: AppStatus.unauthenticated,
+          pageTransitionCount: 0, // Reset page transition count on logout
         ),
       );
     }
@@ -230,14 +244,14 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // Map language code to Locale
       final newLocale = Locale(userAppSettings.language.code);
 
-      print(
-        '[AppBloc] _onAppSettingsRefreshed: userAppSettings.fontFamily: ${userAppSettings.displaySettings.fontFamily}',
+      _logger.info(
+        '_onAppSettingsRefreshed: userAppSettings.fontFamily: ${userAppSettings.displaySettings.fontFamily}',
       );
-      print(
-        '[AppBloc] _onAppSettingsRefreshed: userAppSettings.fontWeight: ${userAppSettings.displaySettings.fontWeight}',
+      _logger.info(
+        '_onAppSettingsRefreshed: userAppSettings.fontWeight: ${userAppSettings.displaySettings.fontWeight}',
       );
-      print(
-        '[AppBloc] _onAppSettingsRefreshed: newFontFamily mapped to: $newFontFamily',
+      _logger.info(
+        '_onAppSettingsRefreshed: newFontFamily mapped to: $newFontFamily',
       );
 
       emit(
@@ -253,7 +267,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     } catch (e) {
       // Handle other potential errors during settings fetch
       // Optionally emit a failure state or log the error
-      print('Error loading user app settings in AppBloc: $e');
+      _logger.severe('Error loading user app settings in AppBloc: $e');
       // Keep the existing theme/font state on error, but ensure settings is not null
       emit(state.copyWith(settings: state.settings));
     }
@@ -353,6 +367,63 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // unawaited(_userAppSettingsRepository.update(id: updatedSettings.id, item: updatedSettings));
   }
 
+  /// Handles page transition events to track interstitial ad frequency.
+  Future<void> _onAppPageTransitioned(
+    AppPageTransitioned event,
+    Emitter<AppState> emit,
+  ) async {
+    // Increment the page transition count.
+    final newCount = state.pageTransitionCount + 1;
+    emit(state.copyWith(pageTransitionCount: newCount));
+
+    _logger.info('Page transitioned. Current count: $newCount');
+
+    final remoteConfig = state.remoteConfig;
+    final user = state.user;
+
+    // Only proceed if remote config is available, ads are globally enabled,
+    // and interstitial ads are enabled in the config.
+    if (remoteConfig == null ||
+        !remoteConfig.adConfig.enabled ||
+        !remoteConfig.adConfig.interstitialAdConfiguration.enabled) {
+      _logger.info('Interstitial ads are not enabled or config not ready.');
+      return;
+    }
+
+    final interstitialConfig = remoteConfig.adConfig.interstitialAdConfiguration;
+    final frequencyConfig = interstitialConfig.feedInterstitialAdFrequencyConfig;
+
+    // Determine the required transitions based on user role.
+    final int requiredTransitions;
+    switch (user?.appRole) {
+      case AppUserRole.guestUser:
+        requiredTransitions =
+            frequencyConfig.guestTransitionsBeforeShowingInterstitialAds;
+      case AppUserRole.standardUser:
+        requiredTransitions =
+            frequencyConfig.standardUserTransitionsBeforeShowingInterstitialAds;
+      case AppUserRole.premiumUser:
+        requiredTransitions =
+            frequencyConfig.premiumUserTransitionsBeforeShowingInterstitialAds;
+      case null:
+        // If user is null, default to guest user settings.
+        requiredTransitions =
+            frequencyConfig.guestTransitionsBeforeShowingInterstitialAds;
+    }
+
+    _logger.info(
+      'Required transitions for user role ${user?.appRole}: $requiredTransitions',
+    );
+
+    // Check if it's time to show an interstitial ad.
+    if (requiredTransitions > 0 && newCount >= requiredTransitions) {
+      _logger.info('Interstitial ad due. Signaling AdNavigatorObserver.');
+      // Signal the AdNavigatorObserver to show the ad.
+      _showInterstitialAdController.add(null); // Add a signal to the stream
+      emit(state.copyWith(pageTransitionCount: 0)); // Reset count after signaling
+    }
+  }
+
   // --- Settings Mapping Helpers ---
 
   ThemeMode _mapAppBaseTheme(AppBaseTheme mode) {
@@ -380,16 +451,16 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   String? _mapFontFamily(String fontFamilyString) {
     // If the input is 'SystemDefault', return null so FlexColorScheme uses its default.
     if (fontFamilyString == 'SystemDefault') {
-      print(
-        '[AppBloc] _mapFontFamily: Input is SystemDefault, returning null.',
+      _logger.info(
+        '_mapFontFamily: Input is SystemDefault, returning null.',
       );
       return null;
     }
     // Otherwise, return the font family string directly.
     // The GoogleFonts.xyz().fontFamily getters often return strings like "Roboto-Regular",
     // but FlexColorScheme's fontFamily parameter or GoogleFonts.xyzTextTheme() expect simple names.
-    print(
-      '[AppBloc] _mapFontFamily: Input is $fontFamilyString, returning as is.',
+    _logger.info(
+      '_mapFontFamily: Input is $fontFamilyString, returning as is.',
     );
     return fontFamilyString;
   }
@@ -402,6 +473,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   @override
   Future<void> close() {
     _userSubscription.cancel();
+    _showInterstitialAdController.close(); // Close the stream controller
     return super.close();
   }
 
@@ -411,7 +483,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   ) async {
     // Guard: Only fetch if a user (authenticated or anonymous) is present.
     if (state.user == null) {
-      print(
+      _logger.info(
         '[AppBloc] User is null. Skipping AppConfig fetch because it requires authentication.',
       );
       // If AppConfig was somehow present without a user, clear it.
@@ -432,17 +504,17 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // For background checks, we don't want to show a loading screen.
     // Only for the initial fetch should we set the status to configFetching.
     if (!event.isBackgroundCheck) {
-      print(
+      _logger.info(
         '[AppBloc] Initial config fetch. Setting status to configFetching.',
       );
       emit(state.copyWith(status: AppStatus.configFetching));
     } else {
-      print('[AppBloc] Background config fetch. Proceeding silently.');
+      _logger.info('[AppBloc] Background config fetch. Proceeding silently.');
     }
 
     try {
       final remoteConfig = await _appConfigRepository.read(id: kRemoteConfigId);
-      print(
+      _logger.info(
         '[AppBloc] Remote Config fetched successfully. ID: ${remoteConfig.id} for user: ${state.user!.id}',
       );
 
@@ -483,7 +555,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           : AppStatus.anonymous;
       emit(state.copyWith(remoteConfig: remoteConfig, status: finalStatus));
     } on HttpException catch (e) {
-      print(
+      _logger.severe(
         '[AppBloc] Failed to fetch AppConfig (HttpException) for user ${state.user?.id}: ${e.runtimeType} - ${e.message}',
       );
       // Only show a failure screen on an initial fetch.
@@ -491,17 +563,18 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       if (!event.isBackgroundCheck) {
         emit(state.copyWith(status: AppStatus.configFetchFailed));
       } else {
-        print('[AppBloc] Silent failure on background config fetch.');
+        _logger.info('[AppBloc] Silent failure on background config fetch.');
       }
     } catch (e, s) {
-      print(
+      _logger.severe(
         '[AppBloc] Unexpected error fetching AppConfig for user ${state.user?.id}: $e',
+        e,
+        s,
       );
-      print('[AppBloc] Stacktrace: $s');
       if (!event.isBackgroundCheck) {
         emit(state.copyWith(status: AppStatus.configFetchFailed));
       } else {
-        print('[AppBloc] Silent failure on background config fetch.');
+        _logger.info('[AppBloc] Silent failure on background config fetch.');
       }
     }
   }
@@ -552,12 +625,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           item: updatedUser,
           userId: updatedUser.id,
         );
-        print(
+        _logger.info(
           '[AppBloc] User ${event.userId} FeedDecorator ${event.feedDecoratorType} '
           'status successfully updated on the backend.',
         );
       } catch (e) {
-        print('Failed to update feed decorator status on backend: $e');
+        _logger.severe('Failed to update feed decorator status on backend: $e');
         // Revert the state on failure to maintain consistency.
         emit(state.copyWith(user: originalUser));
       }

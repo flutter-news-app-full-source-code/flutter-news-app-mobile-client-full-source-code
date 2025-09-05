@@ -5,6 +5,7 @@ import 'package:data_repository/data_repository.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart'; // Import the new AdPlaceholder model
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:logging/logging.dart'; // Added import for Logger
 import 'package:uuid/uuid.dart';
 
 /// A result object returned by the [FeedDecoratorService].
@@ -100,12 +101,15 @@ class FeedDecoratorService {
   FeedDecoratorService({
     required DataRepository<Topic> topicsRepository,
     required DataRepository<Source> sourcesRepository,
+    Logger? logger, // Added logger parameter
   }) : _topicsRepository = topicsRepository,
-       _sourcesRepository = sourcesRepository;
+       _sourcesRepository = sourcesRepository,
+       _logger = logger ?? Logger('FeedDecoratorService'); // Initialized logger
 
   final Uuid _uuid = const Uuid();
   final DataRepository<Topic> _topicsRepository;
   final DataRepository<Source> _sourcesRepository;
+  final Logger _logger; // Declared logger
 
   // The zero-based index in the feed where the decorator will be inserted.
   // A value of 3 places it after the third headline, which is a common
@@ -183,18 +187,24 @@ class FeedDecoratorService {
     }
 
     // --- Step 2: Ad Placeholder Injection ---
-    // Inject ad placeholders into the list that may or may not already contain a decorator.
-    final finalFeed = await injectAdPlaceholders(
-      feedItems: feedWithDecorators,
-      user: user,
-      adConfig: remoteConfig.adConfig,
-      imageStyle: imageStyle,
-      adThemeStyle: adThemeStyle,
-    );
+    // Only inject ad placeholders if ads are globally enabled in the RemoteConfig.
+    if (remoteConfig.adConfig.enabled) {
+      final finalFeed = await injectAdPlaceholders(
+        feedItems: feedWithDecorators,
+        user: user,
+        adConfig: remoteConfig.adConfig,
+        imageStyle: imageStyle,
+        adThemeStyle: adThemeStyle,
+      );
+      // Replace the feedWithDecorators with the finalFeed that includes ads.
+      feedWithDecorators
+        ..clear()
+        ..addAll(finalFeed);
+    }
 
     // --- Step 3: Return the comprehensive result ---
     return FeedDecoratorResult(
-      decoratedItems: finalFeed,
+      decoratedItems: feedWithDecorators,
       injectedDecorator: injectedDecorator,
     );
   }
@@ -398,21 +408,29 @@ class FeedDecoratorService {
     required AdThemeStyle adThemeStyle,
     int processedContentItemCount = 0,
   }) async {
+    // If feed ads are not enabled in the remote config, return the original list.
+    if (!adConfig.feedAdConfiguration.enabled) {
+      return feedItems;
+    }
+
     final userRole = user?.appRole ?? AppUserRole.guestUser;
 
     // Determine ad frequency rules based on user role.
     final (adFrequency, adPlacementInterval) = switch (userRole) {
       AppUserRole.guestUser => (
-        adConfig.guestAdFrequency,
-        adConfig.guestAdPlacementInterval,
+        adConfig.feedAdConfiguration.frequencyConfig.guestAdFrequency,
+        adConfig.feedAdConfiguration.frequencyConfig.guestAdPlacementInterval,
       ),
       AppUserRole.standardUser => (
-        adConfig.authenticatedAdFrequency,
-        adConfig.authenticatedAdPlacementInterval,
+        adConfig.feedAdConfiguration.frequencyConfig.authenticatedAdFrequency,
+        adConfig
+            .feedAdConfiguration
+            .frequencyConfig
+            .authenticatedAdPlacementInterval,
       ),
       AppUserRole.premiumUser => (
-        adConfig.premiumAdFrequency,
-        adConfig.premiumAdPlacementInterval,
+        adConfig.feedAdConfiguration.frequencyConfig.premiumAdFrequency,
+        adConfig.feedAdConfiguration.frequencyConfig.premiumAdPlacementInterval,
       ),
     };
 
@@ -426,6 +444,21 @@ class FeedDecoratorService {
     // topics, sources, countries) processed so far, including those from
     // previous pages. This is key for accurate ad placement.
     var currentContentItemCount = processedContentItemCount;
+
+    // Get the primary ad platform and its identifiers
+    final primaryAdPlatform = adConfig.primaryAdPlatform;
+    final platformAdIdentifiers =
+        adConfig.platformAdIdentifiers[primaryAdPlatform];
+    if (platformAdIdentifiers == null) {
+      _logger.warning(
+        'No AdPlatformIdentifiers found for primary platform: $primaryAdPlatform. '
+        'Cannot inject ad placeholders.',
+      );
+      return feedItems;
+    }
+
+    // Get the ad type for feed ads
+    final feedAdType = adConfig.feedAdConfiguration.adType;
 
     for (final item in feedItems) {
       result.add(item);
@@ -447,15 +480,47 @@ class FeedDecoratorService {
       //    multiple of the ad frequency.
       if (currentContentItemCount >= adPlacementInterval &&
           (currentContentItemCount - adPlacementInterval) % adFrequency == 0) {
-        // Instead of injecting a fully loaded ad, inject an AdPlaceholder.
-        // This is a crucial change: the FeedDecoratorService no longer loads
-        // the actual ad. It only marks a spot for an ad.
-        //
-        // The actual ad loading will be handled by a dedicated `AdLoaderWidget`
-        // in the UI layer when this placeholder scrolls into view. This
-        // decouples ad loading from the BLoC's state and allows for efficient
-        // caching and disposal of native ad resources.
-        result.add(AdPlaceholder(id: _uuid.v4()));
+        String? adUnitId;
+        String? localAdId;
+
+        if (primaryAdPlatform == AdPlatformType.admob) {
+          adUnitId = switch (feedAdType) {
+            AdType.native => platformAdIdentifiers.feedNativeAdId,
+            AdType.banner => platformAdIdentifiers.feedBannerAdId,
+            _ => null, // Interstitial/Video not expected in feed
+          };
+        } else if (primaryAdPlatform == AdPlatformType.local) {
+          localAdId = switch (feedAdType) {
+            AdType.native => platformAdIdentifiers.feedNativeAdId,
+            AdType.banner => platformAdIdentifiers.feedBannerAdId,
+            _ => null, // Interstitial/Video not expected in feed
+          };
+        }
+
+        if (adUnitId != null || localAdId != null) {
+          // Instead of injecting a fully loaded ad, inject an AdPlaceholder.
+          // This is a crucial change: the FeedDecoratorService no longer loads
+          // the actual ad. It only marks a spot for an ad.
+          //
+          // The actual ad loading will be handled by a dedicated `AdLoaderWidget`
+          // in the UI layer when this placeholder scrolls into view. This
+          // decouples ad loading from the BLoC's state and allows for efficient
+          // caching and disposal of native ad resources.
+          result.add(
+            AdPlaceholder(
+              id: _uuid.v4(),
+              adPlatformType: primaryAdPlatform,
+              adType: feedAdType,
+              adUnitId: adUnitId,
+              localAdId: localAdId,
+            ),
+          );
+        } else {
+          _logger.warning(
+            'No valid ad ID found for platform $primaryAdPlatform and type $feedAdType. '
+            'Ad placeholder not injected.',
+          );
+        }
       }
     }
     return result;

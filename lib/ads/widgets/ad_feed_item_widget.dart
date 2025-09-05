@@ -79,9 +79,8 @@ class _AdDispatcher extends StatelessWidget {
         }
         // Fallback for unsupported local ad types or errors
         return const PlaceholderAdWidget();
-      case AdPlatformType.local: // Placeholder for local ads
-        // If the provider is a placeholder, render the PlaceholderAdWidget.
-        // This is used for web or other unsupported platforms to maintain UI.
+      default:
+        // Fallback for unsupported ad platforms or types.
         return const PlaceholderAdWidget();
     }
   }

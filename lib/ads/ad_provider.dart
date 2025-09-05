@@ -31,7 +31,7 @@ abstract class AdProvider {
   /// The [adThemeStyle] provides UI-agnostic theme properties for ad styling.
   Future<app_native_ad.NativeAd?> loadNativeAd({
     required AdPlatformIdentifiers adPlatformIdentifiers,
-    required String adId,
+    required String? adId,
     required AdType adType,
     required AdThemeStyle adThemeStyle,
   });
@@ -47,7 +47,23 @@ abstract class AdProvider {
   /// The [adThemeStyle] provides UI-agnostic theme properties for ad styling.
   Future<app_native_ad.NativeAd?> loadBannerAd({
     required AdPlatformIdentifiers adPlatformIdentifiers,
-    required String adId,
+    required String? adId,
+    required AdType adType,
+    required AdThemeStyle adThemeStyle,
+  });
+
+  /// Loads an interstitial ad.
+  ///
+  /// Returns a [app_native_ad.NativeAd] object if an ad is successfully loaded,
+  /// otherwise returns `null`.
+  ///
+  /// The [adPlatformIdentifiers] provides the platform-specific ad unit IDs.
+  /// The [adId] is the specific identifier for the ad slot (e.g., interstitial ad unit ID).
+  /// The [adType] specifies the type of ad to load (must be [AdType.interstitial]).
+  /// The [adThemeStyle] provides UI-agnostic theme properties for ad styling.
+  Future<app_native_ad.NativeAd?> loadInterstitialAd({
+    required AdPlatformIdentifiers adPlatformIdentifiers,
+    required String? adId,
     required AdType adType,
     required AdThemeStyle adThemeStyle,
   });

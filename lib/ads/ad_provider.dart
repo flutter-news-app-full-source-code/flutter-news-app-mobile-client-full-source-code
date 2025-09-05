@@ -25,14 +25,30 @@ abstract class AdProvider {
   /// Returns a [app_native_ad.NativeAd] object if an ad is successfully loaded,
   /// otherwise returns `null`.
   ///
-  /// The [imageStyle] is used to select an appropriate native ad template
-  /// that best matches the visual density of the surrounding content.
+  /// The [adPlatformIdentifiers] provides the platform-specific ad unit IDs.
+  /// The [adId] is the specific identifier for the ad slot (e.g., native ad unit ID).
+  /// The [adType] specifies the type of ad to load (e.g., native, banner).
   /// The [adThemeStyle] provides UI-agnostic theme properties for ad styling.
   Future<app_native_ad.NativeAd?> loadNativeAd({
-    required HeadlineImageStyle imageStyle,
+    required AdPlatformIdentifiers adPlatformIdentifiers,
+    required String adId,
+    required AdType adType,
     required AdThemeStyle adThemeStyle,
   });
 
-  // Future methods for other ad types (e.g., interstitial, banner)
-  // can be added here as needed in the future.
+  /// Loads a banner ad.
+  ///
+  /// Returns a [app_native_ad.NativeAd] object if an ad is successfully loaded,
+  /// otherwise returns `null`.
+  ///
+  /// The [adPlatformIdentifiers] provides the platform-specific ad unit IDs.
+  /// The [adId] is the specific identifier for the ad slot (e.g., banner ad unit ID).
+  /// The [adType] specifies the type of ad to load (e.g., native, banner).
+  /// The [adThemeStyle] provides UI-agnostic theme properties for ad styling.
+  Future<app_native_ad.NativeAd?> loadBannerAd({
+    required AdPlatformIdentifiers adPlatformIdentifiers,
+    required String adId,
+    required AdType adType,
+    required AdThemeStyle adThemeStyle,
+  });
 }

@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
+import 'package:core/core.dart'; // Import core for AdPlatformType
 
 /// {@template native_ad_template_type}
 /// Defines the visual template type for a native ad.
@@ -13,23 +14,6 @@ enum NativeAdTemplateType {
 
   /// A medium native ad template, typically used for more prominent layouts.
   medium,
-}
-
-/// {@template ad_provider_type}
-/// Defines the supported ad network providers.
-///
-/// This enum is used to identify the source of a [NativeAd] object,
-/// allowing the UI to select the correct rendering widget at runtime.
-/// {@endtemplate}
-enum AdProviderType {
-  /// Google AdMob provider.
-  admob,
-
-  /// A placeholder provider for platforms where native ad SDKs are not supported.
-  ///
-  /// This is primarily used for the web demo environment to maintain UI
-  /// consistency without relying on native SDKs.
-  placeholder,
 }
 
 /// {@template native_ad}
@@ -56,7 +40,7 @@ class NativeAd extends Equatable {
   /// The ad provider that this ad belongs to.
   ///
   /// This is used by the UI to determine which rendering widget to use.
-  final AdProviderType provider;
+  final AdPlatformType provider; // Changed from AdProviderType to AdPlatformType
 
   /// The original, SDK-specific ad object.
   ///

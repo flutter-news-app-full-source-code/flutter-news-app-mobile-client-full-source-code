@@ -1,18 +1,17 @@
 import 'package:core/core.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'
-    as app_native_ad;
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart'; // Import the new InlineAd
 
 /// {@template ad_feed_item}
-/// A [FeedItem] that wraps a loaded native ad object from an ad network SDK.
+/// A [FeedItem] that wraps a loaded inline ad object from an ad network SDK.
 ///
-/// This class allows actual, displayable ad objects (like [app_native_ad.NativeAd]
+/// This class allows actual, displayable ad objects (like [InlineAd]
 /// from our generic ad model) to be seamlessly integrated into the application's
 /// generic feed structure alongside other content types (e.g., [Headline]).
 /// {@endtemplate}
 class AdFeedItem extends FeedItem with EquatableMixin {
   /// {@macro ad_feed_item}
-  const AdFeedItem({required this.id, required this.nativeAd})
+  const AdFeedItem({required this.id, required this.inlineAd})
     : super(type: 'ad_feed_item');
 
   /// A unique identifier for this specific ad instance in the feed.
@@ -21,11 +20,11 @@ class AdFeedItem extends FeedItem with EquatableMixin {
   /// the ad within the feed.
   final String id;
 
-  /// The loaded native ad object, represented by our generic [app_native_ad.NativeAd] model.
+  /// The loaded inline ad object, represented by our generic [InlineAd] model.
   ///
   /// This object contains the actual ad content and is ready for display.
-  final app_native_ad.NativeAd nativeAd;
+  final InlineAd inlineAd;
 
   @override
-  List<Object?> get props => [id, nativeAd, type];
+  List<Object?> get props => [id, inlineAd, type];
 }

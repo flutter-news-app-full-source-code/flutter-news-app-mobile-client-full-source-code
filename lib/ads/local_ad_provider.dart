@@ -35,7 +35,7 @@ class LocalAdProvider implements AdProvider {
   @override
   Future<app_native_ad.NativeAd?> loadNativeAd({
     required AdPlatformIdentifiers adPlatformIdentifiers,
-    required String adId,
+    required String? adId,
     required AdType adType,
     required AdThemeStyle adThemeStyle,
   }) async {
@@ -47,7 +47,7 @@ class LocalAdProvider implements AdProvider {
       return null;
     }
 
-    if (adId.isEmpty) {
+    if (adId == null || adId.isEmpty) {
       _logger.warning('No local native ad ID provided.');
       return null;
     }
@@ -61,7 +61,7 @@ class LocalAdProvider implements AdProvider {
         _logger.info('Local native ad loaded successfully: ${localNativeAd.id}');
         return app_native_ad.NativeAd(
           id: _uuid.v4(),
-          provider: AdPlatformType.local, // Changed from app_native_ad.AdProviderType.local
+          provider: AdPlatformType.local,
           adObject: localNativeAd,
           templateType: app_native_ad.NativeAdTemplateType.medium, // Default for local native
         );
@@ -88,7 +88,7 @@ class LocalAdProvider implements AdProvider {
   @override
   Future<app_native_ad.NativeAd?> loadBannerAd({
     required AdPlatformIdentifiers adPlatformIdentifiers,
-    required String adId,
+    required String? adId,
     required AdType adType,
     required AdThemeStyle adThemeStyle,
   }) async {
@@ -100,7 +100,7 @@ class LocalAdProvider implements AdProvider {
       return null;
     }
 
-    if (adId.isEmpty) {
+    if (adId == null || adId.isEmpty) {
       _logger.warning('No local banner ad ID provided.');
       return null;
     }
@@ -114,7 +114,7 @@ class LocalAdProvider implements AdProvider {
         _logger.info('Local banner ad loaded successfully: ${localBannerAd.id}');
         return app_native_ad.NativeAd(
           id: _uuid.v4(),
-          provider: AdPlatformType.local, // Changed from app_native_ad.AdProviderType.local
+          provider: AdPlatformType.local,
           adObject: localBannerAd,
           templateType: app_native_ad.NativeAdTemplateType.small, // Default for local banner
         );
@@ -131,6 +131,61 @@ class LocalAdProvider implements AdProvider {
     } catch (e, s) {
       _logger.severe(
         'Unexpected error loading local banner ad with ID $adId: $e',
+        e,
+        s,
+      );
+      return null;
+    }
+  }
+
+  @override
+  Future<app_native_ad.NativeAd?> loadInterstitialAd({
+    required AdPlatformIdentifiers adPlatformIdentifiers,
+    required String? adId,
+    required AdType adType,
+    required AdThemeStyle adThemeStyle,
+  }) async {
+    if (adType != AdType.interstitial) {
+      _logger.warning(
+        'LocalAdProvider.loadInterstitialAd called with incorrect AdType: '
+        '$adType. Expected AdType.interstitial.',
+      );
+      return null;
+    }
+
+    if (adId == null || adId.isEmpty) {
+      _logger.warning('No local interstitial ad ID provided.');
+      return null;
+    }
+
+    _logger.info('Attempting to load local interstitial ad with ID: $adId');
+
+    try {
+      final localInterstitialAd = await _localAdRepository.read(id: adId);
+
+      if (localInterstitialAd is LocalInterstitialAd) {
+        _logger.info(
+          'Local interstitial ad loaded successfully: ${localInterstitialAd.id}',
+        );
+        return app_native_ad.NativeAd(
+          id: _uuid.v4(),
+          provider: AdPlatformType.local,
+          adObject: localInterstitialAd,
+          templateType: app_native_ad.NativeAdTemplateType.medium, // Arbitrary for interstitial
+        );
+      } else {
+        _logger.warning(
+          'Fetched ad with ID $adId is not a LocalInterstitialAd. '
+          'Received type: ${localInterstitialAd.runtimeType}',
+        );
+        return null;
+      }
+    } on HttpException catch (e) {
+      _logger.severe('Error fetching local interstitial ad with ID $adId: $e');
+      return null;
+    } catch (e, s) {
+      _logger.severe(
+        'Unexpected error loading local interstitial ad with ID $adId: $e',
         e,
         s,
       );

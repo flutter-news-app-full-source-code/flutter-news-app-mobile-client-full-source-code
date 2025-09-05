@@ -2,9 +2,9 @@ import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart'; // Import the new BannerAd model
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'
-    as app_native_ad;
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'; // Import the refactored NativeAd model
 import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
 
@@ -13,7 +13,7 @@ import 'package:uuid/uuid.dart';
 ///
 /// This provider uses a [DataRepository<LocalAd>] to retrieve [LocalAd] objects
 /// from a backend or local data source. It adapts these [LocalAd] objects
-/// into our generic [app_native_ad.NativeAd] and [InterstitialAd] models for
+/// into our generic [NativeAd], [BannerAd], and [InterstitialAd] models for
 /// consistent handling within the application.
 /// {@endtemplate}
 class LocalAdProvider implements AdProvider {
@@ -37,7 +37,7 @@ class LocalAdProvider implements AdProvider {
   }
 
   @override
-  Future<app_native_ad.NativeAd?> loadNativeAd({
+  Future<NativeAd?> loadNativeAd({
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
     required AdThemeStyle adThemeStyle,
@@ -54,11 +54,11 @@ class LocalAdProvider implements AdProvider {
 
       if (localNativeAd is LocalNativeAd) {
         _logger.info('Local native ad loaded successfully: ${localNativeAd.id}');
-        return app_native_ad.NativeAd(
+        return NativeAd(
           id: _uuid.v4(),
           provider: AdPlatformType.local,
           adObject: localNativeAd,
-          templateType: app_native_ad.NativeAdTemplateType.medium, // Default for local native
+          templateType: NativeAdTemplateType.medium, // Default for local native
         );
       } else {
         _logger.warning(
@@ -81,7 +81,7 @@ class LocalAdProvider implements AdProvider {
   }
 
   @override
-  Future<app_native_ad.NativeAd?> loadBannerAd({
+  Future<BannerAd?> loadBannerAd({
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
     required AdThemeStyle adThemeStyle,
@@ -98,11 +98,10 @@ class LocalAdProvider implements AdProvider {
 
       if (localBannerAd is LocalBannerAd) {
         _logger.info('Local banner ad loaded successfully: ${localBannerAd.id}');
-        return app_native_ad.NativeAd(
+        return BannerAd(
           id: _uuid.v4(),
           provider: AdPlatformType.local,
           adObject: localBannerAd,
-          templateType: app_native_ad.NativeAdTemplateType.small, // Default for local banner
         );
       } else {
         _logger.warning(

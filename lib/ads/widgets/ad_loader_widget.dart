@@ -7,7 +7,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.d
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_feed_item.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart'; // Import InlineAd
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/ad_feed_item_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/placeholder_ad_widget.dart';
 import 'package:logging/logging.dart';
@@ -17,7 +17,7 @@ import 'package:ui_kit/ui_kit.dart';
 /// A self-contained widget responsible for loading and displaying an inline ad.
 ///
 /// This widget handles the entire lifecycle of a single ad slot in the feed.
-/// It attempts to retrieve a cached [NativeAd] first. If no ad is cached,
+/// It attempts to retrieve a cached [InlineAd] first. If no ad is cached,
 /// it requests a new one from the [AdService] using `getInlineAd` and stores
 /// it in the cache upon success. It manages its own loading and error states.
 ///
@@ -32,7 +32,7 @@ class AdLoaderWidget extends StatefulWidget {
     required this.adPlaceholder,
     required this.adService,
     required this.adThemeStyle,
-    required this.adConfig, // Now requires the full AdConfig
+    required this.adConfig,
     super.key,
   });
 
@@ -53,7 +53,7 @@ class AdLoaderWidget extends StatefulWidget {
 }
 
 class _AdLoaderWidgetState extends State<AdLoaderWidget> {
-  NativeAd? _loadedAd;
+  InlineAd? _loadedAd; // Changed to InlineAd
   bool _isLoading = true;
   bool _hasError = false;
   final Logger _logger = Logger('AdLoaderWidget');
@@ -122,7 +122,7 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
 
   /// Loads the inline ad for this slot.
   ///
-  /// This method first checks the [AdCacheService] for a pre-loaded [NativeAd].
+  /// This method first checks the [AdCacheService] for a pre-loaded [InlineAd].
   /// If found, it uses the cached ad. Otherwise, it requests a new inline ad
   /// from the [AdService] using `getInlineAd` and stores it in the cache
   /// upon success.
@@ -194,11 +194,11 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
           'New ad loaded for placeholder ID: ${widget.adPlaceholder.id}',
         );
         // Store the newly loaded ad in the cache.
-        _adCacheService.setAd(widget.adPlaceholder.id, adFeedItem.nativeAd);
+        _adCacheService.setAd(widget.adPlaceholder.id, adFeedItem.inlineAd); // Use inlineAd
         // Ensure the widget is still mounted before calling setState.
         if (!mounted) return;
         setState(() {
-          _loadedAd = adFeedItem.nativeAd;
+          _loadedAd = adFeedItem.inlineAd; // Use inlineAd
           _isLoading = false;
         });
         // Complete the completer only if it hasn't been completed already.
@@ -269,7 +269,7 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
       return AdFeedItemWidget(
         adFeedItem: AdFeedItem(
           id: widget.adPlaceholder.id,
-          nativeAd: _loadedAd!,
+          inlineAd: _loadedAd!, // Use inlineAd
         ),
       );
     }

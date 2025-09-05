@@ -11,7 +11,13 @@ import 'package:equatable/equatable.dart';
 /// {@endtemplate}
 class AdPlaceholder extends FeedItem with EquatableMixin {
   /// {@macro ad_placeholder}
-  const AdPlaceholder({required this.id}) : super(type: 'ad_placeholder');
+  const AdPlaceholder({
+    required this.id,
+    required this.adPlatformType,
+    required this.adType,
+    this.adUnitId,
+    this.localAdId,
+  }) : super(type: 'ad_placeholder');
 
   /// A unique identifier for this specific ad placeholder instance.
   ///
@@ -19,6 +25,18 @@ class AdPlaceholder extends FeedItem with EquatableMixin {
   /// from the ad cache or to load a new one if not found.
   final String id;
 
+  /// The platform type of the ad (e.g., AdMob, Local).
+  final AdPlatformType adPlatformType;
+
+  /// The type of the ad (e.g., native, banner).
+  final AdType adType;
+
+  /// The ad unit ID for platforms like AdMob.
+  final String? adUnitId;
+
+  /// The ID for local ads, used to fetch from a data client.
+  final String? localAdId;
+
   @override
-  List<Object?> get props => [id, type];
+  List<Object?> get props => [id, adPlatformType, adType, adUnitId, localAdId, type];
 }

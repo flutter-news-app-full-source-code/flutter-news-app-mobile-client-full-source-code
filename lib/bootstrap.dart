@@ -10,9 +10,10 @@ import 'package:data_repository/data_repository.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/admob_ad_provider.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/no_op_ad_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/local_ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/app.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
     as app_config;
@@ -22,6 +23,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/bloc_observer.da
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/data/clients/country_inmemory_client.dart';
 import 'package:http_client/http_client.dart';
 import 'package:kv_storage_shared_preferences/kv_storage_shared_preferences.dart';
+import 'package:logging/logging.dart';
 import 'package:logging/logging.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:ui_kit/ui_kit.dart';
@@ -48,12 +50,31 @@ Future<Widget> bootstrap(
   // Initialize AdProvider based on platform.
   // On web, use a No-Op provider to prevent MissingPluginException,
   // as Google Mobile Ads SDK does not support native ads on web.
-  final adProvider = kIsWeb
-      ? NoOpAdProvider(logger: logger)
-      : AdMobAdProvider(logger: logger);
+  final Map<AdPlatformType, AdProvider> adProviders = {
+    AdPlatformType.admob: AdMobAdProvider(logger: logger),
+    AdPlatformType.local: LocalAdProvider(
+      localAdRepository: DataRepository<LocalAd>(
+        dataClient: appConfig.environment == app_config.AppEnvironment.demo
+            ? DataInMemory<LocalAd>(
+                toJson: (i) => LocalAd.toJson(i),
+                getId: (i) => i.id,
+                initialData: localAdsFixturesData,
+                logger: logger,
+              )
+            : DataApi<LocalAd>(
+                httpClient: httpClient!,
+                modelName: 'local_ad',
+                fromJson: LocalAd.fromJson,
+                toJson: (ad) => LocalAd.toJson(ad),
+                logger: logger,
+              ),
+      ),
+      logger: logger,
+    ),
+  };
 
-  final adService = AdService(adProvider: adProvider, logger: logger);
-  await adService.initialize(); // Initialize the selected AdProvider early
+  final adService = AdService(adProviders: adProviders, logger: logger);
+  await adService.initialize(); // Initialize all selected AdProviders early
 
   if (appConfig.environment == app_config.AppEnvironment.demo) {
     authClient = AuthInmemory();
@@ -88,6 +109,7 @@ Future<Widget> bootstrap(
   DataClient<UserAppSettings> userAppSettingsClient;
   DataClient<RemoteConfig> remoteConfigClient;
   DataClient<User> userClient;
+  DataClient<LocalAd> localAdClient; // Declare localAdClient
 
   if (appConfig.environment == app_config.AppEnvironment.demo) {
     headlinesClient = DataInMemory<Headline>(
@@ -164,6 +186,12 @@ Future<Widget> bootstrap(
       getId: (i) => i.id,
       logger: logger,
     );
+    localAdClient = DataInMemory<LocalAd>(
+      toJson: (i) => LocalAd.toJson(i),
+      getId: (i) => i.id,
+      initialData: localAdsFixturesData,
+      logger: logger,
+    );
   } else if (appConfig.environment == app_config.AppEnvironment.development) {
     headlinesClient = DataApi<Headline>(
       httpClient: httpClient!,
@@ -219,6 +247,13 @@ Future<Widget> bootstrap(
       modelName: 'user',
       fromJson: User.fromJson,
       toJson: (user) => user.toJson(),
+      logger: logger,
+    );
+    localAdClient = DataApi<LocalAd>(
+      httpClient: httpClient,
+      modelName: 'local_ad',
+      fromJson: LocalAd.fromJson,
+      toJson: (ad) => LocalAd.toJson(ad),
       logger: logger,
     );
   } else {
@@ -279,11 +314,19 @@ Future<Widget> bootstrap(
       toJson: (user) => user.toJson(),
       logger: logger,
     );
+    localAdClient = DataApi<LocalAd>(
+      httpClient: httpClient,
+      modelName: 'local_ad',
+      fromJson: LocalAd.fromJson,
+      toJson: (ad) => LocalAd.toJson(ad),
+      logger: logger,
+    );
   }
 
   final headlinesRepository = DataRepository<Headline>(
     dataClient: headlinesClient,
   );
+  final localAdRepository = DataRepository<LocalAd>(dataClient: localAdClient);
   final topicsRepository = DataRepository<Topic>(dataClient: topicsClient);
   final countriesRepository = DataRepository<Country>(
     dataClient: countriesClient,
@@ -336,5 +379,6 @@ Future<Widget> bootstrap(
     demoDataInitializerService: demoDataInitializerService,
     adService: adService,
     initialUser: initialUser,
+    localAdRepository: localAdRepository,
   );
 }

@@ -1,9 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
-import 'package:json_annotation/json_annotation.dart';
 import 'package:core/core.dart'; // Import core for AdPlatformType
-
-part 'interstitial_ad.g.dart';
 
 /// {@template interstitial_ad}
 /// A generic, provider-agnostic model representing a full-screen interstitial advertisement.
@@ -11,10 +8,10 @@ part 'interstitial_ad.g.dart';
 /// This model decouples the application's core logic from specific ad network
 /// SDKs (e.g., Google Mobile Ads). It holds a reference to the original,
 /// SDK-specific ad object for display purposes and a [provider] type
-/// to identify its origin.
+/// to identify its origin. This model is intended for internal usage only
+/// and is not serialized to/from JSON.
 /// {@endtemplate}
 @immutable
-@JsonSerializable(explicitToJson: true, includeIfNull: true, checked: true)
 class InterstitialAd extends Equatable {
   /// {@macro interstitial_ad}
   const InterstitialAd({
@@ -56,11 +53,4 @@ class InterstitialAd extends Equatable {
 
   @override
   List<Object?> get props => [id, provider, adObject];
-
-  /// Converts this [InterstitialAd] instance to JSON data.
-  Map<String, dynamic> toJson() => _$InterstitialAdToJson(this);
-
-  /// Creates an [InterstitialAd] from JSON data.
-  factory InterstitialAd.fromJson(Map<String, dynamic> json) =>
-      _$InterstitialAdFromJson(json);
 }

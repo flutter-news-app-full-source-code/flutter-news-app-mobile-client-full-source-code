@@ -2,8 +2,10 @@ import 'package:core/core.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_feed_item.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart'; // Import BannerAd
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart'; // Import InlineAd
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'; // Import NativeAd
 import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
 
@@ -107,7 +109,7 @@ class AdService {
       'Requesting $adType ad from $primaryAdPlatform AdProvider with ID: $adId',
     );
     try {
-      NativeAd? loadedAd;
+      InlineAd? loadedAd; // Use the new InlineAd abstract type
       switch (adType) {
         case AdType.native:
           loadedAd = await adProvider.loadNativeAd(
@@ -132,7 +134,7 @@ class AdService {
 
       if (loadedAd != null) {
         _logger.info('$adType ad successfully loaded and wrapped.');
-        return AdFeedItem(id: _uuid.v4(), nativeAd: loadedAd);
+        return AdFeedItem(id: _uuid.v4(), inlineAd: loadedAd); // Use inlineAd
       } else {
         _logger.info('No $adType ad loaded by AdProvider.');
         return null;
@@ -186,6 +188,7 @@ class AdService {
       return null;
     }
 
+    // Use the correct interstitial ad ID from AdPlatformIdentifiers
     final String? adId = platformAdIdentifiers.feedToArticleInterstitialAdId;
 
     if (adId == null || adId.isEmpty) {

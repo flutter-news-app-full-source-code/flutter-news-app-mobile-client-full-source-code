@@ -5,17 +5,16 @@ import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
 import 'package:logging/logging.dart';
 
 /// {@template admob_native_ad_widget}
-/// A widget that specifically renders a Google AdMob native ad.
+/// A widget that specifically renders an inline Google AdMob native ad.
 ///
 /// This widget is responsible for taking the generic [app_ad_models.NativeAd]
-/// and rendering it using the `AdWidget` from the `google_mobile_ads` package.
-/// It expects the `adObject` within the [app_ad_models.NativeAd] to be a fully
-/// loaded [admob.NativeAd] instance.
+/// (which represents an inline ad) and rendering it using the `AdWidget`
+/// from the `google_mobile_ads` package. It expects the `adObject` within
+/// the [app_ad_models.NativeAd] to be a fully loaded [admob.NativeAd] instance.
 ///
 /// This is a [StatefulWidget] to properly manage the lifecycle of the native
 /// ad object, ensuring it is disposed when the widget is removed from the tree
 /// or when the underlying ad object changes.
-
 /// {@endtemplate}
 class AdmobNativeAdWidget extends StatefulWidget {
   /// {@macro admob_native_ad_widget}
@@ -72,7 +71,7 @@ class _AdmobNativeAdWidgetState extends State<AdmobNativeAdWidget> {
       _ad = null; // Ensure _ad is null if the type is incorrect
 
       _logger.severe(
-        'The provided ad object is not of type admob.NativeAd. '
+        'The provided ad object for AdMob native ad is not of type admob.NativeAd. '
         'Received: ${widget.nativeAd.adObject.runtimeType}. Ad will not be displayed.',
       );
     }

@@ -19,7 +19,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view
 import 'package:go_router/go_router.dart';
 import 'package:kv_storage_service/kv_storage_service.dart';
 import 'package:ui_kit/ui_kit.dart';
-import 'dart:async';
 
 class App extends StatelessWidget {
   const App({
@@ -172,8 +171,6 @@ class _AppViewState extends State<_AppView> {
   AppStatusService? _appStatusService;
   // The observer for handling interstitial ads on route changes.
   AdNavigatorObserver? _adNavigatorObserver;
-  // Stream subscription for interstitial ad signals from AppBloc.
-  StreamSubscription<void>? _interstitialAdSubscription;
 
   @override
   void initState() {
@@ -196,16 +193,10 @@ class _AppViewState extends State<_AppView> {
 
     // Initialize AdNavigatorObserver.
     _adNavigatorObserver = AdNavigatorObserver(
-      appBloc: appBloc,
+      appStateProvider: () => context.read<AppBloc>().state,
       adService: widget.adService,
       adThemeStyle: adThemeStyle,
     );
-
-    // Subscribe to the AppBloc's interstitial ad stream.
-    _interstitialAdSubscription =
-        appBloc.showInterstitialAdStream.listen((_) {
-      _adNavigatorObserver?.showInterstitialAd();
-    });
 
     _router = createRouter(
       authStatusNotifier: _statusNotifier,
@@ -220,7 +211,6 @@ class _AppViewState extends State<_AppView> {
       userRepository: widget.userRepository,
       environment: widget.environment,
       adService: widget.adService,
-      localAdRepository: widget.localAdRepository,
       adNavigatorObserver: _adNavigatorObserver!, // Pass the observer
     );
   }
@@ -230,8 +220,6 @@ class _AppViewState extends State<_AppView> {
     _statusNotifier.dispose();
     // Dispose the AppStatusService to cancel timers and remove observers.
     _appStatusService?.dispose();
-    // Cancel the interstitial ad stream subscription.
-    _interstitialAdSubscription?.cancel();
     // AdNavigatorObserver does not need explicit dispose here as it's a NavigatorObserver
     // and its internal resources are managed by the AdService/AdMob SDK.
     super.dispose();

@@ -8,7 +8,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/acc
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/ad_loader_widget.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/feed_ad_loader_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
@@ -324,8 +324,11 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                     return tile;
                   } else if (item is AdPlaceholder) {
                     // Access the AppBloc to get the remoteConfig for ads.
-                    final adConfig =
-                        context.read<AppBloc>().state.remoteConfig?.adConfig;
+                    final adConfig = context
+                        .read<AppBloc>()
+                        .state
+                        .remoteConfig
+                        ?.adConfig;
 
                     // Ensure adConfig is not null before building the AdLoaderWidget.
                     if (adConfig == null) {
@@ -333,7 +336,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                       return const SizedBox.shrink();
                     }
 
-                    return AdLoaderWidget(
+                    return FeedAdLoaderWidget(
                       adPlaceholder: item,
                       adService: context.read<AdService>(),
                       adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),

@@ -1,11 +1,15 @@
 //
 // ignore_for_file: avoid_redundant_argument_values
 
+import 'package:collection/collection.dart';
 import 'package:core/core.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/in_article_ad_loader_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/headline_details_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/similar_headlines_bloc.dart';
@@ -236,147 +240,253 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       },
     );
 
-    return CustomScrollView(
-      slivers: [
-        SliverAppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new),
-            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-            onPressed: () => context.pop(),
-            color: colorScheme.onSurface,
-          ),
-          actions: [
-            bookmarkButton,
-            shareButtonWidget,
-            const SizedBox(width: AppSpacing.sm),
-          ],
-          pinned: false,
-          floating: true,
-          snap: true,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          foregroundColor: colorScheme.onSurface,
+    final appBlocState = context.watch<AppBloc>().state;
+    final adConfig = appBlocState.remoteConfig?.adConfig;
+    final adService = context.read<AdService>();
+    final adThemeStyle = AdThemeStyle.fromTheme(Theme.of(context));
+
+    final List<Widget> slivers = [
+      SliverAppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+          onPressed: () => context.pop(),
+          color: colorScheme.onSurface,
         ),
-        SliverPadding(
-          padding: horizontalPadding.copyWith(top: AppSpacing.sm),
-          sliver: SliverToBoxAdapter(
-            child: Text(
-              headline.title,
-              style: textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+        actions: [
+          bookmarkButton,
+          shareButtonWidget,
+          const SizedBox(width: AppSpacing.sm),
+        ],
+        pinned: false,
+        floating: true,
+        snap: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        foregroundColor: colorScheme.onSurface,
+      ),
+      SliverPadding(
+        padding: horizontalPadding.copyWith(top: AppSpacing.sm),
+        sliver: SliverToBoxAdapter(
+          child: Text(
+            headline.title,
+            style: textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        SliverPadding(
-          padding: EdgeInsets.only(
-            top: AppSpacing.md,
-            left: horizontalPadding.left,
-            right: horizontalPadding.right,
-          ),
-          sliver: SliverToBoxAdapter(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(AppSpacing.md),
-              child: AspectRatio(
-                aspectRatio: 16 / 9,
-                child: Image.network(
-                  headline.imageUrl,
-                  fit: BoxFit.cover,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return ColoredBox(
-                      color: colorScheme.surfaceContainerHighest,
-                      child: const Center(
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) => ColoredBox(
+      ),
+      SliverPadding(
+        padding: EdgeInsets.only(
+          top: AppSpacing.md,
+          left: horizontalPadding.left,
+          right: horizontalPadding.right,
+        ),
+        sliver: SliverToBoxAdapter(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(AppSpacing.md),
+            child: AspectRatio(
+              aspectRatio: 16 / 9,
+              child: Image.network(
+                headline.imageUrl,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return ColoredBox(
                     color: colorScheme.surfaceContainerHighest,
-                    child: Icon(
-                      Icons.broken_image_outlined,
-                      color: colorScheme.onSurfaceVariant,
-                      size: AppSpacing.xxl * 1.5,
+                    child: const Center(
+                      child: CircularProgressIndicator(strokeWidth: 2),
                     ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) => ColoredBox(
+                  color: colorScheme.surfaceContainerHighest,
+                  child: Icon(
+                    Icons.broken_image_outlined,
+                    color: colorScheme.onSurfaceVariant,
+                    size: AppSpacing.xxl * 1.5,
                   ),
                 ),
               ),
             ),
           ),
         ),
+      ),
+    ];
+
+    // Add ad below main article image if configured
+    if (adConfig != null &&
+        adConfig.enabled &&
+        adConfig.articleAdConfiguration.enabled) {
+      final belowMainImageSlot = adConfig
+          .articleAdConfiguration
+          .inArticleAdSlotConfigurations
+          .firstWhereOrNull(
+            (slot) =>
+                slot.slotType == InArticleAdSlotType.belowMainArticleImage &&
+                slot.enabled,
+          );
+
+      if (belowMainImageSlot != null) {
+        slivers.add(
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: horizontalPadding.copyWith(top: AppSpacing.lg),
+              child: InArticleAdLoaderWidget(
+                slotConfiguration: belowMainImageSlot,
+                adService: adService,
+                adThemeStyle: adThemeStyle,
+                adConfig: adConfig,
+              ),
+            ),
+          ),
+        );
+      }
+    }
+
+    slivers.addAll([
+      SliverPadding(
+        padding: horizontalPadding.copyWith(top: AppSpacing.lg),
+        sliver: SliverToBoxAdapter(
+          child: Wrap(
+            spacing: AppSpacing.md,
+            runSpacing: AppSpacing.sm,
+            children: _buildMetadataChips(context, headline),
+          ),
+        ),
+      ),
+      if (headline.excerpt.isNotEmpty)
         SliverPadding(
           padding: horizontalPadding.copyWith(top: AppSpacing.lg),
           sliver: SliverToBoxAdapter(
-            child: Wrap(
-              spacing: AppSpacing.md,
-              runSpacing: AppSpacing.sm,
-              children: _buildMetadataChips(context, headline),
+            child: Text(
+              headline.excerpt,
+              style: textTheme.bodyLarge?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                height: 1.6,
+              ),
             ),
           ),
         ),
-        if (headline.excerpt.isNotEmpty)
-          SliverPadding(
-            padding: horizontalPadding.copyWith(top: AppSpacing.lg),
-            sliver: SliverToBoxAdapter(
-              child: Text(
-                headline.excerpt,
-                style: textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  height: 1.6,
-                ),
-              ),
-            ),
-          ),
-        if (headline.url.isNotEmpty)
-          SliverPadding(
-            padding: horizontalPadding.copyWith(
-              top: AppSpacing.xl,
-              bottom: AppSpacing.xl,
-            ),
-            sliver: SliverToBoxAdapter(
-              child: ElevatedButton.icon(
-                icon: const Icon(Icons.open_in_new_outlined),
-                onPressed: () async {
-                  await launchUrlString(headline.url);
-                },
-                label: Text(l10n.headlineDetailsContinueReadingButton),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.lg,
-                    vertical: AppSpacing.md,
-                  ),
-                  textStyle: textTheme.labelLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        if (headline.url.isEmpty) // Ensure bottom padding
-          const SliverPadding(
-            padding: EdgeInsets.only(bottom: AppSpacing.xl),
-            sliver: SliverToBoxAdapter(child: SizedBox.shrink()),
-          ),
-        SliverPadding(
-          padding: horizontalPadding,
-          sliver: SliverToBoxAdapter(
+    ]);
+
+    // Add ad above continue reading button if configured
+    if (adConfig != null &&
+        adConfig.enabled &&
+        adConfig.articleAdConfiguration.enabled) {
+      final aboveContinueReadingSlot = adConfig
+          .articleAdConfiguration
+          .inArticleAdSlotConfigurations
+          .firstWhereOrNull(
+            (slot) =>
+                slot.slotType ==
+                    InArticleAdSlotType.aboveArticleContinueReadingButton &&
+                slot.enabled,
+          );
+
+      if (aboveContinueReadingSlot != null) {
+        slivers.add(
+          SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.only(
-                top: (headline.url.isNotEmpty) ? AppSpacing.sm : AppSpacing.xl,
-                bottom: AppSpacing.md,
+              padding: horizontalPadding.copyWith(top: AppSpacing.xl),
+              child: InArticleAdLoaderWidget(
+                slotConfiguration: aboveContinueReadingSlot,
+                adService: adService,
+                adThemeStyle: adThemeStyle,
+                adConfig: adConfig,
               ),
-              child: Text(
-                l10n.similarHeadlinesSectionTitle,
-                style: textTheme.titleLarge?.copyWith(
+            ),
+          ),
+        );
+      }
+    }
+
+    slivers.addAll([
+      if (headline.url.isNotEmpty)
+        SliverPadding(
+          padding: horizontalPadding.copyWith(
+            top: AppSpacing.xl,
+            bottom: AppSpacing.xl,
+          ),
+          sliver: SliverToBoxAdapter(
+            child: ElevatedButton.icon(
+              icon: const Icon(Icons.open_in_new_outlined),
+              onPressed: () async {
+                await launchUrlString(headline.url);
+              },
+              label: Text(l10n.headlineDetailsContinueReadingButton),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg,
+                  vertical: AppSpacing.md,
+                ),
+                textStyle: textTheme.labelLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
           ),
         ),
-        _buildSimilarHeadlinesSection(context, horizontalPadding),
-      ],
-    );
+      if (headline.url.isEmpty) // Ensure bottom padding
+        const SliverPadding(
+          padding: EdgeInsets.only(bottom: AppSpacing.xl),
+          sliver: SliverToBoxAdapter(child: SizedBox.shrink()),
+        ),
+    ]);
+
+    // Add ad below continue reading button if configured
+    if (adConfig != null &&
+        adConfig.enabled &&
+        adConfig.articleAdConfiguration.enabled) {
+      final belowContinueReadingSlot = adConfig
+          .articleAdConfiguration
+          .inArticleAdSlotConfigurations
+          .firstWhereOrNull(
+            (slot) =>
+                slot.slotType ==
+                    InArticleAdSlotType.belowArticleContinueReadingButton &&
+                slot.enabled,
+          );
+
+      if (belowContinueReadingSlot != null) {
+        slivers.add(
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: horizontalPadding.copyWith(top: AppSpacing.xl),
+              child: InArticleAdLoaderWidget(
+                slotConfiguration: belowContinueReadingSlot,
+                adService: adService,
+                adThemeStyle: adThemeStyle,
+                adConfig: adConfig,
+              ),
+            ),
+          ),
+        );
+      }
+    }
+
+    slivers.addAll([
+      SliverPadding(
+        padding: horizontalPadding,
+        sliver: SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.only(
+              top: (headline.url.isNotEmpty) ? AppSpacing.sm : AppSpacing.xl,
+              bottom: AppSpacing.md,
+            ),
+            child: Text(
+              l10n.similarHeadlinesSectionTitle,
+              style: textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      ),
+      _buildSimilarHeadlinesSection(context, horizontalPadding),
+    ]);
+
+    return CustomScrollView(slivers: slivers);
   }
 
   List<Widget> _buildMetadataChips(BuildContext context, Headline headline) {

@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:core/core.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart'; // Import the new BannerAd model
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'; // Import the refactored NativeAd model
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
 import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
@@ -46,6 +46,7 @@ class AdMobAdProvider implements AdProvider {
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
     required AdThemeStyle adThemeStyle,
+    HeadlineImageStyle? headlineImageStyle,
   }) async {
     if (adId == null || adId.isEmpty) {
       _logger.warning('No native ad unit ID provided for AdMob.');
@@ -54,7 +55,12 @@ class AdMobAdProvider implements AdProvider {
 
     _logger.info('Attempting to load native ad from unit ID: $adId');
 
-    const templateType = NativeAdTemplateType.medium; // Default to medium for native
+    // Determine the template type based on the user's feed style preference.
+    // Use largeThumbnail for a more prominent, square-like ad.
+    final templateType =
+        headlineImageStyle == HeadlineImageStyle.largeThumbnail
+            ? NativeAdTemplateType.medium
+            : NativeAdTemplateType.small;
 
     final completer = Completer<admob.NativeAd?>();
 
@@ -128,6 +134,7 @@ class AdMobAdProvider implements AdProvider {
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
     required AdThemeStyle adThemeStyle,
+    HeadlineImageStyle? headlineImageStyle,
   }) async {
     if (adId == null || adId.isEmpty) {
       _logger.warning('No banner ad unit ID provided for AdMob.');
@@ -136,11 +143,17 @@ class AdMobAdProvider implements AdProvider {
 
     _logger.info('Attempting to load banner ad from unit ID: $adId');
 
+    // Determine the ad size based on the user's feed style preference.
+    // Use mediumRectangle for a more square-like ad with large thumbnails.
+    final adSize = headlineImageStyle == HeadlineImageStyle.largeThumbnail
+        ? admob.AdSize.mediumRectangle
+        : admob.AdSize.banner;
+
     final completer = Completer<admob.BannerAd?>();
 
     final ad = admob.BannerAd(
       adUnitId: adId,
-      size: admob.AdSize.banner, // Default banner size
+      size: adSize,
       request: const admob.AdRequest(),
       listener: admob.BannerAdListener(
         onAdLoaded: (ad) {

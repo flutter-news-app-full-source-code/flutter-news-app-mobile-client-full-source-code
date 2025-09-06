@@ -1,6 +1,6 @@
 import 'package:core/core.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart'; // Import the new BannerAd model
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart';
 
@@ -30,10 +30,13 @@ abstract class AdProvider {
   /// The [adPlatformIdentifiers] provides the platform-specific ad unit IDs.
   /// The [adId] is the specific identifier for the ad slot (e.g., native ad unit ID).
   /// The [adThemeStyle] provides UI-agnostic theme properties for ad styling.
+  /// The [headlineImageStyle] provides the user's preference for feed layout,
+  /// which can be used to request an appropriately sized ad.
   Future<NativeAd?> loadNativeAd({
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
     required AdThemeStyle adThemeStyle,
+    HeadlineImageStyle? headlineImageStyle,
   });
 
   /// Loads an inline banner ad.
@@ -45,10 +48,13 @@ abstract class AdProvider {
   /// The [adPlatformIdentifiers] provides the platform-specific ad unit IDs.
   /// The [adId] is the specific identifier for the ad slot (e.g., banner ad unit ID).
   /// The [adThemeStyle] provides UI-agnostic theme properties for ad styling.
+  /// The [headlineImageStyle] provides the user's preference for feed layout,
+  /// which can be used to request an appropriately sized ad.
   Future<BannerAd?> loadBannerAd({
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
     required AdThemeStyle adThemeStyle,
+    HeadlineImageStyle? headlineImageStyle,
   });
 
   /// Loads a full-screen interstitial ad.

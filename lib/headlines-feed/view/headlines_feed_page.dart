@@ -323,19 +323,21 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                     }
                     return tile;
                   } else if (item is AdPlaceholder) {
-                    // Retrieve the user's preferred headline image style from the AppBloc.
-                    // This is the single source of truth for this setting.
-                    final imageStyle = context
-                        .watch<AppBloc>()
-                        .state
-                        .settings
-                        .feedPreferences
-                        .headlineImageStyle;
+                    // Access the AppBloc to get the remoteConfig for ads.
+                    final adConfig =
+                        context.read<AppBloc>().state.remoteConfig?.adConfig;
+
+                    // Ensure adConfig is not null before building the AdLoaderWidget.
+                    if (adConfig == null) {
+                      // Return an empty widget or a placeholder if adConfig is not available.
+                      return const SizedBox.shrink();
+                    }
+
                     return AdLoaderWidget(
                       adPlaceholder: item,
                       adService: context.read<AdService>(),
                       adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
-                      imageStyle: imageStyle,
+                      adConfig: adConfig,
                     );
                   } else if (item is CallToActionItem) {
                     return CallToActionDecoratorWidget(

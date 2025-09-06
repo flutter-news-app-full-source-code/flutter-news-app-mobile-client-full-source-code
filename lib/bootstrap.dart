@@ -21,6 +21,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/services/dem
 import 'package:flutter_news_app_mobile_client_full_source_code/bloc_observer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/data/clients/country_inmemory_client.dart';
 import 'package:http_client/http_client.dart';
+import 'package:kv_storage_service/kv_storage_service.dart';
 import 'package:kv_storage_shared_preferences/kv_storage_shared_preferences.dart';
 import 'package:logging/logging.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -32,22 +33,57 @@ Future<Widget> bootstrap(
 ) async {
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = const AppBlocObserver();
-
+  final logger = Logger('bootstrap');
   timeago.setLocaleMessages('en', EnTimeagoMessages());
   timeago.setLocaleMessages('ar', ArTimeagoMessages());
 
-  final logger = Logger('bootstrap');
-
+  // 1. Initialize KV Storage Service first, as it's a foundational dependency.
   final kvStorage = await KVStorageSharedPreferences.getInstance();
 
+  // 2. Conditionally initialize HttpClient and Auth services based on environment.
+  // This ensures HttpClient is available before any DataApi or AdProvider
+  // that depends on it.
   late final AuthClient authClient;
   late final AuthRepository authenticationRepository;
-  HttpClient? httpClient;
+  late final HttpClient httpClient;
+  if (appConfig.environment == app_config.AppEnvironment.demo) {
+    // In-memory authentication for demo environment.
+    authClient = AuthInmemory();
+    authenticationRepository = AuthRepository(
+      authClient: authClient,
+      storageService: kvStorage,
+    );
+    // For demo, httpClient is not strictly needed for DataApi,
+    // but we initialize a dummy one to satisfy non-nullable requirements
+    // if any part of the code path expects it.
+    // In a real scenario, DataApi would not be used in demo mode.
+    httpClient = HttpClient(
+      baseUrl: appConfig.baseUrl,
+      tokenProvider: () async => null, // No token needed for demo
+      logger: logger,
+    );
+  } else {
+    // For production and development environments, an HTTP client is needed.
+    // Initialize HttpClient first. Its tokenProvider now directly reads from
+    // kvStorage, breaking the circular dependency with AuthRepository.
+    httpClient = HttpClient(
+      baseUrl: appConfig.baseUrl,
+      tokenProvider: () =>
+          kvStorage.readString(key: StorageKey.authToken.stringValue),
+      logger: logger,
+    );
 
-  // Initialize AdProvider and AdService
-  // Initialize AdProvider based on platform.
-  // On web, use a No-Op provider to prevent MissingPluginException,
-  // as Google Mobile Ads SDK does not support native ads on web.
+    // Now that httpClient is available, initialize AuthApi and AuthRepository.
+    authClient = AuthApi(httpClient: httpClient);
+    authenticationRepository = AuthRepository(
+      authClient: authClient,
+      storageService: kvStorage,
+    );
+  }
+
+  // 3. Initialize AdProvider and AdService.
+  // These now have a guaranteed valid httpClient (for DataApi-based LocalAdProvider)
+  // or can proceed independently (AdMobAdProvider).
   final adProviders = <AdPlatformType, AdProvider>{
     AdPlatformType.admob: AdMobAdProvider(logger: logger),
     AdPlatformType.local: LocalAdProvider(
@@ -60,7 +96,8 @@ Future<Widget> bootstrap(
                 logger: logger,
               )
             : DataApi<LocalAd>(
-                httpClient: httpClient!,
+                httpClient:
+                    httpClient, // httpClient is now guaranteed to be non-null
                 modelName: 'local_ad',
                 fromJson: LocalAd.fromJson,
                 toJson: LocalAd.toJson,
@@ -74,31 +111,12 @@ Future<Widget> bootstrap(
   final adService = AdService(adProviders: adProviders, logger: logger);
   await adService.initialize(); // Initialize all selected AdProviders early
 
-  if (appConfig.environment == app_config.AppEnvironment.demo) {
-    authClient = AuthInmemory();
-    authenticationRepository = AuthRepository(
-      authClient: authClient,
-      storageService: kvStorage,
-    );
-  } else {
-    // For production and development environments, an HTTP client is needed.
-    httpClient = HttpClient(
-      baseUrl: appConfig.baseUrl,
-      tokenProvider: () => authenticationRepository.getAuthToken(),
-      logger: logger,
-    );
-    authClient = AuthApi(httpClient: httpClient);
-    authenticationRepository = AuthRepository(
-      authClient: authClient,
-      storageService: kvStorage,
-    );
-  }
-
   // Fetch the initial user from the authentication repository.
   // This ensures the AppBloc starts with an accurate authentication status.
   final initialUser = await authenticationRepository.getCurrentUser();
 
-  // Conditional data client instantiation based on environment
+  // 4. Initialize all other DataClients and Repositories.
+  // These now also have a guaranteed valid httpClient.
   DataClient<Headline> headlinesClient;
   DataClient<Topic> topicsClient;
   DataClient<Country> countriesClient;
@@ -107,8 +125,7 @@ Future<Widget> bootstrap(
   DataClient<UserAppSettings> userAppSettingsClient;
   DataClient<RemoteConfig> remoteConfigClient;
   DataClient<User> userClient;
-  DataClient<LocalAd> localAdClient; // Declare localAdClient
-
+  DataClient<LocalAd> localAdClient;
   if (appConfig.environment == app_config.AppEnvironment.demo) {
     headlinesClient = DataInMemory<Headline>(
       toJson: (i) => i.toJson(),
@@ -192,7 +209,7 @@ Future<Widget> bootstrap(
     );
   } else if (appConfig.environment == app_config.AppEnvironment.development) {
     headlinesClient = DataApi<Headline>(
-      httpClient: httpClient!,
+      httpClient: httpClient,
       modelName: 'headline',
       fromJson: Headline.fromJson,
       toJson: (headline) => headline.toJson(),
@@ -257,7 +274,7 @@ Future<Widget> bootstrap(
   } else {
     // Default to API clients for production
     headlinesClient = DataApi<Headline>(
-      httpClient: httpClient!,
+      httpClient: httpClient,
       modelName: 'headline',
       fromJson: Headline.fromJson,
       toJson: (headline) => headline.toJson(),

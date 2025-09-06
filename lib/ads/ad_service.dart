@@ -25,8 +25,8 @@ class AdService {
   AdService({
     required Map<AdPlatformType, AdProvider> adProviders,
     Logger? logger,
-  })  : _adProviders = adProviders,
-        _logger = logger ?? Logger('AdService');
+  }) : _adProviders = adProviders,
+       _logger = logger ?? Logger('AdService');
 
   final Map<AdPlatformType, AdProvider> _adProviders;
   final Logger _logger;
@@ -217,6 +217,100 @@ class AdService {
       }
     } catch (e) {
       _logger.severe('Error getting Interstitial ad from AdProvider: $e');
+      return null;
+    }
+  }
+
+  /// Retrieves a loaded inline ad (native or banner) for an in-article placement.
+  ///
+  /// This method delegates ad loading to the appropriate [AdProvider] based on
+  /// the [adConfig]'s `primaryAdPlatform` and the `defaultInArticleAdType`
+  /// from the `articleAdConfiguration`.
+  ///
+  /// Returns an [InlineAd] if an ad is available, otherwise `null`.
+  ///
+  /// - [adConfig]: The remote configuration for ad display rules.
+  /// - [adThemeStyle]: UI-agnostic theme properties for ad styling.
+  Future<InlineAd?> getInArticleAd({
+    required AdConfig adConfig,
+    required AdThemeStyle adThemeStyle,
+  }) async {
+    // Check if ads are globally enabled and specifically for articles.
+    if (!adConfig.enabled || !adConfig.articleAdConfiguration.enabled) {
+      _logger.info(
+        'In-article ads are disabled in RemoteConfig, either globally or for articles.',
+      );
+      return null;
+    }
+
+    final primaryAdPlatform = adConfig.primaryAdPlatform;
+    final adProvider = _adProviders[primaryAdPlatform];
+
+    if (adProvider == null) {
+      _logger.warning('No AdProvider found for platform: $primaryAdPlatform');
+      return null;
+    }
+
+    final platformAdIdentifiers =
+        adConfig.platformAdIdentifiers[primaryAdPlatform];
+    if (platformAdIdentifiers == null) {
+      _logger.warning(
+        'No AdPlatformIdentifiers found for platform: $primaryAdPlatform',
+      );
+      return null;
+    }
+
+    // Determine the ad type and ID from the article-specific configuration.
+    final articleAdConfig = adConfig.articleAdConfiguration;
+    final adType = articleAdConfig.defaultInArticleAdType;
+    final adId = switch (adType) {
+      AdType.native => platformAdIdentifiers.inArticleNativeAdId,
+      AdType.banner => platformAdIdentifiers.inArticleBannerAdId,
+      _ => null, // Should not happen due to AdConfig assertion
+    };
+
+    if (adId == null || adId.isEmpty) {
+      _logger.warning(
+        'No in-article ad ID configured for platform $primaryAdPlatform and ad type $adType',
+      );
+      return null;
+    }
+
+    _logger.info(
+      'Requesting in-article $adType ad from $primaryAdPlatform AdProvider with ID: $adId',
+    );
+    try {
+      InlineAd? loadedAd;
+      switch (adType) {
+        case AdType.native:
+          loadedAd = await adProvider.loadNativeAd(
+            adPlatformIdentifiers: platformAdIdentifiers,
+            adId: adId,
+            adThemeStyle: adThemeStyle,
+          );
+        case AdType.banner:
+          loadedAd = await adProvider.loadBannerAd(
+            adPlatformIdentifiers: platformAdIdentifiers,
+            adId: adId,
+            adThemeStyle: adThemeStyle,
+          );
+        case AdType.interstitial:
+        case AdType.video:
+          _logger.warning(
+            'Attempted to load $adType ad using getInArticleAd. This is not supported.',
+          );
+          return null;
+      }
+
+      if (loadedAd != null) {
+        _logger.info('In-article $adType ad successfully loaded.');
+        return loadedAd;
+      } else {
+        _logger.info('No in-article $adType ad loaded by AdProvider.');
+        return null;
+      }
+    } catch (e) {
+      _logger.severe('Error getting in-article $adType ad from AdProvider: $e');
       return null;
     }
   }

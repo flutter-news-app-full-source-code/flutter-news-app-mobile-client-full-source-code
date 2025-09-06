@@ -5,9 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_feed_item.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/ad_feed_item_widget.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/admob_inline_ad_widget.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/local_banner_ad_widget.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/local_native_ad_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/placeholder_ad_widget.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -210,12 +213,20 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
     } else if (_hasError || _loadedAd == null) {
       return const PlaceholderAdWidget();
     } else {
-      return AdFeedItemWidget(
-        adFeedItem: AdFeedItem(
-          id: widget.slotConfiguration.slotType.name,
-          inlineAd: _loadedAd!,
-        ),
-      );
+      // If an ad is successfully loaded, dispatch to the appropriate
+      // provider-specific widget for rendering.
+      switch (_loadedAd!.provider) {
+        case AdPlatformType.admob:
+          return AdmobInlineAdWidget(inlineAd: _loadedAd!);
+        case AdPlatformType.local:
+          if (_loadedAd is NativeAd && _loadedAd!.adObject is LocalNativeAd) {
+            return LocalNativeAdWidget(localNativeAd: _loadedAd!.adObject as LocalNativeAd);
+          } else if (_loadedAd is BannerAd && _loadedAd!.adObject is LocalBannerAd) {
+            return LocalBannerAdWidget(localBannerAd: _loadedAd!.adObject as LocalBannerAd);
+          }
+          // Fallback for unsupported local ad types or errors
+          return const PlaceholderAdWidget();
+      }
     }
   }
 }

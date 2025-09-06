@@ -7,6 +7,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_navigator_observer.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_status_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_initializer_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
@@ -17,6 +19,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view
 import 'package:go_router/go_router.dart';
 import 'package:kv_storage_service/kv_storage_service.dart';
 import 'package:ui_kit/ui_kit.dart';
+import 'dart:async';
 
 class App extends StatelessWidget {
   const App({
@@ -167,7 +170,10 @@ class _AppViewState extends State<_AppView> {
   late final ValueNotifier<AppStatus> _statusNotifier;
   // The service responsible for automated status checks.
   AppStatusService? _appStatusService;
-  // Removed Dynamic Links subscription
+  // The observer for handling interstitial ads on route changes.
+  AdNavigatorObserver? _adNavigatorObserver;
+  // Stream subscription for interstitial ad signals from AppBloc.
+  StreamSubscription<void>? _interstitialAdSubscription;
 
   @override
   void initState() {
@@ -185,6 +191,22 @@ class _AppViewState extends State<_AppView> {
       environment: widget.environment,
     );
 
+    // Derive AdThemeStyle from the current theme.
+    final adThemeStyle = AdThemeStyle.fromTheme(Theme.of(context));
+
+    // Initialize AdNavigatorObserver.
+    _adNavigatorObserver = AdNavigatorObserver(
+      appBloc: appBloc,
+      adService: widget.adService,
+      adThemeStyle: adThemeStyle,
+    );
+
+    // Subscribe to the AppBloc's interstitial ad stream.
+    _interstitialAdSubscription =
+        appBloc.showInterstitialAdStream.listen((_) {
+      _adNavigatorObserver?.showInterstitialAd();
+    });
+
     _router = createRouter(
       authStatusNotifier: _statusNotifier,
       authenticationRepository: widget.authenticationRepository,
@@ -199,9 +221,8 @@ class _AppViewState extends State<_AppView> {
       environment: widget.environment,
       adService: widget.adService,
       localAdRepository: widget.localAdRepository,
+      adNavigatorObserver: _adNavigatorObserver!, // Pass the observer
     );
-
-    // Removed Dynamic Link Initialization
   }
 
   @override
@@ -209,7 +230,10 @@ class _AppViewState extends State<_AppView> {
     _statusNotifier.dispose();
     // Dispose the AppStatusService to cancel timers and remove observers.
     _appStatusService?.dispose();
-    // Removed Dynamic Links subscription cancellation
+    // Cancel the interstitial ad stream subscription.
+    _interstitialAdSubscription?.cancel();
+    // AdNavigatorObserver does not need explicit dispose here as it's a NavigatorObserver
+    // and its internal resources are managed by the AdService/AdMob SDK.
     super.dispose();
   }
 

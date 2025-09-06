@@ -1,6 +1,6 @@
+import 'package:core/core.dart'; // Import core for AdPlatformType
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
-import 'package:core/core.dart'; // Import core for AdPlatformType
 
 /// {@template inline_ad}
 /// An abstract base class for all inline ad types (native and banner).

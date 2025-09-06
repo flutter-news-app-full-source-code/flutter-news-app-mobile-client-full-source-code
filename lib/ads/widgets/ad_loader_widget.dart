@@ -162,7 +162,7 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
     );
     try {
       // The adId is now directly available from the placeholder.
-      final String? adIdentifier = widget.adPlaceholder.adId;
+      final adIdentifier = widget.adPlaceholder.adId;
 
       if (adIdentifier == null || adIdentifier.isEmpty) {
         _logger.warning(

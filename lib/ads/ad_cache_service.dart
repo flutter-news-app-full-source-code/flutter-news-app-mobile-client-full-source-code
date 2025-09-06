@@ -1,10 +1,10 @@
+import 'package:core/core.dart'; // Import core for AdPlatformType
 import 'package:flutter/foundation.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart'; // Import BannerAd
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart'; // Import InlineAd
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'; // Import NativeAd
-import 'package:logging/logging.dart';
-import 'package:core/core.dart'; // Import core for AdPlatformType
 import 'package:google_mobile_ads/google_mobile_ads.dart' as admob; // Import AdMob for disposal
+import 'package:logging/logging.dart';
 
 /// {@template ad_cache_service}
 /// A singleton service for caching loaded inline ad objects (native and banner).

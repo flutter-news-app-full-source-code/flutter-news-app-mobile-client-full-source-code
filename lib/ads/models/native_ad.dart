@@ -1,5 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:core/core.dart'; // Import core for AdPlatformType
+import 'package:flutter/foundation.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart';
 
 /// {@template native_ad_template_type}
@@ -43,7 +43,6 @@ class NativeAd extends InlineAd {
 
   /// Creates a copy of this [NativeAd] but with the given fields replaced with
   /// the new values.
-  @override
   NativeAd copyWith({
     String? id,
     AdPlatformType? provider,

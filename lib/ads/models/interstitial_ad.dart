@@ -1,6 +1,6 @@
+import 'package:core/core.dart'; // Import core for AdPlatformType
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
-import 'package:core/core.dart'; // Import core for AdPlatformType
 
 /// {@template interstitial_ad}
 /// A generic, provider-agnostic model representing a full-screen interstitial advertisement.

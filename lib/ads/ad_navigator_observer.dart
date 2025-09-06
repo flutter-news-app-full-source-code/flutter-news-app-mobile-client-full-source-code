@@ -4,7 +4,6 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
 import 'package:logging/logging.dart';
@@ -97,20 +96,16 @@ class AdNavigatorObserver extends NavigatorObserver {
       case AppUserRole.guestUser:
         requiredTransitions =
             frequencyConfig.guestTransitionsBeforeShowingInterstitialAds;
-        break;
       case AppUserRole.standardUser:
         requiredTransitions =
             frequencyConfig.standardUserTransitionsBeforeShowingInterstitialAds;
-        break;
       case AppUserRole.premiumUser:
         requiredTransitions =
             frequencyConfig.premiumUserTransitionsBeforeShowingInterstitialAds;
-        break;
       case null:
         // If user is null, default to guest user settings.
         requiredTransitions =
             frequencyConfig.guestTransitionsBeforeShowingInterstitialAds;
-        break;
     }
 
     _logger.info(

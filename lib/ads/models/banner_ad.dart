@@ -1,5 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:core/core.dart'; // Import core for AdPlatformType
+import 'package:flutter/foundation.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart';
 
 /// {@template banner_ad}
@@ -22,7 +22,6 @@ class BannerAd extends InlineAd {
 
   /// Creates a copy of this [BannerAd] but with the given fields replaced with
   /// the new values.
-  @override
   BannerAd copyWith({
     String? id,
     AdPlatformType? provider,

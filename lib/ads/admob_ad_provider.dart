@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:core/core.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart'; // Import the new BannerAd model
@@ -55,7 +54,7 @@ class AdMobAdProvider implements AdProvider {
 
     _logger.info('Attempting to load native ad from unit ID: $adId');
 
-    final templateType = NativeAdTemplateType.medium; // Default to medium for native
+    const templateType = NativeAdTemplateType.medium; // Default to medium for native
 
     final completer = Completer<admob.NativeAd?>();
 

@@ -2,10 +2,10 @@ import 'package:core/core.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_feed_item.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart'; // Import BannerAd
+// Import BannerAd
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart'; // Import InlineAd
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'; // Import NativeAd
+// Import NativeAd
 import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
 
@@ -92,7 +92,7 @@ class AdService {
       return null;
     }
 
-    final String? adId = switch (adType) {
+    final adId = switch (adType) {
       AdType.native => platformAdIdentifiers.feedNativeAdId,
       AdType.banner => platformAdIdentifiers.feedBannerAdId,
       _ => null, // Handled by the initial adType check
@@ -189,7 +189,7 @@ class AdService {
     }
 
     // Use the correct interstitial ad ID from AdPlatformIdentifiers
-    final String? adId = platformAdIdentifiers.feedToArticleInterstitialAdId;
+    final adId = platformAdIdentifiers.feedToArticleInterstitialAdId;
 
     if (adId == null || adId.isEmpty) {
       _logger.warning(

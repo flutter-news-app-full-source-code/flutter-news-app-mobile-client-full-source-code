@@ -2,7 +2,6 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart'; // Import BannerAd
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart'; // Import InlineAd
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'; // Import NativeAd
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/models.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/admob_inline_ad_widget.dart'; // Use the renamed widget
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/local_banner_ad_widget.dart';
@@ -84,9 +83,6 @@ class _AdDispatcher extends StatelessWidget {
         }
         // Fallback for unsupported local ad types or errors
         return const PlaceholderAdWidget();
-      default:
-        // Fallback for unsupported ad platforms or types.
-        return const PlaceholderAdWidget();
-    }
+      }
   }
 }

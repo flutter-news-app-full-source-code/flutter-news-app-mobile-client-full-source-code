@@ -116,7 +116,7 @@ class _HeadlineMetadataRow extends StatelessWidget {
     );
     // Icon color to match the subtle text
     final iconColor = colorScheme.primary.withOpacity(0.7);
-    const iconSize = AppSpacing.sm; // Standard small icon size
+    const iconSize = AppSpacing.sm;
 
     return Wrap(
       spacing: AppSpacing.sm, // Increased spacing for readability

@@ -1,4 +1,4 @@
-import 'package:core/core.dart'; // Import core for AdPlatformType
+import 'package:core/core.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 

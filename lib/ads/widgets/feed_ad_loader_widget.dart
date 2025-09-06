@@ -62,7 +62,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
   InlineAd? _loadedAd;
   bool _isLoading = true;
   bool _hasError = false;
-  final Logger _logger = Logger('FeedAdLoaderWidget'); // Renamed logger
+  final Logger _logger = Logger('FeedAdLoaderWidget');
   final InlineAdCacheService _adCacheService = InlineAdCacheService();
 
   /// Completer to manage the lifecycle of the ad loading future.
@@ -100,7 +100,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
           ),
         );
       }
-      _loadAdCompleter = null; // Clear the old completer for the new load
+      _loadAdCompleter = null;
 
       // Immediately set the widget to a loading state to prevent UI flicker.
       // This ensures a smooth transition from the old ad (or no ad) to the
@@ -110,7 +110,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
         _isLoading = true;
         _hasError = false;
       });
-      _loadAd(); // Start loading the new ad
+      _loadAd();
     }
   }
 
@@ -160,7 +160,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
       // Complete the completer only if it hasn't been completed already
       // (e.g., by dispose() or didUpdateWidget() cancelling an old load).
       if (_loadAdCompleter?.isCompleted == false) {
-        _loadAdCompleter!.complete(); // Complete the completer on success
+        _loadAdCompleter!.complete();
       }
       return;
     }
@@ -220,7 +220,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
         });
         // Complete the completer only if it hasn't been completed already.
         if (_loadAdCompleter?.isCompleted == false) {
-          _loadAdCompleter!.complete(); // Complete the completer on success
+          _loadAdCompleter!.complete();
         }
       } else {
         _logger.warning(
@@ -237,7 +237,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
         if (_loadAdCompleter?.isCompleted == false) {
           _loadAdCompleter?.completeError(
             StateError('Failed to load ad: No ad returned.'),
-          ); // Complete with error
+          );
         }
       }
     } catch (e, s) {
@@ -254,7 +254,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
       });
       // Complete the completer with an error only if it hasn't been completed already.
       if (_loadAdCompleter?.isCompleted == false) {
-        _loadAdCompleter?.completeError(e); // Complete with error
+        _loadAdCompleter?.completeError(e);
       }
     }
   }

@@ -118,7 +118,7 @@ class AdNavigatorObserver extends NavigatorObserver {
         _pageTransitionCount >= requiredTransitions) {
       _logger.info('Interstitial ad due. Requesting ad.');
       _showInterstitialAd();
-      _pageTransitionCount = 0; // Reset count after showing
+      _pageTransitionCount = 0;
     }
   }
 

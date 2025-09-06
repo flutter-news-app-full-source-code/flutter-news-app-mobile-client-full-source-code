@@ -5,7 +5,7 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart'; // Import AppBloc
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 
 part 'topics_filter_event.dart';
 part 'topics_filter_state.dart';

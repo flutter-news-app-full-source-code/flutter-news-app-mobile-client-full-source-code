@@ -38,7 +38,7 @@ class AdmobInlineAdWidget extends StatefulWidget {
 }
 
 class _AdmobInlineAdWidgetState extends State<AdmobInlineAdWidget> {
-  admob.Ad? _ad; // Can be NativeAd or BannerAd
+  admob.Ad? _ad;
   final Logger _logger = Logger('AdmobInlineAdWidget');
 
   @override
@@ -80,7 +80,7 @@ class _AdmobInlineAdWidgetState extends State<AdmobInlineAdWidget> {
     } else if (widget.inlineAd.adObject is admob.BannerAd) {
       _ad = widget.inlineAd.adObject as admob.BannerAd;
     } else {
-      _ad = null; // Ensure _ad is null if the type is incorrect
+      _ad = null;
 
       _logger.severe(
         'The provided ad object for AdMob inline ad is not of type '
@@ -111,7 +111,7 @@ class _AdmobInlineAdWidgetState extends State<AdmobInlineAdWidget> {
       // If largeThumbnail, assume mediumRectangle (300x250), otherwise standard banner (320x50).
       adHeight = widget.headlineImageStyle == HeadlineImageStyle.largeThumbnail
           ? 250 // Height for mediumRectangle
-          : 50; // Height for standard banner
+          : 50;
     } else {
       // Fallback height for unknown inline ad types.
       adHeight = 100;

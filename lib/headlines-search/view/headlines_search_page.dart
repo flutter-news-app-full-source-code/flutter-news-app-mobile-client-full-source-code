@@ -346,14 +346,18 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                         } else if (feedItem is Country) {
                           return CountryItemWidget(country: feedItem);
                         } else if (feedItem is AdPlaceholder) {
-                          // Retrieve the user's preferred headline image style from the AppBloc.
-                          // This is the single source of truth for this setting.
-                          final imageStyle = context
-                              .watch<AppBloc>()
+                          // Access the AppBloc to get the remoteConfig for ads.
+                          final adConfig = context
+                              .read<AppBloc>()
                               .state
-                              .settings
-                              .feedPreferences
-                              .headlineImageStyle;
+                              .remoteConfig
+                              ?.adConfig;
+
+                          // Ensure adConfig is not null before building the AdLoaderWidget.
+                          if (adConfig == null) {
+                            // Return an empty widget or a placeholder if adConfig is not available.
+                            return const SizedBox.shrink();
+                          }
 
                           return AdLoaderWidget(
                             adPlaceholder: feedItem,
@@ -361,7 +365,7 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                             adThemeStyle: AdThemeStyle.fromTheme(
                               Theme.of(context),
                             ),
-                            imageStyle: imageStyle,
+                            adConfig: adConfig,
                           );
                         }
                         return const SizedBox.shrink();

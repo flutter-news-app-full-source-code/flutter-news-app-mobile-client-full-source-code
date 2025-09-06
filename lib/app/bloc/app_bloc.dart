@@ -7,13 +7,12 @@ import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart'; // Import AdService
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart'; // Import AdThemeStyle
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
     as local_config;
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_initializer_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
-import 'package:logging/logging.dart'; // Import Logger
+import 'package:logging/logging.dart';
 
 part 'app_event.dart';
 part 'app_state.dart';
@@ -25,7 +24,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required DataRepository<RemoteConfig> appConfigRepository,
     required DataRepository<User> userRepository,
     required local_config.AppEnvironment environment,
-    required AdService adService, // Inject AdService
+    required AdService adService,
     this.demoDataMigrationService,
     this.demoDataInitializerService,
     this.initialUser,
@@ -34,16 +33,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         _appConfigRepository = appConfigRepository,
         _userRepository = userRepository,
         _environment = environment,
-        _adService = adService, // Initialize AdService
-        _logger = Logger('AppBloc'), // Initialize Logger
-        _showInterstitialAdController = StreamController<void>.broadcast(), // Initialize the stream controller
+        _adService = adService,
+        _logger = Logger('AppBloc'),
         super(
           AppState(
-            // Initialize with default settings and preferences.
-            // This is crucial for immediate UI rendering and provides a safe
-            // fallback before user-specific settings are loaded.
-            // The `AppSettingsRefreshed` event will later replace these
-            // with actual user data.
             settings: UserAppSettings(
               id: 'default',
               displaySettings: const DisplaySettings(
@@ -69,15 +62,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             selectedBottomNavigationIndex: 0,
             remoteConfig: null,
             environment: environment,
-            // Initialize status and user based on initialUser
             status: initialUser != null
                 ? (initialUser.appRole == AppUserRole.standardUser
                     ? AppStatus.authenticated
                     : AppStatus.anonymous)
                 : AppStatus.unauthenticated,
             user: initialUser,
-            pageTransitionCount: 0, // Initialize page transition count
-            showInterstitialAdStream: _showInterstitialAdController.stream, // Provide the stream
           ),
         ) {
     on<AppUserChanged>(_onAppUserChanged);
@@ -90,9 +80,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppFontFamilyChanged>(_onFontFamilyChanged);
     on<AppTextScaleFactorChanged>(_onAppTextScaleFactorChanged);
     on<AppFontWeightChanged>(_onAppFontWeightChanged);
-    on<AppPageTransitioned>(_onAppPageTransitioned); // New event handler
 
-    // Listen directly to the auth state changes stream
     _userSubscription = _authenticationRepository.authStateChanges.listen(
       (User? user) => add(AppUserChanged(user)),
     );
@@ -103,9 +91,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final DataRepository<RemoteConfig> _appConfigRepository;
   final DataRepository<User> _userRepository;
   final local_config.AppEnvironment _environment;
-  final AdService _adService; // AdService instance
-  final Logger _logger; // Logger instance
-  final StreamController<void> _showInterstitialAdController; // Stream controller for interstitial ads
+  final AdService _adService;
+  final Logger _logger;
   final DemoDataMigrationService? demoDataMigrationService;
   final DemoDataInitializerService? demoDataInitializerService;
   final User? initialUser;
@@ -204,7 +191,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           remoteConfig: null,
           clearAppConfig: true,
           status: AppStatus.unauthenticated,
-          pageTransitionCount: 0, // Reset page transition count on logout
         ),
       );
     }
@@ -285,8 +271,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         baseTheme: event.themeMode == ThemeMode.light
             ? AppBaseTheme.light
             : (event.themeMode == ThemeMode.dark
-                  ? AppBaseTheme.dark
-                  : AppBaseTheme.system),
+                ? AppBaseTheme.dark
+                : AppBaseTheme.system),
       ),
     );
     emit(state.copyWith(settings: updatedSettings, themeMode: event.themeMode));
@@ -304,8 +290,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         accentTheme: event.flexScheme == FlexScheme.blue
             ? AppAccentTheme.defaultBlue
             : (event.flexScheme == FlexScheme.red
-                  ? AppAccentTheme.newsRed
-                  : AppAccentTheme.graphiteGray),
+                ? AppAccentTheme.newsRed
+                : AppAccentTheme.graphiteGray),
       ),
     );
     emit(
@@ -336,7 +322,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     AppTextScaleFactorChanged event,
     Emitter<AppState> emit,
   ) {
-    // Update settings and emit new state
     final updatedSettings = state.settings.copyWith(
       displaySettings: state.settings.displaySettings.copyWith(
         textScaleFactor: event.appTextScaleFactor,
@@ -356,75 +341,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     AppFontWeightChanged event,
     Emitter<AppState> emit,
   ) {
-    // Update settings and emit new state
     final updatedSettings = state.settings.copyWith(
       displaySettings: state.settings.displaySettings.copyWith(
         fontWeight: event.fontWeight,
       ),
     );
     emit(state.copyWith(settings: updatedSettings));
-    // Optionally save settings to repository here
-    // unawaited(_userAppSettingsRepository.update(id: updatedSettings.id, item: updatedSettings));
   }
-
-  /// Handles page transition events to track interstitial ad frequency.
-  Future<void> _onAppPageTransitioned(
-    AppPageTransitioned event,
-    Emitter<AppState> emit,
-  ) async {
-    // Increment the page transition count.
-    final newCount = state.pageTransitionCount + 1;
-    emit(state.copyWith(pageTransitionCount: newCount));
-
-    _logger.info('Page transitioned. Current count: $newCount');
-
-    final remoteConfig = state.remoteConfig;
-    final user = state.user;
-
-    // Only proceed if remote config is available, ads are globally enabled,
-    // and interstitial ads are enabled in the config.
-    if (remoteConfig == null ||
-        !remoteConfig.adConfig.enabled ||
-        !remoteConfig.adConfig.interstitialAdConfiguration.enabled) {
-      _logger.info('Interstitial ads are not enabled or config not ready.');
-      return;
-    }
-
-    final interstitialConfig = remoteConfig.adConfig.interstitialAdConfiguration;
-    final frequencyConfig = interstitialConfig.feedInterstitialAdFrequencyConfig;
-
-    // Determine the required transitions based on user role.
-    final int requiredTransitions;
-    switch (user?.appRole) {
-      case AppUserRole.guestUser:
-        requiredTransitions =
-            frequencyConfig.guestTransitionsBeforeShowingInterstitialAds;
-      case AppUserRole.standardUser:
-        requiredTransitions =
-            frequencyConfig.standardUserTransitionsBeforeShowingInterstitialAds;
-      case AppUserRole.premiumUser:
-        requiredTransitions =
-            frequencyConfig.premiumUserTransitionsBeforeShowingInterstitialAds;
-      case null:
-        // If user is null, default to guest user settings.
-        requiredTransitions =
-            frequencyConfig.guestTransitionsBeforeShowingInterstitialAds;
-    }
-
-    _logger.info(
-      'Required transitions for user role ${user?.appRole}: $requiredTransitions',
-    );
-
-    // Check if it's time to show an interstitial ad.
-    if (requiredTransitions > 0 && newCount >= requiredTransitions) {
-      _logger.info('Interstitial ad due. Signaling AdNavigatorObserver.');
-      // Signal the AdNavigatorObserver to show the ad.
-      _showInterstitialAdController.add(null); // Add a signal to the stream
-      emit(state.copyWith(pageTransitionCount: 0)); // Reset count after signaling
-    }
-  }
-
-  // --- Settings Mapping Helpers ---
 
   ThemeMode _mapAppBaseTheme(AppBaseTheme mode) {
     switch (mode) {
@@ -451,9 +374,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   String? _mapFontFamily(String fontFamilyString) {
     // If the input is 'SystemDefault', return null so FlexColorScheme uses its default.
     if (fontFamilyString == 'SystemDefault') {
-      _logger.info(
-        '_mapFontFamily: Input is SystemDefault, returning null.',
-      );
+      _logger.info('_mapFontFamily: Input is SystemDefault, returning null.');
       return null;
     }
     // Otherwise, return the font family string directly.
@@ -473,7 +394,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   @override
   Future<void> close() {
     _userSubscription.cancel();
-    _showInterstitialAdController.close(); // Close the stream controller
     return super.close();
   }
 
@@ -589,7 +509,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // Get the current status for the decorator, or create a default if not present.
       final currentStatus =
           originalUser.feedDecoratorStatus[event.feedDecoratorType] ??
-          const UserFeedDecoratorStatus(isCompleted: false);
+              const UserFeedDecoratorStatus(isCompleted: false);
 
       // Create an updated status.
       // It always updates the `lastShownAt` timestamp.
@@ -603,12 +523,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // Create a new map with the updated status for the specific decorator type.
       final newFeedDecoratorStatus =
           Map<FeedDecoratorType, UserFeedDecoratorStatus>.from(
-            originalUser.feedDecoratorStatus,
-          )..update(
-            event.feedDecoratorType,
-            (_) => updatedDecoratorStatus,
-            ifAbsent: () => updatedDecoratorStatus,
-          );
+        originalUser.feedDecoratorStatus,
+      )..update(
+              event.feedDecoratorType,
+              (_) => updatedDecoratorStatus,
+              ifAbsent: () => updatedDecoratorStatus,
+            );
 
       // Update the user with the new feedDecoratorStatus map.
       final updatedUser = originalUser.copyWith(

@@ -1,12 +1,12 @@
-import 'package:core/core.dart'; // Import core for AdPlatformType
+import 'package:core/core.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart'; // Import BannerAd
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart'; // Import InlineAd
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'; // Import NativeAd
-import 'package:google_mobile_ads/google_mobile_ads.dart' as admob; // Import AdMob for disposal
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
 import 'package:logging/logging.dart';
 
-/// {@template ad_cache_service}
+/// {@template inline_ad_cache_service}
 /// A singleton service for caching loaded inline ad objects (native and banner).
 ///
 /// This service helps to prevent unnecessary re-loading of inline ads
@@ -14,23 +14,34 @@ import 'package:logging/logging.dart';
 /// It stores [InlineAd] objects by a unique ID (typically the [AdPlaceholder.id])
 /// and allows for retrieval and clearing of cached ads.
 ///
+/// **Scope of Caching:**
+/// This service specifically caches *inline* ads, which include both feed ads
+/// and in-article ads. These ads are designed to be displayed directly within
+/// content lists and benefit from caching to improve scrolling performance
+/// and reduce network requests.
+///
+/// **Exclusion of Interstitial Ads:**
+/// Interstitial ads are *not* cached by this service. Their lifecycle is
+/// managed differently: they are typically loaded on demand, shown once
+/// during navigation transitions, and then disposed immediately after use.
+/// Caching them would not provide performance benefits and could lead to
+/// resource leaks or unexpected behavior.
+///
 /// Inline ad objects (like `google_mobile_ads.NativeAd` and `google_mobile_ads.BannerAd`)
 /// are stateful and resource-intensive. Caching them allows for smoother scrolling
 /// and reduces network requests, while still ensuring proper disposal when
 /// the cache is cleared (e.g., on a full feed refresh).
-///
-/// Interstitial ads are not cached by this service as their lifecycle is
-/// managed differently (typically shown once on navigation and then disposed).
 /// {@endtemplate}
-class AdCacheService {
+class InlineAdCacheService {
   /// Factory constructor to provide the singleton instance.
-  factory AdCacheService() => _instance;
+  factory InlineAdCacheService() => _instance;
 
   /// Private constructor for the singleton pattern.
-  AdCacheService._internal() : _logger = Logger('AdCacheService');
+  InlineAdCacheService._internal() : _logger = Logger('InlineAdCacheService');
 
-  /// The single instance of [AdCacheService].
-  static final AdCacheService _instance = AdCacheService._internal();
+  /// The single instance of [InlineAdCacheService].
+  static final InlineAdCacheService _instance =
+      InlineAdCacheService._internal();
 
   final Logger _logger;
 
@@ -71,7 +82,9 @@ class AdCacheService {
   /// when the application is closing to ensure all native ad resources
   /// are released.
   void clearAllAds() {
-    _logger.info('Clearing all cached inline ads and disposing native resources.');
+    _logger.info(
+      'Clearing all cached inline ads and disposing native resources.',
+    );
     for (final ad in _cache.values) {
       if (ad?.provider == AdPlatformType.admob) {
         // Dispose AdMob native and banner ad objects.
@@ -90,7 +103,7 @@ class AdCacheService {
   /// For debugging: prints the current state of the cache.
   @visibleForTesting
   void printCacheState() {
-    _logger.info('Current Ad Cache State:');
+    _logger.info('Current Inline Ad Cache State:');
     if (_cache.isEmpty) {
       _logger.info('  Cache is empty.');
     } else {

@@ -397,7 +397,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                             AccountFollowSourceToggled(source: toggledItem),
                           );
                         } else {
-                          return; // Should not happen
+                          return;
                         }
                       },
                       onDismiss: (decoratorType) {

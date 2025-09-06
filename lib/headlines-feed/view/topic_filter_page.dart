@@ -27,7 +27,7 @@ class _TopicFilterPageState extends State<TopicFilterPage> {
     super.initState();
     _scrollController.addListener(_onScroll);
     _topicsFilterBloc = context.read<TopicsFilterBloc>()
-      ..add(TopicsFilterRequested()); // Initial fetch of all topics
+      ..add(TopicsFilterRequested());
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Initialize local selection from GoRouter extra parameter

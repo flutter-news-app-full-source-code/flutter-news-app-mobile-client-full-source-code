@@ -26,7 +26,7 @@ class AdMobAdProvider implements AdProvider {
   final Logger _logger;
   final Uuid _uuid = const Uuid();
 
-  static const _adLoadTimeout = 15; // Unified timeout for all ad types
+  static const _adLoadTimeout = 15;
 
   @override
   Future<void> initialize() async {

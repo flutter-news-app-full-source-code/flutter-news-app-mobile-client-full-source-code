@@ -6,7 +6,7 @@ import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/country_filter_page.dart'; // Import AppBloc
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/country_filter_page.dart';
 
 part 'countries_filter_event.dart';
 part 'countries_filter_state.dart';
@@ -38,7 +38,7 @@ class CountriesFilterBloc
     on<CountriesFilterApplyFollowedRequested>(
       _onCountriesFilterApplyFollowedRequested,
       transformer: restartable(),
-    ); // Register new event handler
+    );
   }
 
   final DataRepository<Country> _countriesRepository;

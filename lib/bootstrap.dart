@@ -109,7 +109,7 @@ Future<Widget> bootstrap(
   };
 
   final adService = AdService(adProviders: adProviders, logger: logger);
-  await adService.initialize(); // Initialize all selected AdProviders early
+  await adService.initialize();
 
   // Fetch the initial user from the authentication repository.
   // This ensures the AppBloc starts with an accurate authentication status.

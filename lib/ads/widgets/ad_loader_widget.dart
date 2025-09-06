@@ -4,11 +4,14 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_feed_item.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart'; // Import InlineAd
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/ad_feed_item_widget.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/admob_inline_ad_widget.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/local_banner_ad_widget.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/local_native_ad_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/placeholder_ad_widget.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -18,7 +21,7 @@ import 'package:ui_kit/ui_kit.dart';
 ///
 /// This widget handles the entire lifecycle of a single ad slot in the feed.
 /// It attempts to retrieve a cached [InlineAd] first. If no ad is cached,
-/// it requests a new one from the [AdService] using `getInlineAd` and stores
+/// it requests a new one from the [AdService] using `getFeedAd` and stores
 /// it in the cache upon success. It manages its own loading and error states.
 ///
 /// This approach decouples ad loading from the BLoC and ensures that native
@@ -53,7 +56,7 @@ class AdLoaderWidget extends StatefulWidget {
 }
 
 class _AdLoaderWidgetState extends State<AdLoaderWidget> {
-  InlineAd? _loadedAd; // Changed to InlineAd
+  InlineAd? _loadedAd;
   bool _isLoading = true;
   bool _hasError = false;
   final Logger _logger = Logger('AdLoaderWidget');
@@ -89,7 +92,9 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
       // while an old one is still in progress.
       if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
         _loadAdCompleter?.completeError(
-          StateError('Ad loading cancelled: Widget updated with new ID or config.'),
+          StateError(
+            'Ad loading cancelled: Widget updated with new ID or config.',
+          ),
         );
       }
       _loadAdCompleter = null; // Clear the old completer for the new load
@@ -124,7 +129,7 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
   ///
   /// This method first checks the [AdCacheService] for a pre-loaded [InlineAd].
   /// If found, it uses the cached ad. Otherwise, it requests a new inline ad
-  /// from the [AdService] using `getInlineAd` and stores it in the cache
+  /// from the [AdService] using `getFeedAd` and stores it in the cache
   /// upon success.
   Future<void> _loadAd() async {
     // Initialize a new completer for this loading operation.
@@ -182,23 +187,26 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
         return;
       }
 
-      // Call AdService.getInlineAd with the full AdConfig and adType from the placeholder.
-      final adFeedItem = await widget.adService.getInlineAd(
+      // Call AdService.getFeedAd with the full AdConfig and adType from the placeholder.
+      final loadedAd = await widget.adService.getFeedAd(
         adConfig: widget.adConfig, // Pass the full AdConfig
         adType: widget.adPlaceholder.adType,
         adThemeStyle: widget.adThemeStyle,
       );
 
-      if (adFeedItem != null) {
+      if (loadedAd != null) {
         _logger.info(
           'New ad loaded for placeholder ID: ${widget.adPlaceholder.id}',
         );
         // Store the newly loaded ad in the cache.
-        _adCacheService.setAd(widget.adPlaceholder.id, adFeedItem.inlineAd); // Use inlineAd
+        _adCacheService.setAd(
+          widget.adPlaceholder.id,
+          loadedAd,
+        );
         // Ensure the widget is still mounted before calling setState.
         if (!mounted) return;
         setState(() {
-          _loadedAd = adFeedItem.inlineAd; // Use inlineAd
+          _loadedAd = loadedAd;
           _isLoading = false;
         });
         // Complete the completer only if it hasn't been completed already.
@@ -262,16 +270,20 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
       // Show a placeholder or error message if ad loading failed.
       return const PlaceholderAdWidget();
     } else {
-      // If an ad is successfully loaded, wrap it in an AdFeedItem
-      // and pass it to the AdFeedItemWidget for rendering.
-      // This improves separation of concerns, as AdLoaderWidget is now
-      // only responsible for loading, not rendering logic.
-      return AdFeedItemWidget(
-        adFeedItem: AdFeedItem(
-          id: widget.adPlaceholder.id,
-          inlineAd: _loadedAd!, // Use inlineAd
-        ),
-      );
+      // If an ad is successfully loaded, dispatch to the appropriate
+      // provider-specific widget for rendering.
+      switch (_loadedAd!.provider) {
+        case AdPlatformType.admob:
+          return AdmobInlineAdWidget(inlineAd: _loadedAd!);
+        case AdPlatformType.local:
+          if (_loadedAd is NativeAd && _loadedAd!.adObject is LocalNativeAd) {
+            return LocalNativeAdWidget(localNativeAd: _loadedAd!.adObject as LocalNativeAd);
+          } else if (_loadedAd is BannerAd && _loadedAd!.adObject is LocalBannerAd) {
+            return LocalBannerAdWidget(localBannerAd: _loadedAd!.adObject as LocalBannerAd);
+          }
+          // Fallback for unsupported local ad types or errors
+          return const PlaceholderAdWidget();
+      }
     }
   }
 }

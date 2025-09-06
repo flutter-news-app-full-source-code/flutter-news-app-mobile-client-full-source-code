@@ -57,10 +57,9 @@ class AdMobAdProvider implements AdProvider {
 
     // Determine the template type based on the user's feed style preference.
     // Use largeThumbnail for a more prominent, square-like ad.
-    final templateType =
-        headlineImageStyle == HeadlineImageStyle.largeThumbnail
-            ? NativeAdTemplateType.medium
-            : NativeAdTemplateType.small;
+    final templateType = headlineImageStyle == HeadlineImageStyle.largeThumbnail
+        ? NativeAdTemplateType.medium
+        : NativeAdTemplateType.small;
 
     final completer = Completer<admob.NativeAd?>();
 

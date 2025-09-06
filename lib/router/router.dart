@@ -71,7 +71,8 @@ GoRouter createRouter({
   required DataRepository<User> userRepository,
   required local_config.AppEnvironment environment,
   required AdService adService,
-  required AdNavigatorObserver adNavigatorObserver, // Accept AdNavigatorObserver
+  required AdNavigatorObserver
+  adNavigatorObserver, // Accept AdNavigatorObserver
 }) {
   // Instantiate AccountBloc once to be shared
   final accountBloc = AccountBloc(

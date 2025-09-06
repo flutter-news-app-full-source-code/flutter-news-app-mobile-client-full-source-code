@@ -28,48 +28,48 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     this.demoDataMigrationService,
     this.demoDataInitializerService,
     this.initialUser,
-  })  : _authenticationRepository = authenticationRepository,
-        _userAppSettingsRepository = userAppSettingsRepository,
-        _appConfigRepository = appConfigRepository,
-        _userRepository = userRepository,
-        _environment = environment,
-        _adService = adService,
-        _logger = Logger('AppBloc'),
-        super(
-          AppState(
-            settings: UserAppSettings(
-              id: 'default',
-              displaySettings: const DisplaySettings(
-                baseTheme: AppBaseTheme.system,
-                accentTheme: AppAccentTheme.defaultBlue,
-                fontFamily: 'SystemDefault',
-                textScaleFactor: AppTextScaleFactor.medium,
-                fontWeight: AppFontWeight.regular,
-              ),
-              language: languagesFixturesData.firstWhere(
-                (l) => l.code == 'en',
-                orElse: () => throw StateError(
-                  'Default language "en" not found in language fixtures.',
-                ),
-              ),
-              feedPreferences: const FeedDisplayPreferences(
-                headlineDensity: HeadlineDensity.standard,
-                headlineImageStyle: HeadlineImageStyle.largeThumbnail,
-                showSourceInHeadlineFeed: true,
-                showPublishDateInHeadlineFeed: true,
-              ),
-            ),
-            selectedBottomNavigationIndex: 0,
-            remoteConfig: null,
-            environment: environment,
-            status: initialUser != null
-                ? (initialUser.appRole == AppUserRole.standardUser
-                    ? AppStatus.authenticated
-                    : AppStatus.anonymous)
-                : AppStatus.unauthenticated,
-            user: initialUser,
-          ),
-        ) {
+  }) : _authenticationRepository = authenticationRepository,
+       _userAppSettingsRepository = userAppSettingsRepository,
+       _appConfigRepository = appConfigRepository,
+       _userRepository = userRepository,
+       _environment = environment,
+       _adService = adService,
+       _logger = Logger('AppBloc'),
+       super(
+         AppState(
+           settings: UserAppSettings(
+             id: 'default',
+             displaySettings: const DisplaySettings(
+               baseTheme: AppBaseTheme.system,
+               accentTheme: AppAccentTheme.defaultBlue,
+               fontFamily: 'SystemDefault',
+               textScaleFactor: AppTextScaleFactor.medium,
+               fontWeight: AppFontWeight.regular,
+             ),
+             language: languagesFixturesData.firstWhere(
+               (l) => l.code == 'en',
+               orElse: () => throw StateError(
+                 'Default language "en" not found in language fixtures.',
+               ),
+             ),
+             feedPreferences: const FeedDisplayPreferences(
+               headlineDensity: HeadlineDensity.standard,
+               headlineImageStyle: HeadlineImageStyle.largeThumbnail,
+               showSourceInHeadlineFeed: true,
+               showPublishDateInHeadlineFeed: true,
+             ),
+           ),
+           selectedBottomNavigationIndex: 0,
+           remoteConfig: null,
+           environment: environment,
+           status: initialUser != null
+               ? (initialUser.appRole == AppUserRole.standardUser
+                     ? AppStatus.authenticated
+                     : AppStatus.anonymous)
+               : AppStatus.unauthenticated,
+           user: initialUser,
+         ),
+       ) {
     on<AppUserChanged>(_onAppUserChanged);
     on<AppSettingsRefreshed>(_onAppSettingsRefreshed);
     on<AppConfigFetchRequested>(_onAppConfigFetchRequested);
@@ -271,8 +271,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         baseTheme: event.themeMode == ThemeMode.light
             ? AppBaseTheme.light
             : (event.themeMode == ThemeMode.dark
-                ? AppBaseTheme.dark
-                : AppBaseTheme.system),
+                  ? AppBaseTheme.dark
+                  : AppBaseTheme.system),
       ),
     );
     emit(state.copyWith(settings: updatedSettings, themeMode: event.themeMode));
@@ -290,8 +290,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         accentTheme: event.flexScheme == FlexScheme.blue
             ? AppAccentTheme.defaultBlue
             : (event.flexScheme == FlexScheme.red
-                ? AppAccentTheme.newsRed
-                : AppAccentTheme.graphiteGray),
+                  ? AppAccentTheme.newsRed
+                  : AppAccentTheme.graphiteGray),
       ),
     );
     emit(
@@ -509,7 +509,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // Get the current status for the decorator, or create a default if not present.
       final currentStatus =
           originalUser.feedDecoratorStatus[event.feedDecoratorType] ??
-              const UserFeedDecoratorStatus(isCompleted: false);
+          const UserFeedDecoratorStatus(isCompleted: false);
 
       // Create an updated status.
       // It always updates the `lastShownAt` timestamp.
@@ -523,12 +523,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // Create a new map with the updated status for the specific decorator type.
       final newFeedDecoratorStatus =
           Map<FeedDecoratorType, UserFeedDecoratorStatus>.from(
-        originalUser.feedDecoratorStatus,
-      )..update(
-              event.feedDecoratorType,
-              (_) => updatedDecoratorStatus,
-              ifAbsent: () => updatedDecoratorStatus,
-            );
+            originalUser.feedDecoratorStatus,
+          )..update(
+            event.feedDecoratorType,
+            (_) => updatedDecoratorStatus,
+            ifAbsent: () => updatedDecoratorStatus,
+          );
 
       // Update the user with the new feedDecoratorStatus map.
       final updatedUser = originalUser.copyWith(

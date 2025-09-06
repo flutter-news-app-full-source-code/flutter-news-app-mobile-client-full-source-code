@@ -229,11 +229,11 @@ class AdService {
 
     final adId = feedAd
         ? (adType == AdType.native
-            ? platformAdIdentifiers.feedNativeAdId
-            : platformAdIdentifiers.feedBannerAdId)
+              ? platformAdIdentifiers.feedNativeAdId
+              : platformAdIdentifiers.feedBannerAdId)
         : (adType == AdType.native
-            ? platformAdIdentifiers.inArticleNativeAdId
-            : platformAdIdentifiers.inArticleBannerAdId);
+              ? platformAdIdentifiers.inArticleNativeAdId
+              : platformAdIdentifiers.inArticleBannerAdId);
 
     if (adId == null || adId.isEmpty) {
       _logger.warning(

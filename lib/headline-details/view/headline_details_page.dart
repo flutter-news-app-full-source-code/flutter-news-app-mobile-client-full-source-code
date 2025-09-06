@@ -245,7 +245,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     final adService = context.read<AdService>();
     final adThemeStyle = AdThemeStyle.fromTheme(Theme.of(context));
 
-    final List<Widget> slivers = [
+    final slivers = <Widget>[
       SliverAppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new),

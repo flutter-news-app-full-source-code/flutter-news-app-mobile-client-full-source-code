@@ -73,10 +73,7 @@ class LocalInterstitialAdDialog extends StatelessWidget {
             top: AppSpacing.lg,
             right: AppSpacing.lg,
             child: IconButton(
-              icon: Icon(
-                Icons.close,
-                color: theme.colorScheme.onSurface,
-              ),
+              icon: Icon(Icons.close, color: theme.colorScheme.onSurface),
               onPressed: () {
                 // Dismiss the dialog.
                 Navigator.of(context).pop();

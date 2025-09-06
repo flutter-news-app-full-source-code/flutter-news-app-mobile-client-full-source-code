@@ -25,8 +25,9 @@ class LocalNativeAdWidget extends StatelessWidget {
 
     // Determine the height based on the headlineImageStyle.
     // If largeThumbnail, use a square aspect ratio, otherwise a standard native ad height.
-    final double imageHeight =
-        headlineImageStyle == HeadlineImageStyle.largeThumbnail ? 250 : 180;
+    final imageHeight = headlineImageStyle == HeadlineImageStyle.largeThumbnail
+        ? 250
+        : 180;
 
     return Card(
       margin: const EdgeInsets.symmetric(
@@ -44,7 +45,7 @@ class LocalNativeAdWidget extends StatelessWidget {
                 child: Image.network(
                   localNativeAd.imageUrl,
                   fit: BoxFit.cover,
-                  height: imageHeight,
+                  height: imageHeight.toDouble(),
                   width: double.infinity,
                   errorBuilder: (context, error, stackTrace) =>
                       const SizedBox.shrink(),
@@ -72,7 +73,9 @@ class LocalNativeAdWidget extends StatelessWidget {
                 onPressed: () {
                   // TODO(fulleni): Implement navigation to localNativeAd.targetUrl
                   // For now, just log the action.
-                  debugPrint('Local Native Ad clicked: ${localNativeAd.targetUrl}');
+                  debugPrint(
+                    'Local Native Ad clicked: ${localNativeAd.targetUrl}',
+                  );
                 },
                 child: const Text('Learn More'),
               ),

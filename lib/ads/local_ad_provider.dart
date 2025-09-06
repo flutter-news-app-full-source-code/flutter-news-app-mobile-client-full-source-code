@@ -21,8 +21,8 @@ class LocalAdProvider implements AdProvider {
   LocalAdProvider({
     required DataRepository<LocalAd> localAdRepository,
     Logger? logger,
-  })  : _localAdRepository = localAdRepository,
-        _logger = logger ?? Logger('LocalAdProvider');
+  }) : _localAdRepository = localAdRepository,
+       _logger = logger ?? Logger('LocalAdProvider');
 
   final DataRepository<LocalAd> _localAdRepository;
   final Logger _logger;
@@ -54,7 +54,9 @@ class LocalAdProvider implements AdProvider {
       final localNativeAd = await _localAdRepository.read(id: adId);
 
       if (localNativeAd is LocalNativeAd) {
-        _logger.info('Local native ad loaded successfully: ${localNativeAd.id}');
+        _logger.info(
+          'Local native ad loaded successfully: ${localNativeAd.id}',
+        );
         return NativeAd(
           id: _uuid.v4(),
           provider: AdPlatformType.local,
@@ -101,7 +103,9 @@ class LocalAdProvider implements AdProvider {
       final localBannerAd = await _localAdRepository.read(id: adId);
 
       if (localBannerAd is LocalBannerAd) {
-        _logger.info('Local banner ad loaded successfully: ${localBannerAd.id}');
+        _logger.info(
+          'Local banner ad loaded successfully: ${localBannerAd.id}',
+        );
         return BannerAd(
           id: _uuid.v4(),
           provider: AdPlatformType.local,

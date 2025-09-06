@@ -22,11 +22,7 @@ class BannerAd extends InlineAd {
 
   /// Creates a copy of this [BannerAd] but with the given fields replaced with
   /// the new values.
-  BannerAd copyWith({
-    String? id,
-    AdPlatformType? provider,
-    Object? adObject,
-  }) {
+  BannerAd copyWith({String? id, AdPlatformType? provider, Object? adObject}) {
     return BannerAd(
       id: id ?? this.id,
       provider: provider ?? this.provider,

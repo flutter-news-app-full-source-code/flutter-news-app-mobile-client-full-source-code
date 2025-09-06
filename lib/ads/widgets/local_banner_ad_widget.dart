@@ -25,8 +25,9 @@ class LocalBannerAdWidget extends StatelessWidget {
 
     // Determine the height based on the headlineImageStyle.
     // If largeThumbnail, use a square aspect ratio, otherwise a standard banner height.
-    final double imageHeight =
-        headlineImageStyle == HeadlineImageStyle.largeThumbnail ? 250 : 90;
+    final imageHeight = headlineImageStyle == HeadlineImageStyle.largeThumbnail
+        ? 250
+        : 90;
 
     return Card(
       margin: const EdgeInsets.symmetric(
@@ -48,7 +49,7 @@ class LocalBannerAdWidget extends StatelessWidget {
                 Image.network(
                   localBannerAd.imageUrl,
                   fit: BoxFit.cover,
-                  height: imageHeight,
+                  height: imageHeight.toDouble(),
                   width: double.infinity,
                   errorBuilder: (context, error, stackTrace) =>
                       const SizedBox.shrink(),

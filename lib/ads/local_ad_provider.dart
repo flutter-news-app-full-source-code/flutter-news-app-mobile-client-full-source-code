@@ -2,9 +2,9 @@ import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart'; // Import the new BannerAd model
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'; // Import the refactored NativeAd model
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart';
 import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
 
@@ -41,6 +41,7 @@ class LocalAdProvider implements AdProvider {
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
     required AdThemeStyle adThemeStyle,
+    HeadlineImageStyle? headlineImageStyle, // Added for interface consistency
   }) async {
     if (adId == null || adId.isEmpty) {
       _logger.warning('No local native ad ID provided.');
@@ -58,7 +59,9 @@ class LocalAdProvider implements AdProvider {
           id: _uuid.v4(),
           provider: AdPlatformType.local,
           adObject: localNativeAd,
-          templateType: NativeAdTemplateType.medium, // Default for local native
+          templateType: headlineImageStyle == HeadlineImageStyle.largeThumbnail
+              ? NativeAdTemplateType.medium
+              : NativeAdTemplateType.small,
         );
       } else {
         _logger.warning(
@@ -85,6 +88,7 @@ class LocalAdProvider implements AdProvider {
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
     required AdThemeStyle adThemeStyle,
+    HeadlineImageStyle? headlineImageStyle, // Added for interface consistency
   }) async {
     if (adId == null || adId.isEmpty) {
       _logger.warning('No local banner ad ID provided.');

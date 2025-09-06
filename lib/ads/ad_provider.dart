@@ -1,7 +1,8 @@
 import 'package:core/core.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'
-    as app_native_ad;
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart';
 
 /// {@template ad_provider}
 /// An abstract class defining the interface for any ad network provider.
@@ -20,19 +21,54 @@ abstract class AdProvider {
   /// It handles any necessary setup for the specific ad network.
   Future<void> initialize();
 
-  /// Loads a native ad, optionally tailoring it to a specific style.
+  /// Loads an inline native ad, optionally tailoring it to a specific style.
   ///
-  /// Returns a [app_native_ad.NativeAd] object if an ad is successfully loaded,
-  /// otherwise returns `null`.
+  /// Returns a [NativeAd] object if an ad is successfully loaded,
+  /// otherwise returns `null`. This method is intended for native ads
+  /// that are displayed directly within content feeds.
   ///
-  /// The [imageStyle] is used to select an appropriate native ad template
-  /// that best matches the visual density of the surrounding content.
+  /// The [adPlatformIdentifiers] provides the platform-specific ad unit IDs.
+  /// The [adId] is the specific identifier for the ad slot (e.g., native ad unit ID).
   /// The [adThemeStyle] provides UI-agnostic theme properties for ad styling.
-  Future<app_native_ad.NativeAd?> loadNativeAd({
-    required HeadlineImageStyle imageStyle,
+  /// The [headlineImageStyle] provides the user's preference for feed layout,
+  /// which can be used to request an appropriately sized ad.
+  Future<NativeAd?> loadNativeAd({
+    required AdPlatformIdentifiers adPlatformIdentifiers,
+    required String? adId,
     required AdThemeStyle adThemeStyle,
+    HeadlineImageStyle? headlineImageStyle,
   });
 
-  // Future methods for other ad types (e.g., interstitial, banner)
-  // can be added here as needed in the future.
+  /// Loads an inline banner ad.
+  ///
+  /// Returns a [BannerAd] object if an ad is successfully loaded,
+  /// otherwise returns `null`. This method is intended for banner ads
+  /// that are displayed directly within content feeds.
+  ///
+  /// The [adPlatformIdentifiers] provides the platform-specific ad unit IDs.
+  /// The [adId] is the specific identifier for the ad slot (e.g., banner ad unit ID).
+  /// The [adThemeStyle] provides UI-agnostic theme properties for ad styling.
+  /// The [headlineImageStyle] provides the user's preference for feed layout,
+  /// which can be used to request an appropriately sized ad.
+  Future<BannerAd?> loadBannerAd({
+    required AdPlatformIdentifiers adPlatformIdentifiers,
+    required String? adId,
+    required AdThemeStyle adThemeStyle,
+    HeadlineImageStyle? headlineImageStyle,
+  });
+
+  /// Loads a full-screen interstitial ad.
+  ///
+  /// Returns an [InterstitialAd] object if an ad is successfully loaded,
+  /// otherwise returns `null`. This method is intended for interstitial ads
+  /// that are displayed as full-screen overlays, typically on route changes.
+  ///
+  /// The [adPlatformIdentifiers] provides the platform-specific ad unit IDs.
+  /// The [adId] is the specific identifier for the ad slot (e.g., interstitial ad unit ID).
+  /// The [adThemeStyle] provides UI-agnostic theme properties for ad styling.
+  Future<InterstitialAd?> loadInterstitialAd({
+    required AdPlatformIdentifiers adPlatformIdentifiers,
+    required String? adId,
+    required AdThemeStyle adThemeStyle,
+  });
 }

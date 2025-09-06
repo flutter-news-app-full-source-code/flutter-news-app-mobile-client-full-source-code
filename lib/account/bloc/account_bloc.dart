@@ -38,11 +38,11 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         .entityUpdated
         .where((type) => type == UserContentPreferences)
         .listen((_) {
-      // If there's a current user, reload their preferences.
-      if (state.user?.id != null) {
-        add(AccountLoadUserPreferences(userId: state.user!.id));
-      }
-    });
+          // If there's a current user, reload their preferences.
+          if (state.user?.id != null) {
+            add(AccountLoadUserPreferences(userId: state.user!.id));
+          }
+        });
 
     // Register event handlers
     on<AccountUserChanged>(_onAccountUserChanged);

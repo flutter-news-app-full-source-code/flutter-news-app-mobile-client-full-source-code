@@ -5,7 +5,7 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_cache_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 
 part 'settings_event.dart';
 part 'settings_state.dart';
@@ -167,7 +167,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     // When the theme's accent color changes, ads must be reloaded to reflect
     // the new styling. Clearing the cache ensures that any visible or
     // soon-to-be-visible ads are fetched again with the updated theme.
-    AdCacheService().clearAllAds();
+    InlineAdCacheService().clearAllAds();
     await _persistSettings(updatedSettings, emit);
   }
 
@@ -232,7 +232,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     // (small or medium) is requested. To ensure the correct ad format is
     // displayed, the cache must be cleared, forcing a new ad load with the
     // appropriate template.
-    AdCacheService().clearAllAds();
+    InlineAdCacheService().clearAllAds();
     await _persistSettings(updatedSettings, emit);
   }
 

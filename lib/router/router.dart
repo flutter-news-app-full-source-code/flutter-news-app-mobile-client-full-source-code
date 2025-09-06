@@ -13,6 +13,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/account/view/man
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/topics/add_topic_to_follow_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/topics/followed_topics_list_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/saved_headlines_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_navigator_observer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
@@ -70,6 +71,8 @@ GoRouter createRouter({
   required DataRepository<User> userRepository,
   required local_config.AppEnvironment environment,
   required AdService adService,
+  required AdNavigatorObserver
+  adNavigatorObserver, // Accept AdNavigatorObserver
 }) {
   // Instantiate AccountBloc once to be shared
   final accountBloc = AccountBloc(
@@ -91,6 +94,9 @@ GoRouter createRouter({
     // an attempt to build a complex page before the app state is ready.
     initialLocation: '/',
     debugLogDiagnostics: true,
+    observers: [
+      adNavigatorObserver, // Pass the AdNavigatorObserver to GoRouter
+    ],
     // --- Redirect Logic ---
     redirect: (BuildContext context, GoRouterState state) {
       final appStatus = context.read<AppBloc>().state.status;

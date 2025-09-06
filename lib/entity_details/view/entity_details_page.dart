@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/ad_loader_widget.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/feed_ad_loader_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/bloc/entity_details_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
@@ -353,20 +353,26 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                       } else if (item is AdPlaceholder) {
                         // Retrieve the user's preferred headline image style from the AppBloc.
                         // This is the single source of truth for this setting.
-                        final imageStyle = context
-                            .watch<AppBloc>()
+                        // Access the AppBloc to get the remoteConfig for ads.
+                        final adConfig = context
+                            .read<AppBloc>()
                             .state
-                            .settings
-                            .feedPreferences
-                            .headlineImageStyle;
+                            .remoteConfig
+                            ?.adConfig;
 
-                        return AdLoaderWidget(
+                        // Ensure adConfig is not null before building the AdLoaderWidget.
+                        if (adConfig == null) {
+                          // Return an empty widget or a placeholder if adConfig is not available.
+                          return const SizedBox.shrink();
+                        }
+
+                        return FeedAdLoaderWidget(
                           adPlaceholder: item,
                           adService: context.read<AdService>(),
                           adThemeStyle: AdThemeStyle.fromTheme(
                             Theme.of(context),
                           ),
-                          imageStyle: imageStyle,
+                          adConfig: adConfig,
                         );
                       }
                       return const SizedBox.shrink();

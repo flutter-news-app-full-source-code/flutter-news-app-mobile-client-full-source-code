@@ -1,7 +1,8 @@
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart'; // Import BannerAd
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart'; // Import InlineAd
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart'; // Import NativeAd
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
 import 'package:logging/logging.dart';
 
@@ -20,10 +21,17 @@ import 'package:logging/logging.dart';
 /// {@endtemplate}
 class AdmobInlineAdWidget extends StatefulWidget {
   /// {@macro admob_inline_ad_widget}
-  const AdmobInlineAdWidget({required this.inlineAd, super.key});
+  const AdmobInlineAdWidget({
+    required this.inlineAd,
+    this.headlineImageStyle,
+    super.key,
+  });
 
   /// The generic inline ad model which contains the provider-specific AdMob ad object.
   final InlineAd inlineAd;
+
+  /// The user's preference for feed layout, used to determine the ad's visual size.
+  final HeadlineImageStyle? headlineImageStyle;
 
   @override
   State<AdmobInlineAdWidget> createState() => _AdmobInlineAdWidgetState();
@@ -90,7 +98,7 @@ class _AdmobInlineAdWidgetState extends State<AdmobInlineAdWidget> {
       return const SizedBox.shrink();
     }
 
-    // Determine the height based on the actual ad type.
+    // Determine the height based on the actual ad type and headlineImageStyle.
     double adHeight;
     if (widget.inlineAd is NativeAd) {
       final nativeAd = widget.inlineAd as NativeAd;
@@ -99,8 +107,11 @@ class _AdmobInlineAdWidgetState extends State<AdmobInlineAdWidget> {
         NativeAdTemplateType.medium => 340,
       };
     } else if (widget.inlineAd is BannerAd) {
-      // Standard banner ad height.
-      adHeight = 50; // AdSize.banner.height
+      // For banner ads, adjust height based on headlineImageStyle.
+      // If largeThumbnail, assume mediumRectangle (300x250), otherwise standard banner (320x50).
+      adHeight = widget.headlineImageStyle == HeadlineImageStyle.largeThumbnail
+          ? 250 // Height for mediumRectangle
+          : 50; // Height for standard banner
     } else {
       // Fallback height for unknown inline ad types.
       adHeight = 100;

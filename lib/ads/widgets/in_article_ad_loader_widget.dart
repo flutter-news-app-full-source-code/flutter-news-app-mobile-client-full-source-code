@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_cache_service.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/admo
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/local_banner_ad_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/local_native_ad_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/placeholder_ad_widget.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -59,7 +61,7 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
   bool _isLoading = true;
   bool _hasError = false;
   final Logger _logger = Logger('InArticleAdLoaderWidget');
-  final AdCacheService _adCacheService = AdCacheService();
+  final InlineAdCacheService _adCacheService = InlineAdCacheService();
 
   Completer<void>? _loadAdCompleter;
 
@@ -110,7 +112,7 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
 
   /// Loads the in-article ad for this slot.
   ///
-  /// This method first checks the [AdCacheService] for a pre-loaded [InlineAd].
+  /// This method first checks the [InlineAdCacheService] for a pre-loaded [InlineAd].
   /// If found, it uses the cached ad. Otherwise, it requests a new in-article ad
   /// from the [AdService] using `getInArticleAd` and stores it in the cache
   /// upon success.
@@ -143,10 +145,19 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
       'Loading new in-article ad for slot: ${widget.slotConfiguration.slotType.name}',
     );
     try {
+      // Get the current HeadlineImageStyle from AppBloc
+      final headlineImageStyle = context
+          .read<AppBloc>()
+          .state
+          .settings
+          .feedPreferences
+          .headlineImageStyle;
+
       // Call AdService.getInArticleAd with the full AdConfig.
       final loadedAd = await widget.adService.getInArticleAd(
         adConfig: widget.adConfig,
         adThemeStyle: widget.adThemeStyle,
+        headlineImageStyle: headlineImageStyle, // Pass the headlineImageStyle
       );
 
       if (loadedAd != null) {
@@ -220,9 +231,14 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
           return AdmobInlineAdWidget(inlineAd: _loadedAd!);
         case AdPlatformType.local:
           if (_loadedAd is NativeAd && _loadedAd!.adObject is LocalNativeAd) {
-            return LocalNativeAdWidget(localNativeAd: _loadedAd!.adObject as LocalNativeAd);
-          } else if (_loadedAd is BannerAd && _loadedAd!.adObject is LocalBannerAd) {
-            return LocalBannerAdWidget(localBannerAd: _loadedAd!.adObject as LocalBannerAd);
+            return LocalNativeAdWidget(
+              localNativeAd: _loadedAd!.adObject as LocalNativeAd,
+            );
+          } else if (_loadedAd is BannerAd &&
+              _loadedAd!.adObject is LocalBannerAd) {
+            return LocalBannerAdWidget(
+              localBannerAd: _loadedAd!.adObject as LocalBannerAd,
+            );
           }
           // Fallback for unsupported local ad types or errors
           return const PlaceholderAdWidget();

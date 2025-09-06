@@ -1,9 +1,7 @@
 import 'package:core/core.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
-import 'package:core/core.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart'; // Import InlineAd
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
 import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
@@ -53,16 +51,20 @@ class AdService {
   /// - [adConfig]: The remote configuration for ad display rules.
   /// - [adType]: The specific type of inline ad to load ([AdType.native] or [AdType.banner]).
   /// - [adThemeStyle]: UI-agnostic theme properties for ad styling.
+  /// - [headlineImageStyle]: The user's preference for feed layout,
+  ///   which can be used to request an appropriately sized ad.
   Future<InlineAd?> getFeedAd({
     required AdConfig adConfig,
     required AdType adType,
     required AdThemeStyle adThemeStyle,
+    HeadlineImageStyle? headlineImageStyle,
   }) async {
     return _loadInlineAd(
       adConfig: adConfig,
       adType: adType,
       adThemeStyle: adThemeStyle,
       feedAd: true,
+      headlineImageStyle: headlineImageStyle,
     );
   }
 
@@ -152,15 +154,19 @@ class AdService {
   ///
   /// - [adConfig]: The remote configuration for ad display rules.
   /// - [adThemeStyle]: UI-agnostic theme properties for ad styling.
+  /// - [headlineImageStyle]: The user's preference for feed layout,
+  ///   which can be used to request an appropriately sized ad.
   Future<InlineAd?> getInArticleAd({
     required AdConfig adConfig,
     required AdThemeStyle adThemeStyle,
+    HeadlineImageStyle? headlineImageStyle,
   }) async {
     return _loadInlineAd(
       adConfig: adConfig,
       adType: adConfig.articleAdConfiguration.defaultInArticleAdType,
       adThemeStyle: adThemeStyle,
       feedAd: false,
+      headlineImageStyle: headlineImageStyle,
     );
   }
 
@@ -174,6 +180,8 @@ class AdService {
   /// - [adType]: The specific type of inline ad to load ([AdType.native] or [AdType.banner]).
   /// - [adThemeStyle]: UI-agnostic theme properties for ad styling.
   /// - [feedAd]: A boolean indicating if this is for a feed ad (true) or in-article ad (false).
+  /// - [headlineImageStyle]: The user's preference for feed layout,
+  ///   which can be used to request an appropriately sized ad.
   ///
   /// Returns an [InlineAd] if an ad is successfully loaded, otherwise `null`.
   Future<InlineAd?> _loadInlineAd({
@@ -181,6 +189,7 @@ class AdService {
     required AdType adType,
     required AdThemeStyle adThemeStyle,
     required bool feedAd,
+    HeadlineImageStyle? headlineImageStyle,
   }) async {
     // Check if ads are globally enabled and specifically for the context (feed or article).
     if (!adConfig.enabled ||
@@ -246,12 +255,14 @@ class AdService {
             adPlatformIdentifiers: platformAdIdentifiers,
             adId: adId,
             adThemeStyle: adThemeStyle,
+            headlineImageStyle: headlineImageStyle,
           );
         case AdType.banner:
           loadedAd = await adProvider.loadBannerAd(
             adPlatformIdentifiers: platformAdIdentifiers,
             adId: adId,
             adThemeStyle: adThemeStyle,
+            headlineImageStyle: headlineImageStyle,
           );
         case AdType.interstitial:
         case AdType.video:

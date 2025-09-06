@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_cache_service.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
@@ -13,11 +14,13 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/admo
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/local_banner_ad_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/local_native_ad_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/placeholder_ad_widget.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
 
-/// {@template ad_loader_widget}
-/// A self-contained widget responsible for loading and displaying an inline ad.
+/// {@template feed_ad_loader_widget}
+/// A self-contained widget responsible for loading and displaying an inline ad
+/// specifically within content feeds (e.g., main feed, search results).
 ///
 /// This widget handles the entire lifecycle of a single ad slot in the feed.
 /// It attempts to retrieve a cached [InlineAd] first. If no ad is cached,
@@ -29,9 +32,9 @@ import 'package:ui_kit/ui_kit.dart';
 /// scrolling performance in lists. It specifically handles inline ads (native
 /// and banner), while interstitial ads are managed separately.
 /// {@endtemplate}
-class AdLoaderWidget extends StatefulWidget {
-  /// {@macro ad_loader_widget}
-  const AdLoaderWidget({
+class FeedAdLoaderWidget extends StatefulWidget {
+  /// {@macro feed_ad_loader_widget}
+  const FeedAdLoaderWidget({
     required this.adPlaceholder,
     required this.adService,
     required this.adThemeStyle,
@@ -52,15 +55,15 @@ class AdLoaderWidget extends StatefulWidget {
   final AdConfig adConfig;
 
   @override
-  State<AdLoaderWidget> createState() => _AdLoaderWidgetState();
+  State<FeedAdLoaderWidget> createState() => _FeedAdLoaderWidgetState();
 }
 
-class _AdLoaderWidgetState extends State<AdLoaderWidget> {
+class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
   InlineAd? _loadedAd;
   bool _isLoading = true;
   bool _hasError = false;
-  final Logger _logger = Logger('AdLoaderWidget');
-  final AdCacheService _adCacheService = AdCacheService();
+  final Logger _logger = Logger('FeedAdLoaderWidget'); // Renamed logger
+  final InlineAdCacheService _adCacheService = InlineAdCacheService();
 
   /// Completer to manage the lifecycle of the ad loading future.
   /// This helps in cancelling pending operations if the widget is disposed
@@ -75,7 +78,7 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
   }
 
   @override
-  void didUpdateWidget(covariant AdLoaderWidget oldWidget) {
+  void didUpdateWidget(covariant FeedAdLoaderWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     // If the adPlaceholder ID changes, it means this widget is being reused
     // for a different ad slot. We need to cancel any ongoing load for the old
@@ -84,7 +87,7 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
     if (widget.adPlaceholder.id != oldWidget.adPlaceholder.id ||
         widget.adConfig != oldWidget.adConfig) {
       _logger.info(
-        'AdLoaderWidget updated for new placeholder ID: '
+        'FeedAdLoaderWidget updated for new placeholder ID: ' // Renamed log
         '${widget.adPlaceholder.id} or AdConfig changed. Re-loading ad.',
       );
       // Cancel the previous loading operation if it's still active and not yet
@@ -125,9 +128,9 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
     super.dispose();
   }
 
-  /// Loads the inline ad for this slot.
+  /// Loads the inline ad for this feed slot.
   ///
-  /// This method first checks the [AdCacheService] for a pre-loaded [InlineAd].
+  /// This method first checks the [InlineAdCacheService] for a pre-loaded [InlineAd].
   /// If found, it uses the cached ad. Otherwise, it requests a new inline ad
   /// from the [AdService] using `getFeedAd` and stores it in the cache
   /// upon success.
@@ -146,7 +149,7 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
 
     if (cachedAd != null) {
       _logger.info(
-        'Using cached ad for placeholder ID: ${widget.adPlaceholder.id}',
+        'Using cached ad for feed placeholder ID: ${widget.adPlaceholder.id}', // Renamed log
       );
       // Ensure the widget is still mounted before calling setState.
       if (!mounted) return;
@@ -163,7 +166,7 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
     }
 
     _logger.info(
-      'Loading new ad for placeholder ID: ${widget.adPlaceholder.id}',
+      'Loading new ad for feed placeholder ID: ${widget.adPlaceholder.id}', // Renamed log
     );
     try {
       // The adId is now directly available from the placeholder.
@@ -187,22 +190,28 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
         return;
       }
 
+      // Get the current HeadlineImageStyle from AppBloc
+      final headlineImageStyle = context
+          .read<AppBloc>()
+          .state
+          .settings
+          .feedPreferences
+          .headlineImageStyle;
+
       // Call AdService.getFeedAd with the full AdConfig and adType from the placeholder.
       final loadedAd = await widget.adService.getFeedAd(
         adConfig: widget.adConfig, // Pass the full AdConfig
         adType: widget.adPlaceholder.adType,
         adThemeStyle: widget.adThemeStyle,
+        headlineImageStyle: headlineImageStyle, // Pass the headlineImageStyle
       );
 
       if (loadedAd != null) {
         _logger.info(
-          'New ad loaded for placeholder ID: ${widget.adPlaceholder.id}',
+          'New ad loaded for feed placeholder ID: ${widget.adPlaceholder.id}', // Renamed log
         );
         // Store the newly loaded ad in the cache.
-        _adCacheService.setAd(
-          widget.adPlaceholder.id,
-          loadedAd,
-        );
+        _adCacheService.setAd(widget.adPlaceholder.id, loadedAd);
         // Ensure the widget is still mounted before calling setState.
         if (!mounted) return;
         setState(() {
@@ -215,7 +224,7 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
         }
       } else {
         _logger.warning(
-          'Failed to load ad for placeholder ID: ${widget.adPlaceholder.id}. '
+          'Failed to load ad for feed placeholder ID: ${widget.adPlaceholder.id}. ' // Renamed log
           'No ad returned.',
         );
         // Ensure the widget is still mounted before calling setState.
@@ -233,7 +242,7 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
       }
     } catch (e, s) {
       _logger.severe(
-        'Error loading ad for placeholder ID: ${widget.adPlaceholder.id}: $e',
+        'Error loading ad for feed placeholder ID: ${widget.adPlaceholder.id}: $e', // Renamed log
         e,
         s,
       );
@@ -274,12 +283,37 @@ class _AdLoaderWidgetState extends State<AdLoaderWidget> {
       // provider-specific widget for rendering.
       switch (_loadedAd!.provider) {
         case AdPlatformType.admob:
-          return AdmobInlineAdWidget(inlineAd: _loadedAd!);
+          return AdmobInlineAdWidget(
+            inlineAd: _loadedAd!,
+            headlineImageStyle: context
+                .read<AppBloc>()
+                .state
+                .settings
+                .feedPreferences
+                .headlineImageStyle,
+          );
         case AdPlatformType.local:
           if (_loadedAd is NativeAd && _loadedAd!.adObject is LocalNativeAd) {
-            return LocalNativeAdWidget(localNativeAd: _loadedAd!.adObject as LocalNativeAd);
-          } else if (_loadedAd is BannerAd && _loadedAd!.adObject is LocalBannerAd) {
-            return LocalBannerAdWidget(localBannerAd: _loadedAd!.adObject as LocalBannerAd);
+            return LocalNativeAdWidget(
+              localNativeAd: _loadedAd!.adObject as LocalNativeAd,
+              headlineImageStyle: context
+                  .read<AppBloc>()
+                  .state
+                  .settings
+                  .feedPreferences
+                  .headlineImageStyle,
+            );
+          } else if (_loadedAd is BannerAd &&
+              _loadedAd!.adObject is LocalBannerAd) {
+            return LocalBannerAdWidget(
+              localBannerAd: _loadedAd!.adObject as LocalBannerAd,
+              headlineImageStyle: context
+                  .read<AppBloc>()
+                  .state
+                  .settings
+                  .feedPreferences
+                  .headlineImageStyle,
+            );
           }
           // Fallback for unsupported local ad types or errors
           return const PlaceholderAdWidget();

@@ -1,7 +1,7 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
+import 'package:url_launcher/url_launcher.dart'; // Import url_launcher
 
 /// {@template local_interstitial_ad_dialog}
 /// A dialog widget that displays a [LocalInterstitialAd].
@@ -36,10 +36,17 @@ class LocalInterstitialAdDialog extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.all(AppSpacing.lg),
                       child: InkWell(
-                        onTap: () {
-                          // Navigate to the target URL when the ad image is tapped.
-                          // Using context.go to open external URL.
-                          context.go(localInterstitialAd.targetUrl);
+                        onTap: () async {
+                          // Launch the target URL in an external browser.
+                          final uri = Uri.parse(localInterstitialAd.targetUrl);
+                          if (await canLaunchUrl(uri)) {
+                            await launchUrl(uri);
+                          } else {
+                            // Log an error or show a user-friendly message
+                            // if the URL cannot be launched.
+                            // For now, we'll just print to debug console.
+                            debugPrint('Could not launch ${localInterstitialAd.targetUrl}');
+                          }
                         },
                         child: Image.network(
                           localInterstitialAd.imageUrl,

@@ -1124,5 +1124,21 @@
     "unfollowButtonText": "Unfollow",
     "@unfollowButtonText": {
         "description": "Text for the unfollow button on suggestion items"
+    },
+    "demoNativeAdText": "NATIVE AD (DEMO)",
+    "@demoNativeAdText": {
+        "description": "Text displayed in the native ad placeholder in demo mode."
+    },
+    "demoBannerAdText": "BANNER AD (DEMO)",
+    "@demoBannerAdText": {
+        "description": "Text displayed in the banner ad placeholder in demo mode."
+    },
+    "demoInterstitialAdText": "INTERSTITIAL AD (DEMO)",
+    "@demoInterstitialAdText": {
+        "description": "Text displayed in the interstitial ad placeholder in demo mode."
+    },
+    "demoInterstitialAdDescription": "This is a full-screen advertisement placeholder.",
+    "@demoInterstitialAdDescription": {
+        "description": "Description text for the interstitial ad placeholder in demo mode."
     }
 }

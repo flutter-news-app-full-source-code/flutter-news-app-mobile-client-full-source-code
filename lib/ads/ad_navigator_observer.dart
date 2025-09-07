@@ -6,6 +6,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.d
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/widgets.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
 import 'package:logging/logging.dart';
 
@@ -124,8 +125,21 @@ class AdNavigatorObserver extends NavigatorObserver {
 
   /// Requests and shows an interstitial ad if conditions are met.
   Future<void> _showInterstitialAd() async {
-    final remoteConfig = appStateProvider().remoteConfig;
+    final appState = appStateProvider();
+    final appEnvironment = appState.environment;
+    final remoteConfig = appState.remoteConfig;
 
+    // In demo environment, display a placeholder interstitial ad directly.
+    if (appEnvironment == AppEnvironment.demo) {
+      _logger.info('Demo environment: Showing placeholder interstitial ad.');
+      await showDialog<void>(
+        context: navigator!.context,
+        builder: (context) => const DemoInterstitialAdDialog(),
+      );
+      return;
+    }
+
+    // For other environments (development, production), proceed with real ad loading.
     // This is a secondary check. The primary check is in _handlePageTransition.
     if (remoteConfig == null || !remoteConfig.adConfig.enabled) {
       _logger.info('Interstitial ads disabled or remote config not available.');

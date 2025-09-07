@@ -11,10 +11,12 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banne
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/admob_inline_ad_widget.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/demo_banner_ad_widget.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/demo_native_ad_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/local_banner_ad_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/local_native_ad_widget.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/placeholder_ad_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -261,6 +263,30 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final appEnvironment = context.read<AppBloc>().state.environment;
+    final headlineImageStyle = context
+        .read<AppBloc>()
+        .state
+        .settings
+        .feedPreferences
+        .headlineImageStyle;
+
+    // In demo environment, display placeholder ads directly.
+    if (appEnvironment == AppEnvironment.demo) {
+      switch (widget.adPlaceholder.adType) {
+        case AdType.native:
+          return DemoNativeAdWidget(headlineImageStyle: headlineImageStyle);
+        case AdType.banner:
+          return DemoBannerAdWidget(headlineImageStyle: headlineImageStyle);
+        case AdType.interstitial:
+        case AdType.video:
+          // Interstitial and video ads are not inline, so they won't be
+          // handled by FeedAdLoaderWidget. Fallback to a generic placeholder.
+          return const SizedBox.shrink();
+      }
+    }
+
+    // For other environments (development, production), proceed with real ad loading.
     if (_isLoading) {
       // Show a shimmer or loading indicator while the ad is being loaded.
       return const Padding(
@@ -276,8 +302,8 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
         ),
       );
     } else if (_hasError || _loadedAd == null) {
-      // Show a placeholder or error message if ad loading failed.
-      return const PlaceholderAdWidget();
+      // Fallback for unsupported local ad types or errors
+      return const SizedBox.shrink();
     } else {
       // If an ad is successfully loaded, dispatch to the appropriate
       // provider-specific widget for rendering.
@@ -285,38 +311,23 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
         case AdPlatformType.admob:
           return AdmobInlineAdWidget(
             inlineAd: _loadedAd!,
-            headlineImageStyle: context
-                .read<AppBloc>()
-                .state
-                .settings
-                .feedPreferences
-                .headlineImageStyle,
+            headlineImageStyle: headlineImageStyle,
           );
         case AdPlatformType.local:
           if (_loadedAd is NativeAd && _loadedAd!.adObject is LocalNativeAd) {
             return LocalNativeAdWidget(
               localNativeAd: _loadedAd!.adObject as LocalNativeAd,
-              headlineImageStyle: context
-                  .read<AppBloc>()
-                  .state
-                  .settings
-                  .feedPreferences
-                  .headlineImageStyle,
+              headlineImageStyle: headlineImageStyle,
             );
           } else if (_loadedAd is BannerAd &&
               _loadedAd!.adObject is LocalBannerAd) {
             return LocalBannerAdWidget(
               localBannerAd: _loadedAd!.adObject as LocalBannerAd,
-              headlineImageStyle: context
-                  .read<AppBloc>()
-                  .state
-                  .settings
-                  .feedPreferences
-                  .headlineImageStyle,
+              headlineImageStyle: headlineImageStyle,
             );
           }
           // Fallback for unsupported local ad types or errors
-          return const PlaceholderAdWidget();
+          return const SizedBox.shrink();
       }
     }
   }

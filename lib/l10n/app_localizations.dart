@@ -1651,6 +1651,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unfollow'**
   String get unfollowButtonText;
+
+  /// Text displayed in the native ad placeholder in demo mode.
+  ///
+  /// In en, this message translates to:
+  /// **'NATIVE AD (DEMO)'**
+  String get demoNativeAdText;
+
+  /// Text displayed in the banner ad placeholder in demo mode.
+  ///
+  /// In en, this message translates to:
+  /// **'BANNER AD (DEMO)'**
+  String get demoBannerAdText;
+
+  /// Text displayed in the interstitial ad placeholder in demo mode.
+  ///
+  /// In en, this message translates to:
+  /// **'INTERSTITIAL AD (DEMO)'**
+  String get demoInterstitialAdText;
+
+  /// Description text for the interstitial ad placeholder in demo mode.
+  ///
+  /// In en, this message translates to:
+  /// **'This is a full-screen advertisement placeholder.'**
+  String get demoInterstitialAdDescription;
 }
 
 class _AppLocalizationsDelegate

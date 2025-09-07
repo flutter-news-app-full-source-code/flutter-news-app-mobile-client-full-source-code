@@ -1124,5 +1124,21 @@
     "unfollowButtonText": "إلغاء المتابعة",
     "@unfollowButtonText": {
         "description": "Text for the unfollow button on suggestion items"
+    },
+    "demoNativeAdText": "إعلان أصلي (الوضع التجريبي)",
+    "@demoNativeAdText": {
+        "description": "النص المعروض في العنصر النائب للإعلان الأصلي في الوضع التجريبي."
+    },
+    "demoBannerAdText": "إعلان بانر (الوضع التجريبي)",
+    "@demoBannerAdText": {
+        "description": "النص المعروض في العنصر النائب لإعلان البانر في الوضع التجريبي."
+    },
+    "demoInterstitialAdText": "إعلان بيني (الوضع التجريبي)",
+    "@demoInterstitialAdText": {
+        "description": "النص المعروض في العنصر النائب للإعلان البيني في الوضع التجريبي."
+    },
+    "demoInterstitialAdDescription": "هذا عنصر نائب لإعلان بملء الشاشة.",
+    "@demoInterstitialAdDescription": {
+        "description": "نص الوصف للعنصر النائب للإعلان البيني في الوضع التجريبي."
     }
 }

@@ -863,4 +863,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unfollowButtonText => 'Unfollow';
+
+  @override
+  String get demoNativeAdText => 'NATIVE AD (DEMO)';
+
+  @override
+  String get demoBannerAdText => 'BANNER AD (DEMO)';
+
+  @override
+  String get demoInterstitialAdText => 'INTERSTITIAL AD (DEMO)';
+
+  @override
+  String get demoInterstitialAdDescription =>
+      'This is a full-screen advertisement placeholder.';
 }

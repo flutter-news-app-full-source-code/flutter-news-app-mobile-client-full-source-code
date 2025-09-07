@@ -860,4 +860,17 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get unfollowButtonText => 'إلغاء المتابعة';
+
+  @override
+  String get demoNativeAdText => 'إعلان أصلي (الوضع التجريبي)';
+
+  @override
+  String get demoBannerAdText => 'إعلان بانر (الوضع التجريبي)';
+
+  @override
+  String get demoInterstitialAdText => 'إعلان بيني (الوضع التجريبي)';
+
+  @override
+  String get demoInterstitialAdDescription =>
+      'هذا عنصر نائب لإعلان بملء الشاشة.';
 }

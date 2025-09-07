@@ -1,5 +1,6 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template demo_banner_ad_widget}
@@ -37,7 +38,7 @@ class DemoBannerAdWidget extends StatelessWidget {
         width: double.infinity,
         child: Center(
           child: Text(
-            'BANNER AD (DEMO)',
+            AppLocalizations.of(context).demoBannerAdText,
             style: theme.textTheme.titleMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),

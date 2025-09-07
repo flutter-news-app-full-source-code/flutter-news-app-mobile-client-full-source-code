@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template demo_interstitial_ad_dialog}
@@ -25,7 +26,7 @@ class DemoInterstitialAdDialog extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'INTERSTITIAL AD (DEMO)',
+                    AppLocalizations.of(context).demoInterstitialAdText,
                     style: theme.textTheme.titleLarge?.copyWith(
                       color: theme.colorScheme.onSurface,
                     ),
@@ -33,7 +34,7 @@ class DemoInterstitialAdDialog extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Text(
-                    'This is a full-screen advertisement placeholder.',
+                    AppLocalizations.of(context).demoInterstitialAdDescription,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),

@@ -1,5 +1,6 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template demo_native_ad_widget}
@@ -10,10 +11,7 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class DemoNativeAdWidget extends StatelessWidget {
   /// {@macro demo_native_ad_widget}
-  const DemoNativeAdWidget({
-    this.headlineImageStyle,
-    super.key,
-  });
+  const DemoNativeAdWidget({this.headlineImageStyle, super.key});
 
   /// The user's preference for feed layout, used to determine the ad's visual size.
   final HeadlineImageStyle? headlineImageStyle;
@@ -21,6 +19,7 @@ class DemoNativeAdWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     // Determine the height based on the headlineImageStyle, mimicking real ad widgets.
     final double adHeight = headlineImageStyle == HeadlineImageStyle.largeThumbnail
@@ -37,7 +36,7 @@ class DemoNativeAdWidget extends StatelessWidget {
         width: double.infinity,
         child: Center(
           child: Text(
-            'NATIVE AD (DEMO)',
+            l10n.demoNativeAdText,
             style: theme.textTheme.titleMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -48,3 +47,4 @@ class DemoNativeAdWidget extends StatelessWidget {
     );
   }
 }
+

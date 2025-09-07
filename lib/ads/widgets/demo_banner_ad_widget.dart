@@ -11,10 +11,7 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class DemoBannerAdWidget extends StatelessWidget {
   /// {@macro demo_banner_ad_widget}
-  const DemoBannerAdWidget({
-    this.headlineImageStyle,
-    super.key,
-  });
+  const DemoBannerAdWidget({this.headlineImageStyle, super.key});
 
   /// The user's preference for feed layout, used to determine the ad's visual size.
   final HeadlineImageStyle? headlineImageStyle;
@@ -24,7 +21,8 @@ class DemoBannerAdWidget extends StatelessWidget {
     final theme = Theme.of(context);
 
     // Determine the height based on the headlineImageStyle, mimicking real ad widgets.
-    final double adHeight = headlineImageStyle == HeadlineImageStyle.largeThumbnail
+    final adHeight =
+        headlineImageStyle == HeadlineImageStyle.largeThumbnail
         ? 250 // Height for mediumRectangle banner
         : 50; // Height for standard banner
 
@@ -34,7 +32,7 @@ class DemoBannerAdWidget extends StatelessWidget {
         vertical: AppSpacing.xs,
       ),
       child: SizedBox(
-        height: adHeight,
+        height: adHeight.toDouble(),
         width: double.infinity,
         child: Center(
           child: Text(

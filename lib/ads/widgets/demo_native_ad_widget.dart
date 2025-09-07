@@ -1,0 +1,50 @@
+import 'package:core/core.dart';
+import 'package:flutter/material.dart';
+import 'package:ui_kit/ui_kit.dart';
+
+/// {@template demo_native_ad_widget}
+/// A widget that displays a placeholder for a native ad in demo mode.
+///
+/// This widget mimics the visual dimensions of a real native ad but
+/// contains only static text to indicate it's a demo.
+/// {@endtemplate}
+class DemoNativeAdWidget extends StatelessWidget {
+  /// {@macro demo_native_ad_widget}
+  const DemoNativeAdWidget({
+    this.headlineImageStyle,
+    super.key,
+  });
+
+  /// The user's preference for feed layout, used to determine the ad's visual size.
+  final HeadlineImageStyle? headlineImageStyle;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    // Determine the height based on the headlineImageStyle, mimicking real ad widgets.
+    final double adHeight = headlineImageStyle == HeadlineImageStyle.largeThumbnail
+        ? 340 // Height for medium native ad template
+        : 120; // Height for small native ad template
+
+    return Card(
+      margin: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.paddingMedium,
+        vertical: AppSpacing.xs,
+      ),
+      child: SizedBox(
+        height: adHeight,
+        width: double.infinity,
+        child: Center(
+          child: Text(
+            'NATIVE AD (DEMO)',
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+    );
+  }
+}

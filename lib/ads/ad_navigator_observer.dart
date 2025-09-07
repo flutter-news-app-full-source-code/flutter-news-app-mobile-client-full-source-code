@@ -36,8 +36,8 @@ class AdNavigatorObserver extends NavigatorObserver {
     required this.adService,
     required AdThemeStyle adThemeStyle,
     Logger? logger,
-  }) : _logger = logger ?? Logger('AdNavigatorObserver'),
-       _adThemeStyle = adThemeStyle;
+  })  : _logger = logger ?? Logger('AdNavigatorObserver'),
+        _adThemeStyle = adThemeStyle;
 
   /// A function that provides the current [AppState].
   final AppStateProvider appStateProvider;
@@ -51,29 +51,71 @@ class AdNavigatorObserver extends NavigatorObserver {
   /// Tracks the number of page transitions since the last interstitial ad.
   int _pageTransitionCount = 0;
 
+  /// Stores the name of the previous route.
+  String? _previousRouteName;
+
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didPush(route, previousRoute);
-    _logger.info('Route pushed: ${route.settings.name}');
-    if (route is PageRoute && route.settings.name != null) {
-      _handlePageTransition();
+    final currentRouteName = route.settings.name;
+    _logger.info('Route pushed: $currentRouteName (Previous: $_previousRouteName)');
+    if (route is PageRoute && currentRouteName != null) {
+      _handlePageTransition(currentRouteName);
     }
+    _previousRouteName = currentRouteName;
   }
 
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didPop(route, previousRoute);
-    _logger.info('Route popped: ${route.settings.name}');
-    if (route is PageRoute && route.settings.name != null) {
-      _handlePageTransition();
+    final currentRouteName = previousRoute?.settings.name; // After pop, previousRoute is the new current
+    _logger.info('Route popped: ${route.settings.name} (New Current: $currentRouteName)');
+    if (route is PageRoute && currentRouteName != null) {
+      _handlePageTransition(currentRouteName);
     }
+    _previousRouteName = currentRouteName;
+  }
+
+  /// Determines if a route transition is eligible for an interstitial ad.
+  ///
+  /// An ad is considered eligible if the transition is from a content list
+  /// (e.g., feed, search) to a detail page (e.g., article, entity details).
+  bool _isEligibleForInterstitialAd(String currentRouteName) {
+    // Define content list routes
+    const contentListRoutes = {
+      'feed',
+      'search',
+      'followedTopicsList',
+      'followedSourcesList',
+      'followedCountriesList',
+      'accountSavedHeadlines',
+    };
+
+    // Define detail page routes
+    const detailPageRoutes = {
+      'articleDetails',
+      'searchArticleDetails',
+      'accountArticleDetails',
+      'globalArticleDetails',
+      'entityDetails',
+    };
+
+    final previous = _previousRouteName;
+    final current = currentRouteName;
+
+    final isFromContentList = previous != null && contentListRoutes.contains(previous);
+    final isToDetailPage = detailPageRoutes.contains(current);
+
+    _logger.info(
+      'Eligibility check: Previous: $previous (Is Content List: $isFromContentList), '
+      'Current: $current (Is Detail Page: $isToDetailPage)',
+    );
+
+    return isFromContentList && isToDetailPage;
   }
 
   /// Handles a page transition event, checks ad frequency, and shows an ad if needed.
-  void _handlePageTransition() {
-    _pageTransitionCount++;
-    _logger.info('Page transitioned. Current count: $_pageTransitionCount');
-
+  void _handlePageTransition(String currentRouteName) {
     final appState = appStateProvider();
     final remoteConfig = appState.remoteConfig;
     final user = appState.user;
@@ -87,10 +129,23 @@ class AdNavigatorObserver extends NavigatorObserver {
       return;
     }
 
+    // Only increment count if the transition is eligible for an interstitial ad.
+    if (_isEligibleForInterstitialAd(currentRouteName)) {
+      _pageTransitionCount++;
+      _logger.info(
+        'Eligible page transition. Current count: $_pageTransitionCount',
+      );
+    } else {
+      _logger.info(
+        'Ineligible page transition. Count remains: $_pageTransitionCount',
+      );
+      return; // Do not proceed if not an eligible transition
+    }
+
     final interstitialConfig =
         remoteConfig.adConfig.interstitialAdConfiguration;
     final frequencyConfig =
-        interstitialConfig.feedInterstitialAdFrequencyConfig;
+        interstitialConfig.feedInterstitialAdFrequencyConfig; // Using existing name
 
     // Determine the required transitions based on user role.
     final int requiredTransitions;
@@ -111,14 +166,16 @@ class AdNavigatorObserver extends NavigatorObserver {
     }
 
     _logger.info(
-      'Required transitions for user role ${user?.appRole}: $requiredTransitions',
+      'Required transitions for user role ${user?.appRole}: $requiredTransitions. '
+      'Current eligible transitions: $_pageTransitionCount',
     );
 
     // Check if it's time to show an interstitial ad.
     if (requiredTransitions > 0 &&
         _pageTransitionCount >= requiredTransitions) {
       _logger.info('Interstitial ad due. Requesting ad.');
-      _showInterstitialAd();
+      unawaited(_showInterstitialAd()); // Use unawaited to not block navigation
+      // Reset count only after an ad is due (whether it shows or fails)
       _pageTransitionCount = 0;
     }
   }
@@ -142,7 +199,10 @@ class AdNavigatorObserver extends NavigatorObserver {
     // For other environments (development, production), proceed with real ad loading.
     // This is a secondary check. The primary check is in _handlePageTransition.
     if (remoteConfig == null || !remoteConfig.adConfig.enabled) {
-      _logger.info('Interstitial ads disabled or remote config not available.');
+      _logger.warning(
+        'Interstitial ads disabled or remote config not available. '
+        'This should have been caught earlier.',
+      );
       return;
     }
 
@@ -150,7 +210,10 @@ class AdNavigatorObserver extends NavigatorObserver {
     final interstitialConfig = adConfig.interstitialAdConfiguration;
 
     if (!interstitialConfig.enabled) {
-      _logger.info('Interstitial ads are specifically disabled in config.');
+      _logger.warning(
+        'Interstitial ads are specifically disabled in config. '
+        'This should have been caught earlier.',
+      );
       return;
     }
 
@@ -192,7 +255,10 @@ class AdNavigatorObserver extends NavigatorObserver {
         );
       }
     } else {
-      _logger.info('No interstitial ad loaded.');
+      _logger.warning(
+        'No interstitial ad loaded by AdService, even though one was due. '
+        'Check AdService implementation and ad unit availability.',
+      );
     }
   }
 }

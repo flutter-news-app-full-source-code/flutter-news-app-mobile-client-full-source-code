@@ -1,0 +1,50 @@
+import 'package:core/core.dart';
+import 'package:flutter/material.dart';
+import 'package:ui_kit/ui_kit.dart';
+
+/// {@template demo_banner_ad_widget}
+/// A widget that displays a placeholder for a banner ad in demo mode.
+///
+/// This widget mimics the visual dimensions of a real banner ad but
+/// contains only static text to indicate it's a demo.
+/// {@endtemplate}
+class DemoBannerAdWidget extends StatelessWidget {
+  /// {@macro demo_banner_ad_widget}
+  const DemoBannerAdWidget({
+    this.headlineImageStyle,
+    super.key,
+  });
+
+  /// The user's preference for feed layout, used to determine the ad's visual size.
+  final HeadlineImageStyle? headlineImageStyle;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    // Determine the height based on the headlineImageStyle, mimicking real ad widgets.
+    final double adHeight = headlineImageStyle == HeadlineImageStyle.largeThumbnail
+        ? 250 // Height for mediumRectangle banner
+        : 50; // Height for standard banner
+
+    return Card(
+      margin: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.paddingMedium,
+        vertical: AppSpacing.xs,
+      ),
+      child: SizedBox(
+        height: adHeight,
+        width: double.infinity,
+        child: Center(
+          child: Text(
+            'BANNER AD (DEMO)',
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+    );
+  }
+}

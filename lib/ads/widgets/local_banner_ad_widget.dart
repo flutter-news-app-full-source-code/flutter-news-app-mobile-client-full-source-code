@@ -28,14 +28,20 @@ class LocalBannerAdWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    // Determine the height based on the bannerAdShape if provided.
-    // If bannerAdShape is square, use height for mediumRectangle (250).
-    // Otherwise, use height for standard banner (90).
-    final imageHeight = switch (bannerAdShape) {
-      BannerAdShape.square => 250,
-      BannerAdShape.rectangle => 90,
-      _ => 90, // Default to standard banner height if shape is null or unknown
-    };
+    // Determine the height. Prioritize bannerAdShape for in-article context.
+    // Fall back to headlineImageStyle for feed context.
+    final int imageHeight;
+    if (bannerAdShape != null) {
+      imageHeight = switch (bannerAdShape) {
+        BannerAdShape.square => 250,
+        BannerAdShape.rectangle => 90,
+        _ => 90,
+      };
+    } else {
+      imageHeight = headlineImageStyle == HeadlineImageStyle.largeThumbnail
+          ? 250
+          : 90;
+    }
 
     return Card(
       margin: const EdgeInsets.symmetric(

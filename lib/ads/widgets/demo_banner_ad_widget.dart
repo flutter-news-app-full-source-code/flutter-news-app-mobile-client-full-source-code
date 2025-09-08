@@ -27,14 +27,20 @@ class DemoBannerAdWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    // Determine the height based on the bannerAdShape if provided.
-    // If bannerAdShape is square, use height for mediumRectangle (250).
-    // Otherwise, use height for standard banner (50).
-    final adHeight = switch (bannerAdShape) {
-      BannerAdShape.square => 250,
-      BannerAdShape.rectangle => 50,
-      _ => 50, // Default to standard banner height if shape is null or unknown
-    };
+    // Determine the height. Prioritize bannerAdShape for in-article context.
+    // Fall back to headlineImageStyle for feed context.
+    final int adHeight;
+    if (bannerAdShape != null) {
+      adHeight = switch (bannerAdShape) {
+        BannerAdShape.square => 250,
+        BannerAdShape.rectangle => 50,
+        _ => 50,
+      };
+    } else {
+      adHeight = headlineImageStyle == HeadlineImageStyle.largeThumbnail
+          ? 250 // Height for mediumRectangle banner
+          : 50; // Height for standard banner
+    }
 
     return Card(
       margin: const EdgeInsets.symmetric(

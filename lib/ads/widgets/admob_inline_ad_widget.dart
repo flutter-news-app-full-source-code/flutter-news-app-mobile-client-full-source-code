@@ -109,7 +109,7 @@ class _AdmobInlineAdWidgetState extends State<AdmobInlineAdWidget> {
       final nativeAd = widget.inlineAd as NativeAd;
       adHeight = switch (nativeAd.templateType) {
         NativeAdTemplateType.small => 120,
-        NativeAdTemplateType.medium => 340,
+        NativeAdTemplateType.medium => 250,
       };
     } else if (widget.inlineAd is BannerAd) {
       // For banner ads, prioritize bannerAdShape if provided (for in-article ads).

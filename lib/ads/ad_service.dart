@@ -34,11 +34,11 @@ class AdService {
   /// This should be called once at application startup to ensure all
   /// integrated ad SDKs are properly initialized.
   Future<void> initialize() async {
-    _logger.info('Initializing AdService...');
+    _logger.info('AdService: Initializing AdService...');
     for (final provider in _adProviders.values) {
       await provider.initialize();
     }
-    _logger.info('AdService initialized.');
+    _logger.info('AdService: AdService initialized.');
   }
 
   /// Retrieves a loaded inline ad (native or banner) for display in a feed.
@@ -59,6 +59,7 @@ class AdService {
     required AdThemeStyle adThemeStyle,
     HeadlineImageStyle? headlineImageStyle,
   }) async {
+    _logger.info('AdService: getFeedAd called for adType: $adType');
     return _loadInlineAd(
       adConfig: adConfig,
       adType: adType,
@@ -83,14 +84,15 @@ class AdService {
     required AdConfig adConfig,
     required AdThemeStyle adThemeStyle,
   }) async {
+    _logger.info('AdService: getInterstitialAd called.');
     if (!adConfig.enabled) {
-      _logger.info('Ads are globally disabled in RemoteConfig.');
+      _logger.info('AdService: Ads are globally disabled in RemoteConfig.');
       return null;
     }
 
     // Check if interstitial ads are enabled in the remote config.
     if (!adConfig.interstitialAdConfiguration.enabled) {
-      _logger.info('Interstitial ads are disabled in RemoteConfig.');
+      _logger.info('AdService: Interstitial ads are disabled in RemoteConfig.');
       return null;
     }
 
@@ -98,7 +100,7 @@ class AdService {
     final adProvider = _adProviders[primaryAdPlatform];
 
     if (adProvider == null) {
-      _logger.warning('No AdProvider found for platform: $primaryAdPlatform');
+      _logger.warning('AdService: No AdProvider found for platform: $primaryAdPlatform');
       return null;
     }
 
@@ -106,7 +108,7 @@ class AdService {
         adConfig.platformAdIdentifiers[primaryAdPlatform];
     if (platformAdIdentifiers == null) {
       _logger.warning(
-        'No AdPlatformIdentifiers found for platform: $primaryAdPlatform',
+        'AdService: No AdPlatformIdentifiers found for platform: $primaryAdPlatform',
       );
       return null;
     }
@@ -116,13 +118,13 @@ class AdService {
 
     if (adId == null || adId.isEmpty) {
       _logger.warning(
-        'No interstitial ad ID configured for platform $primaryAdPlatform',
+        'AdService: No interstitial ad ID configured for platform $primaryAdPlatform',
       );
       return null;
     }
 
     _logger.info(
-      'Requesting Interstitial ad from $primaryAdPlatform AdProvider with ID: $adId',
+      'AdService: Requesting Interstitial ad from $primaryAdPlatform AdProvider with ID: $adId',
     );
     try {
       final loadedAd = await adProvider.loadInterstitialAd(
@@ -132,14 +134,14 @@ class AdService {
       );
 
       if (loadedAd != null) {
-        _logger.info('Interstitial ad successfully loaded.');
+        _logger.info('AdService: Interstitial ad successfully loaded.');
         return loadedAd;
       } else {
-        _logger.info('No Interstitial ad loaded by AdProvider.');
+        _logger.info('AdService: No Interstitial ad loaded by AdProvider.');
         return null;
       }
-    } catch (e) {
-      _logger.severe('Error getting Interstitial ad from AdProvider: $e');
+    } catch (e, s) {
+      _logger.severe('AdService: Error getting Interstitial ad from AdProvider: $e', e, s);
       return null;
     }
   }
@@ -154,21 +156,16 @@ class AdService {
   ///
   /// - [adConfig]: The remote configuration for ad display rules.
   /// - [adThemeStyle]: UI-agnostic theme properties for ad styling.
-  /// - [headlineImageStyle]: The user's preference for feed layout,
-  ///   which can be used to request an appropriately sized ad.
   Future<InlineAd?> getInArticleAd({
     required AdConfig adConfig,
     required AdThemeStyle adThemeStyle,
-    // headlineImageStyle is not directly used for in-article ad sizing,
-    // but kept for consistency with AdService.getFeedAd.
-    HeadlineImageStyle? headlineImageStyle,
   }) async {
+    _logger.info('AdService: getInArticleAd called.');
     return _loadInlineAd(
       adConfig: adConfig,
       adType: AdType.banner, // In-article ads are now always banners
       adThemeStyle: adThemeStyle,
       feedAd: false,
-      headlineImageStyle: headlineImageStyle,
       bannerAdShape: adConfig.articleAdConfiguration.bannerAdShape,
     );
   }
@@ -196,20 +193,27 @@ class AdService {
     HeadlineImageStyle? headlineImageStyle,
     BannerAdShape? bannerAdShape,
   }) async {
+    _logger.info(
+      'AdService: _loadInlineAd called for adType: $adType, feedAd: $feedAd',
+    );
     // Check if ads are globally enabled and specifically for the context (feed or article).
-    if (!adConfig.enabled ||
-        (feedAd && !adConfig.feedAdConfiguration.enabled) ||
-        (!feedAd && !adConfig.articleAdConfiguration.enabled)) {
-      _logger.info(
-        'Inline ads are disabled in RemoteConfig, either globally or for this context.',
-      );
+    if (!adConfig.enabled) {
+      _logger.info('AdService: Ads are globally disabled in RemoteConfig.');
+      return null;
+    }
+    if (feedAd && !adConfig.feedAdConfiguration.enabled) {
+      _logger.info('AdService: Feed ads are disabled in RemoteConfig.');
+      return null;
+    }
+    if (!feedAd && !adConfig.articleAdConfiguration.enabled) {
+      _logger.info('AdService: In-article ads are disabled in RemoteConfig.');
       return null;
     }
 
     // Ensure the requested adType is valid for inline ads.
     if (adType != AdType.native && adType != AdType.banner) {
       _logger.warning(
-        '_loadInlineAd called with unsupported AdType: $adType. '
+        'AdService: _loadInlineAd called with unsupported AdType: $adType. '
         'Expected AdType.native or AdType.banner.',
       );
       return null;
@@ -219,7 +223,7 @@ class AdService {
     final adProvider = _adProviders[primaryAdPlatform];
 
     if (adProvider == null) {
-      _logger.warning('No AdProvider found for platform: $primaryAdPlatform');
+      _logger.warning('AdService: No AdProvider found for platform: $primaryAdPlatform');
       return null;
     }
 
@@ -227,7 +231,7 @@ class AdService {
         adConfig.platformAdIdentifiers[primaryAdPlatform];
     if (platformAdIdentifiers == null) {
       _logger.warning(
-        'No AdPlatformIdentifiers found for platform: $primaryAdPlatform',
+        'AdService: No AdPlatformIdentifiers found for platform: $primaryAdPlatform',
       );
       return null;
     }
@@ -242,26 +246,21 @@ class AdService {
 
     if (adId == null || adId.isEmpty) {
       _logger.warning(
-        'No ad ID configured for platform $primaryAdPlatform and ad type $adType '
+        'AdService: No ad ID configured for platform $primaryAdPlatform and ad type $adType '
         'for ${feedAd ? 'feed' : 'in-article'} placement.',
       );
       return null;
     }
 
     _logger.info(
-      'Requesting $adType ad from $primaryAdPlatform AdProvider with ID: $adId '
+      'AdService: Requesting $adType ad from $primaryAdPlatform AdProvider with ID: $adId '
       'for ${feedAd ? 'feed' : 'in-article'} placement.',
     );
     try {
       InlineAd? loadedAd;
-      // Determine the effective headlineImageStyle for the ad provider.
       // For in-article banner ads, bannerAdShape dictates the visual style.
-      final effectiveHeadlineImageStyle =
-          !feedAd && adType == AdType.banner && bannerAdShape != null
-          ? (bannerAdShape == BannerAdShape.square
-                ? HeadlineImageStyle.largeThumbnail
-                : HeadlineImageStyle.smallThumbnail)
-          : headlineImageStyle; // Otherwise, use the provided headlineImageStyle
+      // For feed ads, headlineImageStyle is still relevant.
+      final effectiveHeadlineImageStyle = feedAd ? headlineImageStyle : null;
 
       switch (adType) {
         case AdType.native:
@@ -281,20 +280,20 @@ class AdService {
         case AdType.interstitial:
         case AdType.video:
           _logger.warning(
-            'Attempted to load $adType ad using _loadInlineAd. This is not supported.',
+            'AdService: Attempted to load $adType ad using _loadInlineAd. This is not supported.',
           );
           return null;
       }
 
       if (loadedAd != null) {
-        _logger.info('$adType ad successfully loaded.');
+        _logger.info('AdService: $adType ad successfully loaded.');
         return loadedAd;
       } else {
-        _logger.info('No $adType ad loaded by AdProvider.');
+        _logger.info('AdService: No $adType ad loaded by AdProvider.');
         return null;
       }
-    } catch (e) {
-      _logger.severe('Error getting $adType ad from AdProvider: $e');
+    } catch (e, s) {
+      _logger.severe('AdService: Error getting $adType ad from AdProvider: $e', e, s);
       return null;
     }
   }

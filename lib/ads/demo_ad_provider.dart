@@ -19,7 +19,7 @@ import 'package:uuid/uuid.dart';
 class DemoAdProvider implements AdProvider {
   /// {@macro demo_ad_provider}
   DemoAdProvider({Logger? logger})
-      : _logger = logger ?? Logger('DemoAdProvider');
+    : _logger = logger ?? Logger('DemoAdProvider');
 
   final Logger _logger;
   final Uuid _uuid = const Uuid();

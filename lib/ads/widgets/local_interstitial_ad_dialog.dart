@@ -45,7 +45,9 @@ class LocalInterstitialAdDialog extends StatelessWidget {
                             // Log an error or show a user-friendly message
                             // if the URL cannot be launched.
                             // For now, we'll just print to debug console.
-                            debugPrint('Could not launch ${localInterstitialAd.targetUrl}');
+                            debugPrint(
+                              'Could not launch ${localInterstitialAd.targetUrl}',
+                            );
                           }
                         },
                         child: Image.network(

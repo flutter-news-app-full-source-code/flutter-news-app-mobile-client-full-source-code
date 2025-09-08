@@ -36,8 +36,8 @@ class AdNavigatorObserver extends NavigatorObserver {
     required this.adService,
     required AdThemeStyle adThemeStyle,
     Logger? logger,
-  })  : _logger = logger ?? Logger('AdNavigatorObserver'),
-        _adThemeStyle = adThemeStyle;
+  }) : _logger = logger ?? Logger('AdNavigatorObserver'),
+       _adThemeStyle = adThemeStyle;
 
   /// A function that provides the current [AppState].
   final AppStateProvider appStateProvider;
@@ -58,7 +58,9 @@ class AdNavigatorObserver extends NavigatorObserver {
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didPush(route, previousRoute);
     final currentRouteName = route.settings.name;
-    _logger.info('Route pushed: $currentRouteName (Previous: $_previousRouteName)');
+    _logger.info(
+      'Route pushed: $currentRouteName (Previous: $_previousRouteName)',
+    );
     if (route is PageRoute && currentRouteName != null) {
       _handlePageTransition(currentRouteName);
     }
@@ -68,8 +70,12 @@ class AdNavigatorObserver extends NavigatorObserver {
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didPop(route, previousRoute);
-    final currentRouteName = previousRoute?.settings.name; // After pop, previousRoute is the new current
-    _logger.info('Route popped: ${route.settings.name} (New Current: $currentRouteName)');
+    final currentRouteName = previousRoute
+        ?.settings
+        .name; // After pop, previousRoute is the new current
+    _logger.info(
+      'Route popped: ${route.settings.name} (New Current: $currentRouteName)',
+    );
     if (route is PageRoute && currentRouteName != null) {
       _handlePageTransition(currentRouteName);
     }
@@ -103,7 +109,8 @@ class AdNavigatorObserver extends NavigatorObserver {
     final previous = _previousRouteName;
     final current = currentRouteName;
 
-    final isFromContentList = previous != null && contentListRoutes.contains(previous);
+    final isFromContentList =
+        previous != null && contentListRoutes.contains(previous);
     final isToDetailPage = detailPageRoutes.contains(current);
 
     _logger.info(
@@ -144,8 +151,8 @@ class AdNavigatorObserver extends NavigatorObserver {
 
     final interstitialConfig =
         remoteConfig.adConfig.interstitialAdConfiguration;
-    final frequencyConfig =
-        interstitialConfig.feedInterstitialAdFrequencyConfig; // Using existing name
+    final frequencyConfig = interstitialConfig
+        .feedInterstitialAdFrequencyConfig; // Using existing name
 
     // Determine the required transitions based on user role.
     final int requiredTransitions;

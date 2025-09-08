@@ -258,10 +258,10 @@ class AdService {
       // For in-article banner ads, bannerAdShape dictates the visual style.
       final effectiveHeadlineImageStyle =
           !feedAd && adType == AdType.banner && bannerAdShape != null
-              ? (bannerAdShape == BannerAdShape.square
-                  ? HeadlineImageStyle.largeThumbnail
-                  : HeadlineImageStyle.smallThumbnail)
-              : headlineImageStyle; // Otherwise, use the provided headlineImageStyle
+          ? (bannerAdShape == BannerAdShape.square
+                ? HeadlineImageStyle.largeThumbnail
+                : HeadlineImageStyle.smallThumbnail)
+          : headlineImageStyle; // Otherwise, use the provided headlineImageStyle
 
       switch (adType) {
         case AdType.native:

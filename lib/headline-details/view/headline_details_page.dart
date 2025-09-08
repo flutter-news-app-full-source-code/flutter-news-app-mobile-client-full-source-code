@@ -399,7 +399,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
         ),
       if (headline.url.isEmpty) // Ensure bottom padding
         const SliverPadding(
-          padding: EdgeInsets.only(bottom: AppSpacing.lg), // Adjusted for symmetry
+          padding: EdgeInsets.only(
+            bottom: AppSpacing.lg,
+          ), // Adjusted for symmetry
           sliver: SliverToBoxAdapter(child: SizedBox.shrink()),
         ),
     ]);
@@ -422,7 +424,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
         slivers.add(
           SliverToBoxAdapter(
             child: Padding(
-              padding: horizontalPadding.copyWith(top: AppSpacing.lg), // Adjusted for symmetry
+              padding: horizontalPadding.copyWith(
+                top: AppSpacing.lg,
+              ), // Adjusted for symmetry
               child: InArticleAdLoaderWidget(
                 slotConfiguration: belowContinueReadingSlot,
                 adService: adService,

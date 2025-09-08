@@ -357,14 +357,19 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       if (aboveContinueReadingSlot != null) {
         slivers.add(
           SliverToBoxAdapter(
-            child: Padding(
-              padding: horizontalPadding.copyWith(top: AppSpacing.lg),
-              child: InArticleAdLoaderWidget(
-                slotConfiguration: aboveContinueReadingSlot,
-                adService: adService,
-                adThemeStyle: adThemeStyle,
-                adConfig: adConfig,
-              ),
+            child: Column(
+              children: [
+                const SizedBox(height: AppSpacing.lg),
+                Padding(
+                  padding: horizontalPadding,
+                  child: InArticleAdLoaderWidget(
+                    slotConfiguration: aboveContinueReadingSlot,
+                    adService: adService,
+                    adThemeStyle: adThemeStyle,
+                    adConfig: adConfig,
+                  ),
+                ),
+              ],
             ),
           ),
         );
@@ -374,36 +379,33 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     slivers.addAll([
       if (headline.url.isNotEmpty)
         SliverPadding(
-          padding: horizontalPadding.copyWith(
-            top: AppSpacing.lg, // Adjusted for symmetry
-            bottom: AppSpacing.lg, // Adjusted for symmetry
-          ),
+          padding: horizontalPadding,
           sliver: SliverToBoxAdapter(
-            child: ElevatedButton.icon(
-              icon: const Icon(Icons.open_in_new_outlined),
-              onPressed: () async {
-                await launchUrlString(headline.url);
-              },
-              label: Text(l10n.headlineDetailsContinueReadingButton),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.lg,
-                  vertical: AppSpacing.md,
+            child: Column(
+              children: [
+                const SizedBox(height: AppSpacing.lg),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.open_in_new_outlined),
+                  onPressed: () async {
+                    await launchUrlString(headline.url);
+                  },
+                  label: Text(l10n.headlineDetailsContinueReadingButton),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                      vertical: AppSpacing.md,
+                    ),
+                    textStyle: textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
-                textStyle: textTheme.labelLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              ],
             ),
           ),
         ),
-      if (headline.url.isEmpty) // Ensure bottom padding
-        const SliverPadding(
-          padding: EdgeInsets.only(
-            bottom: AppSpacing.lg,
-          ), // Adjusted for symmetry
-          sliver: SliverToBoxAdapter(child: SizedBox.shrink()),
-        ),
+      if (headline.url.isEmpty)
+        const SliverToBoxAdapter(child: SizedBox.shrink()),
     ]);
 
     // Add ad below continue reading button if configured
@@ -423,42 +425,60 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       if (belowContinueReadingSlot != null) {
         slivers.add(
           SliverToBoxAdapter(
-            child: Padding(
-              padding: horizontalPadding.copyWith(
-                top: AppSpacing.lg,
-              ), // Adjusted for symmetry
-              child: InArticleAdLoaderWidget(
-                slotConfiguration: belowContinueReadingSlot,
-                adService: adService,
-                adThemeStyle: adThemeStyle,
-                adConfig: adConfig,
-              ),
+            child: Column(
+              children: [
+                const SizedBox(height: AppSpacing.lg),
+                Padding(
+                  padding: horizontalPadding,
+                  child: InArticleAdLoaderWidget(
+                    slotConfiguration: belowContinueReadingSlot,
+                    adService: adService,
+                    adThemeStyle: adThemeStyle,
+                    adConfig: adConfig,
+                  ),
+                ),
+              ],
             ),
           ),
         );
       }
     }
 
-    slivers.addAll([
-      SliverPadding(
-        padding: horizontalPadding,
-        sliver: SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.only(
-              top: AppSpacing.xl, // Adjusted for consistent separation
-              bottom: AppSpacing.md,
-            ),
-            child: Text(
-              l10n.similarHeadlinesSectionTitle,
-              style: textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
+    slivers.add(
+      BlocBuilder<SimilarHeadlinesBloc, SimilarHeadlinesState>(
+        builder: (context, state) {
+          if (state is SimilarHeadlinesLoaded &&
+                  state.similarHeadlines.isEmpty ||
+              state is SimilarHeadlinesEmpty) {
+            return const SliverToBoxAdapter(child: SizedBox.shrink());
+          }
+          return SliverMainAxisGroup(
+            slivers: [
+              const SliverToBoxAdapter(
+                child: SizedBox(height: AppSpacing.xl),
               ),
-            ),
-          ),
-        ),
+              SliverPadding(
+                padding: horizontalPadding,
+                sliver: SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                      bottom: AppSpacing.md,
+                    ),
+                    child: Text(
+                      l10n.similarHeadlinesSectionTitle,
+                      style: textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              _buildSimilarHeadlinesSection(context, horizontalPadding),
+            ],
+          );
+        },
       ),
-      _buildSimilarHeadlinesSection(context, horizontalPadding),
-    ]);
+    );
 
     return CustomScrollView(slivers: slivers);
   }
@@ -594,7 +614,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     BuildContext context,
     EdgeInsets hPadding,
   ) {
-    final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
@@ -622,21 +641,8 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
               ),
             ),
           ),
-          SimilarHeadlinesEmpty() => SliverToBoxAdapter(
-            child: Padding(
-              padding: hPadding.copyWith(
-                top: AppSpacing.md,
-                bottom: AppSpacing.xl,
-              ),
-              child: Text(
-                l10n.similarHeadlinesEmpty,
-                textAlign: TextAlign.center,
-                style: textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ),
-          ),
+          SimilarHeadlinesEmpty() =>
+            const SliverToBoxAdapter(child: SizedBox.shrink()),
           final SimilarHeadlinesLoaded loadedState => SliverPadding(
             padding: hPadding.copyWith(bottom: AppSpacing.xxl),
             sliver: SliverList.separated(

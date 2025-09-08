@@ -21,6 +21,7 @@ dependencies:
       url: https://github.com/flutter-news-app-full-source-code/auth-repository.git
   bloc: ^9.0.0
   bloc_concurrency: ^0.3.0
+  collection: ^1.19.1
   core:
     git:
       url: https://github.com/flutter-news-app-full-source-code/core.git

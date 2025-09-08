@@ -11,11 +11,9 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inlin
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/admob_inline_ad_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/demo_banner_ad_widget.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/demo_native_ad_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/local_banner_ad_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/local_native_ad_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -159,7 +157,7 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
       final loadedAd = await widget.adService.getInArticleAd(
         adConfig: widget.adConfig,
         adThemeStyle: widget.adThemeStyle,
-        headlineImageStyle: headlineImageStyle, // Pass the headlineImageStyle
+        headlineImageStyle: headlineImageStyle,
       );
 
       if (loadedAd != null) {
@@ -210,7 +208,6 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final appEnvironment = context.read<AppBloc>().state.environment;
     final headlineImageStyle = context
         .read<AppBloc>()
         .state
@@ -218,25 +215,6 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
         .feedPreferences
         .headlineImageStyle;
 
-    // In demo environment, display placeholder ads directly.
-    if (appEnvironment == AppEnvironment.demo) {
-      // Determine the ad type from the adConfig's articleAdConfiguration
-      final adType =
-          widget.adConfig.articleAdConfiguration.defaultInArticleAdType;
-      switch (adType) {
-        case AdType.native:
-          return DemoNativeAdWidget(headlineImageStyle: headlineImageStyle);
-        case AdType.banner:
-          return DemoBannerAdWidget(headlineImageStyle: headlineImageStyle);
-        case AdType.interstitial:
-        case AdType.video:
-          // Interstitial and video ads are not inline, so they won't be
-          // handled by InArticleAdLoaderWidget. Fallback to a generic placeholder.
-          return const SizedBox.shrink();
-      }
-    }
-
-    // For other environments (development, production), proceed with real ad loading.
     if (_isLoading) {
       return const Padding(
         padding: EdgeInsets.symmetric(
@@ -276,6 +254,10 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
           }
           // Fallback for unsupported local ad types or errors
           return const SizedBox.shrink();
+        case AdPlatformType.demo:
+          // In demo environment, display placeholder ads directly.
+          // In-article ads are now always banners, so we use DemoBannerAdWidget.
+          return DemoBannerAdWidget(headlineImageStyle: headlineImageStyle);
       }
     }
   }

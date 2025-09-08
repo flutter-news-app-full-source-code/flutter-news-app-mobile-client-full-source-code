@@ -59,7 +59,7 @@ class AdNavigatorObserver extends NavigatorObserver {
     super.didPush(route, previousRoute);
     final currentRouteName = route.settings.name;
     _logger.info(
-      'Route pushed: $currentRouteName (Previous: $_previousRouteName)',
+      'AdNavigatorObserver: Route pushed: $currentRouteName (Previous: $_previousRouteName)',
     );
     if (route is PageRoute && currentRouteName != null) {
       _handlePageTransition(currentRouteName);
@@ -74,7 +74,7 @@ class AdNavigatorObserver extends NavigatorObserver {
         ?.settings
         .name; // After pop, previousRoute is the new current
     _logger.info(
-      'Route popped: ${route.settings.name} (New Current: $currentRouteName)',
+      'AdNavigatorObserver: Route popped: ${route.settings.name} (New Current: $currentRouteName)',
     );
     if (route is PageRoute && currentRouteName != null) {
       _handlePageTransition(currentRouteName);
@@ -114,7 +114,7 @@ class AdNavigatorObserver extends NavigatorObserver {
     final isToDetailPage = detailPageRoutes.contains(current);
 
     _logger.info(
-      'Eligibility check: Previous: $previous (Is Content List: $isFromContentList), '
+      'AdNavigatorObserver: Eligibility check: Previous: $previous (Is Content List: $isFromContentList), '
       'Current: $current (Is Detail Page: $isToDetailPage)',
     );
 
@@ -127,12 +127,22 @@ class AdNavigatorObserver extends NavigatorObserver {
     final remoteConfig = appState.remoteConfig;
     final user = appState.user;
 
+    _logger.info(
+      'AdNavigatorObserver: _handlePageTransition called for route: $currentRouteName',
+    );
+
     // Only proceed if remote config is available, ads are globally enabled,
     // and interstitial ads are enabled in the config.
-    if (remoteConfig == null ||
-        !remoteConfig.adConfig.enabled ||
-        !remoteConfig.adConfig.interstitialAdConfiguration.enabled) {
-      _logger.info('Interstitial ads are not enabled or config not ready.');
+    if (remoteConfig == null) {
+      _logger.warning('AdNavigatorObserver: RemoteConfig is null. Cannot check ad enablement.');
+      return;
+    }
+    if (!remoteConfig.adConfig.enabled) {
+      _logger.info('AdNavigatorObserver: Ads are globally disabled in RemoteConfig.');
+      return;
+    }
+    if (!remoteConfig.adConfig.interstitialAdConfiguration.enabled) {
+      _logger.info('AdNavigatorObserver: Interstitial ads are disabled in RemoteConfig.');
       return;
     }
 
@@ -140,11 +150,11 @@ class AdNavigatorObserver extends NavigatorObserver {
     if (_isEligibleForInterstitialAd(currentRouteName)) {
       _pageTransitionCount++;
       _logger.info(
-        'Eligible page transition. Current count: $_pageTransitionCount',
+        'AdNavigatorObserver: Eligible page transition. Current count: $_pageTransitionCount',
       );
     } else {
       _logger.info(
-        'Ineligible page transition. Count remains: $_pageTransitionCount',
+        'AdNavigatorObserver: Ineligible page transition. Count remains: $_pageTransitionCount',
       );
       return; // Do not proceed if not an eligible transition
     }
@@ -173,33 +183,44 @@ class AdNavigatorObserver extends NavigatorObserver {
     }
 
     _logger.info(
-      'Required transitions for user role ${user?.appRole}: $requiredTransitions. '
+      'AdNavigatorObserver: Required transitions for user role ${user?.appRole}: $requiredTransitions. '
       'Current eligible transitions: $_pageTransitionCount',
     );
 
     // Check if it's time to show an interstitial ad.
     if (requiredTransitions > 0 &&
         _pageTransitionCount >= requiredTransitions) {
-      _logger.info('Interstitial ad due. Requesting ad.');
+      _logger.info('AdNavigatorObserver: Interstitial ad due. Requesting ad.');
       unawaited(_showInterstitialAd()); // Use unawaited to not block navigation
       // Reset count only after an ad is due (whether it shows or fails)
       _pageTransitionCount = 0;
+    } else {
+      _logger.info(
+        'AdNavigatorObserver: Interstitial ad not yet due. '
+        'Required: $requiredTransitions, Current: $_pageTransitionCount',
+      );
     }
   }
 
   /// Requests and shows an interstitial ad if conditions are met.
   Future<void> _showInterstitialAd() async {
+    _logger.info('AdNavigatorObserver: Attempting to show interstitial ad.');
     final appState = appStateProvider();
     final appEnvironment = appState.environment;
     final remoteConfig = appState.remoteConfig;
 
     // In demo environment, display a placeholder interstitial ad directly.
     if (appEnvironment == AppEnvironment.demo) {
-      _logger.info('Demo environment: Showing placeholder interstitial ad.');
+      _logger.info('AdNavigatorObserver: Demo environment: Showing placeholder interstitial ad.');
+      if (navigator?.context == null) {
+        _logger.severe('AdNavigatorObserver: Navigator context is null. Cannot show demo interstitial ad.');
+        return;
+      }
       await showDialog<void>(
         context: navigator!.context,
         builder: (context) => const DemoInterstitialAdDialog(),
       );
+      _logger.info('AdNavigatorObserver: Placeholder interstitial ad shown.');
       return;
     }
 
@@ -207,8 +228,8 @@ class AdNavigatorObserver extends NavigatorObserver {
     // This is a secondary check. The primary check is in _handlePageTransition.
     if (remoteConfig == null || !remoteConfig.adConfig.enabled) {
       _logger.warning(
-        'Interstitial ads disabled or remote config not available. '
-        'This should have been caught earlier.',
+        'AdNavigatorObserver: Interstitial ads disabled or remote config not available. '
+        'This should have been caught earlier in _handlePageTransition.',
       );
       return;
     }
@@ -218,52 +239,63 @@ class AdNavigatorObserver extends NavigatorObserver {
 
     if (!interstitialConfig.enabled) {
       _logger.warning(
-        'Interstitial ads are specifically disabled in config. '
-        'This should have been caught earlier.',
+        'AdNavigatorObserver: Interstitial ads are specifically disabled in config. '
+        'This should have been caught earlier in _handlePageTransition.',
       );
       return;
     }
 
-    _logger.info('Attempting to load interstitial ad...');
+    _logger.info('AdNavigatorObserver: Requesting interstitial ad from AdService...');
     final interstitialAd = await adService.getInterstitialAd(
       adConfig: adConfig,
       adThemeStyle: _adThemeStyle,
     );
 
     if (interstitialAd != null) {
-      _logger.info('Interstitial ad loaded. Showing...');
+      _logger.info('AdNavigatorObserver: Interstitial ad loaded. Showing...');
+      if (navigator?.context == null) {
+        _logger.severe('AdNavigatorObserver: Navigator context is null. Cannot show interstitial ad.');
+        return;
+      }
       // Show the AdMob interstitial ad.
       if (interstitialAd.provider == AdPlatformType.admob &&
           interstitialAd.adObject is admob.InterstitialAd) {
+        _logger.info('AdNavigatorObserver: Showing AdMob interstitial ad.');
         final admobInterstitialAd =
             interstitialAd.adObject as admob.InterstitialAd
               ..fullScreenContentCallback = admob.FullScreenContentCallback(
                 onAdDismissedFullScreenContent: (ad) {
-                  _logger.info('Interstitial Ad dismissed.');
+                  _logger.info('AdNavigatorObserver: AdMob Interstitial Ad dismissed.');
                   ad.dispose();
                 },
                 onAdFailedToShowFullScreenContent: (ad, error) {
-                  _logger.severe('Interstitial Ad failed to show: $error');
+                  _logger.severe('AdNavigatorObserver: AdMob Interstitial Ad failed to show: $error');
                   ad.dispose();
                 },
                 onAdShowedFullScreenContent: (ad) {
-                  _logger.info('Interstitial Ad showed.');
+                  _logger.info('AdNavigatorObserver: AdMob Interstitial Ad showed.');
                 },
               );
         await admobInterstitialAd.show();
       } else if (interstitialAd.provider == AdPlatformType.local &&
           interstitialAd.adObject is LocalInterstitialAd) {
-        _logger.info('Showing local interstitial ad.');
+        _logger.info('AdNavigatorObserver: Showing local interstitial ad.');
         await showDialog<void>(
           context: navigator!.context,
           builder: (context) => LocalInterstitialAdDialog(
             localInterstitialAd: interstitialAd.adObject as LocalInterstitialAd,
           ),
         );
+        _logger.info('AdNavigatorObserver: Local interstitial ad shown.');
+      } else {
+        _logger.warning(
+          'AdNavigatorObserver: Loaded interstitial ad has unknown provider '
+          'or adObject type: ${interstitialAd.provider}, ${interstitialAd.adObject.runtimeType}',
+        );
       }
     } else {
       _logger.warning(
-        'No interstitial ad loaded by AdService, even though one was due. '
+        'AdNavigatorObserver: No interstitial ad loaded by AdService, even though one was due. '
         'Check AdService implementation and ad unit availability.',
       );
     }

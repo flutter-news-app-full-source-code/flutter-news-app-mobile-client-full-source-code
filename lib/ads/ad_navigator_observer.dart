@@ -134,15 +134,21 @@ class AdNavigatorObserver extends NavigatorObserver {
     // Only proceed if remote config is available, ads are globally enabled,
     // and interstitial ads are enabled in the config.
     if (remoteConfig == null) {
-      _logger.warning('AdNavigatorObserver: RemoteConfig is null. Cannot check ad enablement.');
+      _logger.warning(
+        'AdNavigatorObserver: RemoteConfig is null. Cannot check ad enablement.',
+      );
       return;
     }
     if (!remoteConfig.adConfig.enabled) {
-      _logger.info('AdNavigatorObserver: Ads are globally disabled in RemoteConfig.');
+      _logger.info(
+        'AdNavigatorObserver: Ads are globally disabled in RemoteConfig.',
+      );
       return;
     }
     if (!remoteConfig.adConfig.interstitialAdConfiguration.enabled) {
-      _logger.info('AdNavigatorObserver: Interstitial ads are disabled in RemoteConfig.');
+      _logger.info(
+        'AdNavigatorObserver: Interstitial ads are disabled in RemoteConfig.',
+      );
       return;
     }
 
@@ -211,9 +217,13 @@ class AdNavigatorObserver extends NavigatorObserver {
 
     // In demo environment, display a placeholder interstitial ad directly.
     if (appEnvironment == AppEnvironment.demo) {
-      _logger.info('AdNavigatorObserver: Demo environment: Showing placeholder interstitial ad.');
+      _logger.info(
+        'AdNavigatorObserver: Demo environment: Showing placeholder interstitial ad.',
+      );
       if (navigator?.context == null) {
-        _logger.severe('AdNavigatorObserver: Navigator context is null. Cannot show demo interstitial ad.');
+        _logger.severe(
+          'AdNavigatorObserver: Navigator context is null. Cannot show demo interstitial ad.',
+        );
         return;
       }
       await showDialog<void>(
@@ -245,7 +255,9 @@ class AdNavigatorObserver extends NavigatorObserver {
       return;
     }
 
-    _logger.info('AdNavigatorObserver: Requesting interstitial ad from AdService...');
+    _logger.info(
+      'AdNavigatorObserver: Requesting interstitial ad from AdService...',
+    );
     final interstitialAd = await adService.getInterstitialAd(
       adConfig: adConfig,
       adThemeStyle: _adThemeStyle,
@@ -254,7 +266,9 @@ class AdNavigatorObserver extends NavigatorObserver {
     if (interstitialAd != null) {
       _logger.info('AdNavigatorObserver: Interstitial ad loaded. Showing...');
       if (navigator?.context == null) {
-        _logger.severe('AdNavigatorObserver: Navigator context is null. Cannot show interstitial ad.');
+        _logger.severe(
+          'AdNavigatorObserver: Navigator context is null. Cannot show interstitial ad.',
+        );
         return;
       }
       // Show the AdMob interstitial ad.
@@ -265,15 +279,21 @@ class AdNavigatorObserver extends NavigatorObserver {
             interstitialAd.adObject as admob.InterstitialAd
               ..fullScreenContentCallback = admob.FullScreenContentCallback(
                 onAdDismissedFullScreenContent: (ad) {
-                  _logger.info('AdNavigatorObserver: AdMob Interstitial Ad dismissed.');
+                  _logger.info(
+                    'AdNavigatorObserver: AdMob Interstitial Ad dismissed.',
+                  );
                   ad.dispose();
                 },
                 onAdFailedToShowFullScreenContent: (ad, error) {
-                  _logger.severe('AdNavigatorObserver: AdMob Interstitial Ad failed to show: $error');
+                  _logger.severe(
+                    'AdNavigatorObserver: AdMob Interstitial Ad failed to show: $error',
+                  );
                   ad.dispose();
                 },
                 onAdShowedFullScreenContent: (ad) {
-                  _logger.info('AdNavigatorObserver: AdMob Interstitial Ad showed.');
+                  _logger.info(
+                    'AdNavigatorObserver: AdMob Interstitial Ad showed.',
+                  );
                 },
               );
         await admobInterstitialAd.show();

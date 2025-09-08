@@ -33,9 +33,13 @@ class AdMobAdProvider implements AdProvider {
     _logger.info('AdMobAdProvider: Initializing Google Mobile Ads SDK...');
     try {
       await admob.MobileAds.instance.initialize();
-      _logger.info('AdMobAdProvider: Google Mobile Ads SDK initialized successfully.');
+      _logger.info(
+        'AdMobAdProvider: Google Mobile Ads SDK initialized successfully.',
+      );
     } catch (e) {
-      _logger.severe('AdMobAdProvider: Failed to initialize Google Mobile Ads SDK: $e');
+      _logger.severe(
+        'AdMobAdProvider: Failed to initialize Google Mobile Ads SDK: $e',
+      );
       // Depending on requirements, you might want to rethrow or handle this more gracefully.
       // For now, we log and continue, as ad loading might still work in some cases.
     }
@@ -50,11 +54,15 @@ class AdMobAdProvider implements AdProvider {
   }) async {
     _logger.info('AdMobAdProvider: loadNativeAd called for adId: $adId');
     if (adId == null || adId.isEmpty) {
-      _logger.warning('AdMobAdProvider: No native ad unit ID provided for AdMob.');
+      _logger.warning(
+        'AdMobAdProvider: No native ad unit ID provided for AdMob.',
+      );
       return null;
     }
 
-    _logger.info('AdMobAdProvider: Attempting to load native ad from unit ID: $adId');
+    _logger.info(
+      'AdMobAdProvider: Attempting to load native ad from unit ID: $adId',
+    );
 
     // Determine the template type based on the user's feed style preference.
     final templateType = headlineImageStyle == HeadlineImageStyle.largeThumbnail
@@ -117,7 +125,9 @@ class AdMobAdProvider implements AdProvider {
     );
 
     if (googleNativeAd == null) {
-      _logger.warning('AdMobAdProvider: Google Native Ad object is null after load attempt.');
+      _logger.warning(
+        'AdMobAdProvider: Google Native Ad object is null after load attempt.',
+      );
       return null;
     }
 
@@ -139,11 +149,15 @@ class AdMobAdProvider implements AdProvider {
   }) async {
     _logger.info('AdMobAdProvider: loadBannerAd called for adId: $adId');
     if (adId == null || adId.isEmpty) {
-      _logger.warning('AdMobAdProvider: No banner ad unit ID provided for AdMob.');
+      _logger.warning(
+        'AdMobAdProvider: No banner ad unit ID provided for AdMob.',
+      );
       return null;
     }
 
-    _logger.info('AdMobAdProvider: Attempting to load banner ad from unit ID: $adId');
+    _logger.info(
+      'AdMobAdProvider: Attempting to load banner ad from unit ID: $adId',
+    );
 
     // Determine the ad size based on the user's feed style preference.
     final adSize = headlineImageStyle == HeadlineImageStyle.largeThumbnail
@@ -195,7 +209,9 @@ class AdMobAdProvider implements AdProvider {
     );
 
     if (googleBannerAd == null) {
-      _logger.warning('AdMobAdProvider: Google Banner Ad object is null after load attempt.');
+      _logger.warning(
+        'AdMobAdProvider: Google Banner Ad object is null after load attempt.',
+      );
       return null;
     }
 
@@ -216,11 +232,15 @@ class AdMobAdProvider implements AdProvider {
   }) async {
     _logger.info('AdMobAdProvider: loadInterstitialAd called for adId: $adId');
     if (adId == null || adId.isEmpty) {
-      _logger.warning('AdMobAdProvider: No interstitial ad unit ID provided for AdMob.');
+      _logger.warning(
+        'AdMobAdProvider: No interstitial ad unit ID provided for AdMob.',
+      );
       return null;
     }
 
-    _logger.info('AdMobAdProvider: Attempting to load interstitial ad from unit ID: $adId');
+    _logger.info(
+      'AdMobAdProvider: Attempting to load interstitial ad from unit ID: $adId',
+    );
 
     final completer = Completer<admob.InterstitialAd?>();
 
@@ -233,7 +253,9 @@ class AdMobAdProvider implements AdProvider {
           completer.complete(ad);
         },
         onAdFailedToLoad: (error) {
-          _logger.severe('AdMobAdProvider: Interstitial Ad failed to load: $error');
+          _logger.severe(
+            'AdMobAdProvider: Interstitial Ad failed to load: $error',
+          );
           completer.complete(null);
         },
       ),
@@ -248,7 +270,9 @@ class AdMobAdProvider implements AdProvider {
     );
 
     if (googleInterstitialAd == null) {
-      _logger.warning('AdMobAdProvider: Google Interstitial Ad object is null after load attempt.');
+      _logger.warning(
+        'AdMobAdProvider: Google Interstitial Ad object is null after load attempt.',
+      );
       return null;
     }
 

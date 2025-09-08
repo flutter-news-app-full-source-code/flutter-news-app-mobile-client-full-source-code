@@ -241,7 +241,8 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
               _loadedAd!.adObject is LocalBannerAd) {
             return LocalBannerAdWidget(
               localBannerAd: _loadedAd!.adObject as LocalBannerAd,
-              bannerAdShape: widget.adConfig.articleAdConfiguration.bannerAdShape,
+              bannerAdShape:
+                  widget.adConfig.articleAdConfiguration.bannerAdShape,
             );
           }
           // Fallback for unsupported local ad types or errors

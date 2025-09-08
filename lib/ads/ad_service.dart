@@ -4,7 +4,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_th
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
 import 'package:logging/logging.dart';
-import 'package:uuid/uuid.dart';
 
 /// {@template ad_service}
 /// A service responsible for managing and providing ads to the application.
@@ -27,7 +26,6 @@ class AdService {
 
   final Map<AdPlatformType, AdProvider> _adProviders;
   final Logger _logger;
-  final Uuid _uuid = const Uuid();
 
   /// Initializes all underlying ad providers.
   ///
@@ -100,7 +98,9 @@ class AdService {
     final adProvider = _adProviders[primaryAdPlatform];
 
     if (adProvider == null) {
-      _logger.warning('AdService: No AdProvider found for platform: $primaryAdPlatform');
+      _logger.warning(
+        'AdService: No AdProvider found for platform: $primaryAdPlatform',
+      );
       return null;
     }
 
@@ -141,7 +141,11 @@ class AdService {
         return null;
       }
     } catch (e, s) {
-      _logger.severe('AdService: Error getting Interstitial ad from AdProvider: $e', e, s);
+      _logger.severe(
+        'AdService: Error getting Interstitial ad from AdProvider: $e',
+        e,
+        s,
+      );
       return null;
     }
   }
@@ -223,7 +227,9 @@ class AdService {
     final adProvider = _adProviders[primaryAdPlatform];
 
     if (adProvider == null) {
-      _logger.warning('AdService: No AdProvider found for platform: $primaryAdPlatform');
+      _logger.warning(
+        'AdService: No AdProvider found for platform: $primaryAdPlatform',
+      );
       return null;
     }
 
@@ -293,7 +299,11 @@ class AdService {
         return null;
       }
     } catch (e, s) {
-      _logger.severe('AdService: Error getting $adType ad from AdProvider: $e', e, s);
+      _logger.severe(
+        'AdService: Error getting $adType ad from AdProvider: $e',
+        e,
+        s,
+      );
       return null;
     }
   }

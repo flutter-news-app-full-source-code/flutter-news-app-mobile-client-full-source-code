@@ -118,7 +118,8 @@ class _AdmobInlineAdWidgetState extends State<AdmobInlineAdWidget> {
       adHeight = switch (widget.bannerAdShape) {
         BannerAdShape.square => 250,
         BannerAdShape.rectangle => 50,
-        _ => 50, // Default to standard banner height if shape is null or unknown
+        _ =>
+          50, // Default to standard banner height if shape is null or unknown
       };
     } else {
       // Fallback height for unknown inline ad types.

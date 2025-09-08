@@ -11,7 +11,11 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class DemoBannerAdWidget extends StatelessWidget {
   /// {@macro demo_banner_ad_widget}
-  const DemoBannerAdWidget({this.headlineImageStyle, this.bannerAdShape, super.key});
+  const DemoBannerAdWidget({
+    this.headlineImageStyle,
+    this.bannerAdShape,
+    super.key,
+  });
 
   /// The user's preference for feed layout, used to determine the ad's visual size.
   final HeadlineImageStyle? headlineImageStyle;

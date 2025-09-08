@@ -10,6 +10,7 @@ class LocalBannerAdWidget extends StatelessWidget {
   const LocalBannerAdWidget({
     required this.localBannerAd,
     this.headlineImageStyle,
+    this.bannerAdShape,
     super.key,
   });
 
@@ -17,17 +18,30 @@ class LocalBannerAdWidget extends StatelessWidget {
   final LocalBannerAd localBannerAd;
 
   /// The user's preference for feed layout, used to determine the ad's visual size.
+  /// This is only relevant for native ads.
   final HeadlineImageStyle? headlineImageStyle;
+
+  /// The preferred shape for banner ads, used for in-article banners.
+  final BannerAdShape? bannerAdShape;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    // Determine the height based on the headlineImageStyle.
-    // If largeThumbnail, use a square aspect ratio, otherwise a standard banner height.
-    final imageHeight = headlineImageStyle == HeadlineImageStyle.largeThumbnail
-        ? 250
-        : 90;
+    // Determine the height. Prioritize bannerAdShape for in-article context.
+    // Fall back to headlineImageStyle for feed context.
+    final int imageHeight;
+    if (bannerAdShape != null) {
+      imageHeight = switch (bannerAdShape) {
+        BannerAdShape.square => 250,
+        BannerAdShape.rectangle => 90,
+        _ => 90,
+      };
+    } else {
+      imageHeight = headlineImageStyle == HeadlineImageStyle.largeThumbnail
+          ? 250
+          : 90;
+    }
 
     return Card(
       margin: const EdgeInsets.symmetric(

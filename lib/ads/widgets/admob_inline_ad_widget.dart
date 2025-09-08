@@ -24,6 +24,7 @@ class AdmobInlineAdWidget extends StatefulWidget {
   const AdmobInlineAdWidget({
     required this.inlineAd,
     this.headlineImageStyle,
+    this.bannerAdShape,
     super.key,
   });
 
@@ -31,7 +32,11 @@ class AdmobInlineAdWidget extends StatefulWidget {
   final InlineAd inlineAd;
 
   /// The user's preference for feed layout, used to determine the ad's visual size.
+  /// This is only relevant for native ads.
   final HeadlineImageStyle? headlineImageStyle;
+
+  /// The preferred shape for banner ads, used for in-article banners.
+  final BannerAdShape? bannerAdShape;
 
   @override
   State<AdmobInlineAdWidget> createState() => _AdmobInlineAdWidgetState();
@@ -104,14 +109,23 @@ class _AdmobInlineAdWidgetState extends State<AdmobInlineAdWidget> {
       final nativeAd = widget.inlineAd as NativeAd;
       adHeight = switch (nativeAd.templateType) {
         NativeAdTemplateType.small => 120,
-        NativeAdTemplateType.medium => 340,
+        NativeAdTemplateType.medium => 250,
       };
     } else if (widget.inlineAd is BannerAd) {
-      // For banner ads, adjust height based on headlineImageStyle.
-      // If largeThumbnail, assume mediumRectangle (300x250), otherwise standard banner (320x50).
-      adHeight = widget.headlineImageStyle == HeadlineImageStyle.largeThumbnail
-          ? 250 // Height for mediumRectangle
-          : 50;
+      // For banner ads, prioritize bannerAdShape if provided (for in-article ads).
+      // Otherwise, fall back to headlineImageStyle (for feed ads).
+      if (widget.bannerAdShape != null) {
+        adHeight = switch (widget.bannerAdShape) {
+          BannerAdShape.square => 250,
+          BannerAdShape.rectangle => 50,
+          _ => 50,
+        };
+      } else {
+        adHeight =
+            widget.headlineImageStyle == HeadlineImageStyle.largeThumbnail
+            ? 250 // Assumes large thumbnail feed style wants a medium rectangle banner
+            : 50;
+      }
     } else {
       // Fallback height for unknown inline ad types.
       adHeight = 100;

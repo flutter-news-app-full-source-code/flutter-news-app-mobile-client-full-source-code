@@ -30,12 +30,16 @@ class AdMobAdProvider implements AdProvider {
 
   @override
   Future<void> initialize() async {
-    _logger.info('Initializing Google Mobile Ads SDK...');
+    _logger.info('AdMobAdProvider: Initializing Google Mobile Ads SDK...');
     try {
       await admob.MobileAds.instance.initialize();
-      _logger.info('Google Mobile Ads SDK initialized successfully.');
+      _logger.info(
+        'AdMobAdProvider: Google Mobile Ads SDK initialized successfully.',
+      );
     } catch (e) {
-      _logger.severe('Failed to initialize Google Mobile Ads SDK: $e');
+      _logger.severe(
+        'AdMobAdProvider: Failed to initialize Google Mobile Ads SDK: $e',
+      );
       // Depending on requirements, you might want to rethrow or handle this more gracefully.
       // For now, we log and continue, as ad loading might still work in some cases.
     }
@@ -48,12 +52,17 @@ class AdMobAdProvider implements AdProvider {
     required AdThemeStyle adThemeStyle,
     HeadlineImageStyle? headlineImageStyle,
   }) async {
+    _logger.info('AdMobAdProvider: loadNativeAd called for adId: $adId');
     if (adId == null || adId.isEmpty) {
-      _logger.warning('No native ad unit ID provided for AdMob.');
+      _logger.warning(
+        'AdMobAdProvider: No native ad unit ID provided for AdMob.',
+      );
       return null;
     }
 
-    _logger.info('Attempting to load native ad from unit ID: $adId');
+    _logger.info(
+      'AdMobAdProvider: Attempting to load native ad from unit ID: $adId',
+    );
 
     // Determine the template type based on the user's feed style preference.
     final templateType = headlineImageStyle == HeadlineImageStyle.largeThumbnail
@@ -74,27 +83,27 @@ class AdMobAdProvider implements AdProvider {
       ),
       listener: admob.NativeAdListener(
         onAdLoaded: (ad) {
-          _logger.info('Native Ad loaded successfully.');
+          _logger.info('AdMobAdProvider: Native Ad loaded successfully.');
           completer.complete(ad as admob.NativeAd);
         },
         onAdFailedToLoad: (ad, error) {
-          _logger.severe('Native Ad failed to load: $error');
+          _logger.severe('AdMobAdProvider: Native Ad failed to load: $error');
           completer.complete(null);
         },
         onAdClicked: (ad) {
-          _logger.info('Native Ad clicked.');
+          _logger.info('AdMobAdProvider: Native Ad clicked.');
         },
         onAdImpression: (ad) {
-          _logger.info('Native Ad impression recorded.');
+          _logger.info('AdMobAdProvider: Native Ad impression recorded.');
         },
         onAdClosed: (ad) {
-          _logger.info('Native Ad closed.');
+          _logger.info('AdMobAdProvider: Native Ad closed.');
         },
         onAdOpened: (ad) {
-          _logger.info('Native Ad opened.');
+          _logger.info('AdMobAdProvider: Native Ad opened.');
         },
         onAdWillDismissScreen: (ad) {
-          _logger.info('Native Ad will dismiss screen.');
+          _logger.info('AdMobAdProvider: Native Ad will dismiss screen.');
         },
       ),
     );
@@ -102,23 +111,27 @@ class AdMobAdProvider implements AdProvider {
     try {
       await ad.load();
     } catch (e) {
-      _logger.severe('Error during native ad load: $e');
+      _logger.severe('AdMobAdProvider: Error during native ad load: $e');
       completer.complete(null);
     }
 
     final googleNativeAd = await completer.future.timeout(
       const Duration(seconds: _adLoadTimeout),
       onTimeout: () {
-        _logger.warning('Native ad loading timed out.');
+        _logger.warning('AdMobAdProvider: Native ad loading timed out.');
         ad.dispose();
         return null;
       },
     );
 
     if (googleNativeAd == null) {
+      _logger.warning(
+        'AdMobAdProvider: Google Native Ad object is null after load attempt.',
+      );
       return null;
     }
 
+    _logger.info('AdMobAdProvider: Returning loaded NativeAd.');
     return NativeAd(
       id: _uuid.v4(),
       provider: AdPlatformType.admob,
@@ -134,12 +147,17 @@ class AdMobAdProvider implements AdProvider {
     required AdThemeStyle adThemeStyle,
     HeadlineImageStyle? headlineImageStyle,
   }) async {
+    _logger.info('AdMobAdProvider: loadBannerAd called for adId: $adId');
     if (adId == null || adId.isEmpty) {
-      _logger.warning('No banner ad unit ID provided for AdMob.');
+      _logger.warning(
+        'AdMobAdProvider: No banner ad unit ID provided for AdMob.',
+      );
       return null;
     }
 
-    _logger.info('Attempting to load banner ad from unit ID: $adId');
+    _logger.info(
+      'AdMobAdProvider: Attempting to load banner ad from unit ID: $adId',
+    );
 
     // Determine the ad size based on the user's feed style preference.
     final adSize = headlineImageStyle == HeadlineImageStyle.largeThumbnail
@@ -154,22 +172,22 @@ class AdMobAdProvider implements AdProvider {
       request: const admob.AdRequest(),
       listener: admob.BannerAdListener(
         onAdLoaded: (ad) {
-          _logger.info('Banner Ad loaded successfully.');
+          _logger.info('AdMobAdProvider: Banner Ad loaded successfully.');
           completer.complete(ad as admob.BannerAd);
         },
         onAdFailedToLoad: (ad, error) {
-          _logger.severe('Banner Ad failed to load: $error');
+          _logger.severe('AdMobAdProvider: Banner Ad failed to load: $error');
           ad.dispose();
           completer.complete(null);
         },
         onAdOpened: (ad) {
-          _logger.info('Banner Ad opened.');
+          _logger.info('AdMobAdProvider: Banner Ad opened.');
         },
         onAdClosed: (ad) {
-          _logger.info('Banner Ad closed.');
+          _logger.info('AdMobAdProvider: Banner Ad closed.');
         },
         onAdImpression: (ad) {
-          _logger.info('Banner Ad impression recorded.');
+          _logger.info('AdMobAdProvider: Banner Ad impression recorded.');
         },
       ),
     );
@@ -177,24 +195,28 @@ class AdMobAdProvider implements AdProvider {
     try {
       await ad.load();
     } catch (e) {
-      _logger.severe('Error during banner ad load: $e');
+      _logger.severe('AdMobAdProvider: Error during banner ad load: $e');
       completer.complete(null);
     }
 
     final googleBannerAd = await completer.future.timeout(
       const Duration(seconds: _adLoadTimeout),
       onTimeout: () {
-        _logger.warning('Banner ad loading timed out.');
+        _logger.warning('AdMobAdProvider: Banner ad loading timed out.');
         ad.dispose();
         return null;
       },
     );
 
     if (googleBannerAd == null) {
+      _logger.warning(
+        'AdMobAdProvider: Google Banner Ad object is null after load attempt.',
+      );
       return null;
     }
 
     // Wrap the loaded AdMob BannerAd in our generic BannerAd model.
+    _logger.info('AdMobAdProvider: Returning loaded BannerAd.');
     return BannerAd(
       id: _uuid.v4(),
       provider: AdPlatformType.admob,
@@ -208,12 +230,17 @@ class AdMobAdProvider implements AdProvider {
     required String? adId,
     required AdThemeStyle adThemeStyle,
   }) async {
+    _logger.info('AdMobAdProvider: loadInterstitialAd called for adId: $adId');
     if (adId == null || adId.isEmpty) {
-      _logger.warning('No interstitial ad unit ID provided for AdMob.');
+      _logger.warning(
+        'AdMobAdProvider: No interstitial ad unit ID provided for AdMob.',
+      );
       return null;
     }
 
-    _logger.info('Attempting to load interstitial ad from unit ID: $adId');
+    _logger.info(
+      'AdMobAdProvider: Attempting to load interstitial ad from unit ID: $adId',
+    );
 
     final completer = Completer<admob.InterstitialAd?>();
 
@@ -222,11 +249,13 @@ class AdMobAdProvider implements AdProvider {
       request: const admob.AdRequest(),
       adLoadCallback: admob.InterstitialAdLoadCallback(
         onAdLoaded: (ad) {
-          _logger.info('Interstitial Ad loaded successfully.');
+          _logger.info('AdMobAdProvider: Interstitial Ad loaded successfully.');
           completer.complete(ad);
         },
         onAdFailedToLoad: (error) {
-          _logger.severe('Interstitial Ad failed to load: $error');
+          _logger.severe(
+            'AdMobAdProvider: Interstitial Ad failed to load: $error',
+          );
           completer.complete(null);
         },
       ),
@@ -235,12 +264,15 @@ class AdMobAdProvider implements AdProvider {
     final googleInterstitialAd = await completer.future.timeout(
       const Duration(seconds: _adLoadTimeout),
       onTimeout: () {
-        _logger.warning('Interstitial ad loading timed out.');
+        _logger.warning('AdMobAdProvider: Interstitial ad loading timed out.');
         return null;
       },
     );
 
     if (googleInterstitialAd == null) {
+      _logger.warning(
+        'AdMobAdProvider: Google Interstitial Ad object is null after load attempt.',
+      );
       return null;
     }
 
@@ -248,6 +280,7 @@ class AdMobAdProvider implements AdProvider {
     // not rendered as a widget in a feed. We wrap it as a InterstitialAd
     // for consistency in the AdService return type, but its `adObject`
     // will be an `InterstitialAd` which can be shown.
+    _logger.info('AdMobAdProvider: Returning loaded InterstitialAd.');
     return InterstitialAd(
       id: _uuid.v4(),
       provider: AdPlatformType.admob,

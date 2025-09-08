@@ -145,19 +145,10 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
       'Loading new in-article ad for slot: ${widget.slotConfiguration.slotType.name}',
     );
     try {
-      // Get the current HeadlineImageStyle from AppBloc
-      final headlineImageStyle = context
-          .read<AppBloc>()
-          .state
-          .settings
-          .feedPreferences
-          .headlineImageStyle;
-
       // Call AdService.getInArticleAd with the full AdConfig.
       final loadedAd = await widget.adService.getInArticleAd(
         adConfig: widget.adConfig,
         adThemeStyle: widget.adThemeStyle,
-        headlineImageStyle: headlineImageStyle,
       );
 
       if (loadedAd != null) {
@@ -238,6 +229,7 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
           return AdmobInlineAdWidget(
             inlineAd: _loadedAd!,
             headlineImageStyle: headlineImageStyle,
+            bannerAdShape: widget.adConfig.articleAdConfiguration.bannerAdShape,
           );
         case AdPlatformType.local:
           if (_loadedAd is NativeAd && _loadedAd!.adObject is LocalNativeAd) {
@@ -249,7 +241,8 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
               _loadedAd!.adObject is LocalBannerAd) {
             return LocalBannerAdWidget(
               localBannerAd: _loadedAd!.adObject as LocalBannerAd,
-              headlineImageStyle: headlineImageStyle,
+              bannerAdShape:
+                  widget.adConfig.articleAdConfiguration.bannerAdShape,
             );
           }
           // Fallback for unsupported local ad types or errors
@@ -257,7 +250,9 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
         case AdPlatformType.demo:
           // In demo environment, display placeholder ads directly.
           // In-article ads are now always banners, so we use DemoBannerAdWidget.
-          return DemoBannerAdWidget(headlineImageStyle: headlineImageStyle);
+          return DemoBannerAdWidget(
+            bannerAdShape: widget.adConfig.articleAdConfiguration.bannerAdShape,
+          );
       }
     }
   }

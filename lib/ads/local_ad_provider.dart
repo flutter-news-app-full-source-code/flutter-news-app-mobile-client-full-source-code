@@ -33,7 +33,9 @@ class LocalAdProvider implements AdProvider {
   /// This implementation does not require any specific SDK initialization.
   @override
   Future<void> initialize() async {
-    _logger.info('Local Ad Provider initialized (no specific SDK to init).');
+    _logger.info(
+      'LocalAdProvider: Local Ad Provider initialized (no specific SDK to init).',
+    );
   }
 
   @override
@@ -43,19 +45,22 @@ class LocalAdProvider implements AdProvider {
     required AdThemeStyle adThemeStyle,
     HeadlineImageStyle? headlineImageStyle, // Added for interface consistency
   }) async {
+    _logger.info('LocalAdProvider: loadNativeAd called for adId: $adId');
     if (adId == null || adId.isEmpty) {
-      _logger.warning('No local native ad ID provided.');
+      _logger.warning('LocalAdProvider: No local native ad ID provided.');
       return null;
     }
 
-    _logger.info('Attempting to load local native ad with ID: $adId');
+    _logger.info(
+      'LocalAdProvider: Attempting to load local native ad with ID: $adId',
+    );
 
     try {
       final localNativeAd = await _localAdRepository.read(id: adId);
 
       if (localNativeAd is LocalNativeAd) {
         _logger.info(
-          'Local native ad loaded successfully: ${localNativeAd.id}',
+          'LocalAdProvider: Local native ad loaded successfully: ${localNativeAd.id}',
         );
         return NativeAd(
           id: _uuid.v4(),
@@ -67,17 +72,19 @@ class LocalAdProvider implements AdProvider {
         );
       } else {
         _logger.warning(
-          'Fetched ad with ID $adId is not a LocalNativeAd. '
+          'LocalAdProvider: Fetched ad with ID $adId is not a LocalNativeAd. '
           'Received type: ${localNativeAd.runtimeType}',
         );
         return null;
       }
     } on HttpException catch (e) {
-      _logger.severe('Error fetching local native ad with ID $adId: $e');
+      _logger.severe(
+        'LocalAdProvider: Error fetching local native ad with ID $adId: $e',
+      );
       return null;
     } catch (e, s) {
       _logger.severe(
-        'Unexpected error loading local native ad with ID $adId: $e',
+        'LocalAdProvider: Unexpected error loading local native ad with ID $adId: $e',
         e,
         s,
       );
@@ -92,19 +99,22 @@ class LocalAdProvider implements AdProvider {
     required AdThemeStyle adThemeStyle,
     HeadlineImageStyle? headlineImageStyle, // Added for interface consistency
   }) async {
+    _logger.info('LocalAdProvider: loadBannerAd called for adId: $adId');
     if (adId == null || adId.isEmpty) {
-      _logger.warning('No local banner ad ID provided.');
+      _logger.warning('LocalAdProvider: No local banner ad ID provided.');
       return null;
     }
 
-    _logger.info('Attempting to load local banner ad with ID: $adId');
+    _logger.info(
+      'LocalAdProvider: Attempting to load local banner ad with ID: $adId',
+    );
 
     try {
       final localBannerAd = await _localAdRepository.read(id: adId);
 
       if (localBannerAd is LocalBannerAd) {
         _logger.info(
-          'Local banner ad loaded successfully: ${localBannerAd.id}',
+          'LocalAdProvider: Local banner ad loaded successfully: ${localBannerAd.id}',
         );
         return BannerAd(
           id: _uuid.v4(),
@@ -113,17 +123,19 @@ class LocalAdProvider implements AdProvider {
         );
       } else {
         _logger.warning(
-          'Fetched ad with ID $adId is not a LocalBannerAd. '
+          'LocalAdProvider: Fetched ad with ID $adId is not a LocalBannerAd. '
           'Received type: ${localBannerAd.runtimeType}',
         );
         return null;
       }
     } on HttpException catch (e) {
-      _logger.severe('Error fetching local banner ad with ID $adId: $e');
+      _logger.severe(
+        'LocalAdProvider: Error fetching local banner ad with ID $adId: $e',
+      );
       return null;
     } catch (e, s) {
       _logger.severe(
-        'Unexpected error loading local banner ad with ID $adId: $e',
+        'LocalAdProvider: Unexpected error loading local banner ad with ID $adId: $e',
         e,
         s,
       );
@@ -137,19 +149,22 @@ class LocalAdProvider implements AdProvider {
     required String? adId,
     required AdThemeStyle adThemeStyle,
   }) async {
+    _logger.info('LocalAdProvider: loadInterstitialAd called for adId: $adId');
     if (adId == null || adId.isEmpty) {
-      _logger.warning('No local interstitial ad ID provided.');
+      _logger.warning('LocalAdProvider: No local interstitial ad ID provided.');
       return null;
     }
 
-    _logger.info('Attempting to load local interstitial ad with ID: $adId');
+    _logger.info(
+      'LocalAdProvider: Attempting to load local interstitial ad with ID: $adId',
+    );
 
     try {
       final localInterstitialAd = await _localAdRepository.read(id: adId);
 
       if (localInterstitialAd is LocalInterstitialAd) {
         _logger.info(
-          'Local interstitial ad loaded successfully: ${localInterstitialAd.id}',
+          'LocalAdProvider: Local interstitial ad loaded successfully: ${localInterstitialAd.id}',
         );
         return InterstitialAd(
           id: _uuid.v4(),
@@ -158,17 +173,19 @@ class LocalAdProvider implements AdProvider {
         );
       } else {
         _logger.warning(
-          'Fetched ad with ID $adId is not a LocalInterstitialAd. '
+          'LocalAdProvider: Fetched ad with ID $adId is not a LocalInterstitialAd. '
           'Received type: ${localInterstitialAd.runtimeType}',
         );
         return null;
       }
     } on HttpException catch (e) {
-      _logger.severe('Error fetching local interstitial ad with ID $adId: $e');
+      _logger.severe(
+        'LocalAdProvider: Error fetching local interstitial ad with ID $adId: $e',
+      );
       return null;
     } catch (e, s) {
       _logger.severe(
-        'Unexpected error loading local interstitial ad with ID $adId: $e',
+        'LocalAdProvider: Unexpected error loading local interstitial ad with ID $adId: $e',
         e,
         s,
       );

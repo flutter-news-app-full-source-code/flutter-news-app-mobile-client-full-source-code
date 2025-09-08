@@ -454,16 +454,12 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           }
           return SliverMainAxisGroup(
             slivers: [
-              const SliverToBoxAdapter(
-                child: SizedBox(height: AppSpacing.xl),
-              ),
+              const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
               SliverPadding(
                 padding: horizontalPadding,
                 sliver: SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.only(
-                      bottom: AppSpacing.md,
-                    ),
+                    padding: const EdgeInsets.only(bottom: AppSpacing.md),
                     child: Text(
                       l10n.similarHeadlinesSectionTitle,
                       style: textTheme.titleLarge?.copyWith(
@@ -641,8 +637,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
               ),
             ),
           ),
-          SimilarHeadlinesEmpty() =>
-            const SliverToBoxAdapter(child: SizedBox.shrink()),
+          SimilarHeadlinesEmpty() => const SliverToBoxAdapter(
+            child: SizedBox.shrink(),
+          ),
           final SimilarHeadlinesLoaded loadedState => SliverPadding(
             padding: hPadding.copyWith(bottom: AppSpacing.xxl),
             sliver: SliverList.separated(

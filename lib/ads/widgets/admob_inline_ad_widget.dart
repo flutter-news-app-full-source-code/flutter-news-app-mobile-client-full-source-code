@@ -112,15 +112,20 @@ class _AdmobInlineAdWidgetState extends State<AdmobInlineAdWidget> {
         NativeAdTemplateType.medium => 340,
       };
     } else if (widget.inlineAd is BannerAd) {
-      // For banner ads, adjust height based on bannerAdShape if provided.
-      // If bannerAdShape is square, use height for mediumRectangle (250).
-      // Otherwise, use height for standard banner (50).
-      adHeight = switch (widget.bannerAdShape) {
-        BannerAdShape.square => 250,
-        BannerAdShape.rectangle => 50,
-        _ =>
-          50, // Default to standard banner height if shape is null or unknown
-      };
+      // For banner ads, prioritize bannerAdShape if provided (for in-article ads).
+      // Otherwise, fall back to headlineImageStyle (for feed ads).
+      if (widget.bannerAdShape != null) {
+        adHeight = switch (widget.bannerAdShape) {
+          BannerAdShape.square => 250,
+          BannerAdShape.rectangle => 50,
+          _ => 50,
+        };
+      } else {
+        adHeight =
+            widget.headlineImageStyle == HeadlineImageStyle.largeThumbnail
+            ? 250 // Assumes large thumbnail feed style wants a medium rectangle banner
+            : 50;
+      }
     } else {
       // Fallback height for unknown inline ad types.
       adHeight = 100;

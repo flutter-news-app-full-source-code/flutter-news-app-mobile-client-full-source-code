@@ -159,14 +159,17 @@ class AdService {
   Future<InlineAd?> getInArticleAd({
     required AdConfig adConfig,
     required AdThemeStyle adThemeStyle,
+    // headlineImageStyle is not directly used for in-article ad sizing,
+    // but kept for consistency with AdService.getFeedAd.
     HeadlineImageStyle? headlineImageStyle,
   }) async {
     return _loadInlineAd(
       adConfig: adConfig,
-      adType: adConfig.articleAdConfiguration.defaultInArticleAdType,
+      adType: AdType.banner, // In-article ads are now always banners
       adThemeStyle: adThemeStyle,
       feedAd: false,
       headlineImageStyle: headlineImageStyle,
+      bannerAdShape: adConfig.articleAdConfiguration.bannerAdShape,
     );
   }
 
@@ -182,6 +185,7 @@ class AdService {
   /// - [feedAd]: A boolean indicating if this is for a feed ad (true) or in-article ad (false).
   /// - [headlineImageStyle]: The user's preference for feed layout,
   ///   which can be used to request an appropriately sized ad.
+  /// - [bannerAdShape]: The preferred shape for banner ads, used for in-article banners.
   ///
   /// Returns an [InlineAd] if an ad is successfully loaded, otherwise `null`.
   Future<InlineAd?> _loadInlineAd({
@@ -190,6 +194,7 @@ class AdService {
     required AdThemeStyle adThemeStyle,
     required bool feedAd,
     HeadlineImageStyle? headlineImageStyle,
+    BannerAdShape? bannerAdShape,
   }) async {
     // Check if ads are globally enabled and specifically for the context (feed or article).
     if (!adConfig.enabled ||
@@ -249,20 +254,29 @@ class AdService {
     );
     try {
       InlineAd? loadedAd;
+      // Determine the effective headlineImageStyle for the ad provider.
+      // For in-article banner ads, bannerAdShape dictates the visual style.
+      final effectiveHeadlineImageStyle =
+          !feedAd && adType == AdType.banner && bannerAdShape != null
+          ? (bannerAdShape == BannerAdShape.square
+                ? HeadlineImageStyle.largeThumbnail
+                : HeadlineImageStyle.smallThumbnail)
+          : headlineImageStyle; // Otherwise, use the provided headlineImageStyle
+
       switch (adType) {
         case AdType.native:
           loadedAd = await adProvider.loadNativeAd(
             adPlatformIdentifiers: platformAdIdentifiers,
             adId: adId,
             adThemeStyle: adThemeStyle,
-            headlineImageStyle: headlineImageStyle,
+            headlineImageStyle: effectiveHeadlineImageStyle,
           );
         case AdType.banner:
           loadedAd = await adProvider.loadBannerAd(
             adPlatformIdentifiers: platformAdIdentifiers,
             adId: adId,
             adThemeStyle: adThemeStyle,
-            headlineImageStyle: headlineImageStyle,
+            headlineImageStyle: effectiveHeadlineImageStyle,
           );
         case AdType.interstitial:
         case AdType.video:

@@ -314,36 +314,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       ),
     ];
 
-    // Add ad below main article image if configured
-    if (adConfig != null &&
-        adConfig.enabled &&
-        adConfig.articleAdConfiguration.enabled) {
-      final belowMainImageSlot = adConfig
-          .articleAdConfiguration
-          .inArticleAdSlotConfigurations
-          .firstWhereOrNull(
-            (slot) =>
-                slot.slotType == InArticleAdSlotType.belowMainArticleImage &&
-                slot.enabled,
-          );
-
-      if (belowMainImageSlot != null) {
-        slivers.add(
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: horizontalPadding.copyWith(top: AppSpacing.lg),
-              child: InArticleAdLoaderWidget(
-                slotConfiguration: belowMainImageSlot,
-                adService: adService,
-                adThemeStyle: adThemeStyle,
-                adConfig: adConfig,
-              ),
-            ),
-          ),
-        );
-      }
-    }
-
     slivers.addAll([
       SliverPadding(
         padding: horizontalPadding.copyWith(top: AppSpacing.lg),
@@ -388,7 +358,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
         slivers.add(
           SliverToBoxAdapter(
             child: Padding(
-              padding: horizontalPadding.copyWith(top: AppSpacing.xl),
+              padding: horizontalPadding.copyWith(top: AppSpacing.lg),
               child: InArticleAdLoaderWidget(
                 slotConfiguration: aboveContinueReadingSlot,
                 adService: adService,
@@ -405,8 +375,8 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       if (headline.url.isNotEmpty)
         SliverPadding(
           padding: horizontalPadding.copyWith(
-            top: AppSpacing.xl,
-            bottom: AppSpacing.xl,
+            top: AppSpacing.lg, // Adjusted for symmetry
+            bottom: AppSpacing.lg, // Adjusted for symmetry
           ),
           sliver: SliverToBoxAdapter(
             child: ElevatedButton.icon(
@@ -429,7 +399,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
         ),
       if (headline.url.isEmpty) // Ensure bottom padding
         const SliverPadding(
-          padding: EdgeInsets.only(bottom: AppSpacing.xl),
+          padding: EdgeInsets.only(
+            bottom: AppSpacing.lg,
+          ), // Adjusted for symmetry
           sliver: SliverToBoxAdapter(child: SizedBox.shrink()),
         ),
     ]);
@@ -452,7 +424,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
         slivers.add(
           SliverToBoxAdapter(
             child: Padding(
-              padding: horizontalPadding.copyWith(top: AppSpacing.xl),
+              padding: horizontalPadding.copyWith(
+                top: AppSpacing.lg,
+              ), // Adjusted for symmetry
               child: InArticleAdLoaderWidget(
                 slotConfiguration: belowContinueReadingSlot,
                 adService: adService,
@@ -470,8 +444,8 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
         padding: horizontalPadding,
         sliver: SliverToBoxAdapter(
           child: Padding(
-            padding: EdgeInsets.only(
-              top: (headline.url.isNotEmpty) ? AppSpacing.sm : AppSpacing.xl,
+            padding: const EdgeInsets.only(
+              top: AppSpacing.xl, // Adjusted for consistent separation
               bottom: AppSpacing.md,
             ),
             child: Text(

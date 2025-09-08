@@ -56,7 +56,6 @@ class AdMobAdProvider implements AdProvider {
     _logger.info('Attempting to load native ad from unit ID: $adId');
 
     // Determine the template type based on the user's feed style preference.
-    // Use largeThumbnail for a more prominent, square-like ad.
     final templateType = headlineImageStyle == HeadlineImageStyle.largeThumbnail
         ? NativeAdTemplateType.medium
         : NativeAdTemplateType.small;
@@ -143,7 +142,6 @@ class AdMobAdProvider implements AdProvider {
     _logger.info('Attempting to load banner ad from unit ID: $adId');
 
     // Determine the ad size based on the user's feed style preference.
-    // Use mediumRectangle for a more square-like ad with large thumbnails.
     final adSize = headlineImageStyle == HeadlineImageStyle.largeThumbnail
         ? admob.AdSize.mediumRectangle
         : admob.AdSize.banner;

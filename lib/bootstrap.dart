@@ -12,6 +12,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/admob_ad_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/demo_ad_provider.dart'; // Added DemoAdProvider
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/local_ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/app.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
@@ -84,29 +85,43 @@ Future<Widget> bootstrap(
   // 3. Initialize AdProvider and AdService.
   // These now have a guaranteed valid httpClient (for DataApi-based LocalAdProvider)
   // or can proceed independently (AdMobAdProvider).
-  final adProviders = <AdPlatformType, AdProvider>{
-    AdPlatformType.admob: AdMobAdProvider(logger: logger),
-    AdPlatformType.local: LocalAdProvider(
-      localAdRepository: DataRepository<LocalAd>(
-        dataClient: appConfig.environment == app_config.AppEnvironment.demo
-            ? DataInMemory<LocalAd>(
-                toJson: LocalAd.toJson,
-                getId: (i) => i.id,
-                initialData: localAdsFixturesData,
-                logger: logger,
-              )
-            : DataApi<LocalAd>(
-                httpClient:
-                    httpClient, // httpClient is now guaranteed to be non-null
-                modelName: 'local_ad',
-                fromJson: LocalAd.fromJson,
-                toJson: LocalAd.toJson,
-                logger: logger,
-              ),
+  late final Map<AdPlatformType, AdProvider> adProviders;
+
+  // Conditionally instantiate ad providers based on the application environment.
+  // This ensures that only the relevant ad providers are available for the
+  // current environment, preventing unintended usage.
+  if (appConfig.environment == app_config.AppEnvironment.demo) {
+    final demoAdProvider = DemoAdProvider(logger: logger);
+    adProviders = {
+      // In the demo environment, all ad platform types map to the DemoAdProvider.
+      // This simulates ad behavior without actual network calls.
+      AdPlatformType.admob: demoAdProvider,
+      AdPlatformType.local: demoAdProvider,
+      AdPlatformType.demo: demoAdProvider,
+    };
+  } else {
+    // For development and production environments, use real ad providers.
+    adProviders = {
+      // AdMob provider for Google Mobile Ads.
+      AdPlatformType.admob: AdMobAdProvider(logger: logger),
+      // Local ad provider for custom/backend-served ads.
+      AdPlatformType.local: LocalAdProvider(
+        localAdRepository: DataRepository<LocalAd>(
+          dataClient: DataApi<LocalAd>(
+            httpClient: httpClient,
+            modelName: 'local_ad',
+            fromJson: LocalAd.fromJson,
+            toJson: LocalAd.toJson,
+            logger: logger,
+          ),
+        ),
+        logger: logger,
       ),
-      logger: logger,
-    ),
-  };
+      // The demo ad platform is not available in non-demo environments.
+      // If AdService attempts to access it, it will receive null, which is
+      // handled by AdService's internal logic (logging a warning).
+    };
+  }
 
   final adService = AdService(adProviders: adProviders, logger: logger);
   await adService.initialize();

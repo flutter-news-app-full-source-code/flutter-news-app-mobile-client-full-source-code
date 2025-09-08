@@ -21,8 +21,7 @@ class DemoBannerAdWidget extends StatelessWidget {
     final theme = Theme.of(context);
 
     // Determine the height based on the headlineImageStyle, mimicking real ad widgets.
-    final adHeight =
-        headlineImageStyle == HeadlineImageStyle.largeThumbnail
+    final adHeight = headlineImageStyle == HeadlineImageStyle.largeThumbnail
         ? 250 // Height for mediumRectangle banner
         : 50; // Height for standard banner
 

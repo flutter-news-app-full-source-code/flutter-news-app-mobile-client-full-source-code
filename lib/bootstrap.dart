@@ -7,12 +7,17 @@ import 'package:data_api/data_api.dart';
 import 'package:data_client/data_client.dart';
 import 'package:data_inmemory/data_inmemory.dart';
 import 'package:data_repository/data_repository.dart';
+import 'package:flutter/foundation.dart' show kIsWeb; // Import kIsWeb
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/admob_ad_provider.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/demo_ad_provider.dart'; // Added DemoAdProvider
+// Conditional import for AdMobAdProvider
+// This ensures the AdMob package is only imported when not on the web,
+// preventing potential issues or unnecessary logs on web platforms.
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/admob_ad_provider.dart'
+    if (dart.library.io) 'package:flutter_news_app_mobile_client_full_source_code/ads/admob_ad_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/demo_ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/local_ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/app.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
@@ -90,17 +95,19 @@ Future<Widget> bootstrap(
   // Conditionally instantiate ad providers based on the application environment.
   // This ensures that only the relevant ad providers are available for the
   // current environment, preventing unintended usage.
-  if (appConfig.environment == app_config.AppEnvironment.demo) {
+  if (appConfig.environment == app_config.AppEnvironment.demo || kIsWeb) {
     final demoAdProvider = DemoAdProvider(logger: logger);
     adProviders = {
-      // In the demo environment, all ad platform types map to the DemoAdProvider.
-      // This simulates ad behavior without actual network calls.
+      // In the demo environment or on the web, all ad platform types map to
+      // the DemoAdProvider. This simulates ad behavior without actual network
+      // calls and avoids issues with platform-specific ad SDKs on unsupported
+      // platforms (e.g., AdMob on web).
       AdPlatformType.admob: demoAdProvider,
       AdPlatformType.local: demoAdProvider,
       AdPlatformType.demo: demoAdProvider,
     };
   } else {
-    // For development and production environments, use real ad providers.
+    // For development and production environments (non-web), use real ad providers.
     adProviders = {
       // AdMob provider for Google Mobile Ads.
       AdPlatformType.admob: AdMobAdProvider(logger: logger),
@@ -117,7 +124,7 @@ Future<Widget> bootstrap(
         ),
         logger: logger,
       ),
-      // The demo ad platform is not available in non-demo environments.
+      // The demo ad platform is not available in non-demo/non-web environments.
       // If AdService attempts to access it, it will receive null, which is
       // handled by AdService's internal logic (logging a warning).
     };

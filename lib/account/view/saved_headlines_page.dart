@@ -2,6 +2,7 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 // HeadlineItemWidget import removed
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
@@ -105,31 +106,46 @@ class SavedHeadlinesPage extends StatelessWidget {
                 case HeadlineImageStyle.hidden:
                   tile = HeadlineTileTextOnly(
                     headline: headline,
-                    onHeadlineTap: () => context.goNamed(
-                      Routes.accountArticleDetailsName,
-                      pathParameters: {'id': headline.id},
-                      extra: headline,
-                    ),
+                    onHeadlineTap: () {
+                      context
+                          .read<InterstitialAdManager>()
+                          .onPotentialAdTrigger(context: context);
+                      context.goNamed(
+                        Routes.accountArticleDetailsName,
+                        pathParameters: {'id': headline.id},
+                        extra: headline,
+                      );
+                    },
                     trailing: trailingButton,
                   );
                 case HeadlineImageStyle.smallThumbnail:
                   tile = HeadlineTileImageStart(
                     headline: headline,
-                    onHeadlineTap: () => context.goNamed(
-                      Routes.accountArticleDetailsName,
-                      pathParameters: {'id': headline.id},
-                      extra: headline,
-                    ),
+                    onHeadlineTap: () {
+                      context
+                          .read<InterstitialAdManager>()
+                          .onPotentialAdTrigger(context: context);
+                      context.goNamed(
+                        Routes.accountArticleDetailsName,
+                        pathParameters: {'id': headline.id},
+                        extra: headline,
+                      );
+                    },
                     trailing: trailingButton,
                   );
                 case HeadlineImageStyle.largeThumbnail:
                   tile = HeadlineTileImageTop(
                     headline: headline,
-                    onHeadlineTap: () => context.goNamed(
-                      Routes.accountArticleDetailsName,
-                      pathParameters: {'id': headline.id},
-                      extra: headline,
-                    ),
+                    onHeadlineTap: () {
+                      context
+                          .read<InterstitialAdManager>()
+                          .onPotentialAdTrigger(context: context);
+                      context.goNamed(
+                        Routes.accountArticleDetailsName,
+                        pathParameters: {'id': headline.id},
+                        extra: headline,
+                      );
+                    },
                     trailing: trailingButton,
                   );
               }

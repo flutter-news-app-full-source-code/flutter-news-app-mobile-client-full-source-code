@@ -90,14 +90,6 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _kvStorageService),
         RepositoryProvider.value(value: _adService),
         RepositoryProvider.value(value: _localAdRepository),
-        // Provide the InterstitialAdManager as a RepositoryProvider
-        RepositoryProvider(
-          create: (context) => InterstitialAdManager(
-            appBloc: context.read<AppBloc>(),
-            adService: context.read<AdService>(),
-          ),
-          lazy: false, // Ensure it's created immediately
-        ),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -120,6 +112,16 @@ class App extends StatelessWidget {
             create: (context) => AuthenticationBloc(
               authenticationRepository: context.read<AuthRepository>(),
             ),
+          ),
+          // Provide the InterstitialAdManager as a RepositoryProvider
+          // it  depends on the state managed by AppBloc. Therefore, 
+          // so it must be created after AppBloc is available.
+          RepositoryProvider(
+            create: (context) => InterstitialAdManager(
+              appBloc: context.read<AppBloc>(),
+              adService: context.read<AdService>(),
+            ),
+            lazy: false, // Ensure it's created immediately
           ),
         ],
         child: _AppView(
@@ -220,8 +222,6 @@ class _AppViewState extends State<_AppView> {
     _statusNotifier.dispose();
     // Dispose the AppStatusService to cancel timers and remove observers.
     _appStatusService?.dispose();
-    // Dispose the InterstitialAdManager
-    context.read<InterstitialAdManager>().dispose();
     super.dispose();
   }
 

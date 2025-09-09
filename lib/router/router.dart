@@ -13,7 +13,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/account/view/man
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/topics/add_topic_to_follow_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/topics/followed_topics_list_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/saved_headlines_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_navigator_observer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
@@ -71,8 +70,7 @@ GoRouter createRouter({
   required DataRepository<User> userRepository,
   required local_config.AppEnvironment environment,
   required AdService adService,
-  required AdNavigatorObserver
-  adNavigatorObserver, // Accept AdNavigatorObserver
+  required GlobalKey<NavigatorState> navigatorKey, // Add navigatorKey
 }) {
   // Instantiate AccountBloc once to be shared
   final accountBloc = AccountBloc(
@@ -95,7 +93,9 @@ GoRouter createRouter({
     initialLocation: '/',
     debugLogDiagnostics: true,
     observers: [
-      adNavigatorObserver, // Pass the AdNavigatorObserver to GoRouter
+      GoRouterObserver(
+        navigatorKey: navigatorKey,
+      ), // Use GoRouterObserver with navigatorKey
     ],
     // --- Redirect Logic ---
     redirect: (BuildContext context, GoRouterState state) {
@@ -402,7 +402,6 @@ GoRouter createRouter({
                   );
                 },
               ),
-              // Removed separate AccountBloc creation here
             ],
             child: AppShell(navigationShell: navigationShell),
           );
@@ -449,7 +448,7 @@ GoRouter createRouter({
                       );
                     },
                   ),
-                  // Sub-route for notifications (placeholder) - MOVED HERE
+                  // Sub-route for notifications (placeholder)
                   GoRoute(
                     path: Routes.notifications,
                     name: Routes.notificationsName,
@@ -500,8 +499,7 @@ GoRouter createRouter({
                           create: (context) => SourcesFilterBloc(
                             sourcesRepository: context
                                 .read<DataRepository<Source>>(),
-                            countriesRepository: // Added missing repository
-                            context
+                            countriesRepository: context
                                 .read<DataRepository<Country>>(),
                             userContentPreferencesRepository: context
                                 .read<DataRepository<UserContentPreferences>>(),
@@ -528,7 +526,6 @@ GoRouter createRouter({
                           final initialSelection =
                               state.extra as List<Country>?;
                           return MaterialPage(
-                            // fullscreenDialog: true,
                             child: BlocProvider(
                               create: (context) => CountriesFilterBloc(
                                 countriesRepository: context
@@ -785,4 +782,18 @@ GoRouter createRouter({
       ),
     ],
   );
+}
+
+/// A custom [NavigatorObserver] that provides access to the [NavigatorState]
+/// via a [GlobalKey].
+///
+/// This is used to obtain a [BuildContext] for services that need to interact
+/// with the widget tree (e.g., showing dialogs) but are not directly part
+/// of the tree themselves.
+class GoRouterObserver extends NavigatorObserver {
+  /// Creates a [GoRouterObserver].
+  GoRouterObserver({required this.navigatorKey});
+
+  /// The [GlobalKey] used to access the [NavigatorState].
+  final GlobalKey<NavigatorState> navigatorKey;
 }

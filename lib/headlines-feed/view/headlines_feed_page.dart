@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/feed_ad_loader_widget.dart';
@@ -296,29 +297,44 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                       case HeadlineImageStyle.hidden:
                         tile = HeadlineTileTextOnly(
                           headline: item,
-                          onHeadlineTap: () => context.goNamed(
-                            Routes.articleDetailsName,
-                            pathParameters: {'id': item.id},
-                            extra: item,
-                          ),
+                          onHeadlineTap: () {
+                            context
+                                .read<InterstitialAdManager>()
+                                .onPotentialAdTrigger(context: context);
+                            context.goNamed(
+                              Routes.articleDetailsName,
+                              pathParameters: {'id': item.id},
+                              extra: item,
+                            );
+                          },
                         );
                       case HeadlineImageStyle.smallThumbnail:
                         tile = HeadlineTileImageStart(
                           headline: item,
-                          onHeadlineTap: () => context.goNamed(
-                            Routes.articleDetailsName,
-                            pathParameters: {'id': item.id},
-                            extra: item,
-                          ),
+                          onHeadlineTap: () {
+                            context
+                                .read<InterstitialAdManager>()
+                                .onPotentialAdTrigger(context: context);
+                            context.goNamed(
+                              Routes.articleDetailsName,
+                              pathParameters: {'id': item.id},
+                              extra: item,
+                            );
+                          },
                         );
                       case HeadlineImageStyle.largeThumbnail:
                         tile = HeadlineTileImageTop(
                           headline: item,
-                          onHeadlineTap: () => context.goNamed(
-                            Routes.articleDetailsName,
-                            pathParameters: {'id': item.id},
-                            extra: item,
-                          ),
+                          onHeadlineTap: () {
+                            context
+                                .read<InterstitialAdManager>()
+                                .onPotentialAdTrigger(context: context);
+                            context.goNamed(
+                              Routes.articleDetailsName,
+                              pathParameters: {'id': item.id},
+                              extra: item,
+                            );
+                          },
                         );
                     }
                     return tile;

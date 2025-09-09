@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/in_article_ad_loader_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
@@ -312,9 +313,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           ),
         ),
       ),
-    ];
-
-    slivers.addAll([
       SliverPadding(
         padding: horizontalPadding.copyWith(top: AppSpacing.lg),
         sliver: SliverToBoxAdapter(
@@ -338,7 +336,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
             ),
           ),
         ),
-    ]);
+    ];
 
     // Add ad above continue reading button if configured
     if (adConfig != null &&
@@ -521,6 +519,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       ..add(
         InkWell(
           onTap: () {
+            context.read<InterstitialAdManager>().onPotentialAdTrigger(
+              context: context,
+            );
             context.pushNamed(
               Routes.entityDetailsName,
               pathParameters: {
@@ -549,6 +550,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       ..add(
         InkWell(
           onTap: () {
+            context.read<InterstitialAdManager>().onPotentialAdTrigger(
+              context: context,
+            );
             context.pushNamed(
               Routes.entityDetailsName,
               pathParameters: {
@@ -577,6 +581,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       ..add(
         InkWell(
           onTap: () {
+            context.read<InterstitialAdManager>().onPotentialAdTrigger(
+              context: context,
+            );
             context.pushNamed(
               Routes.entityDetailsName,
               pathParameters: {
@@ -662,29 +669,44 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                       case HeadlineImageStyle.hidden:
                         tile = HeadlineTileTextOnly(
                           headline: similarHeadline,
-                          onHeadlineTap: () => context.pushNamed(
-                            Routes.globalArticleDetailsName,
-                            pathParameters: {'id': similarHeadline.id},
-                            extra: similarHeadline,
-                          ),
+                          onHeadlineTap: () {
+                            context
+                                .read<InterstitialAdManager>()
+                                .onPotentialAdTrigger(context: context);
+                            context.pushNamed(
+                              Routes.globalArticleDetailsName,
+                              pathParameters: {'id': similarHeadline.id},
+                              extra: similarHeadline,
+                            );
+                          },
                         );
                       case HeadlineImageStyle.smallThumbnail:
                         tile = HeadlineTileImageStart(
                           headline: similarHeadline,
-                          onHeadlineTap: () => context.pushNamed(
-                            Routes.globalArticleDetailsName,
-                            pathParameters: {'id': similarHeadline.id},
-                            extra: similarHeadline,
-                          ),
+                          onHeadlineTap: () {
+                            context
+                                .read<InterstitialAdManager>()
+                                .onPotentialAdTrigger(context: context);
+                            context.pushNamed(
+                              Routes.globalArticleDetailsName,
+                              pathParameters: {'id': similarHeadline.id},
+                              extra: similarHeadline,
+                            );
+                          },
                         );
                       case HeadlineImageStyle.largeThumbnail:
                         tile = HeadlineTileImageTop(
                           headline: similarHeadline,
-                          onHeadlineTap: () => context.pushNamed(
-                            Routes.globalArticleDetailsName,
-                            pathParameters: {'id': similarHeadline.id},
-                            extra: similarHeadline,
-                          ),
+                          onHeadlineTap: () {
+                            context
+                                .read<InterstitialAdManager>()
+                                .onPotentialAdTrigger(context: context);
+                            context.pushNamed(
+                              Routes.globalArticleDetailsName,
+                              pathParameters: {'id': similarHeadline.id},
+                              extra: similarHeadline,
+                            );
+                          },
                         );
                     }
                     return tile;

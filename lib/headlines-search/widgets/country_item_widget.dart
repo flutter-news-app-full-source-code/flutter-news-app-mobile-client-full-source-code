@@ -1,5 +1,7 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:go_router/go_router.dart';
 
@@ -20,6 +22,9 @@ class CountryItemWidget extends StatelessWidget {
           ? Text(country.isoCode, maxLines: 1, overflow: TextOverflow.ellipsis)
           : null,
       onTap: () {
+        context.read<InterstitialAdManager>().onPotentialAdTrigger(
+          context: context,
+        );
         context.pushNamed(
           Routes.entityDetailsName,
           pathParameters: {'type': ContentType.country.name, 'id': country.id},

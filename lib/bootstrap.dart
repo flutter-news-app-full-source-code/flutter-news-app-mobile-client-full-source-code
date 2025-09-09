@@ -137,6 +137,10 @@ Future<Widget> bootstrap(
   // This ensures the AppBloc starts with an accurate authentication status.
   final initialUser = await authenticationRepository.getCurrentUser();
 
+  // Create a GlobalKey for the NavigatorState to be used by AppBloc
+  // and InterstitialAdManager for BuildContext access.
+  final navigatorKey = GlobalKey<NavigatorState>();
+
   // 4. Initialize all other DataClients and Repositories.
   // These now also have a guaranteed valid httpClient.
   DataClient<Headline> headlinesClient;
@@ -417,5 +421,6 @@ Future<Widget> bootstrap(
     adService: adService,
     initialUser: initialUser,
     localAdRepository: localAdRepository,
+    navigatorKey: navigatorKey, // Pass the navigatorKey to App
   );
 }

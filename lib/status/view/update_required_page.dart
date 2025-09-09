@@ -38,6 +38,7 @@ class UpdateRequiredPage extends StatelessWidget {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
       // If the URL can't be launched, inform the user.
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(

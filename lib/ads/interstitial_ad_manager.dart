@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
@@ -9,6 +10,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/widg
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
 import 'package:logging/logging.dart';
+import 'package:ui_kit/ui_kit.dart';
 
 /// {@template interstitial_ad_manager}
 /// A service that manages the lifecycle of interstitial ads.
@@ -71,12 +73,15 @@ class InterstitialAdManager {
       _adConfig = newAdConfig;
       _userRole = newUserRole;
       // A config change might mean we need to load an ad now.
-      _maybePreloadAd();
+      _maybePreloadAd(state);
     }
   }
 
   /// Pre-loads an interstitial ad if one is not already loaded and conditions are met.
-  Future<void> _maybePreloadAd() async {
+  ///
+  /// This method now takes the current [AppState] to derive theme information
+  /// without needing a [BuildContext].
+  Future<void> _maybePreloadAd(AppState appState) async {
     if (_preloadedAd != null) {
       _logger.info('An interstitial ad is already pre-loaded. Skipping.');
       return;
@@ -92,16 +97,31 @@ class InterstitialAdManager {
 
     _logger.info('Attempting to pre-load an interstitial ad...');
     try {
-      // We need a BuildContext to get the theme for AdThemeStyle.
-      // Since this is a service, we get it from the AppBloc's navigatorKey.
-      final context = _appBloc.navigatorKey.currentContext;
-      if (context == null) {
-        _logger.warning(
-          'BuildContext not available from navigatorKey. Cannot create AdThemeStyle.',
-        );
-        return;
-      }
-      final adThemeStyle = AdThemeStyle.fromTheme(Theme.of(context));
+      // Determine the brightness for theme creation.
+      // If themeMode is system, use platform brightness.
+      final brightness = appState.themeMode == ThemeMode.system
+          ? SchedulerBinding.instance.window.platformBrightness
+          : (appState.themeMode == ThemeMode.dark
+              ? Brightness.dark
+              : Brightness.light);
+
+      // Create a ThemeData instance from the AppState's settings.
+      // This allows us to derive AdThemeStyle without a BuildContext.
+      final themeData = brightness == Brightness.light
+          ? lightTheme(
+              scheme: appState.flexScheme,
+              appTextScaleFactor: appState.settings.displaySettings.textScaleFactor,
+              appFontWeight: appState.settings.displaySettings.fontWeight,
+              fontFamily: appState.settings.displaySettings.fontFamily,
+            )
+          : darkTheme(
+              scheme: appState.flexScheme,
+              appTextScaleFactor: appState.settings.displaySettings.textScaleFactor,
+              appFontWeight: appState.settings.displaySettings.fontWeight,
+              fontFamily: appState.settings.displaySettings.fontFamily,
+            );
+
+      final adThemeStyle = AdThemeStyle.fromTheme(themeData);
 
       final ad = await _adService.getInterstitialAd(
         adConfig: adConfig,
@@ -163,7 +183,7 @@ class InterstitialAdManager {
     if (_preloadedAd == null) {
       _logger.warning('Show ad called, but no ad is pre-loaded. Pre-loading now.');
       // Attempt a last-minute load if no ad is ready.
-      await _maybePreloadAd();
+      await _maybePreloadAd(_appBloc.state);
       if (_preloadedAd == null) {
         _logger.severe('Last-minute ad load failed. Cannot show ad.');
         return;
@@ -188,7 +208,7 @@ class InterstitialAdManager {
       // After the ad is shown or fails to show, dispose of it and
       // start pre-loading the next one for the next opportunity.
       _disposePreloadedAd(); // Ensure the ad object is disposed
-      _maybePreloadAd();
+      _maybePreloadAd(_appBloc.state);
     }
   }
 

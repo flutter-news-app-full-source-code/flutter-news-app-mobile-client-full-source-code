@@ -25,6 +25,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required DataRepository<User> userRepository,
     required local_config.AppEnvironment environment,
     required AdService adService,
+    required GlobalKey<NavigatorState> navigatorKey,
     this.demoDataMigrationService,
     this.demoDataInitializerService,
     this.initialUser,
@@ -34,6 +35,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _userRepository = userRepository,
        _environment = environment,
        _adService = adService,
+       _navigatorKey = navigatorKey,
        _logger = Logger('AppBloc'),
        super(
          AppState(
@@ -92,11 +94,19 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final DataRepository<User> _userRepository;
   final local_config.AppEnvironment _environment;
   final AdService _adService;
+  final GlobalKey<NavigatorState> _navigatorKey;
   final Logger _logger;
   final DemoDataMigrationService? demoDataMigrationService;
   final DemoDataInitializerService? demoDataInitializerService;
   final User? initialUser;
   late final StreamSubscription<User?> _userSubscription;
+
+  /// Provides access to the [NavigatorState] for obtaining a [BuildContext].
+  ///
+  /// This is useful for services that need a [BuildContext] but are not
+  /// directly part of the widget tree (e.g., for showing dialogs or
+  /// deriving theme data).
+  GlobalKey<NavigatorState> get navigatorKey => _navigatorKey;
 
   /// Handles user changes and loads initial settings once user is available.
   Future<void> _onAppUserChanged(

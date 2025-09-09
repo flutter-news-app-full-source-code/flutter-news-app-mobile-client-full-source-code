@@ -795,15 +795,5 @@ class GoRouterObserver extends NavigatorObserver {
   /// The [GlobalKey] used to access the [NavigatorState].
   final GlobalKey<NavigatorState> navigatorKey;
 
-  @override
-  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    super.didPush(route, previousRoute);
-    // You can add logging or other logic here if needed.
-  }
 
-  @override
-  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    super.didPop(route, previousRoute);
-    // You can add logging or other logic here if needed.
-  }
 }

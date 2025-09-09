@@ -26,9 +26,9 @@ class InterstitialAdManager {
     required AppBloc appBloc,
     required AdService adService,
     Logger? logger,
-  })  : _appBloc = appBloc,
-        _adService = adService,
-        _logger = logger ?? Logger('InterstitialAdManager') {
+  }) : _appBloc = appBloc,
+       _adService = adService,
+       _logger = logger ?? Logger('InterstitialAdManager') {
     // Listen to the AppBloc stream to react to state changes.
     _appBlocSubscription = _appBloc.stream.listen(_onAppStateChanged);
     // Initialize with the current state.
@@ -67,9 +67,7 @@ class InterstitialAdManager {
     // If the ad config or user role has changed, update internal state
     // and potentially pre-load a new ad.
     if (newAdConfig != _adConfig || newUserRole != _userRole) {
-      _logger.info(
-        'Ad config or user role changed. Updating internal state.',
-      );
+      _logger.info('Ad config or user role changed. Updating internal state.');
       _adConfig = newAdConfig;
       _userRole = newUserRole;
       // A config change might mean we need to load an ad now.
@@ -102,21 +100,23 @@ class InterstitialAdManager {
       final brightness = appState.themeMode == ThemeMode.system
           ? SchedulerBinding.instance.window.platformBrightness
           : (appState.themeMode == ThemeMode.dark
-              ? Brightness.dark
-              : Brightness.light);
+                ? Brightness.dark
+                : Brightness.light);
 
       // Create a ThemeData instance from the AppState's settings.
       // This allows us to derive AdThemeStyle without a BuildContext.
       final themeData = brightness == Brightness.light
           ? lightTheme(
               scheme: appState.flexScheme,
-              appTextScaleFactor: appState.settings.displaySettings.textScaleFactor,
+              appTextScaleFactor:
+                  appState.settings.displaySettings.textScaleFactor,
               appFontWeight: appState.settings.displaySettings.fontWeight,
               fontFamily: appState.settings.displaySettings.fontFamily,
             )
           : darkTheme(
               scheme: appState.flexScheme,
-              appTextScaleFactor: appState.settings.displaySettings.textScaleFactor,
+              appTextScaleFactor:
+                  appState.settings.displaySettings.textScaleFactor,
               appFontWeight: appState.settings.displaySettings.fontWeight,
               fontFamily: appState.settings.displaySettings.fontFamily,
             );
@@ -170,7 +170,8 @@ class InterstitialAdManager {
     if (requiredTransitions > 0 && _transitionCount >= requiredTransitions) {
       _logger.info('Transition count meets threshold. Attempting to show ad.');
       await _showAd(context);
-      _transitionCount = 0; // Reset counter after showing (or attempting to show)
+      _transitionCount =
+          0; // Reset counter after showing (or attempting to show)
     } else {
       _logger.info(
         'Transition count ($_transitionCount) has not met threshold ($requiredTransitions).',
@@ -181,7 +182,9 @@ class InterstitialAdManager {
   /// Shows the pre-loaded interstitial ad.
   Future<void> _showAd(BuildContext context) async {
     if (_preloadedAd == null) {
-      _logger.warning('Show ad called, but no ad is pre-loaded. Pre-loading now.');
+      _logger.warning(
+        'Show ad called, but no ad is pre-loaded. Pre-loading now.',
+      );
       // Attempt a last-minute load if no ad is ready.
       await _maybePreloadAd(_appBloc.state);
       if (_preloadedAd == null) {
@@ -198,8 +201,10 @@ class InterstitialAdManager {
         case AdPlatformType.admob:
           await _showAdMobAd(adToShow);
         case AdPlatformType.local:
+          // ignore: use_build_context_synchronously
           await _showLocalAd(context, adToShow);
         case AdPlatformType.demo:
+          // ignore: use_build_context_synchronously
           await _showDemoAd(context);
       }
     } catch (e, s) {
@@ -208,26 +213,25 @@ class InterstitialAdManager {
       // After the ad is shown or fails to show, dispose of it and
       // start pre-loading the next one for the next opportunity.
       _disposePreloadedAd(); // Ensure the ad object is disposed
-      _maybePreloadAd(_appBloc.state);
+      unawaited(_maybePreloadAd(_appBloc.state));
     }
   }
 
   Future<void> _showAdMobAd(InterstitialAd ad) async {
     if (ad.adObject is! admob.InterstitialAd) return;
     final admobAd = ad.adObject as admob.InterstitialAd
-
-    ..fullScreenContentCallback = admob.FullScreenContentCallback(
-      onAdShowedFullScreenContent: (ad) =>
-          _logger.info('AdMob ad showed full screen.'),
-      onAdDismissedFullScreenContent: (ad) {
-        _logger.info('AdMob ad dismissed.');
-        ad.dispose();
-      },
-      onAdFailedToShowFullScreenContent: (ad, error) {
-        _logger.severe('AdMob ad failed to show: $error');
-        ad.dispose();
-      },
-    );
+      ..fullScreenContentCallback = admob.FullScreenContentCallback(
+        onAdShowedFullScreenContent: (ad) =>
+            _logger.info('AdMob ad showed full screen.'),
+        onAdDismissedFullScreenContent: (ad) {
+          _logger.info('AdMob ad dismissed.');
+          ad.dispose();
+        },
+        onAdFailedToShowFullScreenContent: (ad, error) {
+          _logger.severe('AdMob ad failed to show: $error');
+          ad.dispose();
+        },
+      );
     await admobAd.show();
   }
 
@@ -235,8 +239,9 @@ class InterstitialAdManager {
     if (ad.adObject is! LocalInterstitialAd) return;
     await showDialog<void>(
       context: context,
-      builder: (_) =>
-          LocalInterstitialAdDialog(localInterstitialAd: ad.adObject as LocalInterstitialAd),
+      builder: (_) => LocalInterstitialAdDialog(
+        localInterstitialAd: ad.adObject as LocalInterstitialAd,
+      ),
     );
   }
 

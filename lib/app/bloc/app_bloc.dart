@@ -240,13 +240,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // Map language code to Locale
       final newLocale = Locale(userAppSettings.language.code);
 
-      _logger.info(
+      _logger..info(
         '_onAppSettingsRefreshed: userAppSettings.fontFamily: ${userAppSettings.displaySettings.fontFamily}',
-      );
-      _logger.info(
+      )
+      ..info(
         '_onAppSettingsRefreshed: userAppSettings.fontWeight: ${userAppSettings.displaySettings.fontWeight}',
-      );
-      _logger.info(
+      )
+      ..info(
         '_onAppSettingsRefreshed: newFontFamily mapped to: $newFontFamily',
       );
 

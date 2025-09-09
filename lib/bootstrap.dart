@@ -18,7 +18,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.d
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/admob_ad_provider.dart'
     if (dart.library.io) 'package:flutter_news_app_mobile_client_full_source_code/ads/admob_ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/demo_ad_provider.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/local_ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/app.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
@@ -140,7 +139,7 @@ Future<Widget> bootstrap(
 
   // Create a GlobalKey for the NavigatorState to be used by AppBloc
   // and InterstitialAdManager for BuildContext access.
-  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  final navigatorKey = GlobalKey<NavigatorState>();
 
   // 4. Initialize all other DataClients and Repositories.
   // These now also have a guaranteed valid httpClient.

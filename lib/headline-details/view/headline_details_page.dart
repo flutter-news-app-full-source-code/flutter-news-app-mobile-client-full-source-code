@@ -313,9 +313,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           ),
         ),
       ),
-    ];
-
-    slivers.addAll([
       SliverPadding(
         padding: horizontalPadding.copyWith(top: AppSpacing.lg),
         sliver: SliverToBoxAdapter(
@@ -339,7 +336,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
             ),
           ),
         ),
-    ]);
+    ];
 
     // Add ad above continue reading button if configured
     if (adConfig != null &&
@@ -522,9 +519,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       ..add(
         InkWell(
           onTap: () {
-            context
-                .read<InterstitialAdManager>()
-                .onPotentialAdTrigger(context: context);
+            context.read<InterstitialAdManager>().onPotentialAdTrigger(
+              context: context,
+            );
             context.pushNamed(
               Routes.entityDetailsName,
               pathParameters: {
@@ -553,9 +550,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       ..add(
         InkWell(
           onTap: () {
-            context
-                .read<InterstitialAdManager>()
-                .onPotentialAdTrigger(context: context);
+            context.read<InterstitialAdManager>().onPotentialAdTrigger(
+              context: context,
+            );
             context.pushNamed(
               Routes.entityDetailsName,
               pathParameters: {
@@ -584,9 +581,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       ..add(
         InkWell(
           onTap: () {
-            context
-                .read<InterstitialAdManager>()
-                .onPotentialAdTrigger(context: context);
+            context.read<InterstitialAdManager>().onPotentialAdTrigger(
+              context: context,
+            );
             context.pushNamed(
               Routes.entityDetailsName,
               pathParameters: {

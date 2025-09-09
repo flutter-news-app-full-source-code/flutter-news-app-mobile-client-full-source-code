@@ -1,0 +1,243 @@
+import 'dart:async';
+
+import 'package:core/core.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/widgets.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
+import 'package:logging/logging.dart';
+
+/// {@template interstitial_ad_manager}
+/// A service that manages the lifecycle of interstitial ads.
+///
+/// This manager listens to the [AppBloc] to stay aware of the current
+/// [RemoteConfig] and user state. It proactively pre-loads an interstitial
+/// ad when conditions are met and provides a mechanism to show it upon
+/// an explicit trigger from the UI.
+/// {@endtemplate}
+class InterstitialAdManager {
+  /// {@macro interstitial_ad_manager}
+  InterstitialAdManager({
+    required AppBloc appBloc,
+    required AdService adService,
+    Logger? logger,
+  })  : _appBloc = appBloc,
+        _adService = adService,
+        _logger = logger ?? Logger('InterstitialAdManager') {
+    // Listen to the AppBloc stream to react to state changes.
+    _appBlocSubscription = _appBloc.stream.listen(_onAppStateChanged);
+    // Initialize with the current state.
+    _onAppStateChanged(_appBloc.state);
+  }
+
+  final AppBloc _appBloc;
+  final AdService _adService;
+  final Logger _logger;
+
+  late final StreamSubscription<AppState> _appBlocSubscription;
+
+  /// The currently pre-loaded interstitial ad.
+  InterstitialAd? _preloadedAd;
+
+  /// Tracks the number of eligible page transitions since the last ad was shown.
+  int _transitionCount = 0;
+
+  /// The current remote configuration for ads.
+  AdConfig? _adConfig;
+
+  /// The current user role.
+  AppUserRole? _userRole;
+
+  /// Disposes the manager and cancels stream subscriptions.
+  void dispose() {
+    _appBlocSubscription.cancel();
+    _disposePreloadedAd();
+  }
+
+  /// Handles changes in the [AppState].
+  void _onAppStateChanged(AppState state) {
+    final newAdConfig = state.remoteConfig?.adConfig;
+    final newUserRole = state.user?.appRole;
+
+    // If the ad config or user role has changed, update internal state
+    // and potentially pre-load a new ad.
+    if (newAdConfig != _adConfig || newUserRole != _userRole) {
+      _logger.info(
+        'Ad config or user role changed. Updating internal state.',
+      );
+      _adConfig = newAdConfig;
+      _userRole = newUserRole;
+      // A config change might mean we need to load an ad now.
+      _maybePreloadAd();
+    }
+  }
+
+  /// Pre-loads an interstitial ad if one is not already loaded and conditions are met.
+  Future<void> _maybePreloadAd() async {
+    if (_preloadedAd != null) {
+      _logger.info('An interstitial ad is already pre-loaded. Skipping.');
+      return;
+    }
+
+    final adConfig = _adConfig;
+    if (adConfig == null ||
+        !adConfig.enabled ||
+        !adConfig.interstitialAdConfiguration.enabled) {
+      _logger.info('Interstitial ads are disabled. Skipping pre-load.');
+      return;
+    }
+
+    _logger.info('Attempting to pre-load an interstitial ad...');
+    try {
+      // We need a BuildContext to get the theme for AdThemeStyle.
+      // Since this is a service, we get it from the AppBloc's navigatorKey.
+      final context = _appBloc.navigatorKey.currentContext;
+      if (context == null) {
+        _logger.warning(
+          'BuildContext not available from navigatorKey. Cannot create AdThemeStyle.',
+        );
+        return;
+      }
+      final adThemeStyle = AdThemeStyle.fromTheme(Theme.of(context));
+
+      final ad = await _adService.getInterstitialAd(
+        adConfig: adConfig,
+        adThemeStyle: adThemeStyle,
+      );
+
+      if (ad != null) {
+        _preloadedAd = ad;
+        _logger.info('Interstitial ad pre-loaded successfully.');
+      } else {
+        _logger.warning('Failed to pre-load interstitial ad.');
+      }
+    } catch (e, s) {
+      _logger.severe('Error pre-loading interstitial ad: $e', e, s);
+    }
+  }
+
+  /// Disposes the currently pre-loaded ad to release its resources.
+  void _disposePreloadedAd() {
+    if (_preloadedAd?.provider == AdPlatformType.admob &&
+        _preloadedAd?.adObject is admob.InterstitialAd) {
+      _logger.info('Disposing pre-loaded AdMob interstitial ad.');
+      (_preloadedAd!.adObject as admob.InterstitialAd).dispose();
+    }
+    _preloadedAd = null;
+  }
+
+  /// Called by the UI before an ad-eligible navigation occurs.
+  ///
+  /// This method increments the transition counter and shows a pre-loaded ad
+  /// if the frequency criteria are met.
+  Future<void> onPotentialAdTrigger({required BuildContext context}) async {
+    _transitionCount++;
+    _logger.info('Potential ad trigger. Transition count: $_transitionCount');
+
+    final adConfig = _adConfig;
+    if (adConfig == null) {
+      _logger.warning('No ad config available. Cannot determine ad frequency.');
+      return;
+    }
+
+    final frequencyConfig =
+        adConfig.interstitialAdConfiguration.feedInterstitialAdFrequencyConfig;
+    final requiredTransitions = _getRequiredTransitions(frequencyConfig);
+
+    if (requiredTransitions > 0 && _transitionCount >= requiredTransitions) {
+      _logger.info('Transition count meets threshold. Attempting to show ad.');
+      await _showAd(context);
+      _transitionCount = 0; // Reset counter after showing (or attempting to show)
+    } else {
+      _logger.info(
+        'Transition count ($_transitionCount) has not met threshold ($requiredTransitions).',
+      );
+    }
+  }
+
+  /// Shows the pre-loaded interstitial ad.
+  Future<void> _showAd(BuildContext context) async {
+    if (_preloadedAd == null) {
+      _logger.warning('Show ad called, but no ad is pre-loaded. Pre-loading now.');
+      // Attempt a last-minute load if no ad is ready.
+      await _maybePreloadAd();
+      if (_preloadedAd == null) {
+        _logger.severe('Last-minute ad load failed. Cannot show ad.');
+        return;
+      }
+    }
+
+    final adToShow = _preloadedAd!;
+    _preloadedAd = null; // Clear the pre-loaded ad before showing
+
+    try {
+      switch (adToShow.provider) {
+        case AdPlatformType.admob:
+          await _showAdMobAd(adToShow);
+        case AdPlatformType.local:
+          await _showLocalAd(context, adToShow);
+        case AdPlatformType.demo:
+          await _showDemoAd(context);
+      }
+    } catch (e, s) {
+      _logger.severe('Error showing interstitial ad: $e', e, s);
+    } finally {
+      // After the ad is shown or fails to show, dispose of it and
+      // start pre-loading the next one for the next opportunity.
+      _disposePreloadedAd(); // Ensure the ad object is disposed
+      _maybePreloadAd();
+    }
+  }
+
+  Future<void> _showAdMobAd(InterstitialAd ad) async {
+    if (ad.adObject is! admob.InterstitialAd) return;
+    final admobAd = ad.adObject as admob.InterstitialAd
+
+    ..fullScreenContentCallback = admob.FullScreenContentCallback(
+      onAdShowedFullScreenContent: (ad) =>
+          _logger.info('AdMob ad showed full screen.'),
+      onAdDismissedFullScreenContent: (ad) {
+        _logger.info('AdMob ad dismissed.');
+        ad.dispose();
+      },
+      onAdFailedToShowFullScreenContent: (ad, error) {
+        _logger.severe('AdMob ad failed to show: $error');
+        ad.dispose();
+      },
+    );
+    await admobAd.show();
+  }
+
+  Future<void> _showLocalAd(BuildContext context, InterstitialAd ad) async {
+    if (ad.adObject is! LocalInterstitialAd) return;
+    await showDialog<void>(
+      context: context,
+      builder: (_) =>
+          LocalInterstitialAdDialog(localInterstitialAd: ad.adObject as LocalInterstitialAd),
+    );
+  }
+
+  Future<void> _showDemoAd(BuildContext context) async {
+    await showDialog<void>(
+      context: context,
+      builder: (_) => const DemoInterstitialAdDialog(),
+    );
+  }
+
+  /// Determines the required number of transitions based on the user's role.
+  int _getRequiredTransitions(InterstitialAdFrequencyConfig config) {
+    switch (_userRole) {
+      case AppUserRole.guestUser:
+        return config.guestTransitionsBeforeShowingInterstitialAds;
+      case AppUserRole.standardUser:
+        return config.standardUserTransitionsBeforeShowingInterstitialAds;
+      case AppUserRole.premiumUser:
+        return config.premiumUserTransitionsBeforeShowingInterstitialAds;
+      case null:
+        return config.guestTransitionsBeforeShowingInterstitialAds;
+    }
+  }
+}

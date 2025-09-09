@@ -23,9 +23,9 @@ class TopicItemWidget extends StatelessWidget {
             )
           : null,
       onTap: () {
-        context
-            .read<InterstitialAdManager>()
-            .onPotentialAdTrigger(context: context);
+        context.read<InterstitialAdManager>().onPotentialAdTrigger(
+          context: context,
+        );
         context.pushNamed(
           Routes.entityDetailsName,
           pathParameters: {'type': ContentType.topic.name, 'id': topic.id},

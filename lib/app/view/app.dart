@@ -28,7 +28,7 @@ class App extends StatelessWidget {
     required DataRepository<Source> sourcesRepository,
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<UserContentPreferences>
-        userContentPreferencesRepository,
+    userContentPreferencesRepository,
     required DataRepository<RemoteConfig> remoteConfigRepository,
     required DataRepository<User> userRepository,
     required KVStorageService kvStorageService,
@@ -40,20 +40,20 @@ class App extends StatelessWidget {
     this.demoDataInitializerService,
     this.initialUser,
     super.key,
-  })  : _authenticationRepository = authenticationRepository,
-        _headlinesRepository = headlinesRepository,
-        _topicsRepository = topicsRepository,
-        _countriesRepository = countriesRepository,
-        _sourcesRepository = sourcesRepository,
-        _userAppSettingsRepository = userAppSettingsRepository,
-        _userContentPreferencesRepository = userContentPreferencesRepository,
-        _appConfigRepository = remoteConfigRepository,
-        _userRepository = userRepository,
-        _kvStorageService = kvStorageService,
-        _environment = environment,
-        _adService = adService,
-        _localAdRepository = localAdRepository,
-        _navigatorKey = navigatorKey;
+  }) : _authenticationRepository = authenticationRepository,
+       _headlinesRepository = headlinesRepository,
+       _topicsRepository = topicsRepository,
+       _countriesRepository = countriesRepository,
+       _sourcesRepository = sourcesRepository,
+       _userAppSettingsRepository = userAppSettingsRepository,
+       _userContentPreferencesRepository = userContentPreferencesRepository,
+       _appConfigRepository = remoteConfigRepository,
+       _userRepository = userRepository,
+       _kvStorageService = kvStorageService,
+       _environment = environment,
+       _adService = adService,
+       _localAdRepository = localAdRepository,
+       _navigatorKey = navigatorKey;
 
   final AuthRepository _authenticationRepository;
   final DataRepository<Headline> _headlinesRepository;
@@ -62,7 +62,7 @@ class App extends StatelessWidget {
   final DataRepository<Source> _sourcesRepository;
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
   final DataRepository<UserContentPreferences>
-      _userContentPreferencesRepository;
+  _userContentPreferencesRepository;
   final DataRepository<RemoteConfig> _appConfigRepository;
   final DataRepository<User> _userRepository;
   final KVStorageService _kvStorageService;
@@ -96,8 +96,8 @@ class App extends StatelessWidget {
           BlocProvider(
             create: (context) => AppBloc(
               authenticationRepository: context.read<AuthRepository>(),
-              userAppSettingsRepository:
-                  context.read<DataRepository<UserAppSettings>>(),
+              userAppSettingsRepository: context
+                  .read<DataRepository<UserAppSettings>>(),
               appConfigRepository: context.read<DataRepository<RemoteConfig>>(),
               userRepository: context.read<DataRepository<User>>(),
               environment: _environment,
@@ -114,7 +114,7 @@ class App extends StatelessWidget {
             ),
           ),
           // Provide the InterstitialAdManager as a RepositoryProvider
-          // it  depends on the state managed by AppBloc. Therefore, 
+          // it  depends on the state managed by AppBloc. Therefore,
           // so it must be created after AppBloc is available.
           RepositoryProvider(
             create: (context) => InterstitialAdManager(

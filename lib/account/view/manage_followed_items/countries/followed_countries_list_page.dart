@@ -97,9 +97,9 @@ class FollowedCountriesListPage extends StatelessWidget {
                   },
                 ),
                 onTap: () {
-                  context
-                      .read<InterstitialAdManager>()
-                      .onPotentialAdTrigger(context: context);
+                  context.read<InterstitialAdManager>().onPotentialAdTrigger(
+                    context: context,
+                  );
                   context.pushNamed(
                     Routes.entityDetailsName,
                     pathParameters: {

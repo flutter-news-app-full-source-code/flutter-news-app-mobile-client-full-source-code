@@ -65,7 +65,7 @@ GoRouter createRouter({
   required DataRepository<Source> sourcesRepository,
   required DataRepository<UserAppSettings> userAppSettingsRepository,
   required DataRepository<UserContentPreferences>
-      userContentPreferencesRepository,
+  userContentPreferencesRepository,
   required DataRepository<RemoteConfig> remoteConfigRepository,
   required DataRepository<User> userRepository,
   required local_config.AppEnvironment environment,
@@ -93,7 +93,9 @@ GoRouter createRouter({
     initialLocation: '/',
     debugLogDiagnostics: true,
     observers: [
-      GoRouterObserver(navigatorKey: navigatorKey), // Use GoRouterObserver with navigatorKey
+      GoRouterObserver(
+        navigatorKey: navigatorKey,
+      ), // Use GoRouterObserver with navigatorKey
     ],
     // --- Redirect Logic ---
     redirect: (BuildContext context, GoRouterState state) {
@@ -497,8 +499,8 @@ GoRouter createRouter({
                           create: (context) => SourcesFilterBloc(
                             sourcesRepository: context
                                 .read<DataRepository<Source>>(),
-                            countriesRepository:
-                                context.read<DataRepository<Country>>(),
+                            countriesRepository: context
+                                .read<DataRepository<Country>>(),
                             userContentPreferencesRepository: context
                                 .read<DataRepository<UserContentPreferences>>(),
                             appBloc: context.read<AppBloc>(),
@@ -794,6 +796,4 @@ class GoRouterObserver extends NavigatorObserver {
 
   /// The [GlobalKey] used to access the [NavigatorState].
   final GlobalKey<NavigatorState> navigatorKey;
-
-
 }

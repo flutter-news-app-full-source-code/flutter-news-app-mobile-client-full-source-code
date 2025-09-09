@@ -23,9 +23,9 @@ class SourceItemWidget extends StatelessWidget {
             )
           : null,
       onTap: () {
-        context
-            .read<InterstitialAdManager>()
-            .onPotentialAdTrigger(context: context);
+        context.read<InterstitialAdManager>().onPotentialAdTrigger(
+          context: context,
+        );
         context.pushNamed(
           Routes.entityDetailsName,
           pathParameters: {'type': ContentType.source.name, 'id': source.id},

@@ -4,9 +4,8 @@ import 'package:data_repository/data_repository.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_navigator_observer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_status_service.dart';
@@ -29,30 +28,32 @@ class App extends StatelessWidget {
     required DataRepository<Source> sourcesRepository,
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<UserContentPreferences>
-    userContentPreferencesRepository,
+        userContentPreferencesRepository,
     required DataRepository<RemoteConfig> remoteConfigRepository,
     required DataRepository<User> userRepository,
     required KVStorageService kvStorageService,
     required AppEnvironment environment,
     required AdService adService,
     required DataRepository<LocalAd> localAdRepository,
+    required GlobalKey<NavigatorState> navigatorKey,
     this.demoDataMigrationService,
     this.demoDataInitializerService,
     this.initialUser,
     super.key,
-  }) : _authenticationRepository = authenticationRepository,
-       _headlinesRepository = headlinesRepository,
-       _topicsRepository = topicsRepository,
-       _countriesRepository = countriesRepository,
-       _sourcesRepository = sourcesRepository,
-       _userAppSettingsRepository = userAppSettingsRepository,
-       _userContentPreferencesRepository = userContentPreferencesRepository,
-       _appConfigRepository = remoteConfigRepository,
-       _userRepository = userRepository,
-       _kvStorageService = kvStorageService,
-       _environment = environment,
-       _adService = adService,
-       _localAdRepository = localAdRepository;
+  })  : _authenticationRepository = authenticationRepository,
+        _headlinesRepository = headlinesRepository,
+        _topicsRepository = topicsRepository,
+        _countriesRepository = countriesRepository,
+        _sourcesRepository = sourcesRepository,
+        _userAppSettingsRepository = userAppSettingsRepository,
+        _userContentPreferencesRepository = userContentPreferencesRepository,
+        _appConfigRepository = remoteConfigRepository,
+        _userRepository = userRepository,
+        _kvStorageService = kvStorageService,
+        _environment = environment,
+        _adService = adService,
+        _localAdRepository = localAdRepository,
+        _navigatorKey = navigatorKey;
 
   final AuthRepository _authenticationRepository;
   final DataRepository<Headline> _headlinesRepository;
@@ -61,13 +62,14 @@ class App extends StatelessWidget {
   final DataRepository<Source> _sourcesRepository;
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
   final DataRepository<UserContentPreferences>
-  _userContentPreferencesRepository;
+      _userContentPreferencesRepository;
   final DataRepository<RemoteConfig> _appConfigRepository;
   final DataRepository<User> _userRepository;
   final KVStorageService _kvStorageService;
   final AppEnvironment _environment;
   final AdService _adService;
   final DataRepository<LocalAd> _localAdRepository;
+  final GlobalKey<NavigatorState> _navigatorKey;
   final DemoDataMigrationService? demoDataMigrationService;
   final DemoDataInitializerService? demoDataInitializerService;
   final User? initialUser;
@@ -88,14 +90,22 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _kvStorageService),
         RepositoryProvider.value(value: _adService),
         RepositoryProvider.value(value: _localAdRepository),
+        // Provide the InterstitialAdManager as a RepositoryProvider
+        RepositoryProvider(
+          create: (context) => InterstitialAdManager(
+            appBloc: context.read<AppBloc>(),
+            adService: context.read<AdService>(),
+          ),
+          lazy: false, // Ensure it's created immediately
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
             create: (context) => AppBloc(
               authenticationRepository: context.read<AuthRepository>(),
-              userAppSettingsRepository: context
-                  .read<DataRepository<UserAppSettings>>(),
+              userAppSettingsRepository:
+                  context.read<DataRepository<UserAppSettings>>(),
               appConfigRepository: context.read<DataRepository<RemoteConfig>>(),
               userRepository: context.read<DataRepository<User>>(),
               environment: _environment,
@@ -103,6 +113,7 @@ class App extends StatelessWidget {
               demoDataInitializerService: demoDataInitializerService,
               initialUser: initialUser,
               adService: context.read<AdService>(),
+              navigatorKey: _navigatorKey, // Pass navigatorKey to AppBloc
             ),
           ),
           BlocProvider(
@@ -124,6 +135,7 @@ class App extends StatelessWidget {
           environment: _environment,
           adService: _adService,
           localAdRepository: _localAdRepository,
+          navigatorKey: _navigatorKey, // Pass navigatorKey to _AppView
         ),
       ),
     );
@@ -144,6 +156,7 @@ class _AppView extends StatefulWidget {
     required this.environment,
     required this.adService,
     required this.localAdRepository,
+    required this.navigatorKey,
   });
 
   final AuthRepository authenticationRepository;
@@ -158,6 +171,7 @@ class _AppView extends StatefulWidget {
   final AppEnvironment environment;
   final AdService adService;
   final DataRepository<LocalAd> localAdRepository;
+  final GlobalKey<NavigatorState> navigatorKey;
 
   @override
   State<_AppView> createState() => _AppViewState();
@@ -165,12 +179,8 @@ class _AppView extends StatefulWidget {
 
 class _AppViewState extends State<_AppView> {
   late final GoRouter _router;
-  // Standard notifier that GoRouter listens to.
   late final ValueNotifier<AppStatus> _statusNotifier;
-  // The service responsible for automated status checks.
   AppStatusService? _appStatusService;
-  // The observer for handling interstitial ads on route changes.
-  AdNavigatorObserver? _adNavigatorObserver;
 
   @override
   void initState() {
@@ -188,16 +198,6 @@ class _AppViewState extends State<_AppView> {
       environment: widget.environment,
     );
 
-    // Derive AdThemeStyle from the current theme.
-    final adThemeStyle = AdThemeStyle.fromTheme(Theme.of(context));
-
-    // Initialize AdNavigatorObserver.
-    _adNavigatorObserver = AdNavigatorObserver(
-      appStateProvider: () => context.read<AppBloc>().state,
-      adService: widget.adService,
-      adThemeStyle: adThemeStyle,
-    );
-
     _router = createRouter(
       authStatusNotifier: _statusNotifier,
       authenticationRepository: widget.authenticationRepository,
@@ -211,7 +211,7 @@ class _AppViewState extends State<_AppView> {
       userRepository: widget.userRepository,
       environment: widget.environment,
       adService: widget.adService,
-      adNavigatorObserver: _adNavigatorObserver!, // Pass the observer
+      navigatorKey: widget.navigatorKey,
     );
   }
 
@@ -220,12 +220,10 @@ class _AppViewState extends State<_AppView> {
     _statusNotifier.dispose();
     // Dispose the AppStatusService to cancel timers and remove observers.
     _appStatusService?.dispose();
-    // AdNavigatorObserver does not need explicit dispose here as it's a NavigatorObserver
-    // and its internal resources are managed by the AdService/AdMob SDK.
+    // Dispose the InterstitialAdManager
+    context.read<InterstitialAdManager>().dispose();
     super.dispose();
   }
-
-  // Removed _initDynamicLinks and _handleDynamicLink methods
 
   @override
   Widget build(BuildContext context) {

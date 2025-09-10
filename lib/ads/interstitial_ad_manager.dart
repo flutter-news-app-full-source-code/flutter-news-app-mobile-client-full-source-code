@@ -153,7 +153,7 @@ class InterstitialAdManager {
   ///
   /// This method increments the transition counter and shows a pre-loaded ad
   /// if the frequency criteria are met.
-  Future<void> onPotentialAdTrigger({required BuildContext context}) async {
+  Future<void> onPotentialAdTrigger() async {
     _transitionCount++;
     _logger.info('Potential ad trigger. Transition count: $_transitionCount');
 
@@ -169,7 +169,7 @@ class InterstitialAdManager {
 
     if (requiredTransitions > 0 && _transitionCount >= requiredTransitions) {
       _logger.info('Transition count meets threshold. Attempting to show ad.');
-      await _showAd(context);
+      await _showAd();
       _transitionCount =
           0; // Reset counter after showing (or attempting to show)
     } else {
@@ -180,7 +180,13 @@ class InterstitialAdManager {
   }
 
   /// Shows the pre-loaded interstitial ad.
-  Future<void> _showAd(BuildContext context) async {
+  Future<void> _showAd() async {
+    final context = _appBloc.navigatorKey.currentContext;
+    if (context == null) {
+      _logger.severe('Cannot show ad: Navigator context is null.');
+      return;
+    }
+
     if (_preloadedAd == null) {
       _logger.warning(
         'Show ad called, but no ad is pre-loaded. Pre-loading now.',
@@ -201,10 +207,8 @@ class InterstitialAdManager {
         case AdPlatformType.admob:
           await _showAdMobAd(adToShow);
         case AdPlatformType.local:
-          // ignore: use_build_context_synchronously
           await _showLocalAd(context, adToShow);
         case AdPlatformType.demo:
-          // ignore: use_build_context_synchronously
           await _showDemoAd(context);
       }
     } catch (e, s) {

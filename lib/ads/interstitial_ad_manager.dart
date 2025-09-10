@@ -267,8 +267,10 @@ class InterstitialAdManager {
 
   Future<void> _showLocalAd(BuildContext context, InterstitialAd ad) async {
     if (ad.adObject is! LocalInterstitialAd) return;
+    // Await the result of showDialog, which completes when the dialog is popped.
     await showDialog<void>(
       context: context,
+      barrierDismissible: false, // Prevent dismissing by tapping outside
       builder: (_) => LocalInterstitialAdDialog(
         localInterstitialAd: ad.adObject as LocalInterstitialAd,
       ),
@@ -276,8 +278,10 @@ class InterstitialAdManager {
   }
 
   Future<void> _showDemoAd(BuildContext context) async {
+    // Await the result of showDialog, which completes when the dialog is popped.
     await showDialog<void>(
       context: context,
+      barrierDismissible: false, // Prevent dismissing by tapping outside
       builder: (_) => const DemoInterstitialAdDialog(),
     );
   }

@@ -22,8 +22,7 @@ class CountryItemWidget extends StatelessWidget {
           ? Text(country.isoCode, maxLines: 1, overflow: TextOverflow.ellipsis)
           : null,
       onTap: () {
-        context.read<InterstitialAdManager>().onPotentialAdTrigger(
-        );
+        context.read<InterstitialAdManager>().onPotentialAdTrigger();
         context.pushNamed(
           Routes.entityDetailsName,
           pathParameters: {'type': ContentType.country.name, 'id': country.id},

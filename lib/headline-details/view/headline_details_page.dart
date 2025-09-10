@@ -250,10 +250,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       context.read<InterstitialAdManager>().onPotentialAdTrigger();
       context.pushNamed(
         Routes.entityDetailsName,
-        pathParameters: {
-          'type': type.name,
-          'id': id,
-        },
+        pathParameters: {'type': type.name, 'id': id},
       );
     }
 
@@ -666,23 +663,20 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                       case HeadlineImageStyle.hidden:
                         tile = HeadlineTileTextOnly(
                           headline: similarHeadline,
-                          onHeadlineTap: () => onSimilarHeadlineTap(
-                            similarHeadline,
-                          ),
+                          onHeadlineTap: () =>
+                              onSimilarHeadlineTap(similarHeadline),
                         );
                       case HeadlineImageStyle.smallThumbnail:
                         tile = HeadlineTileImageStart(
                           headline: similarHeadline,
-                          onHeadlineTap: () => onSimilarHeadlineTap(
-                            similarHeadline,
-                          ),
+                          onHeadlineTap: () =>
+                              onSimilarHeadlineTap(similarHeadline),
                         );
                       case HeadlineImageStyle.largeThumbnail:
                         tile = HeadlineTileImageTop(
                           headline: similarHeadline,
-                          onHeadlineTap: () => onSimilarHeadlineTap(
-                            similarHeadline,
-                          ),
+                          onHeadlineTap: () =>
+                              onSimilarHeadlineTap(similarHeadline),
                         );
                     }
                     return tile;

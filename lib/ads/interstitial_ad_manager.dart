@@ -181,12 +181,6 @@ class InterstitialAdManager {
 
   /// Shows the pre-loaded interstitial ad.
   Future<void> _showAd() async {
-    final context = _appBloc.navigatorKey.currentContext;
-    if (context == null) {
-      _logger.severe('Cannot show ad: Navigator context is null.');
-      return;
-    }
-
     if (_preloadedAd == null) {
       _logger.warning(
         'Show ad called, but no ad is pre-loaded. Pre-loading now.',
@@ -205,11 +199,28 @@ class InterstitialAdManager {
     try {
       switch (adToShow.provider) {
         case AdPlatformType.admob:
+          // AdMob does not require context to be shown.
           await _showAdMobAd(adToShow);
         case AdPlatformType.local:
-          await _showLocalAd(context, adToShow);
+          // Local ads require context. Get it just before use.
+          final context = _appBloc.navigatorKey.currentContext;
+          if (context != null && context.mounted) {
+            await _showLocalAd(context, adToShow);
+          } else {
+            _logger.warning(
+              'Cannot show local ad: context is null or no longer mounted.',
+            );
+          }
         case AdPlatformType.demo:
-          await _showDemoAd(context);
+          // Demo ads require context. Get it just before use.
+          final context = _appBloc.navigatorKey.currentContext;
+          if (context != null && context.mounted) {
+            await _showDemoAd(context);
+          } else {
+            _logger.warning(
+              'Cannot show demo ad: context is null or no longer mounted.',
+            );
+          }
       }
     } catch (e, s) {
       _logger.severe('Error showing interstitial ad: $e', e, s);

@@ -246,9 +246,15 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     final adService = context.read<AdService>();
     final adThemeStyle = AdThemeStyle.fromTheme(Theme.of(context));
 
-    void onEntityChipTap(ContentType type, String id) {
-      context.read<InterstitialAdManager>().onPotentialAdTrigger();
-      context.pushNamed(
+    Future<void> onEntityChipTap(ContentType type, String id) async {
+      // Await for the ad to be shown and dismissed.
+      await context.read<InterstitialAdManager>().onPotentialAdTrigger();
+
+      // Check if the widget is still in the tree before navigating.
+      if (!context.mounted) return;
+
+      // Proceed with navigation after the ad is closed.
+      await context.pushNamed(
         Routes.entityDetailsName,
         pathParameters: {'type': type.name, 'id': id},
       );
@@ -450,9 +456,15 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       }
     }
 
-    void onSimilarHeadlineTap(Headline similarHeadline) {
-      context.read<InterstitialAdManager>().onPotentialAdTrigger();
-      context.pushNamed(
+    Future<void> onSimilarHeadlineTap(Headline similarHeadline) async {
+      // Await for the ad to be shown and dismissed.
+      await context.read<InterstitialAdManager>().onPotentialAdTrigger();
+
+      // Check if the widget is still in the tree before navigating.
+      if (!context.mounted) return;
+
+      // Proceed with navigation after the ad is closed.
+      await context.pushNamed(
         Routes.globalArticleDetailsName,
         pathParameters: {'id': similarHeadline.id},
         extra: similarHeadline,

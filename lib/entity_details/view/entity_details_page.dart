@@ -227,9 +227,12 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
             ],
           );
 
-          void onHeadlineTap(Headline headline) {
-            context.read<InterstitialAdManager>().onPotentialAdTrigger();
-            context.pushNamed(
+          Future<void> onHeadlineTap(Headline headline) async {
+            await context.read<InterstitialAdManager>().onPotentialAdTrigger();
+
+            if (!context.mounted) return;
+
+            await context.pushNamed(
               Routes.globalArticleDetailsName,
               pathParameters: {'id': headline.id},
               extra: headline,

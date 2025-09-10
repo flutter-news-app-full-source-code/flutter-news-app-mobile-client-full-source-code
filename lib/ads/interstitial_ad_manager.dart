@@ -153,7 +153,10 @@ class InterstitialAdManager {
   ///
   /// This method increments the transition counter and shows a pre-loaded ad
   /// if the frequency criteria are met.
-  Future<void> onPotentialAdTrigger({required BuildContext context}) async {
+  ///
+  /// Returns a [Future] that completes when the ad is dismissed, allowing the
+  /// caller to await the ad's lifecycle before proceeding with navigation.
+  Future<void> onPotentialAdTrigger() async {
     _transitionCount++;
     _logger.info('Potential ad trigger. Transition count: $_transitionCount');
 
@@ -169,7 +172,7 @@ class InterstitialAdManager {
 
     if (requiredTransitions > 0 && _transitionCount >= requiredTransitions) {
       _logger.info('Transition count meets threshold. Attempting to show ad.');
-      await _showAd(context);
+      await _showAd();
       _transitionCount =
           0; // Reset counter after showing (or attempting to show)
     } else {
@@ -180,7 +183,9 @@ class InterstitialAdManager {
   }
 
   /// Shows the pre-loaded interstitial ad.
-  Future<void> _showAd(BuildContext context) async {
+  ///
+  /// Returns a [Future] that completes when the ad is dismissed.
+  Future<void> _showAd() async {
     if (_preloadedAd == null) {
       _logger.warning(
         'Show ad called, but no ad is pre-loaded. Pre-loading now.',
@@ -199,13 +204,28 @@ class InterstitialAdManager {
     try {
       switch (adToShow.provider) {
         case AdPlatformType.admob:
+          // AdMob does not require context to be shown.
           await _showAdMobAd(adToShow);
         case AdPlatformType.local:
-          // ignore: use_build_context_synchronously
-          await _showLocalAd(context, adToShow);
+          // Local ads require context. Get it just before use.
+          final context = _appBloc.navigatorKey.currentContext;
+          if (context != null && context.mounted) {
+            await _showLocalAd(context, adToShow);
+          } else {
+            _logger.warning(
+              'Cannot show local ad: context is null or no longer mounted.',
+            );
+          }
         case AdPlatformType.demo:
-          // ignore: use_build_context_synchronously
-          await _showDemoAd(context);
+          // Demo ads require context. Get it just before use.
+          final context = _appBloc.navigatorKey.currentContext;
+          if (context != null && context.mounted) {
+            await _showDemoAd(context);
+          } else {
+            _logger.warning(
+              'Cannot show demo ad: context is null or no longer mounted.',
+            );
+          }
       }
     } catch (e, s) {
       _logger.severe('Error showing interstitial ad: $e', e, s);
@@ -219,6 +239,8 @@ class InterstitialAdManager {
 
   Future<void> _showAdMobAd(InterstitialAd ad) async {
     if (ad.adObject is! admob.InterstitialAd) return;
+
+    final completer = Completer<void>();
     final admobAd = ad.adObject as admob.InterstitialAd
       ..fullScreenContentCallback = admob.FullScreenContentCallback(
         onAdShowedFullScreenContent: (ad) =>
@@ -226,19 +248,29 @@ class InterstitialAdManager {
         onAdDismissedFullScreenContent: (ad) {
           _logger.info('AdMob ad dismissed.');
           ad.dispose();
+          if (!completer.isCompleted) {
+            completer.complete();
+          }
         },
         onAdFailedToShowFullScreenContent: (ad, error) {
           _logger.severe('AdMob ad failed to show: $error');
           ad.dispose();
+          if (!completer.isCompleted) {
+            // Complete normally even on failure to unblock navigation.
+            completer.complete();
+          }
         },
       );
     await admobAd.show();
+    return completer.future;
   }
 
   Future<void> _showLocalAd(BuildContext context, InterstitialAd ad) async {
     if (ad.adObject is! LocalInterstitialAd) return;
+    // Await the result of showDialog, which completes when the dialog is popped.
     await showDialog<void>(
       context: context,
+      barrierDismissible: false, // Prevent dismissing by tapping outside
       builder: (_) => LocalInterstitialAdDialog(
         localInterstitialAd: ad.adObject as LocalInterstitialAd,
       ),
@@ -246,8 +278,10 @@ class InterstitialAdManager {
   }
 
   Future<void> _showDemoAd(BuildContext context) async {
+    // Await the result of showDialog, which completes when the dialog is popped.
     await showDialog<void>(
       context: context,
+      barrierDismissible: false, // Prevent dismissing by tapping outside
       builder: (_) => const DemoInterstitialAdDialog(),
     );
   }

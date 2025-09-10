@@ -70,7 +70,7 @@ GoRouter createRouter({
   required DataRepository<User> userRepository,
   required local_config.AppEnvironment environment,
   required AdService adService,
-  required GlobalKey<NavigatorState> navigatorKey, // Add navigatorKey
+  required GlobalKey<NavigatorState> navigatorKey,
 }) {
   // Instantiate AccountBloc once to be shared
   final accountBloc = AccountBloc(
@@ -92,10 +92,9 @@ GoRouter createRouter({
     // an attempt to build a complex page before the app state is ready.
     initialLocation: '/',
     debugLogDiagnostics: true,
+    navigatorKey: navigatorKey,
     observers: [
-      GoRouterObserver(
-        navigatorKey: navigatorKey,
-      ), // Use GoRouterObserver with navigatorKey
+      // Add any other necessary observers here. If none, this can be an empty list.
     ],
     // --- Redirect Logic ---
     redirect: (BuildContext context, GoRouterState state) {
@@ -782,18 +781,4 @@ GoRouter createRouter({
       ),
     ],
   );
-}
-
-/// A custom [NavigatorObserver] that provides access to the [NavigatorState]
-/// via a [GlobalKey].
-///
-/// This is used to obtain a [BuildContext] for services that need to interact
-/// with the widget tree (e.g., showing dialogs) but are not directly part
-/// of the tree themselves.
-class GoRouterObserver extends NavigatorObserver {
-  /// Creates a [GoRouterObserver].
-  GoRouterObserver({required this.navigatorKey});
-
-  /// The [GlobalKey] used to access the [NavigatorState].
-  final GlobalKey<NavigatorState> navigatorKey;
 }

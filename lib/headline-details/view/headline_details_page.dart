@@ -246,6 +246,20 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     final adService = context.read<AdService>();
     final adThemeStyle = AdThemeStyle.fromTheme(Theme.of(context));
 
+    Future<void> onEntityChipTap(ContentType type, String id) async {
+      // Await for the ad to be shown and dismissed.
+      await context.read<InterstitialAdManager>().onPotentialAdTrigger();
+
+      // Check if the widget is still in the tree before navigating.
+      if (!context.mounted) return;
+
+      // Proceed with navigation after the ad is closed.
+      await context.pushNamed(
+        Routes.entityDetailsName,
+        pathParameters: {'type': type.name, 'id': id},
+      );
+    }
+
     final slivers = <Widget>[
       SliverAppBar(
         leading: IconButton(
@@ -319,7 +333,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           child: Wrap(
             spacing: AppSpacing.md,
             runSpacing: AppSpacing.sm,
-            children: _buildMetadataChips(context, headline),
+            children: _buildMetadataChips(context, headline, onEntityChipTap),
           ),
         ),
       ),
@@ -442,6 +456,21 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       }
     }
 
+    Future<void> onSimilarHeadlineTap(Headline similarHeadline) async {
+      // Await for the ad to be shown and dismissed.
+      await context.read<InterstitialAdManager>().onPotentialAdTrigger();
+
+      // Check if the widget is still in the tree before navigating.
+      if (!context.mounted) return;
+
+      // Proceed with navigation after the ad is closed.
+      await context.pushNamed(
+        Routes.globalArticleDetailsName,
+        pathParameters: {'id': similarHeadline.id},
+        extra: similarHeadline,
+      );
+    }
+
     slivers.add(
       BlocBuilder<SimilarHeadlinesBloc, SimilarHeadlinesState>(
         builder: (context, state) {
@@ -467,7 +496,11 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                   ),
                 ),
               ),
-              _buildSimilarHeadlinesSection(context, horizontalPadding),
+              _buildSimilarHeadlinesSection(
+                context,
+                horizontalPadding,
+                onSimilarHeadlineTap,
+              ),
             ],
           );
         },
@@ -477,7 +510,11 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     return CustomScrollView(slivers: slivers);
   }
 
-  List<Widget> _buildMetadataChips(BuildContext context, Headline headline) {
+  List<Widget> _buildMetadataChips(
+    BuildContext context,
+    Headline headline,
+    void Function(ContentType type, String id) onEntityChipTap,
+  ) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
@@ -518,18 +555,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       )
       ..add(
         InkWell(
-          onTap: () {
-            context.read<InterstitialAdManager>().onPotentialAdTrigger(
-              context: context,
-            );
-            context.pushNamed(
-              Routes.entityDetailsName,
-              pathParameters: {
-                'type': ContentType.source.name,
-                'id': headline.source.id,
-              },
-            );
-          },
+          onTap: () => onEntityChipTap(ContentType.source, headline.source.id),
           borderRadius: BorderRadius.circular(AppSpacing.sm),
           child: Chip(
             avatar: Icon(
@@ -549,18 +575,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       )
       ..add(
         InkWell(
-          onTap: () {
-            context.read<InterstitialAdManager>().onPotentialAdTrigger(
-              context: context,
-            );
-            context.pushNamed(
-              Routes.entityDetailsName,
-              pathParameters: {
-                'type': ContentType.topic.name,
-                'id': headline.topic.id,
-              },
-            );
-          },
+          onTap: () => onEntityChipTap(ContentType.topic, headline.topic.id),
           borderRadius: BorderRadius.circular(AppSpacing.sm),
           child: Chip(
             avatar: Icon(
@@ -580,18 +595,8 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       )
       ..add(
         InkWell(
-          onTap: () {
-            context.read<InterstitialAdManager>().onPotentialAdTrigger(
-              context: context,
-            );
-            context.pushNamed(
-              Routes.entityDetailsName,
-              pathParameters: {
-                'type': ContentType.country.name,
-                'id': headline.eventCountry.id,
-              },
-            );
-          },
+          onTap: () =>
+              onEntityChipTap(ContentType.country, headline.eventCountry.id),
           borderRadius: BorderRadius.circular(AppSpacing.sm),
           child: Chip(
             avatar: Icon(
@@ -616,6 +621,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
   Widget _buildSimilarHeadlinesSection(
     BuildContext context,
     EdgeInsets hPadding,
+    void Function(Headline headline) onSimilarHeadlineTap,
   ) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
@@ -669,44 +675,20 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                       case HeadlineImageStyle.hidden:
                         tile = HeadlineTileTextOnly(
                           headline: similarHeadline,
-                          onHeadlineTap: () {
-                            context
-                                .read<InterstitialAdManager>()
-                                .onPotentialAdTrigger(context: context);
-                            context.pushNamed(
-                              Routes.globalArticleDetailsName,
-                              pathParameters: {'id': similarHeadline.id},
-                              extra: similarHeadline,
-                            );
-                          },
+                          onHeadlineTap: () =>
+                              onSimilarHeadlineTap(similarHeadline),
                         );
                       case HeadlineImageStyle.smallThumbnail:
                         tile = HeadlineTileImageStart(
                           headline: similarHeadline,
-                          onHeadlineTap: () {
-                            context
-                                .read<InterstitialAdManager>()
-                                .onPotentialAdTrigger(context: context);
-                            context.pushNamed(
-                              Routes.globalArticleDetailsName,
-                              pathParameters: {'id': similarHeadline.id},
-                              extra: similarHeadline,
-                            );
-                          },
+                          onHeadlineTap: () =>
+                              onSimilarHeadlineTap(similarHeadline),
                         );
                       case HeadlineImageStyle.largeThumbnail:
                         tile = HeadlineTileImageTop(
                           headline: similarHeadline,
-                          onHeadlineTap: () {
-                            context
-                                .read<InterstitialAdManager>()
-                                .onPotentialAdTrigger(context: context);
-                            context.pushNamed(
-                              Routes.globalArticleDetailsName,
-                              pathParameters: {'id': similarHeadline.id},
-                              extra: similarHeadline,
-                            );
-                          },
+                          onHeadlineTap: () =>
+                              onSimilarHeadlineTap(similarHeadline),
                         );
                     }
                     return tile;

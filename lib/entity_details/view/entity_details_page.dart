@@ -227,6 +227,18 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
             ],
           );
 
+          Future<void> onHeadlineTap(Headline headline) async {
+            await context.read<InterstitialAdManager>().onPotentialAdTrigger();
+
+            if (!context.mounted) return;
+
+            await context.pushNamed(
+              Routes.globalArticleDetailsName,
+              pathParameters: {'id': headline.id},
+              extra: headline,
+            );
+          }
+
           return CustomScrollView(
             controller: _scrollController,
             slivers: [
@@ -325,44 +337,17 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                           case HeadlineImageStyle.hidden:
                             tile = HeadlineTileTextOnly(
                               headline: item,
-                              onHeadlineTap: () {
-                                context
-                                    .read<InterstitialAdManager>()
-                                    .onPotentialAdTrigger(context: context);
-                                context.pushNamed(
-                                  Routes.globalArticleDetailsName,
-                                  pathParameters: {'id': item.id},
-                                  extra: item,
-                                );
-                              },
+                              onHeadlineTap: () => onHeadlineTap(item),
                             );
                           case HeadlineImageStyle.smallThumbnail:
                             tile = HeadlineTileImageStart(
                               headline: item,
-                              onHeadlineTap: () {
-                                context
-                                    .read<InterstitialAdManager>()
-                                    .onPotentialAdTrigger(context: context);
-                                context.pushNamed(
-                                  Routes.globalArticleDetailsName,
-                                  pathParameters: {'id': item.id},
-                                  extra: item,
-                                );
-                              },
+                              onHeadlineTap: () => onHeadlineTap(item),
                             );
                           case HeadlineImageStyle.largeThumbnail:
                             tile = HeadlineTileImageTop(
                               headline: item,
-                              onHeadlineTap: () {
-                                context
-                                    .read<InterstitialAdManager>()
-                                    .onPotentialAdTrigger(context: context);
-                                context.pushNamed(
-                                  Routes.globalArticleDetailsName,
-                                  pathParameters: {'id': item.id},
-                                  extra: item,
-                                );
-                              },
+                              onHeadlineTap: () => onHeadlineTap(item),
                             );
                         }
                         return tile;

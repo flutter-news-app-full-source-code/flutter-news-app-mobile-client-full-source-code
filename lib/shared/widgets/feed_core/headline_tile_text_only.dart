@@ -1,8 +1,7 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
-import 'package:go_router/go_router.dart';
-import 'package:timeago/timeago.dart' as timeago;
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_metadata_row.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_tap_handler.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template headline_tile_text_only}
@@ -47,7 +46,9 @@ class HeadlineTileTextOnly extends StatelessWidget {
         vertical: AppSpacing.xs,
       ),
       child: InkWell(
-        onTap: onHeadlineTap,
+        onTap:
+            onHeadlineTap ??
+            () => HeadlineTapHandler.handleHeadlineTap(context, headline),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
           child: Row(
@@ -66,14 +67,12 @@ class HeadlineTileTextOnly extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: AppSpacing.sm),
-                    _HeadlineMetadataRow(
+                    HeadlineMetadataRow(
                       headline: headline,
                       colorScheme: theme.colorScheme,
                       textTheme: textTheme,
-                      currentContextEntityType:
-                          currentContextEntityType, // Pass down
-                      currentContextEntityId:
-                          currentContextEntityId, // Pass down
+                      currentContextEntityType: currentContextEntityType,
+                      currentContextEntityId: currentContextEntityId,
                     ),
                   ],
                 ),
@@ -86,103 +85,6 @@ class HeadlineTileTextOnly extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-/// Private helper widget to build the metadata row.
-class _HeadlineMetadataRow extends StatelessWidget {
-  const _HeadlineMetadataRow({
-    required this.headline,
-    required this.colorScheme,
-    required this.textTheme,
-    this.currentContextEntityType,
-    this.currentContextEntityId,
-  });
-
-  final Headline headline;
-  final ColorScheme colorScheme;
-  final TextTheme textTheme;
-  final ContentType? currentContextEntityType;
-  final String? currentContextEntityId;
-
-  @override
-  Widget build(BuildContext context) {
-    final formattedDate = timeago.format(headline.createdAt);
-
-    // Use bodySmall for a reasonable base size, with muted accent color
-    final metadataTextStyle = textTheme.bodySmall?.copyWith(
-      color: colorScheme.primary.withOpacity(0.7),
-    );
-    // Icon color to match the subtle text
-    final iconColor = colorScheme.primary.withOpacity(0.7);
-    const iconSize = AppSpacing.sm;
-
-    return Wrap(
-      spacing: AppSpacing.sm, // Increased spacing for readability
-      runSpacing: AppSpacing.xs,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: [
-        if (formattedDate.isNotEmpty)
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.calendar_today_outlined,
-                size: iconSize,
-                color: iconColor,
-              ),
-              const SizedBox(width: AppSpacing.xs / 2),
-              Text(formattedDate, style: metadataTextStyle),
-            ],
-          ),
-        // Conditionally render Topic as Text
-        if (headline.topic.name.isNotEmpty &&
-            !(currentContextEntityType == ContentType.topic &&
-                headline.topic.id == currentContextEntityId)) ...[
-          if (formattedDate.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-              child: Text('•', style: metadataTextStyle),
-            ),
-          GestureDetector(
-            onTap: () {
-              context.pushNamed(
-                Routes.entityDetailsName,
-                pathParameters: {
-                  'type': ContentType.topic.name,
-                  'id': headline.topic.id,
-                },
-              );
-            },
-            child: Text(headline.topic.name, style: metadataTextStyle),
-          ),
-        ],
-        // Conditionally render Source as Text
-        if (!(currentContextEntityType == ContentType.source &&
-            headline.source.id == currentContextEntityId)) ...[
-          if (formattedDate.isNotEmpty ||
-              (headline.topic.name.isNotEmpty &&
-                  !(currentContextEntityType == ContentType.topic &&
-                      headline.topic.id == currentContextEntityId)))
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-              child: Text('•', style: metadataTextStyle),
-            ),
-          GestureDetector(
-            onTap: () {
-              context.pushNamed(
-                Routes.entityDetailsName,
-                pathParameters: {
-                  'type': ContentType.source.name,
-                  'id': headline.source.id,
-                },
-              );
-            },
-            child: Text(headline.source.name, style: metadataTextStyle),
-          ),
-        ],
-      ],
     );
   }
 }

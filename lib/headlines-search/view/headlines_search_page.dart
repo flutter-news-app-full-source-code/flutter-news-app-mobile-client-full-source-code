@@ -310,48 +310,36 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                               .feedPreferences
                               .headlineImageStyle;
                           Widget tile;
+                          Future<void> onHeadlineTap() async {
+                            await context
+                                .read<InterstitialAdManager>()
+                                .onPotentialAdTrigger();
+
+                            // Check if the widget is still in the tree before navigating.
+                            if (!context.mounted) return;
+
+                            await context.pushNamed(
+                              Routes.searchArticleDetailsName,
+                              pathParameters: {'id': feedItem.id},
+                              extra: feedItem,
+                            );
+                          }
+
                           switch (imageStyle) {
                             case HeadlineImageStyle.hidden:
                               tile = HeadlineTileTextOnly(
                                 headline: feedItem,
-                                onHeadlineTap: () {
-                                  context
-                                      .read<InterstitialAdManager>()
-                                      .onPotentialAdTrigger(context: context);
-                                  context.goNamed(
-                                    Routes.searchArticleDetailsName,
-                                    pathParameters: {'id': feedItem.id},
-                                    extra: feedItem,
-                                  );
-                                },
+                                onHeadlineTap: onHeadlineTap,
                               );
                             case HeadlineImageStyle.smallThumbnail:
                               tile = HeadlineTileImageStart(
                                 headline: feedItem,
-                                onHeadlineTap: () {
-                                  context
-                                      .read<InterstitialAdManager>()
-                                      .onPotentialAdTrigger(context: context);
-                                  context.goNamed(
-                                    Routes.searchArticleDetailsName,
-                                    pathParameters: {'id': feedItem.id},
-                                    extra: feedItem,
-                                  );
-                                },
+                                onHeadlineTap: onHeadlineTap,
                               );
                             case HeadlineImageStyle.largeThumbnail:
                               tile = HeadlineTileImageTop(
                                 headline: feedItem,
-                                onHeadlineTap: () {
-                                  context
-                                      .read<InterstitialAdManager>()
-                                      .onPotentialAdTrigger(context: context);
-                                  context.goNamed(
-                                    Routes.searchArticleDetailsName,
-                                    pathParameters: {'id': feedItem.id},
-                                    extra: feedItem,
-                                  );
-                                },
+                                onHeadlineTap: onHeadlineTap,
                               );
                           }
                           return tile;

@@ -23,7 +23,6 @@ class CountryItemWidget extends StatelessWidget {
           : null,
       onTap: () {
         context.read<InterstitialAdManager>().onPotentialAdTrigger(
-          context: context,
         );
         context.pushNamed(
           Routes.entityDetailsName,

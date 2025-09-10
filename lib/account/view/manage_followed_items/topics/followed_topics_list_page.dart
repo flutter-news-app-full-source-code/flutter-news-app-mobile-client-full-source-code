@@ -103,7 +103,6 @@ class FollowedTopicsListPage extends StatelessWidget {
                 ),
                 onTap: () {
                   context.read<InterstitialAdManager>().onPotentialAdTrigger(
-                    context: context,
                   );
                   context.pushNamed(
                     Routes.entityDetailsName,

@@ -40,11 +40,19 @@ class HeadlineMetadataRow extends StatelessWidget {
 
   /// Handles a tap on an entity (topic or source) within the metadata row.
   ///
-  /// This method triggers the interstitial ad manager and navigates to the
-  /// entity details page.
-  void _handleEntityTap(BuildContext context, ContentType type, String id) {
-    context.read<InterstitialAdManager>().onPotentialAdTrigger();
-    context.pushNamed(
+  /// This method triggers the interstitial ad manager, awaits its completion,
+  /// and then navigates to the entity details page.
+  Future<void> _handleEntityTap(
+    BuildContext context,
+    ContentType type,
+    String id,
+  ) async {
+    await context.read<InterstitialAdManager>().onPotentialAdTrigger();
+
+    // Check if the widget is still in the tree before navigating.
+    if (!context.mounted) return;
+
+    await context.pushNamed(
       Routes.entityDetailsName,
       pathParameters: {'type': type.name, 'id': id},
     );

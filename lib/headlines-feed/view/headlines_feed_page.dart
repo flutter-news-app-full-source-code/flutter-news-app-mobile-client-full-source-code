@@ -244,9 +244,17 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
               );
             }
 
-            void onHeadlineTap(Headline headline) {
-              context.read<InterstitialAdManager>().onPotentialAdTrigger();
-              context.goNamed(
+            Future<void> onHeadlineTap(Headline headline) async {
+              // Await for the ad to be shown and dismissed.
+              await context
+                  .read<InterstitialAdManager>()
+                  .onPotentialAdTrigger();
+
+              // Check if the widget is still in the tree before navigating.
+              if (!context.mounted) return;
+
+              // Proceed with navigation after the ad is closed.
+              await context.pushNamed(
                 Routes.articleDetailsName,
                 pathParameters: {'id': headline.id},
                 extra: headline,

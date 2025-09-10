@@ -1,5 +1,7 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:go_router/go_router.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -35,6 +37,18 @@ class HeadlineMetadataRow extends StatelessWidget {
 
   /// The ID of the entity currently being viewed in detail.
   final String? currentContextEntityId;
+
+  /// Handles a tap on an entity (topic or source) within the metadata row.
+  ///
+  /// This method triggers the interstitial ad manager and navigates to the
+  /// entity details page.
+  void _handleEntityTap(BuildContext context, ContentType type, String id) {
+    context.read<InterstitialAdManager>().onPotentialAdTrigger();
+    context.pushNamed(
+      Routes.entityDetailsName,
+      pathParameters: {'type': type.name, 'id': id},
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,15 +90,8 @@ class HeadlineMetadataRow extends StatelessWidget {
               child: Text('•', style: metadataTextStyle),
             ),
           GestureDetector(
-            onTap: () {
-              context.pushNamed(
-                Routes.entityDetailsName,
-                pathParameters: {
-                  'type': ContentType.topic.name,
-                  'id': headline.topic.id,
-                },
-              );
-            },
+            onTap: () =>
+                _handleEntityTap(context, ContentType.topic, headline.topic.id),
             child: Text(headline.topic.name, style: metadataTextStyle),
           ),
         ],
@@ -100,15 +107,11 @@ class HeadlineMetadataRow extends StatelessWidget {
               child: Text('•', style: metadataTextStyle),
             ),
           GestureDetector(
-            onTap: () {
-              context.pushNamed(
-                Routes.entityDetailsName,
-                pathParameters: {
-                  'type': ContentType.source.name,
-                  'id': headline.source.id,
-                },
-              );
-            },
+            onTap: () => _handleEntityTap(
+              context,
+              ContentType.source,
+              headline.source.id,
+            ),
             child: Text(headline.source.name, style: metadataTextStyle),
           ),
         ],

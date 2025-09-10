@@ -310,11 +310,15 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                               .feedPreferences
                               .headlineImageStyle;
                           Widget tile;
-                          void onHeadlineTap() {
-                            context
+                          Future<void> onHeadlineTap() async {
+                            await context
                                 .read<InterstitialAdManager>()
                                 .onPotentialAdTrigger();
-                            context.goNamed(
+
+                            // Check if the widget is still in the tree before navigating.
+                            if (!context.mounted) return;
+
+                            await context.pushNamed(
                               Routes.searchArticleDetailsName,
                               pathParameters: {'id': feedItem.id},
                               extra: feedItem,

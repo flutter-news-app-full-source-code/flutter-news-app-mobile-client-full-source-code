@@ -26,9 +26,9 @@ class InterstitialAdManager {
     required AppBloc appBloc,
     required AdService adService,
     Logger? logger,
-  })  : _appBloc = appBloc,
-        _adService = adService,
-        _logger = logger ?? Logger('InterstitialAdManager') {
+  }) : _appBloc = appBloc,
+       _adService = adService,
+       _logger = logger ?? Logger('InterstitialAdManager') {
     // Listen to the AppBloc stream to react to state changes.
     _appBlocSubscription = _appBloc.stream.listen(_onAppStateChanged);
     // Initialize with the current state.
@@ -100,8 +100,8 @@ class InterstitialAdManager {
       final brightness = appState.themeMode == ThemeMode.system
           ? SchedulerBinding.instance.window.platformBrightness
           : (appState.themeMode == ThemeMode.dark
-              ? Brightness.dark
-              : Brightness.light);
+                ? Brightness.dark
+                : Brightness.light);
 
       // Create a ThemeData instance from the AppState's settings.
       // This allows us to derive AdThemeStyle without a BuildContext.

@@ -94,8 +94,7 @@ class _LocalInterstitialAdDialogState extends State<LocalInterstitialAdDialog> {
             right: AppSpacing.lg,
             child: canClose
                 ? IconButton(
-                    icon:
-                        Icon(Icons.close, color: theme.colorScheme.onSurface),
+                    icon: Icon(Icons.close, color: theme.colorScheme.onSurface),
                     onPressed: () => Navigator.of(context).pop(),
                   )
                 : Container(

@@ -31,7 +31,7 @@ abstract final class HeadlineTapHandler {
     if (!context.mounted) return;
 
     // Proceed with navigation after the ad is closed.
-    context.goNamed(
+    await context.pushNamed(
       Routes.articleDetailsName,
       pathParameters: {'id': headline.id},
       extra: headline,

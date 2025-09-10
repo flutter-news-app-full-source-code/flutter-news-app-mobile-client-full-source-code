@@ -101,9 +101,17 @@ class FollowedTopicsListPage extends StatelessWidget {
                     );
                   },
                 ),
-                onTap: () {
-                  context.read<InterstitialAdManager>().onPotentialAdTrigger();
-                  context.pushNamed(
+                onTap: () async {
+                  // Await for the ad to be shown and dismissed.
+                  await context
+                      .read<InterstitialAdManager>()
+                      .onPotentialAdTrigger();
+
+                  // Check if the widget is still in the tree before navigating.
+                  if (!context.mounted) return;
+
+                  // Proceed with navigation after the ad is closed.
+                  await context.pushNamed(
                     Routes.entityDetailsName,
                     pathParameters: {
                       'type': ContentType.topic.name,

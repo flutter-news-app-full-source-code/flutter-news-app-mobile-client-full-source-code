@@ -26,9 +26,9 @@ class InterstitialAdManager {
     required AppBloc appBloc,
     required AdService adService,
     Logger? logger,
-  }) : _appBloc = appBloc,
-       _adService = adService,
-       _logger = logger ?? Logger('InterstitialAdManager') {
+  })  : _appBloc = appBloc,
+        _adService = adService,
+        _logger = logger ?? Logger('InterstitialAdManager') {
     // Listen to the AppBloc stream to react to state changes.
     _appBlocSubscription = _appBloc.stream.listen(_onAppStateChanged);
     // Initialize with the current state.
@@ -100,8 +100,8 @@ class InterstitialAdManager {
       final brightness = appState.themeMode == ThemeMode.system
           ? SchedulerBinding.instance.window.platformBrightness
           : (appState.themeMode == ThemeMode.dark
-                ? Brightness.dark
-                : Brightness.light);
+              ? Brightness.dark
+              : Brightness.light);
 
       // Create a ThemeData instance from the AppState's settings.
       // This allows us to derive AdThemeStyle without a BuildContext.
@@ -153,6 +153,9 @@ class InterstitialAdManager {
   ///
   /// This method increments the transition counter and shows a pre-loaded ad
   /// if the frequency criteria are met.
+  ///
+  /// Returns a [Future] that completes when the ad is dismissed, allowing the
+  /// caller to await the ad's lifecycle before proceeding with navigation.
   Future<void> onPotentialAdTrigger() async {
     _transitionCount++;
     _logger.info('Potential ad trigger. Transition count: $_transitionCount');
@@ -180,6 +183,8 @@ class InterstitialAdManager {
   }
 
   /// Shows the pre-loaded interstitial ad.
+  ///
+  /// Returns a [Future] that completes when the ad is dismissed.
   Future<void> _showAd() async {
     if (_preloadedAd == null) {
       _logger.warning(
@@ -234,6 +239,8 @@ class InterstitialAdManager {
 
   Future<void> _showAdMobAd(InterstitialAd ad) async {
     if (ad.adObject is! admob.InterstitialAd) return;
+
+    final completer = Completer<void>();
     final admobAd = ad.adObject as admob.InterstitialAd
       ..fullScreenContentCallback = admob.FullScreenContentCallback(
         onAdShowedFullScreenContent: (ad) =>
@@ -241,13 +248,21 @@ class InterstitialAdManager {
         onAdDismissedFullScreenContent: (ad) {
           _logger.info('AdMob ad dismissed.');
           ad.dispose();
+          if (!completer.isCompleted) {
+            completer.complete();
+          }
         },
         onAdFailedToShowFullScreenContent: (ad, error) {
           _logger.severe('AdMob ad failed to show: $error');
           ad.dispose();
+          if (!completer.isCompleted) {
+            // Complete normally even on failure to unblock navigation.
+            completer.complete();
+          }
         },
       );
     await admobAd.show();
+    return completer.future;
   }
 
   Future<void> _showLocalAd(BuildContext context, InterstitialAd ad) async {

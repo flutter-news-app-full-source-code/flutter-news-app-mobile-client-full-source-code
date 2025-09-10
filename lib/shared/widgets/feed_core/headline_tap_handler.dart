@@ -12,14 +12,25 @@ import 'package:go_router/go_router.dart';
 abstract final class HeadlineTapHandler {
   /// Handles a tap on a [Headline] item.
   ///
-  /// This method performs two key actions:
-  /// 1. Notifies the [InterstitialAdManager] of a potential ad transition.
-  /// 2. Navigates to the [Routes.articleDetailsName] page for the given headline.
+  /// This method performs two key actions sequentially:
+  /// 1. Notifies the [InterstitialAdManager] of a potential ad transition and
+  ///    awaits its completion (e.g., the user closing the ad).
+  /// 2. Navigates to the [Routes.articleDetailsName] page for the given headline,
+  ///    but only after the ad has been handled and if the context is still mounted.
   ///
   /// - [context]: The current [BuildContext] to access BLoCs and for navigation.
   /// - [headline]: The [Headline] item that was tapped.
-  static void handleHeadlineTap(BuildContext context, Headline headline) {
-    context.read<InterstitialAdManager>().onPotentialAdTrigger();
+  static Future<void> handleHeadlineTap(
+    BuildContext context,
+    Headline headline,
+  ) async {
+    // Await for the ad to be shown and dismissed.
+    await context.read<InterstitialAdManager>().onPotentialAdTrigger();
+
+    // Check if the widget is still in the tree before navigating.
+    if (!context.mounted) return;
+
+    // Proceed with navigation after the ad is closed.
     context.goNamed(
       Routes.articleDetailsName,
       pathParameters: {'id': headline.id},

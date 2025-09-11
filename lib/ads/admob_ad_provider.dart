@@ -88,6 +88,7 @@ class AdMobAdProvider implements AdProvider {
         },
         onAdFailedToLoad: (ad, error) {
           _logger.severe('AdMobAdProvider: Native Ad failed to load: $error');
+          ad.dispose();
           completer.complete(null);
         },
         onAdClicked: (ad) {

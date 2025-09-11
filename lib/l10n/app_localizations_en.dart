@@ -876,4 +876,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get demoInterstitialAdDescription =>
       'This is a full-screen advertisement placeholder.';
+
+  @override
+  String get adInfoPlaceholderText => 'Ads help keep this app free !';
 }

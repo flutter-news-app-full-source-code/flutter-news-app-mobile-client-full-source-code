@@ -1140,5 +1140,9 @@
     "demoInterstitialAdDescription": "This is a full-screen advertisement placeholder.",
     "@demoInterstitialAdDescription": {
         "description": "Description text for the interstitial ad placeholder in demo mode."
+    },
+    "adInfoPlaceholderText": "Ads help keep this app free !",
+    "@adInfoPlaceholderText": {
+        "description": "Message displayed in ad slots when ads are loading or fail to load, explaining their purpose."
     }
 }

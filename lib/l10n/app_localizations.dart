@@ -1675,6 +1675,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This is a full-screen advertisement placeholder.'**
   String get demoInterstitialAdDescription;
+
+  /// Message displayed in ad slots when ads are loading or fail to load, explaining their purpose.
+  ///
+  /// In en, this message translates to:
+  /// **'Ads help keep this app free !'**
+  String get adInfoPlaceholderText;
 }
 
 class _AppLocalizationsDelegate

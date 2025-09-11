@@ -16,6 +16,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/demo
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/local_banner_ad_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/local_native_ad_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -262,6 +263,8 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizationsX(context).l10n;
+    final theme = Theme.of(context);
     final headlineImageStyle = context
         .read<AppBloc>()
         .state
@@ -269,23 +272,31 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
         .feedPreferences
         .headlineImageStyle;
 
-    if (_isLoading) {
-      // Show a shimmer or loading indicator while the ad is being loaded.
-      return const Padding(
-        padding: EdgeInsets.symmetric(
+    if (_isLoading || _hasError || _loadedAd == null) {
+      // Show a user-friendly message when loading, on error, or if no ad is loaded.
+      return Card(
+        margin: const EdgeInsets.symmetric(
           horizontal: AppSpacing.paddingMedium,
           vertical: AppSpacing.xs,
         ),
         child: AspectRatio(
-          aspectRatio: 16 / 9, // Common aspect ratio for ads
-          child: Card(
-            child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          aspectRatio: 16 / 9,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.paddingMedium,
+              ),
+              child: Text(
+                l10n.adInfoPlaceholderText,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
           ),
         ),
       );
-    } else if (_hasError || _loadedAd == null) {
-      // Fallback for unsupported ad types or errors
-      return const SizedBox.shrink();
     } else {
       // If an ad is successfully loaded, dispatch to the appropriate
       // provider-specific widget for rendering.

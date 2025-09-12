@@ -65,7 +65,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
   bool _isLoading = true;
   bool _hasError = false;
   final Logger _logger = Logger('FeedAdLoaderWidget');
-  final InlineAdCacheService _adCacheService = InlineAdCacheService();
+  late final InlineAdCacheService _adCacheService;
 
   /// Completer to manage the lifecycle of the ad loading future.
   /// This helps in cancelling pending operations if the widget is disposed
@@ -76,6 +76,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
   @override
   void initState() {
     super.initState();
+    _adCacheService = InlineAdCacheService(adService: widget.adService);
     _loadAd();
   }
 
@@ -89,9 +90,12 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
     if (widget.adPlaceholder.id != oldWidget.adPlaceholder.id ||
         widget.adConfig != oldWidget.adConfig) {
       _logger.info(
-        'FeedAdLoaderWidget updated for new placeholder ID: ' // Renamed log
+        'FeedAdLoaderWidget updated for new placeholder ID: '
         '${widget.adPlaceholder.id} or AdConfig changed. Re-loading ad.',
       );
+      // Dispose of the old ad's resources before loading a new one.
+      _adCacheService.removeAndDisposeAd(oldWidget.adPlaceholder.id);
+
       // Cancel the previous loading operation if it's still active and not yet
       // completed. This prevents a race condition if a new load is triggered
       // while an old one is still in progress.
@@ -118,6 +122,9 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
 
   @override
   void dispose() {
+    // Dispose of the ad's resources when the widget is permanently removed.
+    _adCacheService.removeAndDisposeAd(widget.adPlaceholder.id);
+
     // Cancel any pending ad loading operation when the widget is disposed.
     // This prevents `setState()` calls on a disposed widget.
     // Ensure the completer is not already completed before attempting to complete it.
@@ -151,7 +158,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
 
     if (cachedAd != null) {
       _logger.info(
-        'Using cached ad for feed placeholder ID: ${widget.adPlaceholder.id}', // Renamed log
+        'Using cached ad for feed placeholder ID: ${widget.adPlaceholder.id}',
       );
       // Ensure the widget is still mounted before calling setState.
       if (!mounted) return;
@@ -159,8 +166,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
         _loadedAd = cachedAd;
         _isLoading = false;
       });
-      // Complete the completer only if it hasn't been completed already
-      // (e.g., by dispose() or didUpdateWidget() cancelling an old load).
+      // Complete the completer only if it hasn't been completed already.
       if (_loadAdCompleter?.isCompleted == false) {
         _loadAdCompleter!.complete();
       }
@@ -168,7 +174,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
     }
 
     _logger.info(
-      'Loading new ad for feed placeholder ID: ${widget.adPlaceholder.id}', // Renamed log
+      'Loading new ad for feed placeholder ID: ${widget.adPlaceholder.id}',
     );
     try {
       // The adId is now directly available from the placeholder.
@@ -210,7 +216,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
 
       if (loadedAd != null) {
         _logger.info(
-          'New ad loaded for feed placeholder ID: ${widget.adPlaceholder.id}', // Renamed log
+          'New ad loaded for feed placeholder ID: ${widget.adPlaceholder.id}',
         );
         // Store the newly loaded ad in the cache.
         _adCacheService.setAd(widget.adPlaceholder.id, loadedAd);
@@ -226,7 +232,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
         }
       } else {
         _logger.warning(
-          'Failed to load ad for feed placeholder ID: ${widget.adPlaceholder.id}. ' // Renamed log
+          'Failed to load ad for feed placeholder ID: ${widget.adPlaceholder.id}. '
           'No ad returned.',
         );
         // Ensure the widget is still mounted before calling setState.
@@ -244,7 +250,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
       }
     } catch (e, s) {
       _logger.severe(
-        'Error loading ad for feed placeholder ID: ${widget.adPlaceholder.id}: $e', // Renamed log
+        'Error loading ad for feed placeholder ID: ${widget.adPlaceholder.id}: $e',
         e,
         s,
       );

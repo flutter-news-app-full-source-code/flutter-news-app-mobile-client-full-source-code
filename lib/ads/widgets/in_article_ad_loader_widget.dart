@@ -62,13 +62,14 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
   bool _isLoading = true;
   bool _hasError = false;
   final Logger _logger = Logger('InArticleAdLoaderWidget');
-  final InlineAdCacheService _adCacheService = InlineAdCacheService();
+  late final InlineAdCacheService _adCacheService;
 
   Completer<void>? _loadAdCompleter;
 
   @override
   void initState() {
     super.initState();
+    _adCacheService = InlineAdCacheService(adService: widget.adService);
     _loadAd();
   }
 
@@ -84,6 +85,11 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
       _logger.info(
         'InArticleAdLoaderWidget updated for new slot configuration or AdConfig changed. Re-loading ad.',
       );
+      // Dispose of the old ad's resources before loading a new one.
+      final oldCacheKey =
+          'in_article_ad_${oldWidget.slotConfiguration.slotType.name}';
+      _adCacheService.removeAndDisposeAd(oldCacheKey);
+
       if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
         _loadAdCompleter?.completeError(
           StateError('Ad loading cancelled: Widget updated with new config.'),
@@ -102,6 +108,10 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
 
   @override
   void dispose() {
+    // Dispose of the ad's resources when the widget is permanently removed.
+    final cacheKey = 'in_article_ad_${widget.slotConfiguration.slotType.name}';
+    _adCacheService.removeAndDisposeAd(cacheKey);
+
     if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
       _loadAdCompleter?.completeError(
         StateError('Ad loading cancelled: Widget disposed.'),
@@ -136,6 +146,7 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
         _loadedAd = cachedAd;
         _isLoading = false;
       });
+      // Complete the completer only if it hasn't been completed already.
       if (_loadAdCompleter?.isCompleted == false) {
         _loadAdCompleter!.complete();
       }
@@ -175,6 +186,7 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
           _hasError = true;
           _isLoading = false;
         });
+        // Complete the completer with an error only if it hasn't been completed already.
         if (_loadAdCompleter?.isCompleted == false) {
           _loadAdCompleter?.completeError(
             StateError('Failed to load in-article ad: No ad returned.'),
@@ -192,6 +204,7 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
         _hasError = true;
         _isLoading = false;
       });
+      // Complete the completer with an error only if it hasn't been completed already.
       if (_loadAdCompleter?.isCompleted == false) {
         _loadAdCompleter?.completeError(e);
       }

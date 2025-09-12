@@ -336,7 +336,9 @@ class AdMobAdProvider implements AdProvider {
     _logger.info('AdMobAdProvider: Attempting to dispose ad object: $adObject');
     if (adObject is admob.Ad) {
       await adObject.dispose();
-      _logger.info('AdMobAdProvider: Disposed AdMob ad object (NativeAd, BannerAd, or InterstitialAd).');
+      _logger.info(
+        'AdMobAdProvider: Disposed AdMob ad object (NativeAd, BannerAd, or InterstitialAd).',
+      );
     } else {
       _logger.warning(
         'AdMobAdProvider: Attempted to dispose a non-AdMob ad object. '

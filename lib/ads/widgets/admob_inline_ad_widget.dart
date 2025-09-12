@@ -71,7 +71,9 @@ class _AdmobInlineAdWidgetState extends State<AdmobInlineAdWidget> {
     // when the widget is scrolled out of view and then back in.
     // The ad will be disposed when InlineAdCacheService.clearAllAds() is called,
     // typically on a full feed refresh.
-    _logger.info('AdmobInlineAdWidget disposed. Ad object lifecycle managed by InlineAdCacheService.');
+    _logger.info(
+      'AdmobInlineAdWidget disposed. Ad object lifecycle managed by InlineAdCacheService.',
+    );
     super.dispose();
   }
 

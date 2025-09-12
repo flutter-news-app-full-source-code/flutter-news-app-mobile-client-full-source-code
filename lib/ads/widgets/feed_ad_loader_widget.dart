@@ -62,7 +62,8 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
   bool _hasError = false;
   final Logger _logger = Logger('FeedAdLoaderWidget');
   late final InlineAdCacheService _adCacheService;
-  late final AdService _adService; // AdService will be accessed via _adCacheService
+  late final AdService
+  _adService; // AdService will be accessed via _adCacheService
 
   /// Completer to manage the lifecycle of the ad loading future.
   /// This helps in cancelling pending operations if the widget is disposed

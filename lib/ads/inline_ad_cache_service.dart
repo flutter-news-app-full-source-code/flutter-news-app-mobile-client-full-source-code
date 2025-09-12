@@ -45,19 +45,19 @@ class InlineAdCacheService {
 
   final Logger _logger;
 
-/// The [AdService] instance used for disposing inline ad objects.
-/// This is set via the factory constructor.
-late AdService _adService;
+  /// The [AdService] instance used for disposing inline ad objects.
+  /// This is set via the factory constructor.
+  late AdService _adService;
 
-/// A map to store loaded inline ad objects, keyed by their unique ID.
-///
-/// The value is nullable to allow for explicit removal of an ad from the cache.
-final Map<String, InlineAd?> _cache = {};
+  /// A map to store loaded inline ad objects, keyed by their unique ID.
+  ///
+  /// The value is nullable to allow for explicit removal of an ad from the cache.
+  final Map<String, InlineAd?> _cache = {};
 
-/// Retrieves an [InlineAd] from the cache using its [id].
-///
-/// Returns the cached [InlineAd] if found, otherwise `null`.
-InlineAd? getAd(String id) {
+  /// Retrieves an [InlineAd] from the cache using its [id].
+  ///
+  /// Returns the cached [InlineAd] if found, otherwise `null`.
+  InlineAd? getAd(String id) {
     final ad = _cache[id];
     if (ad != null) {
       _logger.info('Retrieved inline ad with ID "$id" from cache.');
@@ -73,7 +73,9 @@ InlineAd? getAd(String id) {
   void setAd(String id, InlineAd? ad) {
     if (_cache.containsKey(id) && _cache[id] != null) {
       // If an old ad exists for this ID, dispose of its resources.
-      _logger.info('Disposing old inline ad for ID "$id" before caching new one.');
+      _logger.info(
+        'Disposing old inline ad for ID "$id" before caching new one.',
+      );
       _adService.disposeAd(_cache[id]);
     }
 

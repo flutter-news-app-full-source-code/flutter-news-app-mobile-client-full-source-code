@@ -59,7 +59,8 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
   bool _hasError = false;
   final Logger _logger = Logger('InArticleAdLoaderWidget');
   late final InlineAdCacheService _adCacheService;
-  late final AdService _adService; // AdService will be accessed via _adCacheService
+  late final AdService
+  _adService; // AdService will be accessed via _adCacheService
 
   Completer<void>? _loadAdCompleter;
 

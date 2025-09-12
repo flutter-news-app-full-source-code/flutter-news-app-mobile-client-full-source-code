@@ -57,7 +57,7 @@ class _AdmobInlineAdWidgetState extends State<AdmobInlineAdWidget> {
     super.didUpdateWidget(oldWidget);
     // If the inlineAd object itself has changed (e.g., a new ad was loaded
     // for the same placeholder ID), set the new one.
-    // The disposal of the old ad is now handled by the AdCacheService when
+    // The disposal of the old ad is now handled by the InlineAdCacheService when
     // the cache is cleared, preventing premature disposal of cached ads.
     if (widget.inlineAd.id != oldWidget.inlineAd.id) {
       _setAd();
@@ -67,11 +67,11 @@ class _AdmobInlineAdWidgetState extends State<AdmobInlineAdWidget> {
   @override
   void dispose() {
     // The AdMob ad object is no longer disposed here.
-    // Its lifecycle is managed by the AdCacheService to prevent crashes
+    // Its lifecycle is managed by the InlineAdCacheService to prevent crashes
     // when the widget is scrolled out of view and then back in.
-    // The ad will be disposed when AdCacheService.clearAllAds() is called,
+    // The ad will be disposed when InlineAdCacheService.clearAllAds() is called,
     // typically on a full feed refresh.
-    _logger.info('AdmobInlineAdWidget disposed.');
+    _logger.info('AdmobInlineAdWidget disposed. Ad object lifecycle managed by InlineAdCacheService.');
     super.dispose();
   }
 

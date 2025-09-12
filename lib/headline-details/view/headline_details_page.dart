@@ -7,7 +7,6 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/in_article_ad_loader_widget.dart';
@@ -243,7 +242,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
 
     final appBlocState = context.watch<AppBloc>().state;
     final adConfig = appBlocState.remoteConfig?.adConfig;
-    final adService = context.read<AdService>();
     final adThemeStyle = AdThemeStyle.fromTheme(Theme.of(context));
 
     Future<void> onEntityChipTap(ContentType type, String id) async {
@@ -376,7 +374,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                   padding: horizontalPadding,
                   child: InArticleAdLoaderWidget(
                     slotConfiguration: aboveContinueReadingSlot,
-                    adService: adService,
                     adThemeStyle: adThemeStyle,
                     adConfig: adConfig,
                   ),
@@ -444,7 +441,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                   padding: horizontalPadding,
                   child: InArticleAdLoaderWidget(
                     slotConfiguration: belowContinueReadingSlot,
-                    adService: adService,
                     adThemeStyle: adThemeStyle,
                     adConfig: adConfig,
                   ),

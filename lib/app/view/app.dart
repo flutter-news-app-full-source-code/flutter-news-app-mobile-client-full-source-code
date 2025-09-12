@@ -5,6 +5,7 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
@@ -36,6 +37,7 @@ class App extends StatelessWidget {
     required AdService adService,
     required DataRepository<LocalAd> localAdRepository,
     required GlobalKey<NavigatorState> navigatorKey,
+    required InlineAdCacheService inlineAdCacheService,
     this.demoDataMigrationService,
     this.demoDataInitializerService,
     this.initialUser,
@@ -53,7 +55,8 @@ class App extends StatelessWidget {
        _environment = environment,
        _adService = adService,
        _localAdRepository = localAdRepository,
-       _navigatorKey = navigatorKey;
+       _navigatorKey = navigatorKey,
+       _inlineAdCacheService = inlineAdCacheService;
 
   final AuthRepository _authenticationRepository;
   final DataRepository<Headline> _headlinesRepository;
@@ -70,6 +73,7 @@ class App extends StatelessWidget {
   final AdService _adService;
   final DataRepository<LocalAd> _localAdRepository;
   final GlobalKey<NavigatorState> _navigatorKey;
+  final InlineAdCacheService _inlineAdCacheService;
   final DemoDataMigrationService? demoDataMigrationService;
   final DemoDataInitializerService? demoDataInitializerService;
   final User? initialUser;
@@ -90,6 +94,7 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _kvStorageService),
         RepositoryProvider.value(value: _adService),
         RepositoryProvider.value(value: _localAdRepository),
+        RepositoryProvider.value(value: _inlineAdCacheService),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -104,7 +109,6 @@ class App extends StatelessWidget {
               demoDataMigrationService: demoDataMigrationService,
               demoDataInitializerService: demoDataInitializerService,
               initialUser: initialUser,
-              adService: context.read<AdService>(),
               navigatorKey: _navigatorKey, // Pass navigatorKey to AppBloc
             ),
           ),
@@ -138,6 +142,7 @@ class App extends StatelessWidget {
           adService: _adService,
           localAdRepository: _localAdRepository,
           navigatorKey: _navigatorKey, // Pass navigatorKey to _AppView
+          inlineAdCacheService: _inlineAdCacheService,
         ),
       ),
     );
@@ -159,6 +164,7 @@ class _AppView extends StatefulWidget {
     required this.adService,
     required this.localAdRepository,
     required this.navigatorKey,
+    required this.inlineAdCacheService,
   });
 
   final AuthRepository authenticationRepository;
@@ -174,6 +180,7 @@ class _AppView extends StatefulWidget {
   final AdService adService;
   final DataRepository<LocalAd> localAdRepository;
   final GlobalKey<NavigatorState> navigatorKey;
+  final InlineAdCacheService inlineAdCacheService;
 
   @override
   State<_AppView> createState() => _AppViewState();
@@ -211,9 +218,9 @@ class _AppViewState extends State<_AppView> {
       userContentPreferencesRepository: widget.userContentPreferencesRepository,
       remoteConfigRepository: widget.appConfigRepository,
       userRepository: widget.userRepository,
-      environment: widget.environment,
       adService: widget.adService,
       navigatorKey: widget.navigatorKey,
+      inlineAdCacheService: widget.inlineAdCacheService,
     );
   }
 

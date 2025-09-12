@@ -34,7 +34,6 @@ class InArticleAdLoaderWidget extends StatefulWidget {
   /// {@macro in_article_ad_loader_widget}
   const InArticleAdLoaderWidget({
     required this.slotConfiguration,
-    required this.adService,
     required this.adThemeStyle,
     required this.adConfig,
     super.key,
@@ -42,9 +41,6 @@ class InArticleAdLoaderWidget extends StatefulWidget {
 
   /// The configuration for this specific in-article ad slot.
   final InArticleAdSlotConfiguration slotConfiguration;
-
-  /// The service responsible for loading ads from ad networks.
-  final AdService adService;
 
   /// The current theme style for ads, used during ad loading.
   final AdThemeStyle adThemeStyle;
@@ -63,13 +59,15 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
   bool _hasError = false;
   final Logger _logger = Logger('InArticleAdLoaderWidget');
   late final InlineAdCacheService _adCacheService;
+  late final AdService _adService; // AdService will be accessed via _adCacheService
 
   Completer<void>? _loadAdCompleter;
 
   @override
   void initState() {
     super.initState();
-    _adCacheService = InlineAdCacheService(adService: widget.adService);
+    _adCacheService = context.read<InlineAdCacheService>();
+    _adService = context.read<AdService>();
     _loadAd();
   }
 
@@ -158,7 +156,7 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
     );
     try {
       // Call AdService.getInArticleAd with the full AdConfig.
-      final loadedAd = await widget.adService.getInArticleAd(
+      final loadedAd = await _adService.getInArticleAd(
         adConfig: widget.adConfig,
         adThemeStyle: widget.adThemeStyle,
       );
@@ -235,12 +233,14 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.paddingMedium,
             ),
-            child: Text(
-              l10n.adInfoPlaceholderText,
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+            child: Center(
+              child: Text(
+                l10n.adInfoPlaceholderText,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
             ),
           ),
         ),

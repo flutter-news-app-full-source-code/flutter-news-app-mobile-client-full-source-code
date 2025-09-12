@@ -1,10 +1,6 @@
-import 'package:core/core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
 import 'package:logging/logging.dart';
 
 /// {@template inline_ad_cache_service}
@@ -49,19 +45,19 @@ class InlineAdCacheService {
 
   final Logger _logger;
 
-  /// The [AdService] instance used for disposing native ad objects.
-  /// This is set via the factory constructor.
-  late AdService _adService;
+/// The [AdService] instance used for disposing inline ad objects.
+/// This is set via the factory constructor.
+late AdService _adService;
 
-  /// A map to store loaded inline ad objects, keyed by their unique ID.
-  ///
-  /// The value is nullable to allow for explicit removal of an ad from the cache.
-  final Map<String, InlineAd?> _cache = {};
+/// A map to store loaded inline ad objects, keyed by their unique ID.
+///
+/// The value is nullable to allow for explicit removal of an ad from the cache.
+final Map<String, InlineAd?> _cache = {};
 
-  /// Retrieves an [InlineAd] from the cache using its [id].
-  ///
-  /// Returns the cached [InlineAd] if found, otherwise `null`.
-  InlineAd? getAd(String id) {
+/// Retrieves an [InlineAd] from the cache using its [id].
+///
+/// Returns the cached [InlineAd] if found, otherwise `null`.
+InlineAd? getAd(String id) {
     final ad = _cache[id];
     if (ad != null) {
       _logger.info('Retrieved inline ad with ID "$id" from cache.');
@@ -76,9 +72,9 @@ class InlineAdCacheService {
   /// If [ad] is `null`, it effectively removes the entry for [id].
   void setAd(String id, InlineAd? ad) {
     if (_cache.containsKey(id) && _cache[id] != null) {
-      // If an old ad exists for this ID, dispose of its native resources.
-      _logger.info('Disposing old ad for ID "$id" before caching new one.');
-      _adService.disposeAd(_cache[id]!);
+      // If an old ad exists for this ID, dispose of its resources.
+      _logger.info('Disposing old inline ad for ID "$id" before caching new one.');
+      _adService.disposeAd(_cache[id]);
     }
 
     if (ad != null) {
@@ -90,7 +86,7 @@ class InlineAdCacheService {
     }
   }
 
-  /// Removes an [InlineAd] from the cache and disposes its native resources.
+  /// Removes an [InlineAd] from the cache and disposes its resources.
   ///
   /// This method should be used when an ad is permanently removed from the UI
   /// and its resources need to be released.
@@ -105,14 +101,14 @@ class InlineAdCacheService {
     }
   }
 
-  /// Clears all cached inline ad objects and disposes their native resources.
+  /// Clears all cached inline ad objects and disposes their resources.
   ///
   /// This method should be called when the feed is fully refreshed or
-  /// when the application is closing to ensure all native ad resources
+  /// when the application is closing to ensure all ad resources
   /// are released.
   void clearAllAds() {
     _logger.info(
-      'Clearing all cached inline ads and disposing native resources.',
+      'Clearing all cached inline ads and disposing their resources.',
     );
     for (final id in _cache.keys.toList()) {
       // Use the new removeAndDisposeAd method for consistent disposal.

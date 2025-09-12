@@ -18,6 +18,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.d
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/admob_ad_provider.dart'
     if (dart.library.io) 'package:flutter_news_app_mobile_client_full_source_code/ads/admob_ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/demo_ad_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/local_ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/app.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
@@ -45,6 +46,10 @@ Future<Widget> bootstrap(
 
   // 1. Initialize KV Storage Service first, as it's a foundational dependency.
   final kvStorage = await KVStorageSharedPreferences.getInstance();
+
+  // Initialize InlineAdCacheService early as it's a singleton and needs AdService.
+  // It will be fully configured once AdService is available.
+  late final InlineAdCacheService inlineAdCacheService;
 
   // 2. Conditionally initialize HttpClient and Auth services based on environment.
   // This ensures HttpClient is available before any DataApi or AdProvider
@@ -132,6 +137,9 @@ Future<Widget> bootstrap(
 
   final adService = AdService(adProviders: adProviders, logger: logger);
   await adService.initialize();
+
+  // Initialize InlineAdCacheService with the created AdService.
+  inlineAdCacheService = InlineAdCacheService(adService: adService);
 
   // Fetch the initial user from the authentication repository.
   // This ensures the AppBloc starts with an accurate authentication status.
@@ -419,6 +427,7 @@ Future<Widget> bootstrap(
     demoDataMigrationService: demoDataMigrationService,
     demoDataInitializerService: demoDataInitializerService,
     adService: adService,
+    inlineAdCacheService: inlineAdCacheService,
     initialUser: initialUser,
     localAdRepository: localAdRepository,
     navigatorKey: navigatorKey, // Pass the navigatorKey to App

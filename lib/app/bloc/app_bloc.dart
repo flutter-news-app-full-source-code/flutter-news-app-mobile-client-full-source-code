@@ -7,7 +7,6 @@ import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
     as local_config;
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_initializer_service.dart';
@@ -24,7 +23,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required DataRepository<RemoteConfig> appConfigRepository,
     required DataRepository<User> userRepository,
     required local_config.AppEnvironment environment,
-    required AdService adService,
     required GlobalKey<NavigatorState> navigatorKey,
     this.demoDataMigrationService,
     this.demoDataInitializerService,
@@ -34,7 +32,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _appConfigRepository = appConfigRepository,
        _userRepository = userRepository,
        _environment = environment,
-       _adService = adService,
        _navigatorKey = navigatorKey,
        _logger = Logger('AppBloc'),
        super(
@@ -93,7 +90,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final DataRepository<RemoteConfig> _appConfigRepository;
   final DataRepository<User> _userRepository;
   final local_config.AppEnvironment _environment;
-  final AdService _adService;
   final GlobalKey<NavigatorState> _navigatorKey;
   final Logger _logger;
   final DemoDataMigrationService? demoDataMigrationService;

@@ -44,28 +44,28 @@ class AdService {
     _logger.info('AdService: AdService initialized.');
   }
 
-  /// Disposes of a native ad object by delegating to the appropriate [AdProvider].
+  /// Disposes of an ad object by delegating to the appropriate [AdProvider].
   ///
   /// This method is called by the [InlineAdCacheService] to ensure that
-  /// native ad resources are released when an ad is removed from the cache
-  /// or replaced.
+  /// inline ad resources are released when an ad is removed from the cache
+  /// or replaced. It also handles disposal of interstitial ads.
   Future<void> disposeAd(dynamic adModel) async {
     // Determine the AdPlatformType from the adModel if it's an InlineAd or InterstitialAd.
     AdPlatformType? providerType;
-    Object? nativeAdObject; // To hold the actual native ad object
+    Object? adObject; // To hold the actual ad object
 
     if (adModel is InlineAd) {
       providerType = adModel.provider;
-      nativeAdObject = adModel.adObject;
+      adObject = adModel.adObject;
     } else if (adModel is InterstitialAd) {
       providerType = adModel.provider;
-      nativeAdObject = adModel.adObject;
+      adObject = adModel.adObject;
     }
 
-    if (providerType != null && nativeAdObject != null) {
+    if (providerType != null && adObject != null) {
       final adProvider = _adProviders[providerType];
       if (adProvider != null) {
-        await adProvider.disposeAd(nativeAdObject); // Pass the native ad object
+        await adProvider.disposeAd(adObject); // Pass the actual ad object
       } else {
         _logger.warning(
           'AdService: No AdProvider found for type $providerType to dispose ad.',
@@ -73,7 +73,7 @@ class AdService {
       }
     } else {
       _logger.warning(
-        'AdService: Cannot determine AdPlatformType or native ad object for ad model of type '
+        'AdService: Cannot determine AdPlatformType or ad object for ad model of type '
         '${adModel.runtimeType}. Cannot dispose ad.',
       );
     }

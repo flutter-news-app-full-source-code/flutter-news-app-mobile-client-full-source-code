@@ -5,8 +5,6 @@ import 'package:bloc/bloc.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
-    as local_config;
 import 'package:logging/logging.dart';
 
 part 'account_event.dart';
@@ -17,11 +15,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     required AuthRepository authenticationRepository,
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
-    required local_config.AppEnvironment environment,
     Logger? logger,
   }) : _authenticationRepository = authenticationRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
-       _environment = environment,
        _logger = logger ?? Logger('AccountBloc'),
        super(const AccountState()) {
     // Listen to user changes from AuthRepository
@@ -57,7 +53,6 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   final AuthRepository _authenticationRepository;
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
-  final local_config.AppEnvironment _environment;
   final Logger _logger;
   late StreamSubscription<User?> _userSubscription;
   late StreamSubscription<Type> _userContentPreferencesSubscription;

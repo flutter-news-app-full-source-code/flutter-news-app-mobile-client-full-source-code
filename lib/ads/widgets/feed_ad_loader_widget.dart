@@ -38,7 +38,6 @@ class FeedAdLoaderWidget extends StatefulWidget {
   /// {@macro feed_ad_loader_widget}
   const FeedAdLoaderWidget({
     required this.adPlaceholder,
-    required this.adService,
     required this.adThemeStyle,
     required this.adConfig,
     super.key,
@@ -46,9 +45,6 @@ class FeedAdLoaderWidget extends StatefulWidget {
 
   /// The stateless placeholder representing this ad slot.
   final AdPlaceholder adPlaceholder;
-
-  /// The service responsible for loading ads from ad networks.
-  final AdService adService;
 
   /// The current theme style for ads, used during ad loading.
   final AdThemeStyle adThemeStyle;
@@ -66,6 +62,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
   bool _hasError = false;
   final Logger _logger = Logger('FeedAdLoaderWidget');
   late final InlineAdCacheService _adCacheService;
+  late final AdService _adService; // AdService will be accessed via _adCacheService
 
   /// Completer to manage the lifecycle of the ad loading future.
   /// This helps in cancelling pending operations if the widget is disposed
@@ -76,7 +73,8 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
   @override
   void initState() {
     super.initState();
-    _adCacheService = InlineAdCacheService(adService: widget.adService);
+    _adCacheService = context.read<InlineAdCacheService>();
+    _adService = context.read<AdService>();
     _loadAd();
   }
 
@@ -207,7 +205,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
           .headlineImageStyle;
 
       // Call AdService.getFeedAd with the full AdConfig and adType from the placeholder.
-      final loadedAd = await widget.adService.getFeedAd(
+      final loadedAd = await _adService.getFeedAd(
         adConfig: widget.adConfig, // Pass the full AdConfig
         adType: widget.adPlaceholder.adType,
         adThemeStyle: widget.adThemeStyle,

@@ -192,4 +192,14 @@ class LocalAdProvider implements AdProvider {
       return null;
     }
   }
+
+  @override
+  Future<void> disposeAd(Object adObject) async {
+    _logger.info(
+      'LocalAdProvider: No explicit disposal needed for local ad object: '
+      '${adObject.runtimeType}',
+    );
+    // Local ad objects are simple Dart objects and do not hold native resources
+    // that require explicit disposal.
+  }
 }

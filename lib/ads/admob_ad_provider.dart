@@ -122,6 +122,7 @@ class AdMobAdProvider implements AdProvider {
         _logger.warning('AdMobAdProvider: Native ad loading timed out.');
         // Ad disposal is now handled by InlineAdCacheService
         completer.complete(null);
+        return null;
       },
     );
 
@@ -206,6 +207,7 @@ class AdMobAdProvider implements AdProvider {
         _logger.warning('AdMobAdProvider: Banner ad loading timed out.');
         // Ad disposal is now handled by InlineAdCacheService
         completer.complete(null);
+        return null;
       },
     );
 
@@ -333,8 +335,8 @@ class AdMobAdProvider implements AdProvider {
   Future<void> disposeAd(Object adObject) async {
     _logger.info('AdMobAdProvider: Attempting to dispose ad object: $adObject');
     if (adObject is admob.Ad) {
-      adObject.dispose();
-      _logger.info('AdMobAdProvider: Disposed AdMob ad object.');
+      await adObject.dispose();
+      _logger.info('AdMobAdProvider: Disposed AdMob ad object (NativeAd, BannerAd, or InterstitialAd).');
     } else {
       _logger.warning(
         'AdMobAdProvider: Attempted to dispose a non-AdMob ad object. '

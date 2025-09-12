@@ -27,6 +27,11 @@ class AdService {
   final Map<AdPlatformType, AdProvider> _adProviders;
   final Logger _logger;
 
+  // Configurable retry parameters for ad loading.
+  // TODO(fulleni): Make this configurable through the remote config.
+  static const int _maxAdLoadRetries = 2;
+  static const Duration _adLoadRetryDelay = Duration(seconds: 1);
+
   /// Initializes all underlying ad providers.
   ///
   /// This should be called once at application startup to ensure all
@@ -37,6 +42,41 @@ class AdService {
       await provider.initialize();
     }
     _logger.info('AdService: AdService initialized.');
+  }
+
+  /// Disposes of a native ad object by delegating to the appropriate [AdProvider].
+  ///
+  /// This method is called by the [InlineAdCacheService] to ensure that
+  /// native ad resources are released when an ad is removed from the cache
+  /// or replaced.
+  Future<void> disposeAd(dynamic adModel) async {
+    // Determine the AdPlatformType from the adModel if it's an InlineAd or InterstitialAd.
+    AdPlatformType? providerType;
+    Object? nativeAdObject; // To hold the actual native ad object
+
+    if (adModel is InlineAd) {
+      providerType = adModel.provider;
+      nativeAdObject = adModel.adObject;
+    } else if (adModel is InterstitialAd) {
+      providerType = adModel.provider;
+      nativeAdObject = adModel.adObject;
+    }
+
+    if (providerType != null && nativeAdObject != null) {
+      final adProvider = _adProviders[providerType];
+      if (adProvider != null) {
+        await adProvider.disposeAd(nativeAdObject); // Pass the native ad object
+      } else {
+        _logger.warning(
+          'AdService: No AdProvider found for type $providerType to dispose ad.',
+        );
+      }
+    } else {
+      _logger.warning(
+        'AdService: Cannot determine AdPlatformType or native ad object for ad model of type '
+        '${adModel.runtimeType}. Cannot dispose ad.',
+      );
+    }
   }
 
   /// Retrieves a loaded inline ad (native or banner) for display in a feed.
@@ -258,53 +298,69 @@ class AdService {
       return null;
     }
 
-    _logger.info(
-      'AdService: Requesting $adType ad from $primaryAdPlatform AdProvider with ID: $adId '
-      'for ${feedAd ? 'feed' : 'in-article'} placement.',
-    );
-    try {
-      InlineAd? loadedAd;
-      // For in-article banner ads, bannerAdShape dictates the visual style.
-      // For feed ads, headlineImageStyle is still relevant.
-      final effectiveHeadlineImageStyle = feedAd ? headlineImageStyle : null;
-
-      switch (adType) {
-        case AdType.native:
-          loadedAd = await adProvider.loadNativeAd(
-            adPlatformIdentifiers: platformAdIdentifiers,
-            adId: adId,
-            adThemeStyle: adThemeStyle,
-            headlineImageStyle: effectiveHeadlineImageStyle,
-          );
-        case AdType.banner:
-          loadedAd = await adProvider.loadBannerAd(
-            adPlatformIdentifiers: platformAdIdentifiers,
-            adId: adId,
-            adThemeStyle: adThemeStyle,
-            headlineImageStyle: effectiveHeadlineImageStyle,
-          );
-        case AdType.interstitial:
-        case AdType.video:
-          _logger.warning(
-            'AdService: Attempted to load $adType ad using _loadInlineAd. This is not supported.',
-          );
-          return null;
+    for (var attempt = 0; attempt <= _maxAdLoadRetries; attempt++) {
+      if (attempt > 0) {
+        _logger.info(
+          'AdService: Retrying $adType ad load (attempt $attempt) for ID: $adId '
+          'after $_adLoadRetryDelay delay.',
+        );
+        await Future<void>.delayed(_adLoadRetryDelay);
       }
 
-      if (loadedAd != null) {
-        _logger.info('AdService: $adType ad successfully loaded.');
-        return loadedAd;
-      } else {
-        _logger.info('AdService: No $adType ad loaded by AdProvider.');
-        return null;
+      try {
+        _logger.info(
+          'AdService: Requesting $adType ad from $primaryAdPlatform AdProvider with ID: $adId '
+          'for ${feedAd ? 'feed' : 'in-article'} placement.',
+        );
+        InlineAd? loadedAd;
+        // For in-article banner ads, bannerAdShape dictates the visual style.
+        // For feed ads, headlineImageStyle is still relevant.
+        final effectiveHeadlineImageStyle = feedAd ? headlineImageStyle : null;
+
+        switch (adType) {
+          case AdType.native:
+            loadedAd = await adProvider.loadNativeAd(
+              adPlatformIdentifiers: platformAdIdentifiers,
+              adId: adId,
+              adThemeStyle: adThemeStyle,
+              headlineImageStyle: effectiveHeadlineImageStyle,
+            );
+          case AdType.banner:
+            loadedAd = await adProvider.loadBannerAd(
+              adPlatformIdentifiers: platformAdIdentifiers,
+              adId: adId,
+              adThemeStyle: adThemeStyle,
+              headlineImageStyle: effectiveHeadlineImageStyle,
+            );
+          case AdType.interstitial:
+          case AdType.video:
+            _logger.warning(
+              'AdService: Attempted to load $adType ad using _loadInlineAd. This is not supported.',
+            );
+            return null;
+        }
+
+        if (loadedAd != null) {
+          _logger.info('AdService: $adType ad successfully loaded.');
+          return loadedAd;
+        } else {
+          _logger.info('AdService: No $adType ad loaded by AdProvider.');
+          // If no ad is returned, it might be a "no fill" scenario.
+          // Continue to the next retry attempt.
+        }
+      } catch (e, s) {
+        _logger.severe(
+          'AdService: Error getting $adType ad from AdProvider on attempt $attempt: $e',
+          e,
+          s,
+        );
+        // If an exception occurs, log it and continue to the next retry attempt.
       }
-    } catch (e, s) {
-      _logger.severe(
-        'AdService: Error getting $adType ad from AdProvider: $e',
-        e,
-        s,
-      );
-      return null;
     }
+
+    _logger.warning(
+      'AdService: All retry attempts failed for $adType ad with ID: $adId.',
+    );
+    return null;
   }
 }

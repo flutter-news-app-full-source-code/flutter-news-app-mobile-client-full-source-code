@@ -29,6 +29,14 @@ import 'package:ui_kit/ui_kit.dart';
 /// This approach decouples ad loading from the BLoC and ensures that native
 /// ad resources are managed efficiently, preventing crashes and improving
 /// scrolling performance in lists.
+///
+/// **AdMob In-Article Ad Handling:**
+/// For AdMob in-article ads, this widget intentionally bypasses the
+/// [InlineAdCacheService]. This is a critical design decision to prevent
+/// the "AdWidget is already in the Widget tree" error that occurs when
+/// navigating between multiple article detail pages. Each AdMob in-article
+/// ad will be loaded as a new instance, ensuring unique `admob.Ad` objects
+/// for each `AdmobInlineAdWidget` in the widget tree.
 /// {@endtemplate}
 class InArticleAdLoaderWidget extends StatefulWidget {
   /// {@macro in_article_ad_loader_widget}
@@ -87,6 +95,8 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
       // Dispose of the old ad's resources before loading a new one.
       final oldCacheKey =
           'in_article_ad_${oldWidget.slotConfiguration.slotType.name}';
+      // Only dispose if it was actually cached (i.e., not an AdMob in-article ad).
+      // The removeAndDisposeAd method handles the check internally.
       _adCacheService.removeAndDisposeAd(oldCacheKey);
 
       if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
@@ -107,6 +117,8 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
   void dispose() {
     // Dispose of the ad's resources when the widget is permanently removed.
     final cacheKey = 'in_article_ad_${widget.slotConfiguration.slotType.name}';
+    // Only dispose if it was actually cached (i.e., not an AdMob in-article ad).
+    // The removeAndDisposeAd method handles the check internally.
     _adCacheService.removeAndDisposeAd(cacheKey);
 
     if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
@@ -122,6 +134,12 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
   /// If found, it uses the cached ad. Otherwise, it requests a new in-article ad
   /// from the [AdService] using `getInArticleAd` and stores it in the cache
   /// upon success.
+  ///
+  /// **AdMob Specific Behavior:**
+  /// For AdMob in-article ads, this method intentionally bypasses the cache.
+  /// This ensures that each `AdmobInlineAdWidget` receives a unique `admob.Ad`
+  /// object, preventing the "AdWidget is already in the Widget tree" error
+  /// when multiple article detail pages are in the navigation stack.
   Future<void> _loadAd() async {
     _loadAdCompleter = Completer<void>();
 
@@ -130,22 +148,33 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
     // In-article ads are typically unique to their slot, so we use the slotType
     // as part of the cache key to differentiate them.
     final cacheKey = 'in_article_ad_${widget.slotConfiguration.slotType.name}';
-    final cachedAd = _adCacheService.getAd(cacheKey);
+    InlineAd? loadedAd;
 
-    if (cachedAd != null) {
-      _logger.info(
-        'Using cached in-article ad for slot: ${widget.slotConfiguration.slotType.name}',
-      );
-      if (!mounted) return;
-      setState(() {
-        _loadedAd = cachedAd;
-        _isLoading = false;
-      });
-      // Complete the completer only if it hasn't been completed already.
-      if (_loadAdCompleter?.isCompleted == false) {
-        _loadAdCompleter!.complete();
+    // Determine if the primary ad platform is AdMob.
+    final isAdMob = widget.adConfig.primaryAdPlatform == AdPlatformType.admob;
+
+    if (!isAdMob) {
+      // For non-AdMob platforms (e.g., Local, Demo), try to get from cache.
+      final cachedAd = _adCacheService.getAd(cacheKey);
+      if (cachedAd != null) {
+        _logger.info(
+          'Using cached in-article ad for slot: ${widget.slotConfiguration.slotType.name}',
+        );
+        if (!mounted) return;
+        setState(() {
+          _loadedAd = cachedAd;
+          _isLoading = false;
+        });
+        if (_loadAdCompleter?.isCompleted == false) {
+          _loadAdCompleter!.complete();
+        }
+        return;
       }
-      return;
+    } else {
+      _logger.info(
+        'AdMob is primary ad platform. Bypassing cache for in-article ad '
+        'for slot: ${widget.slotConfiguration.slotType.name}.',
+      );
     }
 
     _logger.info(
@@ -153,7 +182,7 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
     );
     try {
       // Call AdService.getInArticleAd with the full AdConfig.
-      final loadedAd = await _adService.getInArticleAd(
+      loadedAd = await _adService.getInArticleAd(
         adConfig: widget.adConfig,
         adThemeStyle: widget.adThemeStyle,
       );
@@ -162,7 +191,15 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
         _logger.info(
           'New in-article ad loaded for slot: ${widget.slotConfiguration.slotType.name}',
         );
-        _adCacheService.setAd(cacheKey, loadedAd);
+        // Only cache non-AdMob ads. AdMob ads are not cached to prevent reuse issues.
+        if (!isAdMob) {
+          _adCacheService.setAd(cacheKey, loadedAd);
+        } else {
+          _logger.info(
+            'AdMob in-article ad not cached to prevent reuse issues.',
+          );
+        }
+
         if (!mounted) return;
         setState(() {
           _loadedAd = loadedAd;

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart';
+import 'package:logging/logging.dart';
 
 /// {@template app_status_service}
 /// A service dedicated to monitoring the application's lifecycle and
@@ -32,7 +33,8 @@ class AppStatusService with WidgetsBindingObserver {
     required AppEnvironment environment,
   }) : _context = context,
        _checkInterval = checkInterval,
-       _environment = environment {
+       _environment = environment,
+       _logger = Logger('AppStatusService') {
     // Immediately register this service as a lifecycle observer.
     WidgetsBinding.instance.addObserver(this);
     // Start the periodic checks.
@@ -48,6 +50,9 @@ class AppStatusService with WidgetsBindingObserver {
   /// The current application environment.
   final AppEnvironment _environment;
 
+  /// The logger instance for this service.
+  final Logger _logger;
+
   /// The timer responsible for periodic checks.
   Timer? _timer;
 
@@ -62,10 +67,10 @@ class AppStatusService with WidgetsBindingObserver {
     _timer = Timer.periodic(_checkInterval, (_) {
       // In demo mode, periodic checks are not needed as there's no backend.
       if (_environment == AppEnvironment.demo) {
-        print('[AppStatusService] Demo mode: Skipping periodic check.');
+        _logger.info('[AppStatusService] Demo mode: Skipping periodic check.');
         return;
       }
-      print(
+      _logger.info(
         '[AppStatusService] Periodic check triggered. Requesting AppConfig fetch.',
       );
       // Add the event to the AppBloc to fetch the latest config.
@@ -84,13 +89,13 @@ class AppStatusService with WidgetsBindingObserver {
     // useful on web, where switching browser tabs would otherwise trigger
     // a reload, which is unnecessary and can be distracting for demos.
     if (_environment == AppEnvironment.demo) {
-      print('[AppStatusService] Demo mode: Skipping app lifecycle check.');
+      _logger.info('[AppStatusService] Demo mode: Skipping app lifecycle check.');
       return;
     }
 
     // We are only interested in the 'resumed' state.
     if (state == AppLifecycleState.resumed) {
-      print('[AppStatusService] App resumed. Requesting AppConfig fetch.');
+      _logger.info('[AppStatusService] App resumed. Requesting AppConfig fetch.');
       // When the app comes to the foreground, immediately trigger a check.
       // This is crucial for catching maintenance mode that was enabled
       // while the app was in the background.
@@ -106,7 +111,7 @@ class AppStatusService with WidgetsBindingObserver {
   /// the main app widget is disposed) to prevent memory leaks from the
   /// timer and the observer registration.
   void dispose() {
-    print('[AppStatusService] Disposing service.');
+    _logger.info('[AppStatusService] Disposing service.');
     // Stop the periodic timer.
     _timer?.cancel();
     // Remove this object from the list of lifecycle observers.

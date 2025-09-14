@@ -90,9 +90,7 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
       _adCacheService.removeAndDisposeAd(oldCacheKey);
 
       if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
-        _loadAdCompleter?.completeError(
-          StateError('Ad loading cancelled: Widget updated with new config.'),
-        );
+        _loadAdCompleter!.complete(); // Complete normally to prevent crashes
       }
       _loadAdCompleter = null;
 
@@ -112,9 +110,7 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
     _adCacheService.removeAndDisposeAd(cacheKey);
 
     if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
-      _loadAdCompleter?.completeError(
-        StateError('Ad loading cancelled: Widget disposed.'),
-      );
+      _loadAdCompleter!.complete(); // Complete normally to prevent crashes
     }
     _loadAdCompleter = null;
     super.dispose();
@@ -185,11 +181,10 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
           _hasError = true;
           _isLoading = false;
         });
-        // Complete the completer with an error only if it hasn't been completed already.
+        // Complete the completer normally, indicating that loading finished
+        // but no ad was available. This prevents crashes.
         if (_loadAdCompleter?.isCompleted == false) {
-          _loadAdCompleter?.completeError(
-            StateError('Failed to load in-article ad: No ad returned.'),
-          );
+          _loadAdCompleter!.complete();
         }
       }
     } catch (e, s) {
@@ -203,9 +198,10 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
         _hasError = true;
         _isLoading = false;
       });
-      // Complete the completer with an error only if it hasn't been completed already.
+      // Complete the completer normally, indicating that loading finished
+      // but an error occurred. This prevents crashes.
       if (_loadAdCompleter?.isCompleted == false) {
-        _loadAdCompleter?.completeError(e);
+        _loadAdCompleter!.complete();
       }
     }
   }

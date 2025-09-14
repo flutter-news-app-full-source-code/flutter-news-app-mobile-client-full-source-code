@@ -188,7 +188,7 @@ class _AppView extends StatefulWidget {
 
 class _AppViewState extends State<_AppView> {
   late final GoRouter _router;
-  late final ValueNotifier<AppStatus> _statusNotifier;
+  late final ValueNotifier<AppLifeCycleStatus> _statusNotifier;
   AppStatusService? _appStatusService;
 
   @override
@@ -196,7 +196,7 @@ class _AppViewState extends State<_AppView> {
     super.initState();
     final appBloc = context.read<AppBloc>();
     // Initialize the notifier with the BLoC's current state
-    _statusNotifier = ValueNotifier<AppStatus>(appBloc.state.status);
+    _statusNotifier = ValueNotifier<AppLifeCycleStatus>(appBloc.state.status);
 
     // Instantiate and initialize the AppStatusService.
     // This service will automatically trigger checks when the app is resumed
@@ -259,7 +259,7 @@ class _AppViewState extends State<_AppView> {
           // By returning a dedicated widget here, we ensure these pages are
           // full-screen and exist outside the main app's navigation shell.
 
-          if (state.status == AppStatus.underMaintenance) {
+          if (state.status == AppLifeCycleStatus.underMaintenance) {
             // The app is in maintenance mode. Show the MaintenancePage.
             //
             // WHY A SEPARATE MATERIALAPP?
@@ -299,7 +299,7 @@ class _AppViewState extends State<_AppView> {
             );
           }
 
-          if (state.status == AppStatus.updateRequired) {
+          if (state.status == AppLifeCycleStatus.updateRequired) {
             // A mandatory update is required. Show the UpdateRequiredPage.
             return MaterialApp(
               debugShowCheckedModeBanner: false,
@@ -326,8 +326,8 @@ class _AppViewState extends State<_AppView> {
             );
           }
 
-          if (state.status == AppStatus.configFetching ||
-              state.status == AppStatus.configFetchFailed) {
+          if (state.status == AppLifeCycleStatus.configFetching ||
+              state.status == AppLifeCycleStatus.configFetchFailed) {
             // The app is in the process of fetching its initial remote
             // configuration or has failed to do so. The StatusPage handles
             // both the loading indicator and the retry mechanism.

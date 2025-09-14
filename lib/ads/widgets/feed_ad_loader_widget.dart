@@ -62,8 +62,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
   bool _hasError = false;
   final Logger _logger = Logger('FeedAdLoaderWidget');
   late final InlineAdCacheService _adCacheService;
-  late final AdService
-  _adService; // AdService will be accessed via _adCacheService
+  late final AdService _adService;
 
   /// Completer to manage the lifecycle of the ad loading future.
   /// This helps in cancelling pending operations if the widget is disposed
@@ -106,11 +105,13 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
       // Immediately set the widget to a loading state to prevent UI flicker.
       // This ensures a smooth transition from the old ad (or no ad) to the
       // loading indicator for the new ad.
-      setState(() {
-        _loadedAd = null;
-        _isLoading = true;
-        _hasError = false;
-      });
+      if (mounted) {
+        setState(() {
+          _loadedAd = null;
+          _isLoading = true;
+          _hasError = false;
+        });
+      }
       _loadAd();
     }
   }
@@ -136,15 +137,24 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
   /// If found, it uses the cached ad. Otherwise, it requests a new inline ad
   /// from the [AdService] using `getFeedAd` and stores it in the cache
   /// upon success.
+  ///
+  /// It also includes defensive checks (`mounted`) to prevent `setState` calls
+  /// on disposed widgets and ensures the `_loadAdCompleter` is always completed
+  /// to prevent `StateError`s.
   Future<void> _loadAd() async {
     // Initialize a new completer for this loading operation.
     _loadAdCompleter = Completer<void>();
 
-    // Ensure the widget is still mounted before calling setState.
+    // Ensure the widget is still mounted before proceeding.
     // This prevents the "setState() called after dispose()" error
     // if the widget is removed from the tree while the async operation
     // is still in progress.
-    if (!mounted) return;
+    if (!mounted) {
+      if (_loadAdCompleter?.isCompleted == false) {
+        _loadAdCompleter!.complete();
+      }
+      return;
+    }
 
     // Attempt to retrieve the ad from the cache first.
     final cachedAd = _adCacheService.getAd(widget.adPlaceholder.id);
@@ -154,11 +164,12 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
         'Using cached ad for feed placeholder ID: ${widget.adPlaceholder.id}',
       );
       // Ensure the widget is still mounted before calling setState.
-      if (!mounted) return;
-      setState(() {
-        _loadedAd = cachedAd;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _loadedAd = cachedAd;
+          _isLoading = false;
+        });
+      }
       // Complete the completer only if it hasn't been completed already.
       if (_loadAdCompleter?.isCompleted == false) {
         _loadAdCompleter!.complete();
@@ -178,11 +189,12 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
           'Ad placeholder ID ${widget.adPlaceholder.id} has no adIdentifier. '
           'Cannot load ad.',
         );
-        if (!mounted) return;
-        setState(() {
-          _hasError = true;
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _hasError = true;
+            _isLoading = false;
+          });
+        }
         // Complete the completer normally, indicating that loading finished
         // but no ad was available. This prevents crashes.
         if (_loadAdCompleter?.isCompleted == false) {
@@ -214,11 +226,12 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
         // Store the newly loaded ad in the cache.
         _adCacheService.setAd(widget.adPlaceholder.id, loadedAd);
         // Ensure the widget is still mounted before calling setState.
-        if (!mounted) return;
-        setState(() {
-          _loadedAd = loadedAd;
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _loadedAd = loadedAd;
+            _isLoading = false;
+          });
+        }
         // Complete the completer only if it hasn't been completed already.
         if (_loadAdCompleter?.isCompleted == false) {
           _loadAdCompleter!.complete();
@@ -229,11 +242,12 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
           'No ad returned.',
         );
         // Ensure the widget is still mounted before calling setState.
-        if (!mounted) return;
-        setState(() {
-          _hasError = true;
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _hasError = true;
+            _isLoading = false;
+          });
+        }
         // Complete the completer normally, indicating that loading finished
         // but no ad was available. This prevents crashes.
         if (_loadAdCompleter?.isCompleted == false) {
@@ -247,11 +261,12 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
         s,
       );
       // Ensure the widget is still mounted before calling setState.
-      if (!mounted) return;
-      setState(() {
-        _hasError = true;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _hasError = true;
+          _isLoading = false;
+        });
+      }
       // Complete the completer normally, indicating that loading finished
       // but an error occurred. This prevents crashes.
       if (_loadAdCompleter?.isCompleted == false) {

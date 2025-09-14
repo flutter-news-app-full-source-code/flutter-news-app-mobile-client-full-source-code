@@ -55,9 +55,10 @@ class _AdmobInlineAdWidgetState extends State<AdmobInlineAdWidget> {
   @override
   void didUpdateWidget(covariant AdmobInlineAdWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // If the inlineAd object itself has changed (e.g., a new ad was loaded
-    // for the same placeholder ID), dispose the old ad and set the new one.
-    if (widget.inlineAd.id != oldWidget.inlineAd.id) {
+    // If the inlineAd object reference itself has changed, dispose the old ad
+    // and set the new one. This is a more robust check than just comparing IDs,
+    // as a new InlineAd instance might be created for the same logical ad slot.
+    if (widget.inlineAd != oldWidget.inlineAd) {
       _disposeCurrentAd(); // Dispose the old ad object
       _setAd();
     }
@@ -146,7 +147,13 @@ class _AdmobInlineAdWidgetState extends State<AdmobInlineAdWidget> {
     // lists to prevent "unbounded height" errors.
     return SizedBox(
       height: adHeight,
-      child: admob.AdWidget(ad: _ad! as admob.AdWithView), // Cast to AdWithView
+      // Use a ValueKey derived from the adObject's hashCode to force Flutter
+      // to create a new AdWidget instance if the underlying ad object changes.
+      // This prevents the "AdWidget is already in the Widget tree" error.
+      child: admob.AdWidget(
+        key: ValueKey(_ad!.hashCode),
+        ad: _ad! as admob.AdWithView,
+      ),
     );
   }
 }

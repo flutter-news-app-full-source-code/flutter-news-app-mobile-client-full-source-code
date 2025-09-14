@@ -392,8 +392,8 @@ class FeedDecoratorService {
   /// This method ensures that ad placeholders for *inline* ads (native and banner)
   /// are placed according to the `adPlacementInterval` (initial buffer before
   /// the first ad) and `adFrequency` (subsequent ad spacing). It correctly
-  /// accounts for content items only, ignoring previously injected decorators
-  /// when calculating placement. Interstitial ads are not handled here.
+  /// accounts for content items and decorators, ignoring previously injected
+  /// ad placeholders when calculating placement.
   ///
   /// [feedItems]: The list of feed items (headlines, other decorators)
   ///   to inject ad placeholders into.
@@ -452,8 +452,8 @@ class FeedDecoratorService {
 
     final result = <FeedItem>[];
     // This counter tracks the absolute number of *content items* (headlines,
-    // topics, sources, countries) processed so far, including those from
-    // previous pages. This is key for accurate ad placement.
+    // topics, sources, countries, and decorators) processed so far, including
+    // those from previous pages. This is key for accurate ad placement.
     var currentContentItemCount = processedContentItemCount;
 
     // Get the primary ad platform and its identifiers
@@ -475,12 +475,9 @@ class FeedDecoratorService {
       result.add(item);
 
       // Only increment the content item counter if the current item is
-      // a primary content type (not an ad or a decorator).
-      // This ensures ad placement is based purely on content density.
-      if (item is Headline ||
-          item is Topic ||
-          item is Source ||
-          item is Country) {
+      // a primary content type or a decorator (not an ad placeholder).
+      // This ensures ad placement is based purely on content/decorator density.
+      if (item is! AdPlaceholder) {
         currentContentItemCount++;
       }
 

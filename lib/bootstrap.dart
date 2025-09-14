@@ -135,7 +135,11 @@ Future<Widget> bootstrap(
     };
   }
 
-  final adService = AdService(adProviders: adProviders, logger: logger);
+  final adService = AdService(
+    adProviders: adProviders,
+    environment: appConfig.environment,
+    logger: logger,
+  );
   await adService.initialize();
 
   // Initialize InlineAdCacheService with the created AdService.

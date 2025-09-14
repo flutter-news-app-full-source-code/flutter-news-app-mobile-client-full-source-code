@@ -22,12 +22,14 @@ class HeadlinesSearchBloc
     required DataRepository<Country> countryRepository,
     required AppBloc appBloc,
     required FeedDecoratorService feedDecoratorService,
+    required InlineAdCacheService inlineAdCacheService,
   }) : _headlinesRepository = headlinesRepository,
        _topicRepository = topicRepository,
        _sourceRepository = sourceRepository,
        _countryRepository = countryRepository,
        _appBloc = appBloc,
        _feedDecoratorService = feedDecoratorService,
+       _inlineAdCacheService = inlineAdCacheService,
        super(const HeadlinesSearchInitial()) {
     on<HeadlinesSearchModelTypeChanged>(_onHeadlinesSearchModelTypeChanged);
     on<HeadlinesSearchFetchRequested>(
@@ -42,6 +44,7 @@ class HeadlinesSearchBloc
   final DataRepository<Country> _countryRepository;
   final AppBloc _appBloc;
   final FeedDecoratorService _feedDecoratorService;
+  final InlineAdCacheService _inlineAdCacheService;
   static const _limit = 10;
 
   Future<void> _onHeadlinesSearchModelTypeChanged(
@@ -201,7 +204,7 @@ class HeadlinesSearchBloc
     }
 
     // New search, clear previous ad cache.
-    InlineAdCacheService().clearAllAds();
+    _inlineAdCacheService.clearAllAds();
     emit(
       HeadlinesSearchLoading(
         lastSearchTerm: searchTerm,

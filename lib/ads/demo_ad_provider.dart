@@ -85,4 +85,14 @@ class DemoAdProvider implements AdProvider {
       adObject: Object(), // Placeholder object
     );
   }
+
+  @override
+  Future<void> disposeAd(Object adObject) async {
+    _logger.info(
+      'DemoAdProvider: No explicit disposal needed for demo ad object: '
+      '${adObject.runtimeType}',
+    );
+    // Demo ad objects are simple Dart objects and do not hold native resources
+    // that require explicit disposal.
+  }
 }

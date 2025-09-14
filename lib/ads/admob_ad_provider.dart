@@ -88,6 +88,7 @@ class AdMobAdProvider implements AdProvider {
         },
         onAdFailedToLoad: (ad, error) {
           _logger.severe('AdMobAdProvider: Native Ad failed to load: $error');
+          // Ad disposal is now handled by InlineAdCacheService
           completer.complete(null);
         },
         onAdClicked: (ad) {
@@ -119,7 +120,8 @@ class AdMobAdProvider implements AdProvider {
       const Duration(seconds: _adLoadTimeout),
       onTimeout: () {
         _logger.warning('AdMobAdProvider: Native ad loading timed out.');
-        ad.dispose();
+        // Ad disposal is now handled by InlineAdCacheService
+        completer.complete(null);
         return null;
       },
     );
@@ -177,7 +179,7 @@ class AdMobAdProvider implements AdProvider {
         },
         onAdFailedToLoad: (ad, error) {
           _logger.severe('AdMobAdProvider: Banner Ad failed to load: $error');
-          ad.dispose();
+          // Ad disposal is now handled by InlineAdCacheService
           completer.complete(null);
         },
         onAdOpened: (ad) {
@@ -203,7 +205,8 @@ class AdMobAdProvider implements AdProvider {
       const Duration(seconds: _adLoadTimeout),
       onTimeout: () {
         _logger.warning('AdMobAdProvider: Banner ad loading timed out.');
-        ad.dispose();
+        // Ad disposal is now handled by InlineAdCacheService
+        completer.complete(null);
         return null;
       },
     );
@@ -326,5 +329,21 @@ class AdMobAdProvider implements AdProvider {
         size: adThemeStyle.tertiaryTextSize,
       ),
     );
+  }
+
+  @override
+  Future<void> disposeAd(Object adObject) async {
+    _logger.info('AdMobAdProvider: Attempting to dispose ad object: $adObject');
+    if (adObject is admob.Ad) {
+      await adObject.dispose();
+      _logger.info(
+        'AdMobAdProvider: Disposed AdMob ad object (NativeAd, BannerAd, or InterstitialAd).',
+      );
+    } else {
+      _logger.warning(
+        'AdMobAdProvider: Attempted to dispose a non-AdMob ad object. '
+        'Type: ${adObject.runtimeType}',
+      );
+    }
   }
 }

@@ -1,9 +1,6 @@
-import 'package:core/core.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
 import 'package:logging/logging.dart';
 
 /// {@template inline_ad_cache_service}
@@ -34,7 +31,10 @@ import 'package:logging/logging.dart';
 /// {@endtemplate}
 class InlineAdCacheService {
   /// Factory constructor to provide the singleton instance.
-  factory InlineAdCacheService() => _instance;
+  factory InlineAdCacheService({required AdService adService}) {
+    _instance._adService = adService;
+    return _instance;
+  }
 
   /// Private constructor for the singleton pattern.
   InlineAdCacheService._internal() : _logger = Logger('InlineAdCacheService');
@@ -44,6 +44,10 @@ class InlineAdCacheService {
       InlineAdCacheService._internal();
 
   final Logger _logger;
+
+  /// The [AdService] instance used for disposing inline ad objects.
+  /// This is set via the factory constructor.
+  late AdService _adService;
 
   /// A map to store loaded inline ad objects, keyed by their unique ID.
   ///
@@ -67,6 +71,14 @@ class InlineAdCacheService {
   ///
   /// If [ad] is `null`, it effectively removes the entry for [id].
   void setAd(String id, InlineAd? ad) {
+    if (_cache.containsKey(id) && _cache[id] != null) {
+      // If an old ad exists for this ID, dispose of its resources via AdService.
+      _logger.info(
+        'Disposing old inline ad for ID "$id" before caching new one.',
+      );
+      _adService.disposeAd(_cache[id]);
+    }
+
     if (ad != null) {
       _cache[id] = ad;
       _logger.info('Cached inline ad with ID "$id".');
@@ -76,27 +88,47 @@ class InlineAdCacheService {
     }
   }
 
-  /// Clears all cached inline ad objects and disposes their native resources.
+  /// Removes an [InlineAd] from the cache without disposing its resources.
+  ///
+  /// This method should be used when an ad is temporarily removed from the UI
+  /// (e.g., scrolled off-screen) but its resources might still be needed later.
+  void removeAd(String id) {
+    if (_cache.containsKey(id)) {
+      _cache.remove(id);
+      _logger.info('Removed inline ad with ID "$id" from cache (no disposal).');
+    } else {
+      _logger.info('Inline ad with ID "$id" not found in cache for removal.');
+    }
+  }
+
+  /// Removes an [InlineAd] from the cache and disposes its resources.
+  ///
+  /// This method should be used when an ad is permanently removed from the UI
+  /// and its resources need to be released.
+  void removeAndDisposeAd(String id) {
+    final ad = _cache[id];
+    if (ad != null) {
+      _logger.info('Removing and disposing inline ad with ID "$id".');
+      _adService.disposeAd(ad); // Delegate disposal to AdService
+      _cache.remove(id);
+    } else {
+      _logger.info('Inline ad with ID "$id" not found in cache for disposal.');
+    }
+  }
+
+  /// Clears all cached inline ad objects and disposes their resources.
   ///
   /// This method should be called when the feed is fully refreshed or
-  /// when the application is closing to ensure all native ad resources
+  /// when the application is closing to ensure all ad resources
   /// are released.
   void clearAllAds() {
     _logger.info(
-      'Clearing all cached inline ads and disposing native resources.',
+      'Clearing all cached inline ads and disposing their resources.',
     );
-    for (final ad in _cache.values) {
-      if (ad?.provider == AdPlatformType.admob) {
-        // Dispose AdMob native and banner ad objects.
-        // This is safe because we check the provider type.
-        if (ad is NativeAd && ad.adObject is admob.NativeAd) {
-          (ad.adObject as admob.NativeAd).dispose();
-        } else if (ad is BannerAd && ad.adObject is admob.BannerAd) {
-          (ad.adObject as admob.BannerAd).dispose();
-        }
-      }
+    for (final ad in _cache.values.whereType<InlineAd>()) {
+      _adService.disposeAd(ad); // Delegate disposal to AdService
     }
-    _cache.clear();
+    _cache.clear(); // Ensure cache is empty after disposal attempts.
     _logger.info('All cached inline ads cleared.');
   }
 

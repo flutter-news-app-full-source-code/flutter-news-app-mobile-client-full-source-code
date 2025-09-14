@@ -16,6 +16,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/demo
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/local_banner_ad_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/local_native_ad_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -37,7 +38,6 @@ class FeedAdLoaderWidget extends StatefulWidget {
   /// {@macro feed_ad_loader_widget}
   const FeedAdLoaderWidget({
     required this.adPlaceholder,
-    required this.adService,
     required this.adThemeStyle,
     required this.adConfig,
     super.key,
@@ -45,9 +45,6 @@ class FeedAdLoaderWidget extends StatefulWidget {
 
   /// The stateless placeholder representing this ad slot.
   final AdPlaceholder adPlaceholder;
-
-  /// The service responsible for loading ads from ad networks.
-  final AdService adService;
 
   /// The current theme style for ads, used during ad loading.
   final AdThemeStyle adThemeStyle;
@@ -64,7 +61,9 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
   bool _isLoading = true;
   bool _hasError = false;
   final Logger _logger = Logger('FeedAdLoaderWidget');
-  final InlineAdCacheService _adCacheService = InlineAdCacheService();
+  late final InlineAdCacheService _adCacheService;
+  late final AdService
+  _adService; // AdService will be accessed via _adCacheService
 
   /// Completer to manage the lifecycle of the ad loading future.
   /// This helps in cancelling pending operations if the widget is disposed
@@ -75,6 +74,8 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
   @override
   void initState() {
     super.initState();
+    _adCacheService = context.read<InlineAdCacheService>();
+    _adService = context.read<AdService>();
     _loadAd();
   }
 
@@ -88,18 +89,17 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
     if (widget.adPlaceholder.id != oldWidget.adPlaceholder.id ||
         widget.adConfig != oldWidget.adConfig) {
       _logger.info(
-        'FeedAdLoaderWidget updated for new placeholder ID: ' // Renamed log
+        'FeedAdLoaderWidget updated for new placeholder ID: '
         '${widget.adPlaceholder.id} or AdConfig changed. Re-loading ad.',
       );
+      // Dispose of the old ad's resources before loading a new one.
+      _adCacheService.removeAndDisposeAd(oldWidget.adPlaceholder.id);
+
       // Cancel the previous loading operation if it's still active and not yet
       // completed. This prevents a race condition if a new load is triggered
       // while an old one is still in progress.
       if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
-        _loadAdCompleter?.completeError(
-          StateError(
-            'Ad loading cancelled: Widget updated with new ID or config.',
-          ),
-        );
+        _loadAdCompleter!.complete(); // Complete normally to prevent crashes
       }
       _loadAdCompleter = null;
 
@@ -117,13 +117,14 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
 
   @override
   void dispose() {
+    // Dispose of the ad's resources when the widget is permanently removed.
+    _adCacheService.removeAndDisposeAd(widget.adPlaceholder.id);
+
     // Cancel any pending ad loading operation when the widget is disposed.
     // This prevents `setState()` calls on a disposed widget.
     // Ensure the completer is not already completed before attempting to complete it.
     if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
-      _loadAdCompleter?.completeError(
-        StateError('Ad loading cancelled: Widget disposed.'),
-      );
+      _loadAdCompleter!.complete(); // Complete normally to prevent crashes
     }
     _loadAdCompleter = null;
     super.dispose();
@@ -150,7 +151,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
 
     if (cachedAd != null) {
       _logger.info(
-        'Using cached ad for feed placeholder ID: ${widget.adPlaceholder.id}', // Renamed log
+        'Using cached ad for feed placeholder ID: ${widget.adPlaceholder.id}',
       );
       // Ensure the widget is still mounted before calling setState.
       if (!mounted) return;
@@ -158,8 +159,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
         _loadedAd = cachedAd;
         _isLoading = false;
       });
-      // Complete the completer only if it hasn't been completed already
-      // (e.g., by dispose() or didUpdateWidget() cancelling an old load).
+      // Complete the completer only if it hasn't been completed already.
       if (_loadAdCompleter?.isCompleted == false) {
         _loadAdCompleter!.complete();
       }
@@ -167,7 +167,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
     }
 
     _logger.info(
-      'Loading new ad for feed placeholder ID: ${widget.adPlaceholder.id}', // Renamed log
+      'Loading new ad for feed placeholder ID: ${widget.adPlaceholder.id}',
     );
     try {
       // The adId is now directly available from the placeholder.
@@ -183,10 +183,10 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
           _hasError = true;
           _isLoading = false;
         });
+        // Complete the completer normally, indicating that loading finished
+        // but no ad was available. This prevents crashes.
         if (_loadAdCompleter?.isCompleted == false) {
-          _loadAdCompleter?.completeError(
-            StateError('Failed to load ad: No ad identifier.'),
-          );
+          _loadAdCompleter!.complete();
         }
         return;
       }
@@ -200,7 +200,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
           .headlineImageStyle;
 
       // Call AdService.getFeedAd with the full AdConfig and adType from the placeholder.
-      final loadedAd = await widget.adService.getFeedAd(
+      final loadedAd = await _adService.getFeedAd(
         adConfig: widget.adConfig, // Pass the full AdConfig
         adType: widget.adPlaceholder.adType,
         adThemeStyle: widget.adThemeStyle,
@@ -209,7 +209,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
 
       if (loadedAd != null) {
         _logger.info(
-          'New ad loaded for feed placeholder ID: ${widget.adPlaceholder.id}', // Renamed log
+          'New ad loaded for feed placeholder ID: ${widget.adPlaceholder.id}',
         );
         // Store the newly loaded ad in the cache.
         _adCacheService.setAd(widget.adPlaceholder.id, loadedAd);
@@ -225,7 +225,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
         }
       } else {
         _logger.warning(
-          'Failed to load ad for feed placeholder ID: ${widget.adPlaceholder.id}. ' // Renamed log
+          'Failed to load ad for feed placeholder ID: ${widget.adPlaceholder.id}. '
           'No ad returned.',
         );
         // Ensure the widget is still mounted before calling setState.
@@ -234,16 +234,15 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
           _hasError = true;
           _isLoading = false;
         });
-        // Complete the completer with an error only if it hasn't been completed already.
+        // Complete the completer normally, indicating that loading finished
+        // but no ad was available. This prevents crashes.
         if (_loadAdCompleter?.isCompleted == false) {
-          _loadAdCompleter?.completeError(
-            StateError('Failed to load ad: No ad returned.'),
-          );
+          _loadAdCompleter!.complete();
         }
       }
     } catch (e, s) {
       _logger.severe(
-        'Error loading ad for feed placeholder ID: ${widget.adPlaceholder.id}: $e', // Renamed log
+        'Error loading ad for feed placeholder ID: ${widget.adPlaceholder.id}: $e',
         e,
         s,
       );
@@ -253,15 +252,18 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
         _hasError = true;
         _isLoading = false;
       });
-      // Complete the completer with an error only if it hasn't been completed already.
+      // Complete the completer normally, indicating that loading finished
+      // but an error occurred. This prevents crashes.
       if (_loadAdCompleter?.isCompleted == false) {
-        _loadAdCompleter?.completeError(e);
+        _loadAdCompleter!.complete();
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizationsX(context).l10n;
+    final theme = Theme.of(context);
     final headlineImageStyle = context
         .read<AppBloc>()
         .state
@@ -269,23 +271,31 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
         .feedPreferences
         .headlineImageStyle;
 
-    if (_isLoading) {
-      // Show a shimmer or loading indicator while the ad is being loaded.
-      return const Padding(
-        padding: EdgeInsets.symmetric(
+    if (_isLoading || _hasError || _loadedAd == null) {
+      // Show a user-friendly message when loading, on error, or if no ad is loaded.
+      return Card(
+        margin: const EdgeInsets.symmetric(
           horizontal: AppSpacing.paddingMedium,
           vertical: AppSpacing.xs,
         ),
         child: AspectRatio(
-          aspectRatio: 16 / 9, // Common aspect ratio for ads
-          child: Card(
-            child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          aspectRatio: 16 / 9,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.paddingMedium,
+              ),
+              child: Text(
+                l10n.adInfoPlaceholderText,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
           ),
         ),
       );
-    } else if (_hasError || _loadedAd == null) {
-      // Fallback for unsupported ad types or errors
-      return const SizedBox.shrink();
     } else {
       // If an ad is successfully loaded, dispatch to the appropriate
       // provider-specific widget for rendering.

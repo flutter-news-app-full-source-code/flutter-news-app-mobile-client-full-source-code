@@ -24,6 +24,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     required AccountBloc accountBloc,
     required AppBloc appBloc,
     required FeedDecoratorService feedDecoratorService,
+    required InlineAdCacheService inlineAdCacheService,
   }) : _headlinesRepository = headlinesRepository,
        _topicRepository = topicRepository,
        _sourceRepository = sourceRepository,
@@ -31,6 +32,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
        _accountBloc = accountBloc,
        _appBloc = appBloc,
        _feedDecoratorService = feedDecoratorService,
+       _inlineAdCacheService = inlineAdCacheService,
        super(const EntityDetailsState()) {
     on<EntityDetailsLoadRequested>(_onEntityDetailsLoadRequested);
     on<EntityDetailsToggleFollowRequested>(
@@ -58,6 +60,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
   final AccountBloc _accountBloc;
   final AppBloc _appBloc;
   final FeedDecoratorService _feedDecoratorService;
+  final InlineAdCacheService _inlineAdCacheService;
   late final StreamSubscription<AccountState> _accountBlocSubscription;
 
   static const _headlinesLimit = 10;
@@ -68,7 +71,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
   ) async {
     // When loading a new entity's details, clear any previously cached ads
     // to ensure a fresh set of ads is displayed for the new content.
-    InlineAdCacheService().clearAllAds();
+    _inlineAdCacheService.clearAllAds();
     emit(
       state.copyWith(status: EntityDetailsStatus.loading, clearEntity: true),
     );

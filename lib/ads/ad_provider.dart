@@ -71,4 +71,9 @@ abstract class AdProvider {
     required String? adId,
     required AdThemeStyle adThemeStyle,
   });
+
+  /// This method is responsible for releasing the resources held by the
+  /// platform-specific ad object (e.g., `google_mobile_ads.Ad`).
+  /// It should be called when an ad is no longer needed to prevent memory leaks.
+  Future<void> disposeAd(Object adObject);
 }

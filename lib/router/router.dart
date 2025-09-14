@@ -14,10 +14,9 @@ import 'package:flutter_news_app_mobile_client_full_source_code/account/view/man
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/topics/followed_topics_list_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/saved_headlines_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart'; // Import InlineAdCacheService
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
-    as local_config;
 import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_shell.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/authentication_page.dart';
@@ -61,22 +60,21 @@ GoRouter createRouter({
   required AuthRepository authenticationRepository,
   required DataRepository<Headline> headlinesRepository,
   required DataRepository<Topic> topicsRepository,
-  required DataRepository<Country> countriesRepository,
   required DataRepository<Source> sourcesRepository,
+  required DataRepository<Country> countriesRepository,
   required DataRepository<UserAppSettings> userAppSettingsRepository,
   required DataRepository<UserContentPreferences>
   userContentPreferencesRepository,
   required DataRepository<RemoteConfig> remoteConfigRepository,
   required DataRepository<User> userRepository,
-  required local_config.AppEnvironment environment,
   required AdService adService,
   required GlobalKey<NavigatorState> navigatorKey,
+  required InlineAdCacheService inlineAdCacheService,
 }) {
   // Instantiate AccountBloc once to be shared
   final accountBloc = AccountBloc(
     authenticationRepository: authenticationRepository,
     userContentPreferencesRepository: userContentPreferencesRepository,
-    environment: environment,
   );
 
   // Instantiate FeedDecoratorService once to be shared
@@ -298,6 +296,7 @@ GoRouter createRouter({
                       accountBloc: accountBloc,
                       appBloc: context.read<AppBloc>(),
                       feedDecoratorService: feedDecoratorService,
+                      inlineAdCacheService: inlineAdCacheService,
                     )..add(
                       EntityDetailsLoadRequested(
                         entityId: args.entityId,
@@ -385,6 +384,7 @@ GoRouter createRouter({
                         .read<DataRepository<UserContentPreferences>>(),
                     feedDecoratorService: feedDecoratorService,
                     appBloc: context.read<AppBloc>(),
+                    inlineAdCacheService: inlineAdCacheService,
                   );
                 },
               ),
@@ -398,6 +398,7 @@ GoRouter createRouter({
                     countryRepository: context.read<DataRepository<Country>>(),
                     appBloc: context.read<AppBloc>(),
                     feedDecoratorService: feedDecoratorService,
+                    inlineAdCacheService: inlineAdCacheService,
                   );
                 },
               ),
@@ -615,6 +616,7 @@ GoRouter createRouter({
                           final settingsBloc = SettingsBloc(
                             userAppSettingsRepository: context
                                 .read<DataRepository<UserAppSettings>>(),
+                            inlineAdCacheService: inlineAdCacheService,
                           );
                           // Only load settings if a userId is available
                           if (userId != null) {

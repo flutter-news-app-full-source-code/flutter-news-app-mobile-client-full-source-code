@@ -1140,5 +1140,9 @@
     "demoInterstitialAdDescription": "هذا عنصر نائب لإعلان بملء الشاشة.",
     "@demoInterstitialAdDescription": {
         "description": "نص الوصف للعنصر النائب للإعلان البيني في الوضع التجريبي."
+    },
+    "adInfoPlaceholderText": "الإعلانات تساعد في إبقاء هذا التطبيق مجانيًا.",
+    "@adInfoPlaceholderText": {
+        "description": "رسالة معروضة في خانات الإعلانات عند تحميل الإعلانات أو فشلها، تشرح الغرض منها."
     }
 }

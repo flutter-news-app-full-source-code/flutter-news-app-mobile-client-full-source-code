@@ -20,7 +20,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   /// {@macro settings_bloc}
   SettingsBloc({
     required DataRepository<UserAppSettings> userAppSettingsRepository,
+    required InlineAdCacheService inlineAdCacheService,
   }) : _userAppSettingsRepository = userAppSettingsRepository,
+       _inlineAdCacheService = inlineAdCacheService,
        super(const SettingsState()) {
     // Register event handlers
     on<SettingsLoadRequested>(_onLoadRequested);
@@ -52,6 +54,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   }
 
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
+  final InlineAdCacheService _inlineAdCacheService;
 
   Future<void> _persistSettings(
     UserAppSettings settingsToSave,
@@ -167,7 +170,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     // When the theme's accent color changes, ads must be reloaded to reflect
     // the new styling. Clearing the cache ensures that any visible or
     // soon-to-be-visible ads are fetched again with the updated theme.
-    InlineAdCacheService().clearAllAds();
+    _inlineAdCacheService.clearAllAds();
     await _persistSettings(updatedSettings, emit);
   }
 
@@ -232,7 +235,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     // (small or medium) is requested. To ensure the correct ad format is
     // displayed, the cache must be cleared, forcing a new ad load with the
     // appropriate template.
-    InlineAdCacheService().clearAllAds();
+    _inlineAdCacheService.clearAllAds();
     await _persistSettings(updatedSettings, emit);
   }
 

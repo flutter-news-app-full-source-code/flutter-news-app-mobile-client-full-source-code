@@ -56,22 +56,22 @@ class _AdmobInlineAdWidgetState extends State<AdmobInlineAdWidget> {
   void didUpdateWidget(covariant AdmobInlineAdWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     // If the inlineAd object itself has changed (e.g., a new ad was loaded
-    // for the same placeholder ID), set the new one.
-    // The disposal of the old ad is now handled by the AdCacheService when
-    // the cache is cleared, preventing premature disposal of cached ads.
+    // for the same placeholder ID), dispose the old ad and set the new one.
     if (widget.inlineAd.id != oldWidget.inlineAd.id) {
+      _disposeCurrentAd(); // Dispose the old ad object
       _setAd();
     }
   }
 
   @override
   void dispose() {
-    // The AdMob ad object is no longer disposed here.
-    // Its lifecycle is managed by the AdCacheService to prevent crashes
-    // when the widget is scrolled out of view and then back in.
-    // The ad will be disposed when AdCacheService.clearAllAds() is called,
-    // typically on a full feed refresh.
-    _logger.info('AdmobInlineAdWidget disposed.');
+    // Dispose the AdMob ad object when the widget is removed from the tree.
+    // This is crucial to prevent "AdWidget is already in the Widget tree" errors
+    // and memory leaks, as each AdWidget instance should manage its own ad object.
+    _disposeCurrentAd();
+    _logger.info(
+      'AdmobInlineAdWidget disposed. Ad object explicitly disposed.',
+    );
     super.dispose();
   }
 
@@ -86,12 +86,20 @@ class _AdmobInlineAdWidgetState extends State<AdmobInlineAdWidget> {
       _ad = widget.inlineAd.adObject as admob.BannerAd;
     } else {
       _ad = null;
-
       _logger.severe(
         'The provided ad object for AdMob inline ad is not of type '
         'admob.NativeAd or admob.BannerAd. Received: '
         '${widget.inlineAd.adObject.runtimeType}. Ad will not be displayed.',
       );
+    }
+  }
+
+  /// Disposes the currently held [_ad] object if it's an [admob.Ad].
+  void _disposeCurrentAd() {
+    if (_ad is admob.Ad) {
+      _logger.info('Disposing AdMob ad object: ${_ad!.adUnitId}');
+      _ad!.dispose();
+      _ad = null;
     }
   }
 

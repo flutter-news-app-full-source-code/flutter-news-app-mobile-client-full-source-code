@@ -873,4 +873,8 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get demoInterstitialAdDescription =>
       'هذا عنصر نائب لإعلان بملء الشاشة.';
+
+  @override
+  String get adInfoPlaceholderText =>
+      'الإعلانات تساعد في إبقاء هذا التطبيق مجانيًا.';
 }

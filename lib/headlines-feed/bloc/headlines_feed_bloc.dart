@@ -31,10 +31,12 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     userContentPreferencesRepository,
     required FeedDecoratorService feedDecoratorService,
     required AppBloc appBloc,
+    required InlineAdCacheService inlineAdCacheService,
   }) : _headlinesRepository = headlinesRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
        _feedDecoratorService = feedDecoratorService,
        _appBloc = appBloc,
+       _inlineAdCacheService = inlineAdCacheService,
        super(const HeadlinesFeedState()) {
     on<HeadlinesFeedFetchRequested>(
       _onHeadlinesFeedFetchRequested,
@@ -65,6 +67,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   _userContentPreferencesRepository;
   final FeedDecoratorService _feedDecoratorService;
   final AppBloc _appBloc;
+  final InlineAdCacheService _inlineAdCacheService;
 
   /// The number of headlines to fetch per page.
   static const _headlinesFetchLimit = 10;
@@ -154,7 +157,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     Emitter<HeadlinesFeedState> emit,
   ) async {
     // On a full refresh, clear the ad cache to ensure fresh ads are loaded.
-    InlineAdCacheService().clearAllAds();
+    _inlineAdCacheService.clearAllAds();
     emit(state.copyWith(status: HeadlinesFeedStatus.loading));
     try {
       final currentUser = _appBloc.state.user;
@@ -236,7 +239,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   ) async {
     // When applying new filters, this is considered a major feed change,
     // so we clear the ad cache to get a fresh set of relevant ads.
-    InlineAdCacheService().clearAllAds();
+    _inlineAdCacheService.clearAllAds();
     emit(
       state.copyWith(
         status: HeadlinesFeedStatus.loading,
@@ -323,7 +326,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     Emitter<HeadlinesFeedState> emit,
   ) async {
     // Clearing filters is a major feed change, so clear the ad cache.
-    InlineAdCacheService().clearAllAds();
+    _inlineAdCacheService.clearAllAds();
     emit(
       state.copyWith(
         status: HeadlinesFeedStatus.loading,

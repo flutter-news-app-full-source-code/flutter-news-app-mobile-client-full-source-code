@@ -14,6 +14,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/demo
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/local_banner_ad_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/local_native_ad_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -28,12 +29,19 @@ import 'package:ui_kit/ui_kit.dart';
 /// This approach decouples ad loading from the BLoC and ensures that native
 /// ad resources are managed efficiently, preventing crashes and improving
 /// scrolling performance in lists.
+///
+/// **AdMob In-Article Ad Handling:**
+/// For AdMob in-article ads, this widget intentionally bypasses the
+/// [InlineAdCacheService]. This is a critical design decision to prevent
+/// the "AdWidget is already in the Widget tree" error that occurs when
+/// navigating between multiple article detail pages. Each AdMob in-article
+/// ad will be loaded as a new instance, ensuring unique `admob.Ad` objects
+/// for each `AdmobInlineAdWidget` in the widget tree.
 /// {@endtemplate}
 class InArticleAdLoaderWidget extends StatefulWidget {
   /// {@macro in_article_ad_loader_widget}
   const InArticleAdLoaderWidget({
     required this.slotConfiguration,
-    required this.adService,
     required this.adThemeStyle,
     required this.adConfig,
     super.key,
@@ -41,9 +49,6 @@ class InArticleAdLoaderWidget extends StatefulWidget {
 
   /// The configuration for this specific in-article ad slot.
   final InArticleAdSlotConfiguration slotConfiguration;
-
-  /// The service responsible for loading ads from ad networks.
-  final AdService adService;
 
   /// The current theme style for ads, used during ad loading.
   final AdThemeStyle adThemeStyle;
@@ -61,13 +66,17 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
   bool _isLoading = true;
   bool _hasError = false;
   final Logger _logger = Logger('InArticleAdLoaderWidget');
-  final InlineAdCacheService _adCacheService = InlineAdCacheService();
+  late final InlineAdCacheService _adCacheService;
+  late final AdService
+  _adService; // AdService will be accessed via _adCacheService
 
   Completer<void>? _loadAdCompleter;
 
   @override
   void initState() {
     super.initState();
+    _adCacheService = context.read<InlineAdCacheService>();
+    _adService = context.read<AdService>();
     _loadAd();
   }
 
@@ -83,10 +92,15 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
       _logger.info(
         'InArticleAdLoaderWidget updated for new slot configuration or AdConfig changed. Re-loading ad.',
       );
+      // Dispose of the old ad's resources before loading a new one.
+      final oldCacheKey =
+          'in_article_ad_${oldWidget.slotConfiguration.slotType.name}';
+      // Only dispose if it was actually cached (i.e., not an AdMob in-article ad).
+      // The removeAndDisposeAd method handles the check internally.
+      _adCacheService.removeAndDisposeAd(oldCacheKey);
+
       if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
-        _loadAdCompleter?.completeError(
-          StateError('Ad loading cancelled: Widget updated with new config.'),
-        );
+        _loadAdCompleter!.complete(); // Complete normally to prevent crashes
       }
       _loadAdCompleter = null;
 
@@ -101,10 +115,14 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
 
   @override
   void dispose() {
+    // Dispose of the ad's resources when the widget is permanently removed.
+    final cacheKey = 'in_article_ad_${widget.slotConfiguration.slotType.name}';
+    // Only dispose if it was actually cached (i.e., not an AdMob in-article ad).
+    // The removeAndDisposeAd method handles the check internally.
+    _adCacheService.removeAndDisposeAd(cacheKey);
+
     if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
-      _loadAdCompleter?.completeError(
-        StateError('Ad loading cancelled: Widget disposed.'),
-      );
+      _loadAdCompleter!.complete(); // Complete normally to prevent crashes
     }
     _loadAdCompleter = null;
     super.dispose();
@@ -116,6 +134,12 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
   /// If found, it uses the cached ad. Otherwise, it requests a new in-article ad
   /// from the [AdService] using `getInArticleAd` and stores it in the cache
   /// upon success.
+  ///
+  /// **AdMob Specific Behavior:**
+  /// For AdMob in-article ads, this method intentionally bypasses the cache.
+  /// This ensures that each `AdmobInlineAdWidget` receives a unique `admob.Ad`
+  /// object, preventing the "AdWidget is already in the Widget tree" error
+  /// when multiple article detail pages are in the navigation stack.
   Future<void> _loadAd() async {
     _loadAdCompleter = Completer<void>();
 
@@ -124,21 +148,33 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
     // In-article ads are typically unique to their slot, so we use the slotType
     // as part of the cache key to differentiate them.
     final cacheKey = 'in_article_ad_${widget.slotConfiguration.slotType.name}';
-    final cachedAd = _adCacheService.getAd(cacheKey);
+    InlineAd? loadedAd;
 
-    if (cachedAd != null) {
-      _logger.info(
-        'Using cached in-article ad for slot: ${widget.slotConfiguration.slotType.name}',
-      );
-      if (!mounted) return;
-      setState(() {
-        _loadedAd = cachedAd;
-        _isLoading = false;
-      });
-      if (_loadAdCompleter?.isCompleted == false) {
-        _loadAdCompleter!.complete();
+    // Determine if the primary ad platform is AdMob.
+    final isAdMob = widget.adConfig.primaryAdPlatform == AdPlatformType.admob;
+
+    if (!isAdMob) {
+      // For non-AdMob platforms (e.g., Local, Demo), try to get from cache.
+      final cachedAd = _adCacheService.getAd(cacheKey);
+      if (cachedAd != null) {
+        _logger.info(
+          'Using cached in-article ad for slot: ${widget.slotConfiguration.slotType.name}',
+        );
+        if (!mounted) return;
+        setState(() {
+          _loadedAd = cachedAd;
+          _isLoading = false;
+        });
+        if (_loadAdCompleter?.isCompleted == false) {
+          _loadAdCompleter!.complete();
+        }
+        return;
       }
-      return;
+    } else {
+      _logger.info(
+        'AdMob is primary ad platform. Bypassing cache for in-article ad '
+        'for slot: ${widget.slotConfiguration.slotType.name}.',
+      );
     }
 
     _logger.info(
@@ -146,7 +182,7 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
     );
     try {
       // Call AdService.getInArticleAd with the full AdConfig.
-      final loadedAd = await widget.adService.getInArticleAd(
+      loadedAd = await _adService.getInArticleAd(
         adConfig: widget.adConfig,
         adThemeStyle: widget.adThemeStyle,
       );
@@ -155,7 +191,15 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
         _logger.info(
           'New in-article ad loaded for slot: ${widget.slotConfiguration.slotType.name}',
         );
-        _adCacheService.setAd(cacheKey, loadedAd);
+        // Only cache non-AdMob ads. AdMob ads are not cached to prevent reuse issues.
+        if (!isAdMob) {
+          _adCacheService.setAd(cacheKey, loadedAd);
+        } else {
+          _logger.info(
+            'AdMob in-article ad not cached to prevent reuse issues.',
+          );
+        }
+
         if (!mounted) return;
         setState(() {
           _loadedAd = loadedAd;
@@ -174,10 +218,10 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
           _hasError = true;
           _isLoading = false;
         });
+        // Complete the completer normally, indicating that loading finished
+        // but no ad was available. This prevents crashes.
         if (_loadAdCompleter?.isCompleted == false) {
-          _loadAdCompleter?.completeError(
-            StateError('Failed to load in-article ad: No ad returned.'),
-          );
+          _loadAdCompleter!.complete();
         }
       }
     } catch (e, s) {
@@ -191,14 +235,18 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
         _hasError = true;
         _isLoading = false;
       });
+      // Complete the completer normally, indicating that loading finished
+      // but an error occurred. This prevents crashes.
       if (_loadAdCompleter?.isCompleted == false) {
-        _loadAdCompleter?.completeError(e);
+        _loadAdCompleter!.complete();
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizationsX(context).l10n;
+    final theme = Theme.of(context);
     final headlineImageStyle = context
         .read<AppBloc>()
         .state
@@ -206,21 +254,31 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
         .feedPreferences
         .headlineImageStyle;
 
-    if (_isLoading) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(
+    if (_isLoading || _hasError || _loadedAd == null) {
+      // Show a user-friendly message when loading, on error, or if no ad is loaded.
+      return Card(
+        margin: const EdgeInsets.symmetric(
           horizontal: AppSpacing.paddingMedium,
           vertical: AppSpacing.xs,
         ),
         child: AspectRatio(
           aspectRatio: 16 / 9,
-          child: Card(
-            child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.paddingMedium,
+            ),
+            child: Center(
+              child: Text(
+                l10n.adInfoPlaceholderText,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
           ),
         ),
       );
-    } else if (_hasError || _loadedAd == null) {
-      return const SizedBox.shrink();
     } else {
       // If an ad is successfully loaded, dispatch to the appropriate
       // provider-specific widget for rendering.

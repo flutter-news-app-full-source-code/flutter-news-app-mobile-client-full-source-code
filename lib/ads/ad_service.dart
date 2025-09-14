@@ -4,6 +4,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_th
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
 import 'package:logging/logging.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 
 /// {@template ad_service}
 /// A service responsible for managing and providing ads to the application.
@@ -20,11 +21,14 @@ class AdService {
   /// These providers will be used to load ads from specific ad networks.
   AdService({
     required Map<AdPlatformType, AdProvider> adProviders,
+    required AppEnvironment environment,
     Logger? logger,
   }) : _adProviders = adProviders,
+       _environment = environment,
        _logger = logger ?? Logger('AdService');
 
   final Map<AdPlatformType, AdProvider> _adProviders;
+  final AppEnvironment _environment;
   final Logger _logger;
 
   // Configurable retry parameters for ad loading.
@@ -135,6 +139,18 @@ class AdService {
     }
 
     final primaryAdPlatform = adConfig.primaryAdPlatform;
+
+    // If RemoteConfig specifies AdPlatformType.demo but the app is not in demo environment,
+    // log a warning and skip ad load.
+    if (primaryAdPlatform == AdPlatformType.demo &&
+        _environment != AppEnvironment.demo) {
+      _logger.warning(
+        'AdService: RemoteConfig specifies AdPlatformType.demo as primary '
+        'ad platform, but app is not in demo environment. Skipping interstitial ad load.',
+      );
+      return null;
+    }
+
     final adProvider = _adProviders[primaryAdPlatform];
 
     if (adProvider == null) {
@@ -264,6 +280,18 @@ class AdService {
     }
 
     final primaryAdPlatform = adConfig.primaryAdPlatform;
+
+    // If RemoteConfig specifies AdPlatformType.demo but the app is not in demo environment,
+    // log a warning and skip ad load.
+    if (primaryAdPlatform == AdPlatformType.demo &&
+        _environment != AppEnvironment.demo) {
+      _logger.warning(
+        'AdService: RemoteConfig specifies AdPlatformType.demo as primary '
+        'ad platform, but app is not in demo environment. Skipping inline ad load.',
+      );
+      return null;
+    }
+
     final adProvider = _adProviders[primaryAdPlatform];
 
     if (adProvider == null) {

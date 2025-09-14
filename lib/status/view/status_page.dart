@@ -40,8 +40,7 @@ class StatusPage extends StatelessWidget {
           // This allows the user to recover from transient network issues.
           return FailureStateWidget(
             exception: const NetworkException(), // A generic network error
-            retryButtonText:
-                'l10n.retryButtonText', //TODO(fulleni): localize me.
+            retryButtonText: l10n.retryButtonText,
             onRetry: () {
               // Dispatch the event to AppBloc to re-trigger the fetch.
               context.read<AppBloc>().add(const AppConfigFetchRequested());

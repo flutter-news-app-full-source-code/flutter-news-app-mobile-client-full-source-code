@@ -1681,6 +1681,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Ads help keep this app free !'**
   String get adInfoPlaceholderText;
+
+  /// Text for a button that allows the user to retry a failed operation.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retryButtonText;
 }
 
 class _AppLocalizationsDelegate

@@ -877,4 +877,7 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get adInfoPlaceholderText =>
       'الإعلانات تساعد في إبقاء هذا التطبيق مجانيًا.';
+
+  @override
+  String get retryButtonText => 'إعادة المحاولة';
 }

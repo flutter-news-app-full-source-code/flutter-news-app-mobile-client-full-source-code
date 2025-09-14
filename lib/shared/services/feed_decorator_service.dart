@@ -477,13 +477,7 @@ class FeedDecoratorService {
       // Only increment the content item counter if the current item is
       // a primary content type or a decorator (not an ad placeholder).
       // This ensures ad placement is based purely on content/decorator density.
-      if (item is Headline ||
-          item is Topic ||
-          item is Source ||
-          item is Country ||
-          item is CallToActionItem || 
-          item is ContentCollectionItem 
-          ) {
+      if (item is! AdPlaceholder) {
         currentContentItemCount++;
       }
 

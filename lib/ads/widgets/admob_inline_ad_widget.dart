@@ -69,7 +69,9 @@ class _AdmobInlineAdWidgetState extends State<AdmobInlineAdWidget> {
     // This is crucial to prevent "AdWidget is already in the Widget tree" errors
     // and memory leaks, as each AdWidget instance should manage its own ad object.
     _disposeCurrentAd();
-    _logger.info('AdmobInlineAdWidget disposed. Ad object explicitly disposed.');
+    _logger.info(
+      'AdmobInlineAdWidget disposed. Ad object explicitly disposed.',
+    );
     super.dispose();
   }
 

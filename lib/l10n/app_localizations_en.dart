@@ -879,4 +879,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adInfoPlaceholderText => 'Ads help keep this app free !';
+
+  @override
+  String get retryButtonText => 'Retry';
 }

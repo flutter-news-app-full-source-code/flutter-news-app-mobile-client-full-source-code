@@ -56,7 +56,7 @@ import 'package:go_router/go_router.dart';
 /// Requires an [authStatusNotifier] to trigger route re-evaluation when
 /// authentication state changes.
 GoRouter createRouter({
-  required ValueNotifier<AppStatus> authStatusNotifier,
+  required ValueNotifier<AppLifeCycleStatus> authStatusNotifier,
   required AuthRepository authenticationRepository,
   required DataRepository<Headline> headlinesRepository,
   required DataRepository<Topic> topicsRepository,
@@ -119,7 +119,7 @@ GoRouter createRouter({
       // --- Case 1: Unauthenticated User ---
       // If the user is unauthenticated, they should be on an auth path.
       // If they are trying to access any other part of the app, redirect them.
-      if (appStatus == AppStatus.unauthenticated) {
+      if (appStatus == AppLifeCycleStatus.unauthenticated) {
         print('  Redirect: User is unauthenticated.');
         // If they are already on an auth path, allow it. Otherwise, redirect.
         return isGoingToAuth ? null : authenticationPath;
@@ -129,14 +129,14 @@ GoRouter createRouter({
       // If a user is anonymous or authenticated, they should not be able to
       // access the main authentication flows, with an exception for account
       // linking for anonymous users.
-      if (appStatus == AppStatus.anonymous ||
-          appStatus == AppStatus.authenticated) {
+      if (appStatus == AppLifeCycleStatus.anonymous ||
+          appStatus == AppLifeCycleStatus.authenticated) {
         print('  Redirect: User is $appStatus.');
 
         // If the user is trying to access an authentication path:
         if (isGoingToAuth) {
           // A fully authenticated user should never see auth pages.
-          if (appStatus == AppStatus.authenticated) {
+          if (appStatus == AppLifeCycleStatus.authenticated) {
             print(
               '    Action: Authenticated user on auth path. Redirecting to feed.',
             );

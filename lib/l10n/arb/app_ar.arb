@@ -1144,5 +1144,9 @@
     "adInfoPlaceholderText": "الإعلانات تساعد في إبقاء هذا التطبيق مجانيًا.",
     "@adInfoPlaceholderText": {
         "description": "رسالة معروضة في خانات الإعلانات عند تحميل الإعلانات أو فشلها، تشرح الغرض منها."
+    },
+    "retryButtonText": "إعادة المحاولة",
+    "@retryButtonText": {
+        "description": "Text for a button that allows the user to retry a failed operation."
     }
 }

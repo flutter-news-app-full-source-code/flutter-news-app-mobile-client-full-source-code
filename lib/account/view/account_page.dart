@@ -23,7 +23,7 @@ class AccountPage extends StatelessWidget {
     final appState = context.watch<AppBloc>().state;
     final user = appState.user;
     final status = appState.status;
-    final isAnonymous = status == AppStatus.anonymous;
+    final isAnonymous = status == AppLifeCycleStatus.anonymous;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
 

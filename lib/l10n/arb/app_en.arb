@@ -1144,5 +1144,9 @@
     "adInfoPlaceholderText": "Ads help keep this app free !",
     "@adInfoPlaceholderText": {
         "description": "Message displayed in ad slots when ads are loading or fail to load, explaining their purpose."
+    },
+    "retryButtonText": "Retry",
+    "@retryButtonText": {
+        "description": "Text for a button that allows the user to retry a failed operation."
     }
 }

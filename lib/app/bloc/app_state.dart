@@ -1,127 +1,137 @@
 part of 'app_bloc.dart';
 
-/// Represents the application's authentication status.
-enum AppStatus {
-  /// The application is initializing and the status is unknown.
-  initial,
+/// Defines the various statuses of the application's overall state.
+///
+/// This enum helps manage the application's flow, especially during startup
+/// and critical operations like fetching remote configuration or handling
+/// authentication changes.
+enum AppLifeCycleStatus {
+  /// The application is in the initial phase of bootstrapping,
+  /// fetching remote configuration and user settings.
+  initializing,
 
-  /// The user is authenticated.
-  authenticated,
-
-  /// The user is unauthenticated.
+  /// The user is not authenticated.
   unauthenticated,
 
-  /// The user is anonymous (signed in using an anonymous provider).
+  /// The user is authenticated (e.g., standard user).
+  authenticated,
+
+  /// The user is anonymous (e.g., guest user).
   anonymous,
 
-  /// Fetching the essential RemoteConfig.
+  /// The application is currently fetching remote configuration.
+  /// This status is used for re-fetching or background checks, not initial load.
   configFetching,
 
-  /// Fetching the essential RemoteConfig failed.
+  /// The application failed to fetch remote configuration.
   configFetchFailed,
 
-  /// A new version of the app is required.
-  updateRequired,
-
-  /// The app is currently under maintenance.
+  /// The application is currently under maintenance.
   underMaintenance,
+
+  /// A mandatory update is required for the application.
+  updateRequired,
 }
 
+/// {@template app_state}
+/// Represents the overall state of the application.
+///
+/// This state includes authentication status, user settings, remote
+/// configuration, and UI-related preferences.
+/// {@endtemplate}
 class AppState extends Equatable {
   /// {@macro app_state}
   const AppState({
+    required this.status,
     required this.settings,
-    required this.selectedBottomNavigationIndex,
-    this.themeMode = ThemeMode.system,
-    this.appTextScaleFactor = AppTextScaleFactor.medium,
-    this.flexScheme = FlexScheme.material,
-    this.fontFamily,
-    this.status = AppStatus.initial, // Changed from AppStatus
+    required this.environment,
     this.user,
-    this.locale = const Locale('en'), // Default to English
     this.remoteConfig,
-    this.environment,
+    this.themeMode = ThemeMode.system,
+    this.flexScheme = FlexScheme.blue,
+    this.fontFamily,
+    this.appTextScaleFactor = AppTextScaleFactor.medium,
+    this.selectedBottomNavigationIndex = 0,
+    this.locale,
   });
 
-  /// The index of the currently selected item in the bottom navigation bar.
-  final int selectedBottomNavigationIndex;
+  /// The current status of the application.
+  final AppLifeCycleStatus status;
 
-  /// The overall theme mode (light, dark, system).
-  final ThemeMode themeMode;
-
-  /// The text scale factor for the app's UI.
-  final AppTextScaleFactor appTextScaleFactor;
-
-  /// The active color scheme defined by FlexColorScheme.
-  final FlexScheme flexScheme;
-
-  /// The active font family name (e.g., from Google Fonts).
-  /// Null uses the default font family defined in the FlexColorScheme theme.
-  final String? fontFamily;
-
-  /// The current authentication status of the application.
-  final AppStatus status;
-
-  /// The current user details. Null if unauthenticated.
+  /// The currently authenticated or anonymous user.
   final User? user;
 
-  /// User-specific application settings.
+  /// The user's application settings, including display preferences.
   final UserAppSettings settings;
 
-  /// The current application locale.
-  final Locale locale;
-
-  /// The global application configuration (remote config).
+  /// The remote configuration fetched from the backend.
   final RemoteConfig? remoteConfig;
 
-  /// The current application environment (e.g., production, development, demo).
-  final local_config.AppEnvironment? environment;
+  /// The current theme mode (light, dark, or system).
+  final ThemeMode themeMode;
 
-  /// Creates a copy of the current state with updated values.
-  AppState copyWith({
-    int? selectedBottomNavigationIndex,
-    ThemeMode? themeMode,
-    FlexScheme? flexScheme,
-    String? fontFamily,
-    AppTextScaleFactor? appTextScaleFactor,
-    AppStatus? status, // Changed from AppStatus
-    User? user,
-    UserAppSettings? settings,
-    Locale? locale,
-    RemoteConfig? remoteConfig,
-    local_config.AppEnvironment? environment,
-    bool clearFontFamily = false,
-    bool clearAppConfig = false,
-    bool clearEnvironment = false,
-  }) {
-    return AppState(
-      selectedBottomNavigationIndex:
-          selectedBottomNavigationIndex ?? this.selectedBottomNavigationIndex,
-      themeMode: themeMode ?? this.themeMode,
-      flexScheme: flexScheme ?? this.flexScheme,
-      fontFamily: clearFontFamily ? null : fontFamily ?? this.fontFamily,
-      appTextScaleFactor: appTextScaleFactor ?? this.appTextScaleFactor,
-      status: status ?? this.status,
-      user: user ?? this.user,
-      settings: settings ?? this.settings,
-      locale: locale ?? this.locale,
-      remoteConfig: clearAppConfig ? null : remoteConfig ?? this.remoteConfig,
-      environment: clearEnvironment ? null : environment ?? this.environment,
-    );
-  }
+  /// The current FlexColorScheme scheme for accent colors.
+  final FlexScheme flexScheme;
+
+  /// The currently selected font family.
+  final String? fontFamily;
+
+  /// The current text scale factor.
+  final AppTextScaleFactor appTextScaleFactor;
+
+  /// The currently selected index for bottom navigation.
+  final int selectedBottomNavigationIndex;
+
+  /// The current application environment.
+  final local_config.AppEnvironment environment;
+
+  /// The currently selected locale for localization.
+  final Locale? locale;
 
   @override
   List<Object?> get props => [
-    selectedBottomNavigationIndex,
+    status,
+    user,
+    settings,
+    remoteConfig,
     themeMode,
     flexScheme,
     fontFamily,
     appTextScaleFactor,
-    status,
-    user,
-    settings,
-    locale,
-    remoteConfig,
+    selectedBottomNavigationIndex,
     environment,
+    locale,
   ];
+
+  /// Creates a copy of this [AppState] with the given fields replaced with
+  /// the new values.
+  AppState copyWith({
+    AppLifeCycleStatus? status,
+    User? user,
+    UserAppSettings? settings,
+    RemoteConfig? remoteConfig,
+    bool clearAppConfig = false,
+    ThemeMode? themeMode,
+    FlexScheme? flexScheme,
+    String? fontFamily,
+    AppTextScaleFactor? appTextScaleFactor,
+    int? selectedBottomNavigationIndex,
+    local_config.AppEnvironment? environment,
+    Locale? locale,
+  }) {
+    return AppState(
+      status: status ?? this.status,
+      user: user ?? this.user,
+      settings: settings ?? this.settings,
+      remoteConfig: clearAppConfig ? null : remoteConfig ?? this.remoteConfig,
+      themeMode: themeMode ?? this.themeMode,
+      flexScheme: flexScheme ?? this.flexScheme,
+      fontFamily: fontFamily ?? this.fontFamily,
+      appTextScaleFactor: appTextScaleFactor ?? this.appTextScaleFactor,
+      selectedBottomNavigationIndex:
+          selectedBottomNavigationIndex ?? this.selectedBottomNavigationIndex,
+      environment: environment ?? this.environment,
+      locale: locale ?? this.locale,
+    );
+  }
 }

@@ -36,7 +36,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required DataRepository<User> userRepository,
     required local_config.AppEnvironment environment,
     required GlobalKey<NavigatorState> navigatorKey,
-    required RemoteConfig initialRemoteConfig,
+    required RemoteConfig? initialRemoteConfig,
+    required HttpException? initialRemoteConfigError,
     this.demoDataMigrationService,
     this.demoDataInitializerService,
     this.initialUser,
@@ -49,20 +50,22 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _logger = Logger('AppBloc'),
        super(
          // The initial state of the app. The status is set based on the
-         // initialRemoteConfig and whether an initial user is provided.
-         // This ensures critical app status (maintenance, update) is checked
-         // immediately upon app launch, before any user-specific data is loaded.
+         // initialRemoteConfig, initialRemoteConfigError, and whether an
+         // initial user is provided. This ensures critical app status
+         // (maintenance, update, critical error) is checked immediately
+         // upon app launch, before any user-specific data is loaded.
          AppState(
-           status: initialRemoteConfig.appStatus.isUnderMaintenance
-               ? AppLifeCycleStatus.underMaintenance
-               : initialRemoteConfig.appStatus.isLatestVersionOnly
-               ? AppLifeCycleStatus.updateRequired
-               : initialUser == null
-               ? AppLifeCycleStatus.unauthenticated
-               : AppLifeCycleStatus
-                     .authenticated, // Assuming authenticated if user exists and no other critical status
+           status: initialRemoteConfigError != null
+               ? AppLifeCycleStatus.criticalError
+               : initialRemoteConfig?.appStatus.isUnderMaintenance ?? false
+                   ? AppLifeCycleStatus.underMaintenance
+                   : initialRemoteConfig?.appStatus.isLatestVersionOnly ?? false
+                       ? AppLifeCycleStatus.updateRequired
+                       : initialUser == null
+                           ? AppLifeCycleStatus.unauthenticated
+                           : AppLifeCycleStatus.authenticated,
            settings: UserAppSettings(
-             id: 'default',
+             id: 'default', // This will be replaced by actual user settings
              displaySettings: const DisplaySettings(
                baseTheme: AppBaseTheme.system,
                accentTheme: AppAccentTheme.defaultBlue,
@@ -85,6 +88,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
            ),
            selectedBottomNavigationIndex: 0,
            remoteConfig: initialRemoteConfig, // Use the pre-fetched config
+           initialRemoteConfigError: initialRemoteConfigError, // Store any initial config error
            environment: environment,
            user: initialUser, // Set initial user if available
            themeMode: _mapAppBaseTheme(
@@ -143,15 +147,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   ///   1. It will first check if the user's ID has actually changed to prevent
   ///      redundant reloads from simple token refreshes.
   ///   2. If the user is `null`, it will emit an `unauthenticated` state.
-  ///   3. If a user is present, it will immediately emit a `configFetching`
-  ///      state to display the loading UI.
-  ///   4. It will then proceed to fetch the `userAppSettings` (RemoteConfig is
-  ///      already available from initial bootstrap).
+  ///   3. If a user is present, it will immediately emit the new user.
+  ///   4. It will then proceed to fetch the `userAppSettings`.
   ///   5. Upon successful fetch, it will evaluate the app's status (maintenance,
   ///      update required) using the *already available* `remoteConfig` and
   ///      emit the final stable state (`authenticated`, `anonymous`, etc.)
   ///      with the correct, freshly-loaded data.
-  ///   6. If any fetch fails, it will emit a `configFetchFailed` state,
+  ///   6. If any fetch fails, it will emit a `criticalError` state,
   ///      allowing the user to retry.
   Future<void> _onAppUserChanged(
     AppUserChanged event,
@@ -178,8 +180,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         state.copyWith(
           status: AppLifeCycleStatus.unauthenticated,
           user: null,
-          // RemoteConfig is now managed by initial bootstrap and AppConfigFetchRequested.
-          // It should not be cleared here.
         ),
       );
       return;
@@ -192,11 +192,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       'Beginning data fetch sequence.',
     );
 
-    // Immediately emit the new user and set status to configFetching.
-    // This ensures the UI shows a loading state while we fetch user-specific data.
-    emit(
-      state.copyWith(user: newUser, status: AppLifeCycleStatus.configFetching),
-    );
+    // Immediately emit the new user.
+    emit(state.copyWith(user: newUser));
 
     // In demo mode, ensure user-specific data is initialized.
     if (_environment == local_config.AppEnvironment.demo &&
@@ -232,16 +229,45 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     // --- Fetch Core Application Data ---
     try {
-      // Only fetch user settings. RemoteConfig is already available from bootstrap
-      // and is stored in the current state.
-      final userAppSettings = await _userAppSettingsRepository.read(
-        id: newUser.id,
-        userId: newUser.id,
-      );
-
-      _logger.info(
-        '[AppBloc] UserAppSettings fetched successfully for user: ${newUser.id}',
-      );
+      UserAppSettings userAppSettings;
+      try {
+        // Attempt to fetch user settings from the backend.
+        userAppSettings = await _userAppSettingsRepository.read(
+          id: newUser.id,
+          userId: newUser.id,
+        );
+        _logger.info(
+          '[AppBloc] UserAppSettings fetched successfully for user: ${newUser.id}',
+        );
+      } on HttpException catch (e) {
+        // If any HttpException occurs during read or create, transition to critical error.
+        _logger.severe(
+          '[AppBloc] Failed to fetch UserAppSettings for user '
+          '${newUser.id}: ${e.runtimeType} - ${e.message}',
+        );
+        emit(
+          state.copyWith(
+            status: AppLifeCycleStatus.criticalError,
+            initialRemoteConfigError: e,
+          ),
+        );
+        return; // Critical error, stop further processing.
+      } catch (e, s) {
+        // Catch any other unexpected errors during read or create.
+        _logger.severe(
+          '[AppBloc] Unexpected error during UserAppSettings fetch/create for user '
+          '${newUser.id}.',
+          e,
+          s,
+        );
+        emit(
+          state.copyWith(
+            status: AppLifeCycleStatus.criticalError,
+            initialRemoteConfigError: UnknownException(e.toString()),
+          ),
+        );
+        return; // Critical error, stop further processing.
+      }
 
       // Map loaded settings to the AppState.
       final newThemeMode = _mapAppBaseTheme(
@@ -261,7 +287,26 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // --- CRITICAL STATUS EVALUATION (using already available remoteConfig) ---
       // The remoteConfig is already in the state from the initial bootstrap.
       // We use the existing state.remoteConfig to perform these checks.
-      final remoteConfig = state.remoteConfig!;
+      final remoteConfig = state.remoteConfig;
+
+      // If remoteConfig is null at this point, it means the initial fetch
+      // in bootstrap failed, and we should transition to a critical error state.
+      if (remoteConfig == null) {
+        emit(
+          state.copyWith(
+            status: AppLifeCycleStatus.criticalError,
+            initialRemoteConfigError: state.initialRemoteConfigError ??
+                const UnknownException('RemoteConfig is null after user change.'),
+            settings: userAppSettings,
+            themeMode: newThemeMode,
+            flexScheme: newFlexScheme,
+            fontFamily: newFontFamily,
+            appTextScaleFactor: newAppTextScaleFactor,
+            locale: newLocale,
+          ),
+        );
+        return;
+      }
 
       if (remoteConfig.appStatus.isUnderMaintenance) {
         emit(
@@ -316,18 +361,28 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       );
     } on HttpException catch (e) {
       _logger.severe(
-        '[AppBloc] Failed to fetch initial data (HttpException) for user '
+        '[AppBloc] Failed to fetch or create UserAppSettings (HttpException) for user '
         '${newUser.id}: ${e.runtimeType} - ${e.message}',
       );
-      emit(state.copyWith(status: AppLifeCycleStatus.configFetchFailed));
+      emit(
+        state.copyWith(
+          status: AppLifeCycleStatus.criticalError,
+          initialRemoteConfigError: e,
+        ),
+      );
     } catch (e, s) {
       _logger.severe(
-        '[AppBloc] Unexpected error during initial data fetch for user '
+        '[AppBloc] Unexpected error during UserAppSettings fetch/create for user '
         '${newUser.id}.',
         e,
         s,
       );
-      emit(state.copyWith(status: AppLifeCycleStatus.configFetchFailed));
+      emit(
+        state.copyWith(
+          status: AppLifeCycleStatus.criticalError,
+          initialRemoteConfigError: UnknownException(e.toString()),
+        ),
+      );
     }
   }
 
@@ -383,10 +438,20 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       _logger.severe(
         'Error loading user app settings in AppBloc (HttpException): $e',
       );
-      emit(state.copyWith(settings: state.settings));
+      emit(
+        state.copyWith(
+          status: AppLifeCycleStatus.criticalError,
+          initialRemoteConfigError: e,
+        ),
+      );
     } catch (e, s) {
       _logger.severe('Error loading user app settings in AppBloc.', e, s);
-      emit(state.copyWith(settings: state.settings));
+      emit(
+        state.copyWith(
+          status: AppLifeCycleStatus.criticalError,
+          initialRemoteConfigError: UnknownException(e.toString()),
+        ),
+      );
     }
   }
 
@@ -605,26 +670,22 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   ) async {
     if (state.user == null) {
       _logger.info('[AppBloc] User is null. Skipping AppConfig fetch.');
-      // If there's no user, and we're not already fetching, or if remoteConfig
-      // is present, we might transition to unauthenticated.
-      if (state.remoteConfig != null ||
-          state.status == AppLifeCycleStatus.configFetching) {
-        emit(
-          state.copyWith(
-            remoteConfig: null, // Clear remoteConfig if unauthenticated
-            clearAppConfig: true,
-            status: AppLifeCycleStatus.unauthenticated,
-          ),
-        );
-      }
+      emit(
+        state.copyWith(
+          remoteConfig: null,
+          clearAppConfig: true,
+          status: AppLifeCycleStatus.unauthenticated,
+          initialRemoteConfigError: null,
+        ),
+      );
       return;
     }
 
     if (!event.isBackgroundCheck) {
       _logger.info(
-        '[AppBloc] Initial config fetch. Setting status to configFetching.',
+        '[AppBloc] Initial config fetch. Setting status to criticalError if failed.',
       );
-      emit(state.copyWith(status: AppLifeCycleStatus.configFetching));
+      emit(state.copyWith(status: AppLifeCycleStatus.criticalError));
     } else {
       _logger.info('[AppBloc] Background config fetch. Proceeding silently.');
     }
@@ -640,6 +701,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           state.copyWith(
             status: AppLifeCycleStatus.underMaintenance,
             remoteConfig: remoteConfig,
+            initialRemoteConfigError: null,
           ),
         );
         return;
@@ -651,6 +713,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           state.copyWith(
             status: AppLifeCycleStatus.updateRequired,
             remoteConfig: remoteConfig,
+            initialRemoteConfigError: null,
           ),
         );
         return;
@@ -659,13 +722,24 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       final finalStatus = state.user!.appRole == AppUserRole.standardUser
           ? AppLifeCycleStatus.authenticated
           : AppLifeCycleStatus.anonymous;
-      emit(state.copyWith(remoteConfig: remoteConfig, status: finalStatus));
+      emit(
+        state.copyWith(
+          remoteConfig: remoteConfig,
+          status: finalStatus,
+          initialRemoteConfigError: null,
+        ),
+      );
     } on HttpException catch (e) {
       _logger.severe(
         '[AppBloc] Failed to fetch AppConfig (HttpException) for user ${state.user?.id}: ${e.runtimeType} - ${e.message}',
       );
       if (!event.isBackgroundCheck) {
-        emit(state.copyWith(status: AppLifeCycleStatus.configFetchFailed));
+        emit(
+          state.copyWith(
+            status: AppLifeCycleStatus.criticalError,
+            initialRemoteConfigError: e,
+          ),
+        );
       }
     } catch (e, s) {
       _logger.severe(
@@ -674,7 +748,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         s,
       );
       if (!event.isBackgroundCheck) {
-        emit(state.copyWith(status: AppLifeCycleStatus.configFetchFailed));
+        emit(
+          state.copyWith(
+            status: AppLifeCycleStatus.criticalError,
+            initialRemoteConfigError: UnknownException(e.toString()),
+          ),
+        );
       }
     }
   }

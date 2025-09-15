@@ -99,44 +99,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
           userAppSettings: appSettings,
         ),
       );
-    } on NotFoundException {
-      // Settings not found for the user, create and persist defaults
-      final defaultLanguage = languagesFixturesData.firstWhere(
-        (l) => l.code == 'en',
-        orElse: () => throw StateError(
-          'Default language "en" not found in language fixtures.',
-        ),
-      );
-
-      final defaultSettings = UserAppSettings(
-        id: event.userId,
-        displaySettings: const DisplaySettings(
-          baseTheme: AppBaseTheme.system,
-          accentTheme: AppAccentTheme.defaultBlue,
-          fontFamily: 'SystemDefault',
-          textScaleFactor: AppTextScaleFactor.medium,
-          fontWeight: AppFontWeight.regular,
-        ),
-        language: defaultLanguage,
-        feedPreferences: const FeedDisplayPreferences(
-          headlineDensity: HeadlineDensity.standard,
-          headlineImageStyle: HeadlineImageStyle.largeThumbnail,
-          showSourceInHeadlineFeed: true,
-          showPublishDateInHeadlineFeed: true,
-        ),
-      );
-      emit(
-        state.copyWith(
-          status: SettingsStatus.success,
-          userAppSettings: defaultSettings,
-        ),
-      );
-      // Persist these default settings
-      await _persistSettings(defaultSettings, emit);
-    } on HttpException catch (e) {
-      emit(state.copyWith(status: SettingsStatus.failure, error: e));
+    } on HttpException {
+      rethrow; // Re-throw to AppBloc for centralized error handling
     } catch (e) {
-      emit(state.copyWith(status: SettingsStatus.failure, error: e));
+      rethrow; // Re-throw to AppBloc for centralized error handling
     }
   }
 

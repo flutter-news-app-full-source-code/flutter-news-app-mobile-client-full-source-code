@@ -33,7 +33,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required AuthRepository authenticationRepository,
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<UserContentPreferences>
-        userContentPreferencesRepository,
+    userContentPreferencesRepository,
     required DataRepository<RemoteConfig> appConfigRepository,
     required DataRepository<User> userRepository,
     required local_config.AppEnvironment environment,
@@ -43,54 +43,37 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     this.demoDataMigrationService,
     this.demoDataInitializerService,
     this.initialUser,
-  })  : _authenticationRepository = authenticationRepository,
-        _userAppSettingsRepository = userAppSettingsRepository,
-        _userContentPreferencesRepository = userContentPreferencesRepository,
-        _appConfigRepository = appConfigRepository,
-        _userRepository = userRepository,
-        _environment = environment,
-        _navigatorKey = navigatorKey,
-        _logger = Logger('AppBloc'),
-        super(
-          // Initial state of the app. The status is set to loadingUserData
-          // as the AppBloc will now handle fetching user-specific data.
-          AppState(
-            status: AppLifeCycleStatus.loadingUserData,
-            settings: UserAppSettings(
-              id: 'default', // This will be replaced by actual user settings
-              displaySettings: const DisplaySettings(
-                baseTheme: AppBaseTheme.system,
-                accentTheme: AppAccentTheme.defaultBlue,
-                fontFamily: 'SystemDefault',
-                textScaleFactor: AppTextScaleFactor.medium,
-                fontWeight: AppFontWeight.regular,
-              ),
-              language: languagesFixturesData.firstWhere(
-                (l) => l.code == 'en',
-                orElse: () => throw StateError(
-                  'Default language "en" not found in language fixtures.',
-                ),
-              ),
-              feedPreferences: const FeedDisplayPreferences(
-                headlineDensity: HeadlineDensity.standard,
-                headlineImageStyle: HeadlineImageStyle.largeThumbnail,
-                showSourceInHeadlineFeed: true,
-                showPublishDateInHeadlineFeed: true,
-              ),
-            ),
-            selectedBottomNavigationIndex: 0,
-            remoteConfig: initialRemoteConfig, // Use the pre-fetched config
-            initialRemoteConfigError:
-                initialRemoteConfigError, // Store any initial config error
-            environment: environment,
-            user: initialUser, // Set initial user if available
-            themeMode: _mapAppBaseTheme(AppBaseTheme.system), // Default to system theme
-            flexScheme: _mapAppAccentTheme(AppAccentTheme.defaultBlue),
-            fontFamily: _mapFontFamily('SystemDefault'),
-            appTextScaleFactor: AppTextScaleFactor.medium,
-            locale: const Locale('en'), // Default to English
-          ),
-        ) {
+  }) : _authenticationRepository = authenticationRepository,
+       _userAppSettingsRepository = userAppSettingsRepository,
+       _userContentPreferencesRepository = userContentPreferencesRepository,
+       _appConfigRepository = appConfigRepository,
+       _userRepository = userRepository,
+       _environment = environment,
+       _navigatorKey = navigatorKey,
+       _logger = Logger('AppBloc'),
+       super(
+         // Initial state of the app. The status is set to loadingUserData
+         // as the AppBloc will now handle fetching user-specific data.
+         // UserAppSettings and UserContentPreferences are initially null
+         // and will be fetched asynchronously.
+         AppState(
+           status: AppLifeCycleStatus.loadingUserData,
+           // settings is now nullable and will be fetched.
+           settings: null,
+           selectedBottomNavigationIndex: 0,
+           remoteConfig: initialRemoteConfig, // Use the pre-fetched config
+           initialRemoteConfigError:
+               initialRemoteConfigError, // Store any initial config error
+           environment: environment,
+           user: initialUser, // Set initial user if available
+           // Default theme settings until user settings are loaded
+           themeMode: _mapAppBaseTheme(AppBaseTheme.system),
+           flexScheme: _mapAppAccentTheme(AppAccentTheme.defaultBlue),
+           fontFamily: _mapFontFamily('SystemDefault'),
+           appTextScaleFactor: AppTextScaleFactor.medium,
+           locale: const Locale('en'), // Default to English
+         ),
+       ) {
     // Register event handlers for various app-level events.
     on<AppStarted>(_onAppStarted); // New event handler
     on<AppUserChanged>(_onAppUserChanged);
@@ -103,6 +86,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppFontFamilyChanged>(_onFontFamilyChanged);
     on<AppTextScaleFactorChanged>(_onAppTextScaleFactorChanged);
     on<AppFontWeightChanged>(_onAppFontWeightChanged);
+    on<AppUserDataLoaded>(_onAppUserDataLoaded); // New event handler
 
     // Subscribe to the authentication repository's authStateChanges stream.
     // This stream is the single source of truth for the user's auth state
@@ -114,7 +98,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   final AuthRepository _authenticationRepository;
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
-  final DataRepository<UserContentPreferences> _userContentPreferencesRepository;
+  final DataRepository<UserContentPreferences>
+  _userContentPreferencesRepository;
   final DataRepository<RemoteConfig> _appConfigRepository;
   final DataRepository<User> _userRepository;
   final local_config.AppEnvironment _environment;
@@ -130,10 +115,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   /// Handles the [AppStarted] event, orchestrating the initial loading of
   /// user-specific data and evaluating the overall app status.
-  Future<void> _onAppStarted(
-    AppStarted event,
-    Emitter<AppState> emit,
-  ) async {
+  Future<void> _onAppStarted(AppStarted event, Emitter<AppState> emit) async {
     _logger.info('[AppBloc] AppStarted event received. Starting data load.');
 
     // If there was a critical error during bootstrap (e.g., RemoteConfig fetch failed),
@@ -156,8 +138,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       emit(
         state.copyWith(
           status: AppLifeCycleStatus.criticalError,
-          initialRemoteConfigError:
-              const UnknownException('RemoteConfig is null after bootstrap.'),
+          initialRemoteConfigError: const UnknownException(
+            'RemoteConfig is null after bootstrap.',
+          ),
         ),
       );
       return;
@@ -212,11 +195,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       );
 
       // Fetch UserContentPreferences
-      final userContentPreferences =
-          await _userContentPreferencesRepository.read(
-        id: currentUser.id,
-        userId: currentUser.id,
-      );
+      final userContentPreferences = await _userContentPreferencesRepository
+          .read(id: currentUser.id, userId: currentUser.id);
       _logger.info(
         '[AppBloc] UserContentPreferences fetched successfully for user: ${currentUser.id}',
       );
@@ -245,7 +225,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           status: finalStatus,
           user: currentUser,
           settings: userAppSettings,
-          userContentPreferences: userContentPreferences, // Store userContentPreferences
+          userContentPreferences:
+              userContentPreferences, // Store userContentPreferences
           themeMode: newThemeMode,
           flexScheme: newFlexScheme,
           fontFamily: newFontFamily,
@@ -254,6 +235,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           initialUserPreferencesError: null,
         ),
       );
+      // Dispatch event to signal that user settings are loaded
+      add(const AppUserDataLoaded());
     } on HttpException catch (e) {
       _logger.severe(
         '[AppBloc] Failed to fetch user settings or preferences (HttpException) for user '
@@ -308,8 +291,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     final newStatus = newUser == null
         ? AppLifeCycleStatus.unauthenticated
         : (newUser.appRole == AppUserRole.standardUser
-            ? AppLifeCycleStatus.authenticated
-            : AppLifeCycleStatus.anonymous);
+              ? AppLifeCycleStatus.authenticated
+              : AppLifeCycleStatus.anonymous);
 
     emit(state.copyWith(status: newStatus));
 
@@ -365,11 +348,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       );
 
       // Also fetch UserContentPreferences when settings are refreshed
-      final userContentPreferences =
-          await _userContentPreferencesRepository.read(
-        id: state.user!.id,
-        userId: state.user!.id,
-      );
+      final userContentPreferences = await _userContentPreferencesRepository
+          .read(id: state.user!.id, userId: state.user!.id);
 
       final newThemeMode = _mapAppBaseTheme(
         userAppSettings.displaySettings.baseTheme,
@@ -400,10 +380,14 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           appTextScaleFactor: newAppTextScaleFactor,
           fontFamily: newFontFamily,
           settings: userAppSettings,
-          userContentPreferences: userContentPreferences, // Store userContentPreferences
+          userContentPreferences:
+              userContentPreferences, // Store userContentPreferences
           locale: newLocale,
+          initialUserPreferencesError: null,
         ),
       );
+      // Dispatch event to signal that user settings are loaded
+      add(const AppUserDataLoaded());
     } on HttpException catch (e) {
       _logger.severe(
         'Error loading user app settings or preferences in AppBloc (HttpException): $e',
@@ -423,7 +407,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       emit(
         state.copyWith(
           status: AppLifeCycleStatus.criticalError,
-          initialUserPreferencesError: UnknownException(e.toString()), // Use the new error field
+          initialUserPreferencesError: UnknownException(
+            e.toString(),
+          ), // Use the new error field
         ),
       );
     }
@@ -439,8 +425,16 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     AppThemeModeChanged event,
     Emitter<AppState> emit,
   ) async {
-    final updatedSettings = state.settings.copyWith(
-      displaySettings: state.settings.displaySettings.copyWith(
+    // Ensure settings are loaded before attempting to update.
+    if (state.settings == null) {
+      _logger.warning(
+        '[AppBloc] Skipping theme mode change: UserAppSettings not loaded.',
+      );
+      return;
+    }
+
+    final updatedSettings = state.settings!.copyWith(
+      displaySettings: state.settings!.displaySettings.copyWith(
         baseTheme: event.themeMode == ThemeMode.light
             ? AppBaseTheme.light
             : (event.themeMode == ThemeMode.dark
@@ -470,8 +464,16 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     AppFlexSchemeChanged event,
     Emitter<AppState> emit,
   ) async {
-    final updatedSettings = state.settings.copyWith(
-      displaySettings: state.settings.displaySettings.copyWith(
+    // Ensure settings are loaded before attempting to update.
+    if (state.settings == null) {
+      _logger.warning(
+        '[AppBloc] Skipping accent scheme change: UserAppSettings not loaded.',
+      );
+      return;
+    }
+
+    final updatedSettings = state.settings!.copyWith(
+      displaySettings: state.settings!.displaySettings.copyWith(
         accentTheme: event.flexScheme == FlexScheme.blue
             ? AppAccentTheme.defaultBlue
             : (event.flexScheme == FlexScheme.red
@@ -505,8 +507,16 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     AppFontFamilyChanged event,
     Emitter<AppState> emit,
   ) async {
-    final updatedSettings = state.settings.copyWith(
-      displaySettings: state.settings.displaySettings.copyWith(
+    // Ensure settings are loaded before attempting to update.
+    if (state.settings == null) {
+      _logger.warning(
+        '[AppBloc] Skipping font family change: UserAppSettings not loaded.',
+      );
+      return;
+    }
+
+    final updatedSettings = state.settings!.copyWith(
+      displaySettings: state.settings!.displaySettings.copyWith(
         fontFamily: event.fontFamily ?? 'SystemDefault',
       ),
     );
@@ -534,8 +544,16 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     AppTextScaleFactorChanged event,
     Emitter<AppState> emit,
   ) async {
-    final updatedSettings = state.settings.copyWith(
-      displaySettings: state.settings.displaySettings.copyWith(
+    // Ensure settings are loaded before attempting to update.
+    if (state.settings == null) {
+      _logger.warning(
+        '[AppBloc] Skipping text scale factor change: UserAppSettings not loaded.',
+      );
+      return;
+    }
+
+    final updatedSettings = state.settings!.copyWith(
+      displaySettings: state.settings!.displaySettings.copyWith(
         textScaleFactor: event.appTextScaleFactor,
       ),
     );
@@ -568,8 +586,16 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     AppFontWeightChanged event,
     Emitter<AppState> emit,
   ) async {
-    final updatedSettings = state.settings.copyWith(
-      displaySettings: state.settings.displaySettings.copyWith(
+    // Ensure settings are loaded before attempting to update.
+    if (state.settings == null) {
+      _logger.warning(
+        '[AppBloc] Skipping font weight change: UserAppSettings not loaded.',
+      );
+      return;
+    }
+
+    final updatedSettings = state.settings!.copyWith(
+      displaySettings: state.settings!.displaySettings.copyWith(
         fontWeight: event.fontWeight,
       ),
     );
@@ -780,5 +806,19 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         emit(state.copyWith(user: originalUser));
       }
     }
+  }
+
+  /// Handles the [AppUserDataLoaded] event.
+  /// This event is dispatched when user-specific settings (UserAppSettings and
+  /// UserContentPreferences) have been successfully loaded and updated in the
+  /// AppBloc state. This handler currently does nothing, but it serves as a
+  /// placeholder for future logic that might need to react to this event.
+  Future<void> _onAppUserDataLoaded(
+    AppUserDataLoaded event,
+    Emitter<AppState> emit,
+  ) async {
+    _logger.info('[AppBloc] AppUserSettingsLoaded event received.');
+    // This event is primarily for other BLoCs to listen to.
+    // AppBloc itself doesn't need to do anything further here.
   }
 }

@@ -123,6 +123,8 @@ class App extends StatelessWidget {
               authenticationRepository: context.read<AuthRepository>(),
               userAppSettingsRepository:
                   context.read<DataRepository<UserAppSettings>>(),
+              userContentPreferencesRepository:
+                  context.read<DataRepository<UserContentPreferences>>(),
               appConfigRepository: context.read<DataRepository<RemoteConfig>>(),
               userRepository: context.read<DataRepository<User>>(),
               environment: _environment,
@@ -134,7 +136,7 @@ class App extends StatelessWidget {
                   _initialRemoteConfig, // Pass initialRemoteConfig
               initialRemoteConfigError:
                   _initialRemoteConfigError, // Pass initialRemoteConfigError
-            ),
+            )..add(AppStarted(initialUser: initialUser)), // Dispatch AppStarted event
           ),
           BlocProvider(
             create: (context) => AuthenticationBloc(
@@ -261,6 +263,7 @@ class _AppViewState extends State<_AppView> {
 
   @override
   Widget build(BuildContext context) {
+
     // Wrap the part of the tree that needs to react to AppBloc state changes
     // with a BlocListener and a BlocBuilder.
     return BlocListener<AppBloc, AppState>(
@@ -280,6 +283,37 @@ class _AppViewState extends State<_AppView> {
       // to fixing the original race conditions and BuildContext instability.
       child: BlocBuilder<AppBloc, AppState>(
         builder: (context, state) {
+          // --- Loading State ---
+          if (state.status == AppLifeCycleStatus.loadingUserData) {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              theme: lightTheme(
+                scheme: FlexScheme.material,
+                appTextScaleFactor: AppTextScaleFactor.medium,
+                appFontWeight: AppFontWeight.regular,
+                fontFamily: null,
+              ),
+              darkTheme: darkTheme(
+                scheme: FlexScheme.material,
+                appTextScaleFactor: AppTextScaleFactor.medium,
+                appFontWeight: AppFontWeight.regular,
+                fontFamily: null,
+              ),
+              themeMode: state.themeMode,
+              localizationsDelegates: const [
+                ...AppLocalizations.localizationsDelegates,
+                ...UiKitLocalizations.localizationsDelegates,
+              ],
+              supportedLocales: AppLocalizations.supportedLocales,
+              locale: state.locale,
+              home: const LoadingStateWidget(
+                icon: Icons.sync,
+                headline: 'Loading User Data', // Placeholder
+                subheadline: 'Fetching your settings and preferences...', // Placeholder
+              ),
+            );
+          }
+
           // --- Full-Screen Status Pages ---
           // The following states represent critical, app-wide conditions that
           // must be handled before the main router and UI are displayed.
@@ -310,11 +344,25 @@ class _AppViewState extends State<_AppView> {
               locale: state.locale,
               home: CriticalErrorPage(
                 exception: state.initialRemoteConfigError ??
+                    state.initialUserPreferencesError ??
                     const UnknownException('An unknown critical error occurred.'),
                 onRetry: () {
-                  context
-                      .read<AppBloc>()
-                      .add(const AppConfigFetchRequested(isBackgroundCheck: false));
+                  // If remote config failed, retry remote config.
+                  // If user preferences failed, retry AppStarted.
+                  if (state.initialRemoteConfigError != null) {
+                    context.read<AppBloc>().add(
+                          const AppConfigFetchRequested(isBackgroundCheck: false),
+                        );
+                  } else if (state.initialUserPreferencesError != null) {
+                    context.read<AppBloc>().add(
+                          AppStarted(initialUser: state.user),
+                        );
+                  } else {
+                    // Fallback for unknown critical error
+                    context.read<AppBloc>().add(
+                          AppStarted(initialUser: state.user),
+                        );
+                  }
                 },
               ),
             );

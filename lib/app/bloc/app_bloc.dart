@@ -16,7 +16,19 @@ import 'package:logging/logging.dart';
 part 'app_event.dart';
 part 'app_state.dart';
 
+/// {@template app_bloc}
+/// Manages the overall application state, including authentication status,
+/// user settings, and remote configuration.
+///
+/// This BLoC is central to the application's lifecycle, reacting to user
+/// authentication changes, managing user preferences, and applying global
+/// remote configurations.
+/// {@endtemplate}
 class AppBloc extends Bloc<AppEvent, AppState> {
+  /// {@macro app_bloc}
+  ///
+  /// Initializes the BLoC with required repositories, environment, and
+  /// pre-fetched initial data.
   AppBloc({
     required AuthRepository authenticationRepository,
     required DataRepository<UserAppSettings> userAppSettingsRepository,
@@ -24,6 +36,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required DataRepository<User> userRepository,
     required local_config.AppEnvironment environment,
     required GlobalKey<NavigatorState> navigatorKey,
+    required RemoteConfig initialRemoteConfig,
     this.demoDataMigrationService,
     this.demoDataInitializerService,
     this.initialUser,
@@ -35,15 +48,19 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _navigatorKey = navigatorKey,
        _logger = Logger('AppBloc'),
        super(
-         // The initial state of the app. The status is set based on whether
-         // an initial user is provided. If a user exists, it immediately
-         // transitions to `configFetching` to show the loading UI.
-         // Default settings are provided as a fallback until user-specific
-         // settings are loaded via the `AppUserChanged` event.
+         // The initial state of the app. The status is set based on the
+         // initialRemoteConfig and whether an initial user is provided.
+         // This ensures critical app status (maintenance, update) is checked
+         // immediately upon app launch, before any user-specific data is loaded.
          AppState(
-           status: initialUser == null
+           status: initialRemoteConfig.appStatus.isUnderMaintenance
+               ? AppLifeCycleStatus.underMaintenance
+               : initialRemoteConfig.appStatus.isLatestVersionOnly
+               ? AppLifeCycleStatus.updateRequired
+               : initialUser == null
                ? AppLifeCycleStatus.unauthenticated
-               : AppLifeCycleStatus.configFetching,
+               : AppLifeCycleStatus
+                     .authenticated, // Assuming authenticated if user exists and no other critical status
            settings: UserAppSettings(
              id: 'default',
              displaySettings: const DisplaySettings(
@@ -67,10 +84,20 @@ class AppBloc extends Bloc<AppEvent, AppState> {
              ),
            ),
            selectedBottomNavigationIndex: 0,
-           remoteConfig: null,
+           remoteConfig: initialRemoteConfig, // Use the pre-fetched config
            environment: environment,
-           // The `user` is intentionally not set here. It will be set by
-           // the `AppUserChanged` event, which is triggered by the auth stream.
+           user: initialUser, // Set initial user if available
+           themeMode: _mapAppBaseTheme(
+             initialUser?.appRole == AppUserRole.guestUser
+                 ? AppBaseTheme.system
+                 : AppBaseTheme.system, // Default to system theme
+           ),
+           flexScheme: _mapAppAccentTheme(AppAccentTheme.defaultBlue),
+           fontFamily: _mapFontFamily('SystemDefault'),
+           appTextScaleFactor: AppTextScaleFactor.medium,
+           locale: Locale(
+             initialUser?.appRole == AppUserRole.guestUser ? 'en' : 'en',
+           ), // Default to English
          ),
        ) {
     // Register event handlers for various app-level events.
@@ -118,11 +145,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   ///   2. If the user is `null`, it will emit an `unauthenticated` state.
   ///   3. If a user is present, it will immediately emit a `configFetching`
   ///      state to display the loading UI.
-  ///   4. It will then proceed to fetch the `remoteConfig` and `userAppSettings`
-  ///      concurrently.
+  ///   4. It will then proceed to fetch the `userAppSettings` (RemoteConfig is
+  ///      already available from initial bootstrap).
   ///   5. Upon successful fetch, it will evaluate the app's status (maintenance,
-  ///      update required) and emit the final stable state (`authenticated`,
-  ///      `anonymous`, etc.) with the correct, freshly-loaded data.
+  ///      update required) using the *already available* `remoteConfig` and
+  ///      emit the final stable state (`authenticated`, `anonymous`, etc.)
+  ///      with the correct, freshly-loaded data.
   ///   6. If any fetch fails, it will emit a `configFetchFailed` state,
   ///      allowing the user to retry.
   Future<void> _onAppUserChanged(
@@ -150,8 +178,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         state.copyWith(
           status: AppLifeCycleStatus.unauthenticated,
           user: null,
-          remoteConfig: null,
-          clearAppConfig: true, // Explicitly clear remoteConfig
+          // RemoteConfig is now managed by initial bootstrap and AppConfigFetchRequested.
+          // It should not be cleared here.
         ),
       );
       return;
@@ -165,7 +193,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     );
 
     // Immediately emit the new user and set status to configFetching.
-    // This ensures the UI shows a loading state while we fetch data.
+    // This ensures the UI shows a loading state while we fetch user-specific data.
     emit(
       state.copyWith(user: newUser, status: AppLifeCycleStatus.configFetching),
     );
@@ -204,18 +232,15 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     // --- Fetch Core Application Data ---
     try {
-      // Fetch remote config and user settings concurrently for performance.
-      final results = await Future.wait([
-        _appConfigRepository.read(id: kRemoteConfigId),
-        _userAppSettingsRepository.read(id: newUser.id, userId: newUser.id),
-      ]);
-
-      final remoteConfig = results[0] as RemoteConfig;
-      final userAppSettings = results[1] as UserAppSettings;
+      // Only fetch user settings. RemoteConfig is already available from bootstrap
+      // and is stored in the current state.
+      final userAppSettings = await _userAppSettingsRepository.read(
+        id: newUser.id,
+        userId: newUser.id,
+      );
 
       _logger.info(
-        '[AppBloc] RemoteConfig and UserAppSettings fetched successfully for '
-        'user: ${newUser.id}',
+        '[AppBloc] UserAppSettings fetched successfully for user: ${newUser.id}',
       );
 
       // Map loaded settings to the AppState.
@@ -233,12 +258,16 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       );
       final newLocale = Locale(userAppSettings.language.code);
 
-      // --- CRITICAL STATUS EVALUATION ---
+      // --- CRITICAL STATUS EVALUATION (using already available remoteConfig) ---
+      // The remoteConfig is already in the state from the initial bootstrap.
+      // We use the existing state.remoteConfig to perform these checks.
+      final remoteConfig = state.remoteConfig!;
+
       if (remoteConfig.appStatus.isUnderMaintenance) {
         emit(
           state.copyWith(
             status: AppLifeCycleStatus.underMaintenance,
-            remoteConfig: remoteConfig,
+            // remoteConfig: remoteConfig, // Already in state, no need to re-assign
             settings: userAppSettings,
             themeMode: newThemeMode,
             flexScheme: newFlexScheme,
@@ -255,7 +284,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         emit(
           state.copyWith(
             status: AppLifeCycleStatus.updateRequired,
-            remoteConfig: remoteConfig,
+            // remoteConfig: remoteConfig, // Already in state, no need to re-assign
             settings: userAppSettings,
             themeMode: newThemeMode,
             flexScheme: newFlexScheme,
@@ -276,7 +305,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       emit(
         state.copyWith(
           status: finalStatus,
-          remoteConfig: remoteConfig,
+          // remoteConfig: remoteConfig, // Already in state, no need to re-assign
           settings: userAppSettings,
           themeMode: newThemeMode,
           flexScheme: newFlexScheme,
@@ -376,8 +405,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         baseTheme: event.themeMode == ThemeMode.light
             ? AppBaseTheme.light
             : (event.themeMode == ThemeMode.dark
-                ? AppBaseTheme.dark
-                : AppBaseTheme.system),
+                  ? AppBaseTheme.dark
+                  : AppBaseTheme.system),
       ),
     );
     emit(state.copyWith(settings: updatedSettings, themeMode: event.themeMode));
@@ -407,8 +436,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         accentTheme: event.flexScheme == FlexScheme.blue
             ? AppAccentTheme.defaultBlue
             : (event.flexScheme == FlexScheme.red
-                ? AppAccentTheme.newsRed
-                : AppAccentTheme.graphiteGray),
+                  ? AppAccentTheme.newsRed
+                  : AppAccentTheme.graphiteGray),
       ),
     );
     emit(
@@ -523,7 +552,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   }
 
   /// Maps [AppBaseTheme] enum to Flutter's [ThemeMode].
-  ThemeMode _mapAppBaseTheme(AppBaseTheme mode) {
+  static ThemeMode _mapAppBaseTheme(AppBaseTheme mode) {
     switch (mode) {
       case AppBaseTheme.light:
         return ThemeMode.light;
@@ -535,7 +564,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   }
 
   /// Maps [AppAccentTheme] enum to FlexColorScheme's [FlexScheme].
-  FlexScheme _mapAppAccentTheme(AppAccentTheme name) {
+  static FlexScheme _mapAppAccentTheme(AppAccentTheme name) {
     switch (name) {
       case AppAccentTheme.defaultBlue:
         return FlexScheme.blue;
@@ -547,19 +576,15 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   }
 
   /// Maps a font family string to a nullable string for theme data.
-  String? _mapFontFamily(String fontFamilyString) {
+  static String? _mapFontFamily(String fontFamilyString) {
     if (fontFamilyString == 'SystemDefault') {
-      _logger.info('_mapFontFamily: Input is SystemDefault, returning null.');
       return null;
     }
-    _logger.info(
-      '_mapFontFamily: Input is $fontFamilyString, returning as is.',
-    );
     return fontFamilyString;
   }
 
   /// Maps [AppTextScaleFactor] to itself (no transformation needed).
-  AppTextScaleFactor _mapTextScaleFactor(AppTextScaleFactor factor) {
+  static AppTextScaleFactor _mapTextScaleFactor(AppTextScaleFactor factor) {
     return factor;
   }
 
@@ -570,17 +595,23 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   }
 
   /// Handles fetching the remote application configuration.
+  ///
+  /// This method is primarily used for re-fetching the remote configuration
+  /// (e.g., by [AppStatusService] for background checks or by [StatusPage]
+  /// for retries). The initial remote configuration is fetched during bootstrap.
   Future<void> _onAppConfigFetchRequested(
     AppConfigFetchRequested event,
     Emitter<AppState> emit,
   ) async {
     if (state.user == null) {
       _logger.info('[AppBloc] User is null. Skipping AppConfig fetch.');
+      // If there's no user, and we're not already fetching, or if remoteConfig
+      // is present, we might transition to unauthenticated.
       if (state.remoteConfig != null ||
           state.status == AppLifeCycleStatus.configFetching) {
         emit(
           state.copyWith(
-            remoteConfig: null,
+            remoteConfig: null, // Clear remoteConfig if unauthenticated
             clearAppConfig: true,
             status: AppLifeCycleStatus.unauthenticated,
           ),
@@ -658,7 +689,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       final now = DateTime.now();
       final currentStatus =
           originalUser.feedDecoratorStatus[event.feedDecoratorType] ??
-              const UserFeedDecoratorStatus(isCompleted: false);
+          const UserFeedDecoratorStatus(isCompleted: false);
 
       final updatedDecoratorStatus = currentStatus.copyWith(
         lastShownAt: now,
@@ -667,12 +698,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
       final newFeedDecoratorStatus =
           Map<FeedDecoratorType, UserFeedDecoratorStatus>.from(
-        originalUser.feedDecoratorStatus,
-      )..update(
-          event.feedDecoratorType,
-          (_) => updatedDecoratorStatus,
-          ifAbsent: () => updatedDecoratorStatus,
-        );
+            originalUser.feedDecoratorStatus,
+          )..update(
+            event.feedDecoratorType,
+            (_) => updatedDecoratorStatus,
+            ifAbsent: () => updatedDecoratorStatus,
+          );
 
       final updatedUser = originalUser.copyWith(
         feedDecoratorStatus: newFeedDecoratorStatus,

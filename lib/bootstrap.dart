@@ -197,13 +197,6 @@ Future<Widget> bootstrap(
       initialData: topicsFixturesData,
       logger: logger,
     );
-    countriesClient = DataInMemory<Country>(
-      toJson: (i) => i.toJson(),
-      getId: (i) => i.id,
-      initialData: countriesFixturesData,
-      logger: logger,
-    );
-
     // Wrap the generic DataInMemory<Country> with CountryInMemoryClient.
     // This decorator adds specialized filtering for 'hasActiveSources' and
     // 'hasActiveHeadlines' which are specific to the application's needs
@@ -227,10 +220,16 @@ Future<Widget> bootstrap(
     //     its reusability. The Decorator Pattern allows us to extend its
     //     functionality for `Country` models without altering the generic base.
     countriesClient = CountryInMemoryClient(
-      decoratedClient: countriesClient,
+      decoratedClient: DataInMemory<Country>(
+        toJson: (i) => i.toJson(),
+        getId: (i) => i.id,
+        initialData: countriesFixturesData,
+        logger: logger,
+      ),
       allSources: sourcesFixturesData,
       allHeadlines: headlinesFixturesData,
     );
+
     //
     sourcesClient = DataInMemory<Source>(
       toJson: (i) => i.toJson(),

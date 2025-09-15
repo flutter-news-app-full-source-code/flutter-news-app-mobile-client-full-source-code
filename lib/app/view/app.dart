@@ -20,7 +20,16 @@ import 'package:go_router/go_router.dart';
 import 'package:kv_storage_service/kv_storage_service.dart';
 import 'package:ui_kit/ui_kit.dart';
 
+/// {@template app_widget}
+/// The root widget of the application.
+///
+/// This widget is responsible for setting up the dependency injection
+/// (RepositoryProviders and BlocProviders) for the entire application.
+/// It also orchestrates the initial application startup flow, passing
+/// pre-fetched data and services to the [AppBloc] and [_AppView].
+/// {@endtemplate}
 class App extends StatelessWidget {
+  /// {@macro app_widget}
   const App({
     required AuthRepository authenticationRepository,
     required DataRepository<Headline> headlinesRepository,
@@ -38,6 +47,7 @@ class App extends StatelessWidget {
     required DataRepository<LocalAd> localAdRepository,
     required GlobalKey<NavigatorState> navigatorKey,
     required InlineAdCacheService inlineAdCacheService,
+    required RemoteConfig initialRemoteConfig,
     this.demoDataMigrationService,
     this.demoDataInitializerService,
     this.initialUser,
@@ -56,7 +66,8 @@ class App extends StatelessWidget {
        _adService = adService,
        _localAdRepository = localAdRepository,
        _navigatorKey = navigatorKey,
-       _inlineAdCacheService = inlineAdCacheService;
+       _inlineAdCacheService = inlineAdCacheService,
+       _initialRemoteConfig = initialRemoteConfig;
 
   final AuthRepository _authenticationRepository;
   final DataRepository<Headline> _headlinesRepository;
@@ -77,6 +88,9 @@ class App extends StatelessWidget {
   final DemoDataMigrationService? demoDataMigrationService;
   final DemoDataInitializerService? demoDataInitializerService;
   final User? initialUser;
+  /// The remote configuration fetched during the app's bootstrap phase.
+  /// This is used to initialize the AppBloc with the global app status.
+  final RemoteConfig _initialRemoteConfig;
 
   @override
   Widget build(BuildContext context) {
@@ -110,6 +124,7 @@ class App extends StatelessWidget {
               demoDataInitializerService: demoDataInitializerService,
               initialUser: initialUser,
               navigatorKey: _navigatorKey, // Pass navigatorKey to AppBloc
+              initialRemoteConfig: _initialRemoteConfig, // Pass initialRemoteConfig
             ),
           ),
           BlocProvider(
@@ -117,9 +132,9 @@ class App extends StatelessWidget {
               authenticationRepository: context.read<AuthRepository>(),
             ),
           ),
-          // Provide the InterstitialAdManager as a RepositoryProvider
-          // it  depends on the state managed by AppBloc. Therefore,
-          // so it must be created after AppBloc is available.
+          // Provide the InterstitialAdManager as a RepositoryProvider.
+          // It depends on the state managed by AppBloc, so it must be created
+          // after AppBloc is available.
           RepositoryProvider(
             create: (context) => InterstitialAdManager(
               appBloc: context.read<AppBloc>(),
@@ -195,12 +210,15 @@ class _AppViewState extends State<_AppView> {
   void initState() {
     super.initState();
     final appBloc = context.read<AppBloc>();
-    // Initialize the notifier with the BLoC's current state
+    // Initialize the notifier with the BLoC's current state.
+    // This notifier is used by GoRouter's refreshListenable to trigger
+    // route re-evaluation when the app's lifecycle status changes.
     _statusNotifier = ValueNotifier<AppLifeCycleStatus>(appBloc.state.status);
 
     // Instantiate and initialize the AppStatusService.
-    // This service will automatically trigger checks when the app is resumed
-    // or at periodic intervals, ensuring the app status is always fresh.
+    // This service monitors the app's lifecycle and periodically triggers
+    // remote configuration fetches via the AppBloc, ensuring the app status
+    // is always fresh (e.g., detecting maintenance mode or forced updates).
     _appStatusService = AppStatusService(
       context: context,
       checkInterval: const Duration(minutes: 15),

@@ -1,4 +1,4 @@
-import 'package:core/core.dart' show HttpException, UnknownException;
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:ui_kit/ui_kit.dart';

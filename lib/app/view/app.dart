@@ -15,7 +15,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/services/dem
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/router.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart'; // Import view.dart for CriticalErrorPage
 import 'package:go_router/go_router.dart';
 import 'package:kv_storage_service/kv_storage_service.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -38,7 +38,7 @@ class App extends StatelessWidget {
     required DataRepository<Source> sourcesRepository,
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<UserContentPreferences>
-    userContentPreferencesRepository,
+        userContentPreferencesRepository,
     required DataRepository<RemoteConfig> remoteConfigRepository,
     required DataRepository<User> userRepository,
     required KVStorageService kvStorageService,
@@ -47,27 +47,29 @@ class App extends StatelessWidget {
     required DataRepository<LocalAd> localAdRepository,
     required GlobalKey<NavigatorState> navigatorKey,
     required InlineAdCacheService inlineAdCacheService,
-    required RemoteConfig initialRemoteConfig,
+    required RemoteConfig? initialRemoteConfig,
+    required HttpException? initialRemoteConfigError,
     this.demoDataMigrationService,
     this.demoDataInitializerService,
     this.initialUser,
     super.key,
-  }) : _authenticationRepository = authenticationRepository,
-       _headlinesRepository = headlinesRepository,
-       _topicsRepository = topicsRepository,
-       _countriesRepository = countriesRepository,
-       _sourcesRepository = sourcesRepository,
-       _userAppSettingsRepository = userAppSettingsRepository,
-       _userContentPreferencesRepository = userContentPreferencesRepository,
-       _appConfigRepository = remoteConfigRepository,
-       _userRepository = userRepository,
-       _kvStorageService = kvStorageService,
-       _environment = environment,
-       _adService = adService,
-       _localAdRepository = localAdRepository,
-       _navigatorKey = navigatorKey,
-       _inlineAdCacheService = inlineAdCacheService,
-       _initialRemoteConfig = initialRemoteConfig;
+  })  : _authenticationRepository = authenticationRepository,
+        _headlinesRepository = headlinesRepository,
+        _topicsRepository = topicsRepository,
+        _countriesRepository = countriesRepository,
+        _sourcesRepository = sourcesRepository,
+        _userAppSettingsRepository = userAppSettingsRepository,
+        _userContentPreferencesRepository = userContentPreferencesRepository,
+        _appConfigRepository = remoteConfigRepository,
+        _userRepository = userRepository,
+        _kvStorageService = kvStorageService,
+        _environment = environment,
+        _adService = adService,
+        _localAdRepository = localAdRepository,
+        _navigatorKey = navigatorKey,
+        _inlineAdCacheService = inlineAdCacheService,
+        _initialRemoteConfig = initialRemoteConfig,
+        _initialRemoteConfigError = initialRemoteConfigError;
 
   final AuthRepository _authenticationRepository;
   final DataRepository<Headline> _headlinesRepository;
@@ -76,7 +78,7 @@ class App extends StatelessWidget {
   final DataRepository<Source> _sourcesRepository;
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
   final DataRepository<UserContentPreferences>
-  _userContentPreferencesRepository;
+      _userContentPreferencesRepository;
   final DataRepository<RemoteConfig> _appConfigRepository;
   final DataRepository<User> _userRepository;
   final KVStorageService _kvStorageService;
@@ -88,9 +90,13 @@ class App extends StatelessWidget {
   final DemoDataMigrationService? demoDataMigrationService;
   final DemoDataInitializerService? demoDataInitializerService;
   final User? initialUser;
+
   /// The remote configuration fetched during the app's bootstrap phase.
   /// This is used to initialize the AppBloc with the global app status.
-  final RemoteConfig _initialRemoteConfig;
+  final RemoteConfig? _initialRemoteConfig;
+
+  /// Any error that occurred during the initial remote config fetch.
+  final HttpException? _initialRemoteConfigError;
 
   @override
   Widget build(BuildContext context) {
@@ -115,8 +121,8 @@ class App extends StatelessWidget {
           BlocProvider(
             create: (context) => AppBloc(
               authenticationRepository: context.read<AuthRepository>(),
-              userAppSettingsRepository: context
-                  .read<DataRepository<UserAppSettings>>(),
+              userAppSettingsRepository:
+                  context.read<DataRepository<UserAppSettings>>(),
               appConfigRepository: context.read<DataRepository<RemoteConfig>>(),
               userRepository: context.read<DataRepository<User>>(),
               environment: _environment,
@@ -124,7 +130,10 @@ class App extends StatelessWidget {
               demoDataInitializerService: demoDataInitializerService,
               initialUser: initialUser,
               navigatorKey: _navigatorKey, // Pass navigatorKey to AppBloc
-              initialRemoteConfig: _initialRemoteConfig, // Pass initialRemoteConfig
+              initialRemoteConfig:
+                  _initialRemoteConfig, // Pass initialRemoteConfig
+              initialRemoteConfigError:
+                  _initialRemoteConfigError, // Pass initialRemoteConfigError
             ),
           ),
           BlocProvider(
@@ -277,6 +286,40 @@ class _AppViewState extends State<_AppView> {
           // By returning a dedicated widget here, we ensure these pages are
           // full-screen and exist outside the main app's navigation shell.
 
+          if (state.status == AppLifeCycleStatus.criticalError) {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              theme: lightTheme(
+                scheme: FlexScheme.material,
+                appTextScaleFactor: AppTextScaleFactor.medium,
+                appFontWeight: AppFontWeight.regular,
+                fontFamily: null,
+              ),
+              darkTheme: darkTheme(
+                scheme: FlexScheme.material,
+                appTextScaleFactor: AppTextScaleFactor.medium,
+                appFontWeight: AppFontWeight.regular,
+                fontFamily: null,
+              ),
+              themeMode: state.themeMode,
+              localizationsDelegates: const [
+                ...AppLocalizations.localizationsDelegates,
+                ...UiKitLocalizations.localizationsDelegates,
+              ],
+              supportedLocales: AppLocalizations.supportedLocales,
+              locale: state.locale,
+              home: CriticalErrorPage(
+                exception: state.initialRemoteConfigError ??
+                    const UnknownException('An unknown critical error occurred.'),
+                onRetry: () {
+                  context
+                      .read<AppBloc>()
+                      .add(const AppConfigFetchRequested(isBackgroundCheck: false));
+                },
+              ),
+            );
+          }
+
           if (state.status == AppLifeCycleStatus.underMaintenance) {
             // The app is in maintenance mode. Show the MaintenancePage.
             //
@@ -341,36 +384,6 @@ class _AppViewState extends State<_AppView> {
               supportedLocales: AppLocalizations.supportedLocales,
               locale: state.locale,
               home: const UpdateRequiredPage(),
-            );
-          }
-
-          if (state.status == AppLifeCycleStatus.configFetching ||
-              state.status == AppLifeCycleStatus.configFetchFailed) {
-            // The app is in the process of fetching its initial remote
-            // configuration or has failed to do so. The StatusPage handles
-            // both the loading indicator and the retry mechanism.
-            return MaterialApp(
-              debugShowCheckedModeBanner: false,
-              theme: lightTheme(
-                scheme: FlexScheme.material,
-                appTextScaleFactor: AppTextScaleFactor.medium,
-                appFontWeight: AppFontWeight.regular,
-                fontFamily: null,
-              ),
-              darkTheme: darkTheme(
-                scheme: FlexScheme.material,
-                appTextScaleFactor: AppTextScaleFactor.medium,
-                appFontWeight: AppFontWeight.regular,
-                fontFamily: null,
-              ),
-              themeMode: state.themeMode,
-              localizationsDelegates: const [
-                ...AppLocalizations.localizationsDelegates,
-                ...UiKitLocalizations.localizationsDelegates,
-              ],
-              supportedLocales: AppLocalizations.supportedLocales,
-              locale: state.locale,
-              home: const StatusPage(),
             );
           }
 

@@ -32,6 +32,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   AppBloc({
     required AuthRepository authenticationRepository,
     required DataRepository<UserAppSettings> userAppSettingsRepository,
+    required DataRepository<UserContentPreferences>
+        userContentPreferencesRepository,
     required DataRepository<RemoteConfig> appConfigRepository,
     required DataRepository<User> userRepository,
     required local_config.AppEnvironment environment,
@@ -41,70 +43,56 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     this.demoDataMigrationService,
     this.demoDataInitializerService,
     this.initialUser,
-  }) : _authenticationRepository = authenticationRepository,
-       _userAppSettingsRepository = userAppSettingsRepository,
-       _appConfigRepository = appConfigRepository,
-       _userRepository = userRepository,
-       _environment = environment,
-       _navigatorKey = navigatorKey,
-       _logger = Logger('AppBloc'),
-       super(
-         // The initial state of the app. The status is set based on the
-         // initialRemoteConfig, initialRemoteConfigError, and whether an
-         // initial user is provided. This ensures critical app status
-         // (maintenance, update, critical error) is checked immediately
-         // upon app launch, before any user-specific data is loaded.
-         AppState(
-           status: initialRemoteConfigError != null
-               ? AppLifeCycleStatus.criticalError
-               : initialRemoteConfig?.appStatus.isUnderMaintenance ?? false
-                   ? AppLifeCycleStatus.underMaintenance
-                   : initialRemoteConfig?.appStatus.isLatestVersionOnly ?? false
-                       ? AppLifeCycleStatus.updateRequired
-                       : initialUser == null
-                           ? AppLifeCycleStatus.unauthenticated
-                           : AppLifeCycleStatus.authenticated,
-           settings: UserAppSettings(
-             id: 'default', // This will be replaced by actual user settings
-             displaySettings: const DisplaySettings(
-               baseTheme: AppBaseTheme.system,
-               accentTheme: AppAccentTheme.defaultBlue,
-               fontFamily: 'SystemDefault',
-               textScaleFactor: AppTextScaleFactor.medium,
-               fontWeight: AppFontWeight.regular,
-             ),
-             language: languagesFixturesData.firstWhere(
-               (l) => l.code == 'en',
-               orElse: () => throw StateError(
-                 'Default language "en" not found in language fixtures.',
-               ),
-             ),
-             feedPreferences: const FeedDisplayPreferences(
-               headlineDensity: HeadlineDensity.standard,
-               headlineImageStyle: HeadlineImageStyle.largeThumbnail,
-               showSourceInHeadlineFeed: true,
-               showPublishDateInHeadlineFeed: true,
-             ),
-           ),
-           selectedBottomNavigationIndex: 0,
-           remoteConfig: initialRemoteConfig, // Use the pre-fetched config
-           initialRemoteConfigError: initialRemoteConfigError, // Store any initial config error
-           environment: environment,
-           user: initialUser, // Set initial user if available
-           themeMode: _mapAppBaseTheme(
-             initialUser?.appRole == AppUserRole.guestUser
-                 ? AppBaseTheme.system
-                 : AppBaseTheme.system, // Default to system theme
-           ),
-           flexScheme: _mapAppAccentTheme(AppAccentTheme.defaultBlue),
-           fontFamily: _mapFontFamily('SystemDefault'),
-           appTextScaleFactor: AppTextScaleFactor.medium,
-           locale: Locale(
-             initialUser?.appRole == AppUserRole.guestUser ? 'en' : 'en',
-           ), // Default to English
-         ),
-       ) {
+  })  : _authenticationRepository = authenticationRepository,
+        _userAppSettingsRepository = userAppSettingsRepository,
+        _userContentPreferencesRepository = userContentPreferencesRepository,
+        _appConfigRepository = appConfigRepository,
+        _userRepository = userRepository,
+        _environment = environment,
+        _navigatorKey = navigatorKey,
+        _logger = Logger('AppBloc'),
+        super(
+          // Initial state of the app. The status is set to loadingUserData
+          // as the AppBloc will now handle fetching user-specific data.
+          AppState(
+            status: AppLifeCycleStatus.loadingUserData,
+            settings: UserAppSettings(
+              id: 'default', // This will be replaced by actual user settings
+              displaySettings: const DisplaySettings(
+                baseTheme: AppBaseTheme.system,
+                accentTheme: AppAccentTheme.defaultBlue,
+                fontFamily: 'SystemDefault',
+                textScaleFactor: AppTextScaleFactor.medium,
+                fontWeight: AppFontWeight.regular,
+              ),
+              language: languagesFixturesData.firstWhere(
+                (l) => l.code == 'en',
+                orElse: () => throw StateError(
+                  'Default language "en" not found in language fixtures.',
+                ),
+              ),
+              feedPreferences: const FeedDisplayPreferences(
+                headlineDensity: HeadlineDensity.standard,
+                headlineImageStyle: HeadlineImageStyle.largeThumbnail,
+                showSourceInHeadlineFeed: true,
+                showPublishDateInHeadlineFeed: true,
+              ),
+            ),
+            selectedBottomNavigationIndex: 0,
+            remoteConfig: initialRemoteConfig, // Use the pre-fetched config
+            initialRemoteConfigError:
+                initialRemoteConfigError, // Store any initial config error
+            environment: environment,
+            user: initialUser, // Set initial user if available
+            themeMode: _mapAppBaseTheme(AppBaseTheme.system), // Default to system theme
+            flexScheme: _mapAppAccentTheme(AppAccentTheme.defaultBlue),
+            fontFamily: _mapFontFamily('SystemDefault'),
+            appTextScaleFactor: AppTextScaleFactor.medium,
+            locale: const Locale('en'), // Default to English
+          ),
+        ) {
     // Register event handlers for various app-level events.
+    on<AppStarted>(_onAppStarted); // New event handler
     on<AppUserChanged>(_onAppUserChanged);
     on<AppSettingsRefreshed>(_onAppSettingsRefreshed);
     on<AppConfigFetchRequested>(_onAppConfigFetchRequested);
@@ -126,6 +114,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   final AuthRepository _authenticationRepository;
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
+  final DataRepository<UserContentPreferences> _userContentPreferencesRepository;
   final DataRepository<RemoteConfig> _appConfigRepository;
   final DataRepository<User> _userRepository;
   final local_config.AppEnvironment _environment;
@@ -139,135 +128,98 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   /// Provides access to the [NavigatorState] for obtaining a [BuildContext].
   GlobalKey<NavigatorState> get navigatorKey => _navigatorKey;
 
-  /// Handles all logic related to user authentication state changes.
-  ///
-  /// This method is the consolidated entry point for the app's startup
-  /// and data loading sequence, triggered exclusively by the auth stream.
-  ///
-  ///   1. It will first check if the user's ID has actually changed to prevent
-  ///      redundant reloads from simple token refreshes.
-  ///   2. If the user is `null`, it will emit an `unauthenticated` state.
-  ///   3. If a user is present, it will immediately emit the new user.
-  ///   4. It will then proceed to fetch the `userAppSettings`.
-  ///   5. Upon successful fetch, it will evaluate the app's status (maintenance,
-  ///      update required) using the *already available* `remoteConfig` and
-  ///      emit the final stable state (`authenticated`, `anonymous`, etc.)
-  ///      with the correct, freshly-loaded data.
-  ///   6. If any fetch fails, it will emit a `criticalError` state,
-  ///      allowing the user to retry.
-  Future<void> _onAppUserChanged(
-    AppUserChanged event,
+  /// Handles the [AppStarted] event, orchestrating the initial loading of
+  /// user-specific data and evaluating the overall app status.
+  Future<void> _onAppStarted(
+    AppStarted event,
     Emitter<AppState> emit,
   ) async {
-    final oldUser = state.user;
+    _logger.info('[AppBloc] AppStarted event received. Starting data load.');
 
-    // Optimization: Prevent redundant reloads if the user ID hasn't changed.
-    // This can happen with token refreshes that re-emit the same user.
-    if (oldUser?.id == event.user?.id) {
-      _logger.info(
-        '[AppBloc] AppUserChanged triggered, but user ID is the same. '
-        'Skipping reload.',
+    // If there was a critical error during bootstrap (e.g., RemoteConfig fetch failed),
+    // we should immediately transition to criticalError state.
+    if (state.initialRemoteConfigError != null) {
+      _logger.severe(
+        '[AppBloc] Initial RemoteConfig fetch failed during bootstrap. '
+        'Transitioning to critical error.',
       );
+      emit(state.copyWith(status: AppLifeCycleStatus.criticalError));
       return;
     }
 
-    // --- Handle Unauthenticated State (User is null) ---
-    if (event.user == null) {
-      _logger.info(
-        '[AppBloc] User is null. Transitioning to unauthenticated state.',
+    // If RemoteConfig is null at this point, it's an unexpected error.
+    if (state.remoteConfig == null) {
+      _logger.severe(
+        '[AppBloc] RemoteConfig is null after bootstrap, but no error was reported. '
+        'Transitioning to critical error.',
       );
       emit(
         state.copyWith(
-          status: AppLifeCycleStatus.unauthenticated,
-          user: null,
+          status: AppLifeCycleStatus.criticalError,
+          initialRemoteConfigError:
+              const UnknownException('RemoteConfig is null after bootstrap.'),
         ),
       );
       return;
     }
 
-    // --- Handle Authenticated/Anonymous State (User is present) ---
-    final newUser = event.user!;
+    // Evaluate global app status from RemoteConfig first.
+    if (state.remoteConfig!.appStatus.isUnderMaintenance) {
+      _logger.info(
+        '[AppBloc] App is under maintenance. Transitioning to maintenance state.',
+      );
+      emit(state.copyWith(status: AppLifeCycleStatus.underMaintenance));
+      return;
+    }
+
+    if (state.remoteConfig!.appStatus.isLatestVersionOnly) {
+      // TODO(fulleni): Compare with actual app version.
+      _logger.info(
+        '[AppBloc] App update required. Transitioning to updateRequired state.',
+      );
+      emit(state.copyWith(status: AppLifeCycleStatus.updateRequired));
+      return;
+    }
+
+    // If we reach here, the app is not under maintenance or requires update.
+    // Proceed to load user-specific data.
+    emit(state.copyWith(status: AppLifeCycleStatus.loadingUserData));
+
+    final currentUser = event.initialUser;
+
+    if (currentUser == null) {
+      _logger.info(
+        '[AppBloc] No initial user. Transitioning to unauthenticated state.',
+      );
+      emit(state.copyWith(status: AppLifeCycleStatus.unauthenticated));
+      return;
+    }
+
+    // User is present, proceed to fetch user-specific settings and preferences.
     _logger.info(
-      '[AppBloc] User changed to ${newUser.id} (${newUser.appRole}). '
-      'Beginning data fetch sequence.',
+      '[AppBloc] Initial user found: ${currentUser.id} (${currentUser.appRole}). '
+      'Fetching user settings and preferences.',
     );
 
-    // Immediately emit the new user.
-    emit(state.copyWith(user: newUser));
-
-    // In demo mode, ensure user-specific data is initialized.
-    if (_environment == local_config.AppEnvironment.demo &&
-        demoDataInitializerService != null) {
-      try {
-        _logger.info('Demo mode: Initializing data for user ${newUser.id}.');
-        await demoDataInitializerService!.initializeUserSpecificData(newUser);
-        _logger.info(
-          'Demo mode: Data initialization complete for ${newUser.id}.',
-        );
-      } catch (e, s) {
-        _logger.severe('ERROR: Failed to initialize demo user data.', e, s);
-      }
-    }
-
-    // Handle data migration if an anonymous user signs in.
-    if (oldUser != null &&
-        oldUser.appRole == AppUserRole.guestUser &&
-        newUser.appRole == AppUserRole.standardUser) {
-      _logger.info(
-        'Anonymous user ${oldUser.id} transitioned to authenticated user '
-        '${newUser.id}. Attempting data migration.',
-      );
-      if (demoDataMigrationService != null &&
-          _environment == local_config.AppEnvironment.demo) {
-        await demoDataMigrationService!.migrateAnonymousData(
-          oldUserId: oldUser.id,
-          newUserId: newUser.id,
-        );
-        _logger.info('Demo mode: Data migration completed for ${newUser.id}.');
-      }
-    }
-
-    // --- Fetch Core Application Data ---
     try {
-      UserAppSettings userAppSettings;
-      try {
-        // Attempt to fetch user settings from the backend.
-        userAppSettings = await _userAppSettingsRepository.read(
-          id: newUser.id,
-          userId: newUser.id,
-        );
-        _logger.info(
-          '[AppBloc] UserAppSettings fetched successfully for user: ${newUser.id}',
-        );
-      } on HttpException catch (e) {
-        // If any HttpException occurs during read or create, transition to critical error.
-        _logger.severe(
-          '[AppBloc] Failed to fetch UserAppSettings for user '
-          '${newUser.id}: ${e.runtimeType} - ${e.message}',
-        );
-        emit(
-          state.copyWith(
-            status: AppLifeCycleStatus.criticalError,
-            initialRemoteConfigError: e,
-          ),
-        );
-        return; // Critical error, stop further processing.
-      } catch (e, s) {
-        // Catch any other unexpected errors during read or create.
-        _logger.severe(
-          '[AppBloc] Unexpected error during UserAppSettings fetch/create for user '
-          '${newUser.id}.',
-          e,
-          s,
-        );
-        emit(
-          state.copyWith(
-            status: AppLifeCycleStatus.criticalError,
-            initialRemoteConfigError: UnknownException(e.toString()),
-          ),
-        );
-        return; // Critical error, stop further processing.
-      }
+      // Fetch UserAppSettings
+      final userAppSettings = await _userAppSettingsRepository.read(
+        id: currentUser.id,
+        userId: currentUser.id,
+      );
+      _logger.info(
+        '[AppBloc] UserAppSettings fetched successfully for user: ${currentUser.id}',
+      );
+
+      // Fetch UserContentPreferences
+      final userContentPreferences =
+          await _userContentPreferencesRepository.read(
+        id: currentUser.id,
+        userId: currentUser.id,
+      );
+      _logger.info(
+        '[AppBloc] UserContentPreferences fetched successfully for user: ${currentUser.id}',
+      );
 
       // Map loaded settings to the AppState.
       final newThemeMode = _mapAppBaseTheme(
@@ -284,105 +236,115 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       );
       final newLocale = Locale(userAppSettings.language.code);
 
-      // --- CRITICAL STATUS EVALUATION (using already available remoteConfig) ---
-      // The remoteConfig is already in the state from the initial bootstrap.
-      // We use the existing state.remoteConfig to perform these checks.
-      final remoteConfig = state.remoteConfig;
-
-      // If remoteConfig is null at this point, it means the initial fetch
-      // in bootstrap failed, and we should transition to a critical error state.
-      if (remoteConfig == null) {
-        emit(
-          state.copyWith(
-            status: AppLifeCycleStatus.criticalError,
-            initialRemoteConfigError: state.initialRemoteConfigError ??
-                const UnknownException('RemoteConfig is null after user change.'),
-            settings: userAppSettings,
-            themeMode: newThemeMode,
-            flexScheme: newFlexScheme,
-            fontFamily: newFontFamily,
-            appTextScaleFactor: newAppTextScaleFactor,
-            locale: newLocale,
-          ),
-        );
-        return;
-      }
-
-      if (remoteConfig.appStatus.isUnderMaintenance) {
-        emit(
-          state.copyWith(
-            status: AppLifeCycleStatus.underMaintenance,
-            // remoteConfig: remoteConfig, // Already in state, no need to re-assign
-            settings: userAppSettings,
-            themeMode: newThemeMode,
-            flexScheme: newFlexScheme,
-            fontFamily: newFontFamily,
-            appTextScaleFactor: newAppTextScaleFactor,
-            locale: newLocale,
-          ),
-        );
-        return;
-      }
-
-      if (remoteConfig.appStatus.isLatestVersionOnly) {
-        // TODO(fulleni): Compare with actual app version.
-        emit(
-          state.copyWith(
-            status: AppLifeCycleStatus.updateRequired,
-            // remoteConfig: remoteConfig, // Already in state, no need to re-assign
-            settings: userAppSettings,
-            themeMode: newThemeMode,
-            flexScheme: newFlexScheme,
-            fontFamily: newFontFamily,
-            appTextScaleFactor: newAppTextScaleFactor,
-            locale: newLocale,
-          ),
-        );
-        return;
-      }
-
-      // --- Final State Transition ---
-      // If no critical status, transition to the final stable state.
-      final finalStatus = newUser.appRole == AppUserRole.standardUser
+      final finalStatus = currentUser.appRole == AppUserRole.standardUser
           ? AppLifeCycleStatus.authenticated
           : AppLifeCycleStatus.anonymous;
 
       emit(
         state.copyWith(
           status: finalStatus,
-          // remoteConfig: remoteConfig, // Already in state, no need to re-assign
+          user: currentUser,
           settings: userAppSettings,
+          userContentPreferences: userContentPreferences, // Store userContentPreferences
           themeMode: newThemeMode,
           flexScheme: newFlexScheme,
           fontFamily: newFontFamily,
           appTextScaleFactor: newAppTextScaleFactor,
           locale: newLocale,
+          initialUserPreferencesError: null,
         ),
       );
     } on HttpException catch (e) {
       _logger.severe(
-        '[AppBloc] Failed to fetch or create UserAppSettings (HttpException) for user '
-        '${newUser.id}: ${e.runtimeType} - ${e.message}',
+        '[AppBloc] Failed to fetch user settings or preferences (HttpException) for user '
+        '${currentUser.id}: ${e.runtimeType} - ${e.message}',
       );
       emit(
         state.copyWith(
           status: AppLifeCycleStatus.criticalError,
-          initialRemoteConfigError: e,
+          initialUserPreferencesError: e,
         ),
       );
     } catch (e, s) {
       _logger.severe(
-        '[AppBloc] Unexpected error during UserAppSettings fetch/create for user '
-        '${newUser.id}.',
+        '[AppBloc] Unexpected error during user settings/preferences fetch for user '
+        '${currentUser.id}.',
         e,
         s,
       );
       emit(
         state.copyWith(
           status: AppLifeCycleStatus.criticalError,
-          initialRemoteConfigError: UnknownException(e.toString()),
+          initialUserPreferencesError: UnknownException(e.toString()),
         ),
       );
+    }
+  }
+
+  /// Handles all logic related to user authentication state changes.
+  ///
+  /// This method is now simplified to only update the user and status based
+  /// on the authentication stream, and handle data migration.
+  Future<void> _onAppUserChanged(
+    AppUserChanged event,
+    Emitter<AppState> emit,
+  ) async {
+    final oldUser = state.user;
+    final newUser = event.user;
+
+    // Optimization: Prevent redundant reloads if the user ID hasn't changed.
+    if (oldUser?.id == newUser?.id) {
+      _logger.info(
+        '[AppBloc] AppUserChanged triggered, but user ID is the same. '
+        'Skipping reload.',
+      );
+      return;
+    }
+
+    // Update the user in the state.
+    emit(state.copyWith(user: newUser));
+
+    // Determine the new status based on the user.
+    final newStatus = newUser == null
+        ? AppLifeCycleStatus.unauthenticated
+        : (newUser.appRole == AppUserRole.standardUser
+            ? AppLifeCycleStatus.authenticated
+            : AppLifeCycleStatus.anonymous);
+
+    emit(state.copyWith(status: newStatus));
+
+    // In demo mode, ensure user-specific data is initialized.
+    if (_environment == local_config.AppEnvironment.demo &&
+        demoDataInitializerService != null &&
+        newUser != null) {
+      try {
+        _logger.info('Demo mode: Initializing data for user ${newUser.id}.');
+        await demoDataInitializerService!.initializeUserSpecificData(newUser);
+        _logger.info(
+          'Demo mode: Data initialization complete for ${newUser.id}.',
+        );
+      } catch (e, s) {
+        _logger.severe('ERROR: Failed to initialize demo user data.', e, s);
+      }
+    }
+
+    // Handle data migration if an anonymous user signs in.
+    if (oldUser != null &&
+        oldUser.appRole == AppUserRole.guestUser &&
+        newUser != null &&
+        newUser.appRole == AppUserRole.standardUser) {
+      _logger.info(
+        'Anonymous user ${oldUser.id} transitioned to authenticated user '
+        '${newUser.id}. Attempting data migration.',
+      );
+      if (demoDataMigrationService != null &&
+          _environment == local_config.AppEnvironment.demo) {
+        await demoDataMigrationService!.migrateAnonymousData(
+          oldUserId: oldUser.id,
+          newUserId: newUser.id,
+        );
+        _logger.info('Demo mode: Data migration completed for ${newUser.id}.');
+      }
     }
   }
 
@@ -398,6 +360,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     try {
       final userAppSettings = await _userAppSettingsRepository.read(
+        id: state.user!.id,
+        userId: state.user!.id,
+      );
+
+      // Also fetch UserContentPreferences when settings are refreshed
+      final userContentPreferences =
+          await _userContentPreferencesRepository.read(
         id: state.user!.id,
         userId: state.user!.id,
       );
@@ -431,25 +400,30 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           appTextScaleFactor: newAppTextScaleFactor,
           fontFamily: newFontFamily,
           settings: userAppSettings,
+          userContentPreferences: userContentPreferences, // Store userContentPreferences
           locale: newLocale,
         ),
       );
     } on HttpException catch (e) {
       _logger.severe(
-        'Error loading user app settings in AppBloc (HttpException): $e',
+        'Error loading user app settings or preferences in AppBloc (HttpException): $e',
       );
       emit(
         state.copyWith(
           status: AppLifeCycleStatus.criticalError,
-          initialRemoteConfigError: e,
+          initialUserPreferencesError: e, // Use the new error field
         ),
       );
     } catch (e, s) {
-      _logger.severe('Error loading user app settings in AppBloc.', e, s);
+      _logger.severe(
+        'Error loading user app settings or preferences in AppBloc.',
+        e,
+        s,
+      );
       emit(
         state.copyWith(
           status: AppLifeCycleStatus.criticalError,
-          initialRemoteConfigError: UnknownException(e.toString()),
+          initialUserPreferencesError: UnknownException(e.toString()), // Use the new error field
         ),
       );
     }
@@ -681,11 +655,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       return;
     }
 
+    // Only show critical error if it's not a background check.
     if (!event.isBackgroundCheck) {
       _logger.info(
-        '[AppBloc] Initial config fetch. Setting status to criticalError if failed.',
+        '[AppBloc] Initial config fetch. Setting status to loadingUserData if failed.',
       );
-      emit(state.copyWith(status: AppLifeCycleStatus.criticalError));
+      emit(state.copyWith(status: AppLifeCycleStatus.loadingUserData));
     } else {
       _logger.info('[AppBloc] Background config fetch. Proceeding silently.');
     }

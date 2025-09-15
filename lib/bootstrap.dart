@@ -89,10 +89,27 @@ Future<Widget> bootstrap(
   // Fetch the initial RemoteConfig. This is a critical step to determine
   // the app's global status (e.g., maintenance mode, update required)
   // before proceeding with other initializations.
-  final initialRemoteConfig = await remoteConfigRepository.read(
-    id: kRemoteConfigId,
-  );
-  logger.info('[bootstrap] Initial RemoteConfig fetched successfully.');
+  RemoteConfig? initialRemoteConfig;
+  HttpException? initialRemoteConfigError;
+
+  try {
+    initialRemoteConfig = await remoteConfigRepository.read(
+      id: kRemoteConfigId,
+    );
+    logger.info('[bootstrap] Initial RemoteConfig fetched successfully.');
+  } on HttpException catch (e) {
+    logger.severe(
+      '[bootstrap] Failed to fetch initial RemoteConfig (HttpException): $e',
+    );
+    initialRemoteConfigError = e;
+  } catch (e, s) {
+    logger.severe(
+      '[bootstrap] Unexpected error fetching initial RemoteConfig.',
+      e,
+      s,
+    );
+    initialRemoteConfigError = UnknownException(e.toString());
+  }
 
   // 4. Conditionally initialize Auth services based on environment.
   // This is done after RemoteConfig is fetched, as Auth services might depend
@@ -432,5 +449,6 @@ Future<Widget> bootstrap(
     localAdRepository: localAdRepository,
     navigatorKey: navigatorKey, // Pass the navigatorKey to App
     initialRemoteConfig: initialRemoteConfig, // Pass the initialRemoteConfig
+    initialRemoteConfigError: initialRemoteConfigError, // Pass the initialRemoteConfigError
   );
 }

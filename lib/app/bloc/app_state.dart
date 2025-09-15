@@ -6,6 +6,9 @@ part of 'app_bloc.dart';
 /// and critical operations like fetching remote configuration or handling
 /// authentication changes.
 enum AppLifeCycleStatus {
+  /// The application is currently loading user-specific data (settings, preferences).
+  loadingUserData,
+
   /// The user is not authenticated.
   unauthenticated,
 
@@ -41,6 +44,8 @@ class AppState extends Equatable {
     this.user,
     this.remoteConfig,
     this.initialRemoteConfigError,
+    this.initialUserPreferencesError,
+    this.userContentPreferences,
     this.themeMode = ThemeMode.system,
     this.flexScheme = FlexScheme.blue,
     this.fontFamily,
@@ -63,6 +68,12 @@ class AppState extends Equatable {
 
   /// An error that occurred during the initial remote config fetch.
   final HttpException? initialRemoteConfigError;
+
+  /// An error that occurred during the initial user preferences fetch.
+  final HttpException? initialUserPreferencesError;
+
+  /// The user's content preferences, including followed countries, sources, topics, and saved headlines.
+  final UserContentPreferences? userContentPreferences;
 
   /// The current theme mode (light, dark, or system).
   final ThemeMode themeMode;
@@ -92,6 +103,8 @@ class AppState extends Equatable {
     settings,
     remoteConfig,
     initialRemoteConfigError,
+    initialUserPreferencesError,
+    userContentPreferences,
     themeMode,
     flexScheme,
     fontFamily,
@@ -110,6 +123,8 @@ class AppState extends Equatable {
     RemoteConfig? remoteConfig,
     bool clearAppConfig = false,
     HttpException? initialRemoteConfigError,
+    HttpException? initialUserPreferencesError,
+    UserContentPreferences? userContentPreferences,
     ThemeMode? themeMode,
     FlexScheme? flexScheme,
     String? fontFamily,
@@ -125,6 +140,10 @@ class AppState extends Equatable {
       remoteConfig: clearAppConfig ? null : remoteConfig ?? this.remoteConfig,
       initialRemoteConfigError:
           initialRemoteConfigError ?? this.initialRemoteConfigError,
+      initialUserPreferencesError:
+          initialUserPreferencesError ?? this.initialUserPreferencesError,
+      userContentPreferences:
+          userContentPreferences ?? this.userContentPreferences,
       themeMode: themeMode ?? this.themeMode,
       flexScheme: flexScheme ?? this.flexScheme,
       fontFamily: fontFamily ?? this.fontFamily,

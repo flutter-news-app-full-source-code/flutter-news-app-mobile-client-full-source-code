@@ -6,10 +6,6 @@ part of 'app_bloc.dart';
 /// and critical operations like fetching remote configuration or handling
 /// authentication changes.
 enum AppLifeCycleStatus {
-  /// The application is in the initial phase of bootstrapping,
-  /// fetching remote configuration and user settings.
-  initializing,
-
   /// The user is not authenticated.
   unauthenticated,
 
@@ -19,12 +15,9 @@ enum AppLifeCycleStatus {
   /// The user is anonymous (e.g., guest user).
   anonymous,
 
-  /// The application is currently fetching remote configuration.
-  /// This status is used for re-fetching or background checks, not initial load.
-  configFetching,
-
-  /// The application failed to fetch remote configuration.
-  configFetchFailed,
+  /// A critical error occurred during application startup,
+  /// preventing normal operation.
+  criticalError,
 
   /// The application is currently under maintenance.
   underMaintenance,
@@ -47,6 +40,7 @@ class AppState extends Equatable {
     required this.environment,
     this.user,
     this.remoteConfig,
+    this.initialRemoteConfigError,
     this.themeMode = ThemeMode.system,
     this.flexScheme = FlexScheme.blue,
     this.fontFamily,
@@ -66,6 +60,9 @@ class AppState extends Equatable {
 
   /// The remote configuration fetched from the backend.
   final RemoteConfig? remoteConfig;
+
+  /// An error that occurred during the initial remote config fetch.
+  final HttpException? initialRemoteConfigError;
 
   /// The current theme mode (light, dark, or system).
   final ThemeMode themeMode;
@@ -94,6 +91,7 @@ class AppState extends Equatable {
     user,
     settings,
     remoteConfig,
+    initialRemoteConfigError,
     themeMode,
     flexScheme,
     fontFamily,
@@ -111,6 +109,7 @@ class AppState extends Equatable {
     UserAppSettings? settings,
     RemoteConfig? remoteConfig,
     bool clearAppConfig = false,
+    HttpException? initialRemoteConfigError,
     ThemeMode? themeMode,
     FlexScheme? flexScheme,
     String? fontFamily,
@@ -124,6 +123,8 @@ class AppState extends Equatable {
       user: user ?? this.user,
       settings: settings ?? this.settings,
       remoteConfig: clearAppConfig ? null : remoteConfig ?? this.remoteConfig,
+      initialRemoteConfigError:
+          initialRemoteConfigError ?? this.initialRemoteConfigError,
       themeMode: themeMode ?? this.themeMode,
       flexScheme: flexScheme ?? this.flexScheme,
       fontFamily: fontFamily ?? this.fontFamily,

@@ -52,7 +52,6 @@ class App extends StatelessWidget {
     this.demoDataMigrationService,
     this.demoDataInitializerService,
     this.initialUser,
-    super.key,
   })  : _authenticationRepository = authenticationRepository,
         _headlinesRepository = headlinesRepository,
         _topicsRepository = topicsRepository,
@@ -263,7 +262,6 @@ class _AppViewState extends State<_AppView> {
 
   @override
   Widget build(BuildContext context) {
-
     // Wrap the part of the tree that needs to react to AppBloc state changes
     // with a BlocListener and a BlocBuilder.
     return BlocListener<AppBloc, AppState>(
@@ -283,37 +281,6 @@ class _AppViewState extends State<_AppView> {
       // to fixing the original race conditions and BuildContext instability.
       child: BlocBuilder<AppBloc, AppState>(
         builder: (context, state) {
-          // --- Loading State ---
-          if (state.status == AppLifeCycleStatus.loadingUserData) {
-            return MaterialApp(
-              debugShowCheckedModeBanner: false,
-              theme: lightTheme(
-                scheme: FlexScheme.material,
-                appTextScaleFactor: AppTextScaleFactor.medium,
-                appFontWeight: AppFontWeight.regular,
-                fontFamily: null,
-              ),
-              darkTheme: darkTheme(
-                scheme: FlexScheme.material,
-                appTextScaleFactor: AppTextScaleFactor.medium,
-                appFontWeight: AppFontWeight.regular,
-                fontFamily: null,
-              ),
-              themeMode: state.themeMode,
-              localizationsDelegates: const [
-                ...AppLocalizations.localizationsDelegates,
-                ...UiKitLocalizations.localizationsDelegates,
-              ],
-              supportedLocales: AppLocalizations.supportedLocales,
-              locale: state.locale,
-              home: const LoadingStateWidget(
-                icon: Icons.sync,
-                headline: 'Loading User Data', // Placeholder
-                subheadline: 'Fetching your settings and preferences...', // Placeholder
-              ),
-            );
-          }
-
           // --- Full-Screen Status Pages ---
           // The following states represent critical, app-wide conditions that
           // must be handled before the main router and UI are displayed.
@@ -435,21 +402,58 @@ class _AppViewState extends State<_AppView> {
             );
           }
 
+          // --- Loading User Data State ---
+          // If the app is not in a critical status but user settings or preferences
+          // are still null, display a loading screen. This ensures the main UI
+          // is only built when all necessary user-specific data is available.
+          if (state.settings == null || state.userContentPreferences == null) {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              theme: lightTheme(
+                scheme: FlexScheme.material,
+                appTextScaleFactor: AppTextScaleFactor.medium,
+                appFontWeight: AppFontWeight.regular,
+                fontFamily: null,
+              ),
+              darkTheme: darkTheme(
+                scheme: FlexScheme.material,
+                appTextScaleFactor: AppTextScaleFactor.medium,
+                appFontWeight: AppFontWeight.regular,
+                fontFamily: null,
+              ),
+              themeMode: state.themeMode,
+              localizationsDelegates: const [
+                ...AppLocalizations.localizationsDelegates,
+                ...UiKitLocalizations.localizationsDelegates,
+              ],
+              supportedLocales: AppLocalizations.supportedLocales,
+              locale: state.locale,
+              home: LoadingStateWidget(
+                icon: Icons.sync,
+                headline: AppLocalizations.of(context).settingsLoadingHeadline,
+                subheadline:
+                    AppLocalizations.of(context).settingsLoadingSubheadline,
+              ),
+            );
+          }
+
           // --- Main Application UI ---
-          // If none of the critical states above are met, the app is ready
-          // to display its main UI. We build the MaterialApp.router here.
+          // If none of the critical states above are met, and user settings
+          // are loaded, the app is ready to display its main UI.
+          // We build the MaterialApp.router here.
           // This is the single, STABLE root widget for the entire main app.
           //
           // WHY IS THIS SO IMPORTANT?
           // Because this widget is now built conditionally inside a single
           // BlocBuilder, it is created only ONCE when the app enters a
-          // "running" state (e.g., authenticated, anonymous). It is no longer
-          // destroyed and rebuilt during startup, which was the root cause of
-          // the `BuildContext` instability and the `l10n` crashes.
+          // "running" state (e.g., authenticated, anonymous) with all
+          // necessary data. It is no longer destroyed and rebuilt during
+          // startup, which was the root cause of the `BuildContext` instability
+          // and the `l10n` crashes.
           //
           // THEME CONFIGURATION:
-          // Unlike the status pages, this MaterialApp is themed using the full,
-          // detailed settings loaded into the AppState (e.g., `state.flexScheme`,
+          // This MaterialApp is themed using the full, detailed settings
+          // loaded into the AppState (e.g., `state.flexScheme`,
           // `state.settings.displaySettings...`), providing the complete,
           // personalized user experience.
           return MaterialApp.router(
@@ -458,16 +462,16 @@ class _AppViewState extends State<_AppView> {
             theme: lightTheme(
               scheme: state.flexScheme,
               appTextScaleFactor:
-                  state.settings.displaySettings.textScaleFactor,
-              appFontWeight: state.settings.displaySettings.fontWeight,
-              fontFamily: state.settings.displaySettings.fontFamily,
+                  state.settings!.displaySettings.textScaleFactor,
+              appFontWeight: state.settings!.displaySettings.fontWeight,
+              fontFamily: state.settings!.displaySettings.fontFamily,
             ),
             darkTheme: darkTheme(
               scheme: state.flexScheme,
               appTextScaleFactor:
-                  state.settings.displaySettings.textScaleFactor,
-              appFontWeight: state.settings.displaySettings.fontWeight,
-              fontFamily: state.settings.displaySettings.fontFamily,
+                  state.settings!.displaySettings.textScaleFactor,
+              appFontWeight: state.settings!.displaySettings.fontWeight,
+              fontFamily: state.settings!.displaySettings.fontFamily,
             ),
             routerConfig: _router,
             locale: state.locale,

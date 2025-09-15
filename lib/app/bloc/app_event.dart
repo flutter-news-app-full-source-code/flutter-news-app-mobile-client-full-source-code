@@ -7,6 +7,17 @@ abstract class AppEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+/// Dispatched when the application is first started and ready to load initial data.
+class AppStarted extends AppEvent {
+  const AppStarted({this.initialUser});
+
+  /// The user object pre-fetched during bootstrap, if available.
+  final User? initialUser;
+
+  @override
+  List<Object?> get props => [initialUser];
+}
+
 /// Dispatched when the authentication state changes (e.g., user logs in/out).
 class AppUserChanged extends AppEvent {
   const AppUserChanged(this.user);

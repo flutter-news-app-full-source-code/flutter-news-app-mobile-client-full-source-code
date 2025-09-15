@@ -39,13 +39,13 @@ class AppState extends Equatable {
   /// {@macro app_state}
   const AppState({
     required this.status,
-    required this.settings,
     required this.environment,
     this.user,
     this.remoteConfig,
     this.initialRemoteConfigError,
     this.initialUserPreferencesError,
     this.userContentPreferences,
+    this.settings,
     this.themeMode = ThemeMode.system,
     this.flexScheme = FlexScheme.blue,
     this.fontFamily,
@@ -61,7 +61,8 @@ class AppState extends Equatable {
   final User? user;
 
   /// The user's application settings, including display preferences.
-  final UserAppSettings settings;
+  /// This is null until successfully fetched from the backend.
+  final UserAppSettings? settings;
 
   /// The remote configuration fetched from the backend.
   final RemoteConfig? remoteConfig;

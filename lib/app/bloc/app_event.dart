@@ -97,6 +97,20 @@ class AppLogoutRequested extends AppEvent {
   const AppLogoutRequested();
 }
 
+/// Dispatched when the user's content preferences have been updated.
+///
+/// This event carries the complete, updated [UserContentPreferences] object,
+/// allowing the [AppBloc] to update its state and persist the changes.
+class AppUserContentPreferencesChanged extends AppEvent {
+  const AppUserContentPreferencesChanged({required this.preferences});
+
+  /// The updated [UserContentPreferences] object.
+  final UserContentPreferences preferences;
+
+  @override
+  List<Object> get props => [preferences];
+}
+
 /// Dispatched when a one-time user account decorator has been shown.
 ///
 /// This event updates the user's interaction status with specific in-feed

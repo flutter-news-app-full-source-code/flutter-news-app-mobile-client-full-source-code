@@ -1,7 +1,7 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
@@ -18,8 +18,6 @@ class FollowedCountriesListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
-    final followedCountries =
-        context.watch<AccountBloc>().state.preferences?.followedCountries ?? [];
 
     return Scaffold(
       appBar: AppBar(
@@ -34,10 +32,13 @@ class FollowedCountriesListPage extends StatelessWidget {
           ),
         ],
       ),
-      body: BlocBuilder<AccountBloc, AccountState>(
-        builder: (context, state) {
-          if (state.status == AccountStatus.loading &&
-              state.preferences == null) {
+      body: BlocBuilder<AppBloc, AppState>(
+        builder: (context, appState) {
+          final user = appState.user;
+          final userContentPreferences = appState.userContentPreferences;
+
+          if (appState.status == AppLifeCycleStatus.loadingUserData ||
+              userContentPreferences == null) {
             return LoadingStateWidget(
               icon: Icons.flag_outlined,
               headline: l10n.followedCountriesLoadingHeadline,
@@ -45,21 +46,18 @@ class FollowedCountriesListPage extends StatelessWidget {
             );
           }
 
-          if (state.status == AccountStatus.failure &&
-              state.preferences == null) {
+          if (appState.initialUserPreferencesError != null) {
             return FailureStateWidget(
-              exception:
-                  state.error ??
-                  OperationFailedException(l10n.followedCountriesErrorHeadline),
+              exception: appState.initialUserPreferencesError!,
               onRetry: () {
-                if (state.user?.id != null) {
-                  context.read<AccountBloc>().add(
-                    AccountLoadUserPreferences(userId: state.user!.id),
-                  );
-                }
+                context.read<AppBloc>().add(
+                      AppStarted(initialUser: user),
+                    );
               },
             );
           }
+
+          final followedCountries = userContentPreferences.followedCountries;
 
           if (followedCountries.isEmpty) {
             return InitialStateWidget(
@@ -91,9 +89,20 @@ class FollowedCountriesListPage extends StatelessWidget {
                   ),
                   tooltip: l10n.unfollowCountryTooltip(country.name),
                   onPressed: () {
-                    context.read<AccountBloc>().add(
-                      AccountFollowCountryToggled(country: country),
+                    final updatedFollowedCountries =
+                        List<Country>.from(followedCountries)
+                          ..removeWhere((c) => c.id == country.id);
+
+                    final updatedPreferences =
+                        userContentPreferences.copyWith(
+                      followedCountries: updatedFollowedCountries,
                     );
+
+                    context.read<AppBloc>().add(
+                          AppUserContentPreferencesChanged(
+                            preferences: updatedPreferences,
+                          ),
+                        );
                   },
                 ),
                 onTap: () async {

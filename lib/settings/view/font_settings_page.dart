@@ -68,7 +68,7 @@ class FontSettingsPage extends StatelessWidget {
       listener: (context, settingsState) {
         // Renamed state to avoid conflict
         if (settingsState.status == SettingsStatus.success) {
-          context.read<AppBloc>().add(const AppSettingsRefreshed());
+          context.read<AppBloc>().add(const AppUserAppSettingsRefreshed());
         }
       },
       child: Scaffold(

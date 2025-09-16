@@ -75,7 +75,7 @@ class AppStatusService with WidgetsBindingObserver {
       );
       // Add the event to the AppBloc to fetch the latest config.
       _context.read<AppBloc>().add(
-        const AppConfigFetchRequested(isBackgroundCheck: true),
+        const AppPeriodicConfigFetchRequested(isBackgroundCheck: true),
       );
     });
   }
@@ -89,18 +89,22 @@ class AppStatusService with WidgetsBindingObserver {
     // useful on web, where switching browser tabs would otherwise trigger
     // a reload, which is unnecessary and can be distracting for demos.
     if (_environment == AppEnvironment.demo) {
-      _logger.info('[AppStatusService] Demo mode: Skipping app lifecycle check.');
+      _logger.info(
+        '[AppStatusService] Demo mode: Skipping app lifecycle check.',
+      );
       return;
     }
 
     // We are only interested in the 'resumed' state.
     if (state == AppLifecycleState.resumed) {
-      _logger.info('[AppStatusService] App resumed. Requesting AppConfig fetch.');
+      _logger.info(
+        '[AppStatusService] App resumed. Requesting AppConfig fetch.',
+      );
       // When the app comes to the foreground, immediately trigger a check.
       // This is crucial for catching maintenance mode that was enabled
       // while the app was in the background.
       _context.read<AppBloc>().add(
-        const AppConfigFetchRequested(isBackgroundCheck: true),
+        const AppPeriodicConfigFetchRequested(isBackgroundCheck: true),
       );
     }
   }

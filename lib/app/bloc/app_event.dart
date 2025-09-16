@@ -112,12 +112,3 @@ class AppUserFeedDecoratorShown extends AppEvent {
   @override
   List<Object> get props => [userId, feedDecoratorType, isCompleted];
 }
-
-/// Dispatched when user-specific data (UserAppSettings and UserContentPreferences)
-/// have been successfully loaded and updated in the AppBloc state.
-///
-/// This event serves as a signal for other BLoCs or components that depend
-/// on fully loaded user data.
-class AppUserDataLoaded extends AppEvent {
-  const AppUserDataLoaded();
-}

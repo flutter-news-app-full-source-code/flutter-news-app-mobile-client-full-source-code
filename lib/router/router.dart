@@ -74,7 +74,6 @@ GoRouter createRouter({
   // Instantiate AccountBloc once to be shared
   final accountBloc = AccountBloc(
     authenticationRepository: authenticationRepository,
-    userContentPreferencesRepository: userContentPreferencesRepository,
   );
 
   // Instantiate FeedDecoratorService once to be shared

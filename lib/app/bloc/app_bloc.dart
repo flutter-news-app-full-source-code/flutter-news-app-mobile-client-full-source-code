@@ -75,7 +75,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppPeriodicConfigFetchRequested>(_onAppPeriodicConfigFetchRequested);
     on<AppUserFeedDecoratorShown>(_onAppUserFeedDecoratorShown);
     on<AppLogoutRequested>(_onLogoutRequested);
-    on<AppUserDataLoaded>(_onAppUserDataLoaded);
 
     // Subscribe to the authentication repository's authStateChanges stream.
     // This stream is the single source of truth for the user's auth state
@@ -101,6 +100,71 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   /// Provides access to the [NavigatorState] for obtaining a [BuildContext].
   GlobalKey<NavigatorState> get navigatorKey => _navigatorKey;
+
+  /// Fetches [UserAppSettings] and [UserContentPreferences] for the given
+  /// [user] and updates the [AppState].
+  ///
+  /// This method centralizes the logic for loading user-specific data,
+  /// ensuring consistency across different app lifecycle events.
+  /// It also handles potential [HttpException]s during the fetch operation.
+  Future<void> _fetchAndSetUserData(User user, Emitter<AppState> emit) async {
+    _logger.info(
+      '[AppBloc] Fetching user settings and preferences for user: ${user.id}',
+    );
+    try {
+      final userAppSettings = await _userAppSettingsRepository.read(
+        id: user.id,
+        userId: user.id,
+      );
+      _logger.info(
+        '[AppBloc] UserAppSettings fetched successfully for user: ${user.id}',
+      );
+
+      final userContentPreferences = await _userContentPreferencesRepository
+          .read(id: user.id, userId: user.id);
+      _logger.info(
+        '[AppBloc] UserContentPreferences fetched successfully for user: ${user.id}',
+      );
+
+      final finalStatus = user.appRole == AppUserRole.standardUser
+          ? AppLifeCycleStatus.authenticated
+          : AppLifeCycleStatus.anonymous;
+
+      emit(
+        state.copyWith(
+          status: finalStatus,
+          user: user,
+          settings: userAppSettings,
+          userContentPreferences: userContentPreferences,
+          initialUserPreferencesError: null,
+        ),
+      );
+    } on HttpException catch (e) {
+      _logger.severe(
+        '[AppBloc] Failed to fetch user settings or preferences (HttpException) '
+        'for user ${user.id}: ${e.runtimeType} - ${e.message}',
+      );
+      emit(
+        state.copyWith(
+          status: AppLifeCycleStatus.criticalError,
+          initialUserPreferencesError: e,
+        ),
+      );
+    } catch (e, s) {
+      _logger.severe(
+        '[AppBloc] Unexpected error during user settings/preferences fetch '
+        'for user ${user.id}.',
+        e,
+        s,
+      );
+      emit(
+        state.copyWith(
+          status: AppLifeCycleStatus.criticalError,
+          initialUserPreferencesError: UnknownException(e.toString()),
+        ),
+      );
+    }
+  }
 
   /// Handles the [AppStarted] event, orchestrating the initial loading of
   /// user-specific data and evaluating the overall app status.
@@ -168,68 +232,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     }
 
     // User is present, proceed to fetch user-specific settings and preferences.
-    _logger.info(
-      '[AppBloc] Initial user found: ${currentUser.id} (${currentUser.appRole}). '
-      'Fetching user settings and preferences.',
-    );
-
-    try {
-      // Fetch UserAppSettings
-      final userAppSettings = await _userAppSettingsRepository.read(
-        id: currentUser.id,
-        userId: currentUser.id,
-      );
-      _logger.info(
-        '[AppBloc] UserAppSettings fetched successfully for user: ${currentUser.id}',
-      );
-
-      // Fetch UserContentPreferences
-      final userContentPreferences = await _userContentPreferencesRepository
-          .read(id: currentUser.id, userId: currentUser.id);
-      _logger.info(
-        '[AppBloc] UserContentPreferences fetched successfully for user: ${currentUser.id}',
-      );
-
-      final finalStatus = currentUser.appRole == AppUserRole.standardUser
-          ? AppLifeCycleStatus.authenticated
-          : AppLifeCycleStatus.anonymous;
-
-      emit(
-        state.copyWith(
-          status: finalStatus,
-          user: currentUser,
-          settings: userAppSettings,
-          userContentPreferences: userContentPreferences,
-          initialUserPreferencesError: null,
-        ),
-      );
-      // Dispatch event to signal that user settings are loaded
-      add(const AppUserDataLoaded());
-    } on HttpException catch (e) {
-      _logger.severe(
-        '[AppBloc] Failed to fetch user settings or preferences (HttpException) for user '
-        '${currentUser.id}: ${e.runtimeType} - ${e.message}',
-      );
-      emit(
-        state.copyWith(
-          status: AppLifeCycleStatus.criticalError,
-          initialUserPreferencesError: e,
-        ),
-      );
-    } catch (e, s) {
-      _logger.severe(
-        '[AppBloc] Unexpected error during user settings/preferences fetch for user '
-        '${currentUser.id}.',
-        e,
-        s,
-      );
-      emit(
-        state.copyWith(
-          status: AppLifeCycleStatus.criticalError,
-          initialUserPreferencesError: UnknownException(e.toString()),
-        ),
-      );
-    }
+    await _fetchAndSetUserData(currentUser, emit);
   }
 
   /// Handles all logic related to user authentication state changes.
@@ -263,6 +266,19 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             : AppLifeCycleStatus.anonymous);
 
     emit(state.copyWith(status: newStatus));
+
+    // If a new user is present, fetch their specific data.
+    if (newUser != null) {
+      await _fetchAndSetUserData(newUser, emit);
+    } else {
+      // If user logs out, clear user-specific data from state.
+      emit(
+        state.copyWith(
+          settings: null,
+          userContentPreferences: null,
+        ),
+      );
+    }
 
     // In demo mode, ensure user-specific data is initialized.
     if (_environment == local_config.AppEnvironment.demo &&
@@ -309,53 +325,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       return;
     }
 
-    try {
-      final userAppSettings = await _userAppSettingsRepository.read(
-        id: state.user!.id,
-        userId: state.user!.id,
-      );
-
-      // Also fetch UserContentPreferences when settings are refreshed
-      final userContentPreferences = await _userContentPreferencesRepository
-          .read(id: state.user!.id, userId: state.user!.id);
-
-      _logger.info(
-        '[AppBloc] UserAppSettings and UserContentPreferences refreshed '
-        'successfully for user: ${state.user!.id}',
-      );
-
-      emit(
-        state.copyWith(
-          settings: userAppSettings,
-          userContentPreferences: userContentPreferences,
-          initialUserPreferencesError: null,
-        ),
-      );
-      // Dispatch event to signal that user settings are loaded
-      add(const AppUserDataLoaded());
-    } on HttpException catch (e) {
-      _logger.severe(
-        'Error loading user app settings or preferences in AppBloc (HttpException): $e',
-      );
-      emit(
-        state.copyWith(
-          status: AppLifeCycleStatus.criticalError,
-          initialUserPreferencesError: e,
-        ),
-      );
-    } catch (e, s) {
-      _logger.severe(
-        'Error loading user app settings or preferences in AppBloc.',
-        e,
-        s,
-      );
-      emit(
-        state.copyWith(
-          status: AppLifeCycleStatus.criticalError,
-          initialUserPreferencesError: UnknownException(e.toString()),
-        ),
-      );
-    }
+    await _fetchAndSetUserData(state.user!, emit);
   }
 
   /// Handles the [AppSettingsChanged] event, updating and persisting the
@@ -564,19 +534,5 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         emit(state.copyWith(user: originalUser));
       }
     }
-  }
-
-  /// Handles the [AppUserDataLoaded] event.
-  /// This event is dispatched when user-specific settings (UserAppSettings and
-  /// UserContentPreferences) have been successfully loaded and updated in the
-  /// AppBloc state. This handler currently does nothing, but it serves as a
-  /// placeholder for future logic that might need to react to this event.
-  Future<void> _onAppUserDataLoaded(
-    AppUserDataLoaded event,
-    Emitter<AppState> emit,
-  ) async {
-    _logger.info('[AppBloc] AppUserSettingsLoaded event received.');
-    // This event is primarily for other BLoCs to listen to.
-    // AppBloc itself doesn't need to do anything further here.
   }
 }

@@ -33,7 +33,8 @@ enum AppLifeCycleStatus {
 /// Represents the overall state of the application.
 ///
 /// This state includes authentication status, user settings, remote
-/// configuration, and UI-related preferences.
+/// configuration, and UI-related preferences. It acts as the single source
+/// of truth for global application state.
 /// {@endtemplate}
 class AppState extends Equatable {
   /// {@macro app_state}
@@ -46,56 +47,92 @@ class AppState extends Equatable {
     this.initialUserPreferencesError,
     this.userContentPreferences,
     this.settings,
-    this.themeMode = ThemeMode.system,
-    this.flexScheme = FlexScheme.blue,
-    this.fontFamily,
-    this.appTextScaleFactor = AppTextScaleFactor.medium,
     this.selectedBottomNavigationIndex = 0,
-    this.locale,
   });
 
-  /// The current status of the application.
+  /// The current status of the application, indicating its lifecycle stage.
   final AppLifeCycleStatus status;
 
   /// The currently authenticated or anonymous user.
+  /// Null if no user is logged in or recognized.
   final User? user;
 
-  /// The user's application settings, including display preferences.
+  /// The user's application settings, including display preferences and language.
   /// This is null until successfully fetched from the backend.
   final UserAppSettings? settings;
 
   /// The remote configuration fetched from the backend.
+  /// Contains global settings like maintenance mode, update requirements, and ad configurations.
   final RemoteConfig? remoteConfig;
 
   /// An error that occurred during the initial remote config fetch.
+  /// If not null, indicates a critical issue preventing app startup.
   final HttpException? initialRemoteConfigError;
 
   /// An error that occurred during the initial user preferences fetch.
+  /// If not null, indicates a critical issue preventing app startup.
   final HttpException? initialUserPreferencesError;
 
-  /// The user's content preferences, including followed countries, sources, topics, and saved headlines.
+  /// The user's content preferences, including followed countries, sources,
+  /// topics, and saved headlines.
+  /// This is null until successfully fetched from the backend.
   final UserContentPreferences? userContentPreferences;
-
-  /// The current theme mode (light, dark, or system).
-  final ThemeMode themeMode;
-
-  /// The current FlexColorScheme scheme for accent colors.
-  final FlexScheme flexScheme;
-
-  /// The currently selected font family.
-  final String? fontFamily;
-
-  /// The current text scale factor.
-  final AppTextScaleFactor appTextScaleFactor;
 
   /// The currently selected index for bottom navigation.
   final int selectedBottomNavigationIndex;
 
-  /// The current application environment.
+  /// The current application environment (e.g., demo, development, production).
   final local_config.AppEnvironment environment;
 
-  /// The currently selected locale for localization.
-  final Locale? locale;
+  /// The current theme mode (light, dark, or system), derived from [settings].
+  /// Defaults to [ThemeMode.system] if [settings] are not yet loaded.
+  ThemeMode get themeMode {
+    return settings?.displaySettings.baseTheme == AppBaseTheme.light
+        ? ThemeMode.light
+        : (settings?.displaySettings.baseTheme == AppBaseTheme.dark
+            ? ThemeMode.dark
+            : ThemeMode.system);
+  }
+
+  /// The current FlexColorScheme scheme for accent colors, derived from [settings].
+  /// Defaults to [FlexScheme.blue] if [settings] are not yet loaded.
+  FlexScheme get flexScheme {
+    switch (settings?.displaySettings.accentTheme) {
+      case AppAccentTheme.newsRed:
+        return FlexScheme.red;
+      case AppAccentTheme.graphiteGray:
+        return FlexScheme.material;
+      case AppAccentTheme.defaultBlue:
+      case null:
+        return FlexScheme.blue;
+    }
+  }
+
+  /// The currently selected font family, derived from [settings].
+  /// Returns null if 'SystemDefault' is selected or if [settings] are not yet loaded.
+  String? get fontFamily {
+    final family = settings?.displaySettings.fontFamily;
+    return family == 'SystemDefault' ? null : family;
+  }
+
+  /// The current text scale factor, derived from [settings].
+  /// Defaults to [AppTextScaleFactor.medium] if [settings] are not yet loaded.
+  AppTextScaleFactor get appTextScaleFactor {
+    return settings?.displaySettings.textScaleFactor ??
+        AppTextScaleFactor.medium;
+  }
+
+  /// The current font weight, derived from [settings].
+  /// Defaults to [AppFontWeight.regular] if [settings] are not yet loaded.
+  AppFontWeight get appFontWeight {
+    return settings?.displaySettings.fontWeight ?? AppFontWeight.regular;
+  }
+
+  /// The currently selected locale for localization, derived from [settings].
+  /// Defaults to English ('en') if [settings] are not yet loaded.
+  Locale get locale {
+    return Locale(settings?.language.code ?? 'en');
+  }
 
   @override
   List<Object?> get props => [
@@ -106,13 +143,8 @@ class AppState extends Equatable {
     initialRemoteConfigError,
     initialUserPreferencesError,
     userContentPreferences,
-    themeMode,
-    flexScheme,
-    fontFamily,
-    appTextScaleFactor,
     selectedBottomNavigationIndex,
     environment,
-    locale,
   ];
 
   /// Creates a copy of this [AppState] with the given fields replaced with
@@ -126,13 +158,8 @@ class AppState extends Equatable {
     HttpException? initialRemoteConfigError,
     HttpException? initialUserPreferencesError,
     UserContentPreferences? userContentPreferences,
-    ThemeMode? themeMode,
-    FlexScheme? flexScheme,
-    String? fontFamily,
-    AppTextScaleFactor? appTextScaleFactor,
     int? selectedBottomNavigationIndex,
     local_config.AppEnvironment? environment,
-    Locale? locale,
   }) {
     return AppState(
       status: status ?? this.status,
@@ -145,14 +172,9 @@ class AppState extends Equatable {
           initialUserPreferencesError ?? this.initialUserPreferencesError,
       userContentPreferences:
           userContentPreferences ?? this.userContentPreferences,
-      themeMode: themeMode ?? this.themeMode,
-      flexScheme: flexScheme ?? this.flexScheme,
-      fontFamily: fontFamily ?? this.fontFamily,
-      appTextScaleFactor: appTextScaleFactor ?? this.appTextScaleFactor,
       selectedBottomNavigationIndex:
           selectedBottomNavigationIndex ?? this.selectedBottomNavigationIndex,
       environment: environment ?? this.environment,
-      locale: locale ?? this.locale,
     );
   }
 }

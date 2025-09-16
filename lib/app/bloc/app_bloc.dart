@@ -75,6 +75,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppSettingsChanged>(_onAppSettingsChanged);
     on<AppPeriodicConfigFetchRequested>(_onAppPeriodicConfigFetchRequested);
     on<AppUserFeedDecoratorShown>(_onAppUserFeedDecoratorShown);
+    on<AppUserContentPreferencesChanged>(_onAppUserContentPreferencesChanged);
     on<AppLogoutRequested>(_onLogoutRequested);
 
     // Subscribe to the authentication repository's authStateChanges stream.
@@ -595,6 +596,57 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         _logger.severe('Failed to update feed decorator status on backend: $e');
         emit(state.copyWith(user: originalUser));
       }
+    }
+  }
+
+  /// Handles updating the user's content preferences.
+  ///
+  /// This event is dispatched by UI components when the user modifies their
+  /// followed countries, sources, topics, or saved headlines. The event
+  /// carries the complete, updated [UserContentPreferences] object, which
+  /// is then persisted to the backend.
+  Future<void> _onAppUserContentPreferencesChanged(
+    AppUserContentPreferencesChanged event,
+    Emitter<AppState> emit,
+  ) async {
+    // Ensure a user is available before attempting to update preferences.
+    if (state.user == null) {
+      _logger.warning(
+        '[AppBloc] Skipping AppUserContentPreferencesChanged: User is null.',
+      );
+      return;
+    }
+
+    final updatedPreferences = event.preferences;
+
+    // Optimistically update the state.
+    emit(state.copyWith(userContentPreferences: updatedPreferences));
+
+    try {
+      await _userContentPreferencesRepository.update(
+        id: updatedPreferences.id,
+        item: updatedPreferences,
+        userId: updatedPreferences.id,
+      );
+      _logger.info(
+        '[AppBloc] UserContentPreferences successfully updated and persisted '
+        'for user ${updatedPreferences.id}.',
+      );
+    } on HttpException catch (e) {
+      _logger.severe(
+        'Failed to persist UserContentPreferences for user ${updatedPreferences.id} '
+        '(HttpException): $e',
+      );
+      // Revert to original preferences on failure to maintain state consistency.
+      emit(state.copyWith(userContentPreferences: state.userContentPreferences));
+    } catch (e, s) {
+      _logger.severe(
+        'Unexpected error persisting UserContentPreferences for user ${updatedPreferences.id}.',
+        e,
+        s,
+      );
+      // Revert to original preferences on failure to maintain state consistency.
+      emit(state.copyWith(userContentPreferences: state.userContentPreferences));
     }
   }
 }

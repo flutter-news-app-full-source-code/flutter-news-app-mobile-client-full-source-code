@@ -22,7 +22,8 @@ part 'app_state.dart';
 ///
 /// This BLoC is central to the application's lifecycle, reacting to user
 /// authentication changes, managing user preferences, and applying global
-/// remote configurations.
+/// remote configurations. It acts as the single source of truth for global
+/// application state.
 /// {@endtemplate}
 class AppBloc extends Bloc<AppEvent, AppState> {
   /// {@macro app_bloc}
@@ -33,7 +34,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required AuthRepository authenticationRepository,
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<UserContentPreferences>
-    userContentPreferencesRepository,
+        userContentPreferencesRepository,
     required DataRepository<RemoteConfig> appConfigRepository,
     required DataRepository<User> userRepository,
     required local_config.AppEnvironment environment,
@@ -43,50 +44,38 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     this.demoDataMigrationService,
     this.demoDataInitializerService,
     this.initialUser,
-  }) : _authenticationRepository = authenticationRepository,
-       _userAppSettingsRepository = userAppSettingsRepository,
-       _userContentPreferencesRepository = userContentPreferencesRepository,
-       _appConfigRepository = appConfigRepository,
-       _userRepository = userRepository,
-       _environment = environment,
-       _navigatorKey = navigatorKey,
-       _logger = Logger('AppBloc'),
-       super(
-         // Initial state of the app. The status is set to loadingUserData
-         // as the AppBloc will now handle fetching user-specific data.
-         // UserAppSettings and UserContentPreferences are initially null
-         // and will be fetched asynchronously.
-         AppState(
-           status: AppLifeCycleStatus.loadingUserData,
-           // settings is now nullable and will be fetched.
-           settings: null,
-           selectedBottomNavigationIndex: 0,
-           remoteConfig: initialRemoteConfig, // Use the pre-fetched config
-           initialRemoteConfigError:
-               initialRemoteConfigError, // Store any initial config error
-           environment: environment,
-           user: initialUser, // Set initial user if available
-           // Default theme settings until user settings are loaded
-           themeMode: _mapAppBaseTheme(AppBaseTheme.system),
-           flexScheme: _mapAppAccentTheme(AppAccentTheme.defaultBlue),
-           fontFamily: _mapFontFamily('SystemDefault'),
-           appTextScaleFactor: AppTextScaleFactor.medium,
-           locale: const Locale('en'), // Default to English
-         ),
-       ) {
+  })  : _authenticationRepository = authenticationRepository,
+        _userAppSettingsRepository = userAppSettingsRepository,
+        _userContentPreferencesRepository = userContentPreferencesRepository,
+        _appConfigRepository = appConfigRepository,
+        _userRepository = userRepository,
+        _environment = environment,
+        _navigatorKey = navigatorKey,
+        _logger = Logger('AppBloc'),
+        super(
+          // Initial state of the app. The status is set to loadingUserData
+          // as the AppBloc will now handle fetching user-specific data.
+          // UserAppSettings and UserContentPreferences are initially null
+          // and will be fetched asynchronously.
+          AppState(
+            status: AppLifeCycleStatus.loadingUserData,
+            selectedBottomNavigationIndex: 0,
+            remoteConfig: initialRemoteConfig, // Use the pre-fetched config
+            initialRemoteConfigError:
+                initialRemoteConfigError, // Store any initial config error
+            environment: environment,
+            user: initialUser, // Set initial user if available
+          ),
+        ) {
     // Register event handlers for various app-level events.
-    on<AppStarted>(_onAppStarted); // New event handler
+    on<AppStarted>(_onAppStarted);
     on<AppUserChanged>(_onAppUserChanged);
     on<AppSettingsRefreshed>(_onAppSettingsRefreshed);
-    on<AppConfigFetchRequested>(_onAppConfigFetchRequested);
+    on<AppSettingsChanged>(_onAppSettingsChanged);
+    on<AppPeriodicConfigFetchRequested>(_onAppPeriodicConfigFetchRequested);
     on<AppUserFeedDecoratorShown>(_onAppUserFeedDecoratorShown);
     on<AppLogoutRequested>(_onLogoutRequested);
-    on<AppThemeModeChanged>(_onThemeModeChanged);
-    on<AppFlexSchemeChanged>(_onFlexSchemeChanged);
-    on<AppFontFamilyChanged>(_onFontFamilyChanged);
-    on<AppTextScaleFactorChanged>(_onAppTextScaleFactorChanged);
-    on<AppFontWeightChanged>(_onAppFontWeightChanged);
-    on<AppUserDataLoaded>(_onAppUserDataLoaded); // New event handler
+    on<AppUserDataLoaded>(_onAppUserDataLoaded);
 
     // Subscribe to the authentication repository's authStateChanges stream.
     // This stream is the single source of truth for the user's auth state
@@ -99,7 +88,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final AuthRepository _authenticationRepository;
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
   final DataRepository<UserContentPreferences>
-  _userContentPreferencesRepository;
+      _userContentPreferencesRepository;
   final DataRepository<RemoteConfig> _appConfigRepository;
   final DataRepository<User> _userRepository;
   final local_config.AppEnvironment _environment;
@@ -119,7 +108,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     _logger.info('[AppBloc] AppStarted event received. Starting data load.');
 
     // If there was a critical error during bootstrap (e.g., RemoteConfig fetch failed),
-    // we should immediately transition to criticalError state.
+    // immediately transition to criticalError state.
     if (state.initialRemoteConfigError != null) {
       _logger.severe(
         '[AppBloc] Initial RemoteConfig fetch failed during bootstrap. '
@@ -201,21 +190,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         '[AppBloc] UserContentPreferences fetched successfully for user: ${currentUser.id}',
       );
 
-      // Map loaded settings to the AppState.
-      final newThemeMode = _mapAppBaseTheme(
-        userAppSettings.displaySettings.baseTheme,
-      );
-      final newFlexScheme = _mapAppAccentTheme(
-        userAppSettings.displaySettings.accentTheme,
-      );
-      final newFontFamily = _mapFontFamily(
-        userAppSettings.displaySettings.fontFamily,
-      );
-      final newAppTextScaleFactor = _mapTextScaleFactor(
-        userAppSettings.displaySettings.textScaleFactor,
-      );
-      final newLocale = Locale(userAppSettings.language.code);
-
       final finalStatus = currentUser.appRole == AppUserRole.standardUser
           ? AppLifeCycleStatus.authenticated
           : AppLifeCycleStatus.anonymous;
@@ -225,13 +199,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           status: finalStatus,
           user: currentUser,
           settings: userAppSettings,
-          userContentPreferences:
-              userContentPreferences, // Store userContentPreferences
-          themeMode: newThemeMode,
-          flexScheme: newFlexScheme,
-          fontFamily: newFontFamily,
-          appTextScaleFactor: newAppTextScaleFactor,
-          locale: newLocale,
+          userContentPreferences: userContentPreferences,
           initialUserPreferencesError: null,
         ),
       );
@@ -291,8 +259,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     final newStatus = newUser == null
         ? AppLifeCycleStatus.unauthenticated
         : (newUser.appRole == AppUserRole.standardUser
-              ? AppLifeCycleStatus.authenticated
-              : AppLifeCycleStatus.anonymous);
+            ? AppLifeCycleStatus.authenticated
+            : AppLifeCycleStatus.anonymous);
 
     emit(state.copyWith(status: newStatus));
 
@@ -351,38 +319,15 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       final userContentPreferences = await _userContentPreferencesRepository
           .read(id: state.user!.id, userId: state.user!.id);
 
-      final newThemeMode = _mapAppBaseTheme(
-        userAppSettings.displaySettings.baseTheme,
+      _logger.info(
+        '[AppBloc] UserAppSettings and UserContentPreferences refreshed '
+        'successfully for user: ${state.user!.id}',
       );
-      final newFlexScheme = _mapAppAccentTheme(
-        userAppSettings.displaySettings.accentTheme,
-      );
-      final newFontFamily = _mapFontFamily(
-        userAppSettings.displaySettings.fontFamily,
-      );
-      final newAppTextScaleFactor = _mapTextScaleFactor(
-        userAppSettings.displaySettings.textScaleFactor,
-      );
-      final newLocale = Locale(userAppSettings.language.code);
-
-      _logger
-        ..info(
-          '_onAppSettingsRefreshed: userAppSettings.fontFamily: ${userAppSettings.displaySettings.fontFamily}',
-        )
-        ..info(
-          '_onAppSettingsRefreshed: newFontFamily mapped to: $newFontFamily',
-        );
 
       emit(
         state.copyWith(
-          themeMode: newThemeMode,
-          flexScheme: newFlexScheme,
-          appTextScaleFactor: newAppTextScaleFactor,
-          fontFamily: newFontFamily,
           settings: userAppSettings,
-          userContentPreferences:
-              userContentPreferences, // Store userContentPreferences
-          locale: newLocale,
+          userContentPreferences: userContentPreferences,
           initialUserPreferencesError: null,
         ),
       );
@@ -395,7 +340,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       emit(
         state.copyWith(
           status: AppLifeCycleStatus.criticalError,
-          initialUserPreferencesError: e, // Use the new error field
+          initialUserPreferencesError: e,
         ),
       );
     } catch (e, s) {
@@ -407,11 +352,57 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       emit(
         state.copyWith(
           status: AppLifeCycleStatus.criticalError,
-          initialUserPreferencesError: UnknownException(
-            e.toString(),
-          ), // Use the new error field
+          initialUserPreferencesError: UnknownException(e.toString()),
         ),
       );
+    }
+  }
+
+  /// Handles the [AppSettingsChanged] event, updating and persisting the
+  /// user's application settings.
+  ///
+  /// This event is dispatched when any part of the user's settings (theme,
+  /// font, language, etc.) is modified. The entire [UserAppSettings] object
+  /// is updated and then persisted to the backend.
+  Future<void> _onAppSettingsChanged(
+    AppSettingsChanged event,
+    Emitter<AppState> emit,
+  ) async {
+    // Ensure settings are loaded and a user is available before attempting to update.
+    if (state.user == null || state.settings == null) {
+      _logger.warning(
+        '[AppBloc] Skipping AppSettingsChanged: User or UserAppSettings not loaded.',
+      );
+      return;
+    }
+
+    final updatedSettings = event.settings;
+
+    emit(state.copyWith(settings: updatedSettings));
+
+    try {
+      await _userAppSettingsRepository.update(
+        id: updatedSettings.id,
+        item: updatedSettings,
+        userId: updatedSettings.id,
+      );
+      _logger.info(
+        '[AppBloc] UserAppSettings successfully updated and persisted for user ${updatedSettings.id}.',
+      );
+    } on HttpException catch (e) {
+      _logger.severe(
+        'Failed to persist UserAppSettings for user ${updatedSettings.id} (HttpException): $e',
+      );
+      // Revert to original settings on failure to maintain state consistency
+      emit(state.copyWith(settings: state.settings));
+    } catch (e, s) {
+      _logger.severe(
+        'Unexpected error persisting UserAppSettings for user ${updatedSettings.id}.',
+        e,
+        s,
+      );
+      // Revert to original settings on failure to maintain state consistency
+      emit(state.copyWith(settings: state.settings));
     }
   }
 
@@ -420,252 +411,19 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     unawaited(_authenticationRepository.signOut());
   }
 
-  /// Handles changes to the application's base theme mode (light, dark, system).
-  Future<void> _onThemeModeChanged(
-    AppThemeModeChanged event,
-    Emitter<AppState> emit,
-  ) async {
-    // Ensure settings are loaded before attempting to update.
-    if (state.settings == null) {
-      _logger.warning(
-        '[AppBloc] Skipping theme mode change: UserAppSettings not loaded.',
-      );
-      return;
-    }
-
-    final updatedSettings = state.settings!.copyWith(
-      displaySettings: state.settings!.displaySettings.copyWith(
-        baseTheme: event.themeMode == ThemeMode.light
-            ? AppBaseTheme.light
-            : (event.themeMode == ThemeMode.dark
-                  ? AppBaseTheme.dark
-                  : AppBaseTheme.system),
-      ),
-    );
-    emit(state.copyWith(settings: updatedSettings, themeMode: event.themeMode));
-    try {
-      await _userAppSettingsRepository.update(
-        id: updatedSettings.id,
-        item: updatedSettings,
-        userId: updatedSettings.id,
-      );
-      _logger.info('[AppBloc] UserAppSettings updated for theme mode change.');
-    } catch (e, s) {
-      _logger.severe(
-        'Failed to persist theme mode change for user ${updatedSettings.id}.',
-        e,
-        s,
-      );
-    }
-  }
-
-  /// Handles changes to the application's accent color scheme.
-  Future<void> _onFlexSchemeChanged(
-    AppFlexSchemeChanged event,
-    Emitter<AppState> emit,
-  ) async {
-    // Ensure settings are loaded before attempting to update.
-    if (state.settings == null) {
-      _logger.warning(
-        '[AppBloc] Skipping accent scheme change: UserAppSettings not loaded.',
-      );
-      return;
-    }
-
-    final updatedSettings = state.settings!.copyWith(
-      displaySettings: state.settings!.displaySettings.copyWith(
-        accentTheme: event.flexScheme == FlexScheme.blue
-            ? AppAccentTheme.defaultBlue
-            : (event.flexScheme == FlexScheme.red
-                  ? AppAccentTheme.newsRed
-                  : AppAccentTheme.graphiteGray),
-      ),
-    );
-    emit(
-      state.copyWith(settings: updatedSettings, flexScheme: event.flexScheme),
-    );
-    try {
-      await _userAppSettingsRepository.update(
-        id: updatedSettings.id,
-        item: updatedSettings,
-        userId: updatedSettings.id,
-      );
-      _logger.info(
-        '[AppBloc] UserAppSettings updated for accent scheme change.',
-      );
-    } catch (e, s) {
-      _logger.severe(
-        'Failed to persist accent scheme change for user ${updatedSettings.id}.',
-        e,
-        s,
-      );
-    }
-  }
-
-  /// Handles changes to the application's font family.
-  Future<void> _onFontFamilyChanged(
-    AppFontFamilyChanged event,
-    Emitter<AppState> emit,
-  ) async {
-    // Ensure settings are loaded before attempting to update.
-    if (state.settings == null) {
-      _logger.warning(
-        '[AppBloc] Skipping font family change: UserAppSettings not loaded.',
-      );
-      return;
-    }
-
-    final updatedSettings = state.settings!.copyWith(
-      displaySettings: state.settings!.displaySettings.copyWith(
-        fontFamily: event.fontFamily ?? 'SystemDefault',
-      ),
-    );
-    emit(
-      state.copyWith(settings: updatedSettings, fontFamily: event.fontFamily),
-    );
-    try {
-      await _userAppSettingsRepository.update(
-        id: updatedSettings.id,
-        item: updatedSettings,
-        userId: updatedSettings.id,
-      );
-      _logger.info('[AppBloc] UserAppSettings updated for font family change.');
-    } catch (e, s) {
-      _logger.severe(
-        'Failed to persist font family change for user ${updatedSettings.id}.',
-        e,
-        s,
-      );
-    }
-  }
-
-  /// Handles changes to the application's text scale factor.
-  Future<void> _onAppTextScaleFactorChanged(
-    AppTextScaleFactorChanged event,
-    Emitter<AppState> emit,
-  ) async {
-    // Ensure settings are loaded before attempting to update.
-    if (state.settings == null) {
-      _logger.warning(
-        '[AppBloc] Skipping text scale factor change: UserAppSettings not loaded.',
-      );
-      return;
-    }
-
-    final updatedSettings = state.settings!.copyWith(
-      displaySettings: state.settings!.displaySettings.copyWith(
-        textScaleFactor: event.appTextScaleFactor,
-      ),
-    );
-    emit(
-      state.copyWith(
-        settings: updatedSettings,
-        appTextScaleFactor: event.appTextScaleFactor,
-      ),
-    );
-    try {
-      await _userAppSettingsRepository.update(
-        id: updatedSettings.id,
-        item: updatedSettings,
-        userId: updatedSettings.id,
-      );
-      _logger.info(
-        '[AppBloc] UserAppSettings updated for text scale factor change.',
-      );
-    } catch (e, s) {
-      _logger.severe(
-        'Failed to persist text scale factor change for user ${updatedSettings.id}.',
-        e,
-        s,
-      );
-    }
-  }
-
-  /// Handles changes to the application's font weight.
-  Future<void> _onAppFontWeightChanged(
-    AppFontWeightChanged event,
-    Emitter<AppState> emit,
-  ) async {
-    // Ensure settings are loaded before attempting to update.
-    if (state.settings == null) {
-      _logger.warning(
-        '[AppBloc] Skipping font weight change: UserAppSettings not loaded.',
-      );
-      return;
-    }
-
-    final updatedSettings = state.settings!.copyWith(
-      displaySettings: state.settings!.displaySettings.copyWith(
-        fontWeight: event.fontWeight,
-      ),
-    );
-    emit(state.copyWith(settings: updatedSettings));
-    try {
-      await _userAppSettingsRepository.update(
-        id: updatedSettings.id,
-        item: updatedSettings,
-        userId: updatedSettings.id,
-      );
-      _logger.info('[AppBloc] UserAppSettings updated for font weight change.');
-    } catch (e, s) {
-      _logger.severe(
-        'Failed to persist font weight change for user ${updatedSettings.id}.',
-        e,
-        s,
-      );
-    }
-  }
-
-  /// Maps [AppBaseTheme] enum to Flutter's [ThemeMode].
-  static ThemeMode _mapAppBaseTheme(AppBaseTheme mode) {
-    switch (mode) {
-      case AppBaseTheme.light:
-        return ThemeMode.light;
-      case AppBaseTheme.dark:
-        return ThemeMode.dark;
-      case AppBaseTheme.system:
-        return ThemeMode.system;
-    }
-  }
-
-  /// Maps [AppAccentTheme] enum to FlexColorScheme's [FlexScheme].
-  static FlexScheme _mapAppAccentTheme(AppAccentTheme name) {
-    switch (name) {
-      case AppAccentTheme.defaultBlue:
-        return FlexScheme.blue;
-      case AppAccentTheme.newsRed:
-        return FlexScheme.red;
-      case AppAccentTheme.graphiteGray:
-        return FlexScheme.material;
-    }
-  }
-
-  /// Maps a font family string to a nullable string for theme data.
-  static String? _mapFontFamily(String fontFamilyString) {
-    if (fontFamilyString == 'SystemDefault') {
-      return null;
-    }
-    return fontFamilyString;
-  }
-
-  /// Maps [AppTextScaleFactor] to itself (no transformation needed).
-  static AppTextScaleFactor _mapTextScaleFactor(AppTextScaleFactor factor) {
-    return factor;
-  }
-
   @override
   Future<void> close() {
     _userSubscription.cancel();
     return super.close();
   }
 
-  /// Handles fetching the remote application configuration.
+  /// Handles periodic fetching of the remote application configuration.
   ///
   /// This method is primarily used for re-fetching the remote configuration
   /// (e.g., by [AppStatusService] for background checks or by [StatusPage]
   /// for retries). The initial remote configuration is fetched during bootstrap.
-  Future<void> _onAppConfigFetchRequested(
-    AppConfigFetchRequested event,
+  Future<void> _onAppPeriodicConfigFetchRequested(
+    AppPeriodicConfigFetchRequested event,
     Emitter<AppState> emit,
   ) async {
     if (state.user == null) {

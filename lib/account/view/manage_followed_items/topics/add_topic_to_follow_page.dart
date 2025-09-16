@@ -2,8 +2,8 @@ import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/available_topics_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -57,14 +57,14 @@ class AddTopicToFollowPage extends StatelessWidget {
 
             final topics = topicsState.availableTopics;
 
-            return BlocBuilder<AccountBloc, AccountState>(
+            return BlocBuilder<AppBloc, AppState>(
               buildWhen: (previous, current) =>
-                  previous.preferences?.followedTopics !=
-                      current.preferences?.followedTopics ||
-                  previous.status != current.status,
-              builder: (context, accountState) {
+                  previous.userContentPreferences?.followedTopics !=
+                      current.userContentPreferences?.followedTopics,
+              builder: (context, appState) {
+                final userContentPreferences = appState.userContentPreferences;
                 final followedTopics =
-                    accountState.preferences?.followedTopics ?? [];
+                    userContentPreferences?.followedTopics ?? [];
 
                 return ListView.builder(
                   padding: const EdgeInsets.symmetric(
@@ -149,9 +149,27 @@ class AddTopicToFollowPage extends StatelessWidget {
                               ? l10n.unfollowTopicTooltip(topic.name)
                               : l10n.followTopicTooltip(topic.name),
                           onPressed: () {
-                            context.read<AccountBloc>().add(
-                              AccountFollowTopicToggled(topic: topic),
+                            if (userContentPreferences == null) return;
+
+                            final updatedFollowedTopics =
+                                List<Topic>.from(followedTopics);
+                            if (isFollowed) {
+                              updatedFollowedTopics
+                                  .removeWhere((t) => t.id == topic.id);
+                            } else {
+                              updatedFollowedTopics.add(topic);
+                            }
+
+                            final updatedPreferences =
+                                userContentPreferences.copyWith(
+                              followedTopics: updatedFollowedTopics,
                             );
+
+                            context.read<AppBloc>().add(
+                                  AppUserContentPreferencesChanged(
+                                    preferences: updatedPreferences,
+                                  ),
+                                );
                           },
                         ),
                         contentPadding: const EdgeInsets.symmetric(

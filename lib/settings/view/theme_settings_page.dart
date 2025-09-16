@@ -63,7 +63,7 @@ class ThemeSettingsPage extends StatelessWidget {
           // A more robust check might involve comparing previous and current userAppSettings
           // For now, refreshing on any success after an interaction is reasonable.
           // Ensure AppBloc is available in context before reading
-          context.read<AppBloc>().add(const AppSettingsRefreshed());
+          context.read<AppBloc>().add(const AppUserAppSettingsRefreshed());
         }
         // Optionally, show a SnackBar for errors if not handled globally
         // if (settingsState.status == SettingsStatus.failure && settingsState.error != null) {

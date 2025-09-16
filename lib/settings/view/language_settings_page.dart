@@ -37,7 +37,7 @@ class LanguageSettingsPage extends StatelessWidget {
     return BlocListener<SettingsBloc, SettingsState>(
       listener: (context, state) {
         if (state.status == SettingsStatus.success) {
-          context.read<AppBloc>().add(const AppSettingsRefreshed());
+          context.read<AppBloc>().add(const AppUserAppSettingsRefreshed());
         }
       },
       child: Scaffold(

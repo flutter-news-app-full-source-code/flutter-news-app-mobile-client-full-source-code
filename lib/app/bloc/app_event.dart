@@ -43,8 +43,16 @@ class AppUserChanged extends AppEvent {
 ///
 /// This event is typically used when external changes might have occurred
 /// or when a manual refresh of settings is desired.
-class AppSettingsRefreshed extends AppEvent {
-  const AppSettingsRefreshed();
+class AppUserAppSettingsRefreshed extends AppEvent {
+  const AppUserAppSettingsRefreshed();
+}
+
+/// Dispatched to request a refresh of the user's content preferences.
+///
+/// This event is typically used when external changes might have occurred
+/// or when a manual refresh of preferences is desired.
+class AppUserContentPreferencesRefreshed extends AppEvent {
+  const AppUserContentPreferencesRefreshed();
 }
 
 /// Dispatched when the user's application settings have been updated.

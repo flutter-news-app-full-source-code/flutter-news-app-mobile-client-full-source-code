@@ -43,7 +43,7 @@ class FeedSettingsPage extends StatelessWidget {
     return BlocListener<SettingsBloc, SettingsState>(
       listener: (context, settingsState) {
         if (settingsState.status == SettingsStatus.success) {
-          context.read<AppBloc>().add(const AppSettingsRefreshed());
+            context.read<AppBloc>().add(const AppUserAppSettingsRefreshed());
         }
       },
       child: Scaffold(

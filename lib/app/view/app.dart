@@ -15,7 +15,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/services/dem
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/router.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart'; // Import view.dart for CriticalErrorPage
+import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kv_storage_service/kv_storage_service.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -38,7 +38,7 @@ class App extends StatelessWidget {
     required DataRepository<Source> sourcesRepository,
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<UserContentPreferences>
-        userContentPreferencesRepository,
+    userContentPreferencesRepository,
     required DataRepository<RemoteConfig> remoteConfigRepository,
     required DataRepository<User> userRepository,
     required KVStorageService kvStorageService,
@@ -52,23 +52,23 @@ class App extends StatelessWidget {
     this.demoDataMigrationService,
     this.demoDataInitializerService,
     this.initialUser,
-  })  : _authenticationRepository = authenticationRepository,
-        _headlinesRepository = headlinesRepository,
-        _topicsRepository = topicsRepository,
-        _countriesRepository = countriesRepository,
-        _sourcesRepository = sourcesRepository,
-        _userAppSettingsRepository = userAppSettingsRepository,
-        _userContentPreferencesRepository = userContentPreferencesRepository,
-        _appConfigRepository = remoteConfigRepository,
-        _userRepository = userRepository,
-        _kvStorageService = kvStorageService,
-        _environment = environment,
-        _adService = adService,
-        _localAdRepository = localAdRepository,
-        _navigatorKey = navigatorKey,
-        _inlineAdCacheService = inlineAdCacheService,
-        _initialRemoteConfig = initialRemoteConfig,
-        _initialRemoteConfigError = initialRemoteConfigError;
+  }) : _authenticationRepository = authenticationRepository,
+       _headlinesRepository = headlinesRepository,
+       _topicsRepository = topicsRepository,
+       _countriesRepository = countriesRepository,
+       _sourcesRepository = sourcesRepository,
+       _userAppSettingsRepository = userAppSettingsRepository,
+       _userContentPreferencesRepository = userContentPreferencesRepository,
+       _appConfigRepository = remoteConfigRepository,
+       _userRepository = userRepository,
+       _kvStorageService = kvStorageService,
+       _environment = environment,
+       _adService = adService,
+       _localAdRepository = localAdRepository,
+       _navigatorKey = navigatorKey,
+       _inlineAdCacheService = inlineAdCacheService,
+       _initialRemoteConfig = initialRemoteConfig,
+       _initialRemoteConfigError = initialRemoteConfigError;
 
   final AuthRepository _authenticationRepository;
   final DataRepository<Headline> _headlinesRepository;
@@ -77,7 +77,7 @@ class App extends StatelessWidget {
   final DataRepository<Source> _sourcesRepository;
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
   final DataRepository<UserContentPreferences>
-      _userContentPreferencesRepository;
+  _userContentPreferencesRepository;
   final DataRepository<RemoteConfig> _appConfigRepository;
   final DataRepository<User> _userRepository;
   final KVStorageService _kvStorageService;
@@ -118,24 +118,28 @@ class App extends StatelessWidget {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) => AppBloc(
-              authenticationRepository: context.read<AuthRepository>(),
-              userAppSettingsRepository:
-                  context.read<DataRepository<UserAppSettings>>(),
-              userContentPreferencesRepository:
-                  context.read<DataRepository<UserContentPreferences>>(),
-              appConfigRepository: context.read<DataRepository<RemoteConfig>>(),
-              userRepository: context.read<DataRepository<User>>(),
-              environment: _environment,
-              demoDataMigrationService: demoDataMigrationService,
-              demoDataInitializerService: demoDataInitializerService,
-              initialUser: initialUser,
-              navigatorKey: _navigatorKey, // Pass navigatorKey to AppBloc
-              initialRemoteConfig:
-                  _initialRemoteConfig, // Pass initialRemoteConfig
-              initialRemoteConfigError:
-                  _initialRemoteConfigError, // Pass initialRemoteConfigError
-            )..add(AppStarted(initialUser: initialUser)), // Dispatch AppStarted event
+            create: (context) =>
+                AppBloc(
+                  authenticationRepository: context.read<AuthRepository>(),
+                  userAppSettingsRepository: context
+                      .read<DataRepository<UserAppSettings>>(),
+                  userContentPreferencesRepository: context
+                      .read<DataRepository<UserContentPreferences>>(),
+                  appConfigRepository: context
+                      .read<DataRepository<RemoteConfig>>(),
+                  userRepository: context.read<DataRepository<User>>(),
+                  environment: _environment,
+                  demoDataMigrationService: demoDataMigrationService,
+                  demoDataInitializerService: demoDataInitializerService,
+                  initialUser: initialUser,
+                  navigatorKey: _navigatorKey, // Pass navigatorKey to AppBloc
+                  initialRemoteConfig:
+                      _initialRemoteConfig, // Pass initialRemoteConfig
+                  initialRemoteConfigError:
+                      _initialRemoteConfigError, // Pass initialRemoteConfigError
+                )..add(
+                  AppStarted(initialUser: initialUser),
+                ), // Dispatch AppStarted event
           ),
           BlocProvider(
             create: (context) => AuthenticationBloc(
@@ -310,25 +314,30 @@ class _AppViewState extends State<_AppView> {
               supportedLocales: AppLocalizations.supportedLocales,
               locale: state.locale,
               home: CriticalErrorPage(
-                exception: state.initialRemoteConfigError ??
+                exception:
+                    state.initialRemoteConfigError ??
                     state.initialUserPreferencesError ??
-                    const UnknownException('An unknown critical error occurred.'),
+                    const UnknownException(
+                      'An unknown critical error occurred.',
+                    ),
                 onRetry: () {
                   // If remote config failed, retry remote config.
                   // If user preferences failed, retry AppStarted.
                   if (state.initialRemoteConfigError != null) {
                     context.read<AppBloc>().add(
-                          const AppConfigFetchRequested(isBackgroundCheck: false),
-                        );
+                      const AppPeriodicConfigFetchRequested(
+                        isBackgroundCheck: false,
+                      ),
+                    );
                   } else if (state.initialUserPreferencesError != null) {
                     context.read<AppBloc>().add(
-                          AppStarted(initialUser: state.user),
-                        );
+                      AppStarted(initialUser: state.user),
+                    );
                   } else {
                     // Fallback for unknown critical error
                     context.read<AppBloc>().add(
-                          AppStarted(initialUser: state.user),
-                        );
+                      AppStarted(initialUser: state.user),
+                    );
                   }
                 },
               ),
@@ -431,8 +440,9 @@ class _AppViewState extends State<_AppView> {
               home: LoadingStateWidget(
                 icon: Icons.sync,
                 headline: AppLocalizations.of(context).settingsLoadingHeadline,
-                subheadline:
-                    AppLocalizations.of(context).settingsLoadingSubheadline,
+                subheadline: AppLocalizations.of(
+                  context,
+                ).settingsLoadingSubheadline,
               ),
             );
           }
@@ -461,17 +471,15 @@ class _AppViewState extends State<_AppView> {
             themeMode: state.themeMode,
             theme: lightTheme(
               scheme: state.flexScheme,
-              appTextScaleFactor:
-                  state.settings!.displaySettings.textScaleFactor,
-              appFontWeight: state.settings!.displaySettings.fontWeight,
-              fontFamily: state.settings!.displaySettings.fontFamily,
+              appTextScaleFactor: state.appTextScaleFactor,
+              appFontWeight: state.appFontWeight,
+              fontFamily: state.fontFamily,
             ),
             darkTheme: darkTheme(
               scheme: state.flexScheme,
-              appTextScaleFactor:
-                  state.settings!.displaySettings.textScaleFactor,
-              appFontWeight: state.settings!.displaySettings.fontWeight,
-              fontFamily: state.settings!.displaySettings.fontFamily,
+              appTextScaleFactor: state.appTextScaleFactor,
+              appFontWeight: state.appFontWeight,
+              fontFamily: state.fontFamily,
             ),
             routerConfig: _router,
             locale: state.locale,

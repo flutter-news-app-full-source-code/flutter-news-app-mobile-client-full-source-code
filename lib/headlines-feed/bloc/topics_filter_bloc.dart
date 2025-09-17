@@ -5,8 +5,6 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-
 part 'topics_filter_event.dart';
 part 'topics_filter_state.dart';
 
@@ -22,9 +20,7 @@ class TopicsFilterBloc extends Bloc<TopicsFilterEvent, TopicsFilterState> {
   /// Requires a [DataRepository<Topic>] to interact with the data layer.
   TopicsFilterBloc({
     required DataRepository<Topic> topicsRepository,
-    required AppBloc appBloc,
   }) : _topicsRepository = topicsRepository,
-       _appBloc = appBloc,
        super(const TopicsFilterState()) {
     on<TopicsFilterRequested>(
       _onTopicsFilterRequested,
@@ -37,7 +33,6 @@ class TopicsFilterBloc extends Bloc<TopicsFilterEvent, TopicsFilterState> {
   }
 
   final DataRepository<Topic> _topicsRepository;
-  final AppBloc _appBloc;
 
   /// Number of topics to fetch per page.
   static const _topicsLimit = 20;

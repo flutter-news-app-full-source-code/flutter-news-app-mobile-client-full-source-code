@@ -49,12 +49,10 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
   /// `HeadlinesFilterPage`. This ensures the checkboxes reflect the state
   /// from the main filter page when this page loads.
   late Set<Country> _pageSelectedCountries;
-  late final CountriesFilterBloc _countriesFilterBloc;
 
   @override
   void initState() {
     super.initState();
-    _countriesFilterBloc = context.read<CountriesFilterBloc>();
 
     // Initialization needs to happen after the first frame to safely access
     // GoRouterState.of(context).
@@ -70,11 +68,6 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
       //    This ensures the checkboxes on this page are initially checked
       //    correctly based on the selections made previously.
       _pageSelectedCountries = Set.from(initialSelection ?? []);
-
-      // 3. Trigger the page-specific BLoC (CountriesFilterBloc) to start
-      //    fetching the list of *all available* countries that the user can
-      //    potentially select from, using the specified usage filter.
-      _countriesFilterBloc.add(CountriesFilterRequested(usage: widget.filter));
     });
   }
 
@@ -101,7 +94,8 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
             builder: (context, appState) {
               final followedCountries =
                   appState.userContentPreferences?.followedCountries ?? [];
-              final isFollowedFilterActive = followedCountries.isNotEmpty &&
+              final isFollowedFilterActive =
+                  followedCountries.isNotEmpty &&
                   _pageSelectedCountries.length == followedCountries.length &&
                   _pageSelectedCountries.containsAll(followedCountries);
 
@@ -109,7 +103,9 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
                 icon: isFollowedFilterActive
                     ? const Icon(Icons.favorite)
                     : const Icon(Icons.favorite_border),
-                color: isFollowedFilterActive ? theme.colorScheme.primary : null,
+                color: isFollowedFilterActive
+                    ? theme.colorScheme.primary
+                    : null,
                 tooltip: l10n.headlinesFeedFilterApplyFollowedLabel,
                 onPressed: () {
                   setState(() {
@@ -161,9 +157,8 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
           if (state.status == CountriesFilterStatus.failure &&
               state.countries.isEmpty) {
             return FailureStateWidget(
-              exception:
-                  state.error ?? const UnknownException('Unknown error'),
-              onRetry: () => _countriesFilterBloc.add(
+              exception: state.error ?? const UnknownException('Unknown error'),
+              onRetry: () => context.read<CountriesFilterBloc>().add(
                 CountriesFilterRequested(usage: widget.filter),
               ),
             );
@@ -196,9 +191,7 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
                   height: AppSpacing.lg + AppSpacing.sm,
                   child: ClipRRect(
                     // Clip the image for rounded corners if desired
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.xs / 2,
-                    ),
+                    borderRadius: BorderRadius.circular(AppSpacing.xs / 2),
                     child: Image.network(
                       country.flagUrl,
                       fit: BoxFit.cover,
@@ -212,8 +205,7 @@ class _CountryFilterPageState extends State<CountryFilterPage> {
                         return Center(
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            value:
-                                loadingProgress.expectedTotalBytes != null
+                            value: loadingProgress.expectedTotalBytes != null
                                 ? loadingProgress.cumulativeBytesLoaded /
                                       loadingProgress.expectedTotalBytes!
                                 : null,

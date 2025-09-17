@@ -128,6 +128,13 @@ class AppState extends Equatable {
     return settings?.displaySettings.fontWeight ?? AppFontWeight.regular;
   }
 
+  /// The current headline image style, derived from [settings].
+  /// Defaults to [HeadlineImageStyle.smallThumbnail] if [settings] are not yet loaded.
+  HeadlineImageStyle get headlineImageStyle {
+    return settings?.feedPreferences.headlineImageStyle ??
+        HeadlineImageStyle.smallThumbnail;
+  }
+
   /// The currently selected locale for localization, derived from [settings].
   /// Defaults to English ('en') if [settings] are not yet loaded.
   Locale get locale {

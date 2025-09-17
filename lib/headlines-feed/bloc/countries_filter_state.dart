@@ -1,7 +1,5 @@
 part of 'countries_filter_bloc.dart';
 
-// Import removed, will be added to the main bloc file.
-
 /// Enum representing the different statuses of the country filter data fetching.
 enum CountriesFilterStatus {
   /// Initial state, no data loaded yet.
@@ -34,8 +32,6 @@ final class CountriesFilterState extends Equatable {
     this.hasMore = true,
     this.cursor,
     this.error,
-    this.followedCountriesStatus = CountriesFilterStatus.initial,
-    this.followedCountries = const [],
   });
 
   /// The current status of fetching countries.
@@ -54,12 +50,6 @@ final class CountriesFilterState extends Equatable {
   /// An optional error object if the status is [CountriesFilterStatus.failure].
   final HttpException? error;
 
-  /// The current status of fetching followed countries.
-  final CountriesFilterStatus followedCountriesStatus;
-
-  /// The list of [Country] objects representing the user's followed countries.
-  final List<Country> followedCountries;
-
   /// Creates a copy of this state with the given fields replaced.
   CountriesFilterState copyWith({
     CountriesFilterStatus? status,
@@ -67,11 +57,8 @@ final class CountriesFilterState extends Equatable {
     bool? hasMore,
     String? cursor,
     HttpException? error,
-    CountriesFilterStatus? followedCountriesStatus,
-    List<Country>? followedCountries,
     bool clearError = false,
     bool clearCursor = false,
-    bool clearFollowedCountriesError = false,
   }) {
     return CountriesFilterState(
       status: status ?? this.status,
@@ -81,9 +68,6 @@ final class CountriesFilterState extends Equatable {
       cursor: clearCursor ? null : (cursor ?? this.cursor),
       // Clear error if requested, otherwise keep existing or use new one
       error: clearError ? null : error ?? this.error,
-      followedCountriesStatus:
-          followedCountriesStatus ?? this.followedCountriesStatus,
-      followedCountries: followedCountries ?? this.followedCountries,
     );
   }
 
@@ -94,7 +78,5 @@ final class CountriesFilterState extends Equatable {
     hasMore,
     cursor,
     error,
-    followedCountriesStatus,
-    followedCountries,
   ];
 }

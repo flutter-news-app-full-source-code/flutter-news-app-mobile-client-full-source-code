@@ -325,12 +325,8 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                       final item = state.feedItems[index];
 
                       if (item is Headline) {
-                        final imageStyle = context
-                            .watch<AppBloc>()
-                            .state
-                            .settings
-                            .feedPreferences
-                            .headlineImageStyle;
+                        final imageStyle =
+                            context.read<AppBloc>().state.headlineImageStyle;
                         Widget tile;
                         switch (imageStyle) {
                           case HeadlineImageStyle.hidden:
@@ -354,11 +350,8 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                         // Retrieve the user's preferred headline image style from the AppBloc.
                         // This is the single source of truth for this setting.
                         // Access the AppBloc to get the remoteConfig for ads.
-                        final adConfig = context
-                            .read<AppBloc>()
-                            .state
-                            .remoteConfig
-                            ?.adConfig;
+                        final adConfig =
+                            context.read<AppBloc>().state.remoteConfig?.adConfig;
 
                         // Ensure adConfig is not null before building the AdLoaderWidget.
                         if (adConfig == null) {

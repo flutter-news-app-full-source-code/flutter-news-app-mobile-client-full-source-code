@@ -27,9 +27,3 @@ final class CountriesFilterRequested extends CountriesFilterEvent {
   @override
   List<Object?> get props => [usage];
 }
-
-/// {@template countries_filter_apply_followed_requested}
-/// Event triggered to request applying the user's followed countries as filters.
-/// {@endtemplate}
-final class CountriesFilterApplyFollowedRequested
-    extends CountriesFilterEvent {}

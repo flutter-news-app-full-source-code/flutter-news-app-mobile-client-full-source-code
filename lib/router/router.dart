@@ -3,7 +3,6 @@ import 'package:core/core.dart' hide AppStatus;
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/account_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/countries/add_country_to_follow_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/countries/followed_countries_list_page.dart';
@@ -71,10 +70,6 @@ GoRouter createRouter({
   required GlobalKey<NavigatorState> navigatorKey,
   required InlineAdCacheService inlineAdCacheService,
 }) {
-  // Instantiate AccountBloc once to be shared
-  final accountBloc = AccountBloc(
-    authenticationRepository: authenticationRepository,
-  );
 
   // Instantiate FeedDecoratorService once to be shared
   final feedDecoratorService = FeedDecoratorService(
@@ -292,7 +287,6 @@ GoRouter createRouter({
                       sourceRepository: context.read<DataRepository<Source>>(),
                       countryRepository: context
                           .read<DataRepository<Country>>(),
-                      accountBloc: accountBloc,
                       appBloc: context.read<AppBloc>(),
                       feedDecoratorService: feedDecoratorService,
                       inlineAdCacheService: inlineAdCacheService,

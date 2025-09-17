@@ -4,8 +4,6 @@ import 'package:bloc/bloc.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-
 part 'sources_filter_event.dart';
 part 'sources_filter_state.dart';
 
@@ -13,10 +11,8 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
   SourcesFilterBloc({
     required DataRepository<Source> sourcesRepository,
     required DataRepository<Country> countriesRepository,
-    required AppBloc appBloc,
   }) : _sourcesRepository = sourcesRepository,
        _countriesRepository = countriesRepository,
-       _appBloc = appBloc,
        super(const SourcesFilterState()) {
     on<LoadSourceFilterData>(_onLoadSourceFilterData);
     on<CountryCapsuleToggled>(_onCountryCapsuleToggled);
@@ -27,7 +23,6 @@ class SourcesFilterBloc extends Bloc<SourcesFilterEvent, SourcesFilterState> {
 
   final DataRepository<Source> _sourcesRepository;
   final DataRepository<Country> _countriesRepository;
-  final AppBloc _appBloc;
 
   Future<void> _onLoadSourceFilterData(
     LoadSourceFilterData event,

@@ -4,7 +4,6 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
@@ -302,12 +301,8 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                   final item = state.feedItems[index];
 
                   if (item is Headline) {
-                    final imageStyle = context
-                        .watch<AppBloc>()
-                        .state
-                        .settings
-                        .feedPreferences
-                        .headlineImageStyle;
+                    final imageStyle =
+                        context.watch<AppBloc>().state.headlineImageStyle;
                     Widget tile;
                     switch (imageStyle) {
                       case HeadlineImageStyle.hidden:
@@ -364,53 +359,74 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                       },
                     );
                   } else if (item is ContentCollectionItem) {
-                    // Access AccountBloc to get the user's content preferences,
+                    // Access AppBloc to get the user's content preferences,
                     // which is the source of truth for followed items.
-                    final accountState = context.watch<AccountBloc>().state;
+                    final appState = context.watch<AppBloc>().state;
                     final followedTopics =
-                        accountState.preferences?.followedTopics ?? [];
+                        appState.userContentPreferences?.followedTopics ?? [];
                     final followedSources =
-                        accountState.preferences?.followedSources ?? [];
+                        appState.userContentPreferences?.followedSources ?? [];
 
-                    final followedTopicIds = followedTopics
-                        .map((t) => t.id)
-                        .toList();
-                    final followedSourceIds = followedSources
-                        .map((s) => s.id)
-                        .toList();
+                    final followedTopicIds =
+                        followedTopics.map((t) => t.id).toList();
+                    final followedSourceIds =
+                        followedSources.map((s) => s.id).toList();
 
                     return ContentCollectionDecoratorWidget(
                       item: item,
                       followedTopicIds: followedTopicIds,
                       followedSourceIds: followedSourceIds,
                       onFollowToggle: (toggledItem) {
-                        // Determine the current following status to toggle it.
-                        // ignore: unused_local_variable
-                        final bool isCurrentlyFollowing;
+                        final currentUserPreferences =
+                            appState.userContentPreferences;
+                        if (currentUserPreferences == null) return;
+
+                        UserContentPreferences updatedPreferences;
+
                         if (toggledItem is Topic) {
-                          isCurrentlyFollowing = followedTopicIds.contains(
-                            toggledItem.id,
-                          );
-                          context.read<AccountBloc>().add(
-                            AccountFollowTopicToggled(topic: toggledItem),
+                          final isCurrentlyFollowing =
+                              followedTopicIds.contains(toggledItem.id);
+                          final newFollowedTopics =
+                              List<Topic>.from(followedTopics);
+                          if (isCurrentlyFollowing) {
+                            newFollowedTopics
+                                .removeWhere((t) => t.id == toggledItem.id);
+                          } else {
+                            newFollowedTopics.add(toggledItem);
+                          }
+                          updatedPreferences = currentUserPreferences.copyWith(
+                            followedTopics: newFollowedTopics,
                           );
                         } else if (toggledItem is Source) {
-                          isCurrentlyFollowing = followedSourceIds.contains(
-                            toggledItem.id,
-                          );
-                          context.read<AccountBloc>().add(
-                            AccountFollowSourceToggled(source: toggledItem),
+                          final isCurrentlyFollowing =
+                              followedSourceIds.contains(toggledItem.id);
+                          final newFollowedSources =
+                              List<Source>.from(followedSources);
+                          if (isCurrentlyFollowing) {
+                            newFollowedSources
+                                .removeWhere((s) => s.id == toggledItem.id);
+                          } else {
+                            newFollowedSources.add(toggledItem);
+                          }
+                          updatedPreferences = currentUserPreferences.copyWith(
+                            followedSources: newFollowedSources,
                           );
                         } else {
                           return;
                         }
+
+                        context.read<AppBloc>().add(
+                              AppUserContentPreferencesChanged(
+                                preferences: updatedPreferences,
+                              ),
+                            );
                       },
                       onDismiss: (decoratorType) {
                         context.read<HeadlinesFeedBloc>().add(
-                          FeedDecoratorDismissed(
-                            feedDecoratorType: decoratorType,
-                          ),
-                        );
+                              FeedDecoratorDismissed(
+                                feedDecoratorType: decoratorType,
+                              ),
+                            );
                       },
                     );
                   }

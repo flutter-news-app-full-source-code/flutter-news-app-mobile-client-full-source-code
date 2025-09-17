@@ -22,11 +22,8 @@ class TopicsFilterBloc extends Bloc<TopicsFilterEvent, TopicsFilterState> {
   /// Requires a [DataRepository<Topic>] to interact with the data layer.
   TopicsFilterBloc({
     required DataRepository<Topic> topicsRepository,
-    required DataRepository<UserContentPreferences>
-    userContentPreferencesRepository,
     required AppBloc appBloc,
   }) : _topicsRepository = topicsRepository,
-       _userContentPreferencesRepository = userContentPreferencesRepository,
        _appBloc = appBloc,
        super(const TopicsFilterState()) {
     on<TopicsFilterRequested>(
@@ -37,15 +34,9 @@ class TopicsFilterBloc extends Bloc<TopicsFilterEvent, TopicsFilterState> {
       _onTopicsFilterLoadMoreRequested,
       transformer: droppable(),
     );
-    on<TopicsFilterApplyFollowedRequested>(
-      _onTopicsFilterApplyFollowedRequested,
-      transformer: restartable(),
-    );
   }
 
   final DataRepository<Topic> _topicsRepository;
-  final DataRepository<UserContentPreferences>
-  _userContentPreferencesRepository;
   final AppBloc _appBloc;
 
   /// Number of topics to fetch per page.
@@ -59,7 +50,6 @@ class TopicsFilterBloc extends Bloc<TopicsFilterEvent, TopicsFilterState> {
     // Prevent fetching if already loading or successful (unless forced refresh)
     if (state.status == TopicsFilterStatus.loading ||
         state.status == TopicsFilterStatus.success) {
-      // Optionally add logic here for forced refresh if needed
       return;
     }
 
@@ -116,56 +106,6 @@ class TopicsFilterBloc extends Bloc<TopicsFilterEvent, TopicsFilterState> {
     } on HttpException catch (e) {
       // Keep existing data but indicate failure
       emit(state.copyWith(status: TopicsFilterStatus.failure, error: e));
-    }
-  }
-
-  /// Handles the request to apply the user's followed topics as filters.
-  Future<void> _onTopicsFilterApplyFollowedRequested(
-    TopicsFilterApplyFollowedRequested event,
-    Emitter<TopicsFilterState> emit,
-  ) async {
-    emit(state.copyWith(followedTopicsStatus: TopicsFilterStatus.loading));
-
-    final currentUser = _appBloc.state.user!;
-
-    try {
-      final preferences = await _userContentPreferencesRepository.read(
-        id: currentUser.id,
-        userId: currentUser.id,
-      );
-
-      if (preferences.followedTopics.isEmpty) {
-        emit(
-          state.copyWith(
-            followedTopicsStatus: TopicsFilterStatus.success,
-            followedTopics: const [],
-            clearError: true,
-          ),
-        );
-        return;
-      }
-
-      emit(
-        state.copyWith(
-          followedTopicsStatus: TopicsFilterStatus.success,
-          followedTopics: preferences.followedTopics,
-          clearFollowedTopicsError: true,
-        ),
-      );
-    } on HttpException catch (e) {
-      emit(
-        state.copyWith(
-          followedTopicsStatus: TopicsFilterStatus.failure,
-          error: e,
-        ),
-      );
-    } catch (e) {
-      emit(
-        state.copyWith(
-          followedTopicsStatus: TopicsFilterStatus.failure,
-          error: UnknownException(e.toString()),
-        ),
-      );
     }
   }
 }

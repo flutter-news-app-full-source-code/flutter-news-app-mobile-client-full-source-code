@@ -24,26 +24,17 @@ class CountriesFilterBloc
   /// Requires a [DataRepository<Country>] to interact with the data layer.
   CountriesFilterBloc({
     required DataRepository<Country> countriesRepository,
-    required DataRepository<UserContentPreferences>
-    userContentPreferencesRepository, // Inject UserContentPreferencesRepository
     required AppBloc appBloc, // Inject AppBloc
   }) : _countriesRepository = countriesRepository,
-       _userContentPreferencesRepository = userContentPreferencesRepository,
        _appBloc = appBloc,
        super(const CountriesFilterState()) {
     on<CountriesFilterRequested>(
       _onCountriesFilterRequested,
       transformer: restartable(),
     );
-    on<CountriesFilterApplyFollowedRequested>(
-      _onCountriesFilterApplyFollowedRequested,
-      transformer: restartable(),
-    );
   }
 
   final DataRepository<Country> _countriesRepository;
-  final DataRepository<UserContentPreferences>
-  _userContentPreferencesRepository;
   final AppBloc _appBloc;
 
   /// Handles the request to fetch countries based on a specific usage.
@@ -87,58 +78,6 @@ class CountriesFilterBloc
       );
     } on HttpException catch (e) {
       emit(state.copyWith(status: CountriesFilterStatus.failure, error: e));
-    }
-  }
-
-  /// Handles the request to apply the user's followed countries as filters.
-  Future<void> _onCountriesFilterApplyFollowedRequested(
-    CountriesFilterApplyFollowedRequested event,
-    Emitter<CountriesFilterState> emit,
-  ) async {
-    emit(
-      state.copyWith(followedCountriesStatus: CountriesFilterStatus.loading),
-    );
-
-    final currentUser = _appBloc.state.user!;
-
-    try {
-      final preferences = await _userContentPreferencesRepository.read(
-        id: currentUser.id,
-        userId: currentUser.id,
-      );
-
-      if (preferences.followedCountries.isEmpty) {
-        emit(
-          state.copyWith(
-            followedCountriesStatus: CountriesFilterStatus.success,
-            followedCountries: const [],
-            clearError: true,
-          ),
-        );
-        return;
-      }
-
-      emit(
-        state.copyWith(
-          followedCountriesStatus: CountriesFilterStatus.success,
-          followedCountries: preferences.followedCountries,
-          clearFollowedCountriesError: true,
-        ),
-      );
-    } on HttpException catch (e) {
-      emit(
-        state.copyWith(
-          followedCountriesStatus: CountriesFilterStatus.failure,
-          error: e,
-        ),
-      );
-    } catch (e) {
-      emit(
-        state.copyWith(
-          followedCountriesStatus: CountriesFilterStatus.failure,
-          error: UnknownException(e.toString()),
-        ),
-      );
     }
   }
 }

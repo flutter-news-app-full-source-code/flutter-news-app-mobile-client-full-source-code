@@ -30,18 +30,15 @@ class SourceFilterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) =>
-          SourcesFilterBloc(
-            sourcesRepository: context.read<DataRepository<Source>>(),
-            countriesRepository: context.read<DataRepository<Country>>(),
-            userContentPreferencesRepository: context
-                .read<DataRepository<UserContentPreferences>>(),
-            appBloc: context.read<AppBloc>(),
-          )..add(
-            LoadSourceFilterData(
-              initialSelectedSources: initialSelectedSources,
-            ),
+      create: (context) => SourcesFilterBloc(
+        sourcesRepository: context.read<DataRepository<Source>>(),
+        countriesRepository: context.read<DataRepository<Country>>(),
+        appBloc: context.read<AppBloc>(),
+      )..add(
+          LoadSourceFilterData(
+            initialSelectedSources: initialSelectedSources,
           ),
+        ),
       child: const _SourceFilterView(),
     );
   }
@@ -65,16 +62,18 @@ class _SourceFilterView extends StatelessWidget {
         ),
         actions: [
           // Apply My Followed Sources Button
-          BlocBuilder<SourcesFilterBloc, SourcesFilterState>(
-            builder: (context, state) {
-              // Determine if the "Apply My Followed" icon should be filled
-              final isFollowedFilterActive =
-                  state.followedSources.isNotEmpty &&
-                  state.finallySelectedSourceIds.length ==
-                      state.followedSources.length &&
-                  state.followedSources.every(
-                    (source) =>
-                        state.finallySelectedSourceIds.contains(source.id),
+          BlocBuilder<AppBloc, AppState>(
+            builder: (context, appState) {
+              final followedSources =
+                  appState.userContentPreferences?.followedSources ?? [];
+              final sourcesFilterBloc = context.read<SourcesFilterBloc>();
+
+              final isFollowedFilterActive = followedSources.isNotEmpty &&
+                  sourcesFilterBloc.state.finallySelectedSourceIds.length ==
+                      followedSources.length &&
+                  followedSources.every(
+                    (source) => sourcesFilterBloc.state.finallySelectedSourceIds
+                        .contains(source.id),
                   );
 
               return IconButton(
@@ -85,16 +84,23 @@ class _SourceFilterView extends StatelessWidget {
                     ? theme.colorScheme.primary
                     : null,
                 tooltip: l10n.headlinesFeedFilterApplyFollowedLabel,
-                onPressed:
-                    state.followedSourcesStatus ==
-                        SourceFilterDataLoadingStatus.loading
-                    ? null // Disable while loading
-                    : () {
-                        // Dispatch event to BLoC to fetch and apply followed sources
-                        context.read<SourcesFilterBloc>().add(
-                          SourcesFilterApplyFollowedRequested(),
-                        );
-                      },
+                onPressed: () {
+                  sourcesFilterBloc.add(
+                    SourceFilterFollowedApplied(
+                      followedSources: followedSources,
+                    ),
+                  );
+                  if (followedSources.isEmpty) {
+                    ScaffoldMessenger.of(context)
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(
+                        SnackBar(
+                          content: Text(l10n.noFollowedItemsForFilterSnackbar),
+                          duration: const Duration(seconds: 3),
+                        ),
+                      );
+                  }
+                },
               );
             },
           ),
@@ -112,121 +118,60 @@ class _SourceFilterView extends StatelessWidget {
           ),
         ],
       ),
-      body: BlocListener<SourcesFilterBloc, SourcesFilterState>(
-        listenWhen: (previous, current) =>
-            previous.followedSourcesStatus != current.followedSourcesStatus ||
-            previous.followedSources != current.followedSources,
-        listener: (context, state) {
-          if (state.followedSourcesStatus ==
-              SourceFilterDataLoadingStatus.success) {
-            if (state.followedSources.isEmpty) {
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(
-                    content: Text(l10n.noFollowedItemsForFilterSnackbar),
-                    duration: const Duration(seconds: 3),
-                  ),
-                );
-            }
-          } else if (state.followedSourcesStatus ==
-              SourceFilterDataLoadingStatus.failure) {
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(
-                  content: Text(state.error?.message ?? l10n.unknownError),
-                  duration: const Duration(seconds: 3),
-                ),
-              );
-          }
-        },
-        child: BlocBuilder<SourcesFilterBloc, SourcesFilterState>(
-          builder: (context, state) {
-            final isLoadingMainList =
-                state.dataLoadingStatus ==
-                    SourceFilterDataLoadingStatus.loading &&
-                state.allAvailableSources.isEmpty;
-            final isLoadingFollowedSources =
-                state.followedSourcesStatus ==
-                SourceFilterDataLoadingStatus.loading;
+      body: BlocBuilder<SourcesFilterBloc, SourcesFilterState>(
+        builder: (context, state) {
+          final isLoadingMainList =
+              state.dataLoadingStatus ==
+                  SourceFilterDataLoadingStatus.loading &&
+              state.allAvailableSources.isEmpty;
 
-            if (isLoadingMainList) {
-              return LoadingStateWidget(
-                icon: Icons.source_outlined,
-                headline: l10n.sourceFilterLoadingHeadline,
-                subheadline: l10n.sourceFilterLoadingSubheadline,
-              );
-            }
-            if (state.dataLoadingStatus ==
-                    SourceFilterDataLoadingStatus.failure &&
-                state.allAvailableSources.isEmpty) {
-              return FailureStateWidget(
-                exception:
-                    state.error ??
-                    const UnknownException(
-                      'Failed to load source filter data.',
-                    ),
-                onRetry: () {
-                  context.read<SourcesFilterBloc>().add(
-                    const LoadSourceFilterData(),
-                  );
-                },
-              );
-            }
-
-            return Stack(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildCountryCapsules(context, state, l10n, textTheme),
-                    const SizedBox(height: AppSpacing.md),
-                    _buildSourceTypeCapsules(context, state, l10n, textTheme),
-                    const SizedBox(height: AppSpacing.md),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.paddingMedium,
-                      ),
-                      child: Text(
-                        l10n.headlinesFeedFilterSourceLabel,
-                        style: textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Expanded(
-                      child: _buildSourcesList(context, state, l10n, textTheme),
-                    ),
-                  ],
-                ),
-                // Show loading overlay if followed sources are being fetched
-                if (isLoadingFollowedSources)
-                  Positioned.fill(
-                    child: ColoredBox(
-                      color: Colors.black54, // Semi-transparent overlay
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const CircularProgressIndicator(),
-                            const SizedBox(height: AppSpacing.md),
-                            Text(
-                              l10n.headlinesFeedLoadingHeadline,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
+          if (isLoadingMainList) {
+            return LoadingStateWidget(
+              icon: Icons.source_outlined,
+              headline: l10n.sourceFilterLoadingHeadline,
+              subheadline: l10n.sourceFilterLoadingSubheadline,
             );
-          },
-        ),
+          }
+          if (state.dataLoadingStatus ==
+                  SourceFilterDataLoadingStatus.failure &&
+              state.allAvailableSources.isEmpty) {
+            return FailureStateWidget(
+              exception:
+                  state.error ??
+                  const UnknownException(
+                    'Failed to load source filter data.',
+                  ),
+              onRetry: () {
+                context.read<SourcesFilterBloc>().add(const LoadSourceFilterData());
+              },
+            );
+          }
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildCountryCapsules(context, state, l10n, textTheme),
+              const SizedBox(height: AppSpacing.md),
+              _buildSourceTypeCapsules(context, state, l10n, textTheme),
+              const SizedBox(height: AppSpacing.md),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.paddingMedium,
+                ),
+                child: Text(
+                  l10n.headlinesFeedFilterSourceLabel,
+                  style: textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Expanded(
+                child: _buildSourcesList(context, state, l10n, textTheme),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

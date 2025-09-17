@@ -470,70 +470,22 @@ GoRouter createRouter({
                       GoRoute(
                         path: Routes.feedFilterTopics,
                         name: Routes.feedFilterTopicsName,
-                        // Wrap with BlocProviderUserContentPreferencesRepository
-                        builder: (context, state) => BlocProvider(
-                          create: (context) => TopicsFilterBloc(
-                            topicsRepository: context
-                                .read<DataRepository<Topic>>(),
-                            userContentPreferencesRepository: context
-                                .read<DataRepository<UserContentPreferences>>(),
-                            appBloc: context.read<AppBloc>(),
-                          ),
-                          child: const TopicFilterPage(),
-                        ),
+                        builder: (context, state) => const TopicFilterPage(),
                       ),
                       // Sub-route for source selection
                       GoRoute(
                         path: Routes.feedFilterSources,
                         name: Routes.feedFilterSourcesName,
-                        // Wrap with BlocProvider
-                        builder: (context, state) => BlocProvider(
-                          create: (context) => SourcesFilterBloc(
-                            sourcesRepository: context
-                                .read<DataRepository<Source>>(),
-                            countriesRepository: context
-                                .read<DataRepository<Country>>(),
-                            userContentPreferencesRepository: context
-                                .read<DataRepository<UserContentPreferences>>(),
-                            appBloc: context.read<AppBloc>(),
-                          ),
-                          // Pass initialSelectedSources from state.extra
-                          child: Builder(
-                            builder: (context) {
-                              final initialSources =
-                                  state.extra as List<Source>? ?? const [];
-
-                              return SourceFilterPage(
-                                initialSelectedSources: initialSources,
-                              );
-                            },
-                          ),
-                        ),
+                        builder: (context, state) => const SourceFilterPage(),
                       ),
                       GoRoute(
                         path: Routes.feedFilterEventCountries,
                         name: Routes.feedFilterEventCountriesName,
                         pageBuilder: (context, state) {
                           final l10n = context.l10n;
-                          final initialSelection =
-                              state.extra as List<Country>?;
                           return MaterialPage(
-                            child: BlocProvider(
-                              create: (context) => CountriesFilterBloc(
-                                countriesRepository: context
-                                    .read<DataRepository<Country>>(),
-                                userContentPreferencesRepository: context
-                                    .read<
-                                      DataRepository<UserContentPreferences>
-                                    >(),
-                                appBloc: context.read<AppBloc>(),
-                              ),
-                              child: CountryFilterPage(
-                                title:
-                                    l10n.headlinesFeedFilterEventCountryLabel,
-                                filter: CountryFilterUsage.hasActiveHeadlines,
-                                key: ValueKey(initialSelection.hashCode),
-                              ),
+                            child: CountryFilterPage(
+                              title: l10n.headlinesFeedFilterEventCountryLabel,
                             ),
                           );
                         },

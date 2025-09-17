@@ -5,7 +5,6 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/country_filter_page.dart';
 
 part 'countries_filter_event.dart';
@@ -24,9 +23,7 @@ class CountriesFilterBloc
   /// Requires a [DataRepository<Country>] to interact with the data layer.
   CountriesFilterBloc({
     required DataRepository<Country> countriesRepository,
-    required AppBloc appBloc, // Inject AppBloc
   }) : _countriesRepository = countriesRepository,
-       _appBloc = appBloc,
        super(const CountriesFilterState()) {
     on<CountriesFilterRequested>(
       _onCountriesFilterRequested,
@@ -35,7 +32,6 @@ class CountriesFilterBloc
   }
 
   final DataRepository<Country> _countriesRepository;
-  final AppBloc _appBloc;
 
   /// Handles the request to fetch countries based on a specific usage.
   ///

@@ -185,7 +185,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
   ) async {
     final entity = state.entity;
     final currentUser = _appBloc.state.user;
-    var currentPreferences = _appBloc.state.userContentPreferences;
+    final currentPreferences = _appBloc.state.userContentPreferences;
 
     if (entity == null || currentUser == null || currentPreferences == null) {
       return;

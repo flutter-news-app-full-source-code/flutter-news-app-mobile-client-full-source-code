@@ -62,7 +62,16 @@ class SourceCheckboxToggled extends SourcesFilterEvent {
   List<Object> get props => [sourceId, isSelected];
 }
 
-/// {@template sources_filter_apply_followed_requested}
-/// Event triggered to request applying the user's followed sources as filters.
+/// {@template source_filter_followed_applied}
+/// Event triggered when the user's followed sources are applied as filters.
 /// {@endtemplate}
-final class SourcesFilterApplyFollowedRequested extends SourcesFilterEvent {}
+final class SourceFilterFollowedApplied extends SourcesFilterEvent {
+  /// {@macro source_filter_followed_applied}
+  const SourceFilterFollowedApplied({required this.followedSources});
+
+  /// The list of sources the user is following.
+  final List<Source> followedSources;
+
+  @override
+  List<Object> get props => [followedSources];
+}

@@ -1,6 +1,8 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/topics_filter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:go_router/go_router.dart';
@@ -68,16 +70,13 @@ class _TopicFilterPageState extends State<TopicFilterPage> {
         ),
         actions: [
           // Apply My Followed Topics Button
-          BlocBuilder<TopicsFilterBloc, TopicsFilterState>(
-            builder: (context, state) {
-              // Determine if the "Apply My Followed" icon should be filled
-              // This logic checks if all currently selected topics are
-              // also present in the fetched followed topics list.
-              final followedTopicsSet = state.followedTopics.toSet();
-              final isFollowedFilterActive =
-                  followedTopicsSet.isNotEmpty &&
-                  _pageSelectedTopics.length == followedTopicsSet.length &&
-                  _pageSelectedTopics.containsAll(followedTopicsSet);
+          BlocBuilder<AppBloc, AppState>(
+            builder: (context, appState) {
+              final followedTopics =
+                  appState.userContentPreferences?.followedTopics ?? [];
+              final isFollowedFilterActive = followedTopics.isNotEmpty &&
+                  _pageSelectedTopics.length == followedTopics.length &&
+                  _pageSelectedTopics.containsAll(followedTopics);
 
               return IconButton(
                 icon: isFollowedFilterActive
@@ -87,15 +86,21 @@ class _TopicFilterPageState extends State<TopicFilterPage> {
                     ? theme.colorScheme.primary
                     : null,
                 tooltip: l10n.headlinesFeedFilterApplyFollowedLabel,
-                onPressed:
-                    state.followedTopicsStatus == TopicsFilterStatus.loading
-                    ? null // Disable while loading
-                    : () {
-                        // Dispatch event to BLoC to fetch and apply followed topics
-                        _topicsFilterBloc.add(
-                          TopicsFilterApplyFollowedRequested(),
-                        );
-                      },
+                onPressed: () {
+                  setState(() {
+                    _pageSelectedTopics = Set.from(followedTopics);
+                  });
+                  if (followedTopics.isEmpty) {
+                    ScaffoldMessenger.of(context)
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(
+                        SnackBar(
+                          content: Text(l10n.noFollowedItemsForFilterSnackbar),
+                          duration: const Duration(seconds: 3),
+                        ),
+                      );
+                  }
+                },
               );
             },
           ),
@@ -109,134 +114,70 @@ class _TopicFilterPageState extends State<TopicFilterPage> {
           ),
         ],
       ),
-      body: BlocListener<TopicsFilterBloc, TopicsFilterState>(
-        // Listen for changes in followedTopicsStatus or followedTopics
-        listenWhen: (previous, current) =>
-            previous.followedTopicsStatus != current.followedTopicsStatus ||
-            previous.followedTopics != current.followedTopics,
-        listener: (context, state) {
-          if (state.followedTopicsStatus == TopicsFilterStatus.success) {
-            // Update local state with followed topics from BLoC
-            setState(() {
-              _pageSelectedTopics = Set.from(state.followedTopics);
-            });
-            if (state.followedTopics.isEmpty) {
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(
-                    content: Text(l10n.noFollowedItemsForFilterSnackbar),
-                    duration: const Duration(seconds: 3),
-                  ),
-                );
-            }
-          } else if (state.followedTopicsStatus == TopicsFilterStatus.failure) {
-            // Show error message if fetching followed topics failed
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(
-                  content: Text(state.error?.message ?? l10n.unknownError),
-                  duration: const Duration(seconds: 3),
-                ),
-              );
-          }
-        },
-        child: BlocBuilder<TopicsFilterBloc, TopicsFilterState>(
-          builder: (context, state) {
-            // Determine overall loading status for the main list
-            final isLoadingMainList =
-                state.status == TopicsFilterStatus.initial ||
-                state.status == TopicsFilterStatus.loading;
+      body: BlocBuilder<TopicsFilterBloc, TopicsFilterState>(
+        builder: (context, state) {
+          // Determine overall loading status for the main list
+          final isLoadingMainList =
+              state.status == TopicsFilterStatus.initial ||
+              state.status == TopicsFilterStatus.loading;
 
-            // Determine if followed topics are currently loading
-            final isLoadingFollowedTopics =
-                state.followedTopicsStatus == TopicsFilterStatus.loading;
-
-            if (isLoadingMainList) {
-              return LoadingStateWidget(
-                icon: Icons.category_outlined,
-                headline: l10n.topicFilterLoadingHeadline,
-                subheadline: l10n.pleaseWait,
-              );
-            }
-
-            if (state.status == TopicsFilterStatus.failure &&
-                state.topics.isEmpty) {
-              return Center(
-                child: FailureStateWidget(
-                  exception:
-                      state.error ??
-                      const UnknownException(
-                        'An unknown error occurred while fetching topics.',
-                      ),
-                  onRetry: () => _topicsFilterBloc.add(TopicsFilterRequested()),
-                ),
-              );
-            }
-
-            if (state.topics.isEmpty) {
-              return InitialStateWidget(
-                icon: Icons.category_outlined,
-                headline: l10n.topicFilterEmptyHeadline,
-                subheadline: l10n.topicFilterEmptySubheadline,
-              );
-            }
-
-            return Stack(
-              children: [
-                ListView.builder(
-                  controller: _scrollController,
-                  itemCount: state.hasMore
-                      ? state.topics.length + 1
-                      : state.topics.length,
-                  itemBuilder: (context, index) {
-                    if (index >= state.topics.length) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    final topic = state.topics[index];
-                    final isSelected = _pageSelectedTopics.contains(topic);
-                    return CheckboxListTile(
-                      title: Text(topic.name),
-                      value: isSelected,
-                      onChanged: (bool? value) {
-                        setState(() {
-                          if (value == true) {
-                            _pageSelectedTopics.add(topic);
-                          } else {
-                            _pageSelectedTopics.remove(topic);
-                          }
-                        });
-                      },
-                    );
-                  },
-                ),
-                // Show loading overlay if followed topics are being fetched
-                if (isLoadingFollowedTopics)
-                  Positioned.fill(
-                    child: ColoredBox(
-                      color: Colors.black54, // Semi-transparent overlay
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const CircularProgressIndicator(),
-                            const SizedBox(height: AppSpacing.md),
-                            Text(
-                              l10n.headlinesFeedLoadingHeadline,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
+          if (isLoadingMainList) {
+            return LoadingStateWidget(
+              icon: Icons.category_outlined,
+              headline: l10n.topicFilterLoadingHeadline,
+              subheadline: l10n.pleaseWait,
             );
-          },
-        ),
+          }
+
+          if (state.status == TopicsFilterStatus.failure &&
+              state.topics.isEmpty) {
+            return Center(
+              child: FailureStateWidget(
+                exception:
+                    state.error ??
+                    const UnknownException(
+                      'An unknown error occurred while fetching topics.',
+                    ),
+                onRetry: () => _topicsFilterBloc.add(TopicsFilterRequested()),
+              ),
+            );
+          }
+
+          if (state.topics.isEmpty) {
+            return InitialStateWidget(
+              icon: Icons.category_outlined,
+              headline: l10n.topicFilterEmptyHeadline,
+              subheadline: l10n.topicFilterEmptySubheadline,
+            );
+          }
+
+          return ListView.builder(
+            controller: _scrollController,
+            itemCount: state.hasMore
+                ? state.topics.length + 1
+                : state.topics.length,
+            itemBuilder: (context, index) {
+              if (index >= state.topics.length) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              final topic = state.topics[index];
+              final isSelected = _pageSelectedTopics.contains(topic);
+              return CheckboxListTile(
+                title: Text(topic.name),
+                value: isSelected,
+                onChanged: (bool? value) {
+                  setState(() {
+                    if (value == true) {
+                      _pageSelectedTopics.add(topic);
+                    } else {
+                      _pageSelectedTopics.remove(topic);
+                    }
+                  });
+                },
+              );
+            },
+          );
+        },
       ),
     );
   }

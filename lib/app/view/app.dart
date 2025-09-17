@@ -30,25 +30,8 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class App extends StatelessWidget {
   /// {@macro app_widget}
-  const App({
-    required AuthRepository authenticationRepository,
-    required DataRepository<Headline> headlinesRepository,
-    required DataRepository<Topic> topicsRepository,
-    required DataRepository<Country> countriesRepository,
-    required DataRepository<Source> sourcesRepository,
-    required DataRepository<UserAppSettings> userAppSettingsRepository,
-    required DataRepository<UserContentPreferences>
-    userContentPreferencesRepository,
-    required DataRepository<RemoteConfig> remoteConfigRepository,
-    required DataRepository<User> userRepository,
-    required KVStorageService kvStorageService,
-    required AppEnvironment environment,
-    required AdService adService,
-    required DataRepository<LocalAd> localAdRepository,
-    required GlobalKey<NavigatorState> navigatorKey,
-    required InlineAdCacheService inlineAdCacheService,
-    required RemoteConfig? initialRemoteConfig,
-    required HttpException? initialRemoteConfigError,
+  const App({required AuthRepository authenticationRepository, required DataRepository<Headline> headlinesRepository, required DataRepository<Topic> topicsRepository, required DataRepository<Country> countriesRepository, required DataRepository<Source> sourcesRepository, required DataRepository<UserAppSettings> userAppSettingsRepository, required DataRepository<UserContentPreferences>
+    userContentPreferencesRepository, required DataRepository<RemoteConfig> remoteConfigRepository, required DataRepository<User> userRepository, required KVStorageService kvStorageService, required AppEnvironment environment, required AdService adService, required DataRepository<LocalAd> localAdRepository, required GlobalKey<NavigatorState> navigatorKey, required InlineAdCacheService inlineAdCacheService, required RemoteConfig? initialRemoteConfig, required HttpException? initialRemoteConfigError, super.key,
     this.demoDataMigrationService,
     this.demoDataInitializerService,
     this.initialUser,

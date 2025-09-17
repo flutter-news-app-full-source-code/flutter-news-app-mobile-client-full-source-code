@@ -70,7 +70,6 @@ GoRouter createRouter({
   required GlobalKey<NavigatorState> navigatorKey,
   required InlineAdCacheService inlineAdCacheService,
 }) {
-
   // Instantiate FeedDecoratorService once to be shared
   final feedDecoratorService = FeedDecoratorService(
     topicsRepository: topicsRepository,

@@ -147,11 +147,8 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                       tooltip: l10n.headlinesFeedFilterTooltip,
                       onPressed: () {
                         // Navigate to the filter page route
-                        final headlinesFeedBloc = context
-                            .read<HeadlinesFeedBloc>();
                         context.goNamed(
                           Routes.feedFilterName,
-                          extra: headlinesFeedBloc,
                         );
                       },
                     ),

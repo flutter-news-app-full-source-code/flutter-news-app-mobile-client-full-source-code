@@ -47,15 +47,3 @@ class EntityDetailsLoadMoreHeadlinesRequested extends EntityDetailsEvent {
   @override
   List<Object> get props => [adThemeStyle];
 }
-
-/// Internal event to notify the BLoC that the user's content preferences
-/// have changed elsewhere in the app.
-class _EntityDetailsUserPreferencesChanged extends EntityDetailsEvent {
-  const _EntityDetailsUserPreferencesChanged(this.preferences);
-
-  /// The updated user content preferences.
-  final UserContentPreferences preferences;
-
-  @override
-  List<Object?> get props => [preferences];
-}

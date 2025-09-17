@@ -13,8 +13,17 @@ import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/
 part 'headlines_search_event.dart';
 part 'headlines_search_state.dart';
 
+/// {@template headlines_search_bloc}
+/// A BLoC that manages the state for the headlines search feature.
+///
+/// This BLoC is responsible for fetching search results based on a query
+/// and selected content type, and for injecting ad placeholders into the
+/// headline results. It consumes global application state from [AppBloc]
+/// for user settings and remote configuration.
+/// {@endtemplate}
 class HeadlinesSearchBloc
     extends Bloc<HeadlinesSearchEvent, HeadlinesSearchState> {
+  /// {@macro headlines_search_bloc}
   HeadlinesSearchBloc({
     required DataRepository<Headline> headlinesRepository,
     required DataRepository<Topic> topicRepository,
@@ -47,6 +56,10 @@ class HeadlinesSearchBloc
   final InlineAdCacheService _inlineAdCacheService;
   static const _limit = 10;
 
+  /// Handles changes to the selected model type for search.
+  ///
+  /// If there's an active search term, it re-triggers the search with the
+  /// new model type.
   Future<void> _onHeadlinesSearchModelTypeChanged(
     HeadlinesSearchModelTypeChanged event,
     Emitter<HeadlinesSearchState> emit,
@@ -64,6 +77,11 @@ class HeadlinesSearchBloc
     emit(HeadlinesSearchInitial(selectedModelType: event.newModelType));
   }
 
+  /// Handles requests to fetch search results.
+  ///
+  /// This method performs the actual search operation based on the search term
+  /// and selected model type. It also handles pagination and injects ad
+  /// placeholders into headline results.
   Future<void> _onSearchFetchRequested(
     HeadlinesSearchFetchRequested event,
     Emitter<HeadlinesSearchState> emit,
@@ -125,7 +143,7 @@ class HeadlinesSearchBloc
                 user: currentUser,
                 adConfig: appConfig.adConfig,
                 imageStyle:
-                    _appBloc.state.settings.feedPreferences.headlineImageStyle,
+                    _appBloc.state.headlineImageStyle, // Use AppBloc getter
                 adThemeStyle: event.adThemeStyle,
                 // Calculate the count of actual content items (headlines) already in the
                 // feed. This is crucial for the FeedDecoratorService to correctly apply
@@ -158,7 +176,6 @@ class HeadlinesSearchBloc
                   cursor: response.cursor,
                 ),
               );
-            // Added break
             case ContentType.source:
               response = await _sourceRepository.readAll(
                 filter: {'q': searchTerm},
@@ -245,7 +262,7 @@ class HeadlinesSearchBloc
             user: currentUser,
             adConfig: appConfig.adConfig,
             imageStyle:
-                _appBloc.state.settings.feedPreferences.headlineImageStyle,
+                _appBloc.state.headlineImageStyle, // Use AppBloc getter
             adThemeStyle: event.adThemeStyle,
           );
         case ContentType.topic:

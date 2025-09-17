@@ -42,11 +42,8 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
   late List<Source> _tempSelectedSources;
   late List<Country> _tempSelectedEventCountries;
 
-  // New state variables for the "Apply my followed items" feature
+  /// Flag to indicate if the "Apply my followed items" filter is active.
   bool _useFollowedFilters = false;
-  bool _isLoadingFollowedFilters = false;
-  String? _loadFollowedFiltersError;
-  UserContentPreferences? _currentUserPreferences;
 
   @override
   void initState() {
@@ -61,125 +58,6 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
     _tempSelectedEventCountries = List.from(currentFilter.eventCountries ?? []);
 
     _useFollowedFilters = currentFilter.isFromFollowedItems;
-    _isLoadingFollowedFilters = false;
-    _loadFollowedFiltersError = null;
-    _currentUserPreferences = null;
-
-    // If the "Apply my followed items" feature is initially active,
-    // fetch the followed items to populate the temporary filter lists.
-    if (_useFollowedFilters) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _fetchAndApplyFollowedFilters();
-        }
-      });
-    }
-  }
-
-  /// Fetches the user's followed items (topics, sources, countries) and
-  /// applies them to the temporary filter state.
-  ///
-  /// This method is called when the "Apply my followed items" toggle is
-  /// activated. It handles loading states, errors, and updates the UI.
-  Future<void> _fetchAndApplyFollowedFilters() async {
-    setState(() {
-      _isLoadingFollowedFilters = true;
-      _loadFollowedFiltersError = null;
-    });
-
-    final appState = context.read<AppBloc>().state;
-    final currentUser = appState.user!;
-
-    try {
-      final preferencesRepo = context
-          .read<DataRepository<UserContentPreferences>>();
-      final preferences = await preferencesRepo.read(
-        id: currentUser.id,
-        userId: currentUser.id,
-      );
-
-      // Check if followed items are empty across all categories
-      if (preferences.followedTopics.isEmpty &&
-          preferences.followedSources.isEmpty &&
-          preferences.followedCountries.isEmpty) {
-        setState(() {
-          _isLoadingFollowedFilters = false;
-          _useFollowedFilters = false;
-          _tempSelectedTopics = [];
-          _tempSelectedSources = [];
-          _tempSelectedEventCountries = [];
-        });
-        if (mounted) {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: Text(
-                  AppLocalizationsX(
-                    context,
-                  ).l10n.noFollowedItemsForFilterSnackbar,
-                ),
-                duration: const Duration(seconds: 3),
-              ),
-            );
-        }
-        return;
-      } else {
-        setState(() {
-          _currentUserPreferences = preferences;
-          _tempSelectedTopics = List.from(preferences.followedTopics);
-          _tempSelectedSources = List.from(preferences.followedSources);
-          _tempSelectedEventCountries = List.from(
-            preferences.followedCountries,
-          );
-          _isLoadingFollowedFilters = false;
-        });
-      }
-    } on NotFoundException {
-      // If user preferences are not found, treat as empty followed items.
-      setState(() {
-        _currentUserPreferences = UserContentPreferences(
-          id: currentUser.id,
-          followedTopics: const [],
-          followedSources: const [],
-          followedCountries: const [],
-          savedHeadlines: const [],
-        );
-        _tempSelectedTopics = [];
-        _tempSelectedSources = [];
-        _tempSelectedEventCountries = [];
-        _isLoadingFollowedFilters = false;
-        _useFollowedFilters = false;
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(
-            SnackBar(
-              content: Text(
-                AppLocalizationsX(
-                  context,
-                ).l10n.noFollowedItemsForFilterSnackbar,
-              ),
-              duration: const Duration(seconds: 3),
-            ),
-          );
-      }
-    } on HttpException catch (e) {
-      setState(() {
-        _isLoadingFollowedFilters = false;
-        _useFollowedFilters = false;
-        _loadFollowedFiltersError = e.message;
-      });
-    } catch (e) {
-      setState(() {
-        _isLoadingFollowedFilters = false;
-        _useFollowedFilters = false;
-        _loadFollowedFiltersError = AppLocalizationsX(
-          context,
-        ).l10n.unknownError;
-      });
-    }
   }
 
   /// Clears all temporary filter selections.
@@ -243,10 +121,9 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
     final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
 
-    // Determine if the "Apply my followed items" feature is active and loading.
+    // Determine if the "Apply my followed items" feature is active.
     // This will disable the individual filter tiles.
-    final isFollowedFilterActiveOrLoading =
-        _useFollowedFilters || _isLoadingFollowedFilters;
+    final isFollowedFilterActive = _useFollowedFilters;
 
     return Scaffold(
       appBar: AppBar(
@@ -270,34 +147,59 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
               // Also reset local state for the "Apply my followed items"
               setState(() {
                 _useFollowedFilters = false;
-                _isLoadingFollowedFilters = false;
-                _loadFollowedFiltersError = null;
                 _clearTemporaryFilters();
               });
               context.pop();
             },
           ),
           // Apply My Followed Items Button
-          IconButton(
-            icon: _useFollowedFilters
-                ? const Icon(Icons.favorite)
-                : const Icon(Icons.favorite_border),
-            color: _useFollowedFilters ? theme.colorScheme.primary : null,
-            tooltip: l10n.headlinesFeedFilterApplyFollowedLabel,
-            onPressed: _isLoadingFollowedFilters
-                ? null // Disable while loading
-                : () {
-                    setState(() {
-                      _useFollowedFilters = !_useFollowedFilters;
-                      if (_useFollowedFilters) {
-                        _fetchAndApplyFollowedFilters();
-                      } else {
-                        _isLoadingFollowedFilters = false;
-                        _loadFollowedFiltersError = null;
-                        _clearTemporaryFilters();
+          BlocBuilder<AppBloc, AppState>(
+            builder: (context, appState) {
+              final followedTopics =
+                  appState.userContentPreferences?.followedTopics ?? [];
+              final followedSources =
+                  appState.userContentPreferences?.followedSources ?? [];
+              final followedCountries =
+                  appState.userContentPreferences?.followedCountries ?? [];
+
+              final hasFollowedItems = followedTopics.isNotEmpty ||
+                  followedSources.isNotEmpty ||
+                  followedCountries.isNotEmpty;
+
+              return IconButton(
+                icon: _useFollowedFilters
+                    ? const Icon(Icons.favorite)
+                    : const Icon(Icons.favorite_border),
+                color: _useFollowedFilters ? theme.colorScheme.primary : null,
+                tooltip: l10n.headlinesFeedFilterApplyFollowedLabel,
+                onPressed: hasFollowedItems
+                    ? () {
+                        setState(() {
+                          _useFollowedFilters = !_useFollowedFilters;
+                          if (_useFollowedFilters) {
+                            _tempSelectedTopics = List.from(followedTopics);
+                            _tempSelectedSources = List.from(followedSources);
+                            _tempSelectedEventCountries =
+                                List.from(followedCountries);
+                          } else {
+                            _clearTemporaryFilters();
+                          }
+                        });
                       }
-                    });
-                  },
+                    : () {
+                        ScaffoldMessenger.of(context)
+                          ..hideCurrentSnackBar()
+                          ..showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                l10n.noFollowedItemsForFilterSnackbar,
+                              ),
+                              duration: const Duration(seconds: 3),
+                            ),
+                          );
+                      },
+              );
+            },
           ),
           // Apply Filters Button
           IconButton(
@@ -330,41 +232,11 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
         children: [
-          if (_isLoadingFollowedFilters)
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.paddingLarge,
-                vertical: AppSpacing.sm,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  Text(l10n.headlinesFeedLoadingHeadline),
-                ],
-              ),
-            ),
-          if (_loadFollowedFiltersError != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.paddingLarge,
-                vertical: AppSpacing.sm,
-              ),
-              child: Text(
-                _loadFollowedFiltersError!,
-                style: TextStyle(color: theme.colorScheme.error),
-              ),
-            ),
           const Divider(),
           _buildFilterTile<Topic>(
             context: context,
             title: l10n.headlinesFeedFilterTopicLabel,
-            enabled: !isFollowedFilterActiveOrLoading,
+            enabled: !isFollowedFilterActive,
             selectedCount: _tempSelectedTopics.length,
             routeName: Routes.feedFilterTopicsName,
             currentSelectionData: _tempSelectedTopics,
@@ -375,7 +247,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
           _buildFilterTile<Source>(
             context: context,
             title: l10n.headlinesFeedFilterSourceLabel,
-            enabled: !isFollowedFilterActiveOrLoading,
+            enabled: !isFollowedFilterActive,
             selectedCount: _tempSelectedSources.length,
             routeName: Routes.feedFilterSourcesName,
             currentSelectionData: _tempSelectedSources,
@@ -386,7 +258,7 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
           _buildFilterTile<Country>(
             context: context,
             title: l10n.headlinesFeedFilterEventCountryLabel,
-            enabled: !isFollowedFilterActiveOrLoading,
+            enabled: !isFollowedFilterActive,
             selectedCount: _tempSelectedEventCountries.length,
             routeName: Routes.feedFilterEventCountriesName,
             currentSelectionData: _tempSelectedEventCountries,

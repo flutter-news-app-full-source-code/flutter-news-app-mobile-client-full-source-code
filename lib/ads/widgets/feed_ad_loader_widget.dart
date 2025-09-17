@@ -204,12 +204,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
       }
 
       // Get the current HeadlineImageStyle from AppBloc
-      final headlineImageStyle = context
-          .read<AppBloc>()
-          .state
-          .settings
-          .feedPreferences
-          .headlineImageStyle;
+      final headlineImageStyle = context.read<AppBloc>().state.headlineImageStyle;
 
       // Call AdService.getFeedAd with the full AdConfig and adType from the placeholder.
       final loadedAd = await _adService.getFeedAd(
@@ -279,12 +274,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
-    final headlineImageStyle = context
-        .read<AppBloc>()
-        .state
-        .settings
-        .feedPreferences
-        .headlineImageStyle;
+    final headlineImageStyle = context.read<AppBloc>().state.headlineImageStyle;
 
     if (_isLoading || _hasError || _loadedAd == null) {
       // Show a user-friendly message when loading, on error, or if no ad is loaded.

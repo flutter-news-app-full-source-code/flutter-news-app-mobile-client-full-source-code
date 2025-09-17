@@ -880,4 +880,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get retryButtonText => 'إعادة المحاولة';
+
+  @override
+  String get headlinesFeedFilterLoadingHeadline => 'جاري تحميل الفلاتر';
 }

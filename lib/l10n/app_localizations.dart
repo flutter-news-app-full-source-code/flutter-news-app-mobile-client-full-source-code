@@ -1687,6 +1687,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Retry'**
   String get retryButtonText;
+
+  /// Headline for the loading state when fetching filter options on the headlines filter page.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading Filters'**
+  String get headlinesFeedFilterLoadingHeadline;
 }
 
 class _AppLocalizationsDelegate

@@ -1,61 +1,20 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/topics_filter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_filter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
-import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template topic_filter_page}
 /// A page dedicated to selecting news topics for filtering headlines.
+///
+/// This page now interacts with the centralized [HeadlinesFilterBloc]
+/// to manage the list of available topics and the user's selections.
 /// {@endtemplate}
-class TopicFilterPage extends StatefulWidget {
+class TopicFilterPage extends StatelessWidget {
   /// {@macro topic_filter_page}
   const TopicFilterPage({super.key});
-
-  @override
-  State<TopicFilterPage> createState() => _TopicFilterPageState();
-}
-
-class _TopicFilterPageState extends State<TopicFilterPage> {
-  final _scrollController = ScrollController();
-  late final TopicsFilterBloc _topicsFilterBloc;
-  late Set<Topic> _pageSelectedTopics;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_onScroll);
-    _topicsFilterBloc = context.read<TopicsFilterBloc>()
-      ..add(TopicsFilterRequested());
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Initialize local selection from GoRouter extra parameter
-      final initialSelection = GoRouterState.of(context).extra as List<Topic>?;
-      _pageSelectedTopics = Set.from(initialSelection ?? []);
-    });
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _onScroll() {
-    if (_isBottom) {
-      _topicsFilterBloc.add(TopicsFilterLoadMoreRequested());
-    }
-  }
-
-  bool get _isBottom {
-    if (!_scrollController.hasClients) return false;
-    final maxScroll = _scrollController.position.maxScrollExtent;
-    final currentScroll = _scrollController.offset;
-    return currentScroll >= (maxScroll * 0.9);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,13 +29,16 @@ class _TopicFilterPageState extends State<TopicFilterPage> {
         ),
         actions: [
           // Apply My Followed Topics Button
-          BlocBuilder<AppBloc, AppState>(
-            builder: (context, appState) {
+          BlocBuilder<HeadlinesFilterBloc, HeadlinesFilterState>(
+            builder: (context, filterState) {
+              final appState = context.watch<AppBloc>().state;
               final followedTopics =
                   appState.userContentPreferences?.followedTopics ?? [];
+
+              // Determine if the current selection matches the followed topics
               final isFollowedFilterActive = followedTopics.isNotEmpty &&
-                  _pageSelectedTopics.length == followedTopics.length &&
-                  _pageSelectedTopics.containsAll(followedTopics);
+                  filterState.selectedTopics.length == followedTopics.length &&
+                  filterState.selectedTopics.containsAll(followedTopics);
 
               return IconButton(
                 icon: isFollowedFilterActive
@@ -87,9 +49,6 @@ class _TopicFilterPageState extends State<TopicFilterPage> {
                     : null,
                 tooltip: l10n.headlinesFeedFilterApplyFollowedLabel,
                 onPressed: () {
-                  setState(() {
-                    _pageSelectedTopics = Set.from(followedTopics);
-                  });
                   if (followedTopics.isEmpty) {
                     ScaffoldMessenger.of(context)
                       ..hideCurrentSnackBar()
@@ -99,27 +58,35 @@ class _TopicFilterPageState extends State<TopicFilterPage> {
                           duration: const Duration(seconds: 3),
                         ),
                       );
+                  } else {
+                    // Toggle the followed items filter in the HeadlinesFilterBloc
+                    context.read<HeadlinesFilterBloc>().add(
+                          FollowedItemsFilterToggled(
+                            isUsingFollowedItems: !isFollowedFilterActive,
+                          ),
+                        );
                   }
                 },
               );
             },
           ),
-          // Apply Filters Button
+          // Apply Filters Button (now just pops, as state is managed centrally)
           IconButton(
             icon: const Icon(Icons.check),
             tooltip: l10n.headlinesFeedFilterApplyButton,
             onPressed: () {
-              context.pop(_pageSelectedTopics.toList());
+              // The selections are already managed by HeadlinesFilterBloc.
+              // Just pop the page.
+              Navigator.of(context).pop();
             },
           ),
         ],
       ),
-      body: BlocBuilder<TopicsFilterBloc, TopicsFilterState>(
-        builder: (context, state) {
+      body: BlocBuilder<HeadlinesFilterBloc, HeadlinesFilterState>(
+        builder: (context, filterState) {
           // Determine overall loading status for the main list
           final isLoadingMainList =
-              state.status == TopicsFilterStatus.initial ||
-              state.status == TopicsFilterStatus.loading;
+              filterState.status == HeadlinesFilterStatus.loading;
 
           if (isLoadingMainList) {
             return LoadingStateWidget(
@@ -129,21 +96,27 @@ class _TopicFilterPageState extends State<TopicFilterPage> {
             );
           }
 
-          if (state.status == TopicsFilterStatus.failure &&
-              state.topics.isEmpty) {
+          if (filterState.status == HeadlinesFilterStatus.failure &&
+              filterState.allTopics.isEmpty) {
             return Center(
               child: FailureStateWidget(
-                exception:
-                    state.error ??
+                exception: filterState.error ??
                     const UnknownException(
                       'An unknown error occurred while fetching topics.',
                     ),
-                onRetry: () => _topicsFilterBloc.add(TopicsFilterRequested()),
+                onRetry: () => context.read<HeadlinesFilterBloc>().add(
+                      FilterDataLoaded(
+                        initialSelectedTopics: filterState.selectedTopics.toList(),
+                        initialSelectedSources: filterState.selectedSources.toList(),
+                        initialSelectedCountries: filterState.selectedCountries.toList(),
+                        isUsingFollowedItems: filterState.isUsingFollowedItems,
+                      ),
+                    ),
               ),
             );
           }
 
-          if (state.topics.isEmpty) {
+          if (filterState.allTopics.isEmpty) {
             return InitialStateWidget(
               icon: Icons.category_outlined,
               headline: l10n.topicFilterEmptyHeadline,
@@ -152,27 +125,19 @@ class _TopicFilterPageState extends State<TopicFilterPage> {
           }
 
           return ListView.builder(
-            controller: _scrollController,
-            itemCount: state.hasMore
-                ? state.topics.length + 1
-                : state.topics.length,
+            itemCount: filterState.allTopics.length,
             itemBuilder: (context, index) {
-              if (index >= state.topics.length) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              final topic = state.topics[index];
-              final isSelected = _pageSelectedTopics.contains(topic);
+              final topic = filterState.allTopics[index];
+              final isSelected = filterState.selectedTopics.contains(topic);
               return CheckboxListTile(
                 title: Text(topic.name),
                 value: isSelected,
                 onChanged: (bool? value) {
-                  setState(() {
-                    if (value == true) {
-                      _pageSelectedTopics.add(topic);
-                    } else {
-                      _pageSelectedTopics.remove(topic);
-                    }
-                  });
+                  if (value != null) {
+                    context.read<HeadlinesFilterBloc>().add(
+                          FilterTopicToggled(topic: topic, isSelected: value),
+                        );
+                  }
                 },
               );
             },

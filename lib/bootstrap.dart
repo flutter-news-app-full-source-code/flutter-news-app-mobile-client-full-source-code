@@ -420,6 +420,10 @@ Future<Widget> bootstrap(
       : null;
 
   // Conditionally instantiate DemoDataInitializerService
+  // This service is responsible for ensuring that essential user-specific data
+  // (like UserAppSettings, UserContentPreferences)
+  // exists in the data in-memory clients when a user is first encountered
+  // in the demo environment.
   final demoDataInitializerService =
       appConfig.environment == app_config.AppEnvironment.demo
       ? DemoDataInitializerService(

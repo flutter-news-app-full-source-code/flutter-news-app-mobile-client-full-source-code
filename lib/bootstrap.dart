@@ -49,7 +49,7 @@ Future<Widget> bootstrap(
 
   // Initialize InlineAdCacheService early as it's a singleton and needs AdService.
   // It will be fully configured once AdService is available.
-  late final InlineAdCacheService inlineAdCacheService;
+  InlineAdCacheService? inlineAdCacheService;
 
   // 2. Initialize HttpClient. Its tokenProvider now directly reads from
   // kvStorage, breaking the circular dependency with AuthRepository.

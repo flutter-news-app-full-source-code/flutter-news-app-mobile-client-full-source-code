@@ -51,12 +51,71 @@ Future<Widget> bootstrap(
   // It will be fully configured once AdService is available.
   late final InlineAdCacheService inlineAdCacheService;
 
-  // 2. Conditionally initialize HttpClient and Auth services based on environment.
-  // This ensures HttpClient is available before any DataApi or AdProvider
-  // that depends on it.
+  // 2. Initialize HttpClient. Its tokenProvider now directly reads from
+  // kvStorage, breaking the circular dependency with AuthRepository.
+  // This HttpClient instance is used for all subsequent API calls, including
+  // the initial unauthenticated fetch of RemoteConfig.
+  final httpClient = HttpClient(
+    baseUrl: appConfig.baseUrl,
+    tokenProvider: () =>
+        kvStorage.readString(key: StorageKey.authToken.stringValue),
+    logger: logger,
+  );
+
+  // 3. Initialize RemoteConfigClient and Repository, and fetch RemoteConfig.
+  // This is done early because RemoteConfig is now publicly accessible (unauthenticated).
+  late DataClient<RemoteConfig> remoteConfigClient;
+  if (appConfig.environment == app_config.AppEnvironment.demo) {
+    remoteConfigClient = DataInMemory<RemoteConfig>(
+      toJson: (i) => i.toJson(),
+      getId: (i) => i.id,
+      initialData: remoteConfigsFixturesData,
+      logger: logger,
+    );
+  } else {
+    // For development and production environments, use DataApi.
+    remoteConfigClient = DataApi<RemoteConfig>(
+      httpClient: httpClient,
+      modelName: 'remote_config',
+      fromJson: RemoteConfig.fromJson,
+      toJson: (config) => config.toJson(),
+      logger: logger,
+    );
+  }
+  final remoteConfigRepository = DataRepository<RemoteConfig>(
+    dataClient: remoteConfigClient,
+  );
+
+  // Fetch the initial RemoteConfig. This is a critical step to determine
+  // the app's global status (e.g., maintenance mode, update required)
+  // before proceeding with other initializations.
+  RemoteConfig? initialRemoteConfig;
+  HttpException? initialRemoteConfigError;
+
+  try {
+    initialRemoteConfig = await remoteConfigRepository.read(
+      id: kRemoteConfigId,
+    );
+    logger.info('[bootstrap] Initial RemoteConfig fetched successfully.');
+  } on HttpException catch (e) {
+    logger.severe(
+      '[bootstrap] Failed to fetch initial RemoteConfig (HttpException): $e',
+    );
+    initialRemoteConfigError = e;
+  } catch (e, s) {
+    logger.severe(
+      '[bootstrap] Unexpected error fetching initial RemoteConfig.',
+      e,
+      s,
+    );
+    initialRemoteConfigError = UnknownException(e.toString());
+  }
+
+  // 4. Conditionally initialize Auth services based on environment.
+  // This is done after RemoteConfig is fetched, as Auth services might depend
+  // on configurations defined in RemoteConfig (though not directly in this case).
   late final AuthClient authClient;
   late final AuthRepository authenticationRepository;
-  late final HttpClient httpClient;
   if (appConfig.environment == app_config.AppEnvironment.demo) {
     // In-memory authentication for demo environment.
     authClient = AuthInmemory();
@@ -64,26 +123,7 @@ Future<Widget> bootstrap(
       authClient: authClient,
       storageService: kvStorage,
     );
-    // For demo, httpClient is not strictly needed for DataApi,
-    // but we initialize a dummy one to satisfy non-nullable requirements
-    // if any part of the code path expects it.
-    // In a real scenario, DataApi would not be used in demo mode.
-    httpClient = HttpClient(
-      baseUrl: appConfig.baseUrl,
-      tokenProvider: () async => null, // No token needed for demo
-      logger: logger,
-    );
   } else {
-    // For production and development environments, an HTTP client is needed.
-    // Initialize HttpClient first. Its tokenProvider now directly reads from
-    // kvStorage, breaking the circular dependency with AuthRepository.
-    httpClient = HttpClient(
-      baseUrl: appConfig.baseUrl,
-      tokenProvider: () =>
-          kvStorage.readString(key: StorageKey.authToken.stringValue),
-      logger: logger,
-    );
-
     // Now that httpClient is available, initialize AuthApi and AuthRepository.
     authClient = AuthApi(httpClient: httpClient);
     authenticationRepository = AuthRepository(
@@ -92,9 +132,7 @@ Future<Widget> bootstrap(
     );
   }
 
-  // 3. Initialize AdProvider and AdService.
-  // These now have a guaranteed valid httpClient (for DataApi-based LocalAdProvider)
-  // or can proceed independently (AdMobAdProvider).
+  // 5. Initialize AdProvider and AdService.
   late final Map<AdPlatformType, AdProvider> adProviders;
 
   // Conditionally instantiate ad providers based on the application environment.
@@ -153,17 +191,16 @@ Future<Widget> bootstrap(
   // and InterstitialAdManager for BuildContext access.
   final navigatorKey = GlobalKey<NavigatorState>();
 
-  // 4. Initialize all other DataClients and Repositories.
+  // 6. Initialize all other DataClients and Repositories.
   // These now also have a guaranteed valid httpClient.
-  DataClient<Headline> headlinesClient;
-  DataClient<Topic> topicsClient;
-  DataClient<Country> countriesClient;
-  DataClient<Source> sourcesClient;
-  DataClient<UserContentPreferences> userContentPreferencesClient;
-  DataClient<UserAppSettings> userAppSettingsClient;
-  DataClient<RemoteConfig> remoteConfigClient;
-  DataClient<User> userClient;
-  DataClient<LocalAd> localAdClient;
+  late final DataClient<Headline> headlinesClient;
+  late final DataClient<Topic> topicsClient;
+  late final DataClient<Country> countriesClient;
+  late final DataClient<Source> sourcesClient;
+  late final DataClient<UserContentPreferences> userContentPreferencesClient;
+  late final DataClient<UserAppSettings> userAppSettingsClient;
+  late final DataClient<User> userClient;
+  late final DataClient<LocalAd> localAdClient;
   if (appConfig.environment == app_config.AppEnvironment.demo) {
     headlinesClient = DataInMemory<Headline>(
       toJson: (i) => i.toJson(),
@@ -177,13 +214,6 @@ Future<Widget> bootstrap(
       initialData: topicsFixturesData,
       logger: logger,
     );
-    countriesClient = DataInMemory<Country>(
-      toJson: (i) => i.toJson(),
-      getId: (i) => i.id,
-      initialData: countriesFixturesData,
-      logger: logger,
-    );
-
     // Wrap the generic DataInMemory<Country> with CountryInMemoryClient.
     // This decorator adds specialized filtering for 'hasActiveSources' and
     // 'hasActiveHeadlines' which are specific to the application's needs
@@ -207,10 +237,16 @@ Future<Widget> bootstrap(
     //     its reusability. The Decorator Pattern allows us to extend its
     //     functionality for `Country` models without altering the generic base.
     countriesClient = CountryInMemoryClient(
-      decoratedClient: countriesClient,
+      decoratedClient: DataInMemory<Country>(
+        toJson: (i) => i.toJson(),
+        getId: (i) => i.id,
+        initialData: countriesFixturesData,
+        logger: logger,
+      ),
       allSources: sourcesFixturesData,
       allHeadlines: headlinesFixturesData,
     );
+
     //
     sourcesClient = DataInMemory<Source>(
       toJson: (i) => i.toJson(),
@@ -226,12 +262,6 @@ Future<Widget> bootstrap(
     userAppSettingsClient = DataInMemory<UserAppSettings>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
-      logger: logger,
-    );
-    remoteConfigClient = DataInMemory<RemoteConfig>(
-      toJson: (i) => i.toJson(),
-      getId: (i) => i.id,
-      initialData: remoteConfigsFixturesData,
       logger: logger,
     );
     userClient = DataInMemory<User>(
@@ -286,13 +316,6 @@ Future<Widget> bootstrap(
       modelName: 'user_app_settings',
       fromJson: UserAppSettings.fromJson,
       toJson: (settings) => settings.toJson(),
-      logger: logger,
-    );
-    remoteConfigClient = DataApi<RemoteConfig>(
-      httpClient: httpClient,
-      modelName: 'remote_config',
-      fromJson: RemoteConfig.fromJson,
-      toJson: (config) => config.toJson(),
       logger: logger,
     );
     userClient = DataApi<User>(
@@ -353,13 +376,6 @@ Future<Widget> bootstrap(
       toJson: (settings) => settings.toJson(),
       logger: logger,
     );
-    remoteConfigClient = DataApi<RemoteConfig>(
-      httpClient: httpClient,
-      modelName: 'remote_config',
-      fromJson: RemoteConfig.fromJson,
-      toJson: (config) => config.toJson(),
-      logger: logger,
-    );
     userClient = DataApi<User>(
       httpClient: httpClient,
       modelName: 'user',
@@ -391,9 +407,6 @@ Future<Widget> bootstrap(
       );
   final userAppSettingsRepository = DataRepository<UserAppSettings>(
     dataClient: userAppSettingsClient,
-  );
-  final remoteConfigRepository = DataRepository<RemoteConfig>(
-    dataClient: remoteConfigClient,
   );
   final userRepository = DataRepository<User>(dataClient: userClient);
 
@@ -435,5 +448,8 @@ Future<Widget> bootstrap(
     initialUser: initialUser,
     localAdRepository: localAdRepository,
     navigatorKey: navigatorKey, // Pass the navigatorKey to App
+    initialRemoteConfig: initialRemoteConfig, // Pass the initialRemoteConfig
+    initialRemoteConfigError:
+        initialRemoteConfigError, // Pass the initialRemoteConfigError
   );
 }

@@ -882,4 +882,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get retryButtonText => 'Retry';
+
+  @override
+  String get headlinesFeedFilterLoadingHeadline => 'Loading Filters';
 }

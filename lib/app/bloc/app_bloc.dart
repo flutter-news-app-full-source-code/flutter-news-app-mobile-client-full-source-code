@@ -16,74 +16,64 @@ import 'package:logging/logging.dart';
 part 'app_event.dart';
 part 'app_state.dart';
 
+/// {@template app_bloc}
+/// Manages the overall application state, including authentication status,
+/// user settings, and remote configuration.
+///
+/// This BLoC is central to the application's lifecycle, reacting to user
+/// authentication changes, managing user preferences, and applying global
+/// remote configurations. It acts as the single source of truth for global
+/// application state.
+/// {@endtemplate}
 class AppBloc extends Bloc<AppEvent, AppState> {
+  /// {@macro app_bloc}
+  ///
+  /// Initializes the BLoC with required repositories, environment, and
+  /// pre-fetched initial data.
   AppBloc({
     required AuthRepository authenticationRepository,
     required DataRepository<UserAppSettings> userAppSettingsRepository,
+    required DataRepository<UserContentPreferences>
+    userContentPreferencesRepository,
     required DataRepository<RemoteConfig> appConfigRepository,
     required DataRepository<User> userRepository,
     required local_config.AppEnvironment environment,
     required GlobalKey<NavigatorState> navigatorKey,
+    required RemoteConfig? initialRemoteConfig,
+    required HttpException? initialRemoteConfigError,
     this.demoDataMigrationService,
     this.demoDataInitializerService,
     this.initialUser,
   }) : _authenticationRepository = authenticationRepository,
        _userAppSettingsRepository = userAppSettingsRepository,
+       _userContentPreferencesRepository = userContentPreferencesRepository,
        _appConfigRepository = appConfigRepository,
        _userRepository = userRepository,
        _environment = environment,
        _navigatorKey = navigatorKey,
        _logger = Logger('AppBloc'),
        super(
-         // The initial state of the app. The status is set based on whether
-         // an initial user is provided. If a user exists, it immediately
-         // transitions to `configFetching` to show the loading UI.
-         // Default settings are provided as a fallback until user-specific
-         // settings are loaded via the `AppUserChanged` event.
          AppState(
            status: initialUser == null
                ? AppLifeCycleStatus.unauthenticated
-               : AppLifeCycleStatus.configFetching,
-           settings: UserAppSettings(
-             id: 'default',
-             displaySettings: const DisplaySettings(
-               baseTheme: AppBaseTheme.system,
-               accentTheme: AppAccentTheme.defaultBlue,
-               fontFamily: 'SystemDefault',
-               textScaleFactor: AppTextScaleFactor.medium,
-               fontWeight: AppFontWeight.regular,
-             ),
-             language: languagesFixturesData.firstWhere(
-               (l) => l.code == 'en',
-               orElse: () => throw StateError(
-                 'Default language "en" not found in language fixtures.',
-               ),
-             ),
-             feedPreferences: const FeedDisplayPreferences(
-               headlineDensity: HeadlineDensity.standard,
-               headlineImageStyle: HeadlineImageStyle.largeThumbnail,
-               showSourceInHeadlineFeed: true,
-               showPublishDateInHeadlineFeed: true,
-             ),
-           ),
+               : AppLifeCycleStatus.loadingUserData,
            selectedBottomNavigationIndex: 0,
-           remoteConfig: null,
+           remoteConfig: initialRemoteConfig,
+           initialRemoteConfigError: initialRemoteConfigError,
            environment: environment,
-           // The `user` is intentionally not set here. It will be set by
-           // the `AppUserChanged` event, which is triggered by the auth stream.
+           user: initialUser,
          ),
        ) {
     // Register event handlers for various app-level events.
+    on<AppStarted>(_onAppStarted);
     on<AppUserChanged>(_onAppUserChanged);
-    on<AppSettingsRefreshed>(_onAppSettingsRefreshed);
-    on<AppConfigFetchRequested>(_onAppConfigFetchRequested);
+    on<AppUserAppSettingsRefreshed>(_onUserAppSettingsRefreshed);
+    on<AppUserContentPreferencesRefreshed>(_onUserContentPreferencesRefreshed);
+    on<AppSettingsChanged>(_onAppSettingsChanged);
+    on<AppPeriodicConfigFetchRequested>(_onAppPeriodicConfigFetchRequested);
     on<AppUserFeedDecoratorShown>(_onAppUserFeedDecoratorShown);
+    on<AppUserContentPreferencesChanged>(_onAppUserContentPreferencesChanged);
     on<AppLogoutRequested>(_onLogoutRequested);
-    on<AppThemeModeChanged>(_onThemeModeChanged);
-    on<AppFlexSchemeChanged>(_onFlexSchemeChanged);
-    on<AppFontFamilyChanged>(_onFontFamilyChanged);
-    on<AppTextScaleFactorChanged>(_onAppTextScaleFactorChanged);
-    on<AppFontWeightChanged>(_onAppFontWeightChanged);
 
     // Subscribe to the authentication repository's authStateChanges stream.
     // This stream is the single source of truth for the user's auth state
@@ -95,6 +85,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   final AuthRepository _authenticationRepository;
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
+  final DataRepository<UserContentPreferences>
+  _userContentPreferencesRepository;
   final DataRepository<RemoteConfig> _appConfigRepository;
   final DataRepository<User> _userRepository;
   final local_config.AppEnvironment _environment;
@@ -108,32 +100,200 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   /// Provides access to the [NavigatorState] for obtaining a [BuildContext].
   GlobalKey<NavigatorState> get navigatorKey => _navigatorKey;
 
+  /// Fetches [UserAppSettings] and [UserContentPreferences] for the given
+  /// [user] and updates the [AppState].
+  ///
+  /// This method centralizes the logic for loading user-specific data,
+  /// ensuring consistency across different app lifecycle events.
+  /// It also handles potential [HttpException]s during the fetch operation.
+  Future<void> _fetchAndSetUserData(User user, Emitter<AppState> emit) async {
+    await _fetchAndSetUserSettings(user, emit);
+    await _fetchAndSetUserContentPreferences(user, emit);
+
+    final finalStatus = user.appRole == AppUserRole.standardUser
+        ? AppLifeCycleStatus.authenticated
+        : AppLifeCycleStatus.anonymous;
+
+    emit(
+      state.copyWith(
+        status: finalStatus,
+        user: user,
+        initialUserPreferencesError: null,
+      ),
+    );
+  }
+
+  /// Fetches [UserAppSettings] for the given [user] and updates the [AppState].
+  Future<void> _fetchAndSetUserSettings(
+    User user,
+    Emitter<AppState> emit,
+  ) async {
+    _logger.info('[AppBloc] Fetching user settings for user: ${user.id}');
+    try {
+      final userAppSettings = await _userAppSettingsRepository.read(
+        id: user.id,
+        userId: user.id,
+      );
+      _logger.info(
+        '[AppBloc] UserAppSettings fetched successfully for user: ${user.id}',
+      );
+      emit(state.copyWith(settings: userAppSettings));
+    } on HttpException catch (e) {
+      _logger.severe(
+        '[AppBloc] Failed to fetch user settings (HttpException) '
+        'for user ${user.id}: ${e.runtimeType} - ${e.message}',
+      );
+      emit(
+        state.copyWith(
+          status: AppLifeCycleStatus.criticalError,
+          initialUserPreferencesError: e,
+        ),
+      );
+    } catch (e, s) {
+      _logger.severe(
+        '[AppBloc] Unexpected error during user settings fetch '
+        'for user ${user.id}.',
+        e,
+        s,
+      );
+      emit(
+        state.copyWith(
+          status: AppLifeCycleStatus.criticalError,
+          initialUserPreferencesError: UnknownException(e.toString()),
+        ),
+      );
+    }
+  }
+
+  /// Fetches [UserContentPreferences] for the given [user] and updates the [AppState].
+  Future<void> _fetchAndSetUserContentPreferences(
+    User user,
+    Emitter<AppState> emit,
+  ) async {
+    _logger.info(
+      '[AppBloc] Fetching user content preferences for user: ${user.id}',
+    );
+    try {
+      final userContentPreferences = await _userContentPreferencesRepository
+          .read(id: user.id, userId: user.id);
+      _logger.info(
+        '[AppBloc] UserContentPreferences fetched successfully for user: ${user.id}',
+      );
+      emit(state.copyWith(userContentPreferences: userContentPreferences));
+    } on HttpException catch (e) {
+      _logger.severe(
+        '[AppBloc] Failed to fetch user content preferences (HttpException) '
+        'for user ${user.id}: ${e.runtimeType} - ${e.message}',
+      );
+      emit(
+        state.copyWith(
+          status: AppLifeCycleStatus.criticalError,
+          initialUserPreferencesError: e,
+        ),
+      );
+    } catch (e, s) {
+      _logger.severe(
+        '[AppBloc] Unexpected error during user content preferences fetch '
+        'for user ${user.id}.',
+        e,
+        s,
+      );
+      emit(
+        state.copyWith(
+          status: AppLifeCycleStatus.criticalError,
+          initialUserPreferencesError: UnknownException(e.toString()),
+        ),
+      );
+    }
+  }
+
+  /// Handles the [AppStarted] event, orchestrating the initial loading of
+  /// user-specific data and evaluating the overall app status.
+  Future<void> _onAppStarted(AppStarted event, Emitter<AppState> emit) async {
+    _logger.info('[AppBloc] AppStarted event received. Starting data load.');
+
+    // If there was a critical error during bootstrap (e.g., RemoteConfig fetch failed),
+    // immediately transition to criticalError state.
+    if (state.initialRemoteConfigError != null) {
+      _logger.severe(
+        '[AppBloc] Initial RemoteConfig fetch failed during bootstrap. '
+        'Transitioning to critical error.',
+      );
+      emit(state.copyWith(status: AppLifeCycleStatus.criticalError));
+      return;
+    }
+
+    // If RemoteConfig is null at this point, it's an unexpected error.
+    if (state.remoteConfig == null) {
+      _logger.severe(
+        '[AppBloc] RemoteConfig is null after bootstrap, but no error was reported. '
+        'Transitioning to critical error.',
+      );
+      emit(
+        state.copyWith(
+          status: AppLifeCycleStatus.criticalError,
+          initialRemoteConfigError: const UnknownException(
+            'RemoteConfig is null after bootstrap.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    // Evaluate global app status from RemoteConfig first.
+    if (state.remoteConfig!.appStatus.isUnderMaintenance) {
+      _logger.info(
+        '[AppBloc] App is under maintenance. Transitioning to maintenance state.',
+      );
+      emit(state.copyWith(status: AppLifeCycleStatus.underMaintenance));
+      return;
+    }
+
+    if (state.remoteConfig!.appStatus.isLatestVersionOnly) {
+      // TODO(fulleni): Compare with actual app version.
+      _logger.info(
+        '[AppBloc] App update required. Transitioning to updateRequired state.',
+      );
+      emit(state.copyWith(status: AppLifeCycleStatus.updateRequired));
+      return;
+    }
+
+    // If we reach here, the app is not under maintenance or requires update.
+    // Now, handle user-specific data loading.
+    final currentUser = event.initialUser;
+
+    if (currentUser == null) {
+      _logger.info(
+        '[AppBloc] No initial user. Ensuring unauthenticated state.',
+      );
+      // Ensure the state is unauthenticated if no user, and it wasn't already set by initial state.
+      if (state.status != AppLifeCycleStatus.unauthenticated) {
+        emit(state.copyWith(status: AppLifeCycleStatus.unauthenticated));
+      }
+      return;
+    }
+
+    // If a user is present, and we are not already in loadingUserData state,
+    // transition to loadingUserData and fetch user-specific settings and preferences.
+    if (state.status != AppLifeCycleStatus.loadingUserData) {
+      emit(state.copyWith(status: AppLifeCycleStatus.loadingUserData));
+    }
+    await _fetchAndSetUserData(currentUser, emit);
+  }
+
   /// Handles all logic related to user authentication state changes.
   ///
-  /// This method is the consolidated entry point for the app's startup
-  /// and data loading sequence, triggered exclusively by the auth stream.
-  ///
-  ///   1. It will first check if the user's ID has actually changed to prevent
-  ///      redundant reloads from simple token refreshes.
-  ///   2. If the user is `null`, it will emit an `unauthenticated` state.
-  ///   3. If a user is present, it will immediately emit a `configFetching`
-  ///      state to display the loading UI.
-  ///   4. It will then proceed to fetch the `remoteConfig` and `userAppSettings`
-  ///      concurrently.
-  ///   5. Upon successful fetch, it will evaluate the app's status (maintenance,
-  ///      update required) and emit the final stable state (`authenticated`,
-  ///      `anonymous`, etc.) with the correct, freshly-loaded data.
-  ///   6. If any fetch fails, it will emit a `configFetchFailed` state,
-  ///      allowing the user to retry.
+  /// This method is now simplified to only update the user and status based
+  /// on the authentication stream, and handle data migration.
   Future<void> _onAppUserChanged(
     AppUserChanged event,
     Emitter<AppState> emit,
   ) async {
     final oldUser = state.user;
+    final newUser = event.user;
 
     // Optimization: Prevent redundant reloads if the user ID hasn't changed.
-    // This can happen with token refreshes that re-emit the same user.
-    if (oldUser?.id == event.user?.id) {
+    if (oldUser?.id == newUser?.id) {
       _logger.info(
         '[AppBloc] AppUserChanged triggered, but user ID is the same. '
         'Skipping reload.',
@@ -141,38 +301,30 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       return;
     }
 
-    // --- Handle Unauthenticated State (User is null) ---
-    if (event.user == null) {
-      _logger.info(
-        '[AppBloc] User is null. Transitioning to unauthenticated state.',
-      );
-      emit(
-        state.copyWith(
-          status: AppLifeCycleStatus.unauthenticated,
-          user: null,
-          remoteConfig: null,
-          clearAppConfig: true, // Explicitly clear remoteConfig
-        ),
-      );
-      return;
+    // Update the user in the state.
+    emit(state.copyWith(user: newUser));
+
+    // Determine the new status based on the user.
+    final newStatus = newUser == null
+        ? AppLifeCycleStatus.unauthenticated
+        : (newUser.appRole == AppUserRole.standardUser
+              ? AppLifeCycleStatus.authenticated
+              : AppLifeCycleStatus.anonymous);
+
+    emit(state.copyWith(status: newStatus));
+
+    // If a new user is present, fetch their specific data.
+    if (newUser != null) {
+      await _fetchAndSetUserData(newUser, emit);
+    } else {
+      // If user logs out, clear user-specific data from state.
+      emit(state.copyWith(settings: null, userContentPreferences: null));
     }
-
-    // --- Handle Authenticated/Anonymous State (User is present) ---
-    final newUser = event.user!;
-    _logger.info(
-      '[AppBloc] User changed to ${newUser.id} (${newUser.appRole}). '
-      'Beginning data fetch sequence.',
-    );
-
-    // Immediately emit the new user and set status to configFetching.
-    // This ensures the UI shows a loading state while we fetch data.
-    emit(
-      state.copyWith(user: newUser, status: AppLifeCycleStatus.configFetching),
-    );
 
     // In demo mode, ensure user-specific data is initialized.
     if (_environment == local_config.AppEnvironment.demo &&
-        demoDataInitializerService != null) {
+        demoDataInitializerService != null &&
+        newUser != null) {
       try {
         _logger.info('Demo mode: Initializing data for user ${newUser.id}.');
         await demoDataInitializerService!.initializeUserSpecificData(newUser);
@@ -187,6 +339,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // Handle data migration if an anonymous user signs in.
     if (oldUser != null &&
         oldUser.appRole == AppUserRole.guestUser &&
+        newUser != null &&
         newUser.appRole == AppUserRole.standardUser) {
       _logger.info(
         'Anonymous user ${oldUser.id} transitioned to authenticated user '
@@ -201,162 +354,82 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         _logger.info('Demo mode: Data migration completed for ${newUser.id}.');
       }
     }
-
-    // --- Fetch Core Application Data ---
-    try {
-      // Fetch remote config and user settings concurrently for performance.
-      final results = await Future.wait([
-        _appConfigRepository.read(id: kRemoteConfigId),
-        _userAppSettingsRepository.read(id: newUser.id, userId: newUser.id),
-      ]);
-
-      final remoteConfig = results[0] as RemoteConfig;
-      final userAppSettings = results[1] as UserAppSettings;
-
-      _logger.info(
-        '[AppBloc] RemoteConfig and UserAppSettings fetched successfully for '
-        'user: ${newUser.id}',
-      );
-
-      // Map loaded settings to the AppState.
-      final newThemeMode = _mapAppBaseTheme(
-        userAppSettings.displaySettings.baseTheme,
-      );
-      final newFlexScheme = _mapAppAccentTheme(
-        userAppSettings.displaySettings.accentTheme,
-      );
-      final newFontFamily = _mapFontFamily(
-        userAppSettings.displaySettings.fontFamily,
-      );
-      final newAppTextScaleFactor = _mapTextScaleFactor(
-        userAppSettings.displaySettings.textScaleFactor,
-      );
-      final newLocale = Locale(userAppSettings.language.code);
-
-      // --- CRITICAL STATUS EVALUATION ---
-      if (remoteConfig.appStatus.isUnderMaintenance) {
-        emit(
-          state.copyWith(
-            status: AppLifeCycleStatus.underMaintenance,
-            remoteConfig: remoteConfig,
-            settings: userAppSettings,
-            themeMode: newThemeMode,
-            flexScheme: newFlexScheme,
-            fontFamily: newFontFamily,
-            appTextScaleFactor: newAppTextScaleFactor,
-            locale: newLocale,
-          ),
-        );
-        return;
-      }
-
-      if (remoteConfig.appStatus.isLatestVersionOnly) {
-        // TODO(fulleni): Compare with actual app version.
-        emit(
-          state.copyWith(
-            status: AppLifeCycleStatus.updateRequired,
-            remoteConfig: remoteConfig,
-            settings: userAppSettings,
-            themeMode: newThemeMode,
-            flexScheme: newFlexScheme,
-            fontFamily: newFontFamily,
-            appTextScaleFactor: newAppTextScaleFactor,
-            locale: newLocale,
-          ),
-        );
-        return;
-      }
-
-      // --- Final State Transition ---
-      // If no critical status, transition to the final stable state.
-      final finalStatus = newUser.appRole == AppUserRole.standardUser
-          ? AppLifeCycleStatus.authenticated
-          : AppLifeCycleStatus.anonymous;
-
-      emit(
-        state.copyWith(
-          status: finalStatus,
-          remoteConfig: remoteConfig,
-          settings: userAppSettings,
-          themeMode: newThemeMode,
-          flexScheme: newFlexScheme,
-          fontFamily: newFontFamily,
-          appTextScaleFactor: newAppTextScaleFactor,
-          locale: newLocale,
-        ),
-      );
-    } on HttpException catch (e) {
-      _logger.severe(
-        '[AppBloc] Failed to fetch initial data (HttpException) for user '
-        '${newUser.id}: ${e.runtimeType} - ${e.message}',
-      );
-      emit(state.copyWith(status: AppLifeCycleStatus.configFetchFailed));
-    } catch (e, s) {
-      _logger.severe(
-        '[AppBloc] Unexpected error during initial data fetch for user '
-        '${newUser.id}.',
-        e,
-        s,
-      );
-      emit(state.copyWith(status: AppLifeCycleStatus.configFetchFailed));
-    }
   }
 
   /// Handles refreshing/loading app settings (theme, font).
-  Future<void> _onAppSettingsRefreshed(
-    AppSettingsRefreshed event,
+  Future<void> _onUserAppSettingsRefreshed(
+    AppUserAppSettingsRefreshed event,
     Emitter<AppState> emit,
   ) async {
     if (state.user == null) {
-      _logger.info('[AppBloc] Skipping AppSettingsRefreshed: User is null.');
+      _logger.info(
+        '[AppBloc] Skipping AppUserAppSettingsRefreshed: User is null.',
+      );
       return;
     }
 
+    await _fetchAndSetUserSettings(state.user!, emit);
+  }
+
+  /// Handles refreshing/loading user content preferences.
+  Future<void> _onUserContentPreferencesRefreshed(
+    AppUserContentPreferencesRefreshed event,
+    Emitter<AppState> emit,
+  ) async {
+    if (state.user == null) {
+      _logger.info(
+        '[AppBloc] Skipping AppUserContentPreferencesRefreshed: User is null.',
+      );
+      return;
+    }
+
+    await _fetchAndSetUserContentPreferences(state.user!, emit);
+  }
+
+  /// Handles the [AppSettingsChanged] event, updating and persisting the
+  /// user's application settings.
+  ///
+  /// This event is dispatched when any part of the user's settings (theme,
+  /// font, language, etc.) is modified. The entire [UserAppSettings] object
+  /// is updated and then persisted to the backend.
+  Future<void> _onAppSettingsChanged(
+    AppSettingsChanged event,
+    Emitter<AppState> emit,
+  ) async {
+    // Ensure settings are loaded and a user is available before attempting to update.
+    if (state.user == null || state.settings == null) {
+      _logger.warning(
+        '[AppBloc] Skipping AppSettingsChanged: User or UserAppSettings not loaded.',
+      );
+      return;
+    }
+
+    final updatedSettings = event.settings;
+
+    emit(state.copyWith(settings: updatedSettings));
+
     try {
-      final userAppSettings = await _userAppSettingsRepository.read(
-        id: state.user!.id,
-        userId: state.user!.id,
+      await _userAppSettingsRepository.update(
+        id: updatedSettings.id,
+        item: updatedSettings,
+        userId: updatedSettings.id,
       );
-
-      final newThemeMode = _mapAppBaseTheme(
-        userAppSettings.displaySettings.baseTheme,
-      );
-      final newFlexScheme = _mapAppAccentTheme(
-        userAppSettings.displaySettings.accentTheme,
-      );
-      final newFontFamily = _mapFontFamily(
-        userAppSettings.displaySettings.fontFamily,
-      );
-      final newAppTextScaleFactor = _mapTextScaleFactor(
-        userAppSettings.displaySettings.textScaleFactor,
-      );
-      final newLocale = Locale(userAppSettings.language.code);
-
-      _logger
-        ..info(
-          '_onAppSettingsRefreshed: userAppSettings.fontFamily: ${userAppSettings.displaySettings.fontFamily}',
-        )
-        ..info(
-          '_onAppSettingsRefreshed: newFontFamily mapped to: $newFontFamily',
-        );
-
-      emit(
-        state.copyWith(
-          themeMode: newThemeMode,
-          flexScheme: newFlexScheme,
-          appTextScaleFactor: newAppTextScaleFactor,
-          fontFamily: newFontFamily,
-          settings: userAppSettings,
-          locale: newLocale,
-        ),
+      _logger.info(
+        '[AppBloc] UserAppSettings successfully updated and persisted for user ${updatedSettings.id}.',
       );
     } on HttpException catch (e) {
       _logger.severe(
-        'Error loading user app settings in AppBloc (HttpException): $e',
+        'Failed to persist UserAppSettings for user ${updatedSettings.id} (HttpException): $e',
       );
+      // Revert to original settings on failure to maintain state consistency
       emit(state.copyWith(settings: state.settings));
     } catch (e, s) {
-      _logger.severe('Error loading user app settings in AppBloc.', e, s);
+      _logger.severe(
+        'Unexpected error persisting UserAppSettings for user ${updatedSettings.id}.',
+        e,
+        s,
+      );
+      // Revert to original settings on failure to maintain state consistency
       emit(state.copyWith(settings: state.settings));
     }
   }
@@ -366,234 +439,40 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     unawaited(_authenticationRepository.signOut());
   }
 
-  /// Handles changes to the application's base theme mode (light, dark, system).
-  Future<void> _onThemeModeChanged(
-    AppThemeModeChanged event,
-    Emitter<AppState> emit,
-  ) async {
-    final updatedSettings = state.settings.copyWith(
-      displaySettings: state.settings.displaySettings.copyWith(
-        baseTheme: event.themeMode == ThemeMode.light
-            ? AppBaseTheme.light
-            : (event.themeMode == ThemeMode.dark
-                ? AppBaseTheme.dark
-                : AppBaseTheme.system),
-      ),
-    );
-    emit(state.copyWith(settings: updatedSettings, themeMode: event.themeMode));
-    try {
-      await _userAppSettingsRepository.update(
-        id: updatedSettings.id,
-        item: updatedSettings,
-        userId: updatedSettings.id,
-      );
-      _logger.info('[AppBloc] UserAppSettings updated for theme mode change.');
-    } catch (e, s) {
-      _logger.severe(
-        'Failed to persist theme mode change for user ${updatedSettings.id}.',
-        e,
-        s,
-      );
-    }
-  }
-
-  /// Handles changes to the application's accent color scheme.
-  Future<void> _onFlexSchemeChanged(
-    AppFlexSchemeChanged event,
-    Emitter<AppState> emit,
-  ) async {
-    final updatedSettings = state.settings.copyWith(
-      displaySettings: state.settings.displaySettings.copyWith(
-        accentTheme: event.flexScheme == FlexScheme.blue
-            ? AppAccentTheme.defaultBlue
-            : (event.flexScheme == FlexScheme.red
-                ? AppAccentTheme.newsRed
-                : AppAccentTheme.graphiteGray),
-      ),
-    );
-    emit(
-      state.copyWith(settings: updatedSettings, flexScheme: event.flexScheme),
-    );
-    try {
-      await _userAppSettingsRepository.update(
-        id: updatedSettings.id,
-        item: updatedSettings,
-        userId: updatedSettings.id,
-      );
-      _logger.info(
-        '[AppBloc] UserAppSettings updated for accent scheme change.',
-      );
-    } catch (e, s) {
-      _logger.severe(
-        'Failed to persist accent scheme change for user ${updatedSettings.id}.',
-        e,
-        s,
-      );
-    }
-  }
-
-  /// Handles changes to the application's font family.
-  Future<void> _onFontFamilyChanged(
-    AppFontFamilyChanged event,
-    Emitter<AppState> emit,
-  ) async {
-    final updatedSettings = state.settings.copyWith(
-      displaySettings: state.settings.displaySettings.copyWith(
-        fontFamily: event.fontFamily ?? 'SystemDefault',
-      ),
-    );
-    emit(
-      state.copyWith(settings: updatedSettings, fontFamily: event.fontFamily),
-    );
-    try {
-      await _userAppSettingsRepository.update(
-        id: updatedSettings.id,
-        item: updatedSettings,
-        userId: updatedSettings.id,
-      );
-      _logger.info('[AppBloc] UserAppSettings updated for font family change.');
-    } catch (e, s) {
-      _logger.severe(
-        'Failed to persist font family change for user ${updatedSettings.id}.',
-        e,
-        s,
-      );
-    }
-  }
-
-  /// Handles changes to the application's text scale factor.
-  Future<void> _onAppTextScaleFactorChanged(
-    AppTextScaleFactorChanged event,
-    Emitter<AppState> emit,
-  ) async {
-    final updatedSettings = state.settings.copyWith(
-      displaySettings: state.settings.displaySettings.copyWith(
-        textScaleFactor: event.appTextScaleFactor,
-      ),
-    );
-    emit(
-      state.copyWith(
-        settings: updatedSettings,
-        appTextScaleFactor: event.appTextScaleFactor,
-      ),
-    );
-    try {
-      await _userAppSettingsRepository.update(
-        id: updatedSettings.id,
-        item: updatedSettings,
-        userId: updatedSettings.id,
-      );
-      _logger.info(
-        '[AppBloc] UserAppSettings updated for text scale factor change.',
-      );
-    } catch (e, s) {
-      _logger.severe(
-        'Failed to persist text scale factor change for user ${updatedSettings.id}.',
-        e,
-        s,
-      );
-    }
-  }
-
-  /// Handles changes to the application's font weight.
-  Future<void> _onAppFontWeightChanged(
-    AppFontWeightChanged event,
-    Emitter<AppState> emit,
-  ) async {
-    final updatedSettings = state.settings.copyWith(
-      displaySettings: state.settings.displaySettings.copyWith(
-        fontWeight: event.fontWeight,
-      ),
-    );
-    emit(state.copyWith(settings: updatedSettings));
-    try {
-      await _userAppSettingsRepository.update(
-        id: updatedSettings.id,
-        item: updatedSettings,
-        userId: updatedSettings.id,
-      );
-      _logger.info('[AppBloc] UserAppSettings updated for font weight change.');
-    } catch (e, s) {
-      _logger.severe(
-        'Failed to persist font weight change for user ${updatedSettings.id}.',
-        e,
-        s,
-      );
-    }
-  }
-
-  /// Maps [AppBaseTheme] enum to Flutter's [ThemeMode].
-  ThemeMode _mapAppBaseTheme(AppBaseTheme mode) {
-    switch (mode) {
-      case AppBaseTheme.light:
-        return ThemeMode.light;
-      case AppBaseTheme.dark:
-        return ThemeMode.dark;
-      case AppBaseTheme.system:
-        return ThemeMode.system;
-    }
-  }
-
-  /// Maps [AppAccentTheme] enum to FlexColorScheme's [FlexScheme].
-  FlexScheme _mapAppAccentTheme(AppAccentTheme name) {
-    switch (name) {
-      case AppAccentTheme.defaultBlue:
-        return FlexScheme.blue;
-      case AppAccentTheme.newsRed:
-        return FlexScheme.red;
-      case AppAccentTheme.graphiteGray:
-        return FlexScheme.material;
-    }
-  }
-
-  /// Maps a font family string to a nullable string for theme data.
-  String? _mapFontFamily(String fontFamilyString) {
-    if (fontFamilyString == 'SystemDefault') {
-      _logger.info('_mapFontFamily: Input is SystemDefault, returning null.');
-      return null;
-    }
-    _logger.info(
-      '_mapFontFamily: Input is $fontFamilyString, returning as is.',
-    );
-    return fontFamilyString;
-  }
-
-  /// Maps [AppTextScaleFactor] to itself (no transformation needed).
-  AppTextScaleFactor _mapTextScaleFactor(AppTextScaleFactor factor) {
-    return factor;
-  }
-
   @override
   Future<void> close() {
     _userSubscription.cancel();
     return super.close();
   }
 
-  /// Handles fetching the remote application configuration.
-  Future<void> _onAppConfigFetchRequested(
-    AppConfigFetchRequested event,
+  /// Handles periodic fetching of the remote application configuration.
+  ///
+  /// This method is primarily used for re-fetching the remote configuration
+  /// (e.g., by [AppStatusService] for background checks or by [StatusPage]
+  /// for retries). The initial remote configuration is fetched during bootstrap.
+  Future<void> _onAppPeriodicConfigFetchRequested(
+    AppPeriodicConfigFetchRequested event,
     Emitter<AppState> emit,
   ) async {
     if (state.user == null) {
       _logger.info('[AppBloc] User is null. Skipping AppConfig fetch.');
-      if (state.remoteConfig != null ||
-          state.status == AppLifeCycleStatus.configFetching) {
-        emit(
-          state.copyWith(
-            remoteConfig: null,
-            clearAppConfig: true,
-            status: AppLifeCycleStatus.unauthenticated,
-          ),
-        );
-      }
+      emit(
+        state.copyWith(
+          remoteConfig: null,
+          clearAppConfig: true,
+          status: AppLifeCycleStatus.unauthenticated,
+          initialRemoteConfigError: null,
+        ),
+      );
       return;
     }
 
+    // Only show critical error if it's not a background check.
     if (!event.isBackgroundCheck) {
       _logger.info(
-        '[AppBloc] Initial config fetch. Setting status to configFetching.',
+        '[AppBloc] Initial config fetch. Setting status to loadingUserData if failed.',
       );
-      emit(state.copyWith(status: AppLifeCycleStatus.configFetching));
+      emit(state.copyWith(status: AppLifeCycleStatus.loadingUserData));
     } else {
       _logger.info('[AppBloc] Background config fetch. Proceeding silently.');
     }
@@ -609,6 +488,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           state.copyWith(
             status: AppLifeCycleStatus.underMaintenance,
             remoteConfig: remoteConfig,
+            initialRemoteConfigError: null,
           ),
         );
         return;
@@ -620,6 +500,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           state.copyWith(
             status: AppLifeCycleStatus.updateRequired,
             remoteConfig: remoteConfig,
+            initialRemoteConfigError: null,
           ),
         );
         return;
@@ -628,13 +509,24 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       final finalStatus = state.user!.appRole == AppUserRole.standardUser
           ? AppLifeCycleStatus.authenticated
           : AppLifeCycleStatus.anonymous;
-      emit(state.copyWith(remoteConfig: remoteConfig, status: finalStatus));
+      emit(
+        state.copyWith(
+          remoteConfig: remoteConfig,
+          status: finalStatus,
+          initialRemoteConfigError: null,
+        ),
+      );
     } on HttpException catch (e) {
       _logger.severe(
         '[AppBloc] Failed to fetch AppConfig (HttpException) for user ${state.user?.id}: ${e.runtimeType} - ${e.message}',
       );
       if (!event.isBackgroundCheck) {
-        emit(state.copyWith(status: AppLifeCycleStatus.configFetchFailed));
+        emit(
+          state.copyWith(
+            status: AppLifeCycleStatus.criticalError,
+            initialRemoteConfigError: e,
+          ),
+        );
       }
     } catch (e, s) {
       _logger.severe(
@@ -643,7 +535,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         s,
       );
       if (!event.isBackgroundCheck) {
-        emit(state.copyWith(status: AppLifeCycleStatus.configFetchFailed));
+        emit(
+          state.copyWith(
+            status: AppLifeCycleStatus.criticalError,
+            initialRemoteConfigError: UnknownException(e.toString()),
+          ),
+        );
       }
     }
   }
@@ -658,7 +555,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       final now = DateTime.now();
       final currentStatus =
           originalUser.feedDecoratorStatus[event.feedDecoratorType] ??
-              const UserFeedDecoratorStatus(isCompleted: false);
+          const UserFeedDecoratorStatus(isCompleted: false);
 
       final updatedDecoratorStatus = currentStatus.copyWith(
         lastShownAt: now,
@@ -667,12 +564,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
       final newFeedDecoratorStatus =
           Map<FeedDecoratorType, UserFeedDecoratorStatus>.from(
-        originalUser.feedDecoratorStatus,
-      )..update(
-          event.feedDecoratorType,
-          (_) => updatedDecoratorStatus,
-          ifAbsent: () => updatedDecoratorStatus,
-        );
+            originalUser.feedDecoratorStatus,
+          )..update(
+            event.feedDecoratorType,
+            (_) => updatedDecoratorStatus,
+            ifAbsent: () => updatedDecoratorStatus,
+          );
 
       final updatedUser = originalUser.copyWith(
         feedDecoratorStatus: newFeedDecoratorStatus,
@@ -694,6 +591,61 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         _logger.severe('Failed to update feed decorator status on backend: $e');
         emit(state.copyWith(user: originalUser));
       }
+    }
+  }
+
+  /// Handles updating the user's content preferences.
+  ///
+  /// This event is dispatched by UI components when the user modifies their
+  /// followed countries, sources, topics, or saved headlines. The event
+  /// carries the complete, updated [UserContentPreferences] object, which
+  /// is then persisted to the backend.
+  Future<void> _onAppUserContentPreferencesChanged(
+    AppUserContentPreferencesChanged event,
+    Emitter<AppState> emit,
+  ) async {
+    // Ensure a user is available before attempting to update preferences.
+    if (state.user == null) {
+      _logger.warning(
+        '[AppBloc] Skipping AppUserContentPreferencesChanged: User is null.',
+      );
+      return;
+    }
+
+    final updatedPreferences = event.preferences;
+
+    // Optimistically update the state.
+    emit(state.copyWith(userContentPreferences: updatedPreferences));
+
+    try {
+      await _userContentPreferencesRepository.update(
+        id: updatedPreferences.id,
+        item: updatedPreferences,
+        userId: updatedPreferences.id,
+      );
+      _logger.info(
+        '[AppBloc] UserContentPreferences successfully updated and persisted '
+        'for user ${updatedPreferences.id}.',
+      );
+    } on HttpException catch (e) {
+      _logger.severe(
+        'Failed to persist UserContentPreferences for user ${updatedPreferences.id} '
+        '(HttpException): $e',
+      );
+      // Revert to original preferences on failure to maintain state consistency.
+      emit(
+        state.copyWith(userContentPreferences: state.userContentPreferences),
+      );
+    } catch (e, s) {
+      _logger.severe(
+        'Unexpected error persisting UserContentPreferences for user ${updatedPreferences.id}.',
+        e,
+        s,
+      );
+      // Revert to original preferences on failure to maintain state consistency.
+      emit(
+        state.copyWith(userContentPreferences: state.userContentPreferences),
+      );
     }
   }
 }

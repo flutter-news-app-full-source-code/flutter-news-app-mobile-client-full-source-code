@@ -2,8 +2,8 @@ import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/available_countries_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -57,14 +57,14 @@ class AddCountryToFollowPage extends StatelessWidget {
 
             final countries = countriesState.availableCountries;
 
-            return BlocBuilder<AccountBloc, AccountState>(
+            return BlocBuilder<AppBloc, AppState>(
               buildWhen: (previous, current) =>
-                  previous.preferences?.followedCountries !=
-                      current.preferences?.followedCountries ||
-                  previous.status != current.status,
-              builder: (context, accountState) {
+                  previous.userContentPreferences?.followedCountries !=
+                  current.userContentPreferences?.followedCountries,
+              builder: (context, appState) {
+                final userContentPreferences = appState.userContentPreferences;
                 final followedCountries =
-                    accountState.preferences?.followedCountries ?? [];
+                    userContentPreferences?.followedCountries ?? [];
 
                 return ListView.builder(
                   padding: const EdgeInsets.symmetric(
@@ -150,8 +150,28 @@ class AddCountryToFollowPage extends StatelessWidget {
                               ? l10n.unfollowCountryTooltip(country.name)
                               : l10n.followCountryTooltip(country.name),
                           onPressed: () {
-                            context.read<AccountBloc>().add(
-                              AccountFollowCountryToggled(country: country),
+                            if (userContentPreferences == null) return;
+
+                            final updatedFollowedCountries = List<Country>.from(
+                              followedCountries,
+                            );
+                            if (isFollowed) {
+                              updatedFollowedCountries.removeWhere(
+                                (c) => c.id == country.id,
+                              );
+                            } else {
+                              updatedFollowedCountries.add(country);
+                            }
+
+                            final updatedPreferences = userContentPreferences
+                                .copyWith(
+                                  followedCountries: updatedFollowedCountries,
+                                );
+
+                            context.read<AppBloc>().add(
+                              AppUserContentPreferencesChanged(
+                                preferences: updatedPreferences,
+                              ),
                             );
                           },
                         ),

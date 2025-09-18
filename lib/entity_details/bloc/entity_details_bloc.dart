@@ -6,7 +6,6 @@ import 'package:bloc/bloc.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
@@ -15,13 +14,21 @@ import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/
 part 'entity_details_event.dart';
 part 'entity_details_state.dart';
 
+/// {@template entity_details_bloc}
+/// Manages the state for the entity details feature.
+///
+/// This BLoC is responsible for fetching the details of a specific entity
+/// (Topic, Source, or Country) and its associated headlines. It also handles
+/// toggling the "follow" status of the entity by dispatching events to the
+/// [AppBloc], which is the single source of truth for user preferences.
+/// {@endtemplate}
 class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
+  /// {@macro entity_details_bloc}
   EntityDetailsBloc({
     required DataRepository<Headline> headlinesRepository,
     required DataRepository<Topic> topicRepository,
     required DataRepository<Source> sourceRepository,
     required DataRepository<Country> countryRepository,
-    required AccountBloc accountBloc,
     required AppBloc appBloc,
     required FeedDecoratorService feedDecoratorService,
     required InlineAdCacheService inlineAdCacheService,
@@ -29,7 +36,6 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
        _topicRepository = topicRepository,
        _sourceRepository = sourceRepository,
        _countryRepository = countryRepository,
-       _accountBloc = accountBloc,
        _appBloc = appBloc,
        _feedDecoratorService = feedDecoratorService,
        _inlineAdCacheService = inlineAdCacheService,
@@ -41,30 +47,21 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     on<EntityDetailsLoadMoreHeadlinesRequested>(
       _onEntityDetailsLoadMoreHeadlinesRequested,
     );
-    on<_EntityDetailsUserPreferencesChanged>(
-      _onEntityDetailsUserPreferencesChanged,
-    );
-
-    // Listen to AccountBloc for changes in user preferences
-    _accountBlocSubscription = _accountBloc.stream.listen((accountState) {
-      if (accountState.preferences != null) {
-        add(_EntityDetailsUserPreferencesChanged(accountState.preferences!));
-      }
-    });
   }
 
   final DataRepository<Headline> _headlinesRepository;
   final DataRepository<Topic> _topicRepository;
   final DataRepository<Source> _sourceRepository;
   final DataRepository<Country> _countryRepository;
-  final AccountBloc _accountBloc;
   final AppBloc _appBloc;
   final FeedDecoratorService _feedDecoratorService;
   final InlineAdCacheService _inlineAdCacheService;
-  late final StreamSubscription<AccountState> _accountBlocSubscription;
 
   static const _headlinesLimit = 10;
 
+  /// Handles the [EntityDetailsLoadRequested] event.
+  ///
+  /// Fetches the entity details and its initial set of headlines.
   Future<void> _onEntityDetailsLoadRequested(
     EntityDetailsLoadRequested event,
     Emitter<EntityDetailsState> emit,
@@ -130,14 +127,13 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
             feedItems: headlineResponse.items,
             user: currentUser,
             adConfig: remoteConfig.adConfig,
-            imageStyle:
-                _appBloc.state.settings.feedPreferences.headlineImageStyle,
+            imageStyle: _appBloc.state.headlineImageStyle,
             adThemeStyle: event.adThemeStyle,
           );
 
-      // 3. Determine isFollowing status
+      // 3. Determine isFollowing status from AppBloc's user preferences
       var isCurrentlyFollowing = false;
-      final preferences = _accountBloc.state.preferences;
+      final preferences = _appBloc.state.userContentPreferences;
       if (preferences != null) {
         if (entityToLoad is Topic) {
           isCurrentlyFollowing = preferences.followedTopics.any(
@@ -180,22 +176,78 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     }
   }
 
+  /// Handles the [EntityDetailsToggleFollowRequested] event.
+  ///
+  /// Dispatches an [AppUserContentPreferencesChanged] event to the [AppBloc]
+  /// to update the user's followed entities.
   Future<void> _onEntityDetailsToggleFollowRequested(
     EntityDetailsToggleFollowRequested event,
     Emitter<EntityDetailsState> emit,
   ) async {
     final entity = state.entity;
-    if (entity == null) return;
+    final currentUser = _appBloc.state.user;
+    final currentPreferences = _appBloc.state.userContentPreferences;
+
+    if (entity == null || currentUser == null || currentPreferences == null) {
+      return;
+    }
+
+    // Create a mutable copy of the lists to modify
+    final updatedFollowedTopics = List<Topic>.from(
+      currentPreferences.followedTopics,
+    );
+    final updatedFollowedSources = List<Source>.from(
+      currentPreferences.followedSources,
+    );
+    final updatedFollowedCountries = List<Country>.from(
+      currentPreferences.followedCountries,
+    );
+
+    var isCurrentlyFollowing = false;
 
     if (entity is Topic) {
-      _accountBloc.add(AccountFollowTopicToggled(topic: entity));
+      final topic = entity;
+      if (updatedFollowedTopics.any((t) => t.id == topic.id)) {
+        updatedFollowedTopics.removeWhere((t) => t.id == topic.id);
+      } else {
+        updatedFollowedTopics.add(topic);
+        isCurrentlyFollowing = true;
+      }
     } else if (entity is Source) {
-      _accountBloc.add(AccountFollowSourceToggled(source: entity));
+      final source = entity;
+      if (updatedFollowedSources.any((s) => s.id == source.id)) {
+        updatedFollowedSources.removeWhere((s) => s.id == source.id);
+      } else {
+        updatedFollowedSources.add(source);
+        isCurrentlyFollowing = true;
+      }
     } else if (entity is Country) {
-      _accountBloc.add(AccountFollowCountryToggled(country: entity));
+      final country = entity;
+      if (updatedFollowedCountries.any((c) => c.id == country.id)) {
+        updatedFollowedCountries.removeWhere((c) => c.id == country.id);
+      } else {
+        updatedFollowedCountries.add(country);
+        isCurrentlyFollowing = true;
+      }
     }
+
+    // Create a new UserContentPreferences object with the updated lists
+    final newPreferences = currentPreferences.copyWith(
+      followedTopics: updatedFollowedTopics,
+      followedSources: updatedFollowedSources,
+      followedCountries: updatedFollowedCountries,
+    );
+
+    // Dispatch the event to AppBloc to update and persist preferences
+    _appBloc.add(AppUserContentPreferencesChanged(preferences: newPreferences));
+
+    // Optimistically update local state
+    emit(state.copyWith(isFollowing: isCurrentlyFollowing));
   }
 
+  /// Handles the [EntityDetailsLoadMoreHeadlinesRequested] event.
+  ///
+  /// Fetches the next page of headlines for the current entity.
   Future<void> _onEntityDetailsLoadMoreHeadlinesRequested(
     EntityDetailsLoadMoreHeadlinesRequested event,
     Emitter<EntityDetailsState> emit,
@@ -245,7 +297,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         feedItems: headlineResponse.items,
         user: currentUser,
         adConfig: remoteConfig.adConfig,
-        imageStyle: _appBloc.state.settings.feedPreferences.headlineImageStyle,
+        imageStyle: _appBloc.state.headlineImageStyle,
         // Use the AdThemeStyle passed directly from the UI via the event.
         // This ensures that ads are styled consistently with the current,
         // fully-resolved theme of the widget, preventing visual discrepancies.
@@ -280,40 +332,5 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         ),
       );
     }
-  }
-
-  void _onEntityDetailsUserPreferencesChanged(
-    _EntityDetailsUserPreferencesChanged event,
-    Emitter<EntityDetailsState> emit,
-  ) {
-    final entity = state.entity;
-    if (entity == null) return;
-
-    var isCurrentlyFollowing = false;
-    final preferences = event.preferences;
-
-    if (entity is Topic) {
-      isCurrentlyFollowing = preferences.followedTopics.any(
-        (t) => t.id == entity.id,
-      );
-    } else if (entity is Source) {
-      isCurrentlyFollowing = preferences.followedSources.any(
-        (s) => s.id == entity.id,
-      );
-    } else if (entity is Country) {
-      isCurrentlyFollowing = preferences.followedCountries.any(
-        (c) => c.id == entity.id,
-      );
-    }
-
-    if (state.isFollowing != isCurrentlyFollowing) {
-      emit(state.copyWith(isFollowing: isCurrentlyFollowing));
-    }
-  }
-
-  @override
-  Future<void> close() {
-    _accountBlocSubscription.cancel();
-    return super.close();
   }
 }

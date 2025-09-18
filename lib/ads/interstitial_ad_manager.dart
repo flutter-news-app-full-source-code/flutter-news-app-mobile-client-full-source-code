@@ -108,17 +108,15 @@ class InterstitialAdManager {
       final themeData = brightness == Brightness.light
           ? lightTheme(
               scheme: appState.flexScheme,
-              appTextScaleFactor:
-                  appState.settings.displaySettings.textScaleFactor,
-              appFontWeight: appState.settings.displaySettings.fontWeight,
-              fontFamily: appState.settings.displaySettings.fontFamily,
+              appTextScaleFactor: appState.appTextScaleFactor,
+              appFontWeight: appState.appFontWeight,
+              fontFamily: appState.fontFamily,
             )
           : darkTheme(
               scheme: appState.flexScheme,
-              appTextScaleFactor:
-                  appState.settings.displaySettings.textScaleFactor,
-              appFontWeight: appState.settings.displaySettings.fontWeight,
-              fontFamily: appState.settings.displaySettings.fontFamily,
+              appTextScaleFactor: appState.appTextScaleFactor,
+              appFontWeight: appState.appFontWeight,
+              fontFamily: appState.fontFamily,
             );
 
       final adThemeStyle = AdThemeStyle.fromTheme(themeData);

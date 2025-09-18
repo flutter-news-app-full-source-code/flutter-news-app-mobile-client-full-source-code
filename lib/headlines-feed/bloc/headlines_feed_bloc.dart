@@ -27,13 +27,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   /// Requires repositories and services for its operations.
   HeadlinesFeedBloc({
     required DataRepository<Headline> headlinesRepository,
-    required DataRepository<UserContentPreferences>
-    userContentPreferencesRepository,
     required FeedDecoratorService feedDecoratorService,
     required AppBloc appBloc,
     required InlineAdCacheService inlineAdCacheService,
   }) : _headlinesRepository = headlinesRepository,
-       _userContentPreferencesRepository = userContentPreferencesRepository,
        _feedDecoratorService = feedDecoratorService,
        _appBloc = appBloc,
        _inlineAdCacheService = inlineAdCacheService,
@@ -63,8 +60,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   }
 
   final DataRepository<Headline> _headlinesRepository;
-  final DataRepository<UserContentPreferences>
-  _userContentPreferencesRepository;
   final FeedDecoratorService _feedDecoratorService;
   final AppBloc _appBloc;
   final InlineAdCacheService _inlineAdCacheService;
@@ -131,7 +126,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         feedItems: headlineResponse.items,
         user: currentUser,
         adConfig: remoteConfig.adConfig,
-        imageStyle: _appBloc.state.settings.feedPreferences.headlineImageStyle,
+        imageStyle: _appBloc.state.settings!.feedPreferences.headlineImageStyle,
         adThemeStyle: event.adThemeStyle,
         // Calculate the count of actual content items (headlines) already in the
         // feed. This is crucial for the FeedDecoratorService to correctly apply
@@ -174,13 +169,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
-      // Fetch user content preferences to get followed items for filtering suggestions.
-      final userPreferences = currentUser?.id != null
-          ? await _userContentPreferencesRepository.read(
-              id: currentUser!.id,
-              userId: currentUser.id,
-            )
-          : null;
+      // Use user content preferences from AppBloc for followed items.
+      final userPreferences = _appBloc.state.userContentPreferences;
 
       // For a major load, use the full decoration pipeline, which includes
       // injecting a high-priority decorator and stateless ad placeholders.
@@ -193,7 +183,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
             userPreferences?.followedTopics.map((t) => t.id).toList() ?? [],
         followedSourceIds:
             userPreferences?.followedSources.map((s) => s.id).toList() ?? [],
-        imageStyle: _appBloc.state.settings.feedPreferences.headlineImageStyle,
+        imageStyle: _appBloc.state.settings!.feedPreferences.headlineImageStyle,
         adThemeStyle: event.adThemeStyle,
       );
 
@@ -264,13 +254,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
-      // Fetch user content preferences to get followed items for filtering suggestions.
-      final userPreferences = currentUser?.id != null
-          ? await _userContentPreferencesRepository.read(
-              id: currentUser!.id,
-              userId: currentUser.id,
-            )
-          : null;
+      // Use user content preferences from AppBloc for followed items.
+      final userPreferences = _appBloc.state.userContentPreferences;
 
       // Use the full decoration pipeline, which includes injecting a
       // high-priority decorator and stateless ad placeholders.
@@ -283,7 +268,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
             userPreferences?.followedTopics.map((t) => t.id).toList() ?? [],
         followedSourceIds:
             userPreferences?.followedSources.map((s) => s.id).toList() ?? [],
-        imageStyle: _appBloc.state.settings.feedPreferences.headlineImageStyle,
+        imageStyle: _appBloc.state.settings!.feedPreferences.headlineImageStyle,
         adThemeStyle: event.adThemeStyle,
       );
 
@@ -350,16 +335,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
-      // Fetch user content preferences to get followed items for filtering suggestions.
-      final userPreferences = currentUser?.id != null
-          ? await _userContentPreferencesRepository.read(
-              id: currentUser!.id,
-              // In the demo environment, `DataInMemory` requires `userId` for correct
-              // scoping of user-specific data. In development/production, the backend
-              // handles this scoping, making `userId` optional at the client level.
-              userId: currentUser.id,
-            )
-          : null;
+      // Use user content preferences from AppBloc for followed items.
+      final userPreferences = _appBloc.state.userContentPreferences;
 
       // Use the full decoration pipeline, which includes injecting a
       // high-priority decorator and stateless ad placeholders.
@@ -372,7 +349,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
             userPreferences?.followedTopics.map((t) => t.id).toList() ?? [],
         followedSourceIds:
             userPreferences?.followedSources.map((s) => s.id).toList() ?? [],
-        imageStyle: _appBloc.state.settings.feedPreferences.headlineImageStyle,
+        imageStyle: _appBloc.state.settings!.feedPreferences.headlineImageStyle,
         adThemeStyle: event.adThemeStyle,
       );
 

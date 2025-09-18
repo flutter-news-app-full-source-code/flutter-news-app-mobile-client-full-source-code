@@ -326,10 +326,8 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
 
                       if (item is Headline) {
                         final imageStyle = context
-                            .watch<AppBloc>()
+                            .read<AppBloc>()
                             .state
-                            .settings
-                            .feedPreferences
                             .headlineImageStyle;
                         Widget tile;
                         switch (imageStyle) {

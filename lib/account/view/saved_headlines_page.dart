@@ -1,10 +1,8 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-// HeadlineItemWidget import removed
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/feed_core.dart';
@@ -35,10 +33,13 @@ class SavedHeadlinesPage extends StatelessWidget {
           style: textTheme.titleLarge,
         ),
       ),
-      body: BlocBuilder<AccountBloc, AccountState>(
-        builder: (context, state) {
-          if (state.status == AccountStatus.loading &&
-              state.preferences == null) {
+      body: BlocBuilder<AppBloc, AppState>(
+        builder: (context, appState) {
+          final user = appState.user;
+          final userContentPreferences = appState.userContentPreferences;
+
+          if (appState.status == AppLifeCycleStatus.loadingUserData ||
+              userContentPreferences == null) {
             return LoadingStateWidget(
               icon: Icons.bookmarks_outlined,
               headline: l10n.savedHeadlinesLoadingHeadline,
@@ -46,23 +47,16 @@ class SavedHeadlinesPage extends StatelessWidget {
             );
           }
 
-          if (state.status == AccountStatus.failure &&
-              state.preferences == null) {
+          if (appState.initialUserPreferencesError != null) {
             return FailureStateWidget(
-              exception:
-                  state.error ??
-                  OperationFailedException(l10n.savedHeadlinesErrorHeadline),
+              exception: appState.initialUserPreferencesError!,
               onRetry: () {
-                if (state.user?.id != null) {
-                  context.read<AccountBloc>().add(
-                    AccountLoadUserPreferences(userId: state.user!.id),
-                  );
-                }
+                context.read<AppBloc>().add(AppStarted(initialUser: user));
               },
             );
           }
 
-          final savedHeadlines = state.preferences?.savedHeadlines ?? [];
+          final savedHeadlines = userContentPreferences.savedHeadlines;
 
           if (savedHeadlines.isEmpty) {
             return InitialStateWidget(
@@ -99,19 +93,27 @@ class SavedHeadlinesPage extends StatelessWidget {
             ),
             itemBuilder: (context, index) {
               final headline = savedHeadlines[index];
-              final imageStyle = context
-                  .watch<AppBloc>()
-                  .state
-                  .settings
-                  .feedPreferences
-                  .headlineImageStyle;
+              final imageStyle =
+                  appState.settings?.feedPreferences.headlineImageStyle ??
+                  HeadlineImageStyle
+                      .smallThumbnail; // Default if settings not loaded
 
               final trailingButton = IconButton(
                 icon: Icon(Icons.delete_outline, color: colorScheme.error),
                 tooltip: l10n.headlineDetailsRemoveFromSavedTooltip,
                 onPressed: () {
-                  context.read<AccountBloc>().add(
-                    AccountSaveHeadlineToggled(headline: headline),
+                  final updatedSavedHeadlines = List<Headline>.from(
+                    savedHeadlines,
+                  )..removeWhere((h) => h.id == headline.id);
+
+                  final updatedPreferences = userContentPreferences.copyWith(
+                    savedHeadlines: updatedSavedHeadlines,
+                  );
+
+                  context.read<AppBloc>().add(
+                    AppUserContentPreferencesChanged(
+                      preferences: updatedPreferences,
+                    ),
                   );
                 },
               );

@@ -8,14 +8,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_filter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/headline_filter.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
-
-// Keys for passing data to/from SourceFilterPage
-const String keySelectedSources = 'selectedSources';
 
 /// {@template headlines_filter_page}
 /// A full-screen dialog page for selecting headline filters.
@@ -24,191 +22,49 @@ const String keySelectedSources = 'selectedSources';
 /// sources, and event countries. Manages the temporary state of these
 /// selections before applying them to the [HeadlinesFeedBloc].
 /// {@endtemplate}
-class HeadlinesFilterPage extends StatefulWidget {
+class HeadlinesFilterPage extends StatelessWidget {
   /// {@macro headlines_filter_page}
   const HeadlinesFilterPage({super.key});
 
   @override
-  State<HeadlinesFilterPage> createState() => _HeadlinesFilterPageState();
+  Widget build(BuildContext context) {
+    // Access the HeadlinesFeedBloc to get the current filter state for initialization.
+    final headlinesFeedBloc = context.read<HeadlinesFeedBloc>();
+    final currentFilter = headlinesFeedBloc.state.filter;
+
+    return BlocProvider(
+      create: (context) =>
+          HeadlinesFilterBloc(
+            topicsRepository: context.read<DataRepository<Topic>>(),
+            sourcesRepository: context.read<DataRepository<Source>>(),
+            countriesRepository: context.read<DataRepository<Country>>(),
+            appBloc: context.read<AppBloc>(),
+          )..add(
+            FilterDataLoaded(
+              initialSelectedTopics: currentFilter.topics ?? [],
+              initialSelectedSources: currentFilter.sources ?? [],
+              initialSelectedCountries: currentFilter.eventCountries ?? [],
+              isUsingFollowedItems: currentFilter.isFromFollowedItems,
+            ),
+          ),
+      child: const _HeadlinesFilterView(),
+    );
+  }
 }
 
-class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
-  /// Temporary state for filter selections within this modal flow.
-  /// These hold the selections made by the user *while* this filter page
-  /// and its sub-pages (Category, Source, Country) are open.
-  /// They are initialized from the main [HeadlinesFeedBloc]'s current filter
-  /// and are only applied back to the BLoC when the user taps 'Apply'.
-  late List<Topic> _tempSelectedTopics;
-  late List<Source> _tempSelectedSources;
-  late List<Country> _tempSelectedEventCountries;
-
-  // New state variables for the "Apply my followed items" feature
-  bool _useFollowedFilters = false;
-  bool _isLoadingFollowedFilters = false;
-  String? _loadFollowedFiltersError;
-  UserContentPreferences? _currentUserPreferences;
-
-  @override
-  void initState() {
-    super.initState();
-    final headlinesFeedState = BlocProvider.of<HeadlinesFeedBloc>(
-      context,
-    ).state;
-
-    final currentFilter = headlinesFeedState.filter;
-    _tempSelectedTopics = List.from(currentFilter.topics ?? []);
-    _tempSelectedSources = List.from(currentFilter.sources ?? []);
-    _tempSelectedEventCountries = List.from(currentFilter.eventCountries ?? []);
-
-    _useFollowedFilters = currentFilter.isFromFollowedItems;
-    _isLoadingFollowedFilters = false;
-    _loadFollowedFiltersError = null;
-    _currentUserPreferences = null;
-
-    // If the "Apply my followed items" feature is initially active,
-    // fetch the followed items to populate the temporary filter lists.
-    if (_useFollowedFilters) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _fetchAndApplyFollowedFilters();
-        }
-      });
-    }
-  }
-
-  /// Fetches the user's followed items (topics, sources, countries) and
-  /// applies them to the temporary filter state.
-  ///
-  /// This method is called when the "Apply my followed items" toggle is
-  /// activated. It handles loading states, errors, and updates the UI.
-  Future<void> _fetchAndApplyFollowedFilters() async {
-    setState(() {
-      _isLoadingFollowedFilters = true;
-      _loadFollowedFiltersError = null;
-    });
-
-    final appState = context.read<AppBloc>().state;
-    final currentUser = appState.user!;
-
-    try {
-      final preferencesRepo = context
-          .read<DataRepository<UserContentPreferences>>();
-      final preferences = await preferencesRepo.read(
-        id: currentUser.id,
-        userId: currentUser.id,
-      );
-
-      // Check if followed items are empty across all categories
-      if (preferences.followedTopics.isEmpty &&
-          preferences.followedSources.isEmpty &&
-          preferences.followedCountries.isEmpty) {
-        setState(() {
-          _isLoadingFollowedFilters = false;
-          _useFollowedFilters = false;
-          _tempSelectedTopics = [];
-          _tempSelectedSources = [];
-          _tempSelectedEventCountries = [];
-        });
-        if (mounted) {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: Text(
-                  AppLocalizationsX(
-                    context,
-                  ).l10n.noFollowedItemsForFilterSnackbar,
-                ),
-                duration: const Duration(seconds: 3),
-              ),
-            );
-        }
-        return;
-      } else {
-        setState(() {
-          _currentUserPreferences = preferences;
-          _tempSelectedTopics = List.from(preferences.followedTopics);
-          _tempSelectedSources = List.from(preferences.followedSources);
-          _tempSelectedEventCountries = List.from(
-            preferences.followedCountries,
-          );
-          _isLoadingFollowedFilters = false;
-        });
-      }
-    } on NotFoundException {
-      // If user preferences are not found, treat as empty followed items.
-      setState(() {
-        _currentUserPreferences = UserContentPreferences(
-          id: currentUser.id,
-          followedTopics: const [],
-          followedSources: const [],
-          followedCountries: const [],
-          savedHeadlines: const [],
-        );
-        _tempSelectedTopics = [];
-        _tempSelectedSources = [];
-        _tempSelectedEventCountries = [];
-        _isLoadingFollowedFilters = false;
-        _useFollowedFilters = false;
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(
-            SnackBar(
-              content: Text(
-                AppLocalizationsX(
-                  context,
-                ).l10n.noFollowedItemsForFilterSnackbar,
-              ),
-              duration: const Duration(seconds: 3),
-            ),
-          );
-      }
-    } on HttpException catch (e) {
-      setState(() {
-        _isLoadingFollowedFilters = false;
-        _useFollowedFilters = false;
-        _loadFollowedFiltersError = e.message;
-      });
-    } catch (e) {
-      setState(() {
-        _isLoadingFollowedFilters = false;
-        _useFollowedFilters = false;
-        _loadFollowedFiltersError = AppLocalizationsX(
-          context,
-        ).l10n.unknownError;
-      });
-    }
-  }
-
-  /// Clears all temporary filter selections.
-  void _clearTemporaryFilters() {
-    setState(() {
-      _tempSelectedTopics = [];
-      _tempSelectedSources = [];
-      _tempSelectedEventCountries = [];
-    });
-  }
+class _HeadlinesFilterView extends StatelessWidget {
+  const _HeadlinesFilterView();
 
   /// Builds a [ListTile] representing a filter criterion (e.g., Categories).
   ///
   /// Displays the criterion [title], the number of currently selected items
   /// ([selectedCount]), and navigates to the corresponding selection page
   /// specified by [routeName] when tapped.
-  ///
-  /// Uses [currentSelection] to pass the current temporary selection state
-  /// (e.g., `_tempSelectedSources`) to the corresponding criterion selection page
-  /// (e.g., `SourceFilterPage`) via the `extra` parameter of `context.pushNamed`.
-  /// Updates the temporary state via the [onResult] callback when the
-  /// criterion page pops with a result (the user tapped 'Apply' on that page).
-  Widget _buildFilterTile<T>({
+  Widget _buildFilterTile({
     required BuildContext context,
     required String title,
     required int selectedCount,
     required String routeName,
-    required List<T> currentSelectionData,
-    required void Function(List<T>)? onResult,
     bool enabled = true,
   }) {
     final l10n = AppLocalizationsX(context).l10n;
@@ -225,14 +81,10 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
       trailing: const Icon(Icons.chevron_right),
       enabled: enabled,
       onTap: enabled
-          ? () async {
-              final result = await context.pushNamed<List<T>>(
-                routeName,
-                extra: currentSelectionData,
-              );
-              if (result != null && onResult != null) {
-                onResult(result);
-              }
+          ? () {
+              // Navigate to the child filter page. The child page will read
+              // the current selections from HeadlinesFilterBloc directly.
+              context.pushNamed(routeName);
             }
           : null,
     );
@@ -242,11 +94,6 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
-
-    // Determine if the "Apply my followed items" feature is active and loading.
-    // This will disable the individual filter tiles.
-    final isFollowedFilterActiveOrLoading =
-        _useFollowedFilters || _isLoadingFollowedFilters;
 
     return Scaffold(
       appBar: AppBar(
@@ -262,59 +109,76 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
             icon: const Icon(Icons.refresh),
             tooltip: l10n.headlinesFeedFilterResetButton,
             onPressed: () {
-              context.read<HeadlinesFeedBloc>().add(
-                HeadlinesFeedFiltersCleared(
-                  adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
-                ),
+              context.read<HeadlinesFilterBloc>().add(
+                const FilterSelectionsCleared(),
               );
-              // Also reset local state for the "Apply my followed items"
-              setState(() {
-                _useFollowedFilters = false;
-                _isLoadingFollowedFilters = false;
-                _loadFollowedFiltersError = null;
-                _clearTemporaryFilters();
-              });
-              context.pop();
             },
           ),
           // Apply My Followed Items Button
-          IconButton(
-            icon: _useFollowedFilters
-                ? const Icon(Icons.favorite)
-                : const Icon(Icons.favorite_border),
-            color: _useFollowedFilters ? theme.colorScheme.primary : null,
-            tooltip: l10n.headlinesFeedFilterApplyFollowedLabel,
-            onPressed: _isLoadingFollowedFilters
-                ? null // Disable while loading
-                : () {
-                    setState(() {
-                      _useFollowedFilters = !_useFollowedFilters;
-                      if (_useFollowedFilters) {
-                        _fetchAndApplyFollowedFilters();
-                      } else {
-                        _isLoadingFollowedFilters = false;
-                        _loadFollowedFiltersError = null;
-                        _clearTemporaryFilters();
+          BlocBuilder<HeadlinesFilterBloc, HeadlinesFilterState>(
+            builder: (context, filterState) {
+              final appState = context.watch<AppBloc>().state;
+              final followedTopics =
+                  appState.userContentPreferences?.followedTopics ?? [];
+              final followedSources =
+                  appState.userContentPreferences?.followedSources ?? [];
+              final followedCountries =
+                  appState.userContentPreferences?.followedCountries ?? [];
+
+              final hasFollowedItems =
+                  followedTopics.isNotEmpty ||
+                  followedSources.isNotEmpty ||
+                  followedCountries.isNotEmpty;
+
+              return IconButton(
+                icon: filterState.isUsingFollowedItems
+                    ? const Icon(Icons.favorite)
+                    : const Icon(Icons.favorite_border),
+                color: filterState.isUsingFollowedItems
+                    ? theme.colorScheme.primary
+                    : null,
+                tooltip: l10n.headlinesFeedFilterApplyFollowedLabel,
+                onPressed: hasFollowedItems
+                    ? () {
+                        context.read<HeadlinesFilterBloc>().add(
+                          FollowedItemsFilterToggled(
+                            isUsingFollowedItems:
+                                !filterState.isUsingFollowedItems,
+                          ),
+                        );
                       }
-                    });
-                  },
+                    : () {
+                        ScaffoldMessenger.of(context)
+                          ..hideCurrentSnackBar()
+                          ..showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                l10n.noFollowedItemsForFilterSnackbar,
+                              ),
+                              duration: const Duration(seconds: 3),
+                            ),
+                          );
+                      },
+              );
+            },
           ),
           // Apply Filters Button
           IconButton(
             icon: const Icon(Icons.check),
             tooltip: l10n.headlinesFeedFilterApplyButton,
             onPressed: () {
+              final filterState = context.read<HeadlinesFilterBloc>().state;
               final newFilter = HeadlineFilter(
-                topics: _tempSelectedTopics.isNotEmpty
-                    ? _tempSelectedTopics
+                topics: filterState.selectedTopics.isNotEmpty
+                    ? filterState.selectedTopics.toList()
                     : null,
-                sources: _tempSelectedSources.isNotEmpty
-                    ? _tempSelectedSources
+                sources: filterState.selectedSources.isNotEmpty
+                    ? filterState.selectedSources.toList()
                     : null,
-                eventCountries: _tempSelectedEventCountries.isNotEmpty
-                    ? _tempSelectedEventCountries
+                eventCountries: filterState.selectedCountries.isNotEmpty
+                    ? filterState.selectedCountries.toList()
                     : null,
-                isFromFollowedItems: _useFollowedFilters,
+                isFromFollowedItems: filterState.isUsingFollowedItems,
               );
               context.read<HeadlinesFeedBloc>().add(
                 HeadlinesFeedFiltersApplied(
@@ -327,74 +191,69 @@ class _HeadlinesFilterPageState extends State<HeadlinesFilterPage> {
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-        children: [
-          if (_isLoadingFollowedFilters)
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.paddingLarge,
-                vertical: AppSpacing.sm,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+      body: BlocBuilder<HeadlinesFilterBloc, HeadlinesFilterState>(
+        builder: (context, filterState) {
+          // Determine if the "Apply my followed items" feature is active.
+          // This will disable the individual filter tiles.
+          final isFollowedFilterActive = filterState.isUsingFollowedItems;
+
+          if (filterState.status == HeadlinesFilterStatus.loading) {
+            return LoadingStateWidget(
+              icon: Icons.filter_list,
+              headline: l10n.headlinesFeedFilterLoadingHeadline,
+              subheadline: l10n.pleaseWait,
+            );
+          }
+
+          if (filterState.status == HeadlinesFilterStatus.failure) {
+            return FailureStateWidget(
+              exception:
+                  filterState.error ??
+                  const UnknownException('Failed to load filter data.'),
+              onRetry: () {
+                final headlinesFeedBloc = context.read<HeadlinesFeedBloc>();
+                final currentFilter = headlinesFeedBloc.state.filter;
+                context.read<HeadlinesFilterBloc>().add(
+                  FilterDataLoaded(
+                    initialSelectedTopics: currentFilter.topics ?? [],
+                    initialSelectedSources: currentFilter.sources ?? [],
+                    initialSelectedCountries:
+                        currentFilter.eventCountries ?? [],
+                    isUsingFollowedItems: currentFilter.isFromFollowedItems,
                   ),
-                  const SizedBox(width: AppSpacing.md),
-                  Text(l10n.headlinesFeedLoadingHeadline),
-                ],
+                );
+              },
+            );
+          }
+
+          return ListView(
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+            children: [
+              const Divider(),
+              _buildFilterTile(
+                context: context,
+                title: l10n.headlinesFeedFilterTopicLabel,
+                enabled: !isFollowedFilterActive,
+                selectedCount: filterState.selectedTopics.length,
+                routeName: Routes.feedFilterTopicsName,
               ),
-            ),
-          if (_loadFollowedFiltersError != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.paddingLarge,
-                vertical: AppSpacing.sm,
+              _buildFilterTile(
+                context: context,
+                title: l10n.headlinesFeedFilterSourceLabel,
+                enabled: !isFollowedFilterActive,
+                selectedCount: filterState.selectedSources.length,
+                routeName: Routes.feedFilterSourcesName,
               ),
-              child: Text(
-                _loadFollowedFiltersError!,
-                style: TextStyle(color: theme.colorScheme.error),
+              _buildFilterTile(
+                context: context,
+                title: l10n.headlinesFeedFilterEventCountryLabel,
+                enabled: !isFollowedFilterActive,
+                selectedCount: filterState.selectedCountries.length,
+                routeName: Routes.feedFilterEventCountriesName,
               ),
-            ),
-          const Divider(),
-          _buildFilterTile<Topic>(
-            context: context,
-            title: l10n.headlinesFeedFilterTopicLabel,
-            enabled: !isFollowedFilterActiveOrLoading,
-            selectedCount: _tempSelectedTopics.length,
-            routeName: Routes.feedFilterTopicsName,
-            currentSelectionData: _tempSelectedTopics,
-            onResult: (result) {
-              setState(() => _tempSelectedTopics = result);
-            },
-          ),
-          _buildFilterTile<Source>(
-            context: context,
-            title: l10n.headlinesFeedFilterSourceLabel,
-            enabled: !isFollowedFilterActiveOrLoading,
-            selectedCount: _tempSelectedSources.length,
-            routeName: Routes.feedFilterSourcesName,
-            currentSelectionData: _tempSelectedSources,
-            onResult: (result) {
-              setState(() => _tempSelectedSources = result);
-            },
-          ),
-          _buildFilterTile<Country>(
-            context: context,
-            title: l10n.headlinesFeedFilterEventCountryLabel,
-            enabled: !isFollowedFilterActiveOrLoading,
-            selectedCount: _tempSelectedEventCountries.length,
-            routeName: Routes.feedFilterEventCountriesName,
-            currentSelectionData: _tempSelectedEventCountries,
-            onResult: (result) {
-              setState(() => _tempSelectedEventCountries = result);
-            },
-          ),
-        ],
+            ],
+          );
+        },
       ),
     );
   }

@@ -3,7 +3,6 @@ import 'package:core/core.dart' hide AppStatus;
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/account_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/countries/add_country_to_follow_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/countries/followed_countries_list_page.dart';
@@ -27,10 +26,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/v
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/headline_details_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/similar_headlines_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/view/headline_details_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/countries_filter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/sources_filter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/topics_filter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/country_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_feed_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_filter_page.dart';
@@ -71,12 +67,6 @@ GoRouter createRouter({
   required GlobalKey<NavigatorState> navigatorKey,
   required InlineAdCacheService inlineAdCacheService,
 }) {
-  // Instantiate AccountBloc once to be shared
-  final accountBloc = AccountBloc(
-    authenticationRepository: authenticationRepository,
-    userContentPreferencesRepository: userContentPreferencesRepository,
-  );
-
   // Instantiate FeedDecoratorService once to be shared
   final feedDecoratorService = FeedDecoratorService(
     topicsRepository: topicsRepository,
@@ -283,7 +273,6 @@ GoRouter createRouter({
           final adThemeStyle = AdThemeStyle.fromTheme(Theme.of(context));
           return MultiBlocProvider(
             providers: [
-              BlocProvider.value(value: accountBloc),
               BlocProvider(
                 create: (context) =>
                     EntityDetailsBloc(
@@ -293,7 +282,6 @@ GoRouter createRouter({
                       sourceRepository: context.read<DataRepository<Source>>(),
                       countryRepository: context
                           .read<DataRepository<Country>>(),
-                      accountBloc: accountBloc,
                       appBloc: context.read<AppBloc>(),
                       feedDecoratorService: feedDecoratorService,
                       inlineAdCacheService: inlineAdCacheService,
@@ -341,15 +329,8 @@ GoRouter createRouter({
           final headlineFromExtra = state.extra as Headline?;
           final headlineIdFromPath = state.pathParameters['id'];
 
-          // Ensure accountBloc is available if needed by HeadlineDetailsPage
-          // or its descendants for actions like saving.
-          // If AccountBloc is already provided higher up (e.g., in AppShell or App),
-          // this specific BlocProvider.value might not be strictly necessary here,
-          // but it's safer to ensure it's available for this top-level route.
-          // We are using the `accountBloc` instance created at the top of `createRouter`.
           return MultiBlocProvider(
             providers: [
-              BlocProvider.value(value: accountBloc),
               BlocProvider(
                 create: (context) => HeadlineDetailsBloc(
                   headlinesRepository: context.read<DataRepository<Headline>>(),
@@ -374,14 +355,11 @@ GoRouter createRouter({
           // Return the shell widget which contains the AdaptiveScaffold
           return MultiBlocProvider(
             providers: [
-              BlocProvider.value(value: accountBloc),
               BlocProvider(
                 create: (context) {
                   return HeadlinesFeedBloc(
                     headlinesRepository: context
                         .read<DataRepository<Headline>>(),
-                    userContentPreferencesRepository: context
-                        .read<DataRepository<UserContentPreferences>>(),
                     feedDecoratorService: feedDecoratorService,
                     appBloc: context.read<AppBloc>(),
                     inlineAdCacheService: inlineAdCacheService,
@@ -425,7 +403,6 @@ GoRouter createRouter({
 
                       return MultiBlocProvider(
                         providers: [
-                          BlocProvider.value(value: accountBloc),
                           BlocProvider(
                             create: (context) => HeadlineDetailsBloc(
                               headlinesRepository: context
@@ -478,70 +455,22 @@ GoRouter createRouter({
                       GoRoute(
                         path: Routes.feedFilterTopics,
                         name: Routes.feedFilterTopicsName,
-                        // Wrap with BlocProviderUserContentPreferencesRepository
-                        builder: (context, state) => BlocProvider(
-                          create: (context) => TopicsFilterBloc(
-                            topicsRepository: context
-                                .read<DataRepository<Topic>>(),
-                            userContentPreferencesRepository: context
-                                .read<DataRepository<UserContentPreferences>>(),
-                            appBloc: context.read<AppBloc>(),
-                          ),
-                          child: const TopicFilterPage(),
-                        ),
+                        builder: (context, state) => const TopicFilterPage(),
                       ),
                       // Sub-route for source selection
                       GoRoute(
                         path: Routes.feedFilterSources,
                         name: Routes.feedFilterSourcesName,
-                        // Wrap with BlocProvider
-                        builder: (context, state) => BlocProvider(
-                          create: (context) => SourcesFilterBloc(
-                            sourcesRepository: context
-                                .read<DataRepository<Source>>(),
-                            countriesRepository: context
-                                .read<DataRepository<Country>>(),
-                            userContentPreferencesRepository: context
-                                .read<DataRepository<UserContentPreferences>>(),
-                            appBloc: context.read<AppBloc>(),
-                          ),
-                          // Pass initialSelectedSources from state.extra
-                          child: Builder(
-                            builder: (context) {
-                              final initialSources =
-                                  state.extra as List<Source>? ?? const [];
-
-                              return SourceFilterPage(
-                                initialSelectedSources: initialSources,
-                              );
-                            },
-                          ),
-                        ),
+                        builder: (context, state) => const SourceFilterPage(),
                       ),
                       GoRoute(
                         path: Routes.feedFilterEventCountries,
                         name: Routes.feedFilterEventCountriesName,
                         pageBuilder: (context, state) {
                           final l10n = context.l10n;
-                          final initialSelection =
-                              state.extra as List<Country>?;
                           return MaterialPage(
-                            child: BlocProvider(
-                              create: (context) => CountriesFilterBloc(
-                                countriesRepository: context
-                                    .read<DataRepository<Country>>(),
-                                userContentPreferencesRepository: context
-                                    .read<
-                                      DataRepository<UserContentPreferences>
-                                    >(),
-                                appBloc: context.read<AppBloc>(),
-                              ),
-                              child: CountryFilterPage(
-                                title:
-                                    l10n.headlinesFeedFilterEventCountryLabel,
-                                filter: CountryFilterUsage.hasActiveHeadlines,
-                                key: ValueKey(initialSelection.hashCode),
-                              ),
+                            child: CountryFilterPage(
+                              title: l10n.headlinesFeedFilterEventCountryLabel,
                             ),
                           );
                         },
@@ -569,7 +498,6 @@ GoRouter createRouter({
                       final headlineIdFromPath = state.pathParameters['id'];
                       return MultiBlocProvider(
                         providers: [
-                          BlocProvider.value(value: accountBloc),
                           BlocProvider(
                             create: (context) => HeadlineDetailsBloc(
                               headlinesRepository: context
@@ -751,7 +679,6 @@ GoRouter createRouter({
                           final headlineIdFromPath = state.pathParameters['id'];
                           return MultiBlocProvider(
                             providers: [
-                              BlocProvider.value(value: accountBloc),
                               BlocProvider(
                                 create: (context) => HeadlineDetailsBloc(
                                   headlinesRepository: context

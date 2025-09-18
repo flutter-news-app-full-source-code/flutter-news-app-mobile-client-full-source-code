@@ -23,35 +23,27 @@ import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/f
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
-/// Page widget responsible for providing the BLoC for the headlines search feature.
-class HeadlinesSearchPage extends StatelessWidget {
+/// {@template headlines_search_page}
+/// The main page for the headlines search feature.
+///
+/// This widget is responsible for building the UI for the headlines search
+/// page, including the search bar, model type selection, and displaying
+/// search results. It consumes state from [HeadlinesSearchBloc] and
+/// dispatches events for search operations. It also leverages [AppBloc]
+/// for global settings like `headlineImageStyle` and `adConfig`.
+/// {@endtemplate}
+class HeadlinesSearchPage extends StatefulWidget {
+  /// {@macro headlines_search_page}
   const HeadlinesSearchPage({super.key});
 
-  /// Defines the route for this page.
-  static Route<void> route() {
-    return MaterialPageRoute<void>(builder: (_) => const HeadlinesSearchPage());
-  }
-
   @override
-  Widget build(BuildContext context) {
-    return const _HeadlinesSearchView();
-  }
+  State<HeadlinesSearchPage> createState() => _HeadlinesSearchPageState();
 }
 
-/// Private View widget that builds the UI for the headlines search page.
-/// It listens to the HeadlinesSearchBloc state and displays the appropriate UI.
-class _HeadlinesSearchView extends StatefulWidget {
-  const _HeadlinesSearchView();
-
-  @override
-  State<_HeadlinesSearchView> createState() => _HeadlinesSearchViewState();
-}
-
-class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
+class _HeadlinesSearchPageState extends State<HeadlinesSearchPage> {
   final _scrollController = ScrollController();
   final _textController = TextEditingController();
   bool _showClearButton = false;
-  ContentType _selectedModelType = ContentType.headline;
 
   @override
   void initState() {
@@ -62,17 +54,15 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
         _showClearButton = _textController.text.isNotEmpty;
       });
     });
-    final searchableTypes = [
-      ContentType.headline,
-      ContentType.topic,
-      ContentType.source,
-      ContentType.country,
-    ];
-    if (!searchableTypes.contains(_selectedModelType)) {
-      _selectedModelType = ContentType.headline;
-    }
+    // Initialize the selected model type from the BLoC's initial state.
+    // This ensures consistency if the BLoC was already initialized with a
+    // specific type (e.g., after a hot restart).
+    final initialModelType = context
+        .read<HeadlinesSearchBloc>()
+        .state
+        .selectedModelType;
     context.read<HeadlinesSearchBloc>().add(
-      HeadlinesSearchModelTypeChanged(_selectedModelType),
+      HeadlinesSearchModelTypeChanged(initialModelType),
     );
   }
 
@@ -128,69 +118,64 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
       ContentType.country,
     ];
 
-    if (!availableSearchModelTypes.contains(_selectedModelType)) {
-      _selectedModelType = ContentType.headline;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          context.read<HeadlinesSearchBloc>().add(
-            HeadlinesSearchModelTypeChanged(_selectedModelType),
-          );
-        }
-      });
-    }
-
     return Scaffold(
       appBar: AppBar(
         titleSpacing: AppSpacing.paddingSmall,
-        // backgroundColor: appBarTheme.backgroundColor ?? colorScheme.surface,
         elevation: appBarTheme.elevation ?? 0,
         title: Row(
           children: [
-            SizedBox(
-              width: 150,
-              child: DropdownButtonFormField<ContentType>(
-                value: _selectedModelType,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: AppSpacing.sm,
-                    vertical: AppSpacing.xs,
+            // BlocBuilder to react to changes in selectedModelType from HeadlinesSearchBloc
+            BlocBuilder<HeadlinesSearchBloc, HeadlinesSearchState>(
+              buildWhen: (previous, current) =>
+                  previous.selectedModelType != current.selectedModelType,
+              builder: (context, state) {
+                // Ensure the selected model type is always one of the available types.
+                // If not, default to headline.
+                final currentSelectedModelType =
+                    availableSearchModelTypes.contains(state.selectedModelType)
+                    ? state.selectedModelType
+                    : ContentType.headline;
+
+                return SizedBox(
+                  width: 150,
+                  child: DropdownButtonFormField<ContentType>(
+                    value: currentSelectedModelType,
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: AppSpacing.sm,
+                        vertical: AppSpacing.xs,
+                      ),
+                      isDense: true,
+                    ),
+                    style: textTheme.titleMedium?.copyWith(
+                      color:
+                          appBarTheme.titleTextStyle?.color ??
+                          colorScheme.onSurface,
+                    ),
+                    dropdownColor: colorScheme.surfaceContainerHighest,
+                    icon: Icon(
+                      Icons.arrow_drop_down_rounded,
+                      color:
+                          appBarTheme.iconTheme?.color ??
+                          colorScheme.onSurfaceVariant,
+                    ),
+                    items: availableSearchModelTypes.map((ContentType type) {
+                      return DropdownMenuItem<ContentType>(
+                        value: type,
+                        child: Text(type.displayName(context)),
+                      );
+                    }).toList(),
+                    onChanged: (ContentType? newValue) {
+                      if (newValue != null) {
+                        context.read<HeadlinesSearchBloc>().add(
+                          HeadlinesSearchModelTypeChanged(newValue),
+                        );
+                      }
+                    },
                   ),
-                  isDense: true,
-                ),
-                style: textTheme.titleMedium?.copyWith(
-                  color:
-                      appBarTheme.titleTextStyle?.color ??
-                      colorScheme.onSurface,
-                ),
-                dropdownColor: colorScheme.surfaceContainerHighest,
-                icon: Icon(
-                  Icons.arrow_drop_down_rounded,
-                  color:
-                      appBarTheme.iconTheme?.color ??
-                      colorScheme.onSurfaceVariant,
-                ),
-                // TODO(fulleni): Use the new localization extension here.
-                items: availableSearchModelTypes.map((ContentType type) {
-                  return DropdownMenuItem<ContentType>(
-                    value: type,
-                    child: Text(type.displayName(context)),
-                  );
-                }).toList(),
-                onChanged: (ContentType? newValue) {
-                  if (newValue != null) {
-                    setState(() {
-                      _selectedModelType = newValue;
-                    });
-                    context.read<HeadlinesSearchBloc>().add(
-                      HeadlinesSearchModelTypeChanged(newValue),
-                    );
-                    // Optionally trigger search or clear text when type changes
-                    // _textController.clear();
-                    // _performSearch();
-                  }
-                },
-              ),
+                );
+              },
             ),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
@@ -207,7 +192,6 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                   ),
                   border: InputBorder.none,
                   filled: false,
-                  // fillColor: colorScheme.surface.withAlpha(26),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.md,
                     vertical: AppSpacing.sm,
@@ -234,7 +218,6 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
             icon: const Icon(Icons.search_outlined),
             tooltip: l10n.headlinesSearchActionTooltip,
             onPressed: _performSearch,
-            // color: appBarTheme.actionsIconTheme?.color,
           ),
           const SizedBox(width: AppSpacing.xs),
         ],
@@ -248,7 +231,6 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
               subheadline: l10n.searchPageInitialSubheadline,
             ),
             HeadlinesSearchLoading() => LoadingStateWidget(
-              // Use LoadingStateWidget
               icon: Icons.search_outlined,
               headline: l10n.headlinesFeedLoadingHeadline,
               subheadline: l10n.searchingFor(
@@ -274,7 +256,6 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                     )
                   : items.isEmpty
                   ? InitialStateWidget(
-                      // Use InitialStateWidget for no results as it's not a failure
                       icon: Icons.search_off_outlined,
                       headline: l10n.headlinesSearchNoResultsHeadline,
                       subheadline:
@@ -283,7 +264,6 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                   : ListView.separated(
                       controller: _scrollController,
                       padding: const EdgeInsets.symmetric(
-                        // Consistent padding
                         horizontal: AppSpacing.paddingMedium,
                         vertical: AppSpacing.paddingSmall,
                       ).copyWith(bottom: AppSpacing.xxl),
@@ -305,16 +285,13 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                           final imageStyle = context
                               .watch<AppBloc>()
                               .state
-                              .settings
-                              .feedPreferences
-                              .headlineImageStyle;
+                              .headlineImageStyle; // Use AppBloc getter
                           Widget tile;
                           Future<void> onHeadlineTap() async {
                             await context
                                 .read<InterstitialAdManager>()
                                 .onPotentialAdTrigger();
 
-                            // Check if the widget is still in the tree before navigating.
                             if (!context.mounted) return;
 
                             await context.pushNamed(
@@ -349,16 +326,13 @@ class _HeadlinesSearchViewState extends State<_HeadlinesSearchView> {
                         } else if (feedItem is Country) {
                           return CountryItemWidget(country: feedItem);
                         } else if (feedItem is AdPlaceholder) {
-                          // Access the AppBloc to get the remoteConfig for ads.
                           final adConfig = context
-                              .read<AppBloc>()
+                              .watch<AppBloc>()
                               .state
                               .remoteConfig
-                              ?.adConfig;
+                              ?.adConfig; // Use AppBloc getter
 
-                          // Ensure adConfig is not null before building the AdLoaderWidget.
                           if (adConfig == null) {
-                            // Return an empty widget or a placeholder if adConfig is not available.
                             return const SizedBox.shrink();
                           }
 

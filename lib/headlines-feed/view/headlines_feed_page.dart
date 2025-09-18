@@ -4,7 +4,6 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
@@ -148,12 +147,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                       tooltip: l10n.headlinesFeedFilterTooltip,
                       onPressed: () {
                         // Navigate to the filter page route
-                        final headlinesFeedBloc = context
-                            .read<HeadlinesFeedBloc>();
-                        context.goNamed(
-                          Routes.feedFilterName,
-                          extra: headlinesFeedBloc,
-                        );
+                        context.goNamed(Routes.feedFilterName);
                       },
                     ),
                     if (isFilterApplied)
@@ -305,8 +299,6 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                     final imageStyle = context
                         .watch<AppBloc>()
                         .state
-                        .settings
-                        .feedPreferences
                         .headlineImageStyle;
                     Widget tile;
                     switch (imageStyle) {
@@ -342,7 +334,9 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                     }
 
                     return FeedAdLoaderWidget(
-                      key: ValueKey(item.id), // Add a unique key for AdPlaceholder
+                      key: ValueKey(
+                        item.id,
+                      ), // Add a unique key for AdPlaceholder
                       adPlaceholder: item,
                       adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
                       adConfig: adConfig,
@@ -364,13 +358,13 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                       },
                     );
                   } else if (item is ContentCollectionItem) {
-                    // Access AccountBloc to get the user's content preferences,
+                    // Access AppBloc to get the user's content preferences,
                     // which is the source of truth for followed items.
-                    final accountState = context.watch<AccountBloc>().state;
+                    final appState = context.watch<AppBloc>().state;
                     final followedTopics =
-                        accountState.preferences?.followedTopics ?? [];
+                        appState.userContentPreferences?.followedTopics ?? [];
                     final followedSources =
-                        accountState.preferences?.followedSources ?? [];
+                        appState.userContentPreferences?.followedSources ?? [];
 
                     final followedTopicIds = followedTopics
                         .map((t) => t.id)
@@ -384,26 +378,53 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                       followedTopicIds: followedTopicIds,
                       followedSourceIds: followedSourceIds,
                       onFollowToggle: (toggledItem) {
-                        // Determine the current following status to toggle it.
-                        // ignore: unused_local_variable
-                        final bool isCurrentlyFollowing;
+                        final currentUserPreferences =
+                            appState.userContentPreferences;
+                        if (currentUserPreferences == null) return;
+
+                        UserContentPreferences updatedPreferences;
+
                         if (toggledItem is Topic) {
-                          isCurrentlyFollowing = followedTopicIds.contains(
-                            toggledItem.id,
+                          final isCurrentlyFollowing = followedTopicIds
+                              .contains(toggledItem.id);
+                          final newFollowedTopics = List<Topic>.from(
+                            followedTopics,
                           );
-                          context.read<AccountBloc>().add(
-                            AccountFollowTopicToggled(topic: toggledItem),
+                          if (isCurrentlyFollowing) {
+                            newFollowedTopics.removeWhere(
+                              (t) => t.id == toggledItem.id,
+                            );
+                          } else {
+                            newFollowedTopics.add(toggledItem);
+                          }
+                          updatedPreferences = currentUserPreferences.copyWith(
+                            followedTopics: newFollowedTopics,
                           );
                         } else if (toggledItem is Source) {
-                          isCurrentlyFollowing = followedSourceIds.contains(
-                            toggledItem.id,
+                          final isCurrentlyFollowing = followedSourceIds
+                              .contains(toggledItem.id);
+                          final newFollowedSources = List<Source>.from(
+                            followedSources,
                           );
-                          context.read<AccountBloc>().add(
-                            AccountFollowSourceToggled(source: toggledItem),
+                          if (isCurrentlyFollowing) {
+                            newFollowedSources.removeWhere(
+                              (s) => s.id == toggledItem.id,
+                            );
+                          } else {
+                            newFollowedSources.add(toggledItem);
+                          }
+                          updatedPreferences = currentUserPreferences.copyWith(
+                            followedSources: newFollowedSources,
                           );
                         } else {
                           return;
                         }
+
+                        context.read<AppBloc>().add(
+                          AppUserContentPreferencesChanged(
+                            preferences: updatedPreferences,
+                          ),
+                        );
                       },
                       onDismiss: (decoratorType) {
                         context.read<HeadlinesFeedBloc>().add(

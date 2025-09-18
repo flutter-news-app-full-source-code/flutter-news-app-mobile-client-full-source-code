@@ -20,7 +20,16 @@ import 'package:go_router/go_router.dart';
 import 'package:kv_storage_service/kv_storage_service.dart';
 import 'package:ui_kit/ui_kit.dart';
 
+/// {@template app_widget}
+/// The root widget of the application.
+///
+/// This widget is responsible for setting up the dependency injection
+/// (RepositoryProviders and BlocProviders) for the entire application.
+/// It also orchestrates the initial application startup flow, passing
+/// pre-fetched data and services to the [AppBloc] and [_AppView].
+/// {@endtemplate}
 class App extends StatelessWidget {
+  /// {@macro app_widget}
   const App({
     required AuthRepository authenticationRepository,
     required DataRepository<Headline> headlinesRepository,
@@ -38,10 +47,12 @@ class App extends StatelessWidget {
     required DataRepository<LocalAd> localAdRepository,
     required GlobalKey<NavigatorState> navigatorKey,
     required InlineAdCacheService inlineAdCacheService,
+    required RemoteConfig? initialRemoteConfig,
+    required HttpException? initialRemoteConfigError,
+    super.key,
     this.demoDataMigrationService,
     this.demoDataInitializerService,
     this.initialUser,
-    super.key,
   }) : _authenticationRepository = authenticationRepository,
        _headlinesRepository = headlinesRepository,
        _topicsRepository = topicsRepository,
@@ -56,7 +67,9 @@ class App extends StatelessWidget {
        _adService = adService,
        _localAdRepository = localAdRepository,
        _navigatorKey = navigatorKey,
-       _inlineAdCacheService = inlineAdCacheService;
+       _inlineAdCacheService = inlineAdCacheService,
+       _initialRemoteConfig = initialRemoteConfig,
+       _initialRemoteConfigError = initialRemoteConfigError;
 
   final AuthRepository _authenticationRepository;
   final DataRepository<Headline> _headlinesRepository;
@@ -77,6 +90,13 @@ class App extends StatelessWidget {
   final DemoDataMigrationService? demoDataMigrationService;
   final DemoDataInitializerService? demoDataInitializerService;
   final User? initialUser;
+
+  /// The remote configuration fetched during the app's bootstrap phase.
+  /// This is used to initialize the AppBloc with the global app status.
+  final RemoteConfig? _initialRemoteConfig;
+
+  /// Any error that occurred during the initial remote config fetch.
+  final HttpException? _initialRemoteConfigError;
 
   @override
   Widget build(BuildContext context) {
@@ -99,27 +119,37 @@ class App extends StatelessWidget {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) => AppBloc(
-              authenticationRepository: context.read<AuthRepository>(),
-              userAppSettingsRepository: context
-                  .read<DataRepository<UserAppSettings>>(),
-              appConfigRepository: context.read<DataRepository<RemoteConfig>>(),
-              userRepository: context.read<DataRepository<User>>(),
-              environment: _environment,
-              demoDataMigrationService: demoDataMigrationService,
-              demoDataInitializerService: demoDataInitializerService,
-              initialUser: initialUser,
-              navigatorKey: _navigatorKey, // Pass navigatorKey to AppBloc
-            ),
+            create: (context) =>
+                AppBloc(
+                  authenticationRepository: context.read<AuthRepository>(),
+                  userAppSettingsRepository: context
+                      .read<DataRepository<UserAppSettings>>(),
+                  userContentPreferencesRepository: context
+                      .read<DataRepository<UserContentPreferences>>(),
+                  appConfigRepository: context
+                      .read<DataRepository<RemoteConfig>>(),
+                  userRepository: context.read<DataRepository<User>>(),
+                  environment: _environment,
+                  demoDataMigrationService: demoDataMigrationService,
+                  demoDataInitializerService: demoDataInitializerService,
+                  initialUser: initialUser,
+                  navigatorKey: _navigatorKey, // Pass navigatorKey to AppBloc
+                  initialRemoteConfig:
+                      _initialRemoteConfig, // Pass initialRemoteConfig
+                  initialRemoteConfigError:
+                      _initialRemoteConfigError, // Pass initialRemoteConfigError
+                )..add(
+                  AppStarted(initialUser: initialUser),
+                ), // Dispatch AppStarted event
           ),
           BlocProvider(
             create: (context) => AuthenticationBloc(
               authenticationRepository: context.read<AuthRepository>(),
             ),
           ),
-          // Provide the InterstitialAdManager as a RepositoryProvider
-          // it  depends on the state managed by AppBloc. Therefore,
-          // so it must be created after AppBloc is available.
+          // Provide the InterstitialAdManager as a RepositoryProvider.
+          // It depends on the state managed by AppBloc, so it must be created
+          // after AppBloc is available.
           RepositoryProvider(
             create: (context) => InterstitialAdManager(
               appBloc: context.read<AppBloc>(),
@@ -195,12 +225,15 @@ class _AppViewState extends State<_AppView> {
   void initState() {
     super.initState();
     final appBloc = context.read<AppBloc>();
-    // Initialize the notifier with the BLoC's current state
+    // Initialize the notifier with the BLoC's current state.
+    // This notifier is used by GoRouter's refreshListenable to trigger
+    // route re-evaluation when the app's lifecycle status changes.
     _statusNotifier = ValueNotifier<AppLifeCycleStatus>(appBloc.state.status);
 
     // Instantiate and initialize the AppStatusService.
-    // This service will automatically trigger checks when the app is resumed
-    // or at periodic intervals, ensuring the app status is always fresh.
+    // This service monitors the app's lifecycle and periodically triggers
+    // remote configuration fetches via the AppBloc, ensuring the app status
+    // is always fresh (e.g., detecting maintenance mode or forced updates).
     _appStatusService = AppStatusService(
       context: context,
       checkInterval: const Duration(minutes: 15),
@@ -259,6 +292,59 @@ class _AppViewState extends State<_AppView> {
           // By returning a dedicated widget here, we ensure these pages are
           // full-screen and exist outside the main app's navigation shell.
 
+          if (state.status == AppLifeCycleStatus.criticalError) {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              theme: lightTheme(
+                scheme: FlexScheme.material,
+                appTextScaleFactor: state.appTextScaleFactor,
+                appFontWeight: state.appFontWeight,
+                fontFamily: state.fontFamily,
+              ),
+              darkTheme: darkTheme(
+                scheme: FlexScheme.material,
+                appTextScaleFactor: state.appTextScaleFactor,
+                appFontWeight: state.appFontWeight,
+                fontFamily: state.fontFamily,
+              ),
+              themeMode: state.themeMode,
+              localizationsDelegates: const [
+                ...AppLocalizations.localizationsDelegates,
+                ...UiKitLocalizations.localizationsDelegates,
+              ],
+              supportedLocales: AppLocalizations.supportedLocales,
+              locale: state.locale,
+              home: CriticalErrorPage(
+                exception:
+                    state.initialRemoteConfigError ??
+                    state.initialUserPreferencesError ??
+                    const UnknownException(
+                      'An unknown critical error occurred.',
+                    ),
+                onRetry: () {
+                  // If remote config failed, retry remote config.
+                  // If user preferences failed, retry AppStarted.
+                  if (state.initialRemoteConfigError != null) {
+                    context.read<AppBloc>().add(
+                      const AppPeriodicConfigFetchRequested(
+                        isBackgroundCheck: false,
+                      ),
+                    );
+                  } else if (state.initialUserPreferencesError != null) {
+                    context.read<AppBloc>().add(
+                      AppStarted(initialUser: state.user),
+                    );
+                  } else {
+                    // Fallback for unknown critical error
+                    context.read<AppBloc>().add(
+                      AppStarted(initialUser: state.user),
+                    );
+                  }
+                },
+              ),
+            );
+          }
+
           if (state.status == AppLifeCycleStatus.underMaintenance) {
             // The app is in maintenance mode. Show the MaintenancePage.
             //
@@ -278,15 +364,15 @@ class _AppViewState extends State<_AppView> {
               debugShowCheckedModeBanner: false,
               theme: lightTheme(
                 scheme: FlexScheme.material,
-                appTextScaleFactor: AppTextScaleFactor.medium,
-                appFontWeight: AppFontWeight.regular,
-                fontFamily: null,
+                appTextScaleFactor: state.appTextScaleFactor,
+                appFontWeight: state.appFontWeight,
+                fontFamily: state.fontFamily,
               ),
               darkTheme: darkTheme(
                 scheme: FlexScheme.material,
-                appTextScaleFactor: AppTextScaleFactor.medium,
-                appFontWeight: AppFontWeight.regular,
-                fontFamily: null,
+                appTextScaleFactor: state.appTextScaleFactor,
+                appFontWeight: state.appFontWeight,
+                fontFamily: state.fontFamily,
               ),
               themeMode: state.themeMode,
               localizationsDelegates: const [
@@ -305,15 +391,15 @@ class _AppViewState extends State<_AppView> {
               debugShowCheckedModeBanner: false,
               theme: lightTheme(
                 scheme: FlexScheme.material,
-                appTextScaleFactor: AppTextScaleFactor.medium,
-                appFontWeight: AppFontWeight.regular,
-                fontFamily: null,
+                appTextScaleFactor: state.appTextScaleFactor,
+                appFontWeight: state.appFontWeight,
+                fontFamily: state.fontFamily,
               ),
               darkTheme: darkTheme(
                 scheme: FlexScheme.material,
-                appTextScaleFactor: AppTextScaleFactor.medium,
-                appFontWeight: AppFontWeight.regular,
-                fontFamily: null,
+                appTextScaleFactor: state.appTextScaleFactor,
+                appFontWeight: state.appFontWeight,
+                fontFamily: state.fontFamily,
               ),
               themeMode: state.themeMode,
               localizationsDelegates: const [
@@ -326,24 +412,26 @@ class _AppViewState extends State<_AppView> {
             );
           }
 
-          if (state.status == AppLifeCycleStatus.configFetching ||
-              state.status == AppLifeCycleStatus.configFetchFailed) {
-            // The app is in the process of fetching its initial remote
-            // configuration or has failed to do so. The StatusPage handles
-            // both the loading indicator and the retry mechanism.
+          // --- Loading User Data State ---
+          // --- Loading User Data State ---
+          // Display a loading screen ONLY if the app is actively trying to load
+          // user-specific data (settings or preferences) for an authenticated/anonymous user.
+          // If the status is unauthenticated, it means there's no user data to load,
+          // and the app should proceed to the router to show the authentication page.
+          if (state.status == AppLifeCycleStatus.loadingUserData) {
             return MaterialApp(
               debugShowCheckedModeBanner: false,
               theme: lightTheme(
                 scheme: FlexScheme.material,
-                appTextScaleFactor: AppTextScaleFactor.medium,
-                appFontWeight: AppFontWeight.regular,
-                fontFamily: null,
+                appTextScaleFactor: state.appTextScaleFactor,
+                appFontWeight: state.appFontWeight,
+                fontFamily: state.fontFamily,
               ),
               darkTheme: darkTheme(
                 scheme: FlexScheme.material,
-                appTextScaleFactor: AppTextScaleFactor.medium,
-                appFontWeight: AppFontWeight.regular,
-                fontFamily: null,
+                appTextScaleFactor: state.appTextScaleFactor,
+                appFontWeight: state.appFontWeight,
+                fontFamily: state.fontFamily,
               ),
               themeMode: state.themeMode,
               localizationsDelegates: const [
@@ -352,25 +440,37 @@ class _AppViewState extends State<_AppView> {
               ],
               supportedLocales: AppLocalizations.supportedLocales,
               locale: state.locale,
-              home: const StatusPage(),
+              home: Builder(
+                builder: (context) {
+                  return LoadingStateWidget(
+                    icon: Icons.sync,
+                    headline: AppLocalizations.of(context).settingsLoadingHeadline,
+                    subheadline: AppLocalizations.of(
+                      context,
+                    ).settingsLoadingSubheadline,
+                  );
+                },
+              ),
             );
           }
 
           // --- Main Application UI ---
-          // If none of the critical states above are met, the app is ready
-          // to display its main UI. We build the MaterialApp.router here.
+          // If none of the critical states above are met, and user settings
+          // are loaded, the app is ready to display its main UI.
+          // We build the MaterialApp.router here.
           // This is the single, STABLE root widget for the entire main app.
           //
           // WHY IS THIS SO IMPORTANT?
           // Because this widget is now built conditionally inside a single
           // BlocBuilder, it is created only ONCE when the app enters a
-          // "running" state (e.g., authenticated, anonymous). It is no longer
-          // destroyed and rebuilt during startup, which was the root cause of
-          // the `BuildContext` instability and the `l10n` crashes.
+          // "running" state (e.g., authenticated, anonymous) with all
+          // necessary data. It is no longer destroyed and rebuilt during
+          // startup, which was the root cause of the `BuildContext` instability
+          // and the `l10n` crashes.
           //
           // THEME CONFIGURATION:
-          // Unlike the status pages, this MaterialApp is themed using the full,
-          // detailed settings loaded into the AppState (e.g., `state.flexScheme`,
+          // This MaterialApp is themed using the full, detailed settings
+          // loaded into the AppState (e.g., `state.flexScheme`,
           // `state.settings.displaySettings...`), providing the complete,
           // personalized user experience.
           return MaterialApp.router(
@@ -378,17 +478,15 @@ class _AppViewState extends State<_AppView> {
             themeMode: state.themeMode,
             theme: lightTheme(
               scheme: state.flexScheme,
-              appTextScaleFactor:
-                  state.settings.displaySettings.textScaleFactor,
-              appFontWeight: state.settings.displaySettings.fontWeight,
-              fontFamily: state.settings.displaySettings.fontFamily,
+              appTextScaleFactor: state.appTextScaleFactor,
+              appFontWeight: state.appFontWeight,
+              fontFamily: state.fontFamily,
             ),
             darkTheme: darkTheme(
               scheme: state.flexScheme,
-              appTextScaleFactor:
-                  state.settings.displaySettings.textScaleFactor,
-              appFontWeight: state.settings.displaySettings.fontWeight,
-              fontFamily: state.settings.displaySettings.fontFamily,
+              appTextScaleFactor: state.appTextScaleFactor,
+              appFontWeight: state.appFontWeight,
+              fontFamily: state.fontFamily,
             ),
             routerConfig: _router,
             locale: state.locale,

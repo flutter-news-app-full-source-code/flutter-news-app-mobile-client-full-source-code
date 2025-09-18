@@ -2,8 +2,8 @@ import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/available_sources_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -47,14 +47,14 @@ class AddSourceToFollowPage extends StatelessWidget {
               );
             }
 
-            return BlocBuilder<AccountBloc, AccountState>(
+            return BlocBuilder<AppBloc, AppState>(
               buildWhen: (previous, current) =>
-                  previous.preferences?.followedSources !=
-                      current.preferences?.followedSources ||
-                  previous.status != current.status,
-              builder: (context, accountState) {
+                  previous.userContentPreferences?.followedSources !=
+                  current.userContentPreferences?.followedSources,
+              builder: (context, appState) {
+                final userContentPreferences = appState.userContentPreferences;
                 final followedSources =
-                    accountState.preferences?.followedSources ?? [];
+                    userContentPreferences?.followedSources ?? [];
 
                 return ListView.builder(
                   padding: const EdgeInsets.all(AppSpacing.md),
@@ -80,8 +80,28 @@ class AddSourceToFollowPage extends StatelessWidget {
                               ? l10n.unfollowSourceTooltip(source.name)
                               : l10n.followSourceTooltip(source.name),
                           onPressed: () {
-                            context.read<AccountBloc>().add(
-                              AccountFollowSourceToggled(source: source),
+                            if (userContentPreferences == null) return;
+
+                            final updatedFollowedSources = List<Source>.from(
+                              followedSources,
+                            );
+                            if (isFollowed) {
+                              updatedFollowedSources.removeWhere(
+                                (s) => s.id == source.id,
+                              );
+                            } else {
+                              updatedFollowedSources.add(source);
+                            }
+
+                            final updatedPreferences = userContentPreferences
+                                .copyWith(
+                                  followedSources: updatedFollowedSources,
+                                );
+
+                            context.read<AppBloc>().add(
+                              AppUserContentPreferencesChanged(
+                                preferences: updatedPreferences,
+                              ),
                             );
                           },
                         ),

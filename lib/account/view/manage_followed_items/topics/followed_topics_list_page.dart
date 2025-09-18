@@ -1,8 +1,8 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/interstitial_ad_manager.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:go_router/go_router.dart';
@@ -18,8 +18,6 @@ class FollowedTopicsListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
-    final followedTopics =
-        context.watch<AccountBloc>().state.preferences?.followedTopics ?? [];
 
     return Scaffold(
       appBar: AppBar(
@@ -34,10 +32,13 @@ class FollowedTopicsListPage extends StatelessWidget {
           ),
         ],
       ),
-      body: BlocBuilder<AccountBloc, AccountState>(
-        builder: (context, state) {
-          if (state.status == AccountStatus.loading &&
-              state.preferences == null) {
+      body: BlocBuilder<AppBloc, AppState>(
+        builder: (context, appState) {
+          final user = appState.user;
+          final userContentPreferences = appState.userContentPreferences;
+
+          if (appState.status == AppLifeCycleStatus.loadingUserData ||
+              userContentPreferences == null) {
             return LoadingStateWidget(
               icon: Icons.topic_outlined,
               headline: l10n.followedTopicsLoadingHeadline,
@@ -45,21 +46,16 @@ class FollowedTopicsListPage extends StatelessWidget {
             );
           }
 
-          if (state.status == AccountStatus.failure &&
-              state.preferences == null) {
+          if (appState.initialUserPreferencesError != null) {
             return FailureStateWidget(
-              exception:
-                  state.error ??
-                  OperationFailedException(l10n.followedTopicsErrorHeadline),
+              exception: appState.initialUserPreferencesError!,
               onRetry: () {
-                if (state.user?.id != null) {
-                  context.read<AccountBloc>().add(
-                    AccountLoadUserPreferences(userId: state.user!.id),
-                  );
-                }
+                context.read<AppBloc>().add(AppStarted(initialUser: user));
               },
             );
           }
+
+          final followedTopics = userContentPreferences.followedTopics;
 
           if (followedTopics.isEmpty) {
             return InitialStateWidget(
@@ -96,8 +92,18 @@ class FollowedTopicsListPage extends StatelessWidget {
                   ),
                   tooltip: l10n.unfollowTopicTooltip(topic.name),
                   onPressed: () {
-                    context.read<AccountBloc>().add(
-                      AccountFollowTopicToggled(topic: topic),
+                    final updatedFollowedTopics = List<Topic>.from(
+                      followedTopics,
+                    )..removeWhere((t) => t.id == topic.id);
+
+                    final updatedPreferences = userContentPreferences.copyWith(
+                      followedTopics: updatedFollowedTopics,
+                    );
+
+                    context.read<AppBloc>().add(
+                      AppUserContentPreferencesChanged(
+                        preferences: updatedPreferences,
+                      ),
                     );
                   },
                 ),

@@ -6,7 +6,6 @@ import 'package:core/core.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/account_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/in_article_ad_loader_widget.dart';
@@ -67,42 +66,33 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       },
       child: SafeArea(
         child: Scaffold(
-          body: BlocListener<AccountBloc, AccountState>(
+          body: BlocListener<AppBloc, AppState>(
             listenWhen: (previous, current) {
               final detailsState = context.read<HeadlineDetailsBloc>().state;
               if (detailsState is HeadlineDetailsLoaded) {
                 final currentHeadlineId = detailsState.headline.id;
                 final wasPreviouslySaved =
-                    previous.preferences?.savedHeadlines.any(
+                    previous.userContentPreferences?.savedHeadlines.any(
                       (h) => h.id == currentHeadlineId,
                     ) ??
                     false;
                 final isCurrentlySaved =
-                    current.preferences?.savedHeadlines.any(
+                    current.userContentPreferences?.savedHeadlines.any(
                       (h) => h.id == currentHeadlineId,
                     ) ??
                     false;
-                if (wasPreviouslySaved != isCurrentlySaved) {
-                  return current.status == AccountStatus.success ||
-                      current.status == AccountStatus.failure;
-                }
-                if (current.status == AccountStatus.failure &&
-                    previous.status == AccountStatus.loading) {
-                  return true;
-                }
+
+                // Listen for changes in saved status or errors during persistence
+                return (wasPreviouslySaved != isCurrentlySaved) ||
+                    (current.initialUserPreferencesError != null &&
+                        previous.initialUserPreferencesError == null);
               }
               return false;
             },
-            listener: (context, accountState) {
+            listener: (context, appState) {
               final detailsState = context.read<HeadlineDetailsBloc>().state;
               if (detailsState is HeadlineDetailsLoaded) {
-                final nowIsSaved =
-                    accountState.preferences?.savedHeadlines.any(
-                      (h) => h.id == detailsState.headline.id,
-                    ) ??
-                    false;
-                if (accountState.status == AccountStatus.failure &&
-                    accountState.error != null) {
+                if (appState.initialUserPreferencesError != null) {
                   ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
                     ..showSnackBar(
@@ -112,6 +102,11 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                       ),
                     );
                 } else {
+                  final nowIsSaved =
+                      appState.userContentPreferences?.savedHeadlines.any(
+                        (h) => h.id == detailsState.headline.id,
+                      ) ??
+                      false;
                   ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
                     ..showSnackBar(
@@ -174,9 +169,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       horizontal: AppSpacing.paddingLarge,
     );
 
-    final accountState = context.watch<AccountBloc>().state;
+    final appBlocState = context.watch<AppBloc>().state;
     final isSaved =
-        accountState.preferences?.savedHeadlines.any(
+        appBlocState.userContentPreferences?.savedHeadlines.any(
           (h) => h.id == headline.id,
         ) ??
         false;
@@ -190,8 +185,36 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           ? l10n.headlineDetailsRemoveFromSavedTooltip
           : l10n.headlineDetailsSaveTooltip,
       onPressed: () {
-        context.read<AccountBloc>().add(
-          AccountSaveHeadlineToggled(headline: headline),
+        final currentPreferences = appBlocState.userContentPreferences;
+        if (currentPreferences == null) {
+          // Handle case where preferences are not loaded (e.g., show error)
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                content: Text(l10n.headlineSaveErrorSnackbar),
+                backgroundColor: Theme.of(context).colorScheme.error,
+              ),
+            );
+          return;
+        }
+
+        final List<Headline> updatedSavedHeadlines;
+        if (isSaved) {
+          updatedSavedHeadlines = currentPreferences.savedHeadlines
+              .where((h) => h.id != headline.id)
+              .toList();
+        } else {
+          updatedSavedHeadlines = List.from(currentPreferences.savedHeadlines)
+            ..add(headline);
+        }
+
+        final updatedPreferences = currentPreferences.copyWith(
+          savedHeadlines: updatedSavedHeadlines,
+        );
+
+        context.read<AppBloc>().add(
+          AppUserContentPreferencesChanged(preferences: updatedPreferences),
         );
       },
     );
@@ -240,7 +263,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       },
     );
 
-    final appBlocState = context.watch<AppBloc>().state;
     final adConfig = appBlocState.remoteConfig?.adConfig;
     final adThemeStyle = AdThemeStyle.fromTheme(Theme.of(context));
 
@@ -663,8 +685,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                     final imageStyle = context
                         .watch<AppBloc>()
                         .state
-                        .settings
-                        .feedPreferences
                         .headlineImageStyle;
                     Widget tile;
                     switch (imageStyle) {

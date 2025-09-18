@@ -429,7 +429,6 @@ Future<Widget> bootstrap(
       ? DemoDataInitializerService(
           userAppSettingsRepository: userAppSettingsRepository,
           userContentPreferencesRepository: userContentPreferencesRepository,
-          userRepository: userRepository,
         )
       : null;
 
@@ -453,7 +452,6 @@ Future<Widget> bootstrap(
     localAdRepository: localAdRepository,
     navigatorKey: navigatorKey,
     initialRemoteConfig: initialRemoteConfig,
-    initialRemoteConfigError:
-        initialRemoteConfigError,
+    initialRemoteConfigError: initialRemoteConfigError,
   );
 }

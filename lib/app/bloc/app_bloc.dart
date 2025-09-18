@@ -143,12 +143,17 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         '[AppBloc] Failed to fetch user settings (HttpException) '
         'for user ${user.id}: ${e.runtimeType} - ${e.message}',
       );
-      emit(
-        state.copyWith(
-          status: AppLifeCycleStatus.criticalError,
-          initialUserPreferencesError: e,
-        ),
-      );
+      // In demo mode, NotFoundException for user settings is expected if not yet initialized.
+      // Do not transition to criticalError immediately.
+      if (_environment != local_config.AppEnvironment.demo ||
+          e is! NotFoundException) {
+        emit(
+          state.copyWith(
+            status: AppLifeCycleStatus.criticalError,
+            initialUserPreferencesError: e,
+          ),
+        );
+      }
     } catch (e, s) {
       _logger.severe(
         '[AppBloc] Unexpected error during user settings fetch '
@@ -185,12 +190,17 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         '[AppBloc] Failed to fetch user content preferences (HttpException) '
         'for user ${user.id}: ${e.runtimeType} - ${e.message}',
       );
-      emit(
-        state.copyWith(
-          status: AppLifeCycleStatus.criticalError,
-          initialUserPreferencesError: e,
-        ),
-      );
+      // In demo mode, NotFoundException for user content preferences is expected if not yet initialized.
+      // Do not transition to criticalError immediately.
+      if (_environment != local_config.AppEnvironment.demo ||
+          e is! NotFoundException) {
+        emit(
+          state.copyWith(
+            status: AppLifeCycleStatus.criticalError,
+            initialUserPreferencesError: e,
+          ),
+        );
+      }
     } catch (e, s) {
       _logger.severe(
         '[AppBloc] Unexpected error during user content preferences fetch '
@@ -313,27 +323,35 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     emit(state.copyWith(status: newStatus));
 
-    // If a new user is present, fetch their specific data.
+    // If a new user is present, handle their data.
     if (newUser != null) {
+      // In demo mode, ensure user-specific data is initialized BEFORE fetching.
+      if (_environment == local_config.AppEnvironment.demo &&
+          demoDataInitializerService != null) {
+        try {
+          _logger.info('Demo mode: Initializing data for user ${newUser.id}.');
+          await demoDataInitializerService!.initializeUserSpecificData(newUser);
+          _logger.info(
+            'Demo mode: Data initialization complete for ${newUser.id}.',
+          );
+        } catch (e, s) {
+          _logger.severe('ERROR: Failed to initialize demo user data.', e, s);
+          // If demo data initialization fails, it's a critical error for demo mode.
+          emit(
+            state.copyWith(
+              status: AppLifeCycleStatus.criticalError,
+              initialUserPreferencesError: UnknownException(
+                'Failed to initialize demo user data: ${e.toString()}',
+              ),
+            ),
+          );
+          return; // Stop further processing if demo data init failed critically.
+        }
+      }
       await _fetchAndSetUserData(newUser, emit);
     } else {
       // If user logs out, clear user-specific data from state.
       emit(state.copyWith(settings: null, userContentPreferences: null));
-    }
-
-    // In demo mode, ensure user-specific data is initialized.
-    if (_environment == local_config.AppEnvironment.demo &&
-        demoDataInitializerService != null &&
-        newUser != null) {
-      try {
-        _logger.info('Demo mode: Initializing data for user ${newUser.id}.');
-        await demoDataInitializerService!.initializeUserSpecificData(newUser);
-        _logger.info(
-          'Demo mode: Data initialization complete for ${newUser.id}.',
-        );
-      } catch (e, s) {
-        _logger.severe('ERROR: Failed to initialize demo user data.', e, s);
-      }
     }
 
     // Handle data migration if an anonymous user signs in.
@@ -406,6 +424,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     final updatedSettings = event.settings;
 
+    // Optimistically update the state.
     emit(state.copyWith(settings: updatedSettings));
 
     try {

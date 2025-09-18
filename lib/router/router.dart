@@ -27,6 +27,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headline-details
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/similar_headlines_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/view/headline_details_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_filter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/country_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_feed_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_filter_page.dart';
@@ -455,22 +456,33 @@ GoRouter createRouter({
                       GoRoute(
                         path: Routes.feedFilterTopics,
                         name: Routes.feedFilterTopicsName,
-                        builder: (context, state) => const TopicFilterPage(),
+                        builder: (context, state) {
+                          final filterBloc =
+                              state.extra! as HeadlinesFilterBloc;
+                          return TopicFilterPage(filterBloc: filterBloc);
+                        },
                       ),
                       // Sub-route for source selection
                       GoRoute(
                         path: Routes.feedFilterSources,
                         name: Routes.feedFilterSourcesName,
-                        builder: (context, state) => const SourceFilterPage(),
+                        builder: (context, state) {
+                          final filterBloc =
+                              state.extra! as HeadlinesFilterBloc;
+                          return SourceFilterPage(filterBloc: filterBloc);
+                        },
                       ),
                       GoRoute(
                         path: Routes.feedFilterEventCountries,
                         name: Routes.feedFilterEventCountriesName,
                         pageBuilder: (context, state) {
                           final l10n = context.l10n;
+                          final filterBloc =
+                              state.extra! as HeadlinesFilterBloc;
                           return MaterialPage(
                             child: CountryFilterPage(
                               title: l10n.headlinesFeedFilterEventCountryLabel,
+                              filterBloc: filterBloc,
                             ),
                           );
                         },

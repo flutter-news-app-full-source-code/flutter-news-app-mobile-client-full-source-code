@@ -143,12 +143,17 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         '[AppBloc] Failed to fetch user settings (HttpException) '
         'for user ${user.id}: ${e.runtimeType} - ${e.message}',
       );
-      emit(
-        state.copyWith(
-          status: AppLifeCycleStatus.criticalError,
-          initialUserPreferencesError: e,
-        ),
-      );
+      // In demo mode, NotFoundException for user settings is expected if not yet initialized.
+      // Do not transition to criticalError immediately.
+      if (_environment != local_config.AppEnvironment.demo ||
+          e is! NotFoundException) {
+        emit(
+          state.copyWith(
+            status: AppLifeCycleStatus.criticalError,
+            initialUserPreferencesError: e,
+          ),
+        );
+      }
     } catch (e, s) {
       _logger.severe(
         '[AppBloc] Unexpected error during user settings fetch '
@@ -185,12 +190,17 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         '[AppBloc] Failed to fetch user content preferences (HttpException) '
         'for user ${user.id}: ${e.runtimeType} - ${e.message}',
       );
-      emit(
-        state.copyWith(
-          status: AppLifeCycleStatus.criticalError,
-          initialUserPreferencesError: e,
-        ),
-      );
+      // In demo mode, NotFoundException for user content preferences is expected if not yet initialized.
+      // Do not transition to criticalError immediately.
+      if (_environment != local_config.AppEnvironment.demo ||
+          e is! NotFoundException) {
+        emit(
+          state.copyWith(
+            status: AppLifeCycleStatus.criticalError,
+            initialUserPreferencesError: e,
+          ),
+        );
+      }
     } catch (e, s) {
       _logger.severe(
         '[AppBloc] Unexpected error during user content preferences fetch '
@@ -313,46 +323,86 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     emit(state.copyWith(status: newStatus));
 
-    // If a new user is present, fetch their specific data.
+    // If a new user is present, handle their data.
     if (newUser != null) {
+      // In demo mode, ensure essential user-specific data (settings,
+      // preferences, and the user object itself in the data client)
+      // are initialized if they don't already exist. This prevents
+      // NotFoundException during subsequent reads.
+      if (_environment == local_config.AppEnvironment.demo &&
+          demoDataInitializerService != null) {
+        _logger.info(
+          '[AppBloc] Demo mode: Initializing user-specific data for '
+          'user: ${newUser.id}',
+        );
+        try {
+          await demoDataInitializerService!.initializeUserSpecificData(newUser);
+          _logger.info(
+            '[AppBloc] Demo mode: User-specific data initialized for '
+            'user: ${newUser.id}.',
+          );
+        } catch (e, s) {
+          _logger.severe(
+            '[AppBloc] ERROR: Failed to initialize demo user data.',
+            e,
+            s,
+          );
+          emit(
+            state.copyWith(
+              status: AppLifeCycleStatus.criticalError,
+              initialUserPreferencesError: UnknownException(
+                'Failed to initialize demo user data: $e',
+              ),
+            ),
+          );
+          return; // Stop further processing if initialization failed critically.
+        }
+      }
+
+      // Handle data migration if an anonymous user signs in.
+      if (oldUser != null &&
+          oldUser.appRole == AppUserRole.guestUser &&
+          newUser.appRole == AppUserRole.standardUser) {
+        _logger.info(
+          '[AppBloc] Anonymous user ${oldUser.id} transitioned to '
+          'authenticated user ${newUser.id}. Attempting data migration.',
+        );
+        if (demoDataMigrationService != null &&
+            _environment == local_config.AppEnvironment.demo) {
+          try {
+            await demoDataMigrationService!.migrateAnonymousData(
+              oldUserId: oldUser.id,
+              newUserId: newUser.id,
+            );
+            _logger.info(
+              '[AppBloc] Demo mode: Data migration completed for ${newUser.id}.',
+            );
+          } catch (e, s) {
+            _logger.severe(
+              '[AppBloc] ERROR: Failed to migrate demo user data.',
+              e,
+              s,
+            );
+            // If demo data migration fails, it's a critical error for demo mode.
+            emit(
+              state.copyWith(
+                status: AppLifeCycleStatus.criticalError,
+                initialUserPreferencesError: UnknownException(
+                  'Failed to migrate demo user data: $e',
+                ),
+              ),
+            );
+            return; // Stop further processing if migration failed critically.
+          }
+        }
+      }
+
+      // After potential initialization and migration,
+      // ensure user-specific data (settings and preferences) are loaded.
       await _fetchAndSetUserData(newUser, emit);
     } else {
       // If user logs out, clear user-specific data from state.
       emit(state.copyWith(settings: null, userContentPreferences: null));
-    }
-
-    // In demo mode, ensure user-specific data is initialized.
-    if (_environment == local_config.AppEnvironment.demo &&
-        demoDataInitializerService != null &&
-        newUser != null) {
-      try {
-        _logger.info('Demo mode: Initializing data for user ${newUser.id}.');
-        await demoDataInitializerService!.initializeUserSpecificData(newUser);
-        _logger.info(
-          'Demo mode: Data initialization complete for ${newUser.id}.',
-        );
-      } catch (e, s) {
-        _logger.severe('ERROR: Failed to initialize demo user data.', e, s);
-      }
-    }
-
-    // Handle data migration if an anonymous user signs in.
-    if (oldUser != null &&
-        oldUser.appRole == AppUserRole.guestUser &&
-        newUser != null &&
-        newUser.appRole == AppUserRole.standardUser) {
-      _logger.info(
-        'Anonymous user ${oldUser.id} transitioned to authenticated user '
-        '${newUser.id}. Attempting data migration.',
-      );
-      if (demoDataMigrationService != null &&
-          _environment == local_config.AppEnvironment.demo) {
-        await demoDataMigrationService!.migrateAnonymousData(
-          oldUserId: oldUser.id,
-          newUserId: newUser.id,
-        );
-        _logger.info('Demo mode: Data migration completed for ${newUser.id}.');
-      }
     }
   }
 
@@ -406,6 +456,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     final updatedSettings = event.settings;
 
+    // Optimistically update the state.
     emit(state.copyWith(settings: updatedSettings));
 
     try {

@@ -444,7 +444,9 @@ class _AppViewState extends State<_AppView> {
                 builder: (context) {
                   return LoadingStateWidget(
                     icon: Icons.sync,
-                    headline: AppLocalizations.of(context).settingsLoadingHeadline,
+                    headline: AppLocalizations.of(
+                      context,
+                    ).settingsLoadingHeadline,
                     subheadline: AppLocalizations.of(
                       context,
                     ).settingsLoadingSubheadline,

@@ -1,5 +1,6 @@
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
+import 'package:logging/logging.dart'; // Import Logger
 
 /// {@template demo_data_migration_service}
 /// A service responsible for migrating user data (settings and preferences)
@@ -11,16 +12,18 @@ import 'package:data_repository/data_repository.dart';
 /// {@endtemplate}
 class DemoDataMigrationService {
   /// {@macro demo_data_migration_service}
-  const DemoDataMigrationService({
+  DemoDataMigrationService({
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
   }) : _userAppSettingsRepository = userAppSettingsRepository,
-       _userContentPreferencesRepository = userContentPreferencesRepository;
+       _userContentPreferencesRepository = userContentPreferencesRepository,
+       _logger = Logger('DemoDataMigrationService');
 
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
+  final Logger _logger;
 
   /// Migrates user settings and content preferences from an old anonymous
   /// user ID to a new authenticated user ID.
@@ -31,7 +34,7 @@ class DemoDataMigrationService {
     required String oldUserId,
     required String newUserId,
   }) async {
-    print(
+    _logger.info(
       '[DemoDataMigrationService] Attempting to migrate data from '
       'anonymous user ID: $oldUserId to authenticated user ID: $newUserId',
     );
@@ -70,19 +73,21 @@ class DemoDataMigrationService {
       }
 
       await _userAppSettingsRepository.delete(id: oldUserId, userId: oldUserId);
-      print(
+      _logger.info(
         '[DemoDataMigrationService] UserAppSettings migrated successfully '
         'from $oldUserId to $newUserId.',
       );
     } on NotFoundException {
-      print(
+      _logger.info(
         '[DemoDataMigrationService] No UserAppSettings found for old user ID: '
         '$oldUserId. Skipping migration for settings.',
       );
     } catch (e, s) {
-      print(
+      _logger.severe(
         '[DemoDataMigrationService] Error migrating UserAppSettings from '
-        '$oldUserId to $newUserId: $e\n$s',
+        '$oldUserId to $newUserId: $e',
+        e,
+        s,
       );
     }
 
@@ -123,19 +128,21 @@ class DemoDataMigrationService {
         id: oldUserId,
         userId: oldUserId,
       );
-      print(
+      _logger.info(
         '[DemoDataMigrationService] UserContentPreferences migrated '
         'successfully from $oldUserId to $newUserId.',
       );
     } on NotFoundException {
-      print(
+      _logger.info(
         '[DemoDataMigrationService] No UserContentPreferences found for old '
         'user ID: $oldUserId. Skipping migration for preferences.',
       );
     } catch (e, s) {
-      print(
+      _logger.severe(
         '[DemoDataMigrationService] Error migrating UserContentPreferences '
-        'from $oldUserId to $newUserId: $e\n$s',
+        'from $oldUserId to $newUserId: $e',
+        e,
+        s,
       );
     }
   }

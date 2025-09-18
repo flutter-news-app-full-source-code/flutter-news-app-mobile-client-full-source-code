@@ -14,9 +14,34 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class CountryFilterPage extends StatelessWidget {
   /// {@macro country_filter_page}
-  const CountryFilterPage({required this.title, super.key});
+  ///
+  /// Requires a [title] for the app bar and the [filterBloc] instance
+  /// passed from the parent route.
+  const CountryFilterPage({
+    required this.title,
+    required this.filterBloc,
+    super.key,
+  });
 
   /// The title to display in the app bar for this filter page.
+  final String title;
+
+  /// The instance of [HeadlinesFilterBloc] provided by the parent route.
+  final HeadlinesFilterBloc filterBloc;
+
+  @override
+  Widget build(BuildContext context) {
+    // Provide the existing filterBloc to this subtree.
+    return BlocProvider.value(
+      value: filterBloc,
+      child: _CountryFilterView(title: title),
+    );
+  }
+}
+
+class _CountryFilterView extends StatelessWidget {
+  const _CountryFilterView({required this.title});
+
   final String title;
 
   @override

@@ -49,7 +49,7 @@ Future<Widget> bootstrap(
 
   // Initialize InlineAdCacheService early as it's a singleton and needs AdService.
   // It will be fully configured once AdService is available.
-  late final InlineAdCacheService inlineAdCacheService;
+  InlineAdCacheService? inlineAdCacheService;
 
   // 2. Initialize HttpClient. Its tokenProvider now directly reads from
   // kvStorage, breaking the circular dependency with AuthRepository.
@@ -420,12 +420,15 @@ Future<Widget> bootstrap(
       : null;
 
   // Conditionally instantiate DemoDataInitializerService
+  // This service is responsible for ensuring that essential user-specific data
+  // (like UserAppSettings, UserContentPreferences)
+  // exists in the data in-memory clients when a user is first encountered
+  // in the demo environment.
   final demoDataInitializerService =
       appConfig.environment == app_config.AppEnvironment.demo
       ? DemoDataInitializerService(
           userAppSettingsRepository: userAppSettingsRepository,
           userContentPreferencesRepository: userContentPreferencesRepository,
-          userRepository: userRepository,
         )
       : null;
 
@@ -449,7 +452,6 @@ Future<Widget> bootstrap(
     localAdRepository: localAdRepository,
     navigatorKey: navigatorKey,
     initialRemoteConfig: initialRemoteConfig,
-    initialRemoteConfigError:
-        initialRemoteConfigError,
+    initialRemoteConfigError: initialRemoteConfigError,
   );
 }

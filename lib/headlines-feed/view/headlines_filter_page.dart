@@ -82,9 +82,13 @@ class _HeadlinesFilterView extends StatelessWidget {
       enabled: enabled,
       onTap: enabled
           ? () {
-              // Navigate to the child filter page. The child page will read
-              // the current selections from HeadlinesFilterBloc directly.
-              context.pushNamed(routeName);
+              // Navigate to the child filter page, passing the current
+              // HeadlinesFilterBloc instance as an extra argument.
+              // This ensures the child page can access the bloc directly.
+              context.pushNamed(
+                routeName,
+                extra: context.read<HeadlinesFilterBloc>(),
+              );
             }
           : null,
     );

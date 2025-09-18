@@ -447,9 +447,9 @@ Future<Widget> bootstrap(
     inlineAdCacheService: inlineAdCacheService,
     initialUser: initialUser,
     localAdRepository: localAdRepository,
-    navigatorKey: navigatorKey, // Pass the navigatorKey to App
-    initialRemoteConfig: initialRemoteConfig, // Pass the initialRemoteConfig
+    navigatorKey: navigatorKey,
+    initialRemoteConfig: initialRemoteConfig,
     initialRemoteConfigError:
-        initialRemoteConfigError, // Pass the initialRemoteConfigError
+        initialRemoteConfigError,
   );
 }

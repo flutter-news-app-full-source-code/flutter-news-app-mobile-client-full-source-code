@@ -325,18 +325,28 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     // If a new user is present, handle their data.
     if (newUser != null) {
-      // In demo mode, ensure user-specific data is initialized BEFORE fetching.
+      // In demo mode, ensure essential user-specific data (settings,
+      // preferences, and the user object itself in the data client)
+      // are initialized if they don't already exist. This prevents
+      // NotFoundException during subsequent reads.
       if (_environment == local_config.AppEnvironment.demo &&
           demoDataInitializerService != null) {
+        _logger.info(
+          '[AppBloc] Demo mode: Initializing user-specific data for '
+          'user: ${newUser.id}',
+        );
         try {
-          _logger.info('Demo mode: Initializing data for user ${newUser.id}.');
           await demoDataInitializerService!.initializeUserSpecificData(newUser);
           _logger.info(
-            'Demo mode: Data initialization complete for ${newUser.id}.',
+            '[AppBloc] Demo mode: User-specific data initialized for '
+            'user: ${newUser.id}.',
           );
         } catch (e, s) {
-          _logger.severe('ERROR: Failed to initialize demo user data.', e, s);
-          // If demo data initialization fails, it's a critical error for demo mode.
+          _logger.severe(
+            '[AppBloc] ERROR: Failed to initialize demo user data.',
+            e,
+            s,
+          );
           emit(
             state.copyWith(
               status: AppLifeCycleStatus.criticalError,
@@ -345,32 +355,54 @@ class AppBloc extends Bloc<AppEvent, AppState> {
               ),
             ),
           );
-          return; // Stop further processing if demo data init failed critically.
+          return; // Stop further processing if initialization failed critically.
         }
       }
+
+      // Handle data migration if an anonymous user signs in.
+      if (oldUser != null &&
+          oldUser.appRole == AppUserRole.guestUser &&
+          newUser.appRole == AppUserRole.standardUser) {
+        _logger.info(
+          '[AppBloc] Anonymous user ${oldUser.id} transitioned to '
+          'authenticated user ${newUser.id}. Attempting data migration.',
+        );
+        if (demoDataMigrationService != null &&
+            _environment == local_config.AppEnvironment.demo) {
+          try {
+            await demoDataMigrationService!.migrateAnonymousData(
+              oldUserId: oldUser.id,
+              newUserId: newUser.id,
+            );
+            _logger.info(
+              '[AppBloc] Demo mode: Data migration completed for ${newUser.id}.',
+            );
+          } catch (e, s) {
+            _logger.severe(
+              '[AppBloc] ERROR: Failed to migrate demo user data.',
+              e,
+              s,
+            );
+            // If demo data migration fails, it's a critical error for demo mode.
+            emit(
+              state.copyWith(
+                status: AppLifeCycleStatus.criticalError,
+                initialUserPreferencesError: UnknownException(
+                  'Failed to migrate demo user data: ${e.toString()}',
+                ),
+              ),
+            );
+            return; // Stop further processing if migration failed critically.
+          }
+        }
+      }
+
+      // After potential initialization and migration,
+      // ensure user-specific data (settings and preferences) are loaded.
       await _fetchAndSetUserData(newUser, emit);
     } else {
       // If user logs out, clear user-specific data from state.
       emit(state.copyWith(settings: null, userContentPreferences: null));
-    }
-
-    // Handle data migration if an anonymous user signs in.
-    if (oldUser != null &&
-        oldUser.appRole == AppUserRole.guestUser &&
-        newUser != null &&
-        newUser.appRole == AppUserRole.standardUser) {
-      _logger.info(
-        'Anonymous user ${oldUser.id} transitioned to authenticated user '
-        '${newUser.id}. Attempting data migration.',
-      );
-      if (demoDataMigrationService != null &&
-          _environment == local_config.AppEnvironment.demo) {
-        await demoDataMigrationService!.migrateAnonymousData(
-          oldUserId: oldUser.id,
-          newUserId: newUser.id,
-        );
-        _logger.info('Demo mode: Data migration completed for ${newUser.id}.');
-      }
     }
   }
 

@@ -19,11 +19,20 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class SourceFilterPage extends StatelessWidget {
   /// {@macro source_filter_page}
-  const SourceFilterPage({super.key});
+  ///
+  /// Requires the [filterBloc] instance passed from the parent route.
+  const SourceFilterPage({required this.filterBloc, super.key});
+
+  /// The instance of [HeadlinesFilterBloc] provided by the parent route.
+  final HeadlinesFilterBloc filterBloc;
 
   @override
   Widget build(BuildContext context) {
-    return const _SourceFilterView();
+    // Provide the existing filterBloc to this subtree.
+    return BlocProvider.value(
+      value: filterBloc,
+      child: const _SourceFilterView(),
+    );
   }
 }
 

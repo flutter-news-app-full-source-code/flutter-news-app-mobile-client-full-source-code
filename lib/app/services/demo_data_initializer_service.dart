@@ -17,16 +17,13 @@ class DemoDataInitializerService {
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
-    required DataRepository<User> userRepository,
   }) : _userAppSettingsRepository = userAppSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
-       _userRepository = userRepository, // Retained for consistency in constructor, but not used internally by this service.
        _logger = Logger('DemoDataInitializerService'); // Initialize logger
 
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
-  final DataRepository<User> _userRepository; // Retained for consistency in constructor, but not used internally by this service.
   final Logger _logger; // Add logger instance
 
   /// Initializes essential user-specific data in the in-memory clients

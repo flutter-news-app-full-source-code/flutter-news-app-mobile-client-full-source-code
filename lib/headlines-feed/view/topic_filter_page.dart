@@ -14,7 +14,25 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class TopicFilterPage extends StatelessWidget {
   /// {@macro topic_filter_page}
-  const TopicFilterPage({super.key});
+  ///
+  /// Requires the [filterBloc] instance passed from the parent route.
+  const TopicFilterPage({required this.filterBloc, super.key});
+
+  /// The instance of [HeadlinesFilterBloc] provided by the parent route.
+  final HeadlinesFilterBloc filterBloc;
+
+  @override
+  Widget build(BuildContext context) {
+    // Provide the existing filterBloc to this subtree.
+    return BlocProvider.value(
+      value: filterBloc,
+      child: const _TopicFilterView(),
+    );
+  }
+}
+
+class _TopicFilterView extends StatelessWidget {
+  const _TopicFilterView();
 
   @override
   Widget build(BuildContext context) {

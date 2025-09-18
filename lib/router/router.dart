@@ -26,10 +26,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/v
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/headline_details_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/similar_headlines_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/view/headline_details_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/countries_filter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/sources_filter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/topics_filter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/country_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_feed_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_filter_page.dart';
@@ -276,7 +273,6 @@ GoRouter createRouter({
           final adThemeStyle = AdThemeStyle.fromTheme(Theme.of(context));
           return MultiBlocProvider(
             providers: [
-              BlocProvider.value(value: accountBloc),
               BlocProvider(
                 create: (context) =>
                     EntityDetailsBloc(
@@ -333,15 +329,8 @@ GoRouter createRouter({
           final headlineFromExtra = state.extra as Headline?;
           final headlineIdFromPath = state.pathParameters['id'];
 
-          // Ensure accountBloc is available if needed by HeadlineDetailsPage
-          // or its descendants for actions like saving.
-          // If AccountBloc is already provided higher up (e.g., in AppShell or App),
-          // this specific BlocProvider.value might not be strictly necessary here,
-          // but it's safer to ensure it's available for this top-level route.
-          // We are using the `accountBloc` instance created at the top of `createRouter`.
           return MultiBlocProvider(
             providers: [
-              BlocProvider.value(value: accountBloc),
               BlocProvider(
                 create: (context) => HeadlineDetailsBloc(
                   headlinesRepository: context.read<DataRepository<Headline>>(),
@@ -366,14 +355,11 @@ GoRouter createRouter({
           // Return the shell widget which contains the AdaptiveScaffold
           return MultiBlocProvider(
             providers: [
-              BlocProvider.value(value: accountBloc),
               BlocProvider(
                 create: (context) {
                   return HeadlinesFeedBloc(
                     headlinesRepository: context
                         .read<DataRepository<Headline>>(),
-                    userContentPreferencesRepository: context
-                        .read<DataRepository<UserContentPreferences>>(),
                     feedDecoratorService: feedDecoratorService,
                     appBloc: context.read<AppBloc>(),
                     inlineAdCacheService: inlineAdCacheService,
@@ -417,7 +403,6 @@ GoRouter createRouter({
 
                       return MultiBlocProvider(
                         providers: [
-                          BlocProvider.value(value: accountBloc),
                           BlocProvider(
                             create: (context) => HeadlineDetailsBloc(
                               headlinesRepository: context
@@ -513,7 +498,6 @@ GoRouter createRouter({
                       final headlineIdFromPath = state.pathParameters['id'];
                       return MultiBlocProvider(
                         providers: [
-                          BlocProvider.value(value: accountBloc),
                           BlocProvider(
                             create: (context) => HeadlineDetailsBloc(
                               headlinesRepository: context
@@ -695,7 +679,6 @@ GoRouter createRouter({
                           final headlineIdFromPath = state.pathParameters['id'];
                           return MultiBlocProvider(
                             providers: [
-                              BlocProvider.value(value: accountBloc),
                               BlocProvider(
                                 create: (context) => HeadlineDetailsBloc(
                                   headlinesRepository: context

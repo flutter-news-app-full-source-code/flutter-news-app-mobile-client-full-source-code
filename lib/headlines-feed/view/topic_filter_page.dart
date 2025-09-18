@@ -36,7 +36,8 @@ class TopicFilterPage extends StatelessWidget {
                   appState.userContentPreferences?.followedTopics ?? [];
 
               // Determine if the current selection matches the followed topics
-              final isFollowedFilterActive = followedTopics.isNotEmpty &&
+              final isFollowedFilterActive =
+                  followedTopics.isNotEmpty &&
                   filterState.selectedTopics.length == followedTopics.length &&
                   filterState.selectedTopics.containsAll(followedTopics);
 
@@ -61,10 +62,10 @@ class TopicFilterPage extends StatelessWidget {
                   } else {
                     // Toggle the followed items filter in the HeadlinesFilterBloc
                     context.read<HeadlinesFilterBloc>().add(
-                          FollowedItemsFilterToggled(
-                            isUsingFollowedItems: !isFollowedFilterActive,
-                          ),
-                        );
+                      FollowedItemsFilterToggled(
+                        isUsingFollowedItems: !isFollowedFilterActive,
+                      ),
+                    );
                   }
                 },
               );
@@ -100,18 +101,21 @@ class TopicFilterPage extends StatelessWidget {
               filterState.allTopics.isEmpty) {
             return Center(
               child: FailureStateWidget(
-                exception: filterState.error ??
+                exception:
+                    filterState.error ??
                     const UnknownException(
                       'An unknown error occurred while fetching topics.',
                     ),
                 onRetry: () => context.read<HeadlinesFilterBloc>().add(
-                      FilterDataLoaded(
-                        initialSelectedTopics: filterState.selectedTopics.toList(),
-                        initialSelectedSources: filterState.selectedSources.toList(),
-                        initialSelectedCountries: filterState.selectedCountries.toList(),
-                        isUsingFollowedItems: filterState.isUsingFollowedItems,
-                      ),
-                    ),
+                  FilterDataLoaded(
+                    initialSelectedTopics: filterState.selectedTopics.toList(),
+                    initialSelectedSources: filterState.selectedSources
+                        .toList(),
+                    initialSelectedCountries: filterState.selectedCountries
+                        .toList(),
+                    isUsingFollowedItems: filterState.isUsingFollowedItems,
+                  ),
+                ),
               ),
             );
           }
@@ -135,8 +139,8 @@ class TopicFilterPage extends StatelessWidget {
                 onChanged: (bool? value) {
                   if (value != null) {
                     context.read<HeadlinesFilterBloc>().add(
-                          FilterTopicToggled(topic: topic, isSelected: value),
-                        );
+                      FilterTopicToggled(topic: topic, isSelected: value),
+                    );
                   }
                 },
               );

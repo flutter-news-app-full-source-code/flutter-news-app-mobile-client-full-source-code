@@ -57,11 +57,13 @@ class _HeadlinesSearchPageState extends State<HeadlinesSearchPage> {
     // Initialize the selected model type from the BLoC's initial state.
     // This ensures consistency if the BLoC was already initialized with a
     // specific type (e.g., after a hot restart).
-    final initialModelType =
-        context.read<HeadlinesSearchBloc>().state.selectedModelType;
+    final initialModelType = context
+        .read<HeadlinesSearchBloc>()
+        .state
+        .selectedModelType;
     context.read<HeadlinesSearchBloc>().add(
-          HeadlinesSearchModelTypeChanged(initialModelType),
-        );
+      HeadlinesSearchModelTypeChanged(initialModelType),
+    );
   }
 
   @override
@@ -77,11 +79,11 @@ class _HeadlinesSearchPageState extends State<HeadlinesSearchPage> {
     final state = context.read<HeadlinesSearchBloc>().state;
     if (_isBottom && state is HeadlinesSearchSuccess && state.hasMore) {
       context.read<HeadlinesSearchBloc>().add(
-            HeadlinesSearchFetchRequested(
-              searchTerm: state.lastSearchTerm,
-              adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
-            ),
-          );
+        HeadlinesSearchFetchRequested(
+          searchTerm: state.lastSearchTerm,
+          adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+        ),
+      );
     }
   }
 
@@ -94,11 +96,11 @@ class _HeadlinesSearchPageState extends State<HeadlinesSearchPage> {
 
   void _performSearch() {
     context.read<HeadlinesSearchBloc>().add(
-          HeadlinesSearchFetchRequested(
-            searchTerm: _textController.text,
-            adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
-          ),
-        );
+      HeadlinesSearchFetchRequested(
+        searchTerm: _textController.text,
+        adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+      ),
+    );
   }
 
   @override
@@ -131,8 +133,8 @@ class _HeadlinesSearchPageState extends State<HeadlinesSearchPage> {
                 // If not, default to headline.
                 final currentSelectedModelType =
                     availableSearchModelTypes.contains(state.selectedModelType)
-                        ? state.selectedModelType
-                        : ContentType.headline;
+                    ? state.selectedModelType
+                    : ContentType.headline;
 
                 return SizedBox(
                   width: 150,
@@ -147,13 +149,15 @@ class _HeadlinesSearchPageState extends State<HeadlinesSearchPage> {
                       isDense: true,
                     ),
                     style: textTheme.titleMedium?.copyWith(
-                      color: appBarTheme.titleTextStyle?.color ??
+                      color:
+                          appBarTheme.titleTextStyle?.color ??
                           colorScheme.onSurface,
                     ),
                     dropdownColor: colorScheme.surfaceContainerHighest,
                     icon: Icon(
                       Icons.arrow_drop_down_rounded,
-                      color: appBarTheme.iconTheme?.color ??
+                      color:
+                          appBarTheme.iconTheme?.color ??
                           colorScheme.onSurfaceVariant,
                     ),
                     items: availableSearchModelTypes.map((ContentType type) {
@@ -165,8 +169,8 @@ class _HeadlinesSearchPageState extends State<HeadlinesSearchPage> {
                     onChanged: (ContentType? newValue) {
                       if (newValue != null) {
                         context.read<HeadlinesSearchBloc>().add(
-                              HeadlinesSearchModelTypeChanged(newValue),
-                            );
+                          HeadlinesSearchModelTypeChanged(newValue),
+                        );
                       }
                     },
                   ),
@@ -181,9 +185,10 @@ class _HeadlinesSearchPageState extends State<HeadlinesSearchPage> {
                 decoration: InputDecoration(
                   hintText: l10n.searchHintTextGeneric,
                   hintStyle: textTheme.bodyMedium?.copyWith(
-                    color: (appBarTheme.titleTextStyle?.color ??
-                            colorScheme.onSurface)
-                        .withOpacity(0.6),
+                    color:
+                        (appBarTheme.titleTextStyle?.color ??
+                                colorScheme.onSurface)
+                            .withOpacity(0.6),
                   ),
                   border: InputBorder.none,
                   filled: false,
@@ -195,7 +200,8 @@ class _HeadlinesSearchPageState extends State<HeadlinesSearchPage> {
                       ? IconButton(
                           icon: Icon(
                             Icons.clear_rounded,
-                            color: appBarTheme.iconTheme?.color ??
+                            color:
+                                appBarTheme.iconTheme?.color ??
                                 colorScheme.onSurfaceVariant,
                           ),
                           onPressed: _textController.clear,
@@ -220,17 +226,17 @@ class _HeadlinesSearchPageState extends State<HeadlinesSearchPage> {
         builder: (context, state) {
           return switch (state) {
             HeadlinesSearchInitial() => InitialStateWidget(
-                icon: Icons.search_outlined,
-                headline: l10n.searchPageInitialHeadline,
-                subheadline: l10n.searchPageInitialSubheadline,
-              ),
+              icon: Icons.search_outlined,
+              headline: l10n.searchPageInitialHeadline,
+              subheadline: l10n.searchPageInitialSubheadline,
+            ),
             HeadlinesSearchLoading() => LoadingStateWidget(
-                icon: Icons.search_outlined,
-                headline: l10n.headlinesFeedLoadingHeadline,
-                subheadline: l10n.searchingFor(
-                  state.selectedModelType.displayName(context).toLowerCase(),
-                ),
+              icon: Icons.search_outlined,
+              headline: l10n.headlinesFeedLoadingHeadline,
+              subheadline: l10n.searchingFor(
+                state.selectedModelType.displayName(context).toLowerCase(),
               ),
+            ),
             HeadlinesSearchSuccess(
               items: final items,
               hasMore: final hasMore,
@@ -242,105 +248,105 @@ class _HeadlinesSearchPageState extends State<HeadlinesSearchPage> {
                   ? FailureStateWidget(
                       exception: UnknownException(errorMessage),
                       onRetry: () => context.read<HeadlinesSearchBloc>().add(
-                            HeadlinesSearchFetchRequested(
-                              searchTerm: lastSearchTerm,
-                              adThemeStyle: AdThemeStyle.fromTheme(theme),
-                            ),
-                          ),
+                        HeadlinesSearchFetchRequested(
+                          searchTerm: lastSearchTerm,
+                          adThemeStyle: AdThemeStyle.fromTheme(theme),
+                        ),
+                      ),
                     )
                   : items.isEmpty
-                      ? InitialStateWidget(
-                          icon: Icons.search_off_outlined,
-                          headline: l10n.headlinesSearchNoResultsHeadline,
-                          subheadline:
-                              'For "$lastSearchTerm" in ${resultsModelType.displayName(context).toLowerCase()}.\n${l10n.headlinesSearchNoResultsSubheadline}',
-                        )
-                      : ListView.separated(
-                          controller: _scrollController,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.paddingMedium,
-                            vertical: AppSpacing.paddingSmall,
-                          ).copyWith(bottom: AppSpacing.xxl),
-                          itemCount: hasMore ? items.length + 1 : items.length,
-                          separatorBuilder: (context, index) =>
-                              const SizedBox(height: AppSpacing.sm),
-                          itemBuilder: (context, index) {
-                            if (index >= items.length) {
-                              return const Padding(
-                                padding: EdgeInsets.symmetric(
-                                  vertical: AppSpacing.lg,
-                                ),
-                                child: Center(child: CircularProgressIndicator()),
+                  ? InitialStateWidget(
+                      icon: Icons.search_off_outlined,
+                      headline: l10n.headlinesSearchNoResultsHeadline,
+                      subheadline:
+                          'For "$lastSearchTerm" in ${resultsModelType.displayName(context).toLowerCase()}.\n${l10n.headlinesSearchNoResultsSubheadline}',
+                    )
+                  : ListView.separated(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.paddingMedium,
+                        vertical: AppSpacing.paddingSmall,
+                      ).copyWith(bottom: AppSpacing.xxl),
+                      itemCount: hasMore ? items.length + 1 : items.length,
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: AppSpacing.sm),
+                      itemBuilder: (context, index) {
+                        if (index >= items.length) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(
+                              vertical: AppSpacing.lg,
+                            ),
+                            child: Center(child: CircularProgressIndicator()),
+                          );
+                        }
+                        final feedItem = items[index];
+
+                        if (feedItem is Headline) {
+                          final imageStyle = context
+                              .watch<AppBloc>()
+                              .state
+                              .headlineImageStyle; // Use AppBloc getter
+                          Widget tile;
+                          Future<void> onHeadlineTap() async {
+                            await context
+                                .read<InterstitialAdManager>()
+                                .onPotentialAdTrigger();
+
+                            if (!context.mounted) return;
+
+                            await context.pushNamed(
+                              Routes.searchArticleDetailsName,
+                              pathParameters: {'id': feedItem.id},
+                              extra: feedItem,
+                            );
+                          }
+
+                          switch (imageStyle) {
+                            case HeadlineImageStyle.hidden:
+                              tile = HeadlineTileTextOnly(
+                                headline: feedItem,
+                                onHeadlineTap: onHeadlineTap,
                               );
-                            }
-                            final feedItem = items[index];
-
-                            if (feedItem is Headline) {
-                              final imageStyle = context
-                                  .watch<AppBloc>()
-                                  .state
-                                  .headlineImageStyle; // Use AppBloc getter
-                              Widget tile;
-                              Future<void> onHeadlineTap() async {
-                                await context
-                                    .read<InterstitialAdManager>()
-                                    .onPotentialAdTrigger();
-
-                                if (!context.mounted) return;
-
-                                await context.pushNamed(
-                                  Routes.searchArticleDetailsName,
-                                  pathParameters: {'id': feedItem.id},
-                                  extra: feedItem,
-                                );
-                              }
-
-                              switch (imageStyle) {
-                                case HeadlineImageStyle.hidden:
-                                  tile = HeadlineTileTextOnly(
-                                    headline: feedItem,
-                                    onHeadlineTap: onHeadlineTap,
-                                  );
-                                case HeadlineImageStyle.smallThumbnail:
-                                  tile = HeadlineTileImageStart(
-                                    headline: feedItem,
-                                    onHeadlineTap: onHeadlineTap,
-                                  );
-                                case HeadlineImageStyle.largeThumbnail:
-                                  tile = HeadlineTileImageTop(
-                                    headline: feedItem,
-                                    onHeadlineTap: onHeadlineTap,
-                                  );
-                              }
-                              return tile;
-                            } else if (feedItem is Topic) {
-                              return TopicItemWidget(topic: feedItem);
-                            } else if (feedItem is Source) {
-                              return SourceItemWidget(source: feedItem);
-                            } else if (feedItem is Country) {
-                              return CountryItemWidget(country: feedItem);
-                            } else if (feedItem is AdPlaceholder) {
-                              final adConfig = context
-                                  .watch<AppBloc>()
-                                  .state
-                                  .remoteConfig
-                                  ?.adConfig; // Use AppBloc getter
-
-                              if (adConfig == null) {
-                                return const SizedBox.shrink();
-                              }
-
-                              return FeedAdLoaderWidget(
-                                adPlaceholder: feedItem,
-                                adThemeStyle: AdThemeStyle.fromTheme(
-                                  Theme.of(context),
-                                ),
-                                adConfig: adConfig,
+                            case HeadlineImageStyle.smallThumbnail:
+                              tile = HeadlineTileImageStart(
+                                headline: feedItem,
+                                onHeadlineTap: onHeadlineTap,
                               );
-                            }
+                            case HeadlineImageStyle.largeThumbnail:
+                              tile = HeadlineTileImageTop(
+                                headline: feedItem,
+                                onHeadlineTap: onHeadlineTap,
+                              );
+                          }
+                          return tile;
+                        } else if (feedItem is Topic) {
+                          return TopicItemWidget(topic: feedItem);
+                        } else if (feedItem is Source) {
+                          return SourceItemWidget(source: feedItem);
+                        } else if (feedItem is Country) {
+                          return CountryItemWidget(country: feedItem);
+                        } else if (feedItem is AdPlaceholder) {
+                          final adConfig = context
+                              .watch<AppBloc>()
+                              .state
+                              .remoteConfig
+                              ?.adConfig; // Use AppBloc getter
+
+                          if (adConfig == null) {
                             return const SizedBox.shrink();
-                          },
-                        ),
+                          }
+
+                          return FeedAdLoaderWidget(
+                            adPlaceholder: feedItem,
+                            adThemeStyle: AdThemeStyle.fromTheme(
+                              Theme.of(context),
+                            ),
+                            adConfig: adConfig,
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    ),
             HeadlinesSearchFailure(
               errorMessage: final errorMessage,
               lastSearchTerm: final lastSearchTerm,
@@ -351,11 +357,11 @@ class _HeadlinesSearchPageState extends State<HeadlinesSearchPage> {
                   'Failed to search "$lastSearchTerm" in ${failedModelType.displayName(context).toLowerCase()}:\n$errorMessage',
                 ),
                 onRetry: () => context.read<HeadlinesSearchBloc>().add(
-                      HeadlinesSearchFetchRequested(
-                        searchTerm: lastSearchTerm,
-                        adThemeStyle: AdThemeStyle.fromTheme(theme),
-                      ),
-                    ),
+                  HeadlinesSearchFetchRequested(
+                    searchTerm: lastSearchTerm,
+                    adThemeStyle: AdThemeStyle.fromTheme(theme),
+                  ),
+                ),
               ),
             _ => const SizedBox.shrink(),
           };

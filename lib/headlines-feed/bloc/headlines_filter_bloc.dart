@@ -19,7 +19,8 @@ part 'headlines_filter_state.dart';
 /// as they interact with the filter UI. It also integrates with the [AppBloc]
 /// to access user-specific content preferences for "followed items" functionality.
 /// {@endtemplate}
-class HeadlinesFilterBloc extends Bloc<HeadlinesFilterEvent, HeadlinesFilterState> {
+class HeadlinesFilterBloc
+    extends Bloc<HeadlinesFilterEvent, HeadlinesFilterState> {
   /// {@macro headlines_filter_bloc}
   ///
   /// Requires repositories for topics, sources, and countries, as well as
@@ -29,12 +30,12 @@ class HeadlinesFilterBloc extends Bloc<HeadlinesFilterEvent, HeadlinesFilterStat
     required DataRepository<Source> sourcesRepository,
     required DataRepository<Country> countriesRepository,
     required AppBloc appBloc,
-  })  : _topicsRepository = topicsRepository,
-        _sourcesRepository = sourcesRepository,
-        _countriesRepository = countriesRepository,
-        _appBloc = appBloc,
-        _logger = Logger('HeadlinesFilterBloc'),
-        super(const HeadlinesFilterState()) {
+  }) : _topicsRepository = topicsRepository,
+       _sourcesRepository = sourcesRepository,
+       _countriesRepository = countriesRepository,
+       _appBloc = appBloc,
+       _logger = Logger('HeadlinesFilterBloc'),
+       super(const HeadlinesFilterState()) {
     on<FilterDataLoaded>(_onFilterDataLoaded, transformer: restartable());
     on<FilterTopicToggled>(_onFilterTopicToggled);
     on<FilterSourceToggled>(_onFilterSourceToggled);
@@ -74,7 +75,9 @@ class HeadlinesFilterBloc extends Bloc<HeadlinesFilterEvent, HeadlinesFilterStat
         sort: [const SortOption('name', SortOrder.asc)],
       );
       final allCountriesResponse = await _countriesRepository.readAll(
-        filter: {'hasActiveSources': true}, // Only countries with active sources
+        filter: {
+          'hasActiveSources': true,
+        }, // Only countries with active sources
         sort: [const SortOption('name', SortOrder.asc)],
       );
 
@@ -119,7 +122,8 @@ class HeadlinesFilterBloc extends Bloc<HeadlinesFilterEvent, HeadlinesFilterStat
     emit(
       state.copyWith(
         selectedTopics: updatedSelectedTopics,
-        isUsingFollowedItems: false, // Toggling individual item clears followed filter
+        isUsingFollowedItems:
+            false, // Toggling individual item clears followed filter
       ),
     );
   }
@@ -138,7 +142,8 @@ class HeadlinesFilterBloc extends Bloc<HeadlinesFilterEvent, HeadlinesFilterStat
     emit(
       state.copyWith(
         selectedSources: updatedSelectedSources,
-        isUsingFollowedItems: false, // Toggling individual item clears followed filter
+        isUsingFollowedItems:
+            false, // Toggling individual item clears followed filter
       ),
     );
   }
@@ -157,7 +162,8 @@ class HeadlinesFilterBloc extends Bloc<HeadlinesFilterEvent, HeadlinesFilterStat
     emit(
       state.copyWith(
         selectedCountries: updatedSelectedCountries,
-        isUsingFollowedItems: false, // Toggling individual item clears followed filter
+        isUsingFollowedItems:
+            false, // Toggling individual item clears followed filter
       ),
     );
   }

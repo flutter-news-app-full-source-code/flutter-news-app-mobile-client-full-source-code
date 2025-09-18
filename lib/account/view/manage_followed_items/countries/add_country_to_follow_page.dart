@@ -60,7 +60,7 @@ class AddCountryToFollowPage extends StatelessWidget {
             return BlocBuilder<AppBloc, AppState>(
               buildWhen: (previous, current) =>
                   previous.userContentPreferences?.followedCountries !=
-                      current.userContentPreferences?.followedCountries,
+                  current.userContentPreferences?.followedCountries,
               builder: (context, appState) {
                 final userContentPreferences = appState.userContentPreferences;
                 final followedCountries =
@@ -152,25 +152,27 @@ class AddCountryToFollowPage extends StatelessWidget {
                           onPressed: () {
                             if (userContentPreferences == null) return;
 
-                            final updatedFollowedCountries =
-                                List<Country>.from(followedCountries);
+                            final updatedFollowedCountries = List<Country>.from(
+                              followedCountries,
+                            );
                             if (isFollowed) {
-                              updatedFollowedCountries
-                                  .removeWhere((c) => c.id == country.id);
+                              updatedFollowedCountries.removeWhere(
+                                (c) => c.id == country.id,
+                              );
                             } else {
                               updatedFollowedCountries.add(country);
                             }
 
-                            final updatedPreferences =
-                                userContentPreferences.copyWith(
-                              followedCountries: updatedFollowedCountries,
-                            );
+                            final updatedPreferences = userContentPreferences
+                                .copyWith(
+                                  followedCountries: updatedFollowedCountries,
+                                );
 
                             context.read<AppBloc>().add(
-                                  AppUserContentPreferencesChanged(
-                                    preferences: updatedPreferences,
-                                  ),
-                                );
+                              AppUserContentPreferencesChanged(
+                                preferences: updatedPreferences,
+                              ),
+                            );
                           },
                         ),
                         contentPadding: const EdgeInsets.symmetric(

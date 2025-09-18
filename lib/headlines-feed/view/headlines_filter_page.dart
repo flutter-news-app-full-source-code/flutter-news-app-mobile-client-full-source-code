@@ -33,19 +33,20 @@ class HeadlinesFilterPage extends StatelessWidget {
     final currentFilter = headlinesFeedBloc.state.filter;
 
     return BlocProvider(
-      create: (context) => HeadlinesFilterBloc(
-        topicsRepository: context.read<DataRepository<Topic>>(),
-        sourcesRepository: context.read<DataRepository<Source>>(),
-        countriesRepository: context.read<DataRepository<Country>>(),
-        appBloc: context.read<AppBloc>(),
-      )..add(
-          FilterDataLoaded(
-            initialSelectedTopics: currentFilter.topics ?? [],
-            initialSelectedSources: currentFilter.sources ?? [],
-            initialSelectedCountries: currentFilter.eventCountries ?? [],
-            isUsingFollowedItems: currentFilter.isFromFollowedItems,
+      create: (context) =>
+          HeadlinesFilterBloc(
+            topicsRepository: context.read<DataRepository<Topic>>(),
+            sourcesRepository: context.read<DataRepository<Source>>(),
+            countriesRepository: context.read<DataRepository<Country>>(),
+            appBloc: context.read<AppBloc>(),
+          )..add(
+            FilterDataLoaded(
+              initialSelectedTopics: currentFilter.topics ?? [],
+              initialSelectedSources: currentFilter.sources ?? [],
+              initialSelectedCountries: currentFilter.eventCountries ?? [],
+              isUsingFollowedItems: currentFilter.isFromFollowedItems,
+            ),
           ),
-        ),
       child: const _HeadlinesFilterView(),
     );
   }
@@ -109,8 +110,8 @@ class _HeadlinesFilterView extends StatelessWidget {
             tooltip: l10n.headlinesFeedFilterResetButton,
             onPressed: () {
               context.read<HeadlinesFilterBloc>().add(
-                    const FilterSelectionsCleared(),
-                  );
+                const FilterSelectionsCleared(),
+              );
             },
           ),
           // Apply My Followed Items Button
@@ -124,7 +125,8 @@ class _HeadlinesFilterView extends StatelessWidget {
               final followedCountries =
                   appState.userContentPreferences?.followedCountries ?? [];
 
-              final hasFollowedItems = followedTopics.isNotEmpty ||
+              final hasFollowedItems =
+                  followedTopics.isNotEmpty ||
                   followedSources.isNotEmpty ||
                   followedCountries.isNotEmpty;
 
@@ -139,11 +141,11 @@ class _HeadlinesFilterView extends StatelessWidget {
                 onPressed: hasFollowedItems
                     ? () {
                         context.read<HeadlinesFilterBloc>().add(
-                              FollowedItemsFilterToggled(
-                                isUsingFollowedItems:
-                                    !filterState.isUsingFollowedItems,
-                              ),
-                            );
+                          FollowedItemsFilterToggled(
+                            isUsingFollowedItems:
+                                !filterState.isUsingFollowedItems,
+                          ),
+                        );
                       }
                     : () {
                         ScaffoldMessenger.of(context)
@@ -179,11 +181,11 @@ class _HeadlinesFilterView extends StatelessWidget {
                 isFromFollowedItems: filterState.isUsingFollowedItems,
               );
               context.read<HeadlinesFeedBloc>().add(
-                    HeadlinesFeedFiltersApplied(
-                      filter: newFilter,
-                      adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
-                    ),
-                  );
+                HeadlinesFeedFiltersApplied(
+                  filter: newFilter,
+                  adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+                ),
+              );
               context.pop();
             },
           ),
@@ -205,20 +207,21 @@ class _HeadlinesFilterView extends StatelessWidget {
 
           if (filterState.status == HeadlinesFilterStatus.failure) {
             return FailureStateWidget(
-              exception: filterState.error ??
+              exception:
+                  filterState.error ??
                   const UnknownException('Failed to load filter data.'),
               onRetry: () {
                 final headlinesFeedBloc = context.read<HeadlinesFeedBloc>();
                 final currentFilter = headlinesFeedBloc.state.filter;
                 context.read<HeadlinesFilterBloc>().add(
-                      FilterDataLoaded(
-                        initialSelectedTopics: currentFilter.topics ?? [],
-                        initialSelectedSources: currentFilter.sources ?? [],
-                        initialSelectedCountries:
-                            currentFilter.eventCountries ?? [],
-                        isUsingFollowedItems: currentFilter.isFromFollowedItems,
-                      ),
-                    );
+                  FilterDataLoaded(
+                    initialSelectedTopics: currentFilter.topics ?? [],
+                    initialSelectedSources: currentFilter.sources ?? [],
+                    initialSelectedCountries:
+                        currentFilter.eventCountries ?? [],
+                    isUsingFollowedItems: currentFilter.isFromFollowedItems,
+                  ),
+                );
               },
             );
           }

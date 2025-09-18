@@ -34,7 +34,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required AuthRepository authenticationRepository,
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<UserContentPreferences>
-        userContentPreferencesRepository,
+    userContentPreferencesRepository,
     required DataRepository<RemoteConfig> appConfigRepository,
     required DataRepository<User> userRepository,
     required local_config.AppEnvironment environment,
@@ -44,29 +44,29 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     this.demoDataMigrationService,
     this.demoDataInitializerService,
     this.initialUser,
-  })  : _authenticationRepository = authenticationRepository,
-        _userAppSettingsRepository = userAppSettingsRepository,
-        _userContentPreferencesRepository = userContentPreferencesRepository,
-        _appConfigRepository = appConfigRepository,
-        _userRepository = userRepository,
-        _environment = environment,
-        _navigatorKey = navigatorKey,
-        _logger = Logger('AppBloc'),
-        super(
-          // Initial state of the app. The status is set to loadingUserData
-          // as the AppBloc will now handle fetching user-specific data.
-          // UserAppSettings and UserContentPreferences are initially null
-          // and will be fetched asynchronously.
-          AppState(
-            status: AppLifeCycleStatus.loadingUserData,
-            selectedBottomNavigationIndex: 0,
-            remoteConfig: initialRemoteConfig, // Use the pre-fetched config
-            initialRemoteConfigError:
-                initialRemoteConfigError, // Store any initial config error
-            environment: environment,
-            user: initialUser, // Set initial user if available
-          ),
-        ) {
+  }) : _authenticationRepository = authenticationRepository,
+       _userAppSettingsRepository = userAppSettingsRepository,
+       _userContentPreferencesRepository = userContentPreferencesRepository,
+       _appConfigRepository = appConfigRepository,
+       _userRepository = userRepository,
+       _environment = environment,
+       _navigatorKey = navigatorKey,
+       _logger = Logger('AppBloc'),
+       super(
+         // Initial state of the app. The status is set to loadingUserData
+         // as the AppBloc will now handle fetching user-specific data.
+         // UserAppSettings and UserContentPreferences are initially null
+         // and will be fetched asynchronously.
+         AppState(
+           status: AppLifeCycleStatus.loadingUserData,
+           selectedBottomNavigationIndex: 0,
+           remoteConfig: initialRemoteConfig, // Use the pre-fetched config
+           initialRemoteConfigError:
+               initialRemoteConfigError, // Store any initial config error
+           environment: environment,
+           user: initialUser, // Set initial user if available
+         ),
+       ) {
     // Register event handlers for various app-level events.
     on<AppStarted>(_onAppStarted);
     on<AppUserChanged>(_onAppUserChanged);
@@ -89,7 +89,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final AuthRepository _authenticationRepository;
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
   final DataRepository<UserContentPreferences>
-      _userContentPreferencesRepository;
+  _userContentPreferencesRepository;
   final DataRepository<RemoteConfig> _appConfigRepository;
   final DataRepository<User> _userRepository;
   final local_config.AppEnvironment _environment;
@@ -131,9 +131,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     User user,
     Emitter<AppState> emit,
   ) async {
-    _logger.info(
-      '[AppBloc] Fetching user settings for user: ${user.id}',
-    );
+    _logger.info('[AppBloc] Fetching user settings for user: ${user.id}');
     try {
       final userAppSettings = await _userAppSettingsRepository.read(
         id: user.id,
@@ -308,8 +306,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     final newStatus = newUser == null
         ? AppLifeCycleStatus.unauthenticated
         : (newUser.appRole == AppUserRole.standardUser
-            ? AppLifeCycleStatus.authenticated
-            : AppLifeCycleStatus.anonymous);
+              ? AppLifeCycleStatus.authenticated
+              : AppLifeCycleStatus.anonymous);
 
     emit(state.copyWith(status: newStatus));
 
@@ -318,12 +316,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       await _fetchAndSetUserData(newUser, emit);
     } else {
       // If user logs out, clear user-specific data from state.
-      emit(
-        state.copyWith(
-          settings: null,
-          userContentPreferences: null,
-        ),
-      );
+      emit(state.copyWith(settings: null, userContentPreferences: null));
     }
 
     // In demo mode, ensure user-specific data is initialized.
@@ -638,7 +631,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         '(HttpException): $e',
       );
       // Revert to original preferences on failure to maintain state consistency.
-      emit(state.copyWith(userContentPreferences: state.userContentPreferences));
+      emit(
+        state.copyWith(userContentPreferences: state.userContentPreferences),
+      );
     } catch (e, s) {
       _logger.severe(
         'Unexpected error persisting UserContentPreferences for user ${updatedPreferences.id}.',
@@ -646,7 +641,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         s,
       );
       // Revert to original preferences on failure to maintain state consistency.
-      emit(state.copyWith(userContentPreferences: state.userContentPreferences));
+      emit(
+        state.copyWith(userContentPreferences: state.userContentPreferences),
+      );
     }
   }
 }

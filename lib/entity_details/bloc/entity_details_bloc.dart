@@ -122,13 +122,14 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       // This method injects stateless `AdPlaceholder` markers into the feed.
       // The full ad loading and lifecycle is managed by the UI layer.
       // See `FeedDecoratorService` for a detailed explanation.
-      final processedFeedItems = await _feedDecoratorService.injectAdPlaceholders(
-        feedItems: headlineResponse.items,
-        user: currentUser,
-        adConfig: remoteConfig.adConfig,
-        imageStyle: _appBloc.state.headlineImageStyle,
-        adThemeStyle: event.adThemeStyle,
-      );
+      final processedFeedItems = await _feedDecoratorService
+          .injectAdPlaceholders(
+            feedItems: headlineResponse.items,
+            user: currentUser,
+            adConfig: remoteConfig.adConfig,
+            imageStyle: _appBloc.state.headlineImageStyle,
+            adThemeStyle: event.adThemeStyle,
+          );
 
       // 3. Determine isFollowing status from AppBloc's user preferences
       var isCurrentlyFollowing = false;
@@ -192,9 +193,15 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     }
 
     // Create a mutable copy of the lists to modify
-    final updatedFollowedTopics = List<Topic>.from(currentPreferences.followedTopics);
-    final updatedFollowedSources = List<Source>.from(currentPreferences.followedSources);
-    final updatedFollowedCountries = List<Country>.from(currentPreferences.followedCountries);
+    final updatedFollowedTopics = List<Topic>.from(
+      currentPreferences.followedTopics,
+    );
+    final updatedFollowedSources = List<Source>.from(
+      currentPreferences.followedSources,
+    );
+    final updatedFollowedCountries = List<Country>.from(
+      currentPreferences.followedCountries,
+    );
 
     var isCurrentlyFollowing = false;
 
@@ -326,5 +333,4 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       );
     }
   }
-
 }

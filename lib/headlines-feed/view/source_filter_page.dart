@@ -51,8 +51,10 @@ class _SourceFilterView extends StatelessWidget {
                   appState.userContentPreferences?.followedSources ?? [];
 
               // Determine if the current selection matches the followed sources
-              final isFollowedFilterActive = followedSources.isNotEmpty &&
-                  filterState.selectedSources.length == followedSources.length &&
+              final isFollowedFilterActive =
+                  followedSources.isNotEmpty &&
+                  filterState.selectedSources.length ==
+                      followedSources.length &&
                   filterState.selectedSources.containsAll(followedSources);
 
               return IconButton(
@@ -76,10 +78,10 @@ class _SourceFilterView extends StatelessWidget {
                   } else {
                     // Toggle the followed items filter in the HeadlinesFilterBloc
                     context.read<HeadlinesFilterBloc>().add(
-                          FollowedItemsFilterToggled(
-                            isUsingFollowedItems: !isFollowedFilterActive,
-                          ),
-                        );
+                      FollowedItemsFilterToggled(
+                        isUsingFollowedItems: !isFollowedFilterActive,
+                      ),
+                    );
                   }
                 },
               );
@@ -113,30 +115,34 @@ class _SourceFilterView extends StatelessWidget {
           if (filterState.status == HeadlinesFilterStatus.failure &&
               filterState.allSources.isEmpty) {
             return FailureStateWidget(
-              exception: filterState.error ??
-                  const UnknownException(
-                    'Failed to load source filter data.',
-                  ),
+              exception:
+                  filterState.error ??
+                  const UnknownException('Failed to load source filter data.'),
               onRetry: () {
                 context.read<HeadlinesFilterBloc>().add(
-                      FilterDataLoaded(
-                        initialSelectedTopics: filterState.selectedTopics.toList(),
-                        initialSelectedSources: filterState.selectedSources.toList(),
-                        initialSelectedCountries: filterState.selectedCountries.toList(),
-                        isUsingFollowedItems: filterState.isUsingFollowedItems,
-                      ),
-                    );
+                  FilterDataLoaded(
+                    initialSelectedTopics: filterState.selectedTopics.toList(),
+                    initialSelectedSources: filterState.selectedSources
+                        .toList(),
+                    initialSelectedCountries: filterState.selectedCountries
+                        .toList(),
+                    isUsingFollowedItems: filterState.isUsingFollowedItems,
+                  ),
+                );
               },
             );
           }
 
           // Filter sources based on selected countries and types from HeadlinesFilterBloc
           final displayableSources = filterState.allSources.where((source) {
-            final matchesCountry = filterState.selectedCountries.isEmpty ||
-                filterState.selectedCountries
-                    .any((c) => c.isoCode == source.headquarters.isoCode);
+            final matchesCountry =
+                filterState.selectedCountries.isEmpty ||
+                filterState.selectedCountries.any(
+                  (c) => c.isoCode == source.headquarters.isoCode,
+                );
             // Assuming all source types are available and selected by default if none are explicitly selected
-            final matchesType = filterState.selectedSources.isEmpty ||
+            final matchesType =
+                filterState.selectedSources.isEmpty ||
                 filterState.selectedSources.contains(source);
             return matchesCountry && matchesType;
           }).toList();
@@ -225,11 +231,11 @@ class _SourceFilterView extends StatelessWidget {
                       // Clear all country selections
                       for (final country in filterState.allCountries) {
                         context.read<HeadlinesFilterBloc>().add(
-                              FilterCountryToggled(
-                                country: country,
-                                isSelected: false,
-                              ),
-                            );
+                          FilterCountryToggled(
+                            country: country,
+                            isSelected: false,
+                          ),
+                        );
                       }
                     },
                   );
@@ -247,11 +253,11 @@ class _SourceFilterView extends StatelessWidget {
                   selected: filterState.selectedCountries.contains(country),
                   onSelected: (isSelected) {
                     context.read<HeadlinesFilterBloc>().add(
-                          FilterCountryToggled(
-                            country: country,
-                            isSelected: isSelected,
-                          ),
-                        );
+                      FilterCountryToggled(
+                        country: country,
+                        isSelected: isSelected,
+                      ),
+                    );
                   },
                 );
               },
@@ -269,11 +275,9 @@ class _SourceFilterView extends StatelessWidget {
     TextTheme textTheme,
   ) {
     // For source types, we need to get all unique source types from all available sources
-    final allSourceTypes = filterState.allSources
-        .map((s) => s.sourceType)
-        .toSet()
-        .toList()
-        ..sort((a, b) => a.name.compareTo(b.name));
+    final allSourceTypes =
+        filterState.allSources.map((s) => s.sourceType).toSet().toList()
+          ..sort((a, b) => a.name.compareTo(b.name));
 
     // Determine which source types are currently selected based on the selected sources
     final selectedSourceTypes = filterState.selectedSources
@@ -307,11 +311,11 @@ class _SourceFilterView extends StatelessWidget {
                       // Clear all source selections
                       for (final source in filterState.allSources) {
                         context.read<HeadlinesFilterBloc>().add(
-                              FilterSourceToggled(
-                                source: source,
-                                isSelected: false,
-                              ),
-                            );
+                          FilterSourceToggled(
+                            source: source,
+                            isSelected: false,
+                          ),
+                        );
                       }
                     },
                   );
@@ -323,14 +327,15 @@ class _SourceFilterView extends StatelessWidget {
                   selected: selectedSourceTypes.contains(sourceType),
                   onSelected: (isSelected) {
                     // Toggle all sources of this type
-                    for (final source in filterState.allSources
-                        .where((s) => s.sourceType == sourceType)) {
+                    for (final source in filterState.allSources.where(
+                      (s) => s.sourceType == sourceType,
+                    )) {
                       context.read<HeadlinesFilterBloc>().add(
-                            FilterSourceToggled(
-                              source: source,
-                              isSelected: isSelected,
-                            ),
-                          );
+                        FilterSourceToggled(
+                          source: source,
+                          isSelected: isSelected,
+                        ),
+                      );
                     }
                   },
                 );
@@ -356,17 +361,18 @@ class _SourceFilterView extends StatelessWidget {
     if (filterState.status == HeadlinesFilterStatus.failure &&
         displayableSources.isEmpty) {
       return FailureStateWidget(
-        exception: filterState.error ??
+        exception:
+            filterState.error ??
             const UnknownException('Failed to load displayable sources.'),
         onRetry: () {
           context.read<HeadlinesFilterBloc>().add(
-                FilterDataLoaded(
-                  initialSelectedTopics: filterState.selectedTopics.toList(),
-                  initialSelectedSources: filterState.selectedSources.toList(),
-                  initialSelectedCountries: filterState.selectedCountries.toList(),
-                  isUsingFollowedItems: filterState.isUsingFollowedItems,
-                ),
-              );
+            FilterDataLoaded(
+              initialSelectedTopics: filterState.selectedTopics.toList(),
+              initialSelectedSources: filterState.selectedSources.toList(),
+              initialSelectedCountries: filterState.selectedCountries.toList(),
+              isUsingFollowedItems: filterState.isUsingFollowedItems,
+            ),
+          );
         },
       );
     }
@@ -397,8 +403,8 @@ class _SourceFilterView extends StatelessWidget {
           onChanged: (bool? value) {
             if (value != null) {
               context.read<HeadlinesFilterBloc>().add(
-                    FilterSourceToggled(source: source, isSelected: value),
-                  );
+                FilterSourceToggled(source: source, isSelected: value),
+              );
             }
           },
           controlAffinity: ListTileControlAffinity.leading,

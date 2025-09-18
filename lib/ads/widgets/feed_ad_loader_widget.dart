@@ -204,7 +204,10 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
       }
 
       // Get the current HeadlineImageStyle from AppBloc
-      final headlineImageStyle = context.read<AppBloc>().state.headlineImageStyle;
+      final headlineImageStyle = context
+          .read<AppBloc>()
+          .state
+          .headlineImageStyle;
 
       // Call AdService.getFeedAd with the full AdConfig and adType from the placeholder.
       final loadedAd = await _adService.getFeedAd(

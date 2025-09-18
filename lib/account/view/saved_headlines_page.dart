@@ -51,9 +51,7 @@ class SavedHeadlinesPage extends StatelessWidget {
             return FailureStateWidget(
               exception: appState.initialUserPreferencesError!,
               onRetry: () {
-                context.read<AppBloc>().add(
-                      AppStarted(initialUser: user),
-                    );
+                context.read<AppBloc>().add(AppStarted(initialUser: user));
               },
             );
           }
@@ -95,27 +93,28 @@ class SavedHeadlinesPage extends StatelessWidget {
             ),
             itemBuilder: (context, index) {
               final headline = savedHeadlines[index];
-              final imageStyle = appState.settings?.feedPreferences.headlineImageStyle ??
-                  HeadlineImageStyle.smallThumbnail; // Default if settings not loaded
+              final imageStyle =
+                  appState.settings?.feedPreferences.headlineImageStyle ??
+                  HeadlineImageStyle
+                      .smallThumbnail; // Default if settings not loaded
 
               final trailingButton = IconButton(
                 icon: Icon(Icons.delete_outline, color: colorScheme.error),
                 tooltip: l10n.headlineDetailsRemoveFromSavedTooltip,
                 onPressed: () {
-                  final updatedSavedHeadlines =
-                      List<Headline>.from(savedHeadlines)
-                        ..removeWhere((h) => h.id == headline.id);
+                  final updatedSavedHeadlines = List<Headline>.from(
+                    savedHeadlines,
+                  )..removeWhere((h) => h.id == headline.id);
 
-                  final updatedPreferences =
-                      userContentPreferences.copyWith(
+                  final updatedPreferences = userContentPreferences.copyWith(
                     savedHeadlines: updatedSavedHeadlines,
                   );
 
                   context.read<AppBloc>().add(
-                        AppUserContentPreferencesChanged(
-                          preferences: updatedPreferences,
-                        ),
-                      );
+                    AppUserContentPreferencesChanged(
+                      preferences: updatedPreferences,
+                    ),
+                  );
                 },
               );
 

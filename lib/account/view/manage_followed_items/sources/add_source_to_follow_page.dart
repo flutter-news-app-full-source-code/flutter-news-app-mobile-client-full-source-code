@@ -50,7 +50,7 @@ class AddSourceToFollowPage extends StatelessWidget {
             return BlocBuilder<AppBloc, AppState>(
               buildWhen: (previous, current) =>
                   previous.userContentPreferences?.followedSources !=
-                      current.userContentPreferences?.followedSources,
+                  current.userContentPreferences?.followedSources,
               builder: (context, appState) {
                 final userContentPreferences = appState.userContentPreferences;
                 final followedSources =
@@ -82,25 +82,27 @@ class AddSourceToFollowPage extends StatelessWidget {
                           onPressed: () {
                             if (userContentPreferences == null) return;
 
-                            final updatedFollowedSources =
-                                List<Source>.from(followedSources);
+                            final updatedFollowedSources = List<Source>.from(
+                              followedSources,
+                            );
                             if (isFollowed) {
-                              updatedFollowedSources
-                                  .removeWhere((s) => s.id == source.id);
+                              updatedFollowedSources.removeWhere(
+                                (s) => s.id == source.id,
+                              );
                             } else {
                               updatedFollowedSources.add(source);
                             }
 
-                            final updatedPreferences =
-                                userContentPreferences.copyWith(
-                              followedSources: updatedFollowedSources,
-                            );
+                            final updatedPreferences = userContentPreferences
+                                .copyWith(
+                                  followedSources: updatedFollowedSources,
+                                );
 
                             context.read<AppBloc>().add(
-                                  AppUserContentPreferencesChanged(
-                                    preferences: updatedPreferences,
-                                  ),
-                                );
+                              AppUserContentPreferencesChanged(
+                                preferences: updatedPreferences,
+                              ),
+                            );
                           },
                         ),
                       ),

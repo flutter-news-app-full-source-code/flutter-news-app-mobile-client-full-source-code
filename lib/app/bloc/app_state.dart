@@ -90,8 +90,8 @@ class AppState extends Equatable {
     return settings?.displaySettings.baseTheme == AppBaseTheme.light
         ? ThemeMode.light
         : (settings?.displaySettings.baseTheme == AppBaseTheme.dark
-            ? ThemeMode.dark
-            : ThemeMode.system);
+              ? ThemeMode.dark
+              : ThemeMode.system);
   }
 
   /// The current FlexColorScheme scheme for accent colors, derived from [settings].

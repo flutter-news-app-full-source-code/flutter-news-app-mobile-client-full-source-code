@@ -449,6 +449,7 @@ Future<Widget> bootstrap(
     localAdRepository: localAdRepository,
     navigatorKey: navigatorKey, // Pass the navigatorKey to App
     initialRemoteConfig: initialRemoteConfig, // Pass the initialRemoteConfig
-    initialRemoteConfigError: initialRemoteConfigError, // Pass the initialRemoteConfigError
+    initialRemoteConfigError:
+        initialRemoteConfigError, // Pass the initialRemoteConfigError
   );
 }

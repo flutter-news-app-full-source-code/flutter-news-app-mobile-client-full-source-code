@@ -261,8 +261,7 @@ class HeadlinesSearchBloc
             feedItems: headlines,
             user: currentUser,
             adConfig: appConfig.adConfig,
-            imageStyle:
-                _appBloc.state.headlineImageStyle, // Use AppBloc getter
+            imageStyle: _appBloc.state.headlineImageStyle, // Use AppBloc getter
             adThemeStyle: event.adThemeStyle,
           );
         case ContentType.topic:

@@ -50,9 +50,7 @@ class FollowedTopicsListPage extends StatelessWidget {
             return FailureStateWidget(
               exception: appState.initialUserPreferencesError!,
               onRetry: () {
-                context.read<AppBloc>().add(
-                      AppStarted(initialUser: user),
-                    );
+                context.read<AppBloc>().add(AppStarted(initialUser: user));
               },
             );
           }
@@ -94,20 +92,19 @@ class FollowedTopicsListPage extends StatelessWidget {
                   ),
                   tooltip: l10n.unfollowTopicTooltip(topic.name),
                   onPressed: () {
-                    final updatedFollowedTopics =
-                        List<Topic>.from(followedTopics)
-                          ..removeWhere((t) => t.id == topic.id);
+                    final updatedFollowedTopics = List<Topic>.from(
+                      followedTopics,
+                    )..removeWhere((t) => t.id == topic.id);
 
-                    final updatedPreferences =
-                        userContentPreferences.copyWith(
+                    final updatedPreferences = userContentPreferences.copyWith(
                       followedTopics: updatedFollowedTopics,
                     );
 
                     context.read<AppBloc>().add(
-                          AppUserContentPreferencesChanged(
-                            preferences: updatedPreferences,
-                          ),
-                        );
+                      AppUserContentPreferencesChanged(
+                        preferences: updatedPreferences,
+                      ),
+                    );
                   },
                 ),
                 onTap: () async {

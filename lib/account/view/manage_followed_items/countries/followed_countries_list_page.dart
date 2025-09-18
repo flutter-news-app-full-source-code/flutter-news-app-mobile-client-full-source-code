@@ -50,9 +50,7 @@ class FollowedCountriesListPage extends StatelessWidget {
             return FailureStateWidget(
               exception: appState.initialUserPreferencesError!,
               onRetry: () {
-                context.read<AppBloc>().add(
-                      AppStarted(initialUser: user),
-                    );
+                context.read<AppBloc>().add(AppStarted(initialUser: user));
               },
             );
           }
@@ -89,20 +87,19 @@ class FollowedCountriesListPage extends StatelessWidget {
                   ),
                   tooltip: l10n.unfollowCountryTooltip(country.name),
                   onPressed: () {
-                    final updatedFollowedCountries =
-                        List<Country>.from(followedCountries)
-                          ..removeWhere((c) => c.id == country.id);
+                    final updatedFollowedCountries = List<Country>.from(
+                      followedCountries,
+                    )..removeWhere((c) => c.id == country.id);
 
-                    final updatedPreferences =
-                        userContentPreferences.copyWith(
+                    final updatedPreferences = userContentPreferences.copyWith(
                       followedCountries: updatedFollowedCountries,
                     );
 
                     context.read<AppBloc>().add(
-                          AppUserContentPreferencesChanged(
-                            preferences: updatedPreferences,
-                          ),
-                        );
+                      AppUserContentPreferencesChanged(
+                        preferences: updatedPreferences,
+                      ),
+                    );
                   },
                 ),
                 onTap: () async {

@@ -50,9 +50,7 @@ class FollowedSourcesListPage extends StatelessWidget {
             return FailureStateWidget(
               exception: appState.initialUserPreferencesError!,
               onRetry: () {
-                context.read<AppBloc>().add(
-                      AppStarted(initialUser: user),
-                    );
+                context.read<AppBloc>().add(AppStarted(initialUser: user));
               },
             );
           }
@@ -86,20 +84,19 @@ class FollowedSourcesListPage extends StatelessWidget {
                   ),
                   tooltip: l10n.unfollowSourceTooltip(source.name),
                   onPressed: () {
-                    final updatedFollowedSources =
-                        List<Source>.from(followedSources)
-                          ..removeWhere((s) => s.id == source.id);
+                    final updatedFollowedSources = List<Source>.from(
+                      followedSources,
+                    )..removeWhere((s) => s.id == source.id);
 
-                    final updatedPreferences =
-                        userContentPreferences.copyWith(
+                    final updatedPreferences = userContentPreferences.copyWith(
                       followedSources: updatedFollowedSources,
                     );
 
                     context.read<AppBloc>().add(
-                          AppUserContentPreferencesChanged(
-                            preferences: updatedPreferences,
-                          ),
-                        );
+                      AppUserContentPreferencesChanged(
+                        preferences: updatedPreferences,
+                      ),
+                    );
                   },
                 ),
                 onTap: () async {

@@ -40,7 +40,8 @@ class CountryFilterPage extends StatelessWidget {
                   appState.userContentPreferences?.followedCountries ?? [];
 
               // Determine if the current selection matches the followed countries
-              final isFollowedFilterActive = followedCountries.isNotEmpty &&
+              final isFollowedFilterActive =
+                  followedCountries.isNotEmpty &&
                   filterState.selectedCountries.length ==
                       followedCountries.length &&
                   filterState.selectedCountries.containsAll(followedCountries);
@@ -66,10 +67,10 @@ class CountryFilterPage extends StatelessWidget {
                   } else {
                     // Toggle the followed items filter in the HeadlinesFilterBloc
                     context.read<HeadlinesFilterBloc>().add(
-                          FollowedItemsFilterToggled(
-                            isUsingFollowedItems: !isFollowedFilterActive,
-                          ),
-                        );
+                      FollowedItemsFilterToggled(
+                        isUsingFollowedItems: !isFollowedFilterActive,
+                      ),
+                    );
                   }
                 },
               );
@@ -109,13 +110,14 @@ class CountryFilterPage extends StatelessWidget {
               exception:
                   filterState.error ?? const UnknownException('Unknown error'),
               onRetry: () => context.read<HeadlinesFilterBloc>().add(
-                    FilterDataLoaded(
-                      initialSelectedTopics: filterState.selectedTopics.toList(),
-                      initialSelectedSources: filterState.selectedSources.toList(),
-                      initialSelectedCountries: filterState.selectedCountries.toList(),
-                      isUsingFollowedItems: filterState.isUsingFollowedItems,
-                    ),
-                  ),
+                FilterDataLoaded(
+                  initialSelectedTopics: filterState.selectedTopics.toList(),
+                  initialSelectedSources: filterState.selectedSources.toList(),
+                  initialSelectedCountries: filterState.selectedCountries
+                      .toList(),
+                  isUsingFollowedItems: filterState.isUsingFollowedItems,
+                ),
+              ),
             );
           }
 
@@ -136,7 +138,9 @@ class CountryFilterPage extends StatelessWidget {
             itemCount: filterState.allCountries.length,
             itemBuilder: (context, index) {
               final country = filterState.allCountries[index];
-              final isSelected = filterState.selectedCountries.contains(country);
+              final isSelected = filterState.selectedCountries.contains(
+                country,
+              );
 
               return CheckboxListTile(
                 title: Text(country.name, style: textTheme.titleMedium),
@@ -173,11 +177,8 @@ class CountryFilterPage extends StatelessWidget {
                 onChanged: (bool? value) {
                   if (value != null) {
                     context.read<HeadlinesFilterBloc>().add(
-                          FilterCountryToggled(
-                            country: country,
-                            isSelected: value,
-                          ),
-                        );
+                      FilterCountryToggled(country: country, isSelected: value),
+                    );
                   }
                 },
                 controlAffinity: ListTileControlAffinity.leading,

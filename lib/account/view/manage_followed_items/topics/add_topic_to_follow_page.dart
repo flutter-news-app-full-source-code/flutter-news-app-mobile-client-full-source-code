@@ -60,7 +60,7 @@ class AddTopicToFollowPage extends StatelessWidget {
             return BlocBuilder<AppBloc, AppState>(
               buildWhen: (previous, current) =>
                   previous.userContentPreferences?.followedTopics !=
-                      current.userContentPreferences?.followedTopics,
+                  current.userContentPreferences?.followedTopics,
               builder: (context, appState) {
                 final userContentPreferences = appState.userContentPreferences;
                 final followedTopics =
@@ -151,25 +151,27 @@ class AddTopicToFollowPage extends StatelessWidget {
                           onPressed: () {
                             if (userContentPreferences == null) return;
 
-                            final updatedFollowedTopics =
-                                List<Topic>.from(followedTopics);
+                            final updatedFollowedTopics = List<Topic>.from(
+                              followedTopics,
+                            );
                             if (isFollowed) {
-                              updatedFollowedTopics
-                                  .removeWhere((t) => t.id == topic.id);
+                              updatedFollowedTopics.removeWhere(
+                                (t) => t.id == topic.id,
+                              );
                             } else {
                               updatedFollowedTopics.add(topic);
                             }
 
-                            final updatedPreferences =
-                                userContentPreferences.copyWith(
-                              followedTopics: updatedFollowedTopics,
-                            );
+                            final updatedPreferences = userContentPreferences
+                                .copyWith(
+                                  followedTopics: updatedFollowedTopics,
+                                );
 
                             context.read<AppBloc>().add(
-                                  AppUserContentPreferencesChanged(
-                                    preferences: updatedPreferences,
-                                  ),
-                                );
+                              AppUserContentPreferencesChanged(
+                                preferences: updatedPreferences,
+                              ),
+                            );
                           },
                         ),
                         contentPadding: const EdgeInsets.symmetric(

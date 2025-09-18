@@ -53,18 +53,15 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _navigatorKey = navigatorKey,
        _logger = Logger('AppBloc'),
        super(
-         // Initial state of the app. The status is set to loadingUserData
-         // as the AppBloc will now handle fetching user-specific data.
-         // UserAppSettings and UserContentPreferences are initially null
-         // and will be fetched asynchronously.
          AppState(
-           status: AppLifeCycleStatus.loadingUserData,
+           status: initialUser == null
+               ? AppLifeCycleStatus.unauthenticated
+               : AppLifeCycleStatus.loadingUserData,
            selectedBottomNavigationIndex: 0,
-           remoteConfig: initialRemoteConfig, // Use the pre-fetched config
-           initialRemoteConfigError:
-               initialRemoteConfigError, // Store any initial config error
+           remoteConfig: initialRemoteConfig,
+           initialRemoteConfigError: initialRemoteConfigError,
            environment: environment,
-           user: initialUser, // Set initial user if available
+           user: initialUser,
          ),
        ) {
     // Register event handlers for various app-level events.
@@ -262,20 +259,25 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     }
 
     // If we reach here, the app is not under maintenance or requires update.
-    // Proceed to load user-specific data.
-    emit(state.copyWith(status: AppLifeCycleStatus.loadingUserData));
-
+    // Now, handle user-specific data loading.
     final currentUser = event.initialUser;
 
     if (currentUser == null) {
       _logger.info(
-        '[AppBloc] No initial user. Transitioning to unauthenticated state.',
+        '[AppBloc] No initial user. Ensuring unauthenticated state.',
       );
-      emit(state.copyWith(status: AppLifeCycleStatus.unauthenticated));
+      // Ensure the state is unauthenticated if no user, and it wasn't already set by initial state.
+      if (state.status != AppLifeCycleStatus.unauthenticated) {
+        emit(state.copyWith(status: AppLifeCycleStatus.unauthenticated));
+      }
       return;
     }
 
-    // User is present, proceed to fetch user-specific settings and preferences.
+    // If a user is present, and we are not already in loadingUserData state,
+    // transition to loadingUserData and fetch user-specific settings and preferences.
+    if (state.status != AppLifeCycleStatus.loadingUserData) {
+      emit(state.copyWith(status: AppLifeCycleStatus.loadingUserData));
+    }
     await _fetchAndSetUserData(currentUser, emit);
   }
 

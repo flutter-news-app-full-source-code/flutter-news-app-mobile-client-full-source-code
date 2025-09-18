@@ -205,7 +205,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
               .where((h) => h.id != headline.id)
               .toList();
         } else {
-          updatedSavedHeadlines = List.of(currentPreferences.savedHeadlines)
+          updatedSavedHeadlines = List.from(currentPreferences.savedHeadlines)
             ..add(headline);
         }
 

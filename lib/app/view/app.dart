@@ -413,10 +413,12 @@ class _AppViewState extends State<_AppView> {
           }
 
           // --- Loading User Data State ---
-          // If the app is not in a critical status but user settings or preferences
-          // are still null, display a loading screen. This ensures the main UI
-          // is only built when all necessary user-specific data is available.
-          if (state.settings == null || state.userContentPreferences == null) {
+          // --- Loading User Data State ---
+          // Display a loading screen ONLY if the app is actively trying to load
+          // user-specific data (settings or preferences) for an authenticated/anonymous user.
+          // If the status is unauthenticated, it means there's no user data to load,
+          // and the app should proceed to the router to show the authentication page.
+          if (state.status == AppLifeCycleStatus.loadingUserData) {
             return MaterialApp(
               debugShowCheckedModeBanner: false,
               theme: lightTheme(
@@ -438,12 +440,16 @@ class _AppViewState extends State<_AppView> {
               ],
               supportedLocales: AppLocalizations.supportedLocales,
               locale: state.locale,
-              home: LoadingStateWidget(
-                icon: Icons.sync,
-                headline: AppLocalizations.of(context).settingsLoadingHeadline,
-                subheadline: AppLocalizations.of(
-                  context,
-                ).settingsLoadingSubheadline,
+              home: Builder(
+                builder: (context) {
+                  return LoadingStateWidget(
+                    icon: Icons.sync,
+                    headline: AppLocalizations.of(context).settingsLoadingHeadline,
+                    subheadline: AppLocalizations.of(
+                      context,
+                    ).settingsLoadingSubheadline,
+                  );
+                },
               ),
             );
           }

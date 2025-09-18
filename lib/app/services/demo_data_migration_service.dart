@@ -18,7 +18,7 @@ class DemoDataMigrationService {
     userContentPreferencesRepository,
   }) : _userAppSettingsRepository = userAppSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
-       _logger =  Logger('DemoDataMigrationService');
+       _logger = Logger('DemoDataMigrationService');
 
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
   final DataRepository<UserContentPreferences>

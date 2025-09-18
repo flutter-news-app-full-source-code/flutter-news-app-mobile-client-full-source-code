@@ -351,7 +351,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             state.copyWith(
               status: AppLifeCycleStatus.criticalError,
               initialUserPreferencesError: UnknownException(
-                'Failed to initialize demo user data: ${e.toString()}',
+                'Failed to initialize demo user data: $e',
               ),
             ),
           );
@@ -388,7 +388,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
               state.copyWith(
                 status: AppLifeCycleStatus.criticalError,
                 initialUserPreferencesError: UnknownException(
-                  'Failed to migrate demo user data: ${e.toString()}',
+                  'Failed to migrate demo user data: $e',
                 ),
               ),
             );

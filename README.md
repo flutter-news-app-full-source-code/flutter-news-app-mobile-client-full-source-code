@@ -72,9 +72,9 @@ Click on any category to explore.
 Go beyond basic ad banners. This app includes a sophisticated, provider-agnostic monetization engine designed for flexibility, performance, and a seamless user experience.
 
 - **Multi-Platform by Design:** The entire ad system is built on a provider-agnostic abstraction, giving you the freedom to choose your monetization strategy. It comes with pre-built, production-ready providers for:
-    - **Google AdMob:** The industry standard, ready to go out of the box.
-    - **Custom Ad Server:** Use the `LocalAdProvider` to serve ads directly from your own backend, giving you full control over your ad inventory and revenue.
-    - **Demo Provider:** A built-in placeholder provider that makes development and testing a breeze, without needing live ad network credentials.
+    - **Google AdMob Provider:** The industry standard, ready to go out of the box.
+    - **Local Ad Provider:** Use a custom ad server to serve ads directly from your own backend, giving you full control over your ad inventory and revenue.
+    - **Demo Ad Provider:** A built-in placeholder provider that makes development and testing a breeze, without needing live ad network credentials.
 - **Seamless Integration, Not Intrusion:** Ads are designed to complement your content, not detract from it.
     - **Theme-Aware Styling:** Native ads automatically inherit their look and feel from the user's selected theme (light/dark mode, colors, fonts), making them feel like a natural part of the UI.
     - **Format-Aware Loading:** The system intelligently requests the right ad format (e.g., small or large templates) to match the user's feed layout preferences, ensuring a perfect fit every time.

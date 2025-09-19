@@ -138,7 +138,7 @@ Get started for free and purchase when you're ready to launch!
 
 - **TRY IT:** Download and explore the full source code under the PolyForm Free Trial [license](LICENSE). Perfect for evaluation.
 - **BUY IT:** One-time payment for a lifetime license to publish unlimited commercial apps.
-- **GET YOURS:** [**Purchase via GitHub Sponsors**](https://github.sponsors/flutter-news-app-full-source-code).
+- **GET YOURS:** [**Purchase via GitHub Sponsors**](https://github.sponsors.com/flutter-news-app-full-source-code).
 
 > A single purchase provides a commercial license for every repository within the [Flutter News App Full Source Code Toolkit](https://github.com/flutter-news-app-full-source-code). No other purchases are needed.
 

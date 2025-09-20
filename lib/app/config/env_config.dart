@@ -1,4 +1,4 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:dotenv/dotenv.dart';
 
 /// Defines the different application environments.
 enum AppEnvironment {
@@ -23,17 +23,19 @@ class EnvConfig {
   /// {@macro env_config}
   const EnvConfig._();
 
+  static final _env = DotEnv(includePlatformEnvironment: true);
+
   /// Initializes the environment configuration by loading the `.env` file.
   ///
   /// This method must be called once at application startup before accessing
   /// any environment variables.
-  static Future<void> init() async {
-    await dotenv.load(fileName: '.env');
+  static void init() {
+    _env.load(['.env']);
   }
 
   /// The base URL for the API, loaded from the `BASE_URL` variable.
   static String get baseUrl {
-    return dotenv.env['BASE_URL'] ?? '';
+    return _env['BASE_URL'] ?? '';
   }
 
   /// The current application environment, parsed from the `APP_ENVIRONMENT`
@@ -41,7 +43,7 @@ class EnvConfig {
   ///
   /// Defaults to `AppEnvironment.demo` if the variable is missing or invalid.
   static AppEnvironment get appEnvironment {
-    final env = dotenv.env['APP_ENVIRONMENT']?.toLowerCase();
+    final env = _env['APP_ENVIRONMENT']?.toLowerCase();
     switch (env) {
       case 'production':
         return AppEnvironment.production;

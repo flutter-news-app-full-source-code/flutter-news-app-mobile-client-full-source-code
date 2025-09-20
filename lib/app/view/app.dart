@@ -8,7 +8,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.d
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_status_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_initializer_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
@@ -42,7 +41,6 @@ class App extends StatelessWidget {
     required DataRepository<RemoteConfig> remoteConfigRepository,
     required DataRepository<User> userRepository,
     required KVStorageService kvStorageService,
-    required AppEnvironment environment,
     required AdService adService,
     required DataRepository<LocalAd> localAdRepository,
     required GlobalKey<NavigatorState> navigatorKey,
@@ -63,7 +61,6 @@ class App extends StatelessWidget {
        _appConfigRepository = remoteConfigRepository,
        _userRepository = userRepository,
        _kvStorageService = kvStorageService,
-       _environment = environment,
        _adService = adService,
        _localAdRepository = localAdRepository,
        _navigatorKey = navigatorKey,
@@ -82,7 +79,6 @@ class App extends StatelessWidget {
   final DataRepository<RemoteConfig> _appConfigRepository;
   final DataRepository<User> _userRepository;
   final KVStorageService _kvStorageService;
-  final AppEnvironment _environment;
   final AdService _adService;
   final DataRepository<LocalAd> _localAdRepository;
   final GlobalKey<NavigatorState> _navigatorKey;
@@ -129,15 +125,14 @@ class App extends StatelessWidget {
                   appConfigRepository: context
                       .read<DataRepository<RemoteConfig>>(),
                   userRepository: context.read<DataRepository<User>>(),
-                  environment: _environment,
-                  demoDataMigrationService: demoDataMigrationService,
-                  demoDataInitializerService: demoDataInitializerService,
-                  initialUser: initialUser,
                   navigatorKey: _navigatorKey, // Pass navigatorKey to AppBloc
                   initialRemoteConfig:
                       _initialRemoteConfig, // Pass initialRemoteConfig
                   initialRemoteConfigError:
                       _initialRemoteConfigError, // Pass initialRemoteConfigError
+                  demoDataMigrationService: demoDataMigrationService,
+                  demoDataInitializerService: demoDataInitializerService,
+                  initialUser: initialUser,
                 )..add(
                   AppStarted(initialUser: initialUser),
                 ), // Dispatch AppStarted event
@@ -168,7 +163,6 @@ class App extends StatelessWidget {
           userContentPreferencesRepository: _userContentPreferencesRepository,
           appConfigRepository: _appConfigRepository,
           userRepository: _userRepository,
-          environment: _environment,
           adService: _adService,
           localAdRepository: _localAdRepository,
           navigatorKey: _navigatorKey, // Pass navigatorKey to _AppView
@@ -190,7 +184,6 @@ class _AppView extends StatefulWidget {
     required this.userContentPreferencesRepository,
     required this.appConfigRepository,
     required this.userRepository,
-    required this.environment,
     required this.adService,
     required this.localAdRepository,
     required this.navigatorKey,
@@ -206,7 +199,6 @@ class _AppView extends StatefulWidget {
   final DataRepository<UserContentPreferences> userContentPreferencesRepository;
   final DataRepository<RemoteConfig> appConfigRepository;
   final DataRepository<User> userRepository;
-  final AppEnvironment environment;
   final AdService adService;
   final DataRepository<LocalAd> localAdRepository;
   final GlobalKey<NavigatorState> navigatorKey;
@@ -237,7 +229,6 @@ class _AppViewState extends State<_AppView> {
     _appStatusService = AppStatusService(
       context: context,
       checkInterval: const Duration(minutes: 15),
-      environment: widget.environment,
     );
 
     _router = createRouter(

@@ -7,7 +7,7 @@ import 'package:data_api/data_api.dart';
 import 'package:data_client/data_client.dart';
 import 'package:data_inmemory/data_inmemory.dart';
 import 'package:data_repository/data_repository.dart';
-import 'package:flutter/foundation.dart' show kIsWeb; // Import kIsWeb
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
@@ -21,8 +21,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/demo_ad_prov
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/local_ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/app.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
-    as app_config;
+import 'package:flutter_news_app_mobile_client_full_source_code/app/config/env_config.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_initializer_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/bloc_observer.dart';
@@ -34,10 +33,7 @@ import 'package:logging/logging.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:ui_kit/ui_kit.dart';
 
-Future<Widget> bootstrap(
-  app_config.AppConfig appConfig,
-  app_config.AppEnvironment environment,
-) async {
+Future<Widget> bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = const AppBlocObserver();
   final logger = Logger('bootstrap');
@@ -56,7 +52,7 @@ Future<Widget> bootstrap(
   // This HttpClient instance is used for all subsequent API calls, including
   // the initial unauthenticated fetch of RemoteConfig.
   final httpClient = HttpClient(
-    baseUrl: appConfig.baseUrl,
+    baseUrl: EnvConfig.baseUrl,
     tokenProvider: () =>
         kvStorage.readString(key: StorageKey.authToken.stringValue),
     logger: logger,
@@ -65,7 +61,7 @@ Future<Widget> bootstrap(
   // 3. Initialize RemoteConfigClient and Repository, and fetch RemoteConfig.
   // This is done early because RemoteConfig is now publicly accessible (unauthenticated).
   late DataClient<RemoteConfig> remoteConfigClient;
-  if (appConfig.environment == app_config.AppEnvironment.demo) {
+  if (EnvConfig.appEnvironment == AppEnvironment.demo) {
     remoteConfigClient = DataInMemory<RemoteConfig>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
@@ -116,7 +112,7 @@ Future<Widget> bootstrap(
   // on configurations defined in RemoteConfig (though not directly in this case).
   late final AuthClient authClient;
   late final AuthRepository authenticationRepository;
-  if (appConfig.environment == app_config.AppEnvironment.demo) {
+  if (EnvConfig.appEnvironment == AppEnvironment.demo) {
     // In-memory authentication for demo environment.
     authClient = AuthInmemory();
     authenticationRepository = AuthRepository(
@@ -138,7 +134,7 @@ Future<Widget> bootstrap(
   // Conditionally instantiate ad providers based on the application environment.
   // This ensures that only the relevant ad providers are available for the
   // current environment, preventing unintended usage.
-  if (appConfig.environment == app_config.AppEnvironment.demo || kIsWeb) {
+  if (EnvConfig.appEnvironment == AppEnvironment.demo || kIsWeb) {
     final demoAdProvider = DemoAdProvider(logger: logger);
     adProviders = {
       // In the demo environment or on the web, all ad platform types map to
@@ -175,7 +171,6 @@ Future<Widget> bootstrap(
 
   final adService = AdService(
     adProviders: adProviders,
-    environment: appConfig.environment,
     logger: logger,
   );
   await adService.initialize();
@@ -201,7 +196,7 @@ Future<Widget> bootstrap(
   late final DataClient<UserAppSettings> userAppSettingsClient;
   late final DataClient<User> userClient;
   late final DataClient<LocalAd> localAdClient;
-  if (appConfig.environment == app_config.AppEnvironment.demo) {
+  if (EnvConfig.appEnvironment == AppEnvironment.demo) {
     headlinesClient = DataInMemory<Headline>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
@@ -275,7 +270,7 @@ Future<Widget> bootstrap(
       initialData: localAdsFixturesData,
       logger: logger,
     );
-  } else if (appConfig.environment == app_config.AppEnvironment.development) {
+  } else if (EnvConfig.appEnvironment == AppEnvironment.development) {
     headlinesClient = DataApi<Headline>(
       httpClient: httpClient,
       modelName: 'headline',
@@ -412,7 +407,7 @@ Future<Widget> bootstrap(
 
   // Conditionally instantiate DemoDataMigrationService
   final demoDataMigrationService =
-      appConfig.environment == app_config.AppEnvironment.demo
+      EnvConfig.appEnvironment == AppEnvironment.demo
       ? DemoDataMigrationService(
           userAppSettingsRepository: userAppSettingsRepository,
           userContentPreferencesRepository: userContentPreferencesRepository,
@@ -425,7 +420,7 @@ Future<Widget> bootstrap(
   // exists in the data in-memory clients when a user is first encountered
   // in the demo environment.
   final demoDataInitializerService =
-      appConfig.environment == app_config.AppEnvironment.demo
+      EnvConfig.appEnvironment == AppEnvironment.demo
       ? DemoDataInitializerService(
           userAppSettingsRepository: userAppSettingsRepository,
           userContentPreferencesRepository: userContentPreferencesRepository,
@@ -443,9 +438,6 @@ Future<Widget> bootstrap(
     remoteConfigRepository: remoteConfigRepository,
     userRepository: userRepository,
     kvStorageService: kvStorage,
-    environment: environment,
-    demoDataMigrationService: demoDataMigrationService,
-    demoDataInitializerService: demoDataInitializerService,
     adService: adService,
     inlineAdCacheService: inlineAdCacheService,
     initialUser: initialUser,
@@ -453,5 +445,7 @@ Future<Widget> bootstrap(
     navigatorKey: navigatorKey,
     initialRemoteConfig: initialRemoteConfig,
     initialRemoteConfigError: initialRemoteConfigError,
+    demoDataMigrationService: demoDataMigrationService,
+    demoDataInitializerService: demoDataInitializerService,
   );
 }

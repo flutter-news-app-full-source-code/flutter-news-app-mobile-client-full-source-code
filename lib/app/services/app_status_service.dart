@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/config/env_config.dart'; // Updated import
 import 'package:logging/logging.dart';
 
 /// {@template app_status_service}
@@ -30,10 +30,8 @@ class AppStatusService with WidgetsBindingObserver {
   AppStatusService({
     required BuildContext context,
     required Duration checkInterval,
-    required AppEnvironment environment,
   }) : _context = context,
        _checkInterval = checkInterval,
-       _environment = environment,
        _logger = Logger('AppStatusService') {
     // Immediately register this service as a lifecycle observer.
     WidgetsBinding.instance.addObserver(this);
@@ -46,9 +44,6 @@ class AppStatusService with WidgetsBindingObserver {
 
   /// The interval at which to perform periodic status checks.
   final Duration _checkInterval;
-
-  /// The current application environment.
-  final AppEnvironment _environment;
 
   /// The logger instance for this service.
   final Logger _logger;
@@ -66,7 +61,7 @@ class AppStatusService with WidgetsBindingObserver {
     // Create a new periodic timer.
     _timer = Timer.periodic(_checkInterval, (_) {
       // In demo mode, periodic checks are not needed as there's no backend.
-      if (_environment == AppEnvironment.demo) {
+      if (EnvConfig.appEnvironment == AppEnvironment.demo) {
         _logger.info('[AppStatusService] Demo mode: Skipping periodic check.');
         return;
       }
@@ -88,7 +83,7 @@ class AppStatusService with WidgetsBindingObserver {
     // In demo mode, we disable the app resume check. This is especially
     // useful on web, where switching browser tabs would otherwise trigger
     // a reload, which is unnecessary and can be distracting for demos.
-    if (_environment == AppEnvironment.demo) {
+    if (EnvConfig.appEnvironment == AppEnvironment.demo) {
       _logger.info(
         '[AppStatusService] Demo mode: Skipping app lifecycle check.',
       );

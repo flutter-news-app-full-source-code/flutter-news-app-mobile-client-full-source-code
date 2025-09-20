@@ -40,7 +40,6 @@ class AppState extends Equatable {
   /// {@macro app_state}
   const AppState({
     required this.status,
-    required this.environment,
     this.user,
     this.remoteConfig,
     this.initialRemoteConfigError,
@@ -82,7 +81,7 @@ class AppState extends Equatable {
   final int selectedBottomNavigationIndex;
 
   /// The current application environment (e.g., demo, development, production).
-  final local_config.AppEnvironment environment;
+  AppEnvironment get environment => EnvConfig.appEnvironment;
 
   /// The current theme mode (light, dark, or system), derived from [settings].
   /// Defaults to [ThemeMode.system] if [settings] are not yet loaded.
@@ -166,7 +165,6 @@ class AppState extends Equatable {
     HttpException? initialUserPreferencesError,
     UserContentPreferences? userContentPreferences,
     int? selectedBottomNavigationIndex,
-    local_config.AppEnvironment? environment,
   }) {
     return AppState(
       status: status ?? this.status,
@@ -181,7 +179,6 @@ class AppState extends Equatable {
           userContentPreferences ?? this.userContentPreferences,
       selectedBottomNavigationIndex:
           selectedBottomNavigationIndex ?? this.selectedBottomNavigationIndex,
-      environment: environment ?? this.environment,
     );
   }
 }

@@ -23,7 +23,7 @@ This app comes packed with all the features you need to launch a professional ne
 Click on any category to explore.
 
 <details>
-<summary><strong>📰 Core User Experience</strong></summary>
+<summary><strong>📰 Content Discovery & Feed</strong></summary>
 
 ### 📰 Dynamic & Engaging Headlines Feed
 - Display news in a beautiful, performant, infinitely scrolling feed.
@@ -39,7 +39,10 @@ Click on any category to explore.
 - **Unified Search:** Includes a dedicated search page to help users find specific content quickly, with the ability to search across headlines, topics, sources, and countries.
 > **🎯 Your Advantage:** Give your users powerful content discovery tools that keep them engaged and coming back for more.
 
----
+</details>
+
+<details>
+<summary><strong>🔐 Security & Customization</strong></summary>
 
 ### 🔐 Robust User Authentication
 - 📧 **Email + Code (Passwordless) Sign-In:** Modern and secure.

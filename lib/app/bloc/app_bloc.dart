@@ -7,8 +7,7 @@ import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
-    as local_config;
+import 'package:flutter_news_app_mobile_client_full_source_code/app/config/env_config.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_initializer_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
 import 'package:logging/logging.dart';
@@ -37,7 +36,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     userContentPreferencesRepository,
     required DataRepository<RemoteConfig> appConfigRepository,
     required DataRepository<User> userRepository,
-    required local_config.AppEnvironment environment,
     required GlobalKey<NavigatorState> navigatorKey,
     required RemoteConfig? initialRemoteConfig,
     required HttpException? initialRemoteConfigError,
@@ -49,7 +47,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _userContentPreferencesRepository = userContentPreferencesRepository,
        _appConfigRepository = appConfigRepository,
        _userRepository = userRepository,
-       _environment = environment,
        _navigatorKey = navigatorKey,
        _logger = Logger('AppBloc'),
        super(
@@ -60,7 +57,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
            selectedBottomNavigationIndex: 0,
            remoteConfig: initialRemoteConfig,
            initialRemoteConfigError: initialRemoteConfigError,
-           environment: environment,
            user: initialUser,
          ),
        ) {
@@ -89,7 +85,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   _userContentPreferencesRepository;
   final DataRepository<RemoteConfig> _appConfigRepository;
   final DataRepository<User> _userRepository;
-  final local_config.AppEnvironment _environment;
   final GlobalKey<NavigatorState> _navigatorKey;
   final Logger _logger;
   final DemoDataMigrationService? demoDataMigrationService;
@@ -145,7 +140,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       );
       // In demo mode, NotFoundException for user settings is expected if not yet initialized.
       // Do not transition to criticalError immediately.
-      if (_environment != local_config.AppEnvironment.demo ||
+      if (EnvConfig.appEnvironment != AppEnvironment.demo ||
           e is! NotFoundException) {
         emit(
           state.copyWith(
@@ -192,7 +187,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       );
       // In demo mode, NotFoundException for user content preferences is expected if not yet initialized.
       // Do not transition to criticalError immediately.
-      if (_environment != local_config.AppEnvironment.demo ||
+      if (EnvConfig.appEnvironment != AppEnvironment.demo ||
           e is! NotFoundException) {
         emit(
           state.copyWith(
@@ -329,7 +324,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // preferences, and the user object itself in the data client)
       // are initialized if they don't already exist. This prevents
       // NotFoundException during subsequent reads.
-      if (_environment == local_config.AppEnvironment.demo &&
+      if (EnvConfig.appEnvironment == AppEnvironment.demo &&
           demoDataInitializerService != null) {
         _logger.info(
           '[AppBloc] Demo mode: Initializing user-specific data for '
@@ -368,7 +363,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           'authenticated user ${newUser.id}. Attempting data migration.',
         );
         if (demoDataMigrationService != null &&
-            _environment == local_config.AppEnvironment.demo) {
+            EnvConfig.appEnvironment == AppEnvironment.demo) {
           try {
             await demoDataMigrationService!.migrateAnonymousData(
               oldUserId: oldUser.id,

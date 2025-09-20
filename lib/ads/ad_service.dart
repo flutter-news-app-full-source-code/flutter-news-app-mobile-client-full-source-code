@@ -3,7 +3,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/config/env_config.dart'; // Updated import
 import 'package:logging/logging.dart';
 
 /// {@template ad_service}
@@ -21,14 +21,11 @@ class AdService {
   /// These providers will be used to load ads from specific ad networks.
   AdService({
     required Map<AdPlatformType, AdProvider> adProviders,
-    required AppEnvironment environment,
     Logger? logger,
   }) : _adProviders = adProviders,
-       _environment = environment,
        _logger = logger ?? Logger('AdService');
 
   final Map<AdPlatformType, AdProvider> _adProviders;
-  final AppEnvironment _environment;
   final Logger _logger;
 
   // Configurable retry parameters for ad loading.
@@ -143,7 +140,7 @@ class AdService {
     // If RemoteConfig specifies AdPlatformType.demo but the app is not in demo environment,
     // log a warning and skip ad load.
     if (primaryAdPlatform == AdPlatformType.demo &&
-        _environment != AppEnvironment.demo) {
+        EnvConfig.appEnvironment != AppEnvironment.demo) {
       _logger.warning(
         'AdService: RemoteConfig specifies AdPlatformType.demo as primary '
         'ad platform, but app is not in demo environment. Skipping interstitial ad load.',
@@ -284,7 +281,7 @@ class AdService {
     // If RemoteConfig specifies AdPlatformType.demo but the app is not in demo environment,
     // log a warning and skip ad load.
     if (primaryAdPlatform == AdPlatformType.demo &&
-        _environment != AppEnvironment.demo) {
+        EnvConfig.appEnvironment != AppEnvironment.demo) {
       _logger.warning(
         'AdService: RemoteConfig specifies AdPlatformType.demo as primary '
         'ad platform, but app is not in demo environment. Skipping inline ad load.',

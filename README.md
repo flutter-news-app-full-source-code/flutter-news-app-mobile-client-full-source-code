@@ -124,8 +124,8 @@ Gain complete command over your application's operational state and user experie
 ---
 
 ### 🛠️ Flexible Environment Configuration
-- Easily switch between development (in-memory data or local API) and production environments with a simple code change. This empowers rapid prototyping, robust testing, and seamless deployment.
-> **🚀 Your Advantage:** A flexible setup that speeds up your development cycle and makes deployment simple.
+- The application uses `.env` files and the `dotenv` package for robust and secure environment configuration. Easily switch between `development` (local API), `production` (live API), and `demo` (in-memory data) environments by updating a single `.env` file. This approach ensures sensitive credentials are kept out of source control and simplifies deployment across different stages.
+> **🚀 Your Advantage:** A flexible, secure, and production-ready setup that speeds up your development cycle and makes deployment simple.
 
 ---
 

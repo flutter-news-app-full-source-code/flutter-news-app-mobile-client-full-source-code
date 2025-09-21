@@ -13,23 +13,42 @@ class AppBlocObserver extends BlocObserver {
     final dynamic oldState = change.currentState;
     final dynamic newState = change.nextState;
 
-    var oldStateInfo = oldState.runtimeType.toString();
-    var newStateInfo = newState.runtimeType.toString();
+    // Initialize state information strings.
+    // By default, truncate the full string representation of the state
+    // to the first 250 characters to prevent excessively long logs.
+    var oldStateInfo = oldState.toString().substring(
+      0,
+      oldState.toString().length > 250 ? 250 : oldState.toString().length,
+    );
+    var newStateInfo = newState.toString().substring(
+      0,
+      newState.toString().length > 250 ? 250 : newState.toString().length,
+    );
 
     try {
-      // Attempt to access a 'status' property if it exists
+      // Attempt to access a 'status' property on the state objects.
+      // Many BLoC states use a 'status' property (e.g., Loading, Success, Failure)
+      // to represent their current lifecycle phase. If this property exists
+      // and is not null, prioritize logging its value for conciseness.
       if (oldState.status != null) {
         oldStateInfo = 'status: ${oldState.status}';
       }
       if (newState.status != null) {
         newStateInfo = 'status: ${newState.status}';
       }
-    } catch (_) {
-      // If 'status' property does not exist, or is null,
-      // or if there's any other error accessing it,
-      // fall back to runtimeType (which is already set).
+    } catch (e) {
+      // This catch block handles cases where:
+      // 1. The 'status' property does not exist on the state object (NoSuchMethodError).
+      // 2. Accessing 'status' throws any other runtime error.
+      // In such scenarios, the `oldStateInfo` and `newStateInfo` variables
+      // will retain their initially truncated string representations,
+      // providing a fallback for states without a 'status' property.
+      // Log the error for debugging purposes, but do not rethrow to avoid
+      // crashing the observer.
+      log('Error accessing status property for ${bloc.runtimeType}: $e');
     }
 
+    // Log the state change, including the BLoC type and the old and new state information.
     log('onChange(${bloc.runtimeType}, $oldStateInfo -> $newStateInfo)');
   }
 

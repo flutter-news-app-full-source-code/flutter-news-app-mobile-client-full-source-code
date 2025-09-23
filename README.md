@@ -135,15 +135,10 @@ Gain complete command over your application's operational state and user experie
 
 </details>
 
-## 🔑 License: Source-Available with a Free Trial
+## 🔑 Licensing
 
-Get started for free and purchase when you're ready to launch!
+This `Flutter News App Mobile Client` package is an integral part of the [**Flutter News App Full Source Code Toolkit**](https://github.com/flutter-news-app-full-source-code). For comprehensive details regarding licensing, including trial and commercial options for the entire toolkit, please refer to the main toolkit organization page.
 
-- **TRY IT:** Download and explore the full source code under the PolyForm Free Trial [license](LICENSE). Perfect for evaluation.
-- **BUY IT:** One-time payment for a lifetime license to publish unlimited commercial apps.
-- **GET YOURS:** [**Purchase via GitHub Sponsors**](https://github.com/sponsors/flutter-news-app-full-source-code).
-
-> A single purchase provides a commercial license for every repository within the [Flutter News App Full Source Code Toolkit](https://github.com/flutter-news-app-full-source-code). No other purchases are needed.
 
 ## 🚀 Getting Started & Running Locally
 

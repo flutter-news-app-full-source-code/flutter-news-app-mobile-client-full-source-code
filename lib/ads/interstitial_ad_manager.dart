@@ -176,6 +176,7 @@ class InterstitialAdManager {
     if (requiredTransitions > 0 && _transitionCount >= requiredTransitions) {
       _logger.info('Transition count meets threshold. Attempting to show ad.');
       await _showAd();
+      // Reset counter after showing (or attempting to show)
       _transitionCount = 0;
     } else {
       _logger.info(
@@ -201,6 +202,7 @@ class InterstitialAdManager {
     }
 
     final adToShow = _preloadedAd!;
+    // Clear the pre-loaded ad before showing
     _preloadedAd = null;
 
     try {
@@ -234,6 +236,8 @@ class InterstitialAdManager {
     } finally {
       // After the ad is shown or fails to show, dispose of it and
       // start pre-loading the next one for the next opportunity.
+
+      // Ensure the ad object is disposed
       _disposePreloadedAd();
       unawaited(_maybePreloadAd(_appBloc.state));
     }
@@ -272,6 +276,7 @@ class InterstitialAdManager {
     // Await the result of showDialog, which completes when the dialog is popped.
     await showDialog<void>(
       context: context,
+      // Prevent dismissing by tapping outside
       barrierDismissible: false,
       builder: (_) => LocalInterstitialAdDialog(
         localInterstitialAd: ad.adObject as LocalInterstitialAd,
@@ -283,6 +288,7 @@ class InterstitialAdManager {
     // Await the result of showDialog, which completes when the dialog is popped.
     await showDialog<void>(
       context: context,
+      // Prevent dismissing by tapping outside
       barrierDismissible: false,
       builder: (_) => const DemoInterstitialAdDialog(),
     );

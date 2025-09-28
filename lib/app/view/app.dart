@@ -149,6 +149,7 @@ class App extends StatelessWidget {
               appBloc: context.read<AppBloc>(),
               adService: context.read<AdService>(),
             ),
+            // Ensure it's created immediately
             lazy: false,
           ),
         ],

@@ -348,6 +348,7 @@ class FeedDecoratorService {
               sort: [const SortOption('name', SortOrder.asc)],
               filter: {
                 '_id': {r'$nin': followedTopicIds},
+                'status': ContentStatus.active.name,
               },
             );
             if (topics.items.isEmpty) return null;
@@ -363,6 +364,7 @@ class FeedDecoratorService {
               sort: [const SortOption('name', SortOrder.asc)],
               filter: {
                 '_id': {r'$nin': followedSourceIds},
+                'status': ContentStatus.active.name,
               },
             );
             if (sources.items.isEmpty) return null;

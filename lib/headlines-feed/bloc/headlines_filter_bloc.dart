@@ -69,9 +69,11 @@ class HeadlinesFilterBloc
 
     try {
       final allTopicsResponse = await _topicsRepository.readAll(
+        filter: {'status': ContentStatus.active.name},
         sort: [const SortOption('name', SortOrder.asc)],
       );
       final allSourcesResponse = await _sourcesRepository.readAll(
+        filter: {'status': ContentStatus.active.name},
         sort: [const SortOption('name', SortOrder.asc)],
       );
       final allCountriesResponse = await _countriesRepository.readAll(
@@ -120,6 +122,7 @@ class HeadlinesFilterBloc
     emit(
       state.copyWith(
         selectedTopics: updatedSelectedTopics,
+        // Toggling individual item clears followed filter
         isUsingFollowedItems: false,
       ),
     );
@@ -139,6 +142,7 @@ class HeadlinesFilterBloc
     emit(
       state.copyWith(
         selectedSources: updatedSelectedSources,
+        // Toggling individual item clears followed filter
         isUsingFollowedItems: false,
       ),
     );
@@ -158,6 +162,7 @@ class HeadlinesFilterBloc
     emit(
       state.copyWith(
         selectedCountries: updatedSelectedCountries,
+        // Toggling individual item clears followed filter
         isUsingFollowedItems: false,
       ),
     );

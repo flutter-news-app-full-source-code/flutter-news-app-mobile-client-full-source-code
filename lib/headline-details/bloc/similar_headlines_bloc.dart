@@ -2,7 +2,13 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:core/core.dart'
-    show Headline, HttpException, PaginationOptions, SortOption, SortOrder;
+    show
+        ContentStatus,
+        Headline,
+        HttpException,
+        PaginationOptions,
+        SortOption,
+        SortOrder;
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
 
@@ -28,11 +34,16 @@ class SimilarHeadlinesBloc
     try {
       final currentHeadline = event.currentHeadline;
 
-      final filter = <String, dynamic>{'topic.id': currentHeadline.topic.id};
+      // Filter by topic ID and ensure only active headlines are fetched.
+      final filter = <String, dynamic>{
+        'topic.id': currentHeadline.topic.id,
+        'status': ContentStatus.active.name,
+      };
 
       final response = await _headlinesRepository.readAll(
         filter: filter,
         sort: [const SortOption('updatedAt', SortOrder.desc)],
+        // Fetch one extra to check if current is there
         pagination: const PaginationOptions(limit: _similarHeadlinesLimit + 1),
       );
 

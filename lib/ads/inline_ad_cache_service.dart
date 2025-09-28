@@ -109,6 +109,7 @@ class InlineAdCacheService {
     final ad = _cache[id];
     if (ad != null) {
       _logger.info('Removing and disposing inline ad with ID "$id".');
+      // Delegate disposal to AdService
       _adService.disposeAd(ad);
       _cache.remove(id);
     } else {
@@ -126,8 +127,12 @@ class InlineAdCacheService {
       'Clearing all cached inline ads and disposing their resources.',
     );
     for (final ad in _cache.values.whereType<InlineAd>()) {
+
+      // Delegate disposal to AdService
       _adService.disposeAd(ad);
     }
+    
+    // Ensure cache is empty after disposal attempts.
     _cache.clear();
     _logger.info('All cached inline ads cleared.');
   }

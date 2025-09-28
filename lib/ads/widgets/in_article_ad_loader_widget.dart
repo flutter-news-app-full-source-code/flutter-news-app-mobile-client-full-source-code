@@ -99,6 +99,7 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
       _adCacheService.removeAndDisposeAd(oldCacheKey);
 
       if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
+        // Complete normally to prevent crashes
         _loadAdCompleter!.complete();
       }
       _loadAdCompleter = null;
@@ -121,6 +122,7 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
     _adCacheService.removeAndDisposeAd(cacheKey);
 
     if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
+      // Complete normally to prevent crashes
       _loadAdCompleter!.complete();
     }
     _loadAdCompleter = null;

@@ -571,6 +571,7 @@ GoRouter createRouter({
                           }
                           return settingsBloc;
                         },
+                        // child is the actual page widget (SettingsPage, AppearanceSettingsPage, etc.)
                         child: child,
                       );
                     },

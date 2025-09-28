@@ -160,7 +160,7 @@ class HeadlinesSearchBloc
               );
             case ContentType.topic:
               response = await _topicRepository.readAll(
-                filter: {'q': searchTerm},
+                filter: {'q': searchTerm, 'status': ContentStatus.active.name},
                 pagination: PaginationOptions(
                   limit: _limit,
                   cursor: successState.cursor,
@@ -177,7 +177,7 @@ class HeadlinesSearchBloc
               );
             case ContentType.source:
               response = await _sourceRepository.readAll(
-                filter: {'q': searchTerm},
+                filter: {'q': searchTerm, 'status': ContentStatus.active.name},
                 pagination: PaginationOptions(
                   limit: _limit,
                   cursor: successState.cursor,
@@ -265,14 +265,14 @@ class HeadlinesSearchBloc
           );
         case ContentType.topic:
           rawResponse = await _topicRepository.readAll(
-            filter: {'q': searchTerm},
+            filter: {'q': searchTerm, 'status': ContentStatus.active.name},
             pagination: const PaginationOptions(limit: _limit),
             sort: [const SortOption('name', SortOrder.asc)],
           );
           processedItems = rawResponse.items.cast<FeedItem>();
         case ContentType.source:
           rawResponse = await _sourceRepository.readAll(
-            filter: {'q': searchTerm},
+            filter: {'q': searchTerm, 'status': ContentStatus.active.name},
             pagination: const PaginationOptions(limit: _limit),
             sort: [const SortOption('name', SortOrder.asc)],
           );

@@ -312,6 +312,17 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
         ),
       ),
       SliverPadding(
+        padding: horizontalPadding.copyWith(top: AppSpacing.md),
+        sliver: SliverToBoxAdapter(
+          child: Text(
+            DateFormat('MMM d, yyyy').format(headline.createdAt),
+            style: textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+            ),
+          ),
+        ),
+      ),
+      SliverPadding(
         padding: EdgeInsets.only(
           top: AppSpacing.md,
           left: horizontalPadding.left,
@@ -347,13 +358,22 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           ),
         ),
       ),
-      SliverPadding(
-        padding: horizontalPadding.copyWith(top: AppSpacing.lg),
-        sliver: SliverToBoxAdapter(
-          child: Wrap(
-            spacing: AppSpacing.md,
-            runSpacing: AppSpacing.sm,
-            children: _buildMetadataChips(context, headline, onEntityChipTap),
+      SliverToBoxAdapter(
+        child: SizedBox(
+          height: 52,
+          child: BlocBuilder<HeadlineDetailsBloc, HeadlineDetailsState>(
+            builder: (context, state) {
+              final chips =
+                  _buildMetadataChips(context, headline, onEntityChipTap);
+              return ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: horizontalPadding.copyWith(top: AppSpacing.lg),
+                itemCount: chips.length,
+                separatorBuilder: (context, index) =>
+                    const SizedBox(width: AppSpacing.sm),
+                itemBuilder: (context, index) => chips[index],
+              );
+            },
           ),
         ),
       ),
@@ -540,102 +560,57 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     final colorScheme = theme.colorScheme;
     final chipLabelStyle = textTheme.labelMedium?.copyWith(
       color: colorScheme.onSecondaryContainer,
+      fontWeight: FontWeight.w600,
     );
-    final chipBackgroundColor = colorScheme.secondaryContainer;
+    final chipBackgroundColor = colorScheme.secondaryContainer.withOpacity(0.6);
     final chipAvatarColor = colorScheme.onSecondaryContainer;
-    const chipAvatarSize = AppSpacing.md;
-    const chipPadding = EdgeInsets.symmetric(
-      horizontal: AppSpacing.sm,
-      vertical: AppSpacing.xs,
-    );
-    final chipShape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(AppSpacing.sm),
-      side: BorderSide(color: colorScheme.outlineVariant.withOpacity(0.3)),
-    );
+    const chipAvatarSize = 18.0;
 
-    final chips = <Widget>[];
-
-    final formattedDate = DateFormat('MMM d, yyyy').format(headline.createdAt);
-    chips
-      ..add(
-        Chip(
-          avatar: Icon(
-            Icons.calendar_today_outlined,
-            size: chipAvatarSize,
-            color: chipAvatarColor,
-          ),
-          label: Text(formattedDate),
-          labelStyle: chipLabelStyle,
-          backgroundColor: chipBackgroundColor,
-          padding: chipPadding,
-          shape: chipShape,
-          visualDensity: VisualDensity.compact,
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    Widget buildChip({
+      required IconData icon,
+      required String label,
+      required VoidCallback onPressed,
+    }) {
+      return ActionChip(
+        avatar: Icon(
+          icon,
+          size: chipAvatarSize,
+          color: chipAvatarColor,
         ),
-      )
-      ..add(
-        InkWell(
-          onTap: () => onEntityChipTap(ContentType.source, headline.source.id),
-          borderRadius: BorderRadius.circular(AppSpacing.sm),
-          child: Chip(
-            avatar: Icon(
-              Icons.source_outlined,
-              size: chipAvatarSize,
-              color: chipAvatarColor,
-            ),
-            label: Text(headline.source.name),
-            labelStyle: chipLabelStyle,
-            backgroundColor: chipBackgroundColor,
-            padding: chipPadding,
-            shape: chipShape,
-            visualDensity: VisualDensity.compact,
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          ),
+        label: Text(label),
+        labelStyle: chipLabelStyle,
+        backgroundColor: chipBackgroundColor,
+        onPressed: onPressed,
+        visualDensity: VisualDensity.compact,
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm,
+          vertical: AppSpacing.xs,
         ),
-      )
-      ..add(
-        InkWell(
-          onTap: () => onEntityChipTap(ContentType.topic, headline.topic.id),
-          borderRadius: BorderRadius.circular(AppSpacing.sm),
-          child: Chip(
-            avatar: Icon(
-              Icons.category_outlined,
-              size: chipAvatarSize,
-              color: chipAvatarColor,
-            ),
-            label: Text(headline.topic.name),
-            labelStyle: chipLabelStyle,
-            backgroundColor: chipBackgroundColor,
-            padding: chipPadding,
-            shape: chipShape,
-            visualDensity: VisualDensity.compact,
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          ),
-        ),
-      )
-      ..add(
-        InkWell(
-          onTap: () =>
-              onEntityChipTap(ContentType.country, headline.eventCountry.id),
-          borderRadius: BorderRadius.circular(AppSpacing.sm),
-          child: Chip(
-            avatar: Icon(
-              Icons.location_city_outlined,
-              size: chipAvatarSize,
-              color: chipAvatarColor,
-            ),
-            label: Text(headline.eventCountry.name),
-            labelStyle: chipLabelStyle,
-            backgroundColor: chipBackgroundColor,
-            padding: chipPadding,
-            shape: chipShape,
-            visualDensity: VisualDensity.compact,
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.lg),
+          side: BorderSide.none,
         ),
       );
+    }
 
-    return chips;
+    return [
+      buildChip(
+        icon: Icons.source_outlined,
+        label: headline.source.name,
+        onPressed: () => onEntityChipTap(ContentType.source, headline.source.id),
+      ),
+      buildChip(
+        icon: Icons.category_outlined,
+        label: headline.topic.name,
+        onPressed: () => onEntityChipTap(ContentType.topic, headline.topic.id),
+      ),
+      buildChip(
+        icon: Icons.location_city_outlined,
+        label: headline.eventCountry.name,
+        onPressed: () =>
+            onEntityChipTap(ContentType.country, headline.eventCountry.id),
+      ),
+    ];
   }
 
   Widget _buildSimilarHeadlinesSection(

@@ -51,6 +51,7 @@ class SuggestionItemWidget extends StatelessWidget {
     }
 
     return Card(
+      color: theme.colorScheme.surfaceVariant,
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
       child: SizedBox(
         width: 160,
@@ -64,7 +65,7 @@ class SuggestionItemWidget extends StatelessWidget {
                 width: 64,
                 height: 64,
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceVariant,
+                  color: theme.colorScheme.surface,
                   borderRadius: BorderRadius.circular(AppSpacing.sm),
                 ),
                 child: imageUrl.isNotEmpty
@@ -75,14 +76,14 @@ class SuggestionItemWidget extends StatelessWidget {
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) => Icon(
                             Icons.broken_image,
-                            color: theme.colorScheme.onSurfaceVariant,
+                            color: theme.colorScheme.onSurface,
                           ),
                         ),
                       )
                     : Icon(
                         // Use a more specific icon for sources as a fallback.
                         item is Source ? Icons.source : Icons.category,
-                        color: theme.colorScheme.onSurfaceVariant,
+                        color: theme.colorScheme.onSurface,
                       ),
               ),
               const SizedBox(height: AppSpacing.md),

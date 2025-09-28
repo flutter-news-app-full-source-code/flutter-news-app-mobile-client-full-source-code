@@ -315,7 +315,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
         padding: horizontalPadding.copyWith(top: AppSpacing.md),
         sliver: SliverToBoxAdapter(
           child: Text(
-            DateFormat('MMM d, yyyy').format(headline.createdAt),
+            DateFormat('yyyy/MM/dd').format(headline.createdAt),
             style: textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant.withOpacity(0.7),
             ),

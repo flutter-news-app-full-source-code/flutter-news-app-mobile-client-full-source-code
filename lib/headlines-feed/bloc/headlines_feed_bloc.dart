@@ -84,6 +84,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         r'$in': filter.eventCountries!.map((c) => c.id).toList(),
       };
     }
+    // Always filter for active content.
+    queryFilter['status'] = ContentStatus.active.name;
     // Note: The `selectedSourceCountryIsoCodes` and `selectedSourceSourceTypes`
     // fields are used exclusively for UI-side filtering on the `SourceFilterPage`
     // and are not included in the backend query for headlines. Source filtering

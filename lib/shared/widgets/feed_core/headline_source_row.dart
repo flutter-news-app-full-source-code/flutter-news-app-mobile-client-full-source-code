@@ -2,6 +2,7 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/interstitial_ad_manager.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:go_router/go_router.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -12,10 +13,7 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class HeadlineSourceRow extends StatelessWidget {
   /// {@macro headline_source_row}
-  const HeadlineSourceRow({
-    required this.headline,
-    super.key,
-  });
+  const HeadlineSourceRow({required this.headline, super.key});
 
   /// The headline data to display.
   final Headline headline;
@@ -37,8 +35,12 @@ class HeadlineSourceRow extends StatelessWidget {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
+    final currentLocale = context.watch<AppBloc>().state.locale;
 
-    final formattedDate = timeago.format(headline.createdAt);
+    final formattedDate = timeago.format(
+      headline.createdAt,
+      locale: currentLocale.languageCode,
+    );
 
     final sourceTextStyle = textTheme.bodySmall?.copyWith(
       color: colorScheme.onSurfaceVariant,
@@ -75,11 +77,7 @@ class HeadlineSourceRow extends StatelessWidget {
             ),
           ),
         ),
-        if (formattedDate.isNotEmpty)
-          Text(
-            formattedDate,
-            style: dateTextStyle,
-          ),
+        if (formattedDate.isNotEmpty) Text(formattedDate, style: dateTextStyle),
       ],
     );
   }

@@ -216,6 +216,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
         adType: widget.adPlaceholder.adType,
         adThemeStyle: widget.adThemeStyle,
         headlineImageStyle: headlineImageStyle,
+        userRole: userRole,
       );
 
       if (loadedAd != null) {

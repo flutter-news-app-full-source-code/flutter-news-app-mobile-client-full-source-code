@@ -192,15 +192,12 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                       width: AppSpacing.xxl,
                       height: AppSpacing.xxl,
                       fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) => Icon(
-                        appBarIconData ?? Icons.info_outline,
-                        size: AppSpacing.xxl,
-                        color: colorScheme.onSurfaceVariant,
-                      ),
+                      errorBuilder: (context, error, stackTrace) =>
+                          const SizedBox(),
                     ),
                   ),
                 )
-              else if (appBarIconData != null)
+              else if (state.entity is Source && appBarIconData != null)
                 Padding(
                   padding: Directionality.of(context) == TextDirection.ltr
                       ? const EdgeInsets.only(right: AppSpacing.md)
@@ -267,8 +264,10 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                 )
               else
                 SliverPadding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.paddingMedium,
+                  padding: const EdgeInsets.only(
+                    top: AppSpacing.paddingMedium,
+                    left: AppSpacing.paddingMedium,
+                    right: AppSpacing.paddingMedium,
                   ),
                   sliver: SliverList.separated(
                     itemCount:

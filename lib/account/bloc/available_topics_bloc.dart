@@ -29,7 +29,9 @@ class AvailableTopicsBloc
     emit(state.copyWith(status: AvailableTopicsStatus.loading));
     try {
       // TODO(fulleni): Add pagination if necessary for very large datasets.
+      // Filter to fetch only active topics.
       final response = await _topicsRepository.readAll(
+        filter: {'status': ContentStatus.active.name},
         sort: [const SortOption('name', SortOrder.asc)],
       );
       emit(

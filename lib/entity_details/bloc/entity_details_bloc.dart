@@ -102,6 +102,9 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         filter['eventCountry.id'] = (entityToLoad as Country).id;
       }
 
+      // Always filter for active headlines.
+      filter['status'] = ContentStatus.active.name;
+
       final headlineResponse = await _headlinesRepository.readAll(
         filter: filter,
         pagination: const PaginationOptions(limit: _headlinesLimit),
@@ -269,6 +272,9 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       } else if (state.entity is Country) {
         filter['eventCountry.id'] = (state.entity! as Country).id;
       }
+
+      // Always filter for active headlines.
+      filter['status'] = ContentStatus.active.name;
 
       final headlineResponse = await _headlinesRepository.readAll(
         filter: filter,

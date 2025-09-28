@@ -373,14 +373,17 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     ];
 
     // Add ad above continue reading button if configured
-    if (adConfig != null &&
+    final isAboveButtonAdVisible =
+        adConfig != null &&
         adConfig.enabled &&
         adConfig.articleAdConfiguration.enabled &&
         (adConfig
                 .articleAdConfiguration
                 .visibleTo[userRole]?[InArticleAdSlotType
                 .aboveArticleContinueReadingButton] ??
-            false)) {
+            false);
+
+    if (isAboveButtonAdVisible) {
       slivers.add(
         SliverToBoxAdapter(
           child: Column(
@@ -434,14 +437,17 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     ]);
 
     // Add ad below continue reading button if configured
-    if (adConfig != null &&
+    final isBelowButtonAdVisible =
+        adConfig != null &&
         adConfig.enabled &&
         adConfig.articleAdConfiguration.enabled &&
         (adConfig
                 .articleAdConfiguration
                 .visibleTo[userRole]?[InArticleAdSlotType
                 .belowArticleContinueReadingButton] ??
-            false)) {
+            false);
+
+    if (isBelowButtonAdVisible) {
       slivers.add(
         SliverToBoxAdapter(
           child: Column(

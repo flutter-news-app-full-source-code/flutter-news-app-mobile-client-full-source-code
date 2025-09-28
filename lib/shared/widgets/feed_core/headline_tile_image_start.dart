@@ -1,6 +1,6 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_metadata_row.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_source_row.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_tap_handler.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -86,6 +86,8 @@ class HeadlineTileImageStart extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    HeadlineSourceRow(headline: headline),
+                    const SizedBox(height: AppSpacing.sm),
                     Text(
                       headline.title,
                       style: textTheme.titleMedium?.copyWith(
@@ -93,14 +95,6 @@ class HeadlineTileImageStart extends StatelessWidget {
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    HeadlineMetadataRow(
-                      headline: headline,
-                      colorScheme: colorScheme,
-                      textTheme: textTheme,
-                      currentContextEntityType: currentContextEntityType,
-                      currentContextEntityId: currentContextEntityId,
                     ),
                   ],
                 ),

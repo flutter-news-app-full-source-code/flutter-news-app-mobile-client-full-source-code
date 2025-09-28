@@ -1,6 +1,6 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_metadata_row.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_source_row.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_tap_handler.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -47,84 +47,79 @@ class HeadlineTileImageTop extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.md,
+              AppSpacing.md,
+              AppSpacing.md,
+              AppSpacing.md,
+            ),
+            child: HeadlineSourceRow(headline: headline),
+          ),
           InkWell(
             onTap:
                 onHeadlineTap ??
                 () => HeadlineTapHandler.handleHeadlineTap(context, headline),
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(AppSpacing.xs),
-                topRight: Radius.circular(AppSpacing.xs),
-              ),
-              child: Image.network(
-                headline.imageUrl,
-                width: double.infinity,
-                height: 180,
-                fit: BoxFit.cover,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Container(
-                    width: double.infinity,
-                    height: 180,
-                    color: colorScheme.surfaceContainerHighest,
-                    child: const Center(
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  );
-                },
-                errorBuilder: (context, error, stackTrace) => Container(
+            child: Image.network(
+              headline.imageUrl,
+              width: double.infinity,
+              height: 180,
+              fit: BoxFit.cover,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return Container(
                   width: double.infinity,
                   height: 180,
                   color: colorScheme.surfaceContainerHighest,
-                  child: Icon(
-                    Icons.broken_image_outlined,
-                    color: colorScheme.onSurfaceVariant,
-                    size: AppSpacing.xxl,
+                  child: const Center(
+                    child: CircularProgressIndicator(strokeWidth: 2),
                   ),
+                );
+              },
+              errorBuilder: (context, error, stackTrace) => Container(
+                width: double.infinity,
+                height: 180,
+                color: colorScheme.surfaceContainerHighest,
+                child: Icon(
+                  Icons.broken_image_outlined,
+                  color: colorScheme.onSurfaceVariant,
+                  size: AppSpacing.xxl,
                 ),
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Column(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.md,
+              AppSpacing.md,
+              AppSpacing.md,
+              AppSpacing.md,
+            ),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: InkWell(
-                        onTap:
-                            onHeadlineTap ??
-                            () => HeadlineTapHandler.handleHeadlineTap(
+                Expanded(
+                  child: InkWell(
+                    onTap:
+                        onHeadlineTap ??
+                        () => HeadlineTapHandler.handleHeadlineTap(
                               context,
                               headline,
                             ),
-                        child: Text(
-                          headline.title,
-                          style: textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w500,
-                          ),
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                    child: Text(
+                      headline.title,
+                      style: textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w500,
                       ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    if (trailing != null) ...[
-                      const SizedBox(width: AppSpacing.sm),
-                      trailing!,
-                    ],
-                  ],
+                  ),
                 ),
-                const SizedBox(height: AppSpacing.sm),
-                HeadlineMetadataRow(
-                  headline: headline,
-                  colorScheme: colorScheme,
-                  textTheme: textTheme,
-                  currentContextEntityType: currentContextEntityType,
-                  currentContextEntityId: currentContextEntityId,
-                ),
+                if (trailing != null) ...[
+                  const SizedBox(width: AppSpacing.sm),
+                  trailing!,
+                ],
               ],
             ),
           ),

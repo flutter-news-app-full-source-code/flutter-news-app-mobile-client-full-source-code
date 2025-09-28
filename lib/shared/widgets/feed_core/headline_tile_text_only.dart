@@ -63,7 +63,7 @@ class HeadlineTileTextOnly extends StatelessWidget {
                       style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w500,
                       ),
-                      maxLines: 3, // Allow more lines for text-only
+                      maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: AppSpacing.sm),

@@ -1,6 +1,6 @@
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
-import 'package:logging/logging.dart'; // Import Logger
+import 'package:logging/logging.dart';
 
 /// {@template demo_data_migration_service}
 /// A service responsible for migrating user data (settings and preferences)

@@ -1,7 +1,6 @@
 //
 // ignore_for_file: avoid_redundant_argument_values
 
-import 'package:collection/collection.dart';
 import 'package:core/core.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -265,6 +264,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
 
     final adConfig = appBlocState.remoteConfig?.adConfig;
     final adThemeStyle = AdThemeStyle.fromTheme(Theme.of(context));
+    final userRole = appBlocState.user?.appRole ?? AppUserRole.guestUser;
 
     Future<void> onEntityChipTap(ContentType type, String id) async {
       // Await for the ad to be shown and dismissed.
@@ -375,36 +375,30 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     // Add ad above continue reading button if configured
     if (adConfig != null &&
         adConfig.enabled &&
-        adConfig.articleAdConfiguration.enabled) {
-      final aboveContinueReadingSlot = adConfig
-          .articleAdConfiguration
-          .inArticleAdSlotConfigurations
-          .firstWhereOrNull(
-            (slot) =>
-                slot.slotType ==
-                    InArticleAdSlotType.aboveArticleContinueReadingButton &&
-                slot.enabled,
-          );
-
-      if (aboveContinueReadingSlot != null) {
-        slivers.add(
-          SliverToBoxAdapter(
-            child: Column(
-              children: [
-                const SizedBox(height: AppSpacing.lg),
-                Padding(
-                  padding: horizontalPadding,
-                  child: InArticleAdLoaderWidget(
-                    slotConfiguration: aboveContinueReadingSlot,
-                    adThemeStyle: adThemeStyle,
-                    adConfig: adConfig,
-                  ),
+        adConfig.articleAdConfiguration.enabled &&
+        (adConfig
+                .articleAdConfiguration
+                .visibleTo[userRole]?[InArticleAdSlotType
+                .aboveArticleContinueReadingButton] ??
+            false)) {
+      slivers.add(
+        SliverToBoxAdapter(
+          child: Column(
+            children: [
+              const SizedBox(height: AppSpacing.lg),
+              Padding(
+                padding: horizontalPadding,
+                child: InArticleAdLoaderWidget(
+                  slotType:
+                      InArticleAdSlotType.aboveArticleContinueReadingButton,
+                  adThemeStyle: adThemeStyle,
+                  adConfig: adConfig,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        );
-      }
+        ),
+      );
     }
 
     slivers.addAll([
@@ -442,36 +436,30 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     // Add ad below continue reading button if configured
     if (adConfig != null &&
         adConfig.enabled &&
-        adConfig.articleAdConfiguration.enabled) {
-      final belowContinueReadingSlot = adConfig
-          .articleAdConfiguration
-          .inArticleAdSlotConfigurations
-          .firstWhereOrNull(
-            (slot) =>
-                slot.slotType ==
-                    InArticleAdSlotType.belowArticleContinueReadingButton &&
-                slot.enabled,
-          );
-
-      if (belowContinueReadingSlot != null) {
-        slivers.add(
-          SliverToBoxAdapter(
-            child: Column(
-              children: [
-                const SizedBox(height: AppSpacing.lg),
-                Padding(
-                  padding: horizontalPadding,
-                  child: InArticleAdLoaderWidget(
-                    slotConfiguration: belowContinueReadingSlot,
-                    adThemeStyle: adThemeStyle,
-                    adConfig: adConfig,
-                  ),
+        adConfig.articleAdConfiguration.enabled &&
+        (adConfig
+                .articleAdConfiguration
+                .visibleTo[userRole]?[InArticleAdSlotType
+                .belowArticleContinueReadingButton] ??
+            false)) {
+      slivers.add(
+        SliverToBoxAdapter(
+          child: Column(
+            children: [
+              const SizedBox(height: AppSpacing.lg),
+              Padding(
+                padding: horizontalPadding,
+                child: InArticleAdLoaderWidget(
+                  slotType:
+                      InArticleAdSlotType.belowArticleContinueReadingButton,
+                  adThemeStyle: adThemeStyle,
+                  adConfig: adConfig,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        );
-      }
+        ),
+      );
     }
 
     Future<void> onSimilarHeadlineTap(Headline similarHeadline) async {

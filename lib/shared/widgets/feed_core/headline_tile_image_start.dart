@@ -54,7 +54,7 @@ class HeadlineTileImageStart extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
-                width: 72, // Standard small image size
+                width: 72,
                 height: 72,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(AppSpacing.xs),
@@ -81,7 +81,7 @@ class HeadlineTileImageStart extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: AppSpacing.md), // Always add spacing
+              const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

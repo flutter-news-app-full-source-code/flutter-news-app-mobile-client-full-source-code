@@ -52,10 +52,7 @@ class _CountryFilterView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          title, // Use the dynamic title
-          style: textTheme.titleLarge,
-        ),
+        title: Text(title, style: textTheme.titleLarge),
         actions: [
           // Apply My Followed Countries Button
           BlocBuilder<HeadlinesFilterBloc, HeadlinesFilterState>(

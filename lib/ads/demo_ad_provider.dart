@@ -44,7 +44,7 @@ class DemoAdProvider implements AdProvider {
     return NativeAd(
       id: _uuid.v4(),
       provider: AdPlatformType.demo,
-      adObject: Object(), // Placeholder object
+      adObject: Object(),
       templateType: headlineImageStyle == HeadlineImageStyle.largeThumbnail
           ? NativeAdTemplateType.medium
           : NativeAdTemplateType.small,
@@ -65,7 +65,7 @@ class DemoAdProvider implements AdProvider {
     return BannerAd(
       id: _uuid.v4(),
       provider: AdPlatformType.demo,
-      adObject: Object(), // Placeholder object
+      adObject: Object(),
     );
   }
 
@@ -82,7 +82,7 @@ class DemoAdProvider implements AdProvider {
     return InterstitialAd(
       id: _uuid.v4(),
       provider: AdPlatformType.demo,
-      adObject: Object(), // Placeholder object
+      adObject: Object(),
     );
   }
 

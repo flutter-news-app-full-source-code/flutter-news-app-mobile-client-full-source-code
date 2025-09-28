@@ -71,7 +71,7 @@ class HeadlineMetadataRow extends StatelessWidget {
     const iconSize = AppSpacing.sm;
 
     return Wrap(
-      spacing: AppSpacing.sm, // Increased spacing for readability
+      spacing: AppSpacing.sm,
       runSpacing: AppSpacing.xs,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [

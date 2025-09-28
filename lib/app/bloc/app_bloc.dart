@@ -355,7 +355,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
               ),
             ),
           );
-          return; // Stop further processing if initialization failed critically.
+          return;
         }
       }
 
@@ -392,7 +392,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
                 ),
               ),
             );
-            return; // Stop further processing if migration failed critically.
+            return;
           }
         }
       }

@@ -156,15 +156,6 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
             appBarTitleText = l10n.detailsPageTitle;
           }
 
-          final description = state.entity is Topic
-              ? (state.entity! as Topic).description
-              : state.entity is Source
-              ? (state.entity! as Source).description
-              : state.entity is Country
-              ? (state.entity! as Country)
-                    .name // Using name as description for country
-              : null;
-
           final followButton = IconButton(
             icon: Icon(
               state.isFollowing ? Icons.check_circle : Icons.add_circle_outline,
@@ -191,17 +182,19 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
             children: [
               if (entityIconUrl != null)
                 Padding(
-                  padding: const EdgeInsets.only(right: AppSpacing.sm),
+                  padding: Directionality.of(context) == TextDirection.ltr
+                      ? const EdgeInsets.only(right: AppSpacing.md)
+                      : const EdgeInsets.only(left: AppSpacing.md),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(AppSpacing.xs),
                     child: Image.network(
                       entityIconUrl,
-                      width: kToolbarHeight - AppSpacing.lg,
-                      height: kToolbarHeight - AppSpacing.lg,
+                      width: AppSpacing.xxl,
+                      height: AppSpacing.xxl,
                       fit: BoxFit.contain,
                       errorBuilder: (context, error, stackTrace) => Icon(
                         appBarIconData ?? Icons.info_outline,
-                        size: kToolbarHeight - AppSpacing.xl,
+                        size: AppSpacing.xxl,
                         color: colorScheme.onSurfaceVariant,
                       ),
                     ),
@@ -209,10 +202,12 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                 )
               else if (appBarIconData != null)
                 Padding(
-                  padding: const EdgeInsets.only(right: AppSpacing.sm),
+                  padding: Directionality.of(context) == TextDirection.ltr
+                      ? const EdgeInsets.only(right: AppSpacing.md)
+                      : const EdgeInsets.only(left: AppSpacing.md),
                   child: Icon(
                     appBarIconData,
-                    size: kToolbarHeight - AppSpacing.xl,
+                    size: AppSpacing.xxl,
                     color: colorScheme.onSurface,
                   ),
                 ),
@@ -250,33 +245,6 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                   followButton,
                   const SizedBox(width: AppSpacing.sm),
                 ],
-              ),
-              SliverPadding(
-                padding: const EdgeInsets.all(AppSpacing.paddingMedium),
-                sliver: SliverList(
-                  delegate: SliverChildListDelegate([
-                    if (description != null && description.isNotEmpty) ...[
-                      Text(
-                        description,
-                        style: textTheme.bodyLarge?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                          height: 1.5,
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                    ],
-                    if (state.feedItems.isNotEmpty ||
-                        state.status == EntityDetailsStatus.loadingMore) ...[
-                      Text(
-                        l10n.headlinesSectionTitle,
-                        style: textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const Divider(height: AppSpacing.lg, thickness: 1),
-                    ],
-                  ]),
-                ),
               ),
               if (state.feedItems.isEmpty &&
                   state.status != EntityDetailsStatus.initial &&

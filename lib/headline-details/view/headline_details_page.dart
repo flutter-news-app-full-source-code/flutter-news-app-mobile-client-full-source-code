@@ -402,6 +402,10 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           ),
         ),
       );
+    } else {
+      slivers.add(
+        const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.lg)),
+      );
     }
 
     slivers.addAll([
@@ -465,6 +469,10 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
             ],
           ),
         ),
+      );
+    } else {
+      slivers.add(
+        const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.lg)),
       );
     }
 

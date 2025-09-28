@@ -1693,6 +1693,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Loading Filters'**
   String get headlinesFeedFilterLoadingHeadline;
+
+  /// Title for the suggested topics content collection.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested Topics'**
+  String get suggestedTopicsTitle;
+
+  /// Title for the suggested sources content collection.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested Sources'**
+  String get suggestedSourcesTitle;
 }
 
 class _AppLocalizationsDelegate

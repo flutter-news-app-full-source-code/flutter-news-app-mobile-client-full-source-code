@@ -883,4 +883,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get headlinesFeedFilterLoadingHeadline => 'جاري تحميل الفلاتر';
+
+  @override
+  String get suggestedTopicsTitle => 'مواضيع مقترحة';
+
+  @override
+  String get suggestedSourcesTitle => 'مصادر مقترحة';
 }

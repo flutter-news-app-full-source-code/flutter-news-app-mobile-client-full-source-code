@@ -885,4 +885,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get headlinesFeedFilterLoadingHeadline => 'Loading Filters';
+
+  @override
+  String get suggestedTopicsTitle => 'Suggested Topics';
+
+  @override
+  String get suggestedSourcesTitle => 'Suggested Sources';
 }

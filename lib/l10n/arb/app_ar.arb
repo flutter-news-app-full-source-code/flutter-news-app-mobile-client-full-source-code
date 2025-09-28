@@ -1152,5 +1152,13 @@
     "headlinesFeedFilterLoadingHeadline": "جاري تحميل الفلاتر",
     "@headlinesFeedFilterLoadingHeadline": {
         "description": "Headline for the loading state when fetching filter options on the headlines filter page."
+    },
+    "suggestedTopicsTitle": "مواضيع مقترحة",
+    "@suggestedTopicsTitle": {
+        "description": "عنوان لمجموعة المواضيع المقترحة."
+    },
+    "suggestedSourcesTitle": "مصادر مقترحة",
+    "@suggestedSourcesTitle": {
+        "description": "عنوان لمجموعة المصادر المقترحة."
     }
 }

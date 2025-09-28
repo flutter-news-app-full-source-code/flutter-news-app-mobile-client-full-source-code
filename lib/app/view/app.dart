@@ -291,13 +291,13 @@ class _AppViewState extends State<_AppView> {
             return MaterialApp(
               debugShowCheckedModeBanner: false,
               theme: lightTheme(
-                scheme: FlexScheme.material,
+                scheme: state.flexScheme,
                 appTextScaleFactor: state.appTextScaleFactor,
                 appFontWeight: state.appFontWeight,
                 fontFamily: state.fontFamily,
               ),
               darkTheme: darkTheme(
-                scheme: FlexScheme.material,
+                scheme: state.flexScheme,
                 appTextScaleFactor: state.appTextScaleFactor,
                 appFontWeight: state.appFontWeight,
                 fontFamily: state.fontFamily,
@@ -358,13 +358,13 @@ class _AppViewState extends State<_AppView> {
             return MaterialApp(
               debugShowCheckedModeBanner: false,
               theme: lightTheme(
-                scheme: FlexScheme.material,
+                scheme: state.flexScheme,
                 appTextScaleFactor: state.appTextScaleFactor,
                 appFontWeight: state.appFontWeight,
                 fontFamily: state.fontFamily,
               ),
               darkTheme: darkTheme(
-                scheme: FlexScheme.material,
+                scheme: state.flexScheme,
                 appTextScaleFactor: state.appTextScaleFactor,
                 appFontWeight: state.appFontWeight,
                 fontFamily: state.fontFamily,
@@ -385,13 +385,13 @@ class _AppViewState extends State<_AppView> {
             return MaterialApp(
               debugShowCheckedModeBanner: false,
               theme: lightTheme(
-                scheme: FlexScheme.material,
+                scheme: state.flexScheme,
                 appTextScaleFactor: state.appTextScaleFactor,
                 appFontWeight: state.appFontWeight,
                 fontFamily: state.fontFamily,
               ),
               darkTheme: darkTheme(
-                scheme: FlexScheme.material,
+                scheme: state.flexScheme,
                 appTextScaleFactor: state.appTextScaleFactor,
                 appFontWeight: state.appFontWeight,
                 fontFamily: state.fontFamily,
@@ -417,13 +417,13 @@ class _AppViewState extends State<_AppView> {
             return MaterialApp(
               debugShowCheckedModeBanner: false,
               theme: lightTheme(
-                scheme: FlexScheme.material,
+                scheme: state.flexScheme,
                 appTextScaleFactor: state.appTextScaleFactor,
                 appFontWeight: state.appFontWeight,
                 fontFamily: state.fontFamily,
               ),
               darkTheme: darkTheme(
-                scheme: FlexScheme.material,
+                scheme: state.flexScheme,
                 appTextScaleFactor: state.appTextScaleFactor,
                 appFontWeight: state.appFontWeight,
                 fontFamily: state.fontFamily,

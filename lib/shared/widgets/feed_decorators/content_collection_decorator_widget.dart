@@ -43,6 +43,22 @@ class ContentCollectionDecoratorWidget extends StatelessWidget {
     final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
 
+    String getTitle() {
+      switch (item.decoratorType) {
+        case FeedDecoratorType.suggestedTopics:
+          return l10n.suggestedTopicsTitle;
+        case FeedDecoratorType.suggestedSources:
+          return l10n.suggestedSourcesTitle;
+        // The following cases are for call-to-action types and should not
+        // appear in a content collection, but we handle them gracefully.
+        case FeedDecoratorType.linkAccount:
+        case FeedDecoratorType.upgrade:
+        case FeedDecoratorType.rateApp:
+        case FeedDecoratorType.enableNotifications:
+          return item.title;
+      }
+    }
+
     return Card(
       margin: const EdgeInsets.symmetric(
         horizontal: AppSpacing.lg,
@@ -58,7 +74,7 @@ class ContentCollectionDecoratorWidget extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    item.title,
+                    getTitle(),
                     style: theme.textTheme.titleLarge,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

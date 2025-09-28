@@ -1152,5 +1152,13 @@
     "headlinesFeedFilterLoadingHeadline": "Loading Filters",
     "@headlinesFeedFilterLoadingHeadline": {
         "description": "Headline for the loading state when fetching filter options on the headlines filter page."
+    },
+    "suggestedTopicsTitle": "Suggested Topics",
+    "@suggestedTopicsTitle": {
+        "description": "Title for the suggested topics content collection."
+    },
+    "suggestedSourcesTitle": "Suggested Sources",
+    "@suggestedSourcesTitle": {
+        "description": "Title for the suggested sources content collection."
     }
 }

@@ -285,7 +285,7 @@ class _HeadlinesSearchPageState extends State<HeadlinesSearchPage> {
                           final imageStyle = context
                               .watch<AppBloc>()
                               .state
-                              .headlineImageStyle; // Use AppBloc getter
+                              .headlineImageStyle;
                           Widget tile;
                           Future<void> onHeadlineTap() async {
                             await context
@@ -330,7 +330,7 @@ class _HeadlinesSearchPageState extends State<HeadlinesSearchPage> {
                               .watch<AppBloc>()
                               .state
                               .remoteConfig
-                              ?.adConfig; // Use AppBloc getter
+                              ?.adConfig;
 
                           if (adConfig == null) {
                             return const SizedBox.shrink();

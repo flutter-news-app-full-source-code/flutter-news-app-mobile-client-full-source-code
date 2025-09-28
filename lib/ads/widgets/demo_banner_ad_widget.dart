@@ -38,8 +38,8 @@ class DemoBannerAdWidget extends StatelessWidget {
       };
     } else {
       adHeight = headlineImageStyle == HeadlineImageStyle.largeThumbnail
-          ? 250 // Height for mediumRectangle banner
-          : 50; // Height for standard banner
+          ? 250
+          : 50;
     }
 
     return Card(

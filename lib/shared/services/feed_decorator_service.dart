@@ -304,20 +304,20 @@ class FeedDecoratorService {
             title: 'Upgrade to Premium',
             description: 'Unlock unlimited access to all features and content.',
             ctaText: 'Upgrade Now',
-            ctaUrl: '/upgrade', // Placeholder URL
+            ctaUrl: '/upgrade',
           ),
           FeedDecoratorType.rateApp: (
             title: 'Enjoying the App?',
             description: 'Let us know what you think by leaving a rating.',
             ctaText: 'Rate App',
-            ctaUrl: '/rate-app', // Placeholder URL
+            ctaUrl: '/rate-app',
           ),
           FeedDecoratorType.enableNotifications: (
             title: 'Stay Up to Date',
             description:
                 'Enable notifications to get the latest headlines delivered to you.',
             ctaText: 'Enable',
-            ctaUrl: '/enable-notifications', // Placeholder URL
+            ctaUrl: '/enable-notifications',
           ),
         };
 
@@ -427,23 +427,14 @@ class FeedDecoratorService {
     final userRole = user?.appRole ?? AppUserRole.guestUser;
 
     // Determine ad frequency rules based on user role.
-    final (adFrequency, adPlacementInterval) = switch (userRole) {
-      AppUserRole.guestUser => (
-        adConfig.feedAdConfiguration.frequencyConfig.guestAdFrequency,
-        adConfig.feedAdConfiguration.frequencyConfig.guestAdPlacementInterval,
-      ),
-      AppUserRole.standardUser => (
-        adConfig.feedAdConfiguration.frequencyConfig.authenticatedAdFrequency,
-        adConfig
-            .feedAdConfiguration
-            .frequencyConfig
-            .authenticatedAdPlacementInterval,
-      ),
-      AppUserRole.premiumUser => (
-        adConfig.feedAdConfiguration.frequencyConfig.premiumAdFrequency,
-        adConfig.feedAdConfiguration.frequencyConfig.premiumAdPlacementInterval,
-      ),
-    };
+    // Retrieve FeedAdFrequencyConfig from the visibleTo map.
+    final feedAdFrequencyConfig =
+        adConfig.feedAdConfiguration.visibleTo[userRole];
+
+    // Default to 0 for adFrequency and adPlacementInterval if no config is found
+    // for the user role, effectively disabling ads for that role.
+    final adFrequency = feedAdFrequencyConfig?.adFrequency ?? 0;
+    final adPlacementInterval = feedAdFrequencyConfig?.adPlacementInterval ?? 0;
 
     // If ad frequency is zero or less, no ads should be injected.
     if (adFrequency <= 0) {

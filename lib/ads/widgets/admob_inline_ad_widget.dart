@@ -59,7 +59,7 @@ class _AdmobInlineAdWidgetState extends State<AdmobInlineAdWidget> {
     // and set the new one. This is a more robust check than just comparing IDs,
     // as a new InlineAd instance might be created for the same logical ad slot.
     if (widget.inlineAd != oldWidget.inlineAd) {
-      _disposeCurrentAd(); // Dispose the old ad object
+      _disposeCurrentAd();
       _setAd();
     }
   }

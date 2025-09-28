@@ -81,7 +81,7 @@ class ContentCollectionDecoratorWidget extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.md),
             SizedBox(
-              height: 200, // Fixed height for the horizontal list
+              height: 200,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: item.items.length,

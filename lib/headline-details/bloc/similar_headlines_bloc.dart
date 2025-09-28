@@ -33,11 +33,7 @@ class SimilarHeadlinesBloc
       final response = await _headlinesRepository.readAll(
         filter: filter,
         sort: [const SortOption('updatedAt', SortOrder.desc)],
-        pagination: const PaginationOptions(
-          limit:
-              _similarHeadlinesLimit +
-              1, // Fetch one extra to check if current is there
-        ),
+        pagination: const PaginationOptions(limit: _similarHeadlinesLimit + 1),
       );
 
       // Filter out the current headline from the results

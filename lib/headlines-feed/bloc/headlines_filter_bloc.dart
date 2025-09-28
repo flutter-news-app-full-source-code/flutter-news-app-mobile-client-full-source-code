@@ -75,9 +75,7 @@ class HeadlinesFilterBloc
         sort: [const SortOption('name', SortOrder.asc)],
       );
       final allCountriesResponse = await _countriesRepository.readAll(
-        filter: {
-          'hasActiveSources': true,
-        }, // Only countries with active sources
+        filter: {'hasActiveSources': true},
         sort: [const SortOption('name', SortOrder.asc)],
       );
 
@@ -122,8 +120,7 @@ class HeadlinesFilterBloc
     emit(
       state.copyWith(
         selectedTopics: updatedSelectedTopics,
-        isUsingFollowedItems:
-            false, // Toggling individual item clears followed filter
+        isUsingFollowedItems: false,
       ),
     );
   }
@@ -142,8 +139,7 @@ class HeadlinesFilterBloc
     emit(
       state.copyWith(
         selectedSources: updatedSelectedSources,
-        isUsingFollowedItems:
-            false, // Toggling individual item clears followed filter
+        isUsingFollowedItems: false,
       ),
     );
   }
@@ -162,8 +158,7 @@ class HeadlinesFilterBloc
     emit(
       state.copyWith(
         selectedCountries: updatedSelectedCountries,
-        isUsingFollowedItems:
-            false, // Toggling individual item clears followed filter
+        isUsingFollowedItems: false,
       ),
     );
   }

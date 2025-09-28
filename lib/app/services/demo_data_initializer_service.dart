@@ -1,6 +1,6 @@
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
-import 'package:logging/logging.dart'; // Import Logger
+import 'package:logging/logging.dart';
 
 /// {@template demo_data_initializer_service}
 /// A service responsible for ensuring that essential user-specific data
@@ -19,12 +19,12 @@ class DemoDataInitializerService {
     userContentPreferencesRepository,
   }) : _userAppSettingsRepository = userAppSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
-       _logger = Logger('DemoDataInitializerService'); // Initialize logger
+       _logger = Logger('DemoDataInitializerService');
 
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
-  final Logger _logger; // Add logger instance
+  final Logger _logger;
 
   /// Initializes essential user-specific data in the in-memory clients
   /// for the given [user].

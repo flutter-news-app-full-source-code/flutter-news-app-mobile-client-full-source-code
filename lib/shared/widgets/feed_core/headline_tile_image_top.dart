@@ -59,7 +59,7 @@ class HeadlineTileImageTop extends StatelessWidget {
               child: Image.network(
                 headline.imageUrl,
                 width: double.infinity,
-                height: 180, // Standard large image height
+                height: 180,
                 fit: BoxFit.cover,
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;

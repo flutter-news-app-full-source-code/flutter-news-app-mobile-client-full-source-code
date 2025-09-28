@@ -10,33 +10,42 @@ dependencies:
   auth_api:
     git:
       url: https://github.com/flutter-news-app-full-source-code/auth-api.git
+      ref: 41a7ea2bea938e422acdac0ecfbf3a614b3fb855
   auth_client:
     git:
       url: https://github.com/flutter-news-app-full-source-code/auth-client.git
+      ref: fec23f405d58d4915638783d972b542d3faf96b2
   auth_inmemory:
     git:
       url: https://github.com/flutter-news-app-full-source-code/auth-inmemory.git
+      ref: 7f1a582419ae37cb43efe705e3299f2092c54a8b
   auth_repository:
     git:
       url: https://github.com/flutter-news-app-full-source-code/auth-repository.git
+      ref: 1f1272b586b045903c164be5a39d95383809ba09
   bloc: ^9.0.0
   bloc_concurrency: ^0.3.0
   collection: ^1.19.1
   core:
     git:
       url: https://github.com/flutter-news-app-full-source-code/core.git
+      ref: 828b984517edec069266579c624c7af9fbe0e2ac
   data_api:
     git:
       url: https://github.com/flutter-news-app-full-source-code/data-api.git
+      ref: f90ab664c6333995757026a2c96e96d304da6246
   data_client:
     git:
       url: https://github.com/flutter-news-app-full-source-code/data-client.git
+      ref: 960a00882045ee252274d9d57bfca606c1fe5d64
   data_inmemory:
     git:
       url: https://github.com/flutter-news-app-full-source-code/data-inmemory.git
+      ref: aaf4e18b759ca8b33d060fd4aa8509238d5d3eaa
   data_repository:
     git:
       url: https://github.com/flutter-news-app-full-source-code/data-repository.git
+      ref: f8f01f1191286efbba41fa2bb369fb16eb652ccf
   device_preview: ^1.2.0
   equatable: ^2.0.7
   flex_color_scheme: ^8.3.0
@@ -54,14 +63,17 @@ dependencies:
   http_client:
     git:
       url: https://github.com/flutter-news-app-full-source-code/http-client.git
+      ref: 57f6bcfc0f209ecc135fdcb688194045ec87e6e8
   intl: ^0.20.2
   js_interop: ^0.0.1
   kv_storage_service:
     git:
       url: https://github.com/flutter-news-app-full-source-code/kv-storage-service.git
+      ref: 3bcba6b11fe0480e06e1bedf6eab4159a7c59c53
   kv_storage_shared_preferences:
     git:
       url: https://github.com/flutter-news-app-full-source-code/kv-storage-shared-preferences.git
+      ref: 4cefd202c5fc0c53856782fea7760baa1d0733f7
   logging: ^1.3.0
   meta: ^1.16.0
   pinput: ^5.0.1
@@ -71,6 +83,7 @@ dependencies:
   ui_kit:
     git:
       url: https://github.com/flutter-news-app-full-source-code/ui-kit.git
+      ref: d9c66362ec87fd7b5e3d3dee35828da6cbc1f66a
   url_launcher: ^6.3.1
   uuid: ^4.4.0
 

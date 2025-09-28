@@ -43,7 +43,7 @@ class LocalAdProvider implements AdProvider {
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
     required AdThemeStyle adThemeStyle,
-    HeadlineImageStyle? headlineImageStyle, // Added for interface consistency
+    HeadlineImageStyle? headlineImageStyle,
   }) async {
     _logger.info('LocalAdProvider: loadNativeAd called for adId: $adId');
     if (adId == null || adId.isEmpty) {
@@ -97,7 +97,7 @@ class LocalAdProvider implements AdProvider {
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
     required AdThemeStyle adThemeStyle,
-    HeadlineImageStyle? headlineImageStyle, // Added for interface consistency
+    HeadlineImageStyle? headlineImageStyle,
   }) async {
     _logger.info('LocalAdProvider: loadBannerAd called for adId: $adId');
     if (adId == null || adId.isEmpty) {

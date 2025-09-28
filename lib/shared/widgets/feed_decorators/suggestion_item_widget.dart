@@ -53,7 +53,7 @@ class SuggestionItemWidget extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
       child: SizedBox(
-        width: 160, // Fixed width for each suggestion card
+        width: 160,
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
           child: Column(

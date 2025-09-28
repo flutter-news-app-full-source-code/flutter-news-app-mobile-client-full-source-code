@@ -14,15 +14,13 @@ class AppConfig {
     baseUrl: 'http://api.yourproductiondomain.com',
   );
 
-  factory AppConfig.demo() => const AppConfig(
-    environment: AppEnvironment.demo,
-    baseUrl: '', // No API access needed for in-memory demo
-  );
+  factory AppConfig.demo() =>
+      const AppConfig(environment: AppEnvironment.demo, baseUrl: '');
 
   factory AppConfig.development() => const AppConfig(
     // For local Dart Frog API
     environment: AppEnvironment.development,
-    baseUrl: 'http://localhost:8080', // Default Dart Frog local URL
+    baseUrl: 'http://localhost:8080',
   );
 
   final AppEnvironment environment;

@@ -103,9 +103,9 @@ class HeadlineTileImageTop extends StatelessWidget {
                     onTap:
                         onHeadlineTap ??
                         () => HeadlineTapHandler.handleHeadlineTap(
-                              context,
-                              headline,
-                            ),
+                          context,
+                          headline,
+                        ),
                     child: Text(
                       headline.title,
                       style: textTheme.titleMedium?.copyWith(

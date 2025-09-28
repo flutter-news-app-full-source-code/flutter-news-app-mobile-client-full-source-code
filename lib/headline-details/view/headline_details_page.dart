@@ -365,8 +365,11 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
             height: 36,
             child: BlocBuilder<HeadlineDetailsBloc, HeadlineDetailsState>(
               builder: (context, state) {
-                final chips =
-                    _buildMetadataChips(context, headline, onEntityChipTap);
+                final chips = _buildMetadataChips(
+                  context,
+                  headline,
+                  onEntityChipTap,
+                );
                 return ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: chips.length,
@@ -575,11 +578,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       required VoidCallback onPressed,
     }) {
       return ActionChip(
-        avatar: Icon(
-          icon,
-          size: chipAvatarSize,
-          color: chipAvatarColor,
-        ),
+        avatar: Icon(icon, size: chipAvatarSize, color: chipAvatarColor),
         label: Text(label),
         labelStyle: chipLabelStyle,
         backgroundColor: chipBackgroundColor,
@@ -600,7 +599,8 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       buildChip(
         icon: Icons.source_outlined,
         label: headline.source.name,
-        onPressed: () => onEntityChipTap(ContentType.source, headline.source.id),
+        onPressed: () =>
+            onEntityChipTap(ContentType.source, headline.source.id),
       ),
       buildChip(
         icon: Icons.category_outlined,

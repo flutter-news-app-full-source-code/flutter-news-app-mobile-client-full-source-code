@@ -287,27 +287,27 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                           headline: item,
                           onHeadlineTap: () =>
                               HeadlineTapHandler.handleHeadlineTap(
-                            context,
-                            item,
-                          ),
+                                context,
+                                item,
+                              ),
                         );
                       case HeadlineImageStyle.smallThumbnail:
                         tile = HeadlineTileImageStart(
                           headline: item,
                           onHeadlineTap: () =>
                               HeadlineTapHandler.handleHeadlineTap(
-                            context,
-                            item,
-                          ),
+                                context,
+                                item,
+                              ),
                         );
                       case HeadlineImageStyle.largeThumbnail:
                         tile = HeadlineTileImageTop(
                           headline: item,
                           onHeadlineTap: () =>
                               HeadlineTapHandler.handleHeadlineTap(
-                            context,
-                            item,
-                          ),
+                                context,
+                                item,
+                              ),
                         );
                     }
                     return tile;

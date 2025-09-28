@@ -358,22 +358,25 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           ),
         ),
       ),
-      SliverToBoxAdapter(
-        child: SizedBox(
-          height: 52,
-          child: BlocBuilder<HeadlineDetailsBloc, HeadlineDetailsState>(
-            builder: (context, state) {
-              final chips =
-                  _buildMetadataChips(context, headline, onEntityChipTap);
-              return ListView.separated(
-                scrollDirection: Axis.horizontal,
-                padding: horizontalPadding.copyWith(top: AppSpacing.lg),
-                itemCount: chips.length,
-                separatorBuilder: (context, index) =>
-                    const SizedBox(width: AppSpacing.sm),
-                itemBuilder: (context, index) => chips[index],
-              );
-            },
+      SliverPadding(
+        padding: horizontalPadding.copyWith(top: AppSpacing.lg),
+        sliver: SliverToBoxAdapter(
+          child: SizedBox(
+            height: 36,
+            child: BlocBuilder<HeadlineDetailsBloc, HeadlineDetailsState>(
+              builder: (context, state) {
+                final chips =
+                    _buildMetadataChips(context, headline, onEntityChipTap);
+                return ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: chips.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(width: AppSpacing.sm),
+                  itemBuilder: (context, index) => chips[index],
+                  clipBehavior: Clip.none,
+                );
+              },
+            ),
           ),
         ),
       ),

@@ -38,7 +38,7 @@ class DemoBannerAdWidget extends StatelessWidget {
       };
     } else {
       adHeight = headlineImageStyle == HeadlineImageStyle.largeThumbnail
-          ? 250 // Height for mediumRectangle banner
+          ? 250
           : 50;
     }
 

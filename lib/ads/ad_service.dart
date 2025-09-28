@@ -95,10 +95,12 @@ class AdService {
   /// - [adThemeStyle]: UI-agnostic theme properties for ad styling.
   /// - [headlineImageStyle]: The user's preference for feed layout,
   ///   which can be used to request an appropriately sized ad.
+  /// - [userRole]: The current role of the user, used to determine ad visibility.
   Future<InlineAd?> getFeedAd({
     required AdConfig adConfig,
     required AdType adType,
     required AdThemeStyle adThemeStyle,
+    required AppUserRole userRole,
     HeadlineImageStyle? headlineImageStyle,
   }) async {
     _logger.info('AdService: getFeedAd called for adType: $adType');
@@ -108,6 +110,7 @@ class AdService {
       adThemeStyle: adThemeStyle,
       feedAd: true,
       headlineImageStyle: headlineImageStyle,
+      userRole: userRole,
     );
   }
 
@@ -116,15 +119,17 @@ class AdService {
   /// This method delegates the ad loading to the appropriate [AdProvider]
   /// based on the [adConfig]'s `primaryAdPlatform`. It is specifically
   /// designed for interstitial ads that are displayed as full-screen overlays,
-  /// typically triggered on route changes.
+  /// typically on route changes.
   ///
   /// Returns an [InterstitialAd] if an interstitial ad is available, otherwise `null`.
   ///
   /// - [adConfig]: The remote configuration for ad display rules.
   /// - [adThemeStyle]: UI-agnostic theme properties for ad styling.
+  /// - [userRole]: The current role of the user, used to determine ad visibility.
   Future<InterstitialAd?> getInterstitialAd({
     required AdConfig adConfig,
     required AdThemeStyle adThemeStyle,
+    required AppUserRole userRole,
   }) async {
     _logger.info('AdService: getInterstitialAd called.');
     if (!adConfig.enabled) {
@@ -132,9 +137,19 @@ class AdService {
       return null;
     }
 
-    // Check if interstitial ads are enabled in the remote config.
-    if (!adConfig.interstitialAdConfiguration.enabled) {
-      _logger.info('AdService: Interstitial ads are disabled in RemoteConfig.');
+    // Check if interstitial ads are enabled for the current user role.
+    final interstitialConfig = adConfig.interstitialAdConfiguration;
+    // Check if the interstitial ads are globally enabled AND if the current
+    // user role has a defined configuration in the visibleTo map.
+    final isInterstitialEnabledForRole =
+        interstitialConfig.enabled &&
+        interstitialConfig.visibleTo.containsKey(userRole);
+
+    if (!isInterstitialEnabledForRole) {
+      _logger.info(
+        'AdService: Interstitial ads are disabled for user role $userRole '
+        'or globally in RemoteConfig.',
+      );
       return null;
     }
 
@@ -216,9 +231,13 @@ class AdService {
   ///
   /// - [adConfig]: The remote configuration for ad display rules.
   /// - [adThemeStyle]: UI-agnostic theme properties for ad styling.
+  /// - [userRole]: The current role of the user, used to determine ad visibility.
+  /// - [slotType]: The specific in-article ad slot type.
   Future<InlineAd?> getInArticleAd({
     required AdConfig adConfig,
     required AdThemeStyle adThemeStyle,
+    required AppUserRole userRole,
+    required InArticleAdSlotType slotType,
   }) async {
     _logger.info('AdService: getInArticleAd called.');
     return _loadInlineAd(
@@ -227,6 +246,8 @@ class AdService {
       adThemeStyle: adThemeStyle,
       feedAd: false,
       bannerAdShape: adConfig.articleAdConfiguration.bannerAdShape,
+      userRole: userRole,
+      slotType: slotType,
     );
   }
 
@@ -243,6 +264,8 @@ class AdService {
   /// - [headlineImageStyle]: The user's preference for feed layout,
   ///   which can be used to request an appropriately sized ad.
   /// - [bannerAdShape]: The preferred shape for banner ads, used for in-article banners.
+  /// - [userRole]: The current role of the user, used to determine ad visibility.
+  /// - [slotType]: The specific in-article ad slot type, used for in-article ads.
   ///
   /// Returns an [InlineAd] if an ad is successfully loaded, otherwise `null`.
   Future<InlineAd?> _loadInlineAd({
@@ -250,23 +273,48 @@ class AdService {
     required AdType adType,
     required AdThemeStyle adThemeStyle,
     required bool feedAd,
+    required AppUserRole userRole,
     HeadlineImageStyle? headlineImageStyle,
     BannerAdShape? bannerAdShape,
+    InArticleAdSlotType? slotType,
   }) async {
     _logger.info(
       'AdService: _loadInlineAd called for adType: $adType, feedAd: $feedAd',
     );
-    // Check if ads are globally enabled and specifically for the context (feed or article).
+    // Check if ads are globally enabled.
     if (!adConfig.enabled) {
       _logger.info('AdService: Ads are globally disabled in RemoteConfig.');
       return null;
     }
-    if (feedAd && !adConfig.feedAdConfiguration.enabled) {
-      _logger.info('AdService: Feed ads are disabled in RemoteConfig.');
-      return null;
+
+    // Check if ads are enabled for the specific context and user role.
+    var isContextEnabled = false;
+    if (feedAd) {
+      final feedAdConfig = adConfig.feedAdConfiguration;
+      // Check if feed ads are globally enabled AND if the current user role
+      // has a defined configuration in the visibleTo map.
+      isContextEnabled =
+          feedAdConfig.enabled && feedAdConfig.visibleTo.containsKey(userRole);
+    } else {
+      // For in-article ads, check global article ad enablement and then
+      // specific slot enablement for the user role.
+      final articleAdConfig = adConfig.articleAdConfiguration;
+      final isArticleAdEnabledForRole = articleAdConfig.visibleTo.containsKey(
+        userRole,
+      );
+      final isSlotEnabledForRole =
+          articleAdConfig.visibleTo[userRole]?[slotType] ?? false;
+      isContextEnabled =
+          articleAdConfig.enabled &&
+          isArticleAdEnabledForRole &&
+          isSlotEnabledForRole;
     }
-    if (!feedAd && !adConfig.articleAdConfiguration.enabled) {
-      _logger.info('AdService: In-article ads are disabled in RemoteConfig.');
+
+    if (!isContextEnabled) {
+      _logger.info(
+        'AdService: Ads are disabled for current context (feedAd: $feedAd, '
+        'slotType: $slotType) and user role $userRole in RemoteConfig.',
+      );
       return null;
     }
 

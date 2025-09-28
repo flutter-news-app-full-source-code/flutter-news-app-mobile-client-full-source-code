@@ -124,6 +124,7 @@ class InterstitialAdManager {
       final ad = await _adService.getInterstitialAd(
         adConfig: adConfig,
         adThemeStyle: adThemeStyle,
+        userRole: _userRole ?? AppUserRole.guestUser,
       );
 
       if (ad != null) {
@@ -165,8 +166,12 @@ class InterstitialAdManager {
     }
 
     final frequencyConfig =
-        adConfig.interstitialAdConfiguration.feedInterstitialAdFrequencyConfig;
-    final requiredTransitions = _getRequiredTransitions(frequencyConfig);
+        adConfig.interstitialAdConfiguration.visibleTo[_userRole];
+
+    // If no frequency config is found for the user role, or if it's explicitly
+    // disabled (transitionsBeforeShowingInterstitialAds == 0), then no ad should be shown.
+    final requiredTransitions =
+        frequencyConfig?.transitionsBeforeShowingInterstitialAds ?? 0;
 
     if (requiredTransitions > 0 && _transitionCount >= requiredTransitions) {
       _logger.info('Transition count meets threshold. Attempting to show ad.');
@@ -287,19 +292,5 @@ class InterstitialAdManager {
       barrierDismissible: false,
       builder: (_) => const DemoInterstitialAdDialog(),
     );
-  }
-
-  /// Determines the required number of transitions based on the user's role.
-  int _getRequiredTransitions(InterstitialAdFrequencyConfig config) {
-    switch (_userRole) {
-      case AppUserRole.guestUser:
-        return config.guestTransitionsBeforeShowingInterstitialAds;
-      case AppUserRole.standardUser:
-        return config.standardUserTransitionsBeforeShowingInterstitialAds;
-      case AppUserRole.premiumUser:
-        return config.premiumUserTransitionsBeforeShowingInterstitialAds;
-      case null:
-        return config.guestTransitionsBeforeShowingInterstitialAds;
-    }
   }
 }

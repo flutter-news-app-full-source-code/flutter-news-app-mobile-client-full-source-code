@@ -429,23 +429,14 @@ class FeedDecoratorService {
     final userRole = user?.appRole ?? AppUserRole.guestUser;
 
     // Determine ad frequency rules based on user role.
-    final (adFrequency, adPlacementInterval) = switch (userRole) {
-      AppUserRole.guestUser => (
-        adConfig.feedAdConfiguration.frequencyConfig.guestAdFrequency,
-        adConfig.feedAdConfiguration.frequencyConfig.guestAdPlacementInterval,
-      ),
-      AppUserRole.standardUser => (
-        adConfig.feedAdConfiguration.frequencyConfig.authenticatedAdFrequency,
-        adConfig
-            .feedAdConfiguration
-            .frequencyConfig
-            .authenticatedAdPlacementInterval,
-      ),
-      AppUserRole.premiumUser => (
-        adConfig.feedAdConfiguration.frequencyConfig.premiumAdFrequency,
-        adConfig.feedAdConfiguration.frequencyConfig.premiumAdPlacementInterval,
-      ),
-    };
+    // Retrieve FeedAdFrequencyConfig from the visibleTo map.
+    final feedAdFrequencyConfig =
+        adConfig.feedAdConfiguration.visibleTo[userRole];
+
+    // Default to 0 for adFrequency and adPlacementInterval if no config is found
+    // for the user role, effectively disabling ads for that role.
+    final adFrequency = feedAdFrequencyConfig?.adFrequency ?? 0;
+    final adPlacementInterval = feedAdFrequencyConfig?.adPlacementInterval ?? 0;
 
     // If ad frequency is zero or less, no ads should be injected.
     if (adFrequency <= 0) {

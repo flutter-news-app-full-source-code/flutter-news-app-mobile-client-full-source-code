@@ -67,8 +67,7 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
   bool _hasError = false;
   final Logger _logger = Logger('InArticleAdLoaderWidget');
   late final InlineAdCacheService _adCacheService;
-  late final AdService
-  _adService; // AdService will be accessed via _adCacheService
+  late final AdService _adService;
 
   Completer<void>? _loadAdCompleter;
 
@@ -100,7 +99,8 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
       _adCacheService.removeAndDisposeAd(oldCacheKey);
 
       if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
-        _loadAdCompleter!.complete(); // Complete normally to prevent crashes
+        // Complete normally to prevent crashes
+        _loadAdCompleter!.complete();
       }
       _loadAdCompleter = null;
 
@@ -122,7 +122,8 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
     _adCacheService.removeAndDisposeAd(cacheKey);
 
     if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
-      _loadAdCompleter!.complete(); // Complete normally to prevent crashes
+      // Complete normally to prevent crashes
+      _loadAdCompleter!.complete();
     }
     _loadAdCompleter = null;
     super.dispose();

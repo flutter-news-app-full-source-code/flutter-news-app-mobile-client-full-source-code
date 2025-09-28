@@ -56,7 +56,7 @@ class AdService {
   Future<void> disposeAd(dynamic adModel) async {
     // Determine the AdPlatformType from the adModel if it's an InlineAd or InterstitialAd.
     AdPlatformType? providerType;
-    Object? adObject; // To hold the actual ad object
+    Object? adObject;
 
     if (adModel is InlineAd) {
       providerType = adModel.provider;
@@ -69,7 +69,7 @@ class AdService {
     if (providerType != null && adObject != null) {
       final adProvider = _adProviders[providerType];
       if (adProvider != null) {
-        await adProvider.disposeAd(adObject); // Pass the actual ad object
+        await adProvider.disposeAd(adObject);
       } else {
         _logger.warning(
           'AdService: No AdProvider found for type $providerType to dispose ad.',
@@ -223,7 +223,7 @@ class AdService {
     _logger.info('AdService: getInArticleAd called.');
     return _loadInlineAd(
       adConfig: adConfig,
-      adType: AdType.banner, // In-article ads are now always banners
+      adType: AdType.banner,
       adThemeStyle: adThemeStyle,
       feedAd: false,
       bannerAdShape: adConfig.articleAdConfiguration.bannerAdShape,

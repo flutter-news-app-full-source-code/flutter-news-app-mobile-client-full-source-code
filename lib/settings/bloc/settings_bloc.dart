@@ -100,9 +100,11 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         ),
       );
     } on HttpException {
-      rethrow; // Re-throw to AppBloc for centralized error handling
+      // Re-throw to AppBloc for centralized error handling
+      rethrow;
     } catch (e) {
-      rethrow; // Re-throw to AppBloc for centralized error handling
+      // Re-throw to AppBloc for centralized error handling
+      rethrow;
     }
   }
 

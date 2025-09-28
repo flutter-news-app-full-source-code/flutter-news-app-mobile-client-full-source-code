@@ -98,7 +98,8 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
       // completed. This prevents a race condition if a new load is triggered
       // while an old one is still in progress.
       if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
-        _loadAdCompleter!.complete(); // Complete normally to prevent crashes
+        // Complete normally to prevent crashes
+        _loadAdCompleter!.complete();
       }
       _loadAdCompleter = null;
 
@@ -125,7 +126,8 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
     // This prevents `setState()` calls on a disposed widget.
     // Ensure the completer is not already completed before attempting to complete it.
     if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
-      _loadAdCompleter!.complete(); // Complete normally to prevent crashes
+      // Complete normally to prevent crashes
+      _loadAdCompleter!.complete();
     }
     _loadAdCompleter = null;
     super.dispose();
@@ -211,10 +213,10 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
 
       // Call AdService.getFeedAd with the full AdConfig and adType from the placeholder.
       final loadedAd = await _adService.getFeedAd(
-        adConfig: widget.adConfig, // Pass the full AdConfig
+        adConfig: widget.adConfig,
         adType: widget.adPlaceholder.adType,
         adThemeStyle: widget.adThemeStyle,
-        headlineImageStyle: headlineImageStyle, // Pass the headlineImageStyle
+        headlineImageStyle: headlineImageStyle,
       );
 
       if (loadedAd != null) {

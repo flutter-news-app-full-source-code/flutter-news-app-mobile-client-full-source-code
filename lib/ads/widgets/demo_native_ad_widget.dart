@@ -24,7 +24,7 @@ class DemoNativeAdWidget extends StatelessWidget {
     // Determine the height based on the headlineImageStyle, mimicking real ad widgets.
     final adHeight = headlineImageStyle == HeadlineImageStyle.largeThumbnail
         ? 250 // Height for medium native ad template
-        : 120; // Height for small native ad template
+        : 120;
 
     return Card(
       margin: const EdgeInsets.symmetric(

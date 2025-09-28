@@ -171,8 +171,8 @@ class InterstitialAdManager {
     if (requiredTransitions > 0 && _transitionCount >= requiredTransitions) {
       _logger.info('Transition count meets threshold. Attempting to show ad.');
       await _showAd();
-      _transitionCount =
-          0; // Reset counter after showing (or attempting to show)
+      // Reset counter after showing (or attempting to show)
+      _transitionCount = 0;
     } else {
       _logger.info(
         'Transition count ($_transitionCount) has not met threshold ($requiredTransitions).',
@@ -197,7 +197,8 @@ class InterstitialAdManager {
     }
 
     final adToShow = _preloadedAd!;
-    _preloadedAd = null; // Clear the pre-loaded ad before showing
+    // Clear the pre-loaded ad before showing
+    _preloadedAd = null;
 
     try {
       switch (adToShow.provider) {
@@ -230,7 +231,9 @@ class InterstitialAdManager {
     } finally {
       // After the ad is shown or fails to show, dispose of it and
       // start pre-loading the next one for the next opportunity.
-      _disposePreloadedAd(); // Ensure the ad object is disposed
+
+      // Ensure the ad object is disposed
+      _disposePreloadedAd();
       unawaited(_maybePreloadAd(_appBloc.state));
     }
   }
@@ -268,7 +271,8 @@ class InterstitialAdManager {
     // Await the result of showDialog, which completes when the dialog is popped.
     await showDialog<void>(
       context: context,
-      barrierDismissible: false, // Prevent dismissing by tapping outside
+      // Prevent dismissing by tapping outside
+      barrierDismissible: false,
       builder: (_) => LocalInterstitialAdDialog(
         localInterstitialAd: ad.adObject as LocalInterstitialAd,
       ),
@@ -279,7 +283,8 @@ class InterstitialAdManager {
     // Await the result of showDialog, which completes when the dialog is popped.
     await showDialog<void>(
       context: context,
-      barrierDismissible: false, // Prevent dismissing by tapping outside
+      // Prevent dismissing by tapping outside
+      barrierDismissible: false,
       builder: (_) => const DemoInterstitialAdDialog(),
     );
   }

@@ -304,20 +304,20 @@ class FeedDecoratorService {
             title: 'Upgrade to Premium',
             description: 'Unlock unlimited access to all features and content.',
             ctaText: 'Upgrade Now',
-            ctaUrl: '/upgrade', // Placeholder URL
+            ctaUrl: '/upgrade',
           ),
           FeedDecoratorType.rateApp: (
             title: 'Enjoying the App?',
             description: 'Let us know what you think by leaving a rating.',
             ctaText: 'Rate App',
-            ctaUrl: '/rate-app', // Placeholder URL
+            ctaUrl: '/rate-app',
           ),
           FeedDecoratorType.enableNotifications: (
             title: 'Stay Up to Date',
             description:
                 'Enable notifications to get the latest headlines delivered to you.',
             ctaText: 'Enable',
-            ctaUrl: '/enable-notifications', // Placeholder URL
+            ctaUrl: '/enable-notifications',
           ),
         };
 
@@ -348,7 +348,7 @@ class FeedDecoratorService {
               sort: [const SortOption('name', SortOrder.asc)],
               filter: {
                 '_id': {r'$nin': followedTopicIds},
-                'status': ContentStatus.active.name, // Filter for active topics
+                'status': ContentStatus.active.name,
               },
             );
             if (topics.items.isEmpty) return null;
@@ -364,7 +364,7 @@ class FeedDecoratorService {
               sort: [const SortOption('name', SortOrder.asc)],
               filter: {
                 '_id': {r'$nin': followedSourceIds},
-                'status': ContentStatus.active.name, // Filter for active sources
+                'status': ContentStatus.active.name,
               },
             );
             if (sources.items.isEmpty) return null;

@@ -119,28 +119,22 @@ class App extends StatelessWidget {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) =>
-                AppBloc(
-                  authenticationRepository: context.read<AuthRepository>(),
-                  userAppSettingsRepository: context
-                      .read<DataRepository<UserAppSettings>>(),
-                  userContentPreferencesRepository: context
-                      .read<DataRepository<UserContentPreferences>>(),
-                  appConfigRepository: context
-                      .read<DataRepository<RemoteConfig>>(),
-                  userRepository: context.read<DataRepository<User>>(),
-                  environment: _environment,
-                  demoDataMigrationService: demoDataMigrationService,
-                  demoDataInitializerService: demoDataInitializerService,
-                  initialUser: initialUser,
-                  navigatorKey: _navigatorKey, // Pass navigatorKey to AppBloc
-                  initialRemoteConfig:
-                      _initialRemoteConfig, // Pass initialRemoteConfig
-                  initialRemoteConfigError:
-                      _initialRemoteConfigError, // Pass initialRemoteConfigError
-                )..add(
-                  AppStarted(initialUser: initialUser),
-                ), // Dispatch AppStarted event
+            create: (context) => AppBloc(
+              authenticationRepository: context.read<AuthRepository>(),
+              userAppSettingsRepository: context
+                  .read<DataRepository<UserAppSettings>>(),
+              userContentPreferencesRepository: context
+                  .read<DataRepository<UserContentPreferences>>(),
+              appConfigRepository: context.read<DataRepository<RemoteConfig>>(),
+              userRepository: context.read<DataRepository<User>>(),
+              environment: _environment,
+              demoDataMigrationService: demoDataMigrationService,
+              demoDataInitializerService: demoDataInitializerService,
+              initialUser: initialUser,
+              navigatorKey: _navigatorKey,
+              initialRemoteConfig: _initialRemoteConfig,
+              initialRemoteConfigError: _initialRemoteConfigError,
+            )..add(AppStarted(initialUser: initialUser)),
           ),
           BlocProvider(
             create: (context) => AuthenticationBloc(
@@ -155,7 +149,8 @@ class App extends StatelessWidget {
               appBloc: context.read<AppBloc>(),
               adService: context.read<AdService>(),
             ),
-            lazy: false, // Ensure it's created immediately
+            // Ensure it's created immediately
+            lazy: false,
           ),
         ],
         child: _AppView(
@@ -171,7 +166,7 @@ class App extends StatelessWidget {
           environment: _environment,
           adService: _adService,
           localAdRepository: _localAdRepository,
-          navigatorKey: _navigatorKey, // Pass navigatorKey to _AppView
+          navigatorKey: _navigatorKey,
           inlineAdCacheService: _inlineAdCacheService,
         ),
       ),

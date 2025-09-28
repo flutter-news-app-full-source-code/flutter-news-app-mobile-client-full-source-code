@@ -142,8 +142,7 @@ class HeadlinesSearchBloc
                 feedItems: headlines,
                 user: currentUser,
                 adConfig: appConfig.adConfig,
-                imageStyle:
-                    _appBloc.state.headlineImageStyle, // Use AppBloc getter
+                imageStyle: _appBloc.state.headlineImageStyle,
                 adThemeStyle: event.adThemeStyle,
                 // Calculate the count of actual content items (headlines) already in the
                 // feed. This is crucial for the FeedDecoratorService to correctly apply
@@ -261,7 +260,7 @@ class HeadlinesSearchBloc
             feedItems: headlines,
             user: currentUser,
             adConfig: appConfig.adConfig,
-            imageStyle: _appBloc.state.headlineImageStyle, // Use AppBloc getter
+            imageStyle: _appBloc.state.headlineImageStyle,
             adThemeStyle: event.adThemeStyle,
           );
         case ContentType.topic:

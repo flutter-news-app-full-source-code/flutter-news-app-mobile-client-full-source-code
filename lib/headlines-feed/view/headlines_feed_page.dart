@@ -334,9 +334,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                     }
 
                     return FeedAdLoaderWidget(
-                      key: ValueKey(
-                        item.id,
-                      ), // Add a unique key for AdPlaceholder
+                      key: ValueKey(item.id),
                       adPlaceholder: item,
                       adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
                       adConfig: adConfig,

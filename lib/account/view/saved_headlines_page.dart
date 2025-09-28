@@ -95,8 +95,7 @@ class SavedHeadlinesPage extends StatelessWidget {
               final headline = savedHeadlines[index];
               final imageStyle =
                   appState.settings?.feedPreferences.headlineImageStyle ??
-                  HeadlineImageStyle
-                      .smallThumbnail; // Default if settings not loaded
+                  HeadlineImageStyle.smallThumbnail;
 
               final trailingButton = IconButton(
                 icon: Icon(Icons.delete_outline, color: colorScheme.error),

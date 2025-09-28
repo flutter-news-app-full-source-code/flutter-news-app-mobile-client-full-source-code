@@ -69,9 +69,11 @@ class HeadlinesFilterBloc
 
     try {
       final allTopicsResponse = await _topicsRepository.readAll(
+        filter: {'status': ContentStatus.active.name},
         sort: [const SortOption('name', SortOrder.asc)],
       );
       final allSourcesResponse = await _sourcesRepository.readAll(
+        filter: {'status': ContentStatus.active.name},
         sort: [const SortOption('name', SortOrder.asc)],
       );
       final allCountriesResponse = await _countriesRepository.readAll(

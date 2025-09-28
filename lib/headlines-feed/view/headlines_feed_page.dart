@@ -1,10 +1,6 @@
-//
-// ignore_for_file: lines_longer_than_80_chars
-
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/feed_ad_loader_widget.dart';
@@ -237,23 +233,6 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
               );
             }
 
-            Future<void> onHeadlineTap(Headline headline) async {
-              // Await for the ad to be shown and dismissed.
-              await context
-                  .read<InterstitialAdManager>()
-                  .onPotentialAdTrigger();
-
-              // Check if the widget is still in the tree before navigating.
-              if (!context.mounted) return;
-
-              // Proceed with navigation after the ad is closed.
-              await context.pushNamed(
-                Routes.articleDetailsName,
-                pathParameters: {'id': headline.id},
-                extra: headline,
-              );
-            }
-
             return RefreshIndicator(
               onRefresh: () async {
                 context.read<HeadlinesFeedBloc>().add(
@@ -272,15 +251,16 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                     ? state.feedItems.length + 1
                     : state.feedItems.length,
                 separatorBuilder: (context, index) {
-                  if (index < state.feedItems.length - 1) {
-                    final currentItem = state.feedItems[index];
-                    final nextItem = state.feedItems[index + 1];
-                    // Adjust spacing around any decorator or ad
-                    if (currentItem is! Headline || nextItem is! Headline) {
-                      return const SizedBox(height: AppSpacing.md);
-                    }
+                  if (index >= state.feedItems.length - 1) {
+                    return const SizedBox.shrink();
                   }
-                  return const SizedBox(height: AppSpacing.lg);
+                  final currentItem = state.feedItems[index];
+                  final nextItem = state.feedItems[index + 1];
+
+                  if (currentItem is! Headline || nextItem is! Headline) {
+                    return const SizedBox(height: AppSpacing.md);
+                  }
+                  return const SizedBox(height: AppSpacing.sm);
                 },
                 itemBuilder: (context, index) {
                   if (index >= state.feedItems.length) {
@@ -305,17 +285,29 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                       case HeadlineImageStyle.hidden:
                         tile = HeadlineTileTextOnly(
                           headline: item,
-                          onHeadlineTap: () => onHeadlineTap(item),
+                          onHeadlineTap: () =>
+                              HeadlineTapHandler.handleHeadlineTap(
+                            context,
+                            item,
+                          ),
                         );
                       case HeadlineImageStyle.smallThumbnail:
                         tile = HeadlineTileImageStart(
                           headline: item,
-                          onHeadlineTap: () => onHeadlineTap(item),
+                          onHeadlineTap: () =>
+                              HeadlineTapHandler.handleHeadlineTap(
+                            context,
+                            item,
+                          ),
                         );
                       case HeadlineImageStyle.largeThumbnail:
                         tile = HeadlineTileImageTop(
                           headline: item,
-                          onHeadlineTap: () => onHeadlineTap(item),
+                          onHeadlineTap: () =>
+                              HeadlineTapHandler.handleHeadlineTap(
+                            context,
+                            item,
+                          ),
                         );
                     }
                     return tile;

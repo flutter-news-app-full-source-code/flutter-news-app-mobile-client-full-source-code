@@ -1,6 +1,6 @@
 name: flutter_news_app_mobile_client_full_source_code
 description: Complete, production-ready source code for a feature-rich Flutter news app mobile client.
-version: 1.1.0
+version: 1.1.1
 publish_to: none
 repository: https://github.com/flutter-news-app-full-source-code/flutter-news-app-mobile-client-full-source-code
 documentation: https://flutter-news-app-full-source-code.github.io/
@@ -67,7 +67,6 @@ dependencies:
   flutter_launcher_icons: ^0.14.3
   flutter_localizations:
     sdk: flutter
-  flutter_native_splash: ^2.4.5
   go_router: ^16.0.0
   google_fonts: ^6.2.1
   google_mobile_ads: ^6.0.0
@@ -90,7 +89,7 @@ dependencies:
   package_info_plus: ^9.0.0
   pinput: ^5.0.1
   pub_semver: ^2.2.0
-  share_plus: ^11.0.0
+  share_plus: ^12.0.0
   stream_transform: ^2.1.1
   timeago: ^3.7.1
   ui_kit:
@@ -105,7 +104,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   mocktail: ^1.0.4
-  very_good_analysis: ^9.0.0
+  very_good_analysis: ^10.0.0
 
 flutter:
   uses-material-design: true
@@ -113,16 +112,3 @@ flutter:
 
   assets:
     - assets/icon/
-
-flutter_native_splash:
-  color: "#FFFFFF"
-  color_dark: "#212121"
-
-  # Optional: Specify an image asset for the splash screen
-  image: assets/icon/logo.png
-  image_dark: assets/icon/logo.png
-
-  # Ensure configuration is applied to both platforms
-  android: true
-  ios: true
-  # web: false # Optional: Disable for web if not needed

@@ -11,6 +11,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_e
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_status_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_initializer_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/services/package_info_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/router.dart';
@@ -48,6 +49,7 @@ class App extends StatelessWidget {
     required InlineAdCacheService inlineAdCacheService,
     required RemoteConfig? initialRemoteConfig,
     required HttpException? initialRemoteConfigError,
+    required PackageInfoService packageInfoService,
     super.key,
     this.demoDataMigrationService,
     this.demoDataInitializerService,
@@ -68,7 +70,8 @@ class App extends StatelessWidget {
        _navigatorKey = navigatorKey,
        _inlineAdCacheService = inlineAdCacheService,
        _initialRemoteConfig = initialRemoteConfig,
-       _initialRemoteConfigError = initialRemoteConfigError;
+       _initialRemoteConfigError = initialRemoteConfigError,
+       _packageInfoService = packageInfoService;
 
   final AuthRepository _authenticationRepository;
   final DataRepository<Headline> _headlinesRepository;
@@ -86,6 +89,7 @@ class App extends StatelessWidget {
   final DataRepository<LocalAd> _localAdRepository;
   final GlobalKey<NavigatorState> _navigatorKey;
   final InlineAdCacheService _inlineAdCacheService;
+  final PackageInfoService _packageInfoService;
   final DemoDataMigrationService? demoDataMigrationService;
   final DemoDataInitializerService? demoDataInitializerService;
   final User? initialUser;
@@ -114,6 +118,7 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _adService),
         RepositoryProvider.value(value: _localAdRepository),
         RepositoryProvider.value(value: _inlineAdCacheService),
+        RepositoryProvider.value(value: _packageInfoService),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -133,6 +138,7 @@ class App extends StatelessWidget {
               navigatorKey: _navigatorKey,
               initialRemoteConfig: _initialRemoteConfig,
               initialRemoteConfigError: _initialRemoteConfigError,
+              packageInfoService: _packageInfoService,
             )..add(AppStarted(initialUser: initialUser)),
           ),
           BlocProvider(
@@ -167,6 +173,7 @@ class App extends StatelessWidget {
           localAdRepository: _localAdRepository,
           navigatorKey: _navigatorKey,
           inlineAdCacheService: _inlineAdCacheService,
+          packageInfoService: _packageInfoService,
         ),
       ),
     );
@@ -189,6 +196,7 @@ class _AppView extends StatefulWidget {
     required this.localAdRepository,
     required this.navigatorKey,
     required this.inlineAdCacheService,
+    required this.packageInfoService,
   });
 
   final AuthRepository authenticationRepository;
@@ -205,6 +213,7 @@ class _AppView extends StatefulWidget {
   final DataRepository<LocalAd> localAdRepository;
   final GlobalKey<NavigatorState> navigatorKey;
   final InlineAdCacheService inlineAdCacheService;
+  final PackageInfoService packageInfoService;
 
   @override
   State<_AppView> createState() => _AppViewState();
@@ -402,7 +411,11 @@ class _AppViewState extends State<_AppView> {
               ],
               supportedLocales: AppLocalizations.supportedLocales,
               locale: state.locale,
-              home: const UpdateRequiredPage(),
+              home: UpdateRequiredPage(
+                iosUpdateUrl: state.remoteConfig!.appStatus.iosUpdateUrl,
+                androidUpdateUrl:
+                    state.remoteConfig!.appStatus.androidUpdateUrl,
+              ),
             );
           }
 

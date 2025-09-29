@@ -141,4 +141,4 @@ flutter_native_splash:
   # Ensure configuration is applied to both platforms
   android: true
   ios: true
-  web: true
+  web: false

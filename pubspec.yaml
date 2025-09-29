@@ -3,16 +3,17 @@ description: Complete, production-ready source code for a feature-rich Flutter n
 version: 1.1.1
 publish_to: none
 repository: https://github.com/flutter-news-app-full-source-code/flutter-news-app-mobile-client-full-source-code
-documentation: https://flutter-news-app-full-source-code.github.io/
-homepage: https://github.com/flutter-news-app-full-source-code/flutter-news-app-mobile-client-full-source-code
+homepage: https://flutter-news-app-full-source-code.github.io/docs/
+documentation: https://flutter-news-app-full-source-code.github.io/docs/getting-started/
 issue_tracker: https://github.com/flutter-news-app-full-source-code/flutter-news-app-mobile-client-full-source-code/issues
+funding:
+  - https://github.com/sponsors/flutter-news-app-full-source-code-toolkit
 topics:
-  [
-    flutter-news-app,
-    flutter-news-app-mobile-client,
-    flutter-news-app-source-code,
-    flutter-news-app-sourcecode,
-  ]
+  - flutter-news-app
+  - flutter-news-app-mobile-client
+  - flutter-news-app-source-code
+  - flutter-news-app-sourcecode
+  - flutter-news-app-full-sourcecode
 
 environment:
   sdk: ^3.9.0
@@ -34,7 +35,7 @@ dependencies:
     git:
       url: https://github.com/flutter-news-app-full-source-code/auth-repository.git
       ref: 1f1272b586b045903c164be5a39d95383809ba09
-  bloc: ^9.0.0
+  bloc: ^9.0.1
   bloc_concurrency: ^0.3.0
   collection: ^1.19.1
   core:
@@ -63,12 +64,12 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_adaptive_scaffold: ^0.3.2
-  flutter_bloc: ^9.1.0
+  flutter_bloc: ^9.1.1
   flutter_launcher_icons: ^0.14.3
   flutter_localizations:
     sdk: flutter
-  go_router: ^16.0.0
-  google_fonts: ^6.2.1
+  go_router: ^16.2.4
+  google_fonts: ^6.3.2
   google_mobile_ads: ^6.0.0
   http_client:
     git:
@@ -112,3 +113,7 @@ flutter:
 
   assets:
     - assets/icon/
+
+screenshots:
+  - description: The flutter news app full source code logo.
+    path: assets/icon/logo.png

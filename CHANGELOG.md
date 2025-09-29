@@ -1,8 +1,9 @@
 # Changelog
 
-## 1.1.1
+## 1.2.0
 
--   **Refactor:** Removed `flutter_native_splash` dependency and related configurations.
+-   **Refactor:** Updated `flutter_launcher_icons` configurations.
+-   **Refactor:** Updated `flutter_native_splash` configurations.
 -   **Dependency Update:** Bumped `bloc` to `^9.0.1`.
 -   **Dependency Update:** Bumped `flutter_bloc` to `^9.1.1`.
 -   **Dependency Update:** Bumped `go_router` to `^16.2.4`.

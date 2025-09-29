@@ -1160,5 +1160,34 @@
     "suggestedSourcesTitle": "مصادر مقترحة",
     "@suggestedSourcesTitle": {
         "description": "عنوان لمجموعة المصادر المقترحة."
+    },
+    "couldNotOpenUpdateUrl": "تعذر فتح رابط التحديث: {url}",
+    "@couldNotOpenUpdateUrl": {
+        "description": "رسالة تظهر في شريط الإشعارات عندما يتعذر فتح رابط التحديث.",
+        "placeholders": {
+            "url": {
+                "type": "String"
+            }
+        }
+    },
+    "currentAppVersionLabel": "إصدارك الحالي: {version}",
+    "@currentAppVersionLabel": {
+        "description": "تسمية لعرض إصدار التطبيق الحالي.",
+        "placeholders": {
+            "version": {
+                "type": "String",
+                "example": "1.0.0"
+            }
+        }
+    },
+    "latestRequiredVersionLabel": "الإصدار المطلوب: {version}",
+    "@latestRequiredVersionLabel": {
+        "description": "تسمية لعرض أحدث إصدار مطلوب للتطبيق.",
+        "placeholders": {
+            "version": {
+                "type": "String",
+                "example": "1.1.0"
+            }
+        }
     }
 }

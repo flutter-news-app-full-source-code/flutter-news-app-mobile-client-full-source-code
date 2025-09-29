@@ -89,6 +89,28 @@ class AppPeriodicConfigFetchRequested extends AppEvent {
   List<Object> get props => [isBackgroundCheck];
 }
 
+/// Dispatched to request a check of the application's version against
+/// the remote configuration.
+///
+/// This event is used to determine if a mandatory update is required.
+class AppVersionCheckRequested extends AppEvent {
+  const AppVersionCheckRequested({
+    required this.remoteConfig,
+    this.isBackgroundCheck = true,
+  });
+
+  /// The latest remote configuration.
+  final RemoteConfig remoteConfig;
+
+  /// Whether this check is a silent background check.
+  ///
+  /// If `true`, the BLoC will not enter a visible loading state.
+  final bool isBackgroundCheck;
+
+  @override
+  List<Object> get props => [remoteConfig, isBackgroundCheck];
+}
+
 /// Dispatched when the user logs out.
 ///
 /// This event triggers the sign-out process, clearing authentication tokens

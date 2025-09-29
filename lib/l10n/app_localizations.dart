@@ -1705,6 +1705,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Suggested Sources'**
   String get suggestedSourcesTitle;
+
+  /// Message displayed in a snackbar when the update URL cannot be opened.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open update URL: {url}'**
+  String couldNotOpenUpdateUrl(String url);
+
+  /// Label to display the current app version.
+  ///
+  /// In en, this message translates to:
+  /// **'Your current version: {version}'**
+  String currentAppVersionLabel(String version);
+
+  /// Label to display the latest required app version.
+  ///
+  /// In en, this message translates to:
+  /// **'Required version: {version}'**
+  String latestRequiredVersionLabel(String version);
 }
 
 class _AppLocalizationsDelegate

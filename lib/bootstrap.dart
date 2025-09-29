@@ -25,6 +25,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/config/confi
     as app_config;
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_initializer_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/services/package_info_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/bloc_observer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/data/clients/country_inmemory_client.dart';
 import 'package:http_client/http_client.dart';
@@ -190,6 +191,9 @@ Future<Widget> bootstrap(
   // Create a GlobalKey for the NavigatorState to be used by AppBloc
   // and InterstitialAdManager for BuildContext access.
   final navigatorKey = GlobalKey<NavigatorState>();
+
+  // Initialize PackageInfoService
+  final packageInfoService = PackageInfoServiceImpl(logger: logger);
 
   // 6. Initialize all other DataClients and Repositories.
   // These now also have a guaranteed valid httpClient.
@@ -453,5 +457,6 @@ Future<Widget> bootstrap(
     navigatorKey: navigatorKey,
     initialRemoteConfig: initialRemoteConfig,
     initialRemoteConfigError: initialRemoteConfigError,
+    packageInfoService: packageInfoService,
   );
 }

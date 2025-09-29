@@ -48,6 +48,7 @@ class AppState extends Equatable {
     this.userContentPreferences,
     this.settings,
     this.selectedBottomNavigationIndex = 0,
+    this.currentAppVersion,
   });
 
   /// The current status of the application, indicating its lifecycle stage.
@@ -83,6 +84,14 @@ class AppState extends Equatable {
 
   /// The current application environment (e.g., demo, development, production).
   final local_config.AppEnvironment environment;
+
+  /// The current version of the application, fetched from `package_info_plus`.
+  /// This is used for version enforcement.
+  final String? currentAppVersion;
+
+  /// The latest required app version from the remote configuration.
+  /// Returns `null` if remote config is not available.
+  String? get latestAppVersion => remoteConfig?.appStatus.latestAppVersion;
 
   /// The current theme mode (light, dark, or system), derived from [settings].
   /// Defaults to [ThemeMode.system] if [settings] are not yet loaded.
@@ -152,6 +161,7 @@ class AppState extends Equatable {
     userContentPreferences,
     selectedBottomNavigationIndex,
     environment,
+    currentAppVersion,
   ];
 
   /// Creates a copy of this [AppState] with the given fields replaced with
@@ -167,6 +177,7 @@ class AppState extends Equatable {
     UserContentPreferences? userContentPreferences,
     int? selectedBottomNavigationIndex,
     local_config.AppEnvironment? environment,
+    String? currentAppVersion,
   }) {
     return AppState(
       status: status ?? this.status,
@@ -182,6 +193,7 @@ class AppState extends Equatable {
       selectedBottomNavigationIndex:
           selectedBottomNavigationIndex ?? this.selectedBottomNavigationIndex,
       environment: environment ?? this.environment,
+      currentAppVersion: currentAppVersion ?? this.currentAppVersion,
     );
   }
 }

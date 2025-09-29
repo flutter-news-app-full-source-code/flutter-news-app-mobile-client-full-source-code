@@ -64,8 +64,20 @@ class UpdateRequiredPage extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: () async {
                         final url = Uri.parse(iosUpdateUrl);
-                        if (await canLaunchUrl(url)) {
-                          await launchUrl(url);
+                        if (!await launchUrl(
+                          url,
+                          mode: LaunchMode.externalApplication,
+                        )) {
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context)
+                            ..hideCurrentSnackBar()
+                            ..showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  l10n.couldNotOpenUpdateUrl(iosUpdateUrl),
+                                ),
+                              ),
+                            );
                         }
                       },
                       icon: const Icon(Icons.apple),
@@ -79,8 +91,20 @@ class UpdateRequiredPage extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: () async {
                         final url = Uri.parse(androidUpdateUrl);
-                        if (await canLaunchUrl(url)) {
-                          await launchUrl(url);
+                        if (!await launchUrl(
+                          url,
+                          mode: LaunchMode.externalApplication,
+                        )) {
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context)
+                            ..hideCurrentSnackBar()
+                            ..showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  l10n.couldNotOpenUpdateUrl(androidUpdateUrl),
+                                ),
+                              ),
+                            );
                         }
                       },
                       icon: const Icon(Icons.shop),

@@ -11,7 +11,9 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/config/confi
     as local_config;
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_initializer_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/services/package_info_service.dart';
 import 'package:logging/logging.dart';
+import 'package:pub_semver/pub_semver.dart';
 
 part 'app_event.dart';
 part 'app_state.dart';
@@ -41,6 +43,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required GlobalKey<NavigatorState> navigatorKey,
     required RemoteConfig? initialRemoteConfig,
     required HttpException? initialRemoteConfigError,
+    required PackageInfoService packageInfoService,
     this.demoDataMigrationService,
     this.demoDataInitializerService,
     this.initialUser,
@@ -51,6 +54,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _userRepository = userRepository,
        _environment = environment,
        _navigatorKey = navigatorKey,
+       _packageInfoService = packageInfoService,
        _logger = Logger('AppBloc'),
        super(
          AppState(
@@ -71,6 +75,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppUserContentPreferencesRefreshed>(_onUserContentPreferencesRefreshed);
     on<AppSettingsChanged>(_onAppSettingsChanged);
     on<AppPeriodicConfigFetchRequested>(_onAppPeriodicConfigFetchRequested);
+    on<AppVersionCheckRequested>(_onAppVersionCheckRequested);
     on<AppUserFeedDecoratorShown>(_onAppUserFeedDecoratorShown);
     on<AppUserContentPreferencesChanged>(_onAppUserContentPreferencesChanged);
     on<AppLogoutRequested>(_onLogoutRequested);
@@ -91,6 +96,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final DataRepository<User> _userRepository;
   final local_config.AppEnvironment _environment;
   final GlobalKey<NavigatorState> _navigatorKey;
+  final PackageInfoService _packageInfoService;
   final Logger _logger;
   final DemoDataMigrationService? demoDataMigrationService;
   final DemoDataInitializerService? demoDataInitializerService;
@@ -259,14 +265,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       return;
     }
 
-    if (state.remoteConfig!.appStatus.isLatestVersionOnly) {
-      // TODO(fulleni): Compare with actual app version.
-      _logger.info(
-        '[AppBloc] App update required. Transitioning to updateRequired state.',
-      );
-      emit(state.copyWith(status: AppLifeCycleStatus.updateRequired));
-      return;
-    }
+    // Dispatch AppVersionCheckRequested to handle version enforcement.
+    add(
+      AppVersionCheckRequested(
+        remoteConfig: state.remoteConfig!,
+        isBackgroundCheck: false, // Not a background check during startup
+      ),
+    );
 
     // If we reach here, the app is not under maintenance or requires update.
     // Now, handle user-specific data loading.
@@ -547,17 +552,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
 
-      if (remoteConfig.appStatus.isLatestVersionOnly) {
-        // TODO(fulleni): Compare with actual app version.
-        emit(
-          state.copyWith(
-            status: AppLifeCycleStatus.updateRequired,
-            remoteConfig: remoteConfig,
-            initialRemoteConfigError: null,
-          ),
-        );
-        return;
-      }
+      // Dispatch AppVersionCheckRequested to handle version enforcement.
+      add(
+        AppVersionCheckRequested(
+          remoteConfig: remoteConfig,
+          isBackgroundCheck: event.isBackgroundCheck,
+        ),
+      );
 
       final finalStatus = state.user!.appRole == AppUserRole.standardUser
           ? AppLifeCycleStatus.authenticated
@@ -588,6 +589,94 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         s,
       );
       if (!event.isBackgroundCheck) {
+        emit(
+          state.copyWith(
+            status: AppLifeCycleStatus.criticalError,
+            initialRemoteConfigError: UnknownException(e.toString()),
+          ),
+        );
+      }
+    }
+  }
+
+  /// Handles the [AppVersionCheckRequested] event to enforce app version updates.
+  Future<void> _onAppVersionCheckRequested(
+    AppVersionCheckRequested event,
+    Emitter<AppState> emit,
+  ) async {
+    final remoteConfig = event.remoteConfig;
+    final isBackgroundCheck = event.isBackgroundCheck;
+
+    if (!remoteConfig.appStatus.isLatestVersionOnly) {
+      _logger.info(
+        '[AppBloc] Version enforcement not enabled. Skipping version check.',
+      );
+      return;
+    }
+
+    final currentAppVersionString = await _packageInfoService.getAppVersion();
+
+    if (currentAppVersionString == null) {
+      _logger.warning(
+        '[AppBloc] Could not determine current app version. '
+        'Skipping version comparison.',
+      );
+      // If we can't get the current version, we can't enforce.
+      // Do not block the app, but log a warning.
+      return;
+    }
+
+    try {
+      final currentVersion = Version.parse(currentAppVersionString);
+      final latestRequiredVersion = Version.parse(
+        remoteConfig.appStatus.latestAppVersion,
+      );
+
+      if (currentVersion < latestRequiredVersion) {
+        _logger.info(
+          '[AppBloc] App version ($currentVersion) is older than '
+          'required ($latestRequiredVersion). Transitioning to updateRequired state.',
+        );
+        emit(state.copyWith(status: AppLifeCycleStatus.updateRequired));
+      } else {
+        _logger.info(
+          '[AppBloc] App version ($currentVersion) is up to date '
+          'or newer than required ($latestRequiredVersion).',
+        );
+        // If the app is up to date, and it was previously in an updateRequired
+        // state (e.g., after an update), transition it back to a normal state.
+        if (state.status == AppLifeCycleStatus.updateRequired) {
+          final finalStatus = state.user!.appRole == AppUserRole.standardUser
+              ? AppLifeCycleStatus.authenticated
+              : AppLifeCycleStatus.anonymous;
+          emit(state.copyWith(status: finalStatus));
+        }
+      }
+      emit(state.copyWith(currentAppVersion: currentAppVersionString));
+    } on FormatException catch (e, s) {
+      _logger.severe(
+        '[AppBloc] Failed to parse app version string: $currentAppVersionString '
+        'or latest required version: ${remoteConfig.appStatus.latestAppVersion}.',
+        e,
+        s,
+      );
+      if (!isBackgroundCheck) {
+        emit(
+          state.copyWith(
+            status: AppLifeCycleStatus.criticalError,
+            initialRemoteConfigError: UnknownException(
+              'Failed to parse app version: ${e.message}',
+            ),
+          ),
+        );
+      }
+    } catch (e, s) {
+      _logger.severe(
+        '[AppBloc] Unexpected error during app version check.',
+        e,
+        s,
+      );
+      if (!isBackgroundCheck) {
         emit(
           state.copyWith(
             status: AppLifeCycleStatus.criticalError,

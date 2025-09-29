@@ -19,7 +19,9 @@ void main() async {
 
   // Only remove the splash screen on web after the app is ready.
   if (kIsWeb) {
-    removeSplashFromWeb();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      removeSplashFromWeb();
+    });
   }
 
   if (appConfig.environment == AppEnvironment.demo && kIsWeb) {

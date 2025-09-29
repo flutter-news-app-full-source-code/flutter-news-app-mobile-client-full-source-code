@@ -7,7 +7,7 @@
 -   **Dependency Update:** Bumped `flutter_bloc` to `^9.1.1`.
 -   **Dependency Update:** Bumped `go_router` to `^16.2.4`.
 -   **Dependency Update:** Bumped `google_fonts` to `^6.3.2`.
--   **Dependency Update:** Bumped `share_plus` to `^12.0.0`.
+-   **Dependency Update:** Bumped `share_plus` to `^11.1.0`.
 -   **Dependency Update:** Bumped `very_good_analysis` to `^10.0.0`.
 -   **Metadata Update:** Updated `homepage` and `documentation` URLs.
 -   **Metadata Update:** Added `funding` link.

@@ -12,7 +12,7 @@
 -   **Dependency Update:** Bumped `very_good_analysis` to `^10.0.0`.
 -   **Metadata Update:** Updated `homepage` and `documentation` URLs.
 -   **Metadata Update:** Added `funding` link.
--   **Metadata Update:** Added `flutter-news-app-full-sourcecode` to `topics`.
+-   **Metadata Update:** Added `flutter` and `flutter-full-app` to `topics`.
 -   **Metadata Update:** Added `screenshots` configuration.
 
 ## 1.1.0

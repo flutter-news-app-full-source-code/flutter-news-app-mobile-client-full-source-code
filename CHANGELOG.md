@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.1
+
+-   **Refactor:** Removed `flutter_native_splash` dependency and related configurations.
+-   **Dependency Update:** Bumped `share_plus` to `^12.0.0`.
+-   **Dependency Update:** Bumped `very_good_analysis` to `^10.0.0`.
+
 ## 1.1.0
 
 -   **Feature:** Implemented app version enforcement based on remote configuration, including a dedicated `UpdateRequiredPage` to guide users to update.

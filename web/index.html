@@ -131,13 +131,18 @@
   <div id="splash-container" class="center">
     <div class="loader"></div>
   </div>
+  <script src="flutter.js" defer></script>
   <script>
-    { { flutter_bootstrap_js } }
+    window.addEventListener('load', function () {
+      _flutter.loader.loadEntrypoint({
+        onEntrypointLoaded: function (engineInitializer) {
+          engineInitializer.initializeEngine().then(function (appRunner) {
+            appRunner.runApp();
+          });
+        }
+      });
+    });
   </script>
-
-
-
-
 </body>
 
 </html>

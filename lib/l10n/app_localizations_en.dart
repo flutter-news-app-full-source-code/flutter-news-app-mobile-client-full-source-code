@@ -896,4 +896,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String couldNotOpenUpdateUrl(String url) {
     return 'Could not open update URL: $url';
   }
+
+  @override
+  String currentAppVersionLabel(String version) {
+    return 'Your current version: $version';
+  }
+
+  @override
+  String latestRequiredVersionLabel(String version) {
+    return 'Required version: $version';
+  }
 }

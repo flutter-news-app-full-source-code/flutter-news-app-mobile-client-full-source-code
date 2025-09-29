@@ -894,4 +894,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String couldNotOpenUpdateUrl(String url) {
     return 'تعذر فتح رابط التحديث: $url';
   }
+
+  @override
+  String currentAppVersionLabel(String version) {
+    return 'إصدارك الحالي: $version';
+  }
+
+  @override
+  String latestRequiredVersionLabel(String version) {
+    return 'الإصدار المطلوب: $version';
+  }
 }

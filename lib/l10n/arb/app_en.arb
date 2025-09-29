@@ -1169,5 +1169,25 @@
                 "type": "String"
             }
         }
+    },
+    "currentAppVersionLabel": "Your current version: {version}",
+    "@currentAppVersionLabel": {
+        "description": "Label to display the current app version.",
+        "placeholders": {
+            "version": {
+                "type": "String",
+                "example": "1.0.0"
+            }
+        }
+    },
+    "latestRequiredVersionLabel": "Required version: {version}",
+    "@latestRequiredVersionLabel": {
+        "description": "Label to display the latest required app version.",
+        "placeholders": {
+            "version": {
+                "type": "String",
+                "example": "1.1.0"
+            }
+        }
     }
 }

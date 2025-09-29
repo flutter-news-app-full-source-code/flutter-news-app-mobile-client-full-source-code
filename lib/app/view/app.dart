@@ -415,6 +415,8 @@ class _AppViewState extends State<_AppView> {
                 iosUpdateUrl: state.remoteConfig!.appStatus.iosUpdateUrl,
                 androidUpdateUrl:
                     state.remoteConfig!.appStatus.androidUpdateUrl,
+                currentAppVersion: state.currentAppVersion,
+                latestRequiredVersion: state.latestAppVersion,
               ),
             );
           }

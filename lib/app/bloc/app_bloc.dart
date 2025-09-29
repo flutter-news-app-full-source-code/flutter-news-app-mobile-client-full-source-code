@@ -270,7 +270,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       AppVersionCheckRequested(
         remoteConfig: state.remoteConfig!,
         // Not a background check during startup
-        isBackgroundCheck: false, 
+        isBackgroundCheck: false,
       ),
     );
 
@@ -638,7 +638,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           '[AppBloc] App version ($currentVersion) is older than '
           'required ($latestRequiredVersion). Transitioning to updateRequired state.',
         );
-        emit(state.copyWith(status: AppLifeCycleStatus.updateRequired));
+        emit(
+          state.copyWith(
+            status: AppLifeCycleStatus.updateRequired,
+            currentAppVersion: currentAppVersionString,
+          ),
+        );
       } else {
         _logger.info(
           '[AppBloc] App version ($currentVersion) is up to date '
@@ -650,10 +655,16 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           final finalStatus = state.user!.appRole == AppUserRole.standardUser
               ? AppLifeCycleStatus.authenticated
               : AppLifeCycleStatus.anonymous;
-          emit(state.copyWith(status: finalStatus));
+          emit(
+            state.copyWith(
+              status: finalStatus,
+              currentAppVersion: currentAppVersionString,
+            ),
+          );
+        } else {
+          emit(state.copyWith(currentAppVersion: currentAppVersionString));
         }
       }
-      emit(state.copyWith(currentAppVersion: currentAppVersionString));
     } on FormatException catch (e, s) {
       _logger.severe(
         '[AppBloc] Failed to parse app version string: $currentAppVersionString '

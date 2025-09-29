@@ -112,8 +112,10 @@ flutter:
   generate: true
 
   assets:
-    - assets/icon/
+    - assets
 
 screenshots:
-  - description: The flutter news app full source code logo.
-    path: assets/icon/logo.png
+  - description: The flutter news app full source code dark logo.
+    path: assets/logo/flutter-news-app-full-source-code-dark-logo.png
+  - description: The flutter news app full source code light logo.
+    path: assets/logo/flutter-news-app-full-source-code-light-logo.png

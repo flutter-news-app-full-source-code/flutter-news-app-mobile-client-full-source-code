@@ -16,6 +16,8 @@ class UpdateRequiredPage extends StatelessWidget {
   const UpdateRequiredPage({
     required this.iosUpdateUrl,
     required this.androidUpdateUrl,
+    required this.currentAppVersion,
+    required this.latestRequiredVersion,
     super.key,
   });
 
@@ -24,6 +26,12 @@ class UpdateRequiredPage extends StatelessWidget {
 
   /// The URL to open for Android app updates.
   final String androidUpdateUrl;
+
+  /// The current version of the application.
+  final String? currentAppVersion;
+
+  /// The latest required version of the application.
+  final String? latestRequiredVersion;
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +62,19 @@ class UpdateRequiredPage extends StatelessWidget {
                 style: theme.textTheme.bodyLarge,
                 textAlign: TextAlign.center,
               ),
+              if (currentAppVersion != null && latestRequiredVersion != null) ...[
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  l10n.currentAppVersionLabel(currentAppVersion!),
+                  style: theme.textTheme.bodySmall,
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  l10n.latestRequiredVersionLabel(latestRequiredVersion!),
+                  style: theme.textTheme.bodySmall,
+                  textAlign: TextAlign.center,
+                ),
+              ],
               const SizedBox(height: AppSpacing.xl),
               if (!kIsWeb) ...[
                 // Show platform-specific update buttons for mobile

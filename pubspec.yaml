@@ -117,14 +117,13 @@ flutter:
   uses-material-design: true
   generate: true
   assets:
-    - assets
+    - assets/logo/
 
 flutter_launcher_icons:
   image_path: assets/logo/flutter-news-app-full-source-code-dark-logo.png
 
   android: "launcher_icon"
   min_sdk_android: 21
-  adaptive_icon_background: "assets/icon/background.png"
 
   web:
     generate: true

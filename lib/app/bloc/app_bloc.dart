@@ -633,18 +633,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         remoteConfig.appStatus.latestAppVersion,
       );
 
-      if (currentVersion < latestRequiredVersion) {
-        _logger.info(
-          '[AppBloc] App version ($currentVersion) is older than '
-          'required ($latestRequiredVersion). Transitioning to updateRequired state.',
-        );
-        emit(
-          state.copyWith(
-            status: AppLifeCycleStatus.updateRequired,
-            currentAppVersion: currentAppVersionString,
-          ),
-        );
-      } else {
+      if (currentVersion >= latestRequiredVersion) {
         _logger.info(
           '[AppBloc] App version ($currentVersion) is up to date '
           'or newer than required ($latestRequiredVersion).',
@@ -664,6 +653,17 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         } else {
           emit(state.copyWith(currentAppVersion: currentAppVersionString));
         }
+      } else {
+        _logger.info(
+          '[AppBloc] App version ($currentVersion) is older than '
+          'required ($latestRequiredVersion). Transitioning to updateRequired state.',
+        );
+        emit(
+          state.copyWith(
+            status: AppLifeCycleStatus.updateRequired,
+            currentAppVersion: currentAppVersionString,
+          ),
+        );
       }
     } on FormatException catch (e, s) {
       _logger.severe(

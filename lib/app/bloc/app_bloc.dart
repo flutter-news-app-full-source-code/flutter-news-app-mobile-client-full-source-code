@@ -269,7 +269,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     add(
       AppVersionCheckRequested(
         remoteConfig: state.remoteConfig!,
-        isBackgroundCheck: false, // Not a background check during startup
+        // Not a background check during startup
+        isBackgroundCheck: false, 
       ),
     );
 

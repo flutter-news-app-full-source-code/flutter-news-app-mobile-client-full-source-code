@@ -14,6 +14,11 @@ topics:
   - flutter-news-app
   - flutter-news-app-mobile-client
   - flutter-news-app-source-code
+screenshots:
+  - description: The flutter news app full source code dark logo.
+    path: assets/logo/flutter-news-app-full-source-code-dark-logo.png
+  - description: The flutter news app full source code light logo.
+    path: assets/logo/flutter-news-app-full-source-code-light-logo.png
 
 environment:
   sdk: ^3.9.0
@@ -65,9 +70,10 @@ dependencies:
     sdk: flutter
   flutter_adaptive_scaffold: ^0.3.2
   flutter_bloc: ^9.1.1
-  flutter_launcher_icons: ^0.14.3
+  flutter_launcher_icons: ^0.14.4
   flutter_localizations:
     sdk: flutter
+  flutter_native_splash: ^2.4.6
   go_router: ^16.2.4
   google_fonts: ^6.3.2
   google_mobile_ads: ^6.0.0
@@ -110,12 +116,30 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
-
   assets:
     - assets
 
-screenshots:
-  - description: The flutter news app full source code dark logo.
-    path: assets/logo/flutter-news-app-full-source-code-dark-logo.png
-  - description: The flutter news app full source code light logo.
-    path: assets/logo/flutter-news-app-full-source-code-light-logo.png
+flutter_launcher_icons:
+  image_path: assets/logo/flutter-news-app-full-source-code-dark-logo.png
+
+  android: "launcher_icon"
+  min_sdk_android: 21
+  adaptive_icon_background: "assets/icon/background.png"
+
+  web:
+    generate: true
+    background_color: "#FFFFFF"
+    theme_color: "#FFFFFF"
+
+flutter_native_splash:
+  color: "#FFFFFF"
+  color_dark: "#212121"
+
+  # Optional: Specify an image asset for the splash screen
+  image: assets/logo/flutter-news-app-full-source-code-light-logo.png
+  image_dark: assets/logo/flutter-news-app-full-source-code-dark-logo.png
+
+  # Ensure configuration is applied to both platforms
+  android: true
+  ios: true
+  web: true

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1
+
+-   **Fix:** Resolved an issue where the web splash screen would not disappear after the application loaded due to an incorrect bootstrap script in `index.html`.
+
 ## 1.2.0
 
 -   **Refactor:** Updated `flutter_launcher_icons` configurations.

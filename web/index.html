@@ -115,6 +115,10 @@
       document.body.style.background = "transparent";
     }
   </script>
+  <script>
+    var serviceWorkerVersion = null;
+  </script>
+  <script src="flutter.js" defer></script>
 </head>
 
 <body>
@@ -132,12 +136,20 @@
     <div class="loader"></div>
   </div>
   <script>
-    { { flutter_bootstrap_js } }
+    window.addEventListener('load', function (ev) {
+      // Download main.dart.js
+      _flutter.loader.loadEntrypoint({
+        serviceWorker: {
+          serviceWorkerVersion: serviceWorkerVersion,
+        },
+        onEntrypointLoaded: function (engineInitializer) {
+          engineInitializer.initializeEngine().then(function (appRunner) {
+            appRunner.runApp();
+          });
+        }
+      });
+    });
   </script>
-
-
-
-
 </body>
 
 </html>

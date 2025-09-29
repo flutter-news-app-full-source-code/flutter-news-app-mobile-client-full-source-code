@@ -1160,5 +1160,14 @@
     "suggestedSourcesTitle": "Suggested Sources",
     "@suggestedSourcesTitle": {
         "description": "Title for the suggested sources content collection."
+    },
+    "couldNotOpenUpdateUrl": "Could not open update URL: {url}",
+    "@couldNotOpenUpdateUrl": {
+        "description": "Message displayed in a snackbar when the update URL cannot be opened.",
+        "placeholders": {
+            "url": {
+                "type": "String"
+            }
+        }
     }
 }

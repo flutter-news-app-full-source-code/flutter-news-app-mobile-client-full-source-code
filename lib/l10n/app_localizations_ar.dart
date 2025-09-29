@@ -889,4 +889,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get suggestedSourcesTitle => 'مصادر مقترحة';
+
+  @override
+  String couldNotOpenUpdateUrl(String url) {
+    return 'تعذر فتح رابط التحديث: $url';
+  }
 }

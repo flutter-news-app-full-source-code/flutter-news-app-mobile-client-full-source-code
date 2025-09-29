@@ -1160,5 +1160,14 @@
     "suggestedSourcesTitle": "مصادر مقترحة",
     "@suggestedSourcesTitle": {
         "description": "عنوان لمجموعة المصادر المقترحة."
+    },
+    "couldNotOpenUpdateUrl": "تعذر فتح رابط التحديث: {url}",
+    "@couldNotOpenUpdateUrl": {
+        "description": "رسالة تظهر في شريط الإشعارات عندما يتعذر فتح رابط التحديث.",
+        "placeholders": {
+            "url": {
+                "type": "String"
+            }
+        }
     }
 }

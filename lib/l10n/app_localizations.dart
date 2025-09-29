@@ -1705,6 +1705,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Suggested Sources'**
   String get suggestedSourcesTitle;
+
+  /// Message displayed in a snackbar when the update URL cannot be opened.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open update URL: {url}'**
+  String couldNotOpenUpdateUrl(String url);
 }
 
 class _AppLocalizationsDelegate

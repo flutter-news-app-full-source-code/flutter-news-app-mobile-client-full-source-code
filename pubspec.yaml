@@ -121,10 +121,8 @@ flutter:
 
 flutter_launcher_icons:
   image_path: assets/logo/flutter-news-app-full-source-code-dark-logo.png
-  
   android: "launcher_icon"
   min_sdk_android: 21
-
   web:
     generate: true
     background_color: "#FFFFFF"

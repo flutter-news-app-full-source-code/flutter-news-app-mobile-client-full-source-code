@@ -133,12 +133,8 @@ flutter_launcher_icons:
 flutter_native_splash:
   color: "#FFFFFF"
   color_dark: "#212121"
-
-  # Optional: Specify an image asset for the splash screen
   image: assets/logo/flutter-news-app-full-source-code-dark-logo.png
   image_dark: assets/logo/flutter-news-app-full-source-code-light-logo.png
-
-  # Ensure configuration is applied to both platforms
   android: true
   ios: true
-  web: false
+  web: true

@@ -117,20 +117,7 @@
   <div id="splash-container" class="center">
     <div class="loader"></div>
   </div>
-  <script>
-    { { flutter_bootstrap_js } }
-    { { flutter_js } }
-    { { flutter_build_config } }
-    window.addEventListener('load', function (ev) {
-      _flutter.loader.load({
-        onEntrypointLoaded: function (engineInitializer) {
-          engineInitializer.initializeEngine().then(function (appRunner) {
-            appRunner.runApp();
-          });
-        }
-      });
-    });
-  </script>
+  <script src="flutter_bootstrap.js" async></script>
 
 
 

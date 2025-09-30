@@ -2,19 +2,6 @@
 <html>
 
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
@@ -36,8 +23,6 @@
 
 
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
-
-
 
 
   <style id="splash-screen-style">
@@ -111,14 +96,9 @@
     function removeSplashFromWeb() {
       document.getElementById("splash")?.remove();
       document.getElementById("splash-branding")?.remove();
-      document.getElementById("splash-container")?.remove();
       document.body.style.background = "transparent";
     }
   </script>
-  <script>
-    var serviceWorkerVersion = null;
-  </script>
-  <script src="flutter.js" defer></script>
 </head>
 
 <body>
@@ -132,24 +112,15 @@
     <img class="center" aria-hidden="true" src="splash/img/light-1x.png" alt="">
   </picture>
 
+
+
   <div id="splash-container" class="center">
     <div class="loader"></div>
   </div>
-  <script>
-    window.addEventListener('load', function (ev) {
-      // Download main.dart.js
-      _flutter.loader.loadEntrypoint({
-        serviceWorker: {
-          serviceWorkerVersion: serviceWorkerVersion,
-        },
-        onEntrypointLoaded: function (engineInitializer) {
-          engineInitializer.initializeEngine().then(function (appRunner) {
-            appRunner.runApp();
-          });
-        }
-      });
-    });
-  </script>
+  <script src="flutter_bootstrap.js" async></script>
+
+
+
 </body>
 
 </html>

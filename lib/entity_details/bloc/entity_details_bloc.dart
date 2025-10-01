@@ -9,7 +9,11 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/models/limit_reached_arguments.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_decorator_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/user_limit_service.dart';
+import 'package:go_router/go_router.dart';
 
 part 'entity_details_event.dart';
 part 'entity_details_state.dart';
@@ -32,6 +36,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     required AppBloc appBloc,
     required FeedDecoratorService feedDecoratorService,
     required InlineAdCacheService inlineAdCacheService,
+    required UserLimitService userLimitService,
   }) : _headlinesRepository = headlinesRepository,
        _topicRepository = topicRepository,
        _sourceRepository = sourceRepository,
@@ -39,6 +44,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
        _appBloc = appBloc,
        _feedDecoratorService = feedDecoratorService,
        _inlineAdCacheService = inlineAdCacheService,
+       _userLimitService = userLimitService,
        super(const EntityDetailsState()) {
     on<EntityDetailsLoadRequested>(_onEntityDetailsLoadRequested);
     on<EntityDetailsToggleFollowRequested>(
@@ -56,6 +62,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
   final AppBloc _appBloc;
   final FeedDecoratorService _feedDecoratorService;
   final InlineAdCacheService _inlineAdCacheService;
+  final UserLimitService _userLimitService;
 
   static const _headlinesLimit = 10;
 
@@ -190,10 +197,17 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     final entity = state.entity;
     final currentUser = _appBloc.state.user;
     final currentPreferences = _appBloc.state.userContentPreferences;
+    final remoteConfig = _appBloc.state.remoteConfig;
 
-    if (entity == null || currentUser == null || currentPreferences == null) {
+    if (entity == null ||
+        currentUser == null ||
+        currentPreferences == null ||
+        remoteConfig == null) {
       return;
     }
+
+    final userRole = currentUser.appRole;
+    final userPreferenceConfig = remoteConfig.userPreferenceConfig;
 
     // Create a mutable copy of the lists to modify
     final updatedFollowedTopics = List<Topic>.from(
@@ -210,25 +224,88 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
 
     if (entity is Topic) {
       final topic = entity;
-      if (updatedFollowedTopics.any((t) => t.id == topic.id)) {
+      final isAlreadyFollowing = updatedFollowedTopics.any(
+        (t) => t.id == topic.id,
+      );
+
+      if (isAlreadyFollowing) {
         updatedFollowedTopics.removeWhere((t) => t.id == topic.id);
+        isCurrentlyFollowing = false;
       } else {
+        // Check limit before adding
+        if (_userLimitService.hasReachedFollowedTopicsLimit(
+          userRole: userRole,
+          userPreferenceConfig: userPreferenceConfig,
+          followedTopicsCount: updatedFollowedTopics.length,
+        )) {
+          // Limit reached, navigate to LimitReachedPage
+          _appBloc.navigatorKey.currentContext?.goNamed(
+            Routes.limitReachedName,
+            extra: LimitReachedArguments(
+              limitType: LimitType.followedTopics,
+              userRole: userRole,
+            ),
+          );
+          return; // Stop further processing
+        }
         updatedFollowedTopics.add(topic);
         isCurrentlyFollowing = true;
       }
     } else if (entity is Source) {
       final source = entity;
-      if (updatedFollowedSources.any((s) => s.id == source.id)) {
+      final isAlreadyFollowing = updatedFollowedSources.any(
+        (s) => s.id == source.id,
+      );
+
+      if (isAlreadyFollowing) {
         updatedFollowedSources.removeWhere((s) => s.id == source.id);
+        isCurrentlyFollowing = false;
       } else {
+        // Check limit before adding
+        if (_userLimitService.hasReachedFollowedSourcesLimit(
+          userRole: userRole,
+          userPreferenceConfig: userPreferenceConfig,
+          followedSourcesCount: updatedFollowedSources.length,
+        )) {
+          // Limit reached, navigate to LimitReachedPage
+          _appBloc.navigatorKey.currentContext?.goNamed(
+            Routes.limitReachedName,
+            extra: LimitReachedArguments(
+              limitType: LimitType.followedSources,
+              userRole: userRole,
+            ),
+          );
+          return; // Stop further processing
+        }
         updatedFollowedSources.add(source);
         isCurrentlyFollowing = true;
       }
     } else if (entity is Country) {
       final country = entity;
-      if (updatedFollowedCountries.any((c) => c.id == country.id)) {
+      final isAlreadyFollowing = updatedFollowedCountries.any(
+        (c) => c.id == country.id,
+      );
+
+      if (isAlreadyFollowing) {
         updatedFollowedCountries.removeWhere((c) => c.id == country.id);
+        isCurrentlyFollowing = false;
       } else {
+        // Check limit before adding
+        if (_userLimitService.hasReachedFollowedCountriesLimit(
+          userRole: userRole,
+          userPreferenceConfig: userPreferenceConfig,
+          followedCountriesCount: updatedFollowedCountries.length,
+        )) {
+          // Limit reached, navigate to LimitReachedPage
+          _appBloc.navigatorKey.currentContext?.goNamed(
+            Routes.limitReachedName,
+            extra: LimitReachedArguments(
+              limitType: LimitType.followedCountries,
+              userRole: userRole,
+            ),
+          );
+          return; // Stop further processing
+        }
         updatedFollowedCountries.add(country);
         isCurrentlyFollowing = true;
       }

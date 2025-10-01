@@ -12,6 +12,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/config/confi
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_initializer_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/package_info_service.dart';
+import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:pub_semver/pub_semver.dart';
 
@@ -408,6 +409,23 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // After potential initialization and migration,
       // ensure user-specific data (settings and preferences) are loaded.
       await _fetchAndSetUserData(newUser, emit);
+
+      // After successful authentication, check for a redirectPath in the current
+      // GoRouterState and navigate there if present.
+      final currentContext = _navigatorKey.currentContext;
+      if (currentContext != null) {
+        final currentRouteState = GoRouterState.of(currentContext);
+        final redirectPath =
+            currentRouteState.uri.queryParameters['redirectPath'];
+        if (redirectPath != null && redirectPath.isNotEmpty) {
+          _logger.info(
+            '[AppBloc] Authenticated. Redirecting to previous path: $redirectPath',
+          );
+          // Use go() to replace the current route stack with the redirect path.
+          // This prevents the user from being able to go back to the auth flow.
+          currentContext.go(redirectPath);
+        }
+      }
     } else {
       // If user logs out, clear user-specific data from state.
       emit(state.copyWith(settings: null, userContentPreferences: null));

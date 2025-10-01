@@ -47,8 +47,7 @@ class LimitReachedPage extends StatelessWidget {
     final isStandard = args.userRole == AppUserRole.standardUser;
     final isPremium = args.userRole == AppUserRole.premiumUser;
 
-    final isFollowLimit =
-        args.limitType == LimitType.followedTopics ||
+    final isFollowLimit = args.limitType == LimitType.followedTopics ||
         args.limitType == LimitType.followedSources ||
         args.limitType == LimitType.followedCountries;
 
@@ -62,7 +61,7 @@ class LimitReachedPage extends StatelessWidget {
       actionButton = ElevatedButton(
         onPressed: () {
           context.goNamed(
-            Routes.linkingRequestCodeName,
+            Routes.authenticationName,
             queryParameters: {'context': 'linking'},
           );
         },
@@ -105,28 +104,41 @@ class LimitReachedPage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.limitReachedPageTitle),
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-          onPressed: () => context.pop(),
+      backgroundColor: Colors.black.withOpacity(0.6),
+      body: Dialog(
+        insetPadding: const EdgeInsets.all(AppSpacing.lg),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.md),
         ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(AppSpacing.paddingLarge),
-        child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
           child: SingleChildScrollView(
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                Align(
+                  alignment: Alignment.topRight,
+                  child: IconButton(
+                    icon: const Icon(Icons.close),
+                    tooltip:
+                        MaterialLocalizations.of(context).closeButtonTooltip,
+                    onPressed: () {
+                      if (context.canPop()) {
+                        context.pop();
+                      } else {
+                        context.goNamed(Routes.feedName);
+                      }
+                    },
+                  ),
+                ),
                 Icon(
                   _getIconForLimitType(args.limitType),
                   size: AppSpacing.xxl * 2,
                   color: colorScheme.primary,
                 ),
-                const SizedBox(height: AppSpacing.xl),
+                const SizedBox(height: AppSpacing.lg),
                 Text(
                   headline,
                   style: textTheme.headlineMedium?.copyWith(
@@ -143,9 +155,13 @@ class LimitReachedPage extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 if (actionButton != null) ...[
-                  const SizedBox(height: AppSpacing.xxl),
-                  SizedBox(width: double.infinity, child: actionButton),
+                  const SizedBox(height: AppSpacing.xl),
+                  SizedBox(
+                    width: double.infinity,
+                    child: actionButton,
+                  ),
                 ],
+                const SizedBox(height: AppSpacing.sm),
               ],
             ),
           ),

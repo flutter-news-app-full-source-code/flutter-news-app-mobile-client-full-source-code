@@ -18,30 +18,47 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class RequestCodePage extends StatelessWidget {
   /// {@macro request_code_page}
-  const RequestCodePage({required this.isLinkingContext, super.key});
+  const RequestCodePage({
+    this.authContext,
+    this.redirectPath,
+    super.key,
+  });
 
-  /// Whether this page is being shown in the account linking context.
-  final bool isLinkingContext;
+  /// The context of the authentication flow (e.g., 'linking', 'limit_reached').
+  final String? authContext;
+
+  /// The path to redirect to after successful authentication or cancellation.
+  final String? redirectPath;
 
   @override
   Widget build(BuildContext context) {
     // AuthenticationBloc is assumed to be provided by a parent route.
     // Pass the linking context flag down to the view.
-    return _RequestCodeView(isLinkingContext: isLinkingContext);
+    return _RequestCodeView(
+      authContext: authContext,
+      redirectPath: redirectPath,
+    );
   }
 }
 
 class _RequestCodeView extends StatelessWidget {
   // Accept the flag from the parent page.
-  const _RequestCodeView({required this.isLinkingContext});
+  const _RequestCodeView({
+    this.authContext,
+    this.redirectPath,
+  });
 
-  final bool isLinkingContext;
+  final String? authContext;
+  final String? redirectPath;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+
+    // Determine if this is a linking context based on the authContext
+    final isLinkingContext = authContext == 'linking';
 
     return Scaffold(
       appBar: AppBar(
@@ -52,18 +69,17 @@ class _RequestCodeView extends StatelessWidget {
           tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () {
             // Navigate back differently based on the context.
-            if (isLinkingContext) {
-              // If linking, go back to Auth page preserving the linking query param.
-              context.goNamed(
-                Routes.authenticationName,
-                queryParameters: isLinkingContext
-                    ? {'context': 'linking'}
-                    : const {},
-              );
-            } else {
-              // If normal sign-in, just go back to the Auth page.
-              context.goNamed(Routes.authenticationName);
-            }
+            // If a redirectPath is provided, use it. Otherwise, go back to the
+            // authentication page, preserving the authContext if present.
+            context.go(
+              redirectPath ??
+                  Uri(
+                    path: Routes.authentication,
+                    queryParameters: {
+                      if (authContext != null) 'authContext': authContext,
+                    },
+                  ).toString(),
+            );
           },
         ),
       ),
@@ -82,11 +98,16 @@ class _RequestCodeView extends StatelessWidget {
             } else if (state.status ==
                 AuthenticationStatus.requestCodeSuccess) {
               // Navigate to the code verification page on success, passing the email
+              // and preserving the authContext and redirectPath.
               context.pushNamed(
                 isLinkingContext
                     ? Routes.linkingVerifyCodeName
                     : Routes.verifyCodeName,
                 pathParameters: {'email': state.email!},
+                queryParameters: {
+                  if (authContext != null) 'authContext': authContext,
+                  if (redirectPath != null) 'redirectPath': redirectPath,
+                },
               );
             }
           },

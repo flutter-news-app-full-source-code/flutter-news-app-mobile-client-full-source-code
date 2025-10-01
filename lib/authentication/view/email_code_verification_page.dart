@@ -13,10 +13,21 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class EmailCodeVerificationPage extends StatelessWidget {
   /// {@macro email_code_verification_page}
-  const EmailCodeVerificationPage({required this.email, super.key});
+  const EmailCodeVerificationPage({
+    required this.email,
+    this.authContext,
+    this.redirectPath,
+    super.key,
+  });
 
   /// The email address the sign-in code was sent to.
   final String email;
+
+  /// The context of the authentication flow (e.g., 'linking', 'limit_reached').
+  final String? authContext;
+
+  /// The path to redirect to after successful authentication or cancellation.
+  final String? redirectPath;
 
   @override
   Widget build(BuildContext context) {

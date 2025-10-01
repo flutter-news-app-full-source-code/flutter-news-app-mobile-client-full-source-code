@@ -15,6 +15,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/services/pac
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/router.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/user_limit_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kv_storage_service/kv_storage_service.dart';
@@ -50,6 +51,7 @@ class App extends StatelessWidget {
     required RemoteConfig? initialRemoteConfig,
     required HttpException? initialRemoteConfigError,
     required PackageInfoService packageInfoService,
+    required UserLimitService userLimitService,
     super.key,
     this.demoDataMigrationService,
     this.demoDataInitializerService,
@@ -71,7 +73,8 @@ class App extends StatelessWidget {
        _inlineAdCacheService = inlineAdCacheService,
        _initialRemoteConfig = initialRemoteConfig,
        _initialRemoteConfigError = initialRemoteConfigError,
-       _packageInfoService = packageInfoService;
+       _packageInfoService = packageInfoService,
+       _userLimitService = userLimitService;
 
   final AuthRepository _authenticationRepository;
   final DataRepository<Headline> _headlinesRepository;
@@ -90,6 +93,7 @@ class App extends StatelessWidget {
   final GlobalKey<NavigatorState> _navigatorKey;
   final InlineAdCacheService _inlineAdCacheService;
   final PackageInfoService _packageInfoService;
+  final UserLimitService _userLimitService;
   final DemoDataMigrationService? demoDataMigrationService;
   final DemoDataInitializerService? demoDataInitializerService;
   final User? initialUser;
@@ -119,6 +123,7 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _localAdRepository),
         RepositoryProvider.value(value: _inlineAdCacheService),
         RepositoryProvider.value(value: _packageInfoService),
+        RepositoryProvider.value(value: _userLimitService),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -139,6 +144,7 @@ class App extends StatelessWidget {
               initialRemoteConfig: _initialRemoteConfig,
               initialRemoteConfigError: _initialRemoteConfigError,
               packageInfoService: _packageInfoService,
+              userLimitService: _userLimitService,
             )..add(AppStarted(initialUser: initialUser)),
           ),
           BlocProvider(
@@ -174,6 +180,7 @@ class App extends StatelessWidget {
           navigatorKey: _navigatorKey,
           inlineAdCacheService: _inlineAdCacheService,
           packageInfoService: _packageInfoService,
+          userLimitService: _userLimitService,
         ),
       ),
     );
@@ -197,6 +204,7 @@ class _AppView extends StatefulWidget {
     required this.navigatorKey,
     required this.inlineAdCacheService,
     required this.packageInfoService,
+    required this.userLimitService,
   });
 
   final AuthRepository authenticationRepository;
@@ -214,6 +222,7 @@ class _AppView extends StatefulWidget {
   final GlobalKey<NavigatorState> navigatorKey;
   final InlineAdCacheService inlineAdCacheService;
   final PackageInfoService packageInfoService;
+  final UserLimitService userLimitService;
 
   @override
   State<_AppView> createState() => _AppViewState();
@@ -257,6 +266,7 @@ class _AppViewState extends State<_AppView> {
       adService: widget.adService,
       navigatorKey: widget.navigatorKey,
       inlineAdCacheService: widget.inlineAdCacheService,
+      userLimitService: widget.userLimitService,
     );
   }
 

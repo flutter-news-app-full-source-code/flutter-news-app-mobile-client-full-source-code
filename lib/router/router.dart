@@ -93,11 +93,13 @@ GoRouter createRouter({
     redirect: (BuildContext context, GoRouterState state) {
       final appStatus = context.read<AppBloc>().state.status;
       final currentLocation = state.matchedLocation;
+      final redirectPath = state.uri.queryParameters['redirectPath'];
 
       print(
         'GoRouter Redirect Check:\n'
         '  Current Location (Matched): $currentLocation\n'
-        '  AppStatus: $appStatus',
+        '  AppStatus: $appStatus\n'
+        '  Redirect Path: $redirectPath',
       );
 
       const rootPath = '/';
@@ -139,16 +141,16 @@ GoRouter createRouter({
           }
 
           // An anonymous user is only allowed on auth paths for account linking.
-          final isLinking =
-              state.uri.queryParameters['context'] == 'linking' ||
-              currentLocation.contains('/linking/');
+          final authContext = state.uri.queryParameters['authContext'];
+          final isLinking = authContext == 'linking';
+          final isLimitReachedAuth = authContext == 'limit_reached';
 
-          if (isLinking) {
-            print('    Action: Anonymous user on linking path. Allowing.');
+          if (isLinking || isLimitReachedAuth) {
+            print('    Action: Anonymous user on linking/limit_reached auth path. Allowing.');
             return null;
           } else {
             print(
-              '    Action: Anonymous user on non-linking auth path. Redirecting to feed.',
+              '    Action: Anonymous user on non-linking/non-limit_reached auth path. Redirecting to feed.',
             );
             return feedPath;
           }
@@ -178,8 +180,11 @@ GoRouter createRouter({
         builder: (BuildContext context, GoRouterState state) {
           final l10n = context.l10n;
           // Determine context from query parameter
-          final isLinkingContext =
-              state.uri.queryParameters['context'] == 'linking';
+          final authContext = state.uri.queryParameters['authContext'];
+          final redirectPath = state.uri.queryParameters['redirectPath'];
+
+          final isLinkingContext = authContext == 'linking';
+          final isLimitReachedContext = authContext == 'limit_reached';
 
           // Define content based on context
           final String headline;
@@ -189,6 +194,10 @@ GoRouter createRouter({
           if (isLinkingContext) {
             headline = l10n.authenticationLinkingHeadline;
             subHeadline = l10n.authenticationLinkingSubheadline;
+            showAnonymousButton = false;
+          } else if (isLimitReachedContext) {
+            headline = l10n.authenticationLimitReachedHeadline;
+            subHeadline = l10n.authenticationLimitReachedSubheadline;
             showAnonymousButton = false;
           } else {
             headline = l10n.authenticationSignInHeadline;
@@ -204,7 +213,8 @@ GoRouter createRouter({
               headline: headline,
               subHeadline: subHeadline,
               showAnonymousButton: showAnonymousButton,
-              isLinkingContext: isLinkingContext,
+              authContext: authContext,
+              redirectPath: redirectPath,
             ),
           );
         },
@@ -219,14 +229,21 @@ GoRouter createRouter({
                 path: Routes.requestCode,
                 name: Routes.linkingRequestCodeName,
                 builder: (context, state) =>
-                    const RequestCodePage(isLinkingContext: true),
+                    RequestCodePage(
+                      authContext: state.uri.queryParameters['authContext'],
+                      redirectPath: state.uri.queryParameters['redirectPath'],
+                    ),
               ),
               GoRoute(
                 path: '${Routes.verifyCode}/:email',
                 name: Routes.linkingVerifyCodeName,
                 builder: (context, state) {
                   final email = state.pathParameters['email']!;
-                  return EmailCodeVerificationPage(email: email);
+                  return EmailCodeVerificationPage(
+                    email: email,
+                    authContext: state.uri.queryParameters['authContext'],
+                    redirectPath: state.uri.queryParameters['redirectPath'],
+                  );
                 },
               ),
             ],
@@ -236,14 +253,21 @@ GoRouter createRouter({
             path: Routes.requestCode,
             name: Routes.requestCodeName,
             builder: (context, state) =>
-                const RequestCodePage(isLinkingContext: false),
+                RequestCodePage(
+                  authContext: state.uri.queryParameters['authContext'],
+                  redirectPath: state.uri.queryParameters['redirectPath'],
+                ),
           ),
           GoRoute(
             path: '${Routes.verifyCode}/:email',
             name: Routes.verifyCodeName,
             builder: (context, state) {
               final email = state.pathParameters['email']!;
-              return EmailCodeVerificationPage(email: email);
+              return EmailCodeVerificationPage(
+                email: email,
+                authContext: state.uri.queryParameters['authContext'],
+                redirectPath: state.uri.queryParameters['redirectPath'],
+              );
             },
           ),
         ],

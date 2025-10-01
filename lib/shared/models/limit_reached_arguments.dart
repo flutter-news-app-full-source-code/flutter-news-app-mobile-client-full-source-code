@@ -29,6 +29,7 @@ class LimitReachedArguments extends Equatable {
   const LimitReachedArguments({
     required this.limitType,
     required this.userRole,
+    this.redirectPath,
   });
 
   /// The type of limit that was reached.
@@ -37,6 +38,9 @@ class LimitReachedArguments extends Equatable {
   /// The role of the user when the limit was reached.
   final AppUserRole userRole;
 
+  /// The path to redirect to after the user addresses the limit (e.g., signs in).
+  final String? redirectPath;
+
   @override
-  List<Object> get props => [limitType, userRole];
+  List<Object?> get props => [limitType, userRole, redirectPath];
 }

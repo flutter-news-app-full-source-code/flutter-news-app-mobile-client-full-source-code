@@ -197,7 +197,7 @@ Future<Widget> bootstrap(
   final packageInfoService = PackageInfoServiceImpl(logger: logger);
 
   // Initialize UserLimitService
-  final userLimitService = UserLimitService();
+  const userLimitService = UserLimitService();
 
   // 6. Initialize all other DataClients and Repositories.
   // These now also have a guaranteed valid httpClient.

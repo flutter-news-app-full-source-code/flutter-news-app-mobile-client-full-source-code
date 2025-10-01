@@ -144,7 +144,6 @@ class App extends StatelessWidget {
               initialRemoteConfig: _initialRemoteConfig,
               initialRemoteConfigError: _initialRemoteConfigError,
               packageInfoService: _packageInfoService,
-              userLimitService: _userLimitService,
             )..add(AppStarted(initialUser: initialUser)),
           ),
           BlocProvider(

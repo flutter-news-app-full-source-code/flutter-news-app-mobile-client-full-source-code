@@ -12,7 +12,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/config/confi
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_initializer_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/package_info_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/user_limit_service.dart';
 import 'package:logging/logging.dart';
 import 'package:pub_semver/pub_semver.dart';
 
@@ -45,7 +44,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required RemoteConfig? initialRemoteConfig,
     required HttpException? initialRemoteConfigError,
     required PackageInfoService packageInfoService,
-    required UserLimitService userLimitService,
     this.demoDataMigrationService,
     this.demoDataInitializerService,
     this.initialUser,
@@ -57,7 +55,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _environment = environment,
        _navigatorKey = navigatorKey,
        _packageInfoService = packageInfoService,
-       _userLimitService = userLimitService,
        _logger = Logger('AppBloc'),
        super(
          AppState(
@@ -100,7 +97,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final local_config.AppEnvironment _environment;
   final GlobalKey<NavigatorState> _navigatorKey;
   final PackageInfoService _packageInfoService;
-  final UserLimitService _userLimitService;
   final Logger _logger;
   final DemoDataMigrationService? demoDataMigrationService;
   final DemoDataInitializerService? demoDataInitializerService;

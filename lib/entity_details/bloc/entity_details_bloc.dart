@@ -244,9 +244,11 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
             extra: LimitReachedArguments(
               limitType: LimitType.followedTopics,
               userRole: userRole,
+              redirectPath: _appBloc.navigatorKey.currentContext?.routerDelegate
+                  .currentConfiguration.uri.toString(),
             ),
           );
-          return; // Stop further processing
+          return;
         }
         updatedFollowedTopics.add(topic);
         isCurrentlyFollowing = true;
@@ -273,9 +275,11 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
             extra: LimitReachedArguments(
               limitType: LimitType.followedSources,
               userRole: userRole,
+              redirectPath: _appBloc.navigatorKey.currentContext?.routerDelegate
+                  .currentConfiguration.uri.toString(),
             ),
           );
-          return; // Stop further processing
+          return;
         }
         updatedFollowedSources.add(source);
         isCurrentlyFollowing = true;
@@ -302,9 +306,11 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
             extra: LimitReachedArguments(
               limitType: LimitType.followedCountries,
               userRole: userRole,
+              redirectPath: _appBloc.navigatorKey.currentContext?.routerDelegate
+                  .currentConfiguration.uri.toString(),
             ),
           );
-          return; // Stop further processing
+          return;
         }
         updatedFollowedCountries.add(country);
         isCurrentlyFollowing = true;

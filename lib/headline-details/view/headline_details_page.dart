@@ -222,10 +222,13 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                 extra: LimitReachedArguments(
                   limitType: LimitType.savedHeadlines,
                   userRole: userRole,
+                  redirectPath: GoRouter.of(
+                    context,
+                  ).routerDelegate.currentConfiguration.uri.toString(),
                 ),
               );
             }
-            return; // Stop further processing
+            return;
           }
           updatedSavedHeadlines = List.from(currentPreferences.savedHeadlines)
             ..add(headline);

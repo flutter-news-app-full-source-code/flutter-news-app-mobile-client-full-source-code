@@ -20,6 +20,7 @@ class LimitReachedPage extends StatelessWidget {
   /// The arguments providing context about the limit that was reached.
   final LimitReachedArguments args;
 
+  /// Returns the appropriate icon for the given [LimitType].
   IconData _getIconForLimitType(LimitType limitType) {
     switch (limitType) {
       case LimitType.followedTopics:
@@ -47,7 +48,8 @@ class LimitReachedPage extends StatelessWidget {
     final isStandard = args.userRole == AppUserRole.standardUser;
     final isPremium = args.userRole == AppUserRole.premiumUser;
 
-    final isFollowLimit = args.limitType == LimitType.followedTopics ||
+    final isFollowLimit =
+        args.limitType == LimitType.followedTopics ||
         args.limitType == LimitType.followedSources ||
         args.limitType == LimitType.followedCountries;
 
@@ -60,9 +62,14 @@ class LimitReachedPage extends StatelessWidget {
           : l10n.savedHeadlinesLimitGuestSubheadline;
       actionButton = ElevatedButton(
         onPressed: () {
+          // Navigate to the authentication page, passing the redirect path
+          // and a specific auth context for limit enforcement.
           context.goNamed(
             Routes.authenticationName,
-            queryParameters: {'context': 'linking'},
+            queryParameters: {
+              'authContext': 'limit_reached',
+              if (args.redirectPath != null) 'redirectPath': args.redirectPath,
+            },
           );
         },
         child: Text(
@@ -104,41 +111,31 @@ class LimitReachedPage extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: Colors.black.withOpacity(0.6),
-      body: Dialog(
-        insetPadding: const EdgeInsets.all(AppSpacing.lg),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.md),
+      appBar: AppBar(
+        title: Text(l10n.limitReachedPageTitle),
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+          onPressed: () {
+            // Navigate back to the redirectPath or default to the feed.
+            context.go(args.redirectPath ?? Routes.feed);
+          },
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(AppSpacing.paddingLarge),
+        child: Center(
           child: SingleChildScrollView(
             child: Column(
-              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Align(
-                  alignment: Alignment.topRight,
-                  child: IconButton(
-                    icon: const Icon(Icons.close),
-                    tooltip:
-                        MaterialLocalizations.of(context).closeButtonTooltip,
-                    onPressed: () {
-                      if (context.canPop()) {
-                        context.pop();
-                      } else {
-                        context.goNamed(Routes.feedName);
-                      }
-                    },
-                  ),
-                ),
                 Icon(
                   _getIconForLimitType(args.limitType),
                   size: AppSpacing.xxl * 2,
                   color: colorScheme.primary,
                 ),
-                const SizedBox(height: AppSpacing.lg),
+                const SizedBox(height: AppSpacing.xl),
                 Text(
                   headline,
                   style: textTheme.headlineMedium?.copyWith(
@@ -155,13 +152,9 @@ class LimitReachedPage extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 if (actionButton != null) ...[
-                  const SizedBox(height: AppSpacing.xl),
-                  SizedBox(
-                    width: double.infinity,
-                    child: actionButton,
-                  ),
+                  const SizedBox(height: AppSpacing.xxl),
+                  SizedBox(width: double.infinity, child: actionButton),
                 ],
-                const SizedBox(height: AppSpacing.sm),
               ],
             ),
           ),

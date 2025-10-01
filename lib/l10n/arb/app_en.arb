@@ -1194,7 +1194,7 @@
     "@followedItemsLimitGuestHeadline": {
         "description": "Headline for guest users when they reach the followed items limit."
     },
-    "followedItemsLimitGuestSubheadline": "Sign in or upgrade to follow more topics, sources, and countries.",
+    "followedItemsLimitGuestSubheadline": "Sign in to follow more topics, sources, and countries.",
     "@followedItemsLimitGuestSubheadline": {
         "description": "Subheadline for guest users when they reach the followed items limit."
     },

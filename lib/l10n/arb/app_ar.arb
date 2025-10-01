@@ -1194,7 +1194,7 @@
     "@followedItemsLimitGuestHeadline": {
         "description": "عنوان للمستخدمين الضيوف عندما يصلون إلى حد العناصر المتابعة."
     },
-    "followedItemsLimitGuestSubheadline": "سجل الدخول أو قم بالترقية لمتابعة المزيد من المواضيع والمصادر والبلدان.",
+    "followedItemsLimitGuestSubheadline": "سجل الدخول لمتابعة المزيد من المواضيع والمصادر والبلدان.",
     "@followedItemsLimitGuestSubheadline": {
         "description": "عنوان فرعي للمستخدمين الضيوف عندما يصلون إلى حد العناصر المتابعة."
     },

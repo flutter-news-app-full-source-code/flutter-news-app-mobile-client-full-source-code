@@ -912,7 +912,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get followedItemsLimitGuestSubheadline =>
-      'Sign in or upgrade to follow more topics, sources, and countries.';
+      'Sign in to follow more topics, sources, and countries.';
 
   @override
   String get followedItemsLimitSignInButton => 'Sign In';

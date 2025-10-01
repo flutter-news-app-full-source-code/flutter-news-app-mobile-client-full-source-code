@@ -1733,7 +1733,7 @@ abstract class AppLocalizations {
   /// Subheadline for guest users when they reach the followed items limit.
   ///
   /// In en, this message translates to:
-  /// **'Sign in or upgrade to follow more topics, sources, and countries.'**
+  /// **'Sign in to follow more topics, sources, and countries.'**
   String get followedItemsLimitGuestSubheadline;
 
   /// Button text for guest users to sign in when they reach a limit.

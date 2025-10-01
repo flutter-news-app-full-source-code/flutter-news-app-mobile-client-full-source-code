@@ -910,7 +910,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get followedItemsLimitGuestSubheadline =>
-      'سجل الدخول أو قم بالترقية لمتابعة المزيد من المواضيع والمصادر والبلدان.';
+      'سجل الدخول لمتابعة المزيد من المواضيع والمصادر والبلدان.';
 
   @override
   String get followedItemsLimitSignInButton => 'تسجيل الدخول';

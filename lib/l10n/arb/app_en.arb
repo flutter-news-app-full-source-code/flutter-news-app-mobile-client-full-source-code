@@ -1269,5 +1269,13 @@
     "upgradeToPremiumMessage": "Upgrade to Premium functionality is not yet implemented.",
     "@upgradeToPremiumMessage": {
         "description": "Temporary message for unimplemented upgrade functionality."
+    },
+    "authenticationLimitReachedHeadline": "Unlock More Content",
+    "@authenticationLimitReachedHeadline": {
+        "description": "custom - context aware - headline  for tha user authentication limit reached button in the auth page."
+    },
+    "authenticationLimitReachedSubheadline": "Sign in or create an account to follow more content and save more headlines.",
+    "@authenticationLimitReachedSubheadline": {
+        "description": "custom - context aware - subheadline  for tha user authentication limit reached button in the auth page."
     }
 }

@@ -1269,5 +1269,13 @@
     "upgradeToPremiumMessage": "وظيفة الترقية إلى بريميوم لم يتم تنفيذها بعد.",
     "@upgradeToPremiumMessage": {
         "description": "رسالة مؤقتة لوظيفة الترقية غير المنفذة."
+    },
+    "authenticationLimitReachedHeadline": "افتح المزيد من المحتوى",
+    "@authenticationLimitReachedHeadline": {
+        "description": "custom - context aware - headline  for tha user authentication limit reached button in the auth page."
+    },
+    "authenticationLimitReachedSubheadline": "سجل الدخول أو أنشئ حسابًا لمتابعة المزيد من المحتوى وحفظ المزيد من العناوين الرئيسية.",
+    "@authenticationLimitReachedSubheadline": {
+        "description": "custom - context aware - subheadline  for tha user authentication limit reached button in the auth page."
     }
 }

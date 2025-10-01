@@ -45,7 +45,10 @@ import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/la
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/notification_settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/theme_settings_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/models/limit_reached_arguments.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_decorator_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/user_limit_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/status/view/limit_reached_page.dart';
 import 'package:go_router/go_router.dart';
 
 /// Creates and configures the GoRouter instance for the application.
@@ -67,6 +70,7 @@ GoRouter createRouter({
   required AdService adService,
   required GlobalKey<NavigatorState> navigatorKey,
   required InlineAdCacheService inlineAdCacheService,
+  required UserLimitService userLimitService,
 }) {
   // Instantiate FeedDecoratorService once to be shared
   final feedDecoratorService = FeedDecoratorService(
@@ -286,6 +290,7 @@ GoRouter createRouter({
                       appBloc: context.read<AppBloc>(),
                       feedDecoratorService: feedDecoratorService,
                       inlineAdCacheService: inlineAdCacheService,
+                      userLimitService: userLimitService,
                     )..add(
                       EntityDetailsLoadRequested(
                         entityId: args.entityId,
@@ -348,6 +353,21 @@ GoRouter createRouter({
               headlineId: headlineFromExtra?.id ?? headlineIdFromPath,
             ),
           );
+        },
+      ),
+      // --- Limit Reached Page (Top Level) ---
+      GoRoute(
+        path: Routes.limitReached,
+        name: Routes.limitReachedName,
+        builder: (context, state) {
+          final args = state.extra as LimitReachedArguments?;
+          if (args == null) {
+            // Handle error: arguments are missing
+            return const Scaffold(
+              body: Center(child: Text('Limit Reached Page Missing Arguments')),
+            );
+          }
+          return LimitReachedPage(args: args);
         },
       ),
       // --- Main App Shell ---

@@ -120,4 +120,8 @@ abstract final class Routes {
   static const followedCountriesListName = 'followedCountriesList';
   static const addCountryToFollow = 'add-country';
   static const addCountryToFollowName = 'addCountryToFollow';
+
+  // --- Limit Reached Page ---
+  static const limitReached = '/limit-reached';
+  static const limitReachedName = 'limitReached';
 }

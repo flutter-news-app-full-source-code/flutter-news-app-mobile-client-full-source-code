@@ -21,7 +21,8 @@ class AuthenticationPage extends StatelessWidget {
     required this.headline,
     required this.subHeadline,
     required this.showAnonymousButton,
-    required this.isLinkingContext,
+    this.authContext,
+    this.redirectPath,
     super.key,
   });
 
@@ -34,8 +35,11 @@ class AuthenticationPage extends StatelessWidget {
   /// Whether to show the "Continue Anonymously" button.
   final bool showAnonymousButton;
 
-  /// Whether this page is being shown in the account linking context.
-  final bool isLinkingContext;
+  /// The context of the authentication flow (e.g., 'linking', 'limit_reached').
+  final String? authContext;
+
+  /// The path to redirect to after successful authentication or cancellation.
+  final String? redirectPath;
 
   @override
   Widget build(BuildContext context) {
@@ -43,18 +47,21 @@ class AuthenticationPage extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
+    // Determine if this is a linking context based on the authContext
+    final isLinkingContext = authContext == 'linking';
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         // Conditionally add the leading close button only in linking context
-        leading: isLinkingContext
+        leading: (isLinkingContext || redirectPath != null)
             ? IconButton(
                 icon: const Icon(Icons.close),
                 tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                 onPressed: () {
-                  // Navigate back to the account page when close is pressed
-                  context.goNamed(Routes.accountName);
+                  // Navigate back to the redirectPath or default to the account page.
+                  context.go(redirectPath ?? Routes.account);
                 },
               )
             : null,
@@ -122,6 +129,12 @@ class AuthenticationPage extends StatelessWidget {
                                   isLinkingContext
                                       ? Routes.linkingRequestCodeName
                                       : Routes.requestCodeName,
+                                  queryParameters: {
+                                    if (authContext != null)
+                                      'authContext': authContext,
+                                    if (redirectPath != null)
+                                      'redirectPath': redirectPath,
+                                  },
                                 );
                               },
                         label: Text(l10n.authenticationEmailSignInButton),

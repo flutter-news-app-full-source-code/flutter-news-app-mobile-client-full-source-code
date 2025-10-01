@@ -1,5 +1,5 @@
 {
-    "@@locale": "en",
+    "@locale": "en",
     "accountLinkingPageTitle": "Link Your Account",
     "@accountLinkingPageTitle": {
         "description": "Title for the account linking page"
@@ -1189,5 +1189,85 @@
                 "example": "1.1.0"
             }
         }
+    },
+    "followedItemsLimitGuestHeadline": "Unlock More Content",
+    "@followedItemsLimitGuestHeadline": {
+        "description": "Headline for guest users when they reach the followed items limit."
+    },
+    "followedItemsLimitGuestSubheadline": "Sign in or upgrade to follow more topics, sources, and countries.",
+    "@followedItemsLimitGuestSubheadline": {
+        "description": "Subheadline for guest users when they reach the followed items limit."
+    },
+    "followedItemsLimitSignInButton": "Sign In",
+    "@followedItemsLimitSignInButton": {
+        "description": "Button text for guest users to sign in when they reach a limit."
+    },
+    "followedItemsLimitUpgradeButton": "Upgrade to Premium",
+    "@followedItemsLimitUpgradeButton": {
+        "description": "Button text for guest/standard users to upgrade to premium when they reach a limit."
+    },
+    "followedItemsLimitStandardHeadline": "Upgrade for Unlimited Following",
+    "@followedItemsLimitStandardHeadline": {
+        "description": "Headline for standard users when they reach the followed items limit."
+    },
+    "followedItemsLimitStandardSubheadline": "You've reached the limit for followed items. Upgrade to Premium to follow more.",
+    "@followedItemsLimitStandardSubheadline": {
+        "description": "Subheadline for standard users when they reach the followed items limit."
+    },
+    "followedItemsLimitPremiumHeadline": "Maximum Following Reached",
+    "@followedItemsLimitPremiumHeadline": {
+        "description": "Headline for premium users when they reach the followed items limit."
+    },
+    "followedItemsLimitPremiumSubheadline": "You've reached the maximum number of items you can follow. Manage your followed items to make space.",
+    "@followedItemsLimitPremiumSubheadline": {
+        "description": "Subheadline for premium users when they reach the followed items limit."
+    },
+    "savedHeadlinesLimitGuestHeadline": "Save More Headlines",
+    "@savedHeadlinesLimitGuestHeadline": {
+        "description": "Headline for guest users when they reach the saved headlines limit."
+    },
+    "savedHeadlinesLimitGuestSubheadline": "Sign in or upgrade to save more headlines.",
+    "@savedHeadlinesLimitGuestSubheadline": {
+        "description": "Subheadline for guest users when they reach the saved headlines limit."
+    },
+    "savedHeadlinesLimitSignInButton": "Sign In",
+    "@savedHeadlinesLimitSignInButton": {
+        "description": "Button text for guest users to sign in when they reach a limit."
+    },
+    "savedHeadlinesLimitUpgradeButton": "Upgrade to Premium",
+    "@savedHeadlinesLimitUpgradeButton": {
+        "description": "Button text for guest/standard users to upgrade to premium when they reach a limit."
+    },
+    "savedHeadlinesLimitStandardHeadline": "Upgrade for Unlimited Saves",
+    "@savedHeadlinesLimitStandardHeadline": {
+        "description": "Headline for standard users when they reach the saved headlines limit."
+    },
+    "savedHeadlinesLimitStandardSubheadline": "You've reached the limit for saved headlines. Upgrade to Premium to save more.",
+    "@savedHeadlinesLimitStandardSubheadline": {
+        "description": "Subheadline for standard users when they reach the saved headlines limit."
+    },
+    "savedHeadlinesLimitPremiumHeadline": "Maximum Saved Headlines Reached",
+    "@savedHeadlinesLimitPremiumHeadline": {
+        "description": "Headline for premium users when they reach the saved headlines limit."
+    },
+    "savedHeadlinesLimitPremiumSubheadline": "You've reached the maximum number of headlines you can save. Manage your saved headlines to make space.",
+    "@savedHeadlinesLimitPremiumSubheadline": {
+        "description": "Subheadline for premium users when they reach the saved headlines limit."
+    },
+    "limitReachedGenericHeadline": "Limit Reached",
+    "@limitReachedGenericHeadline": {
+        "description": "Generic headline for when a content limit is reached."
+    },
+    "limitReachedGenericSubheadline": "You've reached a content limit. Please sign in or upgrade to continue.",
+    "@limitReachedGenericSubheadline": {
+        "description": "Generic subheadline for when a content limit is reached."
+    },
+    "limitReachedPageTitle": "Limit Reached",
+    "@limitReachedPageTitle": {
+        "description": "Title for the Limit Reached page."
+    },
+    "upgradeToPremiumMessage": "Upgrade to Premium functionality is not yet implemented.",
+    "@upgradeToPremiumMessage": {
+        "description": "Temporary message for unimplemented upgrade functionality."
     }
 }

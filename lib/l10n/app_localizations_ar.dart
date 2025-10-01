@@ -904,4 +904,74 @@ class AppLocalizationsAr extends AppLocalizations {
   String latestRequiredVersionLabel(String version) {
     return 'الإصدار المطلوب: $version';
   }
+
+  @override
+  String get followedItemsLimitGuestHeadline => 'افتح المزيد من المحتوى';
+
+  @override
+  String get followedItemsLimitGuestSubheadline =>
+      'سجل الدخول أو قم بالترقية لمتابعة المزيد من المواضيع والمصادر والبلدان.';
+
+  @override
+  String get followedItemsLimitSignInButton => 'تسجيل الدخول';
+
+  @override
+  String get followedItemsLimitUpgradeButton => 'الترقية إلى بريميوم';
+
+  @override
+  String get followedItemsLimitStandardHeadline => 'الترقية لمتابعة غير محدودة';
+
+  @override
+  String get followedItemsLimitStandardSubheadline =>
+      'لقد وصلت إلى حد العناصر المتابعة. قم بالترقية إلى بريميوم لمتابعة المزيد.';
+
+  @override
+  String get followedItemsLimitPremiumHeadline =>
+      'تم الوصول إلى الحد الأقصى للمتابعة';
+
+  @override
+  String get followedItemsLimitPremiumSubheadline =>
+      'لقد وصلت إلى الحد الأقصى لعدد العناصر التي يمكنك متابعتها. قم بإدارة العناصر المتابعة لإفساح المجال.';
+
+  @override
+  String get savedHeadlinesLimitGuestHeadline => 'احفظ المزيد من العناوين';
+
+  @override
+  String get savedHeadlinesLimitGuestSubheadline =>
+      'سجل الدخول أو قم بالترقية لحفظ المزيد من العناوين.';
+
+  @override
+  String get savedHeadlinesLimitSignInButton => 'تسجيل الدخول';
+
+  @override
+  String get savedHeadlinesLimitUpgradeButton => 'الترقية إلى بريميوم';
+
+  @override
+  String get savedHeadlinesLimitStandardHeadline => 'الترقية لحفظ غير محدود';
+
+  @override
+  String get savedHeadlinesLimitStandardSubheadline =>
+      'لقد وصلت إلى حد العناوين المحفوظة. قم بالترقية إلى بريميوم لحفظ المزيد.';
+
+  @override
+  String get savedHeadlinesLimitPremiumHeadline =>
+      'تم الوصول إلى الحد الأقصى للعناوين المحفوظة';
+
+  @override
+  String get savedHeadlinesLimitPremiumSubheadline =>
+      'لقد وصلت إلى الحد الأقصى لعدد العناوين التي يمكنك حفظها. قم بإدارة العناوين المحفوظة لإفساح المجال.';
+
+  @override
+  String get limitReachedGenericHeadline => 'تم الوصول إلى الحد الأقصى';
+
+  @override
+  String get limitReachedGenericSubheadline =>
+      'لقد وصلت إلى حد المحتوى. يرجى تسجيل الدخول أو الترقية للمتابعة.';
+
+  @override
+  String get limitReachedPageTitle => 'تم الوصول إلى الحد الأقصى';
+
+  @override
+  String get upgradeToPremiumMessage =>
+      'وظيفة الترقية إلى بريميوم لم يتم تنفيذها بعد.';
 }

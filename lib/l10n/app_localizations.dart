@@ -1723,6 +1723,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Required version: {version}'**
   String latestRequiredVersionLabel(String version);
+
+  /// Headline for guest users when they reach the followed items limit.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock More Content'**
+  String get followedItemsLimitGuestHeadline;
+
+  /// Subheadline for guest users when they reach the followed items limit.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in or upgrade to follow more topics, sources, and countries.'**
+  String get followedItemsLimitGuestSubheadline;
+
+  /// Button text for guest users to sign in when they reach a limit.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get followedItemsLimitSignInButton;
+
+  /// Button text for guest/standard users to upgrade to premium when they reach a limit.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to Premium'**
+  String get followedItemsLimitUpgradeButton;
+
+  /// Headline for standard users when they reach the followed items limit.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade for Unlimited Following'**
+  String get followedItemsLimitStandardHeadline;
+
+  /// Subheadline for standard users when they reach the followed items limit.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve reached the limit for followed items. Upgrade to Premium to follow more.'**
+  String get followedItemsLimitStandardSubheadline;
+
+  /// Headline for premium users when they reach the followed items limit.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum Following Reached'**
+  String get followedItemsLimitPremiumHeadline;
+
+  /// Subheadline for premium users when they reach the followed items limit.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve reached the maximum number of items you can follow. Manage your followed items to make space.'**
+  String get followedItemsLimitPremiumSubheadline;
+
+  /// Headline for guest users when they reach the saved headlines limit.
+  ///
+  /// In en, this message translates to:
+  /// **'Save More Headlines'**
+  String get savedHeadlinesLimitGuestHeadline;
+
+  /// Subheadline for guest users when they reach the saved headlines limit.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in or upgrade to save more headlines.'**
+  String get savedHeadlinesLimitGuestSubheadline;
+
+  /// Button text for guest users to sign in when they reach a limit.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get savedHeadlinesLimitSignInButton;
+
+  /// Button text for guest/standard users to upgrade to premium when they reach a limit.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to Premium'**
+  String get savedHeadlinesLimitUpgradeButton;
+
+  /// Headline for standard users when they reach the saved headlines limit.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade for Unlimited Saves'**
+  String get savedHeadlinesLimitStandardHeadline;
+
+  /// Subheadline for standard users when they reach the saved headlines limit.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve reached the limit for saved headlines. Upgrade to Premium to save more.'**
+  String get savedHeadlinesLimitStandardSubheadline;
+
+  /// Headline for premium users when they reach the saved headlines limit.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum Saved Headlines Reached'**
+  String get savedHeadlinesLimitPremiumHeadline;
+
+  /// Subheadline for premium users when they reach the saved headlines limit.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve reached the maximum number of headlines you can save. Manage your saved headlines to make space.'**
+  String get savedHeadlinesLimitPremiumSubheadline;
+
+  /// Generic headline for when a content limit is reached.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit Reached'**
+  String get limitReachedGenericHeadline;
+
+  /// Generic subheadline for when a content limit is reached.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve reached a content limit. Please sign in or upgrade to continue.'**
+  String get limitReachedGenericSubheadline;
+
+  /// Title for the Limit Reached page.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit Reached'**
+  String get limitReachedPageTitle;
+
+  /// Temporary message for unimplemented upgrade functionality.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to Premium functionality is not yet implemented.'**
+  String get upgradeToPremiumMessage;
 }
 
 class _AppLocalizationsDelegate

@@ -906,4 +906,75 @@ class AppLocalizationsEn extends AppLocalizations {
   String latestRequiredVersionLabel(String version) {
     return 'Required version: $version';
   }
+
+  @override
+  String get followedItemsLimitGuestHeadline => 'Unlock More Content';
+
+  @override
+  String get followedItemsLimitGuestSubheadline =>
+      'Sign in or upgrade to follow more topics, sources, and countries.';
+
+  @override
+  String get followedItemsLimitSignInButton => 'Sign In';
+
+  @override
+  String get followedItemsLimitUpgradeButton => 'Upgrade to Premium';
+
+  @override
+  String get followedItemsLimitStandardHeadline =>
+      'Upgrade for Unlimited Following';
+
+  @override
+  String get followedItemsLimitStandardSubheadline =>
+      'You\'ve reached the limit for followed items. Upgrade to Premium to follow more.';
+
+  @override
+  String get followedItemsLimitPremiumHeadline => 'Maximum Following Reached';
+
+  @override
+  String get followedItemsLimitPremiumSubheadline =>
+      'You\'ve reached the maximum number of items you can follow. Manage your followed items to make space.';
+
+  @override
+  String get savedHeadlinesLimitGuestHeadline => 'Save More Headlines';
+
+  @override
+  String get savedHeadlinesLimitGuestSubheadline =>
+      'Sign in or upgrade to save more headlines.';
+
+  @override
+  String get savedHeadlinesLimitSignInButton => 'Sign In';
+
+  @override
+  String get savedHeadlinesLimitUpgradeButton => 'Upgrade to Premium';
+
+  @override
+  String get savedHeadlinesLimitStandardHeadline =>
+      'Upgrade for Unlimited Saves';
+
+  @override
+  String get savedHeadlinesLimitStandardSubheadline =>
+      'You\'ve reached the limit for saved headlines. Upgrade to Premium to save more.';
+
+  @override
+  String get savedHeadlinesLimitPremiumHeadline =>
+      'Maximum Saved Headlines Reached';
+
+  @override
+  String get savedHeadlinesLimitPremiumSubheadline =>
+      'You\'ve reached the maximum number of headlines you can save. Manage your saved headlines to make space.';
+
+  @override
+  String get limitReachedGenericHeadline => 'Limit Reached';
+
+  @override
+  String get limitReachedGenericSubheadline =>
+      'You\'ve reached a content limit. Please sign in or upgrade to continue.';
+
+  @override
+  String get limitReachedPageTitle => 'Limit Reached';
+
+  @override
+  String get upgradeToPremiumMessage =>
+      'Upgrade to Premium functionality is not yet implemented.';
 }

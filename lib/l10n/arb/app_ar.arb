@@ -1,5 +1,5 @@
 {
-    "@@locale": "ar",
+    "@locale": "ar",
     "accountLinkingPageTitle": "ربط حسابك",
     "@accountLinkingPageTitle": {
         "description": "Title for the account linking page"
@@ -1189,5 +1189,85 @@
                 "example": "1.1.0"
             }
         }
+    },
+    "followedItemsLimitGuestHeadline": "افتح المزيد من المحتوى",
+    "@followedItemsLimitGuestHeadline": {
+        "description": "عنوان للمستخدمين الضيوف عندما يصلون إلى حد العناصر المتابعة."
+    },
+    "followedItemsLimitGuestSubheadline": "سجل الدخول أو قم بالترقية لمتابعة المزيد من المواضيع والمصادر والبلدان.",
+    "@followedItemsLimitGuestSubheadline": {
+        "description": "عنوان فرعي للمستخدمين الضيوف عندما يصلون إلى حد العناصر المتابعة."
+    },
+    "followedItemsLimitSignInButton": "تسجيل الدخول",
+    "@followedItemsLimitSignInButton": {
+        "description": "نص الزر للمستخدمين الضيوف لتسجيل الدخول عندما يصلون إلى حد."
+    },
+    "followedItemsLimitUpgradeButton": "الترقية إلى بريميوم",
+    "@followedItemsLimitUpgradeButton": {
+        "description": "نص الزر للمستخدمين الضيوف/العاديين للترقية إلى بريميوم عندما يصلون إلى حد."
+    },
+    "followedItemsLimitStandardHeadline": "الترقية لمتابعة غير محدودة",
+    "@followedItemsLimitStandardHeadline": {
+        "description": "عنوان للمستخدمين العاديين عندما يصلون إلى حد العناصر المتابعة."
+    },
+    "followedItemsLimitStandardSubheadline": "لقد وصلت إلى حد العناصر المتابعة. قم بالترقية إلى بريميوم لمتابعة المزيد.",
+    "@followedItemsLimitStandardSubheadline": {
+        "description": "عنوان فرعي للمستخدمين العاديين عندما يصلون إلى حد العناصر المتابعة."
+    },
+    "followedItemsLimitPremiumHeadline": "تم الوصول إلى الحد الأقصى للمتابعة",
+    "@followedItemsLimitPremiumHeadline": {
+        "description": "عنوان للمستخدمين المميزين عندما يصلون إلى حد العناصر المتابعة."
+    },
+    "followedItemsLimitPremiumSubheadline": "لقد وصلت إلى الحد الأقصى لعدد العناصر التي يمكنك متابعتها. قم بإدارة العناصر المتابعة لإفساح المجال.",
+    "@followedItemsLimitPremiumSubheadline": {
+        "description": "عنوان فرعي للمستخدمين المميزين عندما يصلون إلى حد العناصر المتابعة."
+    },
+    "savedHeadlinesLimitGuestHeadline": "احفظ المزيد من العناوين",
+    "@savedHeadlinesLimitGuestHeadline": {
+        "description": "عنوان للمستخدمين الضيوف عندما يصلون إلى حد العناوين المحفوظة."
+    },
+    "savedHeadlinesLimitGuestSubheadline": "سجل الدخول أو قم بالترقية لحفظ المزيد من العناوين.",
+    "@savedHeadlinesLimitGuestSubheadline": {
+        "description": "عنوان فرعي للمستخدمين الضيوف عندما يصلون إلى حد العناوين المحفوظة."
+    },
+    "savedHeadlinesLimitSignInButton": "تسجيل الدخول",
+    "@savedHeadlinesLimitSignInButton": {
+        "description": "نص الزر للمستخدمين الضيوف لتسجيل الدخول عندما يصلون إلى حد."
+    },
+    "savedHeadlinesLimitUpgradeButton": "الترقية إلى بريميوم",
+    "@savedHeadlinesLimitUpgradeButton": {
+        "description": "نص الزر للمستخدمين الضيوف/العاديين للترقية إلى بريميوم عندما يصلون إلى حد."
+    },
+    "savedHeadlinesLimitStandardHeadline": "الترقية لحفظ غير محدود",
+    "@savedHeadlinesLimitStandardHeadline": {
+        "description": "عنوان للمستخدمين العاديين عندما يصلون إلى حد العناوين المحفوظة."
+    },
+    "savedHeadlinesLimitStandardSubheadline": "لقد وصلت إلى حد العناوين المحفوظة. قم بالترقية إلى بريميوم لحفظ المزيد.",
+    "@savedHeadlinesLimitStandardSubheadline": {
+        "description": "عنوان فرعي للمستخدمين العاديين عندما يصلون إلى حد العناوين المحفوظة."
+    },
+    "savedHeadlinesLimitPremiumHeadline": "تم الوصول إلى الحد الأقصى للعناوين المحفوظة",
+    "@savedHeadlinesLimitPremiumHeadline": {
+        "description": "عنوان للمستخدمين المميزين عندما يصلون إلى حد العناوين المحفوظة."
+    },
+    "savedHeadlinesLimitPremiumSubheadline": "لقد وصلت إلى الحد الأقصى لعدد العناوين التي يمكنك حفظها. قم بإدارة العناوين المحفوظة لإفساح المجال.",
+    "@savedHeadlinesLimitPremiumSubheadline": {
+        "description": "عنوان فرعي للمستخدمين المميزين عندما يصلون إلى حد العناوين المحفوظة."
+    },
+    "limitReachedGenericHeadline": "تم الوصول إلى الحد الأقصى",
+    "@limitReachedGenericHeadline": {
+        "description": "عنوان عام عند الوصول إلى حد المحتوى."
+    },
+    "limitReachedGenericSubheadline": "لقد وصلت إلى حد المحتوى. يرجى تسجيل الدخول أو الترقية للمتابعة.",
+    "@limitReachedGenericSubheadline": {
+        "description": "عنوان فرعي عام عند الوصول إلى حد المحتوى."
+    },
+    "limitReachedPageTitle": "تم الوصول إلى الحد الأقصى",
+    "@limitReachedPageTitle": {
+        "description": "عنوان صفحة 'تم الوصول إلى الحد الأقصى'."
+    },
+    "upgradeToPremiumMessage": "وظيفة الترقية إلى بريميوم لم يتم تنفيذها بعد.",
+    "@upgradeToPremiumMessage": {
+        "description": "رسالة مؤقتة لوظيفة الترقية غير المنفذة."
     }
 }

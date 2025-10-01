@@ -62,7 +62,7 @@ class LimitReachedPage extends StatelessWidget {
       actionButton = ElevatedButton(
         onPressed: () {
           context.goNamed(
-            Routes.authenticationName,
+            Routes.linkingRequestCodeName,
             queryParameters: {'context': 'linking'},
           );
         },

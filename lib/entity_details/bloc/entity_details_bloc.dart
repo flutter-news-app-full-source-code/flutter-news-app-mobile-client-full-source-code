@@ -244,11 +244,16 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
             extra: LimitReachedArguments(
               limitType: LimitType.followedTopics,
               userRole: userRole,
-              redirectPath: _appBloc.navigatorKey.currentContext?.routerDelegate
-                  .currentConfiguration.uri.toString(),
+              redirectPath: _appBloc.navigatorKey.currentContext != null
+                  ? GoRouter.of(_appBloc.navigatorKey.currentContext!)
+                      .routerDelegate
+                      .currentConfiguration
+                      .uri
+                      .toString()
+                  : null,
             ),
           );
-          return;
+          return; // Stop further processing
         }
         updatedFollowedTopics.add(topic);
         isCurrentlyFollowing = true;
@@ -275,11 +280,16 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
             extra: LimitReachedArguments(
               limitType: LimitType.followedSources,
               userRole: userRole,
-              redirectPath: _appBloc.navigatorKey.currentContext?.routerDelegate
-                  .currentConfiguration.uri.toString(),
+              redirectPath: _appBloc.navigatorKey.currentContext != null
+                  ? GoRouter.of(_appBloc.navigatorKey.currentContext!)
+                      .routerDelegate
+                      .currentConfiguration
+                      .uri
+                      .toString()
+                  : null,
             ),
           );
-          return;
+          return; // Stop further processing
         }
         updatedFollowedSources.add(source);
         isCurrentlyFollowing = true;
@@ -306,11 +316,16 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
             extra: LimitReachedArguments(
               limitType: LimitType.followedCountries,
               userRole: userRole,
-              redirectPath: _appBloc.navigatorKey.currentContext?.routerDelegate
-                  .currentConfiguration.uri.toString(),
+              redirectPath: _appBloc.navigatorKey.currentContext != null
+                  ? GoRouter.of(_appBloc.navigatorKey.currentContext!)
+                      .routerDelegate
+                      .currentConfiguration
+                      .uri
+                      .toString()
+                  : null,
             ),
           );
-          return;
+          return; // Stop further processing
         }
         updatedFollowedCountries.add(country);
         isCurrentlyFollowing = true;

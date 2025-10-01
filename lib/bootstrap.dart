@@ -28,6 +28,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/services/dem
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/package_info_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/bloc_observer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/data/clients/country_inmemory_client.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/user_limit_service.dart';
 import 'package:http_client/http_client.dart';
 import 'package:kv_storage_service/kv_storage_service.dart';
 import 'package:kv_storage_shared_preferences/kv_storage_shared_preferences.dart';
@@ -194,6 +195,9 @@ Future<Widget> bootstrap(
 
   // Initialize PackageInfoService
   final packageInfoService = PackageInfoServiceImpl(logger: logger);
+
+  // Initialize UserLimitService
+  final userLimitService = UserLimitService();
 
   // 6. Initialize all other DataClients and Repositories.
   // These now also have a guaranteed valid httpClient.
@@ -458,5 +462,6 @@ Future<Widget> bootstrap(
     initialRemoteConfig: initialRemoteConfig,
     initialRemoteConfigError: initialRemoteConfigError,
     packageInfoService: packageInfoService,
+    userLimitService: userLimitService,
   );
 }

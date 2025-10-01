@@ -150,6 +150,41 @@ class AppState extends Equatable {
     return Locale(settings?.language.code ?? 'en');
   }
 
+  /// The maximum number of followed items (countries, sources, or topics)
+  /// allowed for the current user role.
+  /// Returns `0` if remote config or user is not available.
+  int get followedItemsLimit {
+    final userRole = user?.appRole;
+    final config = remoteConfig?.userPreferenceConfig;
+    if (userRole == null || config == null) return 0;
+
+    switch (userRole) {
+      case AppUserRole.guestUser:
+        return config.guestFollowedItemsLimit;
+      case AppUserRole.standardUser:
+        return config.authenticatedFollowedItemsLimit;
+      case AppUserRole.premiumUser:
+        return config.premiumFollowedItemsLimit;
+    }
+  }
+
+  /// The maximum number of saved headlines allowed for the current user role.
+  /// Returns `0` if remote config or user is not available.
+  int get savedHeadlinesLimit {
+    final userRole = user?.appRole;
+    final config = remoteConfig?.userPreferenceConfig;
+    if (userRole == null || config == null) return 0;
+
+    switch (userRole) {
+      case AppUserRole.guestUser:
+        return config.guestSavedHeadlinesLimit;
+      case AppUserRole.standardUser:
+        return config.authenticatedSavedHeadlinesLimit;
+      case AppUserRole.premiumUser:
+        return config.premiumSavedHeadlinesLimit;
+    }
+  }
+
   @override
   List<Object?> get props => [
     status,

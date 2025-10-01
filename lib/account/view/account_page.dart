@@ -115,7 +115,7 @@ class AccountPage extends StatelessWidget {
           onPressed: () {
             context.goNamed(
               Routes.authenticationName,
-              queryParameters: {'context': 'linking'},
+              queryParameters: {'authContext': 'linking'},
             );
           },
         ),

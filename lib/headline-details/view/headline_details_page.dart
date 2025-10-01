@@ -13,6 +13,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headline-details
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/similar_headlines_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/models/limit_reached_arguments.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/user_limit_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/feed_core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -169,11 +171,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     );
 
     final appBlocState = context.watch<AppBloc>().state;
-    final isSaved =
-        appBlocState.userContentPreferences?.savedHeadlines.any(
-          (h) => h.id == headline.id,
-        ) ??
-        false;
+    final isSaved = appBlocState.userContentPreferences!.savedHeadlines.any(
+      (h) => h.id == headline.id,
+    );
 
     final bookmarkButton = IconButton(
       icon: Icon(
@@ -184,19 +184,13 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           ? l10n.headlineDetailsRemoveFromSavedTooltip
           : l10n.headlineDetailsSaveTooltip,
       onPressed: () {
-        final currentPreferences = appBlocState.userContentPreferences;
-        if (currentPreferences == null) {
-          // Handle case where preferences are not loaded (e.g., show error)
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: Text(l10n.headlineSaveErrorSnackbar),
-                backgroundColor: Theme.of(context).colorScheme.error,
-              ),
-            );
-          return;
-        }
+        final currentPreferences = appBlocState.userContentPreferences!;
+        final currentUser = appBlocState.user!;
+        final remoteConfig = appBlocState.remoteConfig!;
+
+        final userLimitService = context.read<UserLimitService>();
+        final userRole = currentUser.appRole;
+        final userPreferenceConfig = remoteConfig.userPreferenceConfig;
 
         final List<Headline> updatedSavedHeadlines;
         if (isSaved) {
@@ -204,6 +198,35 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
               .where((h) => h.id != headline.id)
               .toList();
         } else {
+          // Check limit before adding
+          if (userLimitService.hasReachedSavedHeadlinesLimit(
+            userRole: userRole,
+            userPreferenceConfig: userPreferenceConfig,
+            savedHeadlinesCount: currentPreferences.savedHeadlines.length,
+          )) {
+            // Limit reached
+            if (userRole == AppUserRole.premiumUser) {
+              // Premium users get a snackbar
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  SnackBar(
+                    content: Text(l10n.savedHeadlinesLimitPremiumSubheadline),
+                    backgroundColor: Theme.of(context).colorScheme.error,
+                  ),
+                );
+            } else {
+              // Guest/Standard users navigate to LimitReachedPage
+              context.pushNamed(
+                Routes.limitReachedName,
+                extra: LimitReachedArguments(
+                  limitType: LimitType.savedHeadlines,
+                  userRole: userRole,
+                ),
+              );
+            }
+            return; // Stop further processing
+          }
           updatedSavedHeadlines = List.from(currentPreferences.savedHeadlines)
             ..add(headline);
         }

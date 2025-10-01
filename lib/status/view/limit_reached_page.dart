@@ -1,8 +1,5 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/models/limit_reached_arguments.dart';
@@ -23,120 +20,88 @@ class LimitReachedPage extends StatelessWidget {
   /// The arguments providing context about the limit that was reached.
   final LimitReachedArguments args;
 
+  IconData _getIconForLimitType(LimitType limitType) {
+    switch (limitType) {
+      case LimitType.followedTopics:
+        return Icons.topic_outlined;
+      case LimitType.followedSources:
+        return Icons.source_outlined;
+      case LimitType.followedCountries:
+        return Icons.flag_outlined;
+      case LimitType.savedHeadlines:
+        return Icons.bookmark_border;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
-    // Determine content based on limit type and user role
     String headline;
     String subheadline;
-    List<Widget> actions = [];
+    Widget? actionButton;
 
     final isGuest = args.userRole == AppUserRole.guestUser;
     final isStandard = args.userRole == AppUserRole.standardUser;
     final isPremium = args.userRole == AppUserRole.premiumUser;
 
-    switch (args.limitType) {
-      case LimitType.followedTopics:
-      case LimitType.followedSources:
-      case LimitType.followedCountries:
-        if (isGuest) {
-          headline = l10n.followedItemsLimitGuestHeadline;
-          subheadline = l10n.followedItemsLimitGuestSubheadline;
-          actions = [
-            ElevatedButton(
-              onPressed: () {
-                context.goNamed(
-                  Routes.authenticationName,
-                  queryParameters: {'context': 'linking'},
-                );
-              },
-              child: Text(l10n.followedItemsLimitSignInButton),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            OutlinedButton(
-              onPressed: () {
-                // TODO(fulleni): Implement navigation to upgrade page
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.upgradeToPremiumMessage)),
-                );
-              },
-              child: Text(l10n.followedItemsLimitUpgradeButton),
-            ),
-          ];
-        } else if (isStandard) {
-          headline = l10n.followedItemsLimitStandardHeadline;
-          subheadline = l10n.followedItemsLimitStandardSubheadline;
-          actions = [
-            ElevatedButton(
-              onPressed: () {
-                // TODO(fulleni): Implement navigation to upgrade page
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.upgradeToPremiumMessage)),
-                );
-              },
-              child: Text(l10n.followedItemsLimitUpgradeButton),
-            ),
-          ];
-        } else if (isPremium) {
-          headline = l10n.followedItemsLimitPremiumHeadline;
-          subheadline = l10n.followedItemsLimitPremiumSubheadline;
-          // No actions for premium users, as they are at the highest tier
-        } else {
-          headline = l10n.limitReachedGenericHeadline;
-          subheadline = l10n.limitReachedGenericSubheadline;
-        }
-        break;
-      case LimitType.savedHeadlines:
-        if (isGuest) {
-          headline = l10n.savedHeadlinesLimitGuestHeadline;
-          subheadline = l10n.savedHeadlinesLimitGuestSubheadline;
-          actions = [
-            ElevatedButton(
-              onPressed: () {
-                context.goNamed(
-                  Routes.authenticationName,
-                  queryParameters: {'context': 'linking'},
-                );
-              },
-              child: Text(l10n.savedHeadlinesLimitSignInButton),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            OutlinedButton(
-              onPressed: () {
-                // TODO(fulleni): Implement navigation to upgrade page
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.upgradeToPremiumMessage)),
-                );
-              },
-              child: Text(l10n.savedHeadlinesLimitUpgradeButton),
-            ),
-          ];
-        } else if (isStandard) {
-          headline = l10n.savedHeadlinesLimitStandardHeadline;
-          subheadline = l10n.savedHeadlinesLimitStandardSubheadline;
-          actions = [
-            ElevatedButton(
-              onPressed: () {
-                // TODO(fulleni): Implement navigation to upgrade page
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.upgradeToPremiumMessage)),
-                );
-              },
-              child: Text(l10n.savedHeadlinesLimitUpgradeButton),
-            ),
-          ];
-        } else if (isPremium) {
-          headline = l10n.savedHeadlinesLimitPremiumHeadline;
-          subheadline = l10n.savedHeadlinesLimitPremiumSubheadline;
-          // No actions for premium users
-        } else {
-          headline = l10n.limitReachedGenericHeadline;
-          subheadline = l10n.limitReachedGenericSubheadline;
-        }
-        break;
+    final isFollowLimit =
+        args.limitType == LimitType.followedTopics ||
+        args.limitType == LimitType.followedSources ||
+        args.limitType == LimitType.followedCountries;
+
+    if (isGuest) {
+      headline = isFollowLimit
+          ? l10n.followedItemsLimitGuestHeadline
+          : l10n.savedHeadlinesLimitGuestHeadline;
+      subheadline = isFollowLimit
+          ? l10n.followedItemsLimitGuestSubheadline
+          : l10n.savedHeadlinesLimitGuestSubheadline;
+      actionButton = ElevatedButton(
+        onPressed: () {
+          context.goNamed(
+            Routes.authenticationName,
+            queryParameters: {'context': 'linking'},
+          );
+        },
+        child: Text(
+          isFollowLimit
+              ? l10n.followedItemsLimitSignInButton
+              : l10n.savedHeadlinesLimitSignInButton,
+        ),
+      );
+    } else if (isStandard) {
+      headline = isFollowLimit
+          ? l10n.followedItemsLimitStandardHeadline
+          : l10n.savedHeadlinesLimitStandardHeadline;
+      subheadline = isFollowLimit
+          ? l10n.followedItemsLimitStandardSubheadline
+          : l10n.savedHeadlinesLimitStandardSubheadline;
+      actionButton = ElevatedButton(
+        onPressed: () {
+          // TODO(fulleni): Implement navigation to upgrade page
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(l10n.upgradeToPremiumMessage)));
+        },
+        child: Text(
+          isFollowLimit
+              ? l10n.followedItemsLimitUpgradeButton
+              : l10n.savedHeadlinesLimitUpgradeButton,
+        ),
+      );
+    } else if (isPremium) {
+      headline = isFollowLimit
+          ? l10n.followedItemsLimitPremiumHeadline
+          : l10n.savedHeadlinesLimitPremiumHeadline;
+      subheadline = isFollowLimit
+          ? l10n.followedItemsLimitPremiumSubheadline
+          : l10n.savedHeadlinesLimitPremiumSubheadline;
+    } else {
+      headline = l10n.limitReachedGenericHeadline;
+      subheadline = l10n.limitReachedGenericSubheadline;
     }
 
     return Scaffold(
@@ -145,9 +110,7 @@ class LimitReachedPage extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.close),
           tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-          onPressed: () {
-            context.pop();
-          },
+          onPressed: () => context.pop(),
         ),
       ),
       body: Padding(
@@ -159,7 +122,7 @@ class LimitReachedPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Icon(
-                  Icons.lock_outline,
+                  _getIconForLimitType(args.limitType),
                   size: AppSpacing.xxl * 2,
                   color: colorScheme.primary,
                 ),
@@ -179,8 +142,10 @@ class LimitReachedPage extends StatelessWidget {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: AppSpacing.xxl),
-                ...actions,
+                if (actionButton != null) ...[
+                  const SizedBox(height: AppSpacing.xxl),
+                  SizedBox(width: double.infinity, child: actionButton),
+                ],
               ],
             ),
           ),

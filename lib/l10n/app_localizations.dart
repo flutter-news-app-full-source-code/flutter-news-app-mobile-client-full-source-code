@@ -1843,6 +1843,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Upgrade to Premium functionality is not yet implemented.'**
   String get upgradeToPremiumMessage;
+
+  /// custom - context aware - headline  for tha user authentication limit reached button in the auth page.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock More Content'**
+  String get authenticationLimitReachedHeadline;
+
+  /// custom - context aware - subheadline  for tha user authentication limit reached button in the auth page.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in or create an account to follow more content and save more headlines.'**
+  String get authenticationLimitReachedSubheadline;
 }
 
 class _AppLocalizationsDelegate

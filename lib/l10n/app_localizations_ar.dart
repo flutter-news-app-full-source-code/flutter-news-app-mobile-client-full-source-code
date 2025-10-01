@@ -974,4 +974,11 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get upgradeToPremiumMessage =>
       'وظيفة الترقية إلى بريميوم لم يتم تنفيذها بعد.';
+
+  @override
+  String get authenticationLimitReachedHeadline => 'افتح المزيد من المحتوى';
+
+  @override
+  String get authenticationLimitReachedSubheadline =>
+      'سجل الدخول أو أنشئ حسابًا لمتابعة المزيد من المحتوى وحفظ المزيد من العناوين الرئيسية.';
 }

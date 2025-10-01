@@ -977,4 +977,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get upgradeToPremiumMessage =>
       'Upgrade to Premium functionality is not yet implemented.';
+
+  @override
+  String get authenticationLimitReachedHeadline => 'Unlock More Content';
+
+  @override
+  String get authenticationLimitReachedSubheadline =>
+      'Sign in or create an account to follow more content and save more headlines.';
 }

@@ -34,6 +34,7 @@ class AuthenticationBloc
     );
     on<AuthenticationSignOutRequested>(_onAuthenticationSignOutRequested);
     on<AuthenticationCooldownCompleted>(_onAuthenticationCooldownCompleted);
+    on<AuthenticationLinkingInitiated>(_onAuthenticationLinkingInitiated);
   }
 
   final AuthRepository _authenticationRepository;
@@ -41,6 +42,9 @@ class AuthenticationBloc
   Timer? _cooldownTimer;
 
   /// Handles [_AuthenticationUserChanged] events.
+  ///
+  /// Updates the authentication status and user, and resets the authentication
+  /// flow to `signIn` if the user becomes unauthenticated.
   Future<void> _onAuthenticationUserChanged(
     _AuthenticationUserChanged event,
     Emitter<AuthenticationState> emit,
@@ -50,6 +54,11 @@ class AuthenticationBloc
         state.copyWith(
           status: AuthenticationStatus.authenticated,
           user: event.user,
+          // When a user is authenticated, ensure the flow is reset to signIn
+          // unless it's explicitly a linking flow that just completed.
+          // For now, we reset to signIn as the linking context is handled
+          // by the router redirect.
+          flow: AuthFlow.signIn,
         ),
       );
     } else {
@@ -57,6 +66,8 @@ class AuthenticationBloc
         state.copyWith(
           status: AuthenticationStatus.unauthenticated,
           user: null,
+          // When a user logs out, reset the flow to standard sign-in.
+          flow: AuthFlow.signIn,
         ),
       );
     }
@@ -146,6 +157,8 @@ class AuthenticationBloc
   }
 
   /// Handles [AuthenticationSignOutRequested] events.
+  ///
+  /// Resets the authentication flow to `signIn` upon sign-out.
   Future<void> _onAuthenticationSignOutRequested(
     AuthenticationSignOutRequested event,
     Emitter<AuthenticationState> emit,
@@ -155,6 +168,8 @@ class AuthenticationBloc
       await _authenticationRepository.signOut();
       // On success, the _AuthenticationUserChanged listener will handle
       // emitting the unauthenticated state.
+      // Also, explicitly reset the flow to signIn.
+      emit(state.copyWith(flow: AuthFlow.signIn));
     } on HttpException catch (e) {
       emit(state.copyWith(status: AuthenticationStatus.failure, exception: e));
     } catch (e) {
@@ -184,5 +199,15 @@ class AuthenticationBloc
         clearCooldownEndTime: true,
       ),
     );
+  }
+
+  /// Handles [AuthenticationLinkingInitiated] events.
+  ///
+  /// Sets the authentication flow to `linkAccount`.
+  void _onAuthenticationLinkingInitiated(
+    AuthenticationLinkingInitiated event,
+    Emitter<AuthenticationState> emit,
+  ) {
+    emit(state.copyWith(flow: AuthFlow.linkAccount));
   }
 }

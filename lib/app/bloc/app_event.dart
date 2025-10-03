@@ -156,3 +156,18 @@ class AppUserFeedDecoratorShown extends AppEvent {
   @override
   List<Object> get props => [userId, feedDecoratorType, isCompleted];
 }
+
+/// {@template post_auth_redirect_intent_captured}
+/// Event triggered when a navigation intent is captured before an authentication
+/// flow, indicating where the user should be redirected after successful auth.
+/// {@endtemplate}
+final class PostAuthRedirectIntentCaptured extends AppEvent {
+  /// {@macro post_auth_redirect_intent_captured}
+  const PostAuthRedirectIntentCaptured({required this.intent});
+
+  /// The [GoRouterState] representing the intended destination.
+  final GoRouterState intent;
+
+  @override
+  List<Object> get props => [intent];
+}

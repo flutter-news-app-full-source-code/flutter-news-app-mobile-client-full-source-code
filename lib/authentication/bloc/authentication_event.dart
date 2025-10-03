@@ -84,3 +84,11 @@ final class AuthenticationCooldownCompleted extends AuthenticationEvent {
   /// {@macro authentication_cooldown_completed}
   const AuthenticationCooldownCompleted();
 }
+
+/// {@template authentication_linking_initiated}
+/// Event triggered when an anonymous user initiates the account linking flow.
+/// {@endtemplate}
+final class AuthenticationLinkingInitiated extends AuthenticationEvent {
+  /// {@macro authentication_linking_initiated}
+  const AuthenticationLinkingInitiated();
+}

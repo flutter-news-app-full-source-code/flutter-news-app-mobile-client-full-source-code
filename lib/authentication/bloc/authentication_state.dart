@@ -24,6 +24,15 @@ enum AuthenticationStatus {
   failure,
 }
 
+/// Defines the different authentication flows the user might be in.
+enum AuthFlow {
+  /// Standard sign-in/sign-up flow.
+  signIn,
+
+  /// Account linking flow for an existing anonymous user.
+  linkAccount,
+}
+
 /// {@template authentication_state}
 /// Represents the state of the authentication process.
 ///
@@ -40,6 +49,8 @@ class AuthenticationState extends Equatable {
     this.email,
     this.exception,
     this.cooldownEndTime,
+    // Initialize the authentication flow to standard sign-in by default.
+    this.flow = AuthFlow.signIn,
   });
 
   /// The current status of the authentication process.
@@ -57,6 +68,9 @@ class AuthenticationState extends Equatable {
   /// The time when the cooldown for requesting a new code ends.
   final DateTime? cooldownEndTime;
 
+  /// The current authentication flow (e.g., standard sign-in or account linking).
+  final AuthFlow flow;
+
   /// Creates a copy of the current [AuthenticationState] with updated values.
   AuthenticationState copyWith({
     AuthenticationStatus? status,
@@ -65,6 +79,7 @@ class AuthenticationState extends Equatable {
     HttpException? exception,
     DateTime? cooldownEndTime,
     bool clearCooldownEndTime = false,
+    AuthFlow? flow,
   }) {
     return AuthenticationState(
       status: status ?? this.status,
@@ -74,9 +89,17 @@ class AuthenticationState extends Equatable {
       cooldownEndTime: clearCooldownEndTime
           ? null
           : cooldownEndTime ?? this.cooldownEndTime,
+      flow: flow ?? this.flow,
     );
   }
 
   @override
-  List<Object?> get props => [status, user, email, exception, cooldownEndTime];
+  List<Object?> get props => [
+    status,
+    user,
+    email,
+    exception,
+    cooldownEndTime,
+    flow, // Include the new flow property in props
+  ];
 }

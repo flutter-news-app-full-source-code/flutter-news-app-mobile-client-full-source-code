@@ -18,24 +18,8 @@ import 'package:ui_kit/ui_kit.dart';
 class AuthenticationPage extends StatelessWidget {
   /// {@macro authentication_page}
   const AuthenticationPage({
-    required this.headline,
-    required this.subHeadline,
-    required this.showAnonymousButton,
-    required this.isLinkingContext,
     super.key,
   });
-
-  /// The main title displayed on the page.
-  final String headline;
-
-  /// The descriptive text displayed below the headline.
-  final String subHeadline;
-
-  /// Whether to show the "Continue Anonymously" button.
-  final bool showAnonymousButton;
-
-  /// Whether this page is being shown in the account linking context.
-  final bool isLinkingContext;
 
   @override
   Widget build(BuildContext context) {
@@ -47,17 +31,14 @@ class AuthenticationPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        // Conditionally add the leading close button only in linking context
-        leading: isLinkingContext
-            ? IconButton(
-                icon: const Icon(Icons.close),
-                tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-                onPressed: () {
-                  // Navigate back to the account page when close is pressed
-                  context.goNamed(Routes.accountName);
-                },
-              )
-            : null,
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+          onPressed: () {
+            // Navigate back to the account page when close is pressed
+            context.goNamed(Routes.accountName);
+          },
+        ),
       ),
       body: SafeArea(
         child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
@@ -76,6 +57,24 @@ class AuthenticationPage extends StatelessWidget {
           builder: (context, state) {
             final isLoading = state.status == AuthenticationStatus.loading;
 
+            // Determine content based on the current authentication flow.
+            final String headline;
+            final String subHeadline;
+            final bool showAnonymousButton;
+            final IconData pageIcon;
+
+            if (state.flow == AuthFlow.linkAccount) {
+              headline = l10n.authenticationLinkingHeadline;
+              subHeadline = l10n.authenticationLinkingSubheadline;
+              showAnonymousButton = false;
+              pageIcon = Icons.sync;
+            } else {
+              headline = l10n.authenticationSignInHeadline;
+              subHeadline = l10n.authenticationSignInSubheadline;
+              showAnonymousButton = true;
+              pageIcon = Icons.newspaper;
+            }
+
             return Padding(
               padding: const EdgeInsets.all(AppSpacing.paddingLarge),
               child: Center(
@@ -88,7 +87,7 @@ class AuthenticationPage extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(bottom: AppSpacing.xl),
                         child: Icon(
-                          isLinkingContext ? Icons.sync : Icons.newspaper,
+                          pageIcon,
                           size: AppSpacing.xxl * 2,
                           color: colorScheme.primary,
                         ),
@@ -118,11 +117,10 @@ class AuthenticationPage extends StatelessWidget {
                         onPressed: isLoading
                             ? null
                             : () {
-                                context.goNamed(
-                                  isLinkingContext
-                                      ? Routes.linkingRequestCodeName
-                                      : Routes.requestCodeName,
-                                );
+                                // Always navigate to the request code page.
+                                // The behavior of the request code page will
+                                // depend on the AuthenticationBloc's flow state.
+                                context.goNamed(Routes.requestCodeName);
                               },
                         label: Text(l10n.authenticationEmailSignInButton),
                         style: ElevatedButton.styleFrom(

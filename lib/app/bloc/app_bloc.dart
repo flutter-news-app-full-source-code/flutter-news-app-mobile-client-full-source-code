@@ -12,6 +12,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/config/confi
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_initializer_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/package_info_service.dart';
+import 'package:go_router/go_router.dart'; // Added import for GoRouterState
 import 'package:logging/logging.dart';
 import 'package:pub_semver/pub_semver.dart';
 
@@ -79,6 +80,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppUserFeedDecoratorShown>(_onAppUserFeedDecoratorShown);
     on<AppUserContentPreferencesChanged>(_onAppUserContentPreferencesChanged);
     on<AppLogoutRequested>(_onLogoutRequested);
+    on<PostAuthRedirectIntentCaptured>(_onPostAuthRedirectIntentCaptured);
 
     // Subscribe to the authentication repository's authStateChanges stream.
     // This stream is the single source of truth for the user's auth state
@@ -408,6 +410,19 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // After potential initialization and migration,
       // ensure user-specific data (settings and preferences) are loaded.
       await _fetchAndSetUserData(newUser, emit);
+
+      // After user data is loaded, check for a pending redirect intent.
+      final redirectIntent = state.postAuthRedirectIntent;
+      if (redirectIntent != null) {
+        _logger.info(
+          '[AppBloc] Post-authentication redirect intent found: '
+          '${redirectIntent.matchedLocation}. Navigating...',
+        );
+        // Use the navigatorKey's context to navigate to the intended route.
+        _navigatorKey.currentState?.context.go(redirectIntent.matchedLocation);
+        // Clear the intent after navigation to prevent re-triggering.
+        emit(state.copyWith(clearPostAuthRedirectIntent: true));
+      }
     } else {
       // If user logs out, clear user-specific data from state.
       emit(state.copyWith(settings: null, userContentPreferences: null));
@@ -801,5 +816,15 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         state.copyWith(userContentPreferences: state.userContentPreferences),
       );
     }
+  }
+
+  /// Handles [PostAuthRedirectIntentCaptured] events.
+  ///
+  /// Stores the intended navigation path in the state.
+  void _onPostAuthRedirectIntentCaptured(
+    PostAuthRedirectIntentCaptured event,
+    Emitter<AppState> emit,
+  ) {
+    emit(state.copyWith(postAuthRedirectIntent: event.intent));
   }
 }

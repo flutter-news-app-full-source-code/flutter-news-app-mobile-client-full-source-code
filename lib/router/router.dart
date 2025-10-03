@@ -95,6 +95,19 @@ GoRouter createRouter({
       final currentLocation = state.matchedLocation;
       final redirectPath = state.uri.queryParameters['redirectPath'];
 
+      /// Helper function to build a URI with the redirectPath query parameter.
+      ///
+      /// This ensures that the `redirectPath` is carried forward across redirects
+      /// within the GoRouter's internal logic, preventing it from being lost.
+      String _buildRedirectUri(String baseUri) {
+        final uri = Uri.parse(baseUri);
+        final queryParameters = Map<String, String>.from(uri.queryParameters);
+        if (redirectPath != null) {
+          queryParameters['redirectPath'] = redirectPath;
+        }
+        return uri.replace(queryParameters: queryParameters).toString();
+      }
+
       print(
         'GoRouter Redirect Check:\n'
         '  Current Location (Matched): $currentLocation\n'
@@ -119,7 +132,7 @@ GoRouter createRouter({
       if (appStatus == AppLifeCycleStatus.unauthenticated) {
         print('  Redirect: User is unauthenticated.');
         // If they are already on an auth path, allow it. Otherwise, redirect.
-        return isGoingToAuth ? null : authenticationPath;
+        return isGoingToAuth ? null : _buildRedirectUri(authenticationPath);
       }
 
       // --- Case 2: Anonymous or Authenticated User ---
@@ -137,7 +150,7 @@ GoRouter createRouter({
             print(
               '    Action: Authenticated user on auth path. Redirecting to feed.',
             );
-            return feedPath;
+            return _buildRedirectUri(feedPath);
           }
 
           // An anonymous user is only allowed on auth paths for account linking.
@@ -152,14 +165,14 @@ GoRouter createRouter({
             print(
               '    Action: Anonymous user on non-linking/non-limit_reached auth path. Redirecting to feed.',
             );
-            return feedPath;
+            return _buildRedirectUri(feedPath);
           }
         }
 
         // If the user is at the root path, they should be sent to the feed.
         if (currentLocation == rootPath) {
           print('    Action: User at root. Redirecting to feed.');
-          return feedPath;
+          return _buildRedirectUri(feedPath);
         }
       }
 

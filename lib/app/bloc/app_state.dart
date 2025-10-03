@@ -49,6 +49,8 @@ class AppState extends Equatable {
     this.settings,
     this.selectedBottomNavigationIndex = 0,
     this.currentAppVersion,
+    // New property to store the intended navigation path after authentication.
+    this.postAuthRedirectIntent,
   });
 
   /// The current status of the application, indicating its lifecycle stage.
@@ -88,6 +90,12 @@ class AppState extends Equatable {
   /// The current version of the application, fetched from `package_info_plus`.
   /// This is used for version enforcement.
   final String? currentAppVersion;
+
+  /// Stores the intended navigation path (GoRouterState) that the user was
+  /// trying to access before being redirected for authentication.
+  /// This is used to redirect the user back to their original destination
+  /// after successful login or account linking.
+  final GoRouterState? postAuthRedirectIntent;
 
   /// The latest required app version from the remote configuration.
   /// Returns `null` if remote config is not available.
@@ -162,6 +170,7 @@ class AppState extends Equatable {
     selectedBottomNavigationIndex,
     environment,
     currentAppVersion,
+    postAuthRedirectIntent, // Include the new property in props
   ];
 
   /// Creates a copy of this [AppState] with the given fields replaced with
@@ -178,6 +187,8 @@ class AppState extends Equatable {
     int? selectedBottomNavigationIndex,
     local_config.AppEnvironment? environment,
     String? currentAppVersion,
+    GoRouterState? postAuthRedirectIntent,
+    bool clearPostAuthRedirectIntent = false,
   }) {
     return AppState(
       status: status ?? this.status,
@@ -194,6 +205,9 @@ class AppState extends Equatable {
           selectedBottomNavigationIndex ?? this.selectedBottomNavigationIndex,
       environment: environment ?? this.environment,
       currentAppVersion: currentAppVersion ?? this.currentAppVersion,
+      postAuthRedirectIntent: clearPostAuthRedirectIntent
+          ? null
+          : postAuthRedirectIntent ?? this.postAuthRedirectIntent,
     );
   }
 }

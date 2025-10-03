@@ -50,20 +50,12 @@ abstract final class Routes {
   static const resetPasswordName = 'resetPassword';
   static const confirmEmail = 'confirm-email';
   static const confirmEmailName = 'confirmEmail';
-  static const accountLinking = 'linking';
-  static const accountLinkingName = 'accountLinking';
 
   // routes for email code verification flow
   static const requestCode = 'request-code';
   static const requestCodeName = 'requestCode';
   static const verifyCode = 'verify-code';
   static const verifyCodeName = 'verifyCode';
-
-  // Linking-specific authentication routes
-  static const linkingRequestCode = 'linking/request-code';
-  static const linkingRequestCodeName = 'linkingRequestCode';
-  static const linkingVerifyCode = 'linking/verify-code';
-  static const linkingVerifyCodeName = 'linkingVerifyCode';
 
   // --- Settings Sub-Routes (relative to /account/settings) ---
   static const settingsAppearance = 'appearance';

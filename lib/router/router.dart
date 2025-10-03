@@ -126,6 +126,22 @@ GoRouter createRouter({
       // States like `configFetching`, `underMaintenance`, etc., are now
       // handled by the root App widget *before* this router is ever built.
 
+      // --- New: Handle post-authentication redirectPath ---
+      // If the user is now authenticated/anonymous and a redirectPath is present,
+      // navigate directly to it. This ensures the user returns to their intended
+      // page after completing an auth flow (e.g., from LimitReachedPage).
+      if ((appStatus == AppLifeCycleStatus.authenticated ||
+              appStatus == AppLifeCycleStatus.anonymous) &&
+          redirectPath != null &&
+          redirectPath.isNotEmpty &&
+          currentLocation != redirectPath) {
+        print(
+          '  Redirect: User is $appStatus and redirectPath "$redirectPath" '
+          'is present. Navigating to redirectPath.',
+        );
+        return redirectPath;
+      }
+
       // --- Case 1: Unauthenticated User ---
       // If the user is unauthenticated, they should be on an auth path.
       // If they are trying to access any other part of the app, redirect them.

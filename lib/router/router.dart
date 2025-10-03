@@ -50,6 +50,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/user_limit_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/limit_reached_page.dart';
 import 'package:go_router/go_router.dart';
+import 'package:logging/logging.dart';
 
 /// Creates and configures the GoRouter instance for the application.
 ///
@@ -64,7 +65,7 @@ GoRouter createRouter({
   required DataRepository<Country> countriesRepository,
   required DataRepository<UserAppSettings> userAppSettingsRepository,
   required DataRepository<UserContentPreferences>
-  userContentPreferencesRepository,
+      userContentPreferencesRepository,
   required DataRepository<RemoteConfig> remoteConfigRepository,
   required DataRepository<User> userRepository,
   required AdService adService,
@@ -77,6 +78,7 @@ GoRouter createRouter({
     topicsRepository: topicsRepository,
     sourcesRepository: sourcesRepository,
   );
+  final logger = Logger('GoRouter');
 
   return GoRouter(
     refreshListenable: authStatusNotifier,
@@ -99,7 +101,7 @@ GoRouter createRouter({
       ///
       /// This ensures that the `redirectPath` is carried forward across redirects
       /// within the GoRouter's internal logic, preventing it from being lost.
-      String _buildRedirectUri(String baseUri) {
+      String buildRedirectUri(String baseUri) {
         final uri = Uri.parse(baseUri);
         final queryParameters = Map<String, String>.from(uri.queryParameters);
         if (redirectPath != null) {
@@ -108,11 +110,11 @@ GoRouter createRouter({
         return uri.replace(queryParameters: queryParameters).toString();
       }
 
-      print(
-        'GoRouter Redirect Check:\n'
-        '  Current Location (Matched): $currentLocation\n'
-        '  AppStatus: $appStatus\n'
-        '  Redirect Path: $redirectPath',
+      logger.info(
+        'Redirect Check:\n'
+        '  - Current Location: $currentLocation\n'
+        '  - AppStatus: $appStatus\n'
+        '  - Redirect Path: $redirectPath',
       );
 
       const rootPath = '/';
@@ -126,75 +128,84 @@ GoRouter createRouter({
       // States like `configFetching`, `underMaintenance`, etc., are now
       // handled by the root App widget *before* this router is ever built.
 
-      // --- New: Handle post-authentication redirectPath ---
-      // If the user is now authenticated/anonymous and a redirectPath is present,
-      // navigate directly to it. This ensures the user returns to their intended
-      // page after completing an auth flow (e.g., from LimitReachedPage).
-      if ((appStatus == AppLifeCycleStatus.authenticated ||
-              appStatus == AppLifeCycleStatus.anonymous) &&
-          redirectPath != null &&
-          redirectPath.isNotEmpty &&
-          currentLocation != redirectPath) {
-        print(
-          '  Redirect: User is $appStatus and redirectPath "$redirectPath" '
-          'is present. Navigating to redirectPath.',
-        );
-        return redirectPath;
-      }
-
       // --- Case 1: Unauthenticated User ---
-      // If the user is unauthenticated, they should be on an auth path.
+      // If the user is unauthenticated, they must be on an auth path.
       // If they are trying to access any other part of the app, redirect them.
       if (appStatus == AppLifeCycleStatus.unauthenticated) {
-        print('  Redirect: User is unauthenticated.');
-        // If they are already on an auth path, allow it. Otherwise, redirect.
-        return isGoingToAuth ? null : _buildRedirectUri(authenticationPath);
+        logger.info('  [Decision] User is unauthenticated.');
+        if (isGoingToAuth) {
+          logger.info('  [Action] Already on an auth path. Allowing.');
+          return null; // Allow navigation
+        } else {
+          logger.info(
+            '  [Action] Not on an auth path. Redirecting to $authenticationPath.',
+          );
+          return buildRedirectUri(authenticationPath);
+        }
       }
 
       // --- Case 2: Anonymous or Authenticated User ---
-      // If a user is anonymous or authenticated, they should not be able to
-      // access the main authentication flows, with an exception for account
-      // linking for anonymous users.
       if (appStatus == AppLifeCycleStatus.anonymous ||
           appStatus == AppLifeCycleStatus.authenticated) {
-        print('  Redirect: User is $appStatus.');
+        logger.info('  [Decision] User is $appStatus.');
 
-        // If the user is trying to access an authentication path:
+        // --- Sub-case 2.1: Post-Authentication Redirect ---
+        // This is the highest priority for an authenticated user. If a
+        // redirectPath is present, it means the user just finished an auth
+        // flow and should be sent to their original destination.
+        if (redirectPath != null &&
+            redirectPath.isNotEmpty &&
+            currentLocation != redirectPath) {
+          logger.info(
+            '  [Action] Post-auth redirectPath found: "$redirectPath". Navigating.',
+          );
+          return redirectPath;
+        }
+
+        // --- Sub-case 2.2: Accessing Authentication Routes ---
+        // If no post-auth redirect is happening, check if the user is trying
+        // to access auth pages, which should generally be disallowed.
         if (isGoingToAuth) {
+          logger.info('  [Decision] User is on an auth path.');
           // A fully authenticated user should never see auth pages.
           if (appStatus == AppLifeCycleStatus.authenticated) {
-            print(
-              '    Action: Authenticated user on auth path. Redirecting to feed.',
+            logger.info(
+              '  [Action] Authenticated user on auth path. Redirecting to feed.',
             );
-            return _buildRedirectUri(feedPath);
+            return buildRedirectUri(feedPath);
           }
 
-          // An anonymous user is only allowed on auth paths for account linking.
-          final authContext = state.uri.queryParameters['authContext'];
-          final isLinking = authContext == 'linking';
-          final isLimitReachedAuth = authContext == 'limit_reached';
+          // An anonymous user is only allowed on auth paths for specific flows.
+          if (appStatus == AppLifeCycleStatus.anonymous) {
+            final authContext = state.uri.queryParameters['authContext'];
+            final isLinking = authContext == 'linking';
+            final isLimitReachedAuth = authContext == 'limit_reached';
 
-          if (isLinking || isLimitReachedAuth) {
-            print('    Action: Anonymous user on linking/limit_reached auth path. Allowing.');
-            return null;
-          } else {
-            print(
-              '    Action: Anonymous user on non-linking/non-limit_reached auth path. Redirecting to feed.',
-            );
-            return _buildRedirectUri(feedPath);
+            if (isLinking || isLimitReachedAuth) {
+              logger.info(
+                '  [Action] Anonymous user on linking/limit_reached auth path. Allowing.',
+              );
+              return null; // Allow
+            } else {
+              logger.info(
+                '  [Action] Anonymous user on non-linking/non-limit_reached auth path. Redirecting to feed.',
+              );
+              return buildRedirectUri(feedPath);
+            }
           }
         }
 
-        // If the user is at the root path, they should be sent to the feed.
+        // --- Sub-case 2.3: Accessing Root Path ---
+        // If the user is at the root, they should be sent to the feed.
         if (currentLocation == rootPath) {
-          print('    Action: User at root. Redirecting to feed.');
-          return _buildRedirectUri(feedPath);
+          logger.info('  [Action] User at root. Redirecting to feed.');
+          return buildRedirectUri(feedPath);
         }
       }
 
       // --- Fallback ---
       // For any other case, allow navigation.
-      print('  Redirect: No condition met. Allowing navigation.');
+      logger.info('  [Decision] No specific redirect condition met. Allowing.');
       return null;
     },
     // --- Authentication Routes ---
@@ -257,11 +268,10 @@ GoRouter createRouter({
               GoRoute(
                 path: Routes.requestCode,
                 name: Routes.linkingRequestCodeName,
-                builder: (context, state) =>
-                    RequestCodePage(
-                      authContext: state.uri.queryParameters['authContext'],
-                      redirectPath: state.uri.queryParameters['redirectPath'],
-                    ),
+                builder: (context, state) => RequestCodePage(
+                  authContext: state.uri.queryParameters['authContext'],
+                  redirectPath: state.uri.queryParameters['redirectPath'],
+                ),
               ),
               GoRoute(
                 path: '${Routes.verifyCode}/:email',
@@ -281,11 +291,10 @@ GoRouter createRouter({
           GoRoute(
             path: Routes.requestCode,
             name: Routes.requestCodeName,
-            builder: (context, state) =>
-                RequestCodePage(
-                  authContext: state.uri.queryParameters['authContext'],
-                  redirectPath: state.uri.queryParameters['redirectPath'],
-                ),
+            builder: (context, state) => RequestCodePage(
+              authContext: state.uri.queryParameters['authContext'],
+              redirectPath: state.uri.queryParameters['redirectPath'],
+            ),
           ),
           GoRoute(
             path: '${Routes.verifyCode}/:email',
@@ -332,25 +341,24 @@ GoRouter createRouter({
           return MultiBlocProvider(
             providers: [
               BlocProvider(
-                create: (context) =>
-                    EntityDetailsBloc(
-                      headlinesRepository: context
-                          .read<DataRepository<Headline>>(),
-                      topicRepository: context.read<DataRepository<Topic>>(),
-                      sourceRepository: context.read<DataRepository<Source>>(),
-                      countryRepository: context
-                          .read<DataRepository<Country>>(),
-                      appBloc: context.read<AppBloc>(),
-                      feedDecoratorService: feedDecoratorService,
-                      inlineAdCacheService: inlineAdCacheService,
-                      userLimitService: userLimitService,
-                    )..add(
-                      EntityDetailsLoadRequested(
-                        entityId: args.entityId,
-                        contentType: args.contentType,
-                        adThemeStyle: adThemeStyle,
-                      ),
+                create: (context) => EntityDetailsBloc(
+                  headlinesRepository:
+                      context.read<DataRepository<Headline>>(),
+                  topicRepository: context.read<DataRepository<Topic>>(),
+                  sourceRepository: context.read<DataRepository<Source>>(),
+                  countryRepository:
+                      context.read<DataRepository<Country>>(),
+                  appBloc: context.read<AppBloc>(),
+                  feedDecoratorService: feedDecoratorService,
+                  inlineAdCacheService: inlineAdCacheService,
+                  userLimitService: userLimitService,
+                )..add(
+                    EntityDetailsLoadRequested(
+                      entityId: args.entityId,
+                      contentType: args.contentType,
+                      adThemeStyle: adThemeStyle,
                     ),
+                  ),
               ),
             ],
             child: EntityDetailsPage(args: args),
@@ -392,12 +400,14 @@ GoRouter createRouter({
             providers: [
               BlocProvider(
                 create: (context) => HeadlineDetailsBloc(
-                  headlinesRepository: context.read<DataRepository<Headline>>(),
+                  headlinesRepository:
+                      context.read<DataRepository<Headline>>(),
                 ),
               ),
               BlocProvider(
                 create: (context) => SimilarHeadlinesBloc(
-                  headlinesRepository: context.read<DataRepository<Headline>>(),
+                  headlinesRepository:
+                      context.read<DataRepository<Headline>>(),
                 ),
               ),
             ],
@@ -432,8 +442,8 @@ GoRouter createRouter({
               BlocProvider(
                 create: (context) {
                   return HeadlinesFeedBloc(
-                    headlinesRepository: context
-                        .read<DataRepository<Headline>>(),
+                    headlinesRepository:
+                        context.read<DataRepository<Headline>>(),
                     feedDecoratorService: feedDecoratorService,
                     appBloc: context.read<AppBloc>(),
                     inlineAdCacheService: inlineAdCacheService,
@@ -443,11 +453,12 @@ GoRouter createRouter({
               BlocProvider(
                 create: (context) {
                   return HeadlinesSearchBloc(
-                    headlinesRepository: context
-                        .read<DataRepository<Headline>>(),
+                    headlinesRepository:
+                        context.read<DataRepository<Headline>>(),
                     topicRepository: context.read<DataRepository<Topic>>(),
                     sourceRepository: context.read<DataRepository<Source>>(),
-                    countryRepository: context.read<DataRepository<Country>>(),
+                    countryRepository:
+                        context.read<DataRepository<Country>>(),
                     appBloc: context.read<AppBloc>(),
                     feedDecoratorService: feedDecoratorService,
                     inlineAdCacheService: inlineAdCacheService,
@@ -479,14 +490,14 @@ GoRouter createRouter({
                         providers: [
                           BlocProvider(
                             create: (context) => HeadlineDetailsBloc(
-                              headlinesRepository: context
-                                  .read<DataRepository<Headline>>(),
+                              headlinesRepository:
+                                  context.read<DataRepository<Headline>>(),
                             ),
                           ),
                           BlocProvider(
                             create: (context) => SimilarHeadlinesBloc(
-                              headlinesRepository: context
-                                  .read<DataRepository<Headline>>(),
+                              headlinesRepository:
+                                  context.read<DataRepository<Headline>>(),
                             ),
                           ),
                         ],
@@ -585,14 +596,14 @@ GoRouter createRouter({
                         providers: [
                           BlocProvider(
                             create: (context) => HeadlineDetailsBloc(
-                              headlinesRepository: context
-                                  .read<DataRepository<Headline>>(),
+                              headlinesRepository:
+                                  context.read<DataRepository<Headline>>(),
                             ),
                           ),
                           BlocProvider(
                             create: (context) => SimilarHeadlinesBloc(
-                              headlinesRepository: context
-                                  .read<DataRepository<Headline>>(),
+                              headlinesRepository:
+                                  context.read<DataRepository<Headline>>(),
                             ),
                           ),
                         ],
@@ -618,7 +629,8 @@ GoRouter createRouter({
                 routes: [
                   // ShellRoute for settings to provide SettingsBloc to children
                   ShellRoute(
-                    builder: (BuildContext context, GoRouterState state, Widget child) {
+                    builder:
+                        (BuildContext context, GoRouterState state, Widget child) {
                       // This builder provides SettingsBloc to all routes within this ShellRoute.
                       // 'child' will be SettingsPage, AppearanceSettingsPage, etc.
                       final appBloc = context.read<AppBloc>();
@@ -638,7 +650,7 @@ GoRouter createRouter({
                             );
                           } else {
                             // Handle case where user is unexpectedly null.
-                            print(
+                            logger.warning(
                               'ShellRoute/SettingsBloc: User ID is null when creating SettingsBloc. Settings will not be loaded.',
                             );
                           }
@@ -761,7 +773,8 @@ GoRouter createRouter({
                         name: Routes.accountArticleDetailsName,
                         builder: (context, state) {
                           final headlineFromExtra = state.extra as Headline?;
-                          final headlineIdFromPath = state.pathParameters['id'];
+                          final headlineIdFromPath =
+                              state.pathParameters['id'];
                           return MultiBlocProvider(
                             providers: [
                               BlocProvider(

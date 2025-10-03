@@ -410,24 +410,16 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // ensure user-specific data (settings and preferences) are loaded.
       await _fetchAndSetUserData(newUser, emit);
 
-      // After successful authentication, check for a redirectPath in the current
-      // GoRouterState and navigate there if present.
-      final currentContext = _navigatorKey.currentContext;
-      if (currentContext != null) {
-        final currentRouteState = GoRouterState.of(currentContext);
-        final redirectPath =
-            currentRouteState.uri.queryParameters['redirectPath'];
-        if (redirectPath != null && redirectPath.isNotEmpty) {
-          _logger.info(
-            '[AppBloc] Authenticated. Redirecting to previous path: $redirectPath',
-          );
-          // Use go() to replace the current route stack with the redirect path.
-          // This prevents the user from being able to go back to the auth flow.
-          currentContext.go(redirectPath);
-        }
-      }
+      // After successful authentication, the GoRouter's redirect function
+      // will handle navigation based on the 'redirectPath' query parameter.
+      // No direct navigation from AppBloc is needed here to avoid BuildContext issues.
+      _logger.info(
+        '[AppBloc] User ${newUser.id} authenticated. GoRouter redirect '
+        'function will handle post-authentication navigation.',
+      );
     } else {
       // If user logs out, clear user-specific data from state.
+      _logger.info('[AppBloc] User logged out. Clearing user-specific data.');
       emit(state.copyWith(settings: null, userContentPreferences: null));
     }
   }

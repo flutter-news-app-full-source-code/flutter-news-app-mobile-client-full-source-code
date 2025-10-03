@@ -100,6 +100,6 @@ class AuthenticationState extends Equatable {
     email,
     exception,
     cooldownEndTime,
-    flow, // Include the new flow property in props
+    flow,
   ];
 }

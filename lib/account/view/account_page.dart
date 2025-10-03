@@ -113,9 +113,9 @@ class AccountPage extends StatelessWidget {
             textStyle: textTheme.labelLarge,
           ),
           onPressed: () {
-            context
-                .read<AuthenticationBloc>()
-                .add(const AuthenticationLinkingInitiated());
+            context.read<AuthenticationBloc>().add(
+              const AuthenticationLinkingInitiated(),
+            );
             context.goNamed(Routes.authenticationName);
           },
         ),

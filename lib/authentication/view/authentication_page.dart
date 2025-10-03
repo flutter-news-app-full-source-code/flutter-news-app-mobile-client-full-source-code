@@ -17,9 +17,7 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class AuthenticationPage extends StatelessWidget {
   /// {@macro authentication_page}
-  const AuthenticationPage({
-    super.key,
-  });
+  const AuthenticationPage({super.key});
 
   @override
   Widget build(BuildContext context) {

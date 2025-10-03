@@ -170,7 +170,7 @@ class AppState extends Equatable {
     selectedBottomNavigationIndex,
     environment,
     currentAppVersion,
-    postAuthRedirectIntent, // Include the new property in props
+    postAuthRedirectIntent,
   ];
 
   /// Creates a copy of this [AppState] with the given fields replaced with

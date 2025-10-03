@@ -97,12 +97,12 @@ GoRouter createRouter({
 
       // Enhanced logging for easier debugging of navigation flows.
       final log = Logger('GoRouterRedirect')
-      ..info(
-        'Redirect Check Triggered:\n'
-        '  -> Location: "${state.uri}" (Matched: "$currentLocation")\n'
-        '  -> App Status: $appStatus\n'
-        '  -> Auth Flow: $authFlow',
-      );
+        ..info(
+          'Redirect Check Triggered:\n'
+          '  -> Location: "${state.uri}" (Matched: "$currentLocation")\n'
+          '  -> App Status: $appStatus\n'
+          '  -> Auth Flow: $authFlow',
+        );
 
       const authenticationPath = Routes.authentication;
       const feedPath = Routes.feed;
@@ -117,11 +117,15 @@ GoRouter createRouter({
       if (appStatus == AppLifeCycleStatus.unauthenticated) {
         // If they are already on an authentication path, allow it.
         if (isGoingToAuth) {
-          log.fine('Decision: Allowing unauthenticated user to access auth route.');
+          log.fine(
+            'Decision: Allowing unauthenticated user to access auth route.',
+          );
           return null;
         }
         // Otherwise, redirect them to the main authentication page.
-        log.info('Decision: Redirecting unauthenticated user to "$authenticationPath".');
+        log.info(
+          'Decision: Redirecting unauthenticated user to "$authenticationPath".',
+        );
         return authenticationPath;
       }
 
@@ -134,17 +138,23 @@ GoRouter createRouter({
         if (isGoingToAuth) {
           // A fully authenticated user should never see the sign-in pages.
           if (appStatus == AppLifeCycleStatus.authenticated) {
-            log.info('Decision: Authenticated user on auth path. Redirecting to feed.');
+            log.info(
+              'Decision: Authenticated user on auth path. Redirecting to feed.',
+            );
             return feedPath;
           }
 
           // An anonymous user is only allowed on auth paths if they are in
           // the 'linkAccount' flow. This is now the single source of truth.
           if (authFlow == AuthFlow.linkAccount) {
-            log.fine('Decision: Allowing anonymous user in "linkAccount" flow.');
+            log.fine(
+              'Decision: Allowing anonymous user in "linkAccount" flow.',
+            );
             return null;
           } else {
-            log.info('Decision: Anonymous user on auth path outside of linking flow. Redirecting to feed.');
+            log.info(
+              'Decision: Anonymous user on auth path outside of linking flow. Redirecting to feed.',
+            );
             return feedPath;
           }
         }
@@ -186,8 +196,7 @@ GoRouter createRouter({
           GoRoute(
             path: Routes.requestCode,
             name: Routes.requestCodeName,
-            builder: (context, state) =>
-                const RequestCodePage(),
+            builder: (context, state) => const RequestCodePage(),
           ),
           GoRoute(
             path: '${Routes.verifyCode}/:email',

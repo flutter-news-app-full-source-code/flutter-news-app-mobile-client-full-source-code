@@ -25,11 +25,18 @@ enum AuthenticationStatus {
 }
 
 /// Defines the different authentication flows the user might be in.
+///
+/// This enum is crucial for distinguishing between a standard sign-in/sign-up
+/// process and an account linking process for an existing anonymous user.
+/// The `GoRouter`'s redirect logic relies on this flow to determine
+/// appropriate navigation.
 enum AuthFlow {
-  /// Standard sign-in/sign-up flow.
+  /// Standard sign-in/sign-up flow, where a user is either creating a new
+  /// account or logging into an existing one.
   signIn,
 
-  /// Account linking flow for an existing anonymous user.
+  /// Account linking flow, specifically for an anonymous user who wishes to
+  /// associate their current anonymous session with a permanent email account.
   linkAccount,
 }
 
@@ -69,6 +76,10 @@ class AuthenticationState extends Equatable {
   final DateTime? cooldownEndTime;
 
   /// The current authentication flow (e.g., standard sign-in or account linking).
+  ///
+  /// This property is critical for the `GoRouter`'s redirect logic,
+  /// allowing it to differentiate between a user attempting a standard sign-in
+  /// and an anonymous user attempting to link their account.
   final AuthFlow flow;
 
   /// Creates a copy of the current [AuthenticationState] with updated values.

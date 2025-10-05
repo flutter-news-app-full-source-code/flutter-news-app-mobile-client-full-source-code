@@ -29,14 +29,28 @@ class AuthenticationPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-          onPressed: () {
-            // Navigate back to the account page when close is pressed
-            context.goNamed(Routes.accountName);
-          },
-        ),
+        // Conditionally display the leading close button based on the authentication flow.
+        // It should only be visible when the user is in the account linking flow,
+        // allowing them to dismiss the authentication page and return to their account.
+        // For initial sign-in, there's no previous page to dismiss to.
+        leading: context.watch<AuthenticationBloc>().state.flow == AuthFlow.linkAccount
+            ? IconButton(
+                icon: const Icon(Icons.close),
+                tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+                onPressed: () {
+                  // When the authentication page is dismissed, reset the authentication
+                  // flow in the BLoC. This ensures that if the user attempts to link
+                  // their account again, the BlocListener in AccountPage will
+                  // correctly re-trigger navigation, and the AuthenticationBloc
+                  // is in a clean state for any future authentication attempts.
+                  context.read<AuthenticationBloc>().add(
+                        const AuthenticationFlowReset(),
+                      );
+                  // Navigate back to the account page.
+                  context.goNamed(Routes.accountName);
+                },
+              )
+            : null, // Hide the leading button if not in account linking flow.
       ),
       body: SafeArea(
         child: BlocConsumer<AuthenticationBloc, AuthenticationState>(

@@ -87,8 +87,28 @@ final class AuthenticationCooldownCompleted extends AuthenticationEvent {
 
 /// {@template authentication_linking_initiated}
 /// Event triggered when an anonymous user initiates the account linking flow.
+///
+/// This event must be dispatched *before* navigating to the authentication
+/// route (`Routes.authenticationName`) when an anonymous user intends to
+/// link their account to an email. It sets the `AuthFlow` in the
+/// `AuthenticationBloc` to `linkAccount`, which is then used by the
+/// `GoRouter`'s redirect logic to permit access to the authentication UI
+/// in the correct context.
 /// {@endtemplate}
 final class AuthenticationLinkingInitiated extends AuthenticationEvent {
   /// {@macro authentication_linking_initiated}
   const AuthenticationLinkingInitiated();
+}
+
+/// {@template authentication_flow_reset}
+/// Event triggered to reset the authentication flow context.
+///
+/// This event is dispatched when the authentication UI is dismissed
+/// or when an authentication flow (like linking an account) has successfully
+/// completed, ensuring that the `AuthFlow` state in the `AuthenticationBloc`
+/// reverts to `signIn` for subsequent authentication attempts or a clean state.
+/// {@endtemplate}
+final class AuthenticationFlowReset extends AuthenticationEvent {
+  /// {@macro authentication_flow_reset}
+  const AuthenticationFlowReset();
 }

@@ -144,8 +144,12 @@ GoRouter createRouter({
             return feedPath;
           }
 
-          // An anonymous user is only allowed on auth paths if they are in
-          // the 'linkAccount' flow. This is now the single source of truth.
+          // This is the critical gate that allows an anonymous user to access
+          // the authentication page *only if* they have explicitly initiated
+          // the account linking flow (AuthFlow.linkAccount).
+          // If the flow is not 'linkAccount', it means they are trying to
+          // access the auth page outside of the intended linking context,
+          // and should be redirected to the feed.
           if (authFlow == AuthFlow.linkAccount) {
             log.fine(
               'Decision: Allowing anonymous user in "linkAccount" flow.',

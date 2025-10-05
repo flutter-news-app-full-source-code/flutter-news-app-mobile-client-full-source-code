@@ -1,17 +1,5 @@
 part of 'user_limit_bloc.dart';
 
-/// Defines the possible actions a user can take when a limit is exceeded.
-enum LimitAction {
-  /// No specific action is required or offered.
-  none,
-
-  /// The user should be prompted to link their account.
-  linkAccount,
-
-  /// The user should be prompted to upgrade to a premium subscription.
-  upgradeToPremium,
-}
-
 /// Base class for all states in the [UserLimitBloc].
 sealed class UserLimitState extends Equatable {
   const UserLimitState();

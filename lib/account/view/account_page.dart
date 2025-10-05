@@ -6,6 +6,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/authentication/b
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:go_router/go_router.dart';
+import 'package:logging/logging.dart'; // Import for Logger
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template account_view}
@@ -15,6 +16,9 @@ import 'package:ui_kit/ui_kit.dart';
 class AccountPage extends StatelessWidget {
   /// {@macro account_view}
   const AccountPage({super.key});
+
+  // Logger instance for AccountPage
+  static final _logger = Logger('AccountPage');
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +31,7 @@ class AccountPage extends StatelessWidget {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
 
+    // Removed BlocListener as per user instruction.
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.accountPageTitle, style: textTheme.titleLarge),
@@ -102,7 +107,6 @@ class AccountPage extends StatelessWidget {
       statusWidget = Padding(
         padding: const EdgeInsets.only(top: AppSpacing.md),
         child: ElevatedButton.icon(
-          // Changed to ElevatedButton
           icon: const Icon(Icons.link_outlined),
           label: Text(l10n.accountSignInPromptButton),
           style: ElevatedButton.styleFrom(
@@ -113,10 +117,16 @@ class AccountPage extends StatelessWidget {
             textStyle: textTheme.labelLarge,
           ),
           onPressed: () {
+            _logger.info(
+              'AccountPage: "Link Account" button pressed. '
+              'Dispatching AuthenticationLinkingInitiated event and navigating to authentication page with AuthFlow.linkAccount extra.',
+            );
+            // Dispatch the event to set the AuthFlow in AuthenticationBloc
             context.read<AuthenticationBloc>().add(
               const AuthenticationLinkingInitiated(),
             );
-            context.goNamed(Routes.authenticationName);
+            // Navigate to the authentication page
+            context.pushNamed(Routes.authenticationName);
           },
         ),
       );
@@ -127,7 +137,6 @@ class AccountPage extends StatelessWidget {
         children: [
           const SizedBox(height: AppSpacing.md),
           OutlinedButton.icon(
-            // Changed to OutlinedButton.icon
             icon: Icon(Icons.logout, color: colorScheme.error),
             label: Text(l10n.accountSignOutTile),
             style: OutlinedButton.styleFrom(
@@ -140,6 +149,7 @@ class AccountPage extends StatelessWidget {
               textStyle: textTheme.labelLarge,
             ),
             onPressed: () {
+              _logger.info('AccountPage: "Sign Out" button pressed.');
               context.read<AuthenticationBloc>().add(
                 const AuthenticationSignOutRequested(),
               );

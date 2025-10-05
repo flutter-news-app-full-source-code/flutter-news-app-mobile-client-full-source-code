@@ -9,13 +9,18 @@ enum AppLifeCycleStatus {
   /// The application is currently loading user-specific data (settings, preferences).
   loadingUserData,
 
-  /// The user is not authenticated.
+  /// The user is not authenticated. This state indicates that there is no
+  /// active user session at all, and the user needs to either sign in or
+  /// sign up.
   unauthenticated,
 
-  /// The user is authenticated (e.g., standard user).
+  /// The user is authenticated (e.g., standard user). This state indicates
+  /// a full, permanent user session is active.
   authenticated,
 
-  /// The user is anonymous (e.g., guest user).
+  /// The user is anonymous (e.g., guest user). This state indicates a temporary
+  /// user session is active, allowing limited functionality before a full
+  /// account is created or linked.
   anonymous,
 
   /// A critical error occurred during application startup,

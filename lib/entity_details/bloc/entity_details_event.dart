@@ -37,6 +37,14 @@ class EntityDetailsToggleFollowRequested extends EntityDetailsEvent {
   const EntityDetailsToggleFollowRequested();
 }
 
+/// Event to toggle the "follow" status of the currently loaded entity,
+/// including a limit check.
+final class EntityDetailsToggleFollowRequestedWithLimitCheck extends EntityDetailsEvent {
+  /// Creates a [EntityDetailsToggleFollowRequestedWithLimitCheck] event.
+  const EntityDetailsToggleFollowRequestedWithLimitCheck();
+}
+
+
 /// Event to load the next page of headlines for the current entity.
 class EntityDetailsLoadMoreHeadlinesRequested extends EntityDetailsEvent {
   const EntityDetailsLoadMoreHeadlinesRequested({required this.adThemeStyle});

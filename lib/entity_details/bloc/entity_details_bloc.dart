@@ -10,6 +10,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_ca
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_decorator_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/user_limit_service.dart'; // Import UserLimitService
+import 'package:flutter_news_app_mobile_client_full_source_code/status/bloc/user_limit/user_limit_bloc.dart'; // Import UserLimitBloc
 
 part 'entity_details_event.dart';
 part 'entity_details_state.dart';
@@ -21,6 +23,8 @@ part 'entity_details_state.dart';
 /// (Topic, Source, or Country) and its associated headlines. It also handles
 /// toggling the "follow" status of the entity by dispatching events to the
 /// [AppBloc], which is the single source of truth for user preferences.
+/// It now also integrates with [UserLimitService] to enforce user preference
+/// limits before allowing follow actions.
 /// {@endtemplate}
 class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
   /// {@macro entity_details_bloc}
@@ -32,6 +36,8 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     required AppBloc appBloc,
     required FeedDecoratorService feedDecoratorService,
     required InlineAdCacheService inlineAdCacheService,
+    required UserLimitService userLimitService, // New dependency
+    required UserLimitBloc userLimitBloc, // New dependency
   }) : _headlinesRepository = headlinesRepository,
        _topicRepository = topicRepository,
        _sourceRepository = sourceRepository,
@@ -39,6 +45,8 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
        _appBloc = appBloc,
        _feedDecoratorService = feedDecoratorService,
        _inlineAdCacheService = inlineAdCacheService,
+       _userLimitService = userLimitService, // Initialize new dependency
+       _userLimitBloc = userLimitBloc, // Initialize new dependency
        super(const EntityDetailsState()) {
     on<EntityDetailsLoadRequested>(_onEntityDetailsLoadRequested);
     on<EntityDetailsToggleFollowRequested>(
@@ -47,6 +55,35 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     on<EntityDetailsLoadMoreHeadlinesRequested>(
       _onEntityDetailsLoadMoreHeadlinesRequested,
     );
+
+    // Listen to AppBloc for changes in user content preferences
+    _appBlocSubscription = _appBloc.stream.listen((appState) {
+      if (state.status == EntityDetailsStatus.success && state.entity != null) {
+        final currentEntity = state.entity!;
+        var isCurrentlyFollowing = false;
+        final preferences = appState.userContentPreferences;
+
+        if (preferences != null) {
+          if (currentEntity is Topic) {
+            isCurrentlyFollowing = preferences.followedTopics.any(
+              (t) => t.id == currentEntity.id,
+            );
+          } else if (currentEntity is Source) {
+            isCurrentlyFollowing = preferences.followedSources.any(
+              (s) => s.id == currentEntity.id,
+            );
+          } else if (currentEntity is Country) {
+            isCurrentlyFollowing = preferences.followedCountries.any(
+              (c) => c.id == currentEntity.id,
+            );
+          }
+        }
+        // Only emit if the following status has actually changed
+        if (isCurrentlyFollowing != state.isFollowing) {
+          emit(state.copyWith(isFollowing: isCurrentlyFollowing));
+        }
+      }
+    });
   }
 
   final DataRepository<Headline> _headlinesRepository;
@@ -56,6 +93,10 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
   final AppBloc _appBloc;
   final FeedDecoratorService _feedDecoratorService;
   final InlineAdCacheService _inlineAdCacheService;
+  final UserLimitService _userLimitService; // New service instance
+  final UserLimitBloc _userLimitBloc; // New BLoC instance
+  late final StreamSubscription
+  _appBlocSubscription; // Subscription for AppBloc
 
   static const _headlinesLimit = 10;
 
@@ -183,6 +224,8 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
   ///
   /// Dispatches an [AppUserContentPreferencesChanged] event to the [AppBloc]
   /// to update the user's followed entities.
+  /// It now also performs a limit check using [UserLimitService] before
+  /// allowing a follow action.
   Future<void> _onEntityDetailsToggleFollowRequested(
     EntityDetailsToggleFollowRequested event,
     Emitter<EntityDetailsState> emit,
@@ -192,10 +235,112 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     final currentPreferences = _appBloc.state.userContentPreferences;
 
     if (entity == null || currentUser == null || currentPreferences == null) {
+      // This case should ideally not happen if the AppBloc is in a stable state.
+      // If it does, it means essential data is not loaded.
+      emit(
+        state.copyWith(
+          status: EntityDetailsStatus.partialFailure,
+          exception: const OperationFailedException(
+            'User, entity, or preferences not available.',
+          ),
+        ),
+      );
       return;
     }
 
-    // Create a mutable copy of the lists to modify
+    LimitType? limitType;
+    if (entity is Topic) {
+      limitType = LimitType.followedTopics;
+    } else if (entity is Source) {
+      limitType = LimitType.followedSources;
+    } else if (entity is Country) {
+      limitType = LimitType.followedCountries;
+    }
+
+    if (limitType == null) {
+      emit(
+        state.copyWith(
+          status: EntityDetailsStatus.partialFailure,
+          exception: const OperationFailedException(
+            'Unsupported entity type for follow limit check.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    var isCurrentlyFollowing = false;
+
+    // Check if the entity is currently followed.
+    if (entity is Topic) {
+      isCurrentlyFollowing = currentPreferences.followedTopics.any(
+        (t) => t.id == entity.id,
+      );
+    } else if (entity is Source) {
+      isCurrentlyFollowing = currentPreferences.followedSources.any(
+        (s) => s.id == entity.id,
+      );
+    } else if (entity is Country) {
+      isCurrentlyFollowing = currentPreferences.followedCountries.any(
+        (c) => c.id == entity.id,
+      );
+    }
+
+    // If currently following, this is an unfollow action, so no limit check is needed.
+    if (isCurrentlyFollowing) {
+      final updatedFollowedTopics = List<Topic>.from(
+        currentPreferences.followedTopics,
+      );
+      final updatedFollowedSources = List<Source>.from(
+        currentPreferences.followedSources,
+      );
+      final updatedFollowedCountries = List<Country>.from(
+        currentPreferences.followedCountries,
+      );
+
+      if (entity is Topic) {
+        updatedFollowedTopics.removeWhere((t) => t.id == entity.id);
+      } else if (entity is Source) {
+        updatedFollowedSources.removeWhere((s) => s.id == entity.id);
+      } else if (entity is Country) {
+        updatedFollowedCountries.removeWhere((c) => c.id == entity.id);
+      }
+
+      final newPreferences = currentPreferences.copyWith(
+        followedTopics: updatedFollowedTopics,
+        followedSources: updatedFollowedSources,
+        followedCountries: updatedFollowedCountries,
+      );
+
+      _appBloc.add(
+        AppUserContentPreferencesChanged(preferences: newPreferences),
+      );
+      emit(
+        state.copyWith(isFollowing: false),
+      ); // Optimistically update local state
+      return;
+    }
+
+    // If not currently following, perform a limit check before following.
+    final limitExceeded = _userLimitService.checkLimit(
+      limitType: limitType,
+      entityId: entity.id,
+    );
+
+    if (limitExceeded != null) {
+      // If limit exceeded, trigger the UserLimitBloc to show the prompt.
+      _userLimitBloc.add(
+        LimitExceededTriggered(
+          limitType: limitExceeded.limitType,
+          userRole: limitExceeded.userRole,
+          action: limitExceeded.action,
+        ),
+      );
+      // Do not proceed with follow action, and do not change isFollowing state.
+      return;
+    }
+
+    // If no limit exceeded, proceed with following.
     final updatedFollowedTopics = List<Topic>.from(
       currentPreferences.followedTopics,
     );
@@ -206,46 +351,24 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       currentPreferences.followedCountries,
     );
 
-    var isCurrentlyFollowing = false;
-
     if (entity is Topic) {
-      final topic = entity;
-      if (updatedFollowedTopics.any((t) => t.id == topic.id)) {
-        updatedFollowedTopics.removeWhere((t) => t.id == topic.id);
-      } else {
-        updatedFollowedTopics.add(topic);
-        isCurrentlyFollowing = true;
-      }
+      updatedFollowedTopics.add(entity);
     } else if (entity is Source) {
-      final source = entity;
-      if (updatedFollowedSources.any((s) => s.id == source.id)) {
-        updatedFollowedSources.removeWhere((s) => s.id == source.id);
-      } else {
-        updatedFollowedSources.add(source);
-        isCurrentlyFollowing = true;
-      }
+      updatedFollowedSources.add(entity);
     } else if (entity is Country) {
-      final country = entity;
-      if (updatedFollowedCountries.any((c) => c.id == country.id)) {
-        updatedFollowedCountries.removeWhere((c) => c.id == country.id);
-      } else {
-        updatedFollowedCountries.add(country);
-        isCurrentlyFollowing = true;
-      }
+      updatedFollowedCountries.add(entity);
     }
 
-    // Create a new UserContentPreferences object with the updated lists
     final newPreferences = currentPreferences.copyWith(
       followedTopics: updatedFollowedTopics,
       followedSources: updatedFollowedSources,
       followedCountries: updatedFollowedCountries,
     );
 
-    // Dispatch the event to AppBloc to update and persist preferences
     _appBloc.add(AppUserContentPreferencesChanged(preferences: newPreferences));
-
-    // Optimistically update local state
-    emit(state.copyWith(isFollowing: isCurrentlyFollowing));
+    emit(
+      state.copyWith(isFollowing: true),
+    ); // Optimistically update local state
   }
 
   /// Handles the [EntityDetailsLoadMoreHeadlinesRequested] event.
@@ -338,5 +461,11 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
         ),
       );
     }
+  }
+
+  @override
+  Future<void> close() {
+    _appBlocSubscription.cancel();
+    return super.close();
   }
 }

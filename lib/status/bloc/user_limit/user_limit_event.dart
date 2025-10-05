@@ -1,20 +1,5 @@
 part of 'user_limit_bloc.dart';
 
-/// Defines the types of user preferences that have limits.
-enum LimitType {
-  /// Represents the limit for followed topics.
-  followedTopics,
-
-  /// Represents the limit for followed sources.
-  followedSources,
-
-  /// Represents the limit for followed countries.
-  followedCountries,
-
-  /// Represents the limit for saved headlines.
-  savedHeadlines,
-}
-
 /// Base class for all events in the [UserLimitBloc].
 sealed class UserLimitEvent extends Equatable {
   const UserLimitEvent();
@@ -23,28 +8,36 @@ sealed class UserLimitEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-/// Event triggered to check if a user has exceeded a specific preference limit.
-final class CheckLimitRequested extends UserLimitEvent {
-  /// Creates a [CheckLimitRequested] event.
-  ///
-  /// [limitType] specifies which type of limit to check.
-  /// [entityId] is optional and can be used for specific item checks
-  /// (e.g., checking if a particular item can be followed/saved).
-  const CheckLimitRequested({required this.limitType, this.entityId});
-
-  /// The type of limit to check.
-  final LimitType limitType;
-
-  /// Optional ID of the entity being checked against the limit.
-  final String? entityId;
-
-  @override
-  List<Object?> get props => [limitType, entityId];
-}
-
 /// Event triggered when a user has taken an action in response to a limit
 /// prompt (e.g., dismissed the prompt, initiated account linking, or upgrade).
 final class LimitActionTaken extends UserLimitEvent {
   /// Creates a [LimitActionTaken] event.
   const LimitActionTaken();
+}
+
+/// Event triggered to signal that a user limit has been exceeded and
+/// the UI should react accordingly.
+final class LimitExceededTriggered extends UserLimitEvent {
+  /// Creates a [LimitExceededTriggered] event.
+  ///
+  /// [limitType] specifies which type of limit was exceeded.
+  /// [userRole] is the role of the user who exceeded the limit.
+  /// [action] is the recommended action for the user to take.
+  const LimitExceededTriggered({
+    required this.limitType,
+    required this.userRole,
+    required this.action,
+  });
+
+  /// The type of limit that was exceeded.
+  final LimitType limitType;
+
+  /// The role of the user who exceeded the limit.
+  final AppUserRole userRole;
+
+  /// The recommended action for the user to take.
+  final LimitAction action;
+
+  @override
+  List<Object?> get props => [limitType, userRole, action];
 }

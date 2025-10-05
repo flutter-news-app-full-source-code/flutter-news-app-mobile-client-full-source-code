@@ -105,3 +105,15 @@ class EntityDetailsState extends Equatable {
     exception,
   ];
 }
+
+/// State indicating that an entity follow limit has been exceeded.
+final class EntityDetailsLimitExceeded extends EntityDetailsState {
+  /// Creates an [EntityDetailsLimitExceeded] state.
+  const EntityDetailsLimitExceeded({required this.limitExceeded});
+
+  /// The [LimitExceeded] object containing details about the exceeded limit.
+  final LimitExceeded limitExceeded;
+
+  @override
+  List<Object> get props => [limitExceeded];
+}

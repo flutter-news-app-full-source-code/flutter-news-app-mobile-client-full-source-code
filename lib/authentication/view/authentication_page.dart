@@ -10,32 +10,13 @@ import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template authentication_page}
-/// Displays authentication options (Google, Email, Anonymous) based on context.
+/// Displays authentication options (Email, Anonymous) for new users.
 ///
-/// This page can be used for both initial sign-in and for connecting an
-/// existing anonymous account.
+/// This page is exclusively for initial sign-in/sign-up.
 /// {@endtemplate}
 class AuthenticationPage extends StatelessWidget {
   /// {@macro authentication_page}
-  const AuthenticationPage({
-    required this.headline,
-    required this.subHeadline,
-    required this.showAnonymousButton,
-    required this.isLinkingContext,
-    super.key,
-  });
-
-  /// The main title displayed on the page.
-  final String headline;
-
-  /// The descriptive text displayed below the headline.
-  final String subHeadline;
-
-  /// Whether to show the "Continue Anonymously" button.
-  final bool showAnonymousButton;
-
-  /// Whether this page is being shown in the account linking context.
-  final bool isLinkingContext;
+  const AuthenticationPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -43,22 +24,13 @@ class AuthenticationPage extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
+    // Static content for the main authentication page.
+    const String headline = 'Welcome to the News App';
+    const String subHeadline =
+        'Sign in or create an account to get personalized news.';
+
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        // Conditionally add the leading close button only in linking context
-        leading: isLinkingContext
-            ? IconButton(
-                icon: const Icon(Icons.close),
-                tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-                onPressed: () {
-                  // Navigate back to the account page when close is pressed
-                  context.goNamed(Routes.accountName);
-                },
-              )
-            : null,
-      ),
+      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
       body: SafeArea(
         child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
           listener: (context, state) {
@@ -88,7 +60,7 @@ class AuthenticationPage extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(bottom: AppSpacing.xl),
                         child: Icon(
-                          isLinkingContext ? Icons.sync : Icons.newspaper,
+                          Icons.newspaper,
                           size: AppSpacing.xxl * 2,
                           color: colorScheme.primary,
                         ),
@@ -118,11 +90,7 @@ class AuthenticationPage extends StatelessWidget {
                         onPressed: isLoading
                             ? null
                             : () {
-                                context.goNamed(
-                                  isLinkingContext
-                                      ? Routes.linkingRequestCodeName
-                                      : Routes.requestCodeName,
-                                );
+                                context.goNamed(Routes.requestCodeName);
                               },
                         label: Text(l10n.authenticationEmailSignInButton),
                         style: ElevatedButton.styleFrom(
@@ -134,24 +102,22 @@ class AuthenticationPage extends StatelessWidget {
                       ),
                       const SizedBox(height: AppSpacing.lg),
 
-                      // --- Anonymous Sign-In Button (Conditional) ---
-                      if (showAnonymousButton) ...[
-                        OutlinedButton.icon(
-                          icon: const Icon(Icons.person_outline),
-                          onPressed: isLoading
-                              ? null
-                              : () => context.read<AuthenticationBloc>().add(
-                                  const AuthenticationAnonymousSignInRequested(),
-                                ),
-                          label: Text(l10n.authenticationAnonymousSignInButton),
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: AppSpacing.md,
-                            ),
-                            textStyle: textTheme.labelLarge,
+                      // --- Anonymous Sign-In Button ---
+                      OutlinedButton.icon(
+                        icon: const Icon(Icons.person_outline),
+                        onPressed: isLoading
+                            ? null
+                            : () => context.read<AuthenticationBloc>().add(
+                                const AuthenticationAnonymousSignInRequested(),
+                              ),
+                        label: Text(l10n.authenticationAnonymousSignInButton),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: AppSpacing.md,
                           ),
+                          textStyle: textTheme.labelLarge,
                         ),
-                      ],
+                      ),
 
                       // --- Loading Indicator ---
                       if (isLoading) ...[

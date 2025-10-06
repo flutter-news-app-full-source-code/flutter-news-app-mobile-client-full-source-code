@@ -12,11 +12,11 @@
     "@accountLinkingEmailSentSuccess": {
         "description": "Success message shown after sending an email sign-in link"
     },
-    "accountLinkingHeadline": "أنشئ حسابًا أو اربطه لحفظ تقدمك",
+    "accountLinkingHeadline": "أحفظ تقدمك",
     "@accountLinkingHeadline": {
         "description": "Headline text on the account linking page"
     },
-    "accountLinkingBody": "يتيح لك التسجيل أو الربط الوصول إلى معلوماتك عبر أجهزة متعددة ويضمن عدم فقدان تقدمك.",
+    "accountLinkingBody": "يتيح لك التسجيل الوصول إلى معلوماتك عبر أجهزة متعددة ويضمن عدم فقدان تقدمك.",
     "@accountLinkingBody": {
         "description": "Body text explaining the benefits of linking an account"
     },

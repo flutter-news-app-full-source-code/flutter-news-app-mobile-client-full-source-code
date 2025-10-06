@@ -50,7 +50,9 @@ abstract final class Routes {
   static const resetPasswordName = 'resetPassword';
   static const confirmEmail = 'confirm-email';
   static const confirmEmailName = 'confirmEmail';
-  static const accountLinking = 'linking';
+
+  // Top-level account linking route
+  static const accountLinking = '/account-linking';
   static const accountLinkingName = 'accountLinking';
 
   // routes for email code verification flow
@@ -59,11 +61,9 @@ abstract final class Routes {
   static const verifyCode = 'verify-code';
   static const verifyCodeName = 'verifyCode';
 
-  // Linking-specific authentication routes
-  static const linkingRequestCode = 'linking/request-code';
-  static const linkingRequestCodeName = 'linkingRequestCode';
-  static const linkingVerifyCode = 'linking/verify-code';
-  static const linkingVerifyCodeName = 'linkingVerifyCode';
+  // Linking-specific authentication routes (now nested under accountLinking)
+  static const accountLinkingRequestCodeName = 'accountLinkingRequestCode';
+  static const accountLinkingVerifyCodeName = 'accountLinkingVerifyCode';
 
   // --- Settings Sub-Routes (relative to /account/settings) ---
   static const settingsAppearance = 'appearance';
@@ -85,10 +85,6 @@ abstract final class Routes {
   // --- Language Settings Sub-Route (relative to /account/settings) ---
   static const settingsLanguage = 'language';
   static const settingsLanguageName = 'settingsLanguage';
-
-  // Add names for notification sub-selection routes if needed later
-  // static const settingsNotificationCategories = 'categories';
-  // static const settingsNotificationCategoriesName = 'settingsNotificationCategories';
 
   // --- Account Sub-Routes (relative to /account) ---
   static const manageFollowedItems = 'manage-followed-items';

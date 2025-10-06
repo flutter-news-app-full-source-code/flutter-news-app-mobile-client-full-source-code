@@ -18,6 +18,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_th
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_shell.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/account_linking_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/authentication_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/email_code_verification_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/request_code_page.dart';
@@ -52,6 +53,14 @@ import 'package:go_router/go_router.dart';
 ///
 /// Requires an [authStatusNotifier] to trigger route re-evaluation when
 /// authentication state changes.
+///
+///
+/// With the current App startup architecture, the router is only active
+/// when the app is in a stable, running state. The `redirect` function's
+/// only responsibility is to handle auth-based route protection.
+/// States like `configFetching`, `underMaintenance`, etc., are handled
+/// by the root App widget *before* this router is ever built.
+
 GoRouter createRouter({
   required ValueNotifier<AppLifeCycleStatus> authStatusNotifier,
   required AuthRepository authenticationRepository,
@@ -86,6 +95,8 @@ GoRouter createRouter({
       // Add any other necessary observers here. If none, this can be an empty list.
     ],
     // --- Redirect Logic ---
+    // This function is the single source of truth for route protection.
+    // It's driven by the AppBloc's AppLifeCycleStatus.
     redirect: (BuildContext context, GoRouterState state) {
       final appStatus = context.read<AppBloc>().state.status;
       final currentLocation = state.matchedLocation;
@@ -98,59 +109,50 @@ GoRouter createRouter({
 
       const rootPath = '/';
       const authenticationPath = Routes.authentication;
+      const accountLinkingPath = Routes.accountLinking;
       const feedPath = Routes.feed;
       final isGoingToAuth = currentLocation.startsWith(authenticationPath);
-
-      // With the current App startup architecture, the router is only active when
-      // the app is in a stable, running state. The `redirect` function's
-      // only responsibility is to handle auth-based route protection.
-      // States like `configFetching`, `underMaintenance`, etc., are now
-      // handled by the root App widget *before* this router is ever built.
+      final isGoingToLinking = currentLocation.startsWith(accountLinkingPath);
 
       // --- Case 1: Unauthenticated User ---
-      // If the user is unauthenticated, they should be on an auth path.
-      // If they are trying to access any other part of the app, redirect them.
+      // If the user is unauthenticated, they must be on an auth path.
+      // If they try to go anywhere else, they are redirected to the sign-in page.
       if (appStatus == AppLifeCycleStatus.unauthenticated) {
         print('  Redirect: User is unauthenticated.');
-        // If they are already on an auth path, allow it. Otherwise, redirect.
         return isGoingToAuth ? null : authenticationPath;
       }
 
-      // --- Case 2: Anonymous or Authenticated User ---
-      // If a user is anonymous or authenticated, they should not be able to
-      // access the main authentication flows, with an exception for account
-      // linking for anonymous users.
-      if (appStatus == AppLifeCycleStatus.anonymous ||
-          appStatus == AppLifeCycleStatus.authenticated) {
-        print('  Redirect: User is $appStatus.');
-
-        // If the user is trying to access an authentication path:
+      // --- Case 2: Anonymous User ---
+      // An anonymous user is partially authenticated. They can browse the app.
+      if (appStatus == AppLifeCycleStatus.anonymous) {
+        print('  Redirect: User is anonymous.');
+        // Block anonymous users from the main sign-in page.
         if (isGoingToAuth) {
-          // A fully authenticated user should never see auth pages.
-          if (appStatus == AppLifeCycleStatus.authenticated) {
-            print(
-              '    Action: Authenticated user on auth path. Redirecting to feed.',
-            );
-            return feedPath;
-          }
-
-          // An anonymous user is only allowed on auth paths for account linking.
-          final isLinking =
-              state.uri.queryParameters['context'] == 'linking' ||
-              currentLocation.contains('/linking/');
-
-          if (isLinking) {
-            print('    Action: Anonymous user on linking path. Allowing.');
-            return null;
-          } else {
-            print(
-              '    Action: Anonymous user on non-linking auth path. Redirecting to feed.',
-            );
-            return feedPath;
-          }
+          print(
+            '    Action: Anonymous user on auth path. Redirecting to feed.',
+          );
+          return feedPath;
         }
+        // If at the root, send them to the feed.
+        if (currentLocation == rootPath) {
+          print('    Action: User at root. Redirecting to feed.');
+          return feedPath;
+        }
+        // Allow navigation to other pages, including the new linking page.
+        return null;
+      }
 
-        // If the user is at the root path, they should be sent to the feed.
+      // --- Case 3: Authenticated User ---
+      // A fully authenticated user should be blocked from all auth/linking pages.
+      if (appStatus == AppLifeCycleStatus.authenticated) {
+        print('  Redirect: User is authenticated.');
+        if (isGoingToAuth || isGoingToLinking) {
+          print(
+            '    Action: Authenticated user on auth/linking path. Redirecting to feed.',
+          );
+          return feedPath;
+        }
+        // If at the root, send them to the feed.
         if (currentLocation == rootPath) {
           print('    Action: User at root. Redirecting to feed.');
           return feedPath;
@@ -158,81 +160,32 @@ GoRouter createRouter({
       }
 
       // --- Fallback ---
-      // For any other case, allow navigation.
+      // For any other case (or if no conditions are met), allow navigation.
       print('  Redirect: No condition met. Allowing navigation.');
       return null;
     },
     // --- Authentication Routes ---
     routes: [
       // A neutral root route that the app starts on. The redirect logic will
-      // immediately move the user to the correct location. This route's
-      // builder will never be called in practice.
+      // immediately move the user to the correct location.
       GoRoute(path: '/', builder: (context, state) => const SizedBox.shrink()),
       GoRoute(
         path: Routes.authentication,
         name: Routes.authenticationName,
         builder: (BuildContext context, GoRouterState state) {
-          final l10n = context.l10n;
-          // Determine context from query parameter
-          final isLinkingContext =
-              state.uri.queryParameters['context'] == 'linking';
-
-          // Define content based on context
-          final String headline;
-          final String subHeadline;
-          final bool showAnonymousButton;
-
-          if (isLinkingContext) {
-            headline = l10n.authenticationLinkingHeadline;
-            subHeadline = l10n.authenticationLinkingSubheadline;
-            showAnonymousButton = false;
-          } else {
-            headline = l10n.authenticationSignInHeadline;
-            subHeadline = l10n.authenticationSignInSubheadline;
-            showAnonymousButton = true;
-          }
-
           return BlocProvider(
             create: (context) => AuthenticationBloc(
               authenticationRepository: context.read<AuthRepository>(),
             ),
-            child: AuthenticationPage(
-              headline: headline,
-              subHeadline: subHeadline,
-              showAnonymousButton: showAnonymousButton,
-              isLinkingContext: isLinkingContext,
-            ),
+            child: const AuthenticationPage(),
           );
         },
         routes: [
-          // Nested route for account linking flow (defined first for priority)
-          GoRoute(
-            path: Routes.accountLinking,
-            name: Routes.accountLinkingName,
-            builder: (context, state) => const SizedBox.shrink(),
-            routes: [
-              GoRoute(
-                path: Routes.requestCode,
-                name: Routes.linkingRequestCodeName,
-                builder: (context, state) =>
-                    const RequestCodePage(isLinkingContext: true),
-              ),
-              GoRoute(
-                path: '${Routes.verifyCode}/:email',
-                name: Routes.linkingVerifyCodeName,
-                builder: (context, state) {
-                  final email = state.pathParameters['email']!;
-                  return EmailCodeVerificationPage(email: email);
-                },
-              ),
-            ],
-          ),
-          // Non-linking authentication routes (defined after linking routes)
+          // Sub-routes for the standard sign-in flow.
           GoRoute(
             path: Routes.requestCode,
             name: Routes.requestCodeName,
-            builder: (context, state) =>
-                const RequestCodePage(isLinkingContext: false),
+            builder: (context, state) => const RequestCodePage(),
           ),
           GoRoute(
             path: '${Routes.verifyCode}/:email',
@@ -244,7 +197,38 @@ GoRouter createRouter({
           ),
         ],
       ),
+      // --- New Top-Level Modal Route for Account Linking ---
+      GoRoute(
+        path: Routes.accountLinking,
+        name: Routes.accountLinkingName,
+        builder: (context, state) {
+          return BlocProvider(
+            create: (context) => AuthenticationBloc(
+              authenticationRepository: context.read<AuthRepository>(),
+            ),
+            child: const AccountLinkingPage(),
+          );
+        },
+        routes: [
+          // Nested routes for the account linking email/code flow.
+          GoRoute(
+            path: Routes.requestCode,
+            name: Routes.accountLinkingRequestCodeName,
+            builder: (context, state) => const RequestCodePage(),
+          ),
+          GoRoute(
+            path: '${Routes.verifyCode}/:email',
+            name: Routes.accountLinkingVerifyCodeName,
+            builder: (context, state) {
+              final email = state.pathParameters['email']!;
+              return EmailCodeVerificationPage(email: email);
+            },
+          ),
+        ],
+      ),
+
       // --- Entity Details Route (Top Level) ---
+      //
       // This route handles displaying details for various content entities
       // (Topic, Source, Country) based on path parameters.
       GoRoute(
@@ -299,7 +283,9 @@ GoRouter createRouter({
           );
         },
       ),
+
       // --- Global Article Details Route (Top Level) ---
+      //
       // This GoRoute provides a top-level, globally accessible way to view the
       // HeadlineDetailsPage.
       //

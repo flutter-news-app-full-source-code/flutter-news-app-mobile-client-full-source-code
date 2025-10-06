@@ -18,24 +18,17 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class RequestCodePage extends StatelessWidget {
   /// {@macro request_code_page}
-  const RequestCodePage({required this.isLinkingContext, super.key});
-
-  /// Whether this page is being shown in the account linking context.
-  final bool isLinkingContext;
+  const RequestCodePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     // AuthenticationBloc is assumed to be provided by a parent route.
-    // Pass the linking context flag down to the view.
-    return _RequestCodeView(isLinkingContext: isLinkingContext);
+    return const _RequestCodeView();
   }
 }
 
 class _RequestCodeView extends StatelessWidget {
-  // Accept the flag from the parent page.
-  const _RequestCodeView({required this.isLinkingContext});
-
-  final bool isLinkingContext;
+  const _RequestCodeView();
 
   @override
   Widget build(BuildContext context) {
@@ -51,19 +44,10 @@ class _RequestCodeView extends StatelessWidget {
           icon: const Icon(Icons.arrow_back),
           tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () {
-            // Navigate back differently based on the context.
-            if (isLinkingContext) {
-              // If linking, go back to Auth page preserving the linking query param.
-              context.goNamed(
-                Routes.authenticationName,
-                queryParameters: isLinkingContext
-                    ? {'context': 'linking'}
-                    : const {},
-              );
-            } else {
-              // If normal sign-in, just go back to the Auth page.
-              context.goNamed(Routes.authenticationName);
-            }
+            // Navigate back to the previous page in the stack.
+            // GoRouter will handle the correct navigation based on the current
+            // route's parent.
+            context.pop();
           },
         ),
       ),
@@ -81,13 +65,23 @@ class _RequestCodeView extends StatelessWidget {
                 );
             } else if (state.status ==
                 AuthenticationStatus.requestCodeSuccess) {
-              // Navigate to the code verification page on success, passing the email
-              context.pushNamed(
-                isLinkingContext
-                    ? Routes.linkingVerifyCodeName
-                    : Routes.verifyCodeName,
-                pathParameters: {'email': state.email!},
-              );
+              // Navigate to the code verification page on success, passing the email.
+              // The current route's parent will determine if this is for linking
+              // or standard authentication.
+              final currentRouteName = GoRouter.of(
+                context,
+              ).routerDelegate.currentConfiguration.last.route.name;
+              if (currentRouteName == Routes.accountLinkingRequestCodeName) {
+                context.goNamed(
+                  Routes.accountLinkingVerifyCodeName,
+                  pathParameters: {'email': state.email!},
+                );
+              } else {
+                context.goNamed(
+                  Routes.verifyCodeName,
+                  pathParameters: {'email': state.email!},
+                );
+              }
             }
           },
           // BuildWhen prevents unnecessary rebuilds if only listening
@@ -130,33 +124,6 @@ class _RequestCodeView extends StatelessWidget {
                         ),
                         textAlign: TextAlign.center,
                       ),
-
-                      // NOT NEEDED; any email is accepted in demo mode
-                      //
-                      //Display demo email suggestion if in demo environment
-                      // BlocSelector<AppBloc, AppState, AppEnvironment?>(
-                      //   selector: (state) => state.environment,
-                      //   builder: (context, environment) {
-                      //     if (environment == AppEnvironment.demo) {
-                      //       return Column(
-                      //         children: [
-                      //           const SizedBox(height: AppSpacing.md),
-                      //           Text(
-                      //             l10n.demoEmailSuggestionMessage(
-                      //               'admin@mail.com',
-                      //             ),
-                      //             style: textTheme.bodyMedium?.copyWith(
-                      //               color: colorScheme.secondary,
-                      //               fontWeight: FontWeight.bold,
-                      //             ),
-                      //             textAlign: TextAlign.center,
-                      //           ),
-                      //         ],
-                      //       );
-                      //     }
-                      //     return const SizedBox.shrink();
-                      //   },
-                      // ),
                       const SizedBox(height: AppSpacing.xxl),
                       _EmailLinkForm(isLoading: isLoading),
                     ],

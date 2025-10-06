@@ -119,13 +119,13 @@ abstract class AppLocalizations {
   /// Headline text on the account linking page
   ///
   /// In en, this message translates to:
-  /// **'Create or Link Account to Save Progress'**
+  /// **'Save your progress'**
   String get accountLinkingHeadline;
 
   /// Body text explaining the benefits of linking an account
   ///
   /// In en, this message translates to:
-  /// **'Signing up or linking allows you to access your information across multiple devices and ensures your progress isn\'t lost.'**
+  /// **'Signing up allows you to access your information across multiple devices and ensures your progress isn\'t lost.'**
   String get accountLinkingBody;
 
   /// Text for the Google sign-in button

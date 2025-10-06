@@ -62,7 +62,8 @@ class UpdateRequiredPage extends StatelessWidget {
                 style: theme.textTheme.bodyLarge,
                 textAlign: TextAlign.center,
               ),
-              if (currentAppVersion != null && latestRequiredVersion != null) ...[
+              if (currentAppVersion != null &&
+                  latestRequiredVersion != null) ...[
                 const SizedBox(height: AppSpacing.md),
                 Text(
                   l10n.currentAppVersionLabel(currentAppVersion!),

@@ -12,7 +12,7 @@
     "@accountLinkingEmailSentSuccess": {
         "description": "Success message shown after sending an email sign-in link"
     },
-    "accountLinkingHeadline": "أنشئ حسابًا أو اربطه لحفظ تقدمك",
+    "accountLinkingHeadline": "أحفظ تقدمك",
     "@accountLinkingHeadline": {
         "description": "Headline text on the account linking page"
     },

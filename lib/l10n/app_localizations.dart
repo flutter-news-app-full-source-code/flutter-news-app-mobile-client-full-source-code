@@ -119,7 +119,7 @@ abstract class AppLocalizations {
   /// Headline text on the account linking page
   ///
   /// In en, this message translates to:
-  /// **'Create or Link Account to Save Progress'**
+  /// **'Link Account'**
   String get accountLinkingHeadline;
 
   /// Body text explaining the benefits of linking an account

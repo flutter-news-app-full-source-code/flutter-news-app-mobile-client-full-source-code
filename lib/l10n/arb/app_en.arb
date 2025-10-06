@@ -12,7 +12,7 @@
     "@accountLinkingEmailSentSuccess": {
         "description": "Success message shown after sending an email sign-in link"
     },
-    "accountLinkingHeadline": "Create or Link Account to Save Progress",
+    "accountLinkingHeadline": "Link Account",
     "@accountLinkingHeadline": {
         "description": "Headline text on the account linking page"
     },

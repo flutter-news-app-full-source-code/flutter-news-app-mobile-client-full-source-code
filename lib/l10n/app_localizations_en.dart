@@ -19,8 +19,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Check your email for the sign-in link!';
 
   @override
-  String get accountLinkingHeadline =>
-      'Create or Link Account to Save Progress';
+  String get accountLinkingHeadline => 'Link Account';
 
   @override
   String get accountLinkingBody =>

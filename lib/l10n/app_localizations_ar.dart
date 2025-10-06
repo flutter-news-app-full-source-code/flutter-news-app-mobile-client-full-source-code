@@ -19,7 +19,7 @@ class AppLocalizationsAr extends AppLocalizations {
       'تحقق من بريدك الإلكتروني للحصول على رابط تسجيل الدخول!';
 
   @override
-  String get accountLinkingHeadline => 'أنشئ حسابًا أو اربطه لحفظ تقدمك';
+  String get accountLinkingHeadline => 'أحفظ تقدمك';
 
   @override
   String get accountLinkingBody =>

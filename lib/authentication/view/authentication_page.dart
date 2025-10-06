@@ -24,11 +24,6 @@ class AuthenticationPage extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
-    // Static content for the main authentication page.
-    const String headline = 'Welcome to the News App';
-    const String subHeadline =
-        'Sign in or create an account to get personalized news.';
-
     return Scaffold(
       appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
       body: SafeArea(
@@ -68,7 +63,7 @@ class AuthenticationPage extends StatelessWidget {
                       // const SizedBox(height: AppSpacing.lg),
                       // --- Headline and Subheadline ---
                       Text(
-                        headline,
+                        l10n.authenticationSignInHeadline,
                         style: textTheme.headlineMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -76,7 +71,7 @@ class AuthenticationPage extends StatelessWidget {
                       ),
                       const SizedBox(height: AppSpacing.md),
                       Text(
-                        subHeadline,
+                        l10n.authenticationSignInSubheadline,
                         style: textTheme.bodyLarge?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),

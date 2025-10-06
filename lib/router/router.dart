@@ -55,10 +55,10 @@ import 'package:go_router/go_router.dart';
 /// authentication state changes.
 ///
 ///
-/// With the current App startup architecture, the router is only active 
+/// With the current App startup architecture, the router is only active
 /// when the app is in a stable, running state. The `redirect` function's
 /// only responsibility is to handle auth-based route protection.
-/// States like `configFetching`, `underMaintenance`, etc., are handled 
+/// States like `configFetching`, `underMaintenance`, etc., are handled
 /// by the root App widget *before* this router is ever built.
 
 GoRouter createRouter({

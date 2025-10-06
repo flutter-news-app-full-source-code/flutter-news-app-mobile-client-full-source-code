@@ -12,11 +12,11 @@
     "@accountLinkingEmailSentSuccess": {
         "description": "Success message shown after sending an email sign-in link"
     },
-    "accountLinkingHeadline": "Link Account",
+    "accountLinkingHeadline": "Save your progress",
     "@accountLinkingHeadline": {
         "description": "Headline text on the account linking page"
     },
-    "accountLinkingBody": "Signing up or linking allows you to access your information across multiple devices and ensures your progress isn't lost.",
+    "accountLinkingBody": "Signing up allows you to access your information across multiple devices and ensures your progress isn't lost.",
     "@accountLinkingBody": {
         "description": "Body text explaining the benefits of linking an account"
     },

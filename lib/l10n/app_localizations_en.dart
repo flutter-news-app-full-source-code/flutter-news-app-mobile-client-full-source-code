@@ -19,11 +19,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Check your email for the sign-in link!';
 
   @override
-  String get accountLinkingHeadline => 'Link Account';
+  String get accountLinkingHeadline => 'Save your progress';
 
   @override
   String get accountLinkingBody =>
-      'Signing up or linking allows you to access your information across multiple devices and ensures your progress isn\'t lost.';
+      'Signing up allows you to access your information across multiple devices and ensures your progress isn\'t lost.';
 
   @override
   String get accountLinkingContinueWithGoogleButton => 'Continue with Google';

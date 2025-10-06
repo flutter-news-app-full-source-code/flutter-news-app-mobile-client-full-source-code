@@ -23,7 +23,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get accountLinkingBody =>
-      'يتيح لك التسجيل أو الربط الوصول إلى معلوماتك عبر أجهزة متعددة ويضمن عدم فقدان تقدمك.';
+      'يتيح لك التسجيل الوصول إلى معلوماتك عبر أجهزة متعددة ويضمن عدم فقدان تقدمك.';
 
   @override
   String get accountLinkingContinueWithGoogleButton => 'المتابعة باستخدام جوجل';

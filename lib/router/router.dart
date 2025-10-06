@@ -53,6 +53,14 @@ import 'package:go_router/go_router.dart';
 ///
 /// Requires an [authStatusNotifier] to trigger route re-evaluation when
 /// authentication state changes.
+///
+///
+/// With the current App startup architecture, the router is only active 
+/// when the app is in a stable, running state. The `redirect` function's
+/// only responsibility is to handle auth-based route protection.
+/// States like `configFetching`, `underMaintenance`, etc., are handled 
+/// by the root App widget *before* this router is ever built.
+
 GoRouter createRouter({
   required ValueNotifier<AppLifeCycleStatus> authStatusNotifier,
   required AuthRepository authenticationRepository,
@@ -161,13 +169,10 @@ GoRouter createRouter({
       // A neutral root route that the app starts on. The redirect logic will
       // immediately move the user to the correct location.
       GoRoute(path: '/', builder: (context, state) => const SizedBox.shrink()),
-      // --- Simplified Authentication Route for New Users ---
       GoRoute(
         path: Routes.authentication,
         name: Routes.authenticationName,
         builder: (BuildContext context, GoRouterState state) {
-          // This page is now self-contained and doesn't need parameters.
-          // It's only for truly unauthenticated users.
           return BlocProvider(
             create: (context) => AuthenticationBloc(
               authenticationRepository: context.read<AuthRepository>(),
@@ -225,7 +230,11 @@ GoRouter createRouter({
           ),
         ],
       ),
+
       // --- Entity Details Route (Top Level) ---
+      //
+      // This route handles displaying details for various content entities
+      // (Topic, Source, Country) based on path parameters.
       GoRoute(
         path: Routes.entityDetails,
         name: Routes.entityDetailsName,
@@ -278,7 +287,32 @@ GoRouter createRouter({
           );
         },
       ),
+
       // --- Global Article Details Route (Top Level) ---
+      //
+      // This GoRoute provides a top-level, globally accessible way to view the
+      // HeadlineDetailsPage.
+      //
+      // Purpose:
+      // It is specifically designed for navigating to article details from contexts
+      // that are *outside* the main StatefulShellRoute's branches (e.g., from
+      // EntityDetailsPage, which is itself a top-level route, or potentially
+      // from other future top-level pages or deep links).
+      //
+      // Why it's necessary:
+      // Attempting to push a route that is deeply nested within a specific shell
+      // branch (like '/feed/article/:id') from a BuildContext outside of that
+      // shell can lead to navigator context issues and assertion failures.
+      // This global route avoids such problems by providing a clean, direct path
+      // to the HeadlineDetailsPage.
+      //
+      // How it differs:
+      // This route is distinct from the article detail routes nested within the
+      // StatefulShellRoute branches (e.g., Routes.articleDetailsName under /feed,
+      // Routes.searchArticleDetailsName under /search). Those nested routes are
+      // intended for navigation *within* their respective shell branches,
+      // preserving the shell's UI (like the bottom navigation bar).
+      // This global route, being top-level, will typically cover the entire screen.
       GoRoute(
         path: Routes.globalArticleDetails,
         name: Routes.globalArticleDetailsName,

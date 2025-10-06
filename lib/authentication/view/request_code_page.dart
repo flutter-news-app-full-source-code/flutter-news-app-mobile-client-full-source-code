@@ -68,9 +68,12 @@ class _RequestCodeView extends StatelessWidget {
               // Navigate to the code verification page on success, passing the email.
               // The current route's parent will determine if this is for linking
               // or standard authentication.
-              context.go(
-                '${GoRouter.of(context).routerDelegate.currentConfiguration.last.matchedLocation}/${Routes.verifyCode}/${state.email!}',
-              );
+              final currentRouteName = GoRouter.of(context).routerDelegate.currentConfiguration.last.route.name;
+              if (currentRouteName == Routes.accountLinkingRequestCodeName) {
+                context.goNamed(Routes.accountLinkingVerifyCodeName, pathParameters: {'email': state.email!});
+              } else {
+                context.goNamed(Routes.verifyCodeName, pathParameters: {'email': state.email!});
+              }
             }
           },
           // BuildWhen prevents unnecessary rebuilds if only listening

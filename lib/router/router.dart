@@ -201,10 +201,23 @@ GoRouter createRouter({
       GoRoute(
         path: Routes.accountLinking,
         name: Routes.accountLinkingName,
-        // Use pageBuilder to create a modal (fullscreen dialog) presentation.
+        // Use CustomTransitionPage to create a modal bottom sheet presentation.
         pageBuilder: (context, state) {
-          return MaterialPage(
-            fullscreenDialog: true,
+          return CustomTransitionPage<void>(
+            // Set opaque to false to allow the underlying page to be visible.
+            opaque: false,
+            // Allow dismissing the modal by tapping outside the sheet.
+            barrierDismissible: true,
+            // Define the slide-up transition for the modal bottom sheet.
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, 1), // Start from bottom
+                  end: Offset.zero, // Slide to its final position
+                ).animate(animation),
+                child: child,
+              );
+            },
             child: BlocProvider(
               create: (context) => AuthenticationBloc(
                 authenticationRepository: context.read<AuthRepository>(),

@@ -40,9 +40,11 @@ Future<Widget> bootstrap(
   app_config.AppEnvironment environment,
 ) async {
   Logger.root.level = Level.ALL;
-  Logger.root.onRecord.listen((record) {
-    print(''''${record.level.name}: ${record.time}: ${record.loggerName}: ${record.message}'''');
-  });
+  Logger.root.onRecord.listen(
+    (record) => print(
+      '${record.level.name}: ${record.time}: ${record.loggerName}: ${record.message}',
+    ),
+  );
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = const AppBlocObserver();
   final logger = Logger('bootstrap');

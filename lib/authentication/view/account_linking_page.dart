@@ -21,7 +21,19 @@ class AccountLinkingPage extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.accountLinkingHeadline)),
+      appBar: AppBar(
+        title: Text(l10n.accountLinkingHeadline),
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+
+          // onPressed context.goNamed() produce the following exception
+          // "unknown route name: /feed"
+          onPressed: () => context.go(Routes.feed),
+
+          color: colorScheme.onSurface,
+        ),
+      ),
       body: BlocConsumer<AuthenticationBloc, AuthenticationState>(
         listener: (context, state) {
           if (state.status == AuthenticationStatus.failure) {
@@ -75,7 +87,7 @@ class AccountLinkingPage extends StatelessWidget {
                       onPressed: isLoading
                           ? null
                           : () {
-                              context.pushNamed(
+                              context.goNamed(
                                 Routes.accountLinkingRequestCodeName,
                               );
                             },

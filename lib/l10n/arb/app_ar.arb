@@ -1190,15 +1190,15 @@
             }
         }
     },
-    "anonymousLimitTitle": "سجّل الدخول لحفظ المزيد",
+    "anonymousLimitTitle": "تسجيل الدخول للقيام بالمزيد",
     "@anonymousLimitTitle": {
         "description": "Title for the bottom sheet when an anonymous user hits a content limit."
     },
-    "anonymousLimitBody": "أنشئ حسابًا مجانيًا لحفظ ومتابعة عدد غير محدود من المواضيع والمصادر والدول.",
+    "anonymousLimitBody": "قم بإنشاء حساب مجاني لإضافة المزيد ومتابعة المزيد.",
     "@anonymousLimitBody": {
         "description": "Body text for the bottom sheet when an anonymous user hits a content limit."
     },
-    "anonymousLimitButton": "تسجيل الدخول وربط الحساب",
+    "anonymousLimitButton": "تسجيل الدخول",
     "@anonymousLimitButton": {
         "description": "Button text for the bottom sheet when an anonymous user hits a content limit."
     },

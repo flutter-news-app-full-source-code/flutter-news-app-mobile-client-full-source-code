@@ -1190,19 +1190,19 @@
             }
         }
     },
-    "anonymousLimitTitle": "Sign in to Save More",
+    "anonymousLimitTitle": "Sign in to Do More",
     "@anonymousLimitTitle": {
         "description": "Title for the bottom sheet when an anonymous user hits a content limit."
     },
-    "anonymousLimitBody": "Create a free account to save and follow unlimited topics, sources, and countries.",
+    "anonymousLimitBody": "Create a free account to bookmark more and follow more.",
     "@anonymousLimitBody": {
         "description": "Body text for the bottom sheet when an anonymous user hits a content limit."
     },
-    "anonymousLimitButton": "Sign In & Link Account",
+    "anonymousLimitButton": "Sign In",
     "@anonymousLimitButton": {
         "description": "Button text for the bottom sheet when an anonymous user hits a content limit."
     },
-    "standardLimitTitle": "Unlock Unlimited Access",
+    "standardLimitTitle": "Unlock More Access",
     "@standardLimitTitle": {
         "description": "Title for the bottom sheet when a standard user hits a content limit."
     },

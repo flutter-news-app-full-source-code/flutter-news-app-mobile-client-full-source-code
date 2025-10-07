@@ -1727,25 +1727,25 @@ abstract class AppLocalizations {
   /// Title for the bottom sheet when an anonymous user hits a content limit.
   ///
   /// In en, this message translates to:
-  /// **'Sign in to Save More'**
+  /// **'Sign in to Do More'**
   String get anonymousLimitTitle;
 
   /// Body text for the bottom sheet when an anonymous user hits a content limit.
   ///
   /// In en, this message translates to:
-  /// **'Create a free account to save and follow unlimited topics, sources, and countries.'**
+  /// **'Create a free account to bookmark more and follow more.'**
   String get anonymousLimitBody;
 
   /// Button text for the bottom sheet when an anonymous user hits a content limit.
   ///
   /// In en, this message translates to:
-  /// **'Sign In & Link Account'**
+  /// **'Sign In'**
   String get anonymousLimitButton;
 
   /// Title for the bottom sheet when a standard user hits a content limit.
   ///
   /// In en, this message translates to:
-  /// **'Unlock Unlimited Access'**
+  /// **'Unlock More Access'**
   String get standardLimitTitle;
 
   /// Body text for the bottom sheet when a standard user hits a content limit.

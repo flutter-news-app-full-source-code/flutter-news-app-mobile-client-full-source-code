@@ -906,14 +906,14 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get anonymousLimitTitle => 'سجّل الدخول لحفظ المزيد';
+  String get anonymousLimitTitle => 'تسجيل الدخول للقيام بالمزيد';
 
   @override
   String get anonymousLimitBody =>
-      'أنشئ حسابًا مجانيًا لحفظ ومتابعة عدد غير محدود من المواضيع والمصادر والدول.';
+      'قم بإنشاء حساب مجاني لإضافة المزيد ومتابعة المزيد.';
 
   @override
-  String get anonymousLimitButton => 'تسجيل الدخول وربط الحساب';
+  String get anonymousLimitButton => 'تسجيل الدخول';
 
   @override
   String get standardLimitTitle => 'افتح الوصول غير المحدود';

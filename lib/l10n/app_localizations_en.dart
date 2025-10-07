@@ -907,17 +907,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get anonymousLimitTitle => 'Sign in to Save More';
+  String get anonymousLimitTitle => 'Sign in to Do More';
 
   @override
   String get anonymousLimitBody =>
-      'Create a free account to save and follow unlimited topics, sources, and countries.';
+      'Create a free account to bookmark more and follow more.';
 
   @override
-  String get anonymousLimitButton => 'Sign In & Link Account';
+  String get anonymousLimitButton => 'Sign In';
 
   @override
-  String get standardLimitTitle => 'Unlock Unlimited Access';
+  String get standardLimitTitle => 'Unlock More Access';
 
   @override
   String get standardLimitBody =>

@@ -137,21 +137,23 @@ class _BaseLimitView extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.paddingLarge),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: AppSpacing.xxl * 1.5, color: colorScheme.primary),
-          const SizedBox(height: AppSpacing.lg),
-          Text(
-            title,
-            style: textTheme.headlineSmall,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Text(body, style: textTheme.bodyLarge, textAlign: TextAlign.center),
-          const SizedBox(height: AppSpacing.lg),
-          child,
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: AppSpacing.xxl * 1.5, color: colorScheme.primary),
+            const SizedBox(height: AppSpacing.lg),
+            Text(
+              title,
+              style: textTheme.headlineSmall,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Text(body, style: textTheme.bodyLarge, textAlign: TextAlign.center),
+            const SizedBox(height: AppSpacing.lg),
+            child,
+          ],
+        ),
       ),
     );
   }

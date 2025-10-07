@@ -16,6 +16,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/authentication/b
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/router.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kv_storage_service/kv_storage_service.dart';
 import 'package:logging/logging.dart';
@@ -157,6 +158,12 @@ class App extends StatelessWidget {
             ),
             // Ensure it's created immediately
             lazy: false,
+          ),
+          // Provide the ContentLimitationService.
+          // It depends on AppBloc, so it is created here.
+          RepositoryProvider(
+            create: (context) =>
+                ContentLimitationService(appBloc: context.read<AppBloc>()),
           ),
         ],
         child: _AppView(

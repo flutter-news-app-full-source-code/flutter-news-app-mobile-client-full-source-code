@@ -180,16 +180,15 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
 
                 if (contentType == null) return;
 
-                final ContentAction action;
-                switch (contentType) {
-                  case ContentType.topic:
-                    action = ContentAction.followTopic;
-                  case ContentType.source:
-                    action = ContentAction.followSource;
-                  case ContentType.country:
-                    action = ContentAction.followCountry;
-                  case ContentType.headline:
-                    return;
+                final action = switch (contentType) {
+                  ContentType.topic => ContentAction.followTopic,
+                  ContentType.source => ContentAction.followSource,
+                  ContentType.country => ContentAction.followCountry,
+                  _ => null,
+                };
+
+                if (action == null) {
+                  return;
                 }
 
                 final status = limitationService.checkAction(action);

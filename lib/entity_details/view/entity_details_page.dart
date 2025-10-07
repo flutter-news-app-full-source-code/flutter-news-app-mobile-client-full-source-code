@@ -12,6 +12,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/b
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/feed_core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -165,9 +167,45 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                 ? l10n.unfollowButtonLabel
                 : l10n.followButtonLabel,
             onPressed: () {
-              context.read<EntityDetailsBloc>().add(
-                const EntityDetailsToggleFollowRequested(),
-              );
+              // If the user is unfollowing, always allow it.
+              if (state.isFollowing) {
+                context.read<EntityDetailsBloc>().add(
+                  const EntityDetailsToggleFollowRequested(),
+                );
+              } else {
+                // If the user is following, check the limit first.
+                final limitationService = context
+                    .read<ContentLimitationService>();
+                final contentType = state.contentType;
+
+                if (contentType == null) return;
+
+                final ContentAction action;
+                switch (contentType) {
+                  case ContentType.topic:
+                    action = ContentAction.followTopic;
+                  case ContentType.source:
+                    action = ContentAction.followSource;
+                  case ContentType.country:
+                    action = ContentAction.followCountry;
+                  case ContentType.headline:
+                    return;
+                }
+
+                final status = limitationService.checkAction(action);
+
+                if (status == LimitationStatus.allowed) {
+                  context.read<EntityDetailsBloc>().add(
+                    const EntityDetailsToggleFollowRequested(),
+                  );
+                } else {
+                  showModalBottomSheet<void>(
+                    context: context,
+                    builder: (_) =>
+                        ContentLimitationBottomSheet(status: status),
+                  );
+                }
+              }
             },
           );
 

@@ -72,12 +72,12 @@ class _RequestCodeView extends StatelessWidget {
                 context,
               ).routerDelegate.currentConfiguration.last.route.name;
               if (currentRouteName == Routes.accountLinkingRequestCodeName) {
-                context.goNamed(
+                context.pushNamed(
                   Routes.accountLinkingVerifyCodeName,
                   pathParameters: {'email': state.email!},
                 );
               } else {
-                context.goNamed(
+                context.pushNamed(
                   Routes.verifyCodeName,
                   pathParameters: {'email': state.email!},
                 );

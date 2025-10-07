@@ -85,7 +85,7 @@ class AuthenticationPage extends StatelessWidget {
                         onPressed: isLoading
                             ? null
                             : () {
-                                context.goNamed(Routes.requestCodeName);
+                                context.pushNamed(Routes.requestCodeName);
                               },
                         label: Text(l10n.authenticationEmailSignInButton),
                         style: ElevatedButton.styleFrom(

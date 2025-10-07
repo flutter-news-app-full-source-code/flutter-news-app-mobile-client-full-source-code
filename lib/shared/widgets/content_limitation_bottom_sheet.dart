@@ -41,7 +41,6 @@ class _AnonymousLimitView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
-    final theme = Theme.of(context);
 
     return _BaseLimitView(
       icon: Icons.person_add_alt_1_outlined,
@@ -70,7 +69,6 @@ class _StandardUserLimitView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
-    final theme = Theme.of(context);
 
     return _BaseLimitView(
       icon: Icons.workspace_premium_outlined,
@@ -96,8 +94,6 @@ class _PremiumUserLimitView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
-
-    final theme = Theme.of(context);
 
     return _BaseLimitView(
       icon: Icons.inventory_2_outlined,

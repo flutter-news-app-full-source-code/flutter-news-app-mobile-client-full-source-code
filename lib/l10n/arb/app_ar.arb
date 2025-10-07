@@ -1189,5 +1189,41 @@
                 "example": "1.1.0"
             }
         }
+    },
+    "anonymousLimitTitle": "تسجيل الدخول للقيام بالمزيد",
+    "@anonymousLimitTitle": {
+        "description": "Title for the bottom sheet when an anonymous user hits a content limit."
+    },
+    "anonymousLimitBody": "قم بإنشاء حساب مجاني لإضافة المزيد ومتابعة المزيد.",
+    "@anonymousLimitBody": {
+        "description": "Body text for the bottom sheet when an anonymous user hits a content limit."
+    },
+    "anonymousLimitButton": "تسجيل الدخول",
+    "@anonymousLimitButton": {
+        "description": "Button text for the bottom sheet when an anonymous user hits a content limit."
+    },
+    "standardLimitTitle": "افتح الوصول غير المحدود",
+    "@standardLimitTitle": {
+        "description": "Title for the bottom sheet when a standard user hits a content limit."
+    },
+    "standardLimitBody": "لقد وصلت إلى الحد الأقصى للباقة المجانية. قم بالترقية لحفظ ومتابعة المزيد.",
+    "@standardLimitBody": {
+        "description": "Body text for the bottom sheet when a standard user hits a content limit."
+    },
+    "standardLimitButton": "الترقية إلى بريميوم",
+    "@standardLimitButton": {
+        "description": "Button text for the bottom sheet when a standard user hits a content limit."
+    },
+    "premiumLimitTitle": "لقد وصلت إلى الحد الأقصى",
+    "@premiumLimitTitle": {
+        "description": "Title for the bottom sheet when a premium user hits a content limit."
+    },
+    "premiumLimitBody": "لإضافة عناصر جديدة، يرجى مراجعة وإدارة المحتوى المحفوظ والمتابع الحالي.",
+    "@premiumLimitBody": {
+        "description": "Body text for the bottom sheet when a premium user hits a content limit."
+    },
+    "premiumLimitButton": "إدارة المحتوى الخاص بي",
+    "@premiumLimitButton": {
+        "description": "Button text for the bottom sheet when a premium user hits a content limit."
     }
 }

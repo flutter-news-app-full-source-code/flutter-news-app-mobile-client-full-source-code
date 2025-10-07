@@ -13,6 +13,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headline-details
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/similar_headlines_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/feed_core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -198,23 +200,42 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           return;
         }
 
-        final List<Headline> updatedSavedHeadlines;
+        // If the user is un-saving, always allow it.
         if (isSaved) {
-          updatedSavedHeadlines = currentPreferences.savedHeadlines
+          final updatedSavedHeadlines = currentPreferences.savedHeadlines
               .where((h) => h.id != headline.id)
               .toList();
+          final updatedPreferences = currentPreferences.copyWith(
+            savedHeadlines: updatedSavedHeadlines,
+          );
+          context.read<AppBloc>().add(
+            AppUserContentPreferencesChanged(preferences: updatedPreferences),
+          );
         } else {
-          updatedSavedHeadlines = List.from(currentPreferences.savedHeadlines)
-            ..add(headline);
+          // If the user is saving, check the limit first.
+          final limitationService = context.read<ContentLimitationService>();
+          final status = limitationService.checkAction(
+            ContentAction.bookmarkHeadline,
+          );
+
+          if (status == LimitationStatus.allowed) {
+            final updatedSavedHeadlines = List<Headline>.from(
+              currentPreferences.savedHeadlines,
+            )..add(headline);
+            final updatedPreferences = currentPreferences.copyWith(
+              savedHeadlines: updatedSavedHeadlines,
+            );
+            context.read<AppBloc>().add(
+              AppUserContentPreferencesChanged(preferences: updatedPreferences),
+            );
+          } else {
+            // If the limit is reached, show the bottom sheet.
+            showModalBottomSheet<void>(
+              context: context,
+              builder: (_) => ContentLimitationBottomSheet(status: status),
+            );
+          }
         }
-
-        final updatedPreferences = currentPreferences.copyWith(
-          savedHeadlines: updatedSavedHeadlines,
-        );
-
-        context.read<AppBloc>().add(
-          AppUserContentPreferencesChanged(preferences: updatedPreferences),
-        );
       },
     );
 

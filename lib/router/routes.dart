@@ -44,12 +44,6 @@ abstract final class Routes {
   // --- Authentication Routes ---
   static const authentication = '/authentication';
   static const authenticationName = 'authentication';
-  static const forgotPassword = 'forgot-password';
-  static const forgotPasswordName = 'forgotPassword';
-  static const resetPassword = 'reset-password';
-  static const resetPasswordName = 'resetPassword';
-  static const confirmEmail = 'confirm-email';
-  static const confirmEmailName = 'confirmEmail';
 
   // Top-level account linking route
   static const accountLinking = '/account-linking';

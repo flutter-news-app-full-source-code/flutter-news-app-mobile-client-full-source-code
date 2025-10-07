@@ -904,4 +904,34 @@ class AppLocalizationsAr extends AppLocalizations {
   String latestRequiredVersionLabel(String version) {
     return 'الإصدار المطلوب: $version';
   }
+
+  @override
+  String get anonymousLimitTitle => 'تسجيل الدخول للقيام بالمزيد';
+
+  @override
+  String get anonymousLimitBody =>
+      'قم بإنشاء حساب مجاني لإضافة المزيد ومتابعة المزيد.';
+
+  @override
+  String get anonymousLimitButton => 'تسجيل الدخول';
+
+  @override
+  String get standardLimitTitle => 'افتح الوصول غير المحدود';
+
+  @override
+  String get standardLimitBody =>
+      'لقد وصلت إلى الحد الأقصى للباقة المجانية. قم بالترقية لحفظ ومتابعة المزيد.';
+
+  @override
+  String get standardLimitButton => 'الترقية إلى بريميوم';
+
+  @override
+  String get premiumLimitTitle => 'لقد وصلت إلى الحد الأقصى';
+
+  @override
+  String get premiumLimitBody =>
+      'لإضافة عناصر جديدة، يرجى مراجعة وإدارة المحتوى المحفوظ والمتابع الحالي.';
+
+  @override
+  String get premiumLimitButton => 'إدارة المحتوى الخاص بي';
 }

@@ -1189,5 +1189,41 @@
                 "example": "1.1.0"
             }
         }
+    },
+    "anonymousLimitTitle": "Sign in to Do More",
+    "@anonymousLimitTitle": {
+        "description": "Title for the bottom sheet when an anonymous user hits a content limit."
+    },
+    "anonymousLimitBody": "Create a free account to bookmark more and follow more.",
+    "@anonymousLimitBody": {
+        "description": "Body text for the bottom sheet when an anonymous user hits a content limit."
+    },
+    "anonymousLimitButton": "Sign In",
+    "@anonymousLimitButton": {
+        "description": "Button text for the bottom sheet when an anonymous user hits a content limit."
+    },
+    "standardLimitTitle": "Unlock More Access",
+    "@standardLimitTitle": {
+        "description": "Title for the bottom sheet when a standard user hits a content limit."
+    },
+    "standardLimitBody": "You've reached your limit for the free plan. Upgrade to save and follow more.",
+    "@standardLimitBody": {
+        "description": "Body text for the bottom sheet when a standard user hits a content limit."
+    },
+    "standardLimitButton": "Upgrade to Premium",
+    "@standardLimitButton": {
+        "description": "Button text for the bottom sheet when a standard user hits a content limit."
+    },
+    "premiumLimitTitle": "You've Reached the Limit",
+    "@premiumLimitTitle": {
+        "description": "Title for the bottom sheet when a premium user hits a content limit."
+    },
+    "premiumLimitBody": "To add new items, please review and manage your existing saved and followed content.",
+    "@premiumLimitBody": {
+        "description": "Body text for the bottom sheet when a premium user hits a content limit."
+    },
+    "premiumLimitButton": "Manage My Content",
+    "@premiumLimitButton": {
+        "description": "Button text for the bottom sheet when a premium user hits a content limit."
     }
 }

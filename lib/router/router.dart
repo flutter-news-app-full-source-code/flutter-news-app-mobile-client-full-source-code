@@ -37,6 +37,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/v
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-search/bloc/headlines_search_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-search/view/headlines_search_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/router/go_router_observer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/bloc/settings_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/appearance_settings_page.dart';
@@ -48,6 +49,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/se
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/theme_settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_decorator_service.dart';
 import 'package:go_router/go_router.dart';
+import 'package:logging/logging.dart';
 
 /// Creates and configures the GoRouter instance for the application.
 ///
@@ -76,6 +78,7 @@ GoRouter createRouter({
   required AdService adService,
   required GlobalKey<NavigatorState> navigatorKey,
   required InlineAdCacheService inlineAdCacheService,
+  required Logger logger,
 }) {
   // Instantiate FeedDecoratorService once to be shared
   final feedDecoratorService = FeedDecoratorService(
@@ -91,9 +94,7 @@ GoRouter createRouter({
     initialLocation: '/',
     debugLogDiagnostics: true,
     navigatorKey: navigatorKey,
-    observers: [
-      // Add any other necessary observers here. If none, this can be an empty list.
-    ],
+    observers: [GoRouterObserver(logger: logger)],
     // --- Redirect Logic ---
     // This function is the single source of truth for route protection.
     // It's driven by the AppBloc's AppLifeCycleStatus.
@@ -101,7 +102,7 @@ GoRouter createRouter({
       final appStatus = context.read<AppBloc>().state.status;
       final currentLocation = state.matchedLocation;
 
-      print(
+      logger.info(
         'GoRouter Redirect Check:\n'
         '  Current Location (Matched): $currentLocation\n'
         '  AppStatus: $appStatus',
@@ -118,24 +119,24 @@ GoRouter createRouter({
       // If the user is unauthenticated, they must be on an auth path.
       // If they try to go anywhere else, they are redirected to the sign-in page.
       if (appStatus == AppLifeCycleStatus.unauthenticated) {
-        print('  Redirect: User is unauthenticated.');
+        logger.info('  Redirect: User is unauthenticated.');
         return isGoingToAuth ? null : authenticationPath;
       }
 
       // --- Case 2: Anonymous User ---
       // An anonymous user is partially authenticated. They can browse the app.
       if (appStatus == AppLifeCycleStatus.anonymous) {
-        print('  Redirect: User is anonymous.');
+        logger.info('  Redirect: User is anonymous.');
         // Block anonymous users from the main sign-in page.
         if (isGoingToAuth) {
-          print(
+          logger.info(
             '    Action: Anonymous user on auth path. Redirecting to feed.',
           );
           return feedPath;
         }
         // If at the root, send them to the feed.
         if (currentLocation == rootPath) {
-          print('    Action: User at root. Redirecting to feed.');
+          logger.info('    Action: User at root. Redirecting to feed.');
           return feedPath;
         }
         // Allow navigation to other pages, including the new linking page.
@@ -145,23 +146,23 @@ GoRouter createRouter({
       // --- Case 3: Authenticated User ---
       // A fully authenticated user should be blocked from all auth/linking pages.
       if (appStatus == AppLifeCycleStatus.authenticated) {
-        print('  Redirect: User is authenticated.');
+        logger.info('  Redirect: User is authenticated.');
         if (isGoingToAuth || isGoingToLinking) {
-          print(
+          logger.info(
             '    Action: Authenticated user on auth/linking path. Redirecting to feed.',
           );
           return feedPath;
         }
         // If at the root, send them to the feed.
         if (currentLocation == rootPath) {
-          print('    Action: User at root. Redirecting to feed.');
+          logger.info('    Action: User at root. Redirecting to feed.');
           return feedPath;
         }
       }
 
       // --- Fallback ---
       // For any other case (or if no conditions are met), allow navigation.
-      print('  Redirect: No condition met. Allowing navigation.');
+      logger.info('  Redirect: No condition met. Allowing navigation.');
       return null;
     },
     // --- Authentication Routes ---
@@ -551,8 +552,8 @@ GoRouter createRouter({
                             );
                           } else {
                             // Handle case where user is unexpectedly null.
-                            print(
-                              'ShellRoute/SettingsBloc: User ID is null when creating SettingsBloc. Settings will not be loaded.',
+                            logger.warning(
+                              'User ID is null when creating SettingsBloc. Settings will not be loaded.',
                             );
                           }
                           return settingsBloc;

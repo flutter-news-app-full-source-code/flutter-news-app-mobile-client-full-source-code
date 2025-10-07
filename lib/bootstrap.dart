@@ -39,14 +39,37 @@ Future<Widget> bootstrap(
   app_config.AppConfig appConfig,
   app_config.AppEnvironment environment,
 ) async {
+  // Setup logging
+  Logger.root.level = environment == app_config.AppEnvironment.production
+      ? Level.INFO
+      : Level.ALL;
+
+  Logger.root.onRecord.listen((record) {
+    final message = StringBuffer(
+      '${record.level.name}: ${record.time}: ${record.loggerName}: ${record.message}',
+    );
+    if (record.error != null) {
+      message.write('\nError: ${record.error}');
+    }
+    if (record.stackTrace != null) {
+      message.write('\nStack Trace: ${record.stackTrace}');
+    }
+    print(message);
+  });
+
+  final logger = Logger('bootstrap')
+    ..config('--- Starting Bootstrap Process ---')
+    ..config('App Environment: $environment');
+
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = const AppBlocObserver();
-  final logger = Logger('bootstrap');
   timeago.setLocaleMessages('en', EnTimeagoMessages());
   timeago.setLocaleMessages('ar', ArTimeagoMessages());
 
+  logger.info('1. Initializing KV Storage Service...');
   // 1. Initialize KV Storage Service first, as it's a foundational dependency.
   final kvStorage = await KVStorageSharedPreferences.getInstance();
+  logger.fine('KV Storage Service initialized (SharedPreferences).');
 
   // Initialize InlineAdCacheService early as it's a singleton and needs AdService.
   // It will be fully configured once AdService is available.
@@ -54,6 +77,7 @@ Future<Widget> bootstrap(
 
   // 2. Initialize HttpClient. Its tokenProvider now directly reads from
   // kvStorage, breaking the circular dependency with AuthRepository.
+  logger.info('2. Initializing HttpClient...');
   // This HttpClient instance is used for all subsequent API calls, including
   // the initial unauthenticated fetch of RemoteConfig.
   final httpClient = HttpClient(
@@ -62,11 +86,14 @@ Future<Widget> bootstrap(
         kvStorage.readString(key: StorageKey.authToken.stringValue),
     logger: logger,
   );
-
-  // 3. Initialize RemoteConfigClient and Repository, and fetch RemoteConfig.
+  logger
+    ..fine('HttpClient initialized for base URL: ${appConfig.baseUrl}')
+    // 3. Initialize RemoteConfigClient and Repository, and fetch RemoteConfig.
+    ..info('3. Initializing RemoteConfig client and repository...');
   // This is done early because RemoteConfig is now publicly accessible (unauthenticated).
   late DataClient<RemoteConfig> remoteConfigClient;
   if (appConfig.environment == app_config.AppEnvironment.demo) {
+    logger.fine('Using in-memory client for RemoteConfig.');
     remoteConfigClient = DataInMemory<RemoteConfig>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
@@ -74,6 +101,7 @@ Future<Widget> bootstrap(
       logger: logger,
     );
   } else {
+    logger.fine('Using API client for RemoteConfig.');
     // For development and production environments, use DataApi.
     remoteConfigClient = DataApi<RemoteConfig>(
       httpClient: httpClient,
@@ -86,6 +114,7 @@ Future<Widget> bootstrap(
   final remoteConfigRepository = DataRepository<RemoteConfig>(
     dataClient: remoteConfigClient,
   );
+  logger.fine('RemoteConfig repository initialized.');
 
   // Fetch the initial RemoteConfig. This is a critical step to determine
   // the app's global status (e.g., maintenance mode, update required)
@@ -93,31 +122,28 @@ Future<Widget> bootstrap(
   RemoteConfig? initialRemoteConfig;
   HttpException? initialRemoteConfigError;
 
+  logger.info('4. Fetching initial RemoteConfig...');
   try {
     initialRemoteConfig = await remoteConfigRepository.read(
       id: kRemoteConfigId,
     );
-    logger.info('[bootstrap] Initial RemoteConfig fetched successfully.');
+    logger.fine('Initial RemoteConfig fetched successfully.');
   } on HttpException catch (e) {
-    logger.severe(
-      '[bootstrap] Failed to fetch initial RemoteConfig (HttpException): $e',
-    );
+    logger.severe('Failed to fetch initial RemoteConfig (HttpException): $e');
     initialRemoteConfigError = e;
   } catch (e, s) {
-    logger.severe(
-      '[bootstrap] Unexpected error fetching initial RemoteConfig.',
-      e,
-      s,
-    );
+    logger.severe('Unexpected error fetching initial RemoteConfig.', e, s);
     initialRemoteConfigError = UnknownException(e.toString());
   }
 
   // 4. Conditionally initialize Auth services based on environment.
   // This is done after RemoteConfig is fetched, as Auth services might depend
-  // on configurations defined in RemoteConfig (though not directly in this case).
+  // on configurations defined in RemoteConfig.
+  logger.info('5. Initializing Authentication services...');
   late final AuthClient authClient;
   late final AuthRepository authenticationRepository;
   if (appConfig.environment == app_config.AppEnvironment.demo) {
+    logger.fine('Using in-memory client for Authentication.');
     // In-memory authentication for demo environment.
     authClient = AuthInmemory();
     authenticationRepository = AuthRepository(
@@ -125,6 +151,7 @@ Future<Widget> bootstrap(
       storageService: kvStorage,
     );
   } else {
+    logger.fine('Using API client for Authentication.');
     // Now that httpClient is available, initialize AuthApi and AuthRepository.
     authClient = AuthApi(httpClient: httpClient);
     authenticationRepository = AuthRepository(
@@ -132,14 +159,17 @@ Future<Widget> bootstrap(
       storageService: kvStorage,
     );
   }
-
-  // 5. Initialize AdProvider and AdService.
+  logger
+    ..fine('Authentication repository initialized.')
+    // 5. Initialize AdProvider and AdService.
+    ..info('6. Initializing Ad providers and AdService...');
   late final Map<AdPlatformType, AdProvider> adProviders;
 
   // Conditionally instantiate ad providers based on the application environment.
   // This ensures that only the relevant ad providers are available for the
   // current environment, preventing unintended usage.
   if (appConfig.environment == app_config.AppEnvironment.demo || kIsWeb) {
+    logger.fine('Using DemoAdProvider for all ad platforms.');
     final demoAdProvider = DemoAdProvider(logger: logger);
     adProviders = {
       // In the demo environment or on the web, all ad platform types map to
@@ -151,6 +181,7 @@ Future<Widget> bootstrap(
       AdPlatformType.demo: demoAdProvider,
     };
   } else {
+    logger.fine('Using AdMobAdProvider and LocalAdProvider.');
     // For development and production environments (non-web), use real ad providers.
     adProviders = {
       // AdMob provider for Google Mobile Ads.
@@ -180,13 +211,17 @@ Future<Widget> bootstrap(
     logger: logger,
   );
   await adService.initialize();
+  logger.fine('AdService initialized.');
 
   // Initialize InlineAdCacheService with the created AdService.
   inlineAdCacheService = InlineAdCacheService(adService: adService);
-
-  // Fetch the initial user from the authentication repository.
-  // This ensures the AppBloc starts with an accurate authentication status.
+  logger
+    ..fine('InlineAdCacheService initialized.')
+    // Fetch the initial user from the authentication repository.
+    // This ensures the AppBloc starts with an accurate authentication status.
+    ..info('7. Fetching initial user...');
   final initialUser = await authenticationRepository.getCurrentUser();
+  logger.fine('Initial user fetched: ${initialUser?.id ?? 'none'}.');
 
   // Create a GlobalKey for the NavigatorState to be used by AppBloc
   // and InterstitialAdManager for BuildContext access.
@@ -194,8 +229,10 @@ Future<Widget> bootstrap(
 
   // Initialize PackageInfoService
   final packageInfoService = PackageInfoServiceImpl(logger: logger);
-
-  // 6. Initialize all other DataClients and Repositories.
+  logger
+    ..fine('PackageInfoService initialized.')
+    // 6. Initialize all other DataClients and Repositories.
+    ..info('8. Initializing Data clients and repositories...');
   // These now also have a guaranteed valid httpClient.
   late final DataClient<Headline> headlinesClient;
   late final DataClient<Topic> topicsClient;
@@ -206,6 +243,7 @@ Future<Widget> bootstrap(
   late final DataClient<User> userClient;
   late final DataClient<LocalAd> localAdClient;
   if (appConfig.environment == app_config.AppEnvironment.demo) {
+    logger.fine('Using in-memory clients for all data repositories.');
     headlinesClient = DataInMemory<Headline>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
@@ -280,6 +318,7 @@ Future<Widget> bootstrap(
       logger: logger,
     );
   } else if (appConfig.environment == app_config.AppEnvironment.development) {
+    logger.fine('Using API clients for all data repositories (Development).');
     headlinesClient = DataApi<Headline>(
       httpClient: httpClient,
       modelName: 'headline',
@@ -337,6 +376,7 @@ Future<Widget> bootstrap(
       logger: logger,
     );
   } else {
+    logger.fine('Using API clients for all data repositories (Production).');
     // Default to API clients for production
     headlinesClient = DataApi<Headline>(
       httpClient: httpClient,
@@ -395,6 +435,7 @@ Future<Widget> bootstrap(
       logger: logger,
     );
   }
+  logger.fine('All data clients instantiated.');
 
   final headlinesRepository = DataRepository<Headline>(
     dataClient: headlinesClient,
@@ -413,6 +454,7 @@ Future<Widget> bootstrap(
     dataClient: userAppSettingsClient,
   );
   final userRepository = DataRepository<User>(dataClient: userClient);
+  logger.fine('All data repositories initialized.');
 
   // Conditionally instantiate DemoDataMigrationService
   final demoDataMigrationService =
@@ -422,6 +464,9 @@ Future<Widget> bootstrap(
           userContentPreferencesRepository: userContentPreferencesRepository,
         )
       : null;
+  logger.fine(
+    'DemoDataMigrationService initialized: ${demoDataMigrationService != null}',
+  );
 
   // Conditionally instantiate DemoDataInitializerService
   // This service is responsible for ensuring that essential user-specific data
@@ -435,7 +480,11 @@ Future<Widget> bootstrap(
           userContentPreferencesRepository: userContentPreferencesRepository,
         )
       : null;
-
+  logger
+    ..fine(
+      'DemoDataInitializerService initialized: ${demoDataInitializerService != null}',
+    )
+    ..info('--- Bootstrap Process Complete. Returning App widget. ---');
   return App(
     authenticationRepository: authenticationRepository,
     headlinesRepository: headlinesRepository,

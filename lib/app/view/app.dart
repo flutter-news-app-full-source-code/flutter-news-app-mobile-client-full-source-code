@@ -18,6 +18,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/router/router.da
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kv_storage_service/kv_storage_service.dart';
+import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template app_widget}
@@ -223,6 +224,7 @@ class _AppViewState extends State<_AppView> {
   late final GoRouter _router;
   late final ValueNotifier<AppLifeCycleStatus> _statusNotifier;
   AppStatusService? _appStatusService;
+  final _routerLogger = Logger('GoRouter');
 
   @override
   void initState() {
@@ -257,6 +259,7 @@ class _AppViewState extends State<_AppView> {
       adService: widget.adService,
       navigatorKey: widget.navigatorKey,
       inlineAdCacheService: widget.inlineAdCacheService,
+      logger: _routerLogger,
     );
   }
 

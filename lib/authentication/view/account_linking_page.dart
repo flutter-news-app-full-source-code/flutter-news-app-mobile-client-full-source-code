@@ -75,7 +75,7 @@ class AccountLinkingPage extends StatelessWidget {
                       onPressed: isLoading
                           ? null
                           : () {
-                              context.goNamed(
+                              context.pushNamed(
                                 Routes.accountLinkingRequestCodeName,
                               );
                             },

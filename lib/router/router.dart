@@ -2,6 +2,7 @@ import 'package:auth_repository/auth_repository.dart';
 import 'package:core/core.dart' hide AppStatus;
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/router/go_router_observer.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/account_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/countries/add_country_to_follow_page.dart';
@@ -93,9 +94,7 @@ GoRouter createRouter({
     initialLocation: '/',
     debugLogDiagnostics: true,
     navigatorKey: navigatorKey,
-    observers: [
-      // Add any other necessary observers here. If none, this can be an empty list.
-    ],
+    observers: [GoRouterObserver(logger: logger)],
     // --- Redirect Logic ---
     // This function is the single source of truth for route protection.
     // It's driven by the AppBloc's AppLifeCycleStatus.

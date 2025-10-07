@@ -43,17 +43,20 @@ Future<Widget> bootstrap(
   Logger.root.level = environment == app_config.AppEnvironment.production
       ? Level.INFO
       : Level.ALL;
+      
   Logger.root.onRecord.listen((record) {
-    print(
+    final message = StringBuffer(
       '${record.level.name}: ${record.time}: ${record.loggerName}: ${record.message}',
     );
     if (record.error != null) {
-      print('Error: ${record.error}');
+      message.write('\nError: ${record.error}');
     }
     if (record.stackTrace != null) {
-      print('Stack Trace: ${record.stackTrace}');
+      message.write('\nStack Trace: ${record.stackTrace}');
     }
+    print(message.toString());
   });
+
   final logger = Logger('bootstrap');
   logger.config('--- Starting Bootstrap Process ---');
   logger.config('App Environment: $environment');

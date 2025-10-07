@@ -113,7 +113,7 @@ class AccountPage extends StatelessWidget {
             textStyle: textTheme.labelLarge,
           ),
           onPressed: () {
-            context.pushNamed(Routes.accountLinkingName);
+            context.goNamed(Routes.accountLinkingName);
           },
         ),
       );

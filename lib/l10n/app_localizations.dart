@@ -1723,6 +1723,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Required version: {version}'**
   String latestRequiredVersionLabel(String version);
+
+  /// Title for the bottom sheet when an anonymous user hits a content limit.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to Save More'**
+  String get anonymousLimitTitle;
+
+  /// Body text for the bottom sheet when an anonymous user hits a content limit.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a free account to save and follow unlimited topics, sources, and countries.'**
+  String get anonymousLimitBody;
+
+  /// Button text for the bottom sheet when an anonymous user hits a content limit.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In & Link Account'**
+  String get anonymousLimitButton;
+
+  /// Title for the bottom sheet when a standard user hits a content limit.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock Unlimited Access'**
+  String get standardLimitTitle;
+
+  /// Body text for the bottom sheet when a standard user hits a content limit.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve reached your limit for the free plan. Upgrade to save and follow more.'**
+  String get standardLimitBody;
+
+  /// Button text for the bottom sheet when a standard user hits a content limit.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to Premium'**
+  String get standardLimitButton;
+
+  /// Title for the bottom sheet when a premium user hits a content limit.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve Reached the Limit'**
+  String get premiumLimitTitle;
+
+  /// Body text for the bottom sheet when a premium user hits a content limit.
+  ///
+  /// In en, this message translates to:
+  /// **'To add new items, please review and manage your existing saved and followed content.'**
+  String get premiumLimitBody;
+
+  /// Button text for the bottom sheet when a premium user hits a content limit.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage My Content'**
+  String get premiumLimitButton;
 }
 
 class _AppLocalizationsDelegate

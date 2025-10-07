@@ -905,4 +905,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String latestRequiredVersionLabel(String version) {
     return 'Required version: $version';
   }
+
+  @override
+  String get anonymousLimitTitle => 'Sign in to Save More';
+
+  @override
+  String get anonymousLimitBody =>
+      'Create a free account to save and follow unlimited topics, sources, and countries.';
+
+  @override
+  String get anonymousLimitButton => 'Sign In & Link Account';
+
+  @override
+  String get standardLimitTitle => 'Unlock Unlimited Access';
+
+  @override
+  String get standardLimitBody =>
+      'You\'ve reached your limit for the free plan. Upgrade to save and follow more.';
+
+  @override
+  String get standardLimitButton => 'Upgrade to Premium';
+
+  @override
+  String get premiumLimitTitle => 'You\'ve Reached the Limit';
+
+  @override
+  String get premiumLimitBody =>
+      'To add new items, please review and manage your existing saved and followed content.';
+
+  @override
+  String get premiumLimitButton => 'Manage My Content';
 }

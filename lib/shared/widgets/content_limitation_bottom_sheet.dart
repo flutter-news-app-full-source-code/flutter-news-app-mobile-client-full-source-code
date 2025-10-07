@@ -135,24 +135,24 @@ class _BaseLimitView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final colorScheme = theme.colorScheme;
+
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.paddingLarge),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: AppSpacing.xxl * 1.5, color: Colors.blue),
+          Icon(icon, size: AppSpacing.xxl * 1.5, color: colorScheme.primary),
           const SizedBox(height: AppSpacing.lg),
           Text(
             title,
-            style: const TextStyle(fontSize: 22),
+            style: textTheme.headlineSmall,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppSpacing.md),
-          Text(
-            body,
-            style: const TextStyle(fontSize: 16),
-            textAlign: TextAlign.center,
-          ),
+          Text(body, style: textTheme.bodyLarge, textAlign: TextAlign.center),
           const SizedBox(height: AppSpacing.lg),
           child,
         ],

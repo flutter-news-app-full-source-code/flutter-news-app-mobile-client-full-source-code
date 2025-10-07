@@ -43,7 +43,7 @@ Future<Widget> bootstrap(
   Logger.root.level = environment == app_config.AppEnvironment.production
       ? Level.INFO
       : Level.ALL;
-      
+
   Logger.root.onRecord.listen((record) {
     final message = StringBuffer(
       '${record.level.name}: ${record.time}: ${record.loggerName}: ${record.message}',
@@ -54,12 +54,12 @@ Future<Widget> bootstrap(
     if (record.stackTrace != null) {
       message.write('\nStack Trace: ${record.stackTrace}');
     }
-    print(message.toString());
+    print(message);
   });
 
-  final logger = Logger('bootstrap');
-  logger.config('--- Starting Bootstrap Process ---');
-  logger.config('App Environment: $environment');
+  final logger = Logger('bootstrap')
+    ..config('--- Starting Bootstrap Process ---')
+    ..config('App Environment: $environment');
 
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = const AppBlocObserver();
@@ -86,10 +86,10 @@ Future<Widget> bootstrap(
         kvStorage.readString(key: StorageKey.authToken.stringValue),
     logger: logger,
   );
-  logger.fine('HttpClient initialized for base URL: ${appConfig.baseUrl}');
-
-  // 3. Initialize RemoteConfigClient and Repository, and fetch RemoteConfig.
-  logger.info('3. Initializing RemoteConfig client and repository...');
+  logger
+    ..fine('HttpClient initialized for base URL: ${appConfig.baseUrl}')
+    // 3. Initialize RemoteConfigClient and Repository, and fetch RemoteConfig.
+    ..info('3. Initializing RemoteConfig client and repository...');
   // This is done early because RemoteConfig is now publicly accessible (unauthenticated).
   late DataClient<RemoteConfig> remoteConfigClient;
   if (appConfig.environment == app_config.AppEnvironment.demo) {
@@ -159,10 +159,10 @@ Future<Widget> bootstrap(
       storageService: kvStorage,
     );
   }
-  logger.fine('Authentication repository initialized.');
-
-  // 5. Initialize AdProvider and AdService.
-  logger.info('6. Initializing Ad providers and AdService...');
+  logger
+    ..fine('Authentication repository initialized.')
+    // 5. Initialize AdProvider and AdService.
+    ..info('6. Initializing Ad providers and AdService...');
   late final Map<AdPlatformType, AdProvider> adProviders;
 
   // Conditionally instantiate ad providers based on the application environment.
@@ -215,11 +215,11 @@ Future<Widget> bootstrap(
 
   // Initialize InlineAdCacheService with the created AdService.
   inlineAdCacheService = InlineAdCacheService(adService: adService);
-  logger.fine('InlineAdCacheService initialized.');
-
-  // Fetch the initial user from the authentication repository.
-  // This ensures the AppBloc starts with an accurate authentication status.
-  logger.info('7. Fetching initial user...');
+  logger
+    ..fine('InlineAdCacheService initialized.')
+    // Fetch the initial user from the authentication repository.
+    // This ensures the AppBloc starts with an accurate authentication status.
+    ..info('7. Fetching initial user...');
   final initialUser = await authenticationRepository.getCurrentUser();
   logger.fine('Initial user fetched: ${initialUser?.id ?? 'none'}.');
 
@@ -229,10 +229,10 @@ Future<Widget> bootstrap(
 
   // Initialize PackageInfoService
   final packageInfoService = PackageInfoServiceImpl(logger: logger);
-  logger.fine('PackageInfoService initialized.');
-
-  // 6. Initialize all other DataClients and Repositories.
-  logger.info('8. Initializing Data clients and repositories...');
+  logger
+    ..fine('PackageInfoService initialized.')
+    // 6. Initialize all other DataClients and Repositories.
+    ..info('8. Initializing Data clients and repositories...');
   // These now also have a guaranteed valid httpClient.
   late final DataClient<Headline> headlinesClient;
   late final DataClient<Topic> topicsClient;
@@ -480,11 +480,11 @@ Future<Widget> bootstrap(
           userContentPreferencesRepository: userContentPreferencesRepository,
         )
       : null;
-  logger.fine(
-    'DemoDataInitializerService initialized: ${demoDataInitializerService != null}',
-  );
-
-  logger.info('--- Bootstrap Process Complete. Returning App widget. ---');
+  logger
+    ..fine(
+      'DemoDataInitializerService initialized: ${demoDataInitializerService != null}',
+    )
+    ..info('--- Bootstrap Process Complete. Returning App widget. ---');
   return App(
     authenticationRepository: authenticationRepository,
     headlinesRepository: headlinesRepository,

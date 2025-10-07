@@ -26,11 +26,7 @@ class AccountLinkingPage extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.close),
           tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-
-          // onPressed context.goNamed() produce the following exception
-          // "unknown route name: /feed"
-          onPressed: () => context.go(Routes.feed),
-
+          onPressed: () => context.goNamed(Routes.feedName),
           color: colorScheme.onSurface,
         ),
       ),

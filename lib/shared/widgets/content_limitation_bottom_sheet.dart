@@ -3,7 +3,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ui_kit/ui_kit.dart';
+import 'package:ui_kit/ui_kit.dart' hide UiKitLocalizations;
 
 /// {@template content_limitation_bottom_sheet}
 /// A bottom sheet that informs the user about content limitations and provides
@@ -40,16 +40,13 @@ class _AnonymousLimitView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
 
     return _BaseLimitView(
       icon: Icons.person_add_alt_1_outlined,
-      // TODO(fulleni): Add l10n.anonymousLimitTitle
-      title: 'Sign in to Save More',
-      // TODO(fulleni): Add l10n.anonymousLimitBody
-      body:
-          'Create a free account to save and follow unlimited topics, sources, and countries.',
+      title: l10n.anonymousLimitTitle,
+      body: l10n.anonymousLimitBody,
       child: ElevatedButton(
         onPressed: () {
           // Pop the bottom sheet first.
@@ -60,8 +57,7 @@ class _AnonymousLimitView extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           minimumSize: const Size.fromHeight(AppSpacing.xxl + AppSpacing.sm),
         ),
-        // TODO(fulleni): Add l10n.anonymousLimitButton
-        child: const Text('Sign In & Link Account'),
+        child: Text(l10n.anonymousLimitButton),
       ),
     );
   }
@@ -73,16 +69,13 @@ class _StandardUserLimitView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
 
     return _BaseLimitView(
       icon: Icons.workspace_premium_outlined,
-      // TODO(fulleni): Add l10n.standardLimitTitle
-      title: 'Unlock Unlimited Access',
-      // TODO(fulleni): Add l10n.standardLimitBody
-      body:
-          "You've reached your limit for the free plan. Upgrade to save and follow more.",
+      title: l10n.standardLimitTitle,
+      body: l10n.standardLimitBody,
       child: ElevatedButton(
         // TODO(fulleni): Implement account upgrade flow.
         // The upgrade flow is not yet implemented, so the button is disabled.
@@ -90,8 +83,7 @@ class _StandardUserLimitView extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           minimumSize: const Size.fromHeight(AppSpacing.xxl + AppSpacing.sm),
         ),
-        // TODO(fulleni): Add l10n.standardLimitButton
-        child: const Text('Upgrade to Premium'),
+        child: Text(l10n.standardLimitButton),
       ),
     );
   }
@@ -103,16 +95,14 @@ class _PremiumUserLimitView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
+
     final theme = Theme.of(context);
 
     return _BaseLimitView(
       icon: Icons.inventory_2_outlined,
-      // TODO(fulleni): Add l10n.premiumLimitTitle
-      title: "You've Reached the Limit",
-      // TODO(fulleni): Add l10n.premiumLimitBody
-      body:
-          'To add new items, please review and manage your existing saved and followed content.',
+      title: l10n.premiumLimitTitle,
+      body: l10n.premiumLimitBody,
       child: ElevatedButton(
         onPressed: () {
           // Pop the bottom sheet first.
@@ -123,8 +113,7 @@ class _PremiumUserLimitView extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           minimumSize: const Size.fromHeight(AppSpacing.xxl + AppSpacing.sm),
         ),
-        // TODO(fulleni): Add l10n.premiumLimitButton
-        child: const Text('Manage My Content'),
+        child: Text(l10n.premiumLimitButton),
       ),
     );
   }

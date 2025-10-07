@@ -1,7 +1,6 @@
 import 'package:core/core.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 
-
 /// Defines the specific type of content-related action a user is trying to
 /// perform, which may be subject to limitations.
 enum ContentAction {
@@ -32,7 +31,6 @@ enum LimitationStatus {
   /// The user has reached the content limit for premium users.
   premiumUserLimitReached,
 }
-
 
 /// {@template content_limitation_service}
 /// A service that centralizes the logic for checking if a user can perform
@@ -65,35 +63,53 @@ class ContentLimitationService {
       return LimitationStatus.allowed;
     }
 
-    final limits = remoteConfig.contentConfiguration;
+    final limits = remoteConfig.userPreferenceConfig;
     final role = user.appRole;
 
     switch (action) {
       case ContentAction.bookmarkHeadline:
         final count = preferences.savedHeadlines.length;
-        final limit = limits.savedHeadlinesLimit[role];
-        if (limit != null && count >= limit) {
+        final int limit;
+        switch (role) {
+          case AppUserRole.guestUser:
+            limit = limits.guestSavedHeadlinesLimit;
+          case AppUserRole.standardUser:
+            limit = limits.authenticatedSavedHeadlinesLimit;
+          case AppUserRole.premiumUser:
+            limit = limits.premiumSavedHeadlinesLimit;
+        }
+        if (count >= limit) {
           return _getLimitationStatusForRole(role);
         }
 
       case ContentAction.followTopic:
-        final count = preferences.followedTopics.length;
-        final limit = limits.followedTopicsLimit[role];
-        if (limit != null && count >= limit) {
-          return _getLimitationStatusForRole(role);
-        }
-
       case ContentAction.followSource:
-        final count = preferences.followedSources.length;
-        final limit = limits.followedSourcesLimit[role];
-        if (limit != null && count >= limit) {
-          return _getLimitationStatusForRole(role);
+      case ContentAction.followCountry:
+        final int limit;
+        switch (role) {
+          case AppUserRole.guestUser:
+            limit = limits.guestFollowedItemsLimit;
+          case AppUserRole.standardUser:
+            limit = limits.authenticatedFollowedItemsLimit;
+          case AppUserRole.premiumUser:
+            limit = limits.premiumFollowedItemsLimit;
         }
 
-      case ContentAction.followCountry:
-        final count = preferences.followedCountries.length;
-        final limit = limits.followedCountriesLimit[role];
-        if (limit != null && count >= limit) {
+        // Determine the count for the specific item type being followed.
+        final int count;
+        switch (action) {
+          case ContentAction.followTopic:
+            count = preferences.followedTopics.length;
+          case ContentAction.followSource:
+            count = preferences.followedSources.length;
+          case ContentAction.followCountry:
+            count = preferences.followedCountries.length;
+          case ContentAction.bookmarkHeadline:
+            // This case is handled above and will not be reached here.
+            count = 0;
+        }
+
+        if (count >= limit) {
           return _getLimitationStatusForRole(role);
         }
     }

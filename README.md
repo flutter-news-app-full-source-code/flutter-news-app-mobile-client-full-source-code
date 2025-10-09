@@ -62,7 +62,7 @@ Click on any category to explore.
 
 ### ⚙️ Customizable App Settings
 - **Appearance:** Configure base theme (Light/Dark/System), accent colors (via FlexColorScheme), font choices (family, size, weight).
-- **Feed Display:** Customize how headlines are presented, including `HeadlineDensity` and `HeadlineImageStyle`, and visibility of source/publish date.
+- **Feed Display:** Customize how headlines are presented, including `HeadlineDensity` and `HeadlineImageStyle`.
 - **Language Selection:** Choose the application's display language.
 > **🎨 Your Advantage:** Deliver a premium, adaptable user experience that caters to individual needs without writing any code.
 

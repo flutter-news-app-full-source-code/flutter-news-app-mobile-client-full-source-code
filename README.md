@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://avatars.githubusercontent.com/u/202675624?s=400&u=dc72a2b53e8158956a3b672f8e52e39394b6b610&v=4" alt="Flutter News App Toolkit Logo" width="220">
+  <img src="https://repository-images.githubusercontent.com/946589707/33b56f2c-76c3-4af0-a67f-8c08ca494b1b" alt="Flutter News App Toolkit Logo" width="440">
   <h1>Flutter News App Mobile Client</h1>
   <p><strong>Complete, production-ready source code for a feature-rich Flutter news app mobile client.</strong></p>
 </div>

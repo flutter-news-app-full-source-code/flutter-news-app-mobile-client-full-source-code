@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.3.0
+
+- feat: enforce content following and bookmarking limits ([#145](link), [#159](link))
+- feat: enforce mandatory app updates via remote configuration ([#134](link))
+- refactor: separate authentication and account linking flows ([#142](link))
+- refactor: use `flutter_native_splash` for web splash screen management ([#137](link))
+- refactor: implement centralized logging for GoRouter navigation ([#143](link))
+- fix: web splash screen remains visible indefinitely ([#136](link))
+- fix: back button is unresponsive during authentication flow ([#144](link))
+- fix: ensure proper redirection after successful authentication ([#148](link))
+- fix: content limitation bottom sheet overflows on small screens ([#149](link))
+- chore(deps): update bloc, go_router, and other key dependencies ([#135](link))
+- docs: clarify feed display settings in README ([#150](link))
+  
 ## 1.2.1
 
 -   **Fix:** Resolved an issue where the web splash screen would not disappear after the application loaded due to an incorrect bootstrap script in `index.html`.

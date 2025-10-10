@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/available_countries_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template add_country_to_follow_page}
@@ -150,29 +152,61 @@ class AddCountryToFollowPage extends StatelessWidget {
                               ? l10n.unfollowCountryTooltip(country.name)
                               : l10n.followCountryTooltip(country.name),
                           onPressed: () {
+                            // Ensure user preferences are available before
+                            // proceeding.
                             if (userContentPreferences == null) return;
 
+                            // Create a mutable copy of the followed countries list.
                             final updatedFollowedCountries = List<Country>.from(
                               followedCountries,
                             );
+
+                            // If the user is unfollowing, always allow it.
                             if (isFollowed) {
                               updatedFollowedCountries.removeWhere(
                                 (c) => c.id == country.id,
                               );
+                              final updatedPreferences = userContentPreferences
+                                  .copyWith(
+                                    followedCountries: updatedFollowedCountries,
+                                  );
+
+                              context.read<AppBloc>().add(
+                                AppUserContentPreferencesChanged(
+                                  preferences: updatedPreferences,
+                                ),
+                              );
                             } else {
-                              updatedFollowedCountries.add(country);
-                            }
+                              // If the user is following, check the limit first.
+                              final limitationService = context
+                                  .read<ContentLimitationService>();
+                              final status = limitationService.checkAction(
+                                ContentAction.followCountry,
+                              );
 
-                            final updatedPreferences = userContentPreferences
-                                .copyWith(
-                                  followedCountries: updatedFollowedCountries,
+                              if (status == LimitationStatus.allowed) {
+                                updatedFollowedCountries.add(country);
+                                final updatedPreferences =
+                                    userContentPreferences.copyWith(
+                                      followedCountries:
+                                          updatedFollowedCountries,
+                                    );
+
+                                context.read<AppBloc>().add(
+                                  AppUserContentPreferencesChanged(
+                                    preferences: updatedPreferences,
+                                  ),
                                 );
-
-                            context.read<AppBloc>().add(
-                              AppUserContentPreferencesChanged(
-                                preferences: updatedPreferences,
-                              ),
-                            );
+                              } else {
+                                // If the limit is reached, show the bottom sheet.
+                                showModalBottomSheet<void>(
+                                  context: context,
+                                  builder: (_) => ContentLimitationBottomSheet(
+                                    status: status,
+                                  ),
+                                );
+                              }
+                            }
                           },
                         ),
                         contentPadding: const EdgeInsets.symmetric(

@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/available_topics_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template add_topic_to_follow_page}
@@ -149,29 +151,60 @@ class AddTopicToFollowPage extends StatelessWidget {
                               ? l10n.unfollowTopicTooltip(topic.name)
                               : l10n.followTopicTooltip(topic.name),
                           onPressed: () {
+                            // Ensure user preferences are available before
+                            // proceeding.
                             if (userContentPreferences == null) return;
 
+                            // Create a mutable copy of the followed topics list.
                             final updatedFollowedTopics = List<Topic>.from(
                               followedTopics,
                             );
+
+                            // If the user is unfollowing, always allow it.
                             if (isFollowed) {
                               updatedFollowedTopics.removeWhere(
                                 (t) => t.id == topic.id,
                               );
+                              final updatedPreferences = userContentPreferences
+                                  .copyWith(
+                                    followedTopics: updatedFollowedTopics,
+                                  );
+
+                              context.read<AppBloc>().add(
+                                AppUserContentPreferencesChanged(
+                                  preferences: updatedPreferences,
+                                ),
+                              );
                             } else {
-                              updatedFollowedTopics.add(topic);
-                            }
+                              // If the user is following, check the limit first.
+                              final limitationService = context
+                                  .read<ContentLimitationService>();
+                              final status = limitationService.checkAction(
+                                ContentAction.followTopic,
+                              );
 
-                            final updatedPreferences = userContentPreferences
-                                .copyWith(
-                                  followedTopics: updatedFollowedTopics,
+                              if (status == LimitationStatus.allowed) {
+                                updatedFollowedTopics.add(topic);
+                                final updatedPreferences =
+                                    userContentPreferences.copyWith(
+                                      followedTopics: updatedFollowedTopics,
+                                    );
+
+                                context.read<AppBloc>().add(
+                                  AppUserContentPreferencesChanged(
+                                    preferences: updatedPreferences,
+                                  ),
                                 );
-
-                            context.read<AppBloc>().add(
-                              AppUserContentPreferencesChanged(
-                                preferences: updatedPreferences,
-                              ),
-                            );
+                              } else {
+                                // If the limit is reached, show the bottom sheet.
+                                showModalBottomSheet<void>(
+                                  context: context,
+                                  builder: (_) => ContentLimitationBottomSheet(
+                                    status: status,
+                                  ),
+                                );
+                              }
+                            }
                           },
                         ),
                         contentPadding: const EdgeInsets.symmetric(

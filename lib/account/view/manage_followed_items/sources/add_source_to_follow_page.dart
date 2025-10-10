@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/available_sources_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template add_source_to_follow_page}
@@ -80,29 +82,60 @@ class AddSourceToFollowPage extends StatelessWidget {
                               ? l10n.unfollowSourceTooltip(source.name)
                               : l10n.followSourceTooltip(source.name),
                           onPressed: () {
+                            // Ensure user preferences are available before
+                            // proceeding.
                             if (userContentPreferences == null) return;
 
+                            // Create a mutable copy of the followed sources list.
                             final updatedFollowedSources = List<Source>.from(
                               followedSources,
                             );
+
+                            // If the user is unfollowing, always allow it.
                             if (isFollowed) {
                               updatedFollowedSources.removeWhere(
                                 (s) => s.id == source.id,
                               );
+                              final updatedPreferences = userContentPreferences
+                                  .copyWith(
+                                    followedSources: updatedFollowedSources,
+                                  );
+
+                              context.read<AppBloc>().add(
+                                AppUserContentPreferencesChanged(
+                                  preferences: updatedPreferences,
+                                ),
+                              );
                             } else {
-                              updatedFollowedSources.add(source);
-                            }
+                              // If the user is following, check the limit first.
+                              final limitationService = context
+                                  .read<ContentLimitationService>();
+                              final status = limitationService.checkAction(
+                                ContentAction.followSource,
+                              );
 
-                            final updatedPreferences = userContentPreferences
-                                .copyWith(
-                                  followedSources: updatedFollowedSources,
+                              if (status == LimitationStatus.allowed) {
+                                updatedFollowedSources.add(source);
+                                final updatedPreferences =
+                                    userContentPreferences.copyWith(
+                                      followedSources: updatedFollowedSources,
+                                    );
+
+                                context.read<AppBloc>().add(
+                                  AppUserContentPreferencesChanged(
+                                    preferences: updatedPreferences,
+                                  ),
                                 );
-
-                            context.read<AppBloc>().add(
-                              AppUserContentPreferencesChanged(
-                                preferences: updatedPreferences,
-                              ),
-                            );
+                              } else {
+                                // If the limit is reached, show the bottom sheet.
+                                showModalBottomSheet<void>(
+                                  context: context,
+                                  builder: (_) => ContentLimitationBottomSheet(
+                                    status: status,
+                                  ),
+                                );
+                              }
+                            }
                           },
                         ),
                       ),

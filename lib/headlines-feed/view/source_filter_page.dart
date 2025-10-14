@@ -36,8 +36,18 @@ class SourceFilterPage extends StatelessWidget {
   }
 }
 
-class _SourceFilterView extends StatelessWidget {
+class _SourceFilterView extends StatefulWidget {
   const _SourceFilterView();
+
+  @override
+  State<_SourceFilterView> createState() => _SourceFilterViewState();
+}
+
+class _SourceFilterViewState extends State<_SourceFilterView> {
+  // Local state for the headquarter country filter capsules.
+  // This is intentionally decoupled from the main filter bloc's country
+  // selection, which is for "event country".
+  final Set<Country> _selectedHeadquarterCountries = {};
 
   @override
   Widget build(BuildContext context) {
@@ -144,11 +154,13 @@ class _SourceFilterView extends StatelessWidget {
 
           // Filter sources based on selected countries and types from HeadlinesFilterBloc
           final displayableSources = filterState.allSources.where((source) {
+            // Use the local state for headquarter country filtering.
             final matchesCountry =
-                filterState.selectedCountries.isEmpty ||
-                filterState.selectedCountries.any(
+                _selectedHeadquarterCountries.isEmpty ||
+                _selectedHeadquarterCountries.any(
                   (c) => c.isoCode == source.headquarters.isoCode,
                 );
+
             // Assuming all source types are available and selected by default if none are explicitly selected
             final matchesType =
                 filterState.selectedSources.isEmpty ||
@@ -173,7 +185,12 @@ class _SourceFilterView extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildCountryCapsules(context, filterState, l10n, textTheme),
+              _buildCountryCapsules(
+                context,
+                filterState.allCountries,
+                l10n,
+                textTheme,
+              ),
               const SizedBox(height: AppSpacing.md),
               _buildSourceTypeCapsules(context, filterState, l10n, textTheme),
               const SizedBox(height: AppSpacing.md),
@@ -207,7 +224,7 @@ class _SourceFilterView extends StatelessWidget {
 
   Widget _buildCountryCapsules(
     BuildContext context,
-    HeadlinesFilterState filterState,
+    List<Country> allCountries,
     AppLocalizations l10n,
     TextTheme textTheme,
   ) {
@@ -227,7 +244,7 @@ class _SourceFilterView extends StatelessWidget {
             height: AppSpacing.xl + AppSpacing.md,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              itemCount: filterState.allCountries.length + 1,
+              itemCount: allCountries.length + 1,
               separatorBuilder: (context, index) =>
                   const SizedBox(width: AppSpacing.sm),
               itemBuilder: (context, index) {
@@ -235,21 +252,16 @@ class _SourceFilterView extends StatelessWidget {
                   return ChoiceChip(
                     label: Text(l10n.headlinesFeedFilterAllLabel),
                     labelStyle: textTheme.labelLarge,
-                    selected: filterState.selectedCountries.isEmpty,
+                    selected: _selectedHeadquarterCountries.isEmpty,
                     onSelected: (_) {
                       // Clear all country selections
-                      for (final country in filterState.allCountries) {
-                        context.read<HeadlinesFilterBloc>().add(
-                          FilterCountryToggled(
-                            country: country,
-                            isSelected: false,
-                          ),
-                        );
+                      if (_selectedHeadquarterCountries.isNotEmpty) {
+                        setState(() => _selectedHeadquarterCountries.clear());
                       }
                     },
                   );
                 }
-                final country = filterState.allCountries[index - 1];
+                final country = allCountries[index - 1];
                 return ChoiceChip(
                   avatar: country.flagUrl.isNotEmpty
                       ? CircleAvatar(
@@ -259,14 +271,15 @@ class _SourceFilterView extends StatelessWidget {
                       : null,
                   label: Text(country.name),
                   labelStyle: textTheme.labelLarge,
-                  selected: filterState.selectedCountries.contains(country),
+                  selected: _selectedHeadquarterCountries.contains(country),
                   onSelected: (isSelected) {
-                    context.read<HeadlinesFilterBloc>().add(
-                      FilterCountryToggled(
-                        country: country,
-                        isSelected: isSelected,
-                      ),
-                    );
+                    setState(() {
+                      if (isSelected) {
+                        _selectedHeadquarterCountries.add(country);
+                      } else {
+                        _selectedHeadquarterCountries.remove(country);
+                      }
+                    });
                   },
                 );
               },

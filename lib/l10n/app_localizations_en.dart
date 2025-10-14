@@ -935,4 +935,56 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get premiumLimitButton => 'Manage My Content';
+
+  @override
+  String get saveButtonLabel => 'Save';
+
+  @override
+  String get cancelButtonLabel => 'Cancel';
+
+  @override
+  String get manageFiltersPageTitle => 'Manage Filters';
+
+  @override
+  String get manageFiltersEmptyHeadline => 'No Saved Filters';
+
+  @override
+  String get manageFiltersEmptySubheadline =>
+      'You can save filters from the filter page.';
+
+  @override
+  String get manageFiltersRenameTooltip => 'Rename Filter';
+
+  @override
+  String get manageFiltersDeleteTooltip => 'Delete Filter';
+
+  @override
+  String get saveFilterDialogTitleSave => 'Save Filter';
+
+  @override
+  String get saveFilterDialogTitleRename => 'Rename Filter';
+
+  @override
+  String get saveFilterDialogInputLabel => 'Filter Name';
+
+  @override
+  String get saveFilterDialogValidationEmpty => 'Name cannot be empty';
+
+  @override
+  String get saveFilterDialogValidationTooLong => 'Name is too long';
+
+  @override
+  String get headlinesFilterSaveTooltip => 'Save Filter';
+
+  @override
+  String get headlinesFilterManageTooltip => 'Manage Filters';
+
+  @override
+  String get savedFiltersBarOpenTooltip => 'Open Filters';
+
+  @override
+  String get savedFiltersBarAllLabel => 'All';
+
+  @override
+  String get savedFiltersBarCustomLabel => 'Custom';
 }

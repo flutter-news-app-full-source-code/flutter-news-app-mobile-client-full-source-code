@@ -125,10 +125,7 @@ final class NavigationHandled extends HeadlinesFeedEvent {}
 /// {@endtemplate}
 final class SavedFilterSelected extends HeadlinesFeedEvent {
   /// {@macro saved_filter_selected}
-  const SavedFilterSelected({
-    required this.filter,
-    required this.adThemeStyle,
-  });
+  const SavedFilterSelected({required this.filter, required this.adThemeStyle});
 
   /// The saved filter that was selected.
   final SavedFilter filter;

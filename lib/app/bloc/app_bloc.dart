@@ -822,9 +822,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       return;
     }
 
-    final updatedSavedFilters =
-        List<SavedFilter>.from(state.userContentPreferences!.savedFilters)
-          ..add(event.filter);
+    final updatedSavedFilters = List<SavedFilter>.from(
+      state.userContentPreferences!.savedFilters,
+    )..add(event.filter);
 
     final updatedPreferences = state.userContentPreferences!.copyWith(
       savedFilters: updatedSavedFilters,
@@ -884,9 +884,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       return;
     }
 
-    final updatedSavedFilters =
-        List<SavedFilter>.from(state.userContentPreferences!.savedFilters)
-          ..removeWhere((f) => f.id == event.filterId);
+    final updatedSavedFilters = List<SavedFilter>.from(
+      state.userContentPreferences!.savedFilters,
+    )..removeWhere((f) => f.id == event.filterId);
 
     // Check if the list was actually modified to avoid unnecessary updates.
     if (updatedSavedFilters.length ==

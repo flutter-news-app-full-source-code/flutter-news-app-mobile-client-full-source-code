@@ -204,12 +204,7 @@ class HeadlinesFilterBloc
         ),
       );
     } else {
-      emit(
-        state.copyWith(
-          selectedTopics: {},
-          isUsingFollowedItems: false,
-        ),
-      );
+      emit(state.copyWith(selectedTopics: {}, isUsingFollowedItems: false));
     }
   }
 
@@ -232,12 +227,7 @@ class HeadlinesFilterBloc
         ),
       );
     } else {
-      emit(
-        state.copyWith(
-          selectedSources: {},
-          isUsingFollowedItems: false,
-        ),
-      );
+      emit(state.copyWith(selectedSources: {}, isUsingFollowedItems: false));
     }
   }
 
@@ -253,20 +243,14 @@ class HeadlinesFilterBloc
       final userPreferences = _appBloc.state.userContentPreferences;
       emit(
         state.copyWith(
-          selectedCountries:
-              Set.from(userPreferences?.followedCountries ?? []),
+          selectedCountries: Set.from(userPreferences?.followedCountries ?? []),
           // This granular toggle means the monolithic "followed items"
           // flag is no longer applicable for this action.
           isUsingFollowedItems: false,
         ),
       );
     } else {
-      emit(
-        state.copyWith(
-          selectedCountries: {},
-          isUsingFollowedItems: false,
-        ),
-      );
+      emit(state.copyWith(selectedCountries: {}, isUsingFollowedItems: false));
     }
   }
 }

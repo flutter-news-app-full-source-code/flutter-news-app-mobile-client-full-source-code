@@ -16,6 +16,7 @@ class HeadlinesFeedState extends Equatable {
   });
 
   final HeadlinesFeedStatus status;
+
   /// The list of feed items, which can include headlines, ads, and decorators.
   final List<FeedItem> feedItems;
   final bool hasMore;
@@ -56,8 +57,9 @@ class HeadlinesFeedState extends Equatable {
       cursor: clearCursor ? null : cursor ?? this.cursor,
       filter: filter ?? this.filter,
       savedFilters: savedFilters ?? this.savedFilters,
-      activeFilterId:
-          clearActiveFilterId ? null : activeFilterId ?? this.activeFilterId,
+      activeFilterId: clearActiveFilterId
+          ? null
+          : activeFilterId ?? this.activeFilterId,
       error: error ?? this.error,
       navigationUrl: clearNavigationUrl
           ? null

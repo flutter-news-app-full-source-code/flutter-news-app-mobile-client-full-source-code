@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -22,7 +23,7 @@ class SavedFiltersBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO(user): Replace placeholder strings with l10n keys.
+    final l10n = context.l10n;
     final theme = Theme.of(context);
 
     return SizedBox(
@@ -39,7 +40,7 @@ class SavedFiltersBar extends StatelessWidget {
               // Button to open the filter page
               IconButton(
                 icon: const Icon(Icons.filter_list),
-                tooltip: 'Open Filters',
+                tooltip: l10n.savedFiltersBarOpenTooltip,
                 onPressed: () => context.goNamed(Routes.feedFilterName),
               ),
               const VerticalDivider(
@@ -52,7 +53,7 @@ class SavedFiltersBar extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
                 child: ChoiceChip(
-                  label: const Text('All'),
+                  label: Text(l10n.savedFiltersBarAllLabel),
                   selected: activeFilterId == _allFilterId,
                   onSelected: (_) {
                     context.read<HeadlinesFeedBloc>().add(

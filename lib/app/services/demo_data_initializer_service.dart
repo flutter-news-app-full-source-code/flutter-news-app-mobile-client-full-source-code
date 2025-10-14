@@ -118,6 +118,7 @@ class DemoDataInitializerService {
         followedSources: const [],
         followedTopics: const [],
         savedHeadlines: const [],
+        savedFilters: const [],
       );
       await _userContentPreferencesRepository.create(
         item: defaultPreferences,

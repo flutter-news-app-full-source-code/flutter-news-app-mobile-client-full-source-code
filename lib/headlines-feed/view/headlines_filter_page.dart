@@ -51,8 +51,16 @@ class HeadlinesFilterPage extends StatelessWidget {
   }
 }
 
-class _HeadlinesFilterView extends StatelessWidget {
+class _HeadlinesFilterView extends StatefulWidget {
   const _HeadlinesFilterView();
+
+  @override
+  State<_HeadlinesFilterView> createState() => _HeadlinesFilterViewState();
+}
+
+class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
+  /// Track the most recently saved filter within this page's lifecycle.
+  SavedFilter? _newlySavedFilter;
 
   /// Builds a [ListTile] representing a filter criterion (e.g., Categories).
   ///
@@ -144,6 +152,8 @@ class _HeadlinesFilterView extends StatelessWidget {
                         sources: filterState.selectedSources.toList(),
                         countries: filterState.selectedCountries.toList(),
                       );
+                      // Keep track of the newly saved filter.
+                      setState(() => _newlySavedFilter = newFilter);
                       context.read<AppBloc>().add(
                         SavedFilterAdded(filter: newFilter),
                       );
@@ -174,6 +184,8 @@ class _HeadlinesFilterView extends StatelessWidget {
               context.read<HeadlinesFeedBloc>().add(
                 HeadlinesFeedFiltersApplied(
                   filter: newFilter,
+                  // Pass the newly saved filter if it exists.
+                  savedFilter: _newlySavedFilter,
                   adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
                 ),
               );

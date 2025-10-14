@@ -59,17 +59,23 @@ final class HeadlinesFeedFiltersApplied extends HeadlinesFeedEvent {
   const HeadlinesFeedFiltersApplied({
     required this.filter,
     required this.adThemeStyle,
+    this.savedFilter,
   });
 
   /// The [HeadlineFilter] containing the selected categories, sources,
   /// and/or countries.
   final HeadlineFilter filter;
 
+  /// The optional [SavedFilter] that this filter corresponds to.
+  /// This is used to correctly set the active filter ID when a new
+  /// filter is saved and immediately applied.
+  final SavedFilter? savedFilter;
+
   /// The current ad theme style of the application.
   final AdThemeStyle adThemeStyle;
 
   @override
-  List<Object?> get props => [filter, adThemeStyle];
+  List<Object?> get props => [filter, adThemeStyle, savedFilter];
 }
 
 /// {@template headlines_feed_filters_cleared}

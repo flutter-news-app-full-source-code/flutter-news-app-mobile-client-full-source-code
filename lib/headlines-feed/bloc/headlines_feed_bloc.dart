@@ -248,14 +248,28 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     HeadlinesFeedFiltersApplied event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
+    String? newActiveFilterId;
+
+    // If a saved filter was explicitly passed (e.g., just created), use its ID.
+    if (event.savedFilter != null) {
+      newActiveFilterId = event.savedFilter!.id;
+    } else {
+      // Otherwise, determine if this is a pre-existing saved filter being
+      // re-applied or a custom one.
+      final isSavedFilter =
+          state.activeFilterId != 'all' &&
+          state.activeFilterId != 'custom' &&
+          state.activeFilterId != null;
+      newActiveFilterId = isSavedFilter ? state.activeFilterId : 'custom';
+    }
+
     // When applying new filters, this is considered a major feed change,
     // so we clear the ad cache to get a fresh set of relevant ads.
     _inlineAdCacheService.clearAllAds();
     emit(
       state.copyWith(
-        // Applying a filter from the filter page always results in a 'custom' state.
         filter: event.filter,
-        activeFilterId: 'custom',
+        activeFilterId: newActiveFilterId,
         status: HeadlinesFeedStatus.loading,
         feedItems: [],
         cursor: null,

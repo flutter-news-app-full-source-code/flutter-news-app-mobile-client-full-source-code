@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:core/core.dart';
@@ -35,6 +33,19 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
        _appBloc = appBloc,
        _inlineAdCacheService = inlineAdCacheService,
        super(const HeadlinesFeedState()) {
+    // Subscribe to AppBloc to receive updates on user preferences.
+    _appBlocSubscription = _appBloc.stream.listen((appState) {
+      // Check if userContentPreferences has changed and is not null.
+      if (appState.userContentPreferences != null &&
+          state.savedFilters != appState.userContentPreferences!.savedFilters) {
+        add(
+          _AppContentPreferencesChanged(
+            preferences: appState.userContentPreferences!,
+          ),
+        );
+      }
+    });
+
     on<HeadlinesFeedFetchRequested>(
       _onHeadlinesFeedFetchRequested,
       transformer: droppable(),
@@ -57,12 +68,18 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     );
     on<CallToActionTapped>(_onCallToActionTapped, transformer: sequential());
     on<NavigationHandled>(_onNavigationHandled, transformer: sequential());
+    on<_AppContentPreferencesChanged>(_onAppContentPreferencesChanged);
+    on<SavedFilterSelected>(_onSavedFilterSelected, transformer: restartable());
+    on<AllFilterSelected>(_onAllFilterSelected, transformer: restartable());
   }
 
   final DataRepository<Headline> _headlinesRepository;
   final FeedDecoratorService _feedDecoratorService;
   final AppBloc _appBloc;
   final InlineAdCacheService _inlineAdCacheService;
+
+  /// Subscription to the AppBloc's state stream.
+  late final StreamSubscription<AppState> _appBlocSubscription;
 
   /// The number of headlines to fetch per page.
   static const _headlinesFetchLimit = 10;
@@ -236,6 +253,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       state.copyWith(
         status: HeadlinesFeedStatus.loading,
         filter: event.filter,
+        activeFilterId: 'custom',
         feedItems: [],
         cursor: null,
         clearCursor: true,
@@ -318,6 +336,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       state.copyWith(
         status: HeadlinesFeedStatus.loading,
         filter: const HeadlineFilter(),
+        activeFilterId: 'all',
         feedItems: [],
         cursor: null,
         clearCursor: true,
@@ -443,5 +462,59 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   ) {
     // Clear the navigationUrl from the state after it has been handled by the UI.
     emit(state.copyWith(clearNavigationUrl: true));
+  }
+
+  /// Handles updates to user content preferences from the AppBloc.
+  void _onAppContentPreferencesChanged(
+    _AppContentPreferencesChanged event,
+    Emitter<HeadlinesFeedState> emit,
+  ) {
+    emit(state.copyWith(savedFilters: event.preferences.savedFilters));
+  }
+
+  /// Handles the selection of a saved filter from the filter bar.
+  ///
+  /// This creates a [HeadlineFilter] from the selected [SavedFilter] and
+  /// triggers a full feed refresh.
+  Future<void> _onSavedFilterSelected(
+    SavedFilterSelected event,
+    Emitter<HeadlinesFeedState> emit,
+  ) async {
+    final newFilter = HeadlineFilter(
+      topics: event.filter.topics,
+      sources: event.filter.sources,
+      eventCountries: event.filter.countries,
+      // This is not from the "followed items" toggle.
+      isFromFollowedItems: false,
+    );
+
+    // Set the active filter ID and then dispatch an event to apply the filter
+    // and refresh the feed.
+    emit(state.copyWith(activeFilterId: event.filter.id));
+    add(
+      HeadlinesFeedFiltersApplied(
+        filter: newFilter,
+        adThemeStyle: event.adThemeStyle,
+      ),
+    );
+  }
+
+  /// Handles the selection of the "All" filter from the filter bar.
+  ///
+  /// This clears all active filters and triggers a full feed refresh.
+  Future<void> _onAllFilterSelected(
+    AllFilterSelected event,
+    Emitter<HeadlinesFeedState> emit,
+  ) async {
+    // Set the active filter ID to 'all' and then dispatch an event to clear
+    // all filters and refresh the feed.
+    emit(state.copyWith(activeFilterId: 'all'));
+    add(HeadlinesFeedFiltersCleared(adThemeStyle: event.adThemeStyle));
+  }
+
+  @override
+  Future<void> close() {
+    _appBlocSubscription.cancel();
+    return super.close();
   }
 }

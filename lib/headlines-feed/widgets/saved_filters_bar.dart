@@ -93,7 +93,7 @@ class SavedFiltersBar extends StatelessWidget {
                     horizontal: AppSpacing.xs,
                   ),
                   child: ChoiceChip(
-                    label: const Text('Custom'),
+                    label: Text(l10n.savedFiltersBarCustomLabel),
                     // Always selected when visible, but disabled to prevent
                     // user interaction. It's a status indicator.
                     selected: true,

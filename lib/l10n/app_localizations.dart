@@ -1879,6 +1879,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Custom'**
   String get savedFiltersBarCustomLabel;
+
+  /// Title for the dialog that asks the user how to apply a filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply Filter'**
+  String get applyFilterDialogTitle;
+
+  /// Content for the dialog that asks the user how to apply a filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you want to apply these filter settings for this session only, or save them for future use?'**
+  String get applyFilterDialogContent;
+
+  /// Button text to apply the filter for the current session only.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply Only'**
+  String get applyFilterDialogApplyOnlyButton;
+
+  /// Button text to apply and save the filter for future use.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply & Save'**
+  String get applyFilterDialogApplyAndSaveButton;
 }
 
 class _AppLocalizationsDelegate

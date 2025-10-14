@@ -1293,5 +1293,21 @@
     "savedFiltersBarCustomLabel": "Custom",
     "@savedFiltersBarCustomLabel": {
         "description": "Label for the 'Custom' chip in the saved filters bar, indicating an unsaved filter is active."
+    },
+    "applyFilterDialogTitle": "Apply Filter",
+    "@applyFilterDialogTitle": {
+        "description": "Title for the dialog that asks the user how to apply a filter."
+    },
+    "applyFilterDialogContent": "Do you want to apply these filter settings for this session only, or save them for future use?",
+    "@applyFilterDialogContent": {
+        "description": "Content for the dialog that asks the user how to apply a filter."
+    },
+    "applyFilterDialogApplyOnlyButton": "Apply Only",
+    "@applyFilterDialogApplyOnlyButton": {
+        "description": "Button text to apply the filter for the current session only."
+    },
+    "applyFilterDialogApplyAndSaveButton": "Apply & Save",
+    "@applyFilterDialogApplyAndSaveButton": {
+        "description": "Button text to apply and save the filter for future use."
     }
 }

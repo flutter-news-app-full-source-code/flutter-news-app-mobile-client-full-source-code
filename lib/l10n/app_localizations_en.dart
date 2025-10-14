@@ -987,4 +987,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get savedFiltersBarCustomLabel => 'Custom';
+
+  @override
+  String get applyFilterDialogTitle => 'Apply Filter';
+
+  @override
+  String get applyFilterDialogContent =>
+      'Do you want to apply these filter settings for this session only, or save them for future use?';
+
+  @override
+  String get applyFilterDialogApplyOnlyButton => 'Apply Only';
+
+  @override
+  String get applyFilterDialogApplyAndSaveButton => 'Apply & Save';
 }

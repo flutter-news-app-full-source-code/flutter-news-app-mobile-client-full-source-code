@@ -986,4 +986,17 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get savedFiltersBarCustomLabel => 'مخصص';
+
+  @override
+  String get applyFilterDialogTitle => 'تطبيق الفلتر';
+
+  @override
+  String get applyFilterDialogContent =>
+      'هل تريد تطبيق إعدادات الفلترة هذه لهذه الجلسة فقط، أم حفظها للاستخدام المستقبلي؟';
+
+  @override
+  String get applyFilterDialogApplyOnlyButton => 'تطبيق فقط';
+
+  @override
+  String get applyFilterDialogApplyAndSaveButton => 'تطبيق وحفظ';
 }

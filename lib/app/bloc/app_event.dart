@@ -156,3 +156,45 @@ class AppUserFeedDecoratorShown extends AppEvent {
   @override
   List<Object> get props => [userId, feedDecoratorType, isCompleted];
 }
+
+/// {@template saved_filter_added}
+/// Dispatched when a new feed filter is saved by the user.
+/// {@endtemplate}
+class SavedFilterAdded extends AppEvent {
+  /// {@macro saved_filter_added}
+  const SavedFilterAdded({required this.filter});
+
+  /// The new [SavedFilter] to be added.
+  final SavedFilter filter;
+
+  @override
+  List<Object> get props => [filter];
+}
+
+/// {@template saved_filter_updated}
+/// Dispatched when an existing saved feed filter is updated (e.g., renamed).
+/// {@endtemplate}
+class SavedFilterUpdated extends AppEvent {
+  /// {@macro saved_filter_updated}
+  const SavedFilterUpdated({required this.filter});
+
+  /// The updated [SavedFilter] object.
+  final SavedFilter filter;
+
+  @override
+  List<Object> get props => [filter];
+}
+
+/// {@template saved_filter_deleted}
+/// Dispatched when a saved feed filter is deleted by the user.
+/// {@endtemplate}
+class SavedFilterDeleted extends AppEvent {
+  /// {@macro saved_filter_deleted}
+  const SavedFilterDeleted({required this.filterId});
+
+  /// The ID of the filter to be deleted.
+  final String filterId;
+
+  @override
+  List<Object> get props => [filterId];
+}

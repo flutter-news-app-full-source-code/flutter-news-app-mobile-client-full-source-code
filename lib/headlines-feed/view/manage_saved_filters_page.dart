@@ -40,7 +40,8 @@ class ManageSavedFiltersPage extends StatelessWidget {
 
           return ListView.separated(
             itemCount: savedFilters.length,
-            separatorBuilder: (context, index) => const Divider(height: 1),
+            separatorBuilder: (context, index) =>
+                const Divider(height: 1, indent: AppSpacing.md),
             itemBuilder: (context, index) {
               final filter = savedFilters[index];
               return ListTile(

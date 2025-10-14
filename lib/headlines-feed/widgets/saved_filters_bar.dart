@@ -27,7 +27,7 @@ class SavedFiltersBar extends StatelessWidget {
     final theme = Theme.of(context);
 
     return SizedBox(
-      height: 48,
+      height: 52,
       child: BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
         builder: (context, state) {
           final savedFilters = state.savedFilters;

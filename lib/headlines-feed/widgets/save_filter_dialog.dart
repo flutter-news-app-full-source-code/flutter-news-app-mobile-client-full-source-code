@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -50,29 +51,31 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final isRenaming = widget.initialValue != null;
 
-    // TODO(user): Replace placeholder strings with l10n keys.
     return AlertDialog(
-      title: Text(isRenaming ? 'Rename Filter' : 'Save Filter'),
+      title: Text(
+        isRenaming
+            ? l10n.saveFilterDialogTitleRename
+            : l10n.saveFilterDialogTitleSave,
+      ),
       content: Form(
         key: _formKey,
         child: TextFormField(
           controller: _controller,
           autofocus: true,
           maxLength: _maxNameLength,
-          decoration: const InputDecoration(
-            labelText: 'Filter Name',
+          decoration: InputDecoration(
+            labelText: l10n.saveFilterDialogInputLabel,
             counterText: '',
           ),
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
-              return 'Name cannot be empty';
+              return l10n.saveFilterDialogValidationEmpty;
             }
             if (value.length > _maxNameLength) {
-              // This case is handled by maxLength, but good for explicit msg.
-              return 'Name is too long';
+              return l10n.saveFilterDialogValidationTooLong;
             }
             return null;
           },

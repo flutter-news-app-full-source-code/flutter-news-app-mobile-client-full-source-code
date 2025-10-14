@@ -80,8 +80,8 @@ class _TopicFilterView extends StatelessWidget {
                   } else {
                     // Toggle the followed items filter in the HeadlinesFilterBloc
                     context.read<HeadlinesFilterBloc>().add(
-                      FollowedItemsFilterToggled(
-                        isUsingFollowedItems: !isFollowedFilterActive,
+                      FollowedTopicsFilterToggled(
+                        isSelected: !isFollowedFilterActive,
                       ),
                     );
                   }

@@ -59,9 +59,6 @@ class _HeadlinesFilterView extends StatefulWidget {
 }
 
 class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
-  /// Track the most recently saved filter within this page's lifecycle.
-  SavedFilter? _newlySavedFilter;
-
   /// Builds a [ListTile] representing a filter criterion (e.g., Categories).
   ///
   /// Displays the criterion [title], the number of currently selected items

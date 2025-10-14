@@ -55,6 +55,7 @@ class SavedFiltersBar extends StatelessWidget {
                 child: ChoiceChip(
                   label: Text(l10n.savedFiltersBarAllLabel),
                   selected: activeFilterId == _allFilterId,
+                  showCheckmark: false,
                   onSelected: (_) {
                     context.read<HeadlinesFeedBloc>().add(
                       AllFilterSelected(
@@ -74,6 +75,7 @@ class SavedFiltersBar extends StatelessWidget {
                   child: ChoiceChip(
                     label: Text(filter.name),
                     selected: activeFilterId == filter.id,
+                    showCheckmark: false,
                     onSelected: (_) {
                       context.read<HeadlinesFeedBloc>().add(
                         SavedFilterSelected(
@@ -96,6 +98,7 @@ class SavedFiltersBar extends StatelessWidget {
                     label: Text(l10n.savedFiltersBarCustomLabel),
                     // Always selected when visible, but disabled to prevent
                     // user interaction. It's a status indicator.
+                    showCheckmark: false,
                     selected: true,
                     onSelected: null,
                     selectedColor: theme.colorScheme.primary.withOpacity(0.2),

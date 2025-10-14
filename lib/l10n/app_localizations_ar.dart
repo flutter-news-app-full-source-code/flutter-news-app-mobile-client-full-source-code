@@ -934,4 +934,69 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get premiumLimitButton => 'إدارة المحتوى الخاص بي';
+
+  @override
+  String get saveButtonLabel => 'حفظ';
+
+  @override
+  String get cancelButtonLabel => 'إلغاء';
+
+  @override
+  String get manageFiltersPageTitle => 'إدارة الفلاتر';
+
+  @override
+  String get manageFiltersEmptyHeadline => 'لا توجد فلاتر محفوظة';
+
+  @override
+  String get manageFiltersEmptySubheadline =>
+      'يمكنك حفظ الفلاتر من صفحة التصفية.';
+
+  @override
+  String get manageFiltersRenameTooltip => 'إعادة تسمية الفلتر';
+
+  @override
+  String get manageFiltersDeleteTooltip => 'حذف الفلتر';
+
+  @override
+  String get saveFilterDialogTitleSave => 'حفظ الفلتر';
+
+  @override
+  String get saveFilterDialogTitleRename => 'إعادة تسمية الفلتر';
+
+  @override
+  String get saveFilterDialogInputLabel => 'اسم الفلتر';
+
+  @override
+  String get saveFilterDialogValidationEmpty => 'لا يمكن أن يكون الاسم فارغًا';
+
+  @override
+  String get saveFilterDialogValidationTooLong => 'الاسم طويل جدًا';
+
+  @override
+  String get headlinesFilterSaveTooltip => 'حفظ الفلتر';
+
+  @override
+  String get headlinesFilterManageTooltip => 'إدارة الفلاتر';
+
+  @override
+  String get savedFiltersBarOpenTooltip => 'فتح الفلاتر';
+
+  @override
+  String get savedFiltersBarAllLabel => 'الكل';
+
+  @override
+  String get savedFiltersBarCustomLabel => 'مخصص';
+
+  @override
+  String get applyFilterDialogTitle => 'تطبيق الفلتر';
+
+  @override
+  String get applyFilterDialogContent =>
+      'هل تريد تطبيق إعدادات الفلترة هذه لهذه الجلسة فقط، أم حفظها للاستخدام المستقبلي؟';
+
+  @override
+  String get applyFilterDialogApplyOnlyButton => 'تطبيق فقط';
+
+  @override
+  String get applyFilterDialogApplyAndSaveButton => 'تطبيق وحفظ';
 }

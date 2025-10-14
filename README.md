@@ -36,6 +36,7 @@ Click on any category to explore.
 ### 🔍 Advanced Content Filtering & Search
 - **Comprehensive Filtering:** Let users filter headlines by `Topic`, `Source`, and `Country` using a dedicated filter interface.
 - **"Followed Items" Filter:** Users can instantly filter the feed to show only content from their followed topics, sources, and countries.
+- **Saved & Quick-Access Filters:** Empower users to save complex filter combinations and recall them with a single tap from a new, persistent filter bar on the main feed.
 - **Unified Search:** Includes a dedicated search page to help users find specific content quickly, with the ability to search across headlines, topics, sources, and countries.
 > **🎯 Your Advantage:** Give your users powerful content discovery tools that keep them engaged and coming back for more.
 

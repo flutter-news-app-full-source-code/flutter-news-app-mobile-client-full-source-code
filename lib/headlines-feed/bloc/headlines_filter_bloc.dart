@@ -40,7 +40,9 @@ class HeadlinesFilterBloc
     on<FilterTopicToggled>(_onFilterTopicToggled);
     on<FilterSourceToggled>(_onFilterSourceToggled);
     on<FilterCountryToggled>(_onFilterCountryToggled);
-    on<FollowedItemsFilterToggled>(_onFollowedItemsFilterToggled);
+    on<FollowedTopicsFilterToggled>(_onFollowedTopicsFilterToggled);
+    on<FollowedSourcesFilterToggled>(_onFollowedSourcesFilterToggled);
+    on<FollowedCountriesFilterToggled>(_onFollowedCountriesFilterToggled);
     on<FilterSelectionsCleared>(_onFilterSelectionsCleared);
   }
 
@@ -168,34 +170,6 @@ class HeadlinesFilterBloc
     );
   }
 
-  /// Handles the [FollowedItemsFilterToggled] event, applying or clearing
-  /// followed items as filters.
-  void _onFollowedItemsFilterToggled(
-    FollowedItemsFilterToggled event,
-    Emitter<HeadlinesFilterState> emit,
-  ) {
-    if (event.isUsingFollowedItems) {
-      final userPreferences = _appBloc.state.userContentPreferences;
-      emit(
-        state.copyWith(
-          selectedTopics: Set.from(userPreferences?.followedTopics ?? []),
-          selectedSources: Set.from(userPreferences?.followedSources ?? []),
-          selectedCountries: Set.from(userPreferences?.followedCountries ?? []),
-          isUsingFollowedItems: true,
-        ),
-      );
-    } else {
-      emit(
-        state.copyWith(
-          selectedTopics: {},
-          selectedSources: {},
-          selectedCountries: {},
-          isUsingFollowedItems: false,
-        ),
-      );
-    }
-  }
-
   /// Handles the [FilterSelectionsCleared] event, clearing all filter selections.
   void _onFilterSelectionsCleared(
     FilterSelectionsCleared event,
@@ -209,5 +183,74 @@ class HeadlinesFilterBloc
         isUsingFollowedItems: false,
       ),
     );
+  }
+
+  /// Handles toggling the followed topics filter.
+  ///
+  /// This method specifically updates the `selectedTopics` set based on the
+  /// user's followed topics, without affecting other filter selections.
+  void _onFollowedTopicsFilterToggled(
+    FollowedTopicsFilterToggled event,
+    Emitter<HeadlinesFilterState> emit,
+  ) {
+    if (event.isSelected) {
+      final userPreferences = _appBloc.state.userContentPreferences;
+      emit(
+        state.copyWith(
+          selectedTopics: Set.from(userPreferences?.followedTopics ?? []),
+          // This granular toggle means the monolithic "followed items"
+          // flag is no longer applicable for this action.
+          isUsingFollowedItems: false,
+        ),
+      );
+    } else {
+      emit(state.copyWith(selectedTopics: {}, isUsingFollowedItems: false));
+    }
+  }
+
+  /// Handles toggling the followed sources filter.
+  ///
+  /// This method specifically updates the `selectedSources` set based on the
+  /// user's followed sources, without affecting other filter selections.
+  void _onFollowedSourcesFilterToggled(
+    FollowedSourcesFilterToggled event,
+    Emitter<HeadlinesFilterState> emit,
+  ) {
+    if (event.isSelected) {
+      final userPreferences = _appBloc.state.userContentPreferences;
+      emit(
+        state.copyWith(
+          selectedSources: Set.from(userPreferences?.followedSources ?? []),
+          // This granular toggle means the monolithic "followed items"
+          // flag is no longer applicable for this action.
+          isUsingFollowedItems: false,
+        ),
+      );
+    } else {
+      emit(state.copyWith(selectedSources: {}, isUsingFollowedItems: false));
+    }
+  }
+
+  /// Handles toggling the followed countries filter.
+  ///
+  /// This method specifically updates the `selectedCountries` set based on the
+  /// user's followed countries, without affecting other filter selections.
+  void _onFollowedCountriesFilterToggled(
+    FollowedCountriesFilterToggled event,
+    Emitter<HeadlinesFilterState> emit,
+  ) {
+    if (event.isSelected) {
+      final userPreferences = _appBloc.state.userContentPreferences;
+      emit(
+        state.copyWith(
+          selectedCountries: Set.from(userPreferences?.followedCountries ?? []),
+          // This granular toggle means the monolithic "followed items"
+          // flag is no longer applicable for this action.
+          isUsingFollowedItems: false,
+        ),
+      );
+    } else {
+      emit(state.copyWith(selectedCountries: {}, isUsingFollowedItems: false));
+    }
   }
 }

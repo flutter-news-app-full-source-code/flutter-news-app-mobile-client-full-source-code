@@ -16,6 +16,10 @@ abstract final class Routes {
   static const feedFilterSources = 'sources';
   static const feedFilterSourcesName = 'feedFilterSources';
 
+  // New route for managing saved filters
+  static const manageSavedFilters = 'manage-saved-filters';
+  static const manageSavedFiltersName = 'manageSavedFilters';
+
   // New routes for country filtering
   static const feedFilterEventCountries = 'event-countries';
   static const feedFilterEventCountriesName = 'feedFilterEventCountries';

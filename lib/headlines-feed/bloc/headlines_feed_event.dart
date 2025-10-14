@@ -59,17 +59,23 @@ final class HeadlinesFeedFiltersApplied extends HeadlinesFeedEvent {
   const HeadlinesFeedFiltersApplied({
     required this.filter,
     required this.adThemeStyle,
+    this.savedFilter,
   });
 
   /// The [HeadlineFilter] containing the selected categories, sources,
   /// and/or countries.
   final HeadlineFilter filter;
 
+  /// The optional [SavedFilter] that this filter corresponds to.
+  /// This is used to correctly set the active filter ID when a new
+  /// filter is saved and immediately applied.
+  final SavedFilter? savedFilter;
+
   /// The current ad theme style of the application.
   final AdThemeStyle adThemeStyle;
 
   @override
-  List<Object?> get props => [filter, adThemeStyle];
+  List<Object?> get props => [filter, adThemeStyle, savedFilter];
 }
 
 /// {@template headlines_feed_filters_cleared}
@@ -119,3 +125,44 @@ final class CallToActionTapped extends HeadlinesFeedEvent {
 /// This is used to clear the navigationUrl from the state.
 /// {@endtemplate}
 final class NavigationHandled extends HeadlinesFeedEvent {}
+
+/// {@template saved_filter_selected}
+/// Event triggered when a user selects a saved filter from the filter bar.
+/// {@endtemplate}
+final class SavedFilterSelected extends HeadlinesFeedEvent {
+  /// {@macro saved_filter_selected}
+  const SavedFilterSelected({required this.filter, required this.adThemeStyle});
+
+  /// The saved filter that was selected.
+  final SavedFilter filter;
+
+  /// The current ad theme style of the application.
+  final AdThemeStyle adThemeStyle;
+
+  @override
+  List<Object> get props => [filter, adThemeStyle];
+}
+
+/// {@template all_filter_selected}
+/// Event triggered when the user selects the "All" filter from the filter bar.
+/// {@endtemplate}
+final class AllFilterSelected extends HeadlinesFeedEvent {
+  /// {@macro all_filter_selected}
+  const AllFilterSelected({required this.adThemeStyle});
+
+  /// The current ad theme style of the application.
+  final AdThemeStyle adThemeStyle;
+
+  @override
+  List<Object> get props => [adThemeStyle];
+}
+
+/// Internal event to notify the bloc of changes in user content preferences.
+final class _AppContentPreferencesChanged extends HeadlinesFeedEvent {
+  const _AppContentPreferencesChanged({required this.preferences});
+
+  final UserContentPreferences preferences;
+
+  @override
+  List<Object> get props => [preferences];
+}

@@ -1225,5 +1225,89 @@
     "premiumLimitButton": "Manage My Content",
     "@premiumLimitButton": {
         "description": "Button text for the bottom sheet when a premium user hits a content limit."
+    },
+    "saveButtonLabel": "Save",
+    "@saveButtonLabel": {
+        "description": "Generic label for a save button."
+    },
+    "cancelButtonLabel": "Cancel",
+    "@cancelButtonLabel": {
+        "description": "Generic label for a cancel button."
+    },
+    "manageFiltersPageTitle": "Manage Filters",
+    "@manageFiltersPageTitle": {
+        "description": "Title for the page where users manage their saved filters."
+    },
+    "manageFiltersEmptyHeadline": "No Saved Filters",
+    "@manageFiltersEmptyHeadline": {
+        "description": "Headline for the empty state on the manage saved filters page."
+    },
+    "manageFiltersEmptySubheadline": "You can save filters from the filter page.",
+    "@manageFiltersEmptySubheadline": {
+        "description": "Subheadline for the empty state on the manage saved filters page."
+    },
+    "manageFiltersRenameTooltip": "Rename Filter",
+    "@manageFiltersRenameTooltip": {
+        "description": "Tooltip for the button to rename a saved filter."
+    },
+    "manageFiltersDeleteTooltip": "Delete Filter",
+    "@manageFiltersDeleteTooltip": {
+        "description": "Tooltip for the button to delete a saved filter."
+    },
+    "saveFilterDialogTitleSave": "Save Filter",
+    "@saveFilterDialogTitleSave": {
+        "description": "Title for the dialog when saving a new filter."
+    },
+    "saveFilterDialogTitleRename": "Rename Filter",
+    "@saveFilterDialogTitleRename": {
+        "description": "Title for the dialog when renaming an existing filter."
+    },
+    "saveFilterDialogInputLabel": "Filter Name",
+    "@saveFilterDialogInputLabel": {
+        "description": "Label for the text input field where the user names a filter."
+    },
+    "saveFilterDialogValidationEmpty": "Name cannot be empty",
+    "@saveFilterDialogValidationEmpty": {
+        "description": "Validation error message when the filter name is empty."
+    },
+    "saveFilterDialogValidationTooLong": "Name is too long",
+    "@saveFilterDialogValidationTooLong": {
+        "description": "Validation error message when the filter name is too long."
+    },
+    "headlinesFilterSaveTooltip": "Save Filter",
+    "@headlinesFilterSaveTooltip": {
+        "description": "Tooltip for the save icon on the main filter page."
+    },
+    "headlinesFilterManageTooltip": "Manage Filters",
+    "@headlinesFilterManageTooltip": {
+        "description": "Tooltip for the manage icon on the main filter page."
+    },
+    "savedFiltersBarOpenTooltip": "Open Filters",
+    "@savedFiltersBarOpenTooltip": {
+        "description": "Tooltip for the icon button on the filters bar that opens the filter page."
+    },
+    "savedFiltersBarAllLabel": "All",
+    "@savedFiltersBarAllLabel": {
+        "description": "Label for the 'All' chip in the saved filters bar."
+    },
+    "savedFiltersBarCustomLabel": "Custom",
+    "@savedFiltersBarCustomLabel": {
+        "description": "Label for the 'Custom' chip in the saved filters bar, indicating an unsaved filter is active."
+    },
+    "applyFilterDialogTitle": "Apply Filter",
+    "@applyFilterDialogTitle": {
+        "description": "Title for the dialog that asks the user how to apply a filter."
+    },
+    "applyFilterDialogContent": "Do you want to apply these filter settings for this session only, or save them for future use?",
+    "@applyFilterDialogContent": {
+        "description": "Content for the dialog that asks the user how to apply a filter."
+    },
+    "applyFilterDialogApplyOnlyButton": "Apply Only",
+    "@applyFilterDialogApplyOnlyButton": {
+        "description": "Button text to apply the filter for the current session only."
+    },
+    "applyFilterDialogApplyAndSaveButton": "Apply & Save",
+    "@applyFilterDialogApplyAndSaveButton": {
+        "description": "Button text to apply and save the filter for future use."
     }
 }

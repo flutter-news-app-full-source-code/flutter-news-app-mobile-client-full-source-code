@@ -1777,6 +1777,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Manage My Content'**
   String get premiumLimitButton;
+
+  /// Generic label for a save button.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get saveButtonLabel;
+
+  /// Generic label for a cancel button.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancelButtonLabel;
+
+  /// Title for the page where users manage their saved filters.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Filters'**
+  String get manageFiltersPageTitle;
+
+  /// Headline for the empty state on the manage saved filters page.
+  ///
+  /// In en, this message translates to:
+  /// **'No Saved Filters'**
+  String get manageFiltersEmptyHeadline;
+
+  /// Subheadline for the empty state on the manage saved filters page.
+  ///
+  /// In en, this message translates to:
+  /// **'You can save filters from the filter page.'**
+  String get manageFiltersEmptySubheadline;
+
+  /// Tooltip for the button to rename a saved filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename Filter'**
+  String get manageFiltersRenameTooltip;
+
+  /// Tooltip for the button to delete a saved filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Filter'**
+  String get manageFiltersDeleteTooltip;
+
+  /// Title for the dialog when saving a new filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Filter'**
+  String get saveFilterDialogTitleSave;
+
+  /// Title for the dialog when renaming an existing filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename Filter'**
+  String get saveFilterDialogTitleRename;
+
+  /// Label for the text input field where the user names a filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter Name'**
+  String get saveFilterDialogInputLabel;
+
+  /// Validation error message when the filter name is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Name cannot be empty'**
+  String get saveFilterDialogValidationEmpty;
+
+  /// Validation error message when the filter name is too long.
+  ///
+  /// In en, this message translates to:
+  /// **'Name is too long'**
+  String get saveFilterDialogValidationTooLong;
+
+  /// Tooltip for the save icon on the main filter page.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Filter'**
+  String get headlinesFilterSaveTooltip;
+
+  /// Tooltip for the manage icon on the main filter page.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Filters'**
+  String get headlinesFilterManageTooltip;
+
+  /// Tooltip for the icon button on the filters bar that opens the filter page.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Filters'**
+  String get savedFiltersBarOpenTooltip;
+
+  /// Label for the 'All' chip in the saved filters bar.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get savedFiltersBarAllLabel;
+
+  /// Label for the 'Custom' chip in the saved filters bar, indicating an unsaved filter is active.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get savedFiltersBarCustomLabel;
+
+  /// Title for the dialog that asks the user how to apply a filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply Filter'**
+  String get applyFilterDialogTitle;
+
+  /// Content for the dialog that asks the user how to apply a filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you want to apply these filter settings for this session only, or save them for future use?'**
+  String get applyFilterDialogContent;
+
+  /// Button text to apply the filter for the current session only.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply Only'**
+  String get applyFilterDialogApplyOnlyButton;
+
+  /// Button text to apply and save the filter for future use.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply & Save'**
+  String get applyFilterDialogApplyAndSaveButton;
 }
 
 class _AppLocalizationsDelegate

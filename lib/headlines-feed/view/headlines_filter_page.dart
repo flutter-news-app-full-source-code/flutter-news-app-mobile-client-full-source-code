@@ -101,6 +101,90 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
     );
   }
 
+  /// Shows the dialog to let the user choose between applying the filter
+  /// for one-time use or saving it for future use.
+  Future<void> _showApplyOptionsDialog() async {
+    final l10n = AppLocalizationsX(context).l10n;
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text(l10n.applyFilterDialogTitle),
+          content: Text(l10n.applyFilterDialogContent),
+          actions: <Widget>[
+            TextButton(
+              child: Text(l10n.applyFilterDialogApplyOnlyButton),
+              onPressed: () {
+                // Pop the dialog first.
+                Navigator.of(dialogContext).pop();
+                // Apply the filter as a "custom" one-time filter.
+                _applyAndExit(null);
+              },
+            ),
+            FilledButton(
+              child: Text(l10n.applyFilterDialogApplyAndSaveButton),
+              onPressed: () {
+                // Pop the dialog first.
+                Navigator.of(dialogContext).pop();
+                // Initiate the save and apply flow.
+                _saveAndApplyFilter();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// Initiates the process of saving a filter by showing the naming dialog,
+  /// and then applies it.
+  void _saveAndApplyFilter() {
+    final filterState = context.read<HeadlinesFilterBloc>().state;
+    showDialog<void>(
+      context: context,
+      builder: (_) {
+        return SaveFilterDialog(
+          onSave: (name) {
+            final newFilter = SavedFilter(
+              id: const Uuid().v4(),
+              name: name,
+              topics: filterState.selectedTopics.toList(),
+              sources: filterState.selectedSources.toList(),
+              countries: filterState.selectedCountries.toList(),
+            );
+            // Add the filter to the global state.
+            context.read<AppBloc>().add(SavedFilterAdded(filter: newFilter));
+            // Apply the newly saved filter and exit the page.
+            _applyAndExit(newFilter);
+          },
+        );
+      },
+    );
+  }
+
+  /// Applies the current filter selections to the feed and pops the page.
+  ///
+  /// If a [savedFilter] is provided, it's passed to the event to ensure
+  /// its chip is correctly selected on the feed. Otherwise, the filter is
+  /// treated as a "custom" one.
+  void _applyAndExit(SavedFilter? savedFilter) {
+    final filterState = context.read<HeadlinesFilterBloc>().state;
+    final newFilter = HeadlineFilter(
+      topics: filterState.selectedTopics.toList(),
+      sources: filterState.selectedSources.toList(),
+      eventCountries: filterState.selectedCountries.toList(),
+      isFromFollowedItems: filterState.isUsingFollowedItems,
+    );
+    context.read<HeadlinesFeedBloc>().add(
+      HeadlinesFeedFiltersApplied(
+        filter: newFilter,
+        savedFilter: savedFilter,
+        adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+      ),
+    );
+    context.pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
@@ -134,63 +218,11 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
             icon: const Icon(Icons.edit_note_outlined),
             onPressed: () => context.pushNamed(Routes.manageSavedFiltersName),
           ),
-          // Save Filter Button
-          IconButton(
-            tooltip: l10n.headlinesFilterSaveTooltip,
-            icon: const Icon(Icons.save_outlined),
-            onPressed: () {
-              showDialog<void>(
-                context: context,
-                builder: (_) {
-                  final filterState = context.read<HeadlinesFilterBloc>().state;
-                  return SaveFilterDialog(
-                    onSave: (name) {
-                      final newFilter = SavedFilter(
-                        id: const Uuid().v4(),
-                        name: name,
-                        topics: filterState.selectedTopics.toList(),
-                        sources: filterState.selectedSources.toList(),
-                        countries: filterState.selectedCountries.toList(),
-                      );
-                      // Keep track of the newly saved filter.
-                      setState(() => _newlySavedFilter = newFilter);
-                      context.read<AppBloc>().add(
-                        SavedFilterAdded(filter: newFilter),
-                      );
-                    },
-                  );
-                },
-              );
-            },
-          ),
           // Apply Filters Button
           IconButton(
             icon: const Icon(Icons.check),
             tooltip: l10n.headlinesFeedFilterApplyButton,
-            onPressed: () {
-              final filterState = context.read<HeadlinesFilterBloc>().state;
-              final newFilter = HeadlineFilter(
-                topics: filterState.selectedTopics.isNotEmpty
-                    ? filterState.selectedTopics.toList()
-                    : null,
-                sources: filterState.selectedSources.isNotEmpty
-                    ? filterState.selectedSources.toList()
-                    : null,
-                eventCountries: filterState.selectedCountries.isNotEmpty
-                    ? filterState.selectedCountries.toList()
-                    : null,
-                isFromFollowedItems: filterState.isUsingFollowedItems,
-              );
-              context.read<HeadlinesFeedBloc>().add(
-                HeadlinesFeedFiltersApplied(
-                  filter: newFilter,
-                  // Pass the newly saved filter if it exists.
-                  savedFilter: _newlySavedFilter,
-                  adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
-                ),
-              );
-              context.pop();
-            },
+            onPressed: _showApplyOptionsDialog,
           ),
         ],
       ),

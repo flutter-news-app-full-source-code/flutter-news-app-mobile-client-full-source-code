@@ -123,7 +123,10 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
         ),
         body: Column(
           children: [
-            const SavedFiltersBar(),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
+              child: SavedFiltersBar(),
+            ),
             Expanded(
               child: BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
                 builder: (context, state) {

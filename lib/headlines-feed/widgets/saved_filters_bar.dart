@@ -35,7 +35,9 @@ class SavedFiltersBar extends StatelessWidget {
 
           return ListView(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            // Padding is now handled by the parent widget in the page view
+            // to ensure consistent layout constraints.
+            padding: EdgeInsets.zero,
             children: [
               // Button to open the filter page
               IconButton(

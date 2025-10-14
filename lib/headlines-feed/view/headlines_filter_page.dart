@@ -105,7 +105,10 @@ class _HeadlinesFilterView extends StatelessWidget {
           tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
           onPressed: () => context.pop(),
         ),
-        title: Text(l10n.headlinesFeedFilterTitle),
+        title: Text(
+          l10n.headlinesFeedFilterTitle,
+          style: theme.textTheme.titleLarge,
+        ),
         actions: [
           // Reset All Filters Button
           IconButton(
@@ -214,32 +217,38 @@ class _HeadlinesFilterView extends StatelessWidget {
             );
           }
 
-          return ListView(
-            padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-            children: [
-              const Divider(),
-              _buildFilterTile(
+          // Use a Map to define the filter tiles for cleaner code.
+          final filterTiles = {
+            l10n.headlinesFeedFilterTopicLabel: Routes.feedFilterTopicsName,
+            l10n.headlinesFeedFilterSourceLabel: Routes.feedFilterSourcesName,
+            l10n.headlinesFeedFilterEventCountryLabel:
+                Routes.feedFilterEventCountriesName,
+          };
+
+          return ListView.separated(
+            itemCount: filterTiles.length,
+            separatorBuilder: (context, index) => const Divider(height: 1),
+            itemBuilder: (context, index) {
+              final title = filterTiles.keys.elementAt(index);
+              final routeName = filterTiles.values.elementAt(index);
+              int selectedCount;
+
+              if (routeName == Routes.feedFilterTopicsName) {
+                selectedCount = filterState.selectedTopics.length;
+              } else if (routeName == Routes.feedFilterSourcesName) {
+                selectedCount = filterState.selectedSources.length;
+              } else {
+                selectedCount = filterState.selectedCountries.length;
+              }
+
+              return _buildFilterTile(
                 context: context,
-                title: l10n.headlinesFeedFilterTopicLabel,
+                title: title,
                 enabled: !isFollowedFilterActive,
-                selectedCount: filterState.selectedTopics.length,
-                routeName: Routes.feedFilterTopicsName,
-              ),
-              _buildFilterTile(
-                context: context,
-                title: l10n.headlinesFeedFilterSourceLabel,
-                enabled: !isFollowedFilterActive,
-                selectedCount: filterState.selectedSources.length,
-                routeName: Routes.feedFilterSourcesName,
-              ),
-              _buildFilterTile(
-                context: context,
-                title: l10n.headlinesFeedFilterEventCountryLabel,
-                enabled: !isFollowedFilterActive,
-                selectedCount: filterState.selectedCountries.length,
-                routeName: Routes.feedFilterEventCountriesName,
-              ),
-            ],
+                selectedCount: selectedCount,
+                routeName: routeName,
+              );
+            },
           );
         },
       ),

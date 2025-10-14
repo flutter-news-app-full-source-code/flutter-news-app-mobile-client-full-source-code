@@ -256,7 +256,7 @@ class _SourceFilterViewState extends State<_SourceFilterView> {
                     onSelected: (_) {
                       // Clear all country selections
                       if (_selectedHeadquarterCountries.isNotEmpty) {
-                        setState(() => _selectedHeadquarterCountries.clear());
+                        setState(_selectedHeadquarterCountries.clear);
                       }
                     },
                   );

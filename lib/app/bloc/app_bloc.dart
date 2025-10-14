@@ -891,7 +891,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // Check if the list was actually modified to avoid unnecessary updates.
     if (updatedSavedFilters.length ==
         state.userContentPreferences!.savedFilters.length) {
-      return;
+      if (updatedSavedFilters.length ==
+          state.userContentPreferences!.savedFilters.length) {
+        _logger.warning(
+          '[AppBloc] Skipping SavedFilterDeleted: Filter with id ${event.filterId} not found.',
+        );
+        return;
+      }
     }
 
     final updatedPreferences = state.userContentPreferences!.copyWith(

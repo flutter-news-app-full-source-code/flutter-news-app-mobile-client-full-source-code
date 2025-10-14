@@ -44,7 +44,10 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       widget.onSave(_controller.text.trim());
-      Navigator.of(context).pop();
+      // Pop the dialog and return `true` to signal to the caller that the
+      // save operation was successfully initiated. This allows the caller
+      // to coordinate subsequent navigation actions, preventing race conditions.
+      Navigator.of(context).pop(true); // Return true on success.
     }
   }
 

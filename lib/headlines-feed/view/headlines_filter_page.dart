@@ -135,13 +135,22 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
 
   /// Initiates the process of saving a filter by showing the naming dialog,
   /// and then applies it.
-  void _saveAndApplyFilter() {
+  ///
+  /// This function `await`s the result of the `SaveFilterDialog`. This is
+  /// crucial to prevent a race condition where the `HeadlinesFilterPage` might
+  /// be popped before the dialog is fully dismissed, which was causing a
+  /// navigation stack error and a black screen.
+  Future<void> _saveAndApplyFilter() async {
     final filterState = context.read<HeadlinesFilterBloc>().state;
-    showDialog<void>(
+
+    // `showDialog` returns a Future that completes when the dialog is popped.
+    // We await its result (`true` on successful save) to synchronize navigation.
+    final didSave = await showDialog<bool>(
       context: context,
       builder: (_) {
         return SaveFilterDialog(
           onSave: (name) {
+            // This callback is executed when the user submits the save dialog.
             final newFilter = SavedFilter(
               id: const Uuid().v4(),
               name: name,
@@ -149,14 +158,25 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
               sources: filterState.selectedSources.toList(),
               countries: filterState.selectedCountries.toList(),
             );
-            // Add the filter to the global state.
+            // Add the new filter to the global AppBloc state.
             context.read<AppBloc>().add(SavedFilterAdded(filter: newFilter));
-            // Apply the newly saved filter and exit the page.
-            _applyAndExit(newFilter);
+
+            // Apply the filter to the HeadlinesFeedBloc. The page is not
+            // popped here; that action is deferred until after the dialog
+            // has been successfully dismissed.
+            _applyFilter(newFilter);
           },
         );
       },
     );
+
+    // After the dialog is popped and we have the result, check if the save
+    // was successful and if the widget is still in the tree.
+    // This check prevents the "Don't use 'BuildContext's across async gaps"
+    // lint warning and ensures we don't try to pop a disposed context.
+    if (didSave == true && mounted) {
+      context.pop();
+    }
   }
 
   /// Applies the current filter selections to the feed and pops the page.
@@ -164,7 +184,7 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
   /// If a [savedFilter] is provided, it's passed to the event to ensure
   /// its chip is correctly selected on the feed. Otherwise, the filter is
   /// treated as a "custom" one.
-  void _applyAndExit(SavedFilter? savedFilter) {
+  void _applyFilter(SavedFilter? savedFilter) {
     final filterState = context.read<HeadlinesFilterBloc>().state;
     final newFilter = HeadlineFilter(
       topics: filterState.selectedTopics.toList(),
@@ -179,6 +199,12 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
         adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
       ),
     );
+  }
+
+  void _applyAndExit(SavedFilter? savedFilter) {
+    // This helper method now separates applying the filter from exiting.
+    // It's called for the "Apply Only" flow.
+    _applyFilter(savedFilter);
     context.pop();
   }
 

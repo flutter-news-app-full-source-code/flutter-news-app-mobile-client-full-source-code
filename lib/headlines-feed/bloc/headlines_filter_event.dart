@@ -118,3 +118,45 @@ final class FilterSelectionsCleared extends HeadlinesFilterEvent {
   /// {@macro filter_selections_cleared}
   const FilterSelectionsCleared();
 }
+
+/// {@template followed_topics_filter_toggled}
+/// Event triggered when the "Apply my followed topics" button is toggled.
+/// {@endtemplate}
+final class FollowedTopicsFilterToggled extends HeadlinesFilterEvent {
+  /// {@macro followed_topics_filter_toggled}
+  const FollowedTopicsFilterToggled({required this.isSelected});
+
+  /// The new selection state of the followed topics filter.
+  final bool isSelected;
+
+  @override
+  List<Object> get props => [isSelected];
+}
+
+/// {@template followed_sources_filter_toggled}
+/// Event triggered when the "Apply my followed sources" button is toggled.
+/// {@endtemplate}
+final class FollowedSourcesFilterToggled extends HeadlinesFilterEvent {
+  /// {@macro followed_sources_filter_toggled}
+  const FollowedSourcesFilterToggled({required this.isSelected});
+
+  /// The new selection state of the followed sources filter.
+  final bool isSelected;
+
+  @override
+  List<Object> get props => [isSelected];
+}
+
+/// {@template followed_countries_filter_toggled}
+/// Event triggered when the "Apply my followed countries" button is toggled.
+/// {@endtemplate}
+final class FollowedCountriesFilterToggled extends HeadlinesFilterEvent {
+  /// {@macro followed_countries_filter_toggled}
+  const FollowedCountriesFilterToggled({required this.isSelected});
+
+  /// The new selection state of the followed countries filter.
+  final bool isSelected;
+
+  @override
+  List<Object> get props => [isSelected];
+}

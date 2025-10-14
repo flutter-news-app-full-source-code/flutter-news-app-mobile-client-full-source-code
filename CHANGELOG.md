@@ -5,6 +5,7 @@
 - **feat**: implement saved feed filters with create, rename, and delete
 - **feat**: add horizontal filter bar to the headlines feed for quick selection
 - **refactor**: replace monolithic "apply followed items" with granular controls
+- **refactor**:  Updated the Headline Details page with a fading scroll effect for metadata chips and a new style for the 'Continue Reading' button. The main feed's filter icon was removed from the AppBar in favor of the new filter bar.
 
 ## 1.3.0 - 2025-10-10
 

@@ -17,14 +17,13 @@ class ManageSavedFiltersPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO(user): Replace placeholder strings with l10n keys.
     final l10n = context.l10n;
     final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Manage Filters',
+          l10n.manageFiltersPageTitle,
           style: theme.textTheme.titleLarge,
         ),
       ),
@@ -33,10 +32,10 @@ class ManageSavedFiltersPage extends StatelessWidget {
           final savedFilters = state.userContentPreferences?.savedFilters ?? [];
 
           if (savedFilters.isEmpty) {
-            return const InitialStateWidget(
+            return InitialStateWidget(
               icon: Icons.filter_list_off_outlined,
-              headline: 'No Saved Filters',
-              subheadline: 'You can save filters from the filter page.',
+              headline: l10n.manageFiltersEmptyHeadline,
+              subheadline: l10n.manageFiltersEmptySubheadline,
             );
           }
 
@@ -52,18 +51,19 @@ class ManageSavedFiltersPage extends StatelessWidget {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.edit_outlined),
-                      tooltip: 'Rename Filter',
+                      tooltip: l10n.manageFiltersRenameTooltip,
                       onPressed: () {
                         showDialog<void>(
                           context: context,
                           builder: (_) => SaveFilterDialog(
                             initialValue: filter.name,
                             onSave: (newName) {
-                              final updatedFilter =
-                                  filter.copyWith(name: newName);
+                              final updatedFilter = filter.copyWith(
+                                name: newName,
+                              );
                               context.read<AppBloc>().add(
-                                    SavedFilterUpdated(filter: updatedFilter),
-                                  );
+                                SavedFilterUpdated(filter: updatedFilter),
+                              );
                             },
                           ),
                         );
@@ -74,11 +74,11 @@ class ManageSavedFiltersPage extends StatelessWidget {
                         Icons.delete_outline,
                         color: theme.colorScheme.error,
                       ),
-                      tooltip: 'Delete Filter',
+                      tooltip: l10n.manageFiltersDeleteTooltip,
                       onPressed: () {
-                        context
-                            .read<AppBloc>()
-                            .add(SavedFilterDeleted(filterId: filter.id));
+                        context.read<AppBloc>().add(
+                          SavedFilterDeleted(filterId: filter.id),
+                        );
                       },
                     ),
                   ],

@@ -1,5 +1,6 @@
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/b
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_filter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/headline_filter.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/widgets/save_filter_dialog.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:go_router/go_router.dart';
@@ -211,114 +213,157 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
-    final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-          onPressed: () => context.pop(),
-        ),
-        title: Text(
-          l10n.headlinesFeedFilterTitle,
-          style: theme.textTheme.titleLarge,
-        ),
-        actions: [
-          // Reset All Filters Button
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: l10n.headlinesFeedFilterResetButton,
-            onPressed: () {
-              context.read<HeadlinesFilterBloc>().add(
-                const FilterSelectionsCleared(),
-              );
-            },
-          ),
-          // Manage Saved Filters Button
-          IconButton(
-            tooltip: l10n.headlinesFilterManageTooltip,
-            icon: const Icon(Icons.edit_note_outlined),
-            onPressed: () => context.pushNamed(Routes.manageSavedFiltersName),
-          ),
-          // Apply Filters Button
-          IconButton(
-            icon: const Icon(Icons.check),
-            tooltip: l10n.headlinesFeedFilterApplyButton,
-            onPressed: _showApplyOptionsDialog,
-          ),
-        ],
-      ),
-      body: BlocBuilder<HeadlinesFilterBloc, HeadlinesFilterState>(
-        builder: (context, filterState) {
-          // Determine if the "Apply my followed items" feature is active.
-          // This will disable the individual filter tiles.
-          final isFollowedFilterActive = filterState.isUsingFollowedItems;
+    // Watch both AppBloc and HeadlinesFilterBloc to react to changes in either.
+    return BlocBuilder<AppBloc, AppState>(
+      builder: (context, appState) {
+        return BlocBuilder<HeadlinesFilterBloc, HeadlinesFilterState>(
+          builder: (context, filterState) {
+            final theme = Theme.of(context);
 
-          if (filterState.status == HeadlinesFilterStatus.loading) {
-            return LoadingStateWidget(
-              icon: Icons.filter_list,
-              headline: l10n.headlinesFeedFilterLoadingHeadline,
-              subheadline: l10n.pleaseWait,
-            );
-          }
+            // Determine if the "Apply" button should be enabled.
+            final isFilterEmpty =
+                filterState.selectedTopics.isEmpty &&
+                filterState.selectedSources.isEmpty &&
+                filterState.selectedCountries.isEmpty;
 
-          if (filterState.status == HeadlinesFilterStatus.failure) {
-            return FailureStateWidget(
-              exception:
-                  filterState.error ??
-                  const UnknownException('Failed to load filter data.'),
-              onRetry: () {
-                final headlinesFeedBloc = context.read<HeadlinesFeedBloc>();
-                final currentFilter = headlinesFeedBloc.state.filter;
-                context.read<HeadlinesFilterBloc>().add(
-                  FilterDataLoaded(
-                    initialSelectedTopics: currentFilter.topics ?? [],
-                    initialSelectedSources: currentFilter.sources ?? [],
-                    initialSelectedCountries:
-                        currentFilter.eventCountries ?? [],
-                    isUsingFollowedItems: currentFilter.isFromFollowedItems,
+            final savedFilters =
+                appState.userContentPreferences?.savedFilters ?? [];
+
+            // Check if the current selection matches any existing saved filter.
+            final isDuplicate = savedFilters.any(
+              (savedFilter) =>
+                  setEquals(
+                    savedFilter.topics.toSet(),
+                    filterState.selectedTopics,
+                  ) &&
+                  setEquals(
+                    savedFilter.sources.toSet(),
+                    filterState.selectedSources,
+                  ) &&
+                  setEquals(
+                    savedFilter.countries.toSet(),
+                    filterState.selectedCountries,
                   ),
-                );
-              },
             );
-          }
 
-          // Use a Map to define the filter tiles for cleaner code.
-          final filterTiles = {
-            l10n.headlinesFeedFilterTopicLabel: Routes.feedFilterTopicsName,
-            l10n.headlinesFeedFilterSourceLabel: Routes.feedFilterSourcesName,
-            l10n.headlinesFeedFilterEventCountryLabel:
-                Routes.feedFilterEventCountriesName,
-          };
+            final isApplyEnabled = !isFilterEmpty && !isDuplicate;
 
-          return ListView.separated(
-            itemCount: filterTiles.length,
-            separatorBuilder: (context, index) => const Divider(height: 1),
-            itemBuilder: (context, index) {
-              final title = filterTiles.keys.elementAt(index);
-              final routeName = filterTiles.values.elementAt(index);
-              int selectedCount;
+            return Scaffold(
+              appBar: AppBar(
+                leading: IconButton(
+                  icon: const Icon(Icons.close),
+                  tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+                  onPressed: () => context.pop(),
+                ),
+                title: Text(
+                  l10n.headlinesFeedFilterTitle,
+                  style: theme.textTheme.titleLarge,
+                ),
+                actions: [
+                  // Reset All Filters Button
+                  IconButton(
+                    icon: const Icon(Icons.refresh),
+                    tooltip: l10n.headlinesFeedFilterResetButton,
+                    onPressed: () {
+                      context.read<HeadlinesFilterBloc>().add(
+                        const FilterSelectionsCleared(),
+                      );
+                    },
+                  ),
+                  // Manage Saved Filters Button
+                  IconButton(
+                    tooltip: l10n.headlinesFilterManageTooltip,
+                    icon: const Icon(Icons.edit_note_outlined),
+                    onPressed: () =>
+                        context.pushNamed(Routes.manageSavedFiltersName),
+                  ),
+                  // Apply Filters Button
+                  IconButton(
+                    icon: const Icon(Icons.check),
+                    tooltip: l10n.headlinesFeedFilterApplyButton,
+                    // Disable the button if the filter is empty or a duplicate.
+                    onPressed: isApplyEnabled ? _showApplyOptionsDialog : null,
+                  ),
+                ],
+              ),
+              body: _buildBody(context, l10n, filterState),
+            );
+          },
+        );
+      },
+    );
+  }
 
-              if (routeName == Routes.feedFilterTopicsName) {
-                selectedCount = filterState.selectedTopics.length;
-              } else if (routeName == Routes.feedFilterSourcesName) {
-                selectedCount = filterState.selectedSources.length;
-              } else {
-                selectedCount = filterState.selectedCountries.length;
-              }
+  Widget _buildBody(
+    BuildContext context,
+    AppLocalizations l10n,
+    HeadlinesFilterState filterState,
+  ) {
+    // Determine if the "Apply my followed items" feature is active.
+    // This will disable the individual filter tiles.
+    final isFollowedFilterActive = filterState.isUsingFollowedItems;
 
-              return _buildFilterTile(
-                context: context,
-                title: title,
-                enabled: !isFollowedFilterActive,
-                selectedCount: selectedCount,
-                routeName: routeName,
-              );
-            },
+    if (filterState.status == HeadlinesFilterStatus.loading) {
+      return LoadingStateWidget(
+        icon: Icons.filter_list,
+        headline: l10n.headlinesFeedFilterLoadingHeadline,
+        subheadline: l10n.pleaseWait,
+      );
+    }
+
+    if (filterState.status == HeadlinesFilterStatus.failure) {
+      return FailureStateWidget(
+        exception:
+            filterState.error ??
+            const UnknownException('Failed to load filter data.'),
+        onRetry: () {
+          final headlinesFeedBloc = context.read<HeadlinesFeedBloc>();
+          final currentFilter = headlinesFeedBloc.state.filter;
+          context.read<HeadlinesFilterBloc>().add(
+            FilterDataLoaded(
+              initialSelectedTopics: currentFilter.topics ?? [],
+              initialSelectedSources: currentFilter.sources ?? [],
+              initialSelectedCountries: currentFilter.eventCountries ?? [],
+              isUsingFollowedItems: currentFilter.isFromFollowedItems,
+            ),
           );
         },
-      ),
+      );
+    }
+
+    // Use a Map to define the filter tiles for cleaner code.
+    final filterTiles = {
+      l10n.headlinesFeedFilterTopicLabel: Routes.feedFilterTopicsName,
+      l10n.headlinesFeedFilterSourceLabel: Routes.feedFilterSourcesName,
+      l10n.headlinesFeedFilterEventCountryLabel:
+          Routes.feedFilterEventCountriesName,
+    };
+
+    return ListView.separated(
+      itemCount: filterTiles.length,
+      separatorBuilder: (context, index) => const Divider(height: 1),
+      itemBuilder: (context, index) {
+        final title = filterTiles.keys.elementAt(index);
+        final routeName = filterTiles.values.elementAt(index);
+        int selectedCount;
+
+        if (routeName == Routes.feedFilterTopicsName) {
+          selectedCount = filterState.selectedTopics.length;
+        } else if (routeName == Routes.feedFilterSourcesName) {
+          selectedCount = filterState.selectedSources.length;
+        } else {
+          selectedCount = filterState.selectedCountries.length;
+        }
+
+        return _buildFilterTile(
+          context: context,
+          title: title,
+          enabled: !isFollowedFilterActive,
+          selectedCount: selectedCount,
+          routeName: routeName,
+        );
+      },
     );
   }
 }

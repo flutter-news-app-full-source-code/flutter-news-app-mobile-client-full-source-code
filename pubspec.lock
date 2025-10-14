@@ -53,8 +53,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "41a7ea2bea938e422acdac0ecfbf3a614b3fb855"
-      resolved-ref: "41a7ea2bea938e422acdac0ecfbf3a614b3fb855"
+      ref: "v1.0.0"
+      resolved-ref: "7360a5a1af202bdc291138c81ddc817979454b78"
       url: "https://github.com/flutter-news-app-full-source-code/auth-api.git"
     source: git
     version: "0.0.0"
@@ -62,8 +62,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: fec23f405d58d4915638783d972b542d3faf96b2
-      resolved-ref: fec23f405d58d4915638783d972b542d3faf96b2
+      ref: "v1.0.0"
+      resolved-ref: a90e24285874e4c39cb331bbbeae2423901f3289
       url: "https://github.com/flutter-news-app-full-source-code/auth-client.git"
     source: git
     version: "0.0.0"
@@ -71,8 +71,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "7f1a582419ae37cb43efe705e3299f2092c54a8b"
-      resolved-ref: "7f1a582419ae37cb43efe705e3299f2092c54a8b"
+      ref: "v1.0.0"
+      resolved-ref: "5316331378ee90e13dbbb0966a964a4b02e4dfcf"
       url: "https://github.com/flutter-news-app-full-source-code/auth-inmemory.git"
     source: git
     version: "0.0.0"
@@ -80,8 +80,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "1f1272b586b045903c164be5a39d95383809ba09"
-      resolved-ref: "1f1272b586b045903c164be5a39d95383809ba09"
+      ref: "v1.0.0"
+      resolved-ref: "0d751f835d563c970945a7dab828e1bcb4181049"
       url: "https://github.com/flutter-news-app-full-source-code/auth-repository.git"
     source: git
     version: "0.0.0"
@@ -177,11 +177,11 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "828b984517edec069266579c624c7af9fbe0e2ac"
-      resolved-ref: "828b984517edec069266579c624c7af9fbe0e2ac"
+      ref: "v1.2.0"
+      resolved-ref: d052799c1ebb7bcdd1a725a2a7919948c14fa001
       url: "https://github.com/flutter-news-app-full-source-code/core.git"
     source: git
-    version: "0.0.0"
+    version: "1.2.0"
   coverage:
     dependency: transitive
     description:
@@ -218,8 +218,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: f90ab664c6333995757026a2c96e96d304da6246
-      resolved-ref: f90ab664c6333995757026a2c96e96d304da6246
+      ref: "v1.0.0"
+      resolved-ref: b838da6b8c29ba3a54a68fe11402e7fe3886d135
       url: "https://github.com/flutter-news-app-full-source-code/data-api.git"
     source: git
     version: "0.0.0"
@@ -227,8 +227,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "960a00882045ee252274d9d57bfca606c1fe5d64"
-      resolved-ref: "960a00882045ee252274d9d57bfca606c1fe5d64"
+      ref: "v1.0.0"
+      resolved-ref: b9a8a8c2c660928c22f2d38d657000bcae4c74d6
       url: "https://github.com/flutter-news-app-full-source-code/data-client.git"
     source: git
     version: "0.0.0"
@@ -236,8 +236,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: aaf4e18b759ca8b33d060fd4aa8509238d5d3eaa
-      resolved-ref: aaf4e18b759ca8b33d060fd4aa8509238d5d3eaa
+      ref: "v1.0.0"
+      resolved-ref: cd7a39e12f321c4c0c6bb5041c5d91cb32bc1586
       url: "https://github.com/flutter-news-app-full-source-code/data-inmemory.git"
     source: git
     version: "0.0.0"
@@ -245,8 +245,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: f8f01f1191286efbba41fa2bb369fb16eb652ccf
-      resolved-ref: f8f01f1191286efbba41fa2bb369fb16eb652ccf
+      ref: "v1.0.0"
+      resolved-ref: "7f9242d810d60fefd2f883b19e1650e8e4eb41a3"
       url: "https://github.com/flutter-news-app-full-source-code/data-repository.git"
     source: git
     version: "0.0.0"
@@ -466,8 +466,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "57f6bcfc0f209ecc135fdcb688194045ec87e6e8"
-      resolved-ref: "57f6bcfc0f209ecc135fdcb688194045ec87e6e8"
+      ref: "v1.0.1"
+      resolved-ref: ce550196f78ee2e95aa9e985759179265983689d
       url: "https://github.com/flutter-news-app-full-source-code/http-client.git"
     source: git
     version: "0.0.0"
@@ -539,7 +539,7 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "3bcba6b11fe0480e06e1bedf6eab4159a7c59c53"
+      ref: "v1.0.0"
       resolved-ref: "3bcba6b11fe0480e06e1bedf6eab4159a7c59c53"
       url: "https://github.com/flutter-news-app-full-source-code/kv-storage-service.git"
     source: git
@@ -548,8 +548,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "4cefd202c5fc0c53856782fea7760baa1d0733f7"
-      resolved-ref: "4cefd202c5fc0c53856782fea7760baa1d0733f7"
+      ref: "v1.0.0"
+      resolved-ref: ed94c16ae5ced56216f1adcc14b995e418d5c464
       url: "https://github.com/flutter-news-app-full-source-code/kv-storage-shared-preferences.git"
     source: git
     version: "0.0.0"
@@ -1010,8 +1010,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: d9c66362ec87fd7b5e3d3dee35828da6cbc1f66a
-      resolved-ref: d9c66362ec87fd7b5e3d3dee35828da6cbc1f66a
+      ref: "v1.0.0"
+      resolved-ref: "5e84f206a0e047f6afd608d510aec998c6a37dd3"
       url: "https://github.com/flutter-news-app-full-source-code/ui-kit.git"
     source: git
     version: "0.0.0"

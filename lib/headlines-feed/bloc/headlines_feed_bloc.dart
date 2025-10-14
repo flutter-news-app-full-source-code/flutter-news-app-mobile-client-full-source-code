@@ -251,7 +251,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     // If an active filter ID is already being set (e.g., from a saved filter
     // selection), don't override it with 'custom'. Otherwise, mark it as custom.
     final newActiveFilterId = state.activeFilterId ?? 'custom';
-    
+
     // When applying new filters, this is considered a major feed change,
     // so we clear the ad cache to get a fresh set of relevant ads.
     _inlineAdCacheService.clearAllAds();
@@ -512,9 +512,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     AllFilterSelected event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
-    // Set the active filter ID to 'all' and then dispatch an event to clear
-    // all filters and refresh the feed.
-    emit(state.copyWith(activeFilterId: 'all'));
+    // Immediately clear the filter object in the state when 'All' is selected.
+    // This prevents the old 'custom' filter from persisting during the
+    // subsequent refresh action.
+    emit(state.copyWith(activeFilterId: 'all', filter: const HeadlineFilter()));
     add(HeadlinesFeedFiltersCleared(adThemeStyle: event.adThemeStyle));
   }
 

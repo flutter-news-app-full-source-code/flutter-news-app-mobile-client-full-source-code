@@ -40,7 +40,6 @@ class HeadlinesFilterBloc
     on<FilterTopicToggled>(_onFilterTopicToggled);
     on<FilterSourceToggled>(_onFilterSourceToggled);
     on<FilterCountryToggled>(_onFilterCountryToggled);
-    on<FollowedItemsFilterToggled>(_onFollowedItemsFilterToggled);
     on<FollowedTopicsFilterToggled>(_onFollowedTopicsFilterToggled);
     on<FollowedSourcesFilterToggled>(_onFollowedSourcesFilterToggled);
     on<FollowedCountriesFilterToggled>(_onFollowedCountriesFilterToggled);
@@ -169,34 +168,6 @@ class HeadlinesFilterBloc
         isUsingFollowedItems: false,
       ),
     );
-  }
-
-  /// Handles the [FollowedItemsFilterToggled] event, applying or clearing
-  /// followed items as filters.
-  void _onFollowedItemsFilterToggled(
-    FollowedItemsFilterToggled event,
-    Emitter<HeadlinesFilterState> emit,
-  ) {
-    if (event.isUsingFollowedItems) {
-      final userPreferences = _appBloc.state.userContentPreferences;
-      emit(
-        state.copyWith(
-          selectedTopics: Set.from(userPreferences?.followedTopics ?? []),
-          selectedSources: Set.from(userPreferences?.followedSources ?? []),
-          selectedCountries: Set.from(userPreferences?.followedCountries ?? []),
-          isUsingFollowedItems: true,
-        ),
-      );
-    } else {
-      emit(
-        state.copyWith(
-          selectedTopics: {},
-          selectedSources: {},
-          selectedCountries: {},
-          isUsingFollowedItems: false,
-        ),
-      );
-    }
   }
 
   /// Handles the [FilterSelectionsCleared] event, clearing all filter selections.

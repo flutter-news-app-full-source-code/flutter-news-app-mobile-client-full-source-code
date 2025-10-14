@@ -70,6 +70,9 @@ class _SavedFiltersBarState extends State<SavedFiltersBar> {
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
                 child: ChoiceChip(
                   label: Text(l10n.savedFiltersBarAllLabel),
+                  labelPadding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xs,
+                  ),
                   selected: activeFilterId == _allFilterId,
                   showCheckmark: false,
                   onSelected: (_) {
@@ -88,6 +91,9 @@ class _SavedFiltersBarState extends State<SavedFiltersBar> {
                   ),
                   child: ChoiceChip(
                     label: Text(filter.name),
+                    labelPadding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.xs,
+                    ),
                     selected: activeFilterId == filter.id,
                     showCheckmark: false,
                     onSelected: (_) {
@@ -108,6 +114,9 @@ class _SavedFiltersBarState extends State<SavedFiltersBar> {
                   ),
                   child: ChoiceChip(
                     label: Text(l10n.savedFiltersBarCustomLabel),
+                    labelPadding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.xs,
+                    ),
                     showCheckmark: false,
                     selected: true,
                     onSelected: null,

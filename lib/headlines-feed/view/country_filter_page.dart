@@ -89,8 +89,8 @@ class _CountryFilterView extends StatelessWidget {
                   } else {
                     // Toggle the followed items filter in the HeadlinesFilterBloc
                     context.read<HeadlinesFilterBloc>().add(
-                      FollowedItemsFilterToggled(
-                        isUsingFollowedItems: !isFollowedFilterActive,
+                      FollowedCountriesFilterToggled(
+                        isSelected: !isFollowedFilterActive,
                       ),
                     );
                   }

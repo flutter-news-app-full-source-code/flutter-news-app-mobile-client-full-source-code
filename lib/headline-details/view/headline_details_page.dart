@@ -378,7 +378,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
         ),
       ),
       SliverPadding(
-        padding: horizontalPadding.copyWith(top: AppSpacing.lg),
+        padding: const EdgeInsets.only(top: AppSpacing.lg),
         sliver: SliverToBoxAdapter(
           child: SizedBox(
             height: 36,
@@ -398,7 +398,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                       const SizedBox(width: AppSpacing.sm),
                   itemBuilder: (context, index) => chips[index],
                   // Apply horizontal padding directly to the ListView
-                  // to ensure consistent spacing at both ends. This is now handled by the parent SliverPadding.
                 );
 
                 // Determine if the fade should be shown based on scroll position.
@@ -437,7 +436,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                     stops: stops,
                   ).createShader(bounds),
                   blendMode: BlendMode.dstIn,
-                  child: listView,
+                  // Apply padding here to ensure the ShaderMask is applied
+                  // to the correctly padded content area.
+                  child: Padding(padding: horizontalPadding, child: listView),
                 );
               },
             ),

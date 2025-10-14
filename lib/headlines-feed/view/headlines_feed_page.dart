@@ -150,10 +150,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
             if (state.status == HeadlinesFeedStatus.failure &&
                 state.feedItems.isEmpty) {
               return FailureStateWidget(
-                //TODO(fulleni): l10n.
-                exception:
-                    state.error ??
-                    const UnknownException('Failed to load headlines feed.'),
+                exception: state.error ?? UnknownException(l10n.unknownError),
                 onRetry: () => context.read<HeadlinesFeedBloc>().add(
                   HeadlinesFeedRefreshRequested(
                     adThemeStyle: AdThemeStyle.fromTheme(theme),
@@ -200,9 +197,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                 slivers: [
                   const SliverToBoxAdapter(
                     child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md,
-                      ),
+                      padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
                       child: SavedFiltersBar(),
                     ),
                   ),

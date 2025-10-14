@@ -27,7 +27,7 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _controller;
 
-  static const _maxNameLength = 25;
+  static const _maxNameLength = 15;
 
   @override
   void initState() {

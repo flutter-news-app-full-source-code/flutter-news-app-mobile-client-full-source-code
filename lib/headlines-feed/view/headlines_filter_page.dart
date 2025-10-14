@@ -119,15 +119,13 @@ class _HeadlinesFilterView extends StatelessWidget {
           ),
           // Manage Saved Filters Button
           IconButton(
-            // TODO(user): Replace with l10n key.
-            tooltip: 'Manage Filters',
+            tooltip: l10n.headlinesFilterManageTooltip,
             icon: const Icon(Icons.edit_note_outlined),
             onPressed: () => context.pushNamed(Routes.manageSavedFiltersName),
           ),
           // Save Filter Button
           IconButton(
-            // TODO(user): Replace with l10n key.
-            tooltip: 'Save Filter',
+            tooltip: l10n.headlinesFilterSaveTooltip,
             icon: const Icon(Icons.save_outlined),
             onPressed: () {
               showDialog<void>(

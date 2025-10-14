@@ -1,6 +1,3 @@
-//
-// ignore_for_file: lines_longer_than_80_chars, public_member_api_docs, unused_field
-
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
@@ -10,10 +7,12 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_blo
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_filter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/headline_filter.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/widgets/save_filter_dialog.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
+import 'package:uuid/uuid.dart';
 
 /// {@template headlines_filter_page}
 /// A full-screen dialog page for selecting headline filters.
@@ -118,51 +117,38 @@ class _HeadlinesFilterView extends StatelessWidget {
               );
             },
           ),
-          // Apply My Followed Items Button
-          BlocBuilder<HeadlinesFilterBloc, HeadlinesFilterState>(
-            builder: (context, filterState) {
-              final appState = context.watch<AppBloc>().state;
-              final followedTopics =
-                  appState.userContentPreferences?.followedTopics ?? [];
-              final followedSources =
-                  appState.userContentPreferences?.followedSources ?? [];
-              final followedCountries =
-                  appState.userContentPreferences?.followedCountries ?? [];
-
-              final hasFollowedItems =
-                  followedTopics.isNotEmpty ||
-                  followedSources.isNotEmpty ||
-                  followedCountries.isNotEmpty;
-
-              return IconButton(
-                icon: filterState.isUsingFollowedItems
-                    ? const Icon(Icons.favorite)
-                    : const Icon(Icons.favorite_border),
-                color: filterState.isUsingFollowedItems
-                    ? theme.colorScheme.primary
-                    : null,
-                tooltip: l10n.headlinesFeedFilterApplyFollowedLabel,
-                onPressed: hasFollowedItems
-                    ? () {
-                        context.read<HeadlinesFilterBloc>().add(
-                          FollowedItemsFilterToggled(
-                            isUsingFollowedItems:
-                                !filterState.isUsingFollowedItems,
-                          ),
-                        );
-                      }
-                    : () {
-                        ScaffoldMessenger.of(context)
-                          ..hideCurrentSnackBar()
-                          ..showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                l10n.noFollowedItemsForFilterSnackbar,
-                              ),
-                              duration: const Duration(seconds: 3),
-                            ),
-                          );
-                      },
+          // Manage Saved Filters Button
+          IconButton(
+            // TODO(user): Replace with l10n key.
+            tooltip: 'Manage Filters',
+            icon: const Icon(Icons.edit_note_outlined),
+            onPressed: () => context.pushNamed(Routes.manageSavedFiltersName),
+          ),
+          // Save Filter Button
+          IconButton(
+            // TODO(user): Replace with l10n key.
+            tooltip: 'Save Filter',
+            icon: const Icon(Icons.save_outlined),
+            onPressed: () {
+              showDialog<void>(
+                context: context,
+                builder: (_) {
+                  final filterState = context.read<HeadlinesFilterBloc>().state;
+                  return SaveFilterDialog(
+                    onSave: (name) {
+                      final newFilter = SavedFilter(
+                        id: const Uuid().v4(),
+                        name: name,
+                        topics: filterState.selectedTopics.toList(),
+                        sources: filterState.selectedSources.toList(),
+                        countries: filterState.selectedCountries.toList(),
+                      );
+                      context.read<AppBloc>().add(
+                        SavedFilterAdded(filter: newFilter),
+                      );
+                    },
+                  );
+                },
               );
             },
           ),

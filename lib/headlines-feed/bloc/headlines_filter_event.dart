@@ -97,20 +97,6 @@ final class FilterCountryToggled extends HeadlinesFilterEvent {
   List<Object> get props => [country, isSelected];
 }
 
-/// {@template followed_items_filter_toggled}
-/// Event triggered when the "Apply my followed items" button is toggled.
-/// {@endtemplate}
-final class FollowedItemsFilterToggled extends HeadlinesFilterEvent {
-  /// {@macro followed_items_filter_toggled}
-  const FollowedItemsFilterToggled({required this.isUsingFollowedItems});
-
-  /// The new state of the "Apply my followed items" toggle.
-  final bool isUsingFollowedItems;
-
-  @override
-  List<Object> get props => [isUsingFollowedItems];
-}
-
 /// {@template filter_selections_cleared}
 /// Event triggered to clear all active filter selections.
 /// {@endtemplate}

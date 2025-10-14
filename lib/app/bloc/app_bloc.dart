@@ -78,6 +78,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppVersionCheckRequested>(_onAppVersionCheckRequested);
     on<AppUserFeedDecoratorShown>(_onAppUserFeedDecoratorShown);
     on<AppUserContentPreferencesChanged>(_onAppUserContentPreferencesChanged);
+    on<SavedFilterAdded>(_onSavedFilterAdded);
+    on<SavedFilterUpdated>(_onSavedFilterUpdated);
+    on<SavedFilterDeleted>(_onSavedFilterDeleted);
     on<AppLogoutRequested>(_onLogoutRequested);
 
     // Subscribe to the authentication repository's authStateChanges stream.
@@ -801,5 +804,100 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         state.copyWith(userContentPreferences: state.userContentPreferences),
       );
     }
+  }
+
+  /// Handles adding a new saved filter to the user's content preferences.
+  ///
+  /// This method optimistically updates the state by dispatching an
+  /// [AppUserContentPreferencesChanged] event, which will then handle
+  /// persistence.
+  Future<void> _onSavedFilterAdded(
+    SavedFilterAdded event,
+    Emitter<AppState> emit,
+  ) async {
+    if (state.userContentPreferences == null) {
+      _logger.warning(
+        '[AppBloc] Skipping SavedFilterAdded: UserContentPreferences not loaded.',
+      );
+      return;
+    }
+
+    final updatedSavedFilters =
+        List<SavedFilter>.from(state.userContentPreferences!.savedFilters)
+          ..add(event.filter);
+
+    final updatedPreferences = state.userContentPreferences!.copyWith(
+      savedFilters: updatedSavedFilters,
+    );
+
+    add(AppUserContentPreferencesChanged(preferences: updatedPreferences));
+  }
+
+  /// Handles updating an existing saved filter (e.g., renaming it).
+  ///
+  /// This method finds the filter by its ID, replaces it with the updated
+  /// version, and then dispatches an [AppUserContentPreferencesChanged] event
+  /// to persist the changes.
+  Future<void> _onSavedFilterUpdated(
+    SavedFilterUpdated event,
+    Emitter<AppState> emit,
+  ) async {
+    if (state.userContentPreferences == null) {
+      _logger.warning(
+        '[AppBloc] Skipping SavedFilterUpdated: UserContentPreferences not loaded.',
+      );
+      return;
+    }
+
+    final originalFilters = state.userContentPreferences!.savedFilters;
+    final index = originalFilters.indexWhere((f) => f.id == event.filter.id);
+
+    if (index == -1) {
+      _logger.warning(
+        '[AppBloc] Skipping SavedFilterUpdated: Filter with id ${event.filter.id} not found.',
+      );
+      return;
+    }
+
+    final updatedSavedFilters = List<SavedFilter>.from(originalFilters)
+      ..[index] = event.filter;
+
+    final updatedPreferences = state.userContentPreferences!.copyWith(
+      savedFilters: updatedSavedFilters,
+    );
+
+    add(AppUserContentPreferencesChanged(preferences: updatedPreferences));
+  }
+
+  /// Handles deleting a saved filter from the user's content preferences.
+  ///
+  /// This method removes the filter by its ID and then dispatches an
+  /// [AppUserContentPreferencesChanged] event to persist the changes.
+  Future<void> _onSavedFilterDeleted(
+    SavedFilterDeleted event,
+    Emitter<AppState> emit,
+  ) async {
+    if (state.userContentPreferences == null) {
+      _logger.warning(
+        '[AppBloc] Skipping SavedFilterDeleted: UserContentPreferences not loaded.',
+      );
+      return;
+    }
+
+    final updatedSavedFilters =
+        List<SavedFilter>.from(state.userContentPreferences!.savedFilters)
+          ..removeWhere((f) => f.id == event.filterId);
+
+    // Check if the list was actually modified to avoid unnecessary updates.
+    if (updatedSavedFilters.length ==
+        state.userContentPreferences!.savedFilters.length) {
+      return;
+    }
+
+    final updatedPreferences = state.userContentPreferences!.copyWith(
+      savedFilters: updatedSavedFilters,
+    );
+
+    add(AppUserContentPreferencesChanged(preferences: updatedPreferences));
   }
 }

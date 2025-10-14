@@ -342,17 +342,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
         ),
       ),
       SliverPadding(
-        padding: horizontalPadding.copyWith(top: AppSpacing.md),
-        sliver: SliverToBoxAdapter(
-          child: Text(
-            DateFormat('yyyy/MM/dd').format(headline.createdAt),
-            style: textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant.withOpacity(0.7),
-            ),
-          ),
-        ),
-      ),
-      SliverPadding(
         padding: EdgeInsets.only(
           top: AppSpacing.md,
           left: horizontalPadding.left,
@@ -408,7 +397,8 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                   separatorBuilder: (context, index) =>
                       const SizedBox(width: AppSpacing.sm),
                   itemBuilder: (context, index) => chips[index],
-                  clipBehavior: Clip.none,
+                  // Apply horizontal padding directly to the ListView
+                  // to ensure consistent spacing at both ends. This is now handled by the parent SliverPadding.
                 );
 
                 // Determine if the fade should be shown based on scroll position.
@@ -630,11 +620,11 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
   List<Widget> _buildMetadataChips(
     BuildContext context,
     Headline headline,
-    void Function(ContentType type, String id) onEntityChipTap,
+    void Function(ContentType, String) onEntityChipTap,
   ) {
     final theme = Theme.of(context);
 
-    Widget buildChip({required String label, required VoidCallback onPressed}) {
+    Widget buildChip({required String label, VoidCallback? onPressed}) {
       return ActionChip(
         label: Text(label),
         // Use default theme styles for a cleaner look.
@@ -646,13 +636,17 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           vertical: AppSpacing.xs,
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.lg),
+          borderRadius: BorderRadius.circular(AppSpacing.md),
           side: BorderSide.none,
         ),
       );
     }
 
     return [
+      buildChip(
+        label: DateFormat('yyyy-MM-dd').format(headline.createdAt),
+        onPressed: null, // This makes the chip non-interactive.
+      ),
       buildChip(
         label: headline.source.name,
         onPressed: () =>

@@ -1225,5 +1225,73 @@
     "premiumLimitButton": "إدارة المحتوى الخاص بي",
     "@premiumLimitButton": {
         "description": "Button text for the bottom sheet when a premium user hits a content limit."
+    },
+    "saveButtonLabel": "حفظ",
+    "@saveButtonLabel": {
+        "description": "Generic label for a save button."
+    },
+    "cancelButtonLabel": "إلغاء",
+    "@cancelButtonLabel": {
+        "description": "Generic label for a cancel button."
+    },
+    "manageFiltersPageTitle": "إدارة الفلاتر",
+    "@manageFiltersPageTitle": {
+        "description": "Title for the page where users manage their saved filters."
+    },
+    "manageFiltersEmptyHeadline": "لا توجد فلاتر محفوظة",
+    "@manageFiltersEmptyHeadline": {
+        "description": "Headline for the empty state on the manage saved filters page."
+    },
+    "manageFiltersEmptySubheadline": "يمكنك حفظ الفلاتر من صفحة التصفية.",
+    "@manageFiltersEmptySubheadline": {
+        "description": "Subheadline for the empty state on the manage saved filters page."
+    },
+    "manageFiltersRenameTooltip": "إعادة تسمية الفلتر",
+    "@manageFiltersRenameTooltip": {
+        "description": "Tooltip for the button to rename a saved filter."
+    },
+    "manageFiltersDeleteTooltip": "حذف الفلتر",
+    "@manageFiltersDeleteTooltip": {
+        "description": "Tooltip for the button to delete a saved filter."
+    },
+    "saveFilterDialogTitleSave": "حفظ الفلتر",
+    "@saveFilterDialogTitleSave": {
+        "description": "Title for the dialog when saving a new filter."
+    },
+    "saveFilterDialogTitleRename": "إعادة تسمية الفلتر",
+    "@saveFilterDialogTitleRename": {
+        "description": "Title for the dialog when renaming an existing filter."
+    },
+    "saveFilterDialogInputLabel": "اسم الفلتر",
+    "@saveFilterDialogInputLabel": {
+        "description": "Label for the text input field where the user names a filter."
+    },
+    "saveFilterDialogValidationEmpty": "لا يمكن أن يكون الاسم فارغًا",
+    "@saveFilterDialogValidationEmpty": {
+        "description": "Validation error message when the filter name is empty."
+    },
+    "saveFilterDialogValidationTooLong": "الاسم طويل جدًا",
+    "@saveFilterDialogValidationTooLong": {
+        "description": "Validation error message when the filter name is too long."
+    },
+    "headlinesFilterSaveTooltip": "حفظ الفلتر",
+    "@headlinesFilterSaveTooltip": {
+        "description": "Tooltip for the save icon on the main filter page."
+    },
+    "headlinesFilterManageTooltip": "إدارة الفلاتر",
+    "@headlinesFilterManageTooltip": {
+        "description": "Tooltip for the manage icon on the main filter page."
+    },
+    "savedFiltersBarOpenTooltip": "فتح الفلاتر",
+    "@savedFiltersBarOpenTooltip": {
+        "description": "Tooltip for the icon button on the filters bar that opens the filter page."
+    },
+    "savedFiltersBarAllLabel": "الكل",
+    "@savedFiltersBarAllLabel": {
+        "description": "Label for the 'All' chip in the saved filters bar."
+    },
+    "savedFiltersBarCustomLabel": "مخصص",
+    "@savedFiltersBarCustomLabel": {
+        "description": "Label for the 'Custom' chip in the saved filters bar, indicating an unsaved filter is active."
     }
 }

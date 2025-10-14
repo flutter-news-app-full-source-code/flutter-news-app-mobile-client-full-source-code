@@ -10,7 +10,7 @@ class HeadlinesFeedState extends Equatable {
     this.cursor,
     this.filter = const HeadlineFilter(),
     this.savedFilters = const [],
-    this.activeFilterId,
+    this.activeFilterId = 'all',
     this.error,
     this.navigationUrl,
   });

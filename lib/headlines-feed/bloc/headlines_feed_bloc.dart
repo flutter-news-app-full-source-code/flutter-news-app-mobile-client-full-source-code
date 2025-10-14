@@ -248,17 +248,14 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     HeadlinesFeedFiltersApplied event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
-    // If an active filter ID is already being set (e.g., from a saved filter
-    // selection), don't override it with 'custom'. Otherwise, mark it as custom.
-    final newActiveFilterId = state.activeFilterId ?? 'custom';
-
     // When applying new filters, this is considered a major feed change,
     // so we clear the ad cache to get a fresh set of relevant ads.
     _inlineAdCacheService.clearAllAds();
     emit(
       state.copyWith(
+        // Applying a filter from the filter page always results in a 'custom' state.
         filter: event.filter,
-        activeFilterId: newActiveFilterId,
+        activeFilterId: 'custom',
         status: HeadlinesFeedStatus.loading,
         feedItems: [],
         cursor: null,
@@ -337,11 +334,12 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     Emitter<HeadlinesFeedState> emit,
   ) async {
     // Clearing filters is a major feed change, so clear the ad cache.
+    const newFilter = HeadlineFilter();
     _inlineAdCacheService.clearAllAds();
     emit(
       state.copyWith(
         status: HeadlinesFeedStatus.loading,
-        filter: const HeadlineFilter(),
+        filter: newFilter,
         activeFilterId: 'all',
         feedItems: [],
         cursor: null,
@@ -358,6 +356,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       }
 
       final headlineResponse = await _headlinesRepository.readAll(
+        filter: _buildFilter(newFilter),
         pagination: const PaginationOptions(limit: _headlinesFetchLimit),
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );

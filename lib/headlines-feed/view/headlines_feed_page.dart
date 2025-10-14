@@ -100,6 +100,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
+    final theme = Theme.of(context);
 
     return BlocListener<HeadlinesFeedBloc, HeadlinesFeedState>(
       listener: (context, state) {
@@ -115,9 +116,9 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
         appBar: AppBar(
           title: Text(
             l10n.headlinesFeedAppBarTitle,
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         body: Column(
@@ -161,9 +162,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                           ),
                       onRetry: () => context.read<HeadlinesFeedBloc>().add(
                         HeadlinesFeedRefreshRequested(
-                          adThemeStyle: AdThemeStyle.fromTheme(
-                            Theme.of(context),
-                          ),
+                          adThemeStyle: AdThemeStyle.fromTheme(theme),
                         ),
                       ),
                     );
@@ -186,9 +185,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                             onPressed: () =>
                                 context.read<HeadlinesFeedBloc>().add(
                                   HeadlinesFeedFiltersCleared(
-                                    adThemeStyle: AdThemeStyle.fromTheme(
-                                      Theme.of(context),
-                                    ),
+                                    adThemeStyle: AdThemeStyle.fromTheme(theme),
                                   ),
                                 ),
                             child: Text(l10n.headlinesFeedClearFiltersButton),
@@ -202,9 +199,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                     onRefresh: () async {
                       context.read<HeadlinesFeedBloc>().add(
                         HeadlinesFeedRefreshRequested(
-                          adThemeStyle: AdThemeStyle.fromTheme(
-                            Theme.of(context),
-                          ),
+                          adThemeStyle: AdThemeStyle.fromTheme(theme),
                         ),
                       );
                     },
@@ -297,9 +292,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                           return FeedAdLoaderWidget(
                             key: ValueKey(item.id),
                             adPlaceholder: item,
-                            adThemeStyle: AdThemeStyle.fromTheme(
-                              Theme.of(context),
-                            ),
+                            adThemeStyle: AdThemeStyle.fromTheme(theme),
                             adConfig: adConfig,
                           );
                         } else if (item is CallToActionItem) {

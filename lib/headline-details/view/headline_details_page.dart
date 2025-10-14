@@ -34,9 +34,12 @@ class HeadlineDetailsPage extends StatefulWidget {
 }
 
 class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
+  final _metadataChipsScrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
+    _metadataChipsScrollController.addListener(() => setState(() {}));
     if (widget.initialHeadline != null) {
       context.read<HeadlineDetailsBloc>().add(
         HeadlineProvided(widget.initialHeadline!),
@@ -49,6 +52,12 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
         FetchHeadlineById(widget.headlineId!),
       );
     }
+  }
+
+  @override
+  void dispose() {
+    _metadataChipsScrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -384,20 +393,61 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
         sliver: SliverToBoxAdapter(
           child: SizedBox(
             height: 36,
-            child: BlocBuilder<HeadlineDetailsBloc, HeadlineDetailsState>(
-              builder: (context, state) {
+            child: LayoutBuilder(
+              builder: (context, constraints) {
                 final chips = _buildMetadataChips(
                   context,
                   headline,
                   onEntityChipTap,
                 );
-                return ListView.separated(
+
+                final listView = ListView.separated(
+                  controller: _metadataChipsScrollController,
                   scrollDirection: Axis.horizontal,
                   itemCount: chips.length,
                   separatorBuilder: (context, index) =>
                       const SizedBox(width: AppSpacing.sm),
                   itemBuilder: (context, index) => chips[index],
                   clipBehavior: Clip.none,
+                );
+
+                // Determine if the fade should be shown based on scroll position.
+                var showStartFade = false;
+                var showEndFade = false;
+                if (_metadataChipsScrollController.hasClients &&
+                    _metadataChipsScrollController.position.maxScrollExtent >
+                        0) {
+                  final pixels = _metadataChipsScrollController.position.pixels;
+                  final minScroll =
+                      _metadataChipsScrollController.position.minScrollExtent;
+                  final maxScroll =
+                      _metadataChipsScrollController.position.maxScrollExtent;
+
+                  if (pixels > minScroll) showStartFade = true;
+                  if (pixels < maxScroll) showEndFade = true;
+                }
+
+                final colors = <Color>[
+                  if (showStartFade) Colors.transparent,
+                  Colors.black,
+                  Colors.black,
+                  if (showEndFade) Colors.transparent,
+                ];
+
+                final stops = <double>[
+                  if (showStartFade) 0.0,
+                  if (showStartFade) 0.05 else 0.0,
+                  if (showEndFade) 0.95 else 1.0,
+                  if (showEndFade) 1.0,
+                ];
+
+                return ShaderMask(
+                  shaderCallback: (bounds) => LinearGradient(
+                    colors: colors,
+                    stops: stops,
+                  ).createShader(bounds),
+                  blendMode: BlendMode.dstIn,
+                  child: listView,
                 );
               },
             ),
@@ -583,26 +633,12 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     void Function(ContentType type, String id) onEntityChipTap,
   ) {
     final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-    final colorScheme = theme.colorScheme;
-    final chipLabelStyle = textTheme.labelMedium?.copyWith(
-      color: colorScheme.onSecondaryContainer,
-      fontWeight: FontWeight.w600,
-    );
-    final chipBackgroundColor = colorScheme.secondaryContainer.withOpacity(0.6);
-    final chipAvatarColor = colorScheme.onSecondaryContainer;
-    const chipAvatarSize = 18.0;
 
-    Widget buildChip({
-      required IconData icon,
-      required String label,
-      required VoidCallback onPressed,
-    }) {
+    Widget buildChip({required String label, required VoidCallback onPressed}) {
       return ActionChip(
-        avatar: Icon(icon, size: chipAvatarSize, color: chipAvatarColor),
         label: Text(label),
-        labelStyle: chipLabelStyle,
-        backgroundColor: chipBackgroundColor,
+        // Use default theme styles for a cleaner look.
+        labelStyle: theme.textTheme.labelMedium,
         onPressed: onPressed,
         visualDensity: VisualDensity.compact,
         padding: const EdgeInsets.symmetric(
@@ -618,18 +654,15 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
 
     return [
       buildChip(
-        icon: Icons.source_outlined,
         label: headline.source.name,
         onPressed: () =>
             onEntityChipTap(ContentType.source, headline.source.id),
       ),
       buildChip(
-        icon: Icons.category_outlined,
         label: headline.topic.name,
         onPressed: () => onEntityChipTap(ContentType.topic, headline.topic.id),
       ),
       buildChip(
-        icon: Icons.location_city_outlined,
         label: headline.eventCountry.name,
         onPressed: () =>
             onEntityChipTap(ContentType.country, headline.eventCountry.id),

@@ -502,21 +502,24 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
           padding: horizontalPadding,
           sliver: SliverToBoxAdapter(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: AppSpacing.lg),
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.open_in_new_outlined),
-                  onPressed: () async {
-                    await launchUrlString(headline.url);
-                  },
-                  label: Text(l10n.headlineDetailsContinueReadingButton),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.lg,
-                      vertical: AppSpacing.md,
-                    ),
-                    textStyle: textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
+                SizedBox(
+                  height: 48,
+                  child: FilledButton.icon(
+                    icon: const Icon(Icons.open_in_new_outlined),
+                    onPressed: () async {
+                      await launchUrlString(headline.url);
+                    },
+                    label: Text(l10n.headlineDetailsContinueReadingButton),
+                    style: FilledButton.styleFrom(
+                      textStyle: textTheme.labelLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppSpacing.sm),
+                      ),
                     ),
                   ),
                 ),

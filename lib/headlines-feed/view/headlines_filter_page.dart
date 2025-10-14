@@ -266,9 +266,15 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
                     icon: const Icon(Icons.refresh),
                     tooltip: l10n.headlinesFeedFilterResetButton,
                     onPressed: () {
-                      context.read<HeadlinesFilterBloc>().add(
-                        const FilterSelectionsCleared(),
+                      // Dispatch event to clear filters in the feed bloc
+                      // and trigger a refresh to the "All" state.
+                      context.read<HeadlinesFeedBloc>().add(
+                        AllFilterSelected(
+                          adThemeStyle: AdThemeStyle.fromTheme(theme),
+                        ),
                       );
+                      // Close the filter page.
+                      context.pop();
                     },
                   ),
                   // Manage Saved Filters Button

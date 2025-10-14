@@ -121,97 +121,97 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
             ),
           ),
         ),
-        body: Column(
-          children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
-              child: SavedFiltersBar(),
-            ),
-            Expanded(
-              child: BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
-                builder: (context, state) {
-                  // Access the AppBloc to check for remoteConfig availability.
-                  final appBlocState = context.watch<AppBloc>().state;
+        body: BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
+          builder: (context, state) {
+            // Access the AppBloc to check for remoteConfig availability.
+            final appBlocState = context.watch<AppBloc>().state;
 
-                  // If remoteConfig is not yet loaded, show a loading indicator.
-                  // This handles the brief period after authentication but before
-                  // the remote config is fetched, preventing null access errors.
-                  if (appBlocState.remoteConfig == null) {
-                    return LoadingStateWidget(
-                      icon: Icons.settings_applications_outlined,
-                      headline: l10n.headlinesFeedLoadingHeadline,
-                      subheadline: l10n.pleaseWait,
-                    );
-                  }
+            // If remoteConfig is not yet loaded, show a loading indicator.
+            // This handles the brief period after authentication but before
+            // the remote config is fetched, preventing null access errors.
+            if (appBlocState.remoteConfig == null) {
+              return LoadingStateWidget(
+                icon: Icons.settings_applications_outlined,
+                headline: l10n.headlinesFeedLoadingHeadline,
+                subheadline: l10n.pleaseWait,
+              );
+            }
 
-                  if (state.status == HeadlinesFeedStatus.initial ||
-                      (state.status == HeadlinesFeedStatus.loading &&
-                          state.feedItems.isEmpty)) {
-                    return LoadingStateWidget(
-                      icon: Icons.newspaper,
-                      headline: l10n.headlinesFeedLoadingHeadline,
-                      subheadline: l10n.headlinesFeedLoadingSubheadline,
-                    );
-                  }
+            if (state.status == HeadlinesFeedStatus.initial ||
+                (state.status == HeadlinesFeedStatus.loading &&
+                    state.feedItems.isEmpty)) {
+              return LoadingStateWidget(
+                icon: Icons.newspaper,
+                headline: l10n.headlinesFeedLoadingHeadline,
+                subheadline: l10n.headlinesFeedLoadingSubheadline,
+              );
+            }
 
-                  if (state.status == HeadlinesFeedStatus.failure &&
-                      state.feedItems.isEmpty) {
-                    return FailureStateWidget(
-                      //TODO(fulleni): l10n.
-                      exception:
-                          state.error ??
-                          const UnknownException(
-                            'Failed to load headlines feed.',
-                          ),
-                      onRetry: () => context.read<HeadlinesFeedBloc>().add(
-                        HeadlinesFeedRefreshRequested(
+            if (state.status == HeadlinesFeedStatus.failure &&
+                state.feedItems.isEmpty) {
+              return FailureStateWidget(
+                //TODO(fulleni): l10n.
+                exception:
+                    state.error ??
+                    const UnknownException('Failed to load headlines feed.'),
+                onRetry: () => context.read<HeadlinesFeedBloc>().add(
+                  HeadlinesFeedRefreshRequested(
+                    adThemeStyle: AdThemeStyle.fromTheme(theme),
+                  ),
+                ),
+              );
+            }
+
+            if (state.status == HeadlinesFeedStatus.success &&
+                state.feedItems.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    InitialStateWidget(
+                      icon: Icons.search_off,
+                      headline: l10n.headlinesFeedEmptyFilteredHeadline,
+                      subheadline: l10n.headlinesFeedEmptyFilteredSubheadline,
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    ElevatedButton(
+                      onPressed: () => context.read<HeadlinesFeedBloc>().add(
+                        HeadlinesFeedFiltersCleared(
                           adThemeStyle: AdThemeStyle.fromTheme(theme),
                         ),
                       ),
-                    );
-                  }
+                      child: Text(l10n.headlinesFeedClearFiltersButton),
+                    ),
+                  ],
+                ),
+              );
+            }
 
-                  if (state.status == HeadlinesFeedStatus.success &&
-                      state.feedItems.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          InitialStateWidget(
-                            icon: Icons.search_off,
-                            headline: l10n.headlinesFeedEmptyFilteredHeadline,
-                            subheadline:
-                                l10n.headlinesFeedEmptyFilteredSubheadline,
-                          ),
-                          const SizedBox(height: AppSpacing.lg),
-                          ElevatedButton(
-                            onPressed: () =>
-                                context.read<HeadlinesFeedBloc>().add(
-                                  HeadlinesFeedFiltersCleared(
-                                    adThemeStyle: AdThemeStyle.fromTheme(theme),
-                                  ),
-                                ),
-                            child: Text(l10n.headlinesFeedClearFiltersButton),
-                          ),
-                        ],
+            return RefreshIndicator(
+              onRefresh: () async {
+                context.read<HeadlinesFeedBloc>().add(
+                  HeadlinesFeedRefreshRequested(
+                    adThemeStyle: AdThemeStyle.fromTheme(theme),
+                  ),
+                );
+              },
+              child: CustomScrollView(
+                controller: _scrollController,
+                slivers: [
+                  const SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
                       ),
-                    );
-                  }
-
-                  return RefreshIndicator(
-                    onRefresh: () async {
-                      context.read<HeadlinesFeedBloc>().add(
-                        HeadlinesFeedRefreshRequested(
-                          adThemeStyle: AdThemeStyle.fromTheme(theme),
-                        ),
-                      );
-                    },
-                    child: ListView.separated(
-                      controller: _scrollController,
-                      padding: const EdgeInsets.only(
-                        top: AppSpacing.md,
-                        bottom: AppSpacing.xxl,
-                      ),
+                      child: SavedFiltersBar(),
+                    ),
+                  ),
+                  SliverPadding(
+                    padding: const EdgeInsets.only(
+                      top: AppSpacing.md,
+                      bottom: AppSpacing.xxl,
+                    ),
+                    sliver: SliverList.separated(
                       itemCount: state.hasMore
                           ? state.feedItems.length + 1
                           : state.feedItems.length,
@@ -401,11 +401,11 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
                         return const SizedBox.shrink();
                       },
                     ),
-                  );
-                },
+                  ),
+                ],
               ),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );

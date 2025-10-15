@@ -30,12 +30,25 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     required FeedDecoratorService feedDecoratorService,
     required AppBloc appBloc,
     required InlineAdCacheService inlineAdCacheService,
+    UserContentPreferences? initialUserContentPreferences,
   }) : _headlinesRepository = headlinesRepository,
        _feedDecoratorService = feedDecoratorService,
        _appBloc = appBloc,
        _inlineAdCacheService = inlineAdCacheService,
-       super(const HeadlinesFeedState()) {
+       super(
+         HeadlinesFeedState(
+           // Initialize the state with saved filters from the AppBloc's
+           // current state. This prevents a race condition where the
+           // feed bloc is created after the AppBloc has already loaded
+           // the user's preferences, ensuring the UI has the data
+           // from the very beginning.
+           savedFilters:
+               initialUserContentPreferences?.savedFilters ?? const [],
+         ),
+       ) {
     // Subscribe to AppBloc to receive updates on user preferences.
+    // This handles subsequent changes to preferences (e.g., adding/deleting
+    // a filter) while the feed page is active.
     _appBlocSubscription = _appBloc.stream.listen((appState) {
       // Check if userContentPreferences has changed and is not null.
       if (appState.userContentPreferences != null &&

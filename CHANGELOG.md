@@ -2,6 +2,7 @@
 
 ## 1.4.0 - 2025-10-14
 
+- **feat(demo)**: pre-populate saved filters and settings for new anonymous users
 - **feat**: implement saved feed filters with create, rename, and delete
 - **feat**: add horizontal filter bar to the headlines feed for quick selection
 - **refactor**: replace monolithic "apply followed items" with granular controls

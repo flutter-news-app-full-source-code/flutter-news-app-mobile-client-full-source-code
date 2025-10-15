@@ -31,7 +31,6 @@ final class HeadlinesFilterState extends Equatable {
     this.selectedTopics = const {},
     this.selectedSources = const {},
     this.selectedCountries = const {},
-    this.isUsingFollowedItems = false,
     this.error,
   });
 
@@ -56,9 +55,6 @@ final class HeadlinesFilterState extends Equatable {
   /// The set of [Country] objects currently selected by the user.
   final Set<Country> selectedCountries;
 
-  /// Flag indicating if the filter is currently set to "Apply my followed items".
-  final bool isUsingFollowedItems;
-
   /// An optional error object if the status is [HeadlinesFilterStatus.failure].
   final HttpException? error;
 
@@ -71,7 +67,6 @@ final class HeadlinesFilterState extends Equatable {
     Set<Topic>? selectedTopics,
     Set<Source>? selectedSources,
     Set<Country>? selectedCountries,
-    bool? isUsingFollowedItems,
     HttpException? error,
     bool clearError = false,
   }) {
@@ -83,7 +78,6 @@ final class HeadlinesFilterState extends Equatable {
       selectedTopics: selectedTopics ?? this.selectedTopics,
       selectedSources: selectedSources ?? this.selectedSources,
       selectedCountries: selectedCountries ?? this.selectedCountries,
-      isUsingFollowedItems: isUsingFollowedItems ?? this.isUsingFollowedItems,
       error: clearError ? null : error ?? this.error,
     );
   }
@@ -97,7 +91,6 @@ final class HeadlinesFilterState extends Equatable {
     selectedTopics,
     selectedSources,
     selectedCountries,
-    isUsingFollowedItems,
     error,
   ];
 }

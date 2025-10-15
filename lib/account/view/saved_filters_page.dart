@@ -1,6 +1,6 @@
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:core/core.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/widgets/save_filter_dialog.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
@@ -37,10 +37,9 @@ class SavedFiltersPage extends StatelessWidget {
 
           if (savedFilters.isEmpty) {
             return InitialStateWidget(
-              // Will be updated to new localization keys later.
               icon: Icons.filter_list_off_outlined,
-              headline: l10n.manageFiltersEmptyHeadline,
-              subheadline: l10n.manageFiltersEmptySubheadline,
+              headline: l10n.savedFiltersEmptyHeadline,
+              subheadline: l10n.savedFiltersEmptySubheadline,
             );
           }
 
@@ -86,14 +85,12 @@ class SavedFiltersPage extends StatelessWidget {
                       <PopupMenuEntry<String>>[
                         PopupMenuItem<String>(
                           value: 'rename',
-                          // Will be updated to new localization keys later.
-                          child: Text(l10n.manageFiltersRenameTooltip),
+                          child: Text(l10n.savedFiltersMenuRename),
                         ),
                         PopupMenuItem<String>(
                           value: 'delete',
                           child: Text(
-                            // Will be updated to new localization keys later.
-                            l10n.manageFiltersDeleteTooltip,
+                            l10n.savedFiltersMenuDelete,
                             style: TextStyle(color: theme.colorScheme.error),
                           ),
                         ),

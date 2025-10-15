@@ -72,6 +72,26 @@ class AccountPage extends StatelessWidget {
             indent: AppSpacing.paddingMedium,
             endIndent: AppSpacing.paddingMedium,
           ),
+          ListTile(
+            leading: Icon(
+              Icons.filter_list_alt,
+              color: theme.colorScheme.primary,
+            ),
+            // This will be updated to use l10n.accountSavedFiltersTile later.
+            title: Text(
+              'Saved Filters',
+              style: textTheme.titleMedium,
+            ),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              // This will be updated to use Routes.accountSavedFiltersName later.
+              context.goNamed('accountSavedFilters');
+            },
+          ),
+          const Divider(
+            indent: AppSpacing.paddingMedium,
+            endIndent: AppSpacing.paddingMedium,
+          ),
           _buildSettingsTile(context),
           const Divider(
             indent: AppSpacing.paddingMedium,

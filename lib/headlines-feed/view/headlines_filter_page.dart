@@ -274,13 +274,6 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
                       context.pop();
                     },
                   ),
-                  // Manage Saved Filters Button
-                  IconButton(
-                    tooltip: l10n.headlinesFilterManageTooltip,
-                    icon: const Icon(Icons.edit_note_outlined),
-                    onPressed: () =>
-                        context.pushNamed(Routes.manageSavedFiltersName),
-                  ),
                   // Apply Filters Button
                   IconButton(
                     icon: const Icon(Icons.check),

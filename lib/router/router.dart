@@ -11,6 +11,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/account/view/man
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/sources/followed_sources_list_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/topics/add_topic_to_follow_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/topics/followed_topics_list_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/account/view/saved_filters_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/saved_headlines_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
@@ -32,7 +33,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/b
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/country_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_feed_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_filter_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/manage_saved_filters_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_list_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/topic_filter_page.dart';
@@ -482,13 +482,6 @@ GoRouter createRouter({
                       );
                     },
                     routes: [
-                      // Sub-route for managing saved filters
-                      GoRoute(
-                        path: Routes.manageSavedFilters,
-                        name: Routes.manageSavedFiltersName,
-                        builder: (context, state) =>
-                            const ManageSavedFiltersPage(),
-                      ),
                       // Sub-route for topic selection
                       GoRoute(
                         path: Routes.feedFilterTopics,
@@ -783,6 +776,12 @@ GoRouter createRouter({
                         },
                       ),
                     ],
+                  ),
+                  // Route for managing saved filters.
+                  GoRoute(
+                    path: Routes.accountSavedFilters,
+                    name: Routes.accountSavedFiltersName,
+                    builder: (context, state) => const SavedFiltersPage(),
                   ),
                 ],
               ),

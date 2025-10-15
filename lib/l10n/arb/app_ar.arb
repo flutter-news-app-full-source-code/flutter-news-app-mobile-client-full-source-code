@@ -1321,5 +1321,29 @@
     "sourceListFilterPageFilterButtonTooltip": "تصفية قائمة المصادر",
     "@sourceListFilterPageFilterButtonTooltip": {
         "description": "Tooltip for the button that opens the source list filter page."
+    },
+    "accountSavedFiltersTile": "الفلاتر المحفوظة",
+    "@accountSavedFiltersTile": {
+        "description": "The title for the list tile on the account page that navigates to the saved filters management page."
+    },
+    "savedFiltersPageTitle": "الفلاتر المحفوظة",
+    "@savedFiltersPageTitle": {
+        "description": "The title for the app bar on the saved filters management page."
+    },
+    "savedFiltersEmptyHeadline": "لا توجد فلاتر محفوظة",
+    "@savedFiltersEmptyHeadline": {
+        "description": "The main headline text displayed on the saved filters page when the user has no saved filters."
+    },
+    "savedFiltersEmptySubheadline": "الفلاتر التي تحفظها من الموجز ستظهر هنا.",
+    "@savedFiltersEmptySubheadline": {
+        "description": "The sub-headline text displayed on the saved filters page when the user has no saved filters."
+    },
+    "savedFiltersMenuRename": "إعادة تسمية",
+    "@savedFiltersMenuRename": {
+        "description": "The text for the 'Rename' option in the popup menu on a saved filter item."
+    },
+    "savedFiltersMenuDelete": "حذف",
+    "@savedFiltersMenuDelete": {
+        "description": "The text for the 'Delete' option in the popup menu on a saved filter item."
     }
 }

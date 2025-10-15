@@ -1321,5 +1321,29 @@
     "sourceListFilterPageFilterButtonTooltip": "Filter source list",
     "@sourceListFilterPageFilterButtonTooltip": {
         "description": "Tooltip for the button that opens the source list filter page."
+    },
+    "accountSavedFiltersTile": "Saved Filters",
+    "@accountSavedFiltersTile": {
+        "description": "The title for the list tile on the account page that navigates to the saved filters management page."
+    },
+    "savedFiltersPageTitle": "Saved Filters",
+    "@savedFiltersPageTitle": {
+        "description": "The title for the app bar on the saved filters management page."
+    },
+    "savedFiltersEmptyHeadline": "No Saved Filters",
+    "@savedFiltersEmptyHeadline": {
+        "description": "The main headline text displayed on the saved filters page when the user has no saved filters."
+    },
+    "savedFiltersEmptySubheadline": "Filters you save from the feed will appear here.",
+    "@savedFiltersEmptySubheadline": {
+        "description": "The sub-headline text displayed on the saved filters page when the user has no saved filters."
+    },
+    "savedFiltersMenuRename": "Rename",
+    "@savedFiltersMenuRename": {
+        "description": "The text for the 'Rename' option in the popup menu on a saved filter item."
+    },
+    "savedFiltersMenuDelete": "Delete",
+    "@savedFiltersMenuDelete": {
+        "description": "The text for the 'Delete' option in the popup menu on a saved filter item."
     }
 }

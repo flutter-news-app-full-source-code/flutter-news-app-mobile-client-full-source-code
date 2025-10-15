@@ -81,6 +81,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<SavedFilterAdded>(_onSavedFilterAdded);
     on<SavedFilterUpdated>(_onSavedFilterUpdated);
     on<SavedFilterDeleted>(_onSavedFilterDeleted);
+    on<SavedFiltersReordered>(_onSavedFiltersReordered);
     on<AppLogoutRequested>(_onLogoutRequested);
 
     // Subscribe to the authentication repository's authStateChanges stream.
@@ -913,5 +914,39 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     );
 
     add(AppUserContentPreferencesChanged(preferences: updatedPreferences));
+  }
+
+  /// Handles reordering the list of saved filters.
+  ///
+  /// This method receives the complete list of filters in their new order
+  /// and dispatches an [AppUserContentPreferencesChanged] event to persist
+  /// the change. This approach leverages the natural order of the list for
+  /// persistence, avoiding the need for a separate 'order' property on the
+  /// [SavedFilter] model.
+  Future<void> _onSavedFiltersReordered(
+    SavedFiltersReordered event,
+    Emitter<AppState> emit,
+  ) async {
+    _logger.info('[AppBloc] SavedFiltersReordered event received.');
+
+    if (state.userContentPreferences == null) {
+      _logger.warning(
+        '[AppBloc] Skipping SavedFiltersReordered: UserContentPreferences not loaded.',
+      );
+      return;
+    }
+
+    // Create an updated preferences object with the reordered list.
+    final updatedPreferences = state.userContentPreferences!.copyWith(
+      savedFilters: event.reorderedFilters,
+    );
+
+    // Dispatch the existing event to handle persistence and state updates.
+    // This reuses the existing logic for updating user preferences.
+    add(AppUserContentPreferencesChanged(preferences: updatedPreferences));
+    _logger.info(
+      '[AppBloc] Dispatched AppUserContentPreferencesChanged '
+      'with reordered filters.',
+    );
   }
 }

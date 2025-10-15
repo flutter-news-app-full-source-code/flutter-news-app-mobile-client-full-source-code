@@ -36,7 +36,7 @@ Click on any category to explore.
 ### 🔍 Powerful Filtering & Search
 - **Quick-Access Filter Bar:** A persistent, horizontal filter bar on the main feed gives users one-tap access to their favorite content views. It includes built-in filters for "All" and "Followed" items, alongside any custom filters the user has saved.
 - **Advanced Filter Creation:** A dedicated, full-screen interface allows users to build complex filters by combining multiple `Topics`, `Sources`, and `Countries`.
-- **Saved Filters:** Users can name and save their custom filter combinations, which then appear in the quick-access filter bar for easy reuse.
+- **Saved Filters:** Users can name and save their custom filter combinations. These filters appear in the quick-access bar and can be reordered for a fully customized workflow.
 - **Unified Search:** A dedicated search page helps users find specific content quickly, with the ability to search across headlines, topics, sources, and countries.
 > **🎯 Your Advantage:** Give your users powerful content discovery tools that keep them engaged and coming back for more.
 
@@ -56,6 +56,7 @@ Click on any category to explore.
 ### 🧑‍🎨 Personalized User Accounts & Preferences
 - **Content Preferences:** Follow/unfollow `Topic`s, `Source`s, and `Country`s.
 - **Saved Headlines:** Bookmark articles for easy access later.
+- **Saved Filters Management:** Rename, delete, and reorder saved filters to control your content discovery shortcuts.
 - **Decorator Interaction Tracking:** User interactions with in-feed decorators (e.g., "Link Account" prompts) are tracked and persisted, ensuring a personalized and non-repetitive experience.
 > **❤️ Your Advantage:** Built-in personalization features that drive user retention and create a sticky app experience.
 

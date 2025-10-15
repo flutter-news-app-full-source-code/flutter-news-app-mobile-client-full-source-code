@@ -1309,5 +1309,9 @@
     "applyFilterDialogApplyAndSaveButton": "تطبيق وحفظ",
     "@applyFilterDialogApplyAndSaveButton": {
         "description": "Button text to apply and save the filter for future use."
+    },
+    "savedFiltersBarFollowedLabel": "المتابَعات",
+    "@savedFiltersBarFollowedLabel": {
+        "description": "Label for the 'Followed' chip in the saved filters bar."
     }
 }

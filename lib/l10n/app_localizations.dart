@@ -1903,6 +1903,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Apply & Save'**
   String get applyFilterDialogApplyAndSaveButton;
+
+  /// Label for the 'Followed' chip in the saved filters bar.
+  ///
+  /// In en, this message translates to:
+  /// **'Followed'**
+  String get savedFiltersBarFollowedLabel;
 }
 
 class _AppLocalizationsDelegate

@@ -1000,4 +1000,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get applyFilterDialogApplyAndSaveButton => 'Apply & Save';
+
+  @override
+  String get savedFiltersBarFollowedLabel => 'Followed';
 }

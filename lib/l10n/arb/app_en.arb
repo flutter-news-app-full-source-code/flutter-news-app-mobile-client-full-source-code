@@ -1309,5 +1309,9 @@
     "applyFilterDialogApplyAndSaveButton": "Apply & Save",
     "@applyFilterDialogApplyAndSaveButton": {
         "description": "Button text to apply and save the filter for future use."
+    },
+    "savedFiltersBarFollowedLabel": "Followed",
+    "@savedFiltersBarFollowedLabel": {
+        "description": "Label for the 'Followed' chip in the saved filters bar."
     }
 }

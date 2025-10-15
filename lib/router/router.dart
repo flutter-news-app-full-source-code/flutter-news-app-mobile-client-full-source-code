@@ -33,8 +33,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/v
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_feed_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/manage_saved_filters_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_list_filter_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/topic_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-search/bloc/headlines_search_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-search/view/headlines_search_page.dart';
@@ -354,9 +354,11 @@ GoRouter createRouter({
           final initialSelectedItems =
               extra['initialSelectedItems'] as Set<dynamic>? ?? {};
           // The itemBuilder is passed as a function to display the item name.
+          // We accept it as a generic Function and let the page handle the type,
+          // avoiding a strict cast here that causes a _TypeError.
           final itemBuilder =
-              extra['itemBuilder'] as String Function(dynamic item)? ??
-              (item) => item.toString();
+              extra['itemBuilder'] as Function? ??
+              (dynamic item) => item.toString();
 
           // Since this is a generic page, we pass the dynamic types directly.
           // The calling page is responsible for casting the result.
@@ -364,7 +366,7 @@ GoRouter createRouter({
             title: title,
             allItems: allItems,
             initialSelectedItems: initialSelectedItems,
-            itemBuilder: itemBuilder,
+            itemBuilder: (dynamic item) => itemBuilder(item) as String,
           );
         },
       ),

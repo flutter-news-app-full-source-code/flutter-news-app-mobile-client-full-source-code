@@ -25,7 +25,7 @@ Click on any category to explore.
 <details>
 <summary><strong>📰 Content Discovery & Feed</strong></summary>
 
-### 📰 Dynamic & Engaging Headlines Feed
+### 📰 Dynamic & Engaging Feed
 - Display news in a beautiful, performant, infinitely scrolling feed.
 - **Customizable Display:** Users can personalize their feed by choosing headline density (compact, standard, comfortable) and image style (hidden, small thumbnail, large thumbnail).
 - **Rich In-Feed Decorators:** Beyond simple calls-to-action, the feed dynamically injects items like `CallToActionItem` (e.g., link account, upgrade, rate app, enable notifications) and `ContentCollectionItem` (e.g., suggested topics/sources to follow), all managed by configurable rules and user interaction status.
@@ -33,11 +33,11 @@ Click on any category to explore.
 
 ---
 
-### 🔍 Advanced Content Filtering & Search
-- **Comprehensive Filtering:** Let users filter headlines by `Topic`, `Source`, and `Country` using a dedicated filter interface.
-- **"Followed Items" Filter:** Users can instantly filter the feed to show only content from their followed topics, sources, and countries.
-- **Saved & Quick-Access Filters:** Empower users to save complex filter combinations and recall them with a single tap from a new, persistent filter bar on the main feed.
-- **Unified Search:** Includes a dedicated search page to help users find specific content quickly, with the ability to search across headlines, topics, sources, and countries.
+### 🔍 Powerful Filtering & Search
+- **Quick-Access Filter Bar:** A persistent, horizontal filter bar on the main feed gives users one-tap access to their favorite content views. It includes built-in filters for "All" and "Followed" items, alongside any custom filters the user has saved.
+- **Advanced Filter Creation:** A dedicated, full-screen interface allows users to build complex filters by combining multiple `Topics`, `Sources`, and `Countries`.
+- **Saved Filters:** Users can name and save their custom filter combinations, which then appear in the quick-access filter bar for easy reuse.
+- **Unified Search:** A dedicated search page helps users find specific content quickly, with the ability to search across headlines, topics, sources, and countries.
 > **🎯 Your Advantage:** Give your users powerful content discovery tools that keep them engaged and coming back for more.
 
 </details>

@@ -1003,4 +1003,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get savedFiltersBarFollowedLabel => 'Followed';
+
+  @override
+  String get sourceListFilterPageTitle => 'Filter Sources';
+
+  @override
+  String get sourceListFilterPageFilterButtonTooltip => 'Filter source list';
 }

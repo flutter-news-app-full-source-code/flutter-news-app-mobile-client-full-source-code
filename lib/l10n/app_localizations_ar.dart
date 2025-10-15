@@ -1002,4 +1002,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get savedFiltersBarFollowedLabel => 'المتابَعات';
+
+  @override
+  String get sourceListFilterPageTitle => 'تصفية المصادر';
+
+  @override
+  String get sourceListFilterPageFilterButtonTooltip => 'تصفية قائمة المصادر';
 }

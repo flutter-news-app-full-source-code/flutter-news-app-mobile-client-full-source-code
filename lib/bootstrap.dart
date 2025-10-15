@@ -473,11 +473,18 @@ Future<Widget> bootstrap(
   // (like UserAppSettings, UserContentPreferences)
   // exists in the data in-memory clients when a user is first encountered
   // in the demo environment.
+  // In the demo environment, this service acts as a "fixture injector".
+  // When a new user is encountered, it clones pre-defined fixture data
+  // (settings and preferences, including saved filters) for that user,
+  // ensuring a rich initial experience.
   final demoDataInitializerService =
       appConfig.environment == app_config.AppEnvironment.demo
       ? DemoDataInitializerService(
           userAppSettingsRepository: userAppSettingsRepository,
           userContentPreferencesRepository: userContentPreferencesRepository,
+          userAppSettingsFixturesData: userAppSettingsFixturesData,
+          userContentPreferencesFixturesData:
+              userContentPreferencesFixturesData,
         )
       : null;
   logger

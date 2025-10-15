@@ -6,7 +6,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/w
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:ui_kit/ui_kit.dart';
 
-/// {@template manage_saved_filters_page}
+/// {@template saved_filters_page}
 /// A page for managing saved feed filters, allowing users to reorder,
 /// rename, or delete them.
 ///
@@ -14,9 +14,9 @@ import 'package:ui_kit/ui_kit.dart';
 /// [SavedFiltersReordered] event to the [AppBloc] to persist the new order.
 /// Renaming and deletion are handled via a [PopupMenuButton] on each list item.
 /// {@endtemplate}
-class ManageSavedFiltersPage extends StatelessWidget {
-  /// {@macro manage_saved_filters_page}
-  const ManageSavedFiltersPage({super.key});
+class SavedFiltersPage extends StatelessWidget {
+  /// {@macro saved_filters_page}
+  const SavedFiltersPage({super.key});
 
   @override
   Widget build(BuildContext context) {

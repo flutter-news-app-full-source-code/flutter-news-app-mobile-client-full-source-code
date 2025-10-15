@@ -32,7 +32,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/b
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/country_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_feed_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_filter_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/manage_saved_filters_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/account/view/saved_filters_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_list_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/topic_filter_page.dart';
@@ -482,13 +482,6 @@ GoRouter createRouter({
                       );
                     },
                     routes: [
-                      // Sub-route for managing saved filters
-                      GoRoute(
-                        path: Routes.manageSavedFilters,
-                        name: Routes.manageSavedFiltersName,
-                        builder: (context, state) =>
-                            const ManageSavedFiltersPage(),
-                      ),
                       // Sub-route for topic selection
                       GoRoute(
                         path: Routes.feedFilterTopics,
@@ -599,6 +592,14 @@ GoRouter createRouter({
                               headlineFromExtra?.id ?? headlineIdFromPath,
                         ),
                       );
+                    },
+                  ),
+                  // Route for managing saved filters, now under the account section.
+                  GoRoute(
+                    path: Routes.accountSavedFilters,
+                    name: Routes.accountSavedFiltersName,
+                    builder: (context, state) {
+                      return const SavedFiltersPage();
                     },
                   ),
                 ],

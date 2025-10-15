@@ -2,14 +2,16 @@
 
 ## 1.4.0 - Next Release
 
-
+- **feat**: created a reusable, searchable multi-select page for filtering
 - **feat**: add 'Followed' filter to quickly view content from followed items
 - **feat(demo)**: pre-populate saved filters and settings for new anonymous users
 - **fix**: ensure saved filters are immediately visible on app start
+- **fix**: corrected a bug where selecting a source type would check all sources
 - **feat**: implement saved feed filters with create, rename, and delete
 - **feat**: add horizontal filter bar to the headlines feed for quick selection
 - **refactor**: replace monolithic "apply followed items" with granular controls
 - **refactor**: simplified filter logic by removing the ambiguous 'isUsingFollowedItems' flag
+- **refactor**: improved the source filter UI by replacing horizontal scrolling with a more scalable and user-friendly vertical layout and navigation
 - **refactor**:  Updated the Headline Details page with a fading scroll effect for metadata chips and a new style for the 'Continue Reading' button. The main feed's filter icon was removed from the AppBar in favor of the new filter bar.
 
 ## 1.3.0 - 2025-10-10

@@ -26,8 +26,8 @@ class SavedFiltersPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          // Will be updated to a new localization key later.
-          l10n.manageFiltersPageTitle,
+          // Use the correct localization key for the page title.
+          l10n.savedFiltersPageTitle,
           style: theme.textTheme.titleLarge,
         ),
       ),

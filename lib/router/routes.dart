@@ -27,6 +27,7 @@ abstract final class Routes {
   static const entityDetailsName = 'entityDetails';
   static const globalArticleDetails = '/article/:id';
   static const globalArticleDetailsName = 'globalArticleDetails';
+  static const multiSelectSearchName = 'multiSelectSearch';
 
   // --- Feed Sub-Routes ---
   static const articleDetailsName = 'articleDetails';

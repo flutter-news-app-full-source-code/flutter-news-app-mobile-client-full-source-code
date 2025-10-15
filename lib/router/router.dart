@@ -50,6 +50,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/no
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/theme_settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_decorator_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/multi_select_search_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 
@@ -336,6 +337,35 @@ GoRouter createRouter({
               initialHeadline: headlineFromExtra,
               headlineId: headlineFromExtra?.id ?? headlineIdFromPath,
             ),
+          );
+        },
+      ),
+      // --- Reusable Multi-Select Search Page Route (Top Level) ---
+      // This route provides a generic UI for selecting multiple items from a
+      // searchable list. It is used by other pages (like the source filter)
+      // to offload the complexity of list selection.
+      GoRoute(
+        path: '/multi-select-search',
+        name: Routes.multiSelectSearchName,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          final title = extra['title'] as String? ?? 'Select';
+          final allItems = extra['allItems'] as List<dynamic>? ?? [];
+          final initialSelectedItems =
+              extra['initialSelectedItems'] as Set<dynamic>? ?? {};
+          // The itemBuilder is passed as a function to display the item name.
+          final itemBuilder = extra['itemBuilder'] as String Function(
+            dynamic item,
+          )? ??
+              (item) => item.toString();
+
+          // Since this is a generic page, we pass the dynamic types directly.
+          // The calling page is responsible for casting the result.
+          return MultiSelectSearchPage<dynamic>(
+            title: title,
+            allItems: allItems,
+            initialSelectedItems: initialSelectedItems,
+            itemBuilder: itemBuilder,
           );
         },
       ),

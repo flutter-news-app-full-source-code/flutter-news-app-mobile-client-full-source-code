@@ -775,15 +775,13 @@ GoRouter createRouter({
                           );
                         },
                       ),
-                      // Route for managing saved filters.
-                      GoRoute(
-                        path: Routes.accountSavedFilters,
-                        name: Routes.accountSavedFiltersName,
-                        builder: (context, state) {
-                          return const SavedFiltersPage();
-                        },
-                      ),
                     ],
+                  ),
+                  // Route for managing saved filters.
+                  GoRoute(
+                    path: Routes.accountSavedFilters,
+                    name: Routes.accountSavedFiltersName,
+                    builder: (context, state) => const SavedFiltersPage(),
                   ),
                 ],
               ),

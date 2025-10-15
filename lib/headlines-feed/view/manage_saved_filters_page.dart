@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:core/core.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/widgets/save_filter_dialog.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template manage_saved_filters_page}
-/// A page for managing saved feed filters.
+/// A page for managing saved feed filters, allowing users to reorder,
+/// rename, or delete them.
 ///
-/// Allows users to rename or delete their saved filters.
+/// Reordering is handled via a [ReorderableListView], which dispatches a
+/// [SavedFiltersReordered] event to the [AppBloc] to persist the new order.
+/// Renaming and deletion are handled via a [PopupMenuButton] on each list item.
 /// {@endtemplate}
 class ManageSavedFiltersPage extends StatelessWidget {
   /// {@macro manage_saved_filters_page}
@@ -22,6 +26,7 @@ class ManageSavedFiltersPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
+          // Will be updated to a new localization key later.
           l10n.manageFiltersPageTitle,
           style: theme.textTheme.titleLarge,
         ),
@@ -32,27 +37,29 @@ class ManageSavedFiltersPage extends StatelessWidget {
 
           if (savedFilters.isEmpty) {
             return InitialStateWidget(
+              // Will be updated to new localization keys later.
               icon: Icons.filter_list_off_outlined,
               headline: l10n.manageFiltersEmptyHeadline,
               subheadline: l10n.manageFiltersEmptySubheadline,
             );
           }
 
-          return ListView.separated(
+          return ReorderableListView.builder(
             itemCount: savedFilters.length,
-            separatorBuilder: (context, index) =>
-                const Divider(height: 1, indent: AppSpacing.md),
             itemBuilder: (context, index) {
               final filter = savedFilters[index];
               return ListTile(
+                // A key is required for ReorderableListView to work correctly.
+                key: ValueKey(filter.id),
+                leading: ReorderableDragStartListener(
+                  index: index,
+                  child: const Icon(Icons.drag_handle),
+                ),
                 title: Text(filter.name),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit_outlined),
-                      tooltip: l10n.manageFiltersRenameTooltip,
-                      onPressed: () {
+                trailing: PopupMenuButton<String>(
+                  onSelected: (value) {
+                    switch (value) {
+                      case 'rename':
                         showDialog<void>(
                           context: context,
                           builder: (_) => SaveFilterDialog(
@@ -67,22 +74,51 @@ class ManageSavedFiltersPage extends StatelessWidget {
                             },
                           ),
                         );
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        Icons.delete_outline,
-                        color: theme.colorScheme.error,
-                      ),
-                      tooltip: l10n.manageFiltersDeleteTooltip,
-                      onPressed: () {
+                        break;
+                      case 'delete':
                         context.read<AppBloc>().add(
                           SavedFilterDeleted(filterId: filter.id),
                         );
-                      },
-                    ),
-                  ],
+                        break;
+                    }
+                  },
+                  itemBuilder: (BuildContext context) =>
+                      <PopupMenuEntry<String>>[
+                        PopupMenuItem<String>(
+                          value: 'rename',
+                          // Will be updated to new localization keys later.
+                          child: Text(l10n.manageFiltersRenameTooltip),
+                        ),
+                        PopupMenuItem<String>(
+                          value: 'delete',
+                          child: Text(
+                            // Will be updated to new localization keys later.
+                            l10n.manageFiltersDeleteTooltip,
+                            style: TextStyle(color: theme.colorScheme.error),
+                          ),
+                        ),
+                      ],
                 ),
+              );
+            },
+            onReorder: (oldIndex, newIndex) {
+              // This adjustment is necessary when moving an item downwards
+              // in the list.
+              if (oldIndex < newIndex) {
+                newIndex -= 1;
+              }
+
+              // Create a mutable copy of the list.
+              final reorderedList = List<SavedFilter>.from(savedFilters);
+
+              // Remove the item from its old position and insert it into the
+              // new position.
+              final movedFilter = reorderedList.removeAt(oldIndex);
+              reorderedList.insert(newIndex, movedFilter);
+
+              // Dispatch the event to the AppBloc to persist the new order.
+              context.read<AppBloc>().add(
+                SavedFiltersReordered(reorderedFilters: reorderedList),
               );
             },
           );

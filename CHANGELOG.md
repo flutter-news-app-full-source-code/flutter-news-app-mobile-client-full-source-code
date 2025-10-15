@@ -2,6 +2,7 @@
 
 ## 1.4.0 - Upcoming Release
 
+- **refactor**: relocated saved filters management to the account page and introduced reordering capability.
 - **feat**: created a reusable, searchable multi-select page for filtering
 - **feat**: add 'Followed' filter to quickly view content from followed items
 - **feat(demo)**: pre-populate saved filters and settings for new anonymous users

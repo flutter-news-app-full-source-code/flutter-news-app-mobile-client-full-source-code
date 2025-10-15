@@ -76,12 +76,10 @@ class SavedFiltersPage extends StatelessWidget {
                             },
                           ),
                         );
-                        break;
                       case 'delete':
                         context.read<AppBloc>().add(
                           SavedFilterDeleted(filterId: filter.id),
                         );
-                        break;
                     }
                   },
                   itemBuilder: (BuildContext context) =>

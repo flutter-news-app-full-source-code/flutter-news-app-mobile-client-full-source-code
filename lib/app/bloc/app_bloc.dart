@@ -944,7 +944,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // Dispatch the existing event to handle persistence and state updates.
     // This reuses the existing logic for updating user preferences.
     add(AppUserContentPreferencesChanged(preferences: updatedPreferences));
-    _logger.info('[AppBloc] Dispatched AppUserContentPreferencesChanged '
-        'with reordered filters.');
+    _logger.info(
+      '[AppBloc] Dispatched AppUserContentPreferencesChanged '
+      'with reordered filters.',
+    );
   }
 }

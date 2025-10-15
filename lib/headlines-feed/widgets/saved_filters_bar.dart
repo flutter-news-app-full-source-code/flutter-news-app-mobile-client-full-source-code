@@ -51,14 +51,17 @@ class _SavedFiltersBarState extends State<SavedFiltersBar> {
       child: BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
         builder: (context, state) {
           final savedFilters = state.savedFilters;
-          final userPreferences = context.watch<AppBloc>().state.userContentPreferences;
+          final userPreferences = context
+              .watch<AppBloc>()
+              .state
+              .userContentPreferences;
 
           // Determine if the user is following any content to decide whether
           // to show the "Followed" filter chip.
-          final isFollowingItems = (userPreferences?.followedTopics.isNotEmpty ?? false) ||
+          final isFollowingItems =
+              (userPreferences?.followedTopics.isNotEmpty ?? false) ||
               (userPreferences?.followedSources.isNotEmpty ?? false) ||
               (userPreferences?.followedCountries.isNotEmpty ?? false);
-
 
           final activeFilterId = state.activeFilterId;
           final listView = ListView(

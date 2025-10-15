@@ -54,50 +54,6 @@ class _CountryFilterView extends StatelessWidget {
       appBar: AppBar(
         title: Text(title, style: textTheme.titleLarge),
         actions: [
-          // Apply My Followed Countries Button
-          BlocBuilder<HeadlinesFilterBloc, HeadlinesFilterState>(
-            builder: (context, filterState) {
-              final appState = context.watch<AppBloc>().state;
-              final followedCountries =
-                  appState.userContentPreferences?.followedCountries ?? [];
-
-              // Determine if the current selection matches the followed countries
-              final isFollowedFilterActive =
-                  followedCountries.isNotEmpty &&
-                  filterState.selectedCountries.length ==
-                      followedCountries.length &&
-                  filterState.selectedCountries.containsAll(followedCountries);
-
-              return IconButton(
-                icon: isFollowedFilterActive
-                    ? const Icon(Icons.favorite)
-                    : const Icon(Icons.favorite_border),
-                color: isFollowedFilterActive
-                    ? theme.colorScheme.primary
-                    : null,
-                tooltip: l10n.headlinesFeedFilterApplyFollowedLabel,
-                onPressed: () {
-                  if (followedCountries.isEmpty) {
-                    ScaffoldMessenger.of(context)
-                      ..hideCurrentSnackBar()
-                      ..showSnackBar(
-                        SnackBar(
-                          content: Text(l10n.noFollowedItemsForFilterSnackbar),
-                          duration: const Duration(seconds: 3),
-                        ),
-                      );
-                  } else {
-                    // Toggle the followed items filter in the HeadlinesFilterBloc
-                    context.read<HeadlinesFilterBloc>().add(
-                      FollowedCountriesFilterToggled(
-                        isSelected: !isFollowedFilterActive,
-                      ),
-                    );
-                  }
-                },
-              );
-            },
-          ),
           // Apply Filters Button (now just pops, as state is managed centrally)
           IconButton(
             icon: const Icon(Icons.check),
@@ -137,7 +93,6 @@ class _CountryFilterView extends StatelessWidget {
                   initialSelectedSources: filterState.selectedSources.toList(),
                   initialSelectedCountries: filterState.selectedCountries
                       .toList(),
-                  isUsingFollowedItems: filterState.isUsingFollowedItems,
                 ),
               ),
             );

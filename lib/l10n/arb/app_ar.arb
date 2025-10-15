@@ -1313,5 +1313,13 @@
     "savedFiltersBarFollowedLabel": "المتابَعات",
     "@savedFiltersBarFollowedLabel": {
         "description": "Label for the 'Followed' chip in the saved filters bar."
+    },
+    "sourceListFilterPageTitle": "تصفية المصادر",
+    "@sourceListFilterPageTitle": {
+        "description": "Title for the page where users can filter the list of sources."
+    },
+    "sourceListFilterPageFilterButtonTooltip": "تصفية قائمة المصادر",
+    "@sourceListFilterPageFilterButtonTooltip": {
+        "description": "Tooltip for the button that opens the source list filter page."
     }
 }

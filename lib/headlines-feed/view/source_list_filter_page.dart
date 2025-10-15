@@ -4,6 +4,9 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/multi_select_search_page.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template source_list_filter_page}
@@ -83,20 +86,51 @@ class _SourceListFilterPageState extends State<SourceListFilterPage> {
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
         children: [
           // Section for filtering by headquarters country.
-          _buildSectionHeader(
-            context,
-            l10n.headlinesFeedFilterSourceCountryLabel,
+          ListTile(
+            title: Text(l10n.headlinesFeedFilterSourceCountryLabel),
+            subtitle: Text(
+              _selectedHeadquarterCountries.isEmpty
+                  ? l10n.headlinesFeedFilterAllLabel
+                  : l10n.headlinesFeedFilterSelectedCountLabel(
+                      _selectedHeadquarterCountries.length,
+                    ),
+            ),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () async {
+              final result = await context.pushNamed<Set<Country>>(
+                Routes.multiSelectSearchName,
+                extra: {
+                  'title': l10n.headlinesFeedFilterSourceCountryLabel,
+                  'allItems': widget.allCountries,
+                  'initialSelectedItems': _selectedHeadquarterCountries,
+                  'itemBuilder': (Country country) => country.name,
+                },
+              );
+
+              if (result != null && mounted) {
+                setState(() => _selectedHeadquarterCountries = result);
+              }
+            },
           ),
-          _buildCountryCapsules(context, widget.allCountries, l10n, textTheme),
+          const Divider(height: 1),
           const SizedBox(height: AppSpacing.lg),
 
           // Section for filtering by source type.
           _buildSectionHeader(context, l10n.headlinesFeedFilterSourceTypeLabel),
-          _buildSourceTypeCapsules(
-            context,
-            widget.allSourceTypes,
-            l10n,
-            textTheme,
+          ...widget.allSourceTypes.map(
+            (sourceType) => CheckboxListTile(
+              title: Text(sourceType.name),
+              value: _selectedSourceTypes.contains(sourceType),
+              onChanged: (isSelected) {
+                setState(() {
+                  if (isSelected == true) {
+                    _selectedSourceTypes.add(sourceType);
+                  } else {
+                    _selectedSourceTypes.remove(sourceType);
+                  }
+                });
+              },
+            ),
           ),
         ],
       ),
@@ -112,110 +146,6 @@ class _SourceListFilterPageState extends State<SourceListFilterPage> {
         style: Theme.of(
           context,
         ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  /// Builds the horizontal list of [ChoiceChip] widgets for countries.
-  Widget _buildCountryCapsules(
-    BuildContext context,
-    List<Country> allCountries,
-    AppLocalizations l10n,
-    TextTheme textTheme,
-  ) {
-    return SizedBox(
-      height: AppSpacing.xl + AppSpacing.md,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.paddingMedium,
-          vertical: AppSpacing.sm,
-        ),
-        itemCount: allCountries.length + 1,
-        itemBuilder: (context, index) {
-          if (index == 0) {
-            // The 'All' chip.
-            return ChoiceChip(
-              label: Text(l10n.headlinesFeedFilterAllLabel),
-              labelStyle: textTheme.labelLarge,
-              selected: _selectedHeadquarterCountries.isEmpty,
-              onSelected: (_) => setState(_selectedHeadquarterCountries.clear),
-            );
-          }
-          final country = allCountries[index - 1];
-          return Padding(
-            padding: const EdgeInsets.only(left: AppSpacing.sm),
-            child: ChoiceChip(
-              avatar: country.flagUrl.isNotEmpty
-                  ? CircleAvatar(
-                      backgroundImage: NetworkImage(country.flagUrl),
-                      radius: AppSpacing.sm + AppSpacing.xs,
-                    )
-                  : null,
-              label: Text(country.name),
-              labelStyle: textTheme.labelLarge,
-              selected: _selectedHeadquarterCountries.contains(country),
-              onSelected: (isSelected) {
-                setState(() {
-                  if (isSelected) {
-                    _selectedHeadquarterCountries.add(country);
-                  } else {
-                    _selectedHeadquarterCountries.remove(country);
-                  }
-                });
-              },
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  /// Builds the horizontal list of [ChoiceChip] widgets for source types.
-  Widget _buildSourceTypeCapsules(
-    BuildContext context,
-    List<SourceType> allSourceTypes,
-    AppLocalizations l10n,
-    TextTheme textTheme,
-  ) {
-    return SizedBox(
-      height: AppSpacing.xl + AppSpacing.md,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.paddingMedium,
-          vertical: AppSpacing.sm,
-        ),
-        itemCount: allSourceTypes.length + 1,
-        itemBuilder: (context, index) {
-          if (index == 0) {
-            // The 'All' chip.
-            return ChoiceChip(
-              label: Text(l10n.headlinesFeedFilterAllLabel),
-              labelStyle: textTheme.labelLarge,
-              selected: _selectedSourceTypes.isEmpty,
-              onSelected: (_) => setState(_selectedSourceTypes.clear),
-            );
-          }
-          final sourceType = allSourceTypes[index - 1];
-          return Padding(
-            padding: const EdgeInsets.only(left: AppSpacing.sm),
-            child: ChoiceChip(
-              label: Text(sourceType.name),
-              labelStyle: textTheme.labelLarge,
-              selected: _selectedSourceTypes.contains(sourceType),
-              onSelected: (isSelected) {
-                setState(() {
-                  if (isSelected) {
-                    _selectedSourceTypes.add(sourceType);
-                  } else {
-                    _selectedSourceTypes.remove(sourceType);
-                  }
-                });
-              },
-            ),
-          );
-        },
       ),
     );
   }

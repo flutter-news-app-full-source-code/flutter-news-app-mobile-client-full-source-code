@@ -594,14 +594,6 @@ GoRouter createRouter({
                       );
                     },
                   ),
-                  // Route for managing saved filters, now under the account section.
-                  GoRoute(
-                    path: Routes.accountSavedFilters,
-                    name: Routes.accountSavedFiltersName,
-                    builder: (context, state) {
-                      return const SavedFiltersPage();
-                    },
-                  ),
                 ],
               ),
             ],
@@ -781,6 +773,14 @@ GoRouter createRouter({
                                   headlineFromExtra?.id ?? headlineIdFromPath,
                             ),
                           );
+                        },
+                      ),
+                      // Route for managing saved filters.
+                      GoRoute(
+                        path: Routes.accountSavedFilters,
+                        name: Routes.accountSavedFiltersName,
+                        builder: (context, state) {
+                          return const SavedFiltersPage();
                         },
                       ),
                     ],

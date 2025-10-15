@@ -36,7 +36,7 @@ Click on any category to explore.
 ### 🔍 Powerful Filtering & Search
 - **Quick-Access Filter Bar:** A persistent, horizontal filter bar on the main feed gives users one-tap access to their favorite content views. It includes built-in filters for "All" and "Followed" items, alongside any custom filters the user has saved.
 - **Advanced Filter Creation:** A dedicated, full-screen interface allows users to build complex filters by combining multiple `Topics`, `Sources`, and `Countries`.
-- **Saved Filters:** Users can name and save their custom filter combinations. These filters appear in the quick-access bar and can be reordered for a fully customized workflow.
+- **Saved Filters:** Users can name and save their custom filter combinations. These filters appear in the quick-access bar and can be reordered for a fully customized experience.
 - **Unified Search:** A dedicated search page helps users find specific content quickly, with the ability to search across headlines, topics, sources, and countries.
 > **🎯 Your Advantage:** Give your users powerful content discovery tools that keep them engaged and coming back for more.
 

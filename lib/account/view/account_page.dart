@@ -74,7 +74,7 @@ class AccountPage extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(
-              Icons.filter_list_alt,
+              Icons.filter_alt_outlined,
               color: theme.colorScheme.primary,
             ),
             title: Text(

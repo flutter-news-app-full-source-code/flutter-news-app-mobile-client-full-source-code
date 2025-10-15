@@ -198,3 +198,17 @@ class SavedFilterDeleted extends AppEvent {
   @override
   List<Object> get props => [filterId];
 }
+
+/// {@template saved_filters_reordered}
+/// Dispatched when the user reorders their saved filters in the UI.
+/// {@endtemplate}
+class SavedFiltersReordered extends AppEvent {
+  /// {@macro saved_filters_reordered}
+  const SavedFiltersReordered({required this.reorderedFilters});
+
+  /// The complete list of saved filters in their new order.
+  final List<SavedFilter> reorderedFilters;
+
+  @override
+  List<Object> get props => [reorderedFilters];
+}

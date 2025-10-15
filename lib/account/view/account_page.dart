@@ -77,15 +77,13 @@ class AccountPage extends StatelessWidget {
               Icons.filter_list_alt,
               color: theme.colorScheme.primary,
             ),
-            // This will be updated to use l10n.accountSavedFiltersTile later.
             title: Text(
-              'Saved Filters',
+              l10n.accountSavedFiltersTile,
               style: textTheme.titleMedium,
             ),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              // This will be updated to use Routes.accountSavedFiltersName later.
-              context.goNamed('accountSavedFilters');
+              context.goNamed(Routes.accountSavedFiltersName);
             },
           ),
           const Divider(

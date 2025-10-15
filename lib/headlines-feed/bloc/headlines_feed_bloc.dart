@@ -86,6 +86,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     on<_AppContentPreferencesChanged>(_onAppContentPreferencesChanged);
     on<SavedFilterSelected>(_onSavedFilterSelected, transformer: restartable());
     on<AllFilterSelected>(_onAllFilterSelected, transformer: restartable());
+    on<FollowedFilterSelected>(
+      _onFollowedFilterSelected,
+      transformer: restartable(),
+    );
   }
 
   final DataRepository<Headline> _headlinesRepository;
@@ -516,8 +520,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       topics: event.filter.topics,
       sources: event.filter.sources,
       eventCountries: event.filter.countries,
-      // This is not from the "followed items" toggle.
-      isFromFollowedItems: false,
     );
 
     // Set the active filter ID and then dispatch an event to apply the filter
@@ -543,6 +545,38 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     // subsequent refresh action.
     emit(state.copyWith(activeFilterId: 'all', filter: const HeadlineFilter()));
     add(HeadlinesFeedFiltersCleared(adThemeStyle: event.adThemeStyle));
+  }
+
+  /// Handles the selection of the "Followed" filter from the filter bar.
+  ///
+  /// This creates a [HeadlineFilter] from the user's followed items and
+  /// triggers a full feed refresh.
+  Future<void> _onFollowedFilterSelected(
+    FollowedFilterSelected event,
+    Emitter<HeadlinesFeedState> emit,
+  ) async {
+    final userPreferences = _appBloc.state.userContentPreferences;
+    if (userPreferences == null) {
+      // This case should ideally not happen if the UI is built correctly,
+      // as the "Followed" button is only shown when preferences are available.
+      return;
+    }
+
+    final newFilter = HeadlineFilter(
+      topics: userPreferences.followedTopics,
+      sources: userPreferences.followedSources,
+      eventCountries: userPreferences.followedCountries,
+    );
+
+    // Set the active filter ID and then dispatch an event to apply the filter
+    // and refresh the feed.
+    emit(state.copyWith(activeFilterId: 'followed'));
+    add(
+      HeadlinesFeedFiltersApplied(
+        filter: newFilter,
+        adThemeStyle: event.adThemeStyle,
+      ),
+    );
   }
 
   @override

@@ -22,7 +22,6 @@ final class FilterDataLoaded extends HeadlinesFilterEvent {
     this.initialSelectedTopics = const [],
     this.initialSelectedSources = const [],
     this.initialSelectedCountries = const [],
-    this.isUsingFollowedItems = false,
   });
 
   /// The topics that were initially selected on the previous page.
@@ -34,15 +33,11 @@ final class FilterDataLoaded extends HeadlinesFilterEvent {
   /// The countries that were initially selected on the previous page.
   final List<Country> initialSelectedCountries;
 
-  /// Whether the filter is initially set to use followed items.
-  final bool isUsingFollowedItems;
-
   @override
   List<Object> get props => [
     initialSelectedTopics,
     initialSelectedSources,
     initialSelectedCountries,
-    isUsingFollowedItems,
   ];
 }
 
@@ -105,44 +100,26 @@ final class FilterSelectionsCleared extends HeadlinesFilterEvent {
   const FilterSelectionsCleared();
 }
 
-/// {@template followed_topics_filter_toggled}
-/// Event triggered when the "Apply my followed topics" button is toggled.
+/// {@template filter_source_criteria_changed}
+/// Event triggered when the source filtering criteria (headquarters or types)
+/// are updated from the `SourceListFilterPage`.
 /// {@endtemplate}
-final class FollowedTopicsFilterToggled extends HeadlinesFilterEvent {
-  /// {@macro followed_topics_filter_toggled}
-  const FollowedTopicsFilterToggled({required this.isSelected});
+final class FilterSourceCriteriaChanged extends HeadlinesFilterEvent {
+  /// {@macro filter_source_criteria_changed}
+  const FilterSourceCriteriaChanged({
+    this.selectedCountries,
+    this.selectedSourceTypes,
+  });
 
-  /// The new selection state of the followed topics filter.
-  final bool isSelected;
+  /// The updated set of selected headquarters countries.
+  final Set<Country>? selectedCountries;
+
+  /// The updated set of selected source types.
+  final Set<SourceType>? selectedSourceTypes;
 
   @override
-  List<Object> get props => [isSelected];
-}
-
-/// {@template followed_sources_filter_toggled}
-/// Event triggered when the "Apply my followed sources" button is toggled.
-/// {@endtemplate}
-final class FollowedSourcesFilterToggled extends HeadlinesFilterEvent {
-  /// {@macro followed_sources_filter_toggled}
-  const FollowedSourcesFilterToggled({required this.isSelected});
-
-  /// The new selection state of the followed sources filter.
-  final bool isSelected;
-
-  @override
-  List<Object> get props => [isSelected];
-}
-
-/// {@template followed_countries_filter_toggled}
-/// Event triggered when the "Apply my followed countries" button is toggled.
-/// {@endtemplate}
-final class FollowedCountriesFilterToggled extends HeadlinesFilterEvent {
-  /// {@macro followed_countries_filter_toggled}
-  const FollowedCountriesFilterToggled({required this.isSelected});
-
-  /// The new selection state of the followed countries filter.
-  final bool isSelected;
-
-  @override
-  List<Object> get props => [isSelected];
+  List<Object> get props => [
+    if (selectedCountries != null) selectedCountries!,
+    if (selectedSourceTypes != null) selectedSourceTypes!,
+  ];
 }

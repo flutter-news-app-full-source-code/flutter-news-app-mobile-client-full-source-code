@@ -29,27 +29,22 @@ class HeadlinesFilterBloc
     required DataRepository<Topic> topicsRepository,
     required DataRepository<Source> sourcesRepository,
     required DataRepository<Country> countriesRepository,
-    required AppBloc appBloc,
   }) : _topicsRepository = topicsRepository,
        _sourcesRepository = sourcesRepository,
        _countriesRepository = countriesRepository,
-       _appBloc = appBloc,
        _logger = Logger('HeadlinesFilterBloc'),
        super(const HeadlinesFilterState()) {
     on<FilterDataLoaded>(_onFilterDataLoaded, transformer: restartable());
     on<FilterTopicToggled>(_onFilterTopicToggled);
     on<FilterSourceToggled>(_onFilterSourceToggled);
     on<FilterCountryToggled>(_onFilterCountryToggled);
-    on<FollowedTopicsFilterToggled>(_onFollowedTopicsFilterToggled);
-    on<FollowedSourcesFilterToggled>(_onFollowedSourcesFilterToggled);
-    on<FollowedCountriesFilterToggled>(_onFollowedCountriesFilterToggled);
     on<FilterSelectionsCleared>(_onFilterSelectionsCleared);
+    on<FilterSourceCriteriaChanged>(_onFilterSourceCriteriaChanged);
   }
 
   final DataRepository<Topic> _topicsRepository;
   final DataRepository<Source> _sourcesRepository;
   final DataRepository<Country> _countriesRepository;
-  final AppBloc _appBloc;
   final Logger _logger;
 
   /// Handles the [FilterDataLoaded] event, fetching all necessary filter data.
@@ -92,7 +87,6 @@ class HeadlinesFilterBloc
           selectedTopics: Set.from(event.initialSelectedTopics),
           selectedSources: Set.from(event.initialSelectedSources),
           selectedCountries: Set.from(event.initialSelectedCountries),
-          isUsingFollowedItems: event.isUsingFollowedItems,
           clearError: true,
         ),
       );
@@ -121,13 +115,7 @@ class HeadlinesFilterBloc
     } else {
       updatedSelectedTopics.remove(event.topic);
     }
-    emit(
-      state.copyWith(
-        selectedTopics: updatedSelectedTopics,
-        // Toggling individual item clears followed filter
-        isUsingFollowedItems: false,
-      ),
-    );
+    emit(state.copyWith(selectedTopics: updatedSelectedTopics));
   }
 
   /// Handles the [FilterSourceToggled] event, updating the selected sources.
@@ -141,13 +129,7 @@ class HeadlinesFilterBloc
     } else {
       updatedSelectedSources.remove(event.source);
     }
-    emit(
-      state.copyWith(
-        selectedSources: updatedSelectedSources,
-        // Toggling individual item clears followed filter
-        isUsingFollowedItems: false,
-      ),
-    );
+    emit(state.copyWith(selectedSources: updatedSelectedSources));
   }
 
   /// Handles the [FilterCountryToggled] event, updating the selected countries.
@@ -161,13 +143,7 @@ class HeadlinesFilterBloc
     } else {
       updatedSelectedCountries.remove(event.country);
     }
-    emit(
-      state.copyWith(
-        selectedCountries: updatedSelectedCountries,
-        // Toggling individual item clears followed filter
-        isUsingFollowedItems: false,
-      ),
-    );
+    emit(state.copyWith(selectedCountries: updatedSelectedCountries));
   }
 
   /// Handles the [FilterSelectionsCleared] event, clearing all filter selections.
@@ -180,77 +156,23 @@ class HeadlinesFilterBloc
         selectedTopics: {},
         selectedSources: {},
         selectedCountries: {},
-        isUsingFollowedItems: false,
       ),
     );
   }
 
-  /// Handles toggling the followed topics filter.
-  ///
-  /// This method specifically updates the `selectedTopics` set based on the
-  /// user's followed topics, without affecting other filter selections.
-  void _onFollowedTopicsFilterToggled(
-    FollowedTopicsFilterToggled event,
+  /// Handles the [FilterSourceCriteriaChanged] event, updating the UI-only
+  /// filter criteria for the source list.
+  void _onFilterSourceCriteriaChanged(
+    FilterSourceCriteriaChanged event,
     Emitter<HeadlinesFilterState> emit,
   ) {
-    if (event.isSelected) {
-      final userPreferences = _appBloc.state.userContentPreferences;
-      emit(
-        state.copyWith(
-          selectedTopics: Set.from(userPreferences?.followedTopics ?? []),
-          // This granular toggle means the monolithic "followed items"
-          // flag is no longer applicable for this action.
-          isUsingFollowedItems: false,
-        ),
-      );
-    } else {
-      emit(state.copyWith(selectedTopics: {}, isUsingFollowedItems: false));
-    }
-  }
-
-  /// Handles toggling the followed sources filter.
-  ///
-  /// This method specifically updates the `selectedSources` set based on the
-  /// user's followed sources, without affecting other filter selections.
-  void _onFollowedSourcesFilterToggled(
-    FollowedSourcesFilterToggled event,
-    Emitter<HeadlinesFilterState> emit,
-  ) {
-    if (event.isSelected) {
-      final userPreferences = _appBloc.state.userContentPreferences;
-      emit(
-        state.copyWith(
-          selectedSources: Set.from(userPreferences?.followedSources ?? []),
-          // This granular toggle means the monolithic "followed items"
-          // flag is no longer applicable for this action.
-          isUsingFollowedItems: false,
-        ),
-      );
-    } else {
-      emit(state.copyWith(selectedSources: {}, isUsingFollowedItems: false));
-    }
-  }
-
-  /// Handles toggling the followed countries filter.
-  ///
-  /// This method specifically updates the `selectedCountries` set based on the
-  /// user's followed countries, without affecting other filter selections.
-  void _onFollowedCountriesFilterToggled(
-    FollowedCountriesFilterToggled event,
-    Emitter<HeadlinesFilterState> emit,
-  ) {
-    if (event.isSelected) {
-      final userPreferences = _appBloc.state.userContentPreferences;
-      emit(
-        state.copyWith(
-          selectedCountries: Set.from(userPreferences?.followedCountries ?? []),
-          // This granular toggle means the monolithic "followed items"
-          // flag is no longer applicable for this action.
-          isUsingFollowedItems: false,
-        ),
-      );
-    } else {
-      emit(state.copyWith(selectedCountries: {}, isUsingFollowedItems: false));
-    }
+    emit(
+      state.copyWith(
+        selectedSourceHeadquarterCountries:
+            event.selectedCountries ?? state.selectedSourceHeadquarterCountries,
+        selectedSourceTypes:
+            event.selectedSourceTypes ?? state.selectedSourceTypes,
+      ),
+    );
   }
 }

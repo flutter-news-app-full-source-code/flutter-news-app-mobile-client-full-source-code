@@ -39,13 +39,11 @@ class HeadlinesFilterPage extends StatelessWidget {
             topicsRepository: context.read<DataRepository<Topic>>(),
             sourcesRepository: context.read<DataRepository<Source>>(),
             countriesRepository: context.read<DataRepository<Country>>(),
-            appBloc: context.read<AppBloc>(),
           )..add(
             FilterDataLoaded(
               initialSelectedTopics: currentFilter.topics ?? [],
               initialSelectedSources: currentFilter.sources ?? [],
               initialSelectedCountries: currentFilter.eventCountries ?? [],
-              isUsingFollowedItems: currentFilter.isFromFollowedItems,
             ),
           ),
       child: const _HeadlinesFilterView(),
@@ -192,7 +190,6 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
       topics: filterState.selectedTopics.toList(),
       sources: filterState.selectedSources.toList(),
       eventCountries: filterState.selectedCountries.toList(),
-      isFromFollowedItems: filterState.isUsingFollowedItems,
     );
     context.read<HeadlinesFeedBloc>().add(
       HeadlinesFeedFiltersApplied(
@@ -306,10 +303,6 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
     AppLocalizations l10n,
     HeadlinesFilterState filterState,
   ) {
-    // Determine if the "Apply my followed items" feature is active.
-    // This will disable the individual filter tiles.
-    final isFollowedFilterActive = filterState.isUsingFollowedItems;
-
     if (filterState.status == HeadlinesFilterStatus.loading) {
       return LoadingStateWidget(
         icon: Icons.filter_list,
@@ -331,7 +324,6 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
               initialSelectedTopics: currentFilter.topics ?? [],
               initialSelectedSources: currentFilter.sources ?? [],
               initialSelectedCountries: currentFilter.eventCountries ?? [],
-              isUsingFollowedItems: currentFilter.isFromFollowedItems,
             ),
           );
         },
@@ -365,7 +357,6 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
         return _buildFilterTile(
           context: context,
           title: title,
-          enabled: !isFollowedFilterActive,
           selectedCount: selectedCount,
           routeName: routeName,
         );

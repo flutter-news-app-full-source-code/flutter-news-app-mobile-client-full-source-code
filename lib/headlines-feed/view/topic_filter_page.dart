@@ -1,7 +1,6 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_filter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -46,49 +45,6 @@ class _TopicFilterView extends StatelessWidget {
           style: theme.textTheme.titleLarge,
         ),
         actions: [
-          // Apply My Followed Topics Button
-          BlocBuilder<HeadlinesFilterBloc, HeadlinesFilterState>(
-            builder: (context, filterState) {
-              final appState = context.watch<AppBloc>().state;
-              final followedTopics =
-                  appState.userContentPreferences?.followedTopics ?? [];
-
-              // Determine if the current selection matches the followed topics
-              final isFollowedFilterActive =
-                  followedTopics.isNotEmpty &&
-                  filterState.selectedTopics.length == followedTopics.length &&
-                  filterState.selectedTopics.containsAll(followedTopics);
-
-              return IconButton(
-                icon: isFollowedFilterActive
-                    ? const Icon(Icons.favorite)
-                    : const Icon(Icons.favorite_border),
-                color: isFollowedFilterActive
-                    ? theme.colorScheme.primary
-                    : null,
-                tooltip: l10n.headlinesFeedFilterApplyFollowedLabel,
-                onPressed: () {
-                  if (followedTopics.isEmpty) {
-                    ScaffoldMessenger.of(context)
-                      ..hideCurrentSnackBar()
-                      ..showSnackBar(
-                        SnackBar(
-                          content: Text(l10n.noFollowedItemsForFilterSnackbar),
-                          duration: const Duration(seconds: 3),
-                        ),
-                      );
-                  } else {
-                    // Toggle the followed items filter in the HeadlinesFilterBloc
-                    context.read<HeadlinesFilterBloc>().add(
-                      FollowedTopicsFilterToggled(
-                        isSelected: !isFollowedFilterActive,
-                      ),
-                    );
-                  }
-                },
-              );
-            },
-          ),
           // Apply Filters Button (now just pops, as state is managed centrally)
           IconButton(
             icon: const Icon(Icons.check),
@@ -131,7 +87,6 @@ class _TopicFilterView extends StatelessWidget {
                         .toList(),
                     initialSelectedCountries: filterState.selectedCountries
                         .toList(),
-                    isUsingFollowedItems: filterState.isUsingFollowedItems,
                   ),
                 ),
               ),

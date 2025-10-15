@@ -34,6 +34,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/v
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/manage_saved_filters_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_filter_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_list_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/topic_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-search/bloc/headlines_search_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-search/view/headlines_search_page.dart';
@@ -49,6 +50,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/no
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/theme_settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_decorator_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/multi_select_search_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 
@@ -338,6 +340,37 @@ GoRouter createRouter({
           );
         },
       ),
+      // --- Reusable Multi-Select Search Page Route (Top Level) ---
+      // This route provides a generic UI for selecting multiple items from a
+      // searchable list. It is used by other pages (like the source filter)
+      // to offload the complexity of list selection.
+      GoRoute(
+        path: '/multi-select-search',
+        name: Routes.multiSelectSearchName,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          final title = extra['title'] as String? ?? 'Select';
+          final allItems = extra['allItems'] as List<dynamic>? ?? [];
+          final initialSelectedItems =
+              extra['initialSelectedItems'] as Set<dynamic>? ?? {};
+          // The itemBuilder is passed as a function to display the item name.
+          // We accept it as a generic Function and let the page handle the type,
+          // avoiding a strict cast here that causes a _TypeError.
+          final itemBuilder =
+              extra['itemBuilder'] as Function? ??
+              (dynamic item) => item.toString();
+
+          // Since this is a generic page, we pass the dynamic types directly.
+          // The calling page is responsible for casting the result.
+          return MultiSelectSearchPage<dynamic>(
+            title: title,
+            allItems: allItems,
+            initialSelectedItems: initialSelectedItems,
+            // ignore: avoid_dynamic_calls
+            itemBuilder: (dynamic item) => itemBuilder(item) as String,
+          );
+        },
+      ),
       // --- Main App Shell ---
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -475,6 +508,39 @@ GoRouter createRouter({
                               state.extra! as HeadlinesFilterBloc;
                           return SourceFilterPage(filterBloc: filterBloc);
                         },
+                        routes: [
+                          GoRoute(
+                            path: 'source-list-filter',
+                            name: Routes.sourceListFilterName,
+                            builder: (context, state) {
+                              final extra =
+                                  state.extra as Map<String, dynamic>? ?? {};
+                              final allCountries =
+                                  extra['allCountries'] as List<Country>? ?? [];
+                              final allSourceTypes =
+                                  extra['allSourceTypes']
+                                      as List<SourceType>? ??
+                                  [];
+                              final initialSelectedHeadquarterCountries =
+                                  extra['initialSelectedHeadquarterCountries']
+                                      as Set<Country>? ??
+                                  {};
+                              final initialSelectedSourceTypes =
+                                  extra['initialSelectedSourceTypes']
+                                      as Set<SourceType>? ??
+                                  {};
+
+                              return SourceListFilterPage(
+                                allCountries: allCountries,
+                                allSourceTypes: allSourceTypes,
+                                initialSelectedHeadquarterCountries:
+                                    initialSelectedHeadquarterCountries,
+                                initialSelectedSourceTypes:
+                                    initialSelectedSourceTypes,
+                              );
+                            },
+                          ),
+                        ],
                       ),
                       GoRoute(
                         path: Routes.feedFilterEventCountries,

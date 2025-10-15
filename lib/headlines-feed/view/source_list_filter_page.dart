@@ -95,7 +95,7 @@ class _SourceListFilterPageState extends State<SourceListFilterPage> {
             ),
             trailing: const Icon(Icons.chevron_right),
             onTap: () async {
-              final result = await context.pushNamed<Set<Country>>(
+              final result = await context.pushNamed<Set<dynamic>>(
                 Routes.multiSelectSearchName,
                 extra: {
                   'title': l10n.headlinesFeedFilterSourceCountryLabel,
@@ -106,7 +106,9 @@ class _SourceListFilterPageState extends State<SourceListFilterPage> {
               );
 
               if (result != null && mounted) {
-                setState(() => _selectedHeadquarterCountries = result);
+                setState(
+                  () => _selectedHeadquarterCountries = result.cast<Country>(),
+                );
               }
             },
           ),

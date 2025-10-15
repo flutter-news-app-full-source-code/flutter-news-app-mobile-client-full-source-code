@@ -1001,5 +1001,5 @@ class AppLocalizationsAr extends AppLocalizations {
   String get applyFilterDialogApplyAndSaveButton => 'تطبيق وحفظ';
 
   @override
-  String get savedFiltersBarFollowedLabel => 'المتابَع';
+  String get savedFiltersBarFollowedLabel => 'المتابَعات';
 }

@@ -120,8 +120,14 @@ class DemoDataInitializerService {
       );
       // Clone the first item from the fixture data, assigning the new user's ID.
       // This provides new demo users with pre-populated saved filters and other preferences.
+      if (userContentPreferencesFixturesData.isEmpty) {
+        throw StateError(
+          'Cannot create preferences from fixture: userContentPreferencesFixturesData is empty.',
+        );
+      }
       final fixturePreferences = userContentPreferencesFixturesData.first
           .copyWith(id: userId);
+
       await _userContentPreferencesRepository.create(
         item: fixturePreferences,
         userId: userId,

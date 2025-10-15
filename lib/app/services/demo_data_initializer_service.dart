@@ -4,8 +4,13 @@ import 'package:logging/logging.dart';
 
 /// {@template demo_data_initializer_service}
 /// A service responsible for ensuring that essential user-specific data
-/// (like [UserAppSettings] and [UserContentPreferences]) exists in the
-/// data in-memory clients when a user is first encountered in the demo environment.
+/// (like [UserAppSettings] and [UserContentPreferences]) exists for a new user
+/// in the demo environment.
+///
+/// Instead of creating default empty objects, this service now acts as a
+/// "fixture injector". It clones rich, pre-defined data from fixture lists,
+/// providing new anonymous users with a full-featured initial experience,
+/// including pre-populated saved filters.
 ///
 /// This service is specifically designed for the in-memory data clients
 /// used in the demo environment. In production/development environments,
@@ -17,6 +22,8 @@ class DemoDataInitializerService {
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
+    required this.userAppSettingsFixturesData,
+    required this.userContentPreferencesFixturesData,
   }) : _userAppSettingsRepository = userAppSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
        _logger = Logger('DemoDataInitializerService');
@@ -25,6 +32,16 @@ class DemoDataInitializerService {
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
   final Logger _logger;
+
+  /// A list of [UserAppSettings] fixture data to be used as a template.
+  ///
+  /// The first item in this list will be cloned for new users.
+  final List<UserAppSettings> userAppSettingsFixturesData;
+
+  /// A list of [UserContentPreferences] fixture data to be used as a template.
+  ///
+  /// The first item in this list will be cloned for new users.
+  final List<UserContentPreferences> userContentPreferencesFixturesData;
 
   /// Initializes essential user-specific data in the in-memory clients
   /// for the given [user].
@@ -58,36 +75,25 @@ class DemoDataInitializerService {
     } on NotFoundException {
       _logger.info(
         'UserAppSettings not found for user ID: '
-        '$userId. Creating default settings.',
+        '$userId. Creating settings from fixture.',
       );
-      final defaultSettings = UserAppSettings(
+      // Clone the first item from the fixture data, assigning the new user's ID.
+      // This ensures every new demo user gets a rich, pre-populated set of settings.
+      if (userAppSettingsFixturesData.isEmpty) {
+        throw StateError(
+          'Cannot create settings from fixture: userAppSettingsFixturesData is empty.',
+        );
+      }
+      final fixtureSettings = userAppSettingsFixturesData.first.copyWith(
         id: userId,
-        displaySettings: const DisplaySettings(
-          baseTheme: AppBaseTheme.system,
-          accentTheme: AppAccentTheme.defaultBlue,
-          fontFamily: 'SystemDefault',
-          textScaleFactor: AppTextScaleFactor.medium,
-          fontWeight: AppFontWeight.regular,
-        ),
-        language: languagesFixturesData.firstWhere(
-          (l) => l.code == 'en',
-          orElse: () => throw StateError(
-            'Default language "en" not found in language fixtures.',
-          ),
-        ),
-        feedPreferences: const FeedDisplayPreferences(
-          headlineDensity: HeadlineDensity.standard,
-          headlineImageStyle: HeadlineImageStyle.smallThumbnail,
-          showSourceInHeadlineFeed: true,
-          showPublishDateInHeadlineFeed: true,
-        ),
       );
+
       await _userAppSettingsRepository.create(
-        item: defaultSettings,
+        item: fixtureSettings,
         userId: userId,
       );
       _logger.info(
-        'Default UserAppSettings created for '
+        'UserAppSettings from fixture created for '
         'user ID: $userId.',
       );
     } catch (e, s) {
@@ -110,22 +116,24 @@ class DemoDataInitializerService {
     } on NotFoundException {
       _logger.info(
         'UserContentPreferences not found for '
-        'user ID: $userId. Creating default preferences.',
+        'user ID: $userId. Creating preferences from fixture.',
       );
-      final defaultPreferences = UserContentPreferences(
-        id: userId,
-        followedCountries: const [],
-        followedSources: const [],
-        followedTopics: const [],
-        savedHeadlines: const [],
-        savedFilters: const [],
-      );
+      // Clone the first item from the fixture data, assigning the new user's ID.
+      // This provides new demo users with pre-populated saved filters and other preferences.
+      if (userContentPreferencesFixturesData.isEmpty) {
+        throw StateError(
+          'Cannot create preferences from fixture: userContentPreferencesFixturesData is empty.',
+        );
+      }
+      final fixturePreferences = userContentPreferencesFixturesData.first
+          .copyWith(id: userId);
+
       await _userContentPreferencesRepository.create(
-        item: defaultPreferences,
+        item: fixturePreferences,
         userId: userId,
       );
       _logger.info(
-        'Default UserContentPreferences created '
+        'UserContentPreferences from fixture created '
         'for user ID: $userId.',
       );
     } catch (e, s) {

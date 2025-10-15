@@ -346,12 +346,21 @@ GoRouter createRouter({
             providers: [
               BlocProvider(
                 create: (context) {
+                  // Read the AppBloc once to get the initial state.
+                  final appBloc = context.read<AppBloc>();
+
                   return HeadlinesFeedBloc(
                     headlinesRepository: context
                         .read<DataRepository<Headline>>(),
                     feedDecoratorService: feedDecoratorService,
-                    appBloc: context.read<AppBloc>(),
+                    appBloc: appBloc,
                     inlineAdCacheService: inlineAdCacheService,
+                    // Prime the HeadlinesFeedBloc with the initial user
+                    // preferences. This prevents a race condition where the
+                    // feed is displayed before the bloc receives the saved
+                    // filters from the AppBloc stream.
+                    initialUserContentPreferences:
+                        appBloc.state.userContentPreferences,
                   );
                 },
               ),

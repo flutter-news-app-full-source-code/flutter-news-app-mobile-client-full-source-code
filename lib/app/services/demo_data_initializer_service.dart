@@ -79,9 +79,15 @@ class DemoDataInitializerService {
       );
       // Clone the first item from the fixture data, assigning the new user's ID.
       // This ensures every new demo user gets a rich, pre-populated set of settings.
+      if (userAppSettingsFixturesData.isEmpty) {
+        throw StateError(
+          'Cannot create settings from fixture: userAppSettingsFixturesData is empty.',
+        );
+      }
       final fixtureSettings = userAppSettingsFixturesData.first.copyWith(
         id: userId,
       );
+
       await _userAppSettingsRepository.create(
         item: fixtureSettings,
         userId: userId,

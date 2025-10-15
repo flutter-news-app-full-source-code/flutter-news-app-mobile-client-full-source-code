@@ -469,10 +469,6 @@ Future<Widget> bootstrap(
   );
 
   // Conditionally instantiate DemoDataInitializerService
-  // This service is responsible for ensuring that essential user-specific data
-  // (like UserAppSettings, UserContentPreferences)
-  // exists in the data in-memory clients when a user is first encountered
-  // in the demo environment.
   // In the demo environment, this service acts as a "fixture injector".
   // When a new user is encountered, it clones pre-defined fixture data
   // (settings and preferences, including saved filters) for that user,

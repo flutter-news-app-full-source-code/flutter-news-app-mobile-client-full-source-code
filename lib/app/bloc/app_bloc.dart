@@ -350,6 +350,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             '[AppBloc] Demo mode: User-specific data initialized for '
             'user: ${newUser.id}.',
           );
+          // After successful initialization, immediately re-fetch the user data.
+          // This ensures that the newly created fixture data (settings and preferences)
+          // is loaded into the AppState and propagated to the UI, making features
+          // like the saved filters bar immediately visible.
+          await _fetchAndSetUserData(newUser, emit);
         } catch (e, s) {
           _logger.severe(
             '[AppBloc] ERROR: Failed to initialize demo user data.',
@@ -408,9 +413,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         }
       }
 
-      // After potential initialization and migration,
-      // ensure user-specific data (settings and preferences) are loaded.
-      await _fetchAndSetUserData(newUser, emit);
+      // If not in demo mode, or if the demo initializer is not used,
+      // perform the standard data fetch. In demo mode, this call is now
+      // redundant as it's handled immediately after initialization.
+      if (_environment != local_config.AppEnvironment.demo) {
+        await _fetchAndSetUserData(newUser, emit);
+      }
     } else {
       // If user logs out, clear user-specific data from state.
       emit(state.copyWith(settings: null, userContentPreferences: null));

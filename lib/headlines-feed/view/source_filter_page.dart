@@ -6,6 +6,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_filter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template source_filter_page}
@@ -43,10 +45,11 @@ class _SourceFilterView extends StatefulWidget {
 }
 
 class _SourceFilterViewState extends State<_SourceFilterView> {
-  // Local state for the headquarter country filter capsules.
-  // This is intentionally decoupled from the main filter bloc's country
-  // selection, which is for "event country".
-  final Set<Country> _selectedHeadquarterCountries = {};
+  // Local state to hold the filter criteria for the source list.
+  // These are managed by the dedicated SourceListFilterPage and are used
+  // only for filtering the UI in this page, not for the final headline query.
+  Set<Country> _filteredHeadquarterCountries = {};
+  Set<SourceType> _filteredSourceTypes = {};
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +64,39 @@ class _SourceFilterViewState extends State<_SourceFilterView> {
           style: textTheme.titleLarge,
         ),
         actions: [
+          // Filter button to open the dedicated filter page.
+          IconButton(
+            icon: const Icon(Icons.filter_alt_outlined),
+            tooltip: l10n.sourceListFilterPageFilterButtonTooltip,
+            onPressed: () async {
+              final filterState = context.read<HeadlinesFilterBloc>().state;
+              final result = await context.pushNamed<Map<String, dynamic>>(
+                Routes.sourceListFilterName,
+                extra: {
+                  'allCountries': filterState.allCountries,
+                  'allSourceTypes':
+                      filterState.allSources
+                          .map((s) => s.sourceType)
+                          .toSet()
+                          .toList()
+                        ..sort((a, b) => a.name.compareTo(b.name)),
+                  'initialSelectedHeadquarterCountries':
+                      _filteredHeadquarterCountries,
+                  'initialSelectedSourceTypes': _filteredSourceTypes,
+                },
+              );
+
+              // When the filter page returns with new criteria, update the
+              // local state to re-render the list.
+              if (result != null && mounted) {
+                setState(() {
+                  _filteredHeadquarterCountries =
+                      result['countries'] as Set<Country>;
+                  _filteredSourceTypes = result['types'] as Set<SourceType>;
+                });
+              }
+            },
+          ),
           // Apply Filters Button (now just pops, as state is managed centrally)
           IconButton(
             icon: const Icon(Icons.check),
@@ -107,17 +143,17 @@ class _SourceFilterViewState extends State<_SourceFilterView> {
 
           // Filter sources based on selected countries and types from HeadlinesFilterBloc
           final displayableSources = filterState.allSources.where((source) {
-            // Use the local state for headquarter country filtering.
+            // Filter by headquarters country.
             final matchesCountry =
-                _selectedHeadquarterCountries.isEmpty ||
-                _selectedHeadquarterCountries.any(
+                _filteredHeadquarterCountries.isEmpty ||
+                _filteredHeadquarterCountries.any(
                   (c) => c.isoCode == source.headquarters.isoCode,
                 );
 
-            // Assuming all source types are available and selected by default if none are explicitly selected
+            // Filter by source type.
             final matchesType =
-                filterState.selectedSources.isEmpty ||
-                filterState.selectedSources.contains(source);
+                _filteredSourceTypes.isEmpty ||
+                _filteredSourceTypes.contains(source.sourceType);
             return matchesCountry && matchesType;
           }).toList();
 
@@ -135,189 +171,15 @@ class _SourceFilterViewState extends State<_SourceFilterView> {
             );
           }
 
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildCountryCapsules(
-                context,
-                filterState.allCountries,
-                l10n,
-                textTheme,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              _buildSourceTypeCapsules(context, filterState, l10n, textTheme),
-              const SizedBox(height: AppSpacing.md),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.paddingMedium,
-                ),
-                child: Text(
-                  l10n.headlinesFeedFilterSourceLabel,
-                  style: textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Expanded(
-                child: _buildSourcesList(
-                  context,
-                  filterState,
-                  l10n,
-                  textTheme,
-                  displayableSources,
-                ),
-              ),
-            ],
+          // The main content is now just the list of sources.
+          return _buildSourcesList(
+            context,
+            filterState,
+            l10n,
+            textTheme,
+            displayableSources,
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildCountryCapsules(
-    BuildContext context,
-    List<Country> allCountries,
-    AppLocalizations l10n,
-    TextTheme textTheme,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.paddingMedium,
-      ).copyWith(top: AppSpacing.md),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.headlinesFeedFilterSourceCountryLabel,
-            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          SizedBox(
-            height: AppSpacing.xl + AppSpacing.md,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: allCountries.length + 1,
-              separatorBuilder: (context, index) =>
-                  const SizedBox(width: AppSpacing.sm),
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return ChoiceChip(
-                    label: Text(l10n.headlinesFeedFilterAllLabel),
-                    labelStyle: textTheme.labelLarge,
-                    selected: _selectedHeadquarterCountries.isEmpty,
-                    onSelected: (_) {
-                      // Clear all country selections
-                      if (_selectedHeadquarterCountries.isNotEmpty) {
-                        setState(_selectedHeadquarterCountries.clear);
-                      }
-                    },
-                  );
-                }
-                final country = allCountries[index - 1];
-                return ChoiceChip(
-                  avatar: country.flagUrl.isNotEmpty
-                      ? CircleAvatar(
-                          backgroundImage: NetworkImage(country.flagUrl),
-                          radius: AppSpacing.sm + AppSpacing.xs,
-                        )
-                      : null,
-                  label: Text(country.name),
-                  labelStyle: textTheme.labelLarge,
-                  selected: _selectedHeadquarterCountries.contains(country),
-                  onSelected: (isSelected) {
-                    setState(() {
-                      if (isSelected) {
-                        _selectedHeadquarterCountries.add(country);
-                      } else {
-                        _selectedHeadquarterCountries.remove(country);
-                      }
-                    });
-                  },
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSourceTypeCapsules(
-    BuildContext context,
-    HeadlinesFilterState filterState,
-    AppLocalizations l10n,
-    TextTheme textTheme,
-  ) {
-    // For source types, we need to get all unique source types from all available sources
-    final allSourceTypes =
-        filterState.allSources.map((s) => s.sourceType).toSet().toList()
-          ..sort((a, b) => a.name.compareTo(b.name));
-
-    // Determine which source types are currently selected based on the selected sources
-    final selectedSourceTypes = filterState.selectedSources
-        .map((s) => s.sourceType)
-        .toSet();
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingMedium),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.headlinesFeedFilterSourceTypeLabel,
-            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          SizedBox(
-            height: AppSpacing.xl + AppSpacing.md,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: allSourceTypes.length + 1,
-              separatorBuilder: (context, index) =>
-                  const SizedBox(width: AppSpacing.sm),
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return ChoiceChip(
-                    label: Text(l10n.headlinesFeedFilterAllLabel),
-                    labelStyle: textTheme.labelLarge,
-                    selected: selectedSourceTypes.isEmpty,
-                    onSelected: (_) {
-                      // Clear all source selections
-                      for (final source in filterState.allSources) {
-                        context.read<HeadlinesFilterBloc>().add(
-                          FilterSourceToggled(
-                            source: source,
-                            isSelected: false,
-                          ),
-                        );
-                      }
-                    },
-                  );
-                }
-                final sourceType = allSourceTypes[index - 1];
-                return ChoiceChip(
-                  label: Text(sourceType.name),
-                  labelStyle: textTheme.labelLarge,
-                  selected: selectedSourceTypes.contains(sourceType),
-                  onSelected: (isSelected) {
-                    // Toggle all sources of this type
-                    for (final source in filterState.allSources.where(
-                      (s) => s.sourceType == sourceType,
-                    )) {
-                      context.read<HeadlinesFilterBloc>().add(
-                        FilterSourceToggled(
-                          source: source,
-                          isSelected: isSelected,
-                        ),
-                      );
-                    }
-                  },
-                );
-              },
-            ),
-          ),
-        ],
       ),
     );
   }

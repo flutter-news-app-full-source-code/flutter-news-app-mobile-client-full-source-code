@@ -44,6 +44,9 @@ class SavedFiltersPage extends StatelessWidget {
           }
 
           return ReorderableListView.builder(
+            // Disable the default trailing drag handles to use only the
+            // custom leading handle.
+            buildDefaultDragHandles: false,
             itemCount: savedFilters.length,
             itemBuilder: (context, index) {
               final filter = savedFilters[index];

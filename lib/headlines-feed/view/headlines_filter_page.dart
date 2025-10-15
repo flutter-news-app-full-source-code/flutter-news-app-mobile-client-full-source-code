@@ -39,7 +39,6 @@ class HeadlinesFilterPage extends StatelessWidget {
             topicsRepository: context.read<DataRepository<Topic>>(),
             sourcesRepository: context.read<DataRepository<Source>>(),
             countriesRepository: context.read<DataRepository<Country>>(),
-            appBloc: context.read<AppBloc>(),
           )..add(
             FilterDataLoaded(
               initialSelectedTopics: currentFilter.topics ?? [],

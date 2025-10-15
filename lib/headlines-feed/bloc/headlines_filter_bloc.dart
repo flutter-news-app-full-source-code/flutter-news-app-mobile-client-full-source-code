@@ -29,11 +29,9 @@ class HeadlinesFilterBloc
     required DataRepository<Topic> topicsRepository,
     required DataRepository<Source> sourcesRepository,
     required DataRepository<Country> countriesRepository,
-    required AppBloc appBloc,
   }) : _topicsRepository = topicsRepository,
        _sourcesRepository = sourcesRepository,
        _countriesRepository = countriesRepository,
-       _appBloc = appBloc,
        _logger = Logger('HeadlinesFilterBloc'),
        super(const HeadlinesFilterState()) {
     on<FilterDataLoaded>(_onFilterDataLoaded, transformer: restartable());
@@ -46,7 +44,6 @@ class HeadlinesFilterBloc
   final DataRepository<Topic> _topicsRepository;
   final DataRepository<Source> _sourcesRepository;
   final DataRepository<Country> _countriesRepository;
-  final AppBloc _appBloc;
   final Logger _logger;
 
   /// Handles the [FilterDataLoaded] event, fetching all necessary filter data.

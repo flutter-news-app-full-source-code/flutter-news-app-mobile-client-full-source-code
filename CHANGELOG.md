@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.4.0 - Next Release
+## 1.4.0 - Upcoming Release
 
 - **feat**: created a reusable, searchable multi-select page for filtering
 - **feat**: add 'Followed' filter to quickly view content from followed items

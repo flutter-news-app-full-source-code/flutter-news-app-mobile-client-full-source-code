@@ -157,6 +157,21 @@ final class AllFilterSelected extends HeadlinesFeedEvent {
   List<Object> get props => [adThemeStyle];
 }
 
+/// {@template followed_filter_selected}
+/// Event triggered when the user selects the "Followed" filter from the
+/// filter bar.
+/// {@endtemplate}
+final class FollowedFilterSelected extends HeadlinesFeedEvent {
+  /// {@macro followed_filter_selected}
+  const FollowedFilterSelected({required this.adThemeStyle});
+
+  /// The current ad theme style of the application.
+  final AdThemeStyle adThemeStyle;
+
+  @override
+  List<Object> get props => [adThemeStyle];
+}
+
 /// Internal event to notify the bloc of changes in user content preferences.
 final class _AppContentPreferencesChanged extends HeadlinesFeedEvent {
   const _AppContentPreferencesChanged({required this.preferences});

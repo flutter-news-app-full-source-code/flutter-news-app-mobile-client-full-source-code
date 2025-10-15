@@ -151,6 +151,7 @@ class _SourceFilterViewState extends State<_SourceFilterView> {
               // When the filter page returns with new criteria, update the
               // bloc to re-render the list.
               if (result != null && mounted) {
+                // ignore: use_build_context_synchronously
                 context.read<HeadlinesFilterBloc>().add(
                   FilterSourceCriteriaChanged(
                     selectedCountries: result['countries'] as Set<Country>,

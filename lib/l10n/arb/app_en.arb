@@ -1313,5 +1313,13 @@
     "savedFiltersBarFollowedLabel": "Followed",
     "@savedFiltersBarFollowedLabel": {
         "description": "Label for the 'Followed' chip in the saved filters bar."
+    },
+    "sourceListFilterPageTitle": "Filter Sources",
+    "@sourceListFilterPageTitle": {
+        "description": "Title for the page where users can filter the list of sources."
+    },
+    "sourceListFilterPageFilterButtonTooltip": "Filter source list",
+    "@sourceListFilterPageFilterButtonTooltip": {
+        "description": "Tooltip for the button that opens the source list filter page."
     }
 }

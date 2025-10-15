@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
@@ -38,6 +39,7 @@ class _SavedFiltersBarState extends State<SavedFiltersBar> {
 
   static const _allFilterId = 'all';
   static const _customFilterId = 'custom';
+  static const _followedFilterId = 'followed';
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +51,15 @@ class _SavedFiltersBarState extends State<SavedFiltersBar> {
       child: BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
         builder: (context, state) {
           final savedFilters = state.savedFilters;
+          final userPreferences = context.watch<AppBloc>().state.userContentPreferences;
+
+          // Determine if the user is following any content to decide whether
+          // to show the "Followed" filter chip.
+          final isFollowingItems = (userPreferences?.followedTopics.isNotEmpty ?? false) ||
+              (userPreferences?.followedSources.isNotEmpty ?? false) ||
+              (userPreferences?.followedCountries.isNotEmpty ?? false);
+
+
           final activeFilterId = state.activeFilterId;
           final listView = ListView(
             controller: _scrollController,
@@ -83,6 +94,28 @@ class _SavedFiltersBarState extends State<SavedFiltersBar> {
                   },
                 ),
               ),
+              // Conditionally display the "Followed" filter chip.
+              if (isFollowingItems)
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xs,
+                  ),
+                  child: ChoiceChip(
+                    label: Text(l10n.savedFiltersBarFollowedLabel),
+                    labelPadding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.xs,
+                    ),
+                    selected: activeFilterId == _followedFilterId,
+                    showCheckmark: false,
+                    onSelected: (_) {
+                      context.read<HeadlinesFeedBloc>().add(
+                        FollowedFilterSelected(
+                          adThemeStyle: AdThemeStyle.fromTheme(theme),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ...savedFilters.map(
                 (filter) => Padding(
                   padding: const EdgeInsets.symmetric(

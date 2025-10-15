@@ -33,6 +33,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/v
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_feed_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/manage_saved_filters_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_list_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/topic_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-search/bloc/headlines_search_bloc.dart';
@@ -475,6 +476,38 @@ GoRouter createRouter({
                               state.extra! as HeadlinesFilterBloc;
                           return SourceFilterPage(filterBloc: filterBloc);
                         },
+                        routes: [
+                          GoRoute(
+                            path: 'source-list-filter',
+                            name: Routes.sourceListFilterName,
+                            builder: (context, state) {
+                              final extra =
+                                  state.extra as Map<String, dynamic>? ?? {};
+                              final allCountries =
+                                  extra['allCountries'] as List<Country>? ?? [];
+                              final allSourceTypes =
+                                  extra['allSourceTypes'] as List<SourceType>? ??
+                                      [];
+                              final initialSelectedHeadquarterCountries = extra[
+                                      'initialSelectedHeadquarterCountries']
+                                  as Set<Country>? ??
+                                  {};
+                              final initialSelectedSourceTypes =
+                                  extra['initialSelectedSourceTypes']
+                                      as Set<SourceType>? ??
+                                      {};
+
+                              return SourceListFilterPage(
+                                allCountries: allCountries,
+                                allSourceTypes: allSourceTypes,
+                                initialSelectedHeadquarterCountries:
+                                    initialSelectedHeadquarterCountries,
+                                initialSelectedSourceTypes:
+                                    initialSelectedSourceTypes,
+                              );
+                            },
+                          ),
+                        ],
                       ),
                       GoRoute(
                         path: Routes.feedFilterEventCountries,

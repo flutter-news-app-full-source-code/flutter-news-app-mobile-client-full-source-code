@@ -99,3 +99,27 @@ final class FilterSelectionsCleared extends HeadlinesFilterEvent {
   /// {@macro filter_selections_cleared}
   const FilterSelectionsCleared();
 }
+
+/// {@template filter_source_criteria_changed}
+/// Event triggered when the source filtering criteria (headquarters or types)
+/// are updated from the `SourceListFilterPage`.
+/// {@endtemplate}
+final class FilterSourceCriteriaChanged extends HeadlinesFilterEvent {
+  /// {@macro filter_source_criteria_changed}
+  const FilterSourceCriteriaChanged({
+    this.selectedCountries,
+    this.selectedSourceTypes,
+  });
+
+  /// The updated set of selected headquarters countries.
+  final Set<Country>? selectedCountries;
+
+  /// The updated set of selected source types.
+  final Set<SourceType>? selectedSourceTypes;
+
+  @override
+  List<Object> get props => [
+    if (selectedCountries != null) selectedCountries!,
+    if (selectedSourceTypes != null) selectedSourceTypes!,
+  ];
+}

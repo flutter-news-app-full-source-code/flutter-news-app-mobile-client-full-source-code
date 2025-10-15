@@ -45,145 +45,6 @@ class _SourceFilterView extends StatefulWidget {
 }
 
 class _SourceFilterViewState extends State<_SourceFilterView> {
-  // Local state to hold the filter criteria for the source list.
-  // These are managed by the dedicated SourceListFilterPage and are used
-  // only for filtering the UI in this page, not for the final headline query.
-  Set<Country> _filteredHeadquarterCountries = {};
-  Set<SourceType> _filteredSourceTypes = {};
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizationsX(context).l10n;
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          l10n.headlinesFeedFilterSourceLabel,
-          style: textTheme.titleLarge,
-        ),
-        actions: [
-          // Filter button to open the dedicated filter page.
-          IconButton(
-            icon: const Icon(Icons.filter_alt_outlined),
-            tooltip: l10n.sourceListFilterPageFilterButtonTooltip,
-            onPressed: () async {
-              final filterState = context.read<HeadlinesFilterBloc>().state;
-              final result = await context.pushNamed<Map<String, dynamic>>(
-                Routes.sourceListFilterName,
-                extra: {
-                  'allCountries': filterState.allCountries,
-                  'allSourceTypes':
-                      filterState.allSources
-                          .map((s) => s.sourceType)
-                          .toSet()
-                          .toList()
-                        ..sort((a, b) => a.name.compareTo(b.name)),
-                  'initialSelectedHeadquarterCountries':
-                      _filteredHeadquarterCountries,
-                  'initialSelectedSourceTypes': _filteredSourceTypes,
-                },
-              );
-
-              // When the filter page returns with new criteria, update the
-              // local state to re-render the list.
-              if (result != null && mounted) {
-                setState(() {
-                  _filteredHeadquarterCountries =
-                      result['countries'] as Set<Country>;
-                  _filteredSourceTypes = result['types'] as Set<SourceType>;
-                });
-              }
-            },
-          ),
-          // Apply Filters Button (now just pops, as state is managed centrally)
-          IconButton(
-            icon: const Icon(Icons.check),
-            tooltip: l10n.headlinesFeedFilterApplyButton,
-            onPressed: () {
-              // The selections are already managed by HeadlinesFilterBloc.
-              // Just pop the page.
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
-      body: BlocBuilder<HeadlinesFilterBloc, HeadlinesFilterState>(
-        builder: (context, filterState) {
-          final isLoadingMainList =
-              filterState.status == HeadlinesFilterStatus.loading;
-
-          if (isLoadingMainList) {
-            return LoadingStateWidget(
-              icon: Icons.source_outlined,
-              headline: l10n.sourceFilterLoadingHeadline,
-              subheadline: l10n.sourceFilterLoadingSubheadline,
-            );
-          }
-          if (filterState.status == HeadlinesFilterStatus.failure &&
-              filterState.allSources.isEmpty) {
-            return FailureStateWidget(
-              exception:
-                  filterState.error ??
-                  const UnknownException('Failed to load source filter data.'),
-              onRetry: () {
-                context.read<HeadlinesFilterBloc>().add(
-                  FilterDataLoaded(
-                    initialSelectedTopics: filterState.selectedTopics.toList(),
-                    initialSelectedSources: filterState.selectedSources
-                        .toList(),
-                    initialSelectedCountries: filterState.selectedCountries
-                        .toList(),
-                  ),
-                );
-              },
-            );
-          }
-
-          // Filter sources based on selected countries and types from HeadlinesFilterBloc
-          final displayableSources = filterState.allSources.where((source) {
-            // Filter by headquarters country.
-            final matchesCountry =
-                _filteredHeadquarterCountries.isEmpty ||
-                _filteredHeadquarterCountries.any(
-                  (c) => c.isoCode == source.headquarters.isoCode,
-                );
-
-            // Filter by source type.
-            final matchesType =
-                _filteredSourceTypes.isEmpty ||
-                _filteredSourceTypes.contains(source.sourceType);
-            return matchesCountry && matchesType;
-          }).toList();
-
-          if (displayableSources.isEmpty &&
-              filterState.status != HeadlinesFilterStatus.loading) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.paddingLarge),
-                child: Text(
-                  l10n.headlinesFeedFilterNoSourcesMatch,
-                  style: textTheme.bodyLarge,
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            );
-          }
-
-          // The main content is now just the list of sources.
-          return _buildSourcesList(
-            context,
-            filterState,
-            l10n,
-            textTheme,
-            displayableSources,
-          );
-        },
-      ),
-    );
-  }
-
   Widget _buildSourcesList(
     BuildContext context,
     HeadlinesFilterState filterState,
@@ -249,6 +110,140 @@ class _SourceFilterViewState extends State<_SourceFilterView> {
           ),
         );
       },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizationsX(context).l10n;
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          l10n.headlinesFeedFilterSourceLabel,
+          style: textTheme.titleLarge,
+        ),
+        actions: [
+          // Filter button to open the dedicated filter page.
+          IconButton(
+            icon: const Icon(Icons.filter_alt_outlined),
+            tooltip: l10n.sourceListFilterPageFilterButtonTooltip,
+            onPressed: () async {
+              final filterState = context.read<HeadlinesFilterBloc>().state;
+              final result = await context.pushNamed<Map<String, dynamic>>(
+                Routes.sourceListFilterName,
+                extra: {
+                  'allCountries': filterState.allCountries,
+                  'allSourceTypes':
+                      filterState.allSources
+                          .map((s) => s.sourceType)
+                          .toSet()
+                          .toList()
+                        ..sort((a, b) => a.name.compareTo(b.name)),
+                  'initialSelectedHeadquarterCountries':
+                      filterState.selectedSourceHeadquarterCountries,
+                  'initialSelectedSourceTypes': filterState.selectedSourceTypes,
+                },
+              );
+
+              // When the filter page returns with new criteria, update the
+              // bloc to re-render the list.
+              if (result != null && mounted) {
+                context.read<HeadlinesFilterBloc>().add(
+                  FilterSourceCriteriaChanged(
+                    selectedCountries: result['countries'] as Set<Country>,
+                    selectedSourceTypes: result['types'] as Set<SourceType>,
+                  ),
+                );
+              }
+            },
+          ),
+          // Apply Filters Button (now just pops, as state is managed centrally)
+          IconButton(
+            icon: const Icon(Icons.check),
+            tooltip: l10n.headlinesFeedFilterApplyButton,
+            onPressed: () {
+              // The selections are already managed by HeadlinesFilterBloc.
+              // Just pop the page.
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+      body: BlocBuilder<HeadlinesFilterBloc, HeadlinesFilterState>(
+        builder: (context, filterState) {
+          final isLoadingMainList =
+              filterState.status == HeadlinesFilterStatus.loading;
+
+          if (isLoadingMainList) {
+            return LoadingStateWidget(
+              icon: Icons.source_outlined,
+              headline: l10n.sourceFilterLoadingHeadline,
+              subheadline: l10n.sourceFilterLoadingSubheadline,
+            );
+          }
+          if (filterState.status == HeadlinesFilterStatus.failure &&
+              filterState.allSources.isEmpty) {
+            return FailureStateWidget(
+              exception:
+                  filterState.error ??
+                  const UnknownException('Failed to load source filter data.'),
+              onRetry: () {
+                context.read<HeadlinesFilterBloc>().add(
+                  FilterDataLoaded(
+                    initialSelectedTopics: filterState.selectedTopics.toList(),
+                    initialSelectedSources: filterState.selectedSources
+                        .toList(),
+                    initialSelectedCountries: filterState.selectedCountries
+                        .toList(),
+                  ),
+                );
+              },
+            );
+          }
+
+          // Filter sources based on selected countries and types from HeadlinesFilterBloc
+          final displayableSources = filterState.allSources.where((source) {
+            // Filter by headquarters country.
+            final matchesCountry =
+                filterState.selectedSourceHeadquarterCountries.isEmpty ||
+                filterState.selectedSourceHeadquarterCountries.any(
+                  (c) => c.isoCode == source.headquarters.isoCode,
+                );
+
+            // Filter by source type.
+            final matchesType =
+                filterState.selectedSourceTypes.isEmpty ||
+                filterState.selectedSourceTypes.contains(source.sourceType);
+            return matchesCountry && matchesType;
+          }).toList();
+
+          if (displayableSources.isEmpty &&
+              filterState.status != HeadlinesFilterStatus.loading) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.paddingLarge),
+                child: Text(
+                  l10n.headlinesFeedFilterNoSourcesMatch,
+                  style: textTheme.bodyLarge,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+          }
+
+          // The main content is now just the list of sources.
+          return _buildSourcesList(
+            context,
+            filterState,
+            l10n,
+            textTheme,
+            displayableSources,
+          );
+        },
+      ),
     );
   }
 }

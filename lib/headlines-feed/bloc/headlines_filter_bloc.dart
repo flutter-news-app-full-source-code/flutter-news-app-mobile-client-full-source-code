@@ -39,6 +39,7 @@ class HeadlinesFilterBloc
     on<FilterSourceToggled>(_onFilterSourceToggled);
     on<FilterCountryToggled>(_onFilterCountryToggled);
     on<FilterSelectionsCleared>(_onFilterSelectionsCleared);
+    on<FilterSourceCriteriaChanged>(_onFilterSourceCriteriaChanged);
   }
 
   final DataRepository<Topic> _topicsRepository;
@@ -155,6 +156,22 @@ class HeadlinesFilterBloc
         selectedTopics: {},
         selectedSources: {},
         selectedCountries: {},
+      ),
+    );
+  }
+
+  /// Handles the [FilterSourceCriteriaChanged] event, updating the UI-only
+  /// filter criteria for the source list.
+  void _onFilterSourceCriteriaChanged(
+    FilterSourceCriteriaChanged event,
+    Emitter<HeadlinesFilterState> emit,
+  ) {
+    emit(
+      state.copyWith(
+        selectedSourceHeadquarterCountries:
+            event.selectedCountries ?? state.selectedSourceHeadquarterCountries,
+        selectedSourceTypes:
+            event.selectedSourceTypes ?? state.selectedSourceTypes,
       ),
     );
   }

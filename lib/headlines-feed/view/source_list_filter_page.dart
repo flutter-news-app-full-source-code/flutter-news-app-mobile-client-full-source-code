@@ -41,8 +41,8 @@ class SourceListFilterPage extends StatefulWidget {
 }
 
 class _SourceListFilterPageState extends State<SourceListFilterPage> {
-  late final Set<Country> _selectedHeadquarterCountries;
-  late final Set<SourceType> _selectedSourceTypes;
+  late Set<Country> _selectedHeadquarterCountries;
+  late Set<SourceType> _selectedSourceTypes;
 
   @override
   void initState() {

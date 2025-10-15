@@ -31,6 +31,8 @@ final class HeadlinesFilterState extends Equatable {
     this.selectedTopics = const {},
     this.selectedSources = const {},
     this.selectedCountries = const {},
+    this.selectedSourceHeadquarterCountries = const {},
+    this.selectedSourceTypes = const {},
     this.error,
   });
 
@@ -55,6 +57,14 @@ final class HeadlinesFilterState extends Equatable {
   /// The set of [Country] objects currently selected by the user.
   final Set<Country> selectedCountries;
 
+  /// The set of [Country] objects selected for filtering the source list
+  /// by headquarters.
+  final Set<Country> selectedSourceHeadquarterCountries;
+
+  /// The set of [SourceType] objects selected for filtering the source list
+  /// by type.
+  final Set<SourceType> selectedSourceTypes;
+
   /// An optional error object if the status is [HeadlinesFilterStatus.failure].
   final HttpException? error;
 
@@ -67,6 +77,8 @@ final class HeadlinesFilterState extends Equatable {
     Set<Topic>? selectedTopics,
     Set<Source>? selectedSources,
     Set<Country>? selectedCountries,
+    Set<Country>? selectedSourceHeadquarterCountries,
+    Set<SourceType>? selectedSourceTypes,
     HttpException? error,
     bool clearError = false,
   }) {
@@ -78,6 +90,10 @@ final class HeadlinesFilterState extends Equatable {
       selectedTopics: selectedTopics ?? this.selectedTopics,
       selectedSources: selectedSources ?? this.selectedSources,
       selectedCountries: selectedCountries ?? this.selectedCountries,
+      selectedSourceHeadquarterCountries:
+          selectedSourceHeadquarterCountries ??
+          this.selectedSourceHeadquarterCountries,
+      selectedSourceTypes: selectedSourceTypes ?? this.selectedSourceTypes,
       error: clearError ? null : error ?? this.error,
     );
   }
@@ -91,6 +107,8 @@ final class HeadlinesFilterState extends Equatable {
     selectedTopics,
     selectedSources,
     selectedCountries,
+    selectedSourceHeadquarterCountries,
+    selectedSourceTypes,
     error,
   ];
 }

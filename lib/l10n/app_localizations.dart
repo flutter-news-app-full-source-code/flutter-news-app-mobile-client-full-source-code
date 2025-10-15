@@ -1921,6 +1921,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Filter source list'**
   String get sourceListFilterPageFilterButtonTooltip;
+
+  /// The title for the list tile on the account page that navigates to the saved filters management page.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved Filters'**
+  String get accountSavedFiltersTile;
+
+  /// The title for the app bar on the saved filters management page.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved Filters'**
+  String get savedFiltersPageTitle;
+
+  /// The main headline text displayed on the saved filters page when the user has no saved filters.
+  ///
+  /// In en, this message translates to:
+  /// **'No Saved Filters'**
+  String get savedFiltersEmptyHeadline;
+
+  /// The sub-headline text displayed on the saved filters page when the user has no saved filters.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters you save from the feed will appear here.'**
+  String get savedFiltersEmptySubheadline;
+
+  /// The text for the 'Rename' option in the popup menu on a saved filter item.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get savedFiltersMenuRename;
+
+  /// The text for the 'Delete' option in the popup menu on a saved filter item.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get savedFiltersMenuDelete;
 }
 
 class _AppLocalizationsDelegate

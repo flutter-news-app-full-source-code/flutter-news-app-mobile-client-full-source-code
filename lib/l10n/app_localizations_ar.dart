@@ -1008,4 +1008,23 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get sourceListFilterPageFilterButtonTooltip => 'تصفية قائمة المصادر';
+
+  @override
+  String get accountSavedFiltersTile => 'الفلاتر المحفوظة';
+
+  @override
+  String get savedFiltersPageTitle => 'الفلاتر المحفوظة';
+
+  @override
+  String get savedFiltersEmptyHeadline => 'لا توجد فلاتر محفوظة';
+
+  @override
+  String get savedFiltersEmptySubheadline =>
+      'الفلاتر التي تحفظها من الموجز ستظهر هنا.';
+
+  @override
+  String get savedFiltersMenuRename => 'إعادة تسمية';
+
+  @override
+  String get savedFiltersMenuDelete => 'حذف';
 }

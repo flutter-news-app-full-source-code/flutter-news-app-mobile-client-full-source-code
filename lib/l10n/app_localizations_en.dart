@@ -1009,4 +1009,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sourceListFilterPageFilterButtonTooltip => 'Filter source list';
+
+  @override
+  String get accountSavedFiltersTile => 'Saved Filters';
+
+  @override
+  String get savedFiltersPageTitle => 'Saved Filters';
+
+  @override
+  String get savedFiltersEmptyHeadline => 'No Saved Filters';
+
+  @override
+  String get savedFiltersEmptySubheadline =>
+      'Filters you save from the feed will appear here.';
+
+  @override
+  String get savedFiltersMenuRename => 'Rename';
+
+  @override
+  String get savedFiltersMenuDelete => 'Delete';
 }

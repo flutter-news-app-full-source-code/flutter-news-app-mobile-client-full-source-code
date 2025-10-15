@@ -37,8 +37,6 @@ abstract final class Routes {
   // --- Feed Filter Sub-Routes ---
   static const feedFilter = 'filter';
   static const feedFilterName = 'feedFilter';
-  static const manageSavedFilters = 'manage-saved-filters';
-  static const manageSavedFiltersName = 'manageSavedFilters';
   static const feedFilterTopics = 'topics';
   static const feedFilterTopicsName = 'feedFilterTopics';
   static const feedFilterSources = 'sources';
@@ -55,6 +53,8 @@ abstract final class Routes {
   static const accountSavedHeadlinesName = 'accountSavedHeadlines';
   static const accountArticleDetails = 'article/:id';
   static const accountArticleDetailsName = 'accountArticleDetails';
+  static const accountSavedFilters = 'saved-filters';
+  static const accountSavedFiltersName = 'accountSavedFilters';
 
   // --- Settings Routes (nested under Account) ---
   static const settings = 'settings';

@@ -266,28 +266,39 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     HeadlinesFeedFiltersApplied event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
-    // Determine if the applied filter matches an existing saved filter.
-    // This logic is crucial for correctly setting the active filter chip in
-    // the UI. It compares the content of the applied filter with each saved
-    // filter, ignoring the order of items within the lists.
-    final matchingSavedFilter = state.savedFilters.firstWhereOrNull((
-      savedFilter,
-    ) {
-      // Use sets for order-agnostic comparison of filter contents.
-      final appliedTopics = event.filter.topics?.toSet() ?? {};
-      final savedTopics = savedFilter.topics.toSet();
-      final appliedSources = event.filter.sources?.toSet() ?? {};
-      final savedSources = savedFilter.sources.toSet();
-      final appliedCountries = event.filter.eventCountries?.toSet() ?? {};
-      final savedCountries = savedFilter.countries.toSet();
+    String newActiveFilterId;
 
-      return const SetEquality<Topic>().equals(appliedTopics, savedTopics) &&
-          const SetEquality<Source>().equals(appliedSources, savedSources) &&
-          const SetEquality<Country>().equals(appliedCountries, savedCountries);
-    });
+    // Prioritize the explicitly passed savedFilter to prevent race conditions.
+    // This is crucial for the "save and apply" flow, where the AppBloc might
+    // not have updated the savedFilters list in this bloc's state yet.
+    if (event.savedFilter != null) {
+      newActiveFilterId = event.savedFilter!.id;
+    } else {
+      // If no filter is explicitly passed, determine if the applied filter
+      // matches an existing saved filter. This handles re-applying a saved
+      // filter or applying a one-time "custom" filter.
+      final matchingSavedFilter = state.savedFilters.firstWhereOrNull((
+        savedFilter,
+      ) {
+        // Use sets for order-agnostic comparison of filter contents.
+        final appliedTopics = event.filter.topics?.toSet() ?? {};
+        final savedTopics = savedFilter.topics.toSet();
+        final appliedSources = event.filter.sources?.toSet() ?? {};
+        final savedSources = savedFilter.sources.toSet();
+        final appliedCountries = event.filter.eventCountries?.toSet() ?? {};
+        final savedCountries = savedFilter.countries.toSet();
 
-    // If a match is found, use its ID. Otherwise, mark it as 'custom'.
-    final newActiveFilterId = matchingSavedFilter?.id ?? 'custom';
+        return const SetEquality<Topic>().equals(appliedTopics, savedTopics) &&
+            const SetEquality<Source>().equals(appliedSources, savedSources) &&
+            const SetEquality<Country>().equals(
+              appliedCountries,
+              savedCountries,
+            );
+      });
+
+      // If a match is found, use its ID. Otherwise, mark it as 'custom'.
+      newActiveFilterId = matchingSavedFilter?.id ?? 'custom';
+    }
 
     // When applying new filters, this is considered a major feed change,
     // so we clear the ad cache to get a fresh set of relevant ads.

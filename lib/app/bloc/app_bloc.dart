@@ -416,10 +416,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         }
       }
 
-      // If not in demo mode, or if it was a migration (where data is already
-      // fetched post-migration), perform the standard data fetch.
-      // This avoids a redundant fetch in the demo initialization path,
-      // which already fetches data.
+      // Perform the standard data fetch if we are not in demo mode, or if a
+      // migration just occurred (to load the migrated data).
+      // This avoids a redundant fetch in the demo initialization path, which
+      // handles its own data fetching after creating fixture data.      
       if (!isDemoMode || isMigration) {
         await _fetchAndSetUserData(newUser, emit);
       }

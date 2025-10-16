@@ -570,15 +570,15 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   /// Handles the selection of the "Followed" filter from the filter bar.
   ///
   /// This creates a [HeadlineFilter] from the user's followed items and
-  /// triggers a full feed refresh.
+  /// triggers a full feed refresh directly within this handler. It no longer
+  /// delegates to `HeadlinesFeedFiltersApplied` to prevent a bug where the
+  /// filter would be incorrectly identified as 'custom'.
   Future<void> _onFollowedFilterSelected(
     FollowedFilterSelected event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
     final userPreferences = _appBloc.state.userContentPreferences;
     if (userPreferences == null) {
-      // This case should ideally not happen if the UI is built correctly,
-      // as the "Followed" button is only shown when preferences are available.
       return;
     }
 
@@ -588,15 +588,77 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       eventCountries: userPreferences.followedCountries,
     );
 
-    // Set the active filter ID and then dispatch an event to apply the filter
-    // and refresh the feed.
-    emit(state.copyWith(activeFilterId: 'followed'));
-    add(
-      HeadlinesFeedFiltersApplied(
+    // This is a major feed change, so clear the ad cache.
+    _inlineAdCacheService.clearAllAds();
+    emit(
+      state.copyWith(
+        status: HeadlinesFeedStatus.loading,
         filter: newFilter,
-        adThemeStyle: event.adThemeStyle,
+        activeFilterId: 'followed',
+        feedItems: [],
+        clearCursor: true,
       ),
     );
+
+    try {
+      final currentUser = _appBloc.state.user;
+      final appConfig = _appBloc.state.remoteConfig;
+
+      if (appConfig == null) {
+        emit(state.copyWith(status: HeadlinesFeedStatus.failure));
+        return;
+      }
+
+      final headlineResponse = await _headlinesRepository.readAll(
+        filter: _buildFilter(newFilter),
+        pagination: const PaginationOptions(limit: _headlinesFetchLimit),
+        sort: [const SortOption('updatedAt', SortOrder.desc)],
+      );
+
+      final decorationResult = await _feedDecoratorService.decorateFeed(
+        headlines: headlineResponse.items,
+        user: currentUser,
+        remoteConfig: appConfig,
+        followedTopicIds: userPreferences.followedTopics
+            .map((t) => t.id)
+            .toList(),
+        followedSourceIds: userPreferences.followedSources
+            .map((s) => s.id)
+            .toList(),
+        imageStyle: _appBloc.state.settings!.feedPreferences.headlineImageStyle,
+        adThemeStyle: event.adThemeStyle,
+      );
+
+      emit(
+        state.copyWith(
+          status: HeadlinesFeedStatus.success,
+          feedItems: decorationResult.decoratedItems,
+          hasMore: headlineResponse.hasMore,
+          cursor: headlineResponse.cursor,
+        ),
+      );
+
+      final injectedDecorator = decorationResult.injectedDecorator;
+      if (injectedDecorator != null && currentUser?.id != null) {
+        if (injectedDecorator is CallToActionItem) {
+          _appBloc.add(
+            AppUserFeedDecoratorShown(
+              userId: currentUser!.id,
+              feedDecoratorType: injectedDecorator.decoratorType,
+            ),
+          );
+        } else if (injectedDecorator is ContentCollectionItem) {
+          _appBloc.add(
+            AppUserFeedDecoratorShown(
+              userId: currentUser!.id,
+              feedDecoratorType: injectedDecorator.decoratorType,
+            ),
+          );
+        }
+      }
+    } on HttpException catch (e) {
+      emit(state.copyWith(status: HeadlinesFeedStatus.failure, error: e));
+    }
   }
 
   @override

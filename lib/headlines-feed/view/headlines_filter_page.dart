@@ -114,8 +114,8 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
               onPressed: () {
                 // Pop the dialog first.
                 Navigator.of(dialogContext).pop();
-                // Apply the filter without saving it.
-                _applyAndExit();
+                // Apply the filter as a "custom" one-time filter.
+                _applyAndExit(null);
               },
             ),
             FilledButton(
@@ -164,7 +164,7 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
             // Apply the newly saved filter to the HeadlinesFeedBloc. The page
             // is not popped here; that action is deferred until after the
             // dialog has been successfully dismissed.
-            _applyFilter();
+            _applyFilter(newFilter);
           },
         );
       },
@@ -180,7 +180,11 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
   }
 
   /// Applies the current filter selections to the feed and pops the page.
-  void _applyFilter() {
+  ///
+  /// If a [savedFilter] is provided, it's passed to the event to ensure
+  /// its chip is correctly selected on the feed. Otherwise, the filter is
+  /// treated as a "custom" one.
+  void _applyFilter(SavedFilter? savedFilter) {
     final filterState = context.read<HeadlinesFilterBloc>().state;
     // Create a new HeadlineFilter from the current selections in the filter bloc.
     final newFilter = HeadlineFilter(
@@ -191,15 +195,16 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
     context.read<HeadlinesFeedBloc>().add(
       HeadlinesFeedFiltersApplied(
         filter: newFilter,
+        savedFilter: savedFilter,
         adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
       ),
     );
   }
 
-  void _applyAndExit() {
+  void _applyAndExit(SavedFilter? savedFilter) {
     // This helper method now separates applying the filter from exiting.
     // It's called for the "Apply Only" flow.
-    _applyFilter();
+    _applyFilter(savedFilter);
     context.pop();
   }
 

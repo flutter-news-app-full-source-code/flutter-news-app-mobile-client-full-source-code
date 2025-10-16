@@ -97,17 +97,14 @@ class _SavedFiltersBarState extends State<SavedFiltersBar> {
             // Lazily create and store a GlobalKey for each chip.
             // The key is associated with the Padding widget to ensure the
             // entire chip area is scrolled into view.
-            final allKey = _chipKeys.putIfAbsent(
-              _allFilterId,
-              () => GlobalKey(),
-            );
+            final allKey = _chipKeys.putIfAbsent(_allFilterId, GlobalKey.new);
             final followedKey = _chipKeys.putIfAbsent(
               _followedFilterId,
-              () => GlobalKey(),
+              GlobalKey.new,
             );
             final customKey = _chipKeys.putIfAbsent(
               _customFilterId,
-              () => GlobalKey(),
+              GlobalKey.new,
             );
 
             final listView = ListView(
@@ -172,7 +169,7 @@ class _SavedFiltersBarState extends State<SavedFiltersBar> {
                 ...savedFilters.map((filter) {
                   final filterKey = _chipKeys.putIfAbsent(
                     filter.id,
-                    () => GlobalKey(),
+                    GlobalKey.new,
                   );
                   return Padding(
                     key: filterKey,

@@ -2,6 +2,9 @@
 
 ## 1.4.0 - Upcoming Release
 
+- **refactor**: improved filter page reset button to clear local selections and disable when not applicable
+- **feat**: auto-scroll to active filter chip in SavedFiltersBar
+- **fix**: resolve bug where applying a modified filter incorrectly selects the original saved filter
 - **refactor**: relocated saved filters management to the account page and introduced reordering capability.
 - **feat**: created a reusable, searchable multi-select page for filtering
 - **feat**: add 'Followed' filter to quickly view content from followed items

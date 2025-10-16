@@ -161,9 +161,9 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
             // Add the new filter to the global AppBloc state.
             context.read<AppBloc>().add(SavedFilterAdded(filter: newFilter));
 
-            // Apply the filter to the HeadlinesFeedBloc. The page is not
-            // popped here; that action is deferred until after the dialog
-            // has been successfully dismissed.
+            // Apply the newly saved filter to the HeadlinesFeedBloc. The page
+            // is not popped here; that action is deferred until after the
+            // dialog has been successfully dismissed.
             _applyFilter(newFilter);
           },
         );
@@ -186,6 +186,7 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
   /// treated as a "custom" one.
   void _applyFilter(SavedFilter? savedFilter) {
     final filterState = context.read<HeadlinesFilterBloc>().state;
+    // Create a new HeadlineFilter from the current selections in the filter bloc.
     final newFilter = HeadlineFilter(
       topics: filterState.selectedTopics.toList(),
       sources: filterState.selectedSources.toList(),
@@ -217,6 +218,13 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
         return BlocBuilder<HeadlinesFilterBloc, HeadlinesFilterState>(
           builder: (context, filterState) {
             final theme = Theme.of(context);
+
+            // Determine if the reset button should be enabled. It's enabled only
+            // if there are active selections to clear.
+            final isResetEnabled =
+                filterState.selectedTopics.isNotEmpty ||
+                filterState.selectedSources.isNotEmpty ||
+                filterState.selectedCountries.isNotEmpty;
 
             // Determine if the "Apply" button should be enabled.
             final isFilterEmpty =
@@ -258,21 +266,16 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
                   style: theme.textTheme.titleLarge,
                 ),
                 actions: [
-                  // Reset All Filters Button
+                  // Reset button to clear local selections on this page.
                   IconButton(
                     icon: const Icon(Icons.refresh),
                     tooltip: l10n.headlinesFeedFilterResetButton,
-                    onPressed: () {
-                      // Dispatch event to clear filters in the feed bloc
-                      // and trigger a refresh to the "All" state.
-                      context.read<HeadlinesFeedBloc>().add(
-                        AllFilterSelected(
-                          adThemeStyle: AdThemeStyle.fromTheme(theme),
-                        ),
-                      );
-                      // Close the filter page.
-                      context.pop();
-                    },
+                    // The button is disabled if there are no selections to clear.
+                    onPressed: isResetEnabled
+                        ? () => context.read<HeadlinesFilterBloc>().add(
+                            const FilterSelectionsCleared(),
+                          )
+                        : null,
                   ),
                   // Apply Filters Button
                   IconButton(

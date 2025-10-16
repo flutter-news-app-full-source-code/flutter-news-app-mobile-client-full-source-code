@@ -52,6 +52,11 @@ final class HeadlinesFeedRefreshRequested extends HeadlinesFeedEvent {
 /// Event triggered when a new set of filters, selected by the user,
 /// should be applied to the headlines feed.
 /// {@endtemplate}
+/// The `activeFilterId` is determined within the `HeadlinesFeedBloc`.
+/// In most cases, this is done by comparing the applied filter against the
+/// list of saved filters. However, to prevent a race condition during the
+/// "save and apply" flow, an optional `savedFilter` can be provided to
+/// ensure the newly created filter is selected immediately.
 final class HeadlinesFeedFiltersApplied extends HeadlinesFeedEvent {
   /// {@macro headlines_feed_filters_applied}
   ///
@@ -67,8 +72,8 @@ final class HeadlinesFeedFiltersApplied extends HeadlinesFeedEvent {
   final HeadlineFilter filter;
 
   /// The optional [SavedFilter] that this filter corresponds to.
-  /// This is used to correctly set the active filter ID when a new
-  /// filter is saved and immediately applied.
+  /// This is used exclusively during the "save and apply" flow to prevent
+  /// a race condition and ensure the new filter's chip is selected.
   final SavedFilter? savedFilter;
 
   /// The current ad theme style of the application.

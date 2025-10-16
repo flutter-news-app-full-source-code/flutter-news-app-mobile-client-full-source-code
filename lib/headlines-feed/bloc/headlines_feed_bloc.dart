@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
+import 'package:collection/collection.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
@@ -265,19 +266,38 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     HeadlinesFeedFiltersApplied event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
-    String? newActiveFilterId;
+    String newActiveFilterId;
 
-    // If a saved filter was explicitly passed (e.g., just created), use its ID.
+    // Prioritize the explicitly passed savedFilter to prevent race conditions.
+    // This is crucial for the "save and apply" flow, where the AppBloc might
+    // not have updated the savedFilters list in this bloc's state yet.
     if (event.savedFilter != null) {
       newActiveFilterId = event.savedFilter!.id;
     } else {
-      // Otherwise, determine if this is a pre-existing saved filter being
-      // re-applied or a custom one.
-      final isSavedFilter =
-          state.activeFilterId != 'all' &&
-          state.activeFilterId != 'custom' &&
-          state.activeFilterId != null;
-      newActiveFilterId = isSavedFilter ? state.activeFilterId : 'custom';
+      // If no filter is explicitly passed, determine if the applied filter
+      // matches an existing saved filter. This handles re-applying a saved
+      // filter or applying a one-time "custom" filter.
+      final matchingSavedFilter = state.savedFilters.firstWhereOrNull((
+        savedFilter,
+      ) {
+        // Use sets for order-agnostic comparison of filter contents.
+        final appliedTopics = event.filter.topics?.toSet() ?? {};
+        final savedTopics = savedFilter.topics.toSet();
+        final appliedSources = event.filter.sources?.toSet() ?? {};
+        final savedSources = savedFilter.sources.toSet();
+        final appliedCountries = event.filter.eventCountries?.toSet() ?? {};
+        final savedCountries = savedFilter.countries.toSet();
+
+        return const SetEquality<Topic>().equals(appliedTopics, savedTopics) &&
+            const SetEquality<Source>().equals(appliedSources, savedSources) &&
+            const SetEquality<Country>().equals(
+              appliedCountries,
+              savedCountries,
+            );
+      });
+
+      // If a match is found, use its ID. Otherwise, mark it as 'custom'.
+      newActiveFilterId = matchingSavedFilter?.id ?? 'custom';
     }
 
     // When applying new filters, this is considered a major feed change,
@@ -550,15 +570,15 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   /// Handles the selection of the "Followed" filter from the filter bar.
   ///
   /// This creates a [HeadlineFilter] from the user's followed items and
-  /// triggers a full feed refresh.
+  /// triggers a full feed refresh directly within this handler. It no longer
+  /// delegates to `HeadlinesFeedFiltersApplied` to prevent a bug where the
+  /// filter would be incorrectly identified as 'custom'.
   Future<void> _onFollowedFilterSelected(
     FollowedFilterSelected event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
     final userPreferences = _appBloc.state.userContentPreferences;
     if (userPreferences == null) {
-      // This case should ideally not happen if the UI is built correctly,
-      // as the "Followed" button is only shown when preferences are available.
       return;
     }
 
@@ -568,15 +588,77 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       eventCountries: userPreferences.followedCountries,
     );
 
-    // Set the active filter ID and then dispatch an event to apply the filter
-    // and refresh the feed.
-    emit(state.copyWith(activeFilterId: 'followed'));
-    add(
-      HeadlinesFeedFiltersApplied(
+    // This is a major feed change, so clear the ad cache.
+    _inlineAdCacheService.clearAllAds();
+    emit(
+      state.copyWith(
+        status: HeadlinesFeedStatus.loading,
         filter: newFilter,
-        adThemeStyle: event.adThemeStyle,
+        activeFilterId: 'followed',
+        feedItems: [],
+        clearCursor: true,
       ),
     );
+
+    try {
+      final currentUser = _appBloc.state.user;
+      final appConfig = _appBloc.state.remoteConfig;
+
+      if (appConfig == null) {
+        emit(state.copyWith(status: HeadlinesFeedStatus.failure));
+        return;
+      }
+
+      final headlineResponse = await _headlinesRepository.readAll(
+        filter: _buildFilter(newFilter),
+        pagination: const PaginationOptions(limit: _headlinesFetchLimit),
+        sort: [const SortOption('updatedAt', SortOrder.desc)],
+      );
+
+      final decorationResult = await _feedDecoratorService.decorateFeed(
+        headlines: headlineResponse.items,
+        user: currentUser,
+        remoteConfig: appConfig,
+        followedTopicIds: userPreferences.followedTopics
+            .map((t) => t.id)
+            .toList(),
+        followedSourceIds: userPreferences.followedSources
+            .map((s) => s.id)
+            .toList(),
+        imageStyle: _appBloc.state.settings!.feedPreferences.headlineImageStyle,
+        adThemeStyle: event.adThemeStyle,
+      );
+
+      emit(
+        state.copyWith(
+          status: HeadlinesFeedStatus.success,
+          feedItems: decorationResult.decoratedItems,
+          hasMore: headlineResponse.hasMore,
+          cursor: headlineResponse.cursor,
+        ),
+      );
+
+      final injectedDecorator = decorationResult.injectedDecorator;
+      if (injectedDecorator != null && currentUser?.id != null) {
+        if (injectedDecorator is CallToActionItem) {
+          _appBloc.add(
+            AppUserFeedDecoratorShown(
+              userId: currentUser!.id,
+              feedDecoratorType: injectedDecorator.decoratorType,
+            ),
+          );
+        } else if (injectedDecorator is ContentCollectionItem) {
+          _appBloc.add(
+            AppUserFeedDecoratorShown(
+              userId: currentUser!.id,
+              feedDecoratorType: injectedDecorator.decoratorType,
+            ),
+          );
+        }
+      }
+    } on HttpException catch (e) {
+      emit(state.copyWith(status: HeadlinesFeedStatus.failure, error: e));
+    }
   }
 
   @override

@@ -336,11 +336,15 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // If a new user is present, handle their data.
     if (newUser != null) {
       // In demo mode, ensure essential user-specific data (settings,
-      // preferences, and the user object itself in the data client)
-      // are initialized if they don't already exist. This prevents
-      // NotFoundException during subsequent reads.
-      if (_environment == local_config.AppEnvironment.demo &&
-          demoDataInitializerService != null) {
+      // preferences) are initialized if they don't already exist.
+      final isDemoMode = _environment == local_config.AppEnvironment.demo;
+      final isMigration =
+          oldUser != null &&
+          oldUser.appRole == AppUserRole.guestUser &&
+          newUser.appRole == AppUserRole.standardUser;
+
+      // Initialize data for a new user, but ONLY if it's not a migration.
+      if (isDemoMode && !isMigration && demoDataInitializerService != null) {
         _logger.info(
           '[AppBloc] Demo mode: Initializing user-specific data for '
           'user: ${newUser.id}',
@@ -376,9 +380,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       }
 
       // Handle data migration if an anonymous user signs in.
-      if (oldUser != null &&
-          oldUser.appRole == AppUserRole.guestUser &&
-          newUser.appRole == AppUserRole.standardUser) {
+      if (isMigration) {
         _logger.info(
           '[AppBloc] Anonymous user ${oldUser.id} transitioned to '
           'authenticated user ${newUser.id}. Attempting data migration.',
@@ -414,10 +416,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         }
       }
 
-      // If not in demo mode, or if the demo initializer is not used,
-      // perform the standard data fetch. In demo mode, this call is now
-      // redundant as it's handled immediately after initialization.
-      if (_environment != local_config.AppEnvironment.demo) {
+      // Perform the standard data fetch if we are not in demo mode, or if a
+      // migration just occurred (to load the migrated data).
+      // This avoids a redundant fetch in the demo initialization path, which
+      // handles its own data fetching after creating fixture data.      
+      if (!isDemoMode || isMigration) {
         await _fetchAndSetUserData(newUser, emit);
       }
     } else {

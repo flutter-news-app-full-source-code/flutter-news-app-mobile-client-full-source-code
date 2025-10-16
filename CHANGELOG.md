@@ -2,6 +2,7 @@
 
 ## 1.4.0 - Upcoming Release
 
+- **fix(demo)**: correct data migration logic for anonymous to authenticated user transitions
 - **refactor**: improved filter page reset button to clear local selections and disable when not applicable
 - **feat**: auto-scroll to active filter chip in SavedFiltersBar
 - **fix**: resolve bug where applying a modified filter incorrectly selects the original saved filter

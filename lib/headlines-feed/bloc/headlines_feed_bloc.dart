@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
+import 'package:collection/collection.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
@@ -265,20 +266,28 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     HeadlinesFeedFiltersApplied event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
-    String? newActiveFilterId;
+    // Determine if the applied filter matches an existing saved filter.
+    // This logic is crucial for correctly setting the active filter chip in
+    // the UI. It compares the content of the applied filter with each saved
+    // filter, ignoring the order of items within the lists.
+    final matchingSavedFilter = state.savedFilters.firstWhereOrNull((
+      savedFilter,
+    ) {
+      // Use sets for order-agnostic comparison of filter contents.
+      final appliedTopics = event.filter.topics?.toSet() ?? {};
+      final savedTopics = savedFilter.topics.toSet();
+      final appliedSources = event.filter.sources?.toSet() ?? {};
+      final savedSources = savedFilter.sources.toSet();
+      final appliedCountries = event.filter.eventCountries?.toSet() ?? {};
+      final savedCountries = savedFilter.countries.toSet();
 
-    // If a saved filter was explicitly passed (e.g., just created), use its ID.
-    if (event.savedFilter != null) {
-      newActiveFilterId = event.savedFilter!.id;
-    } else {
-      // Otherwise, determine if this is a pre-existing saved filter being
-      // re-applied or a custom one.
-      final isSavedFilter =
-          state.activeFilterId != 'all' &&
-          state.activeFilterId != 'custom' &&
-          state.activeFilterId != null;
-      newActiveFilterId = isSavedFilter ? state.activeFilterId : 'custom';
-    }
+      return const SetEquality<Topic>().equals(appliedTopics, savedTopics) &&
+          const SetEquality<Source>().equals(appliedSources, savedSources) &&
+          const SetEquality<Country>().equals(appliedCountries, savedCountries);
+    });
+
+    // If a match is found, use its ID. Otherwise, mark it as 'custom'.
+    final newActiveFilterId = matchingSavedFilter?.id ?? 'custom';
 
     // When applying new filters, this is considered a major feed change,
     // so we clear the ad cache to get a fresh set of relevant ads.

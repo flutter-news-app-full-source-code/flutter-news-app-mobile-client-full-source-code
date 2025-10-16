@@ -114,8 +114,8 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
               onPressed: () {
                 // Pop the dialog first.
                 Navigator.of(dialogContext).pop();
-                // Apply the filter as a "custom" one-time filter.
-                _applyAndExit(null);
+                // Apply the filter without saving it.
+                _applyAndExit();
               },
             ),
             FilledButton(
@@ -161,10 +161,10 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
             // Add the new filter to the global AppBloc state.
             context.read<AppBloc>().add(SavedFilterAdded(filter: newFilter));
 
-            // Apply the filter to the HeadlinesFeedBloc. The page is not
-            // popped here; that action is deferred until after the dialog
-            // has been successfully dismissed.
-            _applyFilter(newFilter);
+            // Apply the newly saved filter to the HeadlinesFeedBloc. The page
+            // is not popped here; that action is deferred until after the
+            // dialog has been successfully dismissed.
+            _applyFilter();
           },
         );
       },
@@ -180,12 +180,9 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
   }
 
   /// Applies the current filter selections to the feed and pops the page.
-  ///
-  /// If a [savedFilter] is provided, it's passed to the event to ensure
-  /// its chip is correctly selected on the feed. Otherwise, the filter is
-  /// treated as a "custom" one.
-  void _applyFilter(SavedFilter? savedFilter) {
+  void _applyFilter() {
     final filterState = context.read<HeadlinesFilterBloc>().state;
+    // Create a new HeadlineFilter from the current selections in the filter bloc.
     final newFilter = HeadlineFilter(
       topics: filterState.selectedTopics.toList(),
       sources: filterState.selectedSources.toList(),
@@ -194,16 +191,15 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
     context.read<HeadlinesFeedBloc>().add(
       HeadlinesFeedFiltersApplied(
         filter: newFilter,
-        savedFilter: savedFilter,
         adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
       ),
     );
   }
 
-  void _applyAndExit(SavedFilter? savedFilter) {
+  void _applyAndExit() {
     // This helper method now separates applying the filter from exiting.
     // It's called for the "Apply Only" flow.
-    _applyFilter(savedFilter);
+    _applyFilter();
     context.pop();
   }
 

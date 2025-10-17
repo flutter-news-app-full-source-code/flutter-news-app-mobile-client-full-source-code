@@ -29,7 +29,7 @@ class SavedHeadlinesPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.close),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             context.pop();
           },

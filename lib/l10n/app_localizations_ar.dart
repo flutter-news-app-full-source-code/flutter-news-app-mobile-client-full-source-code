@@ -1027,4 +1027,27 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get savedFiltersMenuDelete => 'حذف';
+
+  @override
+  String get discoverPageTitle => 'اكتشف';
+
+  @override
+  String get bottomNavDiscoverLabel => 'اكتشف';
+
+  @override
+  String get feedSearchHint => 'ابحث في العناوين...';
+
+  @override
+  String get headlineSearchEnterQuery => 'ابحث عن عناوين من آلاف المصادر.';
+
+  @override
+  String get headlineSearchEnterQuerySubheadline =>
+      'ابحث بالكلمة المفتاحية للعثور على مقالات من آلاف المصادر.';
+
+  @override
+  String get headlineSearchNoResults => 'لم يتم العثور على عناوين.';
+
+  @override
+  String get headlineSearchNoResultsSubheadline =>
+      'لم نتمكن من العثور على أي عناوين تطابق بحثك. يرجى تجربة كلمات مفتاحية مختلفة.';
 }

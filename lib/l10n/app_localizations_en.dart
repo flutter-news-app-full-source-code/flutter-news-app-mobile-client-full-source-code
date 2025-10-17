@@ -1028,4 +1028,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get savedFiltersMenuDelete => 'Delete';
+
+  @override
+  String get discoverPageTitle => 'Discover';
+
+  @override
+  String get bottomNavDiscoverLabel => 'Discover';
+
+  @override
+  String get feedSearchHint => 'Search headlines...';
+
+  @override
+  String get headlineSearchEnterQuery =>
+      'Find headlines from thousands of sources.';
+
+  @override
+  String get headlineSearchEnterQuerySubheadline =>
+      'Search by keyword to find articles from thousands of sources.';
+
+  @override
+  String get headlineSearchNoResults => 'No headlines found.';
+
+  @override
+  String get headlineSearchNoResultsSubheadline =>
+      'We couldn\'t find any headlines matching your search. Please try different keywords.';
 }

@@ -34,6 +34,12 @@ class AccountPage extends StatelessWidget {
           onPressed: () => context.pop(),
         ),
         title: Text(l10n.bottomNavAccountLabel),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => context.pushNamed(Routes.settingsName),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -176,11 +182,6 @@ class AccountPage extends StatelessWidget {
           onTap: () => context.pushNamed(Routes.accountSavedFiltersName),
         ),
         const Divider(),
-        buildTile(
-          icon: Icons.settings_outlined,
-          title: l10n.accountSettingsTile,
-          onTap: () => context.pushNamed(Routes.settingsName),
-        ),
       ],
     );
   }

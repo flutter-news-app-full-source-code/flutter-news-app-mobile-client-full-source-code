@@ -8,37 +8,44 @@ import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.da
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
-/// {@template account_sheet}
-/// A modal bottom sheet that displays user account information and actions.
+/// {@template account_page}
+/// A full-screen modal page that displays user account information and actions.
 ///
-/// This widget is shown when the user taps on their avatar in the app bar.
-/// It adapts its content based on whether the user is authenticated or
-/// anonymous.
+/// This page serves as the main entry point for all account-related
+/// sections like settings, saved items, and content preferences.
 /// {@endtemplate}
-class AccountSheet extends StatelessWidget {
-  /// {@macro account_sheet}
-  const AccountSheet({super.key});
+class AccountPage extends StatelessWidget {
+  /// {@macro account_page}
+  const AccountPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizationsX(context).l10n;
     // Watch AppBloc for user details and authentication status
     final appState = context.watch<AppBloc>().state;
     final user = appState.user;
     final status = appState.status;
     final isAnonymous = status == AppLifeCycleStatus.anonymous;
 
-    // The content is wrapped in a SingleChildScrollView to ensure it's
-    // scrollable on smaller devices where the content might overflow.
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.paddingMedium),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildUserHeader(context, user, isAnonymous),
-            const SizedBox(height: AppSpacing.lg),
-            _buildNavigationList(context),
-          ],
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () => context.pop(),
+        ),
+        title: Text(l10n.accountTitle),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingMedium),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildUserHeader(context, user, isAnonymous),
+              const SizedBox(height: AppSpacing.lg),
+              _buildNavigationList(context),
+            ],
+          ),
         ),
       ),
     );
@@ -76,8 +83,7 @@ class AccountSheet extends StatelessWidget {
             textStyle: textTheme.labelLarge,
           ),
           onPressed: () {
-            // Close the sheet before navigating
-            Navigator.of(context).pop();
+            // Navigate directly to the linking flow.
             context.goNamed(Routes.accountLinkingName);
           },
         ),
@@ -101,8 +107,7 @@ class AccountSheet extends StatelessWidget {
               textStyle: textTheme.labelLarge,
             ),
             onPressed: () {
-              // Close the sheet before signing out
-              Navigator.of(context).pop();
+              // Dispatch sign-out event.
               context.read<AuthenticationBloc>().add(
                 const AuthenticationSignOutRequested(),
               );
@@ -147,11 +152,7 @@ class AccountSheet extends StatelessWidget {
         leading: Icon(icon, color: theme.colorScheme.primary),
         title: Text(title, style: textTheme.titleMedium),
         trailing: const Icon(Icons.chevron_right),
-        onTap: () {
-          // Close the sheet before navigating to the new page.
-          Navigator.of(context).pop();
-          onTap();
-        },
+        onTap: onTap,
       );
     }
 

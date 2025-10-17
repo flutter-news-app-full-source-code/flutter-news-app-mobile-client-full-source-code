@@ -25,14 +25,9 @@ class SettingsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.close),
           onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              // Fallback if it can't pop, perhaps go to account page directly
-              context.goNamed(Routes.accountName);
-            }
+            context.pop();
           },
         ),
         title: Text(l10n.settingsTitle),
@@ -84,21 +79,21 @@ class SettingsPage extends StatelessWidget {
                 context: context,
                 icon: Icons.language_outlined,
                 title: l10n.settingsLanguageTitle,
-                onTap: () => context.goNamed(Routes.settingsLanguageName),
+                onTap: () => context.pushNamed(Routes.settingsLanguageName),
               ),
               const Divider(indent: AppSpacing.lg, endIndent: AppSpacing.lg),
               _buildSettingsTile(
                 context: context,
                 icon: Icons.palette_outlined,
                 title: l10n.settingsAppearanceTitle,
-                onTap: () => context.goNamed(Routes.settingsAppearanceName),
+                onTap: () => context.pushNamed(Routes.settingsAppearanceName),
               ),
               const Divider(indent: AppSpacing.lg, endIndent: AppSpacing.lg),
               _buildSettingsTile(
                 context: context,
                 icon: Icons.feed_outlined,
                 title: l10n.settingsFeedDisplayTitle,
-                onTap: () => context.goNamed(Routes.settingsFeedName),
+                onTap: () => context.pushNamed(Routes.settingsFeedName),
               ),
               const Divider(indent: AppSpacing.lg, endIndent: AppSpacing.lg),
               // _buildSettingsTile(

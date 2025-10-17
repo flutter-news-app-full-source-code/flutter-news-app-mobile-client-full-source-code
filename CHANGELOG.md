@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.4.0 - Upcoming Release
+## 1.4.0 - 2025-10-17
 
 - **feat**: overhauled search and account features with a new sliver-based feed UI, integrated search bar, and modal account sheet.
 - **feat**: implemented an advanced feed filtering system with a quick-access filter bar, support for custom saved filters (create, rename, delete, reorder), and a dedicated "Followed" content view.

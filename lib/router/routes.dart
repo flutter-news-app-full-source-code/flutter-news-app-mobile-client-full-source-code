@@ -46,15 +46,15 @@ abstract final class Routes {
   static const feedFilterEventCountriesName = 'feedFilterEventCountries';
 
   // --- Account Sub-Routes ---
-  static const accountSavedHeadlines = 'saved-headlines';
+  static const accountSavedHeadlines = '/saved-headlines';
   static const accountSavedHeadlinesName = 'accountSavedHeadlines';
   static const accountArticleDetails = 'article/:id';
   static const accountArticleDetailsName = 'accountArticleDetails';
-  static const accountSavedFilters = 'saved-filters';
+  static const accountSavedFilters = '/saved-filters';
   static const accountSavedFiltersName = 'accountSavedFilters';
 
   // --- Settings Routes (nested under Account) ---
-  static const settings = 'settings';
+  static const settings = '/settings';
   static const settingsName = 'settings';
   static const settingsAppearance = 'appearance';
   static const settingsAppearanceName = 'settingsAppearance';
@@ -72,7 +72,7 @@ abstract final class Routes {
   static const settingsLanguageName = 'settingsLanguage';
 
   // --- Manage Followed Items Routes (nested under Account) ---
-  static const manageFollowedItems = 'manage-followed-items';
+  static const manageFollowedItems = '/manage-followed-items';
   static const manageFollowedItemsName = 'manageFollowedItems';
   static const followedTopicsList = 'topics';
   static const followedTopicsListName = 'followedTopicsList';

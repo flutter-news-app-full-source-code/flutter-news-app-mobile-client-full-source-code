@@ -74,6 +74,7 @@ class HeadlineSearchDelegate extends SearchDelegate<void> {
               return InitialStateWidget(
                 icon: Icons.search,
                 headline: l10n.headlineSearchEnterQuery,
+                subheadline: l10n.headlineSearchEnterQuerySubheadline,
               );
             case HeadlineSearchStatus.loading:
               // Show a loading indicator while fetching results.
@@ -91,6 +92,7 @@ class HeadlineSearchDelegate extends SearchDelegate<void> {
                 return InitialStateWidget(
                   icon: Icons.search_off,
                   headline: l10n.headlineSearchNoResults,
+                  subheadline: l10n.headlineSearchNoResultsSubheadline,
                 );
               }
               // Display the list of found headlines.

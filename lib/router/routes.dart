@@ -28,14 +28,14 @@ abstract final class Routes {
   static const globalArticleDetails = '/article/:id';
   static const globalArticleDetailsName = 'globalArticleDetails';
 
-  // --- Top-Level Modal Routes ---
-  static const accountSavedHeadlines = '/saved-headlines';
+  // --- Account Sub-Routes ---
+  static const accountSavedHeadlines = 'saved-headlines';
   static const accountSavedHeadlinesName = 'accountSavedHeadlines';
-  static const accountSavedFilters = '/saved-filters';
+  static const accountSavedFilters = 'saved-filters';
   static const accountSavedFiltersName = 'accountSavedFilters';
-  static const settings = '/settings';
+  static const settings = 'settings';
   static const settingsName = 'settings';
-  static const manageFollowedItems = '/manage-followed-items';
+  static const manageFollowedItems = 'manage-followed-items';
   static const manageFollowedItemsName = 'manageFollowedItems';
 
   // --- Relative Sub-Routes ---

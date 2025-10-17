@@ -3,7 +3,6 @@ import 'package:core/core.dart' hide AppStatus;
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/account/view/account_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/countries/add_country_to_follow_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/countries/followed_countries_list_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/manage_followed_items/manage_followed_items_page.dart';
@@ -23,6 +22,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/authentication/v
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/authentication_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/email_code_verification_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/request_code_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/discover/view/discover_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/bloc/entity_details_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/view/entity_details_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/headline_details_bloc.dart';
@@ -36,8 +36,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/v
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_list_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/topic_filter_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-search/bloc/headlines_search_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-search/view/headline_search_delegate.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/go_router_observer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
@@ -374,44 +372,24 @@ GoRouter createRouter({
       // --- Main App Shell ---
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
-          // Return the shell widget which contains the AdaptiveScaffold
-          return MultiBlocProvider(
-            providers: [
-              BlocProvider(
-                create: (context) {
-                  // Read the AppBloc once to get the initial state.
-                  final appBloc = context.read<AppBloc>();
+          return BlocProvider(
+            create: (context) {
+              // Read the AppBloc once to get the initial state.
+              final appBloc = context.read<AppBloc>();
 
-                  return HeadlinesFeedBloc(
-                    headlinesRepository: context
-                        .read<DataRepository<Headline>>(),
-                    feedDecoratorService: feedDecoratorService,
-                    appBloc: appBloc,
-                    inlineAdCacheService: inlineAdCacheService,
-                    // Prime the HeadlinesFeedBloc with the initial user
-                    // preferences. This prevents a race condition where the
-                    // feed is displayed before the bloc receives the saved
-                    // filters from the AppBloc stream.
-                    initialUserContentPreferences:
-                        appBloc.state.userContentPreferences,
-                  );
-                },
-              ),
-              BlocProvider(
-                create: (context) {
-                  return HeadlinesSearchBloc(
-                    headlinesRepository: context
-                        .read<DataRepository<Headline>>(),
-                    topicRepository: context.read<DataRepository<Topic>>(),
-                    sourceRepository: context.read<DataRepository<Source>>(),
-                    countryRepository: context.read<DataRepository<Country>>(),
-                    appBloc: context.read<AppBloc>(),
-                    feedDecoratorService: feedDecoratorService,
-                    inlineAdCacheService: inlineAdCacheService,
-                  );
-                },
-              ),
-            ],
+              return HeadlinesFeedBloc(
+                headlinesRepository: context.read<DataRepository<Headline>>(),
+                feedDecoratorService: feedDecoratorService,
+                appBloc: appBloc,
+                inlineAdCacheService: inlineAdCacheService,
+                // Prime the HeadlinesFeedBloc with the initial user
+                // preferences. This prevents a race condition where the
+                // feed is displayed before the bloc receives the saved
+                // filters from the AppBloc stream.
+                initialUserContentPreferences:
+                    appBloc.state.userContentPreferences,
+              );
+            },
             child: AppShell(navigationShell: navigationShell),
           );
         },
@@ -556,94 +534,69 @@ GoRouter createRouter({
               ),
             ],
           ),
-          // --- Branch 2: Search ---
+          // --- Branch 2: Discover ---
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: Routes.search,
-                name: Routes.searchName,
-                builder: (context, state) => const HeadlinesSearchPage(),
-                routes: [
-                  // Sub-route for article details from search
-                  GoRoute(
-                    path: 'article/:id',
-                    name: Routes.searchArticleDetailsName,
-                    builder: (context, state) {
-                      final headlineFromExtra = state.extra as Headline?;
-                      final headlineIdFromPath = state.pathParameters['id'];
-                      return MultiBlocProvider(
-                        providers: [
-                          BlocProvider(
-                            create: (context) => HeadlineDetailsBloc(
-                              headlinesRepository: context
-                                  .read<DataRepository<Headline>>(),
-                            ),
-                          ),
-                          BlocProvider(
-                            create: (context) => SimilarHeadlinesBloc(
-                              headlinesRepository: context
-                                  .read<DataRepository<Headline>>(),
-                            ),
-                          ),
-                        ],
-                        child: HeadlineDetailsPage(
-                          initialHeadline: headlineFromExtra,
-                          headlineId:
-                              headlineFromExtra?.id ?? headlineIdFromPath,
-                        ),
-                      );
-                    },
-                  ),
-                ],
+                path: Routes.discover,
+                name: Routes.discoverName,
+                builder: (context, state) => const DiscoverPage(),
               ),
             ],
           ),
-          // --- Branch 3: Account ---
+          // --- Branch 3: Account (REMOVED) ---
+          // The Account page is now accessed via a modal bottom sheet from
+          // the FeedSliverAppBar, so it is no longer a main navigation branch.
+          // Its sub-routes (Settings, Saved Items, etc.) are now defined as
+          // top-level routes to be pushed from the modal sheet.
           StatefulShellBranch(
             routes: [
+              // This GoRoute is a placeholder to keep the shell branch valid
+              // while allowing its sub-routes to be defined. The path will
+              // never be directly navigated to.
               GoRoute(
                 path: Routes.account,
                 name: Routes.accountName,
-                builder: (context, state) => const AccountPage(),
+                builder: (context, state) => const SizedBox.shrink(),
                 routes: [
                   // ShellRoute for settings to provide SettingsBloc to children
                   ShellRoute(
-                    builder: (BuildContext context, GoRouterState state, Widget child) {
-                      // This builder provides SettingsBloc to all routes within this ShellRoute.
-                      // 'child' will be SettingsPage, AppearanceSettingsPage, etc.
-                      final appBloc = context.read<AppBloc>();
-                      final userId = appBloc.state.user?.id;
+                    builder:
+                        (
+                          BuildContext context,
+                          GoRouterState state,
+                          Widget child,
+                        ) {
+                          final appBloc = context.read<AppBloc>();
+                          final userId = appBloc.state.user?.id;
 
-                      return BlocProvider<SettingsBloc>(
-                        create: (context) {
-                          final settingsBloc = SettingsBloc(
-                            userAppSettingsRepository: context
-                                .read<DataRepository<UserAppSettings>>(),
-                            inlineAdCacheService: inlineAdCacheService,
+                          return BlocProvider<SettingsBloc>(
+                            create: (context) {
+                              final settingsBloc = SettingsBloc(
+                                userAppSettingsRepository: context
+                                    .read<DataRepository<UserAppSettings>>(),
+                                inlineAdCacheService: inlineAdCacheService,
+                              );
+                              if (userId != null) {
+                                settingsBloc.add(
+                                  SettingsLoadRequested(userId: userId),
+                                );
+                              } else {
+                                logger.warning(
+                                  'User ID is null when creating SettingsBloc. '
+                                  'Settings will not be loaded.',
+                                );
+                              }
+                              return settingsBloc;
+                            },
+                            child: child,
                           );
-                          // Only load settings if a userId is available
-                          if (userId != null) {
-                            settingsBloc.add(
-                              SettingsLoadRequested(userId: userId),
-                            );
-                          } else {
-                            // Handle case where user is unexpectedly null.
-                            logger.warning(
-                              'User ID is null when creating SettingsBloc. Settings will not be loaded.',
-                            );
-                          }
-                          return settingsBloc;
                         },
-                        // child is the actual page widget (SettingsPage, AppearanceSettingsPage, etc.)
-                        child: child,
-                      );
-                    },
                     routes: [
                       GoRoute(
                         path: Routes.settings,
                         name: Routes.settingsName,
                         builder: (context, state) => const SettingsPage(),
-                        // --- Settings Sub-Routes ---
                         routes: [
                           GoRoute(
                             path: Routes.settingsAppearance,
@@ -651,7 +604,6 @@ GoRouter createRouter({
                             builder: (context, state) =>
                                 const AppearanceSettingsPage(),
                             routes: [
-                              // Children of AppearanceSettingsPage
                               GoRoute(
                                 path: Routes.settingsAppearanceTheme,
                                 name: Routes.settingsAppearanceThemeName,
@@ -688,7 +640,6 @@ GoRouter createRouter({
                       ),
                     ],
                   ),
-                  // New routes for Account sub-pages
                   GoRoute(
                     path: Routes.manageFollowedItems,
                     name: Routes.manageFollowedItemsName,
@@ -777,7 +728,6 @@ GoRouter createRouter({
                       ),
                     ],
                   ),
-                  // Route for managing saved filters.
                   GoRoute(
                     path: Routes.accountSavedFilters,
                     name: Routes.accountSavedFiltersName,

@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
+import 'package:logging/logging.dart';
 import 'package:stream_transform/stream_transform.dart';
 
 part 'headlines_search_event.dart';
@@ -26,10 +27,10 @@ EventTransformer<E> debounce<E>(Duration duration) {
 class HeadlineSearchBloc
     extends Bloc<HeadlineSearchEvent, HeadlineSearchState> {
   /// {@macro headline_search_bloc}
-  HeadlineSearchBloc({
-    required DataRepository<Headline> headlinesRepository,
-  })  : _headlinesRepository = headlinesRepository,
-        super(const HeadlineSearchState()) {
+  HeadlineSearchBloc({required DataRepository<Headline> headlinesRepository})
+    : _headlinesRepository = headlinesRepository,
+      _logger = Logger('HeadlineSearchBloc'),
+      super(const HeadlineSearchState()) {
     on<HeadlineSearchQueryChanged>(
       _onHeadlineSearchQueryChanged,
       // Apply a debounce transformer to prevent excessive API calls.
@@ -38,6 +39,7 @@ class HeadlineSearchBloc
   }
 
   final DataRepository<Headline> _headlinesRepository;
+  final Logger _logger;
 
   /// Handles the [HeadlineSearchQueryChanged] event.
   ///
@@ -49,18 +51,32 @@ class HeadlineSearchBloc
   ) async {
     final query = event.query;
 
-    // If the query is empty, reset to the initial state.
-    if (query.isEmpty) {
-      return emit(const HeadlineSearchState(status: HeadlineSearchStatus.initial));
+    // If the query is empty or too short, reset to the initial state.
+    // This prevents heavy, inefficient searches on the backend for 1 or 2
+    // character queries.
+    if (query.length < 3) {
+      return emit(
+        const HeadlineSearchState(status: HeadlineSearchStatus.initial),
+      );
     }
+
+    _logger.info('Searching for headlines with query: "$query"');
 
     // Emit loading state before starting the search.
     emit(state.copyWith(status: HeadlineSearchStatus.loading));
 
     try {
-      // Fetch headlines from the repository with a filter on the title.
+      // Fetch headlines from the repository using a regex filter for a
+      // case-insensitive, partial match on the title.
       final response = await _headlinesRepository.readAll(
-        filter: {'title': query},
+        filter: {
+          'title': {
+            // Use regex for partial matching.
+            r'$regex': query,
+            // 'i' option for case-insensitivity.
+            r'$options': 'i',
+          },
+        },
         pagination: const PaginationOptions(limit: 20),
       );
 

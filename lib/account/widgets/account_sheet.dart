@@ -160,25 +160,25 @@ class AccountSheet extends StatelessWidget {
         buildTile(
           icon: Icons.tune_outlined,
           title: l10n.accountContentPreferencesTile,
-          onTap: () => context.goNamed(Routes.manageFollowedItemsName),
+          onTap: () => context.pushNamed(Routes.manageFollowedItemsName),
         ),
         const Divider(),
         buildTile(
           icon: Icons.bookmark_outline,
           title: l10n.accountSavedHeadlinesTile,
-          onTap: () => context.goNamed(Routes.accountSavedHeadlinesName),
+          onTap: () => context.pushNamed(Routes.accountSavedHeadlinesName),
         ),
         const Divider(),
         buildTile(
           icon: Icons.filter_alt_outlined,
           title: l10n.accountSavedFiltersTile,
-          onTap: () => context.goNamed(Routes.accountSavedFiltersName),
+          onTap: () => context.pushNamed(Routes.accountSavedFiltersName),
         ),
         const Divider(),
         buildTile(
           icon: Icons.settings_outlined,
           title: l10n.accountSettingsTile,
-          onTap: () => context.goNamed(Routes.settingsName),
+          onTap: () => context.pushNamed(Routes.settingsName),
         ),
       ],
     );

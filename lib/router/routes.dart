@@ -27,14 +27,28 @@ abstract final class Routes {
   static const entityDetailsName = 'entityDetails';
   static const globalArticleDetails = '/article/:id';
   static const globalArticleDetailsName = 'globalArticleDetails';
+
+  // --- Top-Level Modal Routes ---
+  static const accountSavedHeadlines = '/saved-headlines';
+  static const accountSavedHeadlinesName = 'accountSavedHeadlines';
+  static const accountSavedFilters = '/saved-filters';
+  static const accountSavedFiltersName = 'accountSavedFilters';
+  static const settings = '/settings';
+  static const settingsName = 'settings';
+  static const manageFollowedItems = '/manage-followed-items';
+  static const manageFollowedItemsName = 'manageFollowedItems';
+
+  // --- Relative Sub-Routes ---
+  // These routes are defined with relative paths and are intended to be
+  // nested within other routes.
+
+  // Generic
   static const multiSelectSearchName = 'multiSelectSearch';
 
-  // --- Feed Sub-Routes ---
+  // Feed
   static const articleDetailsName = 'articleDetails';
   static const notifications = 'notifications';
   static const notificationsName = 'notifications';
-
-  // --- Feed Filter Sub-Routes ---
   static const feedFilter = 'filter';
   static const feedFilterName = 'feedFilter';
   static const feedFilterTopics = 'topics';
@@ -45,17 +59,11 @@ abstract final class Routes {
   static const feedFilterEventCountries = 'event-countries';
   static const feedFilterEventCountriesName = 'feedFilterEventCountries';
 
-  // --- Account Sub-Routes ---
-  static const accountSavedHeadlines = '/saved-headlines';
-  static const accountSavedHeadlinesName = 'accountSavedHeadlines';
+  // Account
   static const accountArticleDetails = 'article/:id';
   static const accountArticleDetailsName = 'accountArticleDetails';
-  static const accountSavedFilters = '/saved-filters';
-  static const accountSavedFiltersName = 'accountSavedFilters';
 
-  // --- Settings Routes (nested under Account) ---
-  static const settings = '/settings';
-  static const settingsName = 'settings';
+  // Settings
   static const settingsAppearance = 'appearance';
   static const settingsAppearanceName = 'settingsAppearance';
   static const settingsAppearanceTheme = 'theme';
@@ -71,9 +79,7 @@ abstract final class Routes {
   static const settingsLanguage = 'language';
   static const settingsLanguageName = 'settingsLanguage';
 
-  // --- Manage Followed Items Routes (nested under Account) ---
-  static const manageFollowedItems = '/manage-followed-items';
-  static const manageFollowedItemsName = 'manageFollowedItems';
+  // Manage Followed Items
   static const followedTopicsList = 'topics';
   static const followedTopicsListName = 'followedTopicsList';
   static const addTopicToFollow = 'add-topic';

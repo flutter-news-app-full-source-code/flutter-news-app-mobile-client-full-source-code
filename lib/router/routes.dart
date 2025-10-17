@@ -17,10 +17,10 @@ abstract final class Routes {
   // --- Core App Shell Routes ---
   static const feed = '/feed';
   static const feedName = 'feed';
-  static const search = '/search';
-  static const searchName = 'search';
   static const account = '/account';
   static const accountName = 'account';
+  static const discover = '/discover';
+  static const discoverName = 'discover';
 
   // --- Global, Top-Level Routes ---
   static const entityDetails = '/entity-details/:type/:id';
@@ -44,9 +44,6 @@ abstract final class Routes {
   static const sourceListFilterName = 'sourceListFilter';
   static const feedFilterEventCountries = 'event-countries';
   static const feedFilterEventCountriesName = 'feedFilterEventCountries';
-
-  // --- Search Sub-Routes ---
-  static const searchArticleDetailsName = 'searchArticleDetails';
 
   // --- Account Sub-Routes ---
   static const accountSavedHeadlines = 'saved-headlines';

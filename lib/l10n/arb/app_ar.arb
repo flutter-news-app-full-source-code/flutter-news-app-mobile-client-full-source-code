@@ -1373,5 +1373,17 @@
     "headlineSearchNoResultsSubheadline": "لم نتمكن من العثور على أي عناوين تطابق بحثك. يرجى تجربة كلمات مفتاحية مختلفة.",
     "@headlineSearchNoResultsSubheadline": {
         "description": "عنوان فرعي عندما لا يُرجع بحث العناوين أي نتائج"
+    },
+    "accountGuestAccount": "حساب زائر",
+    "@accountGuestAccount": {
+        "description": "تسمية تشير إلى أن المستخدم زائر."
+    },
+    "accountRoleStandard": "مستخدم عادي",
+    "@accountRoleStandard": {
+        "description": "تسمية لدور المستخدم العادي."
+    },
+    "accountRolePremium": "مستخدم مميز",
+    "@accountRolePremium": {
+        "description": "تسمية لدور المستخدم المميز."
     }
 }

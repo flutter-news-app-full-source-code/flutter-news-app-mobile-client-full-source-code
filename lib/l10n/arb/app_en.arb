@@ -1373,5 +1373,18 @@
     "headlineSearchNoResultsSubheadline": "We couldn't find any headlines matching your search. Please try different keywords.",
     "@headlineSearchNoResultsSubheadline": {
         "description": "Subheadline for when a headline search returns no results"
+    },
+    "accountGuestAccount": "Guest Account",
+    "@accountGuestAccount": {
+        "description": "Label indicating the user is a guest."
+    },
+    "accountRoleStandard": "Standard User",
+    "@accountRoleStandard": {
+        "description": "Label for a standard user role."
+    },
+    "accountRolePremium": "Premium User",
+    "@accountRolePremium": {
+        "description": "Label for a premium user role."
     }
+
 }

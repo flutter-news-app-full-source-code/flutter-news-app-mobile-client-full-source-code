@@ -15,7 +15,7 @@ class DiscoverPage extends StatelessWidget {
     final l10n = context.l10n;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.discoverPageTitle)),
-      body: const Center(child: Text('Discover Page Placeholder')),
+      body: const Center(child: Text('Soon...')),
     );
   }
 }

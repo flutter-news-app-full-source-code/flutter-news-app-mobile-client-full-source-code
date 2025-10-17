@@ -1052,4 +1052,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get headlineSearchNoResultsSubheadline =>
       'We couldn\'t find any headlines matching your search. Please try different keywords.';
+
+  @override
+  String get accountGuestAccount => 'Guest Account';
+
+  @override
+  String get accountRoleStandard => 'Standard User';
+
+  @override
+  String get accountRolePremium => 'Premium User';
 }

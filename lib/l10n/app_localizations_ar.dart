@@ -1050,4 +1050,13 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get headlineSearchNoResultsSubheadline =>
       'لم نتمكن من العثور على أي عناوين تطابق بحثك. يرجى تجربة كلمات مفتاحية مختلفة.';
+
+  @override
+  String get accountGuestAccount => 'حساب زائر';
+
+  @override
+  String get accountRoleStandard => 'مستخدم عادي';
+
+  @override
+  String get accountRolePremium => 'مستخدم مميز';
 }

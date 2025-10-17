@@ -1999,6 +1999,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We couldn\'t find any headlines matching your search. Please try different keywords.'**
   String get headlineSearchNoResultsSubheadline;
+
+  /// Label indicating the user is a guest.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest Account'**
+  String get accountGuestAccount;
+
+  /// Label for a standard user role.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard User'**
+  String get accountRoleStandard;
+
+  /// Label for a premium user role.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium User'**
+  String get accountRolePremium;
 }
 
 class _AppLocalizationsDelegate

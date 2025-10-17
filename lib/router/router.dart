@@ -532,6 +532,179 @@ GoRouter createRouter({
                   ),
                 ],
               ),
+              // --- Account-related routes (Nested under Feed) ---
+              // These routes are for pages launched from the AccountSheet, which
+              // is shown from the Feed page. Nesting them here ensures that
+              // go_router can navigate correctly from a context within the
+              // first shell branch.
+
+              // ShellRoute for settings to provide SettingsBloc to children
+              ShellRoute(
+                builder:
+                    (BuildContext context, GoRouterState state, Widget child) {
+                      final appBloc = context.read<AppBloc>();
+                      final userId = appBloc.state.user?.id;
+
+                      return BlocProvider<SettingsBloc>(
+                        create: (context) {
+                          final settingsBloc = SettingsBloc(
+                            userAppSettingsRepository: context
+                                .read<DataRepository<UserAppSettings>>(),
+                            inlineAdCacheService: inlineAdCacheService,
+                          );
+                          if (userId != null) {
+                            settingsBloc.add(
+                              SettingsLoadRequested(userId: userId),
+                            );
+                          } else {
+                            logger.warning(
+                              'User ID is null when creating SettingsBloc. '
+                              'Settings will not be loaded.',
+                            );
+                          }
+                          return settingsBloc;
+                        },
+                        child: child,
+                      );
+                    },
+                routes: [
+                  GoRoute(
+                    path: Routes.settings,
+                    name: Routes.settingsName,
+                    builder: (context, state) => const SettingsPage(),
+                    routes: [
+                      GoRoute(
+                        path: Routes.settingsAppearance,
+                        name: Routes.settingsAppearanceName,
+                        builder: (context, state) =>
+                            const AppearanceSettingsPage(),
+                        routes: [
+                          GoRoute(
+                            path: Routes.settingsAppearanceTheme,
+                            name: Routes.settingsAppearanceThemeName,
+                            builder: (context, state) =>
+                                const ThemeSettingsPage(),
+                          ),
+                          GoRoute(
+                            path: Routes.settingsAppearanceFont,
+                            name: Routes.settingsAppearanceFontName,
+                            builder: (context, state) =>
+                                const FontSettingsPage(),
+                          ),
+                        ],
+                      ),
+                      GoRoute(
+                        path: Routes.settingsFeed,
+                        name: Routes.settingsFeedName,
+                        builder: (context, state) => const FeedSettingsPage(),
+                      ),
+                      GoRoute(
+                        path: Routes.settingsNotifications,
+                        name: Routes.settingsNotificationsName,
+                        builder: (context, state) =>
+                            const NotificationSettingsPage(),
+                      ),
+                      GoRoute(
+                        path: Routes.settingsLanguage,
+                        name: Routes.settingsLanguageName,
+                        builder: (context, state) =>
+                            const LanguageSettingsPage(),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              GoRoute(
+                path: Routes.manageFollowedItems,
+                name: Routes.manageFollowedItemsName,
+                builder: (context, state) => const ManageFollowedItemsPage(),
+                routes: [
+                  GoRoute(
+                    path: Routes.followedTopicsList,
+                    name: Routes.followedTopicsListName,
+                    builder: (context, state) => const FollowedTopicsListPage(),
+                    routes: [
+                      GoRoute(
+                        path: Routes.addTopicToFollow,
+                        name: Routes.addTopicToFollowName,
+                        builder: (context, state) =>
+                            const AddTopicToFollowPage(),
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    path: Routes.followedSourcesList,
+                    name: Routes.followedSourcesListName,
+                    builder: (context, state) =>
+                        const FollowedSourcesListPage(),
+                    routes: [
+                      GoRoute(
+                        path: Routes.addSourceToFollow,
+                        name: Routes.addSourceToFollowName,
+                        builder: (context, state) =>
+                            const AddSourceToFollowPage(),
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    path: Routes.followedCountriesList,
+                    name: Routes.followedCountriesListName,
+                    builder: (context, state) =>
+                        const FollowedCountriesListPage(),
+                    routes: [
+                      GoRoute(
+                        path: Routes.addCountryToFollow,
+                        name: Routes.addCountryToFollowName,
+                        builder: (context, state) =>
+                            const AddCountryToFollowPage(),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              GoRoute(
+                path: Routes.accountSavedHeadlines,
+                name: Routes.accountSavedHeadlinesName,
+                builder: (context, state) {
+                  return const SavedHeadlinesPage();
+                },
+                routes: [
+                  GoRoute(
+                    path: Routes.accountArticleDetails,
+                    name: Routes.accountArticleDetailsName,
+                    builder: (context, state) {
+                      final headlineFromExtra = state.extra as Headline?;
+                      final headlineIdFromPath = state.pathParameters['id'];
+                      return MultiBlocProvider(
+                        providers: [
+                          BlocProvider(
+                            create: (context) => HeadlineDetailsBloc(
+                              headlinesRepository: context
+                                  .read<DataRepository<Headline>>(),
+                            ),
+                          ),
+                          BlocProvider(
+                            create: (context) => SimilarHeadlinesBloc(
+                              headlinesRepository: context
+                                  .read<DataRepository<Headline>>(),
+                            ),
+                          ),
+                        ],
+                        child: HeadlineDetailsPage(
+                          initialHeadline: headlineFromExtra,
+                          headlineId:
+                              headlineFromExtra?.id ?? headlineIdFromPath,
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+              GoRoute(
+                path: Routes.accountSavedFilters,
+                name: Routes.accountSavedFiltersName,
+                builder: (context, state) => const SavedFiltersPage(),
+              ),
             ],
           ),
           // --- Branch 2: Discover ---
@@ -541,199 +714,6 @@ GoRouter createRouter({
                 path: Routes.discover,
                 name: Routes.discoverName,
                 builder: (context, state) => const DiscoverPage(),
-              ),
-            ],
-          ),
-          // --- Branch 3: Account (REMOVED) ---
-          // The Account page is now accessed via a modal bottom sheet from
-          // the FeedSliverAppBar, so it is no longer a main navigation branch.
-          // Its sub-routes (Settings, Saved Items, etc.) are now defined as
-          // top-level routes to be pushed from the modal sheet.
-          StatefulShellBranch(
-            routes: [
-              // This GoRoute is a placeholder to keep the shell branch valid
-              // while allowing its sub-routes to be defined. The path will
-              // never be directly navigated to.
-              GoRoute(
-                path: Routes.account,
-                name: Routes.accountName,
-                builder: (context, state) => const SizedBox.shrink(),
-                routes: [
-                  // ShellRoute for settings to provide SettingsBloc to children
-                  ShellRoute(
-                    builder:
-                        (
-                          BuildContext context,
-                          GoRouterState state,
-                          Widget child,
-                        ) {
-                          final appBloc = context.read<AppBloc>();
-                          final userId = appBloc.state.user?.id;
-
-                          return BlocProvider<SettingsBloc>(
-                            create: (context) {
-                              final settingsBloc = SettingsBloc(
-                                userAppSettingsRepository: context
-                                    .read<DataRepository<UserAppSettings>>(),
-                                inlineAdCacheService: inlineAdCacheService,
-                              );
-                              if (userId != null) {
-                                settingsBloc.add(
-                                  SettingsLoadRequested(userId: userId),
-                                );
-                              } else {
-                                logger.warning(
-                                  'User ID is null when creating SettingsBloc. '
-                                  'Settings will not be loaded.',
-                                );
-                              }
-                              return settingsBloc;
-                            },
-                            child: child,
-                          );
-                        },
-                    routes: [
-                      GoRoute(
-                        path: Routes.settings,
-                        name: Routes.settingsName,
-                        builder: (context, state) => const SettingsPage(),
-                        routes: [
-                          GoRoute(
-                            path: Routes.settingsAppearance,
-                            name: Routes.settingsAppearanceName,
-                            builder: (context, state) =>
-                                const AppearanceSettingsPage(),
-                            routes: [
-                              GoRoute(
-                                path: Routes.settingsAppearanceTheme,
-                                name: Routes.settingsAppearanceThemeName,
-                                builder: (context, state) =>
-                                    const ThemeSettingsPage(),
-                              ),
-                              GoRoute(
-                                path: Routes.settingsAppearanceFont,
-                                name: Routes.settingsAppearanceFontName,
-                                builder: (context, state) =>
-                                    const FontSettingsPage(),
-                              ),
-                            ],
-                          ),
-                          GoRoute(
-                            path: Routes.settingsFeed,
-                            name: Routes.settingsFeedName,
-                            builder: (context, state) =>
-                                const FeedSettingsPage(),
-                          ),
-                          GoRoute(
-                            path: Routes.settingsNotifications,
-                            name: Routes.settingsNotificationsName,
-                            builder: (context, state) =>
-                                const NotificationSettingsPage(),
-                          ),
-                          GoRoute(
-                            path: Routes.settingsLanguage,
-                            name: Routes.settingsLanguageName,
-                            builder: (context, state) =>
-                                const LanguageSettingsPage(),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  GoRoute(
-                    path: Routes.manageFollowedItems,
-                    name: Routes.manageFollowedItemsName,
-                    builder: (context, state) =>
-                        const ManageFollowedItemsPage(),
-                    routes: [
-                      GoRoute(
-                        path: Routes.followedTopicsList,
-                        name: Routes.followedTopicsListName,
-                        builder: (context, state) =>
-                            const FollowedTopicsListPage(),
-                        routes: [
-                          GoRoute(
-                            path: Routes.addTopicToFollow,
-                            name: Routes.addTopicToFollowName,
-                            builder: (context, state) =>
-                                const AddTopicToFollowPage(),
-                          ),
-                        ],
-                      ),
-                      GoRoute(
-                        path: Routes.followedSourcesList,
-                        name: Routes.followedSourcesListName,
-                        builder: (context, state) =>
-                            const FollowedSourcesListPage(),
-                        routes: [
-                          GoRoute(
-                            path: Routes.addSourceToFollow,
-                            name: Routes.addSourceToFollowName,
-                            builder: (context, state) =>
-                                const AddSourceToFollowPage(),
-                          ),
-                        ],
-                      ),
-                      GoRoute(
-                        path: Routes.followedCountriesList,
-                        name: Routes.followedCountriesListName,
-                        builder: (context, state) =>
-                            const FollowedCountriesListPage(),
-                        routes: [
-                          GoRoute(
-                            path: Routes.addCountryToFollow,
-                            name: Routes.addCountryToFollowName,
-                            builder: (context, state) =>
-                                const AddCountryToFollowPage(),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  GoRoute(
-                    path: Routes.accountSavedHeadlines,
-                    name: Routes.accountSavedHeadlinesName,
-                    builder: (context, state) {
-                      return const SavedHeadlinesPage();
-                    },
-                    routes: [
-                      GoRoute(
-                        path: Routes.accountArticleDetails,
-                        name: Routes.accountArticleDetailsName,
-                        builder: (context, state) {
-                          final headlineFromExtra = state.extra as Headline?;
-                          final headlineIdFromPath = state.pathParameters['id'];
-                          return MultiBlocProvider(
-                            providers: [
-                              BlocProvider(
-                                create: (context) => HeadlineDetailsBloc(
-                                  headlinesRepository: context
-                                      .read<DataRepository<Headline>>(),
-                                ),
-                              ),
-                              BlocProvider(
-                                create: (context) => SimilarHeadlinesBloc(
-                                  headlinesRepository: context
-                                      .read<DataRepository<Headline>>(),
-                                ),
-                              ),
-                            ],
-                            child: HeadlineDetailsPage(
-                              initialHeadline: headlineFromExtra,
-                              headlineId:
-                                  headlineFromExtra?.id ?? headlineIdFromPath,
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                  GoRoute(
-                    path: Routes.accountSavedFilters,
-                    name: Routes.accountSavedFiltersName,
-                    builder: (context, state) => const SavedFiltersPage(),
-                  ),
-                ],
               ),
             ],
           ),

@@ -33,7 +33,7 @@ class AccountPage extends StatelessWidget {
           icon: const Icon(Icons.close),
           onPressed: () => context.pop(),
         ),
-        title: Text(l10n.accountTitle),
+        title: Text(l10n.bottomNavAccountLabel),
       ),
       body: SingleChildScrollView(
         child: Padding(

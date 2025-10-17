@@ -62,7 +62,7 @@ class HeadlineSearchDelegate extends SearchDelegate<void> {
   /// Builds the main content area for search results and suggestions.
   Widget _buildSearchResults(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
-    
+
     // Provide the BLoC instance to the widget tree.
     return BlocProvider.value(
       value: headlineSearchBloc,

@@ -1345,5 +1345,33 @@
     "savedFiltersMenuDelete": "Delete",
     "@savedFiltersMenuDelete": {
         "description": "The text for the 'Delete' option in the popup menu on a saved filter item."
+    },
+    "discoverPageTitle": "Discover",
+    "@discoverPageTitle": {
+        "description": "Title for the discover page"
+    },
+    "bottomNavDiscoverLabel": "Discover",
+    "@bottomNavDiscoverLabel": {
+        "description": "Label for the Discover item in the bottom navigation bar"
+    },
+    "feedSearchHint": "Search headlines...",
+    "@feedSearchHint": {
+        "description": "Hint text for the search bar on the feed page"
+    },
+    "headlineSearchEnterQuery": "Find headlines from thousands of sources.",
+    "@headlineSearchEnterQuery": {
+        "description": "Headline for the initial state of the headline search page"
+    },
+    "headlineSearchEnterQuerySubheadline": "Search by keyword to find articles from thousands of sources.",
+    "@headlineSearchEnterQuerySubheadline": {
+        "description": "Subheadline for the initial state of the headline search page"
+    },
+    "headlineSearchNoResults": "No headlines found.",
+    "@headlineSearchNoResults": {
+        "description": "Headline for when a headline search returns no results"
+    },
+    "headlineSearchNoResultsSubheadline": "We couldn't find any headlines matching your search. Please try different keywords.",
+    "@headlineSearchNoResultsSubheadline": {
+        "description": "Subheadline for when a headline search returns no results"
     }
 }

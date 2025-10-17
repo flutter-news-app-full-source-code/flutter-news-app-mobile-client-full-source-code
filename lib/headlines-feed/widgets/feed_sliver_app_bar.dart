@@ -31,6 +31,10 @@ class FeedSliverAppBar extends StatelessWidget {
       pinned: true,
       // The app bar will become visible as soon as the user scrolls up.
       floating: true,
+      // The app bar will snap into view when scrolling up, even if the user
+      // stops scrolling partway. This works in conjunction with `floating` to
+      // create the desired scrolling effect.
+      snap: true,
       // The title is a custom search bar widget.
       title: GestureDetector(
         onTap: () {

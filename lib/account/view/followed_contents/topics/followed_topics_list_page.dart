@@ -8,12 +8,12 @@ import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.da
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
-/// {@template followed_sources_list_page}
-/// Page to display and manage sources followed by the user.
+/// {@template followed_topics_list_page}
+/// Page to display and manage topics followed by the user.
 /// {@endtemplate}
-class FollowedSourcesListPage extends StatelessWidget {
-  /// {@macro followed_sources_list_page}
-  const FollowedSourcesListPage({super.key});
+class FollowedTopicsListPage extends StatelessWidget {
+  /// {@macro followed_topics_list_page}
+  const FollowedTopicsListPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,13 +21,13 @@ class FollowedSourcesListPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.followedSourcesPageTitle),
+        title: Text(l10n.followedTopicsPageTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.add_circle_outline),
-            tooltip: l10n.addSourcesTooltip,
+            tooltip: l10n.addTopicsTooltip,
             onPressed: () {
-              context.goNamed(Routes.addSourceToFollowName);
+              context.pushNamed(Routes.addTopicToFollowName);
             },
           ),
         ],
@@ -40,8 +40,8 @@ class FollowedSourcesListPage extends StatelessWidget {
           if (appState.status == AppLifeCycleStatus.loadingUserData ||
               userContentPreferences == null) {
             return LoadingStateWidget(
-              icon: Icons.source_outlined,
-              headline: l10n.followedSourcesLoadingHeadline,
+              icon: Icons.topic_outlined,
+              headline: l10n.followedTopicsLoadingHeadline,
               subheadline: l10n.pleaseWait,
             );
           }
@@ -55,25 +55,33 @@ class FollowedSourcesListPage extends StatelessWidget {
             );
           }
 
-          final followedSources = userContentPreferences.followedSources;
+          final followedTopics = userContentPreferences.followedTopics;
 
-          if (followedSources.isEmpty) {
+          if (followedTopics.isEmpty) {
             return InitialStateWidget(
               icon: Icons.no_sim_outlined,
-              headline: l10n.followedSourcesEmptyHeadline,
-              subheadline: l10n.followedSourcesEmptySubheadline,
+              headline: l10n.followedTopicsEmptyHeadline,
+              subheadline: l10n.followedTopicsEmptySubheadline,
             );
           }
 
           return ListView.builder(
-            itemCount: followedSources.length,
+            itemCount: followedTopics.length,
             itemBuilder: (context, index) {
-              final source = followedSources[index];
+              final topic = followedTopics[index];
               return ListTile(
-                leading: const Icon(Icons.source_outlined),
-                title: Text(source.name),
+                leading: SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: Image.network(
+                    topic.iconUrl,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.topic_outlined),
+                  ),
+                ),
+                title: Text(topic.name),
                 subtitle: Text(
-                  source.description,
+                  topic.description,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -82,14 +90,14 @@ class FollowedSourcesListPage extends StatelessWidget {
                     Icons.remove_circle_outline,
                     color: Theme.of(context).colorScheme.error,
                   ),
-                  tooltip: l10n.unfollowSourceTooltip(source.name),
+                  tooltip: l10n.unfollowTopicTooltip(topic.name),
                   onPressed: () {
-                    final updatedFollowedSources = List<Source>.from(
-                      followedSources,
-                    )..removeWhere((s) => s.id == source.id);
+                    final updatedFollowedTopics = List<Topic>.from(
+                      followedTopics,
+                    )..removeWhere((t) => t.id == topic.id);
 
                     final updatedPreferences = userContentPreferences.copyWith(
-                      followedSources: updatedFollowedSources,
+                      followedTopics: updatedFollowedTopics,
                     );
 
                     context.read<AppBloc>().add(
@@ -112,8 +120,8 @@ class FollowedSourcesListPage extends StatelessWidget {
                   await context.pushNamed(
                     Routes.entityDetailsName,
                     pathParameters: {
-                      'type': ContentType.source.name,
-                      'id': source.id,
+                      'type': ContentType.topic.name,
+                      'id': topic.id,
                     },
                   );
                 },

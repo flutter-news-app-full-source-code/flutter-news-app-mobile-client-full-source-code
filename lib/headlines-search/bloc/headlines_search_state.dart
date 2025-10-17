@@ -1,91 +1,54 @@
 part of 'headlines_search_bloc.dart';
 
-abstract class HeadlinesSearchState extends Equatable {
-  const HeadlinesSearchState({this.selectedModelType = ContentType.headline});
+/// Defines the status of the headline search operation.
+enum HeadlineSearchStatus {
+  /// The initial state before any search has been performed.
+  initial,
 
-  final ContentType selectedModelType;
+  /// A search is currently in progress.
+  loading,
 
-  @override
-  List<Object?> get props => [selectedModelType];
+  /// The search completed successfully.
+  success,
+
+  /// The search failed.
+  failure,
 }
 
-/// Initial state before any search is performed.
-class HeadlinesSearchInitial extends HeadlinesSearchState {
-  const HeadlinesSearchInitial({super.selectedModelType});
-}
-
-/// State when a search is actively in progress.
-class HeadlinesSearchLoading extends HeadlinesSearchState {
-  const HeadlinesSearchLoading({
-    required this.lastSearchTerm,
-    required super.selectedModelType,
-  });
-  final String lastSearchTerm;
-
-  @override
-  List<Object?> get props => [...super.props, lastSearchTerm];
-}
-
-/// State when a search has successfully returned results.
-class HeadlinesSearchSuccess extends HeadlinesSearchState {
-  const HeadlinesSearchSuccess({
-    required this.items,
-    required this.hasMore,
-    required this.lastSearchTerm,
-    required super.selectedModelType,
-    this.cursor,
-    this.errorMessage,
+/// {@template headline_search_state}
+/// Represents the state for the headline search feature.
+/// {@endtemplate}
+final class HeadlineSearchState extends Equatable {
+  /// {@macro headline_search_state}
+  const HeadlineSearchState({
+    this.status = HeadlineSearchStatus.initial,
+    this.headlines = const [],
+    this.error,
   });
 
-  final List<FeedItem> items;
-  final bool hasMore;
-  final String? cursor;
-  final String? errorMessage;
-  final String lastSearchTerm;
+  /// The current status of the search.
+  final HeadlineSearchStatus status;
 
-  HeadlinesSearchSuccess copyWith({
-    List<FeedItem>? items,
-    bool? hasMore,
-    String? cursor,
-    String? errorMessage,
-    String? lastSearchTerm,
-    ContentType? selectedModelType,
-    bool clearErrorMessage = false,
+  /// The list of headlines found.
+  final List<Headline> headlines;
+
+  /// The error that occurred during the search, if any.
+  final HttpException? error;
+
+  /// Creates a copy of this [HeadlineSearchState] with the given fields
+  /// replaced with the new values.
+  HeadlineSearchState copyWith({
+    HeadlineSearchStatus? status,
+    List<Headline>? headlines,
+    HttpException? error,
   }) {
-    return HeadlinesSearchSuccess(
-      items: items ?? this.items,
-      hasMore: hasMore ?? this.hasMore,
-      cursor: cursor ?? this.cursor,
-      errorMessage: clearErrorMessage
-          ? null
-          : errorMessage ?? this.errorMessage,
-      lastSearchTerm: lastSearchTerm ?? this.lastSearchTerm,
-      selectedModelType: selectedModelType ?? this.selectedModelType,
+    return HeadlineSearchState(
+      status: status ?? this.status,
+      headlines: headlines ?? this.headlines,
+      error: error ?? this.error,
     );
   }
 
   @override
-  List<Object?> get props => [
-    ...super.props,
-    items,
-    hasMore,
-    cursor,
-    errorMessage,
-    lastSearchTerm,
-  ];
-}
-
-/// State when a search operation has failed.
-class HeadlinesSearchFailure extends HeadlinesSearchState {
-  const HeadlinesSearchFailure({
-    required this.errorMessage,
-    required this.lastSearchTerm,
-    required super.selectedModelType,
-  });
-
-  final String errorMessage;
-  final String lastSearchTerm;
-
-  @override
-  List<Object?> get props => [...super.props, errorMessage, lastSearchTerm];
+  List<Object?> get props => [status, headlines, error];
 }

@@ -4,13 +4,13 @@ import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.da
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
-/// {@template manage_followed_items_page}
+/// {@template followed_contents_page}
 /// Page for navigating to lists of followed content types like
 /// topics, sources, and countries.
 /// {@endtemplate}
-class ManageFollowedItemsPage extends StatelessWidget {
-  /// {@macro manage_followed_items_page}
-  const ManageFollowedItemsPage({super.key});
+class FollowedContentsPage extends StatelessWidget {
+  /// {@macro followed_contents_page}
+  const FollowedContentsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +21,12 @@ class ManageFollowedItemsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            context.pop();
+          },
+        ),
         title: Text(
           l10n.accountContentPreferencesTile,
           style: textTheme.titleLarge,
@@ -37,7 +43,7 @@ class ManageFollowedItemsPage extends StatelessWidget {
             ),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              context.goNamed(Routes.followedTopicsListName);
+              context.pushNamed(Routes.followedTopicsListName);
             },
           ),
           const Divider(
@@ -52,7 +58,7 @@ class ManageFollowedItemsPage extends StatelessWidget {
             ),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              context.goNamed(Routes.followedSourcesListName);
+              context.pushNamed(Routes.followedSourcesListName);
             },
           ),
           const Divider(
@@ -70,7 +76,7 @@ class ManageFollowedItemsPage extends StatelessWidget {
             ),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              context.goNamed(Routes.followedCountriesListName);
+              context.pushNamed(Routes.followedCountriesListName);
             },
           ),
           const Divider(

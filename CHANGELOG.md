@@ -2,22 +2,10 @@
 
 ## 1.4.0 - Upcoming Release
 
-- **fix(demo)**: correct data migration logic for anonymous to authenticated user transitions
-- **refactor**: improved filter page reset button to clear local selections and disable when not applicable
-- **feat**: auto-scroll to active filter chip in SavedFiltersBar
-- **fix**: resolve bug where applying a modified filter incorrectly selects the original saved filter
-- **refactor**: relocated saved filters management to the account page and introduced reordering capability.
-- **feat**: created a reusable, searchable multi-select page for filtering
-- **feat**: add 'Followed' filter to quickly view content from followed items
-- **feat(demo)**: pre-populate saved filters and settings for new anonymous users
-- **fix**: ensure saved filters are immediately visible on app start
-- **fix**: corrected a bug where selecting a source type would check all sources
-- **feat**: implement saved feed filters with create, rename, and delete
-- **feat**: add horizontal filter bar to the headlines feed for quick selection
-- **refactor**: replace monolithic "apply followed items" with granular controls
-- **refactor**: simplified filter logic by removing the ambiguous 'isUsingFollowedItems' flag
-- **refactor**: improved the source filter UI by replacing horizontal scrolling with a more scalable and user-friendly vertical layout and navigation
-- **refactor**:  Updated the Headline Details page with a fading scroll effect for metadata chips and a new style for the 'Continue Reading' button. The main feed's filter icon was removed from the AppBar in favor of the new filter bar.
+- **feat**: overhauled search and account features with a new sliver-based feed UI, integrated search bar, and modal account sheet.
+- **feat**: implemented an advanced feed filtering system with a quick-access filter bar, support for custom saved filters (create, rename, delete, reorder), and a dedicated "Followed" content view.
+- **refactor**: enhanced the filter creation UI with a reusable multi-select component and a more scalable vertical layout for source selection.
+- **fix(demo)**: corrected data migration for anonymous users and now pre-populate saved filters for a richer initial experience.
 
 ## 1.3.0 - 2025-10-10
 

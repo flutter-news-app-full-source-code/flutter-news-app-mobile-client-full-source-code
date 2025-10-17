@@ -1957,6 +1957,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete'**
   String get savedFiltersMenuDelete;
+
+  /// Title for the discover page
+  ///
+  /// In en, this message translates to:
+  /// **'Discover'**
+  String get discoverPageTitle;
+
+  /// Label for the Discover item in the bottom navigation bar
+  ///
+  /// In en, this message translates to:
+  /// **'Discover'**
+  String get bottomNavDiscoverLabel;
+
+  /// Hint text for the search bar on the feed page
+  ///
+  /// In en, this message translates to:
+  /// **'Search headlines...'**
+  String get feedSearchHint;
+
+  /// Headline for the initial state of the headline search page
+  ///
+  /// In en, this message translates to:
+  /// **'Find headlines from thousands of sources.'**
+  String get headlineSearchEnterQuery;
+
+  /// Subheadline for the initial state of the headline search page
+  ///
+  /// In en, this message translates to:
+  /// **'Search by keyword to find articles from thousands of sources.'**
+  String get headlineSearchEnterQuerySubheadline;
+
+  /// Headline for when a headline search returns no results
+  ///
+  /// In en, this message translates to:
+  /// **'No headlines found.'**
+  String get headlineSearchNoResults;
+
+  /// Subheadline for when a headline search returns no results
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t find any headlines matching your search. Please try different keywords.'**
+  String get headlineSearchNoResultsSubheadline;
+
+  /// Label indicating the user is a guest.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest Account'**
+  String get accountGuestAccount;
+
+  /// Label for a standard user role.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard User'**
+  String get accountRoleStandard;
+
+  /// Label for a premium user role.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium User'**
+  String get accountRolePremium;
 }
 
 class _AppLocalizationsDelegate

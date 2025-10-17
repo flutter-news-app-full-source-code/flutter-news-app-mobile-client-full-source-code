@@ -6,6 +6,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_th
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/feed_ad_loader_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/widgets/feed_sliver_app_bar.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/widgets/saved_filters_bar.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/feed_core.dart';
@@ -113,14 +114,6 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            l10n.headlinesFeedAppBarTitle,
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
         body: BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
           builder: (context, state) {
             // Access the AppBloc to check for remoteConfig availability.
@@ -195,10 +188,15 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
               child: CustomScrollView(
                 controller: _scrollController,
                 slivers: [
-                  const SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                      child: SavedFiltersBar(),
+                  const FeedSliverAppBar(
+                    bottom: PreferredSize(
+                      preferredSize: Size.fromHeight(52),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                        ),
+                        child: SavedFiltersBar(),
+                      ),
                     ),
                   ),
                   SliverPadding(

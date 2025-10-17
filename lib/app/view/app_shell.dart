@@ -39,7 +39,7 @@ class AppShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
 
     return AdaptiveScaffold(
       useDrawer: false,
@@ -51,22 +51,14 @@ class AppShell extends StatelessWidget {
       // Define the navigation destinations.
       destinations: [
         NavigationDestination(
-          // Make const
           icon: const Icon(Icons.article_outlined),
           selectedIcon: const Icon(Icons.article),
           label: l10n.bottomNavFeedLabel,
         ),
         NavigationDestination(
-          // Make const
-          icon: const Icon(Icons.search_outlined),
-          selectedIcon: const Icon(Icons.search),
-          label: l10n.bottomNavSearchLabel,
-        ),
-        NavigationDestination(
-          // Make const
-          icon: const Icon(Icons.account_circle_outlined),
-          selectedIcon: const Icon(Icons.account_circle),
-          label: l10n.bottomNavAccountLabel,
+          icon: const Icon(Icons.explore_outlined),
+          selectedIcon: const Icon(Icons.explore),
+          label: l10n.bottomNavDiscoverLabel,
         ),
       ],
       // The body displays the widget tree for the currently selected branch.

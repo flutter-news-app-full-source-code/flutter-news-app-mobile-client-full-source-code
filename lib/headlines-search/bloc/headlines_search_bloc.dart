@@ -1,317 +1,94 @@
-// ignore_for_file: no_default_cases
+import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_decorator_service.dart';
+import 'package:logging/logging.dart';
+import 'package:stream_transform/stream_transform.dart';
 
 part 'headlines_search_event.dart';
 part 'headlines_search_state.dart';
 
-/// {@template headlines_search_bloc}
-/// A BLoC that manages the state for the headlines search feature.
+/// A transformer that debounces events to prevent rapid-fire processing.
 ///
-/// This BLoC is responsible for fetching search results based on a query
-/// and selected content type, and for injecting ad placeholders into the
-/// headline results. It consumes global application state from [AppBloc]
-/// for user settings and remote configuration.
+/// This is particularly useful for search queries to avoid sending a request
+/// for every keystroke.
+EventTransformer<E> debounce<E>(Duration duration) {
+  return (events, mapper) => events.debounce(duration).switchMap(mapper);
+}
+
+/// {@template headline_search_bloc}
+/// Manages the state for the headline search feature.
+///
+/// This BLoC handles incoming search queries, debounces them, fetches
+/// matching headlines from the repository, and emits the corresponding state.
 /// {@endtemplate}
-class HeadlinesSearchBloc
-    extends Bloc<HeadlinesSearchEvent, HeadlinesSearchState> {
-  /// {@macro headlines_search_bloc}
-  HeadlinesSearchBloc({
-    required DataRepository<Headline> headlinesRepository,
-    required DataRepository<Topic> topicRepository,
-    required DataRepository<Source> sourceRepository,
-    required DataRepository<Country> countryRepository,
-    required AppBloc appBloc,
-    required FeedDecoratorService feedDecoratorService,
-    required InlineAdCacheService inlineAdCacheService,
-  }) : _headlinesRepository = headlinesRepository,
-       _topicRepository = topicRepository,
-       _sourceRepository = sourceRepository,
-       _countryRepository = countryRepository,
-       _appBloc = appBloc,
-       _feedDecoratorService = feedDecoratorService,
-       _inlineAdCacheService = inlineAdCacheService,
-       super(const HeadlinesSearchInitial()) {
-    on<HeadlinesSearchModelTypeChanged>(_onHeadlinesSearchModelTypeChanged);
-    on<HeadlinesSearchFetchRequested>(
-      _onSearchFetchRequested,
-      transformer: restartable(),
+class HeadlineSearchBloc
+    extends Bloc<HeadlineSearchEvent, HeadlineSearchState> {
+  /// {@macro headline_search_bloc}
+  HeadlineSearchBloc({required DataRepository<Headline> headlinesRepository})
+    : _headlinesRepository = headlinesRepository,
+      _logger = Logger('HeadlineSearchBloc'),
+      super(const HeadlineSearchState()) {
+    on<HeadlineSearchQueryChanged>(
+      _onHeadlineSearchQueryChanged,
+      // Apply a debounce transformer to prevent excessive API calls.
+      transformer: debounce(const Duration(milliseconds: 350)),
     );
   }
 
   final DataRepository<Headline> _headlinesRepository;
-  final DataRepository<Topic> _topicRepository;
-  final DataRepository<Source> _sourceRepository;
-  final DataRepository<Country> _countryRepository;
-  final AppBloc _appBloc;
-  final FeedDecoratorService _feedDecoratorService;
-  final InlineAdCacheService _inlineAdCacheService;
-  static const _limit = 10;
+  final Logger _logger;
 
-  /// Handles changes to the selected model type for search.
+  /// Handles the [HeadlineSearchQueryChanged] event.
   ///
-  /// If there's an active search term, it re-triggers the search with the
-  /// new model type.
-  Future<void> _onHeadlinesSearchModelTypeChanged(
-    HeadlinesSearchModelTypeChanged event,
-    Emitter<HeadlinesSearchState> emit,
+  /// When the query changes, this method fetches headlines from the repository
+  /// that match the query.
+  Future<void> _onHeadlineSearchQueryChanged(
+    HeadlineSearchQueryChanged event,
+    Emitter<HeadlineSearchState> emit,
   ) async {
-    // If there's an active search term, re-trigger search with new model type
-    // ignore: unused_local_variable
-    final currentSearchTerm = state is HeadlinesSearchLoading
-        ? (state as HeadlinesSearchLoading).lastSearchTerm
-        : state is HeadlinesSearchSuccess
-        ? (state as HeadlinesSearchSuccess).lastSearchTerm
-        : state is HeadlinesSearchFailure
-        ? (state as HeadlinesSearchFailure).lastSearchTerm
-        : null;
+    final query = event.query;
 
-    emit(HeadlinesSearchInitial(selectedModelType: event.newModelType));
-  }
-
-  /// Handles requests to fetch search results.
-  ///
-  /// This method performs the actual search operation based on the search term
-  /// and selected model type. It also handles pagination and injects ad
-  /// placeholders into headline results.
-  Future<void> _onSearchFetchRequested(
-    HeadlinesSearchFetchRequested event,
-    Emitter<HeadlinesSearchState> emit,
-  ) async {
-    final searchTerm = event.searchTerm;
-    final modelType = state.selectedModelType;
-
-    if (searchTerm.isEmpty) {
-      emit(
-        HeadlinesSearchSuccess(
-          items: const [],
-          hasMore: false,
-          lastSearchTerm: '',
-          selectedModelType: modelType,
-        ),
+    // If the query is empty or too short, reset to the initial state.
+    // This prevents heavy, inefficient searches on the backend for 1 or 2
+    // character queries.
+    if (query.length < 3) {
+      return emit(
+        const HeadlineSearchState(status: HeadlineSearchStatus.initial),
       );
-      return;
     }
 
-    // Handle pagination
-    if (state is HeadlinesSearchSuccess) {
-      final successState = state as HeadlinesSearchSuccess;
-      if (searchTerm == successState.lastSearchTerm &&
-          modelType == successState.selectedModelType) {
-        if (!successState.hasMore) return;
+    _logger.info('Searching for headlines with query: "$query"');
 
-        try {
-          PaginatedResponse<dynamic> response;
-          switch (modelType) {
-            case ContentType.headline:
-              response = await _headlinesRepository.readAll(
-                filter: {'q': searchTerm},
-                pagination: PaginationOptions(
-                  limit: _limit,
-                  cursor: successState.cursor,
-                ),
-                sort: [const SortOption('updatedAt', SortOrder.desc)],
-              );
-              // Cast to List<Headline> for the injector
-              final headlines = response.items.cast<Headline>();
-              final currentUser = _appBloc.state.user;
-              final appConfig = _appBloc.state.remoteConfig;
-              if (appConfig == null) {
-                emit(
-                  successState.copyWith(
-                    errorMessage:
-                        'App configuration not available for pagination.',
-                  ),
-                );
-                return;
-              }
-              // For search pagination, only inject ad placeholders.
-              //
-              // This method injects stateless `AdPlaceholder` markers into the feed.
-              // The full ad loading and lifecycle is managed by the UI layer.
-              // See `FeedDecoratorService` for a detailed explanation.
-              final injectedItems = await _feedDecoratorService.injectAdPlaceholders(
-                feedItems: headlines,
-                user: currentUser,
-                adConfig: appConfig.adConfig,
-                imageStyle: _appBloc.state.headlineImageStyle,
-                adThemeStyle: event.adThemeStyle,
-                // Calculate the count of actual content items (headlines) already in the
-                // feed. This is crucial for the FeedDecoratorService to correctly apply
-                // ad placement rules across paginated loads.
-                processedContentItemCount: successState.items
-                    .whereType<Headline>()
-                    .length,
-              );
-              emit(
-                successState.copyWith(
-                  items: List.of(successState.items)..addAll(injectedItems),
-                  hasMore: response.hasMore,
-                  cursor: response.cursor,
-                ),
-              );
-            case ContentType.topic:
-              response = await _topicRepository.readAll(
-                filter: {'q': searchTerm, 'status': ContentStatus.active.name},
-                pagination: PaginationOptions(
-                  limit: _limit,
-                  cursor: successState.cursor,
-                ),
-                sort: [const SortOption('name', SortOrder.asc)],
-              );
-              emit(
-                successState.copyWith(
-                  items: List.of(successState.items)
-                    ..addAll(response.items.cast<FeedItem>()),
-                  hasMore: response.hasMore,
-                  cursor: response.cursor,
-                ),
-              );
-            case ContentType.source:
-              response = await _sourceRepository.readAll(
-                filter: {'q': searchTerm, 'status': ContentStatus.active.name},
-                pagination: PaginationOptions(
-                  limit: _limit,
-                  cursor: successState.cursor,
-                ),
-                sort: [const SortOption('name', SortOrder.asc)],
-              );
-              emit(
-                successState.copyWith(
-                  items: List.of(successState.items)
-                    ..addAll(response.items.cast<FeedItem>()),
-                  hasMore: response.hasMore,
-                  cursor: response.cursor,
-                ),
-              );
-            case ContentType.country:
-              response = await _countryRepository.readAll(
-                filter: {'q': searchTerm, 'hasActiveHeadlines': true},
-                pagination: const PaginationOptions(limit: _limit),
-                sort: [const SortOption('name', SortOrder.asc)],
-              );
-              emit(
-                successState.copyWith(
-                  items: List.of(successState.items)
-                    ..addAll(response.items.cast<FeedItem>()),
-                  hasMore: response.hasMore,
-                  cursor: response.cursor,
-                ),
-              );
-          }
-        } on HttpException catch (e) {
-          emit(successState.copyWith(errorMessage: e.message));
-        } catch (e, st) {
-          print('Search pagination error ($modelType): $e\n$st');
-          emit(
-            successState.copyWith(errorMessage: 'Failed to load more results.'),
-          );
-        }
-        return;
-      }
-    }
+    // Emit loading state before starting the search.
+    emit(state.copyWith(status: HeadlineSearchStatus.loading));
 
-    // New search, clear previous ad cache.
-    _inlineAdCacheService.clearAllAds();
-    emit(
-      HeadlinesSearchLoading(
-        lastSearchTerm: searchTerm,
-        selectedModelType: modelType,
-      ),
-    );
     try {
-      PaginatedResponse<dynamic> rawResponse;
-      List<FeedItem> processedItems;
+      // Fetch headlines from the repository using a regex filter for a
+      // case-insensitive, partial match on the title.
+      final response = await _headlinesRepository.readAll(
+        filter: {
+          'title': {
+            // Use regex for partial matching.
+            r'$regex': query,
+            // 'i' option for case-insensitivity.
+            r'$options': 'i',
+          },
+        },
+        pagination: const PaginationOptions(limit: 20),
+      );
 
-      switch (modelType) {
-        case ContentType.headline:
-          rawResponse = await _headlinesRepository.readAll(
-            filter: {'q': searchTerm},
-            pagination: const PaginationOptions(limit: _limit),
-            sort: [const SortOption('updatedAt', SortOrder.desc)],
-          );
-          final headlines = rawResponse.items.cast<Headline>();
-          final currentUser = _appBloc.state.user;
-          final appConfig = _appBloc.state.remoteConfig;
-          if (appConfig == null) {
-            emit(
-              HeadlinesSearchFailure(
-                errorMessage: 'App configuration not available.',
-                lastSearchTerm: searchTerm,
-                selectedModelType: modelType,
-              ),
-            );
-            return;
-          }
-          // For search results, only inject ad placeholders.
-          //
-          // This method injects stateless `AdPlaceholder` markers into the feed.
-          // The full ad loading and lifecycle is managed by the UI layer.
-          // See `FeedDecoratorService` for a detailed explanation.
-          processedItems = await _feedDecoratorService.injectAdPlaceholders(
-            feedItems: headlines,
-            user: currentUser,
-            adConfig: appConfig.adConfig,
-            imageStyle: _appBloc.state.headlineImageStyle,
-            adThemeStyle: event.adThemeStyle,
-          );
-        case ContentType.topic:
-          rawResponse = await _topicRepository.readAll(
-            filter: {'q': searchTerm, 'status': ContentStatus.active.name},
-            pagination: const PaginationOptions(limit: _limit),
-            sort: [const SortOption('name', SortOrder.asc)],
-          );
-          processedItems = rawResponse.items.cast<FeedItem>();
-        case ContentType.source:
-          rawResponse = await _sourceRepository.readAll(
-            filter: {'q': searchTerm, 'status': ContentStatus.active.name},
-            pagination: const PaginationOptions(limit: _limit),
-            sort: [const SortOption('name', SortOrder.asc)],
-          );
-          processedItems = rawResponse.items.cast<FeedItem>();
-        case ContentType.country:
-          rawResponse = await _countryRepository.readAll(
-            filter: {'q': searchTerm, 'hasActiveHeadlines': true},
-            pagination: const PaginationOptions(limit: _limit),
-            sort: [const SortOption('name', SortOrder.asc)],
-          );
-          processedItems = rawResponse.items.cast<FeedItem>();
-      }
+      // On success, emit the new state with the fetched headlines.
       emit(
-        HeadlinesSearchSuccess(
-          items: processedItems,
-          hasMore: rawResponse.hasMore,
-          cursor: rawResponse.cursor,
-          lastSearchTerm: searchTerm,
-          selectedModelType: modelType,
+        state.copyWith(
+          status: HeadlineSearchStatus.success,
+          headlines: response.items,
         ),
       );
-      // Feed actions are not injected in search results.
     } on HttpException catch (e) {
-      emit(
-        HeadlinesSearchFailure(
-          errorMessage: e.message,
-          lastSearchTerm: searchTerm,
-          selectedModelType: modelType,
-        ),
-      );
-    } catch (e, st) {
-      print('Search error ($modelType): $e\n$st');
-      emit(
-        HeadlinesSearchFailure(
-          errorMessage: 'An unexpected error occurred during search.',
-          lastSearchTerm: searchTerm,
-          selectedModelType: modelType,
-        ),
-      );
+      emit(state.copyWith(status: HeadlineSearchStatus.failure, error: e));
     }
   }
 }

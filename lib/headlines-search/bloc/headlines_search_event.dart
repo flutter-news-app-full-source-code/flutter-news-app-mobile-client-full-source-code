@@ -1,30 +1,22 @@
 part of 'headlines_search_bloc.dart';
 
-sealed class HeadlinesSearchEvent extends Equatable {
-  const HeadlinesSearchEvent();
+/// Abstract base class for all events in the [HeadlineSearchBloc].
+sealed class HeadlineSearchEvent extends Equatable {
+  /// {@macro headline_search_event}
+  const HeadlineSearchEvent();
 
   @override
   List<Object> get props => [];
 }
 
-final class HeadlinesSearchModelTypeChanged extends HeadlinesSearchEvent {
-  const HeadlinesSearchModelTypeChanged(this.newModelType);
+/// Dispatched when the search query changes.
+final class HeadlineSearchQueryChanged extends HeadlineSearchEvent {
+  /// {@macro headline_search_query_changed}
+  const HeadlineSearchQueryChanged(this.query);
 
-  final ContentType newModelType;
-
-  @override
-  List<Object> get props => [newModelType];
-}
-
-final class HeadlinesSearchFetchRequested extends HeadlinesSearchEvent {
-  const HeadlinesSearchFetchRequested({
-    required this.searchTerm,
-    required this.adThemeStyle,
-  });
-
-  final String searchTerm;
-  final AdThemeStyle adThemeStyle;
+  /// The search query string.
+  final String query;
 
   @override
-  List<Object> get props => [searchTerm, adThemeStyle];
+  List<Object> get props => [query];
 }

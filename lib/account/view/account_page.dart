@@ -8,12 +8,14 @@ import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.da
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
-/// {@template account_view}
-/// Displays the user's account information and actions.
-/// Adapts UI based on authentication status (authenticated vs. anonymous).
+/// {@template account_page}
+/// A full-screen modal page that displays user account information and actions.
+///
+/// This page serves as the main entry point for all account-related
+/// sections like settings, saved items, and content preferences.
 /// {@endtemplate}
 class AccountPage extends StatelessWidget {
-  /// {@macro account_view}
+  /// {@macro account_page}
   const AccountPage({super.key});
 
   @override
@@ -24,176 +26,185 @@ class AccountPage extends StatelessWidget {
     final user = appState.user;
     final status = appState.status;
     final isAnonymous = status == AppLifeCycleStatus.anonymous;
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.accountPageTitle, style: textTheme.titleLarge),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.paddingMedium),
-        children: [
-          _buildUserHeader(context, user, isAnonymous),
-          const SizedBox(height: AppSpacing.lg),
-          ListTile(
-            leading: Icon(
-              Icons.tune_outlined,
-              color: theme.colorScheme.primary,
-            ),
-            title: Text(
-              l10n.accountContentPreferencesTile,
-              style: textTheme.titleMedium,
-            ),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              context.goNamed(Routes.manageFollowedItemsName);
-            },
-          ),
-          const Divider(
-            indent: AppSpacing.paddingMedium,
-            endIndent: AppSpacing.paddingMedium,
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.bookmark_outline,
-              color: theme.colorScheme.primary,
-            ),
-            title: Text(
-              l10n.accountSavedHeadlinesTile,
-              style: textTheme.titleMedium,
-            ),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              context.goNamed(Routes.accountSavedHeadlinesName);
-            },
-          ),
-          const Divider(
-            indent: AppSpacing.paddingMedium,
-            endIndent: AppSpacing.paddingMedium,
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.filter_alt_outlined,
-              color: theme.colorScheme.primary,
-            ),
-            title: Text(
-              l10n.accountSavedFiltersTile,
-              style: textTheme.titleMedium,
-            ),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              context.goNamed(Routes.accountSavedFiltersName);
-            },
-          ),
-          const Divider(
-            indent: AppSpacing.paddingMedium,
-            endIndent: AppSpacing.paddingMedium,
-          ),
-          _buildSettingsTile(context),
-          const Divider(
-            indent: AppSpacing.paddingMedium,
-            endIndent: AppSpacing.paddingMedium,
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () => context.pop(),
+        ),
+        title: Text(l10n.bottomNavAccountLabel),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => context.pushNamed(Routes.settingsName),
           ),
         ],
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingMedium),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildUserHeader(context, user, isAnonymous),
+              const SizedBox(height: AppSpacing.lg),
+              _buildNavigationList(context),
+            ],
+          ),
+        ),
       ),
     );
   }
 
+  /// Builds the header section of the sheet, displaying the user's avatar,
+  /// name, and a primary action button (Sign Out or Link Account).
   Widget _buildUserHeader(BuildContext context, User? user, bool isAnonymous) {
     final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
 
-    final avatarIcon = Icon(
-      Icons.person_outline,
-      size: AppSpacing.xxl,
-      color: colorScheme.onPrimaryContainer,
-    );
-
-    final String displayName;
-    final Widget statusWidget;
+    final String statusText;
+    final String accountTypeText;
+    final Widget actionButton;
 
     if (isAnonymous) {
-      displayName = l10n.accountAnonymousUser;
-      statusWidget = Padding(
-        padding: const EdgeInsets.only(top: AppSpacing.md),
-        child: ElevatedButton.icon(
-          // Changed to ElevatedButton
-          icon: const Icon(Icons.link_outlined),
-          label: Text(l10n.accountSignInPromptButton),
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.lg,
-              vertical: AppSpacing.sm,
-            ),
-            textStyle: textTheme.labelLarge,
-          ),
-          onPressed: () {
-            context.goNamed(Routes.accountLinkingName);
-          },
-        ),
-      );
+      statusText = l10n.accountAnonymousUser;
+      accountTypeText = l10n.accountGuestAccount;
+      actionButton = _buildSignInButton(context);
     } else {
-      displayName = user?.email ?? l10n.accountNoNameUser;
-      statusWidget = Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: AppSpacing.md),
-          OutlinedButton.icon(
-            // Changed to OutlinedButton.icon
-            icon: Icon(Icons.logout, color: colorScheme.error),
-            label: Text(l10n.accountSignOutTile),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: colorScheme.error,
-              side: BorderSide(color: colorScheme.error.withOpacity(0.5)),
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.lg,
-                vertical: AppSpacing.sm,
+      statusText = user?.email ?? l10n.accountNoNameUser;
+
+      final String roleDisplayName;
+      switch (user?.appRole) {
+        case AppUserRole.standardUser:
+          roleDisplayName = l10n.accountRoleStandard;
+        case AppUserRole.premiumUser:
+          roleDisplayName = l10n.accountRolePremium;
+        case AppUserRole.guestUser:
+          roleDisplayName = l10n.accountGuestAccount;
+        case null:
+          roleDisplayName = '';
+      }
+      accountTypeText = roleDisplayName;
+      actionButton = _buildSignOutButton(context);
+    }
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(AppSpacing.sm),
+              child: Container(
+                width: AppSpacing.xxl + AppSpacing.sm,
+                height: AppSpacing.xxl + AppSpacing.sm,
+                color: colorScheme.primaryContainer,
+                child: Icon(
+                  Icons.person_outline,
+                  size: AppSpacing.xl,
+                  color: colorScheme.onPrimaryContainer,
+                ),
               ),
-              textStyle: textTheme.labelLarge,
             ),
-            onPressed: () {
-              context.read<AuthenticationBloc>().add(
-                const AuthenticationSignOutRequested(),
-              );
-            },
-          ),
-        ],
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    statusText,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  if (accountTypeText.isNotEmpty)
+                    Text(
+                      accountTypeText,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            actionButton,
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Builds the sign-in button for anonymous users.
+  Widget _buildSignInButton(BuildContext context) {
+    final l10n = AppLocalizationsX(context).l10n;
+    return ElevatedButton(
+      onPressed: () => context.goNamed(Routes.accountLinkingName),
+      child: Text(l10n.accountSignInPromptButton),
+    );
+  }
+
+  /// Builds the sign-out button for authenticated users.
+  Widget _buildSignOutButton(BuildContext context) {
+    final l10n = AppLocalizationsX(context).l10n;
+    return OutlinedButton(
+      onPressed: () => context.read<AuthenticationBloc>().add(
+        const AuthenticationSignOutRequested(),
+      ),
+      child: Text(l10n.accountSignOutTile),
+    );
+  }
+
+  /// Builds the list of navigation tiles for accessing different
+  /// account-related sections.
+  Widget _buildNavigationList(BuildContext context) {
+    final l10n = AppLocalizationsX(context).l10n;
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+
+    // Helper to create a ListTile with consistent styling.
+    Widget buildTile({
+      required IconData icon,
+      required String title,
+      required VoidCallback onTap,
+    }) {
+      return ListTile(
+        leading: Icon(icon, color: theme.colorScheme.primary),
+        title: Text(title, style: textTheme.titleMedium),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: onTap,
       );
     }
 
     return Column(
       children: [
-        CircleAvatar(
-          radius: AppSpacing.xxl - AppSpacing.sm,
-          backgroundColor: colorScheme.primaryContainer,
-          child: avatarIcon,
+        buildTile(
+          icon: Icons.tune_outlined,
+          title: l10n.accountContentPreferencesTile,
+          onTap: () => context.pushNamed(Routes.manageFollowedItemsName),
         ),
-        const SizedBox(height: AppSpacing.md),
-        Text(
-          displayName,
-          style: textTheme.headlineSmall,
-          textAlign: TextAlign.center,
+        const Divider(),
+        buildTile(
+          icon: Icons.bookmark_outline,
+          title: l10n.accountSavedHeadlinesTile,
+          onTap: () => context.pushNamed(Routes.accountSavedHeadlinesName),
         ),
-        statusWidget,
+        const Divider(),
+        buildTile(
+          icon: Icons.filter_alt_outlined,
+          title: l10n.accountSavedFiltersTile,
+          onTap: () => context.pushNamed(Routes.accountSavedFiltersName),
+        ),
+        const Divider(),
       ],
-    );
-  }
-
-  Widget _buildSettingsTile(BuildContext context) {
-    final l10n = AppLocalizationsX(context).l10n;
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-
-    return ListTile(
-      leading: Icon(Icons.settings_outlined, color: theme.colorScheme.primary),
-      title: Text(l10n.accountSettingsTile, style: textTheme.titleMedium),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: () {
-        context.goNamed(Routes.settingsName);
-      },
     );
   }
 }

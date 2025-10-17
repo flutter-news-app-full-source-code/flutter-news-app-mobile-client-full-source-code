@@ -1345,5 +1345,45 @@
     "savedFiltersMenuDelete": "حذف",
     "@savedFiltersMenuDelete": {
         "description": "The text for the 'Delete' option in the popup menu on a saved filter item."
+    },
+    "discoverPageTitle": "اكتشف",
+    "@discoverPageTitle": {
+        "description": "عنوان صفحة الاكتشاف"
+    },
+    "bottomNavDiscoverLabel": "اكتشف",
+    "@bottomNavDiscoverLabel": {
+        "description": "تسمية عنصر الاكتشاف في شريط التنقل السفلي"
+    },
+    "feedSearchHint": "ابحث في العناوين...",
+    "@feedSearchHint": {
+        "description": "نص تلميحي لشريط البحث في صفحة الأخبار"
+    },
+    "headlineSearchEnterQuery": "ابحث عن عناوين من آلاف المصادر.",
+    "@headlineSearchEnterQuery": {
+        "description": "عنوان للحالة الأولية لصفحة بحث العناوين"
+    },
+    "headlineSearchEnterQuerySubheadline": "ابحث بالكلمة المفتاحية للعثور على مقالات من آلاف المصادر.",
+    "@headlineSearchEnterQuerySubheadline": {
+        "description": "عنوان فرعي للحالة الأولية لصفحة بحث العناوين"
+    },
+    "headlineSearchNoResults": "لم يتم العثور على عناوين.",
+    "@headlineSearchNoResults": {
+        "description": "عنوان عندما لا يُرجع بحث العناوين أي نتائج"
+    },
+    "headlineSearchNoResultsSubheadline": "لم نتمكن من العثور على أي عناوين تطابق بحثك. يرجى تجربة كلمات مفتاحية مختلفة.",
+    "@headlineSearchNoResultsSubheadline": {
+        "description": "عنوان فرعي عندما لا يُرجع بحث العناوين أي نتائج"
+    },
+    "accountGuestAccount": "حساب زائر",
+    "@accountGuestAccount": {
+        "description": "تسمية تشير إلى أن المستخدم زائر."
+    },
+    "accountRoleStandard": "مستخدم عادي",
+    "@accountRoleStandard": {
+        "description": "تسمية لدور المستخدم العادي."
+    },
+    "accountRolePremium": "مستخدم مميز",
+    "@accountRolePremium": {
+        "description": "تسمية لدور المستخدم المميز."
     }
 }

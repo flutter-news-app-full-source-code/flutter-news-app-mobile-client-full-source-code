@@ -28,6 +28,12 @@ class SavedHeadlinesPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            context.pop();
+          },
+        ),
         title: Text(
           l10n.accountSavedHeadlinesTile,
           style: textTheme.titleLarge,

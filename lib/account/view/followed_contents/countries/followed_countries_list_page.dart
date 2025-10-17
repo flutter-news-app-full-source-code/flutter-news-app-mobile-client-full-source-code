@@ -27,7 +27,7 @@ class FollowedCountriesListPage extends StatelessWidget {
             icon: const Icon(Icons.add_circle_outline),
             tooltip: l10n.addCountriesTooltip,
             onPressed: () {
-              context.goNamed(Routes.addCountryToFollowName);
+              context.pushNamed(Routes.addCountryToFollowName);
             },
           ),
         ],

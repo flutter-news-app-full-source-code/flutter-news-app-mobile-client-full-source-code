@@ -27,7 +27,7 @@ class FollowedTopicsListPage extends StatelessWidget {
             icon: const Icon(Icons.add_circle_outline),
             tooltip: l10n.addTopicsTooltip,
             onPressed: () {
-              context.goNamed(Routes.addTopicToFollowName);
+              context.pushNamed(Routes.addTopicToFollowName);
             },
           ),
         ],

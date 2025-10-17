@@ -27,7 +27,7 @@ class FollowedSourcesListPage extends StatelessWidget {
             icon: const Icon(Icons.add_circle_outline),
             tooltip: l10n.addSourcesTooltip,
             onPressed: () {
-              context.goNamed(Routes.addSourceToFollowName);
+              context.pushNamed(Routes.addSourceToFollowName);
             },
           ),
         ],

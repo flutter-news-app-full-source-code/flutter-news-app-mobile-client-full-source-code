@@ -37,7 +37,7 @@ class AppearanceSettingsPage extends StatelessWidget {
             title: Text(l10n.settingsAppearanceThemeSubPageTitle),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              context.goNamed(Routes.settingsAppearanceThemeName);
+              context.pushNamed(Routes.settingsAppearanceThemeName);
             },
           ),
           const Divider(indent: AppSpacing.lg, endIndent: AppSpacing.lg),
@@ -46,7 +46,7 @@ class AppearanceSettingsPage extends StatelessWidget {
             title: Text(l10n.settingsAppearanceFontSubPageTitle),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              context.goNamed(Routes.settingsAppearanceFontName);
+              context.pushNamed(Routes.settingsAppearanceFontName);
             },
           ),
         ],

@@ -2,6 +2,7 @@
 
 ## 1.4.0 - Upcoming Release
 
+- **feat**: overhauled search and account features with a new sliver-based feed UI, integrated search bar, and modal account sheet.
 - **fix(demo)**: correct data migration logic for anonymous to authenticated user transitions
 - **refactor**: improved filter page reset button to clear local selections and disable when not applicable
 - **feat**: auto-scroll to active filter chip in SavedFiltersBar

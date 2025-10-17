@@ -25,6 +25,12 @@ class SavedFiltersPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () {
+            context.pop();
+          },
+        ),
         title: Text(
           // Use the correct localization key for the page title.
           l10n.savedFiltersPageTitle,

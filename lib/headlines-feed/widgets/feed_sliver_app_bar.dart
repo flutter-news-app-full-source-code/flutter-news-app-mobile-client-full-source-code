@@ -18,9 +18,12 @@ import 'package:ui_kit/ui_kit.dart';
 /// [HeadlineSearchDelegate] and includes a user avatar that opens the
 /// [AccountSheet].
 /// {@endtemplate}
-class FeedSliverAppBar extends StatelessWidget {
+class FeedSliverAppBar extends StatelessWidget implements PreferredSizeWidget {
   /// {@macro feed_sliver_app_bar}
-  const FeedSliverAppBar({super.key});
+  const FeedSliverAppBar({required this.bottom, super.key});
+
+  /// This widget appears across the bottom of the app bar.
+  final PreferredSizeWidget bottom;
 
   @override
   Widget build(BuildContext context) {
@@ -29,13 +32,14 @@ class FeedSliverAppBar extends StatelessWidget {
 
     return SliverAppBar(
       // The app bar will remain visible at the top when scrolling.
-      pinned: true,
+      pinned: false,
       // The app bar will become visible as soon as the user scrolls up.
       floating: true,
       // The app bar will snap into view when scrolling up, even if the user
       // stops scrolling partway. This works in conjunction with `floating` to
       // create the desired scrolling effect.
       snap: true,
+      bottom: bottom,
       // The title is a custom search bar widget.
       title: GestureDetector(
         onTap: () {
@@ -90,4 +94,8 @@ class FeedSliverAppBar extends StatelessWidget {
       ),
     );
   }
+
+  @override
+  Size get preferredSize =>
+      Size.fromHeight(kToolbarHeight + (bottom.preferredSize.height));
 }

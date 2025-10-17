@@ -188,11 +188,15 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
               child: CustomScrollView(
                 controller: _scrollController,
                 slivers: [
-                  const FeedSliverAppBar(),
-                  const SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                      child: SavedFiltersBar(),
+                  const FeedSliverAppBar(
+                    bottom: PreferredSize(
+                      preferredSize: Size.fromHeight(52),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                        ),
+                        child: SavedFiltersBar(),
+                      ),
                     ),
                   ),
                   SliverPadding(

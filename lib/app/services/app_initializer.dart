@@ -235,13 +235,25 @@ class AppInitializer {
   }
 
   /// Handles the complex logic of transitioning a user from one state to
-  /// another, for example, from an anonymous user to a fully authenticated one.
+  /// another while the application is already running.
   ///
-  /// This includes triggering data migration and re-fetching all user-specific
-  /// data to reflect the new authenticated state.
+  /// This method is a critical piece of the "running app" lifecycle and is
+  /// called by the `AppBloc` in response to an authentication change. Its
+  /// primary responsibility is to ensure that the application state is correctly
+  /// primary responsibility is to ensure that the application state is correctly
+  /// and completely updated to reflect the new user's identity.
   ///
-  /// [oldUser]: The user state before the change.
-  /// [newUser]: The user state after the change.
+  /// This process involves two main steps:
+  /// 1.  **Data Migration (if applicable):** It detects if the transition is
+  ///     from an anonymous guest to a fully authenticated user. If so, it
+  ///     triggers the `DemoDataMigrationService` to move any data (like saved
+  ///     articles) from the old anonymous user ID to the new authenticated
+  ///     user ID.
+  /// 2.  **Re-fetching All User Data:** After any potential migration, it
+  ///     re-fetches all user-specific data (`UserAppSettings`,
+  ///     `UserContentPreferences`) for the `newUser`. This is crucial to
+  ///     ensure the app's state is fresh and not polluted with data from the
+  ///     previous user.
   ///
   /// Returns a [InitializationResult] which can be used by the `AppBloc` to
   /// update its state.

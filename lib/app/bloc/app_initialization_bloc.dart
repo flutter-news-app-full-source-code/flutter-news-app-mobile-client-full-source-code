@@ -71,7 +71,7 @@ class AppInitializationBloc
         AppInitializationFailed(
           InitializationFailure(
             status: AppLifeCycleStatus.criticalError,
-            error:  UnknownException(
+            error: UnknownException(
               'An unexpected error occurred during app initialization: $e',
             ),
           ),

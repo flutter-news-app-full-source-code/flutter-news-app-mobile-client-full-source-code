@@ -1,6 +1,5 @@
 part of 'app_initialization_bloc.dart';
 
-
 /// {@template app_initialization_state}
 /// Base class for all states related to the application initialization process.
 /// {@endtemplate}

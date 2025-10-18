@@ -104,7 +104,9 @@ class AppInitializer {
     // If maintenance mode is enabled, halt the entire startup process.
     if (remoteConfig.appStatus.isUnderMaintenance) {
       _logger.warning('[AppInitializer] App is under maintenance. Halting.');
-      return const InitializationFailure(status: AppLifeCycleStatus.underMaintenance);
+      return const InitializationFailure(
+        status: AppLifeCycleStatus.underMaintenance,
+      );
     }
 
     // --- Gate 3: Check for Forced Update ---
@@ -281,9 +283,7 @@ class AppInitializer {
           );
           return InitializationFailure(
             status: AppLifeCycleStatus.criticalError,
-            error: UnknownException(
-              'Failed to migrate demo user data: $e',
-            ),
+            error: UnknownException('Failed to migrate demo user data: $e'),
           );
         }
       }

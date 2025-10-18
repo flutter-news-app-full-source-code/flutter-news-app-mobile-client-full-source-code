@@ -46,27 +46,27 @@ class App extends StatelessWidget {
     required DataRepository<RemoteConfig> remoteConfigRepository,
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<UserContentPreferences>
-        userContentPreferencesRepository,
+    userContentPreferencesRepository,
     required AppEnvironment environment,
     required InlineAdCacheService inlineAdCacheService,
     required AdService adService,
     required DataRepository<LocalAd> localAdRepository,
     required GlobalKey<NavigatorState> navigatorKey,
     super.key,
-  })  : _authenticationRepository = authenticationRepository,
-        _headlinesRepository = headlinesRepository,
-        _topicsRepository = topicsRepository,
-        _countriesRepository = countriesRepository,
-        _sourcesRepository = sourcesRepository,
-        _userRepository = userRepository,
-        _remoteConfigRepository = remoteConfigRepository,
-        _userAppSettingsRepository = userAppSettingsRepository,
-        _userContentPreferencesRepository = userContentPreferencesRepository,
-        _environment = environment,
-        _adService = adService,
-        _localAdRepository = localAdRepository,
-        _navigatorKey = navigatorKey,
-        _inlineAdCacheService = inlineAdCacheService;
+  }) : _authenticationRepository = authenticationRepository,
+       _headlinesRepository = headlinesRepository,
+       _topicsRepository = topicsRepository,
+       _countriesRepository = countriesRepository,
+       _sourcesRepository = sourcesRepository,
+       _userRepository = userRepository,
+       _remoteConfigRepository = remoteConfigRepository,
+       _userAppSettingsRepository = userAppSettingsRepository,
+       _userContentPreferencesRepository = userContentPreferencesRepository,
+       _environment = environment,
+       _adService = adService,
+       _localAdRepository = localAdRepository,
+       _navigatorKey = navigatorKey,
+       _inlineAdCacheService = inlineAdCacheService;
 
   /// The initial user, pre-fetched during startup.
   final User? user;
@@ -89,7 +89,7 @@ class App extends StatelessWidget {
   final DataRepository<RemoteConfig> _remoteConfigRepository;
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
   final DataRepository<UserContentPreferences>
-      _userContentPreferencesRepository;
+  _userContentPreferencesRepository;
   final AppEnvironment _environment;
   final AdService _adService;
   final DataRepository<LocalAd> _localAdRepository;
@@ -182,8 +182,8 @@ class _AppViewState extends State<_AppView> {
     // This stream is the single source of truth for the user's auth state
     // and drives the entire app lifecycle by dispatching AppUserChanged events.
     _userSubscription = context.read<AuthRepository>().authStateChanges.listen(
-          (user) => context.read<AppBloc>().add(AppUserChanged(user)),
-        );
+      (user) => context.read<AppBloc>().add(AppUserChanged(user)),
+    );
 
     // Instantiate and initialize the AppStatusService.
     // This service monitors the app's lifecycle (e.g., resuming from

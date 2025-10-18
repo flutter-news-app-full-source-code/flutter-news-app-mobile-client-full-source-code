@@ -39,28 +39,28 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required AuthRepository authRepository,
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<UserContentPreferences>
-        userContentPreferencesRepository,
+    userContentPreferencesRepository,
     required DataRepository<User> userRepository,
-  })  : _remoteConfigRepository = remoteConfigRepository,
-        _appInitializer = appInitializer,
-        _authRepository = authRepository,
-        _userAppSettingsRepository = userAppSettingsRepository,
-        _userContentPreferencesRepository = userContentPreferencesRepository,
-        _userRepository = userRepository,
-        _logger = Logger('AppBloc'),
-        super(
-          AppState(
-            status: user == null
-                ? AppLifeCycleStatus.unauthenticated
-                : user.isGuest
-                    ? AppLifeCycleStatus.anonymous
-                    : AppLifeCycleStatus.authenticated,
-            user: user,
-            remoteConfig: remoteConfig,
-            settings: settings,
-            userContentPreferences: userContentPreferences,
-          ),
-        ) {
+  }) : _remoteConfigRepository = remoteConfigRepository,
+       _appInitializer = appInitializer,
+       _authRepository = authRepository,
+       _userAppSettingsRepository = userAppSettingsRepository,
+       _userContentPreferencesRepository = userContentPreferencesRepository,
+       _userRepository = userRepository,
+       _logger = Logger('AppBloc'),
+       super(
+         AppState(
+           status: user == null
+               ? AppLifeCycleStatus.unauthenticated
+               : user.isGuest
+               ? AppLifeCycleStatus.anonymous
+               : AppLifeCycleStatus.authenticated,
+           user: user,
+           remoteConfig: remoteConfig,
+           settings: settings,
+           userContentPreferences: userContentPreferences,
+         ),
+       ) {
     // Register event handlers for various app-level events.
     on<AppStarted>(_onAppStarted);
     on<AppUserChanged>(_onAppUserChanged);
@@ -83,7 +83,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final AuthRepository _authRepository;
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
   final DataRepository<UserContentPreferences>
-      _userContentPreferencesRepository;
+  _userContentPreferencesRepository;
   final DataRepository<User> _userRepository;
 
   /// Handles the [AppStarted] event.
@@ -164,13 +164,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // Update the state based on the result of the transition.
     switch (transitionResult) {
       case InitializationSuccess(
-          // On a successful transition, update the state with the newly
-          // fetched user data. The status is determined by the user's role
-          // (guest or standard). Any previous error state is cleared.
-          :final user,
-          :final settings,
-          :final userContentPreferences,
-        ):
+        // On a successful transition, update the state with the newly
+        // fetched user data. The status is determined by the user's role
+        // (guest or standard). Any previous error state is cleared.
+        :final user,
+        :final settings,
+        :final userContentPreferences,
+      ):
         emit(
           state.copyWith(
             status: user!.isGuest
@@ -305,8 +305,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         final restoredStatus = state.user == null
             ? AppLifeCycleStatus.unauthenticated
             : (state.user!.isGuest
-                ? AppLifeCycleStatus.anonymous
-                : AppLifeCycleStatus.authenticated);
+                  ? AppLifeCycleStatus.anonymous
+                  : AppLifeCycleStatus.authenticated);
         emit(
           state.copyWith(status: restoredStatus, remoteConfig: remoteConfig),
         );
@@ -330,7 +330,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       final now = DateTime.now();
       final currentStatus =
           originalUser.feedDecoratorStatus[event.feedDecoratorType] ??
-              const UserFeedDecoratorStatus(isCompleted: false);
+          const UserFeedDecoratorStatus(isCompleted: false);
 
       final updatedDecoratorStatus = currentStatus.copyWith(
         lastShownAt: now,
@@ -339,12 +339,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
       final newFeedDecoratorStatus =
           Map<FeedDecoratorType, UserFeedDecoratorStatus>.from(
-        originalUser.feedDecoratorStatus,
-      )..update(
-              event.feedDecoratorType,
-              (_) => updatedDecoratorStatus,
-              ifAbsent: () => updatedDecoratorStatus,
-            );
+            originalUser.feedDecoratorStatus,
+          )..update(
+            event.feedDecoratorType,
+            (_) => updatedDecoratorStatus,
+            ifAbsent: () => updatedDecoratorStatus,
+          );
 
       final updatedUser = originalUser.copyWith(
         feedDecoratorStatus: newFeedDecoratorStatus,
@@ -403,9 +403,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         s,
       );
       // If persistence fails, roll back the state to the original preferences.
-      emit(
-        state.copyWith(userContentPreferences: originalPreferences),
-      );
+      emit(state.copyWith(userContentPreferences: originalPreferences));
     }
   }
 

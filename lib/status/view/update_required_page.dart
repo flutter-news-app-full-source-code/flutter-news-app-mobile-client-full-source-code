@@ -14,18 +14,18 @@ import 'package:url_launcher/url_launcher.dart';
 class UpdateRequiredPage extends StatelessWidget {
   /// {@macro update_required_page}
   const UpdateRequiredPage({
-    required this.iosUpdateUrl,
-    required this.androidUpdateUrl,
     required this.currentAppVersion,
     required this.latestRequiredVersion,
+    this.iosUpdateUrl,
+    this.androidUpdateUrl,
     super.key,
   });
 
   /// The URL to open for iOS app updates.
-  final String iosUpdateUrl;
+  final String? iosUpdateUrl;
 
   /// The URL to open for Android app updates.
-  final String androidUpdateUrl;
+  final String? androidUpdateUrl;
 
   /// The current version of the application.
   final String? currentAppVersion;
@@ -80,12 +80,12 @@ class UpdateRequiredPage extends StatelessWidget {
               if (!kIsWeb) ...[
                 // Show platform-specific update buttons for mobile
                 if (Theme.of(context).platform == TargetPlatform.iOS &&
-                    iosUpdateUrl.isNotEmpty)
+                    (iosUpdateUrl?.isNotEmpty ?? false))
                   Padding(
                     padding: const EdgeInsets.only(bottom: AppSpacing.md),
                     child: ElevatedButton.icon(
                       onPressed: () async {
-                        final url = Uri.parse(iosUpdateUrl);
+                        final url = Uri.parse(iosUpdateUrl!);
                         if (!await launchUrl(
                           url,
                           mode: LaunchMode.externalApplication,
@@ -96,7 +96,7 @@ class UpdateRequiredPage extends StatelessWidget {
                             ..showSnackBar(
                               SnackBar(
                                 content: Text(
-                                  l10n.couldNotOpenUpdateUrl(iosUpdateUrl),
+                                  l10n.couldNotOpenUpdateUrl(iosUpdateUrl!),
                                 ),
                               ),
                             );
@@ -107,12 +107,12 @@ class UpdateRequiredPage extends StatelessWidget {
                     ),
                   ),
                 if (Theme.of(context).platform == TargetPlatform.android &&
-                    androidUpdateUrl.isNotEmpty)
+                    (androidUpdateUrl?.isNotEmpty ?? false))
                   Padding(
                     padding: const EdgeInsets.only(bottom: AppSpacing.md),
                     child: ElevatedButton.icon(
                       onPressed: () async {
-                        final url = Uri.parse(androidUpdateUrl);
+                        final url = Uri.parse(androidUpdateUrl!);
                         if (!await launchUrl(
                           url,
                           mode: LaunchMode.externalApplication,
@@ -123,7 +123,7 @@ class UpdateRequiredPage extends StatelessWidget {
                             ..showSnackBar(
                               SnackBar(
                                 content: Text(
-                                  l10n.couldNotOpenUpdateUrl(androidUpdateUrl),
+                                  l10n.couldNotOpenUpdateUrl(androidUpdateUrl!),
                                 ),
                               ),
                             );

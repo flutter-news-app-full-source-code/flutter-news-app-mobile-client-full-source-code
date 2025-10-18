@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:auth_repository/auth_repository.dart';
 import 'package:core/core.dart' hide AppStatus;
 import 'package:data_repository/data_repository.dart';
@@ -8,103 +10,98 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_ca
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_status_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_initializer_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/services/package_info_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/router.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kv_storage_service/kv_storage_service.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template app_widget}
-/// The root widget of the application.
+/// The root widget of the main application.
 ///
-/// This widget is responsible for setting up the dependency injection
-/// (RepositoryProviders and BlocProviders) for the entire application.
-/// It also orchestrates the initial application startup flow, passing
-/// pre-fetched data and services to the [AppBloc] and [_AppView].
+/// This widget is built only after a successful startup sequence, as
+/// orchestrated by [AppInitializationPage]. It is responsible for setting up
+/// the core dependency injection (RepositoryProviders and BlocProviders) for the
+/// running application. It receives all pre-fetched data from the
+/// initialization phase and uses it to create the main [AppBloc].
 /// {@endtemplate}
 class App extends StatelessWidget {
   /// {@macro app_widget}
   const App({
+    required this.user,
+    required this.remoteConfig,
+    required this.settings,
+    required this.userContentPreferences,
     required AuthRepository authenticationRepository,
     required DataRepository<Headline> headlinesRepository,
     required DataRepository<Topic> topicsRepository,
     required DataRepository<Country> countriesRepository,
     required DataRepository<Source> sourcesRepository,
+    required DataRepository<User> userRepository,
+    required DataRepository<RemoteConfig> remoteConfigRepository,
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
-    required DataRepository<RemoteConfig> remoteConfigRepository,
-    required DataRepository<User> userRepository,
-    required KVStorageService kvStorageService,
     required AppEnvironment environment,
+    required InlineAdCacheService inlineAdCacheService,
     required AdService adService,
     required DataRepository<LocalAd> localAdRepository,
     required GlobalKey<NavigatorState> navigatorKey,
-    required InlineAdCacheService inlineAdCacheService,
-    required RemoteConfig? initialRemoteConfig,
-    required HttpException? initialRemoteConfigError,
-    required PackageInfoService packageInfoService,
     super.key,
-    this.demoDataMigrationService,
-    this.demoDataInitializerService,
-    this.initialUser,
   }) : _authenticationRepository = authenticationRepository,
        _headlinesRepository = headlinesRepository,
        _topicsRepository = topicsRepository,
        _countriesRepository = countriesRepository,
        _sourcesRepository = sourcesRepository,
+       _userRepository = userRepository,
+       _remoteConfigRepository = remoteConfigRepository,
        _userAppSettingsRepository = userAppSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
-       _appConfigRepository = remoteConfigRepository,
-       _userRepository = userRepository,
-       _kvStorageService = kvStorageService,
        _environment = environment,
        _adService = adService,
        _localAdRepository = localAdRepository,
        _navigatorKey = navigatorKey,
-       _inlineAdCacheService = inlineAdCacheService,
-       _initialRemoteConfig = initialRemoteConfig,
-       _initialRemoteConfigError = initialRemoteConfigError,
-       _packageInfoService = packageInfoService;
+       _inlineAdCacheService = inlineAdCacheService;
+
+  /// The initial user, pre-fetched during startup.
+  final User? user;
+
+  /// The global remote configuration, pre-fetched during startup.
+  final RemoteConfig remoteConfig;
+
+  /// The user's settings, pre-fetched during startup.
+  final UserAppSettings? settings;
+
+  /// The user's content preferences, pre-fetched during startup.
+  final UserContentPreferences? userContentPreferences;
 
   final AuthRepository _authenticationRepository;
   final DataRepository<Headline> _headlinesRepository;
   final DataRepository<Topic> _topicsRepository;
   final DataRepository<Country> _countriesRepository;
   final DataRepository<Source> _sourcesRepository;
+  final DataRepository<User> _userRepository;
+  final DataRepository<RemoteConfig> _remoteConfigRepository;
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
-  final DataRepository<RemoteConfig> _appConfigRepository;
-  final DataRepository<User> _userRepository;
-  final KVStorageService _kvStorageService;
   final AppEnvironment _environment;
   final AdService _adService;
   final DataRepository<LocalAd> _localAdRepository;
   final GlobalKey<NavigatorState> _navigatorKey;
   final InlineAdCacheService _inlineAdCacheService;
-  final PackageInfoService _packageInfoService;
-  final DemoDataMigrationService? demoDataMigrationService;
-  final DemoDataInitializerService? demoDataInitializerService;
-  final User? initialUser;
-
-  /// The remote configuration fetched during the app's bootstrap phase.
-  /// This is used to initialize the AppBloc with the global app status.
-  final RemoteConfig? _initialRemoteConfig;
-
-  /// Any error that occurred during the initial remote config fetch.
-  final HttpException? _initialRemoteConfigError;
 
   @override
   Widget build(BuildContext context) {
+    // The MultiRepositoryProvider makes all essential repositories and services
+    // available to the entire widget tree. This is the single source for all
+    // app dependencies.
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider.value(value: _authenticationRepository),
@@ -112,160 +109,112 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _topicsRepository),
         RepositoryProvider.value(value: _countriesRepository),
         RepositoryProvider.value(value: _sourcesRepository),
+        RepositoryProvider.value(value: _adService),
+        RepositoryProvider.value(value: _userRepository),
+        RepositoryProvider.value(value: _remoteConfigRepository),
         RepositoryProvider.value(value: _userAppSettingsRepository),
         RepositoryProvider.value(value: _userContentPreferencesRepository),
-        RepositoryProvider.value(value: _appConfigRepository),
-        RepositoryProvider.value(value: _userRepository),
-        RepositoryProvider.value(value: _kvStorageService),
-        RepositoryProvider.value(value: _adService),
         RepositoryProvider.value(value: _localAdRepository),
         RepositoryProvider.value(value: _inlineAdCacheService),
-        RepositoryProvider.value(value: _packageInfoService),
+        RepositoryProvider.value(value: _environment),
+        // NOTE: The AppInitializer is provided at the root in bootstrap.dart
+        // and is accessed via context.read() in the AppBloc.
       ],
       child: MultiBlocProvider(
         providers: [
+          // The main AppBloc is created here with all the pre-fetched data.
           BlocProvider(
             create: (context) => AppBloc(
-              authenticationRepository: context.read<AuthRepository>(),
-              userAppSettingsRepository: context
-                  .read<DataRepository<UserAppSettings>>(),
-              userContentPreferencesRepository: context
-                  .read<DataRepository<UserContentPreferences>>(),
-              appConfigRepository: context.read<DataRepository<RemoteConfig>>(),
-              userRepository: context.read<DataRepository<User>>(),
-              environment: _environment,
-              demoDataMigrationService: demoDataMigrationService,
-              demoDataInitializerService: demoDataInitializerService,
-              initialUser: initialUser,
-              navigatorKey: _navigatorKey,
-              initialRemoteConfig: _initialRemoteConfig,
-              initialRemoteConfigError: _initialRemoteConfigError,
-              packageInfoService: _packageInfoService,
-            )..add(AppStarted(initialUser: initialUser)),
+              user: user,
+              remoteConfig: remoteConfig,
+              settings: settings,
+              userContentPreferences: userContentPreferences,
+              remoteConfigRepository: _remoteConfigRepository,
+              appInitializer: context.read<AppInitializer>(),
+              authRepository: context.read<AuthRepository>(),
+              userAppSettingsRepository: _userAppSettingsRepository,
+              userContentPreferencesRepository:
+                  _userContentPreferencesRepository,
+              logger: context.read<Logger>(),
+              userRepository: _userRepository,
+            )..add(const AppStarted()),
           ),
+          // The AuthenticationBloc is provided to handle auth UI events.
           BlocProvider(
             create: (context) => AuthenticationBloc(
               authenticationRepository: context.read<AuthRepository>(),
             ),
           ),
-          // Provide the InterstitialAdManager as a RepositoryProvider.
-          // It depends on the state managed by AppBloc, so it must be created
-          // after AppBloc is available.
-          RepositoryProvider(
-            create: (context) => InterstitialAdManager(
-              appBloc: context.read<AppBloc>(),
-              adService: context.read<AdService>(),
-            ),
-            // Ensure it's created immediately
-            lazy: false,
-          ),
-          // Provide the ContentLimitationService.
-          // It depends on AppBloc, so it is created here.
-          RepositoryProvider(
-            create: (context) =>
-                ContentLimitationService(appBloc: context.read<AppBloc>()),
-          ),
         ],
-        child: _AppView(
-          authenticationRepository: _authenticationRepository,
-          headlinesRepository: _headlinesRepository,
-          topicRepository: _topicsRepository,
-          countriesRepository: _countriesRepository,
-          sourcesRepository: _sourcesRepository,
-          userAppSettingsRepository: _userAppSettingsRepository,
-          userContentPreferencesRepository: _userContentPreferencesRepository,
-          appConfigRepository: _appConfigRepository,
-          userRepository: _userRepository,
-          environment: _environment,
-          adService: _adService,
-          localAdRepository: _localAdRepository,
-          navigatorKey: _navigatorKey,
-          inlineAdCacheService: _inlineAdCacheService,
-          packageInfoService: _packageInfoService,
-        ),
+        child: _AppView(environment: _environment, navigatorKey: _navigatorKey),
       ),
     );
   }
 }
 
+/// The core view of the application, which builds the UI based on the
+/// [AppBloc]'s state.
 class _AppView extends StatefulWidget {
-  const _AppView({
-    required this.authenticationRepository,
-    required this.headlinesRepository,
-    required this.topicRepository,
-    required this.countriesRepository,
-    required this.sourcesRepository,
-    required this.userAppSettingsRepository,
-    required this.userContentPreferencesRepository,
-    required this.appConfigRepository,
-    required this.userRepository,
-    required this.environment,
-    required this.adService,
-    required this.localAdRepository,
-    required this.navigatorKey,
-    required this.inlineAdCacheService,
-    required this.packageInfoService,
-  });
+  const _AppView({required this.environment, required this.navigatorKey});
 
-  final AuthRepository authenticationRepository;
-  final DataRepository<Headline> headlinesRepository;
-  final DataRepository<Topic> topicRepository;
-  final DataRepository<Country> countriesRepository;
-  final DataRepository<Source> sourcesRepository;
-  final DataRepository<UserAppSettings> userAppSettingsRepository;
-  final DataRepository<UserContentPreferences> userContentPreferencesRepository;
-  final DataRepository<RemoteConfig> appConfigRepository;
-  final DataRepository<User> userRepository;
   final AppEnvironment environment;
-  final AdService adService;
-  final DataRepository<LocalAd> localAdRepository;
   final GlobalKey<NavigatorState> navigatorKey;
-  final InlineAdCacheService inlineAdCacheService;
-  final PackageInfoService packageInfoService;
 
   @override
   State<_AppView> createState() => _AppViewState();
 }
 
 class _AppViewState extends State<_AppView> {
-  late final GoRouter _router;
   late final ValueNotifier<AppLifeCycleStatus> _statusNotifier;
+  StreamSubscription<User?>? _userSubscription;
   AppStatusService? _appStatusService;
+  InterstitialAdManager? _interstitialAdManager;
+  late final ContentLimitationService _contentLimitationService;
+  late final GoRouter _router;
   final _routerLogger = Logger('GoRouter');
 
   @override
   void initState() {
     super.initState();
     final appBloc = context.read<AppBloc>();
-    // Initialize the notifier with the BLoC's current state.
+
     // This notifier is used by GoRouter's refreshListenable to trigger
-    // route re-evaluation when the app's lifecycle status changes.
+    // route re-evaluation when the app's lifecycle status changes (e.g.,
+    // login/logout), ensuring the correct routes are accessible.
     _statusNotifier = ValueNotifier<AppLifeCycleStatus>(appBloc.state.status);
 
+    // Subscribe to the authentication repository's authStateChanges stream.
+    // This stream is the single source of truth for the user's auth state
+    // and drives the entire app lifecycle by dispatching AppUserChanged events.
+    _userSubscription = context.read<AuthRepository>().authStateChanges.listen(
+      (user) => context.read<AppBloc>().add(AppUserChanged(user)),
+    );
+
     // Instantiate and initialize the AppStatusService.
-    // This service monitors the app's lifecycle and periodically triggers
-    // remote configuration fetches via the AppBloc, ensuring the app status
-    // is always fresh (e.g., detecting maintenance mode or forced updates).
+    // This service monitors the app's lifecycle (e.g., resuming from
+    // background) and periodically triggers remote configuration fetches,
+    // ensuring the app status is always fresh.
     _appStatusService = AppStatusService(
       context: context,
       checkInterval: const Duration(minutes: 15),
       environment: widget.environment,
     );
 
+    // Create instances of services that need to be managed by this State's
+    // lifecycle. This prevents them from being re-created on every build.
+    _interstitialAdManager = InterstitialAdManager(
+      appBloc: appBloc,
+      adService: context.read<AdService>(),
+      navigatorKey: widget.navigatorKey,
+    );
+    _contentLimitationService = ContentLimitationService(
+      appBloc: context.read<AppBloc>(),
+    );
+
+    // Create the GoRouter instance once and store it.
     _router = createRouter(
       authStatusNotifier: _statusNotifier,
-      authenticationRepository: widget.authenticationRepository,
-      headlinesRepository: widget.headlinesRepository,
-      topicsRepository: widget.topicRepository,
-      countriesRepository: widget.countriesRepository,
-      sourcesRepository: widget.sourcesRepository,
-      userAppSettingsRepository: widget.userAppSettingsRepository,
-      userContentPreferencesRepository: widget.userContentPreferencesRepository,
-      remoteConfigRepository: widget.appConfigRepository,
-      userRepository: widget.userRepository,
-      adService: widget.adService,
       navigatorKey: widget.navigatorKey,
-      inlineAdCacheService: widget.inlineAdCacheService,
       logger: _routerLogger,
     );
   }
@@ -273,106 +222,39 @@ class _AppViewState extends State<_AppView> {
   @override
   void dispose() {
     _statusNotifier.dispose();
-    // Dispose the AppStatusService to cancel timers and remove observers.
+    _userSubscription?.cancel();
     _appStatusService?.dispose();
+    _interstitialAdManager?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Wrap the part of the tree that needs to react to AppBloc state changes
-    // with a BlocListener and a BlocBuilder.
+    // This BlocListener keeps GoRouter's refresh mechanism informed about
+    // authentication status changes. GoRouter's `redirect` logic depends on
+    // this notifier to re-evaluate routes when the user logs in or out
+    // *while the app is running*.
     return BlocListener<AppBloc, AppState>(
-      // The BlocListener's primary role here is to keep GoRouter's refresh
-      // mechanism informed about authentication status changes.
-      // GoRouter's `redirect` logic depends on this notifier to re-evaluate
-      // routes when the user logs in or out *while the app is running*.
       listenWhen: (previous, current) => previous.status != current.status,
       listener: (context, state) {
         _statusNotifier.value = state.status;
       },
-      // The BlocBuilder is the core of the new stable startup architecture.
-      // It functions as a "master switch" for the entire application's UI.
-      // Based on the AppStatus, it decides whether to show a full-screen
-      // status page (like Maintenance or Loading) or to build the main
-      // application UI with its nested router. This approach is fundamental
-      // to fixing the original race conditions and BuildContext instability.
+      // This BlocBuilder is the "master switch" for the entire application's
+      // UI. Based on the AppStatus, it decides whether to show a full-screen
+      // status page (like Maintenance) or to build the main application UI
+      // with its nested router. This is fundamental to the new, stable
+      // startup architecture.
       child: BlocBuilder<AppBloc, AppState>(
         builder: (context, state) {
           // --- Full-Screen Status Pages ---
           // The following states represent critical, app-wide conditions that
           // must be handled before the main router and UI are displayed.
-          // By returning a dedicated widget here, we ensure these pages are
-          // full-screen and exist outside the main app's navigation shell.
-
-          if (state.status == AppLifeCycleStatus.criticalError) {
-            return MaterialApp(
-              debugShowCheckedModeBanner: false,
-              theme: lightTheme(
-                scheme: state.flexScheme,
-                appTextScaleFactor: state.appTextScaleFactor,
-                appFontWeight: state.appFontWeight,
-                fontFamily: state.fontFamily,
-              ),
-              darkTheme: darkTheme(
-                scheme: state.flexScheme,
-                appTextScaleFactor: state.appTextScaleFactor,
-                appFontWeight: state.appFontWeight,
-                fontFamily: state.fontFamily,
-              ),
-              themeMode: state.themeMode,
-              localizationsDelegates: const [
-                ...AppLocalizations.localizationsDelegates,
-                ...UiKitLocalizations.localizationsDelegates,
-              ],
-              supportedLocales: AppLocalizations.supportedLocales,
-              locale: state.locale,
-              home: CriticalErrorPage(
-                exception:
-                    state.initialRemoteConfigError ??
-                    state.initialUserPreferencesError ??
-                    const UnknownException(
-                      'An unknown critical error occurred.',
-                    ),
-                onRetry: () {
-                  // If remote config failed, retry remote config.
-                  // If user preferences failed, retry AppStarted.
-                  if (state.initialRemoteConfigError != null) {
-                    context.read<AppBloc>().add(
-                      const AppPeriodicConfigFetchRequested(
-                        isBackgroundCheck: false,
-                      ),
-                    );
-                  } else if (state.initialUserPreferencesError != null) {
-                    context.read<AppBloc>().add(
-                      AppStarted(initialUser: state.user),
-                    );
-                  } else {
-                    // Fallback for unknown critical error
-                    context.read<AppBloc>().add(
-                      AppStarted(initialUser: state.user),
-                    );
-                  }
-                },
-              ),
-            );
-          }
 
           if (state.status == AppLifeCycleStatus.underMaintenance) {
             // The app is in maintenance mode. Show the MaintenancePage.
-            //
-            // WHY A SEPARATE MATERIALAPP?
-            // Each status page is wrapped in its own simple MaterialApp to create
-            // a self-contained environment. This provides the necessary
-            // Directionality, theme, and localization context for the page
-            // to render correctly, without needing the main app's router.
-            //
-            // WHY A DEFAULT THEME?
-            // The theme uses hardcoded, sensible defaults (like FlexScheme.material)
-            // because at this early stage, we only need a basic visual structure.
-            // However, we critically use `state.themeMode` and `state.locale`,
-            // which are loaded from user settings *before* the maintenance check,
-            // ensuring the page respects the user's chosen light/dark mode and language.
+            // Each status page is wrapped in its own simple MaterialApp to
+            // create a self-contained environment with the necessary theme
+            // and localization context to render correctly.
             return MaterialApp(
               debugShowCheckedModeBanner: false,
               theme: lightTheme(
@@ -422,9 +304,9 @@ class _AppViewState extends State<_AppView> {
               supportedLocales: AppLocalizations.supportedLocales,
               locale: state.locale,
               home: UpdateRequiredPage(
-                iosUpdateUrl: state.remoteConfig!.appStatus.iosUpdateUrl,
+                iosUpdateUrl: state.remoteConfig?.appStatus.iosUpdateUrl,
                 androidUpdateUrl:
-                    state.remoteConfig!.appStatus.androidUpdateUrl,
+                    state.remoteConfig?.appStatus.androidUpdateUrl,
                 currentAppVersion: state.currentAppVersion,
                 latestRequiredVersion: state.latestAppVersion,
               ),
@@ -432,11 +314,8 @@ class _AppViewState extends State<_AppView> {
           }
 
           // --- Loading User Data State ---
-          // --- Loading User Data State ---
-          // Display a loading screen ONLY if the app is actively trying to load
-          // user-specific data (settings or preferences) for an authenticated/anonymous user.
-          // If the status is unauthenticated, it means there's no user data to load,
-          // and the app should proceed to the router to show the authentication page.
+          // Display a loading screen ONLY if the app is actively trying to
+          // load user-specific data (e.g., after a login transition).
           if (state.status == AppLifeCycleStatus.loadingUserData) {
             return MaterialApp(
               debugShowCheckedModeBanner: false,
@@ -476,49 +355,49 @@ class _AppViewState extends State<_AppView> {
           }
 
           // --- Main Application UI ---
-          // If none of the critical states above are met, and user settings
-          // are loaded, the app is ready to display its main UI.
-          // We build the MaterialApp.router here.
-          // This is the single, STABLE root widget for the entire main app.
-          //
-          // WHY IS THIS SO IMPORTANT?
-          // Because this widget is now built conditionally inside a single
-          // BlocBuilder, it is created only ONCE when the app enters a
-          // "running" state (e.g., authenticated, anonymous) with all
-          // necessary data. It is no longer destroyed and rebuilt during
-          // startup, which was the root cause of the `BuildContext` instability
-          // and the `l10n` crashes.
-          //
-          // THEME CONFIGURATION:
-          // This MaterialApp is themed using the full, detailed settings
-          // loaded into the AppState (e.g., `state.flexScheme`,
-          // `state.settings.displaySettings...`), providing the complete,
-          // personalized user experience.
-          return MaterialApp.router(
-            debugShowCheckedModeBanner: false,
-            themeMode: state.themeMode,
-            theme: lightTheme(
-              scheme: state.flexScheme,
-              appTextScaleFactor: state.appTextScaleFactor,
-              appFontWeight: state.appFontWeight,
-              fontFamily: state.fontFamily,
-            ),
-            darkTheme: darkTheme(
-              scheme: state.flexScheme,
-              appTextScaleFactor: state.appTextScaleFactor,
-              appFontWeight: state.appFontWeight,
-              fontFamily: state.fontFamily,
-            ),
-            routerConfig: _router,
-            locale: state.locale,
-            localizationsDelegates: const [
-              ...AppLocalizations.localizationsDelegates,
-              ...UiKitLocalizations.localizationsDelegates,
+          // If none of the critical states above are met, the app is ready
+          // to display its main UI. We build the MaterialApp.router here.
+          // This is the single, STABLE root widget for the entire main app,
+          // which prevents the `BuildContext` instability and `l10n`
+          // crashes seen in the previous architecture. This MultiRepositoryProvider
+          // uses the `.value` constructor to provide the service instances that
+          // were created and are managed by this State object.
+          return MultiRepositoryProvider(
+            providers: [
+              if (_interstitialAdManager != null)
+                RepositoryProvider<InterstitialAdManager>.value(
+                  value: _interstitialAdManager!,
+                ),
+              RepositoryProvider<ContentLimitationService>.value(
+                value: _contentLimitationService,
+              ),
             ],
-            supportedLocales: const [
-              ...AppLocalizations.supportedLocales,
-              ...UiKitLocalizations.supportedLocales,
-            ],
+            child: MaterialApp.router(
+              debugShowCheckedModeBanner: false,
+              themeMode: state.themeMode,
+              theme: lightTheme(
+                scheme: state.flexScheme,
+                appTextScaleFactor: state.appTextScaleFactor,
+                appFontWeight: state.appFontWeight,
+                fontFamily: state.fontFamily,
+              ),
+              darkTheme: darkTheme(
+                scheme: state.flexScheme,
+                appTextScaleFactor: state.appTextScaleFactor,
+                appFontWeight: state.appFontWeight,
+                fontFamily: state.fontFamily,
+              ),
+              routerConfig: _router,
+              locale: state.locale,
+              localizationsDelegates: const [
+                ...AppLocalizations.localizationsDelegates,
+                ...UiKitLocalizations.localizationsDelegates,
+              ],
+              supportedLocales: const [
+                ...AppLocalizations.supportedLocales,
+                ...UiKitLocalizations.supportedLocales,
+              ],
+            ),
           );
         },
       ),

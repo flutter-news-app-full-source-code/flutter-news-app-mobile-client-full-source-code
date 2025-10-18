@@ -92,17 +92,16 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                     ) ??
                     false;
 
-                // Listen for changes in saved status or errors during persistence
+                // Listen for changes in saved status or for a new error.
                 return (wasPreviouslySaved != isCurrentlySaved) ||
-                    (current.initialUserPreferencesError != null &&
-                        previous.initialUserPreferencesError == null);
+                    (current.error != null && previous.error == null);
               }
               return false;
             },
             listener: (context, appState) {
               final detailsState = context.read<HeadlineDetailsBloc>().state;
               if (detailsState is HeadlineDetailsLoaded) {
-                if (appState.initialUserPreferencesError != null) {
+                if (appState.error != null) {
                   ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
                     ..showSnackBar(

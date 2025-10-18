@@ -109,19 +109,15 @@ Gain complete command over your application's operational state and user experie
 <details>
 <summary><strong>🏗️ Architecture & Technical Excellence</strong></summary>
 
-### 📱 Adaptive UI for All Screens
-- Built with `flutter_adaptive_scaffold`, the app offers responsive navigation and layouts that look great on both phones and tablets.
-> **↔️ Your Advantage:** Deliver a consistent and optimized UX across a wide range of devices effortlessly.
-
----
-
 ### 🏗️ Clean & Modern Architecture
 - Developed with best practices for a maintainable and scalable codebase:
-    - **Flutter & Dart:** Cutting-edge mobile development.
-    - **BLoC Pattern:** Predictable and robust state management, enhanced with `bloc_concurrency` transformers (droppable, restartable, sequential) for advanced event handling.
-    - **GoRouter:** Well-structured and powerful navigation.
-    - **KV Storage Service:** Utilizes `KVStorageService` for secure and efficient local key-value storage.
+    - **Multi-Layered Architecture:** A clear separation of concerns into a Data Layer (handling raw data retrieval), Repository Layer (abstracting data sources), and Business Logic Layer (managing state with BLoC) ensures the codebase is decoupled, testable, and easy to reason about.
+    - **Robust Startup & Lifecycle Management:** The app features a rock-solid, "gatekeeper" startup architecture. An `AppInitializationPage` and dedicated `AppInitializationBloc` orchestrate a sequential, race-condition-free startup process using an `AppInitializer` service. This guarantees all critical dependencies (Remote Config, User Settings) are loaded and validated *before* the main application UI is ever built, eliminating an entire class of complex lifecycle bugs.
+    - **Advanced State Management:** The app leverages the **BLoC pattern** for predictable state management, enhanced with `bloc_concurrency` transformers (droppable, restartable) for sophisticated UI event handling.
+    - **Dependency Injection:** Dependencies are provided throughout the app using `RepositoryProvider` and `BlocProvider`, making components highly testable and reusable.
+    - **Type-Safe, Declarative Routing:** Navigation is managed by **GoRouter**, using named routes for a well-structured and maintainable navigation system.
 > **📈 Your Advantage:** The app is built on a clean, modern architecture that's easy to understand and maintain. It's solid and built to last.
+
 
 ---
 

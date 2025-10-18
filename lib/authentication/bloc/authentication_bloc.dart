@@ -109,8 +109,9 @@ class AuthenticationBloc
     emit(state.copyWith(status: AuthenticationStatus.loading));
     try {
       await _authenticationRepository.verifySignInCode(event.email, event.code);
-      // On success, the _AuthenticationUserChanged listener will handle
-      // emitting the authenticated state.
+      // On success, the authStateChanges stream will fire. The global AppBloc
+      // listener will handle the entire post-login sequence, including data
+      // fetching and navigation. No state change is needed here.
     } on HttpException catch (e) {
       emit(state.copyWith(status: AuthenticationStatus.failure, exception: e));
     } catch (e) {
@@ -131,8 +132,9 @@ class AuthenticationBloc
     emit(state.copyWith(status: AuthenticationStatus.loading));
     try {
       await _authenticationRepository.signInAnonymously();
-      // On success, the _AuthenticationUserChanged listener will handle
-      // emitting the authenticated state.
+      // On success, the authStateChanges stream will fire. The global AppBloc
+      // listener will handle the entire post-login sequence, including data
+      // fetching and navigation. No state change is needed here.
     } on HttpException catch (e) {
       emit(state.copyWith(status: AuthenticationStatus.failure, exception: e));
     } catch (e) {

@@ -298,7 +298,7 @@ class FeedDecoratorService {
             description:
                 'Save your preferences and followed items by creating a free account.',
             ctaText: 'Get Started',
-            ctaUrl: '${Routes.authentication}/${Routes.accountLinking}',
+            ctaUrl: Routes.accountLinking,
           ),
           FeedDecoratorType.upgrade: (
             title: 'Upgrade to Premium',

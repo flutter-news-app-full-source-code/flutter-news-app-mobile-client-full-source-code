@@ -13,14 +13,10 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class CriticalErrorPage extends StatelessWidget {
   /// {@macro critical_error_page}
-  const CriticalErrorPage({
-    required this.exception,
-    required this.onRetry,
-    super.key,
-  });
+  const CriticalErrorPage({required this.onRetry, this.exception, super.key});
 
   /// The exception that caused the critical error.
-  final HttpException exception;
+  final HttpException? exception;
 
   /// A callback function to be executed when the user taps the retry button.
   final VoidCallback onRetry;
@@ -33,7 +29,9 @@ class CriticalErrorPage extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: FailureStateWidget(
-          exception: exception,
+          exception:
+              exception ??
+              const UnknownException('An unknown critical error occurred.'),
           retryButtonText: l10n.retryButtonText,
           onRetry: onRetry,
         ),

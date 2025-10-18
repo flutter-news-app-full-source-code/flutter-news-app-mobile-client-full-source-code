@@ -14,10 +14,10 @@ import 'package:url_launcher/url_launcher.dart';
 class UpdateRequiredPage extends StatelessWidget {
   /// {@macro update_required_page}
   const UpdateRequiredPage({
-    this.iosUpdateUrl,
-    this.androidUpdateUrl,
     required this.currentAppVersion,
     required this.latestRequiredVersion,
+    this.iosUpdateUrl,
+    this.androidUpdateUrl,
     super.key,
   });
 
@@ -95,8 +95,8 @@ class UpdateRequiredPage extends StatelessWidget {
                             ..hideCurrentSnackBar()
                             ..showSnackBar(
                               SnackBar(
-                                content: Text(l10n
-                                    .couldNotOpenUpdateUrl(iosUpdateUrl!)),
+                                content: Text(
+                                  l10n.couldNotOpenUpdateUrl(iosUpdateUrl!),
                                 ),
                               ),
                             );
@@ -122,8 +122,8 @@ class UpdateRequiredPage extends StatelessWidget {
                             ..hideCurrentSnackBar()
                             ..showSnackBar(
                               SnackBar(
-                                content: Text(l10n.couldNotOpenUpdateUrl(
-                                  androidUpdateUrl!,
+                                content: Text(
+                                  l10n.couldNotOpenUpdateUrl(androidUpdateUrl!),
                                 ),
                               ),
                             );

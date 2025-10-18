@@ -57,7 +57,8 @@ import 'package:logging/logging.dart';
 ///
 /// This function sets up all the routes, navigation shells, and the crucial
 /// redirect logic that governs access to different parts of the app based on
-/// the user's authentication status.
+/// the user's authentication status *after* the app has successfully
+/// initialized.
 GoRouter createRouter({
   required ValueNotifier<AppLifeCycleStatus> authStatusNotifier,
   required GlobalKey<NavigatorState> navigatorKey,
@@ -70,9 +71,9 @@ GoRouter createRouter({
     navigatorKey: navigatorKey,
     observers: [GoRouterObserver(logger: logger)],
     redirect: (BuildContext context, GoRouterState state) {
-      // The redirect logic is the gatekeeper for the entire app. It runs
+      // The redirect logic is the gatekeeper for the running app. It runs
       // before any navigation occurs and decides whether to allow the
-      // navigation, or redirect the user elsewhere.
+      // navigation or redirect the user elsewhere.
 
       // Get the current, stable lifecycle status from the AppBloc.
       final appStatus = context.read<AppBloc>().state.status;
@@ -91,20 +92,24 @@ GoRouter createRouter({
 
       // Check if the user is trying to go to any part of the auth flow.
       final isGoingToAuth = currentLocation.startsWith(authenticationPath);
-      // Check if the user is trying to go to any part of the account linking flow.
+      // Check if the user is trying to go to any part of the account linking
+      // flow.
       final isGoingToLinking = currentLocation.startsWith(accountLinkingPath);
 
       // RULE 1: If the user is unauthenticated, they can ONLY be on an
       // authentication path. If they try to go anywhere else, redirect them
       // to the main authentication page.
       if (appStatus == AppLifeCycleStatus.unauthenticated) {
-        logger.info('  Redirect: User is unauthenticated.');
+        logger.info(
+          '  Redirect Rule 1: User is unauthenticated. '
+          'Targeting auth path: $isGoingToAuth.',
+        );
         return isGoingToAuth ? null : authenticationPath;
       }
 
       // RULE 2: If the user is anonymous (guest)...
       if (appStatus == AppLifeCycleStatus.anonymous) {
-        logger.info('  Redirect: User is anonymous.');
+        logger.info('  Redirect Rule 2: User is anonymous.');
         // ...and they try to go to the main authentication page, redirect
         // them to the feed. They should use the account linking flow instead.
         if (isGoingToAuth) {
@@ -115,7 +120,7 @@ GoRouter createRouter({
         }
         // ...and they are at the root, send them to the feed.
         if (currentLocation == rootPath) {
-          logger.info('    Action: User at root. Redirecting to feed.');
+          logger.info('    Action: Anonymous user at root. Redirecting to feed.');
           return feedPath;
         }
         // Otherwise, allow navigation (e.g., to account linking).
@@ -124,18 +129,19 @@ GoRouter createRouter({
 
       // RULE 3: If the user is fully authenticated...
       if (appStatus == AppLifeCycleStatus.authenticated) {
-        logger.info('  Redirect: User is authenticated.');
+        logger.info('  Redirect Rule 3: User is authenticated.');
         // ...and they try to go to any authentication or account linking page,
         // redirect them to the feed. They are already logged in.
         if (isGoingToAuth || isGoingToLinking) {
           logger.info(
-            '    Action: Authenticated user on auth/linking path. Redirecting to feed.',
+            '    Action: Authenticated user on auth/linking path. '
+            'Redirecting to feed.',
           );
           return feedPath;
         }
         // ...and they are at the root, send them to the feed.
         if (currentLocation == rootPath) {
-          logger.info('    Action: User at root. Redirecting to feed.');
+          logger.info('    Action: Authenticated user at root. Redirecting to feed.');
           return feedPath;
         }
       }
@@ -215,8 +221,8 @@ GoRouter createRouter({
         pageBuilder: (context, state) =>
             const MaterialPage(fullscreenDialog: true, child: AccountPage()),
         routes: [
-          // The settings section within the account modal. It uses a ShellRoute
-          // to provide a SettingsBloc to all its children.
+          // The settings section within the account modal. It uses a
+          // ShellRoute to provide a SettingsBloc to all its children.
           ShellRoute(
             builder: (BuildContext context, GoRouterState state, Widget child) {
               final appBloc = context.read<AppBloc>();
@@ -225,8 +231,8 @@ GoRouter createRouter({
               return BlocProvider<SettingsBloc>(
                 create: (context) {
                   final settingsBloc = SettingsBloc(
-                    userAppSettingsRepository: context
-                        .read<DataRepository<UserAppSettings>>(),
+                    userAppSettingsRepository:
+                        context.read<DataRepository<UserAppSettings>>(),
                     inlineAdCacheService: context.read<InlineAdCacheService>(),
                   );
                   if (userId != null) {
@@ -343,14 +349,14 @@ GoRouter createRouter({
                     providers: [
                       BlocProvider(
                         create: (context) => HeadlineDetailsBloc(
-                          headlinesRepository: context
-                              .read<DataRepository<Headline>>(),
+                          headlinesRepository:
+                              context.read<DataRepository<Headline>>(),
                         ),
                       ),
                       BlocProvider(
                         create: (context) => SimilarHeadlinesBloc(
-                          headlinesRepository: context
-                              .read<DataRepository<Headline>>(),
+                          headlinesRepository:
+                              context.read<DataRepository<Headline>>(),
                         ),
                       ),
                     ],
@@ -400,29 +406,24 @@ GoRouter createRouter({
           return MultiBlocProvider(
             providers: [
               BlocProvider(
-                create: (context) =>
-                    EntityDetailsBloc(
-                      headlinesRepository: context
-                          .read<DataRepository<Headline>>(),
-                      topicRepository: context.read<DataRepository<Topic>>(),
-                      sourceRepository: context.read<DataRepository<Source>>(),
-                      countryRepository: context
-                          .read<DataRepository<Country>>(),
-                      appBloc: context.read<AppBloc>(),
-                      feedDecoratorService: FeedDecoratorService(
-                        topicsRepository: context.read<DataRepository<Topic>>(),
-                        sourcesRepository: context
-                            .read<DataRepository<Source>>(),
-                      ),
-                      inlineAdCacheService: context
-                          .read<InlineAdCacheService>(),
-                    )..add(
-                      EntityDetailsLoadRequested(
-                        entityId: args.entityId,
-                        contentType: args.contentType,
-                        adThemeStyle: adThemeStyle,
-                      ),
+                create: (context) => EntityDetailsBloc(
+                  headlinesRepository: context.read<DataRepository<Headline>>(),
+                  topicRepository: context.read<DataRepository<Topic>>(),
+                  sourceRepository: context.read<DataRepository<Source>>(),
+                  countryRepository: context.read<DataRepository<Country>>(),
+                  appBloc: context.read<AppBloc>(),
+                  feedDecoratorService: FeedDecoratorService(
+                    topicsRepository: context.read<DataRepository<Topic>>(),
+                    sourcesRepository: context.read<DataRepository<Source>>(),
+                  ),
+                  inlineAdCacheService: context.read<InlineAdCacheService>(),
+                )..add(
+                    EntityDetailsLoadRequested(
+                      entityId: args.entityId,
+                      contentType: args.contentType,
+                      adThemeStyle: adThemeStyle,
                     ),
+                  ),
               ),
             ],
             child: EntityDetailsPage(args: args),
@@ -465,8 +466,7 @@ GoRouter createRouter({
           final allItems = extra['allItems'] as List<dynamic>? ?? [];
           final initialSelectedItems =
               extra['initialSelectedItems'] as Set<dynamic>? ?? {};
-          final itemBuilder =
-              extra['itemBuilder'] as Function? ??
+          final itemBuilder = extra['itemBuilder'] as Function? ??
               (dynamic item) => item.toString();
 
           return MultiSelectSearchPage<dynamic>(
@@ -495,16 +495,16 @@ GoRouter createRouter({
                   create: (context) {
                     final appBloc = context.read<AppBloc>();
                     return HeadlinesFeedBloc(
-                      headlinesRepository: context
-                          .read<DataRepository<Headline>>(),
+                      headlinesRepository:
+                          context.read<DataRepository<Headline>>(),
                       feedDecoratorService: FeedDecoratorService(
                         topicsRepository: context.read<DataRepository<Topic>>(),
-                        sourcesRepository: context
-                            .read<DataRepository<Source>>(),
+                        sourcesRepository:
+                            context.read<DataRepository<Source>>(),
                       ),
                       appBloc: appBloc,
-                      inlineAdCacheService: context
-                          .read<InlineAdCacheService>(),
+                      inlineAdCacheService:
+                          context.read<InlineAdCacheService>(),
                       initialUserContentPreferences:
                           appBloc.state.userContentPreferences,
                     );
@@ -524,14 +524,14 @@ GoRouter createRouter({
                         providers: [
                           BlocProvider(
                             create: (context) => HeadlineDetailsBloc(
-                              headlinesRepository: context
-                                  .read<DataRepository<Headline>>(),
+                              headlinesRepository:
+                                  context.read<DataRepository<Headline>>(),
                             ),
                           ),
                           BlocProvider(
                             create: (context) => SimilarHeadlinesBloc(
-                              headlinesRepository: context
-                                  .read<DataRepository<Headline>>(),
+                              headlinesRepository:
+                                  context.read<DataRepository<Headline>>(),
                             ),
                           ),
                         ],
@@ -593,17 +593,16 @@ GoRouter createRouter({
                               final allCountries =
                                   extra['allCountries'] as List<Country>? ?? [];
                               final allSourceTypes =
-                                  extra['allSourceTypes']
-                                      as List<SourceType>? ??
-                                  [];
-                              final initialSelectedHeadquarterCountries =
-                                  extra['initialSelectedHeadquarterCountries']
-                                      as Set<Country>? ??
+                                  extra['allSourceTypes'] as List<SourceType>? ??
+                                      [];
+                              final initialSelectedHeadquarterCountries = extra[
+                                      'initialSelectedHeadquarterCountries']
+                                  as Set<Country>? ??
                                   {};
                               final initialSelectedSourceTypes =
                                   extra['initialSelectedSourceTypes']
                                       as Set<SourceType>? ??
-                                  {};
+                                      {};
 
                               return SourceListFilterPage(
                                 allCountries: allCountries,

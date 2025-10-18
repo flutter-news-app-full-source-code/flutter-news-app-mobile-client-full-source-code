@@ -3,11 +3,10 @@ import 'package:core/core.dart' hide AppStatus;
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_status_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_initializer_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
@@ -17,7 +16,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localiz
 import 'package:flutter_news_app_mobile_client_full_source_code/router/router.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
-import 'package:go_router/go_router.dart';
 import 'package:kv_storage_service/kv_storage_service.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -33,75 +31,63 @@ import 'package:ui_kit/ui_kit.dart';
 class App extends StatelessWidget {
   /// {@macro app_widget}
   const App({
+    required InitializationResult initializationResult,
     required AuthRepository authenticationRepository,
     required DataRepository<Headline> headlinesRepository,
     required DataRepository<Topic> topicsRepository,
     required DataRepository<Country> countriesRepository,
     required DataRepository<Source> sourcesRepository,
-    required DataRepository<UserAppSettings> userAppSettingsRepository,
+    required DataRepository<UserAppSettings>
+    userAppSettingsRepository, // Will be removed
     required DataRepository<UserContentPreferences>
-    userContentPreferencesRepository,
-    required DataRepository<RemoteConfig> remoteConfigRepository,
-    required DataRepository<User> userRepository,
-    required KVStorageService kvStorageService,
-    required AppEnvironment environment,
+    userContentPreferencesRepository, // Will be removed
+    required DataRepository<RemoteConfig>
+    remoteConfigRepository, // Will be removed
+    required DataRepository<User> userRepository, // Will be removed
+    required KVStorageService kvStorageService, // Will be removed
+    required AppEnvironment environment, // Will be removed
+    required InlineAdCacheService inlineAdCacheService,
     required AdService adService,
     required DataRepository<LocalAd> localAdRepository,
     required GlobalKey<NavigatorState> navigatorKey,
-    required InlineAdCacheService inlineAdCacheService,
-    required RemoteConfig? initialRemoteConfig,
-    required HttpException? initialRemoteConfigError,
-    required PackageInfoService packageInfoService,
     super.key,
-    this.demoDataMigrationService,
-    this.demoDataInitializerService,
-    this.initialUser,
-  }) : _authenticationRepository = authenticationRepository,
+  }) : _initializationResult = initializationResult,
+       _authenticationRepository = authenticationRepository,
        _headlinesRepository = headlinesRepository,
        _topicsRepository = topicsRepository,
        _countriesRepository = countriesRepository,
        _sourcesRepository = sourcesRepository,
-       _userAppSettingsRepository = userAppSettingsRepository,
-       _userContentPreferencesRepository = userContentPreferencesRepository,
-       _appConfigRepository = remoteConfigRepository,
-       _userRepository = userRepository,
-       _kvStorageService = kvStorageService,
-       _environment = environment,
+       _userAppSettingsRepository =
+           userAppSettingsRepository, // Will be removed
+       _userContentPreferencesRepository =
+           userContentPreferencesRepository, // Will be removed
+       _appConfigRepository = remoteConfigRepository, // Will be removed
+       _userRepository = userRepository, // Will be removed
+       _kvStorageService = kvStorageService, // Will be removed
+       _environment = environment, // Will be removed
        _adService = adService,
        _localAdRepository = localAdRepository,
        _navigatorKey = navigatorKey,
-       _inlineAdCacheService = inlineAdCacheService,
-       _initialRemoteConfig = initialRemoteConfig,
-       _initialRemoteConfigError = initialRemoteConfigError,
-       _packageInfoService = packageInfoService;
+       _inlineAdCacheService = inlineAdCacheService; // Will be removed
 
+  final InitializationResult _initializationResult;
   final AuthRepository _authenticationRepository;
   final DataRepository<Headline> _headlinesRepository;
   final DataRepository<Topic> _topicsRepository;
   final DataRepository<Country> _countriesRepository;
   final DataRepository<Source> _sourcesRepository;
-  final DataRepository<UserAppSettings> _userAppSettingsRepository;
+  final DataRepository<UserAppSettings>
+  _userAppSettingsRepository; // Will be removed
   final DataRepository<UserContentPreferences>
-  _userContentPreferencesRepository;
-  final DataRepository<RemoteConfig> _appConfigRepository;
-  final DataRepository<User> _userRepository;
-  final KVStorageService _kvStorageService;
-  final AppEnvironment _environment;
+  _userContentPreferencesRepository; // Will be removed
+  final DataRepository<RemoteConfig> _appConfigRepository; // Will be removed
+  final DataRepository<User> _userRepository; // Will be removed
+  final KVStorageService _kvStorageService; // Will be removed
+  final AppEnvironment _environment; // Will be removed
   final AdService _adService;
   final DataRepository<LocalAd> _localAdRepository;
   final GlobalKey<NavigatorState> _navigatorKey;
-  final InlineAdCacheService _inlineAdCacheService;
-  final PackageInfoService _packageInfoService;
-  final DemoDataMigrationService? demoDataMigrationService;
-  final DemoDataInitializerService? demoDataInitializerService;
-  final User? initialUser;
-
-  /// The remote configuration fetched during the app's bootstrap phase.
-  /// This is used to initialize the AppBloc with the global app status.
-  final RemoteConfig? _initialRemoteConfig;
-
-  /// Any error that occurred during the initial remote config fetch.
-  final HttpException? _initialRemoteConfigError;
+  final InlineAdCacheService _inlineAdCacheService; // Will be removed
 
   @override
   Widget build(BuildContext context) {
@@ -112,36 +98,30 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _topicsRepository),
         RepositoryProvider.value(value: _countriesRepository),
         RepositoryProvider.value(value: _sourcesRepository),
-        RepositoryProvider.value(value: _userAppSettingsRepository),
-        RepositoryProvider.value(value: _userContentPreferencesRepository),
-        RepositoryProvider.value(value: _appConfigRepository),
-        RepositoryProvider.value(value: _userRepository),
-        RepositoryProvider.value(value: _kvStorageService),
+        RepositoryProvider.value(
+          value: _userAppSettingsRepository,
+        ), // Will be removed
+        RepositoryProvider.value(
+          value: _userContentPreferencesRepository,
+        ), // Will be removed
+        RepositoryProvider.value(
+          value: _appConfigRepository,
+        ), // Will be removed
+        RepositoryProvider.value(value: _userRepository), // Will be removed
+        RepositoryProvider.value(value: _kvStorageService), // Will be removed
         RepositoryProvider.value(value: _adService),
         RepositoryProvider.value(value: _localAdRepository),
-        RepositoryProvider.value(value: _inlineAdCacheService),
-        RepositoryProvider.value(value: _packageInfoService),
+        RepositoryProvider.value(
+          value: _inlineAdCacheService,
+        ), // Will be removed
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
             create: (context) => AppBloc(
-              authenticationRepository: context.read<AuthRepository>(),
-              userAppSettingsRepository: context
-                  .read<DataRepository<UserAppSettings>>(),
-              userContentPreferencesRepository: context
-                  .read<DataRepository<UserContentPreferences>>(),
-              appConfigRepository: context.read<DataRepository<RemoteConfig>>(),
-              userRepository: context.read<DataRepository<User>>(),
-              environment: _environment,
-              demoDataMigrationService: demoDataMigrationService,
-              demoDataInitializerService: demoDataInitializerService,
-              initialUser: initialUser,
+              initializationResult: _initializationResult,
               navigatorKey: _navigatorKey,
-              initialRemoteConfig: _initialRemoteConfig,
-              initialRemoteConfigError: _initialRemoteConfigError,
-              packageInfoService: _packageInfoService,
-            )..add(AppStarted(initialUser: initialUser)),
+            )..add(const AppStarted()),
           ),
           BlocProvider(
             create: (context) => AuthenticationBloc(
@@ -170,18 +150,18 @@ class App extends StatelessWidget {
           authenticationRepository: _authenticationRepository,
           headlinesRepository: _headlinesRepository,
           topicRepository: _topicsRepository,
-          countriesRepository: _countriesRepository,
-          sourcesRepository: _sourcesRepository,
-          userAppSettingsRepository: _userAppSettingsRepository,
-          userContentPreferencesRepository: _userContentPreferencesRepository,
-          appConfigRepository: _appConfigRepository,
-          userRepository: _userRepository,
-          environment: _environment,
+          countriesRepository: _countriesRepository, // Will be removed
+          sourcesRepository: _sourcesRepository, // Will be removed
+          userAppSettingsRepository:
+              _userAppSettingsRepository, // Will be removed
+          userContentPreferencesRepository:
+              _userContentPreferencesRepository, // Will be removed
+          appConfigRepository: _appConfigRepository, // Will be removed
+          userRepository: _userRepository, // Will be removed
+          environment: _environment, // Will be removed
           adService: _adService,
           localAdRepository: _localAdRepository,
           navigatorKey: _navigatorKey,
-          inlineAdCacheService: _inlineAdCacheService,
-          packageInfoService: _packageInfoService,
         ),
       ),
     );
@@ -193,42 +173,39 @@ class _AppView extends StatefulWidget {
     required this.authenticationRepository,
     required this.headlinesRepository,
     required this.topicRepository,
-    required this.countriesRepository,
-    required this.sourcesRepository,
-    required this.userAppSettingsRepository,
-    required this.userContentPreferencesRepository,
-    required this.appConfigRepository,
-    required this.userRepository,
-    required this.environment,
+    required this.countriesRepository, // Will be removed
+    required this.sourcesRepository, // Will be removed
+    required this.userAppSettingsRepository, // Will be removed
+    required this.userContentPreferencesRepository, // Will be removed
+    required this.appConfigRepository, // Will be removed
+    required this.userRepository, // Will be removed
+    required this.environment, // Will be removed
     required this.adService,
     required this.localAdRepository,
     required this.navigatorKey,
-    required this.inlineAdCacheService,
-    required this.packageInfoService,
   });
 
   final AuthRepository authenticationRepository;
   final DataRepository<Headline> headlinesRepository;
   final DataRepository<Topic> topicRepository;
-  final DataRepository<Country> countriesRepository;
-  final DataRepository<Source> sourcesRepository;
-  final DataRepository<UserAppSettings> userAppSettingsRepository;
-  final DataRepository<UserContentPreferences> userContentPreferencesRepository;
-  final DataRepository<RemoteConfig> appConfigRepository;
-  final DataRepository<User> userRepository;
-  final AppEnvironment environment;
+  final DataRepository<Country> countriesRepository; // Will be removed
+  final DataRepository<Source> sourcesRepository; // Will be removed
+  final DataRepository<UserAppSettings>
+  userAppSettingsRepository; // Will be removed
+  final DataRepository<UserContentPreferences>
+  userContentPreferencesRepository; // Will be removed
+  final DataRepository<RemoteConfig> appConfigRepository; // Will be removed
+  final DataRepository<User> userRepository; // Will be removed
+  final AppEnvironment environment; // Will be removed
   final AdService adService;
   final DataRepository<LocalAd> localAdRepository;
   final GlobalKey<NavigatorState> navigatorKey;
-  final InlineAdCacheService inlineAdCacheService;
-  final PackageInfoService packageInfoService;
 
   @override
   State<_AppView> createState() => _AppViewState();
 }
 
 class _AppViewState extends State<_AppView> {
-  late final GoRouter _router;
   late final ValueNotifier<AppLifeCycleStatus> _statusNotifier;
   AppStatusService? _appStatusService;
   final _routerLogger = Logger('GoRouter');
@@ -250,23 +227,6 @@ class _AppViewState extends State<_AppView> {
       context: context,
       checkInterval: const Duration(minutes: 15),
       environment: widget.environment,
-    );
-
-    _router = createRouter(
-      authStatusNotifier: _statusNotifier,
-      authenticationRepository: widget.authenticationRepository,
-      headlinesRepository: widget.headlinesRepository,
-      topicsRepository: widget.topicRepository,
-      countriesRepository: widget.countriesRepository,
-      sourcesRepository: widget.sourcesRepository,
-      userAppSettingsRepository: widget.userAppSettingsRepository,
-      userContentPreferencesRepository: widget.userContentPreferencesRepository,
-      remoteConfigRepository: widget.appConfigRepository,
-      userRepository: widget.userRepository,
-      adService: widget.adService,
-      navigatorKey: widget.navigatorKey,
-      inlineAdCacheService: widget.inlineAdCacheService,
-      logger: _routerLogger,
     );
   }
 
@@ -329,30 +289,14 @@ class _AppViewState extends State<_AppView> {
               locale: state.locale,
               home: CriticalErrorPage(
                 exception:
-                    state.initialRemoteConfigError ??
-                    state.initialUserPreferencesError ??
+                    state.error ?? // This will be fixed in the next step
                     const UnknownException(
                       'An unknown critical error occurred.',
                     ),
                 onRetry: () {
-                  // If remote config failed, retry remote config.
-                  // If user preferences failed, retry AppStarted.
-                  if (state.initialRemoteConfigError != null) {
-                    context.read<AppBloc>().add(
-                      const AppPeriodicConfigFetchRequested(
-                        isBackgroundCheck: false,
-                      ),
-                    );
-                  } else if (state.initialUserPreferencesError != null) {
-                    context.read<AppBloc>().add(
-                      AppStarted(initialUser: state.user),
-                    );
-                  } else {
-                    // Fallback for unknown critical error
-                    context.read<AppBloc>().add(
-                      AppStarted(initialUser: state.user),
-                    );
-                  }
+                  // Retrying a critical error requires a full app restart.
+                  // For now, we can just re-trigger the AppStarted event.
+                  context.read<AppBloc>().add(const AppStarted());
                 },
               ),
             );
@@ -509,7 +453,17 @@ class _AppViewState extends State<_AppView> {
               appFontWeight: state.appFontWeight,
               fontFamily: state.fontFamily,
             ),
-            routerConfig: _router,
+            routerConfig: createRouter(
+              authStatusNotifier: _statusNotifier,
+              authenticationRepository: widget.authenticationRepository,
+              headlinesRepository: widget.headlinesRepository,
+              topicsRepository: widget.topicRepository,
+              countriesRepository: widget.countriesRepository,
+              sourcesRepository: widget.sourcesRepository,
+              adService: widget.adService,
+              navigatorKey: widget.navigatorKey,
+              logger: _routerLogger,
+            ),
             locale: state.locale,
             localizationsDelegates: const [
               ...AppLocalizations.localizationsDelegates,

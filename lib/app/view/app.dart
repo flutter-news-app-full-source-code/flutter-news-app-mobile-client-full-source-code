@@ -42,18 +42,18 @@ class App extends StatelessWidget {
     required DataRepository<LocalAd> localAdRepository,
     required GlobalKey<NavigatorState> navigatorKey,
     super.key,
-  })  : _initializationResult = initializationResult,
-        _authenticationRepository = authenticationRepository,
-        _headlinesRepository = headlinesRepository,
-        _topicsRepository = topicsRepository,
-        _countriesRepository = countriesRepository,
-        _sourcesRepository = sourcesRepository,
-        _userRepository = userRepository,
-        _environment = environment,
-        _adService = adService,
-        _localAdRepository = localAdRepository,
-        _navigatorKey = navigatorKey,
-        _inlineAdCacheService = inlineAdCacheService;
+  }) : _initializationResult = initializationResult,
+       _authenticationRepository = authenticationRepository,
+       _headlinesRepository = headlinesRepository,
+       _topicsRepository = topicsRepository,
+       _countriesRepository = countriesRepository,
+       _sourcesRepository = sourcesRepository,
+       _userRepository = userRepository,
+       _environment = environment,
+       _adService = adService,
+       _localAdRepository = localAdRepository,
+       _navigatorKey = navigatorKey,
+       _inlineAdCacheService = inlineAdCacheService;
 
   final InitializationResult _initializationResult;
   final AuthRepository _authenticationRepository;
@@ -277,9 +277,9 @@ class _AppViewState extends State<_AppView> {
               supportedLocales: AppLocalizations.supportedLocales,
               locale: state.locale,
               home: UpdateRequiredPage(
-                iosUpdateUrl: state.remoteConfig!.appStatus.iosUpdateUrl,
+                iosUpdateUrl: state.remoteConfig?.appStatus.iosUpdateUrl,
                 androidUpdateUrl:
-                    state.remoteConfig!.appStatus.androidUpdateUrl,
+                    state.remoteConfig?.appStatus.androidUpdateUrl,
                 currentAppVersion: state.currentAppVersion,
                 latestRequiredVersion: state.latestAppVersion,
               ),
@@ -369,9 +369,8 @@ class _AppViewState extends State<_AppView> {
               // Provide the ContentLimitationService.
               // It also depends on AppBloc's state.
               RepositoryProvider(
-                create: (context) => ContentLimitationService(
-                  appBloc: context.read<AppBloc>(),
-                ),
+                create: (context) =>
+                    ContentLimitationService(appBloc: context.read<AppBloc>()),
               ),
             ],
             child: MaterialApp.router(

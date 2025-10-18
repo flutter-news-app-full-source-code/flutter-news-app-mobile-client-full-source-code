@@ -483,23 +483,28 @@ Future<Widget> bootstrap(
       '--- Bootstrap Process Complete. '
       'Returning AppInitializationPage widget. ---',
     );
-  return AppInitializationPage(
-    // All repositories and services are passed to the initialization page,
-    // which will then pass them to the main App widget upon successful
-    // initialization.
-    authenticationRepository: authenticationRepository,
-    headlinesRepository: headlinesRepository,
-    topicsRepository: topicsRepository,
-    userRepository: userRepository,
-    countriesRepository: countriesRepository,
-    sourcesRepository: sourcesRepository,
-    remoteConfigRepository: remoteConfigRepository,
-    userAppSettingsRepository: userAppSettingsRepository,
-    userContentPreferencesRepository: userContentPreferencesRepository,
-    environment: environment,
-    adService: adService,
-    inlineAdCacheService: inlineAdCacheService,
-    localAdRepository: localAdRepository,
-    navigatorKey: navigatorKey,
+  // Provide the AppInitializer at the root so it can be accessed by the
+  // AppInitializationBloc within AppInitializationPage.
+  return RepositoryProvider.value(
+    value: appInitializer,
+    child: AppInitializationPage(
+      // All repositories and services are passed to the initialization page,
+      // which will then pass them to the main App widget upon successful
+      // initialization.
+      authenticationRepository: authenticationRepository,
+      headlinesRepository: headlinesRepository,
+      topicsRepository: topicsRepository,
+      userRepository: userRepository,
+      countriesRepository: countriesRepository,
+      sourcesRepository: sourcesRepository,
+      remoteConfigRepository: remoteConfigRepository,
+      userAppSettingsRepository: userAppSettingsRepository,
+      userContentPreferencesRepository: userContentPreferencesRepository,
+      environment: environment,
+      adService: adService,
+      inlineAdCacheService: inlineAdCacheService,
+      localAdRepository: localAdRepository,
+      navigatorKey: navigatorKey,
+    ),
   );
 }

@@ -63,9 +63,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppUserContentPreferencesRefreshed>(_onUserContentPreferencesRefreshed);
     on<AppSettingsChanged>(_onAppSettingsChanged);
     on<AppPeriodicConfigFetchRequested>(_onAppPeriodicConfigFetchRequested);
-    on<AppVersionCheckRequested>(_onAppVersionCheckRequested);
-    on<AppUserFeedDecoratorShown>(_onAppUserFeedDecoratorShown);
-    on<AppUserContentPreferencesChanged>(_onAppUserContentPreferencesChanged);
     on<SavedFilterAdded>(_onSavedFilterAdded);
     on<SavedFilterUpdated>(_onSavedFilterUpdated);
     on<SavedFilterDeleted>(_onSavedFilterDeleted);
@@ -129,24 +126,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       return;
     }
 
-    // If the user is null, it's a logout.
-    if (newUser != null) {
-      // handles its own data fetching after creating fixture data.
-      _logger.info(
-        '[AppBloc] User logged out. Transitioning to unauthenticated.',
-      );
-      emit(
-        state.copyWith(
-          status: AppLifeCycleStatus.unauthenticated,
-          user: null,
-          settings: null,
-          userContentPreferences: null,
-        ),
-      );
-      return;
-    }
-
-    // A user is present, so we are either logging in or transitioning roles.
+    // A user is present, so we are logging in or transitioning roles.
     // Show a loading screen while we handle this process.
     emit(state.copyWith(status: AppLifeCycleStatus.loadingUserData));
 
@@ -285,26 +265,58 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   /// Handles periodic fetching of the remote application configuration.
   ///
-  /// This method is primarily used for re-fetching the remote configuration
-  /// (e.g., by [AppStatusService] for background checks or by [StatusPage]
-  /// for retries). The initial remote configuration is fetched during bootstrap.
+  /// This is triggered by [AppStatusService] when the app is resumed or on a
+  /// timer. It performs a silent background check for critical status changes
+  /// like maintenance mode.
   Future<void> _onAppPeriodicConfigFetchRequested(
     AppPeriodicConfigFetchRequested event,
     Emitter<AppState> emit,
   ) async {
-    // This logic is now handled by AppStatusService and AppInitializer.
-    // This event handler is kept for backward compatibility but is a no-op.
-    _logger.fine('[AppBloc] AppPeriodicConfigFetchRequested is now a no-op.');
-  }
+    _logger.fine('[AppBloc] Periodic remote config fetch requested.');
+    try {
+      final remoteConfig = await _navigatorKey.currentContext!
+          .read<DataRepository<RemoteConfig>>()
+          .read(id: kRemoteConfigId);
 
-  /// Handles the [AppVersionCheckRequested] event to enforce app version updates.
-  Future<void> _onAppVersionCheckRequested(
-    AppVersionCheckRequested event,
-    Emitter<AppState> emit,
-  ) async {
-    // This logic is now handled by AppInitializer during startup.
-    // This event handler is kept for backward compatibility but is a no-op.
-    _logger.fine('[AppBloc] AppVersionCheckRequested is now a no-op.');
+      // If the app is now under maintenance, immediately update the state.
+      if (remoteConfig.appStatus.isUnderMaintenance) {
+        _logger.warning(
+          '[AppBloc] Maintenance mode detected during periodic check. '
+          'Updating status.',
+        );
+        emit(
+          state.copyWith(
+            status: AppLifeCycleStatus.underMaintenance,
+            remoteConfig: remoteConfig,
+          ),
+        );
+        return;
+      }
+
+      // If the app was previously in maintenance and is now not, restore
+      // the correct status based on the user.
+      if (state.status == AppLifeCycleStatus.underMaintenance &&
+          !remoteConfig.appStatus.isUnderMaintenance) {
+        _logger.info(
+          '[AppBloc] Maintenance mode lifted. Restoring previous status.',
+        );
+        final restoredStatus = state.user == null
+            ? AppLifeCycleStatus.unauthenticated
+            : (state.user!.isGuest
+                  ? AppLifeCycleStatus.anonymous
+                  : AppLifeCycleStatus.authenticated);
+        emit(
+          state.copyWith(status: restoredStatus, remoteConfig: remoteConfig),
+        );
+      }
+    } catch (e, s) {
+      // Fail silently on background checks.
+      _logger.warning(
+        '[AppBloc] Failed to fetch remote config during periodic check.',
+        e,
+        s,
+      );
+    }
   }
 
   /// Handles updating the user's feed decorator status.

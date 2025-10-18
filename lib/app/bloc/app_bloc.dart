@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:auth_repository/auth_repository.dart';
-import 'package:bloc/bloc.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
@@ -63,6 +62,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppUserContentPreferencesRefreshed>(_onUserContentPreferencesRefreshed);
     on<AppSettingsChanged>(_onAppSettingsChanged);
     on<AppPeriodicConfigFetchRequested>(_onAppPeriodicConfigFetchRequested);
+    on<AppUserFeedDecoratorShown>(_onAppUserFeedDecoratorShown);
+    on<AppUserContentPreferencesChanged>(_onAppUserContentPreferencesChanged);
     on<SavedFilterAdded>(_onSavedFilterAdded);
     on<SavedFilterUpdated>(_onSavedFilterUpdated);
     on<SavedFilterDeleted>(_onSavedFilterDeleted);
@@ -126,6 +127,22 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       return;
     }
 
+    // If the user is null, it's a logout.
+    if (newUser == null) {
+      _logger.info(
+        '[AppBloc] User logged out. Transitioning to unauthenticated.',
+      );
+      emit(
+        state.copyWith(
+          status: AppLifeCycleStatus.unauthenticated,
+          user: null,
+          settings: null,
+          userContentPreferences: null,
+        ),
+      );
+      return;
+    }
+
     // A user is present, so we are logging in or transitioning roles.
     // Show a loading screen while we handle this process.
     emit(state.copyWith(status: AppLifeCycleStatus.loadingUserData));
@@ -135,7 +152,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         .read<AppInitializer>()
         .handleUserTransition(
           oldUser: oldUser,
-          newUser: newUser,
+          newUser: newUser, // This is now safe due to the null check above.
           remoteConfig: state.remoteConfig!,
         );
 
@@ -148,7 +165,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       ):
         emit(
           state.copyWith(
-            status: user.isGuest
+            status: user!.isGuest
                 ? AppLifeCycleStatus.anonymous
                 : AppLifeCycleStatus.authenticated,
             user: user,
@@ -302,7 +319,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         );
         final restoredStatus = state.user == null
             ? AppLifeCycleStatus.unauthenticated
-            : (state.user!.isGuest
+            : (state
+                      .user!
+                      .isGuest // This is now safe due to the check above
                   ? AppLifeCycleStatus.anonymous
                   : AppLifeCycleStatus.authenticated);
         emit(

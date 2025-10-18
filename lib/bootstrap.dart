@@ -483,14 +483,17 @@ Future<Widget> bootstrap(
       '--- Bootstrap Process Complete. '
       'Returning AppInitializationPage widget. ---',
     );
-  // Provide the AppInitializer at the root so it can be accessed by the
-  // AppInitializationBloc within AppInitializationPage.
-  return RepositoryProvider.value(
-    value: appInitializer,
+  // Provide the AppInitializer and Logger at the root so they can be accessed
+  // by the AppInitializationBloc within AppInitializationPage.
+  return MultiRepositoryProvider(
+    providers: [
+      RepositoryProvider.value(value: appInitializer),
+      RepositoryProvider.value(value: logger),
+    ],
     child: AppInitializationPage(
-      // All repositories and services are passed to the initialization page,
-      // which will then pass them to the main App widget upon successful
-      // initialization.
+      // All other repositories and services are passed directly to the
+      // initialization page, which will then pass them to the main App widget
+      // upon successful initialization.
       authenticationRepository: authenticationRepository,
       headlinesRepository: headlinesRepository,
       topicsRepository: topicsRepository,

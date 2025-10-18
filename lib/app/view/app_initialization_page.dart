@@ -14,6 +14,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app.dar
 import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_hot_restart_wrapper.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
+import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template app_initialization_page}
@@ -74,7 +75,7 @@ class AppInitializationPage extends StatelessWidget {
     return BlocProvider(
       create: (context) => AppInitializationBloc(
         appInitializer: context.read<AppInitializer>(),
-        logger: context.read(),
+        logger: context.read<Logger>(),
       )..add(const AppInitializationStarted()),
       child: BlocConsumer<AppInitializationBloc, AppInitializationState>(
         listener: (context, state) {

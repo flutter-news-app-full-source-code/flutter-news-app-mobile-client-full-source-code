@@ -3,16 +3,16 @@ import 'package:core/core.dart' hide AppStatus;
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_status_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/router.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
 import 'package:logging/logging.dart';
@@ -41,17 +41,17 @@ class App extends StatelessWidget {
     required DataRepository<LocalAd> localAdRepository,
     required GlobalKey<NavigatorState> navigatorKey,
     super.key,
-  }) : _initializationResult = initializationResult,
-       _authenticationRepository = authenticationRepository,
-       _headlinesRepository = headlinesRepository,
-       _topicsRepository = topicsRepository,
-       _countriesRepository = countriesRepository,
-       _sourcesRepository = sourcesRepository,
-       _environment = environment,
-       _adService = adService,
-       _localAdRepository = localAdRepository,
-       _navigatorKey = navigatorKey,
-       _inlineAdCacheService = inlineAdCacheService;
+  })  : _initializationResult = initializationResult,
+        _authenticationRepository = authenticationRepository,
+        _headlinesRepository = headlinesRepository,
+        _topicsRepository = topicsRepository,
+        _countriesRepository = countriesRepository,
+        _sourcesRepository = sourcesRepository,
+        _environment = environment,
+        _adService = adService,
+        _localAdRepository = localAdRepository,
+        _navigatorKey = navigatorKey,
+        _inlineAdCacheService = inlineAdCacheService;
 
   final InitializationResult _initializationResult;
   final AuthRepository _authenticationRepository;
@@ -67,6 +67,9 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // The MultiRepositoryProvider makes all essential repositories available
+    // to the entire widget tree. This is the single source for all app
+    // dependencies.
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider.value(value: _authenticationRepository),
@@ -77,16 +80,6 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _adService),
         RepositoryProvider.value(value: _localAdRepository),
         RepositoryProvider.value(value: _inlineAdCacheService),
-        // These repositories are no longer passed down as props but are
-        // provided here so they can be accessed via context by the router
-        // and its nested BLoCs. This is an intermediate step.
-        RepositoryProvider.value(
-          value: context.read<DataRepository<UserAppSettings>>(),
-        ),
-        RepositoryProvider.value(
-          value: context.read<DataRepository<UserContentPreferences>>(),
-        ),
-        RepositoryProvider.value(value: context.read<DataRepository<User>>()),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -120,14 +113,7 @@ class App extends StatelessWidget {
           ),
         ],
         child: _AppView(
-          authenticationRepository: _authenticationRepository,
-          headlinesRepository: _headlinesRepository,
-          topicRepository: _topicsRepository,
-          countriesRepository: _countriesRepository,
-          sourcesRepository: _sourcesRepository,
-          environment: _environment, // Will be removed
-          adService: _adService,
-          localAdRepository: _localAdRepository,
+          environment: _environment,
           navigatorKey: _navigatorKey,
         ),
       ),
@@ -137,30 +123,12 @@ class App extends StatelessWidget {
 
 class _AppView extends StatefulWidget {
   const _AppView({
-    required this.authenticationRepository,
-    required this.headlinesRepository,
-    required this.topicRepository,
-    required this.countriesRepository,
-    required this.sourcesRepository,
-    required this.environment, // Will be removed
-    required this.adService,
-    required this.localAdRepository,
+    required this.environment,
     required this.navigatorKey,
   });
 
-  final AuthRepository authenticationRepository;
-  final DataRepository<Headline> headlinesRepository;
-  final DataRepository<Topic> topicRepository;
-  final DataRepository<Country> countriesRepository;
-  final DataRepository<Source> sourcesRepository;
-  final AppEnvironment environment; // Will be removed
-  final AdService adService;
-  final DataRepository<LocalAd> localAdRepository;
+  final AppEnvironment environment;
   final GlobalKey<NavigatorState> navigatorKey;
-  // These will be removed once the router is refactored.
-  final DataRepository<UserAppSettings> userAppSettingsRepository;
-  final DataRepository<UserContentPreferences> userContentPreferencesRepository;
-  final DataRepository<User> userRepository;
 
   @override
   State<_AppView> createState() => _AppViewState();
@@ -249,8 +217,7 @@ class _AppViewState extends State<_AppView> {
               supportedLocales: AppLocalizations.supportedLocales,
               locale: state.locale,
               home: CriticalErrorPage(
-                exception:
-                    state.error ??
+                exception: state.error ??
                     const UnknownException(
                       'An unknown critical error occurred.',
                     ),
@@ -337,7 +304,6 @@ class _AppViewState extends State<_AppView> {
           }
 
           // --- Loading User Data State ---
-          // --- Loading User Data State ---
           // Display a loading screen ONLY if the app is actively trying to load
           // user-specific data (settings or preferences) for an authenticated/anonymous user.
           // If the status is unauthenticated, it means there's no user data to load,
@@ -416,21 +382,7 @@ class _AppViewState extends State<_AppView> {
             ),
             routerConfig: createRouter(
               authStatusNotifier: _statusNotifier,
-              authenticationRepository: widget.authenticationRepository,
-              headlinesRepository: widget.headlinesRepository,
-              topicsRepository: widget.topicRepository,
-              countriesRepository: widget.countriesRepository,
-              sourcesRepository: widget.sourcesRepository,
-              userAppSettingsRepository: context
-                  .read<DataRepository<UserAppSettings>>(),
-              userContentPreferencesRepository: context
-                  .read<DataRepository<UserContentPreferences>>(),
-              remoteConfigRepository: context
-                  .read<DataRepository<RemoteConfig>>(),
-              userRepository: context.read<DataRepository<User>>(),
-              adService: widget.adService,
               navigatorKey: widget.navigatorKey,
-              inlineAdCacheService: context.read<InlineAdCacheService>(),
               logger: _routerLogger,
             ),
             locale: state.locale,

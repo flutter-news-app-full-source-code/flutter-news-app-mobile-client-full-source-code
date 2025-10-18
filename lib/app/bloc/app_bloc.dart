@@ -10,6 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/initialization_result.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/extensions.dart';
 import 'package:logging/logging.dart';
 
 part 'app_event.dart';

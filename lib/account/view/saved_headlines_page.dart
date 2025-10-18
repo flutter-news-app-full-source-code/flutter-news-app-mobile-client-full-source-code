@@ -41,7 +41,6 @@ class SavedHeadlinesPage extends StatelessWidget {
       ),
       body: BlocBuilder<AppBloc, AppState>(
         builder: (context, appState) {
-          final user = appState.user;
           final userContentPreferences = appState.userContentPreferences;
 
           if (appState.status == AppLifeCycleStatus.loadingUserData ||

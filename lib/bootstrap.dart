@@ -115,12 +115,12 @@ Future<Widget> bootstrap(
   final remoteConfigRepository = DataRepository<RemoteConfig>(
     dataClient: remoteConfigClient,
   );
-  logger.fine('RemoteConfig repository initialized.');
+  logger..fine('RemoteConfig repository initialized.')
 
   // 4. Conditionally initialize Auth services based on environment.
   // This is done after RemoteConfig is fetched, as Auth services might depend
   // on configurations defined in RemoteConfig.
-  logger.info('5. Initializing Authentication services...');
+  ..info('5. Initializing Authentication services...');
   late final AuthClient authClient;
   late final AuthRepository authenticationRepository;
   if (appConfig.environment == app_config.AppEnvironment.demo) {
@@ -474,13 +474,13 @@ Future<Widget> bootstrap(
     demoDataMigrationService: demoDataMigrationService,
     demoDataInitializerService: demoDataInitializerService,
   );
-  logger.fine('AppInitializer service initialized.');
+  logger..fine('AppInitializer service initialized.')
 
-  logger.info('10. Running App Initialization...');
+  ..info('10. Running App Initialization...');
   final initializationResult = await appInitializer.initializeApp();
-  logger.fine('App Initialization complete.');
+  logger..fine('App Initialization complete.')
 
-  logger.info('--- Bootstrap Process Complete. Returning App widget. ---');
+  ..info('--- Bootstrap Process Complete. Returning App widget. ---');
   return App(
     initializationResult: initializationResult,
     authenticationRepository: authenticationRepository,

@@ -3,14 +3,12 @@ import 'dart:async';
 import 'package:auth_repository/auth_repository.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
     as local_config;
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_initializer_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/package_info_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:logging/logging.dart';
 import 'package:pub_semver/pub_semver.dart';
 
@@ -145,12 +143,12 @@ class AppInitializer {
   /// with all the required data, or [InitializationFailure] with a specific
   //  /// failure status.
   Future<InitializationResult> initializeApp() async {
-    _logger.fine('[AppInitializer] --- Starting App Initialization ---');
+    _logger..fine('[AppInitializer] --- Starting App Initialization ---')
 
     // --- Gate 1: Fetch RemoteConfig ---
     // This is the first and most critical step. The RemoteConfig dictates
     // global app behavior like maintenance mode and forced updates.
-    _logger.fine('[AppInitializer] 1. Fetching RemoteConfig...');
+    ..fine('[AppInitializer] 1. Fetching RemoteConfig...');
     late final RemoteConfig remoteConfig;
     try {
       remoteConfig = await _remoteConfigRepository.read(id: kRemoteConfigId);

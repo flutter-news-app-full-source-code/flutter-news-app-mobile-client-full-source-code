@@ -1,3 +1,5 @@
+// ignore_for_file: one_member_abstracts
+
 import 'package:logging/logging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 

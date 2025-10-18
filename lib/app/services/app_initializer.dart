@@ -57,12 +57,23 @@ final class InitializationSuccess extends InitializationResult {
 /// maintenance mode.
 final class InitializationFailure extends InitializationResult {
   /// Creates an instance of a failed initialization result.
-  const InitializationFailure({
+  ///
+  /// An assertion ensures that if the status is `updateRequired`, both
+  /// `currentAppVersion` and `latestAppVersion` must be provided. This is a
+  /// critical safeguard to prevent null-safety crashes on the
+  /// `UpdateRequiredPage` by enforcing data integrity at the point of creation.
+  InitializationFailure({
     required this.status,
     this.error,
     this.currentAppVersion,
     this.latestAppVersion,
-  });
+  }) : assert(
+         status == AppLifeCycleStatus.updateRequired
+             ? currentAppVersion != null && latestAppVersion != null
+             : true,
+         'currentAppVersion and latestAppVersion must be provided '
+         'when status is updateRequired.',
+       );
 
   /// The specific status that caused the failure (e.g., `underMaintenance`,
   /// `updateRequired`, `criticalError`).
@@ -143,12 +154,12 @@ class AppInitializer {
   /// with all the required data, or [InitializationFailure] with a specific
   //  /// failure status.
   Future<InitializationResult> initializeApp() async {
-    _logger..fine('[AppInitializer] --- Starting App Initialization ---')
-
-    // --- Gate 1: Fetch RemoteConfig ---
-    // This is the first and most critical step. The RemoteConfig dictates
-    // global app behavior like maintenance mode and forced updates.
-    ..fine('[AppInitializer] 1. Fetching RemoteConfig...');
+    _logger
+      ..fine('[AppInitializer] --- Starting App Initialization ---')
+      // --- Gate 1: Fetch RemoteConfig ---
+      // This is the first and most critical step. The RemoteConfig dictates
+      // global app behavior like maintenance mode and forced updates.
+      ..fine('[AppInitializer] 1. Fetching RemoteConfig...');
     late final RemoteConfig remoteConfig;
     try {
       remoteConfig = await _remoteConfigRepository.read(id: kRemoteConfigId);
@@ -169,7 +180,7 @@ class AppInitializer {
     // If maintenance mode is enabled, halt the entire startup process.
     if (remoteConfig.appStatus.isUnderMaintenance) {
       _logger.warning('[AppInitializer] App is under maintenance. Halting.');
-      return const InitializationFailure(
+      return InitializationFailure(
         status: AppLifeCycleStatus.underMaintenance,
       );
     }

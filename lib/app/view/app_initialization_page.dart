@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_initialization_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_hot_restart_wrapper.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
 
@@ -120,7 +120,7 @@ class AppInitializationPage extends StatelessWidget {
                 case AppLifeCycleStatus.criticalError:
                   return CriticalErrorPage(
                     exception: failureData.error is HttpException
-                        ? failureData.error as HttpException
+                        ? failureData.error!
                         : null,
                     onRetry: () {
                       // For a critical error, we trigger a full app restart
@@ -135,7 +135,7 @@ class AppInitializationPage extends StatelessWidget {
                 default:
                   return CriticalErrorPage(
                     exception: failureData.error is HttpException
-                        ? failureData.error as HttpException
+                        ? failureData.error!
                         : null,
                     onRetry: () => AppHotRestartWrapper.restartApp(context),
                   );

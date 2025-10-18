@@ -42,25 +42,25 @@ class AppInitializer {
     required AuthRepository authenticationRepository,
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<UserContentPreferences>
-        userContentPreferencesRepository,
+    userContentPreferencesRepository,
     required DataRepository<RemoteConfig> remoteConfigRepository,
     required local_config.AppEnvironment environment,
     required PackageInfoService packageInfoService,
     required Logger logger,
     this.demoDataMigrationService,
     this.demoDataInitializerService,
-  })  : _authenticationRepository = authenticationRepository,
-        _userAppSettingsRepository = userAppSettingsRepository,
-        _userContentPreferencesRepository = userContentPreferencesRepository,
-        _remoteConfigRepository = remoteConfigRepository,
-        _environment = environment,
-        _packageInfoService = packageInfoService,
-        _logger = logger;
+  }) : _authenticationRepository = authenticationRepository,
+       _userAppSettingsRepository = userAppSettingsRepository,
+       _userContentPreferencesRepository = userContentPreferencesRepository,
+       _remoteConfigRepository = remoteConfigRepository,
+       _environment = environment,
+       _packageInfoService = packageInfoService,
+       _logger = logger;
 
   final AuthRepository _authenticationRepository;
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
   final DataRepository<UserContentPreferences>
-      _userContentPreferencesRepository;
+  _userContentPreferencesRepository;
   final DataRepository<RemoteConfig> _remoteConfigRepository;
   final local_config.AppEnvironment _environment;
   final PackageInfoService _packageInfoService;
@@ -104,9 +104,7 @@ class AppInitializer {
     // If maintenance mode is enabled, halt the entire startup process.
     if (remoteConfig.appStatus.isUnderMaintenance) {
       _logger.warning('[AppInitializer] App is under maintenance. Halting.');
-      return InitializationFailure(
-        status: AppLifeCycleStatus.underMaintenance,
-      );
+      return const InitializationFailure(status: AppLifeCycleStatus.underMaintenance);
     }
 
     // --- Gate 3: Check for Forced Update ---
@@ -206,13 +204,9 @@ class AppInitializer {
 
         // Re-fetch the data after initialization.
         _logger.fine('[AppInitializer] Re-fetching data after demo init...');
-        [userAppSettings, userContentPreferences] =
-            await Future.wait<dynamic>([
+        [userAppSettings, userContentPreferences] = await Future.wait<dynamic>([
           _userAppSettingsRepository.read(id: user.id, userId: user.id),
-          _userContentPreferencesRepository.read(
-            id: user.id,
-            userId: user.id,
-          ),
+          _userContentPreferencesRepository.read(id: user.id, userId: user.id),
         ]);
       }
 
@@ -259,7 +253,8 @@ class AppInitializer {
     );
 
     // --- Data Migration Logic ---
-    final isMigration = oldUser != null &&
+    final isMigration =
+        oldUser != null &&
         oldUser.appRole == AppUserRole.guestUser &&
         newUser.appRole == AppUserRole.standardUser;
 
@@ -286,7 +281,9 @@ class AppInitializer {
           );
           return InitializationFailure(
             status: AppLifeCycleStatus.criticalError,
-            error: UnknownException('Failed to migrate demo user data: $e'),
+            error: UnknownException(
+              'Failed to migrate demo user data: $e',
+            ),
           );
         }
       }

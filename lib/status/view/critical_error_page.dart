@@ -13,7 +13,7 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class CriticalErrorPage extends StatelessWidget {
   /// {@macro critical_error_page}
-  const CriticalErrorPage({this.exception, required this.onRetry, super.key});
+  const CriticalErrorPage({required this.onRetry, this.exception, super.key});
 
   /// The exception that caused the critical error.
   final HttpException? exception;

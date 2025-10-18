@@ -52,7 +52,7 @@ final class InitializationSuccess extends InitializationResult {
 /// maintenance mode.
 final class InitializationFailure extends InitializationResult {
   /// Creates an instance of a failed initialization result.
-  InitializationFailure({
+  const InitializationFailure({
     required this.status,
     this.error,
     this.currentAppVersion,
@@ -64,7 +64,7 @@ final class InitializationFailure extends InitializationResult {
   final AppLifeCycleStatus status;
 
   /// The exception that caused the critical error, if applicable.
-  final Exception? error;
+  final HttpException? error;
 
   /// The current version of the app, for display on the update page.
   final String? currentAppVersion;

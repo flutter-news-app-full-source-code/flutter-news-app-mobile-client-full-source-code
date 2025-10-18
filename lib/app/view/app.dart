@@ -3,9 +3,8 @@ import 'package:core/core.dart' hide AppStatus;
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
@@ -13,6 +12,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/router.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
 import 'package:logging/logging.dart';
@@ -77,6 +77,16 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _adService),
         RepositoryProvider.value(value: _localAdRepository),
         RepositoryProvider.value(value: _inlineAdCacheService),
+        // These repositories are no longer passed down as props but are
+        // provided here so they can be accessed via context by the router
+        // and its nested BLoCs. This is an intermediate step.
+        RepositoryProvider.value(
+          value: context.read<DataRepository<UserAppSettings>>(),
+        ),
+        RepositoryProvider.value(
+          value: context.read<DataRepository<UserContentPreferences>>(),
+        ),
+        RepositoryProvider.value(value: context.read<DataRepository<User>>()),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -147,6 +157,10 @@ class _AppView extends StatefulWidget {
   final AdService adService;
   final DataRepository<LocalAd> localAdRepository;
   final GlobalKey<NavigatorState> navigatorKey;
+  // These will be removed once the router is refactored.
+  final DataRepository<UserAppSettings> userAppSettingsRepository;
+  final DataRepository<UserContentPreferences> userContentPreferencesRepository;
+  final DataRepository<User> userRepository;
 
   @override
   State<_AppView> createState() => _AppViewState();
@@ -407,8 +421,16 @@ class _AppViewState extends State<_AppView> {
               topicsRepository: widget.topicRepository,
               countriesRepository: widget.countriesRepository,
               sourcesRepository: widget.sourcesRepository,
+              userAppSettingsRepository: context
+                  .read<DataRepository<UserAppSettings>>(),
+              userContentPreferencesRepository: context
+                  .read<DataRepository<UserContentPreferences>>(),
+              remoteConfigRepository: context
+                  .read<DataRepository<RemoteConfig>>(),
+              userRepository: context.read<DataRepository<User>>(),
               adService: widget.adService,
               navigatorKey: widget.navigatorKey,
+              inlineAdCacheService: context.read<InlineAdCacheService>(),
               logger: _routerLogger,
             ),
             locale: state.locale,

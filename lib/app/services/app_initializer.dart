@@ -121,7 +121,6 @@ class AppInitializer {
        _userAppSettingsRepository = userAppSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
        _remoteConfigRepository = remoteConfigRepository,
-       _userRepository = userRepository,
        _environment = environment,
        _packageInfoService = packageInfoService,
        _logger = logger;
@@ -365,8 +364,8 @@ class AppInitializer {
     );
     try {
       final [
-        userAppSettings,
-        userContentPreferences,
+        userAppSettings as UserAppSettings?,
+        userContentPreferences as UserContentPreferences?,
       ] = await Future.wait<dynamic>([
         _userAppSettingsRepository.read(id: newUser.id, userId: newUser.id),
         _userContentPreferencesRepository.read(
@@ -435,22 +434,5 @@ extension UserFeedDecoratorStatusX on UserFeedDecoratorStatus {
       return true;
     }
     return DateTime.now().difference(lastShownAt!).inDays >= daysBetweenViews;
-  }
-}
-
-/// Extension on [HttpException] to provide a user-friendly message.
-extension HttpExceptionX on HttpException {
-  /// Returns a user-friendly message for the given [HttpException].
-  String toUserFriendlyMessage(BuildContext context) {
-    final l10n = AppLocalizationsX.of(context);
-    return switch (this) {
-      final ConflictException e => e.message,
-      final InternalServerErrorException e => e.message,
-      final InvalidInputException e => e.message,
-      final NotFoundException e => e.message,
-      final UnauthorizedException e => e.message,
-      final UnknownException e => e.message,
-      _ => l10n.unknownError,
-    };
   }
 }

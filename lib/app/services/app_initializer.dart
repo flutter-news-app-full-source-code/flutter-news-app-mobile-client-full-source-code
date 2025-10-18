@@ -11,7 +11,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/services/dem
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/package_info_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:logging/logging.dart';
 import 'package:pub_semver/pub_semver.dart';
 
@@ -234,8 +233,10 @@ class AppInitializer {
     // If there's no user, the initialization is complete. Return success
     // with an unauthenticated status.
     if (user == null) {
-      _logger.fine('[AppInitializer] No initial user found. '
-          'Initialization complete (unauthenticated).');
+      _logger.fine(
+        '[AppInitializer] No initial user found. '
+        'Initialization complete (unauthenticated).',
+      );
       return InitializationSuccess(remoteConfig: remoteConfig);
     }
 
@@ -319,8 +320,76 @@ class AppInitializer {
     required User newUser,
     required RemoteConfig remoteConfig,
   }) async {
-    // This method will be implemented in a subsequent phase.
-    throw UnimplementedError();
+    _logger.fine(
+      '[AppInitializer] Handling user transition for user ${newUser.id}.',
+    );
+
+    // --- Data Migration Logic ---
+    final isMigration = oldUser != null &&
+        oldUser.appRole == AppUserRole.guestUser &&
+        newUser.appRole == AppUserRole.standardUser;
+
+    if (isMigration) {
+      _logger.info(
+        '[AppInitializer] Anonymous user ${oldUser.id} transitioned to '
+        'authenticated user ${newUser.id}. Attempting data migration.',
+      );
+      if (demoDataMigrationService != null &&
+          _environment == local_config.AppEnvironment.demo) {
+        try {
+          await demoDataMigrationService!.migrateAnonymousData(
+            oldUserId: oldUser.id,
+            newUserId: newUser.id,
+          );
+          _logger.info(
+            '[AppInitializer] Demo mode: Data migration completed for ${newUser.id}.',
+          );
+        } catch (e, s) {
+          _logger.severe(
+            '[AppInitializer] CRITICAL: Failed to migrate demo user data.',
+            e,
+            s,
+          );
+          return InitializationFailure(
+            status: AppLifeCycleStatus.criticalError,
+            error: UnknownException('Failed to migrate demo user data: $e'),
+          );
+        }
+      }
+    }
+
+    // --- Re-fetch User Data ---
+    // Always re-fetch data after a transition to ensure the state is fresh.
+    _logger.fine(
+      '[AppInitializer] Re-fetching user data for transitioned user ${newUser.id}...',
+    );
+    try {
+      final [userAppSettings, userContentPreferences] = await Future.wait([
+        _userAppSettingsRepository.read(id: newUser.id, userId: newUser.id),
+        _userContentPreferencesRepository.read(
+          id: newUser.id,
+          userId: newUser.id,
+        ),
+      ]);
+
+      _logger.fine('[AppInitializer] User transition data fetch complete.');
+      return InitializationSuccess(
+        remoteConfig: remoteConfig,
+        user: newUser,
+        settings: userAppSettings,
+        userContentPreferences: userContentPreferences,
+      );
+    } on HttpException catch (e, s) {
+      _logger.severe(
+        '[AppInitializer] CRITICAL: Failed to fetch data for transitioned user.',
+        e,
+        s,
+      );
+      return InitializationFailure(
+        status: AppLifeCycleStatus.criticalError,
+        error: e,
+      );
+    }
   }
 }
 

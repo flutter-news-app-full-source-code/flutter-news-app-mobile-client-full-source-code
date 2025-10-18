@@ -20,10 +20,7 @@ class AppConfig {
   /// with a missing configuration.
   factory AppConfig.production() => const AppConfig(
     environment: AppEnvironment.production,
-    baseUrl: String.fromEnvironment(
-      'BASE_URL',
-      defaultValue: 'http://localhost:8080',
-    ),
+    baseUrl: String.fromEnvironment('BASE_URL'),
   );
 
   /// A factory constructor for the demo environment.
@@ -35,7 +32,10 @@ class AppConfig {
   /// A factory constructor for the development environment.
   factory AppConfig.development() => const AppConfig(
     environment: AppEnvironment.development,
-    baseUrl: 'http://localhost:8080', // Default Dart Frog local URL
+    baseUrl: String.fromEnvironment(
+      'BASE_URL',
+      defaultValue: 'http://localhost:8080',
+    ),
   );
 
   final AppEnvironment environment;

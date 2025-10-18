@@ -30,7 +30,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   AppBloc({
     required InitializationResult initializationResult,
     required GlobalKey<NavigatorState> navigatorKey,
+    required DataRepository<RemoteConfig> remoteConfigRepository,
+    required AppInitializer appInitializer,
+    required AuthRepository authRepository,
   }) : _navigatorKey = navigatorKey,
+       _remoteConfigRepository = remoteConfigRepository,
+       _appInitializer = appInitializer,
+       _authRepository = authRepository,
        _logger = Logger('AppBloc'),
        super(switch (initializationResult) {
          InitializationSuccess(
@@ -84,6 +90,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   final GlobalKey<NavigatorState> _navigatorKey;
   final Logger _logger;
+  final DataRepository<RemoteConfig> _remoteConfigRepository;
+  final AppInitializer _appInitializer;
+  final AuthRepository _authRepository;
 
   /// Provides access to the [NavigatorState] for obtaining a [BuildContext].
   GlobalKey<NavigatorState> get navigatorKey => _navigatorKey;
@@ -156,13 +165,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     }
 
     // Delegate the complex transition logic to the AppInitializer.
-    final transitionResult = await _navigatorKey.currentContext!
-        .read<AppInitializer>()
-        .handleUserTransition(
-          oldUser: oldUser,
-          newUser: newUser,
-          remoteConfig: state.remoteConfig!,
-        );
+    final transitionResult = await _appInitializer.handleUserTransition(
+      oldUser: oldUser,
+      newUser: newUser,
+      remoteConfig: state.remoteConfig!,
+    );
 
     // Update the state based on the result of the transition.
     switch (transitionResult) {
@@ -262,7 +269,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   /// Handles user logout request.
   void _onLogoutRequested(AppLogoutRequested event, Emitter<AppState> emit) {
-    unawaited(_navigatorKey.currentContext!.read<AuthRepository>().signOut());
+    unawaited(_authRepository.signOut());
   }
 
   /// Handles periodic fetching of the remote application configuration.
@@ -272,9 +279,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   ) async {
     _logger.fine('[AppBloc] Periodic remote config fetch requested.');
     try {
-      final remoteConfig = await _navigatorKey.currentContext!
-          .read<DataRepository<RemoteConfig>>()
-          .read(id: kRemoteConfigId);
+      final remoteConfig = await _remoteConfigRepository.read(
+        id: kRemoteConfigId,
+      );
 
       if (remoteConfig.appStatus.isUnderMaintenance) {
         _logger.warning(

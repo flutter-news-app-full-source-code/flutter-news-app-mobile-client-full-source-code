@@ -12,6 +12,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_blo
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_status_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/services/package_info_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/router.dart';
@@ -94,6 +95,21 @@ class App extends StatelessWidget {
             create: (context) => AppBloc(
               initializationResult: _initializationResult,
               navigatorKey: _navigatorKey,
+              remoteConfigRepository: context
+                  .read<DataRepository<RemoteConfig>>(),
+              appInitializer: AppInitializer(
+                authenticationRepository: context.read<AuthRepository>(),
+                userAppSettingsRepository: context
+                    .read<DataRepository<UserAppSettings>>(),
+                userContentPreferencesRepository: context
+                    .read<DataRepository<UserContentPreferences>>(),
+                remoteConfigRepository: context
+                    .read<DataRepository<RemoteConfig>>(),
+                environment: context.read<AppEnvironment>(),
+                packageInfoService: context.read<PackageInfoService>(),
+                logger: Logger('AppBloc'),
+              ),
+              authRepository: context.read<AuthRepository>(),
             )..add(const AppStarted()),
           ),
           BlocProvider(
@@ -136,10 +152,9 @@ class _AppViewState extends State<_AppView> {
     // Subscribe to the authentication repository's authStateChanges stream.
     // This stream is the single source of truth for the user's auth state
     // and drives the entire app lifecycle.
-    _userSubscription = context
-        .read<AuthRepository>()
-        .authStateChanges
-        .listen((user) => context.read<AppBloc>().add(AppUserChanged(user)));
+    _userSubscription = context.read<AuthRepository>().authStateChanges.listen(
+      (user) => context.read<AppBloc>().add(AppUserChanged(user)),
+    );
 
     // Instantiate and initialize the AppStatusService.
     // This service monitors the app's lifecycle and periodically triggers

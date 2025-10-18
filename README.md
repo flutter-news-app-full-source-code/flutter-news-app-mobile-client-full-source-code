@@ -118,10 +118,6 @@ Gain complete command over your application's operational state and user experie
     - **Type-Safe, Declarative Routing:** Navigation is managed by **GoRouter**, using named routes for a well-structured and maintainable navigation system.
 > **📈 Your Advantage:** The app is built on a clean, modern architecture that's easy to understand and maintain. It's solid and built to last.
 
-### 📱 Adaptive UI for All Screens
-- Built with `flutter_adaptive_scaffold`, the app offers responsive navigation and layouts that look great on both phones and tablets.
-> **↔️ Your Advantage:** Deliver a consistent and optimized UX across a wide range of devices effortlessly.
-
 
 ---
 

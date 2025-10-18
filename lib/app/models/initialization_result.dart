@@ -37,8 +37,12 @@ final class InitializationSuccess extends InitializationResult {
   final UserContentPreferences? userContentPreferences;
 
   @override
-  List<Object?> get props =>
-      [remoteConfig, user, settings, userContentPreferences];
+  List<Object?> get props => [
+    remoteConfig,
+    user,
+    settings,
+    userContentPreferences,
+  ];
 }
 
 /// Represents a failed initialization of the application.
@@ -69,6 +73,10 @@ final class InitializationFailure extends InitializationResult {
   final String? latestAppVersion;
 
   @override
-  List<Object?> get props =>
-      [status, error, currentAppVersion, latestAppVersion];
+  List<Object?> get props => [
+    status,
+    error,
+    currentAppVersion,
+    latestAppVersion,
+  ];
 }

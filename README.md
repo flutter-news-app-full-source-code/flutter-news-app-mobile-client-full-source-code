@@ -109,20 +109,19 @@ Gain complete command over your application's operational state and user experie
 <details>
 <summary><strong>🏗️ Architecture & Technical Excellence</strong></summary>
 
-### 📱 Adaptive UI for All Screens
-- Built with `flutter_adaptive_scaffold`, the app offers responsive navigation and layouts that look great on both phones and tablets.
-> **↔️ Your Advantage:** Deliver a consistent and optimized UX across a wide range of devices effortlessly.
-
----
-
 ### 🏗️ Clean & Modern Architecture
 - Developed with best practices for a maintainable and scalable codebase:
-    - **Multi-Layered Architecture:** A clear separation of concerns into a Data Layer (`DataClient`), Repository Layer (`Repository`), and Business Logic Layer (`BLoC`) ensures the codebase is decoupled, testable, and easy to reason about.
+    - **Multi-Layered Architecture:** A clear separation of concerns into a Data Layer (handling raw data retrieval), Repository Layer (abstracting data sources), and Business Logic Layer (managing state with BLoC) ensures the codebase is decoupled, testable, and easy to reason about.
     - **Robust Startup & Lifecycle Management:** A dedicated `AppInitializer` service orchestrates a sequential, race-condition-free startup process. It guarantees all dependencies (Remote Config, User Settings) are loaded *before* the UI is displayed, eliminating a common class of complex bugs.
     - **Advanced State Management:** The app leverages the **BLoC pattern** for predictable state management, enhanced with `bloc_concurrency` transformers (droppable, restartable) for sophisticated UI event handling.
     - **Dependency Injection:** Dependencies are provided throughout the app using `RepositoryProvider` and `BlocProvider`, making components highly testable and reusable.
     - **Type-Safe, Declarative Routing:** Navigation is managed by **GoRouter**, using named routes for a well-structured and maintainable navigation system.
 > **📈 Your Advantage:** The app is built on a clean, modern architecture that's easy to understand and maintain. It's solid and built to last.
+
+### 📱 Adaptive UI for All Screens
+- Built with `flutter_adaptive_scaffold`, the app offers responsive navigation and layouts that look great on both phones and tablets.
+> **↔️ Your Advantage:** Deliver a consistent and optimized UX across a wide range of devices effortlessly.
+
 
 ---
 

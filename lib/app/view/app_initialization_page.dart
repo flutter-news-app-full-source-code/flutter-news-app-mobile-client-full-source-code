@@ -6,12 +6,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_initialization_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_hot_restart_wrapper.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
+import 'package:ui_kit/ui_kit.dart';
 
 /// {@template app_initialization_page}
 /// A top-level widget that orchestrates the application's initialization
@@ -114,6 +116,11 @@ class AppInitializationPage extends StatelessWidget {
               // and localization context to render correctly.
               return MaterialApp(
                 debugShowCheckedModeBanner: false,
+                localizationsDelegates: const [
+                  ...AppLocalizations.localizationsDelegates,
+                  ...UiKitLocalizations.localizationsDelegates,
+                ],
+                supportedLocales: AppLocalizations.supportedLocales,
                 home: switch (failureData.status) {
                   AppLifeCycleStatus.underMaintenance =>
                     const MaintenancePage(),
@@ -144,6 +151,11 @@ class AppInitializationPage extends StatelessWidget {
               // While initializing, show a simple loading indicator.
               return const MaterialApp(
                 debugShowCheckedModeBanner: false,
+                localizationsDelegates: [
+                  ...AppLocalizations.localizationsDelegates,
+                  ...UiKitLocalizations.localizationsDelegates,
+                ],
+                supportedLocales: AppLocalizations.supportedLocales,
                 home: Scaffold(
                   body: Center(child: CircularProgressIndicator()),
                 ),

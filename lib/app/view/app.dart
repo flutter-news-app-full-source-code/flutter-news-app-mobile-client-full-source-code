@@ -120,7 +120,6 @@ class App extends StatelessWidget {
           BlocProvider(
             create: (context) => AppBloc(
               initializationResult: _initializationResult,
-              navigatorKey: _navigatorKey,
               remoteConfigRepository: _remoteConfigRepository,
               appInitializer: context.read<AppInitializer>(),
               authRepository: context.read<AuthRepository>(),
@@ -403,6 +402,7 @@ class _AppViewState extends State<_AppView> {
                 create: (context) => InterstitialAdManager(
                   appBloc: context.read<AppBloc>(),
                   adService: context.read<AdService>(),
+                  navigatorKey: widget.navigatorKey,
                 ),
                 // Ensure it's created immediately.
                 lazy: false,

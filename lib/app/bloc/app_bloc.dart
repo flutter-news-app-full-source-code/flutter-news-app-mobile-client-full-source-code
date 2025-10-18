@@ -29,7 +29,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   /// pre-fetched initial data.
   AppBloc({
     required InitializationResult initializationResult,
-    required GlobalKey<NavigatorState> navigatorKey,
     required DataRepository<RemoteConfig> remoteConfigRepository,
     required AppInitializer appInitializer,
     required AuthRepository authRepository,
@@ -37,8 +36,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
     required DataRepository<User> userRepository,
-  }) : _navigatorKey = navigatorKey,
-       _remoteConfigRepository = remoteConfigRepository,
+  }) : _remoteConfigRepository = remoteConfigRepository,
        _appInitializer = appInitializer,
        _authRepository = authRepository,
        _userAppSettingsRepository = userAppSettingsRepository,
@@ -95,7 +93,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppLogoutRequested>(_onLogoutRequested);
   }
 
-  final GlobalKey<NavigatorState> _navigatorKey;
   final Logger _logger;
   final DataRepository<RemoteConfig> _remoteConfigRepository;
   final AppInitializer _appInitializer;
@@ -104,9 +101,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
   final DataRepository<User> _userRepository;
-
-  /// Provides access to the [NavigatorState] for obtaining a [BuildContext].
-  GlobalKey<NavigatorState> get navigatorKey => _navigatorKey;
 
   /// Handles the [AppStarted] event.
   ///

@@ -20,6 +20,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/admob_ad_pro
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/demo_ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/local_ad_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/app.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
     as app_config;
@@ -116,26 +117,6 @@ Future<Widget> bootstrap(
   );
   logger.fine('RemoteConfig repository initialized.');
 
-  // Fetch the initial RemoteConfig. This is a critical step to determine
-  // the app's global status (e.g., maintenance mode, update required)
-  // before proceeding with other initializations.
-  RemoteConfig? initialRemoteConfig;
-  HttpException? initialRemoteConfigError;
-
-  logger.info('4. Fetching initial RemoteConfig...');
-  try {
-    initialRemoteConfig = await remoteConfigRepository.read(
-      id: kRemoteConfigId,
-    );
-    logger.fine('Initial RemoteConfig fetched successfully.');
-  } on HttpException catch (e) {
-    logger.severe('Failed to fetch initial RemoteConfig (HttpException): $e');
-    initialRemoteConfigError = e;
-  } catch (e, s) {
-    logger.severe('Unexpected error fetching initial RemoteConfig.', e, s);
-    initialRemoteConfigError = UnknownException(e.toString());
-  }
-
   // 4. Conditionally initialize Auth services based on environment.
   // This is done after RemoteConfig is fetched, as Auth services might depend
   // on configurations defined in RemoteConfig.
@@ -215,13 +196,7 @@ Future<Widget> bootstrap(
 
   // Initialize InlineAdCacheService with the created AdService.
   inlineAdCacheService = InlineAdCacheService(adService: adService);
-  logger
-    ..fine('InlineAdCacheService initialized.')
-    // Fetch the initial user from the authentication repository.
-    // This ensures the AppBloc starts with an accurate authentication status.
-    ..info('7. Fetching initial user...');
-  final initialUser = await authenticationRepository.getCurrentUser();
-  logger.fine('Initial user fetched: ${initialUser?.id ?? 'none'}.');
+  logger..fine('InlineAdCacheService initialized.');
 
   // Create a GlobalKey for the NavigatorState to be used by AppBloc
   // and InterstitialAdManager for BuildContext access.
@@ -487,28 +462,37 @@ Future<Widget> bootstrap(
     ..fine(
       'DemoDataInitializerService initialized: ${demoDataInitializerService != null}',
     )
-    ..info('--- Bootstrap Process Complete. Returning App widget. ---');
+    ..info('9. Initializing AppInitializer service...');
+  final appInitializer = AppInitializer(
+    authenticationRepository: authenticationRepository,
+    userAppSettingsRepository: userAppSettingsRepository,
+    userContentPreferencesRepository: userContentPreferencesRepository,
+    remoteConfigRepository: remoteConfigRepository,
+    userRepository: userRepository,
+    environment: environment,
+    packageInfoService: packageInfoService,
+    logger: logger,
+    demoDataMigrationService: demoDataMigrationService,
+    demoDataInitializerService: demoDataInitializerService,
+  );
+  logger.fine('AppInitializer service initialized.');
+
+  logger.info('10. Running App Initialization...');
+  final initializationResult = await appInitializer.initializeApp();
+  logger.fine('App Initialization complete.');
+
+  logger..info('--- Bootstrap Process Complete. Returning App widget. ---');
   return App(
+    initializationResult: initializationResult,
     authenticationRepository: authenticationRepository,
     headlinesRepository: headlinesRepository,
     topicsRepository: topicsRepository,
     countriesRepository: countriesRepository,
     sourcesRepository: sourcesRepository,
-    userAppSettingsRepository: userAppSettingsRepository,
-    userContentPreferencesRepository: userContentPreferencesRepository,
-    remoteConfigRepository: remoteConfigRepository,
-    userRepository: userRepository,
-    kvStorageService: kvStorage,
     environment: environment,
-    demoDataMigrationService: demoDataMigrationService,
-    demoDataInitializerService: demoDataInitializerService,
     adService: adService,
     inlineAdCacheService: inlineAdCacheService,
-    initialUser: initialUser,
     localAdRepository: localAdRepository,
     navigatorKey: navigatorKey,
-    initialRemoteConfig: initialRemoteConfig,
-    initialRemoteConfigError: initialRemoteConfigError,
-    packageInfoService: packageInfoService,
   );
 }

@@ -18,6 +18,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localiz
 import 'package:flutter_news_app_mobile_client_full_source_code/router/router.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
+import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -169,6 +170,7 @@ class _AppViewState extends State<_AppView> {
   AppStatusService? _appStatusService;
   InterstitialAdManager? _interstitialAdManager;
   late final ContentLimitationService _contentLimitationService;
+  late final GoRouter _router;
   final _routerLogger = Logger('GoRouter');
 
   @override
@@ -207,6 +209,13 @@ class _AppViewState extends State<_AppView> {
     );
     _contentLimitationService = ContentLimitationService(
       appBloc: context.read<AppBloc>(),
+    );
+
+    // Create the GoRouter instance once and store it.
+    _router = createRouter(
+      authStatusNotifier: _statusNotifier,
+      navigatorKey: widget.navigatorKey,
+      logger: _routerLogger,
     );
   }
 
@@ -378,11 +387,7 @@ class _AppViewState extends State<_AppView> {
                 appFontWeight: state.appFontWeight,
                 fontFamily: state.fontFamily,
               ),
-              routerConfig: createRouter(
-                authStatusNotifier: _statusNotifier,
-                navigatorKey: widget.navigatorKey,
-                logger: _routerLogger,
-              ),
+              routerConfig: _router,
               locale: state.locale,
               localizationsDelegates: const [
                 ...AppLocalizations.localizationsDelegates,

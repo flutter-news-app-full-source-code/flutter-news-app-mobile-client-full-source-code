@@ -20,7 +20,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/admob_ad_pro
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/demo_ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/local_ad_provider.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/app.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_initialization_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
     as app_config;
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
@@ -476,13 +476,17 @@ Future<Widget> bootstrap(
   );
   logger
     ..fine('AppInitializer service initialized.')
-    ..info('10. Running App Initialization...');
-  final initializationResult = await appInitializer.initializeApp();
-  logger
-    ..fine('App Initialization complete.')
-    ..info('--- Bootstrap Process Complete. Returning App widget. ---');
-  return App(
-    initializationResult: initializationResult,
+    // The initialization is now deferred to the AppInitializationPage, which
+    // will use the AppInitializationBloc to run the AppInitializer.
+    ..info('10. Deferring app initialization to AppInitializationPage.')
+    ..info(
+      '--- Bootstrap Process Complete. '
+      'Returning AppInitializationPage widget. ---',
+    );
+  return AppInitializationPage(
+    // All repositories and services are passed to the initialization page,
+    // which will then pass them to the main App widget upon successful
+    // initialization.
     authenticationRepository: authenticationRepository,
     headlinesRepository: headlinesRepository,
     topicsRepository: topicsRepository,

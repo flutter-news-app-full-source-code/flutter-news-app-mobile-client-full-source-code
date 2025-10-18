@@ -13,7 +13,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_e
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_status_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/services/package_info_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/router.dart';
@@ -23,12 +22,13 @@ import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template app_widget}
-/// The root widget of the application.
+/// The root widget of the main application.
 ///
-/// This widget is responsible for setting up the dependency injection
-/// (RepositoryProviders and BlocProviders) for the entire application.
-/// It also orchestrates the initial application startup flow, passing
-/// pre-fetched data and services to the [AppBloc] and [_AppView].
+/// This widget is built only after a successful startup sequence, as
+/// orchestrated by [AppInitializationPage]. It is responsible for setting up
+/// the core dependency injection (RepositoryProviders and BlocProviders) for the
+/// running application. It receives all pre-fetched data from the
+/// initialization phase and uses it to create the main [AppBloc].
 /// {@endtemplate}
 class App extends StatelessWidget {
   /// {@macro app_widget}
@@ -68,9 +68,16 @@ class App extends StatelessWidget {
         _navigatorKey = navigatorKey,
         _inlineAdCacheService = inlineAdCacheService;
 
+  /// The initial user, pre-fetched during startup.
   final User? user;
+
+  /// The global remote configuration, pre-fetched during startup.
   final RemoteConfig remoteConfig;
+
+  /// The user's settings, pre-fetched during startup.
   final UserAppSettings? settings;
+
+  /// The user's content preferences, pre-fetched during startup.
   final UserContentPreferences? userContentPreferences;
 
   final AuthRepository _authenticationRepository;
@@ -91,9 +98,9 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // The MultiRepositoryProvider makes all essential repositories available
-    // to the entire widget tree. This is the single source for all app
-    // dependencies.
+    // The MultiRepositoryProvider makes all essential repositories and services
+    // available to the entire widget tree. This is the single source for all
+    // app dependencies.
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider.value(value: _authenticationRepository),
@@ -106,24 +113,15 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _remoteConfigRepository),
         RepositoryProvider.value(value: _userAppSettingsRepository),
         RepositoryProvider.value(value: _userContentPreferencesRepository),
-        // Provide the AppInitializer itself, as it's a core service.
-        RepositoryProvider(
-          create: (context) => AppInitializer(
-            authenticationRepository: context.read<AuthRepository>(),
-            userAppSettingsRepository: _userAppSettingsRepository,
-            userContentPreferencesRepository: _userContentPreferencesRepository,
-            remoteConfigRepository: _remoteConfigRepository,
-            environment: _environment,
-            packageInfoService: PackageInfoServiceImpl(logger: Logger('App')),
-            logger: Logger('App'),
-          ),
-        ),
         RepositoryProvider.value(value: _localAdRepository),
         RepositoryProvider.value(value: _inlineAdCacheService),
         RepositoryProvider.value(value: _environment),
+        // NOTE: The AppInitializer is provided at the root in bootstrap.dart
+        // and is accessed via context.read() in the AppBloc.
       ],
       child: MultiBlocProvider(
         providers: [
+          // The main AppBloc is created here with all the pre-fetched data.
           BlocProvider(
             create: (context) => AppBloc(
               user: user,
@@ -139,6 +137,7 @@ class App extends StatelessWidget {
               userRepository: _userRepository,
             )..add(const AppStarted()),
           ),
+          // The AuthenticationBloc is provided to handle auth UI events.
           BlocProvider(
             create: (context) => AuthenticationBloc(
               authenticationRepository: context.read<AuthRepository>(),
@@ -151,6 +150,8 @@ class App extends StatelessWidget {
   }
 }
 
+/// The core view of the application, which builds the UI based on the
+/// [AppBloc]'s state.
 class _AppView extends StatefulWidget {
   const _AppView({required this.environment, required this.navigatorKey});
 
@@ -171,22 +172,23 @@ class _AppViewState extends State<_AppView> {
   void initState() {
     super.initState();
     final appBloc = context.read<AppBloc>();
-    // Initialize the notifier with the BLoC's current state.
+
     // This notifier is used by GoRouter's refreshListenable to trigger
-    // route re-evaluation when the app's lifecycle status changes.
+    // route re-evaluation when the app's lifecycle status changes (e.g.,
+    // login/logout), ensuring the correct routes are accessible.
     _statusNotifier = ValueNotifier<AppLifeCycleStatus>(appBloc.state.status);
 
     // Subscribe to the authentication repository's authStateChanges stream.
     // This stream is the single source of truth for the user's auth state
-    // and drives the entire app lifecycle.
+    // and drives the entire app lifecycle by dispatching AppUserChanged events.
     _userSubscription = context.read<AuthRepository>().authStateChanges.listen(
-      (user) => context.read<AppBloc>().add(AppUserChanged(user)),
-    );
+          (user) => context.read<AppBloc>().add(AppUserChanged(user)),
+        );
 
     // Instantiate and initialize the AppStatusService.
-    // This service monitors the app's lifecycle and periodically triggers
-    // remote configuration fetches via the AppBloc, ensuring the app status
-    // is always fresh (e.g., detecting maintenance mode or forced updates).
+    // This service monitors the app's lifecycle (e.g., resuming from
+    // background) and periodically triggers remote configuration fetches,
+    // ensuring the app status is always fresh.
     _appStatusService = AppStatusService(
       context: context,
       checkInterval: const Duration(minutes: 15),
@@ -198,53 +200,37 @@ class _AppViewState extends State<_AppView> {
   void dispose() {
     _statusNotifier.dispose();
     _userSubscription?.cancel();
-    // Dispose the AppStatusService to cancel timers and remove observers.
     _appStatusService?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Wrap the part of the tree that needs to react to AppBloc state changes
-    // with a BlocListener and a BlocBuilder.
+    // This BlocListener keeps GoRouter's refresh mechanism informed about
+    // authentication status changes. GoRouter's `redirect` logic depends on
+    // this notifier to re-evaluate routes when the user logs in or out
+    // *while the app is running*.
     return BlocListener<AppBloc, AppState>(
-      // The BlocListener's primary role here is to keep GoRouter's refresh
-      // mechanism informed about authentication status changes.
-      // GoRouter's `redirect` logic depends on this notifier to re-evaluate
-      // routes when the user logs in or out *while the app is running*.
       listenWhen: (previous, current) => previous.status != current.status,
       listener: (context, state) {
         _statusNotifier.value = state.status;
       },
-      // The BlocBuilder is the core of the new stable startup architecture.
-      // It functions as a "master switch" for the entire application's UI.
-      // Based on the AppStatus, it decides whether to show a full-screen
-      // status page (like Maintenance or Loading) or to build the main
-      // application UI with its nested router. This approach is fundamental
-      // to fixing the original race conditions and BuildContext instability.
+      // This BlocBuilder is the "master switch" for the entire application's
+      // UI. Based on the AppStatus, it decides whether to show a full-screen
+      // status page (like Maintenance) or to build the main application UI
+      // with its nested router. This is fundamental to the new, stable
+      // startup architecture.
       child: BlocBuilder<AppBloc, AppState>(
         builder: (context, state) {
           // --- Full-Screen Status Pages ---
           // The following states represent critical, app-wide conditions that
           // must be handled before the main router and UI are displayed.
-          // By returning a dedicated widget here, we ensure these pages are
-          // full-screen and exist outside the main app's navigation shell.
 
           if (state.status == AppLifeCycleStatus.underMaintenance) {
             // The app is in maintenance mode. Show the MaintenancePage.
-            //
-            // WHY A SEPARATE MATERIALAPP?
-            // Each status page is wrapped in its own simple MaterialApp to create
-            // a self-contained environment. This provides the necessary
-            // Directionality, theme, and localization context for the page
-            // to render correctly, without needing the main app's router.
-            //
-            // WHY A DEFAULT THEME?
-            // The theme uses hardcoded, sensible defaults (like FlexScheme.material)
-            // because at this early stage, we only need a basic visual structure.
-            // However, we critically use `state.themeMode` and `state.locale`,
-            // which are loaded from user settings *before* the maintenance check,
-            // ensuring the page respects the user's chosen light/dark mode and language.
+            // Each status page is wrapped in its own simple MaterialApp to
+            // create a self-contained environment with the necessary theme
+            // and localization context to render correctly.
             return MaterialApp(
               debugShowCheckedModeBanner: false,
               theme: lightTheme(
@@ -304,10 +290,8 @@ class _AppViewState extends State<_AppView> {
           }
 
           // --- Loading User Data State ---
-          // Display a loading screen ONLY if the app is actively trying to load
-          // user-specific data (settings or preferences) for an authenticated/anonymous user.
-          // If the status is unauthenticated, it means there's no user data to load,
-          // and the app should proceed to the router to show the authentication page.
+          // Display a loading screen ONLY if the app is actively trying to
+          // load user-specific data (e.g., after a login transition).
           if (state.status == AppLifeCycleStatus.loadingUserData) {
             return MaterialApp(
               debugShowCheckedModeBanner: false,
@@ -347,45 +331,27 @@ class _AppViewState extends State<_AppView> {
           }
 
           // --- Main Application UI ---
-          // If none of the critical states above are met, and user settings
-          // are loaded, the app is ready to display its main UI.
-          // We build the MaterialApp.router here.
-          // This is the single, STABLE root widget for the entire main app.
-          //
-          // WHY IS THIS SO IMPORTANT?
-          // Because this widget is now built conditionally inside a single
-          // BlocBuilder, it is created only ONCE when the app enters a
-          // "running" state (e.g., authenticated, anonymous) with all
-          // necessary data. It is no longer destroyed and rebuilt during
-          // startup, which was the root cause of the `BuildContext` instability
-          // and the `l10n` crashes.
-          //
-          // THEME CONFIGURATION:
-          // This MaterialApp is themed using the full, detailed settings
-          // loaded into the AppState (e.g., `state.flexScheme`,
-          // `state.settings.displaySettings...`), providing the complete,
-          // personalized user experience.
+          // If none of the critical states above are met, the app is ready
+          // to display its main UI. We build the MaterialApp.router here.
+          // This is the single, STABLE root widget for the entire main app,
+          // which prevents the `BuildContext` instability and `l10n`
+          // crashes seen in the previous architecture.
           return MultiRepositoryProvider(
             // By placing these providers here, we ensure they are only
             // created when the app is in a stable, running state. This
             // guarantees that any dependencies they have on the AppBloc's
-            // state (like remoteConfig) are available and non-null,
-            // preventing startup crashes.
+            // state (like remoteConfig) are available and non-null.
             providers: [
               // Provide the InterstitialAdManager.
-              // It depends on the state managed by AppBloc, so it must be
-              // created only after AppBloc confirms a successful startup.
               RepositoryProvider(
                 create: (context) => InterstitialAdManager(
                   appBloc: context.read<AppBloc>(),
                   adService: context.read<AdService>(),
                   navigatorKey: widget.navigatorKey,
                 ),
-                // Ensure it's created immediately.
                 lazy: false,
               ),
               // Provide the ContentLimitationService.
-              // It also depends on AppBloc's state.
               RepositoryProvider(
                 create: (context) =>
                     ContentLimitationService(appBloc: context.read<AppBloc>()),

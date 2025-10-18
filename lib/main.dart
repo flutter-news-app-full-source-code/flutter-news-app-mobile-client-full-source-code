@@ -5,7 +5,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/config/confi
 import 'package:flutter_news_app_mobile_client_full_source_code/bootstrap.dart';
 
 // Define the current application environment (production/development/demo).
-const appEnvironment = AppEnvironment.demo;
+const appEnvironment = AppEnvironment.development;
 
 void main() async {
   final appConfig = switch (appEnvironment) {

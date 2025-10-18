@@ -1,6 +1,7 @@
 # Changelog
 
 ## Upcoming Release
+
  - **refactor!**: overhauled app startup and authentication lifecycle to be robust and free of race conditions. This fixes multiple bugs related to indefinite loading, data migration, and authentication flows.
 
 ## 1.4.0 - 2025-10-17

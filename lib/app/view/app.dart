@@ -80,6 +80,7 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _adService),
         RepositoryProvider.value(value: _localAdRepository),
         RepositoryProvider.value(value: _inlineAdCacheService),
+        RepositoryProvider.value(value: _environment),
       ],
       child: MultiBlocProvider(
         providers: [

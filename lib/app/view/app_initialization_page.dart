@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/app.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_initialization_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_hot_restart_wrapper.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
@@ -22,9 +22,9 @@ import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view
 /// based on the initialization state:
 ///
 /// - [AppInitializationInProgress]: Shows a loading indicator.
-/// - [AppInitializationFailure]: Shows a relevant error page (e.g.,
+/// - [AppInitializationFailed]: Shows a relevant error page (e.g.,
 ///   maintenance, update required, or critical error).
-/// - [AppInitializationSuccess]: Transitions to the main [App] widget with all
+/// - [AppInitializationSucceeded]: Transitions to the main [App] widget with all
 ///   the necessary data.
 ///
 /// This approach creates a robust "master switch" for the app, completely
@@ -80,7 +80,7 @@ class AppInitializationPage extends StatelessWidget {
         },
         builder: (context, state) {
           switch (state) {
-            case final AppInitializationSuccess successState:
+            case final AppInitializationSucceeded successState:
               // On success, build the main App widget with the guaranteed
               // successful initialization data.
               final successData = successState.initializationSuccess;
@@ -106,7 +106,7 @@ class AppInitializationPage extends StatelessWidget {
                 navigatorKey: navigatorKey,
               );
 
-            case final AppInitializationFailure failureState:
+            case final AppInitializationFailed failureState:
               // On failure, determine which full-screen error page to show.
               final failureData = failureState.initializationFailure;
               switch (failureData.status) {
@@ -119,7 +119,9 @@ class AppInitializationPage extends StatelessWidget {
                   );
                 case AppLifeCycleStatus.criticalError:
                   return CriticalErrorPage(
-                    exception: failureData.error,
+                    exception: failureData.error is HttpException
+                        ? failureData.error as HttpException
+                        : null,
                     onRetry: () {
                       // For a critical error, we trigger a full app restart
                       // to ensure a clean state.
@@ -132,7 +134,9 @@ class AppInitializationPage extends StatelessWidget {
                 // ignore: no_default_cases
                 default:
                   return CriticalErrorPage(
-                    exception: failureData.error,
+                    exception: failureData.error is HttpException
+                        ? failureData.error as HttpException
+                        : null,
                     onRetry: () => AppHotRestartWrapper.restartApp(context),
                   );
               }

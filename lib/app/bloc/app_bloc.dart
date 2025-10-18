@@ -51,9 +51,18 @@ class AppBloc extends Bloc<AppEvent, AppState> {
                 settings: settings,
                 userContentPreferences: userContentPreferences,
               ),
-            InitializationFailure(:final status, :final error) => AppState(
+            InitializationFailure(
+              :final status,
+              :final error,
+              :final currentAppVersion,
+            ) =>
+              AppState(
                 status: status,
                 error: error,
+                // Explicitly set remoteConfig to null on failure to ensure
+                // the state is predictable and prevent null-safety errors.
+                remoteConfig: null,
+                currentAppVersion: currentAppVersion,
               ),
           },
         ) {
@@ -135,6 +144,25 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // A user is present, so we are logging in or transitioning roles.
     // Show a loading screen while we handle this process.
     emit(state.copyWith(status: AppLifeCycleStatus.loadingUserData));
+
+    // CRITICAL: Guard against a null remoteConfig. This can happen if the
+    // initial app load failed but a user change event is somehow triggered.
+    // Without this check, the app would crash.
+    if (state.remoteConfig == null) {
+      _logger.severe(
+        '[AppBloc] CRITICAL: A user transition was attempted, but remoteConfig '
+        'is null. This indicates a failed initial startup. Halting transition.',
+      );
+      emit(
+        state.copyWith(
+          status: AppLifeCycleStatus.criticalError,
+          error: const UnknownException(
+            'Cannot process user transition without remote configuration.',
+          ),
+        ),
+      );
+      return;
+    }
 
     // Delegate the complex transition logic to the AppInitializer.
     final transitionResult = await _navigatorKey.currentContext!

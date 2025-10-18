@@ -99,6 +99,25 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   }
 
   /// Handles all logic related to user authentication state changes.
+  ///
+  /// This method is the reactive entry point for handling a user logging in,
+  /// logging out, or transitioning from an anonymous to an authenticated
+  /// state while the app is running. It is triggered by the `AppUserChanged`
+  /// event, which is dispatched in response to the `AuthRepository`'s
+  /// `authStateChanges` stream.
+  ///
+  /// **Responsibilities:**
+  /// 1.  **Manages UI State:** It immediately emits a `loadingUserData` status
+  ///     to inform the UI to show a loading indicator, providing immediate
+  ///     feedback to the user.
+  /// 2.  **Delegates Complex Logic:** It does NOT perform the data fetching
+  ///     or migration itself. Instead, it delegates this complex, critical
+  ///     work to the `AppInitializer.handleUserTransition` method. This keeps
+  ///     the BLoC clean and respects the single responsibility of the
+  ///     `AppInitializer`.
+  /// 3.  **Updates Final State:** Based on the `InitializationResult` returned
+  ///     by the `AppInitializer`, it emits the final state, either with the
+  ///     newly hydrated user data or with a critical error.
   Future<void> _onAppUserChanged(
     AppUserChanged event,
     Emitter<AppState> emit,

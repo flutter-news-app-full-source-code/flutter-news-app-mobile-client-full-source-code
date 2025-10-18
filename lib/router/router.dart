@@ -225,8 +225,8 @@ GoRouter createRouter({
               return BlocProvider<SettingsBloc>(
                 create: (context) {
                   final settingsBloc = SettingsBloc(
-                    userAppSettingsRepository:
-                        context.read<DataRepository<UserAppSettings>>(),
+                    userAppSettingsRepository: context
+                        .read<DataRepository<UserAppSettings>>(),
                     inlineAdCacheService: context.read<InlineAdCacheService>(),
                   );
                   if (userId != null) {
@@ -343,14 +343,14 @@ GoRouter createRouter({
                     providers: [
                       BlocProvider(
                         create: (context) => HeadlineDetailsBloc(
-                          headlinesRepository:
-                              context.read<DataRepository<Headline>>(),
+                          headlinesRepository: context
+                              .read<DataRepository<Headline>>(),
                         ),
                       ),
                       BlocProvider(
                         create: (context) => SimilarHeadlinesBloc(
-                          headlinesRepository:
-                              context.read<DataRepository<Headline>>(),
+                          headlinesRepository: context
+                              .read<DataRepository<Headline>>(),
                         ),
                       ),
                     ],
@@ -400,24 +400,29 @@ GoRouter createRouter({
           return MultiBlocProvider(
             providers: [
               BlocProvider(
-                create: (context) => EntityDetailsBloc(
-                  headlinesRepository: context.read<DataRepository<Headline>>(),
-                  topicRepository: context.read<DataRepository<Topic>>(),
-                  sourceRepository: context.read<DataRepository<Source>>(),
-                  countryRepository: context.read<DataRepository<Country>>(),
-                  appBloc: context.read<AppBloc>(),
-                  feedDecoratorService: FeedDecoratorService(
-                    topicsRepository: context.read<DataRepository<Topic>>(),
-                    sourcesRepository: context.read<DataRepository<Source>>(),
-                  ),
-                  inlineAdCacheService: context.read<InlineAdCacheService>(),
-                )..add(
-                    EntityDetailsLoadRequested(
-                      entityId: args.entityId,
-                      contentType: args.contentType,
-                      adThemeStyle: adThemeStyle,
+                create: (context) =>
+                    EntityDetailsBloc(
+                      headlinesRepository: context
+                          .read<DataRepository<Headline>>(),
+                      topicRepository: context.read<DataRepository<Topic>>(),
+                      sourceRepository: context.read<DataRepository<Source>>(),
+                      countryRepository: context
+                          .read<DataRepository<Country>>(),
+                      appBloc: context.read<AppBloc>(),
+                      feedDecoratorService: FeedDecoratorService(
+                        topicsRepository: context.read<DataRepository<Topic>>(),
+                        sourcesRepository: context
+                            .read<DataRepository<Source>>(),
+                      ),
+                      inlineAdCacheService: context
+                          .read<InlineAdCacheService>(),
+                    )..add(
+                      EntityDetailsLoadRequested(
+                        entityId: args.entityId,
+                        contentType: args.contentType,
+                        adThemeStyle: adThemeStyle,
+                      ),
                     ),
-                  ),
               ),
             ],
             child: EntityDetailsPage(args: args),
@@ -460,7 +465,8 @@ GoRouter createRouter({
           final allItems = extra['allItems'] as List<dynamic>? ?? [];
           final initialSelectedItems =
               extra['initialSelectedItems'] as Set<dynamic>? ?? {};
-          final itemBuilder = extra['itemBuilder'] as Function? ??
+          final itemBuilder =
+              extra['itemBuilder'] as Function? ??
               (dynamic item) => item.toString();
 
           return MultiSelectSearchPage<dynamic>(
@@ -489,16 +495,16 @@ GoRouter createRouter({
                   create: (context) {
                     final appBloc = context.read<AppBloc>();
                     return HeadlinesFeedBloc(
-                      headlinesRepository:
-                          context.read<DataRepository<Headline>>(),
+                      headlinesRepository: context
+                          .read<DataRepository<Headline>>(),
                       feedDecoratorService: FeedDecoratorService(
                         topicsRepository: context.read<DataRepository<Topic>>(),
-                        sourcesRepository:
-                            context.read<DataRepository<Source>>(),
+                        sourcesRepository: context
+                            .read<DataRepository<Source>>(),
                       ),
                       appBloc: appBloc,
-                      inlineAdCacheService:
-                          context.read<InlineAdCacheService>(),
+                      inlineAdCacheService: context
+                          .read<InlineAdCacheService>(),
                       initialUserContentPreferences:
                           appBloc.state.userContentPreferences,
                     );
@@ -518,14 +524,14 @@ GoRouter createRouter({
                         providers: [
                           BlocProvider(
                             create: (context) => HeadlineDetailsBloc(
-                              headlinesRepository:
-                                  context.read<DataRepository<Headline>>(),
+                              headlinesRepository: context
+                                  .read<DataRepository<Headline>>(),
                             ),
                           ),
                           BlocProvider(
                             create: (context) => SimilarHeadlinesBloc(
-                              headlinesRepository:
-                                  context.read<DataRepository<Headline>>(),
+                              headlinesRepository: context
+                                  .read<DataRepository<Headline>>(),
                             ),
                           ),
                         ],
@@ -587,16 +593,17 @@ GoRouter createRouter({
                               final allCountries =
                                   extra['allCountries'] as List<Country>? ?? [];
                               final allSourceTypes =
-                                  extra['allSourceTypes'] as List<SourceType>? ??
-                                      [];
+                                  extra['allSourceTypes']
+                                      as List<SourceType>? ??
+                                  [];
                               final initialSelectedHeadquarterCountries =
                                   extra['initialSelectedHeadquarterCountries']
-                                          as Set<Country>? ??
-                                      {};
+                                      as Set<Country>? ??
+                                  {};
                               final initialSelectedSourceTypes =
                                   extra['initialSelectedSourceTypes']
-                                          as Set<SourceType>? ??
-                                      {};
+                                      as Set<SourceType>? ??
+                                  {};
 
                               return SourceListFilterPage(
                                 allCountries: allCountries,

@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:core/core.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/models/initialization_result.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart'
+    show AppInitializer;
 import 'package:logging/logging.dart';
 
 part 'app_initialization_event.dart';
@@ -54,10 +56,10 @@ class AppInitializationBloc
       switch (result) {
         case final InitializationSuccess success:
           _logger.info('App initialization successful.');
-          emit(AppInitializationSuccess(success));
+          emit(AppInitializationSucceeded(success));
         case final InitializationFailure failure:
           _logger.warning('App initialization failed: ${failure.status}');
-          emit(AppInitializationFailure(failure));
+          emit(AppInitializationFailed(failure));
       }
     } catch (e, s) {
       _logger.severe(
@@ -66,7 +68,7 @@ class AppInitializationBloc
         s,
       );
       emit(
-        AppInitializationFailure(
+        AppInitializationFailed(
           InitializationFailure(
             status: AppLifeCycleStatus.criticalError,
             error: UnknownException(

@@ -111,7 +111,6 @@ class AppInitializer {
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
     required DataRepository<RemoteConfig> remoteConfigRepository,
-    required DataRepository<User> userRepository,
     required local_config.AppEnvironment environment,
     required PackageInfoService packageInfoService,
     required Logger logger,

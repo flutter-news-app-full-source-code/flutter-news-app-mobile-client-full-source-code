@@ -6,12 +6,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/app.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_initialization_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_hot_restart_wrapper.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
-import 'package:ui_kit/ui_kit.dart';
 
 /// {@template app_initialization_page}
 /// A top-level widget that orchestrates the application's initialization
@@ -129,6 +129,7 @@ class AppInitializationPage extends StatelessWidget {
                 // The other AppLifeCycleStatus values are not possible failure
                 // states from the initializer, so we default to a critical
                 // error page as a safe fallback.
+                // ignore: no_default_cases
                 default:
                   return CriticalErrorPage(
                     exception: failureData.error,

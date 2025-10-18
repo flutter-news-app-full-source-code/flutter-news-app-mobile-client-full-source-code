@@ -35,23 +35,25 @@ class App extends StatelessWidget {
     required DataRepository<Topic> topicsRepository,
     required DataRepository<Country> countriesRepository,
     required DataRepository<Source> sourcesRepository,
+    required DataRepository<User> userRepository,
     required AppEnvironment environment,
     required InlineAdCacheService inlineAdCacheService,
     required AdService adService,
     required DataRepository<LocalAd> localAdRepository,
     required GlobalKey<NavigatorState> navigatorKey,
     super.key,
-  })  : _initializationResult = initializationResult,
-        _authenticationRepository = authenticationRepository,
-        _headlinesRepository = headlinesRepository,
-        _topicsRepository = topicsRepository,
-        _countriesRepository = countriesRepository,
-        _sourcesRepository = sourcesRepository,
-        _environment = environment,
-        _adService = adService,
-        _localAdRepository = localAdRepository,
-        _navigatorKey = navigatorKey,
-        _inlineAdCacheService = inlineAdCacheService;
+  }) : _initializationResult = initializationResult,
+       _authenticationRepository = authenticationRepository,
+       _headlinesRepository = headlinesRepository,
+       _topicsRepository = topicsRepository,
+       _countriesRepository = countriesRepository,
+       _sourcesRepository = sourcesRepository,
+       _userRepository = userRepository,
+       _environment = environment,
+       _adService = adService,
+       _localAdRepository = localAdRepository,
+       _navigatorKey = navigatorKey,
+       _inlineAdCacheService = inlineAdCacheService;
 
   final InitializationResult _initializationResult;
   final AuthRepository _authenticationRepository;
@@ -59,6 +61,7 @@ class App extends StatelessWidget {
   final DataRepository<Topic> _topicsRepository;
   final DataRepository<Country> _countriesRepository;
   final DataRepository<Source> _sourcesRepository;
+  final DataRepository<User> _userRepository;
   final AppEnvironment _environment;
   final AdService _adService;
   final DataRepository<LocalAd> _localAdRepository;
@@ -78,6 +81,7 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _countriesRepository),
         RepositoryProvider.value(value: _sourcesRepository),
         RepositoryProvider.value(value: _adService),
+        RepositoryProvider.value(value: _userRepository),
         RepositoryProvider.value(value: _localAdRepository),
         RepositoryProvider.value(value: _inlineAdCacheService),
         RepositoryProvider.value(value: _environment),
@@ -113,20 +117,14 @@ class App extends StatelessWidget {
                 ContentLimitationService(appBloc: context.read<AppBloc>()),
           ),
         ],
-        child: _AppView(
-          environment: _environment,
-          navigatorKey: _navigatorKey,
-        ),
+        child: _AppView(environment: _environment, navigatorKey: _navigatorKey),
       ),
     );
   }
 }
 
 class _AppView extends StatefulWidget {
-  const _AppView({
-    required this.environment,
-    required this.navigatorKey,
-  });
+  const _AppView({required this.environment, required this.navigatorKey});
 
   final AppEnvironment environment;
   final GlobalKey<NavigatorState> navigatorKey;
@@ -218,7 +216,8 @@ class _AppViewState extends State<_AppView> {
               supportedLocales: AppLocalizations.supportedLocales,
               locale: state.locale,
               home: CriticalErrorPage(
-                exception: state.error ??
+                exception:
+                    state.error ??
                     const UnknownException(
                       'An unknown critical error occurred.',
                     ),

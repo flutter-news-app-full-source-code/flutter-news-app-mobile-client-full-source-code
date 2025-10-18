@@ -20,10 +20,10 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/admob_ad_pro
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/demo_ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/local_ad_provider.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/app.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
     as app_config;
+import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_initializer_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/package_info_service.dart';
@@ -196,7 +196,7 @@ Future<Widget> bootstrap(
 
   // Initialize InlineAdCacheService with the created AdService.
   inlineAdCacheService = InlineAdCacheService(adService: adService);
-  logger..fine('InlineAdCacheService initialized.');
+  logger.fine('InlineAdCacheService initialized.');
 
   // Create a GlobalKey for the NavigatorState to be used by AppBloc
   // and InterstitialAdManager for BuildContext access.
@@ -480,12 +480,13 @@ Future<Widget> bootstrap(
   final initializationResult = await appInitializer.initializeApp();
   logger.fine('App Initialization complete.');
 
-  logger..info('--- Bootstrap Process Complete. Returning App widget. ---');
+  logger.info('--- Bootstrap Process Complete. Returning App widget. ---');
   return App(
     initializationResult: initializationResult,
     authenticationRepository: authenticationRepository,
     headlinesRepository: headlinesRepository,
     topicsRepository: topicsRepository,
+    userRepository: userRepository,
     countriesRepository: countriesRepository,
     sourcesRepository: sourcesRepository,
     environment: environment,

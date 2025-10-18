@@ -38,7 +38,7 @@ class AppState extends Equatable {
 
   /// An error that occurred during the initialization or a user transition.
   /// If not null, indicates a critical issue.
-  final HttpException? error;
+  final Exception? error;
 
   /// The user's content preferences, including followed countries, sources,
   /// topics, and saved headlines.
@@ -132,7 +132,7 @@ class AppState extends Equatable {
     User? user,
     UserAppSettings? settings,
     RemoteConfig? remoteConfig,
-    HttpException? error,
+    Exception? error,
     bool clearError = false,
     UserContentPreferences? userContentPreferences,
     int? selectedBottomNavigationIndex,

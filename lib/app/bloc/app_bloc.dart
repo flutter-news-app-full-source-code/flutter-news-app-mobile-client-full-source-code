@@ -16,12 +16,13 @@ part 'app_event.dart';
 part 'app_state.dart';
 
 /// {@template app_bloc}
-/// Manages the overall application state, including authentication status,
-/// user settings, and remote configuration.
+/// Manages the global state of the application *after* successful
+/// initialization.
 ///
-/// This BLoC is central to the application's lifecycle, reacting to user
-/// authentication changes, managing user preferences, and applying global
-/// remote configurations. It acts as the single source of truth for global
+/// This BLoC is created only when the [AppInitializationBloc] succeeds. It
+/// receives all the pre-fetched initial data (user, settings, remote config)
+/// and becomes the single source of truth for the running application's state,
+/// reacting to user authentication changes and managing user preferences.
 /// application state.
 /// {@endtemplate}
 class AppBloc extends Bloc<AppEvent, AppState> {
@@ -88,8 +89,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   /// Handles the [AppStarted] event.
   ///
-  /// This is now a no-op as all initialization logic has been moved to the
-  /// [AppInitializer] and is processed in the [AppBloc] constructor.
+  /// This is now a no-op. All critical initialization logic has been moved to
+  /// the [AppInitializer] service and is orchestrated by the
+  /// [AppInitializationBloc] *before* this AppBloc is ever created.
   Future<void> _onAppStarted(AppStarted event, Emitter<AppState> emit) async {
     _logger.fine(
       '[AppBloc] AppStarted event received. State is already initialized.',

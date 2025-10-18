@@ -46,11 +46,13 @@ class FollowedSourcesListPage extends StatelessWidget {
             );
           }
 
-          if (appState.initialUserPreferencesError != null) {
+          if (appState.error != null) {
             return FailureStateWidget(
-              exception: appState.initialUserPreferencesError!,
+              exception: appState.error!,
               onRetry: () {
-                context.read<AppBloc>().add(AppStarted(initialUser: user));
+                context.read<AppBloc>().add(
+                  const AppUserContentPreferencesRefreshed(),
+                );
               },
             );
           }

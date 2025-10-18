@@ -23,7 +23,6 @@ part 'app_state.dart';
 /// receives all the pre-fetched initial data (user, settings, remote config)
 /// and becomes the single source of truth for the running application's state,
 /// reacting to user authentication changes and managing user preferences.
-/// application state.
 /// {@endtemplate}
 class AppBloc extends Bloc<AppEvent, AppState> {
   /// {@macro app_bloc}
@@ -40,28 +39,28 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required AuthRepository authRepository,
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<UserContentPreferences>
-    userContentPreferencesRepository,
+        userContentPreferencesRepository,
     required DataRepository<User> userRepository,
-  }) : _remoteConfigRepository = remoteConfigRepository,
-       _appInitializer = appInitializer,
-       _authRepository = authRepository,
-       _userAppSettingsRepository = userAppSettingsRepository,
-       _userContentPreferencesRepository = userContentPreferencesRepository,
-       _userRepository = userRepository,
-       _logger = Logger('AppBloc'),
-       super(
-         AppState(
-           status: user == null
-               ? AppLifeCycleStatus.unauthenticated
-               : user.isGuest
-               ? AppLifeCycleStatus.anonymous
-               : AppLifeCycleStatus.authenticated,
-           user: user,
-           remoteConfig: remoteConfig,
-           settings: settings,
-           userContentPreferences: userContentPreferences,
-         ),
-       ) {
+  })  : _remoteConfigRepository = remoteConfigRepository,
+        _appInitializer = appInitializer,
+        _authRepository = authRepository,
+        _userAppSettingsRepository = userAppSettingsRepository,
+        _userContentPreferencesRepository = userContentPreferencesRepository,
+        _userRepository = userRepository,
+        _logger = Logger('AppBloc'),
+        super(
+          AppState(
+            status: user == null
+                ? AppLifeCycleStatus.unauthenticated
+                : user.isGuest
+                    ? AppLifeCycleStatus.anonymous
+                    : AppLifeCycleStatus.authenticated,
+            user: user,
+            remoteConfig: remoteConfig,
+            settings: settings,
+            userContentPreferences: userContentPreferences,
+          ),
+        ) {
     // Register event handlers for various app-level events.
     on<AppStarted>(_onAppStarted);
     on<AppUserChanged>(_onAppUserChanged);
@@ -84,7 +83,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final AuthRepository _authRepository;
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
   final DataRepository<UserContentPreferences>
-  _userContentPreferencesRepository;
+      _userContentPreferencesRepository;
   final DataRepository<User> _userRepository;
 
   /// Handles the [AppStarted] event.
@@ -165,10 +164,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // Update the state based on the result of the transition.
     switch (transitionResult) {
       case InitializationSuccess(
-        :final user,
-        :final settings,
-        :final userContentPreferences,
-      ):
+          // On a successful transition, update the state with the newly
+          // fetched user data. The status is determined by the user's role
+          // (guest or standard). Any previous error state is cleared.
+          :final user,
+          :final settings,
+          :final userContentPreferences,
+        ):
         emit(
           state.copyWith(
             status: user!.isGuest
@@ -180,6 +182,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             clearError: true,
           ),
         );
+      // If the transition fails (e.g., due to a network error while
+      // fetching user data), emit a critical error state.
       case InitializationFailure(:final status, :final error):
         emit(state.copyWith(status: status, error: error));
     }
@@ -237,6 +241,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     }
 
     final updatedSettings = event.settings;
+    // Optimistically update the UI with the new settings immediately.
+    // This provides a responsive user experience. The original settings are
+    // saved in case the persistence fails and we need to roll back.
+    final originalSettings = state.settings;
     emit(state.copyWith(settings: updatedSettings));
 
     try {
@@ -254,7 +262,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         e,
         s,
       );
-      emit(state.copyWith(settings: state.settings));
+      // If persistence fails, roll back the state to the original settings
+      // to keep the UI consistent with the backend state.
+      emit(state.copyWith(settings: originalSettings));
     }
   }
 
@@ -295,8 +305,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         final restoredStatus = state.user == null
             ? AppLifeCycleStatus.unauthenticated
             : (state.user!.isGuest
-                  ? AppLifeCycleStatus.anonymous
-                  : AppLifeCycleStatus.authenticated);
+                ? AppLifeCycleStatus.anonymous
+                : AppLifeCycleStatus.authenticated);
         emit(
           state.copyWith(status: restoredStatus, remoteConfig: remoteConfig),
         );
@@ -320,7 +330,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       final now = DateTime.now();
       final currentStatus =
           originalUser.feedDecoratorStatus[event.feedDecoratorType] ??
-          const UserFeedDecoratorStatus(isCompleted: false);
+              const UserFeedDecoratorStatus(isCompleted: false);
 
       final updatedDecoratorStatus = currentStatus.copyWith(
         lastShownAt: now,
@@ -329,12 +339,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
       final newFeedDecoratorStatus =
           Map<FeedDecoratorType, UserFeedDecoratorStatus>.from(
-            originalUser.feedDecoratorStatus,
-          )..update(
-            event.feedDecoratorType,
-            (_) => updatedDecoratorStatus,
-            ifAbsent: () => updatedDecoratorStatus,
-          );
+        originalUser.feedDecoratorStatus,
+      )..update(
+              event.feedDecoratorType,
+              (_) => updatedDecoratorStatus,
+              ifAbsent: () => updatedDecoratorStatus,
+            );
 
       final updatedUser = originalUser.copyWith(
         feedDecoratorStatus: newFeedDecoratorStatus,
@@ -372,6 +382,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     }
 
     final updatedPreferences = event.preferences;
+    // Optimistically update the UI with the new preferences.
+    // The original preferences are saved for potential rollback on failure.
+    final originalPreferences = state.userContentPreferences;
     emit(state.copyWith(userContentPreferences: updatedPreferences));
 
     try {
@@ -389,8 +402,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         e,
         s,
       );
+      // If persistence fails, roll back the state to the original preferences.
       emit(
-        state.copyWith(userContentPreferences: state.userContentPreferences),
+        state.copyWith(userContentPreferences: originalPreferences),
       );
     }
   }
@@ -400,6 +414,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     SavedFilterAdded event,
     Emitter<AppState> emit,
   ) async {
+    _logger.fine(
+      '[AppBloc] SavedFilterAdded event received for filter: "${event.filter.name}".',
+    );
+    // This method modifies the preferences in memory and then delegates the
+    // persistence and final state update to the AppUserContentPreferencesChanged event.
     if (state.userContentPreferences == null) {
       _logger.warning(
         '[AppBloc] Skipping SavedFilterAdded: UserContentPreferences not loaded.',
@@ -423,6 +442,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     SavedFilterUpdated event,
     Emitter<AppState> emit,
   ) async {
+    _logger.fine(
+      '[AppBloc] SavedFilterUpdated event received for filter id: ${event.filter.id}.',
+    );
+    // This method modifies the preferences in memory and then delegates the
+    // persistence and final state update to the AppUserContentPreferencesChanged event.
     if (state.userContentPreferences == null) {
       _logger.warning(
         '[AppBloc] Skipping SavedFilterUpdated: UserContentPreferences not loaded.',
@@ -455,6 +479,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     SavedFilterDeleted event,
     Emitter<AppState> emit,
   ) async {
+    _logger.fine(
+      '[AppBloc] SavedFilterDeleted event received for filter id: ${event.filterId}.',
+    );
+    // This method modifies the preferences in memory and then delegates the
+    // persistence and final state update to the AppUserContentPreferencesChanged event.
     if (state.userContentPreferences == null) {
       _logger.warning(
         '[AppBloc] Skipping SavedFilterDeleted: UserContentPreferences not loaded.',
@@ -486,8 +515,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     SavedFiltersReordered event,
     Emitter<AppState> emit,
   ) async {
-    _logger.info('[AppBloc] SavedFiltersReordered event received.');
-
+    _logger.fine('[AppBloc] SavedFiltersReordered event received.');
+    // This method modifies the preferences in memory and then delegates the
+    // persistence and final state update to the AppUserContentPreferencesChanged event.
     if (state.userContentPreferences == null) {
       _logger.warning(
         '[AppBloc] Skipping SavedFiltersReordered: UserContentPreferences not loaded.',

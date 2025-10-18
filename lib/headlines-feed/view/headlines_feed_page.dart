@@ -40,23 +40,6 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
     super.initState();
     // Add listener to trigger pagination when scrolling near the bottom.
     _scrollController.addListener(_onScroll);
-
-    // Dispatch the initial fetch event for the headlines feed.
-    // This is intentionally placed in `initState` and wrapped in `addPostFrameCallback`
-    // to ensure the `BuildContext` is fully initialized and stable.
-    // This prevents the "Tried to listen to an InheritedWidget in a life-cycle
-    // that will never be called again" error, which occurred when the event
-    // was dispatched from the router's `BlocProvider` `create` method,
-    // as that context could be disposed before asynchronous operations completed.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        context.read<HeadlinesFeedBloc>().add(
-          HeadlinesFeedFetchRequested(
-            adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
-          ),
-        );
-      }
-    });
   }
 
   @override

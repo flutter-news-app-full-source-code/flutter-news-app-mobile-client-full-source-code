@@ -33,10 +33,17 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required DataRepository<RemoteConfig> remoteConfigRepository,
     required AppInitializer appInitializer,
     required AuthRepository authRepository,
+    required DataRepository<UserAppSettings> userAppSettingsRepository,
+    required DataRepository<UserContentPreferences>
+    userContentPreferencesRepository,
+    required DataRepository<User> userRepository,
   }) : _navigatorKey = navigatorKey,
        _remoteConfigRepository = remoteConfigRepository,
        _appInitializer = appInitializer,
        _authRepository = authRepository,
+       _userAppSettingsRepository = userAppSettingsRepository,
+       _userContentPreferencesRepository = userContentPreferencesRepository,
+       _userRepository = userRepository,
        _logger = Logger('AppBloc'),
        super(switch (initializationResult) {
          InitializationSuccess(
@@ -93,6 +100,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final DataRepository<RemoteConfig> _remoteConfigRepository;
   final AppInitializer _appInitializer;
   final AuthRepository _authRepository;
+  final DataRepository<UserAppSettings> _userAppSettingsRepository;
+  final DataRepository<UserContentPreferences>
+  _userContentPreferencesRepository;
+  final DataRepository<User> _userRepository;
 
   /// Provides access to the [NavigatorState] for obtaining a [BuildContext].
   GlobalKey<NavigatorState> get navigatorKey => _navigatorKey;
@@ -206,9 +217,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       return;
     }
 
-    final settings = await _navigatorKey.currentContext!
-        .read<DataRepository<UserAppSettings>>()
-        .read(id: state.user!.id, userId: state.user!.id);
+    final settings = await _userAppSettingsRepository.read(
+      id: state.user!.id,
+      userId: state.user!.id,
+    );
     emit(state.copyWith(settings: settings));
   }
 
@@ -224,9 +236,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       return;
     }
 
-    final preferences = await _navigatorKey.currentContext!
-        .read<DataRepository<UserContentPreferences>>()
-        .read(id: state.user!.id, userId: state.user!.id);
+    final preferences = await _userContentPreferencesRepository.read(
+      id: state.user!.id,
+      userId: state.user!.id,
+    );
     emit(state.copyWith(userContentPreferences: preferences));
   }
 
@@ -247,13 +260,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     emit(state.copyWith(settings: updatedSettings));
 
     try {
-      await _navigatorKey.currentContext!
-          .read<DataRepository<UserAppSettings>>()
-          .update(
-            id: updatedSettings.id,
-            item: updatedSettings,
-            userId: updatedSettings.id,
-          );
+      await _userAppSettingsRepository.update(
+        id: updatedSettings.id,
+        item: updatedSettings,
+        userId: updatedSettings.id,
+      );
       _logger.info(
         '[AppBloc] UserAppSettings successfully updated for user ${updatedSettings.id}.',
       );
@@ -352,7 +363,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       emit(state.copyWith(user: updatedUser));
 
       try {
-        await _navigatorKey.currentContext!.read<DataRepository<User>>().update(
+        await _userRepository.update(
           id: updatedUser.id,
           item: updatedUser,
           userId: updatedUser.id,
@@ -384,13 +395,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     emit(state.copyWith(userContentPreferences: updatedPreferences));
 
     try {
-      await _navigatorKey.currentContext!
-          .read<DataRepository<UserContentPreferences>>()
-          .update(
-            id: updatedPreferences.id,
-            item: updatedPreferences,
-            userId: updatedPreferences.id,
-          );
+      await _userContentPreferencesRepository.update(
+        id: updatedPreferences.id,
+        item: updatedPreferences,
+        userId: updatedPreferences.id,
+      );
       _logger.info(
         '[AppBloc] UserContentPreferences successfully updated for user ${updatedPreferences.id}.',
       );

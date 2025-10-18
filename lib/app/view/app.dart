@@ -39,6 +39,10 @@ class App extends StatelessWidget {
     required DataRepository<Country> countriesRepository,
     required DataRepository<Source> sourcesRepository,
     required DataRepository<User> userRepository,
+    required DataRepository<RemoteConfig> remoteConfigRepository,
+    required DataRepository<UserAppSettings> userAppSettingsRepository,
+    required DataRepository<UserContentPreferences>
+    userContentPreferencesRepository,
     required AppEnvironment environment,
     required InlineAdCacheService inlineAdCacheService,
     required AdService adService,
@@ -52,6 +56,9 @@ class App extends StatelessWidget {
        _countriesRepository = countriesRepository,
        _sourcesRepository = sourcesRepository,
        _userRepository = userRepository,
+       _remoteConfigRepository = remoteConfigRepository,
+       _userAppSettingsRepository = userAppSettingsRepository,
+       _userContentPreferencesRepository = userContentPreferencesRepository,
        _environment = environment,
        _adService = adService,
        _localAdRepository = localAdRepository,
@@ -65,6 +72,10 @@ class App extends StatelessWidget {
   final DataRepository<Country> _countriesRepository;
   final DataRepository<Source> _sourcesRepository;
   final DataRepository<User> _userRepository;
+  final DataRepository<RemoteConfig> _remoteConfigRepository;
+  final DataRepository<UserAppSettings> _userAppSettingsRepository;
+  final DataRepository<UserContentPreferences>
+  _userContentPreferencesRepository;
   final AppEnvironment _environment;
   final AdService _adService;
   final DataRepository<LocalAd> _localAdRepository;
@@ -85,6 +96,21 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _sourcesRepository),
         RepositoryProvider.value(value: _adService),
         RepositoryProvider.value(value: _userRepository),
+        RepositoryProvider.value(value: _remoteConfigRepository),
+        RepositoryProvider.value(value: _userAppSettingsRepository),
+        RepositoryProvider.value(value: _userContentPreferencesRepository),
+        // Provide the AppInitializer itself, as it's a core service.
+        RepositoryProvider(
+          create: (context) => AppInitializer(
+            authenticationRepository: context.read<AuthRepository>(),
+            userAppSettingsRepository: _userAppSettingsRepository,
+            userContentPreferencesRepository: _userContentPreferencesRepository,
+            remoteConfigRepository: _remoteConfigRepository,
+            environment: _environment,
+            packageInfoService: PackageInfoServiceImpl(logger: Logger('App')),
+            logger: Logger('App'),
+          ),
+        ),
         RepositoryProvider.value(value: _localAdRepository),
         RepositoryProvider.value(value: _inlineAdCacheService),
         RepositoryProvider.value(value: _environment),
@@ -95,21 +121,13 @@ class App extends StatelessWidget {
             create: (context) => AppBloc(
               initializationResult: _initializationResult,
               navigatorKey: _navigatorKey,
-              remoteConfigRepository: context
-                  .read<DataRepository<RemoteConfig>>(),
-              appInitializer: AppInitializer(
-                authenticationRepository: context.read<AuthRepository>(),
-                userAppSettingsRepository: context
-                    .read<DataRepository<UserAppSettings>>(),
-                userContentPreferencesRepository: context
-                    .read<DataRepository<UserContentPreferences>>(),
-                remoteConfigRepository: context
-                    .read<DataRepository<RemoteConfig>>(),
-                environment: context.read<AppEnvironment>(),
-                packageInfoService: context.read<PackageInfoService>(),
-                logger: Logger('AppBloc'),
-              ),
+              remoteConfigRepository: _remoteConfigRepository,
+              appInitializer: context.read<AppInitializer>(),
               authRepository: context.read<AuthRepository>(),
+              userAppSettingsRepository: _userAppSettingsRepository,
+              userContentPreferencesRepository:
+                  _userContentPreferencesRepository,
+              userRepository: _userRepository,
             )..add(const AppStarted()),
           ),
           BlocProvider(

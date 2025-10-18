@@ -28,7 +28,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   /// Initializes the BLoC with required repositories, environment, and
   /// pre-fetched initial data.
   AppBloc({
-    required InitializationResult initializationResult,
+    required User? user,
+    required RemoteConfig remoteConfig,
+    required UserAppSettings? settings,
+    required UserContentPreferences? userContentPreferences,
     required DataRepository<RemoteConfig> remoteConfigRepository,
     required AppInitializer appInitializer,
     required AuthRepository authRepository,
@@ -43,40 +46,19 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _userContentPreferencesRepository = userContentPreferencesRepository,
        _userRepository = userRepository,
        _logger = Logger('AppBloc'),
-       super(switch (initializationResult) {
-         InitializationSuccess(
-           :final user,
-           :final remoteConfig,
-           :final settings,
-           :final userContentPreferences,
-         ) =>
-           AppState(
-             status: user == null
-                 ? AppLifeCycleStatus.unauthenticated
-                 : user.isGuest
-                 ? AppLifeCycleStatus.anonymous
-                 : AppLifeCycleStatus.authenticated,
-             user: user,
-             remoteConfig: remoteConfig,
-             settings: settings,
-             userContentPreferences: userContentPreferences,
-           ),
-         InitializationFailure(
-           :final status,
-           :final error,
-           :final currentAppVersion,
-           :final latestAppVersion,
-         ) =>
-           AppState(
-             status: status,
-             error: error,
-             // Explicitly set remoteConfig to null on failure to ensure
-             // the state is predictable and prevent null-safety errors.
-             remoteConfig: null,
-             currentAppVersion: currentAppVersion,
-             latestAppVersion: latestAppVersion,
-           ),
-       }) {
+       super(
+         AppState(
+           status: user == null
+               ? AppLifeCycleStatus.unauthenticated
+               : user.isGuest
+               ? AppLifeCycleStatus.anonymous
+               : AppLifeCycleStatus.authenticated,
+           user: user,
+           remoteConfig: remoteConfig,
+           settings: settings,
+           userContentPreferences: userContentPreferences,
+         ),
+       ) {
     // Register event handlers for various app-level events.
     on<AppStarted>(_onAppStarted);
     on<AppUserChanged>(_onAppUserChanged);

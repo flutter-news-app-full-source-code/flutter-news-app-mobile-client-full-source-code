@@ -55,6 +55,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
               :final status,
               :final error,
               :final currentAppVersion,
+              :final latestAppVersion,
             ) =>
               AppState(
                 status: status,
@@ -63,6 +64,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
                 // the state is predictable and prevent null-safety errors.
                 remoteConfig: null,
                 currentAppVersion: currentAppVersion,
+                latestAppVersion: latestAppVersion,
               ),
           },
         ) {

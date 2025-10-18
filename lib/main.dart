@@ -5,8 +5,13 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/config/confi
 import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_hot_restart_wrapper.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/bootstrap.dart';
 
-// Define the current application environment (production/development/demo).
-const appEnvironment = AppEnvironment.demo;
+// Determine the current application environment from compile-time variables.
+// Defaults to 'development' if no environment is specified.
+const appEnvironment = String.fromEnvironment('APP_ENVIRONMENT') == 'production'
+    ? AppEnvironment.production
+    : (String.fromEnvironment('APP_ENVIRONMENT') == 'demo'
+          ? AppEnvironment.demo
+          : AppEnvironment.development);
 
 void main() async {
   final appConfig = switch (appEnvironment) {

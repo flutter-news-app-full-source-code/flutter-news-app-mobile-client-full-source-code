@@ -13,6 +13,14 @@ sealed class InitializationResult extends Equatable {
 /// This class bundles all the necessary data required for the app to start
 /// in a "ready" state. This includes the remote configuration and, if a user
 /// is present, their specific settings and preferences.
+///
+/// **Architectural Hint for Future Maintenance:**
+/// This class acts as the "data contract" for a successful startup. If, in the
+/// future, a new piece of critical, user-specific data is required for the app
+/// to function (e.g., a `UserSubscription` status, A/B testing flags, etc.),
+/// it should be added as a property here. The `AppInitializer` would then be
+/// updated to fetch this data, and the `App` widget would receive it.
+/// is present, their specific settings and preferences.
 final class InitializationSuccess extends InitializationResult {
   /// Creates an instance of a successful initialization result.
   const InitializationSuccess({

@@ -43,8 +43,7 @@ class AppState extends Equatable {
     required this.environment,
     this.user,
     this.remoteConfig,
-    this.initialRemoteConfigError,
-    this.initialUserPreferencesError,
+    this.error,
     this.userContentPreferences,
     this.settings,
     this.selectedBottomNavigationIndex = 0,
@@ -66,13 +65,9 @@ class AppState extends Equatable {
   /// Contains global settings like maintenance mode, update requirements, and ad configurations.
   final RemoteConfig? remoteConfig;
 
-  /// An error that occurred during the initial remote config fetch.
-  /// If not null, indicates a critical issue preventing app startup.
-  final HttpException? initialRemoteConfigError;
-
-  /// An error that occurred during the initial user preferences fetch.
-  /// If not null, indicates a critical issue preventing app startup.
-  final HttpException? initialUserPreferencesError;
+  /// An error that occurred during the initialization or a user transition.
+  /// If not null, indicates a critical issue.
+  final HttpException? error;
 
   /// The user's content preferences, including followed countries, sources,
   /// topics, and saved headlines.
@@ -156,8 +151,7 @@ class AppState extends Equatable {
     user,
     settings,
     remoteConfig,
-    initialRemoteConfigError,
-    initialUserPreferencesError,
+    error,
     userContentPreferences,
     selectedBottomNavigationIndex,
     environment,
@@ -171,9 +165,8 @@ class AppState extends Equatable {
     User? user,
     UserAppSettings? settings,
     RemoteConfig? remoteConfig,
-    bool clearAppConfig = false,
-    HttpException? initialRemoteConfigError,
-    HttpException? initialUserPreferencesError,
+    HttpException? error,
+    bool clearError = false,
     UserContentPreferences? userContentPreferences,
     int? selectedBottomNavigationIndex,
     local_config.AppEnvironment? environment,
@@ -183,11 +176,8 @@ class AppState extends Equatable {
       status: status ?? this.status,
       user: user ?? this.user,
       settings: settings ?? this.settings,
-      remoteConfig: clearAppConfig ? null : remoteConfig ?? this.remoteConfig,
-      initialRemoteConfigError:
-          initialRemoteConfigError ?? this.initialRemoteConfigError,
-      initialUserPreferencesError:
-          initialUserPreferencesError ?? this.initialUserPreferencesError,
+      remoteConfig: remoteConfig ?? this.remoteConfig,
+      error: clearError ? null : error ?? this.error,
       userContentPreferences:
           userContentPreferences ?? this.userContentPreferences,
       selectedBottomNavigationIndex:

@@ -42,18 +42,18 @@ class App extends StatelessWidget {
     required DataRepository<LocalAd> localAdRepository,
     required GlobalKey<NavigatorState> navigatorKey,
     super.key,
-  }) : _initializationResult = initializationResult,
-       _authenticationRepository = authenticationRepository,
-       _headlinesRepository = headlinesRepository,
-       _topicsRepository = topicsRepository,
-       _countriesRepository = countriesRepository,
-       _sourcesRepository = sourcesRepository,
-       _userRepository = userRepository,
-       _environment = environment,
-       _adService = adService,
-       _localAdRepository = localAdRepository,
-       _navigatorKey = navigatorKey,
-       _inlineAdCacheService = inlineAdCacheService;
+  })  : _initializationResult = initializationResult,
+        _authenticationRepository = authenticationRepository,
+        _headlinesRepository = headlinesRepository,
+        _topicsRepository = topicsRepository,
+        _countriesRepository = countriesRepository,
+        _sourcesRepository = sourcesRepository,
+        _userRepository = userRepository,
+        _environment = environment,
+        _adService = adService,
+        _localAdRepository = localAdRepository,
+        _navigatorKey = navigatorKey,
+        _inlineAdCacheService = inlineAdCacheService;
 
   final InitializationResult _initializationResult;
   final AuthRepository _authenticationRepository;
@@ -98,23 +98,6 @@ class App extends StatelessWidget {
             create: (context) => AuthenticationBloc(
               authenticationRepository: context.read<AuthRepository>(),
             ),
-          ),
-          // Provide the InterstitialAdManager as a RepositoryProvider.
-          // It depends on the state managed by AppBloc, so it must be created
-          // after AppBloc is available.
-          RepositoryProvider(
-            create: (context) => InterstitialAdManager(
-              appBloc: context.read<AppBloc>(),
-              adService: context.read<AdService>(),
-            ),
-            // Ensure it's created immediately
-            lazy: false,
-          ),
-          // Provide the ContentLimitationService.
-          // It depends on AppBloc, so it is created here.
-          RepositoryProvider(
-            create: (context) =>
-                ContentLimitationService(appBloc: context.read<AppBloc>()),
           ),
         ],
         child: _AppView(environment: _environment, navigatorKey: _navigatorKey),
@@ -365,35 +348,62 @@ class _AppViewState extends State<_AppView> {
           // loaded into the AppState (e.g., `state.flexScheme`,
           // `state.settings.displaySettings...`), providing the complete,
           // personalized user experience.
-          return MaterialApp.router(
-            debugShowCheckedModeBanner: false,
-            themeMode: state.themeMode,
-            theme: lightTheme(
-              scheme: state.flexScheme,
-              appTextScaleFactor: state.appTextScaleFactor,
-              appFontWeight: state.appFontWeight,
-              fontFamily: state.fontFamily,
-            ),
-            darkTheme: darkTheme(
-              scheme: state.flexScheme,
-              appTextScaleFactor: state.appTextScaleFactor,
-              appFontWeight: state.appFontWeight,
-              fontFamily: state.fontFamily,
-            ),
-            routerConfig: createRouter(
-              authStatusNotifier: _statusNotifier,
-              navigatorKey: widget.navigatorKey,
-              logger: _routerLogger,
-            ),
-            locale: state.locale,
-            localizationsDelegates: const [
-              ...AppLocalizations.localizationsDelegates,
-              ...UiKitLocalizations.localizationsDelegates,
+          return MultiRepositoryProvider(
+            // By placing these providers here, we ensure they are only
+            // created when the app is in a stable, running state. This
+            // guarantees that any dependencies they have on the AppBloc's
+            // state (like remoteConfig) are available and non-null,
+            // preventing startup crashes.
+            providers: [
+              // Provide the InterstitialAdManager.
+              // It depends on the state managed by AppBloc, so it must be
+              // created only after AppBloc confirms a successful startup.
+              RepositoryProvider(
+                create: (context) => InterstitialAdManager(
+                  appBloc: context.read<AppBloc>(),
+                  adService: context.read<AdService>(),
+                ),
+                // Ensure it's created immediately.
+                lazy: false,
+              ),
+              // Provide the ContentLimitationService.
+              // It also depends on AppBloc's state.
+              RepositoryProvider(
+                create: (context) => ContentLimitationService(
+                  appBloc: context.read<AppBloc>(),
+                ),
+              ),
             ],
-            supportedLocales: const [
-              ...AppLocalizations.supportedLocales,
-              ...UiKitLocalizations.supportedLocales,
-            ],
+            child: MaterialApp.router(
+              debugShowCheckedModeBanner: false,
+              themeMode: state.themeMode,
+              theme: lightTheme(
+                scheme: state.flexScheme,
+                appTextScaleFactor: state.appTextScaleFactor,
+                appFontWeight: state.appFontWeight,
+                fontFamily: state.fontFamily,
+              ),
+              darkTheme: darkTheme(
+                scheme: state.flexScheme,
+                appTextScaleFactor: state.appTextScaleFactor,
+                appFontWeight: state.appFontWeight,
+                fontFamily: state.fontFamily,
+              ),
+              routerConfig: createRouter(
+                authStatusNotifier: _statusNotifier,
+                navigatorKey: widget.navigatorKey,
+                logger: _routerLogger,
+              ),
+              locale: state.locale,
+              localizationsDelegates: const [
+                ...AppLocalizations.localizationsDelegates,
+                ...UiKitLocalizations.localizationsDelegates,
+              ],
+              supportedLocales: const [
+                ...AppLocalizations.supportedLocales,
+                ...UiKitLocalizations.supportedLocales,
+              ],
+            ),
           );
         },
       ),

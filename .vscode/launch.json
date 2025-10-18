@@ -16,7 +16,8 @@
             "type": "dart",
             "program": "lib/main.dart",
             "args": [
-                "--dart-define=APP_ENVIRONMENT=development"
+                "--dart-define=APP_ENVIRONMENT=development",
+                "--dart-define=BASE_URL=http://localhost:8080"
             ]
         },
         {
@@ -25,7 +26,8 @@
             "type": "dart",
             "program": "lib/main.dart",
             "args": [
-                "--dart-define=APP_ENVIRONMENT=production"
+                "--dart-define=APP_ENVIRONMENT=production",
+                "--dart-define=BASE_URL=https://api.your-production-domain.com"
             ]
         }
     ]

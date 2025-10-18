@@ -40,7 +40,6 @@ class AppState extends Equatable {
   /// {@macro app_state}
   const AppState({
     required this.status,
-    required this.environment,
     this.user,
     this.remoteConfig,
     this.error,
@@ -76,9 +75,6 @@ class AppState extends Equatable {
 
   /// The currently selected index for bottom navigation.
   final int selectedBottomNavigationIndex;
-
-  /// The current application environment (e.g., demo, development, production).
-  final local_config.AppEnvironment environment;
 
   /// The current version of the application, fetched from `package_info_plus`.
   /// This is used for version enforcement.
@@ -154,7 +150,6 @@ class AppState extends Equatable {
     error,
     userContentPreferences,
     selectedBottomNavigationIndex,
-    environment,
     currentAppVersion,
   ];
 
@@ -169,7 +164,6 @@ class AppState extends Equatable {
     bool clearError = false,
     UserContentPreferences? userContentPreferences,
     int? selectedBottomNavigationIndex,
-    local_config.AppEnvironment? environment,
     String? currentAppVersion,
   }) {
     return AppState(
@@ -182,7 +176,6 @@ class AppState extends Equatable {
           userContentPreferences ?? this.userContentPreferences,
       selectedBottomNavigationIndex:
           selectedBottomNavigationIndex ?? this.selectedBottomNavigationIndex,
-      environment: environment ?? this.environment,
       currentAppVersion: currentAppVersion ?? this.currentAppVersion,
     );
   }

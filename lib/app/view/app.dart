@@ -167,6 +167,8 @@ class _AppViewState extends State<_AppView> {
   late final ValueNotifier<AppLifeCycleStatus> _statusNotifier;
   StreamSubscription<User?>? _userSubscription;
   AppStatusService? _appStatusService;
+  InterstitialAdManager? _interstitialAdManager;
+  late final ContentLimitationService _contentLimitationService;
   final _routerLogger = Logger('GoRouter');
 
   @override
@@ -195,6 +197,17 @@ class _AppViewState extends State<_AppView> {
       checkInterval: const Duration(minutes: 15),
       environment: widget.environment,
     );
+
+    // Create instances of services that need to be managed by this State's
+    // lifecycle. This prevents them from being re-created on every build.
+    _interstitialAdManager = InterstitialAdManager(
+      appBloc: appBloc,
+      adService: context.read<AdService>(),
+      navigatorKey: widget.navigatorKey,
+    );
+    _contentLimitationService = ContentLimitationService(
+      appBloc: context.read<AppBloc>(),
+    );
   }
 
   @override
@@ -202,6 +215,7 @@ class _AppViewState extends State<_AppView> {
     _statusNotifier.dispose();
     _userSubscription?.cancel();
     _appStatusService?.dispose();
+    _interstitialAdManager?.dispose();
     super.dispose();
   }
 
@@ -336,26 +350,17 @@ class _AppViewState extends State<_AppView> {
           // to display its main UI. We build the MaterialApp.router here.
           // This is the single, STABLE root widget for the entire main app,
           // which prevents the `BuildContext` instability and `l10n`
-          // crashes seen in the previous architecture.
+          // crashes seen in the previous architecture. This MultiRepositoryProvider
+          // uses the `.value` constructor to provide the service instances that
+          // were created and are managed by this State object.
           return MultiRepositoryProvider(
-            // By placing these providers here, we ensure they are only
-            // created when the app is in a stable, running state. This
-            // guarantees that any dependencies they have on the AppBloc's
-            // state (like remoteConfig) are available and non-null.
             providers: [
-              // Provide the InterstitialAdManager.
-              RepositoryProvider(
-                create: (context) => InterstitialAdManager(
-                  appBloc: context.read<AppBloc>(),
-                  adService: context.read<AdService>(),
-                  navigatorKey: widget.navigatorKey,
+              if (_interstitialAdManager != null)
+                RepositoryProvider<InterstitialAdManager>.value(
+                  value: _interstitialAdManager!,
                 ),
-                lazy: false,
-              ),
-              // Provide the ContentLimitationService.
-              RepositoryProvider(
-                create: (context) =>
-                    ContentLimitationService(appBloc: context.read<AppBloc>()),
+              RepositoryProvider<ContentLimitationService>.value(
+                value: _contentLimitationService,
               ),
             ],
             child: MaterialApp.router(

@@ -199,11 +199,7 @@ class _AppViewState extends State<_AppView> {
               supportedLocales: AppLocalizations.supportedLocales,
               locale: state.locale,
               home: CriticalErrorPage(
-                exception:
-                    state.error ??
-                    const UnknownException(
-                      'An unknown critical error occurred.',
-                    ),
+                exception: state.error,
                 onRetry: () {
                   // Retrying a critical error requires a full app restart.
                   // For now, we can just re-trigger the AppStarted event.

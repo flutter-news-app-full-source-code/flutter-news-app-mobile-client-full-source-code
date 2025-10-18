@@ -6,11 +6,14 @@ import 'package:collection/collection.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/headline_filter.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_decorator_service.dart';
+import 'package:ui_kit/ui_kit.dart';
 
 part 'headlines_feed_event.dart';
 part 'headlines_feed_state.dart';
@@ -47,11 +50,32 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
                initialUserContentPreferences?.savedFilters ?? const [],
          ),
        ) {
-    // Subscribe to AppBloc to receive updates on user preferences.
-    // This handles subsequent changes to preferences (e.g., adding/deleting
-    // a filter) while the feed page is active.
+    // Subscribe to AppBloc to react to global state changes.
     _appBlocSubscription = _appBloc.stream.listen((appState) {
-      // Check if userContentPreferences has changed and is not null.
+      // 1. Trigger the initial feed fetch.
+      // This is the new, robust way to start the feed. We wait until the
+      // AppBloc confirms that all user data is loaded and the app is in a
+      // stable 'running' state. This prevents race conditions where the
+      // feed would try to load before its dependencies (like remote config
+      // or user settings) are ready.
+      if (!_isInitialFetchDispatched && appState.status.isRunning) {
+        // The `adThemeStyle` is derived from the theme, which in turn is
+        // derived from the now-guaranteed-to-be-loaded app settings.
+        final theme = _appBloc.state.themeMode == ThemeMode.dark
+            ? darkTheme(scheme: _appBloc.state.flexScheme)
+            : lightTheme(scheme: _appBloc.state.flexScheme);
+
+        add(
+          HeadlinesFeedRefreshRequested(
+            adThemeStyle: AdThemeStyle.fromTheme(theme),
+          ),
+        );
+        _isInitialFetchDispatched = true;
+      }
+
+      // 2. Handle subsequent updates to user preferences.
+      // This ensures that if the user adds or removes a saved filter on
+      // another screen, the filter bar in the feed updates accordingly.
       if (appState.userContentPreferences != null &&
           state.savedFilters != appState.userContentPreferences!.savedFilters) {
         add(
@@ -100,6 +124,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
   /// Subscription to the AppBloc's state stream.
   late final StreamSubscription<AppState> _appBlocSubscription;
+
+  /// A flag to ensure the initial fetch is dispatched only once.
+  bool _isInitialFetchDispatched = false;
 
   /// The number of headlines to fetch per page.
   static const _headlinesFetchLimit = 10;

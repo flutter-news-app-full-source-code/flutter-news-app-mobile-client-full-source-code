@@ -62,8 +62,16 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         // The `adThemeStyle` is derived from the theme, which in turn is
         // derived from the now-guaranteed-to-be-loaded app settings.
         final theme = _appBloc.state.themeMode == ThemeMode.dark
-            ? darkTheme(scheme: _appBloc.state.flexScheme)
-            : lightTheme(scheme: _appBloc.state.flexScheme);
+            ? darkTheme(
+                scheme: _appBloc.state.flexScheme,
+                appTextScaleFactor: _appBloc.state.appTextScaleFactor,
+                appFontWeight: _appBloc.state.appFontWeight,
+              )
+            : lightTheme(
+                scheme: _appBloc.state.flexScheme,
+                appTextScaleFactor: _appBloc.state.appTextScaleFactor,
+                appFontWeight: _appBloc.state.appFontWeight,
+              );
 
         add(
           HeadlinesFeedRefreshRequested(

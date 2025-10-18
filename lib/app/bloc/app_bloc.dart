@@ -30,44 +30,42 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   AppBloc({
     required InitializationResult initializationResult,
     required GlobalKey<NavigatorState> navigatorKey,
-  })  : _navigatorKey = navigatorKey,
-        _logger = Logger('AppBloc'),
-        super(
-          switch (initializationResult) {
-            InitializationSuccess(
-              :final user,
-              :final remoteConfig,
-              :final settings,
-              :final userContentPreferences
-            ) =>
-              AppState(
-                status: user == null
-                    ? AppLifeCycleStatus.unauthenticated
-                    : user.isGuest
-                        ? AppLifeCycleStatus.anonymous
-                        : AppLifeCycleStatus.authenticated,
-                user: user,
-                remoteConfig: remoteConfig,
-                settings: settings,
-                userContentPreferences: userContentPreferences,
-              ),
-            InitializationFailure(
-              :final status,
-              :final error,
-              :final currentAppVersion,
-              :final latestAppVersion,
-            ) =>
-              AppState(
-                status: status,
-                error: error,
-                // Explicitly set remoteConfig to null on failure to ensure
-                // the state is predictable and prevent null-safety errors.
-                remoteConfig: null,
-                currentAppVersion: currentAppVersion,
-                latestAppVersion: latestAppVersion,
-              ),
-          },
-        ) {
+  }) : _navigatorKey = navigatorKey,
+       _logger = Logger('AppBloc'),
+       super(switch (initializationResult) {
+         InitializationSuccess(
+           :final user,
+           :final remoteConfig,
+           :final settings,
+           :final userContentPreferences,
+         ) =>
+           AppState(
+             status: user == null
+                 ? AppLifeCycleStatus.unauthenticated
+                 : user.isGuest
+                 ? AppLifeCycleStatus.anonymous
+                 : AppLifeCycleStatus.authenticated,
+             user: user,
+             remoteConfig: remoteConfig,
+             settings: settings,
+             userContentPreferences: userContentPreferences,
+           ),
+         InitializationFailure(
+           :final status,
+           :final error,
+           :final currentAppVersion,
+           :final latestAppVersion,
+         ) =>
+           AppState(
+             status: status,
+             error: error,
+             // Explicitly set remoteConfig to null on failure to ensure
+             // the state is predictable and prevent null-safety errors.
+             remoteConfig: null,
+             currentAppVersion: currentAppVersion,
+             latestAppVersion: latestAppVersion,
+           ),
+       }) {
     // Register event handlers for various app-level events.
     on<AppStarted>(_onAppStarted);
     on<AppUserChanged>(_onAppUserChanged);
@@ -82,19 +80,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<SavedFilterDeleted>(_onSavedFilterDeleted);
     on<SavedFiltersReordered>(_onSavedFiltersReordered);
     on<AppLogoutRequested>(_onLogoutRequested);
-
-    // Subscribe to the authentication repository's authStateChanges stream.
-    // This stream is the single source of truth for the user's auth state
-    // and drives the entire app lifecycle.
-    _userSubscription = _navigatorKey.currentContext!
-        .read<AuthRepository>()
-        .authStateChanges
-        .listen((User? user) => add(AppUserChanged(user)));
   }
 
   final GlobalKey<NavigatorState> _navigatorKey;
   final Logger _logger;
-  late final StreamSubscription<User?> _userSubscription;
 
   /// Provides access to the [NavigatorState] for obtaining a [BuildContext].
   GlobalKey<NavigatorState> get navigatorKey => _navigatorKey;
@@ -178,10 +167,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // Update the state based on the result of the transition.
     switch (transitionResult) {
       case InitializationSuccess(
-          :final user,
-          :final settings,
-          :final userContentPreferences
-        ):
+        :final user,
+        :final settings,
+        :final userContentPreferences,
+      ):
         emit(
           state.copyWith(
             status: user!.isGuest
@@ -276,12 +265,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     unawaited(_navigatorKey.currentContext!.read<AuthRepository>().signOut());
   }
 
-  @override
-  Future<void> close() {
-    _userSubscription.cancel();
-    return super.close();
-  }
-
   /// Handles periodic fetching of the remote application configuration.
   Future<void> _onAppPeriodicConfigFetchRequested(
     AppPeriodicConfigFetchRequested event,
@@ -314,8 +297,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         final restoredStatus = state.user == null
             ? AppLifeCycleStatus.unauthenticated
             : (state.user!.isGuest
-                ? AppLifeCycleStatus.anonymous
-                : AppLifeCycleStatus.authenticated);
+                  ? AppLifeCycleStatus.anonymous
+                  : AppLifeCycleStatus.authenticated);
         emit(
           state.copyWith(status: restoredStatus, remoteConfig: remoteConfig),
         );
@@ -339,7 +322,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       final now = DateTime.now();
       final currentStatus =
           originalUser.feedDecoratorStatus[event.feedDecoratorType] ??
-              const UserFeedDecoratorStatus(isCompleted: false);
+          const UserFeedDecoratorStatus(isCompleted: false);
 
       final updatedDecoratorStatus = currentStatus.copyWith(
         lastShownAt: now,
@@ -348,12 +331,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
       final newFeedDecoratorStatus =
           Map<FeedDecoratorType, UserFeedDecoratorStatus>.from(
-        originalUser.feedDecoratorStatus,
-      )..update(
-          event.feedDecoratorType,
-          (_) => updatedDecoratorStatus,
-          ifAbsent: () => updatedDecoratorStatus,
-        );
+            originalUser.feedDecoratorStatus,
+          )..update(
+            event.feedDecoratorType,
+            (_) => updatedDecoratorStatus,
+            ifAbsent: () => updatedDecoratorStatus,
+          );
 
       final updatedUser = originalUser.copyWith(
         feedDecoratorStatus: newFeedDecoratorStatus,
@@ -362,13 +345,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       emit(state.copyWith(user: updatedUser));
 
       try {
-        await _navigatorKey.currentContext!
-            .read<DataRepository<User>>()
-            .update(
-              id: updatedUser.id,
-              item: updatedUser,
-              userId: updatedUser.id,
-            );
+        await _navigatorKey.currentContext!.read<DataRepository<User>>().update(
+          id: updatedUser.id,
+          item: updatedUser,
+          userId: updatedUser.id,
+        );
         _logger.info(
           '[AppBloc] User ${event.userId} FeedDecorator ${event.feedDecoratorType} '
           'status successfully updated.',

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:auth_repository/auth_repository.dart';
 import 'package:core/core.dart' hide AppStatus;
 import 'package:data_repository/data_repository.dart';
@@ -118,6 +120,7 @@ class _AppView extends StatefulWidget {
 
 class _AppViewState extends State<_AppView> {
   late final ValueNotifier<AppLifeCycleStatus> _statusNotifier;
+  StreamSubscription<User?>? _userSubscription;
   AppStatusService? _appStatusService;
   final _routerLogger = Logger('GoRouter');
 
@@ -129,6 +132,14 @@ class _AppViewState extends State<_AppView> {
     // This notifier is used by GoRouter's refreshListenable to trigger
     // route re-evaluation when the app's lifecycle status changes.
     _statusNotifier = ValueNotifier<AppLifeCycleStatus>(appBloc.state.status);
+
+    // Subscribe to the authentication repository's authStateChanges stream.
+    // This stream is the single source of truth for the user's auth state
+    // and drives the entire app lifecycle.
+    _userSubscription = context
+        .read<AuthRepository>()
+        .authStateChanges
+        .listen((user) => context.read<AppBloc>().add(AppUserChanged(user)));
 
     // Instantiate and initialize the AppStatusService.
     // This service monitors the app's lifecycle and periodically triggers
@@ -144,6 +155,7 @@ class _AppViewState extends State<_AppView> {
   @override
   void dispose() {
     _statusNotifier.dispose();
+    _userSubscription?.cancel();
     // Dispose the AppStatusService to cancel timers and remove observers.
     _appStatusService?.dispose();
     super.dispose();

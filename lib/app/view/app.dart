@@ -10,7 +10,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_ca
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_hot_restart_wrapper.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_status_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/package_info_service.dart';
@@ -33,7 +32,10 @@ import 'package:ui_kit/ui_kit.dart';
 class App extends StatelessWidget {
   /// {@macro app_widget}
   const App({
-    required InitializationResult initializationResult,
+    required this.user,
+    required this.remoteConfig,
+    required this.settings,
+    required this.userContentPreferences,
     required AuthRepository authenticationRepository,
     required DataRepository<Headline> headlinesRepository,
     required DataRepository<Topic> topicsRepository,
@@ -43,30 +45,33 @@ class App extends StatelessWidget {
     required DataRepository<RemoteConfig> remoteConfigRepository,
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<UserContentPreferences>
-    userContentPreferencesRepository,
+        userContentPreferencesRepository,
     required AppEnvironment environment,
     required InlineAdCacheService inlineAdCacheService,
     required AdService adService,
     required DataRepository<LocalAd> localAdRepository,
     required GlobalKey<NavigatorState> navigatorKey,
     super.key,
-  }) : _initializationResult = initializationResult,
-       _authenticationRepository = authenticationRepository,
-       _headlinesRepository = headlinesRepository,
-       _topicsRepository = topicsRepository,
-       _countriesRepository = countriesRepository,
-       _sourcesRepository = sourcesRepository,
-       _userRepository = userRepository,
-       _remoteConfigRepository = remoteConfigRepository,
-       _userAppSettingsRepository = userAppSettingsRepository,
-       _userContentPreferencesRepository = userContentPreferencesRepository,
-       _environment = environment,
-       _adService = adService,
-       _localAdRepository = localAdRepository,
-       _navigatorKey = navigatorKey,
-       _inlineAdCacheService = inlineAdCacheService;
+  })  : _authenticationRepository = authenticationRepository,
+        _headlinesRepository = headlinesRepository,
+        _topicsRepository = topicsRepository,
+        _countriesRepository = countriesRepository,
+        _sourcesRepository = sourcesRepository,
+        _userRepository = userRepository,
+        _remoteConfigRepository = remoteConfigRepository,
+        _userAppSettingsRepository = userAppSettingsRepository,
+        _userContentPreferencesRepository = userContentPreferencesRepository,
+        _environment = environment,
+        _adService = adService,
+        _localAdRepository = localAdRepository,
+        _navigatorKey = navigatorKey,
+        _inlineAdCacheService = inlineAdCacheService;
 
-  final InitializationResult _initializationResult;
+  final User? user;
+  final RemoteConfig remoteConfig;
+  final UserAppSettings? settings;
+  final UserContentPreferences? userContentPreferences;
+
   final AuthRepository _authenticationRepository;
   final DataRepository<Headline> _headlinesRepository;
   final DataRepository<Topic> _topicsRepository;
@@ -76,7 +81,7 @@ class App extends StatelessWidget {
   final DataRepository<RemoteConfig> _remoteConfigRepository;
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
   final DataRepository<UserContentPreferences>
-  _userContentPreferencesRepository;
+      _userContentPreferencesRepository;
   final AppEnvironment _environment;
   final AdService _adService;
   final DataRepository<LocalAd> _localAdRepository;
@@ -120,7 +125,10 @@ class App extends StatelessWidget {
         providers: [
           BlocProvider(
             create: (context) => AppBloc(
-              initializationResult: _initializationResult,
+              user: user,
+              remoteConfig: remoteConfig,
+              settings: settings,
+              userContentPreferences: userContentPreferences,
               remoteConfigRepository: _remoteConfigRepository,
               appInitializer: context.read<AppInitializer>(),
               authRepository: context.read<AuthRepository>(),
@@ -220,39 +228,6 @@ class _AppViewState extends State<_AppView> {
           // must be handled before the main router and UI are displayed.
           // By returning a dedicated widget here, we ensure these pages are
           // full-screen and exist outside the main app's navigation shell.
-
-          if (state.status == AppLifeCycleStatus.criticalError) {
-            return MaterialApp(
-              debugShowCheckedModeBanner: false,
-              theme: lightTheme(
-                scheme: state.flexScheme,
-                appTextScaleFactor: state.appTextScaleFactor,
-                appFontWeight: state.appFontWeight,
-                fontFamily: state.fontFamily,
-              ),
-              darkTheme: darkTheme(
-                scheme: state.flexScheme,
-                appTextScaleFactor: state.appTextScaleFactor,
-                appFontWeight: state.appFontWeight,
-                fontFamily: state.fontFamily,
-              ),
-              themeMode: state.themeMode,
-              localizationsDelegates: const [
-                ...AppLocalizations.localizationsDelegates,
-                ...UiKitLocalizations.localizationsDelegates,
-              ],
-              supportedLocales: AppLocalizations.supportedLocales,
-              locale: state.locale,
-              home: CriticalErrorPage(
-                exception: state.error,
-                onRetry: () {
-                  // Trigger a full application restart by calling the static
-                  // method on AppHotRestartWrapper.
-                  AppHotRestartWrapper.restartApp(context);
-                },
-              ),
-            );
-          }
 
           if (state.status == AppLifeCycleStatus.underMaintenance) {
             // The app is in maintenance mode. Show the MaintenancePage.

@@ -134,6 +134,7 @@ class App extends StatelessWidget {
               userAppSettingsRepository: _userAppSettingsRepository,
               userContentPreferencesRepository:
                   _userContentPreferencesRepository,
+              logger: context.read<Logger>(),
               userRepository: _userRepository,
             )..add(const AppStarted()),
           ),

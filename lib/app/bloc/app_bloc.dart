@@ -40,6 +40,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
+    required Logger logger,
     required DataRepository<User> userRepository,
   }) : _remoteConfigRepository = remoteConfigRepository,
        _appInitializer = appInitializer,
@@ -47,7 +48,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _userAppSettingsRepository = userAppSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
        _userRepository = userRepository,
-       _logger = Logger('AppBloc'),
+       _logger = logger,
        super(
          AppState(
            status: user == null

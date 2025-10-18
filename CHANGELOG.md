@@ -2,7 +2,6 @@
 
 ## Upcoming Release
 
- - **refactor!**: overhauled app startup and authentication lifecycle to be robust and free of race conditions. This fixes multiple bugs related to indefinite loading, data migration, and authentication flows.
  - **refactor!**: Overhauled the application startup and authentication lifecycle to be robust and free of race conditions. This was a major architectural change that introduced a new `AppInitializationPage` and `AppInitializationBloc` to act as a "gatekeeper," ensuring all critical data is fetched *before* the main UI is built. This fixes a class of bugs related to indefinite loading screens, data migration on account linking, and inconsistent state during startup.
 
 ## 1.4.0 - 2025-10-17

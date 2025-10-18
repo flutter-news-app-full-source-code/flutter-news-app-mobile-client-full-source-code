@@ -109,42 +109,44 @@ class AppInitializationPage extends StatelessWidget {
             case final AppInitializationFailed failureState:
               // On failure, determine which full-screen error page to show.
               final failureData = failureState.initializationFailure;
-              switch (failureData.status) {
-                case AppLifeCycleStatus.underMaintenance:
-                  return const MaintenancePage();
-                case AppLifeCycleStatus.updateRequired:
-                  return UpdateRequiredPage(
+              // Each status page is wrapped in its own simple MaterialApp to
+              // create a self-contained environment with the necessary theme
+              // and localization context to render correctly.
+              return MaterialApp(
+                debugShowCheckedModeBanner: false,
+                home: switch (failureData.status) {
+                  AppLifeCycleStatus.underMaintenance =>
+                    const MaintenancePage(),
+                  AppLifeCycleStatus.updateRequired => UpdateRequiredPage(
                     currentAppVersion: failureData.currentAppVersion,
                     latestRequiredVersion: failureData.latestAppVersion,
-                  );
-                case AppLifeCycleStatus.criticalError:
-                  return CriticalErrorPage(
-                    exception: failureData.error is HttpException
-                        ? failureData.error!
-                        : null,
+                  ),
+                  AppLifeCycleStatus.criticalError => CriticalErrorPage(
+                    exception: failureData.error,
                     onRetry: () {
                       // For a critical error, we trigger a full app restart
                       // to ensure a clean state.
                       AppHotRestartWrapper.restartApp(context);
                     },
-                  );
-                // The other AppLifeCycleStatus values are not possible failure
-                // states from the initializer, so we default to a critical
-                // error page as a safe fallback.
-                // ignore: no_default_cases
-                default:
-                  return CriticalErrorPage(
-                    exception: failureData.error is HttpException
-                        ? failureData.error!
-                        : null,
+                  ),
+                  // The other AppLifeCycleStatus values are not possible failure
+                  // states from the initializer, so we default to a critical
+                  // error page as a safe fallback.
+                  // ignore: no_default_cases
+                  _ => CriticalErrorPage(
+                    exception: failureData.error,
                     onRetry: () => AppHotRestartWrapper.restartApp(context),
-                  );
-              }
+                  ),
+                },
+              );
 
             case AppInitializationInProgress():
               // While initializing, show a simple loading indicator.
-              return const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
+              return const MaterialApp(
+                debugShowCheckedModeBanner: false,
+                home: Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                ),
               );
           }
         },

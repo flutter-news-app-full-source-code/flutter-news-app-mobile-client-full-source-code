@@ -10,6 +10,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_ca
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_hot_restart_wrapper.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_status_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/package_info_service.dart';
@@ -245,9 +246,9 @@ class _AppViewState extends State<_AppView> {
               home: CriticalErrorPage(
                 exception: state.error,
                 onRetry: () {
-                  // Retrying a critical error requires a full app restart.
-                  // For now, we can just re-trigger the AppStarted event.
-                  context.read<AppBloc>().add(const AppStarted());
+                  // Trigger a full application restart by calling the static
+                  // method on AppHotRestartWrapper.
+                  AppHotRestartWrapper.restartApp(context);
                 },
               ),
             );

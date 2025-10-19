@@ -11,6 +11,25 @@ sealed class HeadlinesFeedEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+/// {@template headlines_feed_started}
+/// Dispatched once when the [HeadlinesFeedPage] is first initialized to
+/// trigger the initial loading of the feed content.
+///
+/// This explicit event makes the initial data fetch declarative and robust,
+/// removing the dependency on observing `AppBloc` state transitions which
+/// could lead to race conditions.
+/// {@endtemplate}
+final class HeadlinesFeedStarted extends HeadlinesFeedEvent {
+  /// {@macro headlines_feed_started}
+  const HeadlinesFeedStarted({required this.adThemeStyle});
+
+  /// The current ad theme style of the application.
+  final AdThemeStyle adThemeStyle;
+
+  @override
+  List<Object> get props => [adThemeStyle];
+}
+
 /// {@template headlines_feed_fetch_requested}
 /// Event triggered when more headlines need to be fetched, either for the
 /// initial load or for pagination.

@@ -34,56 +34,17 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     required FeedDecoratorService feedDecoratorService,
     required AppBloc appBloc,
     required InlineAdCacheService inlineAdCacheService,
-    UserContentPreferences? initialUserContentPreferences,
   }) : _headlinesRepository = headlinesRepository,
        _feedDecoratorService = feedDecoratorService,
        _appBloc = appBloc,
        _inlineAdCacheService = inlineAdCacheService,
-       super(
-         HeadlinesFeedState(
-           // Initialize the state with saved filters from the AppBloc's
-           // current state. This prevents a race condition where the
-           // feed bloc is created after the AppBloc has already loaded
-           // the user's preferences, ensuring the UI has the data
-           // from the very beginning.
-           savedFilters:
-               initialUserContentPreferences?.savedFilters ?? const [],
-         ),
-       ) {
-    // Subscribe to AppBloc to react to global state changes.
+       super(const HeadlinesFeedState()) {
+    // Subscribe to AppBloc to react to global state changes, primarily for
+    // keeping the saved filters in sync.
     _appBlocSubscription = _appBloc.stream.listen((appState) {
-      // 1. Trigger the initial feed fetch.
-      // This is the new, robust way to start the feed. We wait until the
-      // AppBloc confirms that all user data is loaded and the app is in a
-      // stable 'running' state. This prevents race conditions where the
-      // feed would try to load before its dependencies (like remote config
-      // or user settings) are ready.
-      if (!_isInitialFetchDispatched && appState.status.isRunning) {
-        // The `adThemeStyle` is derived from the theme, which in turn is
-        // derived from the now-guaranteed-to-be-loaded app settings.
-        final theme = _appBloc.state.themeMode == ThemeMode.dark
-            ? darkTheme(
-                scheme: _appBloc.state.flexScheme,
-                appTextScaleFactor: _appBloc.state.appTextScaleFactor,
-                appFontWeight: _appBloc.state.appFontWeight,
-              )
-            : lightTheme(
-                scheme: _appBloc.state.flexScheme,
-                appTextScaleFactor: _appBloc.state.appTextScaleFactor,
-                appFontWeight: _appBloc.state.appFontWeight,
-              );
-
-        add(
-          HeadlinesFeedRefreshRequested(
-            adThemeStyle: AdThemeStyle.fromTheme(theme),
-          ),
-        );
-        _isInitialFetchDispatched = true;
-      }
-
-      // 2. Handle subsequent updates to user preferences.
-      // This ensures that if the user adds or removes a saved filter on
-      // another screen, the filter bar in the feed updates accordingly.
+      // This subscription is now solely for syncing saved filters from the
+      // AppBloc. The initial fetch logic has been moved to a dedicated
+      // `HeadlinesFeedStarted` event to prevent race conditions.
       if (appState.userContentPreferences != null &&
           state.savedFilters != appState.userContentPreferences!.savedFilters) {
         add(
@@ -94,6 +55,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       }
     });
 
+    on<HeadlinesFeedStarted>(
+      _onHeadlinesFeedStarted,
+      transformer: restartable(),
+    );
     on<HeadlinesFeedFetchRequested>(
       _onHeadlinesFeedFetchRequested,
       transformer: droppable(),
@@ -133,9 +98,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   /// Subscription to the AppBloc's state stream.
   late final StreamSubscription<AppState> _appBlocSubscription;
 
-  /// A flag to ensure the initial fetch is dispatched only once.
-  bool _isInitialFetchDispatched = false;
-
   /// The number of headlines to fetch per page.
   static const _headlinesFetchLimit = 10;
 
@@ -163,6 +125,17 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     // and are not included in the backend query for headlines. Source filtering
     // is performed solely by `source.id` when specific sources are selected.
     return queryFilter;
+  }
+
+  /// Handles the explicit start event to kick off the initial feed load.
+  ///
+  /// This handler's job is to simply delegate to the standard refresh process,
+  /// ensuring the feed loads its content as soon as the UI is ready.
+  Future<void> _onHeadlinesFeedStarted(
+    HeadlinesFeedStarted event,
+    Emitter<HeadlinesFeedState> emit,
+  ) async {
+    add(HeadlinesFeedRefreshRequested(adThemeStyle: event.adThemeStyle));
   }
 
   Future<void> _onHeadlinesFeedFetchRequested(

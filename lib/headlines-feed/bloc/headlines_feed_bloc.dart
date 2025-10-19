@@ -40,11 +40,13 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
        _inlineAdCacheService = inlineAdCacheService,
        super(const HeadlinesFeedState()) {
     // Subscribe to AppBloc to react to global state changes, primarily for
-    // keeping the saved filters in sync.
+    // keeping the feed's list of saved filters synchronized with the global
+    // app state.
     _appBlocSubscription = _appBloc.stream.listen((appState) {
-      // This subscription is now solely for syncing saved filters from the
-      // AppBloc. The initial fetch logic has been moved to a dedicated
-      // `HeadlinesFeedStarted` event to prevent race conditions.
+      // The initial feed fetch is handled by the `HeadlinesFeedStarted` event.
+      // This subscription's responsibility is to listen for changes in user
+      // preferences (like adding/removing a saved filter) from other parts
+      // of the app and update this BLoC's state accordingly.
       if (appState.userContentPreferences != null &&
           state.savedFilters != appState.userContentPreferences!.savedFilters) {
         add(

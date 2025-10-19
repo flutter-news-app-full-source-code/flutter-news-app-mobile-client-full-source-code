@@ -115,7 +115,20 @@ class _SavedFiltersBarState extends State<SavedFiltersBar> {
                 IconButton(
                   icon: const Icon(Icons.filter_list),
                   tooltip: l10n.savedFiltersBarOpenTooltip,
-                  onPressed: () => context.goNamed(Routes.feedFilterName),
+                  onPressed: () {
+                    // Read the current filter from the feed bloc.
+                    final currentFilter = context
+                        .read<HeadlinesFeedBloc>()
+                        .state
+                        .filter;
+                    // Navigate to the filter page, passing the current filter
+                    // as an argument. This ensures the filter page is
+                    // initialized with the correct state.
+                    context.goNamed(
+                      Routes.feedFilterName,
+                      extra: currentFilter,
+                    );
+                  },
                 ),
                 const VerticalDivider(
                   width: AppSpacing.md,

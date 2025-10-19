@@ -25,14 +25,13 @@ import 'package:uuid/uuid.dart';
 /// {@endtemplate}
 class HeadlinesFilterPage extends StatelessWidget {
   /// {@macro headlines_filter_page}
-  const HeadlinesFilterPage({super.key});
+  const HeadlinesFilterPage({required this.initialFilter, super.key});
+
+  /// The filter state from the feed, used to initialize the filter page.
+  final HeadlineFilter initialFilter;
 
   @override
   Widget build(BuildContext context) {
-    // Access the HeadlinesFeedBloc to get the current filter state for initialization.
-    final headlinesFeedBloc = context.read<HeadlinesFeedBloc>();
-    final currentFilter = headlinesFeedBloc.state.filter;
-
     return BlocProvider(
       create: (context) =>
           HeadlinesFilterBloc(
@@ -41,24 +40,21 @@ class HeadlinesFilterPage extends StatelessWidget {
             countriesRepository: context.read<DataRepository<Country>>(),
           )..add(
             FilterDataLoaded(
-              initialSelectedTopics: currentFilter.topics ?? [],
-              initialSelectedSources: currentFilter.sources ?? [],
-              initialSelectedCountries: currentFilter.eventCountries ?? [],
+              initialSelectedTopics: initialFilter.topics ?? [],
+              initialSelectedSources: initialFilter.sources ?? [],
+              initialSelectedCountries: initialFilter.eventCountries ?? [],
             ),
           ),
-      child: const _HeadlinesFilterView(),
+      child: _HeadlinesFilterView(initialFilter: initialFilter),
     );
   }
 }
 
-class _HeadlinesFilterView extends StatefulWidget {
-  const _HeadlinesFilterView();
+class _HeadlinesFilterView extends StatelessWidget {
+  const _HeadlinesFilterView({required this.initialFilter});
 
-  @override
-  State<_HeadlinesFilterView> createState() => _HeadlinesFilterViewState();
-}
+  final HeadlineFilter initialFilter;
 
-class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
   /// Builds a [ListTile] representing a filter criterion (e.g., Categories).
   ///
   /// Displays the criterion [title], the number of currently selected items
@@ -100,7 +96,10 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
 
   /// Shows the dialog to let the user choose between applying the filter
   /// for one-time use or saving it for future use.
-  Future<void> _showApplyOptionsDialog() async {
+  Future<void> _showApplyOptionsDialog({
+    required BuildContext context,
+    required AppLocalizations l10n,
+  }) async {
     final l10n = AppLocalizationsX(context).l10n;
     return showDialog<void>(
       context: context,
@@ -114,8 +113,8 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
               onPressed: () {
                 // Pop the dialog first.
                 Navigator.of(dialogContext).pop();
-                // Apply the filter as a "custom" one-time filter.
-                _applyAndExit(null);
+                // Apply the filter as a "custom" one-time filter and exit.
+                _applyAndExit(context: context, savedFilter: null);
               },
             ),
             FilledButton(
@@ -124,7 +123,7 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
                 // Pop the dialog first.
                 Navigator.of(dialogContext).pop();
                 // Initiate the save and apply flow.
-                _saveAndApplyFilter();
+                _saveAndApplyFilter(context: context);
               },
             ),
           ],
@@ -140,7 +139,7 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
   /// crucial to prevent a race condition where the `HeadlinesFilterPage` might
   /// be popped before the dialog is fully dismissed, which was causing a
   /// navigation stack error and a black screen.
-  Future<void> _saveAndApplyFilter() async {
+  Future<void> _saveAndApplyFilter({required BuildContext context}) async {
     final filterState = context.read<HeadlinesFilterBloc>().state;
 
     // `showDialog` returns a Future that completes when the dialog is popped.
@@ -164,7 +163,7 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
             // Apply the newly saved filter to the HeadlinesFeedBloc. The page
             // is not popped here; that action is deferred until after the
             // dialog has been successfully dismissed.
-            _applyFilter(newFilter);
+            _applyFilter(context: context, savedFilter: newFilter);
           },
         );
       },
@@ -174,7 +173,7 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
     // was successful and if the widget is still in the tree.
     // This check prevents the "Don't use 'BuildContext's across async gaps"
     // lint warning and ensures we don't try to pop a disposed context.
-    if (didSave == true && mounted) {
+    if (didSave == true && context.mounted) {
       context.pop();
     }
   }
@@ -184,7 +183,7 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
   /// If a [savedFilter] is provided, it's passed to the event to ensure
   /// its chip is correctly selected on the feed. Otherwise, the filter is
   /// treated as a "custom" one.
-  void _applyFilter(SavedFilter? savedFilter) {
+  void _applyFilter({required BuildContext context, SavedFilter? savedFilter}) {
     final filterState = context.read<HeadlinesFilterBloc>().state;
     // Create a new HeadlineFilter from the current selections in the filter bloc.
     final newFilter = HeadlineFilter(
@@ -201,10 +200,13 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
     );
   }
 
-  void _applyAndExit(SavedFilter? savedFilter) {
+  void _applyAndExit({
+    required BuildContext context,
+    SavedFilter? savedFilter,
+  }) {
     // This helper method now separates applying the filter from exiting.
     // It's called for the "Apply Only" flow.
-    _applyFilter(savedFilter);
+    _applyFilter(context: context, savedFilter: savedFilter);
     context.pop();
   }
 
@@ -282,7 +284,12 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
                     icon: const Icon(Icons.check),
                     tooltip: l10n.headlinesFeedFilterApplyButton,
                     // Disable the button if the filter is empty or a duplicate.
-                    onPressed: isApplyEnabled ? _showApplyOptionsDialog : null,
+                    onPressed: isApplyEnabled
+                        ? () => _showApplyOptionsDialog(
+                            context: context,
+                            l10n: l10n,
+                          )
+                        : null,
                   ),
                 ],
               ),
@@ -313,13 +320,11 @@ class _HeadlinesFilterViewState extends State<_HeadlinesFilterView> {
             filterState.error ??
             const UnknownException('Failed to load filter data.'),
         onRetry: () {
-          final headlinesFeedBloc = context.read<HeadlinesFeedBloc>();
-          final currentFilter = headlinesFeedBloc.state.filter;
           context.read<HeadlinesFilterBloc>().add(
             FilterDataLoaded(
-              initialSelectedTopics: currentFilter.topics ?? [],
-              initialSelectedSources: currentFilter.sources ?? [],
-              initialSelectedCountries: currentFilter.eventCountries ?? [],
+              initialSelectedTopics: initialFilter.topics ?? [],
+              initialSelectedSources: initialFilter.sources ?? [],
+              initialSelectedCountries: initialFilter.eventCountries ?? [],
             ),
           );
         },

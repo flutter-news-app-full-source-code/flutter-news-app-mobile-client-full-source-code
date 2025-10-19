@@ -32,23 +32,33 @@ class HeadlinesFeedPage extends StatefulWidget {
 
 /// State for the [HeadlinesFeedPage]. Manages the [ScrollController] for
 /// pagination and listens to scroll events.
-class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
+class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
+    with AutomaticKeepAliveClientMixin {
   final _scrollController = ScrollController();
+  bool _isInitialFetchDispatched = false;
 
   @override
   void initState() {
     super.initState();
-    // This is the explicit trigger for the initial feed load.
-    // By adding the `HeadlinesFeedStarted` event here, we ensure the feed
-    // fetches its content as soon as the widget is initialized, removing the
-    // dependency on AppBloc state changes and preventing race conditions.
-    context.read<HeadlinesFeedBloc>().add(
-      HeadlinesFeedStarted(
-        adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
-      ),
-    );
     // Add listener to trigger pagination when scrolling near the bottom.
     _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // The initial data fetch for the feed is explicitly triggered here instead
+    // of in `initState` because it requires access to the `Theme` via
+    // `context`, which is only safe to do after `initState` has completed.
+    // A flag ensures this logic runs only once for the widget's lifecycle.
+    if (!_isInitialFetchDispatched) {
+      context.read<HeadlinesFeedBloc>().add(
+        HeadlinesFeedStarted(
+          adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+        ),
+      );
+      _isInitialFetchDispatched = true;
+    }
   }
 
   @override
@@ -91,6 +101,10 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
   }
 
   @override
+  // Keep the state alive when switching tabs in the bottom navigation.
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
@@ -115,6 +129,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
             // This handles the brief period after authentication but before
             // the remote config is fetched, preventing null access errors.
             if (appBlocState.remoteConfig == null) {
+              super.build(context);
               return LoadingStateWidget(
                 icon: Icons.settings_applications_outlined,
                 headline: l10n.headlinesFeedLoadingHeadline,
@@ -124,6 +139,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
 
             if (state.status == HeadlinesFeedStatus.initial ||
                 (state.status == HeadlinesFeedStatus.loading &&
+                    !_isInitialFetchDispatched &&
                     state.feedItems.isEmpty)) {
               return LoadingStateWidget(
                 icon: Icons.newspaper,
@@ -146,6 +162,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
 
             if (state.status == HeadlinesFeedStatus.success &&
                 state.feedItems.isEmpty) {
+              super.build(context);
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -169,6 +186,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
               );
             }
 
+            super.build(context);
             return RefreshIndicator(
               onRefresh: () async {
                 context.read<HeadlinesFeedBloc>().add(

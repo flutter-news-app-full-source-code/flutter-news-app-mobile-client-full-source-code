@@ -515,8 +515,6 @@ GoRouter createRouter({
                       appBloc: appBloc,
                       inlineAdCacheService: context
                           .read<InlineAdCacheService>(),
-                      initialUserContentPreferences:
-                          appBloc.state.userContentPreferences,
                     );
                   },
                   child: const HeadlinesFeedPage(),

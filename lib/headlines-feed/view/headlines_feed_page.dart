@@ -38,6 +38,15 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage> {
   @override
   void initState() {
     super.initState();
+    // This is the explicit trigger for the initial feed load.
+    // By adding the `HeadlinesFeedStarted` event here, we ensure the feed
+    // fetches its content as soon as the widget is initialized, removing the
+    // dependency on AppBloc state changes and preventing race conditions.
+    context.read<HeadlinesFeedBloc>().add(
+      HeadlinesFeedStarted(
+        adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+      ),
+    );
     // Add listener to trigger pagination when scrolling near the bottom.
     _scrollController.addListener(_onScroll);
   }

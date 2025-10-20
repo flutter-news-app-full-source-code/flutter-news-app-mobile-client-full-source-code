@@ -86,10 +86,16 @@ class SourceListBloc extends Bloc<SourceListEvent, SourceListState> {
           nextCursor: sources.cursor,
         ),
       );
+    } on HttpException catch (e, s) {
+      _logger.severe('[SourceListBloc] Failed to start source list.', e, s);
+      emit(state.copyWith(status: SourceListStatus.failure, error: e));
     } catch (e, s) {
       _logger.severe('[SourceListBloc] Failed to start source list.', e, s);
       emit(
-        state.copyWith(status: SourceListStatus.failure, error: e as Exception),
+        state.copyWith(
+          status: SourceListStatus.failure,
+          error: UnknownException('$e'),
+        ),
       );
     }
   }
@@ -115,10 +121,16 @@ class SourceListBloc extends Bloc<SourceListEvent, SourceListState> {
           nextCursor: sources.cursor,
         ),
       );
+    } on HttpException catch (e, s) {
+      _logger.severe('[SourceListBloc] Failed to refresh sources.', e, s);
+      emit(state.copyWith(status: SourceListStatus.failure, error: e));
     } catch (e, s) {
       _logger.severe('[SourceListBloc] Failed to refresh sources.', e, s);
       emit(
-        state.copyWith(status: SourceListStatus.failure, error: e as Exception),
+        state.copyWith(
+          status: SourceListStatus.failure,
+          error: UnknownException('$e'),
+        ),
       );
     }
   }
@@ -147,12 +159,15 @@ class SourceListBloc extends Bloc<SourceListEvent, SourceListState> {
           nextCursor: newSources.cursor,
         ),
       );
+    } on HttpException catch (e, s) {
+      _logger.warning('[SourceListBloc] Failed to load more sources.', e, s);
+      emit(state.copyWith(status: SourceListStatus.partialFailure, error: e));
     } catch (e, s) {
       _logger.warning('[SourceListBloc] Failed to load more sources.', e, s);
       emit(
         state.copyWith(
           status: SourceListStatus.partialFailure,
-          error: e as Exception,
+          error: UnknownException('$e'),
         ),
       );
     }
@@ -186,10 +201,16 @@ class SourceListBloc extends Bloc<SourceListEvent, SourceListState> {
           nextCursor: sources.cursor,
         ),
       );
+    } on HttpException catch (e, s) {
+      _logger.severe('[SourceListBloc] Failed to fetch with new filter.', e, s);
+      emit(state.copyWith(status: SourceListStatus.failure, error: e));
     } catch (e, s) {
       _logger.severe('[SourceListBloc] Failed to fetch with new filter.', e, s);
       emit(
-        state.copyWith(status: SourceListStatus.failure, error: e as Exception),
+        state.copyWith(
+          status: SourceListStatus.failure,
+          error: UnknownException('$e'),
+        ),
       );
     }
   }

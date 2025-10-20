@@ -60,7 +60,7 @@ final class SourceListState extends Equatable {
   final List<Country> allCountries;
 
   /// The error that occurred, if any.
-  final Exception? error;
+  final HttpException? error;
 
   /// Creates a copy of the current [SourceListState] with the given fields
   /// replaced with the new values.
@@ -71,7 +71,7 @@ final class SourceListState extends Equatable {
     String? nextCursor,
     Set<Country>? selectedCountries,
     List<Country>? allCountries,
-    Exception? error,
+    HttpException? error,
     bool clearError = false,
   }) {
     return SourceListState(

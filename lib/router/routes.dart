@@ -59,6 +59,12 @@ abstract final class Routes {
   static const feedFilterEventCountries = 'event-countries';
   static const feedFilterEventCountriesName = 'feedFilterEventCountries';
 
+  // Discover
+  static const sourceList = 'source-list/:sourceType';
+  static const sourceListName = 'sourceList';
+  static const sourceListFilter = 'filter';
+  static const discoverSourceListFilterName = 'discoverSourceListFilter';
+
   // Account
   static const accountArticleDetails = 'article/:id';
   static const accountArticleDetailsName = 'accountArticleDetails';

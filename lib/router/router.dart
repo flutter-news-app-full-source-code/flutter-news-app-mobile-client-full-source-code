@@ -24,6 +24,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/authentication/v
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/email_code_verification_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/request_code_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/discover/view/discover_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/discover/view/source_list_filter_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/discover/view/source_list_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/bloc/entity_details_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/view/entity_details_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/headline_details_bloc.dart';
@@ -679,6 +681,36 @@ GoRouter createRouter({
                 path: Routes.discover,
                 name: Routes.discoverName,
                 builder: (context, state) => const DiscoverPage(),
+                routes: [
+                  GoRoute(
+                    path: Routes.sourceList,
+                    name: Routes.sourceListName,
+                    builder: (context, state) {
+                      final sourceTypeName = state.pathParameters['sourceType'];
+                      if (sourceTypeName == null) {
+                        return const Scaffold(
+                          body: Center(child: Text('Source Type missing')),
+                        );
+                      }
+                      final sourceType = SourceType.values.firstWhere(
+                        (e) => e.name == sourceTypeName,
+                      );
+                      return SourceListPage(sourceType: sourceType);
+                    },
+                    routes: [
+                      GoRoute(
+                        path: Routes.sourceListFilter,
+                        name: Routes.discoverSourceListFilterName,
+                        builder: (context, state) {
+                          final sourceListBloc = state.extra! as SourceListBloc;
+                          return SourceListFilterPage(
+                            sourceListBloc: sourceListBloc,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),

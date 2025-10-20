@@ -138,7 +138,10 @@ class _SourceCategoryRow extends StatelessWidget {
                 ),
                 TextButton(
                   onPressed: () {
-                    // TODO(you): Navigate to SourceListPage
+                    context.pushNamed(
+                      Routes.sourceListName,
+                      pathParameters: {'sourceType': sourceType.name},
+                    );
                   },
                   child: Row(
                     mainAxisSize: MainAxisSize.min,

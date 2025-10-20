@@ -70,7 +70,7 @@ class SavedFiltersPage extends StatelessWidget {
                   onSelected: (value) async {
                     switch (value) {
                       case 'rename':
-                        showDialog<void>(
+                        await showDialog<void>(
                           context: context,
                           builder: (_) => SaveFilterDialog(
                             initialValue: filter.name,

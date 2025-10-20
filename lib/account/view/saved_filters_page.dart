@@ -2,6 +2,7 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/confirmation_dialog.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/widgets/save_filter_dialog.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:go_router/go_router.dart';
@@ -66,7 +67,7 @@ class SavedFiltersPage extends StatelessWidget {
                 ),
                 title: Text(filter.name),
                 trailing: PopupMenuButton<String>(
-                  onSelected: (value) {
+                  onSelected: (value) async {
                     switch (value) {
                       case 'rename':
                         showDialog<void>(
@@ -84,9 +85,26 @@ class SavedFiltersPage extends StatelessWidget {
                           ),
                         );
                       case 'delete':
-                        context.read<AppBloc>().add(
-                          SavedFilterDeleted(filterId: filter.id),
+                        // Awaiting the dialog result ensures the popup menu
+                        // has time to close before the list rebuilds,
+                        // preventing the red screen flicker.
+                        final confirmed = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => ConfirmationDialog(
+                            title: l10n.deleteConfirmationDialogTitle,
+                            content: l10n.deleteConfirmationDialogContent,
+                            confirmButtonText:
+                                l10n.deleteConfirmationDialogConfirmButton,
+                          ),
                         );
+
+                        // Only proceed with deletion if the user confirmed
+                        // and the widget is still mounted.
+                        if (confirmed == true && context.mounted) {
+                          context.read<AppBloc>().add(
+                            SavedFilterDeleted(filterId: filter.id),
+                          );
+                        }
                     }
                   },
                   itemBuilder: (BuildContext context) =>

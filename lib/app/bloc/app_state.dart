@@ -134,6 +134,7 @@ class AppState extends Equatable {
     RemoteConfig? remoteConfig,
     HttpException? error,
     bool clearError = false,
+    bool clearUser = false,
     UserContentPreferences? userContentPreferences,
     int? selectedBottomNavigationIndex,
     String? currentAppVersion,
@@ -141,12 +142,13 @@ class AppState extends Equatable {
   }) {
     return AppState(
       status: status ?? this.status,
-      user: user ?? this.user,
-      settings: settings ?? this.settings,
+      user: clearUser ? null : user ?? this.user,
+      settings: clearUser ? null : settings ?? this.settings,
       remoteConfig: remoteConfig ?? this.remoteConfig,
       error: clearError ? null : error ?? this.error,
-      userContentPreferences:
-          userContentPreferences ?? this.userContentPreferences,
+      userContentPreferences: clearUser
+          ? null
+          : userContentPreferences ?? this.userContentPreferences,
       selectedBottomNavigationIndex:
           selectedBottomNavigationIndex ?? this.selectedBottomNavigationIndex,
       currentAppVersion: currentAppVersion ?? this.currentAppVersion,

@@ -141,12 +141,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       _logger.info(
         '[AppBloc] User logged out. Transitioning to unauthenticated.',
       );
+      // When logging out, it's crucial to explicitly clear all user-related
+      // data to ensure a clean state for the next session. This prevents
+      // stale data from causing issues on subsequent logins.
       emit(
         state.copyWith(
           status: AppLifeCycleStatus.unauthenticated,
-          user: null,
-          settings: null,
-          userContentPreferences: null,
+          clearUser: true,
         ),
       );
       return;

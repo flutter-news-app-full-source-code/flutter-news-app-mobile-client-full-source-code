@@ -43,14 +43,14 @@ class DiscoverBloc extends Bloc<DiscoverEvent, DiscoverState> {
 
     try {
       // Fetch all available sources from the repository.
-      final sources = await _sourcesRepository.readAll();
+      final sourcesResponse = await _sourcesRepository.readAll();
       _logger.info(
-        '[DiscoverBloc] Successfully fetched ${sources.length} sources.',
+        '[DiscoverBloc] Successfully fetched ${sourcesResponse.items.length} sources.',
       );
 
       // Group the fetched sources by their sourceType.
       final groupedSources = groupBy<Source, SourceType>(
-        sources,
+        sourcesResponse.items,
         (source) => source.sourceType,
       );
 
@@ -60,10 +60,18 @@ class DiscoverBloc extends Bloc<DiscoverEvent, DiscoverState> {
           groupedSources: groupedSources,
         ),
       );
+    } on HttpException catch (e, s) {
+      _logger.severe('[DiscoverBloc] Failed to fetch sources.', e, s);
+      emit(state.copyWith(status: DiscoverStatus.failure, error: e));
     } catch (e, s) {
       _logger.severe('[DiscoverBloc] Failed to fetch sources.', e, s);
       emit(
-        state.copyWith(status: DiscoverStatus.failure, error: e as Exception),
+        state.copyWith(
+          status: DiscoverStatus.failure,
+          error: UnknownException(
+            'An unexpected error occurred: ${e.toString()}',
+          ),
+        ),
       );
     }
   }

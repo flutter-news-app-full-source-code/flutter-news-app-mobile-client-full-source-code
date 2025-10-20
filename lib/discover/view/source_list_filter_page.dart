@@ -25,8 +25,44 @@ class SourceListFilterPage extends StatelessWidget {
   }
 }
 
-class _SourceListFilterView extends StatelessWidget {
+class _SourceListFilterView extends StatefulWidget {
   const _SourceListFilterView();
+
+  @override
+  State<_SourceListFilterView> createState() => _SourceListFilterViewState();
+}
+
+class _SourceListFilterViewState extends State<_SourceListFilterView> {
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_isBottom) {
+      context.read<SourceListBloc>().add(
+        SourceListCountriesLoadMoreRequested(),
+      );
+    }
+  }
+
+  bool get _isBottom {
+    if (!_scrollController.hasClients) return false;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.offset;
+    return currentScroll >= (maxScroll * 0.9);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +85,7 @@ class _SourceListFilterView extends StatelessWidget {
       ),
       body: BlocBuilder<SourceListBloc, SourceListState>(
         builder: (context, state) {
-          if (state.allCountries.isEmpty) {
+          if (state.countries.isEmpty) {
             return InitialStateWidget(
               icon: Icons.flag_circle_outlined,
               headline: l10n.countryFilterEmptyHeadline,
@@ -58,12 +94,27 @@ class _SourceListFilterView extends StatelessWidget {
           }
 
           return ListView.builder(
+            controller: _scrollController,
             padding: const EdgeInsets.symmetric(
               vertical: AppSpacing.md,
             ).copyWith(bottom: AppSpacing.xxl),
-            itemCount: state.allCountries.length,
+            itemCount: state.countriesHasMore
+                ? state.countries.length + 1
+                : state.countries.length,
             itemBuilder: (context, index) {
-              final country = state.allCountries[index];
+              // If we've reached the end of the list, show a loading indicator
+              // if more items are being fetched.
+              if (index >= state.countries.length) {
+                return state.status == SourceListStatus.loadingMoreCountries
+                    ? const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(AppSpacing.lg),
+                          child: CircularProgressIndicator(),
+                        ),
+                      )
+                    : const SizedBox.shrink();
+              }
+              final country = state.countries[index];
               final isSelected = state.selectedCountries.contains(country);
 
               return CheckboxListTile(

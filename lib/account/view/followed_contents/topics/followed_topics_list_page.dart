@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:go_router/go_router.dart';
@@ -34,7 +35,6 @@ class FollowedTopicsListPage extends StatelessWidget {
       ),
       body: BlocBuilder<AppBloc, AppState>(
         builder: (context, appState) {
-          final user = appState.user;
           final userContentPreferences = appState.userContentPreferences;
 
           if (appState.status == AppLifeCycleStatus.loadingUserData ||
@@ -46,11 +46,13 @@ class FollowedTopicsListPage extends StatelessWidget {
             );
           }
 
-          if (appState.initialUserPreferencesError != null) {
+          if (appState.error != null) {
             return FailureStateWidget(
-              exception: appState.initialUserPreferencesError!,
+              exception: appState.error!,
               onRetry: () {
-                context.read<AppBloc>().add(AppStarted(initialUser: user));
+                context.read<AppBloc>().add(
+                  const AppUserContentPreferencesRefreshed(),
+                );
               },
             );
           }

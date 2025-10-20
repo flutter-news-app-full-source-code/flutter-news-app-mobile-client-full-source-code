@@ -2017,6 +2017,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Premium User'**
   String get accountRolePremium;
+
+  /// Title for the dialog that asks the user to confirm a delete action.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Deletion'**
+  String get deleteConfirmationDialogTitle;
+
+  /// The main text in the delete confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this item? This action cannot be undone.'**
+  String get deleteConfirmationDialogContent;
+
+  /// The text for the confirm button in the delete confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get deleteConfirmationDialogConfirmButton;
+
+  /// Headline text shown in the initial state widget on the search page
+  ///
+  /// In en, this message translates to:
+  /// **'Search for Headlines'**
+  String get headlineSearchInitialHeadline;
+
+  /// Subheadline text shown in the initial state widget on the search page
+  ///
+  /// In en, this message translates to:
+  /// **'Enter keywords to find articles.'**
+  String get headlineSearchInitialSubheadline;
+
+  /// Headline for the user header when the user is a guest.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest Account'**
+  String get accountGuestUserHeadline;
+
+  /// Subheadline for the user header prompting guest users to sign in.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to sync your data'**
+  String get accountGuestUserSubheadline;
 }
 
 class _AppLocalizationsDelegate

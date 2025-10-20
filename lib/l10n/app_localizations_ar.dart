@@ -1059,4 +1059,27 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get accountRolePremium => 'مستخدم مميز';
+
+  @override
+  String get deleteConfirmationDialogTitle => 'تأكيد الحذف';
+
+  @override
+  String get deleteConfirmationDialogContent =>
+      'هل أنت متأكد أنك تريد حذف هذا العنصر؟ لا يمكن التراجع عن هذا الإجراء.';
+
+  @override
+  String get deleteConfirmationDialogConfirmButton => 'حذف';
+
+  @override
+  String get headlineSearchInitialHeadline => 'ابحث عن العناوين';
+
+  @override
+  String get headlineSearchInitialSubheadline =>
+      'أدخل كلمات رئيسية للعثور على المقالات.';
+
+  @override
+  String get accountGuestUserHeadline => 'حساب زائر';
+
+  @override
+  String get accountGuestUserSubheadline => 'سجل الدخول لمزامنة بياناتك';
 }

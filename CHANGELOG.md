@@ -1,5 +1,9 @@
 # Changelog
 
+## Upcoming Release
+
+ - **refactor!**: Overhauled the application startup and authentication lifecycle to be robust and free of race conditions. This was a major architectural change that introduced a new `AppInitializationPage` and `AppInitializationBloc` to act as a "gatekeeper," ensuring all critical data is fetched *before* the main UI is built. This fixes a class of bugs related to indefinite loading screens, data migration on account linking, and inconsistent state during startup.
+
 ## 1.4.0 - 2025-10-17
 
 - **feat**: overhauled search and account features with a new sliver-based feed UI, integrated search bar, and modal account sheet.

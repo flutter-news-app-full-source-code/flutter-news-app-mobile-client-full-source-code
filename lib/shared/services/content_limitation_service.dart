@@ -15,6 +15,9 @@ enum ContentAction {
 
   /// The action of following a country.
   followCountry,
+
+  /// The action of saving a filter.
+  saveFilter,
 }
 
 /// Defines the outcome of a content limitation check.
@@ -82,6 +85,21 @@ class ContentLimitationService {
           return _getLimitationStatusForRole(role);
         }
 
+      // Check if the user has reached the limit for saving filters.
+      case ContentAction.saveFilter:
+        final count = preferences.savedFilters.length;
+        final int limit;
+        switch (role) {
+          case AppUserRole.guestUser:
+            limit = limits.guestSavedFiltersLimit;
+          case AppUserRole.standardUser:
+            limit = limits.authenticatedSavedFiltersLimit;
+          case AppUserRole.premiumUser:
+            limit = limits.premiumSavedFiltersLimit;
+        }
+        if (count >= limit) {
+          return _getLimitationStatusForRole(role);
+        }
       case ContentAction.followTopic:
       case ContentAction.followSource:
       case ContentAction.followCountry:
@@ -105,6 +123,9 @@ class ContentLimitationService {
           case ContentAction.followCountry:
             count = preferences.followedCountries.length;
           case ContentAction.bookmarkHeadline:
+            // This case is handled above and will not be reached here.
+            count = 0;
+          case ContentAction.saveFilter:
             // This case is handled above and will not be reached here.
             count = 0;
         }

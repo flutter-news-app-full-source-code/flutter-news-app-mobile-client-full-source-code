@@ -26,6 +26,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   /// {@macro headlines_feed_bloc}
   ///
   /// Requires repositories and services for its operations.
+  /// The [initialUserContentPreferences] are used to "seed" the bloc with the
+  /// current user's saved filters, preventing a race condition on navigation.
   HeadlinesFeedBloc({
     required DataRepository<Headline> headlinesRepository,
     required FeedDecoratorService feedDecoratorService,
@@ -38,20 +40,20 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
        _inlineAdCacheService = inlineAdCacheService,
        super(
          HeadlinesFeedState(
-           // Initialize the state with saved filters from the AppBloc's
-           // current state. This prevents a race condition where the
-           // feed bloc is created after the AppBloc has already loaded
-           // the user's preferences, ensuring the UI has the data
-           // from the very beginning.
            savedFilters:
                initialUserContentPreferences?.savedFilters ?? const [],
          ),
        ) {
-    // Subscribe to AppBloc to receive updates on user preferences.
-    // This handles subsequent changes to preferences (e.g., adding/deleting
-    // a filter) while the feed page is active.
+    // Subscribe to AppBloc to react to global state changes, primarily for
+    // keeping the feed's list of saved filters synchronized with the global
+    // app state.
     _appBlocSubscription = _appBloc.stream.listen((appState) {
-      // Check if userContentPreferences has changed and is not null.
+      // This subscription is now responsible for handling *updates* to the
+      // user's preferences while the bloc is active. The initial state is
+      // handled by the constructor.
+      // This subscription's responsibility is to listen for changes in user
+      // preferences (like adding/removing a saved filter) from other parts
+      // of the app and update this BLoC's state accordingly.
       if (appState.userContentPreferences != null &&
           state.savedFilters != appState.userContentPreferences!.savedFilters) {
         add(
@@ -62,6 +64,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       }
     });
 
+    on<HeadlinesFeedStarted>(
+      _onHeadlinesFeedStarted,
+      transformer: restartable(),
+    );
     on<HeadlinesFeedFetchRequested>(
       _onHeadlinesFeedFetchRequested,
       transformer: droppable(),
@@ -128,6 +134,17 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     // and are not included in the backend query for headlines. Source filtering
     // is performed solely by `source.id` when specific sources are selected.
     return queryFilter;
+  }
+
+  /// Handles the explicit start event to kick off the initial feed load.
+  ///
+  /// This handler's job is to simply delegate to the standard refresh process,
+  /// ensuring the feed loads its content as soon as the UI is ready.
+  Future<void> _onHeadlinesFeedStarted(
+    HeadlinesFeedStarted event,
+    Emitter<HeadlinesFeedState> emit,
+  ) async {
+    add(HeadlinesFeedRefreshRequested(adThemeStyle: event.adThemeStyle));
   }
 
   Future<void> _onHeadlinesFeedFetchRequested(

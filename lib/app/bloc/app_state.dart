@@ -1,34 +1,5 @@
 part of 'app_bloc.dart';
 
-/// Defines the various statuses of the application's overall state.
-///
-/// This enum helps manage the application's flow, especially during startup
-/// and critical operations like fetching remote configuration or handling
-/// authentication changes.
-enum AppLifeCycleStatus {
-  /// The application is currently loading user-specific data (settings, preferences).
-  loadingUserData,
-
-  /// The user is not authenticated.
-  unauthenticated,
-
-  /// The user is authenticated (e.g., standard user).
-  authenticated,
-
-  /// The user is anonymous (e.g., guest user).
-  anonymous,
-
-  /// A critical error occurred during application startup,
-  /// preventing normal operation.
-  criticalError,
-
-  /// The application is currently under maintenance.
-  underMaintenance,
-
-  /// A mandatory update is required for the application.
-  updateRequired,
-}
-
 /// {@template app_state}
 /// Represents the overall state of the application.
 ///
@@ -40,15 +11,14 @@ class AppState extends Equatable {
   /// {@macro app_state}
   const AppState({
     required this.status,
-    required this.environment,
     this.user,
     this.remoteConfig,
-    this.initialRemoteConfigError,
-    this.initialUserPreferencesError,
+    this.error,
     this.userContentPreferences,
     this.settings,
     this.selectedBottomNavigationIndex = 0,
     this.currentAppVersion,
+    this.latestAppVersion,
   });
 
   /// The current status of the application, indicating its lifecycle stage.
@@ -66,13 +36,9 @@ class AppState extends Equatable {
   /// Contains global settings like maintenance mode, update requirements, and ad configurations.
   final RemoteConfig? remoteConfig;
 
-  /// An error that occurred during the initial remote config fetch.
-  /// If not null, indicates a critical issue preventing app startup.
-  final HttpException? initialRemoteConfigError;
-
-  /// An error that occurred during the initial user preferences fetch.
-  /// If not null, indicates a critical issue preventing app startup.
-  final HttpException? initialUserPreferencesError;
+  /// An error that occurred during the initialization or a user transition.
+  /// If not null, indicates a critical issue.
+  final HttpException? error;
 
   /// The user's content preferences, including followed countries, sources,
   /// topics, and saved headlines.
@@ -82,16 +48,12 @@ class AppState extends Equatable {
   /// The currently selected index for bottom navigation.
   final int selectedBottomNavigationIndex;
 
-  /// The current application environment (e.g., demo, development, production).
-  final local_config.AppEnvironment environment;
-
   /// The current version of the application, fetched from `package_info_plus`.
   /// This is used for version enforcement.
   final String? currentAppVersion;
 
-  /// The latest required app version from the remote configuration.
-  /// Returns `null` if remote config is not available.
-  String? get latestAppVersion => remoteConfig?.appStatus.latestAppVersion;
+  /// The latest required app version, passed from [InitializationFailure].
+  final String? latestAppVersion;
 
   /// The current theme mode (light, dark, or system), derived from [settings].
   /// Defaults to [ThemeMode.system] if [settings] are not yet loaded.
@@ -156,12 +118,11 @@ class AppState extends Equatable {
     user,
     settings,
     remoteConfig,
-    initialRemoteConfigError,
-    initialUserPreferencesError,
+    error,
     userContentPreferences,
     selectedBottomNavigationIndex,
-    environment,
     currentAppVersion,
+    latestAppVersion,
   ];
 
   /// Creates a copy of this [AppState] with the given fields replaced with
@@ -171,29 +132,27 @@ class AppState extends Equatable {
     User? user,
     UserAppSettings? settings,
     RemoteConfig? remoteConfig,
-    bool clearAppConfig = false,
-    HttpException? initialRemoteConfigError,
-    HttpException? initialUserPreferencesError,
+    HttpException? error,
+    bool clearError = false,
+    bool clearUser = false,
     UserContentPreferences? userContentPreferences,
     int? selectedBottomNavigationIndex,
-    local_config.AppEnvironment? environment,
     String? currentAppVersion,
+    String? latestAppVersion,
   }) {
     return AppState(
       status: status ?? this.status,
-      user: user ?? this.user,
-      settings: settings ?? this.settings,
-      remoteConfig: clearAppConfig ? null : remoteConfig ?? this.remoteConfig,
-      initialRemoteConfigError:
-          initialRemoteConfigError ?? this.initialRemoteConfigError,
-      initialUserPreferencesError:
-          initialUserPreferencesError ?? this.initialUserPreferencesError,
-      userContentPreferences:
-          userContentPreferences ?? this.userContentPreferences,
+      user: clearUser ? null : user ?? this.user,
+      settings: clearUser ? null : settings ?? this.settings,
+      remoteConfig: remoteConfig ?? this.remoteConfig,
+      error: clearError ? null : error ?? this.error,
+      userContentPreferences: clearUser
+          ? null
+          : userContentPreferences ?? this.userContentPreferences,
       selectedBottomNavigationIndex:
           selectedBottomNavigationIndex ?? this.selectedBottomNavigationIndex,
-      environment: environment ?? this.environment,
       currentAppVersion: currentAppVersion ?? this.currentAppVersion,
+      latestAppVersion: latestAppVersion ?? this.latestAppVersion,
     );
   }
 }

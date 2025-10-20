@@ -1,31 +1,29 @@
 import 'dart:async';
 
 import 'package:auth_repository/auth_repository.dart';
-import 'package:bloc/bloc.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
-    as local_config;
-import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_initializer_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/services/package_info_service.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/models/initialization_result.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/extensions.dart';
 import 'package:logging/logging.dart';
-import 'package:pub_semver/pub_semver.dart';
 
 part 'app_event.dart';
 part 'app_state.dart';
 
 /// {@template app_bloc}
-/// Manages the overall application state, including authentication status,
-/// user settings, and remote configuration.
+/// Manages the global state of the application *after* successful
+/// initialization.
 ///
-/// This BLoC is central to the application's lifecycle, reacting to user
-/// authentication changes, managing user preferences, and applying global
-/// remote configurations. It acts as the single source of truth for global
-/// application state.
+/// This BLoC is created only when the [AppInitializationBloc] succeeds. It
+/// receives all the pre-fetched initial data (user, settings, remote config)
+/// and becomes the single source of truth for the running application's state,
+/// reacting to user authentication changes and managing user preferences.
 /// {@endtemplate}
 class AppBloc extends Bloc<AppEvent, AppState> {
   /// {@macro app_bloc}
@@ -33,39 +31,36 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   /// Initializes the BLoC with required repositories, environment, and
   /// pre-fetched initial data.
   AppBloc({
-    required AuthRepository authenticationRepository,
+    required User? user,
+    required RemoteConfig remoteConfig,
+    required UserAppSettings? settings,
+    required UserContentPreferences? userContentPreferences,
+    required DataRepository<RemoteConfig> remoteConfigRepository,
+    required AppInitializer appInitializer,
+    required AuthRepository authRepository,
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
-    required DataRepository<RemoteConfig> appConfigRepository,
+    required Logger logger,
     required DataRepository<User> userRepository,
-    required local_config.AppEnvironment environment,
-    required GlobalKey<NavigatorState> navigatorKey,
-    required RemoteConfig? initialRemoteConfig,
-    required HttpException? initialRemoteConfigError,
-    required PackageInfoService packageInfoService,
-    this.demoDataMigrationService,
-    this.demoDataInitializerService,
-    this.initialUser,
-  }) : _authenticationRepository = authenticationRepository,
+  }) : _remoteConfigRepository = remoteConfigRepository,
+       _appInitializer = appInitializer,
+       _authRepository = authRepository,
        _userAppSettingsRepository = userAppSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
-       _appConfigRepository = appConfigRepository,
        _userRepository = userRepository,
-       _environment = environment,
-       _navigatorKey = navigatorKey,
-       _packageInfoService = packageInfoService,
-       _logger = Logger('AppBloc'),
+       _logger = logger,
        super(
          AppState(
-           status: initialUser == null
+           status: user == null
                ? AppLifeCycleStatus.unauthenticated
-               : AppLifeCycleStatus.loadingUserData,
-           selectedBottomNavigationIndex: 0,
-           remoteConfig: initialRemoteConfig,
-           initialRemoteConfigError: initialRemoteConfigError,
-           environment: environment,
-           user: initialUser,
+               : user.isGuest
+               ? AppLifeCycleStatus.anonymous
+               : AppLifeCycleStatus.authenticated,
+           user: user,
+           remoteConfig: remoteConfig,
+           settings: settings,
+           userContentPreferences: userContentPreferences,
          ),
        ) {
     // Register event handlers for various app-level events.
@@ -75,7 +70,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppUserContentPreferencesRefreshed>(_onUserContentPreferencesRefreshed);
     on<AppSettingsChanged>(_onAppSettingsChanged);
     on<AppPeriodicConfigFetchRequested>(_onAppPeriodicConfigFetchRequested);
-    on<AppVersionCheckRequested>(_onAppVersionCheckRequested);
     on<AppUserFeedDecoratorShown>(_onAppUserFeedDecoratorShown);
     on<AppUserContentPreferencesChanged>(_onAppUserContentPreferencesChanged);
     on<SavedFilterAdded>(_onSavedFilterAdded);
@@ -83,228 +77,48 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<SavedFilterDeleted>(_onSavedFilterDeleted);
     on<SavedFiltersReordered>(_onSavedFiltersReordered);
     on<AppLogoutRequested>(_onLogoutRequested);
-
-    // Subscribe to the authentication repository's authStateChanges stream.
-    // This stream is the single source of truth for the user's auth state
-    // and drives the entire app lifecycle.
-    _userSubscription = _authenticationRepository.authStateChanges.listen(
-      (User? user) => add(AppUserChanged(user)),
-    );
   }
 
-  final AuthRepository _authenticationRepository;
+  final Logger _logger;
+  final DataRepository<RemoteConfig> _remoteConfigRepository;
+  final AppInitializer _appInitializer;
+  final AuthRepository _authRepository;
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
-  final DataRepository<RemoteConfig> _appConfigRepository;
   final DataRepository<User> _userRepository;
-  final local_config.AppEnvironment _environment;
-  final GlobalKey<NavigatorState> _navigatorKey;
-  final PackageInfoService _packageInfoService;
-  final Logger _logger;
-  final DemoDataMigrationService? demoDataMigrationService;
-  final DemoDataInitializerService? demoDataInitializerService;
-  final User? initialUser;
-  late final StreamSubscription<User?> _userSubscription;
 
-  /// Provides access to the [NavigatorState] for obtaining a [BuildContext].
-  GlobalKey<NavigatorState> get navigatorKey => _navigatorKey;
-
-  /// Fetches [UserAppSettings] and [UserContentPreferences] for the given
-  /// [user] and updates the [AppState].
+  /// Handles the [AppStarted] event.
   ///
-  /// This method centralizes the logic for loading user-specific data,
-  /// ensuring consistency across different app lifecycle events.
-  /// It also handles potential [HttpException]s during the fetch operation.
-  Future<void> _fetchAndSetUserData(User user, Emitter<AppState> emit) async {
-    await _fetchAndSetUserSettings(user, emit);
-    await _fetchAndSetUserContentPreferences(user, emit);
-
-    final finalStatus = user.appRole == AppUserRole.standardUser
-        ? AppLifeCycleStatus.authenticated
-        : AppLifeCycleStatus.anonymous;
-
-    emit(
-      state.copyWith(
-        status: finalStatus,
-        user: user,
-        initialUserPreferencesError: null,
-      ),
-    );
-  }
-
-  /// Fetches [UserAppSettings] for the given [user] and updates the [AppState].
-  Future<void> _fetchAndSetUserSettings(
-    User user,
-    Emitter<AppState> emit,
-  ) async {
-    _logger.info('[AppBloc] Fetching user settings for user: ${user.id}');
-    try {
-      final userAppSettings = await _userAppSettingsRepository.read(
-        id: user.id,
-        userId: user.id,
-      );
-      _logger.info(
-        '[AppBloc] UserAppSettings fetched successfully for user: ${user.id}',
-      );
-      emit(state.copyWith(settings: userAppSettings));
-    } on HttpException catch (e) {
-      _logger.severe(
-        '[AppBloc] Failed to fetch user settings (HttpException) '
-        'for user ${user.id}: ${e.runtimeType} - ${e.message}',
-      );
-      // In demo mode, NotFoundException for user settings is expected if not yet initialized.
-      // Do not transition to criticalError immediately.
-      if (_environment != local_config.AppEnvironment.demo ||
-          e is! NotFoundException) {
-        emit(
-          state.copyWith(
-            status: AppLifeCycleStatus.criticalError,
-            initialUserPreferencesError: e,
-          ),
-        );
-      }
-    } catch (e, s) {
-      _logger.severe(
-        '[AppBloc] Unexpected error during user settings fetch '
-        'for user ${user.id}.',
-        e,
-        s,
-      );
-      emit(
-        state.copyWith(
-          status: AppLifeCycleStatus.criticalError,
-          initialUserPreferencesError: UnknownException(e.toString()),
-        ),
-      );
-    }
-  }
-
-  /// Fetches [UserContentPreferences] for the given [user] and updates the [AppState].
-  Future<void> _fetchAndSetUserContentPreferences(
-    User user,
-    Emitter<AppState> emit,
-  ) async {
-    _logger.info(
-      '[AppBloc] Fetching user content preferences for user: ${user.id}',
-    );
-    try {
-      final userContentPreferences = await _userContentPreferencesRepository
-          .read(id: user.id, userId: user.id);
-      _logger.info(
-        '[AppBloc] UserContentPreferences fetched successfully for user: ${user.id}',
-      );
-      emit(state.copyWith(userContentPreferences: userContentPreferences));
-    } on HttpException catch (e) {
-      _logger.severe(
-        '[AppBloc] Failed to fetch user content preferences (HttpException) '
-        'for user ${user.id}: ${e.runtimeType} - ${e.message}',
-      );
-      // In demo mode, NotFoundException for user content preferences is expected if not yet initialized.
-      // Do not transition to criticalError immediately.
-      if (_environment != local_config.AppEnvironment.demo ||
-          e is! NotFoundException) {
-        emit(
-          state.copyWith(
-            status: AppLifeCycleStatus.criticalError,
-            initialUserPreferencesError: e,
-          ),
-        );
-      }
-    } catch (e, s) {
-      _logger.severe(
-        '[AppBloc] Unexpected error during user content preferences fetch '
-        'for user ${user.id}.',
-        e,
-        s,
-      );
-      emit(
-        state.copyWith(
-          status: AppLifeCycleStatus.criticalError,
-          initialUserPreferencesError: UnknownException(e.toString()),
-        ),
-      );
-    }
-  }
-
-  /// Handles the [AppStarted] event, orchestrating the initial loading of
-  /// user-specific data and evaluating the overall app status.
+  /// This is now a no-op. All critical initialization logic has been moved to
+  /// the [AppInitializer] service and is orchestrated by the
+  /// [AppInitializationBloc] *before* this AppBloc is ever created.
   Future<void> _onAppStarted(AppStarted event, Emitter<AppState> emit) async {
-    _logger.info('[AppBloc] AppStarted event received. Starting data load.');
-
-    // If there was a critical error during bootstrap (e.g., RemoteConfig fetch failed),
-    // immediately transition to criticalError state.
-    if (state.initialRemoteConfigError != null) {
-      _logger.severe(
-        '[AppBloc] Initial RemoteConfig fetch failed during bootstrap. '
-        'Transitioning to critical error.',
-      );
-      emit(state.copyWith(status: AppLifeCycleStatus.criticalError));
-      return;
-    }
-
-    // If RemoteConfig is null at this point, it's an unexpected error.
-    if (state.remoteConfig == null) {
-      _logger.severe(
-        '[AppBloc] RemoteConfig is null after bootstrap, but no error was reported. '
-        'Transitioning to critical error.',
-      );
-      emit(
-        state.copyWith(
-          status: AppLifeCycleStatus.criticalError,
-          initialRemoteConfigError: const UnknownException(
-            'RemoteConfig is null after bootstrap.',
-          ),
-        ),
-      );
-      return;
-    }
-
-    // Evaluate global app status from RemoteConfig first.
-    if (state.remoteConfig!.appStatus.isUnderMaintenance) {
-      _logger.info(
-        '[AppBloc] App is under maintenance. Transitioning to maintenance state.',
-      );
-      emit(state.copyWith(status: AppLifeCycleStatus.underMaintenance));
-      return;
-    }
-
-    // Dispatch AppVersionCheckRequested to handle version enforcement.
-    add(
-      AppVersionCheckRequested(
-        remoteConfig: state.remoteConfig!,
-        // Not a background check during startup
-        isBackgroundCheck: false,
-      ),
+    _logger.fine(
+      '[AppBloc] AppStarted event received. State is already initialized.',
     );
-
-    // If we reach here, the app is not under maintenance or requires update.
-    // Now, handle user-specific data loading.
-    final currentUser = event.initialUser;
-
-    if (currentUser == null) {
-      _logger.info(
-        '[AppBloc] No initial user. Ensuring unauthenticated state.',
-      );
-      // Ensure the state is unauthenticated if no user, and it wasn't already set by initial state.
-      if (state.status != AppLifeCycleStatus.unauthenticated) {
-        emit(state.copyWith(status: AppLifeCycleStatus.unauthenticated));
-      }
-      return;
-    }
-
-    // If a user is present, and we are not already in loadingUserData state,
-    // transition to loadingUserData and fetch user-specific settings and preferences.
-    if (state.status != AppLifeCycleStatus.loadingUserData) {
-      emit(state.copyWith(status: AppLifeCycleStatus.loadingUserData));
-    }
-    await _fetchAndSetUserData(currentUser, emit);
   }
 
   /// Handles all logic related to user authentication state changes.
   ///
-  /// This method is now simplified to only update the user and status based
-  /// on the authentication stream, and handle data migration.
+  /// This method is the reactive entry point for handling a user logging in,
+  /// logging out, or transitioning from an anonymous to an authenticated
+  /// state while the app is running. It is triggered by the `AppUserChanged`
+  /// event, which is dispatched in response to the `AuthRepository`'s
+  /// `authStateChanges` stream.
+  ///
+  /// **Responsibilities:**
+  /// 1.  **Manages UI State:** It immediately emits a `loadingUserData` status
+  ///     to inform the UI to show a loading indicator, providing immediate
+  ///     feedback to the user.
+  /// 2.  **Delegates Complex Logic:** It does NOT perform the data fetching
+  ///     or migration itself. Instead, it delegates this complex, critical
+  ///     work to the `AppInitializer.handleUserTransition` method. This keeps
+  ///     the BLoC clean and respects the single responsibility of the
+  ///     `AppInitializer`.
+  /// 3.  **Updates Final State:** Based on the `InitializationResult` returned
+  ///     by the `AppInitializer`, it emits the final state, either with the
+  ///     newly hydrated user data or with a critical error.
   Future<void> _onAppUserChanged(
     AppUserChanged event,
     Emitter<AppState> emit,
@@ -312,120 +126,88 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     final oldUser = state.user;
     final newUser = event.user;
 
-    // Optimization: Prevent redundant reloads if the user ID hasn't changed.
-    if (oldUser?.id == newUser?.id) {
+    // Critical Change: Detect not just user ID changes, but also role changes.
+    // This is essential for the "anonymous to authenticated" flow.
+    if (oldUser?.id == newUser?.id && oldUser?.appRole == newUser?.appRole) {
       _logger.info(
-        '[AppBloc] AppUserChanged triggered, but user ID is the same. '
-        'Skipping reload.',
+        '[AppBloc] AppUserChanged triggered, but user ID and role are the same. '
+        'Skipping transition.',
       );
       return;
     }
 
-    // Update the user in the state.
-    emit(state.copyWith(user: newUser));
+    // If the user is null, it's a logout.
+    if (newUser == null) {
+      _logger.info(
+        '[AppBloc] User logged out. Transitioning to unauthenticated.',
+      );
+      // When logging out, it's crucial to explicitly clear all user-related
+      // data to ensure a clean state for the next session. This prevents
+      // stale data from causing issues on subsequent logins.
+      emit(
+        state.copyWith(
+          status: AppLifeCycleStatus.unauthenticated,
+          clearUser: true,
+        ),
+      );
+      return;
+    }
 
-    // Determine the new status based on the user.
-    final newStatus = newUser == null
-        ? AppLifeCycleStatus.unauthenticated
-        : (newUser.appRole == AppUserRole.standardUser
-              ? AppLifeCycleStatus.authenticated
-              : AppLifeCycleStatus.anonymous);
+    // A user is present, so we are logging in or transitioning roles.
+    // Show a loading screen while we handle this process.
+    emit(state.copyWith(status: AppLifeCycleStatus.loadingUserData));
 
-    emit(state.copyWith(status: newStatus));
+    // CRITICAL: Guard against a null remoteConfig. This can happen if the
+    // initial app load failed but a user change event is somehow triggered.
+    // Without this check, the app would crash.
+    if (state.remoteConfig == null) {
+      _logger.severe(
+        '[AppBloc] CRITICAL: A user transition was attempted, but remoteConfig '
+        'is null. This indicates a failed initial startup. Halting transition.',
+      );
+      emit(
+        state.copyWith(
+          status: AppLifeCycleStatus.criticalError,
+          error: const UnknownException(
+            'Cannot process user transition without remote configuration.',
+          ),
+        ),
+      );
+      return;
+    }
 
-    // If a new user is present, handle their data.
-    if (newUser != null) {
-      // In demo mode, ensure essential user-specific data (settings,
-      // preferences) are initialized if they don't already exist.
-      final isDemoMode = _environment == local_config.AppEnvironment.demo;
-      final isMigration =
-          oldUser != null &&
-          oldUser.appRole == AppUserRole.guestUser &&
-          newUser.appRole == AppUserRole.standardUser;
+    // Delegate the complex transition logic to the AppInitializer.
+    final transitionResult = await _appInitializer.handleUserTransition(
+      oldUser: oldUser,
+      newUser: newUser,
+      remoteConfig: state.remoteConfig!,
+    );
 
-      // Initialize data for a new user, but ONLY if it's not a migration.
-      if (isDemoMode && !isMigration && demoDataInitializerService != null) {
-        _logger.info(
-          '[AppBloc] Demo mode: Initializing user-specific data for '
-          'user: ${newUser.id}',
+    // Update the state based on the result of the transition.
+    switch (transitionResult) {
+      case InitializationSuccess(
+        // On a successful transition, update the state with the newly
+        // fetched user data. The status is determined by the user's role
+        // (guest or standard). Any previous error state is cleared.
+        :final user,
+        :final settings,
+        :final userContentPreferences,
+      ):
+        emit(
+          state.copyWith(
+            status: user!.isGuest
+                ? AppLifeCycleStatus.anonymous
+                : AppLifeCycleStatus.authenticated,
+            user: user,
+            settings: settings,
+            userContentPreferences: userContentPreferences,
+            clearError: true,
+          ),
         );
-        try {
-          await demoDataInitializerService!.initializeUserSpecificData(newUser);
-          _logger.info(
-            '[AppBloc] Demo mode: User-specific data initialized for '
-            'user: ${newUser.id}.',
-          );
-          // After successful initialization, immediately re-fetch the user data.
-          // This ensures that the newly created fixture data (settings and preferences)
-          // is loaded into the AppState and propagated to the UI, making features
-          // like the saved filters bar immediately visible.
-          await _fetchAndSetUserData(newUser, emit);
-        } catch (e, s) {
-          _logger.severe(
-            '[AppBloc] ERROR: Failed to initialize demo user data.',
-            e,
-            s,
-          );
-          emit(
-            state.copyWith(
-              status: AppLifeCycleStatus.criticalError,
-              initialUserPreferencesError: UnknownException(
-                'Failed to initialize demo user data: $e',
-              ),
-            ),
-          );
-          // Stop further processing if initialization failed critically.
-          return;
-        }
-      }
-
-      // Handle data migration if an anonymous user signs in.
-      if (isMigration) {
-        _logger.info(
-          '[AppBloc] Anonymous user ${oldUser.id} transitioned to '
-          'authenticated user ${newUser.id}. Attempting data migration.',
-        );
-        if (demoDataMigrationService != null &&
-            _environment == local_config.AppEnvironment.demo) {
-          try {
-            await demoDataMigrationService!.migrateAnonymousData(
-              oldUserId: oldUser.id,
-              newUserId: newUser.id,
-            );
-            _logger.info(
-              '[AppBloc] Demo mode: Data migration completed for ${newUser.id}.',
-            );
-          } catch (e, s) {
-            _logger.severe(
-              '[AppBloc] ERROR: Failed to migrate demo user data.',
-              e,
-              s,
-            );
-            // If demo data migration fails, it's a critical error for demo mode.
-            emit(
-              state.copyWith(
-                status: AppLifeCycleStatus.criticalError,
-                initialUserPreferencesError: UnknownException(
-                  'Failed to migrate demo user data: $e',
-                ),
-              ),
-            );
-            // Stop further processing if migration failed critically.
-            return;
-          }
-        }
-      }
-
-      // Perform the standard data fetch if we are not in demo mode, or if a
-      // migration just occurred (to load the migrated data).
-      // This avoids a redundant fetch in the demo initialization path, which
-      // handles its own data fetching after creating fixture data.
-      if (!isDemoMode || isMigration) {
-        await _fetchAndSetUserData(newUser, emit);
-      }
-    } else {
-      // If user logs out, clear user-specific data from state.
-      emit(state.copyWith(settings: null, userContentPreferences: null));
+      // If the transition fails (e.g., due to a network error while
+      // fetching user data), emit a critical error state.
+      case InitializationFailure(:final status, :final error):
+        emit(state.copyWith(status: status, error: error));
     }
   }
 
@@ -441,7 +223,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       return;
     }
 
-    await _fetchAndSetUserSettings(state.user!, emit);
+    final settings = await _userAppSettingsRepository.read(
+      id: state.user!.id,
+      userId: state.user!.id,
+    );
+    emit(state.copyWith(settings: settings));
   }
 
   /// Handles refreshing/loading user content preferences.
@@ -456,20 +242,19 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       return;
     }
 
-    await _fetchAndSetUserContentPreferences(state.user!, emit);
+    final preferences = await _userContentPreferencesRepository.read(
+      id: state.user!.id,
+      userId: state.user!.id,
+    );
+    emit(state.copyWith(userContentPreferences: preferences));
   }
 
   /// Handles the [AppSettingsChanged] event, updating and persisting the
   /// user's application settings.
-  ///
-  /// This event is dispatched when any part of the user's settings (theme,
-  /// font, language, etc.) is modified. The entire [UserAppSettings] object
-  /// is updated and then persisted to the backend.
   Future<void> _onAppSettingsChanged(
     AppSettingsChanged event,
     Emitter<AppState> emit,
   ) async {
-    // Ensure settings are loaded and a user is available before attempting to update.
     if (state.user == null || state.settings == null) {
       _logger.warning(
         '[AppBloc] Skipping AppSettingsChanged: User or UserAppSettings not loaded.',
@@ -478,8 +263,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     }
 
     final updatedSettings = event.settings;
-
-    // Optimistically update the state.
+    // Optimistically update the UI with the new settings immediately.
+    // This provides a responsive user experience. The original settings are
+    // saved in case the persistence fails and we need to roll back.
+    final originalSettings = state.settings;
     emit(state.copyWith(settings: updatedSettings));
 
     try {
@@ -489,228 +276,69 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         userId: updatedSettings.id,
       );
       _logger.info(
-        '[AppBloc] UserAppSettings successfully updated and persisted for user ${updatedSettings.id}.',
+        '[AppBloc] UserAppSettings successfully updated for user ${updatedSettings.id}.',
       );
-    } on HttpException catch (e) {
-      _logger.severe(
-        'Failed to persist UserAppSettings for user ${updatedSettings.id} (HttpException): $e',
-      );
-      // Revert to original settings on failure to maintain state consistency
-      emit(state.copyWith(settings: state.settings));
     } catch (e, s) {
       _logger.severe(
-        'Unexpected error persisting UserAppSettings for user ${updatedSettings.id}.',
+        'Failed to persist UserAppSettings for user ${updatedSettings.id}.',
         e,
         s,
       );
-      // Revert to original settings on failure to maintain state consistency
-      emit(state.copyWith(settings: state.settings));
+      // If persistence fails, roll back the state to the original settings
+      // to keep the UI consistent with the backend state.
+      emit(state.copyWith(settings: originalSettings));
     }
   }
 
   /// Handles user logout request.
   void _onLogoutRequested(AppLogoutRequested event, Emitter<AppState> emit) {
-    unawaited(_authenticationRepository.signOut());
-  }
-
-  @override
-  Future<void> close() {
-    _userSubscription.cancel();
-    return super.close();
+    unawaited(_authRepository.signOut());
   }
 
   /// Handles periodic fetching of the remote application configuration.
-  ///
-  /// This method is primarily used for re-fetching the remote configuration
-  /// (e.g., by [AppStatusService] for background checks or by [StatusPage]
-  /// for retries). The initial remote configuration is fetched during bootstrap.
   Future<void> _onAppPeriodicConfigFetchRequested(
     AppPeriodicConfigFetchRequested event,
     Emitter<AppState> emit,
   ) async {
-    if (state.user == null) {
-      _logger.info('[AppBloc] User is null. Skipping AppConfig fetch.');
-      emit(
-        state.copyWith(
-          remoteConfig: null,
-          clearAppConfig: true,
-          status: AppLifeCycleStatus.unauthenticated,
-          initialRemoteConfigError: null,
-        ),
-      );
-      return;
-    }
-
-    // Only show critical error if it's not a background check.
-    if (!event.isBackgroundCheck) {
-      _logger.info(
-        '[AppBloc] Initial config fetch. Setting status to loadingUserData if failed.',
-      );
-      emit(state.copyWith(status: AppLifeCycleStatus.loadingUserData));
-    } else {
-      _logger.info('[AppBloc] Background config fetch. Proceeding silently.');
-    }
-
+    _logger.fine('[AppBloc] Periodic remote config fetch requested.');
     try {
-      final remoteConfig = await _appConfigRepository.read(id: kRemoteConfigId);
-      _logger.info(
-        '[AppBloc] Remote Config fetched successfully for user: ${state.user!.id}',
+      final remoteConfig = await _remoteConfigRepository.read(
+        id: kRemoteConfigId,
       );
 
       if (remoteConfig.appStatus.isUnderMaintenance) {
+        _logger.warning(
+          '[AppBloc] Maintenance mode detected. Updating status.',
+        );
         emit(
           state.copyWith(
             status: AppLifeCycleStatus.underMaintenance,
             remoteConfig: remoteConfig,
-            initialRemoteConfigError: null,
           ),
         );
         return;
       }
 
-      // Dispatch AppVersionCheckRequested to handle version enforcement.
-      add(
-        AppVersionCheckRequested(
-          remoteConfig: remoteConfig,
-          isBackgroundCheck: event.isBackgroundCheck,
-        ),
-      );
-
-      final finalStatus = state.user!.appRole == AppUserRole.standardUser
-          ? AppLifeCycleStatus.authenticated
-          : AppLifeCycleStatus.anonymous;
-      emit(
-        state.copyWith(
-          remoteConfig: remoteConfig,
-          status: finalStatus,
-          initialRemoteConfigError: null,
-        ),
-      );
-    } on HttpException catch (e) {
-      _logger.severe(
-        '[AppBloc] Failed to fetch AppConfig (HttpException) for user ${state.user?.id}: ${e.runtimeType} - ${e.message}',
-      );
-      if (!event.isBackgroundCheck) {
+      if (state.status == AppLifeCycleStatus.underMaintenance &&
+          !remoteConfig.appStatus.isUnderMaintenance) {
+        _logger.info(
+          '[AppBloc] Maintenance mode lifted. Restoring previous status.',
+        );
+        final restoredStatus = state.user == null
+            ? AppLifeCycleStatus.unauthenticated
+            : (state.user!.isGuest
+                  ? AppLifeCycleStatus.anonymous
+                  : AppLifeCycleStatus.authenticated);
         emit(
-          state.copyWith(
-            status: AppLifeCycleStatus.criticalError,
-            initialRemoteConfigError: e,
-          ),
+          state.copyWith(status: restoredStatus, remoteConfig: remoteConfig),
         );
       }
     } catch (e, s) {
-      _logger.severe(
-        '[AppBloc] Unexpected error fetching AppConfig for user ${state.user?.id}.',
-        e,
-        s,
-      );
-      if (!event.isBackgroundCheck) {
-        emit(
-          state.copyWith(
-            status: AppLifeCycleStatus.criticalError,
-            initialRemoteConfigError: UnknownException(e.toString()),
-          ),
-        );
-      }
-    }
-  }
-
-  /// Handles the [AppVersionCheckRequested] event to enforce app version updates.
-  Future<void> _onAppVersionCheckRequested(
-    AppVersionCheckRequested event,
-    Emitter<AppState> emit,
-  ) async {
-    final remoteConfig = event.remoteConfig;
-    final isBackgroundCheck = event.isBackgroundCheck;
-
-    if (!remoteConfig.appStatus.isLatestVersionOnly) {
-      _logger.info(
-        '[AppBloc] Version enforcement not enabled. Skipping version check.',
-      );
-      return;
-    }
-
-    final currentAppVersionString = await _packageInfoService.getAppVersion();
-
-    if (currentAppVersionString == null) {
       _logger.warning(
-        '[AppBloc] Could not determine current app version. '
-        'Skipping version comparison.',
-      );
-      // If we can't get the current version, we can't enforce.
-      // Do not block the app, but log a warning.
-      return;
-    }
-
-    try {
-      final currentVersion = Version.parse(currentAppVersionString);
-      final latestRequiredVersion = Version.parse(
-        remoteConfig.appStatus.latestAppVersion,
-      );
-
-      if (currentVersion >= latestRequiredVersion) {
-        _logger.info(
-          '[AppBloc] App version ($currentVersion) is up to date '
-          'or newer than required ($latestRequiredVersion).',
-        );
-        // If the app is up to date, and it was previously in an updateRequired
-        // state (e.g., after an update), transition it back to a normal state.
-        if (state.status == AppLifeCycleStatus.updateRequired) {
-          final finalStatus = state.user!.appRole == AppUserRole.standardUser
-              ? AppLifeCycleStatus.authenticated
-              : AppLifeCycleStatus.anonymous;
-          emit(
-            state.copyWith(
-              status: finalStatus,
-              currentAppVersion: currentAppVersionString,
-            ),
-          );
-        } else {
-          emit(state.copyWith(currentAppVersion: currentAppVersionString));
-        }
-      } else {
-        _logger.info(
-          '[AppBloc] App version ($currentVersion) is older than '
-          'required ($latestRequiredVersion). Transitioning to updateRequired state.',
-        );
-        emit(
-          state.copyWith(
-            status: AppLifeCycleStatus.updateRequired,
-            currentAppVersion: currentAppVersionString,
-          ),
-        );
-      }
-    } on FormatException catch (e, s) {
-      _logger.severe(
-        '[AppBloc] Failed to parse app version string: $currentAppVersionString '
-        'or latest required version: ${remoteConfig.appStatus.latestAppVersion}.',
+        '[AppBloc] Failed to fetch remote config during periodic check.',
         e,
         s,
       );
-      if (!isBackgroundCheck) {
-        emit(
-          state.copyWith(
-            status: AppLifeCycleStatus.criticalError,
-            initialRemoteConfigError: UnknownException(
-              'Failed to parse app version: ${e.message}',
-            ),
-          ),
-        );
-      }
-    } catch (e, s) {
-      _logger.severe(
-        '[AppBloc] Unexpected error during app version check.',
-        e,
-        s,
-      );
-      if (!isBackgroundCheck) {
-        emit(
-          state.copyWith(
-            status: AppLifeCycleStatus.criticalError,
-            initialRemoteConfigError: UnknownException(e.toString()),
-          ),
-        );
-      }
     }
   }
 
@@ -754,26 +382,20 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         );
         _logger.info(
           '[AppBloc] User ${event.userId} FeedDecorator ${event.feedDecoratorType} '
-          'status successfully updated on the backend.',
+          'status successfully updated.',
         );
       } catch (e) {
-        _logger.severe('Failed to update feed decorator status on backend: $e');
+        _logger.severe('Failed to update feed decorator status: $e');
         emit(state.copyWith(user: originalUser));
       }
     }
   }
 
   /// Handles updating the user's content preferences.
-  ///
-  /// This event is dispatched by UI components when the user modifies their
-  /// followed countries, sources, topics, or saved headlines. The event
-  /// carries the complete, updated [UserContentPreferences] object, which
-  /// is then persisted to the backend.
   Future<void> _onAppUserContentPreferencesChanged(
     AppUserContentPreferencesChanged event,
     Emitter<AppState> emit,
   ) async {
-    // Ensure a user is available before attempting to update preferences.
     if (state.user == null) {
       _logger.warning(
         '[AppBloc] Skipping AppUserContentPreferencesChanged: User is null.',
@@ -782,8 +404,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     }
 
     final updatedPreferences = event.preferences;
-
-    // Optimistically update the state.
+    // Optimistically update the UI with the new preferences.
+    // The original preferences are saved for potential rollback on failure.
+    final originalPreferences = state.userContentPreferences;
     emit(state.copyWith(userContentPreferences: updatedPreferences));
 
     try {
@@ -793,40 +416,29 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         userId: updatedPreferences.id,
       );
       _logger.info(
-        '[AppBloc] UserContentPreferences successfully updated and persisted '
-        'for user ${updatedPreferences.id}.',
-      );
-    } on HttpException catch (e) {
-      _logger.severe(
-        'Failed to persist UserContentPreferences for user ${updatedPreferences.id} '
-        '(HttpException): $e',
-      );
-      // Revert to original preferences on failure to maintain state consistency.
-      emit(
-        state.copyWith(userContentPreferences: state.userContentPreferences),
+        '[AppBloc] UserContentPreferences successfully updated for user ${updatedPreferences.id}.',
       );
     } catch (e, s) {
       _logger.severe(
-        'Unexpected error persisting UserContentPreferences for user ${updatedPreferences.id}.',
+        'Failed to persist UserContentPreferences for user ${updatedPreferences.id}.',
         e,
         s,
       );
-      // Revert to original preferences on failure to maintain state consistency.
-      emit(
-        state.copyWith(userContentPreferences: state.userContentPreferences),
-      );
+      // If persistence fails, roll back the state to the original preferences.
+      emit(state.copyWith(userContentPreferences: originalPreferences));
     }
   }
 
   /// Handles adding a new saved filter to the user's content preferences.
-  ///
-  /// This method optimistically updates the state by dispatching an
-  /// [AppUserContentPreferencesChanged] event, which will then handle
-  /// persistence.
   Future<void> _onSavedFilterAdded(
     SavedFilterAdded event,
     Emitter<AppState> emit,
   ) async {
+    _logger.fine(
+      '[AppBloc] SavedFilterAdded event received for filter: "${event.filter.name}".',
+    );
+    // This method modifies the preferences in memory and then delegates the
+    // persistence and final state update to the AppUserContentPreferencesChanged event.
     if (state.userContentPreferences == null) {
       _logger.warning(
         '[AppBloc] Skipping SavedFilterAdded: UserContentPreferences not loaded.',
@@ -846,14 +458,15 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   }
 
   /// Handles updating an existing saved filter (e.g., renaming it).
-  ///
-  /// This method finds the filter by its ID, replaces it with the updated
-  /// version, and then dispatches an [AppUserContentPreferencesChanged] event
-  /// to persist the changes.
   Future<void> _onSavedFilterUpdated(
     SavedFilterUpdated event,
     Emitter<AppState> emit,
   ) async {
+    _logger.fine(
+      '[AppBloc] SavedFilterUpdated event received for filter id: ${event.filter.id}.',
+    );
+    // This method modifies the preferences in memory and then delegates the
+    // persistence and final state update to the AppUserContentPreferencesChanged event.
     if (state.userContentPreferences == null) {
       _logger.warning(
         '[AppBloc] Skipping SavedFilterUpdated: UserContentPreferences not loaded.',
@@ -882,13 +495,15 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   }
 
   /// Handles deleting a saved filter from the user's content preferences.
-  ///
-  /// This method removes the filter by its ID and then dispatches an
-  /// [AppUserContentPreferencesChanged] event to persist the changes.
   Future<void> _onSavedFilterDeleted(
     SavedFilterDeleted event,
     Emitter<AppState> emit,
   ) async {
+    _logger.fine(
+      '[AppBloc] SavedFilterDeleted event received for filter id: ${event.filterId}.',
+    );
+    // This method modifies the preferences in memory and then delegates the
+    // persistence and final state update to the AppUserContentPreferencesChanged event.
     if (state.userContentPreferences == null) {
       _logger.warning(
         '[AppBloc] Skipping SavedFilterDeleted: UserContentPreferences not loaded.',
@@ -900,16 +515,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       state.userContentPreferences!.savedFilters,
     )..removeWhere((f) => f.id == event.filterId);
 
-    // Check if the list was actually modified to avoid unnecessary updates.
     if (updatedSavedFilters.length ==
         state.userContentPreferences!.savedFilters.length) {
-      if (updatedSavedFilters.length ==
-          state.userContentPreferences!.savedFilters.length) {
-        _logger.warning(
-          '[AppBloc] Skipping SavedFilterDeleted: Filter with id ${event.filterId} not found.',
-        );
-        return;
-      }
+      _logger.warning(
+        '[AppBloc] Skipping SavedFilterDeleted: Filter with id ${event.filterId} not found.',
+      );
+      return;
     }
 
     final updatedPreferences = state.userContentPreferences!.copyWith(
@@ -920,18 +531,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   }
 
   /// Handles reordering the list of saved filters.
-  ///
-  /// This method receives the complete list of filters in their new order
-  /// and dispatches an [AppUserContentPreferencesChanged] event to persist
-  /// the change. This approach leverages the natural order of the list for
-  /// persistence, avoiding the need for a separate 'order' property on the
-  /// [SavedFilter] model.
   Future<void> _onSavedFiltersReordered(
     SavedFiltersReordered event,
     Emitter<AppState> emit,
   ) async {
-    _logger.info('[AppBloc] SavedFiltersReordered event received.');
-
+    _logger.fine('[AppBloc] SavedFiltersReordered event received.');
+    // This method modifies the preferences in memory and then delegates the
+    // persistence and final state update to the AppUserContentPreferencesChanged event.
     if (state.userContentPreferences == null) {
       _logger.warning(
         '[AppBloc] Skipping SavedFiltersReordered: UserContentPreferences not loaded.',
@@ -939,13 +545,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       return;
     }
 
-    // Create an updated preferences object with the reordered list.
     final updatedPreferences = state.userContentPreferences!.copyWith(
       savedFilters: event.reorderedFilters,
     );
 
-    // Dispatch the existing event to handle persistence and state updates.
-    // This reuses the existing logic for updating user preferences.
     add(AppUserContentPreferencesChanged(preferences: updatedPreferences));
     _logger.info(
       '[AppBloc] Dispatched AppUserContentPreferencesChanged '

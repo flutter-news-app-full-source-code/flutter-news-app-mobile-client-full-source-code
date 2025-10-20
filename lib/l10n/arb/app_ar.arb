@@ -1385,5 +1385,34 @@
     "accountRolePremium": "مستخدم مميز",
     "@accountRolePremium": {
         "description": "تسمية لدور المستخدم المميز."
+    },
+    "deleteConfirmationDialogTitle": "تأكيد الحذف",
+    "@deleteConfirmationDialogTitle": {
+        "description": "عنوان الحوار الذي يطلب من المستخدم تأكيد عملية الحذف."
+    },
+    "deleteConfirmationDialogContent": "هل أنت متأكد أنك تريد حذف هذا العنصر؟ لا يمكن التراجع عن هذا الإجراء.",
+    "@deleteConfirmationDialogContent": {
+        "description": "النص الرئيسي في حوار تأكيد الحذف."
+    },
+    "deleteConfirmationDialogConfirmButton": "حذف",
+    "@deleteConfirmationDialogConfirmButton": {
+        "description": "النص الموجود على زر التأكيد في حوار تأكيد الحذف."
+    },
+    "headlineSearchInitialHeadline": "ابحث عن العناوين",
+    "@headlineSearchInitialHeadline": {
+        "description": "نص العنوان المعروض في حالة البحث الأولية"
+    },
+    "headlineSearchInitialSubheadline": "أدخل كلمات رئيسية للعثور على المقالات.",
+    "@headlineSearchInitialSubheadline": {
+        "description": "نص العنوان الفرعي المعروض في حالة البحث الأولية"
+    },
+        "accountGuestUserHeadline": "حساب زائر",
+    "@accountGuestUserHeadline": {
+        "description": "عنوان رأس المستخدم عندما يكون المستخدم ضيفًا."
+    },
+    "accountGuestUserSubheadline": "سجل الدخول لمزامنة بياناتك",
+    "@accountGuestUserSubheadline": {
+        "description": "عنوان فرعي لرأس المستخدم يطالب المستخدمين الضيوف بتسجيل الدخول."
     }
+
 }

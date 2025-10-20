@@ -13,10 +13,10 @@ import 'package:flutter_news_app_mobile_client_full_source_code/account/view/fol
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/followed_contents/topics/followed_topics_list_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/saved_filters_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/saved_headlines_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_shell.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/account_linking_page.dart';
@@ -31,6 +31,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headline-details
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/view/headline_details_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_filter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/headline_filter.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/country_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_feed_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_filter_page.dart';
@@ -53,54 +54,29 @@ import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/m
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 
-/// Creates and configures the GoRouter instance for the application.
+/// Creates and configures the main [GoRouter] for the application.
 ///
-/// Requires an [authStatusNotifier] to trigger route re-evaluation when
-/// authentication state changes.
-///
-///
-/// With the current App startup architecture, the router is only active
-/// when the app is in a stable, running state. The `redirect` function's
-/// only responsibility is to handle auth-based route protection.
-/// States like `configFetching`, `underMaintenance`, etc., are handled
-/// by the root App widget *before* this router is ever built.
-
+/// This function sets up all the routes, navigation shells, and the crucial
+/// redirect logic that governs access to different parts of the app based on
+/// the user's authentication status *after* the app has successfully
+/// initialized.
 GoRouter createRouter({
   required ValueNotifier<AppLifeCycleStatus> authStatusNotifier,
-  required AuthRepository authenticationRepository,
-  required DataRepository<Headline> headlinesRepository,
-  required DataRepository<Topic> topicsRepository,
-  required DataRepository<Source> sourcesRepository,
-  required DataRepository<Country> countriesRepository,
-  required DataRepository<UserAppSettings> userAppSettingsRepository,
-  required DataRepository<UserContentPreferences>
-  userContentPreferencesRepository,
-  required DataRepository<RemoteConfig> remoteConfigRepository,
-  required DataRepository<User> userRepository,
-  required AdService adService,
   required GlobalKey<NavigatorState> navigatorKey,
-  required InlineAdCacheService inlineAdCacheService,
   required Logger logger,
 }) {
-  // Instantiate FeedDecoratorService once to be shared
-  final feedDecoratorService = FeedDecoratorService(
-    topicsRepository: topicsRepository,
-    sourcesRepository: sourcesRepository,
-  );
-
   return GoRouter(
     refreshListenable: authStatusNotifier,
-    // Start at a neutral root path. The redirect logic will immediately
-    // determine the correct path (/feed or /authentication), preventing
-    // an attempt to build a complex page before the app state is ready.
     initialLocation: '/',
     debugLogDiagnostics: true,
     navigatorKey: navigatorKey,
     observers: [GoRouterObserver(logger: logger)],
-    // --- Redirect Logic ---
-    // This function is the single source of truth for route protection.
-    // It's driven by the AppBloc's AppLifeCycleStatus.
     redirect: (BuildContext context, GoRouterState state) {
+      // The redirect logic is the gatekeeper for the running app. It runs
+      // before any navigation occurs and decides whether to allow the
+      // navigation or redirect the user elsewhere.
+
+      // Get the current, stable lifecycle status from the AppBloc.
       final appStatus = context.read<AppBloc>().state.status;
       final currentLocation = state.matchedLocation;
 
@@ -114,68 +90,83 @@ GoRouter createRouter({
       const authenticationPath = Routes.authentication;
       const accountLinkingPath = Routes.accountLinking;
       const feedPath = Routes.feed;
+
+      // Check if the user is trying to go to any part of the auth flow.
       final isGoingToAuth = currentLocation.startsWith(authenticationPath);
+      // Check if the user is trying to go to any part of the account linking
+      // flow.
       final isGoingToLinking = currentLocation.startsWith(accountLinkingPath);
 
-      // --- Case 1: Unauthenticated User ---
-      // If the user is unauthenticated, they must be on an auth path.
-      // If they try to go anywhere else, they are redirected to the sign-in page.
+      // RULE 1: If the user is unauthenticated, they can ONLY be on an
+      // authentication path. If they try to go anywhere else, redirect them
+      // to the main authentication page.
       if (appStatus == AppLifeCycleStatus.unauthenticated) {
-        logger.info('  Redirect: User is unauthenticated.');
+        logger.info(
+          '  Redirect Rule 1: User is unauthenticated. '
+          'Targeting auth path: $isGoingToAuth.',
+        );
         return isGoingToAuth ? null : authenticationPath;
       }
 
-      // --- Case 2: Anonymous User ---
-      // An anonymous user is partially authenticated. They can browse the app.
+      // RULE 2: If the user is anonymous (guest)...
       if (appStatus == AppLifeCycleStatus.anonymous) {
-        logger.info('  Redirect: User is anonymous.');
-        // Block anonymous users from the main sign-in page.
+        logger.info('  Redirect Rule 2: User is anonymous.');
+        // ...and they try to go to the main authentication page, redirect
+        // them to the feed. They should use the account linking flow instead.
         if (isGoingToAuth) {
           logger.info(
             '    Action: Anonymous user on auth path. Redirecting to feed.',
           );
           return feedPath;
         }
-        // If at the root, send them to the feed.
+        // ...and they are at the root, send them to the feed.
         if (currentLocation == rootPath) {
-          logger.info('    Action: User at root. Redirecting to feed.');
-          return feedPath;
-        }
-        // Allow navigation to other pages, including the new linking page.
-        return null;
-      }
-
-      // --- Case 3: Authenticated User ---
-      // A fully authenticated user should be blocked from all auth/linking pages.
-      if (appStatus == AppLifeCycleStatus.authenticated) {
-        logger.info('  Redirect: User is authenticated.');
-        if (isGoingToAuth || isGoingToLinking) {
           logger.info(
-            '    Action: Authenticated user on auth/linking path. Redirecting to feed.',
+            '    Action: Anonymous user at root. Redirecting to feed.',
           );
           return feedPath;
         }
-        // If at the root, send them to the feed.
+        // Otherwise, allow navigation (e.g., to account linking).
+        return null;
+      }
+
+      // RULE 3: If the user is fully authenticated...
+      if (appStatus == AppLifeCycleStatus.authenticated) {
+        logger.info('  Redirect Rule 3: User is authenticated.');
+        // ...and they try to go to any authentication or account linking page,
+        // redirect them to the feed. They are already logged in.
+        if (isGoingToAuth || isGoingToLinking) {
+          logger.info(
+            '    Action: Authenticated user on auth/linking path. '
+            'Redirecting to feed.',
+          );
+          return feedPath;
+        }
+        // ...and they are at the root, send them to the feed.
         if (currentLocation == rootPath) {
-          logger.info('    Action: User at root. Redirecting to feed.');
+          logger.info(
+            '    Action: Authenticated user at root. Redirecting to feed.',
+          );
           return feedPath;
         }
       }
 
-      // --- Fallback ---
-      // For any other case (or if no conditions are met), allow navigation.
+      // If none of the above rules apply, allow the navigation.
       logger.info('  Redirect: No condition met. Allowing navigation.');
       return null;
     },
-    // --- Authentication Routes ---
     routes: [
-      // A neutral root route that the app starts on. The redirect logic will
-      // immediately move the user to the correct location.
+      // A placeholder route for the root path. The redirect logic will always
+      // move the user away from here to the correct location.
       GoRoute(path: '/', builder: (context, state) => const SizedBox.shrink()),
+
+      // --- Authentication and Account Linking Flows ---
+      // These are top-level routes that exist outside the main app shell.
       GoRoute(
         path: Routes.authentication,
         name: Routes.authenticationName,
         builder: (BuildContext context, GoRouterState state) {
+          // Provide the AuthenticationBloc only to this part of the tree.
           return BlocProvider(
             create: (context) => AuthenticationBloc(
               authenticationRepository: context.read<AuthRepository>(),
@@ -184,7 +175,6 @@ GoRouter createRouter({
           );
         },
         routes: [
-          // Sub-routes for the standard sign-in flow.
           GoRoute(
             path: Routes.requestCode,
             name: Routes.requestCodeName,
@@ -200,7 +190,6 @@ GoRouter createRouter({
           ),
         ],
       ),
-      // --- New Top-Level Modal Route for Account Linking ---
       GoRoute(
         path: Routes.accountLinking,
         name: Routes.accountLinkingName,
@@ -213,7 +202,6 @@ GoRouter createRouter({
           );
         },
         routes: [
-          // Nested routes for the account linking email/code flow.
           GoRoute(
             path: Routes.requestCode,
             name: Routes.accountLinkingRequestCodeName,
@@ -229,18 +217,17 @@ GoRouter createRouter({
           ),
         ],
       ),
-      // --- Account Routes (Top-Level Modal) ---
-      // This route defines the main '/account' page as a full-screen modal.
-      // All other account-related pages (settings, saved items, etc.) are
-      // defined as sub-routes of this page, creating a unified navigation
-      // stack for the entire account section.
+
+      // --- Account Modal ---
+      // This is a full-screen modal route for managing account settings.
       GoRoute(
         path: Routes.account,
         name: Routes.accountName,
         pageBuilder: (context, state) =>
             const MaterialPage(fullscreenDialog: true, child: AccountPage()),
         routes: [
-          // ShellRoute for settings to provide SettingsBloc to children
+          // The settings section within the account modal. It uses a
+          // ShellRoute to provide a SettingsBloc to all its children.
           ShellRoute(
             builder: (BuildContext context, GoRouterState state, Widget child) {
               final appBloc = context.read<AppBloc>();
@@ -251,7 +238,7 @@ GoRouter createRouter({
                   final settingsBloc = SettingsBloc(
                     userAppSettingsRepository: context
                         .read<DataRepository<UserAppSettings>>(),
-                    inlineAdCacheService: inlineAdCacheService,
+                    inlineAdCacheService: context.read<InlineAdCacheService>(),
                   );
                   if (userId != null) {
                     settingsBloc.add(SettingsLoadRequested(userId: userId));
@@ -395,10 +382,7 @@ GoRouter createRouter({
         ],
       ),
 
-      // --- Entity Details Route (Top Level) ---
-      //
-      // This route handles displaying details for various content entities
-      // (Topic, Source, Country) based on path parameters.
+      // --- Global Routes (can be accessed from anywhere) ---
       GoRoute(
         path: Routes.entityDetails,
         name: Routes.entityDetailsName,
@@ -436,8 +420,13 @@ GoRouter createRouter({
                       countryRepository: context
                           .read<DataRepository<Country>>(),
                       appBloc: context.read<AppBloc>(),
-                      feedDecoratorService: feedDecoratorService,
-                      inlineAdCacheService: inlineAdCacheService,
+                      feedDecoratorService: FeedDecoratorService(
+                        topicsRepository: context.read<DataRepository<Topic>>(),
+                        sourcesRepository: context
+                            .read<DataRepository<Source>>(),
+                      ),
+                      inlineAdCacheService: context
+                          .read<InlineAdCacheService>(),
                     )..add(
                       EntityDetailsLoadRequested(
                         entityId: args.entityId,
@@ -451,32 +440,6 @@ GoRouter createRouter({
           );
         },
       ),
-
-      // --- Global Article Details Route (Top Level) ---
-      //
-      // This GoRoute provides a top-level, globally accessible way to view the
-      // HeadlineDetailsPage.
-      //
-      // Purpose:
-      // It is specifically designed for navigating to article details from contexts
-      // that are *outside* the main StatefulShellRoute's branches (e.g., from
-      // EntityDetailsPage, which is itself a top-level route, or potentially
-      // from other future top-level pages or deep links).
-      //
-      // Why it's necessary:
-      // Attempting to push a route that is deeply nested within a specific shell
-      // branch (like '/feed/article/:id') from a BuildContext outside of that
-      // shell can lead to navigator context issues and assertion failures.
-      // This global route avoids such problems by providing a clean, direct path
-      // to the HeadlineDetailsPage.
-      //
-      // How it differs:
-      // This route is distinct from the article detail routes nested within the
-      // StatefulShellRoute branches (e.g., Routes.articleDetailsName under /feed,
-      // Routes.searchArticleDetailsName under /search). Those nested routes are
-      // intended for navigation *within* their respective shell branches,
-      // preserving the shell's UI (like the bottom navigation bar).
-      // This global route, being top-level, will typically cover the entire screen.
       GoRoute(
         path: Routes.globalArticleDetails,
         name: Routes.globalArticleDetailsName,
@@ -504,10 +467,6 @@ GoRouter createRouter({
           );
         },
       ),
-      // --- Reusable Multi-Select Search Page Route (Top Level) ---
-      // This route provides a generic UI for selecting multiple items from a
-      // searchable list. It is used by other pages (like the source filter)
-      // to offload the complexity of list selection.
       GoRoute(
         path: '/multi-select-search',
         name: Routes.multiSelectSearchName,
@@ -517,15 +476,10 @@ GoRouter createRouter({
           final allItems = extra['allItems'] as List<dynamic>? ?? [];
           final initialSelectedItems =
               extra['initialSelectedItems'] as Set<dynamic>? ?? {};
-          // The itemBuilder is passed as a function to display the item name.
-          // We accept it as a generic Function and let the page handle the type,
-          // avoiding a strict cast here that causes a _TypeError.
           final itemBuilder =
               extra['itemBuilder'] as Function? ??
               (dynamic item) => item.toString();
 
-          // Since this is a generic page, we pass the dynamic types directly.
-          // The calling page is responsible for casting the result.
           return MultiSelectSearchPage<dynamic>(
             title: title,
             allItems: allItems,
@@ -535,29 +489,11 @@ GoRouter createRouter({
           );
         },
       ),
-      // --- Main App Shell ---
+
+      // --- Main App Shell with Bottom Navigation ---
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
-          return BlocProvider(
-            create: (context) {
-              // Read the AppBloc once to get the initial state.
-              final appBloc = context.read<AppBloc>();
-
-              return HeadlinesFeedBloc(
-                headlinesRepository: context.read<DataRepository<Headline>>(),
-                feedDecoratorService: feedDecoratorService,
-                appBloc: appBloc,
-                inlineAdCacheService: inlineAdCacheService,
-                // Prime the HeadlinesFeedBloc with the initial user
-                // preferences. This prevents a race condition where the
-                // feed is displayed before the bloc receives the saved
-                // filters from the AppBloc stream.
-                initialUserContentPreferences:
-                    appBloc.state.userContentPreferences,
-              );
-            },
-            child: AppShell(navigationShell: navigationShell),
-          );
+          return AppShell(navigationShell: navigationShell);
         },
         branches: [
           // --- Branch 1: Feed ---
@@ -566,9 +502,33 @@ GoRouter createRouter({
               GoRoute(
                 path: Routes.feed,
                 name: Routes.feedName,
-                builder: (context, state) => const HeadlinesFeedPage(),
+                // The HeadlinesFeedBloc is created here. We pass the initial user
+                // content preferences from the AppBloc to ensure the saved filters
+                // are immediately available, fixing a state synchronization bug.
+                builder: (context, state) => BlocProvider<HeadlinesFeedBloc>(
+                  create: (context) {
+                    final appBloc = context.read<AppBloc>();
+                    final initialUserContentPreferences =
+                        appBloc.state.userContentPreferences;
+                    return HeadlinesFeedBloc(
+                      headlinesRepository: context
+                          .read<DataRepository<Headline>>(),
+                      feedDecoratorService: FeedDecoratorService(
+                        topicsRepository: context.read<DataRepository<Topic>>(),
+                        sourcesRepository: context
+                            .read<DataRepository<Source>>(),
+                      ),
+                      appBloc: appBloc,
+                      inlineAdCacheService: context
+                          .read<InlineAdCacheService>(),
+                      initialUserContentPreferences:
+                          initialUserContentPreferences,
+                    );
+                  },
+                  child: const HeadlinesFeedPage(),
+                ),
                 routes: [
-                  // Sub-route for article details
+                  // Sub-route for article details within the feed context.
                   GoRoute(
                     path: 'article/:id',
                     name: Routes.articleDetailsName,
@@ -593,40 +553,53 @@ GoRouter createRouter({
                         ],
                         child: HeadlineDetailsPage(
                           initialHeadline: headlineFromExtra,
-                          // Ensure headlineId is non-null if initialHeadline is null
                           headlineId:
                               headlineFromExtra?.id ?? headlineIdFromPath,
                         ),
                       );
                     },
                   ),
-                  // Sub-route for notifications (placeholder)
+                  // Sub-route for notifications page.
                   GoRoute(
                     path: Routes.notifications,
                     name: Routes.notificationsName,
                     builder: (context, state) {
-                      // TODO(fulleni): Replace with actual NotificationsPage
                       return const Placeholder(
                         child: Center(child: Text('NOTIFICATIONS PAGE')),
                       );
                     },
                   ),
-
-                  // --- Filter Routes (Nested under Feed) ---
+                  // Sub-route for the full-screen filter page.
                   GoRoute(
                     path: Routes.feedFilter,
                     name: Routes.feedFilterName,
-                    // Use MaterialPage with fullscreenDialog for modal presentation
                     pageBuilder: (context, state) {
-                      // Access the HeadlinesFeedBloc from the context
-                      BlocProvider.of<HeadlinesFeedBloc>(context);
-                      return const MaterialPage(
+                      // The 'extra' parameter now contains a map with the
+                      // initial filter and the HeadlinesFeedBloc instance.
+                      final extra = state.extra! as Map<String, dynamic>;
+                      final initialFilter =
+                          extra['initialFilter'] as HeadlineFilter;
+                      final headlinesFeedBloc =
+                          extra['headlinesFeedBloc'] as HeadlinesFeedBloc;
+
+                      return MaterialPage(
                         fullscreenDialog: true,
-                        child: HeadlinesFilterPage(),
+                        // Wrap the HeadlinesFilterPage with a BlocProvider.value.
+                        // This is crucial for providing the HeadlinesFeedBloc
+                        // instance directly to the filter page's widget tree.
+                        // This approach resolves the ProviderNotFoundException
+                        // by decoupling the filter page from the main feed
+                        // page's context, allowing it to operate correctly
+                        // within its own route.
+                        child: BlocProvider.value(
+                          value: headlinesFeedBloc,
+                          child: HeadlinesFilterPage(
+                            initialFilter: initialFilter,
+                          ),
+                        ),
                       );
                     },
                     routes: [
-                      // Sub-route for topic selection
                       GoRoute(
                         path: Routes.feedFilterTopics,
                         name: Routes.feedFilterTopicsName,
@@ -636,7 +609,6 @@ GoRouter createRouter({
                           return TopicFilterPage(filterBloc: filterBloc);
                         },
                       ),
-                      // Sub-route for source selection
                       GoRoute(
                         path: Routes.feedFilterSources,
                         name: Routes.feedFilterSourcesName,

@@ -32,7 +32,7 @@ final class SourceListState extends Equatable {
     this.status = SourceListStatus.initial,
     this.sourceType,
     this.sources = const [],
-    this.hasMore = true,
+    this.nextCursor,
     this.selectedCountries = const {},
     this.allCountries = const [],
     this.error,
@@ -47,8 +47,11 @@ final class SourceListState extends Equatable {
   /// The current list of loaded sources.
   final List<Source> sources;
 
-  /// Whether there are more sources to load.
-  final bool hasMore;
+  /// The cursor for fetching the next page of sources.
+  final String? nextCursor;
+
+  /// A computed property indicating if there are more sources to load.
+  bool get hasMore => nextCursor != null;
 
   /// The set of countries selected for filtering.
   final Set<Country> selectedCountries;
@@ -65,7 +68,7 @@ final class SourceListState extends Equatable {
     SourceListStatus? status,
     SourceType? sourceType,
     List<Source>? sources,
-    bool? hasMore,
+    String? nextCursor,
     Set<Country>? selectedCountries,
     List<Country>? allCountries,
     Exception? error,
@@ -75,7 +78,7 @@ final class SourceListState extends Equatable {
       status: status ?? this.status,
       sourceType: sourceType ?? this.sourceType,
       sources: sources ?? this.sources,
-      hasMore: hasMore ?? this.hasMore,
+      nextCursor: nextCursor,
       selectedCountries: selectedCountries ?? this.selectedCountries,
       allCountries: allCountries ?? this.allCountries,
       error: clearError ? null : error ?? this.error,
@@ -87,7 +90,7 @@ final class SourceListState extends Equatable {
     status,
     sourceType,
     sources,
-    hasMore,
+    nextCursor,
     selectedCountries,
     allCountries,
     error,

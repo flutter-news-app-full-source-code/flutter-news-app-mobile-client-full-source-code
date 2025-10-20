@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
@@ -31,10 +32,16 @@ class SourceListBloc extends Bloc<SourceListEvent, SourceListState> {
        _contentLimitationService = contentLimitationService,
        _logger = logger,
        super(const SourceListState()) {
-    on<SourceListStarted>(_onSourceListStarted);
-    on<SourceListRefreshed>(_onSourceListRefreshed);
-    on<SourceListLoadMoreRequested>(_onSourceListLoadMoreRequested);
-    on<SourceListCountryFilterChanged>(_onSourceListCountryFilterChanged);
+    on<SourceListStarted>(_onSourceListStarted, transformer: droppable());
+    on<SourceListRefreshed>(_onSourceListRefreshed, transformer: droppable());
+    on<SourceListLoadMoreRequested>(
+      _onSourceListLoadMoreRequested,
+      transformer: droppable(),
+    );
+    on<SourceListCountryFilterChanged>(
+      _onSourceListCountryFilterChanged,
+      transformer: restartable(),
+    );
     on<SourceListFollowToggled>(_onSourceListFollowToggled);
   }
 
@@ -43,6 +50,9 @@ class SourceListBloc extends Bloc<SourceListEvent, SourceListState> {
   final AppBloc _appBloc;
   final ContentLimitationService _contentLimitationService;
   final Logger _logger;
+
+  /// The number of sources to fetch per page.
+  static const _pageSize = 20;
 
   /// Handles the initial loading of sources and filter data.
   Future<void> _onSourceListStarted(
@@ -60,17 +70,20 @@ class SourceListBloc extends Bloc<SourceListEvent, SourceListState> {
     try {
       // Fetch all available countries for the filter UI and the first page
       // of sources concurrently.
-      final [allCountries, sources] = await Future.wait([
+      final results = await Future.wait([
         _countriesRepository.readAll(),
         _fetchSources(sourceType: event.sourceType),
       ]);
 
+      final allCountries = (results[0] as PaginatedResponse<Country>).items;
+      final sources = results[1] as PaginatedResponse<Source>;
+
       emit(
         state.copyWith(
           status: SourceListStatus.success,
-          allCountries: allCountries as List<Country>,
-          sources: sources,
-          hasMore: sources.length == _sourcesRepository.itemsPerPage,
+          allCountries: allCountries,
+          sources: sources.items,
+          nextCursor: sources.cursor,
         ),
       );
     } catch (e, s) {
@@ -91,15 +104,15 @@ class SourceListBloc extends Bloc<SourceListEvent, SourceListState> {
 
     try {
       final sources = await _fetchSources(
-        sourceType: state.sourceType!,
+        sourceType: state.sourceType,
         countryIds: state.selectedCountries.map((c) => c.id).toSet(),
       );
 
       emit(
         state.copyWith(
           status: SourceListStatus.success,
-          sources: sources,
-          hasMore: sources.length == _sourcesRepository.itemsPerPage,
+          sources: sources.items,
+          nextCursor: sources.cursor,
         ),
       );
     } catch (e, s) {
@@ -121,19 +134,17 @@ class SourceListBloc extends Bloc<SourceListEvent, SourceListState> {
     emit(state.copyWith(status: SourceListStatus.loadingMore));
 
     try {
-      final nextPage =
-          (state.sources.length / _sourcesRepository.itemsPerPage).floor() + 1;
       final newSources = await _fetchSources(
-        sourceType: state.sourceType!,
+        sourceType: state.sourceType,
         countryIds: state.selectedCountries.map((c) => c.id).toSet(),
-        page: nextPage,
+        cursor: state.nextCursor,
       );
 
       emit(
         state.copyWith(
           status: SourceListStatus.success,
-          sources: List.of(state.sources)..addAll(newSources),
-          hasMore: newSources.length == _sourcesRepository.itemsPerPage,
+          sources: List.of(state.sources)..addAll(newSources.items),
+          nextCursor: newSources.cursor,
         ),
       );
     } catch (e, s) {
@@ -158,21 +169,21 @@ class SourceListBloc extends Bloc<SourceListEvent, SourceListState> {
         status: SourceListStatus.loading,
         selectedCountries: event.selectedCountries,
         sources: [], // Clear existing sources
-        hasMore: true, // Reset pagination
+        nextCursor: null, // Reset pagination
       ),
     );
 
     try {
       final sources = await _fetchSources(
-        sourceType: state.sourceType!,
+        sourceType: state.sourceType,
         countryIds: event.selectedCountries.map((c) => c.id).toSet(),
       );
 
       emit(
         state.copyWith(
           status: SourceListStatus.success,
-          sources: sources,
-          hasMore: sources.length == _sourcesRepository.itemsPerPage,
+          sources: sources.items,
+          nextCursor: sources.cursor,
         ),
       );
     } catch (e, s) {
@@ -230,17 +241,20 @@ class SourceListBloc extends Bloc<SourceListEvent, SourceListState> {
   }
 
   /// A private helper to fetch sources from the repository with filters.
-  Future<List<Source>> _fetchSources({
-    required SourceType sourceType,
+  Future<PaginatedResponse<Source>> _fetchSources({
+    required SourceType? sourceType,
     Set<String> countryIds = const {},
-    int page = 1,
+    String? cursor,
   }) {
+    if (sourceType == null) {
+      throw ArgumentError.notNull('sourceType');
+    }
     return _sourcesRepository.readAll(
       filter: {
         'sourceType': sourceType.name,
-        if (countryIds.isNotEmpty) 'countryIds': countryIds.join(','),
+        if (countryIds.isNotEmpty) 'countryId': {r'$in': countryIds.toList()},
       },
-      page: page,
+      pagination: PaginationOptions(limit: _pageSize, cursor: cursor),
     );
   }
 }

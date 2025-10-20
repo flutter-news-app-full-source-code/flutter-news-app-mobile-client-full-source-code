@@ -298,8 +298,9 @@ class SourceListBloc extends Bloc<SourceListEvent, SourceListState> {
     Emitter<SourceListState> emit,
   ) async {
     if (!state.countriesHasMore ||
-        state.status == SourceListStatus.loadingMoreCountries)
+        state.status == SourceListStatus.loadingMoreCountries) {
       return;
+    }
 
     _logger.fine('Load more countries for source list filter requested.');
     emit(state.copyWith(status: SourceListStatus.loadingMoreCountries));

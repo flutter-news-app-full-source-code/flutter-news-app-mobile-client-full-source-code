@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -33,12 +34,24 @@ class _SourceListFilterView extends StatefulWidget {
 }
 
 class _SourceListFilterViewState extends State<_SourceListFilterView> {
+  late final Set<Country> _initialSelection;
+  late Set<Country> _currentSelection;
   final _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
+    // Store the initial and current selections locally to track changes.
+    _initialSelection = context.read<SourceListBloc>().state.selectedCountries;
+    _currentSelection = Set.from(_initialSelection);
     _scrollController.addListener(_onScroll);
+  }
+
+  bool get _hasChanges {
+    return !const SetEquality<Country>().equals(
+      _initialSelection,
+      _currentSelection,
+    );
   }
 
   @override
@@ -79,7 +92,20 @@ class _SourceListFilterViewState extends State<_SourceListFilterView> {
           IconButton(
             icon: const Icon(Icons.check),
             tooltip: l10n.headlinesFeedFilterApplyButton,
-            onPressed: () => Navigator.of(context).pop(),
+            // The button is enabled only if the selection has changed.
+            onPressed: _hasChanges
+                ? () {
+                    // When applying, dispatch a single event with the final
+                    // selection and then pop the page.
+                    context.read<SourceListBloc>().add(
+                      SourceListCountryFilterChanged(
+                        selectedCountries: _currentSelection,
+                      ),
+                    );
+                    Navigator.of(context).pop();
+                  }
+                // If there are no changes, the button is disabled.
+                : null,
           ),
         ],
       ),
@@ -115,7 +141,7 @@ class _SourceListFilterViewState extends State<_SourceListFilterView> {
                     : const SizedBox.shrink();
               }
               final country = state.countries[index];
-              final isSelected = state.selectedCountries.contains(country);
+              final isSelected = _currentSelection.contains(country);
 
               return CheckboxListTile(
                 title: Text(country.name, style: textTheme.titleMedium),
@@ -138,19 +164,15 @@ class _SourceListFilterViewState extends State<_SourceListFilterView> {
                 value: isSelected,
                 onChanged: (bool? value) {
                   if (value == null) return;
-                  final newSelection = Set<Country>.from(
-                    state.selectedCountries,
-                  );
-                  if (value) {
-                    newSelection.add(country);
-                  } else {
-                    newSelection.remove(country);
-                  }
-                  context.read<SourceListBloc>().add(
-                    SourceListCountryFilterChanged(
-                      selectedCountries: newSelection,
-                    ),
-                  );
+                  // Update the local selection state, which will trigger a
+                  // rebuild and enable/disable the apply button.
+                  setState(() {
+                    if (value) {
+                      _currentSelection.add(country);
+                    } else {
+                      _currentSelection.remove(country);
+                    }
+                  });
                 },
                 controlAffinity: ListTileControlAffinity.leading,
               );

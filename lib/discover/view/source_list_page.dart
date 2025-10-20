@@ -128,9 +128,13 @@ class _SourceListViewState extends State<_SourceListView> {
                       icon: const Icon(Icons.filter_list),
                       tooltip: l10n.sourceListFilterPageFilterButtonTooltip,
                       onPressed: () {
+                        final bloc = context.read<SourceListBloc>();
                         context.pushNamed(
                           Routes.discoverSourceListFilterName,
-                          extra: context.read<SourceListBloc>(),
+                          pathParameters: {
+                            'sourceType': bloc.state.sourceType!.name,
+                          },
+                          extra: bloc,
                         );
                       },
                     ),

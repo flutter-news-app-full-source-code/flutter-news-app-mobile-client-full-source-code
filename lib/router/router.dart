@@ -569,7 +569,7 @@ GoRouter createRouter({
                     pageBuilder: (context, state) {
                       // The 'extra' parameter now contains a map with the
                       // initial filter and the HeadlinesFeedBloc instance.
-                      final extra = state.extra as Map<String, dynamic>;
+                      final extra = state.extra! as Map<String, dynamic>;
                       final initialFilter =
                           extra['initialFilter'] as HeadlineFilter;
                       final headlinesFeedBloc =

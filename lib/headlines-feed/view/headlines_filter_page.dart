@@ -94,8 +94,9 @@ Widget _buildFilterTile({
 /// for one-time use or saving it for future use.
 Future<void> _showApplyOptionsDialog(BuildContext context) async {
   final l10n = AppLocalizationsX(context).l10n;
-  // No need to await here, the dialog handles its own dismissal.
-  showDialog<void>(
+  // Await the dialog to ensure the method completes only after the dialog
+  // is dismissed, which resolves the "unawaited_futures" lint warning.
+  await showDialog<void>(
     context: context,
     builder: (BuildContext dialogContext) {
       return AlertDialog(

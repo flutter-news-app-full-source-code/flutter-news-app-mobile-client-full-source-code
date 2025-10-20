@@ -6,14 +6,11 @@ import 'package:collection/collection.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/headline_filter.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/extensions.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_decorator_service.dart';
-import 'package:ui_kit/ui_kit.dart';
 
 part 'headlines_feed_event.dart';
 part 'headlines_feed_state.dart';

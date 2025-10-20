@@ -1322,6 +1322,10 @@
     "@sourceListFilterPageFilterButtonTooltip": {
         "description": "Tooltip for the button that opens the source list filter page."
     },
+    "sourceListFilterByHeadquartersPageTitle": "Headquarters location",
+    "@sourceListFilterByHeadquartersPageTitle": {
+        "description": "Title for the page where users filter sources by headquarters country."
+    },
     "accountSavedFiltersTile": "Saved Filters",
     "@accountSavedFiltersTile": {
         "description": "The title for the list tile on the account page that navigates to the saved filters management page."

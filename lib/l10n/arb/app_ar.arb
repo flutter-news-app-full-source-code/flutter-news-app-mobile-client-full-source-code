@@ -1426,6 +1426,10 @@
     "@failedToLoadMoreSources": {
         "description": "رسالة خطأ عند فشل تحميل المزيد من المصادر في صفحة التفاصيل"
     },
+    "sourceListFilterByHeadquartersPageTitle": "مكان المقر",
+    "@sourceListFilterByHeadquartersPageTitle": {
+        "description": "عنوان الصفحة التي يقوم فيها المستخدمون بتصفية المصادر حسب بلد المقر."
+    },
     "sourceTypeNewsAgency": "وكالة أنباء",
     "@sourceTypeNewsAgency": {
         "description": "نوع المصدر لوكالة أنباء"

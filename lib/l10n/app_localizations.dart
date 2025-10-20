@@ -1922,6 +1922,12 @@ abstract class AppLocalizations {
   /// **'Filter source list'**
   String get sourceListFilterPageFilterButtonTooltip;
 
+  /// Title for the page where users filter sources by headquarters country.
+  ///
+  /// In en, this message translates to:
+  /// **'Headquarters location'**
+  String get sourceListFilterByHeadquartersPageTitle;
+
   /// The title for the list tile on the account page that navigates to the saved filters management page.
   ///
   /// In en, this message translates to:

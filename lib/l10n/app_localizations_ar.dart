@@ -1010,6 +1010,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get sourceListFilterPageFilterButtonTooltip => 'تصفية قائمة المصادر';
 
   @override
+  String get sourceListFilterByHeadquartersPageTitle => 'مكان المقر';
+
+  @override
   String get accountSavedFiltersTile => 'الفلاتر المحفوظة';
 
   @override

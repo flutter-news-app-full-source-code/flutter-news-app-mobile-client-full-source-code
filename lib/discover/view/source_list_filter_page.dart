@@ -72,7 +72,7 @@ class _SourceListFilterViewState extends State<_SourceListFilterView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.sourceListFilterPageTitle),
+        title: Text(l10n.sourceListFilterByHeadquartersPageTitle),
         actions: [
           // The "Apply" button simply pops the page. The BLoC handles the
           // state change and triggers a refetch on the previous page.

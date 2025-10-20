@@ -43,6 +43,10 @@ class SourceListBloc extends Bloc<SourceListEvent, SourceListState> {
       transformer: restartable(),
     );
     on<SourceListFollowToggled>(_onSourceListFollowToggled);
+    on<SourceListCountriesLoadMoreRequested>(
+      _onSourceListCountriesLoadMoreRequested,
+      transformer: droppable(),
+    );
   }
 
   final DataRepository<Source> _sourcesRepository;
@@ -53,6 +57,9 @@ class SourceListBloc extends Bloc<SourceListEvent, SourceListState> {
 
   /// The number of sources to fetch per page.
   static const _pageSize = 20;
+
+  /// The number of countries to fetch per page.
+  static const _countriesPageSize = 20;
 
   /// Handles the initial loading of sources and filter data.
   Future<void> _onSourceListStarted(
@@ -71,18 +78,24 @@ class SourceListBloc extends Bloc<SourceListEvent, SourceListState> {
       // Fetch all available countries for the filter UI and the first page
       // of sources concurrently.
       final results = await Future.wait([
-        _countriesRepository.readAll(),
+        _countriesRepository.readAll(
+          filter: {'hasActiveSources': true},
+          sort: [const SortOption('name', SortOrder.asc)],
+          pagination: const PaginationOptions(limit: _countriesPageSize),
+        ),
         _fetchSources(sourceType: event.sourceType),
       ]);
 
-      final allCountries = (results[0] as PaginatedResponse<Country>).items;
+      final countriesResponse = results[0] as PaginatedResponse<Country>;
+      final countries = countriesResponse.items;
       final sources = results[1] as PaginatedResponse<Source>;
 
       emit(
         state.copyWith(
           status: SourceListStatus.success,
-          allCountries: allCountries,
+          countries: countries,
           sources: sources.items,
+          countriesNextCursor: countriesResponse.cursor,
           nextCursor: sources.cursor,
         ),
       );
@@ -277,5 +290,62 @@ class SourceListBloc extends Bloc<SourceListEvent, SourceListState> {
       },
       pagination: PaginationOptions(limit: _pageSize, cursor: cursor),
     );
+  }
+
+  /// Handles loading the next page of countries for infinite scrolling.
+  Future<void> _onSourceListCountriesLoadMoreRequested(
+    SourceListCountriesLoadMoreRequested event,
+    Emitter<SourceListState> emit,
+  ) async {
+    if (!state.countriesHasMore ||
+        state.status == SourceListStatus.loadingMoreCountries)
+      return;
+
+    _logger.fine('Load more countries for source list filter requested.');
+    emit(state.copyWith(status: SourceListStatus.loadingMoreCountries));
+
+    try {
+      final newCountriesResponse = await _countriesRepository.readAll(
+        filter: {'hasActiveSources': true},
+        sort: [const SortOption('name', SortOrder.asc)],
+        pagination: PaginationOptions(
+          limit: _countriesPageSize,
+          cursor: state.countriesNextCursor,
+        ),
+      );
+
+      emit(
+        state.copyWith(
+          status: SourceListStatus.success,
+          countries: List.of(state.countries)
+            ..addAll(newCountriesResponse.items),
+          countriesNextCursor: newCountriesResponse.cursor,
+        ),
+      );
+    } on HttpException catch (e, s) {
+      _logger.warning(
+        'Failed to load more countries for source list filter.',
+        e,
+        s,
+      );
+      emit(
+        state.copyWith(
+          status: SourceListStatus.partialCountriesFailure,
+          error: e,
+        ),
+      );
+    } catch (e, s) {
+      _logger.severe(
+        'Unexpected error loading more countries for source list filter.',
+        e,
+        s,
+      );
+      emit(
+        state.copyWith(
+          status: SourceListStatus.failure,
+          error: UnknownException('$e'),
+        ),
+      );
+    }
   }
 }

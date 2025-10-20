@@ -123,8 +123,9 @@ Gain complete command over your application's operational state and user experie
 ---
 
 ### 🛠️ Flexible Environment Configuration
-- Easily switch between development (in-memory data or local API) and production environments with a simple code change. This empowers rapid prototyping, robust testing, and seamless deployment.
-> **🚀 Your Advantage:** A flexible setup that speeds up your development cycle and makes deployment simple.
+- The app utilizes compile-time variables (`--dart-define`) to seamlessly switch between `production`, `development`, and `demo` environments. This production-ready approach ensures that environment-specific configurations, like API endpoints, are set at build time, eliminating the risk of shipping a production app with development settings.
+- Includes pre-configured VS Code `launch.json` profiles for all environments, enabling one-click running and debugging for any target configuration.
+> **🚀 Your Advantage:** A robust, professional environment setup that streamlines the development-to-production workflow and prevents common configuration errors.
 
 ---
 

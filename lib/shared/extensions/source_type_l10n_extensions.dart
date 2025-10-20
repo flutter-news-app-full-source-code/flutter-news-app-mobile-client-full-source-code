@@ -26,4 +26,28 @@ extension SourceTypeL10n on SourceType {
         return l10n.sourceTypeOther;
     }
   }
+
+  /// Returns the plural localized name for the source type.
+  String l10nPlural(AppLocalizations l10n) {
+    switch (this) {
+      case SourceType.newsAgency:
+        return l10n.sourceTypeNewsAgencies;
+      case SourceType.localNewsOutlet:
+        return l10n.sourceTypeLocalNewsOutlets;
+      case SourceType.nationalNewsOutlet:
+        return l10n.sourceTypeNationalNewsOutlets;
+      case SourceType.internationalNewsOutlet:
+        return l10n.sourceTypeInternationalNewsOutlets;
+      case SourceType.specializedPublisher:
+        return l10n.sourceTypeSpecializedPublishers;
+      case SourceType.blog:
+        return l10n.sourceTypeBlogs;
+      case SourceType.governmentSource:
+        return l10n.sourceTypeGovernmentSources;
+      case SourceType.aggregator:
+        return l10n.sourceTypeAggregators;
+      case SourceType.other:
+        return l10n.sourceTypeOthers;
+    }
+  }
 }

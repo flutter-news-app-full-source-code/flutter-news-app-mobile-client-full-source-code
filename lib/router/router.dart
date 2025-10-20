@@ -24,7 +24,9 @@ import 'package:flutter_news_app_mobile_client_full_source_code/authentication/v
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/email_code_verification_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/request_code_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/discover/view/discover_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/discover/view/source_list_filter_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/discover/bloc/source_list_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/discover/view/source_list_filter_page.dart'
+    as discover_filter;
 import 'package:flutter_news_app_mobile_client_full_source_code/discover/view/source_list_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/bloc/entity_details_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/view/entity_details_page.dart';
@@ -38,7 +40,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/v
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_feed_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_filter_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_list_filter_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_list_filter_page.dart'
+    as feed_filter;
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/topic_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/go_router_observer.dart';
@@ -641,7 +644,7 @@ GoRouter createRouter({
                                       as Set<SourceType>? ??
                                   {};
 
-                              return SourceListFilterPage(
+                              return feed_filter.SourceListFilterPage(
                                 allCountries: allCountries,
                                 allSourceTypes: allSourceTypes,
                                 initialSelectedHeadquarterCountries:
@@ -703,7 +706,7 @@ GoRouter createRouter({
                         name: Routes.discoverSourceListFilterName,
                         builder: (context, state) {
                           final sourceListBloc = state.extra! as SourceListBloc;
-                          return SourceListFilterPage(
+                          return discover_filter.SourceListFilterPage(
                             sourceListBloc: sourceListBloc,
                           );
                         },

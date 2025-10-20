@@ -306,6 +306,23 @@ class AppInitializer {
     _logger.fine(
       '[AppInitializer] Re-fetching user data for transitioned user ${newUser.id}...',
     );
+
+    // --- Demo-Specific Logic: Initialize Data on Transition ---
+    // In demo mode, when a new user authenticates (e.g., anonymous sign-in
+    // or email verification), their user-specific data (settings, preferences)
+    // does not yet exist in the in-memory repositories. This block ensures
+    // that the DemoDataInitializerService is called to create this data
+    // *before* the subsequent code attempts to read it. This prevents a
+    // NotFoundException that would otherwise cause a critical error and
+    // stall the authentication flow.
+    if (_environment == local_config.AppEnvironment.demo) {
+      _logger.info(
+        '[AppInitializer] Demo mode: Initializing data for new user '
+        '${newUser.id} during transition.',
+      );
+      await demoDataInitializerService?.initializeUserSpecificData(newUser);
+    }
+
     try {
       final [
         userAppSettings as UserAppSettings?,

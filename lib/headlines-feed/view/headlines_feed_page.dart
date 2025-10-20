@@ -160,32 +160,6 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
               );
             }
 
-            if (state.status == HeadlinesFeedStatus.success &&
-                state.feedItems.isEmpty) {
-              super.build(context);
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    InitialStateWidget(
-                      icon: Icons.search_off,
-                      headline: l10n.headlinesFeedEmptyFilteredHeadline,
-                      subheadline: l10n.headlinesFeedEmptyFilteredSubheadline,
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    ElevatedButton(
-                      onPressed: () => context.read<HeadlinesFeedBloc>().add(
-                        HeadlinesFeedFiltersCleared(
-                          adThemeStyle: AdThemeStyle.fromTheme(theme),
-                        ),
-                      ),
-                      child: Text(l10n.headlinesFeedClearFiltersButton),
-                    ),
-                  ],
-                ),
-              );
-            }
-
             super.build(context);
             return RefreshIndicator(
               onRefresh: () async {
@@ -209,202 +183,242 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                       ),
                     ),
                   ),
-                  SliverPadding(
-                    padding: const EdgeInsets.only(
-                      top: AppSpacing.md,
-                      bottom: AppSpacing.xxl,
-                    ),
-                    sliver: SliverList.separated(
-                      itemCount: state.hasMore
-                          ? state.feedItems.length + 1
-                          : state.feedItems.length,
-                      separatorBuilder: (context, index) {
-                        if (index >= state.feedItems.length - 1) {
-                          return const SizedBox.shrink();
-                        }
-                        final currentItem = state.feedItems[index];
-                        final nextItem = state.feedItems[index + 1];
-
-                        if (currentItem is! Headline || nextItem is! Headline) {
-                          return const SizedBox(height: AppSpacing.md);
-                        }
-                        return const SizedBox(height: AppSpacing.sm);
-                      },
-                      itemBuilder: (context, index) {
-                        if (index >= state.feedItems.length) {
-                          return state.status == HeadlinesFeedStatus.loadingMore
-                              ? const Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: AppSpacing.lg,
+                  // Conditionally render either the feed content or an empty
+                  // state message within the scroll view. This ensures the
+                  // app bar and filter bar are always visible for a better
+                  // and more consistent user experience, allowing users to
+                  // easily modify filters even when there are no results.
+                  if (state.feedItems.isEmpty &&
+                      state.status != HeadlinesFeedStatus.loading)
+                    SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            InitialStateWidget(
+                              icon: Icons.search_off,
+                              headline: l10n.headlinesFeedEmptyFilteredHeadline,
+                              subheadline:
+                                  l10n.headlinesFeedEmptyFilteredSubheadline,
+                            ),
+                            const SizedBox(height: AppSpacing.lg),
+                            ElevatedButton(
+                              onPressed: () =>
+                                  context.read<HeadlinesFeedBloc>().add(
+                                    HeadlinesFeedFiltersCleared(
+                                      adThemeStyle: AdThemeStyle.fromTheme(
+                                        theme,
+                                      ),
+                                    ),
                                   ),
-                                  child: Center(
-                                    child: CircularProgressIndicator(),
-                                  ),
-                                )
-                              : const SizedBox.shrink();
-                        }
-                        final item = state.feedItems[index];
-
-                        if (item is Headline) {
-                          final imageStyle = context
-                              .watch<AppBloc>()
-                              .state
-                              .headlineImageStyle;
-                          Widget tile;
-                          switch (imageStyle) {
-                            case HeadlineImageStyle.hidden:
-                              tile = HeadlineTileTextOnly(
-                                headline: item,
-                                onHeadlineTap: () =>
-                                    HeadlineTapHandler.handleHeadlineTap(
-                                      context,
-                                      item,
-                                    ),
-                              );
-                            case HeadlineImageStyle.smallThumbnail:
-                              tile = HeadlineTileImageStart(
-                                headline: item,
-                                onHeadlineTap: () =>
-                                    HeadlineTapHandler.handleHeadlineTap(
-                                      context,
-                                      item,
-                                    ),
-                              );
-                            case HeadlineImageStyle.largeThumbnail:
-                              tile = HeadlineTileImageTop(
-                                headline: item,
-                                onHeadlineTap: () =>
-                                    HeadlineTapHandler.handleHeadlineTap(
-                                      context,
-                                      item,
-                                    ),
-                              );
-                          }
-                          return tile;
-                        } else if (item is AdPlaceholder) {
-                          // Access the AppBloc to get the remoteConfig for ads.
-                          final adConfig = context
-                              .read<AppBloc>()
-                              .state
-                              .remoteConfig
-                              ?.adConfig;
-
-                          // Ensure adConfig is not null before building the AdLoaderWidget.
-                          if (adConfig == null) {
-                            // Return an empty widget or a placeholder if adConfig is not available.
+                              child: Text(l10n.headlinesFeedClearFiltersButton),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  else
+                    SliverPadding(
+                      padding: const EdgeInsets.only(
+                        top: AppSpacing.md,
+                        bottom: AppSpacing.xxl,
+                      ),
+                      sliver: SliverList.separated(
+                        itemCount: state.hasMore
+                            ? state.feedItems.length + 1
+                            : state.feedItems.length,
+                        separatorBuilder: (context, index) {
+                          if (index >= state.feedItems.length - 1) {
                             return const SizedBox.shrink();
                           }
+                          final currentItem = state.feedItems[index];
+                          final nextItem = state.feedItems[index + 1];
 
-                          return FeedAdLoaderWidget(
-                            key: ValueKey(item.id),
-                            adPlaceholder: item,
-                            adThemeStyle: AdThemeStyle.fromTheme(theme),
-                            adConfig: adConfig,
-                          );
-                        } else if (item is CallToActionItem) {
-                          return CallToActionDecoratorWidget(
-                            item: item,
-                            onCallToAction: (url) {
-                              context.read<HeadlinesFeedBloc>().add(
-                                CallToActionTapped(url: url),
-                              );
-                            },
-                            onDismiss: (decoratorType) {
-                              context.read<HeadlinesFeedBloc>().add(
-                                FeedDecoratorDismissed(
-                                  feedDecoratorType: decoratorType,
-                                ),
-                              );
-                            },
-                          );
-                        } else if (item is ContentCollectionItem) {
-                          // Access AppBloc to get the user's content preferences,
-                          // which is the source of truth for followed items.
-                          final appState = context.watch<AppBloc>().state;
-                          final followedTopics =
-                              appState.userContentPreferences?.followedTopics ??
-                              [];
-                          final followedSources =
-                              appState
-                                  .userContentPreferences
-                                  ?.followedSources ??
-                              [];
+                          if (currentItem is! Headline ||
+                              nextItem is! Headline) {
+                            return const SizedBox(height: AppSpacing.md);
+                          }
+                          return const SizedBox(height: AppSpacing.sm);
+                        },
+                        itemBuilder: (context, index) {
+                          if (index >= state.feedItems.length) {
+                            return state.status ==
+                                    HeadlinesFeedStatus.loadingMore
+                                ? const Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: AppSpacing.lg,
+                                    ),
+                                    child: Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  )
+                                : const SizedBox.shrink();
+                          }
+                          final item = state.feedItems[index];
 
-                          final followedTopicIds = followedTopics
-                              .map((t) => t.id)
-                              .toList();
-                          final followedSourceIds = followedSources
-                              .map((s) => s.id)
-                              .toList();
-
-                          return ContentCollectionDecoratorWidget(
-                            item: item,
-                            followedTopicIds: followedTopicIds,
-                            followedSourceIds: followedSourceIds,
-                            onFollowToggle: (toggledItem) {
-                              final currentUserPreferences =
-                                  appState.userContentPreferences;
-                              if (currentUserPreferences == null) return;
-
-                              UserContentPreferences updatedPreferences;
-
-                              if (toggledItem is Topic) {
-                                final isCurrentlyFollowing = followedTopicIds
-                                    .contains(toggledItem.id);
-                                final newFollowedTopics = List<Topic>.from(
-                                  followedTopics,
+                          if (item is Headline) {
+                            final imageStyle = context
+                                .watch<AppBloc>()
+                                .state
+                                .headlineImageStyle;
+                            Widget tile;
+                            switch (imageStyle) {
+                              case HeadlineImageStyle.hidden:
+                                tile = HeadlineTileTextOnly(
+                                  headline: item,
+                                  onHeadlineTap: () =>
+                                      HeadlineTapHandler.handleHeadlineTap(
+                                        context,
+                                        item,
+                                      ),
                                 );
-                                if (isCurrentlyFollowing) {
-                                  newFollowedTopics.removeWhere(
-                                    (t) => t.id == toggledItem.id,
-                                  );
-                                } else {
-                                  newFollowedTopics.add(toggledItem);
-                                }
-                                updatedPreferences = currentUserPreferences
-                                    .copyWith(
-                                      followedTopics: newFollowedTopics,
-                                    );
-                              } else if (toggledItem is Source) {
-                                final isCurrentlyFollowing = followedSourceIds
-                                    .contains(toggledItem.id);
-                                final newFollowedSources = List<Source>.from(
-                                  followedSources,
+                              case HeadlineImageStyle.smallThumbnail:
+                                tile = HeadlineTileImageStart(
+                                  headline: item,
+                                  onHeadlineTap: () =>
+                                      HeadlineTapHandler.handleHeadlineTap(
+                                        context,
+                                        item,
+                                      ),
                                 );
-                                if (isCurrentlyFollowing) {
-                                  newFollowedSources.removeWhere(
-                                    (s) => s.id == toggledItem.id,
-                                  );
-                                } else {
-                                  newFollowedSources.add(toggledItem);
-                                }
-                                updatedPreferences = currentUserPreferences
-                                    .copyWith(
-                                      followedSources: newFollowedSources,
-                                    );
-                              } else {
-                                return;
-                              }
+                              case HeadlineImageStyle.largeThumbnail:
+                                tile = HeadlineTileImageTop(
+                                  headline: item,
+                                  onHeadlineTap: () =>
+                                      HeadlineTapHandler.handleHeadlineTap(
+                                        context,
+                                        item,
+                                      ),
+                                );
+                            }
+                            return tile;
+                          } else if (item is AdPlaceholder) {
+                            // Access the AppBloc to get the remoteConfig for ads.
+                            final adConfig = context
+                                .read<AppBloc>()
+                                .state
+                                .remoteConfig
+                                ?.adConfig;
 
-                              context.read<AppBloc>().add(
-                                AppUserContentPreferencesChanged(
-                                  preferences: updatedPreferences,
-                                ),
-                              );
-                            },
-                            onDismiss: (decoratorType) {
-                              context.read<HeadlinesFeedBloc>().add(
-                                FeedDecoratorDismissed(
-                                  feedDecoratorType: decoratorType,
-                                ),
-                              );
-                            },
-                          );
-                        }
-                        return const SizedBox.shrink();
-                      },
+                            // Ensure adConfig is not null before building the AdLoaderWidget.
+                            if (adConfig == null) {
+                              // Return an empty widget or a placeholder if adConfig is not available.
+                              return const SizedBox.shrink();
+                            }
+
+                            return FeedAdLoaderWidget(
+                              key: ValueKey(item.id),
+                              adPlaceholder: item,
+                              adThemeStyle: AdThemeStyle.fromTheme(theme),
+                              adConfig: adConfig,
+                            );
+                          } else if (item is CallToActionItem) {
+                            return CallToActionDecoratorWidget(
+                              item: item,
+                              onCallToAction: (url) {
+                                context.read<HeadlinesFeedBloc>().add(
+                                  CallToActionTapped(url: url),
+                                );
+                              },
+                              onDismiss: (decoratorType) {
+                                context.read<HeadlinesFeedBloc>().add(
+                                  FeedDecoratorDismissed(
+                                    feedDecoratorType: decoratorType,
+                                  ),
+                                );
+                              },
+                            );
+                          } else if (item is ContentCollectionItem) {
+                            // Access AppBloc to get the user's content preferences,
+                            // which is the source of truth for followed items.
+                            final appState = context.watch<AppBloc>().state;
+                            final followedTopics =
+                                appState
+                                    .userContentPreferences
+                                    ?.followedTopics ??
+                                [];
+                            final followedSources =
+                                appState
+                                    .userContentPreferences
+                                    ?.followedSources ??
+                                [];
+
+                            final followedTopicIds = followedTopics
+                                .map((t) => t.id)
+                                .toList();
+                            final followedSourceIds = followedSources
+                                .map((s) => s.id)
+                                .toList();
+
+                            return ContentCollectionDecoratorWidget(
+                              item: item,
+                              followedTopicIds: followedTopicIds,
+                              followedSourceIds: followedSourceIds,
+                              onFollowToggle: (toggledItem) {
+                                final currentUserPreferences =
+                                    appState.userContentPreferences;
+                                if (currentUserPreferences == null) return;
+
+                                UserContentPreferences updatedPreferences;
+
+                                if (toggledItem is Topic) {
+                                  final isCurrentlyFollowing = followedTopicIds
+                                      .contains(toggledItem.id);
+                                  final newFollowedTopics = List<Topic>.from(
+                                    followedTopics,
+                                  );
+                                  if (isCurrentlyFollowing) {
+                                    newFollowedTopics.removeWhere(
+                                      (t) => t.id == toggledItem.id,
+                                    );
+                                  } else {
+                                    newFollowedTopics.add(toggledItem);
+                                  }
+                                  updatedPreferences = currentUserPreferences
+                                      .copyWith(
+                                        followedTopics: newFollowedTopics,
+                                      );
+                                } else if (toggledItem is Source) {
+                                  final isCurrentlyFollowing = followedSourceIds
+                                      .contains(toggledItem.id);
+                                  final newFollowedSources = List<Source>.from(
+                                    followedSources,
+                                  );
+                                  if (isCurrentlyFollowing) {
+                                    newFollowedSources.removeWhere(
+                                      (s) => s.id == toggledItem.id,
+                                    );
+                                  } else {
+                                    newFollowedSources.add(toggledItem);
+                                  }
+                                  updatedPreferences = currentUserPreferences
+                                      .copyWith(
+                                        followedSources: newFollowedSources,
+                                      );
+                                } else {
+                                  return;
+                                }
+
+                                context.read<AppBloc>().add(
+                                  AppUserContentPreferencesChanged(
+                                    preferences: updatedPreferences,
+                                  ),
+                                );
+                              },
+                              onDismiss: (decoratorType) {
+                                context.read<HeadlinesFeedBloc>().add(
+                                  FeedDecoratorDismissed(
+                                    feedDecoratorType: decoratorType,
+                                  ),
+                                );
+                              },
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        },
+                      ),
                     ),
-                  ),
                 ],
               ),
             );

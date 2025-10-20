@@ -23,8 +23,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/authentication/v
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/authentication_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/email_code_verification_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/request_code_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/discover/view/discover_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/discover/bloc/source_list_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/discover/view/discover_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/discover/view/source_list_filter_page.dart'
     as discover_filter;
 import 'package:flutter_news_app_mobile_client_full_source_code/discover/view/source_list_page.dart';

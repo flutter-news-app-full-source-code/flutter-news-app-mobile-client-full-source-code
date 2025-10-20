@@ -69,7 +69,7 @@ class DiscoverBloc extends Bloc<DiscoverEvent, DiscoverState> {
         state.copyWith(
           status: DiscoverStatus.failure,
           error: UnknownException(
-            'An unexpected error occurred: ${e.toString()}',
+            'An unexpected error occurred: $e',
           ),
         ),
       );

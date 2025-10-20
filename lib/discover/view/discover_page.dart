@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/discover/bloc/discover_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/discover/widgets/discover_sliver_app_bar.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/extensions.dart';

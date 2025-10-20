@@ -2,8 +2,8 @@ import 'package:bloc/bloc.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:stream_transform/stream_transform.dart';
 import 'package:logging/logging.dart';
+import 'package:stream_transform/stream_transform.dart';
 
 part 'source_search_event.dart';
 part 'source_search_state.dart';

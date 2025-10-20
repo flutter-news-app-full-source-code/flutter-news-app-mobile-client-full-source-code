@@ -38,6 +38,7 @@ Click on any category to explore.
 - **Advanced Filter Creation:** A dedicated, full-screen interface allows users to build complex filters by combining multiple `Topics`, `Sources`, and `Countries`.
 - **Saved Filters:** Users can name and save their custom filter combinations. These filters appear in the quick-access bar and can be reordered for a fully customized experience.
 - **Integrated Headline Search:** A sleek search bar in the main feed's scrolling app bar provides a focused, full-screen search experience for headlines. A user avatar within the search bar offers instant modal access to account settings.
+- **Intuitive Source Discovery:** A dedicated "Discover" tab provides a rich, multi-layered exploration experience. Users can browse sources by category in horizontally scrolling carousels, dive deeper into full lists with infinite scrolling and country-based filtering, and find specific sources using a familiar, contextual search bar.
 > **🎯 Your Advantage:** Give your users powerful content discovery tools that keep them engaged and coming back for more.
 
 </details>

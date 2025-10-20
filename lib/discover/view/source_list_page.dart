@@ -120,7 +120,8 @@ class _SourceListViewState extends State<_SourceListView> {
               slivers: [
                 SliverAppBar(
                   title: Text(
-                    state.sourceType?.l10n(l10n) ?? l10n.discoverPageTitle,
+                    state.sourceType?.l10nPlural(l10n) ??
+                        l10n.discoverPageTitle,
                   ),
                   pinned: true,
                   actions: [

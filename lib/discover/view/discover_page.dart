@@ -134,7 +134,7 @@ class _SourceCategoryRow extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  sourceType.l10n(l10n), // This will now work correctly
+                  sourceType.l10nPlural(l10n), // This will now work correctly
                   style: theme.textTheme.titleLarge,
                 ),
                 TextButton(

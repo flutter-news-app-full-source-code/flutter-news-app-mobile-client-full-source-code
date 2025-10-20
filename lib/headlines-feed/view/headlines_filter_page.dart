@@ -9,11 +9,11 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/b
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_filter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/headline_filter.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/widgets/save_filter_dialog.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 import 'package:uuid/uuid.dart';
@@ -140,17 +140,17 @@ Future<void> _saveAndApplyFilter(BuildContext context) async {
   // Before showing the save dialog, check if the user is allowed to save
   // another filter based on their subscription level and current usage.
   final contentLimitationService = context.read<ContentLimitationService>();
-  final limitationStatus =
-      contentLimitationService.checkAction(ContentAction.saveFilter);
+  final limitationStatus = contentLimitationService.checkAction(
+    ContentAction.saveFilter,
+  );
 
   // If the user has reached their limit, show the limitation bottom sheet
   // and halt the save process.
   if (limitationStatus != LimitationStatus.allowed) {
     await showModalBottomSheet<void>(
       context: context,
-      builder: (context) => ContentLimitationBottomSheet(
-        status: limitationStatus,
-      ),
+      builder: (context) =>
+          ContentLimitationBottomSheet(status: limitationStatus),
     );
     return;
   }

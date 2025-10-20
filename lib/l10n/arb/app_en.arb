@@ -1413,5 +1413,17 @@
     "accountGuestUserSubheadline": "Sign in to sync your data",
     "@accountGuestUserSubheadline": {
         "description": "Subheadline for the user header prompting guest users to sign in."
+    },
+    "discoverSearchHint": "Search sources...",
+    "@discoverSearchHint": {
+        "description": "Hint text for the search bar on the discover page"
+    },
+    "seeAllButtonLabel": "See all",
+    "@seeAllButtonLabel": {
+        "description": "Label for the button to see all items in a category"
+    },
+    "failedToLoadMoreSources": "Failed to load more sources.",
+    "@failedToLoadMoreSources": {
+        "description": "Error message when loading more sources fails on details page"
     }
 }

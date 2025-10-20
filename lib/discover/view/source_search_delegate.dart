@@ -90,7 +90,7 @@ class SourceSearchDelegate extends SearchDelegate<void> {
               if (state.sources.isEmpty) {
                 return InitialStateWidget(
                   icon: Icons.search_off,
-                  headline: l10n.headlinesSearchNoResults,
+                  headline: l10n.headlinesSearchNoResultsHeadline,
                   subheadline: l10n.headlinesSearchNoResultsSubheadline,
                 );
               }

@@ -86,7 +86,7 @@ class _SourceListViewState extends State<_SourceListView> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -196,7 +196,7 @@ class _SourceListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
 
     // Listen to the AppBloc to get the user's followed sources.

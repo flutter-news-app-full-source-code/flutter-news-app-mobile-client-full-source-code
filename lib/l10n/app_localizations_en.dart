@@ -1071,4 +1071,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteConfirmationDialogConfirmButton => 'Delete';
+
+  @override
+  String get headlineSearchInitialHeadline => 'Search for Headlines';
+
+  @override
+  String get headlineSearchInitialSubheadline =>
+      'Enter keywords to find articles.';
 }

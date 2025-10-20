@@ -1397,6 +1397,13 @@
     "deleteConfirmationDialogConfirmButton": "Delete",
     "@deleteConfirmationDialogConfirmButton": {
         "description": "The text for the confirm button in the delete confirmation dialog."
+    },
+    "headlineSearchInitialHeadline": "Search for Headlines",
+    "@headlineSearchInitialHeadline": {
+        "description": "Headline text shown in the initial state widget on the search page"
+    },
+    "headlineSearchInitialSubheadline": "Enter keywords to find articles.",
+    "@headlineSearchInitialSubheadline": {
+        "description": "Subheadline text shown in the initial state widget on the search page"
     }
-
 }

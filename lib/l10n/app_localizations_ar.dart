@@ -1069,4 +1069,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get deleteConfirmationDialogConfirmButton => 'حذف';
+
+  @override
+  String get headlineSearchInitialHeadline => 'ابحث عن العناوين';
+
+  @override
+  String get headlineSearchInitialSubheadline =>
+      'أدخل كلمات رئيسية للعثور على المقالات.';
 }

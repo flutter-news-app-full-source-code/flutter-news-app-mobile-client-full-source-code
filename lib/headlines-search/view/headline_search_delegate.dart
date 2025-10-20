@@ -73,8 +73,8 @@ class HeadlineSearchDelegate extends SearchDelegate<void> {
               // Show a placeholder message before a search is performed.
               return InitialStateWidget(
                 icon: Icons.search,
-                headline: l10n.headlineSearchEnterQuery,
-                subheadline: l10n.headlineSearchEnterQuerySubheadline,
+                headline: l10n.headlineSearchInitialHeadline,
+                subheadline: l10n.headlineSearchInitialSubheadline,
               );
             case HeadlineSearchStatus.loading:
               // Show a loading indicator while fetching results.

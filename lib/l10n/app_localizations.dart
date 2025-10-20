@@ -2035,6 +2035,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete'**
   String get deleteConfirmationDialogConfirmButton;
+
+  /// Headline text shown in the initial state widget on the search page
+  ///
+  /// In en, this message translates to:
+  /// **'Search for Headlines'**
+  String get headlineSearchInitialHeadline;
+
+  /// Subheadline text shown in the initial state widget on the search page
+  ///
+  /// In en, this message translates to:
+  /// **'Enter keywords to find articles.'**
+  String get headlineSearchInitialSubheadline;
 }
 
 class _AppLocalizationsDelegate

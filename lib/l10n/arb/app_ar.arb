@@ -1397,5 +1397,13 @@
     "deleteConfirmationDialogConfirmButton": "حذف",
     "@deleteConfirmationDialogConfirmButton": {
         "description": "النص الموجود على زر التأكيد في حوار تأكيد الحذف."
+    },
+    "headlineSearchInitialHeadline": "ابحث عن العناوين",
+    "@headlineSearchInitialHeadline": {
+        "description": "نص العنوان المعروض في حالة البحث الأولية"
+    },
+    "headlineSearchInitialSubheadline": "أدخل كلمات رئيسية للعثور على المقالات.",
+    "@headlineSearchInitialSubheadline": {
+        "description": "نص العنوان الفرعي المعروض في حالة البحث الأولية"
     }
 }

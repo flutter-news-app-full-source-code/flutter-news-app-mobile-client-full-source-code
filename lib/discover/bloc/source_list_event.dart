@@ -63,3 +63,8 @@ final class SourceListFollowToggled extends SourceListEvent {
   @override
   List<Object> get props => [source];
 }
+
+/// {@template source_list_countries_load_more_requested}
+/// Event triggered to load the next page of countries for filtering.
+/// {@endtemplate}
+final class SourceListCountriesLoadMoreRequested extends SourceListEvent {}

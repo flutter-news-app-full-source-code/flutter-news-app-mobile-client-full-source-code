@@ -1118,4 +1118,31 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get sourceTypeOther => 'أخرى';
+
+  @override
+  String get sourceTypeNewsAgencies => 'وكالات الأنباء';
+
+  @override
+  String get sourceTypeLocalNewsOutlets => 'منافذ إخبارية محلية';
+
+  @override
+  String get sourceTypeNationalNewsOutlets => 'منافذ إخبارية وطنية';
+
+  @override
+  String get sourceTypeInternationalNewsOutlets => 'منافذ إخبارية دولية';
+
+  @override
+  String get sourceTypeSpecializedPublishers => 'ناشرون متخصصون';
+
+  @override
+  String get sourceTypeBlogs => 'مدونات';
+
+  @override
+  String get sourceTypeGovernmentSources => 'مصادر حكومية';
+
+  @override
+  String get sourceTypeAggregators => 'مجمعات أخبار';
+
+  @override
+  String get sourceTypeOthers => 'أخرى';
 }

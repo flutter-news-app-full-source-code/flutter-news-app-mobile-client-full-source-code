@@ -1120,4 +1120,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sourceTypeOther => 'Other';
+
+  @override
+  String get sourceTypeNewsAgencies => 'News Agencies';
+
+  @override
+  String get sourceTypeLocalNewsOutlets => 'Local News Outlets';
+
+  @override
+  String get sourceTypeNationalNewsOutlets => 'National News Outlets';
+
+  @override
+  String get sourceTypeInternationalNewsOutlets => 'International News Outlets';
+
+  @override
+  String get sourceTypeSpecializedPublishers => 'Specialized Publishers';
+
+  @override
+  String get sourceTypeBlogs => 'Blogs';
+
+  @override
+  String get sourceTypeGovernmentSources => 'Government Sources';
+
+  @override
+  String get sourceTypeAggregators => 'Aggregators';
+
+  @override
+  String get sourceTypeOthers => 'Others';
 }

@@ -1461,5 +1461,41 @@
     "sourceTypeOther": "أخرى",
     "@sourceTypeOther": {
         "description": "نوع المصدر لأخرى"
+    },
+    "sourceTypeNewsAgencies": "وكالات الأنباء",
+    "@sourceTypeNewsAgencies": {
+        "description": "نوع المصدر بصيغة الجمع لوكالة أنباء"
+    },
+    "sourceTypeLocalNewsOutlets": "منافذ إخبارية محلية",
+    "@sourceTypeLocalNewsOutlets": {
+        "description": "نوع المصدر بصيغة الجمع لمنفذ إخباري محلي"
+    },
+    "sourceTypeNationalNewsOutlets": "منافذ إخبارية وطنية",
+    "@sourceTypeNationalNewsOutlets": {
+        "description": "نوع المصدر بصيغة الجمع لمنفذ إخباري وطني"
+    },
+    "sourceTypeInternationalNewsOutlets": "منافذ إخبارية دولية",
+    "@sourceTypeInternationalNewsOutlets": {
+        "description": "نوع المصدر بصيغة الجمع لمنفذ إخباري دولي"
+    },
+    "sourceTypeSpecializedPublishers": "ناشرون متخصصون",
+    "@sourceTypeSpecializedPublishers": {
+        "description": "نوع المصدر بصيغة الجمع لناشر متخصص"
+    },
+    "sourceTypeBlogs": "مدونات",
+    "@sourceTypeBlogs": {
+        "description": "نوع المصدر بصيغة الجمع لمدونة"
+    },
+    "sourceTypeGovernmentSources": "مصادر حكومية",
+    "@sourceTypeGovernmentSources": {
+        "description": "نوع المصدر بصيغة الجمع لمصدر حكومي"
+    },
+    "sourceTypeAggregators": "مجمعات أخبار",
+    "@sourceTypeAggregators": {
+        "description": "نوع المصدر بصيغة الجمع لمجمع أخبار"
+    },
+    "sourceTypeOthers": "أخرى",
+    "@sourceTypeOthers": {
+        "description": "نوع المصدر بصيغة الجمع لأخرى"
     }
 }

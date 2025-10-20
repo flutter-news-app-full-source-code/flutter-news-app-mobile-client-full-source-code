@@ -1461,5 +1461,41 @@
     "sourceTypeOther": "Other",
     "@sourceTypeOther": {
         "description": "Source type for Other"
+    },
+    "sourceTypeNewsAgencies": "News Agencies",
+    "@sourceTypeNewsAgencies": {
+        "description": "Plural source type for News Agency"
+    },
+    "sourceTypeLocalNewsOutlets": "Local News Outlets",
+    "@sourceTypeLocalNewsOutlets": {
+        "description": "Plural source type for Local News Outlet"
+    },
+    "sourceTypeNationalNewsOutlets": "National News Outlets",
+    "@sourceTypeNationalNewsOutlets": {
+        "description": "Plural source type for National News Outlet"
+    },
+    "sourceTypeInternationalNewsOutlets": "International News Outlets",
+    "@sourceTypeInternationalNewsOutlets": {
+        "description": "Plural source type for International News Outlet"
+    },
+    "sourceTypeSpecializedPublishers": "Specialized Publishers",
+    "@sourceTypeSpecializedPublishers": {
+        "description": "Plural source type for Specialized Publisher"
+    },
+    "sourceTypeBlogs": "Blogs",
+    "@sourceTypeBlogs": {
+        "description": "Plural source type for Blog"
+    },
+    "sourceTypeGovernmentSources": "Government Sources",
+    "@sourceTypeGovernmentSources": {
+        "description": "Plural source type for Government Source"
+    },
+    "sourceTypeAggregators": "Aggregators",
+    "@sourceTypeAggregators": {
+        "description": "Plural source type for Aggregator"
+    },
+    "sourceTypeOthers": "Others",
+    "@sourceTypeOthers": {
+        "description": "Plural source type for Other"
     }
 }

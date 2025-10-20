@@ -2131,6 +2131,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Other'**
   String get sourceTypeOther;
+
+  /// Plural source type for News Agency
+  ///
+  /// In en, this message translates to:
+  /// **'News Agencies'**
+  String get sourceTypeNewsAgencies;
+
+  /// Plural source type for Local News Outlet
+  ///
+  /// In en, this message translates to:
+  /// **'Local News Outlets'**
+  String get sourceTypeLocalNewsOutlets;
+
+  /// Plural source type for National News Outlet
+  ///
+  /// In en, this message translates to:
+  /// **'National News Outlets'**
+  String get sourceTypeNationalNewsOutlets;
+
+  /// Plural source type for International News Outlet
+  ///
+  /// In en, this message translates to:
+  /// **'International News Outlets'**
+  String get sourceTypeInternationalNewsOutlets;
+
+  /// Plural source type for Specialized Publisher
+  ///
+  /// In en, this message translates to:
+  /// **'Specialized Publishers'**
+  String get sourceTypeSpecializedPublishers;
+
+  /// Plural source type for Blog
+  ///
+  /// In en, this message translates to:
+  /// **'Blogs'**
+  String get sourceTypeBlogs;
+
+  /// Plural source type for Government Source
+  ///
+  /// In en, this message translates to:
+  /// **'Government Sources'**
+  String get sourceTypeGovernmentSources;
+
+  /// Plural source type for Aggregator
+  ///
+  /// In en, this message translates to:
+  /// **'Aggregators'**
+  String get sourceTypeAggregators;
+
+  /// Plural source type for Other
+  ///
+  /// In en, this message translates to:
+  /// **'Others'**
+  String get sourceTypeOthers;
 }
 
 class _AppLocalizationsDelegate

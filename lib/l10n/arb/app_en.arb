@@ -1385,6 +1385,18 @@
     "accountRolePremium": "Premium User",
     "@accountRolePremium": {
         "description": "Label for a premium user role."
+    },
+    "deleteConfirmationDialogTitle": "Confirm Deletion",
+    "@deleteConfirmationDialogTitle": {
+        "description": "Title for the dialog that asks the user to confirm a delete action."
+    },
+    "deleteConfirmationDialogContent": "Are you sure you want to delete this item? This action cannot be undone.",
+    "@deleteConfirmationDialogContent": {
+        "description": "The main text in the delete confirmation dialog."
+    },
+    "deleteConfirmationDialogConfirmButton": "Delete",
+    "@deleteConfirmationDialogConfirmButton": {
+        "description": "The text for the confirm button in the delete confirmation dialog."
     }
 
 }

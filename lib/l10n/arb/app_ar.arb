@@ -1385,5 +1385,17 @@
     "accountRolePremium": "مستخدم مميز",
     "@accountRolePremium": {
         "description": "تسمية لدور المستخدم المميز."
+    },
+    "deleteConfirmationDialogTitle": "تأكيد الحذف",
+    "@deleteConfirmationDialogTitle": {
+        "description": "عنوان الحوار الذي يطلب من المستخدم تأكيد عملية الحذف."
+    },
+    "deleteConfirmationDialogContent": "هل أنت متأكد أنك تريد حذف هذا العنصر؟ لا يمكن التراجع عن هذا الإجراء.",
+    "@deleteConfirmationDialogContent": {
+        "description": "النص الرئيسي في حوار تأكيد الحذف."
+    },
+    "deleteConfirmationDialogConfirmButton": "حذف",
+    "@deleteConfirmationDialogConfirmButton": {
+        "description": "النص الموجود على زر التأكيد في حوار تأكيد الحذف."
     }
 }

@@ -1,5 +1,4 @@
 import 'package:bloc/bloc.dart';
-import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
@@ -50,9 +49,16 @@ class SourceSearchBloc extends Bloc<SourceSearchEvent, SourceSearchState> {
     emit(state.copyWith(status: SourceSearchStatus.loading));
 
     try {
-      final sources = await _sourcesRepository.search(query: query);
+      final response = await _sourcesRepository.readAll(
+        filter: {
+          'name': {r'$regex': query, r'$options': 'i'},
+        },
+      );
       emit(
-        state.copyWith(status: SourceSearchStatus.success, sources: sources),
+        state.copyWith(
+          status: SourceSearchStatus.success,
+          sources: response.items,
+        ),
       );
     } catch (e) {
       emit(

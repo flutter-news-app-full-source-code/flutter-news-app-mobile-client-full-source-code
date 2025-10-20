@@ -204,7 +204,7 @@ class _SourceCard extends StatelessWidget {
                   source.name,
                   style: theme.textTheme.bodyMedium,
                   textAlign: TextAlign.center,
-                  maxLines: 2,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),

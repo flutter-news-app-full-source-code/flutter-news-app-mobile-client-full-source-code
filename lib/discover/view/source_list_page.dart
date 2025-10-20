@@ -122,6 +122,7 @@ class _SourceListViewState extends State<_SourceListView> {
                   title: Text(
                     state.sourceType?.l10nPlural(l10n) ??
                         l10n.discoverPageTitle,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   pinned: true,
                   actions: [
@@ -216,7 +217,12 @@ class _SourceListTile extends StatelessWidget {
 
     return ListTile(
       leading: const Icon(Icons.source_outlined),
-      title: Text(source.name, style: theme.textTheme.titleMedium),
+      title: Text(
+        source.name,
+        style: theme.textTheme.titleMedium,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
       trailing: TextButton(
         onPressed: () {
           // If the user is unfollowing, always allow it.

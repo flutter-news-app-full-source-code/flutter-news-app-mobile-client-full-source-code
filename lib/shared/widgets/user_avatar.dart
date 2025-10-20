@@ -10,10 +10,13 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class UserAvatar extends StatelessWidget {
   /// {@macro user_avatar}
-  const UserAvatar({this.user, super.key});
+  const UserAvatar({this.user, this.radius = AppSpacing.lg, super.key});
 
   /// The user to display the avatar for. Can be null.
   final User? user;
+
+  /// The radius of the circle avatar. Defaults to [AppSpacing.lg].
+  final double radius;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +25,7 @@ class UserAvatar extends StatelessWidget {
     final hasEmail = user?.email.isNotEmpty ?? false;
 
     return CircleAvatar(
-      radius: AppSpacing.lg,
+      radius: radius,
       backgroundColor: colorScheme.primaryContainer,
       child: hasEmail
           ? Text(

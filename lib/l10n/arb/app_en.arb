@@ -1322,6 +1322,10 @@
     "@sourceListFilterPageFilterButtonTooltip": {
         "description": "Tooltip for the button that opens the source list filter page."
     },
+    "sourceListFilterByHeadquartersPageTitle": "Headquarters location",
+    "@sourceListFilterByHeadquartersPageTitle": {
+        "description": "Title for the page where users filter sources by headquarters country."
+    },
     "accountSavedFiltersTile": "Saved Filters",
     "@accountSavedFiltersTile": {
         "description": "The title for the list tile on the account page that navigates to the saved filters management page."
@@ -1413,5 +1417,89 @@
     "accountGuestUserSubheadline": "Sign in to sync your data",
     "@accountGuestUserSubheadline": {
         "description": "Subheadline for the user header prompting guest users to sign in."
+    },
+    "discoverSearchHint": "Search sources...",
+    "@discoverSearchHint": {
+        "description": "Hint text for the search bar on the discover page"
+    },
+    "seeAllButtonLabel": "See all",
+    "@seeAllButtonLabel": {
+        "description": "Label for the button to see all items in a category"
+    },
+    "failedToLoadMoreSources": "Failed to load more sources.",
+    "@failedToLoadMoreSources": {
+        "description": "Error message when loading more sources fails on details page"
+    },
+    "sourceTypeNewsAgency": "News Agency",
+    "@sourceTypeNewsAgency": {
+        "description": "Source type for News Agency"
+    },
+    "sourceTypeLocalNewsOutlet": "Local News Outlet",
+    "@sourceTypeLocalNewsOutlet": {
+        "description": "Source type for Local News Outlet"
+    },
+    "sourceTypeNationalNewsOutlet": "National News Outlet",
+    "@sourceTypeNationalNewsOutlet": {
+        "description": "Source type for National News Outlet"
+    },
+    "sourceTypeInternationalNewsOutlet": "International News Outlet",
+    "@sourceTypeInternationalNewsOutlet": {
+        "description": "Source type for International News Outlet"
+    },
+    "sourceTypeSpecializedPublisher": "Specialized Publisher",
+    "@sourceTypeSpecializedPublisher": {
+        "description": "Source type for Specialized Publisher"
+    },
+    "sourceTypeBlog": "Blog",
+    "@sourceTypeBlog": {
+        "description": "Source type for Blog"
+    },
+    "sourceTypeGovernmentSource": "Government Source",
+    "@sourceTypeGovernmentSource": {
+        "description": "Source type for Government Source"
+    },
+    "sourceTypeAggregator": "Aggregator",
+    "@sourceTypeAggregator": {
+        "description": "Source type for Aggregator"
+    },
+    "sourceTypeOther": "Other",
+    "@sourceTypeOther": {
+        "description": "Source type for Other"
+    },
+    "sourceTypeNewsAgencies": "News Agencies",
+    "@sourceTypeNewsAgencies": {
+        "description": "Plural source type for News Agency"
+    },
+    "sourceTypeLocalNewsOutlets": "Local News Outlets",
+    "@sourceTypeLocalNewsOutlets": {
+        "description": "Plural source type for Local News Outlet"
+    },
+    "sourceTypeNationalNewsOutlets": "National News Outlets",
+    "@sourceTypeNationalNewsOutlets": {
+        "description": "Plural source type for National News Outlet"
+    },
+    "sourceTypeInternationalNewsOutlets": "International News Outlets",
+    "@sourceTypeInternationalNewsOutlets": {
+        "description": "Plural source type for International News Outlet"
+    },
+    "sourceTypeSpecializedPublishers": "Specialized Publishers",
+    "@sourceTypeSpecializedPublishers": {
+        "description": "Plural source type for Specialized Publisher"
+    },
+    "sourceTypeBlogs": "Blogs",
+    "@sourceTypeBlogs": {
+        "description": "Plural source type for Blog"
+    },
+    "sourceTypeGovernmentSources": "Government Sources",
+    "@sourceTypeGovernmentSources": {
+        "description": "Plural source type for Government Source"
+    },
+    "sourceTypeAggregators": "Aggregators",
+    "@sourceTypeAggregators": {
+        "description": "Plural source type for Aggregator"
+    },
+    "sourceTypeOthers": "Others",
+    "@sourceTypeOthers": {
+        "description": "Plural source type for Other"
     }
 }

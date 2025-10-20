@@ -1406,13 +1406,100 @@
     "@headlineSearchInitialSubheadline": {
         "description": "نص العنوان الفرعي المعروض في حالة البحث الأولية"
     },
-        "accountGuestUserHeadline": "حساب زائر",
+    "accountGuestUserHeadline": "حساب زائر",
     "@accountGuestUserHeadline": {
         "description": "عنوان رأس المستخدم عندما يكون المستخدم ضيفًا."
     },
     "accountGuestUserSubheadline": "سجل الدخول لمزامنة بياناتك",
     "@accountGuestUserSubheadline": {
         "description": "عنوان فرعي لرأس المستخدم يطالب المستخدمين الضيوف بتسجيل الدخول."
+    },
+    "discoverSearchHint": "ابحث في المصادر...",
+    "@discoverSearchHint": {
+        "description": "نص تلميحي لشريط البحث في صفحة الاكتشاف"
+    },
+    "seeAllButtonLabel": "عرض الكل",
+    "@seeAllButtonLabel": {
+        "description": "تسمية الزر لرؤية جميع العناصر في فئة"
+    },
+    "failedToLoadMoreSources": "فشل تحميل المزيد من المصادر.",
+    "@failedToLoadMoreSources": {
+        "description": "رسالة خطأ عند فشل تحميل المزيد من المصادر في صفحة التفاصيل"
+    },
+    "sourceListFilterByHeadquartersPageTitle": "مكان المقر",
+    "@sourceListFilterByHeadquartersPageTitle": {
+        "description": "عنوان الصفحة التي يقوم فيها المستخدمون بتصفية المصادر حسب بلد المقر."
+    },
+    "sourceTypeNewsAgency": "وكالة أنباء",
+    "@sourceTypeNewsAgency": {
+        "description": "نوع المصدر لوكالة أنباء"
+    },
+    "sourceTypeLocalNewsOutlet": "منفذ إخباري محلي",
+    "@sourceTypeLocalNewsOutlet": {
+        "description": "نوع المصدر لمنفذ إخباري محلي"
+    },
+    "sourceTypeNationalNewsOutlet": "منفذ إخباري وطني",
+    "@sourceTypeNationalNewsOutlet": {
+        "description": "نوع المصدر لمنفذ إخباري وطني"
+    },
+    "sourceTypeInternationalNewsOutlet": "منفذ إخباري دولي",
+    "@sourceTypeInternationalNewsOutlet": {
+        "description": "نوع المصدر لمنفذ إخباري دولي"
+    },
+    "sourceTypeSpecializedPublisher": "ناشر متخصص",
+    "@sourceTypeSpecializedPublisher": {
+        "description": "نوع المصدر لناشر متخصص"
+    },
+    "sourceTypeBlog": "مدونة",
+    "@sourceTypeBlog": {
+        "description": "نوع المصدر لمدونة"
+    },
+    "sourceTypeGovernmentSource": "مصدر حكومي",
+    "@sourceTypeGovernmentSource": {
+        "description": "نوع المصدر لمصدر حكومي"
+    },
+    "sourceTypeAggregator": "مجمع أخبار",
+    "@sourceTypeAggregator": {
+        "description": "نوع المصدر لمجمع أخبار"
+    },
+    "sourceTypeOther": "أخرى",
+    "@sourceTypeOther": {
+        "description": "نوع المصدر لأخرى"
+    },
+    "sourceTypeNewsAgencies": "وكالات الأنباء",
+    "@sourceTypeNewsAgencies": {
+        "description": "نوع المصدر بصيغة الجمع لوكالة أنباء"
+    },
+    "sourceTypeLocalNewsOutlets": "منافذ إخبارية محلية",
+    "@sourceTypeLocalNewsOutlets": {
+        "description": "نوع المصدر بصيغة الجمع لمنفذ إخباري محلي"
+    },
+    "sourceTypeNationalNewsOutlets": "منافذ إخبارية وطنية",
+    "@sourceTypeNationalNewsOutlets": {
+        "description": "نوع المصدر بصيغة الجمع لمنفذ إخباري وطني"
+    },
+    "sourceTypeInternationalNewsOutlets": "منافذ إخبارية دولية",
+    "@sourceTypeInternationalNewsOutlets": {
+        "description": "نوع المصدر بصيغة الجمع لمنفذ إخباري دولي"
+    },
+    "sourceTypeSpecializedPublishers": "ناشرون متخصصون",
+    "@sourceTypeSpecializedPublishers": {
+        "description": "نوع المصدر بصيغة الجمع لناشر متخصص"
+    },
+    "sourceTypeBlogs": "مدونات",
+    "@sourceTypeBlogs": {
+        "description": "نوع المصدر بصيغة الجمع لمدونة"
+    },
+    "sourceTypeGovernmentSources": "مصادر حكومية",
+    "@sourceTypeGovernmentSources": {
+        "description": "نوع المصدر بصيغة الجمع لمصدر حكومي"
+    },
+    "sourceTypeAggregators": "مجمعات أخبار",
+    "@sourceTypeAggregators": {
+        "description": "نوع المصدر بصيغة الجمع لمجمع أخبار"
+    },
+    "sourceTypeOthers": "أخرى",
+    "@sourceTypeOthers": {
+        "description": "نوع المصدر بصيغة الجمع لأخرى"
     }
-
 }

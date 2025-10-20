@@ -38,6 +38,7 @@ Click on any category to explore.
 - **Advanced Filter Creation:** A dedicated, full-screen interface allows users to build complex filters by combining multiple `Topics`, `Sources`, and `Countries`.
 - **Saved Filters:** Users can name and save their custom filter combinations. These filters appear in the quick-access bar and can be reordered for a fully customized experience.
 - **Integrated Headline Search:** A sleek search bar in the main feed's scrolling app bar provides a focused, full-screen search experience for headlines. A user avatar within the search bar offers instant modal access to account settings.
+- **Intuitive Source Discovery:** A dedicated "Discover" tab provides a rich, multi-layered exploration experience. Users can browse sources by category in horizontally scrolling carousels, dive deeper into full lists with infinite scrolling and country-based filtering, and find specific sources using a familiar, contextual search bar.
 > **🎯 Your Advantage:** Give your users powerful content discovery tools that keep them engaged and coming back for more.
 
 </details>
@@ -122,8 +123,9 @@ Gain complete command over your application's operational state and user experie
 ---
 
 ### 🛠️ Flexible Environment Configuration
-- Easily switch between development (in-memory data or local API) and production environments with a simple code change. This empowers rapid prototyping, robust testing, and seamless deployment.
-> **🚀 Your Advantage:** A flexible setup that speeds up your development cycle and makes deployment simple.
+- The app utilizes compile-time variables (`--dart-define`) to seamlessly switch between `production`, `development`, and `demo` environments. This production-ready approach ensures that environment-specific configurations, like API endpoints, are set at build time, eliminating the risk of shipping a production app with development settings.
+- Includes pre-configured VS Code `launch.json` profiles for all environments, enabling one-click running and debugging for any target configuration.
+> **🚀 Your Advantage:** A robust, professional environment setup that streamlines the development-to-production workflow and prevents common configuration errors.
 
 ---
 

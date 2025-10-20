@@ -1010,6 +1010,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get sourceListFilterPageFilterButtonTooltip => 'تصفية قائمة المصادر';
 
   @override
+  String get sourceListFilterByHeadquartersPageTitle => 'مكان المقر';
+
+  @override
   String get accountSavedFiltersTile => 'الفلاتر المحفوظة';
 
   @override
@@ -1082,4 +1085,67 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get accountGuestUserSubheadline => 'سجل الدخول لمزامنة بياناتك';
+
+  @override
+  String get discoverSearchHint => 'ابحث في المصادر...';
+
+  @override
+  String get seeAllButtonLabel => 'عرض الكل';
+
+  @override
+  String get failedToLoadMoreSources => 'فشل تحميل المزيد من المصادر.';
+
+  @override
+  String get sourceTypeNewsAgency => 'وكالة أنباء';
+
+  @override
+  String get sourceTypeLocalNewsOutlet => 'منفذ إخباري محلي';
+
+  @override
+  String get sourceTypeNationalNewsOutlet => 'منفذ إخباري وطني';
+
+  @override
+  String get sourceTypeInternationalNewsOutlet => 'منفذ إخباري دولي';
+
+  @override
+  String get sourceTypeSpecializedPublisher => 'ناشر متخصص';
+
+  @override
+  String get sourceTypeBlog => 'مدونة';
+
+  @override
+  String get sourceTypeGovernmentSource => 'مصدر حكومي';
+
+  @override
+  String get sourceTypeAggregator => 'مجمع أخبار';
+
+  @override
+  String get sourceTypeOther => 'أخرى';
+
+  @override
+  String get sourceTypeNewsAgencies => 'وكالات الأنباء';
+
+  @override
+  String get sourceTypeLocalNewsOutlets => 'منافذ إخبارية محلية';
+
+  @override
+  String get sourceTypeNationalNewsOutlets => 'منافذ إخبارية وطنية';
+
+  @override
+  String get sourceTypeInternationalNewsOutlets => 'منافذ إخبارية دولية';
+
+  @override
+  String get sourceTypeSpecializedPublishers => 'ناشرون متخصصون';
+
+  @override
+  String get sourceTypeBlogs => 'مدونات';
+
+  @override
+  String get sourceTypeGovernmentSources => 'مصادر حكومية';
+
+  @override
+  String get sourceTypeAggregators => 'مجمعات أخبار';
+
+  @override
+  String get sourceTypeOthers => 'أخرى';
 }

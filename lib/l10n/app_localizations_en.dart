@@ -1011,6 +1011,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourceListFilterPageFilterButtonTooltip => 'Filter source list';
 
   @override
+  String get sourceListFilterByHeadquartersPageTitle => 'Headquarters location';
+
+  @override
   String get accountSavedFiltersTile => 'Saved Filters';
 
   @override
@@ -1084,4 +1087,67 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accountGuestUserSubheadline => 'Sign in to sync your data';
+
+  @override
+  String get discoverSearchHint => 'Search sources...';
+
+  @override
+  String get seeAllButtonLabel => 'See all';
+
+  @override
+  String get failedToLoadMoreSources => 'Failed to load more sources.';
+
+  @override
+  String get sourceTypeNewsAgency => 'News Agency';
+
+  @override
+  String get sourceTypeLocalNewsOutlet => 'Local News Outlet';
+
+  @override
+  String get sourceTypeNationalNewsOutlet => 'National News Outlet';
+
+  @override
+  String get sourceTypeInternationalNewsOutlet => 'International News Outlet';
+
+  @override
+  String get sourceTypeSpecializedPublisher => 'Specialized Publisher';
+
+  @override
+  String get sourceTypeBlog => 'Blog';
+
+  @override
+  String get sourceTypeGovernmentSource => 'Government Source';
+
+  @override
+  String get sourceTypeAggregator => 'Aggregator';
+
+  @override
+  String get sourceTypeOther => 'Other';
+
+  @override
+  String get sourceTypeNewsAgencies => 'News Agencies';
+
+  @override
+  String get sourceTypeLocalNewsOutlets => 'Local News Outlets';
+
+  @override
+  String get sourceTypeNationalNewsOutlets => 'National News Outlets';
+
+  @override
+  String get sourceTypeInternationalNewsOutlets => 'International News Outlets';
+
+  @override
+  String get sourceTypeSpecializedPublishers => 'Specialized Publishers';
+
+  @override
+  String get sourceTypeBlogs => 'Blogs';
+
+  @override
+  String get sourceTypeGovernmentSources => 'Government Sources';
+
+  @override
+  String get sourceTypeAggregators => 'Aggregators';
+
+  @override
+  String get sourceTypeOthers => 'Others';
 }

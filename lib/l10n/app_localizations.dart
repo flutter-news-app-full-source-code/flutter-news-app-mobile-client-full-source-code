@@ -1922,6 +1922,12 @@ abstract class AppLocalizations {
   /// **'Filter source list'**
   String get sourceListFilterPageFilterButtonTooltip;
 
+  /// Title for the page where users filter sources by headquarters country.
+  ///
+  /// In en, this message translates to:
+  /// **'Headquarters location'**
+  String get sourceListFilterByHeadquartersPageTitle;
+
   /// The title for the list tile on the account page that navigates to the saved filters management page.
   ///
   /// In en, this message translates to:
@@ -2059,6 +2065,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign in to sync your data'**
   String get accountGuestUserSubheadline;
+
+  /// Hint text for the search bar on the discover page
+  ///
+  /// In en, this message translates to:
+  /// **'Search sources...'**
+  String get discoverSearchHint;
+
+  /// Label for the button to see all items in a category
+  ///
+  /// In en, this message translates to:
+  /// **'See all'**
+  String get seeAllButtonLabel;
+
+  /// Error message when loading more sources fails on details page
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load more sources.'**
+  String get failedToLoadMoreSources;
+
+  /// Source type for News Agency
+  ///
+  /// In en, this message translates to:
+  /// **'News Agency'**
+  String get sourceTypeNewsAgency;
+
+  /// Source type for Local News Outlet
+  ///
+  /// In en, this message translates to:
+  /// **'Local News Outlet'**
+  String get sourceTypeLocalNewsOutlet;
+
+  /// Source type for National News Outlet
+  ///
+  /// In en, this message translates to:
+  /// **'National News Outlet'**
+  String get sourceTypeNationalNewsOutlet;
+
+  /// Source type for International News Outlet
+  ///
+  /// In en, this message translates to:
+  /// **'International News Outlet'**
+  String get sourceTypeInternationalNewsOutlet;
+
+  /// Source type for Specialized Publisher
+  ///
+  /// In en, this message translates to:
+  /// **'Specialized Publisher'**
+  String get sourceTypeSpecializedPublisher;
+
+  /// Source type for Blog
+  ///
+  /// In en, this message translates to:
+  /// **'Blog'**
+  String get sourceTypeBlog;
+
+  /// Source type for Government Source
+  ///
+  /// In en, this message translates to:
+  /// **'Government Source'**
+  String get sourceTypeGovernmentSource;
+
+  /// Source type for Aggregator
+  ///
+  /// In en, this message translates to:
+  /// **'Aggregator'**
+  String get sourceTypeAggregator;
+
+  /// Source type for Other
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get sourceTypeOther;
+
+  /// Plural source type for News Agency
+  ///
+  /// In en, this message translates to:
+  /// **'News Agencies'**
+  String get sourceTypeNewsAgencies;
+
+  /// Plural source type for Local News Outlet
+  ///
+  /// In en, this message translates to:
+  /// **'Local News Outlets'**
+  String get sourceTypeLocalNewsOutlets;
+
+  /// Plural source type for National News Outlet
+  ///
+  /// In en, this message translates to:
+  /// **'National News Outlets'**
+  String get sourceTypeNationalNewsOutlets;
+
+  /// Plural source type for International News Outlet
+  ///
+  /// In en, this message translates to:
+  /// **'International News Outlets'**
+  String get sourceTypeInternationalNewsOutlets;
+
+  /// Plural source type for Specialized Publisher
+  ///
+  /// In en, this message translates to:
+  /// **'Specialized Publishers'**
+  String get sourceTypeSpecializedPublishers;
+
+  /// Plural source type for Blog
+  ///
+  /// In en, this message translates to:
+  /// **'Blogs'**
+  String get sourceTypeBlogs;
+
+  /// Plural source type for Government Source
+  ///
+  /// In en, this message translates to:
+  /// **'Government Sources'**
+  String get sourceTypeGovernmentSources;
+
+  /// Plural source type for Aggregator
+  ///
+  /// In en, this message translates to:
+  /// **'Aggregators'**
+  String get sourceTypeAggregators;
+
+  /// Plural source type for Other
+  ///
+  /// In en, this message translates to:
+  /// **'Others'**
+  String get sourceTypeOthers;
 }
 
 class _AppLocalizationsDelegate

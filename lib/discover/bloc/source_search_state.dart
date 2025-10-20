@@ -33,14 +33,14 @@ final class SourceSearchState extends Equatable {
   final List<Source> sources;
 
   /// The error that occurred during the search, if any.
-  final Exception? error;
+  final HttpException? error;
 
   /// Creates a copy of the current [SourceSearchState] with the given fields
   /// replaced with the new values.
   SourceSearchState copyWith({
     SourceSearchStatus? status,
     List<Source>? sources,
-    Exception? error,
+    HttpException? error,
     bool clearError = false,
   }) {
     return SourceSearchState(

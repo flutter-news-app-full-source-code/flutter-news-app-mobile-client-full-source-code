@@ -81,7 +81,7 @@ class SourceSearchDelegate extends SearchDelegate<void> {
             case SourceSearchStatus.failure:
               // Show an error widget if the search fails.
               return FailureStateWidget(
-                exception: state.error ?? UnknownException(l10n.unknownError),
+                exception: state.error!,
                 onRetry: () =>
                     sourceSearchBloc.add(SourceSearchQueryChanged(query)),
               );

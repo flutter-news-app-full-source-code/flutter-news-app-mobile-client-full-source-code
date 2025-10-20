@@ -3,6 +3,7 @@ import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:stream_transform/stream_transform.dart';
+import 'package:logging/logging.dart';
 
 part 'source_search_event.dart';
 part 'source_search_state.dart';
@@ -21,9 +22,12 @@ EventTransformer<Event> debounce<Event>(Duration duration) {
 /// {@endtemplate}
 class SourceSearchBloc extends Bloc<SourceSearchEvent, SourceSearchState> {
   /// {@macro source_search_bloc}
-  SourceSearchBloc({required DataRepository<Source> sourcesRepository})
-    : _sourcesRepository = sourcesRepository,
-      super(const SourceSearchState()) {
+  SourceSearchBloc({
+    required DataRepository<Source> sourcesRepository,
+    required Logger logger,
+  }) : _sourcesRepository = sourcesRepository,
+       _logger = logger,
+       super(const SourceSearchState()) {
     on<SourceSearchQueryChanged>(
       _onSourceSearchQueryChanged,
       transformer: debounce(_duration),
@@ -31,6 +35,7 @@ class SourceSearchBloc extends Bloc<SourceSearchEvent, SourceSearchState> {
   }
 
   final DataRepository<Source> _sourcesRepository;
+  final Logger _logger;
 
   /// Handles the search query changes.
   ///
@@ -60,11 +65,15 @@ class SourceSearchBloc extends Bloc<SourceSearchEvent, SourceSearchState> {
           sources: response.items,
         ),
       );
-    } catch (e) {
+    } on HttpException catch (e, s) {
+      _logger.warning('Source search failed with HttpException', e, s);
+      emit(state.copyWith(status: SourceSearchStatus.failure, error: e));
+    } catch (e, s) {
+      _logger.severe('Source search failed with an unknown error', e, s);
       emit(
         state.copyWith(
           status: SourceSearchStatus.failure,
-          error: e as Exception,
+          error: UnknownException('$e'),
         ),
       );
     }

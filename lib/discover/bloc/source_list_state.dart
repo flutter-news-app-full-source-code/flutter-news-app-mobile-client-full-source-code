@@ -19,6 +19,12 @@ enum SourceListStatus {
 
   /// The state when loading more sources fails, but the existing list is kept.
   partialFailure,
+
+  /// The state when loading more countries for pagination.
+  loadingMoreCountries,
+
+  /// The state when loading more countries fails, but the existing list is kept.
+  partialCountriesFailure,
 }
 
 /// {@template source_list_state}
@@ -33,8 +39,9 @@ final class SourceListState extends Equatable {
     this.sourceType,
     this.sources = const [],
     this.nextCursor,
+    this.countries = const [],
+    this.countriesNextCursor,
     this.selectedCountries = const {},
-    this.allCountries = const [],
     this.error,
   });
 
@@ -53,11 +60,17 @@ final class SourceListState extends Equatable {
   /// A computed property indicating if there are more sources to load.
   bool get hasMore => nextCursor != null;
 
+  /// The current list of loaded countries for the filter UI.
+  final List<Country> countries;
+
+  /// The cursor for fetching the next page of countries.
+  final String? countriesNextCursor;
+
+  /// A computed property indicating if there are more countries to load.
+  bool get countriesHasMore => countriesNextCursor != null;
+
   /// The set of countries selected for filtering.
   final Set<Country> selectedCountries;
-
-  /// The complete list of all available countries for the filter UI.
-  final List<Country> allCountries;
 
   /// The error that occurred, if any.
   final HttpException? error;
@@ -69,8 +82,10 @@ final class SourceListState extends Equatable {
     SourceType? sourceType,
     List<Source>? sources,
     String? nextCursor,
+    List<Country>? countries,
+    String? countriesNextCursor,
+    bool clearCountriesCursor = false,
     Set<Country>? selectedCountries,
-    List<Country>? allCountries,
     HttpException? error,
     bool clearError = false,
   }) {
@@ -79,8 +94,11 @@ final class SourceListState extends Equatable {
       sourceType: sourceType ?? this.sourceType,
       sources: sources ?? this.sources,
       nextCursor: nextCursor,
+      countries: countries ?? this.countries,
+      countriesNextCursor: clearCountriesCursor
+          ? null
+          : countriesNextCursor ?? this.countriesNextCursor,
       selectedCountries: selectedCountries ?? this.selectedCountries,
-      allCountries: allCountries ?? this.allCountries,
       error: clearError ? null : error ?? this.error,
     );
   }
@@ -91,8 +109,9 @@ final class SourceListState extends Equatable {
     sourceType,
     sources,
     nextCursor,
+    countries,
+    countriesNextCursor,
     selectedCountries,
-    allCountries,
     error,
   ];
 }

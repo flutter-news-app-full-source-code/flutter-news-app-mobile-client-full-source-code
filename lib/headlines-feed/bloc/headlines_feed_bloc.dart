@@ -26,21 +26,31 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   /// {@macro headlines_feed_bloc}
   ///
   /// Requires repositories and services for its operations.
+  /// The [initialUserContentPreferences] are used to "seed" the bloc with the
+  /// current user's saved filters, preventing a race condition on navigation.
   HeadlinesFeedBloc({
     required DataRepository<Headline> headlinesRepository,
     required FeedDecoratorService feedDecoratorService,
     required AppBloc appBloc,
     required InlineAdCacheService inlineAdCacheService,
+    UserContentPreferences? initialUserContentPreferences,
   }) : _headlinesRepository = headlinesRepository,
        _feedDecoratorService = feedDecoratorService,
        _appBloc = appBloc,
        _inlineAdCacheService = inlineAdCacheService,
-       super(const HeadlinesFeedState()) {
+       super(
+         HeadlinesFeedState(
+           savedFilters:
+               initialUserContentPreferences?.savedFilters ?? const [],
+         ),
+       ) {
     // Subscribe to AppBloc to react to global state changes, primarily for
     // keeping the feed's list of saved filters synchronized with the global
     // app state.
     _appBlocSubscription = _appBloc.stream.listen((appState) {
-      // The initial feed fetch is handled by the `HeadlinesFeedStarted` event.
+      // This subscription is now responsible for handling *updates* to the
+      // user's preferences while the bloc is active. The initial state is
+      // handled by the constructor.
       // This subscription's responsibility is to listen for changes in user
       // preferences (like adding/removing a saved filter) from other parts
       // of the app and update this BLoC's state accordingly.

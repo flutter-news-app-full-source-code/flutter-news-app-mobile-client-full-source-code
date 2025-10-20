@@ -567,12 +567,28 @@ GoRouter createRouter({
                     path: Routes.feedFilter,
                     name: Routes.feedFilterName,
                     pageBuilder: (context, state) {
-                      // Extract the initial filter state passed during navigation.
-                      final initialFilter = state.extra as HeadlineFilter;
+                      // The 'extra' parameter now contains a map with the
+                      // initial filter and the HeadlinesFeedBloc instance.
+                      final extra = state.extra as Map<String, dynamic>;
+                      final initialFilter =
+                          extra['initialFilter'] as HeadlineFilter;
+                      final headlinesFeedBloc =
+                          extra['headlinesFeedBloc'] as HeadlinesFeedBloc;
+
                       return MaterialPage(
                         fullscreenDialog: true,
-                        child: HeadlinesFilterPage(
-                          initialFilter: initialFilter,
+                        // Wrap the HeadlinesFilterPage with a BlocProvider.value.
+                        // This is crucial for providing the HeadlinesFeedBloc
+                        // instance directly to the filter page's widget tree.
+                        // This approach resolves the ProviderNotFoundException
+                        // by decoupling the filter page from the main feed
+                        // page's context, allowing it to operate correctly
+                        // within its own route.
+                        child: BlocProvider.value(
+                          value: headlinesFeedBloc,
+                          child: HeadlinesFilterPage(
+                            initialFilter: initialFilter,
+                          ),
                         ),
                       );
                     },

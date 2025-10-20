@@ -116,17 +116,22 @@ class _SavedFiltersBarState extends State<SavedFiltersBar> {
                   icon: const Icon(Icons.filter_list),
                   tooltip: l10n.savedFiltersBarOpenTooltip,
                   onPressed: () {
-                    // Read the current filter from the feed bloc.
-                    final currentFilter = context
-                        .read<HeadlinesFeedBloc>()
-                        .state
-                        .filter;
-                    // Navigate to the filter page, passing the current filter
-                    // as an argument. This ensures the filter page is
-                    // initialized with the correct state.
+                    // Read the current filter and the HeadlinesFeedBloc
+                    // instance from the context.
+                    final headlinesFeedBloc = context.read<HeadlinesFeedBloc>();
+                    final currentFilter = headlinesFeedBloc.state.filter;
+
+                    // Navigate to the filter page, passing both the current
+                    // filter and the HeadlinesFeedBloc instance. This allows
+                    // the filter page to communicate back to the feed bloc
+                    // without relying on a shared ancestor context, which was
+                    // causing a ProviderNotFoundException.
                     context.goNamed(
                       Routes.feedFilterName,
-                      extra: currentFilter,
+                      extra: {
+                        'initialFilter': currentFilter,
+                        'headlinesFeedBloc': headlinesFeedBloc,
+                      },
                     );
                   },
                 ),

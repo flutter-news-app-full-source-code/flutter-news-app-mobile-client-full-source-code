@@ -2017,6 +2017,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Premium User'**
   String get accountRolePremium;
+
+  /// Title for the dialog that asks the user to confirm a delete action.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Deletion'**
+  String get deleteConfirmationDialogTitle;
+
+  /// The main text in the delete confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this item? This action cannot be undone.'**
+  String get deleteConfirmationDialogContent;
+
+  /// The text for the confirm button in the delete confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get deleteConfirmationDialogConfirmButton;
 }
 
 class _AppLocalizationsDelegate

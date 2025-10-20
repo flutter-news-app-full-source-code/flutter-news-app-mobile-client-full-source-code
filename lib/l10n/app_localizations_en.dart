@@ -1061,4 +1061,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accountRolePremium => 'Premium User';
+
+  @override
+  String get deleteConfirmationDialogTitle => 'Confirm Deletion';
+
+  @override
+  String get deleteConfirmationDialogContent =>
+      'Are you sure you want to delete this item? This action cannot be undone.';
+
+  @override
+  String get deleteConfirmationDialogConfirmButton => 'Delete';
 }

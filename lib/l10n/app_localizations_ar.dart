@@ -1076,4 +1076,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get headlineSearchInitialSubheadline =>
       'أدخل كلمات رئيسية للعثور على المقالات.';
+
+  @override
+  String get accountGuestUserHeadline => 'حساب زائر';
+
+  @override
+  String get accountGuestUserSubheadline => 'سجل الدخول لمزامنة بياناتك';
 }

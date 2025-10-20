@@ -2047,6 +2047,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter keywords to find articles.'**
   String get headlineSearchInitialSubheadline;
+
+  /// Headline for the user header when the user is a guest.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest Account'**
+  String get accountGuestUserHeadline;
+
+  /// Subheadline for the user header prompting guest users to sign in.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to sync your data'**
+  String get accountGuestUserSubheadline;
 }
 
 class _AppLocalizationsDelegate

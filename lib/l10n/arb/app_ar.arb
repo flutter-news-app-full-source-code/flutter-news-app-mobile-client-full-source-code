@@ -1405,5 +1405,14 @@
     "headlineSearchInitialSubheadline": "أدخل كلمات رئيسية للعثور على المقالات.",
     "@headlineSearchInitialSubheadline": {
         "description": "نص العنوان الفرعي المعروض في حالة البحث الأولية"
+    },
+        "accountGuestUserHeadline": "حساب زائر",
+    "@accountGuestUserHeadline": {
+        "description": "عنوان رأس المستخدم عندما يكون المستخدم ضيفًا."
+    },
+    "accountGuestUserSubheadline": "سجل الدخول لمزامنة بياناتك",
+    "@accountGuestUserSubheadline": {
+        "description": "عنوان فرعي لرأس المستخدم يطالب المستخدمين الضيوف بتسجيل الدخول."
     }
+
 }

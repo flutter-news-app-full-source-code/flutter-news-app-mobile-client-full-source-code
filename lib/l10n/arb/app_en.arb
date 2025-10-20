@@ -1405,5 +1405,13 @@
     "headlineSearchInitialSubheadline": "Enter keywords to find articles.",
     "@headlineSearchInitialSubheadline": {
         "description": "Subheadline text shown in the initial state widget on the search page"
+    },
+    "accountGuestUserHeadline": "Guest Account",
+    "@accountGuestUserHeadline": {
+        "description": "Headline for the user header when the user is a guest."
+    },
+    "accountGuestUserSubheadline": "Sign in to sync your data",
+    "@accountGuestUserSubheadline": {
+        "description": "Subheadline for the user header prompting guest users to sign in."
     }
 }

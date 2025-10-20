@@ -1078,4 +1078,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get headlineSearchInitialSubheadline =>
       'Enter keywords to find articles.';
+
+  @override
+  String get accountGuestUserHeadline => 'Guest Account';
+
+  @override
+  String get accountGuestUserSubheadline => 'Sign in to sync your data';
 }

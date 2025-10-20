@@ -7,6 +7,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_blo
 import 'package:flutter_news_app_mobile_client_full_source_code/discover/bloc/source_list_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/source_type_l10n_extensions.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:go_router/go_router.dart';
@@ -120,8 +121,7 @@ class _SourceListViewState extends State<_SourceListView> {
               slivers: [
                 SliverAppBar(
                   title: Text(
-                    state.sourceType?.name.toTitleCase() ??
-                        l10n.discoverPageTitle,
+                    state.sourceType?.l10n(l10n) ?? l10n.discoverPageTitle,
                   ),
                   pinned: true,
                   actions: [

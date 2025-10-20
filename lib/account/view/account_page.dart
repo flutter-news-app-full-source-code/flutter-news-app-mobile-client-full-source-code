@@ -2,10 +2,10 @@ import 'package:core/core.dart' hide AppStatus;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/user_avatar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -40,6 +40,21 @@ class AccountPage extends StatelessWidget {
             icon: const Icon(Icons.settings_outlined),
             onPressed: () => context.pushNamed(Routes.settingsName),
           ),
+          // Conditionally add a sign-in or sign-out button to the AppBar.
+          // This declutters the main content card and follows common UI patterns.
+          if (isAnonymous)
+            IconButton(
+              icon: const Icon(Icons.login),
+              tooltip: l10n.anonymousLimitButton,
+              onPressed: () => context.goNamed(Routes.accountLinkingName),
+            )
+          else
+            IconButton(
+              icon: const Icon(Icons.logout),
+              tooltip: l10n.accountSignOutTile,
+              onPressed: () =>
+                  context.read<AppBloc>().add(const AppLogoutRequested()),
+            ),
         ],
       ),
       body: SingleChildScrollView(
@@ -67,12 +82,10 @@ class AccountPage extends StatelessWidget {
 
     final String statusText;
     final String accountTypeText;
-    final Widget actionButton;
 
     if (isAnonymous) {
-      statusText = l10n.accountAnonymousUser;
-      accountTypeText = l10n.accountGuestAccount;
-      actionButton = _buildSignInButton(context);
+      statusText = l10n.accountGuestUserHeadline;
+      accountTypeText = l10n.accountGuestUserSubheadline;
     } else {
       statusText = user?.email ?? l10n.accountNoNameUser;
 
@@ -88,7 +101,6 @@ class AccountPage extends StatelessWidget {
           roleDisplayName = '';
       }
       accountTypeText = roleDisplayName;
-      actionButton = _buildSignOutButton(context);
     }
 
     return Card(
@@ -97,18 +109,11 @@ class AccountPage extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            // Use the standard UserAvatar widget, clipped to be square.
+            // This ensures visual consistency with other avatars in the app.
             ClipRRect(
               borderRadius: BorderRadius.circular(AppSpacing.sm),
-              child: Container(
-                width: AppSpacing.xxl + AppSpacing.sm,
-                height: AppSpacing.xxl + AppSpacing.sm,
-                color: colorScheme.primaryContainer,
-                child: Icon(
-                  Icons.person_outline,
-                  size: AppSpacing.xl,
-                  color: colorScheme.onPrimaryContainer,
-                ),
-              ),
+              child: UserAvatar(user: user, radius: AppSpacing.lg),
             ),
             const SizedBox(width: AppSpacing.md),
             Expanded(
@@ -124,20 +129,30 @@ class AccountPage extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: AppSpacing.xs),
+                  // Display the user role inside a styled "capsule" for a
+                  // more refined and less intrusive look.
                   if (accountTypeText.isNotEmpty)
-                    Text(
-                      accountTypeText,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: colorScheme.secondaryContainer,
+                        borderRadius: BorderRadius.circular(AppSpacing.sm),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.sm,
+                          vertical: 2,
+                        ),
+                        child: Text(
+                          accountTypeText,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSecondaryContainer,
+                          ),
+                        ),
+                      ),
                     ),
                 ],
               ),
             ),
-            const SizedBox(width: AppSpacing.md),
-            actionButton,
           ],
         ),
       ),
@@ -145,24 +160,6 @@ class AccountPage extends StatelessWidget {
   }
 
   /// Builds the sign-in button for anonymous users.
-  Widget _buildSignInButton(BuildContext context) {
-    final l10n = AppLocalizationsX(context).l10n;
-    return ElevatedButton(
-      onPressed: () => context.goNamed(Routes.accountLinkingName),
-      child: Text(l10n.accountSignInPromptButton),
-    );
-  }
-
-  /// Builds the sign-out button for authenticated users.
-  Widget _buildSignOutButton(BuildContext context) {
-    final l10n = AppLocalizationsX(context).l10n;
-    return OutlinedButton(
-      onPressed: () => context.read<AuthenticationBloc>().add(
-        const AuthenticationSignOutRequested(),
-      ),
-      child: Text(l10n.accountSignOutTile),
-    );
-  }
 
   /// Builds the list of navigation tiles for accessing different
   /// account-related sections.

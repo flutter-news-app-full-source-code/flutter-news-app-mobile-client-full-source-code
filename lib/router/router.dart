@@ -502,9 +502,14 @@ GoRouter createRouter({
               GoRoute(
                 path: Routes.feed,
                 name: Routes.feedName,
-                builder: (context, state) => BlocProvider(
+                // The HeadlinesFeedBloc is created here. We pass the initial user
+                // content preferences from the AppBloc to ensure the saved filters
+                // are immediately available, fixing a state synchronization bug.
+                builder: (context, state) => BlocProvider<HeadlinesFeedBloc>(
                   create: (context) {
                     final appBloc = context.read<AppBloc>();
+                    final initialUserContentPreferences =
+                        appBloc.state.userContentPreferences;
                     return HeadlinesFeedBloc(
                       headlinesRepository: context
                           .read<DataRepository<Headline>>(),
@@ -516,6 +521,8 @@ GoRouter createRouter({
                       appBloc: appBloc,
                       inlineAdCacheService: context
                           .read<InlineAdCacheService>(),
+                      initialUserContentPreferences:
+                          initialUserContentPreferences,
                     );
                   },
                   child: const HeadlinesFeedPage(),

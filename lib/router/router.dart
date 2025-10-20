@@ -16,7 +16,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/account/view/sav
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/headline_filter.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_shell.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
@@ -32,6 +31,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headline-details
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/view/headline_details_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_filter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/headline_filter.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/country_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_feed_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_filter_page.dart';

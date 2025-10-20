@@ -106,6 +106,9 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
 
   @override
   Widget build(BuildContext context) {
+    // The call to super.build(context) must be the first statement in the build
+    // method when using AutomaticKeepAliveClientMixin.
+    super.build(context);
     final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
 
@@ -129,7 +132,6 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
             // This handles the brief period after authentication but before
             // the remote config is fetched, preventing null access errors.
             if (appBlocState.remoteConfig == null) {
-              super.build(context);
               return LoadingStateWidget(
                 icon: Icons.settings_applications_outlined,
                 headline: l10n.headlinesFeedLoadingHeadline,
@@ -160,7 +162,6 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
               );
             }
 
-            super.build(context);
             return RefreshIndicator(
               onRefresh: () async {
                 context.read<HeadlinesFeedBloc>().add(

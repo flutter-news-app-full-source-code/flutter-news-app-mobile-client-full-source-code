@@ -1082,4 +1082,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get accountGuestUserSubheadline => 'سجل الدخول لمزامنة بياناتك';
+
+  @override
+  String get discoverSearchHint => 'ابحث في المصادر...';
+
+  @override
+  String get seeAllButtonLabel => 'عرض الكل';
+
+  @override
+  String get failedToLoadMoreSources => 'فشل تحميل المزيد من المصادر.';
 }

@@ -2059,6 +2059,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign in to sync your data'**
   String get accountGuestUserSubheadline;
+
+  /// Hint text for the search bar on the discover page
+  ///
+  /// In en, this message translates to:
+  /// **'Search sources...'**
+  String get discoverSearchHint;
+
+  /// Label for the button to see all items in a category
+  ///
+  /// In en, this message translates to:
+  /// **'See all'**
+  String get seeAllButtonLabel;
+
+  /// Error message when loading more sources fails on details page
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load more sources.'**
+  String get failedToLoadMoreSources;
 }
 
 class _AppLocalizationsDelegate

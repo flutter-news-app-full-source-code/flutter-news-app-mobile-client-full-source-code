@@ -1084,4 +1084,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accountGuestUserSubheadline => 'Sign in to sync your data';
+
+  @override
+  String get discoverSearchHint => 'Search sources...';
+
+  @override
+  String get seeAllButtonLabel => 'See all';
+
+  @override
+  String get failedToLoadMoreSources => 'Failed to load more sources.';
 }

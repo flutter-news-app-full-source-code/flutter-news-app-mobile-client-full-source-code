@@ -1091,4 +1091,31 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get failedToLoadMoreSources => 'فشل تحميل المزيد من المصادر.';
+
+  @override
+  String get sourceTypeNewsAgency => 'وكالة أنباء';
+
+  @override
+  String get sourceTypeLocalNewsOutlet => 'منفذ إخباري محلي';
+
+  @override
+  String get sourceTypeNationalNewsOutlet => 'منفذ إخباري وطني';
+
+  @override
+  String get sourceTypeInternationalNewsOutlet => 'منفذ إخباري دولي';
+
+  @override
+  String get sourceTypeSpecializedPublisher => 'ناشر متخصص';
+
+  @override
+  String get sourceTypeBlog => 'مدونة';
+
+  @override
+  String get sourceTypeGovernmentSource => 'مصدر حكومي';
+
+  @override
+  String get sourceTypeAggregator => 'مجمع أخبار';
+
+  @override
+  String get sourceTypeOther => 'أخرى';
 }

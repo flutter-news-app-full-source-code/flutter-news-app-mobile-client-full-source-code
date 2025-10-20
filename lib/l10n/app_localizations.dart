@@ -2077,6 +2077,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to load more sources.'**
   String get failedToLoadMoreSources;
+
+  /// Source type for News Agency
+  ///
+  /// In en, this message translates to:
+  /// **'News Agency'**
+  String get sourceTypeNewsAgency;
+
+  /// Source type for Local News Outlet
+  ///
+  /// In en, this message translates to:
+  /// **'Local News Outlet'**
+  String get sourceTypeLocalNewsOutlet;
+
+  /// Source type for National News Outlet
+  ///
+  /// In en, this message translates to:
+  /// **'National News Outlet'**
+  String get sourceTypeNationalNewsOutlet;
+
+  /// Source type for International News Outlet
+  ///
+  /// In en, this message translates to:
+  /// **'International News Outlet'**
+  String get sourceTypeInternationalNewsOutlet;
+
+  /// Source type for Specialized Publisher
+  ///
+  /// In en, this message translates to:
+  /// **'Specialized Publisher'**
+  String get sourceTypeSpecializedPublisher;
+
+  /// Source type for Blog
+  ///
+  /// In en, this message translates to:
+  /// **'Blog'**
+  String get sourceTypeBlog;
+
+  /// Source type for Government Source
+  ///
+  /// In en, this message translates to:
+  /// **'Government Source'**
+  String get sourceTypeGovernmentSource;
+
+  /// Source type for Aggregator
+  ///
+  /// In en, this message translates to:
+  /// **'Aggregator'**
+  String get sourceTypeAggregator;
+
+  /// Source type for Other
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get sourceTypeOther;
 }
 
 class _AppLocalizationsDelegate

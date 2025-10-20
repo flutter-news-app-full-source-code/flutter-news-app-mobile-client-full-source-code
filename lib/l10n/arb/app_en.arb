@@ -1425,5 +1425,41 @@
     "failedToLoadMoreSources": "Failed to load more sources.",
     "@failedToLoadMoreSources": {
         "description": "Error message when loading more sources fails on details page"
+    },
+    "sourceTypeNewsAgency": "News Agency",
+    "@sourceTypeNewsAgency": {
+        "description": "Source type for News Agency"
+    },
+    "sourceTypeLocalNewsOutlet": "Local News Outlet",
+    "@sourceTypeLocalNewsOutlet": {
+        "description": "Source type for Local News Outlet"
+    },
+    "sourceTypeNationalNewsOutlet": "National News Outlet",
+    "@sourceTypeNationalNewsOutlet": {
+        "description": "Source type for National News Outlet"
+    },
+    "sourceTypeInternationalNewsOutlet": "International News Outlet",
+    "@sourceTypeInternationalNewsOutlet": {
+        "description": "Source type for International News Outlet"
+    },
+    "sourceTypeSpecializedPublisher": "Specialized Publisher",
+    "@sourceTypeSpecializedPublisher": {
+        "description": "Source type for Specialized Publisher"
+    },
+    "sourceTypeBlog": "Blog",
+    "@sourceTypeBlog": {
+        "description": "Source type for Blog"
+    },
+    "sourceTypeGovernmentSource": "Government Source",
+    "@sourceTypeGovernmentSource": {
+        "description": "Source type for Government Source"
+    },
+    "sourceTypeAggregator": "Aggregator",
+    "@sourceTypeAggregator": {
+        "description": "Source type for Aggregator"
+    },
+    "sourceTypeOther": "Other",
+    "@sourceTypeOther": {
+        "description": "Source type for Other"
     }
 }

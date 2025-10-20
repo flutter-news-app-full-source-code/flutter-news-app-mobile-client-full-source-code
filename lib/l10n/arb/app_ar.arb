@@ -1425,5 +1425,41 @@
     "failedToLoadMoreSources": "فشل تحميل المزيد من المصادر.",
     "@failedToLoadMoreSources": {
         "description": "رسالة خطأ عند فشل تحميل المزيد من المصادر في صفحة التفاصيل"
+    },
+    "sourceTypeNewsAgency": "وكالة أنباء",
+    "@sourceTypeNewsAgency": {
+        "description": "نوع المصدر لوكالة أنباء"
+    },
+    "sourceTypeLocalNewsOutlet": "منفذ إخباري محلي",
+    "@sourceTypeLocalNewsOutlet": {
+        "description": "نوع المصدر لمنفذ إخباري محلي"
+    },
+    "sourceTypeNationalNewsOutlet": "منفذ إخباري وطني",
+    "@sourceTypeNationalNewsOutlet": {
+        "description": "نوع المصدر لمنفذ إخباري وطني"
+    },
+    "sourceTypeInternationalNewsOutlet": "منفذ إخباري دولي",
+    "@sourceTypeInternationalNewsOutlet": {
+        "description": "نوع المصدر لمنفذ إخباري دولي"
+    },
+    "sourceTypeSpecializedPublisher": "ناشر متخصص",
+    "@sourceTypeSpecializedPublisher": {
+        "description": "نوع المصدر لناشر متخصص"
+    },
+    "sourceTypeBlog": "مدونة",
+    "@sourceTypeBlog": {
+        "description": "نوع المصدر لمدونة"
+    },
+    "sourceTypeGovernmentSource": "مصدر حكومي",
+    "@sourceTypeGovernmentSource": {
+        "description": "نوع المصدر لمصدر حكومي"
+    },
+    "sourceTypeAggregator": "مجمع أخبار",
+    "@sourceTypeAggregator": {
+        "description": "نوع المصدر لمجمع أخبار"
+    },
+    "sourceTypeOther": "أخرى",
+    "@sourceTypeOther": {
+        "description": "نوع المصدر لأخرى"
     }
 }

@@ -1093,4 +1093,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get failedToLoadMoreSources => 'Failed to load more sources.';
+
+  @override
+  String get sourceTypeNewsAgency => 'News Agency';
+
+  @override
+  String get sourceTypeLocalNewsOutlet => 'Local News Outlet';
+
+  @override
+  String get sourceTypeNationalNewsOutlet => 'National News Outlet';
+
+  @override
+  String get sourceTypeInternationalNewsOutlet => 'International News Outlet';
+
+  @override
+  String get sourceTypeSpecializedPublisher => 'Specialized Publisher';
+
+  @override
+  String get sourceTypeBlog => 'Blog';
+
+  @override
+  String get sourceTypeGovernmentSource => 'Government Source';
+
+  @override
+  String get sourceTypeAggregator => 'Aggregator';
+
+  @override
+  String get sourceTypeOther => 'Other';
 }

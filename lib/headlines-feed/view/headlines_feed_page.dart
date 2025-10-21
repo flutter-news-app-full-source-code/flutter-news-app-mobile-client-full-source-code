@@ -141,7 +141,6 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
 
             if (state.status == HeadlinesFeedStatus.initial ||
                 (state.status == HeadlinesFeedStatus.loading &&
-                    !_isInitialFetchDispatched &&
                     state.feedItems.isEmpty)) {
               return LoadingStateWidget(
                 icon: Icons.newspaper,

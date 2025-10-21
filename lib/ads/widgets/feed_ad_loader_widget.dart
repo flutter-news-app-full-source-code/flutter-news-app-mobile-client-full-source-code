@@ -141,12 +141,11 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
 
   @override
   void dispose() {
-    // Dispose of the ad's resources when the widget is permanently removed.
-    _adCacheService.removeAndDisposeAd(
-      contextKey: widget.contextKey,
-      placeholderId: widget.adPlaceholder.id,
-    );
-
+    // The ad is intentionally not disposed of here. The InlineAdCacheService
+    // is responsible for managing the ad's lifecycle. The cache for this
+    // context ('all', 'followed', etc.) will be cleared by the
+    // HeadlinesFeedBloc during a pull-to-refresh, which is the correct
+    // time to dispose of these ads.
     // Cancel any pending ad loading operation when the widget is disposed.
     // This prevents `setState()` calls on a disposed widget.
     if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {

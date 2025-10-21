@@ -94,11 +94,6 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
         '${widget.slotType.name} or contextKey: ${widget.contextKey}. '
         'Re-loading ad.',
       );
-      // Dispose of the old ad's resources before loading a new one.
-      _adCacheService.removeAndDisposeAd(
-        contextKey: oldWidget.contextKey,
-        placeholderId: oldWidget.slotType.name,
-      );
 
       if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
         // Complete normally to prevent crashes
@@ -117,12 +112,11 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
 
   @override
   void dispose() {
-    // Dispose of the ad's resources when the widget is permanently removed.
-    _adCacheService.removeAndDisposeAd(
-      contextKey: widget.contextKey,
-      placeholderId: widget.slotType.name,
-    );
-
+    // The ad is intentionally not disposed of here. The InlineAdCacheService
+    // is responsible for managing the ad's lifecycle. The cache for an
+    // article context is cleared when the user navigates away from the
+    // article details page, which is handled by other parts of the app
+    // (e.g., a higher-level widget's dispose method).
     if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
       // Complete normally to prevent crashes
       _loadAdCompleter!.complete();
@@ -140,34 +134,50 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
   Future<void> _loadAd() async {
     _loadAdCompleter = Completer<void>();
 
-    if (!mounted) return;
+    if (!mounted) {
+      if (_loadAdCompleter?.isCompleted == false) {
+        _loadAdCompleter!.complete();
+      }
+      return;
+    }
 
     // Use the slotType as the placeholderId within the context of the article.
     final placeholderId = widget.slotType.name;
-    InlineAd? loadedAd;
 
-    // For all ad platforms, try to get from cache first.
-    // The "AdWidget is already in the Widget tree" error is prevented by using
-    // a unique contextKey (the article ID) for each article page.
-    final cachedAd = _adCacheService.getAd(
+    // TODO(fulleni): This should be sourced from RemoteConfig.
+    const adMaxAge = Duration(minutes: 5);
+
+    var cachedAd = _adCacheService.getAd(
       contextKey: widget.contextKey,
       placeholderId: placeholderId,
     );
 
     if (cachedAd != null) {
-      _logger.info(
-        'Using cached in-article ad for context "${widget.contextKey}" '
-        'and slot: ${widget.slotType.name}',
-      );
-      if (!mounted) return;
-      setState(() {
-        _loadedAd = cachedAd;
-        _isLoading = false;
-      });
-      if (_loadAdCompleter?.isCompleted == false) {
-        _loadAdCompleter!.complete();
+      if (DateTime.now().difference(cachedAd.createdAt) > adMaxAge) {
+        _logger.info(
+          'Cached in-article ad for context "${widget.contextKey}" and slot '
+          '${widget.slotType.name} is stale. Discarding and fetching new.',
+        );
+        _adCacheService.removeAndDisposeAd(
+          contextKey: widget.contextKey,
+          placeholderId: placeholderId,
+        );
+        cachedAd = null;
+      } else {
+        _logger.info(
+          'Using fresh cached in-article ad for context "${widget.contextKey}" '
+          'and slot: ${widget.slotType.name}',
+        );
+        if (mounted) {
+          setState(() {
+            _loadedAd = cachedAd;
+            _isLoading = false;
+          });
+        }
+        if (_loadAdCompleter?.isCompleted == false)
+          _loadAdCompleter!.complete();
+        return;
       }
-      return;
     }
 
     _logger.info(
@@ -180,7 +190,7 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
       final userRole = appBlocState.user?.appRole ?? AppUserRole.guestUser;
 
       // Call AdService.getInArticleAd with the full AdConfig.
-      loadedAd = await _adService.getInArticleAd(
+      final loadedAd = await _adService.getInArticleAd(
         adConfig: widget.adConfig,
         adThemeStyle: widget.adThemeStyle,
         userRole: userRole,
@@ -199,27 +209,27 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
           ad: loadedAd,
         );
 
-        if (!mounted) return;
-        setState(() {
-          _loadedAd = loadedAd;
-          _isLoading = false;
-        });
-        if (_loadAdCompleter?.isCompleted == false) {
-          _loadAdCompleter!.complete();
+        if (mounted) {
+          setState(() {
+            _loadedAd = loadedAd;
+            _isLoading = false;
+          });
         }
+        if (_loadAdCompleter?.isCompleted == false)
+          _loadAdCompleter!.complete();
       } else {
         _logger.warning(
           'Failed to load in-article ad for context "${widget.contextKey}" '
           'and slot: ${widget.slotType.name}. No ad returned.',
         );
-        if (!mounted) return;
-        setState(() {
-          _hasError = true;
-          _isLoading = false;
-        });
-        if (_loadAdCompleter?.isCompleted == false) {
-          _loadAdCompleter!.complete();
+        if (mounted) {
+          setState(() {
+            _hasError = true;
+            _isLoading = false;
+          });
         }
+        if (_loadAdCompleter?.isCompleted == false)
+          _loadAdCompleter!.complete();
       }
     } catch (e, s) {
       _logger.severe(
@@ -228,14 +238,13 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
         e,
         s,
       );
-      if (!mounted) return;
-      setState(() {
-        _hasError = true;
-        _isLoading = false;
-      });
-      if (_loadAdCompleter?.isCompleted == false) {
-        _loadAdCompleter!.complete();
+      if (mounted) {
+        setState(() {
+          _hasError = true;
+          _isLoading = false;
+        });
       }
+      if (_loadAdCompleter?.isCompleted == false) _loadAdCompleter!.complete();
     }
   }
 

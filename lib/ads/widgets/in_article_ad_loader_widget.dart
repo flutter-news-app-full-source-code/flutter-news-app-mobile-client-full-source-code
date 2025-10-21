@@ -119,11 +119,10 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
   @override
   void dispose() {
     // The ad object (_loadedAd) is intentionally not disposed of here.
-    // Its lifecycle is managed by the InlineAdCacheService. The cache for this
-    // article's context is cleared when the user navigates away from the
-    // article details page, which is the correct and only time these in-article
-    // ads should be disposed. This prevents ads from being destroyed when they
-    // are part of a list that scrolls out of view.
+    // Its lifecycle is managed by the InlineAdCacheService. The ad remains in
+    // the cache even after navigating away from the article, allowing for
+    // instant reuse if the user returns. The cache is managed by time-based
+    // staleness checks and is cleared globally on user logout.
     if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
       // Complete normally to prevent crashes
       _loadAdCompleter!.complete();

@@ -28,7 +28,7 @@ enum NativeAdTemplateType {
 @immutable
 class NativeAd extends InlineAd {
   /// {@macro native_ad}
-  const NativeAd({
+  NativeAd({
     required super.id,
     required super.provider,
     required super.adObject,

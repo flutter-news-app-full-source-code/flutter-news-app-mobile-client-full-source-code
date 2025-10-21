@@ -19,7 +19,8 @@ import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template in_article_ad_loader_widget}
-/// A self-contained widget responsible for loading and displaying an in-article ad.
+/// A self-contained widget responsible for loading and displaying an in-article
+/// ad.
 ///
 /// This widget handles the entire lifecycle of a single in-article ad slot.
 /// It attempts to retrieve a cached [InlineAd] first. If no ad is cached,
@@ -29,23 +30,21 @@ import 'package:ui_kit/ui_kit.dart';
 /// This approach decouples ad loading from the BLoC and ensures that native
 /// ad resources are managed efficiently, preventing crashes and improving
 /// scrolling performance in lists.
-///
-/// **AdMob In-Article Ad Handling:**
-/// For AdMob in-article ads, this widget intentionally bypasses the
-/// [InlineAdCacheService]. This is a critical design decision to prevent
-/// the "AdWidget is already in the Widget tree" error that occurs when
-/// navigating between multiple article detail pages. Each AdMob in-article
-/// ad will be loaded as a new instance, ensuring unique `admob.Ad` objects
-/// for each `AdmobInlineAdWidget` in the widget tree.
 /// {@endtemplate}
 class InArticleAdLoaderWidget extends StatefulWidget {
   /// {@macro in_article_ad_loader_widget}
   const InArticleAdLoaderWidget({
+    required this.contextKey,
     required this.slotType,
     required this.adThemeStyle,
     required this.adConfig,
     super.key,
   });
+
+  /// A unique key representing the ad context this ad belongs to, typically the
+  /// article ID. This is used to scope the ad within the
+  /// [InlineAdCacheService].
+  final String contextKey;
 
   /// The type of the in-article ad slot.
   final InArticleAdSlotType slotType;
@@ -82,22 +81,26 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
   @override
   void didUpdateWidget(covariant InArticleAdLoaderWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // If the slotType changes, it means this widget is being reused
-    // for a different ad slot. We need to cancel any ongoing load for the old
-    // ad and initiate a new load for the new ad.
-    // Also, if the adConfig changes, we should re-evaluate and potentially reload.
-    if (widget.slotType != oldWidget.slotType ||
+    // If the slotType or contextKey changes, it means this widget is being
+    // reused for a different ad slot or context. We need to cancel any ongoing
+    // load for the old ad and initiate a new load for the new ad.
+    // Also, if the adConfig changes, we should re-evaluate and potentially
+    // reload.
+    if (widget.contextKey != oldWidget.contextKey ||
+        widget.slotType != oldWidget.slotType ||
         widget.adConfig != oldWidget.adConfig) {
       _logger.info(
         'InArticleAdLoaderWidget updated for new slot type: '
-        '${widget.slotType.name} or AdConfig changed. Re-loading ad.',
+        '${widget.slotType.name} or contextKey: ${widget.contextKey}. '
+        'Re-loading ad.',
       );
-      // Dispose of the old ad's resources before loading a new one.
-      final oldCacheKey = 'in_article_ad_${oldWidget.slotType.name}';
-      // Only dispose if it was actually cached (i.e., not an AdMob in-article ad).
-      // The removeAndDisposeAd method handles the check internally.
-      _adCacheService.removeAndDisposeAd(oldCacheKey);
 
+      // Dispose of the old ad's resources before loading a new one to prevent
+      // memory leaks if the widget is reused for a different context.
+      _adCacheService.removeAndDisposeAd(
+        contextKey: oldWidget.contextKey,
+        placeholderId: oldWidget.slotType.name,
+      );
       if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
         // Complete normally to prevent crashes
         _loadAdCompleter!.complete();
@@ -115,12 +118,11 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
 
   @override
   void dispose() {
-    // Dispose of the ad's resources when the widget is permanently removed.
-    final cacheKey = 'in_article_ad_${widget.slotType.name}';
-    // Only dispose if it was actually cached (i.e., not an AdMob in-article ad).
-    // The removeAndDisposeAd method handles the check internally.
-    _adCacheService.removeAndDisposeAd(cacheKey);
-
+    // The ad is intentionally not disposed of here. The InlineAdCacheService
+    // is responsible for managing the ad's lifecycle. The cache for an
+    // article context is cleared when the user navigates away from the
+    // article details page, which is handled by other parts of the app
+    // (e.g., a higher-level widget's dispose method).
     if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
       // Complete normally to prevent crashes
       _loadAdCompleter!.complete();
@@ -131,61 +133,70 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
 
   /// Loads the in-article ad for this slot.
   ///
-  /// This method first checks the [InlineAdCacheService] for a pre-loaded [InlineAd].
-  /// If found, it uses the cached ad. Otherwise, it requests a new in-article ad
-  /// from the [AdService] using `getInArticleAd` and stores it in the cache
-  /// upon success.
-  ///
-  /// **AdMob Specific Behavior:**
-  /// For AdMob in-article ads, this method intentionally bypasses the cache.
-  /// This ensures that each `AdmobInlineAdWidget` receives a unique `admob.Ad`
-  /// object, preventing the "AdWidget is already in the Widget tree" error
-  /// when multiple article detail pages are in the navigation stack.
+  /// This method first checks the [InlineAdCacheService] for a pre-loaded
+  /// [InlineAd]. If found, it uses the cached ad. Otherwise, it requests a new
+  /// in-article ad from the [AdService] using `getInArticleAd` and stores it
+  /// in the cache upon success.
   Future<void> _loadAd() async {
     _loadAdCompleter = Completer<void>();
 
-    if (!mounted) return;
-
-    // In-article ads are typically unique to their slot, so we use the slotType
-    // as part of the cache key to differentiate them.
-    final cacheKey = 'in_article_ad_${widget.slotType.name}';
-    InlineAd? loadedAd;
-
-    // Determine if the primary ad platform is AdMob.
-    final isAdMob = widget.adConfig.primaryAdPlatform == AdPlatformType.admob;
-
-    if (!isAdMob) {
-      // For non-AdMob platforms (e.g., Local, Demo), try to get from cache.
-      final cachedAd = _adCacheService.getAd(cacheKey);
-      if (cachedAd != null) {
-        _logger.info(
-          'Using cached in-article ad for slot: ${widget.slotType.name}',
-        );
-        if (!mounted) return;
-        setState(() {
-          _loadedAd = cachedAd;
-          _isLoading = false;
-        });
-        if (_loadAdCompleter?.isCompleted == false) {
-          _loadAdCompleter!.complete();
-        }
-        return;
+    if (!mounted) {
+      if (_loadAdCompleter?.isCompleted == false) {
+        _loadAdCompleter!.complete();
       }
-    } else {
-      _logger.info(
-        'AdMob is primary ad platform. Bypassing cache for in-article ad '
-        'for slot: ${widget.slotType.name}.',
-      );
+      return;
     }
 
-    _logger.info('Loading new in-article ad for slot: ${widget.slotType.name}');
+    // Use the slotType as the placeholderId within the context of the article.
+    final placeholderId = widget.slotType.name;
+
+    // TODO(fulleni): This should be sourced from RemoteConfig.
+    const adMaxAge = Duration(minutes: 5);
+
+    var cachedAd = _adCacheService.getAd(
+      contextKey: widget.contextKey,
+      placeholderId: placeholderId,
+    );
+
+    if (cachedAd != null) {
+      if (DateTime.now().difference(cachedAd.createdAt) > adMaxAge) {
+        _logger.info(
+          'Cached in-article ad for context "${widget.contextKey}" and slot '
+          '${widget.slotType.name} is stale. Discarding and fetching new.',
+        );
+        _adCacheService.removeAndDisposeAd(
+          contextKey: widget.contextKey,
+          placeholderId: placeholderId,
+        );
+        cachedAd = null;
+      } else {
+        _logger.info(
+          'Using fresh cached in-article ad for context "${widget.contextKey}" '
+          'and slot: ${widget.slotType.name}',
+        );
+        if (mounted) {
+          setState(() {
+            _loadedAd = cachedAd;
+            _isLoading = false;
+          });
+        }
+        if (_loadAdCompleter?.isCompleted == false)
+          _loadAdCompleter!.complete();
+        return;
+      }
+    }
+
+    _logger.info(
+      'Loading new in-article ad for context "${widget.contextKey}" '
+      'and slot: ${widget.slotType.name}',
+    );
     try {
       // Get the current user role from AppBloc
       final appBlocState = context.read<AppBloc>().state;
       final userRole = appBlocState.user?.appRole ?? AppUserRole.guestUser;
 
       // Call AdService.getInArticleAd with the full AdConfig.
-      loadedAd = await _adService.getInArticleAd(
+      final loadedAd = await _adService.getInArticleAd(
         adConfig: widget.adConfig,
         adThemeStyle: widget.adThemeStyle,
         userRole: userRole,
@@ -194,57 +205,52 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
 
       if (loadedAd != null) {
         _logger.info(
-          'New in-article ad loaded for slot: ${widget.slotType.name}',
+          'New in-article ad loaded for context "${widget.contextKey}" '
+          'and slot: ${widget.slotType.name}',
         );
-        // Only cache non-AdMob ads. AdMob ads are not cached to prevent reuse issues.
-        if (!isAdMob) {
-          _adCacheService.setAd(cacheKey, loadedAd);
-        } else {
-          _logger.info(
-            'AdMob in-article ad not cached to prevent reuse issues.',
-          );
-        }
+        // Cache the newly loaded ad.
+        _adCacheService.setAd(
+          contextKey: widget.contextKey,
+          placeholderId: placeholderId,
+          ad: loadedAd,
+        );
 
-        if (!mounted) return;
-        setState(() {
-          _loadedAd = loadedAd;
-          _isLoading = false;
-        });
-        if (_loadAdCompleter?.isCompleted == false) {
-          _loadAdCompleter!.complete();
+        if (mounted) {
+          setState(() {
+            _loadedAd = loadedAd;
+            _isLoading = false;
+          });
         }
+        if (_loadAdCompleter?.isCompleted == false)
+          _loadAdCompleter!.complete();
       } else {
         _logger.warning(
-          'Failed to load in-article ad for slot: ${widget.slotType.name}. '
-          'No ad returned.',
+          'Failed to load in-article ad for context "${widget.contextKey}" '
+          'and slot: ${widget.slotType.name}. No ad returned.',
         );
-        if (!mounted) return;
+        if (mounted) {
+          setState(() {
+            _hasError = true;
+            _isLoading = false;
+          });
+        }
+        if (_loadAdCompleter?.isCompleted == false)
+          _loadAdCompleter!.complete();
+      }
+    } catch (e, s) {
+      _logger.severe(
+        'Error loading in-article ad for context "${widget.contextKey}" '
+        'and slot: ${widget.slotType.name}: $e',
+        e,
+        s,
+      );
+      if (mounted) {
         setState(() {
           _hasError = true;
           _isLoading = false;
         });
-        // Complete the completer normally, indicating that loading finished
-        // but no ad was available. This prevents crashes.
-        if (_loadAdCompleter?.isCompleted == false) {
-          _loadAdCompleter!.complete();
-        }
       }
-    } catch (e, s) {
-      _logger.severe(
-        'Error loading in-article ad for slot: ${widget.slotType.name}: $e',
-        e,
-        s,
-      );
-      if (!mounted) return;
-      setState(() {
-        _hasError = true;
-        _isLoading = false;
-      });
-      // Complete the completer normally, indicating that loading finished
-      // but an error occurred. This prevents crashes.
-      if (_loadAdCompleter?.isCompleted == false) {
-        _loadAdCompleter!.complete();
-      }
+      if (_loadAdCompleter?.isCompleted == false) _loadAdCompleter!.complete();
     }
   }
 
@@ -255,7 +261,8 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
     final headlineImageStyle = context.read<AppBloc>().state.headlineImageStyle;
 
     if (_isLoading || _hasError || _loadedAd == null) {
-      // Show a user-friendly message when loading, on error, or if no ad is loaded.
+      // Show a user-friendly message when loading, on error, or if no ad is
+      // loaded.
       return Card(
         margin: const EdgeInsets.symmetric(
           horizontal: AppSpacing.paddingMedium,

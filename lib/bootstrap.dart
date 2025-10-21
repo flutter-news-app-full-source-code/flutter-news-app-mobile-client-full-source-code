@@ -28,6 +28,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/services/dem
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/package_info_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_initialization_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/bloc_observer.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/data/clients/country_inmemory_client.dart';
 import 'package:http_client/http_client.dart';
 import 'package:kv_storage_service/kv_storage_service.dart';
@@ -197,6 +198,10 @@ Future<Widget> bootstrap(
   // Initialize InlineAdCacheService with the created AdService.
   inlineAdCacheService = InlineAdCacheService(adService: adService);
   logger.fine('InlineAdCacheService initialized.');
+
+  // Initialize FeedCacheService as a singleton for session-based caching.
+  final feedCacheService = FeedCacheService(logger: logger);
+  logger.fine('FeedCacheService initialized.');
 
   // Create a GlobalKey for the NavigatorState to be used by AppBloc
   // and InterstitialAdManager for BuildContext access.
@@ -506,6 +511,7 @@ Future<Widget> bootstrap(
       environment: environment,
       adService: adService,
       inlineAdCacheService: inlineAdCacheService,
+      feedCacheService: feedCacheService,
       localAdRepository: localAdRepository,
       navigatorKey: navigatorKey,
     ),

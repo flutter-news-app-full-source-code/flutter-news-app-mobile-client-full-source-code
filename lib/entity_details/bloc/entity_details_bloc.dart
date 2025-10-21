@@ -55,6 +55,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
   final DataRepository<Country> _countryRepository;
   final AppBloc _appBloc;
   final FeedDecoratorService _feedDecoratorService;
+  // ignore: unused_field
   final InlineAdCacheService _inlineAdCacheService;
 
   static const _headlinesLimit = 10;
@@ -66,9 +67,6 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     EntityDetailsLoadRequested event,
     Emitter<EntityDetailsState> emit,
   ) async {
-    // When loading a new entity's details, clear any previously cached ads
-    // to ensure a fresh set of ads is displayed for the new content.
-    _inlineAdCacheService.clearAllAds();
     emit(
       state.copyWith(status: EntityDetailsStatus.loading, clearEntity: true),
     );

@@ -1,7 +1,7 @@
 # Changelog
 
 ## Upcoming Release
-
+ - **feat**: implemented a session-based in-memory cache for the headlines feed to improve performance and reduce network requests when switching filters.
  - **feat**: implement discover feature for browsing news sources by category with filtering and follow/unfollow functionality.
  - **refactor!**: Overhauled the application startup and authentication lifecycle to be robust and free of race conditions. This was a major architectural change that introduced a new `AppInitializationPage` and `AppInitializationBloc` to act as a "gatekeeper," ensuring all critical data is fetched *before* the main UI is built. This fixes a class of bugs related to indefinite loading screens, data migration on account linking, and inconsistent state during startup.
 

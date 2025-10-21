@@ -9,8 +9,11 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/cached_feed.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/headline_filter.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_decorator_service.dart';
+import 'package:logging/logging.dart';
 
 part 'headlines_feed_event.dart';
 part 'headlines_feed_state.dart';
@@ -18,9 +21,38 @@ part 'headlines_feed_state.dart';
 /// {@template headlines_feed_bloc}
 /// Manages the state for the headlines feed feature.
 ///
-/// Handles fetching headlines, applying filters, pagination, and refreshing
-/// the feed using the provided [DataRepository]. It uses [FeedDecoratorService]
-/// to inject ads and account actions into the feed.
+/// This BLoC is the central orchestrator for the news feed. Its core
+/// responsibilities include:
+/// - Fetching, filtering, and displaying headlines from a [DataRepository].
+/// - Injecting dynamic content such as ads and promotional items using the
+///   [FeedDecoratorService].
+/// - Implementing a robust, session-based in-memory caching strategy via
+///   [FeedCacheService] to provide a highly responsive user experience.
+///
+/// ### Feed Decoration and Ad Injection:
+/// On major feed loads (initial load, refresh, or new filter), this BLoC
+/// uses the [FeedDecoratorService] to intersperse the headline content with
+/// other `FeedItem` types, such as ads and promotional call-to-action items.
+///
+/// ### Caching and Data Flow Scenarios:
+///
+/// 1.  **Cache Miss (Initial Load / New Filter):** When a filter is applied for
+///     the first time, the BLoC fetches data from the [DataRepository],
+///     decorates it using [FeedDecoratorService], and stores the result in the
+///     cache before emitting the `success` state.
+///
+/// 2.  **Cache Hit (Switching Filters):** When switching to a previously viewed
+///     filter, the BLoC instantly emits the cached data. If the cached data is
+///     older than a defined throttle duration, a background refresh is
+///     triggered to fetch fresh content without a loading indicator.
+///
+/// 3.  **Pagination (Infinite Scroll):** When the user scrolls to the end of the
+///     feed, the BLoC fetches the next page of headlines and **appends** them
+///     to the existing cached list, ensuring a seamless infinite scroll.
+///
+/// 4.  **Pull-to-Refresh (Prepending):** On a pull-to-refresh action, the BLoC
+///     fetches the latest headlines and intelligently **prepends** only the new
+///     items to the top of the cached list, avoiding full reloads.
 /// {@endtemplate}
 class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   /// {@macro headlines_feed_bloc}
@@ -33,17 +65,20 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     required FeedDecoratorService feedDecoratorService,
     required AppBloc appBloc,
     required InlineAdCacheService inlineAdCacheService,
+    required FeedCacheService feedCacheService,
     UserContentPreferences? initialUserContentPreferences,
-  }) : _headlinesRepository = headlinesRepository,
-       _feedDecoratorService = feedDecoratorService,
-       _appBloc = appBloc,
-       _inlineAdCacheService = inlineAdCacheService,
-       super(
-         HeadlinesFeedState(
-           savedFilters:
-               initialUserContentPreferences?.savedFilters ?? const [],
-         ),
-       ) {
+  })  : _headlinesRepository = headlinesRepository,
+        _feedDecoratorService = feedDecoratorService,
+        _appBloc = appBloc,
+        _inlineAdCacheService = inlineAdCacheService,
+        _feedCacheService = feedCacheService,
+        _logger = Logger('HeadlinesFeedBloc'),
+        super(
+          HeadlinesFeedState(
+            savedFilters:
+                initialUserContentPreferences?.savedFilters ?? const [],
+          ),
+        ) {
     // Subscribe to AppBloc to react to global state changes, primarily for
     // keeping the feed's list of saved filters synchronized with the global
     // app state.
@@ -103,12 +138,18 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   final FeedDecoratorService _feedDecoratorService;
   final AppBloc _appBloc;
   final InlineAdCacheService _inlineAdCacheService;
+  final FeedCacheService _feedCacheService;
+  final Logger _logger;
 
   /// Subscription to the AppBloc's state stream.
   late final StreamSubscription<AppState> _appBlocSubscription;
 
   /// The number of headlines to fetch per page.
   static const _headlinesFetchLimit = 10;
+
+  /// The duration to wait before allowing another pull-to-refresh request
+  /// for the same filter.
+  static const _refreshThrottleDuration = Duration(seconds: 30);
 
   Map<String, dynamic> _buildFilter(HeadlineFilter filter) {
     final queryFilter = <String, dynamic>{};
@@ -136,6 +177,20 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     return queryFilter;
   }
 
+  /// Generates a deterministic cache key based on the active filter.
+  String _generateFilterKey(String activeFilterId, HeadlineFilter filter) {
+    // For built-in filters, use their static names.
+    if (activeFilterId == 'all' || activeFilterId == 'followed') {
+      return activeFilterId;
+    }
+    // For saved filters, their ID is the key.
+    if (activeFilterId != 'custom') {
+      return activeFilterId;
+    }
+    // For one-off "custom" filters, generate a key from its contents.
+    return 'custom_${filter.hashCode}';
+  }
+
   /// Handles the explicit start event to kick off the initial feed load.
   ///
   /// This handler's job is to simply delegate to the standard refresh process,
@@ -151,8 +206,27 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     HeadlinesFeedFetchRequested event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
-    if (state.status == HeadlinesFeedStatus.loading || !state.hasMore) return;
+    if (state.status == HeadlinesFeedStatus.loadingMore || !state.hasMore) {
+      return;
+    }
 
+    final filterKey = _generateFilterKey(state.activeFilterId!, state.filter);
+    final cachedFeed = _feedCacheService.getFeed(filterKey);
+
+    // This should ideally not happen if the cache is managed correctly,
+    // but as a safeguard, if there's no cached feed during pagination,
+    // we should not proceed.
+    if (cachedFeed == null) {
+      _logger.warning(
+        'Pagination attempted with no cached feed for key "$filterKey".',
+      );
+      return;
+    }
+
+    _logger.info(
+      'Pagination: Fetching next page for filter "$filterKey" with cursor '
+      '"${cachedFeed.cursor}".',
+    );
     emit(state.copyWith(status: HeadlinesFeedStatus.loadingMore));
 
     try {
@@ -168,32 +242,48 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         filter: _buildFilter(state.filter),
         pagination: PaginationOptions(
           limit: _headlinesFetchLimit,
-          cursor: state.cursor,
+          cursor: cachedFeed.cursor,
         ),
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
       // For pagination, only inject ad placeholders, not feed actions.
-      //
-      // This method injects stateless `AdPlaceholder` markers into the feed.
-      // The full ad loading and lifecycle is managed by the UI layer.
-      // See `FeedDecoratorService` for a detailed explanation.
-      final newProcessedFeedItems = await _feedDecoratorService.injectAdPlaceholders(
+      final newProcessedFeedItems =
+          await _feedDecoratorService.injectAdPlaceholders(
         feedItems: headlineResponse.items,
         user: currentUser,
         adConfig: remoteConfig.adConfig,
-        imageStyle: _appBloc.state.settings!.feedPreferences.headlineImageStyle,
+        imageStyle:
+            _appBloc.state.settings!.feedPreferences.headlineImageStyle,
         adThemeStyle: event.adThemeStyle,
-        // Calculate the count of actual content items (headlines) already in the
-        // feed. This is crucial for the FeedDecoratorService to correctly apply
-        // ad placement rules across paginated loads.
-        processedContentItemCount: state.feedItems.whereType<Headline>().length,
+        processedContentItemCount:
+            cachedFeed.feedItems.whereType<Headline>().length,
+      );
+
+      _logger.fine(
+        'Pagination: Appending ${newProcessedFeedItems.length} new items to '
+        'the feed.',
+      );
+
+      final updatedFeedItems = List.of(cachedFeed.feedItems)
+        ..addAll(newProcessedFeedItems);
+
+      final updatedCachedFeed = cachedFeed.copyWith(
+        feedItems: updatedFeedItems,
+        hasMore: headlineResponse.hasMore,
+        cursor: headlineResponse.cursor,
+      );
+
+      _feedCacheService.updateFeed(filterKey, updatedCachedFeed);
+      _logger.fine(
+        'Pagination: Cache updated for filter "$filterKey". New total items: '
+        '${updatedFeedItems.length}.',
       );
 
       emit(
         state.copyWith(
           status: HeadlinesFeedStatus.success,
-          feedItems: List.of(state.feedItems)..addAll(newProcessedFeedItems),
+          feedItems: updatedFeedItems,
           hasMore: headlineResponse.hasMore,
           cursor: headlineResponse.cursor,
         ),
@@ -207,8 +297,25 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     HeadlinesFeedRefreshRequested event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
-    // On a full refresh, clear the ad cache to ensure fresh ads are loaded.
-    _inlineAdCacheService.clearAllAds();
+    final filterKey = _generateFilterKey(state.activeFilterId!, state.filter);
+    final cachedFeed = _feedCacheService.getFeed(filterKey);
+
+    // Apply throttling logic.
+    if (cachedFeed != null) {
+      final timeSinceLastRefresh =
+          DateTime.now().difference(cachedFeed.lastRefreshedAt);
+      if (timeSinceLastRefresh < _refreshThrottleDuration) {
+        _logger.info(
+          'Refresh throttled for filter "$filterKey". '
+          'Time since last: $timeSinceLastRefresh.',
+        );
+        return; // Ignore the request.
+      }
+    }
+
+    // On a full refresh, clear the ad cache for the current context to ensure
+    // fresh ads are loaded.
+    _inlineAdCacheService.clearAdsForContext(contextKey: filterKey);
     emit(state.copyWith(status: HeadlinesFeedStatus.loading));
     try {
       final currentUser = _appBloc.state.user;
@@ -225,12 +332,82 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
+      _logger.info(
+        'Refresh: Fetched ${headlineResponse.items.length} latest headlines '
+        'for filter "$filterKey".',
+      );
+      // If there's an existing cache, perform the intelligent prepend.
+      if (cachedFeed != null) {
+        final newHeadlines = headlineResponse.items;
+        final cachedHeadlines = cachedFeed.feedItems.whereType<Headline>();
+
+        if (cachedHeadlines.isNotEmpty) {
+          final firstCachedHeadlineId = cachedHeadlines.first.id;
+          final matchIndex =
+              newHeadlines.indexWhere((h) => h.id == firstCachedHeadlineId);
+
+          if (matchIndex != -1) {
+            // Prepend only the new items found before the match.
+            _logger.fine(
+              'Refresh: Found a match with cached content at index $matchIndex.',
+            );
+            final itemsToPrepend = newHeadlines.sublist(0, matchIndex);
+            if (itemsToPrepend.isNotEmpty) {
+              final updatedFeedItems = List<FeedItem>.from(itemsToPrepend)
+                ..addAll(cachedFeed.feedItems);
+              _logger.info(
+                'Refresh: Prepending ${itemsToPrepend.length} new items to '
+                'the feed.',
+              );
+
+              // Update cache and state, then return.
+              final updatedCachedFeed = cachedFeed.copyWith(
+                feedItems: updatedFeedItems,
+                lastRefreshedAt: DateTime.now(),
+              );
+              _feedCacheService.updateFeed(filterKey, updatedCachedFeed);
+              emit(
+                state.copyWith(
+                  status: HeadlinesFeedStatus.success,
+                  feedItems: updatedFeedItems,
+                ),
+              );
+              return;
+            } else {
+              _logger.info(
+                'Refresh: No new items to prepend. Emitting existing cached '
+                'state.',
+              );
+              // If there are no new items, just emit the success state with
+              // the existing cached items to dismiss the loading indicator.
+              emit(
+                state.copyWith(
+                  status: HeadlinesFeedStatus.success,
+                  feedItems: cachedFeed.feedItems,
+                ),
+              );
+              // This early return is critical. It prevents the BLoC from
+              // proceeding to the full re-decoration step when no new content
+              // is available, which would unnecessarily clear and reload all
+              // ads.
+              return;
+            }
+          } else {
+            _logger.warning(
+              'Refresh: No match found between new and cached headlines. '
+              'Proceeding with a full refresh.',
+            );
+          }
+        }
+      }
+
       // Use user content preferences from AppBloc for followed items.
+      _logger.info(
+        'Refresh: Performing full decoration for filter "$filterKey".',
+      );
       final userPreferences = _appBloc.state.userContentPreferences;
 
-      // For a major load, use the full decoration pipeline, which includes
-      // injecting a high-priority decorator and stateless ad placeholders.
-      // See `FeedDecoratorService` for a detailed explanation of the ad architecture.
+      // For a major load, use the full decoration pipeline.
       final decorationResult = await _feedDecoratorService.decorateFeed(
         headlines: headlineResponse.items,
         user: currentUser,
@@ -243,12 +420,21 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         adThemeStyle: event.adThemeStyle,
       );
 
+      final newCachedFeed = CachedFeed(
+        feedItems: decorationResult.decoratedItems,
+        hasMore: headlineResponse.hasMore,
+        cursor: headlineResponse.cursor,
+        lastRefreshedAt: DateTime.now(),
+      );
+
+      _feedCacheService.setFeed(filterKey, newCachedFeed);
+
       emit(
         state.copyWith(
           status: HeadlinesFeedStatus.success,
-          feedItems: decorationResult.decoratedItems,
-          hasMore: headlineResponse.hasMore,
-          cursor: headlineResponse.cursor,
+          feedItems: newCachedFeed.feedItems,
+          hasMore: newCachedFeed.hasMore,
+          cursor: newCachedFeed.cursor,
           filter: state.filter,
         ),
       );
@@ -256,8 +442,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       // If a feed decorator was injected, notify AppBloc to update its status.
       final injectedDecorator = decorationResult.injectedDecorator;
       if (injectedDecorator != null && currentUser?.id != null) {
-        // Notify AppBloc that a decorator was shown, so its status can be persisted.
-        // Safely cast to access decoratorType, as it's guaranteed to be one of these types.
         if (injectedDecorator is CallToActionItem) {
           _appBloc.add(
             AppUserFeedDecoratorShown(
@@ -286,47 +470,68 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     String newActiveFilterId;
 
     // Prioritize the explicitly passed savedFilter to prevent race conditions.
-    // This is crucial for the "save and apply" flow, where the AppBloc might
-    // not have updated the savedFilters list in this bloc's state yet.
     if (event.savedFilter != null) {
       newActiveFilterId = event.savedFilter!.id;
     } else {
-      // If no filter is explicitly passed, determine if the applied filter
-      // matches an existing saved filter. This handles re-applying a saved
-      // filter or applying a one-time "custom" filter.
-      final matchingSavedFilter = state.savedFilters.firstWhereOrNull((
-        savedFilter,
-      ) {
-        // Use sets for order-agnostic comparison of filter contents.
-        final appliedTopics = event.filter.topics?.toSet() ?? {};
-        final savedTopics = savedFilter.topics.toSet();
-        final appliedSources = event.filter.sources?.toSet() ?? {};
-        final savedSources = savedFilter.sources.toSet();
-        final appliedCountries = event.filter.eventCountries?.toSet() ?? {};
-        final savedCountries = savedFilter.countries.toSet();
+      final matchingSavedFilter = state.savedFilters.firstWhereOrNull(
+        (savedFilter) {
+          final appliedTopics = event.filter.topics?.toSet() ?? {};
+          final savedTopics = savedFilter.topics.toSet();
+          final appliedSources = event.filter.sources?.toSet() ?? {};
+          final savedSources = savedFilter.sources.toSet();
+          final appliedCountries = event.filter.eventCountries?.toSet() ?? {};
+          final savedCountries = savedFilter.countries.toSet();
 
-        return const SetEquality<Topic>().equals(appliedTopics, savedTopics) &&
-            const SetEquality<Source>().equals(appliedSources, savedSources) &&
-            const SetEquality<Country>().equals(
-              appliedCountries,
-              savedCountries,
-            );
-      });
+          return const SetEquality<Topic>()
+                  .equals(appliedTopics, savedTopics) &&
+              const SetEquality<Source>()
+                  .equals(appliedSources, savedSources) &&
+              const SetEquality<Country>().equals(
+                appliedCountries,
+                savedCountries,
+              );
+        },
+      );
 
-      // If a match is found, use its ID. Otherwise, mark it as 'custom'.
       newActiveFilterId = matchingSavedFilter?.id ?? 'custom';
     }
 
-    // When applying new filters, this is considered a major feed change,
-    // so we clear the ad cache to get a fresh set of relevant ads.
-    _inlineAdCacheService.clearAllAds();
+    final filterKey = _generateFilterKey(newActiveFilterId, event.filter);
+    final cachedFeed = _feedCacheService.getFeed(filterKey);
+
+    if (cachedFeed != null) {
+      _logger.info(
+        'Filter Applied: Cache HIT for key "$filterKey". Emitting cached state.',
+      );
+      emit(
+        state.copyWith(
+          status: HeadlinesFeedStatus.success,
+          feedItems: cachedFeed.feedItems,
+          hasMore: cachedFeed.hasMore,
+          cursor: cachedFeed.cursor,
+          filter: event.filter,
+          activeFilterId: newActiveFilterId,
+        ),
+      );
+      // Only trigger a background refresh if the cache is older than the
+      // throttle duration.
+      if (DateTime.now().difference(cachedFeed.lastRefreshedAt) >
+          _refreshThrottleDuration) {
+        _logger.info('Cached data is stale, triggering background refresh.');
+        add(HeadlinesFeedRefreshRequested(adThemeStyle: event.adThemeStyle));
+      }
+      return;
+    }
+
+    _logger.info(
+      'Filter Applied: Cache MISS for key "$filterKey". Fetching new data.',
+    );
     emit(
       state.copyWith(
         filter: event.filter,
         activeFilterId: newActiveFilterId,
         status: HeadlinesFeedStatus.loading,
         feedItems: [],
-        cursor: null,
         clearCursor: true,
       ),
     );
@@ -345,12 +550,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
-      // Use user content preferences from AppBloc for followed items.
       final userPreferences = _appBloc.state.userContentPreferences;
 
-      // Use the full decoration pipeline, which includes injecting a
-      // high-priority decorator and stateless ad placeholders.
-      // See `FeedDecoratorService` for a detailed explanation of the ad architecture.
       final decorationResult = await _feedDecoratorService.decorateFeed(
         headlines: headlineResponse.items,
         user: currentUser,
@@ -363,19 +564,26 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         adThemeStyle: event.adThemeStyle,
       );
 
+      final newCachedFeed = CachedFeed(
+        feedItems: decorationResult.decoratedItems,
+        hasMore: headlineResponse.hasMore,
+        cursor: headlineResponse.cursor,
+        lastRefreshedAt: DateTime.now(),
+      );
+
+      _feedCacheService.setFeed(filterKey, newCachedFeed);
+
       emit(
         state.copyWith(
           status: HeadlinesFeedStatus.success,
-          feedItems: decorationResult.decoratedItems,
-          hasMore: headlineResponse.hasMore,
-          cursor: headlineResponse.cursor,
+          feedItems: newCachedFeed.feedItems,
+          hasMore: newCachedFeed.hasMore,
+          cursor: newCachedFeed.cursor,
         ),
       );
 
       final injectedDecorator = decorationResult.injectedDecorator;
       if (injectedDecorator != null && currentUser?.id != null) {
-        // Notify AppBloc that a decorator was shown, so its status can be persisted.
-        // Safely cast to access decoratorType, as it's guaranteed to be one of these types.
         if (injectedDecorator is CallToActionItem) {
           _appBloc.add(
             AppUserFeedDecoratorShown(
@@ -401,16 +609,41 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     HeadlinesFeedFiltersCleared event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
-    // Clearing filters is a major feed change, so clear the ad cache.
+    const filterKey = 'all';
+    final cachedFeed = _feedCacheService.getFeed(filterKey);
+
+    if (cachedFeed != null) {
+      _logger.info(
+        'Filters Cleared: Cache HIT for "all" filter. Emitting cached state.',
+      );
+      emit(
+        state.copyWith(
+          status: HeadlinesFeedStatus.success,
+          feedItems: cachedFeed.feedItems,
+          hasMore: cachedFeed.hasMore,
+          cursor: cachedFeed.cursor,
+          filter: const HeadlineFilter(),
+          activeFilterId: 'all',
+        ),
+      );
+      // Only trigger a background refresh if the cache is older than the
+      // throttle duration.
+      if (DateTime.now().difference(cachedFeed.lastRefreshedAt) >
+          _refreshThrottleDuration) {
+        add(HeadlinesFeedRefreshRequested(adThemeStyle: event.adThemeStyle));
+      }
+      return;
+    }
+    _logger.info(
+      'Filters Cleared: Cache MISS for "all" filter. Fetching new data.',
+    );
     const newFilter = HeadlineFilter();
-    _inlineAdCacheService.clearAllAds();
     emit(
       state.copyWith(
         status: HeadlinesFeedStatus.loading,
         filter: newFilter,
         activeFilterId: 'all',
         feedItems: [],
-        cursor: null,
         clearCursor: true,
       ),
     );
@@ -429,12 +662,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
-      // Use user content preferences from AppBloc for followed items.
       final userPreferences = _appBloc.state.userContentPreferences;
 
-      // Use the full decoration pipeline, which includes injecting a
-      // high-priority decorator and stateless ad placeholders.
-      // See `FeedDecoratorService` for a detailed explanation of the ad architecture.
       final decorationResult = await _feedDecoratorService.decorateFeed(
         headlines: headlineResponse.items,
         user: currentUser,
@@ -447,19 +676,26 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         adThemeStyle: event.adThemeStyle,
       );
 
+      final newCachedFeed = CachedFeed(
+        feedItems: decorationResult.decoratedItems,
+        hasMore: headlineResponse.hasMore,
+        cursor: headlineResponse.cursor,
+        lastRefreshedAt: DateTime.now(),
+      );
+
+      _feedCacheService.setFeed(filterKey, newCachedFeed);
+
       emit(
         state.copyWith(
           status: HeadlinesFeedStatus.success,
-          feedItems: decorationResult.decoratedItems,
-          hasMore: headlineResponse.hasMore,
-          cursor: headlineResponse.cursor,
+          feedItems: newCachedFeed.feedItems,
+          hasMore: newCachedFeed.hasMore,
+          cursor: newCachedFeed.cursor,
         ),
       );
 
       final injectedDecorator = decorationResult.injectedDecorator;
       if (injectedDecorator != null && currentUser?.id != null) {
-        // Notify AppBloc that a decorator was shown, so its status can be persisted.
-        // Safely cast to access decoratorType, as it's guaranteed to be one of these types.
         if (injectedDecorator is CallToActionItem) {
           _appBloc.add(
             AppUserFeedDecoratorShown(
@@ -481,18 +717,19 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     }
   }
 
-  /// Handles the dismissal of a feed decorator.
-  ///
-  /// Notifies the [AppBloc] to update the user's feed decorator status,
-  /// marking it as completed so it won't be shown again.
   Future<void> _onFeedDecoratorDismissed(
     FeedDecoratorDismissed event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
+    _logger.info(
+      'Dismissing decorator: ${event.feedDecoratorType}. '
+      'Updating cache and UI.',
+    );
     final currentUser = _appBloc.state.user;
     if (currentUser == null) return;
 
-    // Notify AppBloc to mark the decorator as completed for the user.
+    // First, notify the AppBloc that the user has completed this action.
+    // This prevents the decorator from being shown again in future sessions.
     _appBloc.add(
       AppUserFeedDecoratorShown(
         userId: currentUser.id,
@@ -500,32 +737,57 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         isCompleted: true,
       ),
     );
-    // Remove the dismissed decorator from the current feedItems list to
-    // immediately update the UI.
-    final newFeedItems = List<FeedItem>.from(state.feedItems)
+
+    // Second, update the in-memory cache for the current session.
+    // This ensures the decorator is removed immediately from the current view
+    // and does not reappear when switching between feed filters.
+    final filterKey = _generateFilterKey(state.activeFilterId!, state.filter);
+    final cachedFeed = _feedCacheService.getFeed(filterKey);
+
+    if (cachedFeed == null) {
+      _logger.warning(
+        'Cannot update cache on decorator dismissal: '
+        'No cached feed found for key "$filterKey".',
+      );
+      // Fallback to just removing from the UI state if cache is not found.
+      final newFeedItems = List<FeedItem>.from(state.feedItems)
+        ..removeWhere((item) {
+          if (item is CallToActionItem) {
+            return item.decoratorType == event.feedDecoratorType;
+          }
+          if (item is ContentCollectionItem) {
+            return item.decoratorType == event.feedDecoratorType;
+          }
+          return false;
+        });
+      emit(state.copyWith(feedItems: newFeedItems));
+      return;
+    }
+
+    // Perform the "read-modify-write" cycle on the cache.
+    final newFeedItems = List<FeedItem>.from(cachedFeed.feedItems)
       ..removeWhere((item) {
         if (item is CallToActionItem) {
           return item.decoratorType == event.feedDecoratorType;
-        }
-        if (item is ContentCollectionItem) {
+        } else if (item is ContentCollectionItem) {
           return item.decoratorType == event.feedDecoratorType;
         }
         return false;
       });
 
+    final updatedCachedFeed = cachedFeed.copyWith(feedItems: newFeedItems);
+    _feedCacheService.setFeed(filterKey, updatedCachedFeed);
+    _logger.info(
+      'Cache for key "$filterKey" updated after decorator dismissal.',
+    );
+
     emit(state.copyWith(feedItems: newFeedItems));
   }
 
-  /// Handles a tap on a call-to-action decorator.
-  ///
-  /// This typically involves navigating to an external URL or an internal route.
-  /// The BLoC emits a state that the UI can listen to for navigation.
   Future<void> _onCallToActionTapped(
     CallToActionTapped event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
-    // Emit a state that contains the URL. The UI will listen for this
-    // change, trigger navigation, and then dispatch an event to clear the URL.
     emit(state.copyWith(navigationUrl: event.url));
   }
 
@@ -533,11 +795,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     NavigationHandled event,
     Emitter<HeadlinesFeedState> emit,
   ) {
-    // Clear the navigationUrl from the state after it has been handled by the UI.
     emit(state.copyWith(clearNavigationUrl: true));
   }
 
-  /// Handles updates to user content preferences from the AppBloc.
   void _onAppContentPreferencesChanged(
     _AppContentPreferencesChanged event,
     Emitter<HeadlinesFeedState> emit,
@@ -545,22 +805,46 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     emit(state.copyWith(savedFilters: event.preferences.savedFilters));
   }
 
-  /// Handles the selection of a saved filter from the filter bar.
-  ///
-  /// This creates a [HeadlineFilter] from the selected [SavedFilter] and
-  /// triggers a full feed refresh.
   Future<void> _onSavedFilterSelected(
     SavedFilterSelected event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
+    final filterKey = event.filter.id;
+    final cachedFeed = _feedCacheService.getFeed(filterKey);
     final newFilter = HeadlineFilter(
       topics: event.filter.topics,
       sources: event.filter.sources,
       eventCountries: event.filter.countries,
     );
 
-    // Set the active filter ID and then dispatch an event to apply the filter
-    // and refresh the feed.
+    if (cachedFeed != null) {
+      _logger.info(
+        'Saved Filter Selected: Cache HIT for key "$filterKey". '
+        'Emitting cached state.',
+      );
+      emit(
+        state.copyWith(
+          status: HeadlinesFeedStatus.success,
+          feedItems: cachedFeed.feedItems,
+          hasMore: cachedFeed.hasMore,
+          cursor: cachedFeed.cursor,
+          activeFilterId: filterKey,
+          filter: newFilter,
+        ),
+      );
+      // Only trigger a background refresh if the cache is older than the
+      // throttle duration.
+      if (DateTime.now().difference(cachedFeed.lastRefreshedAt) >
+          _refreshThrottleDuration) {
+        add(HeadlinesFeedRefreshRequested(adThemeStyle: event.adThemeStyle));
+      }
+      return;
+    }
+
+    _logger.info(
+      'Saved Filter Selected: Cache MISS for key "$filterKey". '
+      'Delegating to filter application.',
+    );
     emit(state.copyWith(activeFilterId: event.filter.id));
     add(
       HeadlinesFeedFiltersApplied(
@@ -570,31 +854,43 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     );
   }
 
-  /// Handles the selection of the "All" filter from the filter bar.
-  ///
-  /// This clears all active filters and triggers a full feed refresh.
   Future<void> _onAllFilterSelected(
     AllFilterSelected event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
-    // Immediately clear the filter object in the state when 'All' is selected.
-    // This prevents the old 'custom' filter from persisting during the
-    // subsequent refresh action.
+    const filterKey = 'all';
+    final cachedFeed = _feedCacheService.getFeed(filterKey);
+
+    if (cachedFeed != null) {
+      _logger.info('"All" Filter Selected: Cache HIT. Emitting cached state.');
+      emit(
+        state.copyWith(
+          status: HeadlinesFeedStatus.success,
+          feedItems: cachedFeed.feedItems,
+          hasMore: cachedFeed.hasMore,
+          cursor: cachedFeed.cursor,
+          activeFilterId: 'all',
+          filter: const HeadlineFilter(),
+        ),
+      );
+      return;
+    }
+
+    _logger.info(
+      '"All" Filter Selected: Cache MISS. Delegating to filter clear.',
+    );
     emit(state.copyWith(activeFilterId: 'all', filter: const HeadlineFilter()));
     add(HeadlinesFeedFiltersCleared(adThemeStyle: event.adThemeStyle));
   }
 
-  /// Handles the selection of the "Followed" filter from the filter bar.
-  ///
-  /// This creates a [HeadlineFilter] from the user's followed items and
-  /// triggers a full feed refresh directly within this handler. It no longer
-  /// delegates to `HeadlinesFeedFiltersApplied` to prevent a bug where the
-  /// filter would be incorrectly identified as 'custom'.
   Future<void> _onFollowedFilterSelected(
     FollowedFilterSelected event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
+    const filterKey = 'followed';
+    final cachedFeed = _feedCacheService.getFeed(filterKey);
     final userPreferences = _appBloc.state.userContentPreferences;
+
     if (userPreferences == null) {
       return;
     }
@@ -605,77 +901,35 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       eventCountries: userPreferences.followedCountries,
     );
 
-    // This is a major feed change, so clear the ad cache.
-    _inlineAdCacheService.clearAllAds();
-    emit(
-      state.copyWith(
-        status: HeadlinesFeedStatus.loading,
-        filter: newFilter,
-        activeFilterId: 'followed',
-        feedItems: [],
-        clearCursor: true,
-      ),
-    );
-
-    try {
-      final currentUser = _appBloc.state.user;
-      final appConfig = _appBloc.state.remoteConfig;
-
-      if (appConfig == null) {
-        emit(state.copyWith(status: HeadlinesFeedStatus.failure));
-        return;
-      }
-
-      final headlineResponse = await _headlinesRepository.readAll(
-        filter: _buildFilter(newFilter),
-        pagination: const PaginationOptions(limit: _headlinesFetchLimit),
-        sort: [const SortOption('updatedAt', SortOrder.desc)],
+    if (cachedFeed != null) {
+      _logger.info(
+        '"Followed" Filter Selected: Cache HIT. Emitting cached state.',
       );
-
-      final decorationResult = await _feedDecoratorService.decorateFeed(
-        headlines: headlineResponse.items,
-        user: currentUser,
-        remoteConfig: appConfig,
-        followedTopicIds: userPreferences.followedTopics
-            .map((t) => t.id)
-            .toList(),
-        followedSourceIds: userPreferences.followedSources
-            .map((s) => s.id)
-            .toList(),
-        imageStyle: _appBloc.state.settings!.feedPreferences.headlineImageStyle,
-        adThemeStyle: event.adThemeStyle,
-      );
-
       emit(
         state.copyWith(
           status: HeadlinesFeedStatus.success,
-          feedItems: decorationResult.decoratedItems,
-          hasMore: headlineResponse.hasMore,
-          cursor: headlineResponse.cursor,
+          feedItems: cachedFeed.feedItems,
+          hasMore: cachedFeed.hasMore,
+          cursor: cachedFeed.cursor,
+          activeFilterId: 'followed',
+          filter: newFilter,
         ),
       );
-
-      final injectedDecorator = decorationResult.injectedDecorator;
-      if (injectedDecorator != null && currentUser?.id != null) {
-        if (injectedDecorator is CallToActionItem) {
-          _appBloc.add(
-            AppUserFeedDecoratorShown(
-              userId: currentUser!.id,
-              feedDecoratorType: injectedDecorator.decoratorType,
-            ),
-          );
-        } else if (injectedDecorator is ContentCollectionItem) {
-          _appBloc.add(
-            AppUserFeedDecoratorShown(
-              userId: currentUser!.id,
-              feedDecoratorType: injectedDecorator.decoratorType,
-            ),
-          );
-        }
+      // Only trigger a background refresh if the cache is older than the
+      // throttle duration.
+      if (DateTime.now().difference(cachedFeed.lastRefreshedAt) >
+          _refreshThrottleDuration) {
+        add(HeadlinesFeedRefreshRequested(adThemeStyle: event.adThemeStyle));
       }
-    } on HttpException catch (e) {
-      emit(state.copyWith(status: HeadlinesFeedStatus.failure, error: e));
+      return;
     }
+
+    _logger.info(
+      '"Followed" Filter Selected: Cache MISS. Triggering full refresh.',
+    );
+    // If it's a cache miss, set the state and trigger a full refresh.
+    emit(state.copyWith(activeFilterId: 'followed', filter: newFilter));
+    add(HeadlinesFeedRefreshRequested(adThemeStyle: event.adThemeStyle));
   }
 
   @override

@@ -20,6 +20,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/admob_ad_pro
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/demo_ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/local_ad_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
     as app_config;
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
@@ -197,6 +198,10 @@ Future<Widget> bootstrap(
   // Initialize InlineAdCacheService with the created AdService.
   inlineAdCacheService = InlineAdCacheService(adService: adService);
   logger.fine('InlineAdCacheService initialized.');
+
+  // Initialize FeedCacheService as a singleton for session-based caching.
+  final feedCacheService = FeedCacheService(logger: logger);
+  logger.fine('FeedCacheService initialized.');
 
   // Create a GlobalKey for the NavigatorState to be used by AppBloc
   // and InterstitialAdManager for BuildContext access.
@@ -506,6 +511,7 @@ Future<Widget> bootstrap(
       environment: environment,
       adService: adService,
       inlineAdCacheService: inlineAdCacheService,
+      feedCacheService: feedCacheService,
       localAdRepository: localAdRepository,
       navigatorKey: navigatorKey,
     ),

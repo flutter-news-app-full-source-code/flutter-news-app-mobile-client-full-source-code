@@ -14,11 +14,12 @@ import 'package:flutter/foundation.dart';
 @immutable
 abstract class InlineAd extends Equatable {
   /// {@macro inline_ad}
-  const InlineAd({
+  InlineAd({
     required this.id,
     required this.provider,
     required this.adObject,
-  });
+    DateTime? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now();
 
   /// A unique identifier for this specific inline ad instance.
   final String id;
@@ -36,6 +37,10 @@ abstract class InlineAd extends Equatable {
   /// widget for that provider.
   final Object adObject;
 
+  /// The timestamp when this ad object was created.
+  /// Used for cache-staleness checks.
+  final DateTime createdAt;
+
   @override
-  List<Object?> get props => [id, provider, adObject];
+  List<Object?> get props => [id, provider, adObject, createdAt];
 }

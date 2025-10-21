@@ -14,7 +14,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inlin
 @immutable
 class BannerAd extends InlineAd {
   /// {@macro banner_ad}
-  const BannerAd({
+  BannerAd({
     required super.id,
     required super.provider,
     required super.adObject,

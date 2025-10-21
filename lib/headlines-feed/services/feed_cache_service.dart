@@ -54,6 +54,16 @@ class FeedCacheService {
     _cache[filterKey] = updatedFeed;
   }
 
+  /// Removes a specific feed from the cache using its [filterKey].
+  ///
+  /// This allows for explicit cache invalidation for a single feed, which can
+  /// be useful when user preferences change in a way that should force a full
+  /// reload for a specific view (e.g., after logging out).
+  void removeFeed(String filterKey) {
+    _logger.info('Removing feed from cache for filter key: "$filterKey".');
+    _cache.remove(filterKey);
+  }
+
   /// Clears the entire feed cache.
   ///
   /// This is currently not used in the session-based caching strategy but is

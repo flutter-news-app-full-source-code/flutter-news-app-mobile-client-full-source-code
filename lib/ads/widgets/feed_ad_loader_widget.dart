@@ -158,30 +158,49 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
       return;
     }
 
-    // Attempt to retrieve the ad from the cache first.
-    final cachedAd = _adCacheService.getAd(widget.adPlaceholder.id);
+    // Define the maximum age for a cached ad before it's considered stale.
+    // TODO(fulleni): This should be sourced from RemoteConfig for dynamic control.
+    const adMaxAge = Duration(minutes: 5);
+
+    // Attempt to retrieve the ad from the cache.
+    var cachedAd = _adCacheService.getAd(widget.adPlaceholder.id);
 
     if (cachedAd != null) {
-      _logger.info(
-        'Using cached ad for feed placeholder ID: ${widget.adPlaceholder.id}',
-      );
-      // Ensure the widget is still mounted before calling setState.
-      if (mounted) {
-        setState(() {
-          _loadedAd = cachedAd;
-          _isLoading = false;
-        });
+      // Check if the cached ad is stale.
+      if (DateTime.now().difference(cachedAd.createdAt) > adMaxAge) {
+        _logger.info(
+          'Cached ad for placeholder ID ${widget.adPlaceholder.id} is stale. '
+          'Discarding and fetching a new one.',
+        );
+        // Dispose of the stale ad and invalidate the local variable.
+        _adCacheService.removeAndDisposeAd(widget.adPlaceholder.id);
+        cachedAd = null;
+      } else {
+        _logger.info(
+          'Using fresh cached ad for feed placeholder ID: ${widget.adPlaceholder.id}',
+        );
+        // Ensure the widget is still mounted before calling setState.
+        if (mounted) {
+          setState(() {
+            _loadedAd = cachedAd;
+            _isLoading = false;
+          });
+        }
+        // Complete the completer only if it hasn't been completed already.
+        if (_loadAdCompleter?.isCompleted == false) {
+          _loadAdCompleter!.complete();
+        }
+        return;
       }
-      // Complete the completer only if it hasn't been completed already.
-      if (_loadAdCompleter?.isCompleted == false) {
-        _loadAdCompleter!.complete();
-      }
-      return;
     }
 
-    _logger.info(
-      'Loading new ad for feed placeholder ID: ${widget.adPlaceholder.id}',
-    );
+    // If there's no cached ad (or it was stale), proceed to load a new one.
+    if (cachedAd == null) {
+      _logger.info(
+        'Loading new ad for feed placeholder ID: ${widget.adPlaceholder.id}',
+      );
+    }
+
     try {
       // The adId is now directly available from the placeholder.
       final adIdentifier = widget.adPlaceholder.adId;

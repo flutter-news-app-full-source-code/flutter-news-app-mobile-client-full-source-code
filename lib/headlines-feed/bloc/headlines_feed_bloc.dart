@@ -382,6 +382,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
                   feedItems: cachedFeed.feedItems,
                 ),
               );
+              // This early return is critical. It prevents the BLoC from
+              // proceeding to the full re-decoration step when no new content
+              // is available, which would unnecessarily clear and reload all ads.
+              return;
             }
           } else {
             _logger.warning(
@@ -713,9 +717,15 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     FeedDecoratorDismissed event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
+    _logger.info(
+      'Dismissing decorator: ${event.feedDecoratorType}. '
+      'Updating cache and UI.',
+    );
     final currentUser = _appBloc.state.user;
     if (currentUser == null) return;
 
+    // First, notify the AppBloc that the user has completed this action.
+    // This prevents the decorator from being shown again in future sessions.
     _appBloc.add(
       AppUserFeedDecoratorShown(
         userId: currentUser.id,
@@ -723,16 +733,49 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         isCompleted: true,
       ),
     );
-    final newFeedItems = List<FeedItem>.from(state.feedItems)
+
+    // Second, update the in-memory cache for the current session.
+    // This ensures the decorator is removed immediately from the current view
+    // and does not reappear when switching between feed filters.
+    final filterKey = _generateFilterKey(state.activeFilterId!, state.filter);
+    final cachedFeed = _feedCacheService.getFeed(filterKey);
+
+    if (cachedFeed == null) {
+      _logger.warning(
+        'Cannot update cache on decorator dismissal: '
+        'No cached feed found for key "$filterKey".',
+      );
+      // Fallback to just removing from the UI state if cache is not found.
+      final newFeedItems = List<FeedItem>.from(state.feedItems)
+        ..removeWhere((item) {
+          if (item is CallToActionItem) {
+            return item.decoratorType == event.feedDecoratorType;
+          }
+          if (item is ContentCollectionItem) {
+            return item.decoratorType == event.feedDecoratorType;
+          }
+          return false;
+        });
+      emit(state.copyWith(feedItems: newFeedItems));
+      return;
+    }
+
+    // Perform the "read-modify-write" cycle on the cache.
+    final newFeedItems = List<FeedItem>.from(cachedFeed.feedItems)
       ..removeWhere((item) {
         if (item is CallToActionItem) {
           return item.decoratorType == event.feedDecoratorType;
-        }
-        if (item is ContentCollectionItem) {
+        } else if (item is ContentCollectionItem) {
           return item.decoratorType == event.feedDecoratorType;
         }
         return false;
       });
+
+    final updatedCachedFeed = cachedFeed.copyWith(feedItems: newFeedItems);
+    _feedCacheService.setFeed(filterKey, updatedCachedFeed);
+    _logger.info(
+      'Cache for key "$filterKey" updated after decorator dismissal.',
+    );
 
     emit(state.copyWith(feedItems: newFeedItems));
   }

@@ -142,6 +142,7 @@ class App extends StatelessWidget {
                   _userContentPreferencesRepository,
               logger: context.read<Logger>(),
               userRepository: _userRepository,
+              inlineAdCacheService: _inlineAdCacheService,
             )..add(const AppStarted()),
           ),
           // The AuthenticationBloc is provided to handle auth UI events.

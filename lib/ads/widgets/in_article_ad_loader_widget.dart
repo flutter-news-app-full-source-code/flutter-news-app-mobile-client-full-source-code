@@ -118,11 +118,11 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
 
   @override
   void dispose() {
-    // The ad is intentionally not disposed of here. The InlineAdCacheService
-    // is responsible for managing the ad's lifecycle. The cache for an
-    // article context is cleared when the user navigates away from the
-    // article details page, which is handled by other parts of the app
-    // (e.g., a higher-level widget's dispose method).
+    // The ad object (_loadedAd) is intentionally not disposed of here.
+    // Its lifecycle is managed by the InlineAdCacheService. The ad remains in
+    // the cache even after navigating away from the article, allowing for
+    // instant reuse if the user returns. The cache is managed by time-based
+    // staleness checks and is cleared globally on user logout.
     if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
       // Complete normally to prevent crashes
       _loadAdCompleter!.complete();

@@ -95,6 +95,12 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
         'Re-loading ad.',
       );
 
+      // Dispose of the old ad's resources before loading a new one to prevent
+      // memory leaks if the widget is reused for a different context.
+      _adCacheService.removeAndDisposeAd(
+        contextKey: oldWidget.contextKey,
+        placeholderId: oldWidget.slotType.name,
+      );
       if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
         // Complete normally to prevent crashes
         _loadAdCompleter!.complete();

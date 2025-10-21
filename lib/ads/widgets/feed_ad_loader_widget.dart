@@ -21,27 +21,44 @@ import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template feed_ad_loader_widget}
-/// A self-contained widget responsible for loading and displaying an inline ad
-/// specifically within content feeds (e.g., main feed, search results).
+/// A self-contained, stateful widget that manages the entire lifecycle of a
+/// single ad slot within a specific feed.
 ///
-/// This widget handles the entire lifecycle of a single ad slot in the feed.
-/// It attempts to retrieve a cached [InlineAd] first. If no ad is cached,
-/// it requests a new one from the [AdService] using `getFeedAd` and stores
-/// it in the cache upon success. It manages its own loading and error states.
+/// This widget is the cornerstone of the ad loading architecture, designed to
+/// be robust, performant, and maintainable. It decouples ad loading from the
+/// BLoC and ensures that native ad resources are managed efficiently.
 ///
-/// This approach decouples ad loading from the BLoC and ensures that native
-/// ad resources are managed efficiently, preventing crashes and improving
-/// scrolling performance in lists. It specifically handles inline ads (native
-/// and banner), while interstitial ads are managed separately.
+/// ### Caching and Data Flow Scenarios:
+///
+/// 1.  **Scenario 1 (Happy Path - Cache Hit):** When a user switches back to a
+///     feed, this widget checks the [InlineAdCacheService] for a fresh,
+///     non-stale ad for that specific `feedKey` and displays it instantly.
+///
+/// 2.  **Scenario 2 (Stale Cache):** The widget finds a cached ad, but its
+///     `createdAt` timestamp is older than `adMaxAge`. It discards the stale
+///     ad and fetches a new one.
+///
+/// 3.  **Scenario 3 (Cache Miss):** The widget finds no ad for the given
+///     `feedKey` and `placeholderId`, so it requests a new one from the
+///     [AdService] and caches it upon success.
+///
+/// This widget is responsible for handling its own loading and error states
+/// gracefully, displaying a generic placeholder to the user in case of failure.
 /// {@endtemplate}
 class FeedAdLoaderWidget extends StatefulWidget {
   /// {@macro feed_ad_loader_widget}
   const FeedAdLoaderWidget({
+    required this.feedKey,
     required this.adPlaceholder,
     required this.adThemeStyle,
     required this.adConfig,
     super.key,
   });
+
+  /// A unique key representing the feed context this ad belongs to (e.g.,
+  /// "all", "followed", or a saved filter ID). This is used to scope the ad
+  /// within the [InlineAdCacheService].
+  final String feedKey;
 
   /// The stateless placeholder representing this ad slot.
   final AdPlaceholder adPlaceholder;
@@ -81,22 +98,27 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
   @override
   void didUpdateWidget(covariant FeedAdLoaderWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // If the adPlaceholder ID changes, it means this widget is being reused
-    // for a different ad slot. We need to cancel any ongoing load for the old
-    // ad and initiate a new load for the new ad.
-    // Also, if the adConfig changes, we should re-evaluate and potentially reload.
-    if (widget.adPlaceholder.id != oldWidget.adPlaceholder.id ||
+    // If the adPlaceholder ID or feedKey changes, it means this widget is
+    // being reused for a different ad slot or context. We need to cancel any
+    // ongoing load for the old ad and initiate a new load for the new ad.
+    // Also, if the adConfig changes, we should re-evaluate and potentially
+    // reload.
+    if (widget.feedKey != oldWidget.feedKey ||
+        widget.adPlaceholder.id != oldWidget.adPlaceholder.id ||
         widget.adConfig != oldWidget.adConfig) {
       _logger.info(
-        'FeedAdLoaderWidget updated for new placeholder ID: '
-        '${widget.adPlaceholder.id} or AdConfig changed. Re-loading ad.',
+        'FeedAdLoaderWidget updated for new placeholder ID '
+        '(${widget.adPlaceholder.id}) or feedKey (${widget.feedKey}). '
+        'Re-loading ad.',
       );
       // Dispose of the old ad's resources before loading a new one.
-      _adCacheService.removeAndDisposeAd(oldWidget.adPlaceholder.id);
+      _adCacheService.removeAndDisposeAd(
+        feedKey: oldWidget.feedKey,
+        placeholderId: oldWidget.adPlaceholder.id,
+      );
 
       // Cancel the previous loading operation if it's still active and not yet
-      // completed. This prevents a race condition if a new load is triggered
-      // while an old one is still in progress.
+      // completed. This prevents a race condition if a new load is triggered.
       if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
         // Complete normally to prevent crashes
         _loadAdCompleter!.complete();
@@ -120,11 +142,13 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
   @override
   void dispose() {
     // Dispose of the ad's resources when the widget is permanently removed.
-    _adCacheService.removeAndDisposeAd(widget.adPlaceholder.id);
+    _adCacheService.removeAndDisposeAd(
+      feedKey: widget.feedKey,
+      placeholderId: widget.adPlaceholder.id,
+    );
 
     // Cancel any pending ad loading operation when the widget is disposed.
     // This prevents `setState()` calls on a disposed widget.
-    // Ensure the completer is not already completed before attempting to complete it.
     if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {
       // Complete normally to prevent crashes
       _loadAdCompleter!.complete();
@@ -135,22 +159,20 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
 
   /// Loads the inline ad for this feed slot.
   ///
-  /// This method first checks the [InlineAdCacheService] for a pre-loaded [InlineAd].
-  /// If found, it uses the cached ad. Otherwise, it requests a new inline ad
-  /// from the [AdService] using `getFeedAd` and stores it in the cache
-  /// upon success.
+  /// This method first checks the [InlineAdCacheService] for a pre-loaded,
+  /// feed-scoped [InlineAd]. If found, it uses the cached ad. Otherwise, it
+  /// requests a new inline ad from the [AdService] using `getFeedAd` and
+  /// stores it in the cache upon success.
   ///
   /// It also includes defensive checks (`mounted`) to prevent `setState` calls
-  /// on disposed widgets and ensures the `_loadAdCompleter` is always completed
-  /// to prevent `StateError`s.
+  /// on disposed widgets and ensures the `_loadAdCompleter` is always
+  /// completed to prevent `StateError`s.
   Future<void> _loadAd() async {
     // Initialize a new completer for this loading operation.
     _loadAdCompleter = Completer<void>();
 
     // Ensure the widget is still mounted before proceeding.
-    // This prevents the "setState() called after dispose()" error
-    // if the widget is removed from the tree while the async operation
-    // is still in progress.
+    // This prevents the "setState() called after dispose()" error.
     if (!mounted) {
       if (_loadAdCompleter?.isCompleted == false) {
         _loadAdCompleter!.complete();
@@ -159,34 +181,39 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
     }
 
     // Define the maximum age for a cached ad before it's considered stale.
-    // TODO(fulleni): This should be sourced from RemoteConfig for dynamic control.
+    // TODO(fulleni): This should be sourced from RemoteConfig.
     const adMaxAge = Duration(minutes: 5);
 
-    // Attempt to retrieve the ad from the cache.
-    var cachedAd = _adCacheService.getAd(widget.adPlaceholder.id);
+    // Attempt to retrieve the ad from the cache using the feedKey.
+    var cachedAd = _adCacheService.getAd(
+      feedKey: widget.feedKey,
+      placeholderId: widget.adPlaceholder.id,
+    );
 
     if (cachedAd != null) {
       // Check if the cached ad is stale.
       if (DateTime.now().difference(cachedAd.createdAt) > adMaxAge) {
         _logger.info(
-          'Cached ad for placeholder ID ${widget.adPlaceholder.id} is stale. '
-          'Discarding and fetching a new one.',
+          'Cached ad for feed "${widget.feedKey}" and placeholder '
+          '${widget.adPlaceholder.id} is stale. Discarding and fetching new.',
         );
         // Dispose of the stale ad and invalidate the local variable.
-        _adCacheService.removeAndDisposeAd(widget.adPlaceholder.id);
+        _adCacheService.removeAndDisposeAd(
+          feedKey: widget.feedKey,
+          placeholderId: widget.adPlaceholder.id,
+        );
         cachedAd = null;
       } else {
         _logger.info(
-          'Using fresh cached ad for feed placeholder ID: ${widget.adPlaceholder.id}',
+          'Using fresh cached ad for feed "${widget.feedKey}" and placeholder '
+          'ID: ${widget.adPlaceholder.id}',
         );
-        // Ensure the widget is still mounted before calling setState.
         if (mounted) {
           setState(() {
             _loadedAd = cachedAd;
             _isLoading = false;
           });
         }
-        // Complete the completer only if it hasn't been completed already.
         if (_loadAdCompleter?.isCompleted == false) {
           _loadAdCompleter!.complete();
         }
@@ -197,18 +224,18 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
     // If there's no cached ad (or it was stale), proceed to load a new one.
     if (cachedAd == null) {
       _logger.info(
-        'Loading new ad for feed placeholder ID: ${widget.adPlaceholder.id}',
+        'Loading new ad for feed "${widget.feedKey}" and placeholder ID: '
+        '${widget.adPlaceholder.id}',
       );
     }
 
     try {
-      // The adId is now directly available from the placeholder.
       final adIdentifier = widget.adPlaceholder.adId;
 
       if (adIdentifier == null || adIdentifier.isEmpty) {
         _logger.warning(
-          'Ad placeholder ID ${widget.adPlaceholder.id} has no adIdentifier. '
-          'Cannot load ad.',
+          'Ad placeholder ID ${widget.adPlaceholder.id} for feed '
+          '"${widget.feedKey}" has no adIdentifier. Cannot load ad.',
         );
         if (mounted) {
           setState(() {
@@ -216,20 +243,16 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
             _isLoading = false;
           });
         }
-        // Complete the completer normally, indicating that loading finished
-        // but no ad was available. This prevents crashes.
         if (_loadAdCompleter?.isCompleted == false) {
           _loadAdCompleter!.complete();
         }
         return;
       }
 
-      // Get the current HeadlineImageStyle and user role from AppBloc
       final appBlocState = context.read<AppBloc>().state;
       final headlineImageStyle = appBlocState.headlineImageStyle;
       final userRole = appBlocState.user?.appRole ?? AppUserRole.guestUser;
 
-      // Call AdService.getFeedAd with the full AdConfig and adType from the placeholder.
       final loadedAd = await _adService.getFeedAd(
         adConfig: widget.adConfig,
         adType: widget.adPlaceholder.adType,
@@ -240,54 +263,52 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
 
       if (loadedAd != null) {
         _logger.info(
-          'New ad loaded for feed placeholder ID: ${widget.adPlaceholder.id}',
+          'New ad loaded for feed "${widget.feedKey}" and placeholder ID: '
+          '${widget.adPlaceholder.id}',
         );
-        // Store the newly loaded ad in the cache.
-        _adCacheService.setAd(widget.adPlaceholder.id, loadedAd);
-        // Ensure the widget is still mounted before calling setState.
+        // Store the newly loaded ad in the cache, scoped to the feedKey.
+        _adCacheService.setAd(
+          feedKey: widget.feedKey,
+          placeholderId: widget.adPlaceholder.id,
+          ad: loadedAd,
+        );
         if (mounted) {
           setState(() {
             _loadedAd = loadedAd;
             _isLoading = false;
           });
         }
-        // Complete the completer only if it hasn't been completed already.
         if (_loadAdCompleter?.isCompleted == false) {
           _loadAdCompleter!.complete();
         }
       } else {
         _logger.warning(
-          'Failed to load ad for feed placeholder ID: ${widget.adPlaceholder.id}. '
-          'No ad returned.',
+          'Failed to load ad for feed "${widget.feedKey}" and placeholder '
+          'ID: ${widget.adPlaceholder.id}. No ad returned.',
         );
-        // Ensure the widget is still mounted before calling setState.
         if (mounted) {
           setState(() {
             _hasError = true;
             _isLoading = false;
           });
         }
-        // Complete the completer normally, indicating that loading finished
-        // but no ad was available. This prevents crashes.
         if (_loadAdCompleter?.isCompleted == false) {
           _loadAdCompleter!.complete();
         }
       }
     } catch (e, s) {
       _logger.severe(
-        'Error loading ad for feed placeholder ID: ${widget.adPlaceholder.id}: $e',
+        'Error loading ad for feed "${widget.feedKey}" and placeholder ID: '
+        '${widget.adPlaceholder.id}: $e',
         e,
         s,
       );
-      // Ensure the widget is still mounted before calling setState.
       if (mounted) {
         setState(() {
           _hasError = true;
           _isLoading = false;
         });
       }
-      // Complete the completer normally, indicating that loading finished
-      // but an error occurred. This prevents crashes.
       if (_loadAdCompleter?.isCompleted == false) {
         _loadAdCompleter!.complete();
       }
@@ -301,7 +322,8 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
     final headlineImageStyle = context.read<AppBloc>().state.headlineImageStyle;
 
     if (_isLoading || _hasError || _loadedAd == null) {
-      // Show a user-friendly message when loading, on error, or if no ad is loaded.
+      // Show a user-friendly message when loading, on error, or if no ad is
+      // loaded.
       return Card(
         margin: const EdgeInsets.symmetric(
           horizontal: AppSpacing.paddingMedium,
@@ -359,7 +381,8 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
             case AdType.interstitial:
             case AdType.video:
               // Interstitial and video ads are not inline, so they won't be
-              // handled by FeedAdLoaderWidget. Fallback to a generic placeholder.
+              // handled by FeedAdLoaderWidget. Fallback to a generic
+              // placeholder.
               return const SizedBox.shrink();
           }
       }

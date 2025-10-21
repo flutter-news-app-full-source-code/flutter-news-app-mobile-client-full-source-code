@@ -6,6 +6,7 @@ import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/initialization_result.dart';
@@ -41,6 +42,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
+    required InlineAdCacheService inlineAdCacheService,
     required Logger logger,
     required DataRepository<User> userRepository,
   }) : _remoteConfigRepository = remoteConfigRepository,
@@ -49,6 +51,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _userAppSettingsRepository = userAppSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
        _userRepository = userRepository,
+       _inlineAdCacheService = inlineAdCacheService,
        _logger = logger,
        super(
          AppState(
@@ -87,6 +90,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
   final DataRepository<User> _userRepository;
+  final InlineAdCacheService _inlineAdCacheService;
 
   /// Handles the [AppStarted] event.
   ///
@@ -144,6 +148,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // When logging out, it's crucial to explicitly clear all user-related
       // data to ensure a clean state for the next session. This prevents
       // stale data from causing issues on subsequent logins.
+      _inlineAdCacheService.clearAllAds();
+
       emit(
         state.copyWith(
           status: AppLifeCycleStatus.unauthenticated,

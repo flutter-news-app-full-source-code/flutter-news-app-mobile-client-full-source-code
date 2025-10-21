@@ -27,6 +27,7 @@ Click on any category to explore.
 
 ### 📰 Dynamic & Engaging Feed
 - Display news in a beautiful, performant, infinitely scrolling feed.
+- **Intelligent Caching:** An in-memory, session-based cache dramatically improves performance. Switching between recently viewed filters is instantaneous, eliminating redundant network requests and providing a smoother user experience.
 - **Customizable Display:** Users can personalize their feed by choosing headline density (compact, standard, comfortable) and image style (hidden, small thumbnail, large thumbnail).
 - **Rich In-Feed Decorators:** Beyond simple calls-to-action, the feed dynamically injects items like `CallToActionItem` (e.g., link account, upgrade, rate app, enable notifications) and `ContentCollectionItem` (e.g., suggested topics/sources to follow), all managed by configurable rules and user interaction status.
 > **💡 Your Advantage:** You get a production-quality feed system instantly. Skip the months of complex UI work and state management. ⏱️

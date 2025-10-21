@@ -312,8 +312,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       }
     }
 
-    // On a full refresh, clear the ad cache to ensure fresh ads are loaded.
-    _inlineAdCacheService.clearAllAds();
+    // On a full refresh, clear the ad cache for the current feed to ensure
+    // fresh ads are loaded.
+    _inlineAdCacheService.clearAdsForFeed(feedKey: filterKey);
     emit(state.copyWith(status: HeadlinesFeedStatus.loading));
     try {
       final currentUser = _appBloc.state.user;
@@ -519,7 +520,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     _logger.info(
       'Filter Applied: Cache MISS for key "$filterKey". Fetching new data.',
     );
-    _inlineAdCacheService.clearAllAds();
     emit(
       state.copyWith(
         filter: event.filter,
@@ -631,9 +631,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     _logger.info(
       'Filters Cleared: Cache MISS for "all" filter. Fetching new data.',
     );
-    // Clearing filters is a major feed change, so clear the ad cache.
     const newFilter = HeadlineFilter();
-    _inlineAdCacheService.clearAllAds();
     emit(
       state.copyWith(
         status: HeadlinesFeedStatus.loading,

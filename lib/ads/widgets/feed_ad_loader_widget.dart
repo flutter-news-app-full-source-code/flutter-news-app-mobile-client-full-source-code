@@ -141,11 +141,13 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
 
   @override
   void dispose() {
-    // The ad is intentionally not disposed of here. The InlineAdCacheService
-    // is responsible for managing the ad's lifecycle. The cache for this
-    // context ('all', 'followed', etc.) will be cleared by the
-    // HeadlinesFeedBloc during a pull-to-refresh, which is the correct
-    // time to dispose of these ads.
+    // The ad object (_loadedAd) is intentionally not disposed of here.
+    // Its lifecycle is managed by the InlineAdCacheService. The cache for this
+    // feed's context (e.g., 'all', 'followed', or a filter ID) is cleared
+    // by the HeadlinesFeedBloc during a pull-to-refresh, which is the
+    // correct and only time these feed ads should be disposed. This prevents
+    // ads from being destroyed when they scroll out of view.
+
     // Cancel any pending ad loading operation when the widget is disposed.
     // This prevents `setState()` calls on a disposed widget.
     if (_loadAdCompleter != null && !_loadAdCompleter!.isCompleted) {

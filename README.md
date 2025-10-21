@@ -16,123 +16,98 @@
 
 This repository contains the complete, production-ready source code for a feature-rich Flutter news app mobile client. It gives you everything you need to launch your own news app on the App Store and Google Play, right out of the box. It is a key component of the [**Flutter News App Full Source Code Toolkit**](https://github.com/flutter-news-app-full-source-code), an ecosystem that also includes a Dart Frog [backend API](https://github.com/flutter-news-app-full-source-code/flutter-news-app-api-server-full-source-code) and a web-based [content management dashboard](https://github.com/flutter-news-app-full-source-code/flutter-news-app-web-dashboard-full-source-code).
 
+
 ## ⭐ Feature Showcase: Everything You Get, Ready to Go
 
-This app comes packed with all the features you need to launch a professional news application.
- 
-Click on any category to explore.
+This toolkit is engineered with production-ready features that provide immediate value. Each component is designed to solve common, complex challenges in mobile app development, saving you months of work.
+
+Explore the high-level domains below to see how.
 
 <details>
-<summary><strong>📰 Content Discovery & Feed</strong></summary>
+<summary><strong>📰 Content Discovery & User Engagement</strong></summary>
 
-### 📰 Dynamic & Engaging Feed
-- Display news in a beautiful, performant, infinitely scrolling feed.
-- **Intelligent Caching:** An in-memory, session-based cache dramatically improves performance. Switching between recently viewed filters is instantaneous, eliminating redundant network requests and providing a smoother user experience.
-- **Customizable Display:** Users can personalize their feed by choosing headline density (compact, standard, comfortable) and image style (hidden, small thumbnail, large thumbnail).
-- **Rich In-Feed Decorators:** Beyond simple calls-to-action, the feed dynamically injects items like `CallToActionItem` (e.g., link account, upgrade, rate app, enable notifications) and `ContentCollectionItem` (e.g., suggested topics/sources to follow), all managed by configurable rules and user interaction status.
-> **💡 Your Advantage:** You get a production-quality feed system instantly. Skip the months of complex UI work and state management. ⏱️
+### 📱 Dynamic, High-Performance News Feed
+A beautiful, infinitely scrolling feed serves as the core of the user experience. It's not just a list; it's an intelligent content delivery system.
+- **Instantaneous Content Switching:** An intelligent, session-based cache pre-fetches and holds data, eliminating loading spinners when users switch between their preferred content views.
+- **Personalized Viewing:** Users control their experience with settings for information density and image presentation, adapting the feed to their reading style.
+- **Smart In-Feed Prompts:** The feed dynamically injects context-aware items like calls-to-action and content suggestions, driven by configurable rules to avoid user fatigue.
+> **Your Advantage:** You get a world-class, production-quality feed system out of the box. Skip the complex UI, state management, and performance optimization work.
 
 ---
 
-### 🔍 Powerful Filtering & Search
-- **Quick-Access Filter Bar:** A persistent, horizontal filter bar on the main feed gives users one-tap access to their favorite content views. It includes built-in filters for "All" and "Followed" items, alongside any custom filters the user has saved.
-- **Advanced Filter Creation:** A dedicated, full-screen interface allows users to build complex filters by combining multiple `Topics`, `Sources`, and `Countries`.
-- **Saved Filters:** Users can name and save their custom filter combinations. These filters appear in the quick-access bar and can be reordered for a fully customized experience.
-- **Integrated Headline Search:** A sleek search bar in the main feed's scrolling app bar provides a focused, full-screen search experience for headlines. A user avatar within the search bar offers instant modal access to account settings.
-- **Intuitive Source Discovery:** A dedicated "Discover" tab provides a rich, multi-layered exploration experience. Users can browse sources by category in horizontally scrolling carousels, dive deeper into full lists with infinite scrolling and country-based filtering, and find specific sources using a familiar, contextual search bar.
-> **🎯 Your Advantage:** Give your users powerful content discovery tools that keep them engaged and coming back for more.
+### 🔎 Powerful & Intuitive Search
+Give users the tools to find exactly what they're looking for with a multi-faceted discovery system.
+- **Customizable Filter Bar:** A persistent, one-tap filter bar provides instant access to pre-defined and user-created content streams.
+- **Advanced Content Curation:** A dedicated UI allows users to construct and save highly specific news feeds by combining various content categories, publishers, and regions of interest.
+- **Dedicated Discovery Hub:** Users can browse publishers by category in horizontally scrolling carousels, apply regional filters, and perform targeted searches.
+> **Your Advantage:** Deliver powerful content discovery tools that keep users engaged, increase session duration, and encourage return visits.
 
 </details>
 
 <details>
-<summary><strong>🔐 Security & Customization</strong></summary>
+<summary><strong>👤 User Identity & Personalization</strong></summary>
 
-### 🔐 Robust User Authentication
-- 📧 **Email + Code (Passwordless) Sign-In:** Modern and secure.
-- 👤 **Anonymous Sign-In:** Allow users to explore before committing.
-- 🔗 **Account Linking:** Seamlessly convert anonymous users to registered accounts, preserving all their personalized settings, content preferences, and saved headlines.
-> **✅ Your Advantage:** All the complex security and user management is already done for you, including data migration when users link their accounts.
-
----
-
-### 🧑‍🎨 Personalized User Accounts & Preferences
-- **Content Preferences:** Follow/unfollow `Topic`s, `Source`s, and `Country`s.
-- **Saved Headlines:** Bookmark articles for easy access later.
-- **Saved Filters Management:** Rename, delete, and reorder saved filters to control your content discovery shortcuts.
-- **Decorator Interaction Tracking:** User interactions with in-feed decorators (e.g., "Link Account" prompts) are tracked and persisted, ensuring a personalized and non-repetitive experience.
-> **❤️ Your Advantage:** Built-in personalization features that drive user retention and create a sticky app experience.
+### 🔐 Secure, Modern Authentication
+A complete and secure user authentication system is built-in, covering the entire user lifecycle.
+- **Flexible Sign-In Options:** Includes modern passwordless and anonymous sign-in flows to reduce friction for new users.
+- **Seamless Account Linking:** A robust process allows anonymous users to create a permanent account while transparently migrating all their data—including preferences, bookmarked headlines, and saved content views.
+> **Your Advantage:** The complex logic for security, user management, and data migration is already solved, providing a seamless and secure user journey from the start.
 
 ---
 
-### ⚙️ Customizable App Settings
-- **Appearance:** Configure base theme (Light/Dark/System), accent colors (via FlexColorScheme), font choices (family, size, weight).
-- **Feed Display:** Customize how headlines are presented, including `HeadlineDensity` and `HeadlineImageStyle`.
-- **Language Selection:** Choose the application's display language.
-> **🎨 Your Advantage:** Deliver a premium, adaptable user experience that caters to individual needs without writing any code.
+### 🎨 Deep User Customization
+Empower users to tailor the app to their exact preferences, creating a sticky and personal experience.
+- **Content Subscriptions:** Users can personalize their feed by following specific topics, news organizations, or areas of interest.
+- **Appearance Control:** A comprehensive settings panel allows configuration of the theme (Light/Dark/System), accent colors, and font styles.
+- **Personalized Collections:** Users can bookmark headlines for later reading and fully manage their custom-built news feeds.
+> **Your Advantage:** Built-in personalization features that are proven to drive user retention are included and fully functional from day one.
 
 </details>
 
 <details>
-<summary><strong>💰 Monetization & Remote Control</strong></summary>
+<summary><strong>⚙️ Monetization & Remote Management</strong></summary>
 
-### 💸 Advanced Monetization Engine: Flexible & Remotely Controlled
-Go beyond basic ad banners. This app includes a sophisticated, provider-agnostic monetization engine designed for flexibility, performance, and a seamless user experience.
-
-- **Multi-Platform by Design:** The entire ad system is built on a provider-agnostic abstraction, giving you the freedom to choose your monetization strategy. It comes with pre-built, production-ready providers for:
-    - **Google AdMob Provider:** The industry standard, ready to go out of the box.
-    - **Local Ad Provider:** Use a custom ad server to serve ads directly from your own backend, giving you full control over your ad inventory and revenue.
-    - **Demo Ad Provider:** A built-in placeholder provider that makes development and testing a breeze, without needing live ad network credentials.
-- **Seamless Integration, Not Intrusion:** Ads are designed to complement your content, not detract from it.
-    - **Theme-Aware Styling:** Native ads automatically inherit their look and feel from the user's selected theme (light/dark mode, colors, fonts), making them feel like a natural part of the UI.
-    - **Format-Aware Loading:** The system intelligently requests the right ad format (e.g., small or large templates) to match the user's feed layout preferences, ensuring a perfect fit every time.
-- **Optimized for Performance:** A fast, fluid user experience is paramount.
-    - **Intelligent Caching:** An `InlineAdCacheService` efficiently caches native and banner ads to ensure buttery-smooth scrolling in feeds, minimizing network requests and eliminating UI jank.
-    - **Proactive Interstitial Loading:** A dedicated manager pre-loads full-screen interstitial ads in the background, so they are ready to be displayed instantly during navigation without any lag.
-- **Powerful Remote Control:** All ad behavior is driven by the backend `RemoteConfig`. You can remotely control ad frequency, placement rules, and even switch the primary ad provider—all without shipping a new app update.
-> **💸 Your Advantage:** Start generating revenue from day one with a highly extensible and robust ad system that’s built to scale with your business.
+### 💸 Flexible, Provider-Agnostic Monetization
+Start generating revenue immediately with a sophisticated ad system designed for performance and flexibility.
+- **Multi-Provider Architecture:** Built on an abstraction that supports any ad network. It ships with production-ready providers for Google AdMob and a custom Local Ad Server, plus a Demo provider for easy testing.
+- **Theme-Aware Native Ads:** Ads automatically adapt to the user's theme settings, making them feel like a natural part of the UI instead of an intrusion.
+- **Performance Optimized:** An intelligent caching layer for inline and interstitial ads ensures a smooth, jank-free scrolling experience in feeds and during navigation.
+> **Your Advantage:** Deploy a highly extensible, revenue-ready ad system that respects the user experience and scales with your business needs, all without being locked into a single provider.
 
 ---
 
-### 📡 Centralized Application Control: Dynamic & Adaptable
-Gain complete command over your application's operational state and user experience through a powerful, backend-driven control plane. This architecture empowers you to manage critical app behavior and content delivery with significant flexibility, eliminating the need for frequent app store updates.
-
-- **Real-time Configuration Management:**
-    - **Comprehensive Global Settings:** Remotely manage all critical application parameters, including detailed advertising configurations, user preference limits, and overall application status. This allows for dynamic adjustments to features and policies without client-side code changes.
-    - **Adaptive User Engagement:** Control the dynamic injection and behavior of in-app prompts and content collections. Tailor their appearance, frequency, and targeting based on user roles and historical interactions, ensuring a highly personalized and effective engagement strategy.
-- **Robust Operational Resilience:**
-    - **Proactive Status Monitoring:** An intelligent background service continuously monitors the application's health and status against backend directives. This ensures immediate detection and response to any changes in operational state.
-    - **Seamless Critical State Handling:** Implement essential "kill switch" functionalities and version enforcement with built-in, production-ready flows:
-        - **Maintenance Mode:** Instantly activate a full-screen maintenance page, providing clear communication to users during service downtime.
-        - **Mandatory Updates:** Enforce critical updates by displaying a non-dismissible screen that guides users directly to the latest version in their respective app stores.
-> **⚙️ Your Advantage:** Deploy with confidence, knowing you have a sophisticated, backend-driven system to manage your app's lifecycle, content, and user experience. This architecture provides the agility to respond to market demands and operational needs in real-time, ensuring continuous service delivery and a superior user journey.
+### 📡 Backend-Driven Remote Control
+Manage your app's behavior and operational state in real-time without needing to ship an app update.
+- **Centralized Configuration:** Remotely control ad frequency, placement rules, user permission limits, and other critical parameters from the backend.
+- **Critical State Management:** Includes built-in, production-ready flows for essential "kill switch" scenarios. Instantly activate a full-screen maintenance page or enforce a mandatory update with a non-dismissible screen that directs users to the app store.
+> **Your Advantage:** Gain the agility to respond to operational needs in real-time. Deploy with the confidence that you can manage the entire app lifecycle, from feature flags to critical updates, directly from your server.
 
 </details>
 
 <details>
-<summary><strong>🏗️ Architecture & Technical Excellence</strong></summary>
+<summary><strong>🏗️ Architecture & Developer Experience</strong></summary>
 
-### 🏗️ Clean & Modern Architecture
-- Developed with best practices for a maintainable and scalable codebase:
-    - **Multi-Layered Architecture:** A clear separation of concerns into a Data Layer (handling raw data retrieval), Repository Layer (abstracting data sources), and Business Logic Layer (managing state with BLoC) ensures the codebase is decoupled, testable, and easy to reason about.
-    - **Robust Startup & Lifecycle Management:** The app features a rock-solid, "gatekeeper" startup architecture. An `AppInitializationPage` and dedicated `AppInitializationBloc` orchestrate a sequential, race-condition-free startup process using an `AppInitializer` service. This guarantees all critical dependencies (Remote Config, User Settings) are loaded and validated *before* the main application UI is ever built, eliminating an entire class of complex lifecycle bugs.
-    - **Advanced State Management:** The app leverages the **BLoC pattern** for predictable state management, enhanced with `bloc_concurrency` transformers (droppable, restartable) for sophisticated UI event handling.
-    - **Dependency Injection:** Dependencies are provided throughout the app using `RepositoryProvider` and `BlocProvider`, making components highly testable and reusable.
-    - **Type-Safe, Declarative Routing:** Navigation is managed by **GoRouter**, using named routes for a well-structured and maintainable navigation system.
-> **📈 Your Advantage:** The app is built on a clean, modern architecture that's easy to understand and maintain. It's solid and built to last.
-
+### ✅ Clean, Scalable & Maintainable Codebase
+Built on a modern, multi-layered architecture that prioritizes clarity, testability, and separation of concerns.
+- **Predictable State Management:** Leverages the BLoC pattern with advanced concurrency transformers to handle complex UI events gracefully.
+- **Robust Startup Process:** A "gatekeeper" initialization sequence ensures all critical dependencies (Remote Config, User Settings) are loaded and validated *before* the main UI is built, eliminating a whole class of lifecycle bugs.
+- **Type-Safe Declarative Routing:** Navigation is managed by GoRouter using named routes for a well-structured and maintainable system.
+> **Your Advantage:** The codebase is engineered to be easy to understand, maintain, and extend. It provides a solid, professional foundation for future development.
 
 ---
 
-### 🛠️ Flexible Environment Configuration
-- The app utilizes compile-time variables (`--dart-define`) to seamlessly switch between `production`, `development`, and `demo` environments. This production-ready approach ensures that environment-specific configurations, like API endpoints, are set at build time, eliminating the risk of shipping a production app with development settings.
-- Includes pre-configured VS Code `launch.json` profiles for all environments, enabling one-click running and debugging for any target configuration.
-> **🚀 Your Advantage:** A robust, professional environment setup that streamlines the development-to-production workflow and prevents common configuration errors.
+### 🛠️ Production-Ready Environment Tooling
+Utilizes compile-time variables (`--dart-define`) to seamlessly switch between `production`, `development`, and `demo` environments.
+- **Error-Proof Configuration:** This approach ensures environment-specific settings like API endpoints are set at build time, preventing accidental release of development configurations.
+- **Streamlined Workflow:** Includes pre-configured VS Code `launch.json` profiles for one-click running and debugging in any environment.
+> **Your Advantage:** A robust, professional environment setup that streamlines the development-to-production pipeline and prevents common configuration mistakes.
 
 ---
 
-### 🌍 Localization Ready
-- Fully internationalized with working English and Arabic localizations (`.arb` files). Adding more languages is straightforward.
-> **🌐 Your Advantage:** Easily adapt your application for a global audience and tap into new markets.
+### 🌍 Localization-Ready from Day One
+The application is fully internationalized and includes working English and Arabic localizations out of the box.
+- **Simple Extensibility:** Adding new languages is a straightforward process using standard `.arb` files.
+> **Your Advantage:** The architecture is designed for a global audience, allowing you to easily adapt the application and expand into new markets.
 
 </details>
 

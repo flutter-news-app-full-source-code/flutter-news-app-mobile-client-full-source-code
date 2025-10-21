@@ -309,7 +309,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
 
                             return FeedAdLoaderWidget(
                               key: ValueKey(item.id),
-                              feedKey: state.activeFilterId!,
+                              contextKey: state.activeFilterId!,
                               adPlaceholder: item,
                               adThemeStyle: AdThemeStyle.fromTheme(theme),
                               adConfig: adConfig,

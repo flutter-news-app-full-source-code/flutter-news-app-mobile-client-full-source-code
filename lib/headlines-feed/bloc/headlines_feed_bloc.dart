@@ -67,18 +67,18 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     required InlineAdCacheService inlineAdCacheService,
     required FeedCacheService feedCacheService,
     UserContentPreferences? initialUserContentPreferences,
-  }) : _headlinesRepository = headlinesRepository,
-       _feedDecoratorService = feedDecoratorService,
-       _appBloc = appBloc,
-       _inlineAdCacheService = inlineAdCacheService,
-       _feedCacheService = feedCacheService,
-       _logger = Logger('HeadlinesFeedBloc'),
-       super(
-         HeadlinesFeedState(
-           savedFilters:
-               initialUserContentPreferences?.savedFilters ?? const [],
-         ),
-       ) {
+  })  : _headlinesRepository = headlinesRepository,
+        _feedDecoratorService = feedDecoratorService,
+        _appBloc = appBloc,
+        _inlineAdCacheService = inlineAdCacheService,
+        _feedCacheService = feedCacheService,
+        _logger = Logger('HeadlinesFeedBloc'),
+        super(
+          HeadlinesFeedState(
+            savedFilters:
+                initialUserContentPreferences?.savedFilters ?? const [],
+          ),
+        ) {
     // Subscribe to AppBloc to react to global state changes, primarily for
     // keeping the feed's list of saved filters synchronized with the global
     // app state.
@@ -224,7 +224,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     }
 
     _logger.info(
-      'Pagination: Fetching next page for filter "$filterKey" with cursor "${cachedFeed.cursor}".',
+      'Pagination: Fetching next page for filter "$filterKey" with cursor '
+      '"${cachedFeed.cursor}".',
     );
     emit(state.copyWith(status: HeadlinesFeedStatus.loadingMore));
 
@@ -247,21 +248,21 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       );
 
       // For pagination, only inject ad placeholders, not feed actions.
-      final newProcessedFeedItems = await _feedDecoratorService
-          .injectAdPlaceholders(
-            feedItems: headlineResponse.items,
-            user: currentUser,
-            adConfig: remoteConfig.adConfig,
-            imageStyle:
-                _appBloc.state.settings!.feedPreferences.headlineImageStyle,
-            adThemeStyle: event.adThemeStyle,
-            processedContentItemCount: cachedFeed.feedItems
-                .whereType<Headline>()
-                .length,
-          );
+      final newProcessedFeedItems =
+          await _feedDecoratorService.injectAdPlaceholders(
+        feedItems: headlineResponse.items,
+        user: currentUser,
+        adConfig: remoteConfig.adConfig,
+        imageStyle:
+            _appBloc.state.settings!.feedPreferences.headlineImageStyle,
+        adThemeStyle: event.adThemeStyle,
+        processedContentItemCount:
+            cachedFeed.feedItems.whereType<Headline>().length,
+      );
 
       _logger.fine(
-        'Pagination: Appending ${newProcessedFeedItems.length} new items to the feed.',
+        'Pagination: Appending ${newProcessedFeedItems.length} new items to '
+        'the feed.',
       );
 
       final updatedFeedItems = List.of(cachedFeed.feedItems)
@@ -275,7 +276,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
       _feedCacheService.updateFeed(filterKey, updatedCachedFeed);
       _logger.fine(
-        'Pagination: Cache updated for filter "$filterKey". New total items: ${updatedFeedItems.length}.',
+        'Pagination: Cache updated for filter "$filterKey". New total items: '
+        '${updatedFeedItems.length}.',
       );
 
       emit(
@@ -300,9 +302,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
     // Apply throttling logic.
     if (cachedFeed != null) {
-      final timeSinceLastRefresh = DateTime.now().difference(
-        cachedFeed.lastRefreshedAt,
-      );
+      final timeSinceLastRefresh =
+          DateTime.now().difference(cachedFeed.lastRefreshedAt);
       if (timeSinceLastRefresh < _refreshThrottleDuration) {
         _logger.info(
           'Refresh throttled for filter "$filterKey". '
@@ -312,9 +313,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       }
     }
 
-    // On a full refresh, clear the ad cache for the current feed to ensure
+    // On a full refresh, clear the ad cache for the current context to ensure
     // fresh ads are loaded.
-    _inlineAdCacheService.clearAdsForFeed(feedKey: filterKey);
+    _inlineAdCacheService.clearAdsForContext(contextKey: filterKey);
     emit(state.copyWith(status: HeadlinesFeedStatus.loading));
     try {
       final currentUser = _appBloc.state.user;
@@ -332,7 +333,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       );
 
       _logger.info(
-        'Refresh: Fetched ${headlineResponse.items.length} latest headlines for filter "$filterKey".',
+        'Refresh: Fetched ${headlineResponse.items.length} latest headlines '
+        'for filter "$filterKey".',
       );
       // If there's an existing cache, perform the intelligent prepend.
       if (cachedFeed != null) {
@@ -341,9 +343,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
         if (cachedHeadlines.isNotEmpty) {
           final firstCachedHeadlineId = cachedHeadlines.first.id;
-          final matchIndex = newHeadlines.indexWhere(
-            (h) => h.id == firstCachedHeadlineId,
-          );
+          final matchIndex =
+              newHeadlines.indexWhere((h) => h.id == firstCachedHeadlineId);
 
           if (matchIndex != -1) {
             // Prepend only the new items found before the match.
@@ -355,7 +356,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
               final updatedFeedItems = List<FeedItem>.from(itemsToPrepend)
                 ..addAll(cachedFeed.feedItems);
               _logger.info(
-                'Refresh: Prepending ${itemsToPrepend.length} new items to the feed.',
+                'Refresh: Prepending ${itemsToPrepend.length} new items to '
+                'the feed.',
               );
 
               // Update cache and state, then return.
@@ -373,7 +375,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
               return;
             } else {
               _logger.info(
-                'Refresh: No new items to prepend. Emitting existing cached state.',
+                'Refresh: No new items to prepend. Emitting existing cached '
+                'state.',
               );
               // If there are no new items, just emit the success state with
               // the existing cached items to dismiss the loading indicator.
@@ -385,7 +388,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
               );
               // This early return is critical. It prevents the BLoC from
               // proceeding to the full re-decoration step when no new content
-              // is available, which would unnecessarily clear and reload all ads.
+              // is available, which would unnecessarily clear and reload all
+              // ads.
               return;
             }
           } else {
@@ -469,23 +473,25 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     if (event.savedFilter != null) {
       newActiveFilterId = event.savedFilter!.id;
     } else {
-      final matchingSavedFilter = state.savedFilters.firstWhereOrNull((
-        savedFilter,
-      ) {
-        final appliedTopics = event.filter.topics?.toSet() ?? {};
-        final savedTopics = savedFilter.topics.toSet();
-        final appliedSources = event.filter.sources?.toSet() ?? {};
-        final savedSources = savedFilter.sources.toSet();
-        final appliedCountries = event.filter.eventCountries?.toSet() ?? {};
-        final savedCountries = savedFilter.countries.toSet();
+      final matchingSavedFilter = state.savedFilters.firstWhereOrNull(
+        (savedFilter) {
+          final appliedTopics = event.filter.topics?.toSet() ?? {};
+          final savedTopics = savedFilter.topics.toSet();
+          final appliedSources = event.filter.sources?.toSet() ?? {};
+          final savedSources = savedFilter.sources.toSet();
+          final appliedCountries = event.filter.eventCountries?.toSet() ?? {};
+          final savedCountries = savedFilter.countries.toSet();
 
-        return const SetEquality<Topic>().equals(appliedTopics, savedTopics) &&
-            const SetEquality<Source>().equals(appliedSources, savedSources) &&
-            const SetEquality<Country>().equals(
-              appliedCountries,
-              savedCountries,
-            );
-      });
+          return const SetEquality<Topic>()
+                  .equals(appliedTopics, savedTopics) &&
+              const SetEquality<Source>()
+                  .equals(appliedSources, savedSources) &&
+              const SetEquality<Country>().equals(
+                appliedCountries,
+                savedCountries,
+              );
+        },
+      );
 
       newActiveFilterId = matchingSavedFilter?.id ?? 'custom';
     }
@@ -813,7 +819,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
     if (cachedFeed != null) {
       _logger.info(
-        'Saved Filter Selected: Cache HIT for key "$filterKey". Emitting cached state.',
+        'Saved Filter Selected: Cache HIT for key "$filterKey". '
+        'Emitting cached state.',
       );
       emit(
         state.copyWith(
@@ -835,7 +842,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     }
 
     _logger.info(
-      'Saved Filter Selected: Cache MISS for key "$filterKey". Delegating to filter application.',
+      'Saved Filter Selected: Cache MISS for key "$filterKey". '
+      'Delegating to filter application.',
     );
     emit(state.copyWith(activeFilterId: event.filter.id));
     add(

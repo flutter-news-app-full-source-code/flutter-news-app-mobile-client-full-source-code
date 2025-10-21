@@ -369,6 +369,7 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                         }
 
                         return FeedAdLoaderWidget(
+                          feedKey: widget.args.entityId,
                           adPlaceholder: item,
                           adThemeStyle: AdThemeStyle.fromTheme(
                             Theme.of(context),

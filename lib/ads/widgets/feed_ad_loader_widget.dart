@@ -30,7 +30,7 @@ import 'package:ui_kit/ui_kit.dart';
 ///
 /// ### Caching and Data Flow Scenarios:
 ///
-/// 1.  **Scenario 1 (Happy Path - Cache Hit):** When a user switches back to a
+/// 1.  **Scenario 1 (Cache Hit):** When a user switches back to a
 ///     feed, this widget checks the [InlineAdCacheService] for a fresh,
 ///     non-stale ad for that specific `feedKey` and displays it instantly.
 ///

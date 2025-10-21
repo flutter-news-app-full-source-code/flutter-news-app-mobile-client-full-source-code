@@ -38,18 +38,18 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     required InlineAdCacheService inlineAdCacheService,
     required FeedCacheService feedCacheService,
     UserContentPreferences? initialUserContentPreferences,
-  }) : _headlinesRepository = headlinesRepository,
-       _feedDecoratorService = feedDecoratorService,
-       _appBloc = appBloc,
-       _inlineAdCacheService = inlineAdCacheService,
-       _feedCacheService = feedCacheService,
-       _logger = Logger('HeadlinesFeedBloc'),
-       super(
-         HeadlinesFeedState(
-           savedFilters:
-               initialUserContentPreferences?.savedFilters ?? const [],
-         ),
-       ) {
+  })  : _headlinesRepository = headlinesRepository,
+        _feedDecoratorService = feedDecoratorService,
+        _appBloc = appBloc,
+        _inlineAdCacheService = inlineAdCacheService,
+        _feedCacheService = feedCacheService,
+        _logger = Logger('HeadlinesFeedBloc'),
+        super(
+          HeadlinesFeedState(
+            savedFilters:
+                initialUserContentPreferences?.savedFilters ?? const [],
+          ),
+        ) {
     // Subscribe to AppBloc to react to global state changes, primarily for
     // keeping the feed's list of saved filters synchronized with the global
     // app state.
@@ -215,18 +215,16 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       );
 
       // For pagination, only inject ad placeholders, not feed actions.
-      final newProcessedFeedItems = await _feedDecoratorService
-          .injectAdPlaceholders(
-            feedItems: headlineResponse.items,
-            user: currentUser,
-            adConfig: remoteConfig.adConfig,
-            imageStyle:
-                _appBloc.state.settings!.feedPreferences.headlineImageStyle,
-            adThemeStyle: event.adThemeStyle,
-            processedContentItemCount: cachedFeed.feedItems
-                .whereType<Headline>()
-                .length,
-          );
+      final newProcessedFeedItems =
+          await _feedDecoratorService.injectAdPlaceholders(
+        feedItems: headlineResponse.items,
+        user: currentUser,
+        adConfig: remoteConfig.adConfig,
+        imageStyle: _appBloc.state.settings!.feedPreferences.headlineImageStyle,
+        adThemeStyle: event.adThemeStyle,
+        processedContentItemCount:
+            cachedFeed.feedItems.whereType<Headline>().length,
+      );
 
       final updatedFeedItems = List.of(cachedFeed.feedItems)
         ..addAll(newProcessedFeedItems);
@@ -261,9 +259,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
     // Apply throttling logic.
     if (cachedFeed != null) {
-      final timeSinceLastRefresh = DateTime.now().difference(
-        cachedFeed.lastRefreshedAt,
-      );
+      final timeSinceLastRefresh =
+          DateTime.now().difference(cachedFeed.lastRefreshedAt);
       if (timeSinceLastRefresh < _refreshThrottleDuration) {
         _logger.info(
           'Refresh throttled for filter "$filterKey". '
@@ -298,9 +295,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
         if (cachedHeadlines.isNotEmpty) {
           final firstCachedHeadlineId = cachedHeadlines.first.id;
-          final matchIndex = newHeadlines.indexWhere(
-            (h) => h.id == firstCachedHeadlineId,
-          );
+          final matchIndex =
+              newHeadlines.indexWhere((h) => h.id == firstCachedHeadlineId);
 
           if (matchIndex != -1) {
             // Prepend only the new items found before the match.
@@ -322,6 +318,13 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
                 ),
               );
               return;
+            } else {
+              // If there are no new items, just emit the success state with
+              // the existing cached items to dismiss the loading indicator.
+              emit(state.copyWith(
+                status: HeadlinesFeedStatus.success,
+                feedItems: cachedFeed.feedItems,
+              ));
             }
           }
         }
@@ -408,10 +411,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
         return const SetEquality<Topic>().equals(appliedTopics, savedTopics) &&
             const SetEquality<Source>().equals(appliedSources, savedSources) &&
-            const SetEquality<Country>().equals(
-              appliedCountries,
-              savedCountries,
-            );
+            const SetEquality<Country>()
+                .equals(appliedCountries, savedCountries);
       });
 
       newActiveFilterId = matchingSavedFilter?.id ?? 'custom';
@@ -421,18 +422,21 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     final cachedFeed = _feedCacheService.getFeed(filterKey);
 
     if (cachedFeed != null) {
-      emit(
-        state.copyWith(
-          status: HeadlinesFeedStatus.success,
-          feedItems: cachedFeed.feedItems,
-          hasMore: cachedFeed.hasMore,
-          cursor: cachedFeed.cursor,
-          filter: event.filter,
-          activeFilterId: newActiveFilterId,
-        ),
-      );
-      // Trigger a background refresh if the cache might be stale.
-      add(HeadlinesFeedRefreshRequested(adThemeStyle: event.adThemeStyle));
+      emit(state.copyWith(
+        status: HeadlinesFeedStatus.success,
+        feedItems: cachedFeed.feedItems,
+        hasMore: cachedFeed.hasMore,
+        cursor: cachedFeed.cursor,
+        filter: event.filter,
+        activeFilterId: newActiveFilterId,
+      ));
+      // Only trigger a background refresh if the cache is older than the
+      // throttle duration.
+      if (DateTime.now().difference(cachedFeed.lastRefreshedAt) >
+          _refreshThrottleDuration) {
+        _logger.info('Cached data is stale, triggering background refresh.');
+        add(HeadlinesFeedRefreshRequested(adThemeStyle: event.adThemeStyle));
+      }
       return;
     }
 
@@ -524,20 +528,23 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     final cachedFeed = _feedCacheService.getFeed(filterKey);
 
     if (cachedFeed != null) {
-      emit(
-        state.copyWith(
-          status: HeadlinesFeedStatus.success,
-          feedItems: cachedFeed.feedItems,
-          hasMore: cachedFeed.hasMore,
-          cursor: cachedFeed.cursor,
-          filter: const HeadlineFilter(),
-          activeFilterId: 'all',
-        ),
-      );
-      add(HeadlinesFeedRefreshRequested(adThemeStyle: event.adThemeStyle));
+      emit(state.copyWith(
+        status: HeadlinesFeedStatus.success,
+        feedItems: cachedFeed.feedItems,
+        hasMore: cachedFeed.hasMore,
+        cursor: cachedFeed.cursor,
+        filter: const HeadlineFilter(),
+        activeFilterId: 'all',
+      ));
+      // Only trigger a background refresh if the cache is older than the
+      // throttle duration.
+      if (DateTime.now().difference(cachedFeed.lastRefreshedAt) >
+          _refreshThrottleDuration) {
+        add(HeadlinesFeedRefreshRequested(adThemeStyle: event.adThemeStyle));
+      }
       return;
     }
-
+    // Clearing filters is a major feed change, so clear the ad cache.
     const newFilter = HeadlineFilter();
     _inlineAdCacheService.clearAllAds();
     emit(
@@ -691,7 +698,12 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           filter: newFilter,
         ),
       );
-      add(HeadlinesFeedRefreshRequested(adThemeStyle: event.adThemeStyle));
+      // Only trigger a background refresh if the cache is older than the
+      // throttle duration.
+      if (DateTime.now().difference(cachedFeed.lastRefreshedAt) >
+          _refreshThrottleDuration) {
+        add(HeadlinesFeedRefreshRequested(adThemeStyle: event.adThemeStyle));
+      }
       return;
     }
 
@@ -758,89 +770,18 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           filter: newFilter,
         ),
       );
-      add(HeadlinesFeedRefreshRequested(adThemeStyle: event.adThemeStyle));
+      // Only trigger a background refresh if the cache is older than the
+      // throttle duration.
+      if (DateTime.now().difference(cachedFeed.lastRefreshedAt) >
+          _refreshThrottleDuration) {
+        add(HeadlinesFeedRefreshRequested(adThemeStyle: event.adThemeStyle));
+      }
       return;
     }
 
-    _inlineAdCacheService.clearAllAds();
-    emit(
-      state.copyWith(
-        status: HeadlinesFeedStatus.loading,
-        filter: newFilter,
-        activeFilterId: 'followed',
-        feedItems: [],
-        clearCursor: true,
-      ),
-    );
-
-    try {
-      final currentUser = _appBloc.state.user;
-      final appConfig = _appBloc.state.remoteConfig;
-
-      if (appConfig == null) {
-        emit(state.copyWith(status: HeadlinesFeedStatus.failure));
-        return;
-      }
-
-      final headlineResponse = await _headlinesRepository.readAll(
-        filter: _buildFilter(newFilter),
-        pagination: const PaginationOptions(limit: _headlinesFetchLimit),
-        sort: [const SortOption('updatedAt', SortOrder.desc)],
-      );
-
-      final decorationResult = await _feedDecoratorService.decorateFeed(
-        headlines: headlineResponse.items,
-        user: currentUser,
-        remoteConfig: appConfig,
-        followedTopicIds: userPreferences.followedTopics
-            .map((t) => t.id)
-            .toList(),
-        followedSourceIds: userPreferences.followedSources
-            .map((s) => s.id)
-            .toList(),
-        imageStyle: _appBloc.state.settings!.feedPreferences.headlineImageStyle,
-        adThemeStyle: event.adThemeStyle,
-      );
-
-      final newCachedFeed = CachedFeed(
-        feedItems: decorationResult.decoratedItems,
-        hasMore: headlineResponse.hasMore,
-        cursor: headlineResponse.cursor,
-        lastRefreshedAt: DateTime.now(),
-      );
-
-      _feedCacheService.setFeed(filterKey, newCachedFeed);
-
-      emit(
-        state.copyWith(
-          status: HeadlinesFeedStatus.success,
-          feedItems: newCachedFeed.feedItems,
-          hasMore: newCachedFeed.hasMore,
-          cursor: newCachedFeed.cursor,
-        ),
-      );
-
-      final injectedDecorator = decorationResult.injectedDecorator;
-      if (injectedDecorator != null && currentUser?.id != null) {
-        if (injectedDecorator is CallToActionItem) {
-          _appBloc.add(
-            AppUserFeedDecoratorShown(
-              userId: currentUser!.id,
-              feedDecoratorType: injectedDecorator.decoratorType,
-            ),
-          );
-        } else if (injectedDecorator is ContentCollectionItem) {
-          _appBloc.add(
-            AppUserFeedDecoratorShown(
-              userId: currentUser!.id,
-              feedDecoratorType: injectedDecorator.decoratorType,
-            ),
-          );
-        }
-      }
-    } on HttpException catch (e) {
-      emit(state.copyWith(status: HeadlinesFeedStatus.failure, error: e));
-    }
+    // If it's a cache miss, set the state and trigger a full refresh.
+    emit(state.copyWith(activeFilterId: 'followed', filter: newFilter));
+    add(HeadlinesFeedRefreshRequested(adThemeStyle: event.adThemeStyle));
   }
 
   @override

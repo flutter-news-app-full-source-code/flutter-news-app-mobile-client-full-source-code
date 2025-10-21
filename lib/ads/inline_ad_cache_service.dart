@@ -6,28 +6,29 @@ import 'package:logging/logging.dart';
 /// {@template inline_ad_cache_service}
 /// A singleton service for caching loaded inline ad objects (native and banner).
 ///
-/// This service helps to prevent unnecessary re-loading of inline ads
-/// when they scroll out of view and then back into view in a scrollable list.
-/// It stores [InlineAd] objects by a unique ID (typically the [AdPlaceholder.id])
-/// and allows for retrieval and clearing of cached ads.
+/// This service implements a **feed-scoped caching architecture**. It stores
+/// [InlineAd] objects in separate "buckets" for each feed context (e.g., "all",
+/// "followed", or a saved filter ID). This prevents unnecessary ad reloads when
+/// switching between feeds and ensures ads are contextually relevant.
+///
+/// ### Caching and Data Flow Scenarios:
+///
+/// 1.  **Scenario 1 (Cache Hit):** When a user switches back to a previously
+///     viewed feed, this service provides the already-loaded ads for that
+///     specific feed's key, preventing unnecessary network requests and
+///     providing an instant ad experience.
+///
+/// 2.  **Scenario 2 (Cache Miss):** When a user views a new feed for the first
+///     time (or a feed whose ads were cleared), this service will not have ads
+///     for that feed's key, triggering a new ad load by the UI.
+///
+/// 3.  **Scenario 3 (Targeted Invalidation):** The `clearAdsForFeed` method
+///     allows for precise cache clearing (e.g., during a pull-to-refresh on a
+///     specific feed) without affecting the ad caches of other feeds.
 ///
 /// **Scope of Caching:**
-/// This service specifically caches *inline* ads, which include both feed ads
-/// and in-article ads. These ads are designed to be displayed directly within
-/// content lists and benefit from caching to improve scrolling performance
-/// and reduce network requests.
-///
-/// **Exclusion of Interstitial Ads:**
-/// Interstitial ads are *not* cached by this service. Their lifecycle is
-/// managed differently: they are typically loaded on demand, shown once
-/// during navigation transitions, and then disposed immediately after use.
-/// Caching them would not provide performance benefits and could lead to
-/// resource leaks or unexpected behavior.
-///
-/// Inline ad objects (like `google_mobile_ads.NativeAd` and `google_mobile_ads.BannerAd`)
-/// are stateful and resource-intensive. Caching them allows for smoother scrolling
-/// and reduces network requests, while still ensuring proper disposal when
-/// the cache is cleared (e.g., on a full feed refresh).
+/// This service specifically caches *inline* ads (native and banner). Interstitial
+/// ads are managed separately and are not cached here.
 /// {@endtemplate}
 class InlineAdCacheService {
   /// Factory constructor to provide the singleton instance.
@@ -49,55 +50,63 @@ class InlineAdCacheService {
   /// This is set via the factory constructor.
   late AdService _adService;
 
-  /// A map to store loaded inline ad objects, keyed by their unique ID.
+  /// The internal in-memory cache.
   ///
-  /// The value is nullable to allow for explicit removal of an ad from the cache.
-  final Map<String, InlineAd?> _cache = {};
+  /// The key of the outer map is the feedKey, and the inner map is keyed by
+  /// the placeholderId.
+  final Map<String, Map<String, InlineAd?>> _cache = {};
 
-  /// Retrieves an [InlineAd] from the cache using its [id].
+  /// Retrieves an [InlineAd] from the cache.
   ///
   /// Returns the cached [InlineAd] if found, otherwise `null`.
-  InlineAd? getAd(String id) {
-    final ad = _cache[id];
+  InlineAd? getAd({required String feedKey, required String placeholderId}) {
+    final ad = _cache[feedKey]?[placeholderId];
     if (ad != null) {
-      _logger.info('Retrieved inline ad with ID "$id" from cache.');
+      _logger.info(
+        'Retrieved inline ad for feed "$feedKey" and placeholder '
+        '"$placeholderId" from cache.',
+      );
     } else {
-      _logger.info('Inline ad with ID "$id" not found in cache.');
+      _logger.info(
+        'Inline ad for feed "$feedKey" and placeholder "$placeholderId" '
+        'not found in cache.',
+      );
     }
     return ad;
   }
 
   /// Adds or updates an [InlineAd] in the cache.
   ///
-  /// If [ad] is `null`, it effectively removes the entry for [id].
-  void setAd(String id, InlineAd? ad) {
-    if (_cache.containsKey(id) && _cache[id] != null) {
-      // If an old ad exists for this ID, dispose of its resources via AdService.
+  /// If [ad] is `null`, it effectively removes the entry for the given keys.
+  void setAd({
+    required String feedKey,
+    required String placeholderId,
+    required InlineAd? ad,
+  }) {
+    // Ensure the inner map for the feedKey exists.
+    _cache.putIfAbsent(feedKey, () => {});
+
+    final existingAd = _cache[feedKey]![placeholderId];
+    if (existingAd != null) {
+      // If an old ad exists for this slot, dispose of its resources.
       _logger.info(
-        'Disposing old inline ad for ID "$id" before caching new one.',
+        'Disposing old inline ad for feed "$feedKey" and placeholder '
+        '"$placeholderId" before caching new one.',
       );
-      _adService.disposeAd(_cache[id]);
+      _adService.disposeAd(existingAd);
     }
 
     if (ad != null) {
-      _cache[id] = ad;
-      _logger.info('Cached inline ad with ID "$id".');
+      _cache[feedKey]![placeholderId] = ad;
+      _logger.info(
+        'Cached inline ad for feed "$feedKey" and placeholder "$placeholderId".',
+      );
     } else {
-      _cache.remove(id);
-      _logger.info('Removed inline ad with ID "$id" from cache.');
-    }
-  }
-
-  /// Removes an [InlineAd] from the cache without disposing its resources.
-  ///
-  /// This method should be used when an ad is temporarily removed from the UI
-  /// (e.g., scrolled off-screen) but its resources might still be needed later.
-  void removeAd(String id) {
-    if (_cache.containsKey(id)) {
-      _cache.remove(id);
-      _logger.info('Removed inline ad with ID "$id" from cache (no disposal).');
-    } else {
-      _logger.info('Inline ad with ID "$id" not found in cache for removal.');
+      _cache[feedKey]!.remove(placeholderId);
+      _logger.info(
+        'Removed inline ad for feed "$feedKey" and placeholder '
+        '"$placeholderId" from cache.',
+      );
     }
   }
 
@@ -105,16 +114,43 @@ class InlineAdCacheService {
   ///
   /// This method should be used when an ad is permanently removed from the UI
   /// and its resources need to be released.
-  void removeAndDisposeAd(String id) {
-    final ad = _cache[id];
+  void removeAndDisposeAd({
+    required String feedKey,
+    required String placeholderId,
+  }) {
+    final ad = _cache[feedKey]?[placeholderId];
     if (ad != null) {
-      _logger.info('Removing and disposing inline ad with ID "$id".');
+      _logger.info(
+        'Removing and disposing inline ad for feed "$feedKey" and '
+        'placeholder "$placeholderId".',
+      );
       // Delegate disposal to AdService
       _adService.disposeAd(ad);
-      _cache.remove(id);
+      _cache[feedKey]!.remove(placeholderId);
     } else {
-      _logger.info('Inline ad with ID "$id" not found in cache for disposal.');
+      _logger.info(
+        'Inline ad for feed "$feedKey" and placeholder "$placeholderId" '
+        'not found in cache for disposal.',
+      );
     }
+  }
+
+  /// Clears all cached ads for a *single* feed context and disposes their
+  /// resources.
+  ///
+  /// This is the preferred method for invalidating ads for a specific feed,
+  /// for example, during a pull-to-refresh action, as it does not affect
+  /// the caches of other feeds.
+  void clearAdsForFeed({required String feedKey}) {
+    _logger.info('Clearing all cached ads for feed "$feedKey"...');
+    final feedAdCache = _cache[feedKey];
+    if (feedAdCache != null) {
+      for (final ad in feedAdCache.values.whereType<InlineAd>()) {
+        _adService.disposeAd(ad);
+      }
+    }
+    _cache.remove(feedKey);
+    _logger.info('All cached ads for feed "$feedKey" cleared.');
   }
 
   /// Clears all cached inline ad objects and disposes their resources.
@@ -126,12 +162,9 @@ class InlineAdCacheService {
     _logger.info(
       'Clearing all cached inline ads and disposing their resources.',
     );
-    for (final ad in _cache.values.whereType<InlineAd>()) {
-      // Delegate disposal to AdService
-      _adService.disposeAd(ad);
+    for (final feedKey in _cache.keys.toList()) {
+      clearAdsForFeed(feedKey: feedKey);
     }
-
-    // Ensure cache is empty after disposal attempts.
     _cache.clear();
     _logger.info('All cached inline ads cleared.');
   }
@@ -143,10 +176,14 @@ class InlineAdCacheService {
     if (_cache.isEmpty) {
       _logger.info('  Cache is empty.');
     } else {
-      _cache.forEach((id, ad) {
-        _logger.info(
-          '  ID: $id, Provider: ${ad?.provider}, Type: ${ad.runtimeType}',
-        );
+      _cache.forEach((feedKey, innerMap) {
+        _logger.info('  Feed Key: "$feedKey"');
+        innerMap.forEach((placeholderId, ad) {
+          _logger.info(
+            '    -> Placeholder: $placeholderId, Ad: ${ad?.provider}, '
+            'Type: ${ad.runtimeType}',
+          );
+        });
       });
     }
   }

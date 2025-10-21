@@ -88,7 +88,10 @@ class AdMobAdProvider implements AdProvider {
         },
         onAdFailedToLoad: (ad, error) {
           _logger.severe('AdMobAdProvider: Native Ad failed to load: $error');
-          // Ad disposal is now handled by InlineAdCacheService
+          // On a failed load, we do not dispose the ad object. The ad object
+          // is managed by the google_mobile_ads plugin and will be garbage
+          // collected. Completing with null signals the failure to the
+          // caller.
           completer.complete(null);
         },
         onAdClicked: (ad) {
@@ -120,7 +123,6 @@ class AdMobAdProvider implements AdProvider {
       const Duration(seconds: _adLoadTimeout),
       onTimeout: () {
         _logger.warning('AdMobAdProvider: Native ad loading timed out.');
-        // Ad disposal is now handled by InlineAdCacheService
         completer.complete(null);
         return null;
       },
@@ -179,7 +181,10 @@ class AdMobAdProvider implements AdProvider {
         },
         onAdFailedToLoad: (ad, error) {
           _logger.severe('AdMobAdProvider: Banner Ad failed to load: $error');
-          // Ad disposal is now handled by InlineAdCacheService
+          // On a failed load, we do not dispose the ad object. The ad object
+          // is managed by the google_mobile_ads plugin and will be garbage
+          // collected. Completing with null signals the failure to the
+          // caller.
           completer.complete(null);
         },
         onAdOpened: (ad) {
@@ -205,7 +210,6 @@ class AdMobAdProvider implements AdProvider {
       const Duration(seconds: _adLoadTimeout),
       onTimeout: () {
         _logger.warning('AdMobAdProvider: Banner ad loading timed out.');
-        // Ad disposal is now handled by InlineAdCacheService
         completer.complete(null);
         return null;
       },

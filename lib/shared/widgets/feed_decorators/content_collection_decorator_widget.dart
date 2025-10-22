@@ -8,15 +8,13 @@ import 'package:ui_kit/ui_kit.dart';
 /// A widget to display a horizontally scrollable list of suggested content
 /// (e.g., Topics or Sources).
 ///
-/// This widget presents a title, a horizontal list of [SuggestionItemWidget]s,
-/// and a dismiss option via a [PopupMenuButton].
+/// This widget presents a title and a horizontal list of [SuggestionItemWidget]s.
 /// {@endtemplate}
 class ContentCollectionDecoratorWidget extends StatelessWidget {
   /// {@macro content_collection_decorator_widget}
   const ContentCollectionDecoratorWidget({
     required this.item,
     required this.onFollowToggle,
-    required this.onDismiss,
     required this.followedTopicIds,
     required this.followedSourceIds,
     super.key,
@@ -28,9 +26,6 @@ class ContentCollectionDecoratorWidget extends StatelessWidget {
   /// Callback function when the follow/unfollow button on a suggestion item
   /// is pressed.
   final ValueSetter<FeedItem> onFollowToggle;
-
-  /// Callback function when the dismiss option is selected.
-  final ValueSetter<FeedDecoratorType> onDismiss;
 
   /// List of IDs of topics the user is currently following.
   final List<String> followedTopicIds;
@@ -79,19 +74,6 @@ class ContentCollectionDecoratorWidget extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                PopupMenuButton<String>(
-                  onSelected: (value) {
-                    if (value == 'dismiss') {
-                      onDismiss(item.decoratorType);
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: 'dismiss',
-                      child: Text(l10n.neverShowAgain),
-                    ),
-                  ],
                 ),
               ],
             ),

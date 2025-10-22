@@ -99,7 +99,6 @@ Built on a modern, multi-layered architecture that prioritizes clarity, testabil
 ### 🛠️ Production-Ready Environment Tooling
 Utilizes compile-time variables (`--dart-define`) to seamlessly switch between `production`, `development`, and `demo` environments.
 - **Error-Proof Configuration:** This approach ensures environment-specific settings like API endpoints are set at build time, preventing accidental release of development configurations.
-- **Streamlined Workflow:** Includes pre-configured VS Code `launch.json` profiles for one-click running and debugging in any environment.
 > **Your Advantage:** A robust, professional environment setup that streamlines the development-to-production pipeline and prevents common configuration mistakes.
 
 ---

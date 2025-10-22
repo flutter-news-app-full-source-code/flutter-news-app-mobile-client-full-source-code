@@ -27,7 +27,7 @@ class LocalInterstitialAdDialog extends StatefulWidget {
 }
 
 class _LocalInterstitialAdDialogState extends State<LocalInterstitialAdDialog> {
-  //TODO(fulleni): make teh countdown configurable throuigh teh remote config.
+  //TODO(fulleni): make the countdown configurable throuigh teh remote config.
   static const int _countdownDuration = 5;
   int _countdown = _countdownDuration;
   Timer? _timer;

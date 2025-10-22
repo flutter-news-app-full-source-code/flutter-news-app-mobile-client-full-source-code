@@ -7,14 +7,13 @@ import 'package:ui_kit/ui_kit.dart';
 /// A widget to display a call-to-action feed decorator.
 ///
 /// This widget presents a card with a title, description, and a call-to-action
-/// button. It also includes a dismiss option via a [PopupMenuButton].
+/// button.
 /// {@endtemplate}
 class CallToActionDecoratorWidget extends StatelessWidget {
   /// {@macro call_to_action_decorator_widget}
   const CallToActionDecoratorWidget({
     required this.item,
     required this.onCallToAction,
-    required this.onDismiss,
     super.key,
   });
 
@@ -23,9 +22,6 @@ class CallToActionDecoratorWidget extends StatelessWidget {
 
   /// Callback function when the call-to-action button is pressed.
   final ValueSetter<String> onCallToAction;
-
-  /// Callback function when the dismiss option is selected.
-  final ValueSetter<FeedDecoratorType> onDismiss;
 
   @override
   Widget build(BuildContext context) {
@@ -43,32 +39,7 @@ class CallToActionDecoratorWidget extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    item.title,
-                    style: theme.textTheme.titleLarge,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                PopupMenuButton<String>(
-                  onSelected: (value) {
-                    if (value == 'dismiss') {
-                      onDismiss(item.decoratorType);
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: 'dismiss',
-                      child: Text(l10n.neverShowAgain),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+            Text(item.title, style: theme.textTheme.titleLarge),
             const SizedBox(height: AppSpacing.sm),
             Text(
               item.description,

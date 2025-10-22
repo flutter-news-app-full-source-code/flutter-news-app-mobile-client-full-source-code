@@ -67,18 +67,18 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     required InlineAdCacheService inlineAdCacheService,
     required FeedCacheService feedCacheService,
     UserContentPreferences? initialUserContentPreferences,
-  })  : _headlinesRepository = headlinesRepository,
-        _feedDecoratorService = feedDecoratorService,
-        _appBloc = appBloc,
-        _inlineAdCacheService = inlineAdCacheService,
-        _feedCacheService = feedCacheService,
-        _logger = Logger('HeadlinesFeedBloc'),
-        super(
-          HeadlinesFeedState(
-            savedFilters:
-                initialUserContentPreferences?.savedFilters ?? const [],
-          ),
-        ) {
+  }) : _headlinesRepository = headlinesRepository,
+       _feedDecoratorService = feedDecoratorService,
+       _appBloc = appBloc,
+       _inlineAdCacheService = inlineAdCacheService,
+       _feedCacheService = feedCacheService,
+       _logger = Logger('HeadlinesFeedBloc'),
+       super(
+         HeadlinesFeedState(
+           savedFilters:
+               initialUserContentPreferences?.savedFilters ?? const [],
+         ),
+       ) {
     // Subscribe to AppBloc to react to global state changes, primarily for
     // keeping the feed's list of saved filters synchronized with the global
     // app state.
@@ -118,10 +118,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     on<HeadlinesFeedFiltersCleared>(
       _onHeadlinesFeedFiltersCleared,
       transformer: restartable(),
-    );
-    on<FeedDecoratorDismissed>(
-      _onFeedDecoratorDismissed,
-      transformer: sequential(),
     );
     on<CallToActionTapped>(_onCallToActionTapped, transformer: sequential());
     on<NavigationHandled>(_onNavigationHandled, transformer: sequential());
@@ -248,17 +244,18 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       );
 
       // For pagination, only inject ad placeholders, not feed actions.
-      final newProcessedFeedItems =
-          await _feedDecoratorService.injectAdPlaceholders(
-        feedItems: headlineResponse.items,
-        user: currentUser,
-        adConfig: remoteConfig.adConfig,
-        imageStyle:
-            _appBloc.state.settings!.feedPreferences.headlineImageStyle,
-        adThemeStyle: event.adThemeStyle,
-        processedContentItemCount:
-            cachedFeed.feedItems.whereType<Headline>().length,
-      );
+      final newProcessedFeedItems = await _feedDecoratorService
+          .injectAdPlaceholders(
+            feedItems: headlineResponse.items,
+            user: currentUser,
+            adConfig: remoteConfig.adConfig,
+            imageStyle:
+                _appBloc.state.settings!.feedPreferences.headlineImageStyle,
+            adThemeStyle: event.adThemeStyle,
+            processedContentItemCount: cachedFeed.feedItems
+                .whereType<Headline>()
+                .length,
+          );
 
       _logger.fine(
         'Pagination: Appending ${newProcessedFeedItems.length} new items to '
@@ -302,8 +299,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
     // Apply throttling logic.
     if (cachedFeed != null) {
-      final timeSinceLastRefresh =
-          DateTime.now().difference(cachedFeed.lastRefreshedAt);
+      final timeSinceLastRefresh = DateTime.now().difference(
+        cachedFeed.lastRefreshedAt,
+      );
       if (timeSinceLastRefresh < _refreshThrottleDuration) {
         _logger.info(
           'Refresh throttled for filter "$filterKey". '
@@ -343,8 +341,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
         if (cachedHeadlines.isNotEmpty) {
           final firstCachedHeadlineId = cachedHeadlines.first.id;
-          final matchIndex =
-              newHeadlines.indexWhere((h) => h.id == firstCachedHeadlineId);
+          final matchIndex = newHeadlines.indexWhere(
+            (h) => h.id == firstCachedHeadlineId,
+          );
 
           if (matchIndex != -1) {
             // Prepend only the new items found before the match.
@@ -473,25 +472,23 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     if (event.savedFilter != null) {
       newActiveFilterId = event.savedFilter!.id;
     } else {
-      final matchingSavedFilter = state.savedFilters.firstWhereOrNull(
-        (savedFilter) {
-          final appliedTopics = event.filter.topics?.toSet() ?? {};
-          final savedTopics = savedFilter.topics.toSet();
-          final appliedSources = event.filter.sources?.toSet() ?? {};
-          final savedSources = savedFilter.sources.toSet();
-          final appliedCountries = event.filter.eventCountries?.toSet() ?? {};
-          final savedCountries = savedFilter.countries.toSet();
+      final matchingSavedFilter = state.savedFilters.firstWhereOrNull((
+        savedFilter,
+      ) {
+        final appliedTopics = event.filter.topics?.toSet() ?? {};
+        final savedTopics = savedFilter.topics.toSet();
+        final appliedSources = event.filter.sources?.toSet() ?? {};
+        final savedSources = savedFilter.sources.toSet();
+        final appliedCountries = event.filter.eventCountries?.toSet() ?? {};
+        final savedCountries = savedFilter.countries.toSet();
 
-          return const SetEquality<Topic>()
-                  .equals(appliedTopics, savedTopics) &&
-              const SetEquality<Source>()
-                  .equals(appliedSources, savedSources) &&
-              const SetEquality<Country>().equals(
-                appliedCountries,
-                savedCountries,
-              );
-        },
-      );
+        return const SetEquality<Topic>().equals(appliedTopics, savedTopics) &&
+            const SetEquality<Source>().equals(appliedSources, savedSources) &&
+            const SetEquality<Country>().equals(
+              appliedCountries,
+              savedCountries,
+            );
+      });
 
       newActiveFilterId = matchingSavedFilter?.id ?? 'custom';
     }
@@ -715,73 +712,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     } on HttpException catch (e) {
       emit(state.copyWith(status: HeadlinesFeedStatus.failure, error: e));
     }
-  }
-
-  Future<void> _onFeedDecoratorDismissed(
-    FeedDecoratorDismissed event,
-    Emitter<HeadlinesFeedState> emit,
-  ) async {
-    _logger.info(
-      'Dismissing decorator: ${event.feedDecoratorType}. '
-      'Updating cache and UI.',
-    );
-    final currentUser = _appBloc.state.user;
-    if (currentUser == null) return;
-
-    // First, notify the AppBloc that the user has completed this action.
-    // This prevents the decorator from being shown again in future sessions.
-    _appBloc.add(
-      AppUserFeedDecoratorShown(
-        userId: currentUser.id,
-        feedDecoratorType: event.feedDecoratorType,
-        isCompleted: true,
-      ),
-    );
-
-    // Second, update the in-memory cache for the current session.
-    // This ensures the decorator is removed immediately from the current view
-    // and does not reappear when switching between feed filters.
-    final filterKey = _generateFilterKey(state.activeFilterId!, state.filter);
-    final cachedFeed = _feedCacheService.getFeed(filterKey);
-
-    if (cachedFeed == null) {
-      _logger.warning(
-        'Cannot update cache on decorator dismissal: '
-        'No cached feed found for key "$filterKey".',
-      );
-      // Fallback to just removing from the UI state if cache is not found.
-      final newFeedItems = List<FeedItem>.from(state.feedItems)
-        ..removeWhere((item) {
-          if (item is CallToActionItem) {
-            return item.decoratorType == event.feedDecoratorType;
-          }
-          if (item is ContentCollectionItem) {
-            return item.decoratorType == event.feedDecoratorType;
-          }
-          return false;
-        });
-      emit(state.copyWith(feedItems: newFeedItems));
-      return;
-    }
-
-    // Perform the "read-modify-write" cycle on the cache.
-    final newFeedItems = List<FeedItem>.from(cachedFeed.feedItems)
-      ..removeWhere((item) {
-        if (item is CallToActionItem) {
-          return item.decoratorType == event.feedDecoratorType;
-        } else if (item is ContentCollectionItem) {
-          return item.decoratorType == event.feedDecoratorType;
-        }
-        return false;
-      });
-
-    final updatedCachedFeed = cachedFeed.copyWith(feedItems: newFeedItems);
-    _feedCacheService.setFeed(filterKey, updatedCachedFeed);
-    _logger.info(
-      'Cache for key "$filterKey" updated after decorator dismissal.',
-    );
-
-    emit(state.copyWith(feedItems: newFeedItems));
   }
 
   Future<void> _onCallToActionTapped(

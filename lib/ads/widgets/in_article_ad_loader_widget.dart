@@ -105,7 +105,7 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
           'Disposing old ad for slot "${oldWidget.slotType.name}" '
           'before loading new one.',
         );
-        _adService.disposeAd(_loadedAd!);
+        _adService.disposeAd(_loadedAd);
       }
 
       // Immediately set the widget to a loading state to prevent UI flicker.
@@ -133,7 +133,7 @@ class _InArticleAdLoaderWidgetState extends State<InArticleAdLoaderWidget> {
         'Disposing in-article ad for slot "${widget.slotType.name}" '
         'as widget is being disposed.',
       );
-      _adService.disposeAd(_loadedAd!);
+      _adService.disposeAd(_loadedAd);
     }
 
     // Cancel any pending ad loading operation when the widget is disposed.

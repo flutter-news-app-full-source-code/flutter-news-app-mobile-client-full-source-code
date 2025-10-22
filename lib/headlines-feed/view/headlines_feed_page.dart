@@ -53,10 +53,10 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
     // A flag ensures this logic runs only once for the widget's lifecycle.
     if (!_isInitialFetchDispatched) {
       context.read<HeadlinesFeedBloc>().add(
-            HeadlinesFeedStarted(
-              adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
-            ),
-          );
+        HeadlinesFeedStarted(
+          adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+        ),
+      );
       _isInitialFetchDispatched = true;
     }
   }
@@ -81,10 +81,10 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
         state.hasMore &&
         state.status != HeadlinesFeedStatus.loadingMore) {
       context.read<HeadlinesFeedBloc>().add(
-            HeadlinesFeedFetchRequested(
-              adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
-            ),
-          );
+        HeadlinesFeedFetchRequested(
+          adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+        ),
+      );
     }
   }
 
@@ -154,20 +154,20 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
               return FailureStateWidget(
                 exception: state.error ?? UnknownException(l10n.unknownError),
                 onRetry: () => context.read<HeadlinesFeedBloc>().add(
-                      HeadlinesFeedRefreshRequested(
-                        adThemeStyle: AdThemeStyle.fromTheme(theme),
-                      ),
-                    ),
+                  HeadlinesFeedRefreshRequested(
+                    adThemeStyle: AdThemeStyle.fromTheme(theme),
+                  ),
+                ),
               );
             }
 
             return RefreshIndicator(
               onRefresh: () async {
                 context.read<HeadlinesFeedBloc>().add(
-                      HeadlinesFeedRefreshRequested(
-                        adThemeStyle: AdThemeStyle.fromTheme(theme),
-                      ),
-                    );
+                  HeadlinesFeedRefreshRequested(
+                    adThemeStyle: AdThemeStyle.fromTheme(theme),
+                  ),
+                );
               },
               child: CustomScrollView(
                 controller: _scrollController,
@@ -206,12 +206,12 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                             ElevatedButton(
                               onPressed: () =>
                                   context.read<HeadlinesFeedBloc>().add(
-                                        HeadlinesFeedFiltersCleared(
-                                          adThemeStyle: AdThemeStyle.fromTheme(
-                                            theme,
-                                          ),
-                                        ),
+                                    HeadlinesFeedFiltersCleared(
+                                      adThemeStyle: AdThemeStyle.fromTheme(
+                                        theme,
                                       ),
+                                    ),
+                                  ),
                               child: Text(l10n.headlinesFeedClearFiltersButton),
                             ),
                           ],
@@ -269,27 +269,27 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                                   headline: item,
                                   onHeadlineTap: () =>
                                       HeadlineTapHandler.handleHeadlineTap(
-                                    context,
-                                    item,
-                                  ),
+                                        context,
+                                        item,
+                                      ),
                                 );
                               case HeadlineImageStyle.smallThumbnail:
                                 tile = HeadlineTileImageStart(
                                   headline: item,
                                   onHeadlineTap: () =>
                                       HeadlineTapHandler.handleHeadlineTap(
-                                    context,
-                                    item,
-                                  ),
+                                        context,
+                                        item,
+                                      ),
                                 );
                               case HeadlineImageStyle.largeThumbnail:
                                 tile = HeadlineTileImageTop(
                                   headline: item,
                                   onHeadlineTap: () =>
                                       HeadlineTapHandler.handleHeadlineTap(
-                                    context,
-                                    item,
-                                  ),
+                                        context,
+                                        item,
+                                      ),
                                 );
                             }
                             return tile;
@@ -319,8 +319,8 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                               item: item,
                               onCallToAction: (url) {
                                 context.read<HeadlinesFeedBloc>().add(
-                                      CallToActionTapped(url: url),
-                                    );
+                                  CallToActionTapped(url: url),
+                                );
                               },
                             );
                           } else if (item is ContentCollectionItem) {
@@ -328,16 +328,22 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                             // which is the source of truth for followed items.
                             final appState = context.watch<AppBloc>().state;
                             final followedTopics =
-                                appState.userContentPreferences?.followedTopics ??
-                                    [];
-                            final followedSources = appState
-                                    .userContentPreferences?.followedSources ??
+                                appState
+                                    .userContentPreferences
+                                    ?.followedTopics ??
+                                [];
+                            final followedSources =
+                                appState
+                                    .userContentPreferences
+                                    ?.followedSources ??
                                 [];
 
-                            final followedTopicIds =
-                                followedTopics.map((t) => t.id).toList();
-                            final followedSourceIds =
-                                followedSources.map((s) => s.id).toList();
+                            final followedTopicIds = followedTopics
+                                .map((t) => t.id)
+                                .toList();
+                            final followedSourceIds = followedSources
+                                .map((s) => s.id)
+                                .toList();
 
                             return ContentCollectionDecoratorWidget(
                               item: item,
@@ -351,10 +357,11 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                                 UserContentPreferences updatedPreferences;
 
                                 if (toggledItem is Topic) {
-                                  final isCurrentlyFollowing =
-                                      followedTopicIds.contains(toggledItem.id);
-                                  final newFollowedTopics =
-                                      List<Topic>.from(followedTopics);
+                                  final isCurrentlyFollowing = followedTopicIds
+                                      .contains(toggledItem.id);
+                                  final newFollowedTopics = List<Topic>.from(
+                                    followedTopics,
+                                  );
                                   if (isCurrentlyFollowing) {
                                     newFollowedTopics.removeWhere(
                                       (t) => t.id == toggledItem.id,
@@ -362,16 +369,16 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                                   } else {
                                     newFollowedTopics.add(toggledItem);
                                   }
-                                  updatedPreferences =
-                                      currentUserPreferences.copyWith(
-                                    followedTopics: newFollowedTopics,
-                                  );
+                                  updatedPreferences = currentUserPreferences
+                                      .copyWith(
+                                        followedTopics: newFollowedTopics,
+                                      );
                                 } else if (toggledItem is Source) {
-                                  final isCurrentlyFollowing =
-                                      followedSourceIds
-                                          .contains(toggledItem.id);
-                                  final newFollowedSources =
-                                      List<Source>.from(followedSources);
+                                  final isCurrentlyFollowing = followedSourceIds
+                                      .contains(toggledItem.id);
+                                  final newFollowedSources = List<Source>.from(
+                                    followedSources,
+                                  );
                                   if (isCurrentlyFollowing) {
                                     newFollowedSources.removeWhere(
                                       (s) => s.id == toggledItem.id,
@@ -379,19 +386,19 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                                   } else {
                                     newFollowedSources.add(toggledItem);
                                   }
-                                  updatedPreferences =
-                                      currentUserPreferences.copyWith(
-                                    followedSources: newFollowedSources,
-                                  );
+                                  updatedPreferences = currentUserPreferences
+                                      .copyWith(
+                                        followedSources: newFollowedSources,
+                                      );
                                 } else {
                                   return;
                                 }
 
                                 context.read<AppBloc>().add(
-                                      AppUserContentPreferencesChanged(
-                                        preferences: updatedPreferences,
-                                      ),
-                                    );
+                                  AppUserContentPreferencesChanged(
+                                    preferences: updatedPreferences,
+                                  ),
+                                );
                               },
                             );
                           }

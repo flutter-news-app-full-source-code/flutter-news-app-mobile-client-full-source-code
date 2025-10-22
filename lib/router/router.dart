@@ -527,8 +527,7 @@ GoRouter createRouter({
                       appBloc: appBloc,
                       inlineAdCacheService: context
                           .read<InlineAdCacheService>(),
-                      feedCacheService: context
-                          .read<FeedCacheService>(),
+                      feedCacheService: context.read<FeedCacheService>(),
                       initialUserContentPreferences:
                           initialUserContentPreferences,
                     );

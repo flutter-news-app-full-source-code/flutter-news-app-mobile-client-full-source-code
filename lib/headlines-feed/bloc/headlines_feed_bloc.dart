@@ -67,18 +67,18 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     required InlineAdCacheService inlineAdCacheService,
     required FeedCacheService feedCacheService,
     UserContentPreferences? initialUserContentPreferences,
-  })  : _headlinesRepository = headlinesRepository,
-        _feedDecoratorService = feedDecoratorService,
-        _appBloc = appBloc,
-        _inlineAdCacheService = inlineAdCacheService,
-        _feedCacheService = feedCacheService,
-        _logger = Logger('HeadlinesFeedBloc'),
-        super(
-          HeadlinesFeedState(
-            savedFilters:
-                initialUserContentPreferences?.savedFilters ?? const [],
-          ),
-        ) {
+  }) : _headlinesRepository = headlinesRepository,
+       _feedDecoratorService = feedDecoratorService,
+       _appBloc = appBloc,
+       _inlineAdCacheService = inlineAdCacheService,
+       _feedCacheService = feedCacheService,
+       _logger = Logger('HeadlinesFeedBloc'),
+       super(
+         HeadlinesFeedState(
+           savedFilters:
+               initialUserContentPreferences?.savedFilters ?? const [],
+         ),
+       ) {
     // Subscribe to AppBloc to react to global state changes, primarily for
     // keeping the feed's list of saved filters synchronized with the global
     // app state.
@@ -244,17 +244,18 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       );
 
       // For pagination, only inject ad placeholders, not feed actions.
-      final newProcessedFeedItems =
-          await _feedDecoratorService.injectAdPlaceholders(
-        feedItems: headlineResponse.items,
-        user: currentUser,
-        adConfig: remoteConfig.adConfig,
-        imageStyle:
-            _appBloc.state.settings!.feedPreferences.headlineImageStyle,
-        adThemeStyle: event.adThemeStyle,
-        processedContentItemCount:
-            cachedFeed.feedItems.whereType<Headline>().length,
-      );
+      final newProcessedFeedItems = await _feedDecoratorService
+          .injectAdPlaceholders(
+            feedItems: headlineResponse.items,
+            user: currentUser,
+            adConfig: remoteConfig.adConfig,
+            imageStyle:
+                _appBloc.state.settings!.feedPreferences.headlineImageStyle,
+            adThemeStyle: event.adThemeStyle,
+            processedContentItemCount: cachedFeed.feedItems
+                .whereType<Headline>()
+                .length,
+          );
 
       _logger.fine(
         'Pagination: Appending ${newProcessedFeedItems.length} new items to '
@@ -298,8 +299,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
     // Apply throttling logic.
     if (cachedFeed != null) {
-      final timeSinceLastRefresh =
-          DateTime.now().difference(cachedFeed.lastRefreshedAt);
+      final timeSinceLastRefresh = DateTime.now().difference(
+        cachedFeed.lastRefreshedAt,
+      );
       if (timeSinceLastRefresh < _refreshThrottleDuration) {
         _logger.info(
           'Refresh throttled for filter "$filterKey". '
@@ -339,8 +341,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
         if (cachedHeadlines.isNotEmpty) {
           final firstCachedHeadlineId = cachedHeadlines.first.id;
-          final matchIndex =
-              newHeadlines.indexWhere((h) => h.id == firstCachedHeadlineId);
+          final matchIndex = newHeadlines.indexWhere(
+            (h) => h.id == firstCachedHeadlineId,
+          );
 
           if (matchIndex != -1) {
             // Prepend only the new items found before the match.
@@ -469,25 +472,23 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     if (event.savedFilter != null) {
       newActiveFilterId = event.savedFilter!.id;
     } else {
-      final matchingSavedFilter = state.savedFilters.firstWhereOrNull(
-        (savedFilter) {
-          final appliedTopics = event.filter.topics?.toSet() ?? {};
-          final savedTopics = savedFilter.topics.toSet();
-          final appliedSources = event.filter.sources?.toSet() ?? {};
-          final savedSources = savedFilter.sources.toSet();
-          final appliedCountries = event.filter.eventCountries?.toSet() ?? {};
-          final savedCountries = savedFilter.countries.toSet();
+      final matchingSavedFilter = state.savedFilters.firstWhereOrNull((
+        savedFilter,
+      ) {
+        final appliedTopics = event.filter.topics?.toSet() ?? {};
+        final savedTopics = savedFilter.topics.toSet();
+        final appliedSources = event.filter.sources?.toSet() ?? {};
+        final savedSources = savedFilter.sources.toSet();
+        final appliedCountries = event.filter.eventCountries?.toSet() ?? {};
+        final savedCountries = savedFilter.countries.toSet();
 
-          return const SetEquality<Topic>()
-                  .equals(appliedTopics, savedTopics) &&
-              const SetEquality<Source>()
-                  .equals(appliedSources, savedSources) &&
-              const SetEquality<Country>().equals(
-                appliedCountries,
-                savedCountries,
-              );
-        },
-      );
+        return const SetEquality<Topic>().equals(appliedTopics, savedTopics) &&
+            const SetEquality<Source>().equals(appliedSources, savedSources) &&
+            const SetEquality<Country>().equals(
+              appliedCountries,
+              savedCountries,
+            );
+      });
 
       newActiveFilterId = matchingSavedFilter?.id ?? 'custom';
     }

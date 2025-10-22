@@ -116,20 +116,6 @@ final class HeadlinesFeedFiltersCleared extends HeadlinesFeedEvent {
   List<Object> get props => [adThemeStyle];
 }
 
-/// {@template feed_decorator_dismissed}
-/// Event triggered when a user dismisses a feed decorator.
-/// {@endtemplate}
-final class FeedDecoratorDismissed extends HeadlinesFeedEvent {
-  /// {@macro feed_decorator_dismissed}
-  const FeedDecoratorDismissed({required this.feedDecoratorType});
-
-  /// The type of the decorator that was dismissed.
-  final FeedDecoratorType feedDecoratorType;
-
-  @override
-  List<Object> get props => [feedDecoratorType];
-}
-
 /// {@template call_to_action_tapped}
 /// Event triggered when a user taps the call-to-action button on a decorator.
 /// {@endtemplate}

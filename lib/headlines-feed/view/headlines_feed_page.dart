@@ -322,13 +322,6 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                                       CallToActionTapped(url: url),
                                     );
                               },
-                              onDismiss: (decoratorType) {
-                                context.read<HeadlinesFeedBloc>().add(
-                                      FeedDecoratorDismissed(
-                                        feedDecoratorType: decoratorType,
-                                      ),
-                                    );
-                              },
                             );
                           } else if (item is ContentCollectionItem) {
                             // Access AppBloc to get the user's content preferences,
@@ -397,13 +390,6 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                                 context.read<AppBloc>().add(
                                       AppUserContentPreferencesChanged(
                                         preferences: updatedPreferences,
-                                      ),
-                                    );
-                              },
-                              onDismiss: (decoratorType) {
-                                context.read<HeadlinesFeedBloc>().add(
-                                      FeedDecoratorDismissed(
-                                        feedDecoratorType: decoratorType,
                                       ),
                                     );
                               },

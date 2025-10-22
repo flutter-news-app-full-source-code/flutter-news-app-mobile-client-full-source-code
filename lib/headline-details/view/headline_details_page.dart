@@ -24,7 +24,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 
 class HeadlineDetailsPage extends StatefulWidget {
   const HeadlineDetailsPage({super.key, this.headlineId, this.initialHeadline})
-      : assert(headlineId != null || initialHeadline != null);
+    : assert(headlineId != null || initialHeadline != null);
 
   final String? headlineId;
   final Headline? initialHeadline;
@@ -42,15 +42,15 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     _metadataChipsScrollController.addListener(() => setState(() {}));
     if (widget.initialHeadline != null) {
       context.read<HeadlineDetailsBloc>().add(
-            HeadlineProvided(widget.initialHeadline!),
-          );
+        HeadlineProvided(widget.initialHeadline!),
+      );
       context.read<SimilarHeadlinesBloc>().add(
-            FetchSimilarHeadlines(currentHeadline: widget.initialHeadline!),
-          );
+        FetchSimilarHeadlines(currentHeadline: widget.initialHeadline!),
+      );
     } else if (widget.headlineId != null) {
       context.read<HeadlineDetailsBloc>().add(
-            FetchHeadlineById(widget.headlineId!),
-          );
+        FetchHeadlineById(widget.headlineId!),
+      );
     }
   }
 
@@ -69,8 +69,8 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
         if (headlineState is HeadlineDetailsLoaded) {
           if (widget.initialHeadline == null) {
             context.read<SimilarHeadlinesBloc>().add(
-                  FetchSimilarHeadlines(currentHeadline: headlineState.headline),
-                );
+              FetchSimilarHeadlines(currentHeadline: headlineState.headline),
+            );
           }
         }
       },
@@ -83,14 +83,14 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                 final currentHeadlineId = detailsState.headline.id;
                 final wasPreviouslySaved =
                     previous.userContentPreferences?.savedHeadlines.any(
-                          (h) => h.id == currentHeadlineId,
-                        ) ??
-                        false;
+                      (h) => h.id == currentHeadlineId,
+                    ) ??
+                    false;
                 final isCurrentlySaved =
                     current.userContentPreferences?.savedHeadlines.any(
-                          (h) => h.id == currentHeadlineId,
-                        ) ??
-                        false;
+                      (h) => h.id == currentHeadlineId,
+                    ) ??
+                    false;
 
                 // Listen for changes in saved status or for a new error.
                 return (wasPreviouslySaved != isCurrentlySaved) ||
@@ -113,9 +113,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
                 } else {
                   final nowIsSaved =
                       appState.userContentPreferences?.savedHeadlines.any(
-                            (h) => h.id == detailsState.headline.id,
-                          ) ??
-                          false;
+                        (h) => h.id == detailsState.headline.id,
+                      ) ??
+                      false;
                   ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
                     ..showSnackBar(
@@ -135,31 +135,30 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
               builder: (context, state) {
                 return switch (state) {
                   HeadlineDetailsInitial() ||
-                  HeadlineDetailsLoading() =>
-                    LoadingStateWidget(
-                      icon: Icons.article_outlined,
-                      headline: l10n.headlineDetailsLoadingHeadline,
-                      subheadline: l10n.headlineDetailsLoadingSubheadline,
-                    ),
+                  HeadlineDetailsLoading() => LoadingStateWidget(
+                    icon: Icons.article_outlined,
+                    headline: l10n.headlineDetailsLoadingHeadline,
+                    subheadline: l10n.headlineDetailsLoadingSubheadline,
+                  ),
                   final HeadlineDetailsFailure failureState =>
                     FailureStateWidget(
                       exception: failureState.exception,
                       onRetry: () {
                         if (widget.headlineId != null) {
                           context.read<HeadlineDetailsBloc>().add(
-                                FetchHeadlineById(widget.headlineId!),
-                              );
+                            FetchHeadlineById(widget.headlineId!),
+                          );
                         }
                       },
                     ),
                   final HeadlineDetailsLoaded loadedState =>
                     _buildLoadedContent(context, loadedState.headline),
                   _ => Center(
-                      child: Text(
-                        l10n.unknownError,
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
+                    child: Text(
+                      l10n.unknownError,
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
+                  ),
                 };
               },
             ),
@@ -182,9 +181,9 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     final appBlocState = context.watch<AppBloc>().state;
     final isSaved =
         appBlocState.userContentPreferences?.savedHeadlines.any(
-              (h) => h.id == headline.id,
-            ) ??
-            false;
+          (h) => h.id == headline.id,
+        ) ??
+        false;
 
     final bookmarkButton = IconButton(
       icon: Icon(
@@ -218,8 +217,8 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
             savedHeadlines: updatedSavedHeadlines,
           );
           context.read<AppBloc>().add(
-                AppUserContentPreferencesChanged(preferences: updatedPreferences),
-              );
+            AppUserContentPreferencesChanged(preferences: updatedPreferences),
+          );
         } else {
           // If the user is saving, check the limit first.
           final limitationService = context.read<ContentLimitationService>();
@@ -235,10 +234,8 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
               savedHeadlines: updatedSavedHeadlines,
             );
             context.read<AppBloc>().add(
-                  AppUserContentPreferencesChanged(
-                    preferences: updatedPreferences,
-                  ),
-                );
+              AppUserContentPreferencesChanged(preferences: updatedPreferences),
+            );
           } else {
             // If the limit is reached, show the bottom sheet.
             showModalBottomSheet<void>(
@@ -463,11 +460,14 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     ];
 
     // Add ad above continue reading button if configured
-    final isAboveButtonAdVisible = adConfig != null &&
+    final isAboveButtonAdVisible =
+        adConfig != null &&
         adConfig.enabled &&
         adConfig.articleAdConfiguration.enabled &&
-        (adConfig.articleAdConfiguration.visibleTo[userRole]?[
-                InArticleAdSlotType.aboveArticleContinueReadingButton] ??
+        (adConfig
+                .articleAdConfiguration
+                .visibleTo[userRole]?[InArticleAdSlotType
+                .aboveArticleContinueReadingButton] ??
             false);
 
     if (isAboveButtonAdVisible) {
@@ -479,7 +479,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
               Padding(
                 padding: horizontalPadding,
                 child: InArticleAdLoaderWidget(
-                  contextKey: headline.id,
                   slotType:
                       InArticleAdSlotType.aboveArticleContinueReadingButton,
                   adThemeStyle: adThemeStyle,
@@ -532,11 +531,14 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     ]);
 
     // Add ad below continue reading button if configured
-    final isBelowButtonAdVisible = adConfig != null &&
+    final isBelowButtonAdVisible =
+        adConfig != null &&
         adConfig.enabled &&
         adConfig.articleAdConfiguration.enabled &&
-        (adConfig.articleAdConfiguration.visibleTo[userRole]?[
-                InArticleAdSlotType.belowArticleContinueReadingButton] ??
+        (adConfig
+                .articleAdConfiguration
+                .visibleTo[userRole]?[InArticleAdSlotType
+                .belowArticleContinueReadingButton] ??
             false);
 
     if (isBelowButtonAdVisible) {
@@ -548,7 +550,6 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
               Padding(
                 padding: horizontalPadding,
                 child: InArticleAdLoaderWidget(
-                  contextKey: headline.id,
                   slotType:
                       InArticleAdSlotType.belowArticleContinueReadingButton,
                   adThemeStyle: adThemeStyle,
@@ -679,70 +680,70 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
       builder: (context, state) {
         return switch (state) {
           SimilarHeadlinesInitial() ||
-          SimilarHeadlinesLoading() =>
-            const SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
-                child: Center(child: CircularProgressIndicator()),
-              ),
+          SimilarHeadlinesLoading() => const SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
+              child: Center(child: CircularProgressIndicator()),
             ),
+          ),
           final SimilarHeadlinesError errorState => SliverToBoxAdapter(
-              child: Padding(
-                padding: hPadding.copyWith(
-                  top: AppSpacing.md,
-                  bottom: AppSpacing.xl,
-                ),
-                child: Text(
-                  errorState.message,
-                  textAlign: TextAlign.center,
-                  style:
-                      textTheme.bodyMedium?.copyWith(color: colorScheme.error),
-                ),
+            child: Padding(
+              padding: hPadding.copyWith(
+                top: AppSpacing.md,
+                bottom: AppSpacing.xl,
+              ),
+              child: Text(
+                errorState.message,
+                textAlign: TextAlign.center,
+                style: textTheme.bodyMedium?.copyWith(color: colorScheme.error),
               ),
             ),
+          ),
           SimilarHeadlinesEmpty() => const SliverToBoxAdapter(
-              child: SizedBox.shrink(),
-            ),
+            child: SizedBox.shrink(),
+          ),
           final SimilarHeadlinesLoaded loadedState => SliverPadding(
-              padding: hPadding.copyWith(bottom: AppSpacing.xxl),
-              sliver: SliverList.separated(
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: AppSpacing.sm),
-                itemCount: loadedState.similarHeadlines.length,
-                itemBuilder: (context, index) {
-                  // Corrected: SliverList.separated uses itemBuilder
-                  final similarHeadline = loadedState.similarHeadlines[index];
-                  return Builder(
-                    builder: (context) {
-                      final imageStyle =
-                          context.watch<AppBloc>().state.headlineImageStyle;
-                      Widget tile;
-                      switch (imageStyle) {
-                        case HeadlineImageStyle.hidden:
-                          tile = HeadlineTileTextOnly(
-                            headline: similarHeadline,
-                            onHeadlineTap: () =>
-                                onSimilarHeadlineTap(similarHeadline),
-                          );
-                        case HeadlineImageStyle.smallThumbnail:
-                          tile = HeadlineTileImageStart(
-                            headline: similarHeadline,
-                            onHeadlineTap: () =>
-                                onSimilarHeadlineTap(similarHeadline),
-                          );
-                        case HeadlineImageStyle.largeThumbnail:
-                          tile = HeadlineTileImageTop(
-                            headline: similarHeadline,
-                            onHeadlineTap: () =>
-                                onSimilarHeadlineTap(similarHeadline),
-                          );
-                      }
-                      return tile;
-                    },
-                  );
-                },
-              ),
+            padding: hPadding.copyWith(bottom: AppSpacing.xxl),
+            sliver: SliverList.separated(
+              separatorBuilder: (context, index) =>
+                  const SizedBox(height: AppSpacing.sm),
+              itemCount: loadedState.similarHeadlines.length,
+              itemBuilder: (context, index) {
+                // Corrected: SliverList.separated uses itemBuilder
+                final similarHeadline = loadedState.similarHeadlines[index];
+                return Builder(
+                  builder: (context) {
+                    final imageStyle = context
+                        .watch<AppBloc>()
+                        .state
+                        .headlineImageStyle;
+                    Widget tile;
+                    switch (imageStyle) {
+                      case HeadlineImageStyle.hidden:
+                        tile = HeadlineTileTextOnly(
+                          headline: similarHeadline,
+                          onHeadlineTap: () =>
+                              onSimilarHeadlineTap(similarHeadline),
+                        );
+                      case HeadlineImageStyle.smallThumbnail:
+                        tile = HeadlineTileImageStart(
+                          headline: similarHeadline,
+                          onHeadlineTap: () =>
+                              onSimilarHeadlineTap(similarHeadline),
+                        );
+                      case HeadlineImageStyle.largeThumbnail:
+                        tile = HeadlineTileImageTop(
+                          headline: similarHeadline,
+                          onHeadlineTap: () =>
+                              onSimilarHeadlineTap(similarHeadline),
+                        );
+                    }
+                    return tile;
+                  },
+                );
+              },
             ),
+          ),
           _ => const SliverToBoxAdapter(child: SizedBox.shrink()),
         };
       },

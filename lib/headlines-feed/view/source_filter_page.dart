@@ -94,17 +94,33 @@ class _SourceFilterViewState extends State<_SourceFilterView> {
       itemCount: displayableSources.length,
       itemBuilder: (context, index) {
         final source = displayableSources[index];
-        return CheckboxListTile(
+        final isSelected = filterState.selectedSources.contains(source);
+
+        void handleTap(bool? value) {
+          if (value != null) {
+            context.read<HeadlinesFilterBloc>().add(
+              FilterSourceToggled(source: source, isSelected: value),
+            );
+          }
+        }
+
+        return ListTile(
+          leading: SizedBox(
+            width: 40,
+            height: 40,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(AppSpacing.sm),
+              child: Image.network(
+                source.logoUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.source_outlined),
+              ),
+            ),
+          ),
           title: Text(source.name, style: textTheme.titleMedium),
-          value: filterState.selectedSources.contains(source),
-          onChanged: (bool? value) {
-            if (value != null) {
-              context.read<HeadlinesFilterBloc>().add(
-                FilterSourceToggled(source: source, isSelected: value),
-              );
-            }
-          },
-          controlAffinity: ListTileControlAffinity.leading,
+          trailing: Checkbox(value: isSelected, onChanged: handleTap),
+          onTap: () => handleTap(!isSelected),
           contentPadding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.paddingMedium,
           ),

@@ -111,11 +111,30 @@ class _DiscoverViewState extends State<_DiscoverView> {
 }
 
 /// A widget that displays a single category of sources as a horizontal row.
-class _SourceCategoryRow extends StatelessWidget {
+class _SourceCategoryRow extends StatefulWidget {
   const _SourceCategoryRow({required this.sourceType, required this.sources});
 
   final SourceType sourceType;
   final List<Source> sources;
+
+  @override
+  State<_SourceCategoryRow> createState() => _SourceCategoryRowState();
+}
+
+class _SourceCategoryRowState extends State<_SourceCategoryRow> {
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,13 +148,13 @@ class _SourceCategoryRow extends StatelessWidget {
         children: [
           // Header with category title and "See all" button.
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
                   child: Text(
-                    sourceType.l10nPlural(l10n),
+                    widget.sourceType.l10nPlural(l10n),
                     style: theme.textTheme.titleLarge,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -145,7 +164,7 @@ class _SourceCategoryRow extends StatelessWidget {
                   onPressed: () {
                     context.pushNamed(
                       Routes.sourceListName,
-                      pathParameters: {'sourceType': sourceType.name},
+                      pathParameters: {'sourceType': widget.sourceType.name},
                     );
                   },
                   child: Row(
@@ -163,12 +182,58 @@ class _SourceCategoryRow extends StatelessWidget {
           // Horizontally scrolling list of source cards.
           SizedBox(
             height: 120,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: sources.length,
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-              itemBuilder: (context, index) {
-                return _SourceCard(source: sources[index]);
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final listView = ListView.builder(
+                  controller: _scrollController,
+                  scrollDirection: Axis.horizontal,
+                  itemCount: widget.sources.length,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                  ),
+                  itemBuilder: (context, index) {
+                    return _SourceCard(source: widget.sources[index]);
+                  },
+                );
+
+                var showStartFade = false;
+                var showEndFade = false;
+                if (_scrollController.hasClients &&
+                    _scrollController.position.maxScrollExtent > 0) {
+                  final pixels = _scrollController.position.pixels;
+                  final minScroll = _scrollController.position.minScrollExtent;
+                  final maxScroll = _scrollController.position.maxScrollExtent;
+
+                  if (pixels > minScroll) {
+                    showStartFade = true;
+                  }
+                  if (pixels < maxScroll) {
+                    showEndFade = true;
+                  }
+                }
+
+                final colors = <Color>[
+                  if (showStartFade) Colors.transparent,
+                  Colors.black,
+                  Colors.black,
+                  if (showEndFade) Colors.transparent,
+                ];
+
+                final stops = <double>[
+                  if (showStartFade) 0.0,
+                  if (showStartFade) 0.05 else 0.0,
+                  if (showEndFade) 0.95 else 1.0,
+                  if (showEndFade) 1.0,
+                ];
+
+                return ShaderMask(
+                  shaderCallback: (bounds) => LinearGradient(
+                    colors: colors,
+                    stops: stops,
+                  ).createShader(bounds),
+                  blendMode: BlendMode.dstIn,
+                  child: listView,
+                );
               },
             ),
           ),
@@ -191,6 +256,7 @@ class _SourceCard extends StatelessWidget {
     return SizedBox(
       width: 150,
       child: Card(
+        margin: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: () => context.pushNamed(

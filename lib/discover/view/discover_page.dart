@@ -189,7 +189,7 @@ class _SourceCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return SizedBox(
-      width: 120,
+      width: 150,
       child: Card(
         clipBehavior: Clip.antiAlias,
         child: InkWell(

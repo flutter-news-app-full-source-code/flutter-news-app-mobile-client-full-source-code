@@ -54,17 +54,14 @@ class ContentCollectionDecoratorWidget extends StatelessWidget {
       }
     }
 
-    return Card(
-      margin: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.md,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
@@ -77,29 +74,30 @@ class ContentCollectionDecoratorWidget extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: AppSpacing.md),
-            SizedBox(
-              height: 200,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: item.items.length,
-                itemBuilder: (context, index) {
-                  final suggestion = item.items[index];
-                  final isFollowing =
-                      (suggestion is Topic &&
-                          followedTopicIds.contains(suggestion.id)) ||
-                      (suggestion is Source &&
-                          followedSourceIds.contains(suggestion.id));
-                  return SuggestionItemWidget(
-                    item: suggestion,
-                    onFollowToggle: onFollowToggle,
-                    isFollowing: isFollowing,
-                  );
-                },
-              ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          SizedBox(
+            height: 180,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: item.items.length,
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+              itemBuilder: (context, index) {
+                final suggestion = item.items[index];
+                final isFollowing =
+                    (suggestion is Topic &&
+                        followedTopicIds.contains(suggestion.id)) ||
+                    (suggestion is Source &&
+                        followedSourceIds.contains(suggestion.id));
+                return SuggestionItemWidget(
+                  item: suggestion,
+                  onFollowToggle: onFollowToggle,
+                  isFollowing: isFollowing,
+                );
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -41,8 +41,7 @@ class SuggestionItemWidget extends StatelessWidget {
       name = topic.name;
     } else if (item is Source) {
       final source = item as Source;
-      // TODO(fulleni): Add imageUrl to the Source model for a richer UI.
-      imageUrl = '';
+      imageUrl = source.logoUrl;
       name = source.name;
     } else {
       // Fallback for unexpected types, though type checking should prevent this
@@ -50,59 +49,58 @@ class SuggestionItemWidget extends StatelessWidget {
       name = 'Unknown';
     }
 
-    return Card(
-      color: theme.colorScheme.surfaceVariant,
-      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-      child: SizedBox(
-        width: 160,
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Square image/icon
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surface,
-                  borderRadius: BorderRadius.circular(AppSpacing.sm),
+    return SizedBox(
+      width: 150,
+      child: Card(
+        clipBehavior: Clip.antiAlias,
+        margin: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+        child: Column(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) => Icon(
+                    item is Source
+                        ? Icons.source_outlined
+                        : Icons.category_outlined,
+                    size: AppSpacing.xxl,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
                 ),
-                child: imageUrl.isNotEmpty
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(AppSpacing.sm),
-                        child: Image.network(
-                          imageUrl,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Icon(
-                            Icons.broken_image,
-                            color: theme.colorScheme.onSurface,
-                          ),
-                        ),
-                      )
-                    : Icon(
-                        // Use a more specific icon for sources as a fallback.
-                        item is Source ? Icons.source : Icons.category,
-                        color: theme.colorScheme.onSurface,
-                      ),
               ),
-              const SizedBox(height: AppSpacing.md),
-              Text(
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+              child: Text(
                 name,
-                style: theme.textTheme.titleSmall,
+                style: theme.textTheme.bodyMedium,
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: AppSpacing.md),
-              ElevatedButton(
+            ),
+            Padding(
+              padding: const EdgeInsets.all(
+                AppSpacing.sm,
+              ).copyWith(top: AppSpacing.xs),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
                 onPressed: () => onFollowToggle(item),
-                child: Text(
-                  isFollowing ? l10n.unfollowButtonText : l10n.followButtonText,
+                child: FittedBox(
+                  child: Text(
+                    isFollowing
+                        ? l10n.unfollowButtonText
+                        : l10n.followButtonText,
+                  ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -123,11 +123,21 @@ class _SourceCategoryRow extends StatefulWidget {
 
 class _SourceCategoryRowState extends State<_SourceCategoryRow> {
   final _scrollController = ScrollController();
+  bool _showEndFade = false;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(() => setState(() {}));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted &&
+          _scrollController.hasClients &&
+          _scrollController.position.maxScrollExtent > 0) {
+        setState(() {
+          _showEndFade = true;
+        });
+      }
+    });
   }
 
   @override
@@ -201,13 +211,13 @@ class _SourceCategoryRowState extends State<_SourceCategoryRow> {
                 if (_scrollController.hasClients &&
                     _scrollController.position.maxScrollExtent > 0) {
                   final pixels = _scrollController.position.pixels;
-                  final minScroll = _scrollController.position.minScrollExtent;
-                  final maxScroll = _scrollController.position.maxScrollExtent;
 
-                  if (pixels > minScroll) {
+                  if (pixels > _scrollController.position.minScrollExtent) {
                     showStartFade = true;
                   }
-                  if (pixels < maxScroll) {
+                  if (pixels < _scrollController.position.maxScrollExtent) {
+                    showEndFade = true;
+                  } else {
                     showEndFade = true;
                   }
                 }
@@ -216,7 +226,7 @@ class _SourceCategoryRowState extends State<_SourceCategoryRow> {
                   if (showStartFade) Colors.transparent,
                   Colors.black,
                   Colors.black,
-                  if (showEndFade) Colors.transparent,
+                  if (_showEndFade) Colors.transparent,
                 ];
 
                 final stops = <double>[

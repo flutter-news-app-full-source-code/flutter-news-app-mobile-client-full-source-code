@@ -50,9 +50,7 @@ class AccountPage extends StatelessWidget {
             )
           else
             IconButton(
-              icon: const Icon(
-                Icons.logout,
-              ), // Non-directional icon for logout
+              icon: const Icon(Icons.logout), // Non-directional icon for logout
               tooltip: l10n.accountSignOutTile,
               onPressed: () =>
                   context.read<AppBloc>().add(const AppLogoutRequested()),

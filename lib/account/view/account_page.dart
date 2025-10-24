@@ -50,11 +50,16 @@ class AccountPage extends StatelessWidget {
             )
           else
             IconButton(
-              icon: const Icon(Icons.logout),
+              icon: const Icon(
+                Icons.logout,
+              ), // Non-directional icon for logout
               tooltip: l10n.accountSignOutTile,
               onPressed: () =>
                   context.read<AppBloc>().add(const AppLogoutRequested()),
             ),
+          const SizedBox(
+            width: AppSpacing.lg,
+          ), // Consistent right padding for the AppBar actions
         ],
       ),
       body: SingleChildScrollView(

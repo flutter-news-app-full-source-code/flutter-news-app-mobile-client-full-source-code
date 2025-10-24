@@ -170,8 +170,8 @@ class _ContentCollectionViewState extends State<_ContentCollectionView> {
 
                 final stops = <double>[
                   if (showStartFade) 0.0,
-                  if (showStartFade) 0.05 else 0.0,
-                  if (showEndFade) 0.95 else 1.0,
+                  if (showStartFade) 0.02 else 0.0,
+                  if (showEndFade) 0.98 else 1.0,
                   if (showEndFade) 1.0,
                 ];
 

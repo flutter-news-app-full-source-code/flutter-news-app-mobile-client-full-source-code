@@ -53,46 +53,46 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "v1.0.0"
-      resolved-ref: "7360a5a1af202bdc291138c81ddc817979454b78"
+      ref: "v1.0.1"
+      resolved-ref: f1d7000e990438efeadf3289f5145e15d547d6a2
       url: "https://github.com/flutter-news-app-full-source-code/auth-api.git"
     source: git
-    version: "0.0.0"
+    version: "1.0.1"
   auth_client:
     dependency: "direct main"
     description:
       path: "."
-      ref: "v1.0.0"
-      resolved-ref: a90e24285874e4c39cb331bbbeae2423901f3289
+      ref: "v1.0.1"
+      resolved-ref: "605212aa4bf2a106691f447b824c66bb5218205c"
       url: "https://github.com/flutter-news-app-full-source-code/auth-client.git"
     source: git
-    version: "0.0.0"
+    version: "1.0.1"
   auth_inmemory:
     dependency: "direct main"
     description:
       path: "."
-      ref: "v1.0.0"
-      resolved-ref: "5316331378ee90e13dbbb0966a964a4b02e4dfcf"
+      ref: "v1.0.1"
+      resolved-ref: b999691989447aff05a936414e6f6fdfbbb73a07
       url: "https://github.com/flutter-news-app-full-source-code/auth-inmemory.git"
     source: git
-    version: "0.0.0"
+    version: "1.0.1"
   auth_repository:
     dependency: "direct main"
     description:
       path: "."
-      ref: "v1.0.0"
-      resolved-ref: "0d751f835d563c970945a7dab828e1bcb4181049"
+      ref: "v1.0.1"
+      resolved-ref: e7db1f123d25448c1438843a7958e9aefaee22ab
       url: "https://github.com/flutter-news-app-full-source-code/auth-repository.git"
     source: git
-    version: "0.0.0"
+    version: "1.0.1"
   bloc:
     dependency: "direct main"
     description:
       name: bloc
-      sha256: e18b8e7825e9921d67a6d256dba0b6015ece8a577eb0a411845c46a352994d78
+      sha256: a2cebb899f91d36eeeaa55c7b20b5915db5a9df1b8fd4a3c9c825e22e474537d
       url: "https://pub.dev"
     source: hosted
-    version: "9.0.1"
+    version: "9.1.0"
   bloc_concurrency:
     dependency: "direct main"
     description:
@@ -218,38 +218,38 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "v1.0.0"
-      resolved-ref: b838da6b8c29ba3a54a68fe11402e7fe3886d135
+      ref: "v1.0.1"
+      resolved-ref: bb361024cc2db5bd7252a2bef7ea4657cd3fe8a3
       url: "https://github.com/flutter-news-app-full-source-code/data-api.git"
     source: git
-    version: "0.0.0"
+    version: "1.0.1"
   data_client:
     dependency: "direct main"
     description:
       path: "."
-      ref: "v1.0.0"
-      resolved-ref: b9a8a8c2c660928c22f2d38d657000bcae4c74d6
+      ref: "v1.0.1"
+      resolved-ref: "61e693e22e05c279a41304c98d68d96424b96df6"
       url: "https://github.com/flutter-news-app-full-source-code/data-client.git"
     source: git
-    version: "0.0.0"
+    version: "1.0.1"
   data_inmemory:
     dependency: "direct main"
     description:
       path: "."
-      ref: "v1.0.0"
-      resolved-ref: cd7a39e12f321c4c0c6bb5041c5d91cb32bc1586
+      ref: "v1.0.1"
+      resolved-ref: a54db1b8f49246b549e6211a4306aa57641172a9
       url: "https://github.com/flutter-news-app-full-source-code/data-inmemory.git"
     source: git
-    version: "0.0.0"
+    version: "1.0.1"
   data_repository:
     dependency: "direct main"
     description:
       path: "."
-      ref: "v1.0.0"
-      resolved-ref: "7f9242d810d60fefd2f883b19e1650e8e4eb41a3"
+      ref: "v1.0.1"
+      resolved-ref: "3e9115fc5229a6e84b81f44b74bc7df47824a00e"
       url: "https://github.com/flutter-news-app-full-source-code/data-repository.git"
     source: git
-    version: "0.0.0"
+    version: "1.0.1"
   device_frame:
     dependency: transitive
     description:
@@ -334,10 +334,10 @@ packages:
     dependency: "direct main"
     description:
       name: flex_color_scheme
-      sha256: "034d5720747e6af39b2ad090d82dd92d33fde68e7964f1814b714c9d49ddbd64"
+      sha256: "6e713c27a2ebe63393a44d4bf9cdd2ac81e112724a4c69905fc41cbf231af11d"
       url: "https://pub.dev"
     source: hosted
-    version: "8.3.0"
+    version: "8.3.1"
   flex_seed_scheme:
     dependency: transitive
     description:
@@ -384,10 +384,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_native_splash
-      sha256: "8321a6d11a8d13977fa780c89de8d257cce3d841eecfb7a4cadffcc4f12d82dc"
+      sha256: "4fb9f4113350d3a80841ce05ebf1976a36de622af7d19aca0ca9a9911c7ff002"
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.6"
+    version: "2.4.7"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -426,10 +426,10 @@ packages:
     dependency: "direct main"
     description:
       name: go_router
-      sha256: c752e2d08d088bf83742cb05bf83003f3e9d276ff1519b5c92f9d5e60e5ddd23
+      sha256: d8f590a69729f719177ea68eb1e598295e8dbc41bbc247fed78b2c8a25660d7c
       url: "https://pub.dev"
     source: hosted
-    version: "16.2.4"
+    version: "16.3.0"
   google_fonts:
     dependency: "direct main"
     description:
@@ -467,10 +467,10 @@ packages:
     description:
       path: "."
       ref: "v1.0.1"
-      resolved-ref: ce550196f78ee2e95aa9e985759179265983689d
+      resolved-ref: "22a1531a279769ec472f698e9c727cd2c29a81b9"
       url: "https://github.com/flutter-news-app-full-source-code/http-client.git"
     source: git
-    version: "0.0.0"
+    version: "1.0.1"
   http_multi_server:
     dependency: transitive
     description:
@@ -539,20 +539,20 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "v1.0.0"
-      resolved-ref: "3bcba6b11fe0480e06e1bedf6eab4159a7c59c53"
+      ref: "v1.0.1"
+      resolved-ref: "35f1c6369273e693895c7f07ff18d4111c4dfe45"
       url: "https://github.com/flutter-news-app-full-source-code/kv-storage-service.git"
     source: git
-    version: "0.0.0"
+    version: "1.0.1"
   kv_storage_shared_preferences:
     dependency: "direct main"
     description:
       path: "."
-      ref: "v1.0.0"
-      resolved-ref: ed94c16ae5ced56216f1adcc14b995e418d5c464
+      ref: "v1.0.1"
+      resolved-ref: "7476f7cb344927a555c78853d9bf7bec3a1b6dfd"
       url: "https://github.com/flutter-news-app-full-source-code/kv-storage-shared-preferences.git"
     source: git
-    version: "0.0.0"
+    version: "1.0.1"
   leak_tracker:
     dependency: transitive
     description:
@@ -685,18 +685,18 @@ packages:
     dependency: transitive
     description:
       name: path_provider_android
-      sha256: "993381400e94d18469750e5b9dcb8206f15bc09f9da86b9e44a9b0092a0066db"
+      sha256: e122c5ea805bb6773bb12ce667611265980940145be920cd09a4b0ec0285cb16
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.18"
+    version: "2.2.20"
   path_provider_foundation:
     dependency: transitive
     description:
       name: path_provider_foundation
-      sha256: "16eef174aacb07e09c351502740fa6254c165757638eba1e9116b0a781201bbd"
+      sha256: efaec349ddfc181528345c56f8eda9d6cccd71c177511b132c6a0ddaefaa2738
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.2"
+    version: "2.4.3"
   path_provider_linux:
     dependency: transitive
     description:
@@ -813,18 +813,18 @@ packages:
     dependency: transitive
     description:
       name: shared_preferences_android
-      sha256: bd14436108211b0d4ee5038689a56d4ae3620fd72fd6036e113bf1345bc74d9e
+      sha256: "34266009473bf71d748912da4bf62d439185226c03e01e2d9687bc65bbfcb713"
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.13"
+    version: "2.4.15"
   shared_preferences_foundation:
     dependency: transitive
     description:
       name: shared_preferences_foundation
-      sha256: "6a52cfcdaeac77cad8c97b539ff688ccfc458c007b4db12be584fbe5c0e49e03"
+      sha256: "1c33a907142607c40a7542768ec9badfd16293bac51da3a4482623d15845f88b"
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.4"
+    version: "2.5.5"
   shared_preferences_linux:
     dependency: transitive
     description:
@@ -1010,11 +1010,11 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "v1.0.0"
-      resolved-ref: "5e84f206a0e047f6afd608d510aec998c6a37dd3"
+      ref: "v1.0.1"
+      resolved-ref: "5b970bebf2c2d87c5764f9d0e09cacdec8cd71f6"
       url: "https://github.com/flutter-news-app-full-source-code/ui-kit.git"
     source: git
-    version: "0.0.0"
+    version: "1.0.1"
   universal_io:
     dependency: transitive
     description:
@@ -1043,18 +1043,18 @@ packages:
     dependency: transitive
     description:
       name: url_launcher_android
-      sha256: "199bc33e746088546a39cc5f36bac5a278c5e53b40cb3196f99e7345fdcfae6b"
+      sha256: "5c8b6c2d89a78f5a1cca70a73d9d5f86c701b36b42f9c9dac7bad592113c28e9"
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.22"
+    version: "6.3.24"
   url_launcher_ios:
     dependency: transitive
     description:
       name: url_launcher_ios
-      sha256: d80b3f567a617cb923546034cc94bfe44eb15f989fe670b37f26abdb9d939cb7
+      sha256: "6b63f1441e4f653ae799166a72b50b1767321ecc263a57aadf825a7a2a5477d9"
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.4"
+    version: "6.3.5"
   url_launcher_linux:
     dependency: transitive
     description:
@@ -1067,10 +1067,10 @@ packages:
     dependency: transitive
     description:
       name: url_launcher_macos
-      sha256: c043a77d6600ac9c38300567f33ef12b0ef4f4783a2c1f00231d2b1941fea13f
+      sha256: "8262208506252a3ed4ff5c0dc1e973d2c0e0ef337d0a074d35634da5d44397c9"
       url: "https://pub.dev"
     source: hosted
-    version: "3.2.3"
+    version: "3.2.4"
   url_launcher_platform_interface:
     dependency: transitive
     description:
@@ -1131,10 +1131,10 @@ packages:
     dependency: transitive
     description:
       name: watcher
-      sha256: "5bf046f41320ac97a469d506261797f35254fa61c641741ef32dacda98b7d39c"
+      sha256: "592ab6e2892f67760543fb712ff0177f4ec76c031f02f5b4ff8d3fc5eb9fb61a"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.3"
+    version: "1.1.4"
   web:
     dependency: transitive
     description:
@@ -1179,10 +1179,10 @@ packages:
     dependency: transitive
     description:
       name: webview_flutter_android
-      sha256: "3c4eb4fcc252b40c2b5ce7be20d0481428b70f3ff589b0a8b8aaeb64c6bed701"
+      sha256: e5201c620eb2637dca88a756961fae4a7191bb30b4f2271e08b746405ffdf3fd
       url: "https://pub.dev"
     source: hosted
-    version: "4.10.2"
+    version: "4.10.5"
   webview_flutter_platform_interface:
     dependency: transitive
     description:
@@ -1203,10 +1203,10 @@ packages:
     dependency: transitive
     description:
       name: win32
-      sha256: "66814138c3562338d05613a6e368ed8cfb237ad6d64a9e9334be3f309acfca03"
+      sha256: d7cb55e04cd34096cd3a79b3330245f54cb96a370a1c27adb3c84b917de8b08e
       url: "https://pub.dev"
     source: hosted
-    version: "5.14.0"
+    version: "5.15.0"
   xdg_directories:
     dependency: transitive
     description:

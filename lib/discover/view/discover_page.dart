@@ -133,9 +133,13 @@ class _SourceCategoryRow extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  sourceType.l10nPlural(l10n), // This will now work correctly
-                  style: theme.textTheme.titleLarge,
+                Expanded(
+                  child: Text(
+                    sourceType.l10nPlural(l10n),
+                    style: theme.textTheme.titleLarge,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
                 TextButton(
                   onPressed: () {
@@ -196,7 +200,20 @@ class _SourceCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.source_outlined, size: AppSpacing.xxl),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: Image.network(
+                    source.logoUrl,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) => Icon(
+                      Icons.source_outlined,
+                      size: AppSpacing.xxl,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ),
               const SizedBox(height: AppSpacing.sm),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),

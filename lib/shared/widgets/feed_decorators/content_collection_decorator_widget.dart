@@ -35,11 +35,54 @@ class ContentCollectionDecoratorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return _ContentCollectionView(
+      item: item,
+      onFollowToggle: onFollowToggle,
+      followedTopicIds: followedTopicIds,
+      followedSourceIds: followedSourceIds,
+    );
+  }
+}
+
+class _ContentCollectionView extends StatefulWidget {
+  const _ContentCollectionView({
+    required this.item,
+    required this.onFollowToggle,
+    required this.followedTopicIds,
+    required this.followedSourceIds,
+  });
+
+  final ContentCollectionItem item;
+  final ValueSetter<FeedItem> onFollowToggle;
+  final List<String> followedTopicIds;
+  final List<String> followedSourceIds;
+
+  @override
+  State<_ContentCollectionView> createState() => _ContentCollectionViewState();
+}
+
+class _ContentCollectionViewState extends State<_ContentCollectionView> {
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
 
     String getTitle() {
-      switch (item.decoratorType) {
+      switch (widget.item.decoratorType) {
         case FeedDecoratorType.suggestedTopics:
           return l10n.suggestedTopicsTitle;
         case FeedDecoratorType.suggestedSources:
@@ -50,7 +93,7 @@ class ContentCollectionDecoratorWidget extends StatelessWidget {
         case FeedDecoratorType.upgrade:
         case FeedDecoratorType.rateApp:
         case FeedDecoratorType.enableNotifications:
-          return item.title;
+          return widget.item.title;
       }
     }
 
@@ -78,21 +121,67 @@ class ContentCollectionDecoratorWidget extends StatelessWidget {
           const SizedBox(height: AppSpacing.sm),
           SizedBox(
             height: 180,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: item.items.length,
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-              itemBuilder: (context, index) {
-                final suggestion = item.items[index];
-                final isFollowing =
-                    (suggestion is Topic &&
-                        followedTopicIds.contains(suggestion.id)) ||
-                    (suggestion is Source &&
-                        followedSourceIds.contains(suggestion.id));
-                return SuggestionItemWidget(
-                  item: suggestion,
-                  onFollowToggle: onFollowToggle,
-                  isFollowing: isFollowing,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final listView = ListView.builder(
+                  controller: _scrollController,
+                  scrollDirection: Axis.horizontal,
+                  itemCount: widget.item.items.length,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                  ),
+                  itemBuilder: (context, index) {
+                    final suggestion = widget.item.items[index];
+                    final isFollowing =
+                        (suggestion is Topic &&
+                            widget.followedTopicIds.contains(suggestion.id)) ||
+                        (suggestion is Source &&
+                            widget.followedSourceIds.contains(suggestion.id));
+                    return SuggestionItemWidget(
+                      item: suggestion,
+                      onFollowToggle: widget.onFollowToggle,
+                      isFollowing: isFollowing,
+                    );
+                  },
+                );
+
+                var showStartFade = false;
+                var showEndFade = false;
+                if (_scrollController.hasClients &&
+                    _scrollController.position.maxScrollExtent > 0) {
+                  final pixels = _scrollController.position.pixels;
+                  final minScroll = _scrollController.position.minScrollExtent;
+                  final maxScroll = _scrollController.position.maxScrollExtent;
+
+                  if (pixels > minScroll) {
+                    showStartFade = true;
+                  }
+                  if (pixels < maxScroll) {
+                    showEndFade = true;
+                  }
+                }
+
+                final colors = <Color>[
+                  if (showStartFade) Colors.transparent,
+                  Colors.black,
+                  Colors.black,
+                  if (showEndFade) Colors.transparent,
+                ];
+
+                final stops = <double>[
+                  if (showStartFade) 0.0,
+                  if (showStartFade) 0.05 else 0.0,
+                  if (showEndFade) 0.95 else 1.0,
+                  if (showEndFade) 1.0,
+                ];
+
+                return ShaderMask(
+                  shaderCallback: (bounds) => LinearGradient(
+                    colors: colors,
+                    stops: stops,
+                  ).createShader(bounds),
+                  blendMode: BlendMode.dstIn,
+                  child: listView,
                 );
               },
             ),

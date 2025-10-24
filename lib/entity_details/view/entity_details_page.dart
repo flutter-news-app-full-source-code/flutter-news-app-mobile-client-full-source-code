@@ -208,11 +208,12 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
             },
           );
 
-          final entityIconUrl = (state.entity is Topic)
-              ? (state.entity! as Topic).iconUrl
-              : (state.entity is Country)
-              ? (state.entity! as Country).flagUrl
-              : null;
+          final entityIconUrl = switch (state.entity) {
+            final Topic topic => topic.iconUrl,
+            final Country country => country.flagUrl,
+            final Source source => source.logoUrl,
+            _ => null,
+          };
 
           final Widget appBarTitleWidget = Row(
             mainAxisSize: MainAxisSize.min,
@@ -229,20 +230,12 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                       width: AppSpacing.xxl,
                       height: AppSpacing.xxl,
                       fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) =>
-                          const SizedBox(),
+                      errorBuilder: (context, error, stackTrace) => Icon(
+                        appBarIconData,
+                        size: AppSpacing.xxl,
+                        color: colorScheme.onSurface,
+                      ),
                     ),
-                  ),
-                )
-              else if (state.entity is Source && appBarIconData != null)
-                Padding(
-                  padding: Directionality.of(context) == TextDirection.ltr
-                      ? const EdgeInsets.only(right: AppSpacing.md)
-                      : const EdgeInsets.only(left: AppSpacing.md),
-                  child: Icon(
-                    appBarIconData,
-                    size: AppSpacing.xxl,
-                    color: colorScheme.onSurface,
                   ),
                 ),
               Expanded(

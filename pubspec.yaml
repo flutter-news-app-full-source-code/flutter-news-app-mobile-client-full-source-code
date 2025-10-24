@@ -46,7 +46,7 @@ dependencies:
   core:
     git:
       url: https://github.com/flutter-news-app-full-source-code/core.git
-      ref: v1.2.0
+      ref: v1.3.1
   data_api:
     git:
       url: https://github.com/flutter-news-app-full-source-code/data-api.git
@@ -136,3 +136,9 @@ flutter_native_splash:
   android: true
   ios: true
   web: true
+
+dependency_overrides:
+  core:
+    git:
+      url: https://github.com/flutter-news-app-full-source-code/core.git
+      ref: v1.3.1

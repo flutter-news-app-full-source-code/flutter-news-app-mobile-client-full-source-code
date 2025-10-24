@@ -60,10 +60,21 @@ class HeadlineSourceRow extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.source_outlined,
-                  size: AppSpacing.md,
-                  color: colorScheme.onSurfaceVariant,
+                SizedBox(
+                  width: AppSpacing.md,
+                  height: AppSpacing.md,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(AppSpacing.xs / 2),
+                    child: Image.network(
+                      headline.source.logoUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Icon(
+                        Icons.source_outlined,
+                        size: AppSpacing.md,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
                 ),
                 const SizedBox(width: AppSpacing.xs),
                 Flexible(

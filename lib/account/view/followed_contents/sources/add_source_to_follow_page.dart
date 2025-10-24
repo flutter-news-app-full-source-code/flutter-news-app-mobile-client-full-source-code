@@ -70,6 +70,19 @@ class AddSourceToFollowPage extends StatelessWidget {
                     return Card(
                       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
                       child: ListTile(
+                        leading: SizedBox(
+                          width: 40,
+                          height: 40,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(AppSpacing.sm),
+                            child: Image.network(
+                              source.logoUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(Icons.source_outlined),
+                            ),
+                          ),
+                        ),
                         title: Text(source.name),
                         trailing: IconButton(
                           icon: isFollowed

@@ -111,11 +111,40 @@ class _DiscoverViewState extends State<_DiscoverView> {
 }
 
 /// A widget that displays a single category of sources as a horizontal row.
-class _SourceCategoryRow extends StatelessWidget {
+class _SourceCategoryRow extends StatefulWidget {
   const _SourceCategoryRow({required this.sourceType, required this.sources});
 
   final SourceType sourceType;
   final List<Source> sources;
+
+  @override
+  State<_SourceCategoryRow> createState() => _SourceCategoryRowState();
+}
+
+class _SourceCategoryRowState extends State<_SourceCategoryRow> {
+  final _scrollController = ScrollController();
+  bool _showEndFade = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(() => setState(() {}));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted &&
+          _scrollController.hasClients &&
+          _scrollController.position.maxScrollExtent > 0) {
+        setState(() {
+          _showEndFade = true;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,19 +158,30 @@ class _SourceCategoryRow extends StatelessWidget {
         children: [
           // Header with category title and "See all" button.
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  sourceType.l10nPlural(l10n), // This will now work correctly
-                  style: theme.textTheme.titleLarge,
+                Expanded(
+                  child: Text(
+                    widget.sourceType.l10nPlural(l10n),
+                    style: theme.textTheme.titleLarge,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
                 TextButton(
+                  style: TextButton.styleFrom(
+                    // Remove default padding to align the icon perfectly
+                    // with the right edge.
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppSpacing.sm,
+                    ),
+                  ),
                   onPressed: () {
                     context.pushNamed(
                       Routes.sourceListName,
-                      pathParameters: {'sourceType': sourceType.name},
+                      pathParameters: {'sourceType': widget.sourceType.name},
                     );
                   },
                   child: Row(
@@ -158,13 +198,59 @@ class _SourceCategoryRow extends StatelessWidget {
           const SizedBox(height: AppSpacing.sm),
           // Horizontally scrolling list of source cards.
           SizedBox(
-            height: 120,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: sources.length,
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-              itemBuilder: (context, index) {
-                return _SourceCard(source: sources[index]);
+            height: 140,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final listView = ListView.builder(
+                  controller: _scrollController,
+                  scrollDirection: Axis.horizontal,
+                  itemCount: widget.sources.length,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                  ),
+                  itemBuilder: (context, index) {
+                    return _SourceCard(source: widget.sources[index]);
+                  },
+                );
+
+                var showStartFade = false;
+                var showEndFade = false;
+                if (_scrollController.hasClients &&
+                    _scrollController.position.maxScrollExtent > 0) {
+                  final pixels = _scrollController.position.pixels;
+
+                  if (pixels > _scrollController.position.minScrollExtent) {
+                    showStartFade = true;
+                  }
+                  if (pixels < _scrollController.position.maxScrollExtent) {
+                    showEndFade = true;
+                  } else {
+                    showEndFade = true;
+                  }
+                }
+
+                final colors = <Color>[
+                  if (showStartFade) Colors.transparent,
+                  theme.scaffoldBackgroundColor,
+                  theme.scaffoldBackgroundColor,
+                  if (_showEndFade) Colors.transparent,
+                ];
+
+                final stops = <double>[
+                  if (showStartFade) 0.0,
+                  if (showStartFade) 0.02 else 0.0,
+                  if (showEndFade) 0.98 else 1.0,
+                  if (showEndFade) 1.0,
+                ];
+
+                return ShaderMask(
+                  shaderCallback: (bounds) => LinearGradient(
+                    colors: colors,
+                    stops: stops,
+                  ).createShader(bounds),
+                  blendMode: BlendMode.dstIn,
+                  child: listView,
+                );
               },
             ),
           ),
@@ -185,8 +271,9 @@ class _SourceCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return SizedBox(
-      width: 120,
+      width: 150,
       child: Card(
+        margin: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: () => context.pushNamed(
@@ -196,8 +283,20 @@ class _SourceCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.source_outlined, size: AppSpacing.xxl),
-              const SizedBox(height: AppSpacing.sm),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: Image.network(
+                    source.logoUrl,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) => Icon(
+                      Icons.source_outlined,
+                      size: AppSpacing.xxl,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
                 child: Text(
@@ -208,6 +307,7 @@ class _SourceCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+              const SizedBox(height: AppSpacing.sm),
             ],
           ),
         ),

@@ -257,8 +257,8 @@ class _SavedFiltersBarState extends State<SavedFiltersBar> {
             // Define the gradient colors and stops based on fade visibility.
             final colors = <Color>[
               if (showStartFade) Colors.transparent,
-              Colors.black,
-              Colors.black,
+              theme.scaffoldBackgroundColor,
+              theme.scaffoldBackgroundColor,
               if (showEndFade) Colors.transparent,
             ];
 

@@ -174,8 +174,9 @@ class _SourceCategoryRowState extends State<_SourceCategoryRow> {
                   style: TextButton.styleFrom(
                     // Remove default padding to align the icon perfectly
                     // with the right edge.
-                    padding:
-                        const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppSpacing.sm,
+                    ),
                   ),
                   onPressed: () {
                     context.pushNamed(
@@ -230,8 +231,8 @@ class _SourceCategoryRowState extends State<_SourceCategoryRow> {
 
                 final colors = <Color>[
                   if (showStartFade) Colors.transparent,
-                  Colors.black,
-                  Colors.black,
+                  theme.scaffoldBackgroundColor,
+                  theme.scaffoldBackgroundColor,
                   if (_showEndFade) Colors.transparent,
                 ];
 

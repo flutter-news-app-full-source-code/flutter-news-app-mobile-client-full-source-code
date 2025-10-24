@@ -417,8 +417,8 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
 
                 final colors = <Color>[
                   if (showStartFade) Colors.transparent,
-                  Colors.black,
-                  Colors.black,
+                  theme.scaffoldBackgroundColor,
+                  theme.scaffoldBackgroundColor,
                   if (showEndFade) Colors.transparent,
                 ];
 

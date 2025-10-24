@@ -163,8 +163,8 @@ class _ContentCollectionViewState extends State<_ContentCollectionView> {
 
                 final colors = <Color>[
                   if (showStartFade) Colors.transparent,
-                  Colors.black,
-                  Colors.black,
+                  theme.scaffoldBackgroundColor,
+                  theme.scaffoldBackgroundColor,
                   if (showEndFade) Colors.transparent,
                 ];
 

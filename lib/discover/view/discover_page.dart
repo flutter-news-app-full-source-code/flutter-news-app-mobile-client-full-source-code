@@ -198,7 +198,7 @@ class _SourceCategoryRowState extends State<_SourceCategoryRow> {
           const SizedBox(height: AppSpacing.sm),
           // Horizontally scrolling list of source cards.
           SizedBox(
-            height: 120,
+            height: 140,
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final listView = ListView.builder(
@@ -272,43 +272,50 @@ class _SourceCard extends StatelessWidget {
 
     return SizedBox(
       width: 150,
-      child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: () => context.pushNamed(
-            Routes.entityDetailsName,
-            pathParameters: {'type': ContentType.source.name, 'id': source.id},
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  child: Image.network(
-                    source.logoUrl,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) => Icon(
-                      Icons.source_outlined,
-                      size: AppSpacing.xxl,
-                      color: theme.colorScheme.onSurfaceVariant,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+        child: Card(
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: () => context.pushNamed(
+              Routes.entityDetailsName,
+              pathParameters: {
+                'type': ContentType.source.name,
+                'id': source.id,
+              },
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Image.network(
+                      source.logoUrl,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => Icon(
+                        Icons.source_outlined,
+                        size: AppSpacing.xxl,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-                child: Text(
-                  source.name,
-                  style: theme.textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xs,
+                  ),
+                  child: Text(
+                    source.name,
+                    style: theme.textTheme.bodyMedium,
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: AppSpacing.sm),
+              ],
+            ),
           ),
         ),
       ),

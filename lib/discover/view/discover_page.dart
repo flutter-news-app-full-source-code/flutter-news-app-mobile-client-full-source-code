@@ -171,6 +171,12 @@ class _SourceCategoryRowState extends State<_SourceCategoryRow> {
                   ),
                 ),
                 TextButton(
+                  style: TextButton.styleFrom(
+                    // Remove default padding to align the icon perfectly
+                    // with the right edge.
+                    padding:
+                        const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                  ),
                   onPressed: () {
                     context.pushNamed(
                       Routes.sourceListName,

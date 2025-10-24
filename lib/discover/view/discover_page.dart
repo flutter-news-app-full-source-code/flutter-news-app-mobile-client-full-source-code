@@ -272,50 +272,43 @@ class _SourceCard extends StatelessWidget {
 
     return SizedBox(
       width: 150,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-        child: Card(
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: () => context.pushNamed(
-              Routes.entityDetailsName,
-              pathParameters: {
-                'type': ContentType.source.name,
-                'id': source.id,
-              },
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    child: Image.network(
-                      source.logoUrl,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) => Icon(
-                        Icons.source_outlined,
-                        size: AppSpacing.xxl,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
+      child: Card(
+        margin: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => context.pushNamed(
+            Routes.entityDetailsName,
+            pathParameters: {'type': ContentType.source.name, 'id': source.id},
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: Image.network(
+                    source.logoUrl,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) => Icon(
+                      Icons.source_outlined,
+                      size: AppSpacing.xxl,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.xs,
-                  ),
-                  child: Text(
-                    source.name,
-                    style: theme.textTheme.bodyMedium,
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+                child: Text(
+                  source.name,
+                  style: theme.textTheme.bodyMedium,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: AppSpacing.sm),
-              ],
-            ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+            ],
           ),
         ),
       ),

@@ -216,7 +216,19 @@ class _SourceListTile extends StatelessWidget {
     );
 
     return ListTile(
-      leading: const Icon(Icons.source_outlined),
+      leading: SizedBox(
+        width: 40,
+        height: 40,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(AppSpacing.sm),
+          child: Image.network(
+            source.logoUrl,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) =>
+                const Icon(Icons.source_outlined),
+          ),
+        ),
+      ),
       title: Text(
         source.name,
         style: theme.textTheme.titleMedium,

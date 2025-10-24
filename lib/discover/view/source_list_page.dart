@@ -235,7 +235,13 @@ class _SourceListTile extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
-      trailing: TextButton(
+      trailing: IconButton(
+        icon: isFollowing
+            ? Icon(Icons.check_circle, color: theme.colorScheme.primary)
+            : const Icon(Icons.add_circle_outline),
+        tooltip: isFollowing
+            ? l10n.unfollowSourceTooltip(source.name)
+            : l10n.followSourceTooltip(source.name),
         onPressed: () {
           // If the user is unfollowing, always allow it.
           if (isFollowing) {
@@ -262,13 +268,14 @@ class _SourceListTile extends StatelessWidget {
             }
           }
         },
-        child: Text(
-          isFollowing ? l10n.unfollowButtonText : l10n.followButtonText,
-        ),
       ),
       onTap: () => context.pushNamed(
         Routes.entityDetailsName,
         pathParameters: {'type': ContentType.source.name, 'id': source.id},
+      ),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.sm,
       ),
     );
   }

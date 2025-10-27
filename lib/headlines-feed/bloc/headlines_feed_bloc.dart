@@ -25,7 +25,7 @@ part 'headlines_feed_state.dart';
 /// This BLoC is the central orchestrator for the news feed. Its core
 /// responsibilities include:
 /// - Fetching, filtering, and displaying headlines from a `DataRepository`.
-/// - Injecting dynamic content placeholders for ads and non-ad decorators
+/// - Injecting dynamic content placeholders for ads and decorators
 ///   using the `AdService` and the new `FeedDecoratorService`.
 /// - Implementing a session-based in-memory caching strategy via
 ///   [FeedCacheService] to provide a responsive user experience.
@@ -409,15 +409,15 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       );
       final settings = _appBloc.state.settings;
 
-      // Step 1: Inject the non-ad decorator placeholder.
-      final feedWithDecorator = await _feedDecoratorService.decorateFeed(
+      // Step 1: Inject the decorator placeholder.
+      final feedWithDecorator = _feedDecoratorService.decorateFeed(
         feedItems: headlineResponse.items,
         remoteConfig: appConfig,
       );
 
       // Step 2: Inject ad placeholders into the resulting list.
       final fullyDecoratedFeed = await _adService.injectAdPlaceholders(
-        feedItems: feedWithDecorator.decoratedItems,
+        feedItems: feedWithDecorator,
         user: currentUser,
         adConfig: appConfig.adConfig,
         imageStyle: settings!.feedPreferences.headlineImageStyle,
@@ -425,7 +425,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       );
 
       final newCachedFeed = CachedFeed(
-        feedItems: fullyDecoratedFeed.decoratedItems,
+        feedItems: fullyDecoratedFeed,
         hasMore: headlineResponse.hasMore,
         cursor: headlineResponse.cursor,
         lastRefreshedAt: DateTime.now(),
@@ -534,15 +534,15 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
       final settings = _appBloc.state.settings;
 
-      // Step 1: Inject the non-ad decorator placeholder.
-      final feedWithDecorator = await _feedDecoratorService.decorateFeed(
+      // Step 1: Inject the decorator placeholder.
+      final feedWithDecorator = _feedDecoratorService.decorateFeed(
         feedItems: headlineResponse.items,
         remoteConfig: appConfig,
       );
 
       // Step 2: Inject ad placeholders into the resulting list.
       final fullyDecoratedFeed = await _adService.injectAdPlaceholders(
-        feedItems: feedWithDecorator.decoratedItems,
+        feedItems: feedWithDecorator,
         user: currentUser,
         adConfig: appConfig.adConfig,
         imageStyle: settings!.feedPreferences.headlineImageStyle,
@@ -550,7 +550,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       );
 
       final newCachedFeed = CachedFeed(
-        feedItems: fullyDecoratedFeed.decoratedItems,
+        feedItems: fullyDecoratedFeed,
         hasMore: headlineResponse.hasMore,
         cursor: headlineResponse.cursor,
         lastRefreshedAt: DateTime.now(),
@@ -630,15 +630,15 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
       final settings = _appBloc.state.settings;
 
-      // Step 1: Inject the non-ad decorator placeholder.
-      final feedWithDecorator = await _feedDecoratorService.decorateFeed(
+      // Step 1: Inject the decorator placeholder.
+      final feedWithDecorator = _feedDecoratorService.decorateFeed(
         feedItems: headlineResponse.items,
         remoteConfig: appConfig,
       );
 
       // Step 2: Inject ad placeholders into the resulting list.
       final fullyDecoratedFeed = await _adService.injectAdPlaceholders(
-        feedItems: feedWithDecorator.decoratedItems,
+        feedItems: feedWithDecorator,
         user: currentUser,
         adConfig: appConfig.adConfig,
         imageStyle: settings!.feedPreferences.headlineImageStyle,
@@ -646,7 +646,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       );
 
       final newCachedFeed = CachedFeed(
-        feedItems: fullyDecoratedFeed.decoratedItems,
+        feedItems: fullyDecoratedFeed,
         hasMore: headlineResponse.hasMore,
         cursor: headlineResponse.cursor,
         lastRefreshedAt: DateTime.now(),

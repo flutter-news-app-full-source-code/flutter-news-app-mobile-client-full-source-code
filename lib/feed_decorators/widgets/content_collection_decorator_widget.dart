@@ -162,51 +162,7 @@ class _ContentCollectionViewState extends State<_ContentCollectionView> {
                             followedSourceIds.contains(suggestion.id));
                     return SuggestionItemWidget(
                       item: suggestion,
-                      onFollowToggle: (toggledItem) {
-                        final currentUserPreferences =
-                            appState.userContentPreferences;
-                        if (currentUserPreferences == null) return;
-
-                        UserContentPreferences updatedPreferences;
-
-                        if (toggledItem is Topic) {
-                          final followedTopics = List<Topic>.from(
-                            currentUserPreferences.followedTopics,
-                          );
-                          if (isFollowing) {
-                            followedTopics.removeWhere(
-                              (topic) => topic.id == toggledItem.id,
-                            );
-                          } else {
-                            followedTopics.add(toggledItem);
-                          }
-                          updatedPreferences = currentUserPreferences.copyWith(
-                            followedTopics: followedTopics,
-                          );
-                        } else if (toggledItem is Source) {
-                          final followedSources = List<Source>.from(
-                            currentUserPreferences.followedSources,
-                          );
-                          if (isFollowing) {
-                            followedSources.removeWhere(
-                              (source) => source.id == toggledItem.id,
-                            );
-                          } else {
-                            followedSources.add(toggledItem);
-                          }
-                          updatedPreferences = currentUserPreferences.copyWith(
-                            followedSources: followedSources,
-                          );
-                        } else {
-                          return;
-                        }
-
-                        context.read<AppBloc>().add(
-                          AppUserContentPreferencesChanged(
-                            preferences: updatedPreferences,
-                          ),
-                        );
-                      },
+                      onFollowToggle: widget.onFollowToggle,
                       isFollowing: isFollowing,
                     );
                   },

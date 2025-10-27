@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
@@ -30,14 +31,14 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     required DataRepository<Source> sourceRepository,
     required DataRepository<Country> countryRepository,
     required AppBloc appBloc,
-    required FeedDecoratorService feedDecoratorService,
+    required AdService adService,
     required InlineAdCacheService inlineAdCacheService,
   }) : _headlinesRepository = headlinesRepository,
        _topicRepository = topicRepository,
        _sourceRepository = sourceRepository,
        _countryRepository = countryRepository,
        _appBloc = appBloc,
-       _feedDecoratorService = feedDecoratorService,
+       _adService = adService,
        _inlineAdCacheService = inlineAdCacheService,
        super(const EntityDetailsState()) {
     on<EntityDetailsLoadRequested>(_onEntityDetailsLoadRequested);
@@ -54,8 +55,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
   final DataRepository<Source> _sourceRepository;
   final DataRepository<Country> _countryRepository;
   final AppBloc _appBloc;
-  final FeedDecoratorService _feedDecoratorService;
-  // ignore: unused_field
+  final AdService _adService;
   final InlineAdCacheService _inlineAdCacheService;
 
   static const _headlinesLimit = 10;
@@ -70,6 +70,9 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     emit(
       state.copyWith(status: EntityDetailsStatus.loading, clearEntity: true),
     );
+
+    // On a full load, clear the ad cache for this entity to ensure fresh ads.
+    _inlineAdCacheService.clearAdsForContext(contextKey: event.entityId);
 
     try {
       // 1. Determine/Fetch Entity
@@ -122,15 +125,14 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       //
       // This method injects stateless `AdPlaceholder` markers into the feed.
       // The full ad loading and lifecycle is managed by the UI layer.
-      // See `FeedDecoratorService` for a detailed explanation.
-      final processedFeedItems = await _feedDecoratorService
-          .injectAdPlaceholders(
-            feedItems: headlineResponse.items,
-            user: currentUser,
-            adConfig: remoteConfig.adConfig,
-            imageStyle: _appBloc.state.headlineImageStyle,
-            adThemeStyle: event.adThemeStyle,
-          );
+      // See `AdService` for a detailed explanation.
+      final processedFeedItems = await _adService.injectAdPlaceholders(
+        feedItems: headlineResponse.items,
+        user: currentUser,
+        adConfig: remoteConfig.adConfig,
+        imageStyle: _appBloc.state.headlineImageStyle,
+        adThemeStyle: event.adThemeStyle,
+      );
 
       // 3. Determine isFollowing status from AppBloc's user preferences
       var isCurrentlyFollowing = false;
@@ -297,7 +299,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       // This method injects stateless `AdPlaceholder` markers into the feed.
       // The full ad loading and lifecycle is managed by the UI layer.
       // See `FeedDecoratorService` for a detailed explanation.
-      final newProcessedFeedItems = await _feedDecoratorService.injectAdPlaceholders(
+      final newProcessedFeedItems = await _adService.injectAdPlaceholders(
         feedItems: headlineResponse.items,
         user: currentUser,
         adConfig: remoteConfig.adConfig,

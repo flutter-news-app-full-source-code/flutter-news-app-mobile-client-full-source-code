@@ -1148,4 +1148,102 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get sourceTypeOthers => 'أخرى';
+
+  @override
+  String get decoratorDismissedConfirmation => 'تم إخفاء الاقتراح.';
+
+  @override
+  String get decoratorDismissAction => 'إخفاء الاقتراح';
+
+  @override
+  String get decoratorLinkAccountTitle_1 => 'احفظ مقالاتك وتفضيلاتك';
+
+  @override
+  String get decoratorLinkAccountTitle_2 => 'لا تفقد تفضيلاتك و متابعاتك';
+
+  @override
+  String get decoratorLinkAccountDescription_1 =>
+      'أنشئ حسابًا مجانيًا لحفظ المزيد من المقالات، ومتابعة المزيد من المواضيع، ومزامنة تفضيلاتك عبر الأجهزة.';
+
+  @override
+  String get decoratorLinkAccountDescription_2 =>
+      'سجل لفتح المزيد من الحفظ، وتوسيع المحتوى الذي تتابعه، والحفاظ على موجز أخبارك متسقًا في كل مكان.';
+
+  @override
+  String get decoratorLinkAccountCta_1 => 'سجل الآن';
+
+  @override
+  String get decoratorLinkAccountCta_2 => 'إنشاء حساب مجاني';
+
+  @override
+  String get decoratorUpgradeTitle_1 => 'تجربة أخبار بلا انقطاع';
+
+  @override
+  String get decoratorUpgradeTitle_2 => 'افتح وصولك المميز';
+
+  @override
+  String get decoratorUpgradeDescription_1 =>
+      'تخلص من الإعلانات ووسع حدودك بشكل كبير للمقالات المحفوظة والمحتوى المتابع.';
+
+  @override
+  String get decoratorUpgradeDescription_2 =>
+      'قم بالترقية إلى بريميوم لتجربة خالية من الإعلانات والقدرة على حفظ ومتابعة المزيد من المحتوى الذي تحبه.';
+
+  @override
+  String get decoratorUpgradeCta_1 => 'الترقية إلى بريميوم';
+
+  @override
+  String get decoratorUpgradeCta_2 => 'اعرف المزيد';
+
+  @override
+  String get decoratorRateAppTitle_1 => 'تستمتع بالتطبيق؟';
+
+  @override
+  String get decoratorRateAppTitle_2 => 'شاركنا رأيك';
+
+  @override
+  String get decoratorRateAppDescription_1 =>
+      'تقييمك يساعدنا على تحسين تجربة الأخبار للجميع. رأيك يهمنا!';
+
+  @override
+  String get decoratorRateAppDescription_2 =>
+      'ملاحظاتك تساعدنا في تقديم أخبار أفضل. خذ لحظة لتقييمنا الآن!';
+
+  @override
+  String get decoratorRateAppCta_1 => 'قيم الآن';
+
+  @override
+  String get decoratorRateAppCta_2 => 'أعط تقييمك';
+
+  @override
+  String get decoratorEnableNotificationsTitle_1 => 'لا تفوت الأخبار العاجلة';
+
+  @override
+  String get decoratorEnableNotificationsTitle_2 => 'ابق على اطلاع، فورًا';
+
+  @override
+  String get decoratorEnableNotificationsDescription_1 =>
+      'احصل على تنبيهات فورية للأخبار العاجلة والتحديثات من مواضيعك ومصادرك المتابعة.';
+
+  @override
+  String get decoratorEnableNotificationsDescription_2 =>
+      'قم بتمكين الإشعارات لتلقي تحديثات الأخبار المخصصة مباشرة على جهازك.';
+
+  @override
+  String get decoratorEnableNotificationsCta_1 => 'تفعيل التنبيهات';
+
+  @override
+  String get decoratorEnableNotificationsCta_2 => 'تشغيل الإشعارات';
+
+  @override
+  String get decoratorSuggestedTopicsTitle_1 => 'اكتشف اهتمامات جديدة';
+
+  @override
+  String get decoratorSuggestedTopicsTitle_2 => 'وسع آفاق معرفتك';
+
+  @override
+  String get decoratorSuggestedSourcesTitle_1 => 'ابحث عن وجهات نظر جديدة';
+
+  @override
+  String get decoratorSuggestedSourcesTitle_2 => 'اكتشف مصادر موثوقة';
 }

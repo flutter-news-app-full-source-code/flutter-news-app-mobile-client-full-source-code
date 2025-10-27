@@ -5,13 +5,13 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_pl
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/feed_ad_loader_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/models/decorator_placeholder.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/widgets/feed_decorator_loader_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/widgets/feed_sliver_app_bar.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/widgets/saved_filters_bar.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/feed_core.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_decorators/call_to_action_decorator_widget.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_decorators/content_collection_decorator_widget.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -235,7 +235,8 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                           final currentItem = state.feedItems[index];
                           final nextItem = state.feedItems[index + 1];
 
-                          if (currentItem is! Headline ||
+                          if (currentItem is DecoratorPlaceholder ||
+                              currentItem is! Headline ||
                               nextItem is! Headline) {
                             return const SizedBox(height: AppSpacing.md);
                           }
@@ -314,94 +315,16 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                               adThemeStyle: AdThemeStyle.fromTheme(theme),
                               adConfig: adConfig,
                             );
-                          } else if (item is CallToActionItem) {
-                            return CallToActionDecoratorWidget(
-                              item: item,
-                              onCallToAction: (url) {
-                                context.read<HeadlinesFeedBloc>().add(
-                                  CallToActionTapped(url: url),
-                                );
-                              },
-                            );
-                          } else if (item is ContentCollectionItem) {
-                            // Access AppBloc to get the user's content preferences,
-                            // which is the source of truth for followed items.
-                            final appState = context.watch<AppBloc>().state;
-                            final followedTopics =
-                                appState
-                                    .userContentPreferences
-                                    ?.followedTopics ??
-                                [];
-                            final followedSources =
-                                appState
-                                    .userContentPreferences
-                                    ?.followedSources ??
-                                [];
-
-                            final followedTopicIds = followedTopics
-                                .map((t) => t.id)
-                                .toList();
-                            final followedSourceIds = followedSources
-                                .map((s) => s.id)
-                                .toList();
-
-                            return ContentCollectionDecoratorWidget(
-                              item: item,
-                              followedTopicIds: followedTopicIds,
-                              followedSourceIds: followedSourceIds,
-                              onFollowToggle: (toggledItem) {
-                                final currentUserPreferences =
-                                    appState.userContentPreferences;
-                                if (currentUserPreferences == null) return;
-
-                                UserContentPreferences updatedPreferences;
-
-                                if (toggledItem is Topic) {
-                                  final isCurrentlyFollowing = followedTopicIds
-                                      .contains(toggledItem.id);
-                                  final newFollowedTopics = List<Topic>.from(
-                                    followedTopics,
-                                  );
-                                  if (isCurrentlyFollowing) {
-                                    newFollowedTopics.removeWhere(
-                                      (t) => t.id == toggledItem.id,
-                                    );
-                                  } else {
-                                    newFollowedTopics.add(toggledItem);
-                                  }
-                                  updatedPreferences = currentUserPreferences
-                                      .copyWith(
-                                        followedTopics: newFollowedTopics,
-                                      );
-                                } else if (toggledItem is Source) {
-                                  final isCurrentlyFollowing = followedSourceIds
-                                      .contains(toggledItem.id);
-                                  final newFollowedSources = List<Source>.from(
-                                    followedSources,
-                                  );
-                                  if (isCurrentlyFollowing) {
-                                    newFollowedSources.removeWhere(
-                                      (s) => s.id == toggledItem.id,
-                                    );
-                                  } else {
-                                    newFollowedSources.add(toggledItem);
-                                  }
-                                  updatedPreferences = currentUserPreferences
-                                      .copyWith(
-                                        followedSources: newFollowedSources,
-                                      );
-                                } else {
-                                  return;
-                                }
-
-                                context.read<AppBloc>().add(
-                                  AppUserContentPreferencesChanged(
-                                    preferences: updatedPreferences,
-                                  ),
-                                );
-                              },
+                          } else if (item is DecoratorPlaceholder) {
+                            // The FeedDecoratorLoaderWidget is responsible for
+                            // determining which non-ad decorator to show and
+                            // managing its entire lifecycle. A ValueKey is
+                            // used to ensure its state is preserved correctly.
+                            return FeedDecoratorLoaderWidget(
+                              key: ValueKey(item.id),
                             );
                           }
+                          // Return an empty box for any other unhandled item types.
                           return const SizedBox.shrink();
                         },
                       ),

@@ -6,13 +6,14 @@ import 'package:collection/collection.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/cached_feed.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/headline_filter.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_decorator_service.dart';
 import 'package:logging/logging.dart';
 
 part 'headlines_feed_event.dart';
@@ -23,23 +24,25 @@ part 'headlines_feed_state.dart';
 ///
 /// This BLoC is the central orchestrator for the news feed. Its core
 /// responsibilities include:
-/// - Fetching, filtering, and displaying headlines from a [DataRepository].
-/// - Injecting dynamic content such as ads and promotional items using the
-///   [FeedDecoratorService].
-/// - Implementing a robust, session-based in-memory caching strategy via
-///   [FeedCacheService] to provide a highly responsive user experience.
+/// - Fetching, filtering, and displaying headlines from a `DataRepository`.
+/// - Injecting dynamic content placeholders for ads and decorators
+///   using the `AdService` and the new `FeedDecoratorService`.
+/// - Implementing a session-based in-memory caching strategy via
+///   [FeedCacheService] to provide a responsive user experience.
 ///
 /// ### Feed Decoration and Ad Injection:
 /// On major feed loads (initial load, refresh, or new filter), this BLoC
-/// uses the [FeedDecoratorService] to intersperse the headline content with
-/// other `FeedItem` types, such as ads and promotional call-to-action items.
+/// uses a two-step process:
+/// 1. The new `FeedDecoratorService` injects a single `DecoratorPlaceholder`.
+/// 2. The `AdService` then injects multiple `AdPlaceholder` items.
+/// The UI is then responsible for rendering loader widgets for these placeholders.
 ///
 /// ### Caching and Data Flow Scenarios:
 ///
 /// 1.  **Cache Miss (Initial Load / New Filter):** When a filter is applied for
 ///     the first time, the BLoC fetches data from the [DataRepository],
 ///     decorates it using [FeedDecoratorService], and stores the result in the
-///     cache before emitting the `success` state.
+///     cache before emitting the `success` state with the decorated feed.
 ///
 /// 2.  **Cache Hit (Switching Filters):** When switching to a previously viewed
 ///     filter, the BLoC instantly emits the cached data. If the cached data is
@@ -50,7 +53,7 @@ part 'headlines_feed_state.dart';
 ///     feed, the BLoC fetches the next page of headlines and **appends** them
 ///     to the existing cached list, ensuring a seamless infinite scroll.
 ///
-/// 4.  **Pull-to-Refresh (Prepending):** On a pull-to-refresh action, the BLoC
+/// 4.  **Pull-to-Refresh:** On a pull-to-refresh action, the BLoC
 ///     fetches the latest headlines and intelligently **prepends** only the new
 ///     items to the top of the cached list, avoiding full reloads.
 /// {@endtemplate}
@@ -63,12 +66,14 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   HeadlinesFeedBloc({
     required DataRepository<Headline> headlinesRepository,
     required FeedDecoratorService feedDecoratorService,
+    required AdService adService,
     required AppBloc appBloc,
     required InlineAdCacheService inlineAdCacheService,
     required FeedCacheService feedCacheService,
     UserContentPreferences? initialUserContentPreferences,
   }) : _headlinesRepository = headlinesRepository,
        _feedDecoratorService = feedDecoratorService,
+       _adService = adService,
        _appBloc = appBloc,
        _inlineAdCacheService = inlineAdCacheService,
        _feedCacheService = feedCacheService,
@@ -132,6 +137,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
   final DataRepository<Headline> _headlinesRepository;
   final FeedDecoratorService _feedDecoratorService;
+  final AdService _adService;
   final AppBloc _appBloc;
   final InlineAdCacheService _inlineAdCacheService;
   final FeedCacheService _feedCacheService;
@@ -243,19 +249,17 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
-      // For pagination, only inject ad placeholders, not feed actions.
-      final newProcessedFeedItems = await _feedDecoratorService
-          .injectAdPlaceholders(
-            feedItems: headlineResponse.items,
-            user: currentUser,
-            adConfig: remoteConfig.adConfig,
-            imageStyle:
-                _appBloc.state.settings!.feedPreferences.headlineImageStyle,
-            adThemeStyle: event.adThemeStyle,
-            processedContentItemCount: cachedFeed.feedItems
-                .whereType<Headline>()
-                .length,
-          );
+      // For pagination, only inject ad placeholders.
+      final newProcessedFeedItems = await _adService.injectAdPlaceholders(
+        feedItems: headlineResponse.items,
+        user: currentUser,
+        adConfig: remoteConfig.adConfig,
+        imageStyle: _appBloc.state.settings!.feedPreferences.headlineImageStyle,
+        adThemeStyle: event.adThemeStyle,
+        processedContentItemCount: cachedFeed.feedItems
+            .whereType<Headline>()
+            .length,
+      );
 
       _logger.fine(
         'Pagination: Appending ${newProcessedFeedItems.length} new items to '
@@ -400,27 +404,28 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         }
       }
 
-      // Use user content preferences from AppBloc for followed items.
       _logger.info(
         'Refresh: Performing full decoration for filter "$filterKey".',
       );
-      final userPreferences = _appBloc.state.userContentPreferences;
+      final settings = _appBloc.state.settings;
 
-      // For a major load, use the full decoration pipeline.
-      final decorationResult = await _feedDecoratorService.decorateFeed(
-        headlines: headlineResponse.items,
-        user: currentUser,
+      // Step 1: Inject the decorator placeholder.
+      final feedWithDecorator = _feedDecoratorService.decorateFeed(
+        feedItems: headlineResponse.items,
         remoteConfig: appConfig,
-        followedTopicIds:
-            userPreferences?.followedTopics.map((t) => t.id).toList() ?? [],
-        followedSourceIds:
-            userPreferences?.followedSources.map((s) => s.id).toList() ?? [],
-        imageStyle: _appBloc.state.settings!.feedPreferences.headlineImageStyle,
+      );
+
+      // Step 2: Inject ad placeholders into the resulting list.
+      final fullyDecoratedFeed = await _adService.injectAdPlaceholders(
+        feedItems: feedWithDecorator,
+        user: currentUser,
+        adConfig: appConfig.adConfig,
+        imageStyle: settings!.feedPreferences.headlineImageStyle,
         adThemeStyle: event.adThemeStyle,
       );
 
       final newCachedFeed = CachedFeed(
-        feedItems: decorationResult.decoratedItems,
+        feedItems: fullyDecoratedFeed,
         hasMore: headlineResponse.hasMore,
         cursor: headlineResponse.cursor,
         lastRefreshedAt: DateTime.now(),
@@ -437,26 +442,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           filter: state.filter,
         ),
       );
-
-      // If a feed decorator was injected, notify AppBloc to update its status.
-      final injectedDecorator = decorationResult.injectedDecorator;
-      if (injectedDecorator != null && currentUser?.id != null) {
-        if (injectedDecorator is CallToActionItem) {
-          _appBloc.add(
-            AppUserFeedDecoratorShown(
-              userId: currentUser!.id,
-              feedDecoratorType: injectedDecorator.decoratorType,
-            ),
-          );
-        } else if (injectedDecorator is ContentCollectionItem) {
-          _appBloc.add(
-            AppUserFeedDecoratorShown(
-              userId: currentUser!.id,
-              feedDecoratorType: injectedDecorator.decoratorType,
-            ),
-          );
-        }
-      }
     } on HttpException catch (e) {
       emit(state.copyWith(status: HeadlinesFeedStatus.failure, error: e));
     }
@@ -547,22 +532,25 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
-      final userPreferences = _appBloc.state.userContentPreferences;
+      final settings = _appBloc.state.settings;
 
-      final decorationResult = await _feedDecoratorService.decorateFeed(
-        headlines: headlineResponse.items,
-        user: currentUser,
+      // Step 1: Inject the decorator placeholder.
+      final feedWithDecorator = _feedDecoratorService.decorateFeed(
+        feedItems: headlineResponse.items,
         remoteConfig: appConfig,
-        followedTopicIds:
-            userPreferences?.followedTopics.map((t) => t.id).toList() ?? [],
-        followedSourceIds:
-            userPreferences?.followedSources.map((s) => s.id).toList() ?? [],
-        imageStyle: _appBloc.state.settings!.feedPreferences.headlineImageStyle,
+      );
+
+      // Step 2: Inject ad placeholders into the resulting list.
+      final fullyDecoratedFeed = await _adService.injectAdPlaceholders(
+        feedItems: feedWithDecorator,
+        user: currentUser,
+        adConfig: appConfig.adConfig,
+        imageStyle: settings!.feedPreferences.headlineImageStyle,
         adThemeStyle: event.adThemeStyle,
       );
 
       final newCachedFeed = CachedFeed(
-        feedItems: decorationResult.decoratedItems,
+        feedItems: fullyDecoratedFeed,
         hasMore: headlineResponse.hasMore,
         cursor: headlineResponse.cursor,
         lastRefreshedAt: DateTime.now(),
@@ -578,25 +566,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           cursor: newCachedFeed.cursor,
         ),
       );
-
-      final injectedDecorator = decorationResult.injectedDecorator;
-      if (injectedDecorator != null && currentUser?.id != null) {
-        if (injectedDecorator is CallToActionItem) {
-          _appBloc.add(
-            AppUserFeedDecoratorShown(
-              userId: currentUser!.id,
-              feedDecoratorType: injectedDecorator.decoratorType,
-            ),
-          );
-        } else if (injectedDecorator is ContentCollectionItem) {
-          _appBloc.add(
-            AppUserFeedDecoratorShown(
-              userId: currentUser!.id,
-              feedDecoratorType: injectedDecorator.decoratorType,
-            ),
-          );
-        }
-      }
     } on HttpException catch (e) {
       emit(state.copyWith(status: HeadlinesFeedStatus.failure, error: e));
     }
@@ -659,22 +628,25 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
-      final userPreferences = _appBloc.state.userContentPreferences;
+      final settings = _appBloc.state.settings;
 
-      final decorationResult = await _feedDecoratorService.decorateFeed(
-        headlines: headlineResponse.items,
-        user: currentUser,
+      // Step 1: Inject the decorator placeholder.
+      final feedWithDecorator = _feedDecoratorService.decorateFeed(
+        feedItems: headlineResponse.items,
         remoteConfig: appConfig,
-        followedTopicIds:
-            userPreferences?.followedTopics.map((t) => t.id).toList() ?? [],
-        followedSourceIds:
-            userPreferences?.followedSources.map((s) => s.id).toList() ?? [],
-        imageStyle: _appBloc.state.settings!.feedPreferences.headlineImageStyle,
+      );
+
+      // Step 2: Inject ad placeholders into the resulting list.
+      final fullyDecoratedFeed = await _adService.injectAdPlaceholders(
+        feedItems: feedWithDecorator,
+        user: currentUser,
+        adConfig: appConfig.adConfig,
+        imageStyle: settings!.feedPreferences.headlineImageStyle,
         adThemeStyle: event.adThemeStyle,
       );
 
       final newCachedFeed = CachedFeed(
-        feedItems: decorationResult.decoratedItems,
+        feedItems: fullyDecoratedFeed,
         hasMore: headlineResponse.hasMore,
         cursor: headlineResponse.cursor,
         lastRefreshedAt: DateTime.now(),
@@ -690,25 +662,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           cursor: newCachedFeed.cursor,
         ),
       );
-
-      final injectedDecorator = decorationResult.injectedDecorator;
-      if (injectedDecorator != null && currentUser?.id != null) {
-        if (injectedDecorator is CallToActionItem) {
-          _appBloc.add(
-            AppUserFeedDecoratorShown(
-              userId: currentUser!.id,
-              feedDecoratorType: injectedDecorator.decoratorType,
-            ),
-          );
-        } else if (injectedDecorator is ContentCollectionItem) {
-          _appBloc.add(
-            AppUserFeedDecoratorShown(
-              userId: currentUser!.id,
-              feedDecoratorType: injectedDecorator.decoratorType,
-            ),
-          );
-        }
-      }
     } on HttpException catch (e) {
       emit(state.copyWith(status: HeadlinesFeedStatus.failure, error: e));
     }

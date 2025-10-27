@@ -1,7 +1,9 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/widgets/suggestion_item_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_decorators/suggestion_item_widget.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template content_collection_decorator_widget}
@@ -9,14 +11,14 @@ import 'package:ui_kit/ui_kit.dart';
 /// (e.g., Topics or Sources).
 ///
 /// This widget presents a title and a horizontal list of [SuggestionItemWidget]s.
+/// It now includes a dismiss option in a popup menu.
 /// {@endtemplate}
 class ContentCollectionDecoratorWidget extends StatelessWidget {
   /// {@macro content_collection_decorator_widget}
   const ContentCollectionDecoratorWidget({
     required this.item,
     required this.onFollowToggle,
-    required this.followedTopicIds,
-    required this.followedSourceIds,
+    this.onDismiss,
     super.key,
   });
 
@@ -27,19 +29,16 @@ class ContentCollectionDecoratorWidget extends StatelessWidget {
   /// is pressed.
   final ValueSetter<FeedItem> onFollowToggle;
 
-  /// List of IDs of topics the user is currently following.
-  final List<String> followedTopicIds;
-
-  /// List of IDs of sources the user is currently following.
-  final List<String> followedSourceIds;
+  /// An optional callback that is triggered when the user dismisses the
+  /// decorator.
+  final VoidCallback? onDismiss;
 
   @override
   Widget build(BuildContext context) {
     return _ContentCollectionView(
       item: item,
       onFollowToggle: onFollowToggle,
-      followedTopicIds: followedTopicIds,
-      followedSourceIds: followedSourceIds,
+      onDismiss: onDismiss,
     );
   }
 }
@@ -48,14 +47,12 @@ class _ContentCollectionView extends StatefulWidget {
   const _ContentCollectionView({
     required this.item,
     required this.onFollowToggle,
-    required this.followedTopicIds,
-    required this.followedSourceIds,
+    this.onDismiss,
   });
 
   final ContentCollectionItem item;
   final ValueSetter<FeedItem> onFollowToggle;
-  final List<String> followedTopicIds;
-  final List<String> followedSourceIds;
+  final VoidCallback? onDismiss;
 
   @override
   State<_ContentCollectionView> createState() => _ContentCollectionViewState();
@@ -115,6 +112,18 @@ class _ContentCollectionViewState extends State<_ContentCollectionView> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
+                if (widget.onDismiss != null)
+                  PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert),
+                    tooltip: l10n.decoratorDismissAction,
+                    onSelected: (_) => widget.onDismiss!(),
+                    itemBuilder: (BuildContext context) => [
+                      PopupMenuItem<String>(
+                        value: 'dismiss',
+                        child: Text(l10n.decoratorDismissAction),
+                      ),
+                    ],
+                  ),
               ],
             ),
           ),
@@ -123,6 +132,20 @@ class _ContentCollectionViewState extends State<_ContentCollectionView> {
             height: 180,
             child: LayoutBuilder(
               builder: (context, constraints) {
+                // Access AppBloc to get the user's content preferences,
+                // which is the source of truth for followed items.
+                final appState = context.watch<AppBloc>().state;
+                final followedTopicIds =
+                    appState.userContentPreferences?.followedTopics
+                        .map((t) => t.id)
+                        .toList() ??
+                    [];
+                final followedSourceIds =
+                    appState.userContentPreferences?.followedSources
+                        .map((s) => s.id)
+                        .toList() ??
+                    [];
+
                 final listView = ListView.builder(
                   controller: _scrollController,
                   scrollDirection: Axis.horizontal,
@@ -134,9 +157,9 @@ class _ContentCollectionViewState extends State<_ContentCollectionView> {
                     final suggestion = widget.item.items[index];
                     final isFollowing =
                         (suggestion is Topic &&
-                            widget.followedTopicIds.contains(suggestion.id)) ||
+                            followedTopicIds.contains(suggestion.id)) ||
                         (suggestion is Source &&
-                            widget.followedSourceIds.contains(suggestion.id));
+                            followedSourceIds.contains(suggestion.id));
                     return SuggestionItemWidget(
                       item: suggestion,
                       onFollowToggle: widget.onFollowToggle,

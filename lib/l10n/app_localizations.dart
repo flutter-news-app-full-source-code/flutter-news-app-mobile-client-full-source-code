@@ -2191,6 +2191,186 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Others'**
   String get sourceTypeOthers;
+
+  /// User-friendly confirmation message shown in place of a feed decorator after it has been dismissed.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggestion hidden.'**
+  String get decoratorDismissedConfirmation;
+
+  /// The text for the menu item that allows a user to hide or dismiss a feed decorator.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide suggestion'**
+  String get decoratorDismissAction;
+
+  /// First variation of the title for the 'Link Account' decorator, focusing on the benefit of saving content.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Your Articles & Preferences'**
+  String get decoratorLinkAccountTitle_1;
+
+  /// Second variation of the title for the 'Link Account' decorator, highlighting the benefit of persistence.
+  ///
+  /// In en, this message translates to:
+  /// **'Never Lose Your saved Preferences'**
+  String get decoratorLinkAccountTitle_2;
+
+  /// First variation of the description for the 'Link Account' decorator, hinting at increased limits and syncing.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a free account to save more articles, follow more topics, and sync your preferences across devices.'**
+  String get decoratorLinkAccountDescription_1;
+
+  /// Second variation of the description for the 'Link Account' decorator, hinting at increased limits and consistency.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign up to unlock more saves, expand your followed content, and keep your news feed consistent everywhere.'**
+  String get decoratorLinkAccountDescription_2;
+
+  /// First variation of the call-to-action text for the 'Link Account' decorator.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Up Now'**
+  String get decoratorLinkAccountCta_1;
+
+  /// Second variation of the call-to-action text for the 'Link Account' decorator.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Free Account'**
+  String get decoratorLinkAccountCta_2;
+
+  /// First variation of the title for the 'Upgrade' decorator, focusing on an uninterrupted, ad-free experience.
+  ///
+  /// In en, this message translates to:
+  /// **'Enjoy an Uninterrupted News Experience'**
+  String get decoratorUpgradeTitle_1;
+
+  /// Second variation of the title for the 'Upgrade' decorator, highlighting premium access.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock Your Premium Access'**
+  String get decoratorUpgradeTitle_2;
+
+  /// First variation of the description for the 'Upgrade' decorator, highlighting ad-free and increased limits.
+  ///
+  /// In en, this message translates to:
+  /// **'Go ad-free and greatly expand your limits for saved articles and followed content.'**
+  String get decoratorUpgradeDescription_1;
+
+  /// Second variation of the description for the 'Upgrade' decorator, emphasizing ad-free and the ability to save/follow more.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to Premium for an ad-free experience and the ability to save and follow much more of the content you love.'**
+  String get decoratorUpgradeDescription_2;
+
+  /// First variation of the call-to-action text for the 'Upgrade' decorator.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to Premium'**
+  String get decoratorUpgradeCta_1;
+
+  /// Second variation of the call-to-action text for the 'Upgrade' decorator.
+  ///
+  /// In en, this message translates to:
+  /// **'Learn More'**
+  String get decoratorUpgradeCta_2;
+
+  /// First variation of the title for the 'Rate App' decorator, engaging the user positively.
+  ///
+  /// In en, this message translates to:
+  /// **'Enjoying the App?'**
+  String get decoratorRateAppTitle_1;
+
+  /// Second variation of the title for the 'Rate App' decorator, asking for feedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Your Feedback'**
+  String get decoratorRateAppTitle_2;
+
+  /// First variation of the description for the 'Rate App' decorator, explaining the impact of their rating.
+  ///
+  /// In en, this message translates to:
+  /// **'Your rating helps us improve the news experience for everyone. Your opinion matters!'**
+  String get decoratorRateAppDescription_1;
+
+  /// Second variation of the description for the 'Rate App' decorator, emphasizing the value of their feedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Your feedback helps us deliver better news. Take a moment to rate us now!'**
+  String get decoratorRateAppDescription_2;
+
+  /// First variation of the call-to-action text for the 'Rate App' decorator.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate Now'**
+  String get decoratorRateAppCta_1;
+
+  /// Second variation of the call-to-action text for the 'Rate App' decorator.
+  ///
+  /// In en, this message translates to:
+  /// **'Give Feedback'**
+  String get decoratorRateAppCta_2;
+
+  /// First variation of the title for the 'Enable Notifications' decorator, focusing on breaking news.
+  ///
+  /// In en, this message translates to:
+  /// **'Never Miss Breaking News'**
+  String get decoratorEnableNotificationsTitle_1;
+
+  /// Second variation of the title for the 'Enable Notifications' decorator, emphasizing instant updates.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay Informed, Instantly'**
+  String get decoratorEnableNotificationsTitle_2;
+
+  /// First variation of the description for the 'Enable Notifications' decorator, detailing types of alerts.
+  ///
+  /// In en, this message translates to:
+  /// **'Get instant alerts for breaking news and updates from your followed topics and sources.'**
+  String get decoratorEnableNotificationsDescription_1;
+
+  /// Second variation of the description for the 'Enable Notifications' decorator, highlighting personalized updates.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable notifications to receive personalized news updates directly to your device.'**
+  String get decoratorEnableNotificationsDescription_2;
+
+  /// First variation of the call-to-action text for the 'Enable Notifications' decorator.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Alerts'**
+  String get decoratorEnableNotificationsCta_1;
+
+  /// Second variation of the call-to-action text for the 'Enable Notifications' decorator.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn On Notifications'**
+  String get decoratorEnableNotificationsCta_2;
+
+  /// First variation of the title for the 'Suggested Topics' decorator, encouraging exploration.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover New Interests'**
+  String get decoratorSuggestedTopicsTitle_1;
+
+  /// Second variation of the title for the 'Suggested Topics' decorator, focusing on discovery.
+  ///
+  /// In en, this message translates to:
+  /// **'Broaden Your Knowledge'**
+  String get decoratorSuggestedTopicsTitle_2;
+
+  /// First variation of the title for the 'Suggested Sources' decorator, encouraging discovery of new sources.
+  ///
+  /// In en, this message translates to:
+  /// **'Find New Perspectives'**
+  String get decoratorSuggestedSourcesTitle_1;
+
+  /// Second variation of the title for the 'Suggested Sources' decorator, focusing on broadening reading.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover Trusted Sources'**
+  String get decoratorSuggestedSourcesTitle_2;
 }
 
 class _AppLocalizationsDelegate

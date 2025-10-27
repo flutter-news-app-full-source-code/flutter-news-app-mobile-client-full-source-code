@@ -361,7 +361,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           const UserFeedDecoratorStatus(isCompleted: false);
 
       final updatedDecoratorStatus = currentStatus.copyWith(
+        // Always update the last shown timestamp.
         lastShownAt: now,
+        // If the event marks it as completed, it should be completed.
+        // Otherwise, respect the existing completion status. This prevents
+        // a non-completed event from overriding a completed one.
         isCompleted: event.isCompleted || currentStatus.isCompleted,
       );
 

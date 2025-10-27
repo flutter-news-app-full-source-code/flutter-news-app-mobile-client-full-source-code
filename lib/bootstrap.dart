@@ -28,6 +28,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/services/dem
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/package_info_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_initialization_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/bloc_observer.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/data/clients/country_inmemory_client.dart';
 import 'package:http_client/http_client.dart';
@@ -202,6 +203,10 @@ Future<Widget> bootstrap(
   // Initialize FeedCacheService as a singleton for session-based caching.
   final feedCacheService = FeedCacheService(logger: logger);
   logger.fine('FeedCacheService initialized.');
+
+  // Initialize FeedDecoratorService.
+  final feedDecoratorService = FeedDecoratorService(logger: logger);
+  logger.fine('FeedDecoratorService initialized.');
 
   // Create a GlobalKey for the NavigatorState to be used by AppBloc
   // and InterstitialAdManager for BuildContext access.
@@ -510,6 +515,7 @@ Future<Widget> bootstrap(
       userContentPreferencesRepository: userContentPreferencesRepository,
       environment: environment,
       adService: adService,
+      feedDecoratorService: feedDecoratorService,
       inlineAdCacheService: inlineAdCacheService,
       feedCacheService: feedCacheService,
       localAdRepository: localAdRepository,

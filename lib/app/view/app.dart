@@ -14,6 +14,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_l
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_status_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/router.dart';
@@ -52,6 +53,7 @@ class App extends StatelessWidget {
     required AppEnvironment environment,
     required InlineAdCacheService inlineAdCacheService,
     required AdService adService,
+    required FeedDecoratorService feedDecoratorService,
     required FeedCacheService feedCacheService,
     required DataRepository<LocalAd> localAdRepository,
     required GlobalKey<NavigatorState> navigatorKey,
@@ -67,6 +69,7 @@ class App extends StatelessWidget {
        _userContentPreferencesRepository = userContentPreferencesRepository,
        _environment = environment,
        _adService = adService,
+       _feedDecoratorService = feedDecoratorService,
        _localAdRepository = localAdRepository,
        _feedCacheService = feedCacheService,
        _navigatorKey = navigatorKey,
@@ -96,6 +99,7 @@ class App extends StatelessWidget {
   _userContentPreferencesRepository;
   final AppEnvironment _environment;
   final AdService _adService;
+  final FeedDecoratorService _feedDecoratorService;
   final DataRepository<LocalAd> _localAdRepository;
   final FeedCacheService _feedCacheService;
   final GlobalKey<NavigatorState> _navigatorKey;
@@ -114,6 +118,7 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _countriesRepository),
         RepositoryProvider.value(value: _sourcesRepository),
         RepositoryProvider.value(value: _adService),
+        RepositoryProvider.value(value: _feedDecoratorService),
         RepositoryProvider.value(value: _userRepository),
         RepositoryProvider.value(value: _remoteConfigRepository),
         RepositoryProvider.value(value: _userAppSettingsRepository),

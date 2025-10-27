@@ -1501,5 +1501,125 @@
     "sourceTypeOthers": "Others",
     "@sourceTypeOthers": {
         "description": "Plural source type for Other"
+    },
+    "decoratorDismissedConfirmation": "Suggestion hidden.",
+    "@decoratorDismissedConfirmation": {
+        "description": "User-friendly confirmation message shown in place of a feed decorator after it has been dismissed."
+    },
+    "decoratorDismissAction": "Hide suggestion",
+    "@decoratorDismissAction": {
+        "description": "The text for the menu item that allows a user to hide or dismiss a feed decorator."
+    },
+    "decoratorLinkAccountTitle_1": "Save Your Articles & Preferences",
+    "@decoratorLinkAccountTitle_1": {
+        "description": "First variation of the title for the 'Link Account' decorator, focusing on the benefit of saving content."
+    },
+    "decoratorLinkAccountTitle_2": "Never Lose Your saved Preferences",
+    "@decoratorLinkAccountTitle_2": {
+        "description": "Second variation of the title for the 'Link Account' decorator, highlighting the benefit of persistence."
+    },
+    "decoratorLinkAccountDescription_1": "Create a free account to save more articles, follow more topics, and sync your preferences across devices.",
+    "@decoratorLinkAccountDescription_1": {
+        "description": "First variation of the description for the 'Link Account' decorator, hinting at increased limits and syncing."
+    },
+    "decoratorLinkAccountDescription_2": "Sign up to unlock more saves, expand your followed content, and keep your news feed consistent everywhere.",
+    "@decoratorLinkAccountDescription_2": {
+        "description": "Second variation of the description for the 'Link Account' decorator, hinting at increased limits and consistency."
+    },
+    "decoratorLinkAccountCta_1": "Sign Up Now",
+    "@decoratorLinkAccountCta_1": {
+        "description": "First variation of the call-to-action text for the 'Link Account' decorator."
+    },
+    "decoratorLinkAccountCta_2": "Create Free Account",
+    "@decoratorLinkAccountCta_2": {
+        "description": "Second variation of the call-to-action text for the 'Link Account' decorator."
+    },
+    "decoratorUpgradeTitle_1": "Enjoy an Uninterrupted News Experience",
+    "@decoratorUpgradeTitle_1": {
+        "description": "First variation of the title for the 'Upgrade' decorator, focusing on an uninterrupted, ad-free experience."
+    },
+    "decoratorUpgradeTitle_2": "Unlock Your Premium Access",
+    "@decoratorUpgradeTitle_2": {
+        "description": "Second variation of the title for the 'Upgrade' decorator, highlighting premium access."
+    },
+    "decoratorUpgradeDescription_1": "Go ad-free and greatly expand your limits for saved articles and followed content.",
+    "@decoratorUpgradeDescription_1": {
+        "description": "First variation of the description for the 'Upgrade' decorator, highlighting ad-free and increased limits."
+    },
+    "decoratorUpgradeDescription_2": "Upgrade to Premium for an ad-free experience and the ability to save and follow much more of the content you love.",
+    "@decoratorUpgradeDescription_2": {
+        "description": "Second variation of the description for the 'Upgrade' decorator, emphasizing ad-free and the ability to save/follow more."
+    },
+    "decoratorUpgradeCta_1": "Upgrade to Premium",
+    "@decoratorUpgradeCta_1": {
+        "description": "First variation of the call-to-action text for the 'Upgrade' decorator."
+    },
+    "decoratorUpgradeCta_2": "Learn More",
+    "@decoratorUpgradeCta_2": {
+        "description": "Second variation of the call-to-action text for the 'Upgrade' decorator."
+    },
+    "decoratorRateAppTitle_1": "Enjoying the App?",
+    "@decoratorRateAppTitle_1": {
+        "description": "First variation of the title for the 'Rate App' decorator, engaging the user positively."
+    },
+    "decoratorRateAppTitle_2": "Share Your Feedback",
+    "@decoratorRateAppTitle_2": {
+        "description": "Second variation of the title for the 'Rate App' decorator, asking for feedback."
+    },
+    "decoratorRateAppDescription_1": "Your rating helps us improve the news experience for everyone. Your opinion matters!",
+    "@decoratorRateAppDescription_1": {
+        "description": "First variation of the description for the 'Rate App' decorator, explaining the impact of their rating."
+    },
+    "decoratorRateAppDescription_2": "Your feedback helps us deliver better news. Take a moment to rate us now!",
+    "@decoratorRateAppDescription_2": {
+        "description": "Second variation of the description for the 'Rate App' decorator, emphasizing the value of their feedback."
+    },
+    "decoratorRateAppCta_1": "Rate Now",
+    "@decoratorRateAppCta_1": {
+        "description": "First variation of the call-to-action text for the 'Rate App' decorator."
+    },
+    "decoratorRateAppCta_2": "Give Feedback",
+    "@decoratorRateAppCta_2": {
+        "description": "Second variation of the call-to-action text for the 'Rate App' decorator."
+    },
+    "decoratorEnableNotificationsTitle_1": "Never Miss Breaking News",
+    "@decoratorEnableNotificationsTitle_1": {
+        "description": "First variation of the title for the 'Enable Notifications' decorator, focusing on breaking news."
+    },
+    "decoratorEnableNotificationsTitle_2": "Stay Informed, Instantly",
+    "@decoratorEnableNotificationsTitle_2": {
+        "description": "Second variation of the title for the 'Enable Notifications' decorator, emphasizing instant updates."
+    },
+    "decoratorEnableNotificationsDescription_1": "Get instant alerts for breaking news and updates from your followed topics and sources.",
+    "@decoratorEnableNotificationsDescription_1": {
+        "description": "First variation of the description for the 'Enable Notifications' decorator, detailing types of alerts."
+    },
+    "decoratorEnableNotificationsDescription_2": "Enable notifications to receive personalized news updates directly to your device.",
+    "@decoratorEnableNotificationsDescription_2": {
+        "description": "Second variation of the description for the 'Enable Notifications' decorator, highlighting personalized updates."
+    },
+    "decoratorEnableNotificationsCta_1": "Enable Alerts",
+    "@decoratorEnableNotificationsCta_1": {
+        "description": "First variation of the call-to-action text for the 'Enable Notifications' decorator."
+    },
+    "decoratorEnableNotificationsCta_2": "Turn On Notifications",
+    "@decoratorEnableNotificationsCta_2": {
+        "description": "Second variation of the call-to-action text for the 'Enable Notifications' decorator."
+    },
+    "decoratorSuggestedTopicsTitle_1": "Discover New Interests",
+    "@decoratorSuggestedTopicsTitle_1": {
+        "description": "First variation of the title for the 'Suggested Topics' decorator, encouraging exploration."
+    },
+    "decoratorSuggestedTopicsTitle_2": "Broaden Your Knowledge",
+    "@decoratorSuggestedTopicsTitle_2": {
+        "description": "Second variation of the title for the 'Suggested Topics' decorator, focusing on discovery."
+    },
+    "decoratorSuggestedSourcesTitle_1": "Find New Perspectives",
+    "@decoratorSuggestedSourcesTitle_1": {
+        "description": "First variation of the title for the 'Suggested Sources' decorator, encouraging discovery of new sources."
+    },
+    "decoratorSuggestedSourcesTitle_2": "Discover Trusted Sources",
+    "@decoratorSuggestedSourcesTitle_2": {
+        "description": "Second variation of the title for the 'Suggested Sources' decorator, focusing on broadening reading."
     }
 }

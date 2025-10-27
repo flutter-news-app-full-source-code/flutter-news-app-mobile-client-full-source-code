@@ -30,6 +30,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/discover/view/so
 import 'package:flutter_news_app_mobile_client_full_source_code/discover/view/source_list_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/bloc/entity_details_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/view/entity_details_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/headline_details_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/similar_headlines_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/view/headline_details_page.dart';
@@ -55,7 +56,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/la
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/notification_settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/theme_settings_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/feed_decorator_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/multi_select_search_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';

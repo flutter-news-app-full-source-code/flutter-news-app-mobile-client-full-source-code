@@ -76,13 +76,12 @@ class CallToActionDecoratorWidget extends StatelessWidget {
               right: AppSpacing.xs,
               child: PopupMenuButton<void>(
                 icon: const Icon(Icons.more_vert),
-                tooltip: l10n.manageFiltersDeleteTooltip,
+                tooltip: l10n.decoratorDismissAction,
                 onSelected: (_) => onDismiss!(),
                 itemBuilder: (BuildContext context) => [
                   PopupMenuItem<void>(
                     value: null,
-                    // TODO(fulleni): Replace with a localized string.
-                    child: Text(l10n.savedFiltersMenuDelete),
+                    child: Text(l10n.decoratorDismissAction),
                   ),
                 ],
               ),

@@ -1,5 +1,7 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_decorators/suggestion_item_widget.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -113,13 +115,12 @@ class _ContentCollectionViewState extends State<_ContentCollectionView> {
                 if (widget.onDismiss != null)
                   PopupMenuButton<void>(
                     icon: const Icon(Icons.more_vert),
-                    tooltip: l10n.manageFiltersDeleteTooltip,
+                    tooltip: l10n.decoratorDismissAction,
                     onSelected: (_) => widget.onDismiss!(),
                     itemBuilder: (BuildContext context) => [
                       PopupMenuItem<void>(
                         value: null,
-                        // TODO(fulleni): Replace with a localized string.
-                        child: Text(l10n.savedFiltersMenuDelete),
+                        child: Text(l10n.decoratorDismissAction),
                       ),
                     ],
                   ),

@@ -75,11 +75,17 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
   final _logger = Logger('FeedDecoratorLoaderWidget');
   final _uuid = const Uuid();
 
+  /// Flag to ensure the decorator loading logic is dispatched only once
+  /// during the initial widget lifecycle.
+  bool _isDecoratorLoadDispatched = false;
+
   // Defines the static priority for each feed decorator. A lower number is a
   // higher priority.
   static const _decoratorPriorities = <FeedDecoratorType, int>{
     FeedDecoratorType.linkAccount: 1,
     FeedDecoratorType.upgrade: 2,
+    // Suggested topics and sources are content collections, which are
+    // generally lower priority than direct calls to action.
     FeedDecoratorType.suggestedTopics: 3,
     FeedDecoratorType.suggestedSources: 4,
     FeedDecoratorType.enableNotifications: 5,
@@ -87,9 +93,13 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
   };
 
   @override
-  void initState() {
-    super.initState();
-    _loadDecorator();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Load the decorator only once after dependencies are available.
+    if (!_isDecoratorLoadDispatched) {
+      _loadDecorator();
+      _isDecoratorLoadDispatched = true;
+    }
   }
 
   Future<void> _loadDecorator() async {
@@ -201,8 +211,6 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
       );
       return;
     }
-
-    UserContentPreferences updatedPreferences = userContentPreferences;
 
     if (item is Topic) {
       final topic = item;

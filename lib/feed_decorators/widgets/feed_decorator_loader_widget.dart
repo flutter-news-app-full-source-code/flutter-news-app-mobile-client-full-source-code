@@ -224,9 +224,11 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
     FeedDecoratorConfig decoratorConfig,
   ) async {
     // This logic is a simplified version of the original service, as the
-    // content is now hardcoded for CTAs.
+    // content for CTAs is defined statically.
     switch (decoratorConfig.category) {
       case FeedDecoratorCategory.callToAction:
+        // A map of static content for different call-to-action types.
+        // TODO(fulleni): random l10n selection for each type.
         const ctaContent = {
           FeedDecoratorType.linkAccount: (
             title: 'Create an Account',
@@ -234,6 +236,25 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
                 'Save your preferences and followed items by creating a free account.',
             ctaText: 'Get Started',
             ctaUrl: Routes.accountLinking,
+          ),
+          FeedDecoratorType.upgrade: (
+            title: 'Upgrade to Premium',
+            description: 'Unlock unlimited access to all features and content.',
+            ctaText: 'Upgrade Now',
+            ctaUrl: '/upgrade',
+          ),
+          FeedDecoratorType.rateApp: (
+            title: 'Enjoying the App?',
+            description: 'Let us know what you think by leaving a rating.',
+            ctaText: 'Rate App',
+            ctaUrl: '/rate-app',
+          ),
+          FeedDecoratorType.enableNotifications: (
+            title: 'Stay Up to Date',
+            description:
+                'Enable notifications to get the latest headlines delivered to you.',
+            ctaText: 'Enable',
+            ctaUrl: '/enable-notifications',
           ),
         };
         final content = ctaContent[decoratorType];
@@ -277,8 +298,29 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
               title: 'Suggested Topics',
               items: topics.items,
             );
-          // Other content collection cases would go here.
+          case FeedDecoratorType.suggestedSources:
+            final sources = await context
+                .read<DataRepository<Source>>()
+                .readAll(
+                  pagination: PaginationOptions(limit: itemsToDisplay),
+                  sort: [const SortOption('name', SortOrder.asc)],
+                  filter: {
+                    '_id': {r'$nin': followedSourceIds},
+                    'status': ContentStatus.active.name,
+                  },
+                );
+            if (sources.items.isEmpty) return null;
+            return ContentCollectionItem<Source>(
+              id: _uuid.v4(),
+              decoratorType: decoratorType,
+              title: 'Suggested Sources',
+              items: sources.items,
+            );
+          // ignore: no_default_cases
           default:
+            _logger.warning(
+              'Unhandled ContentCollection decorator type: $decoratorType',
+            );
             return null;
         }
     }

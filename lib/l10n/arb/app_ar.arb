@@ -1501,5 +1501,9 @@
     "sourceTypeOthers": "أخرى",
     "@sourceTypeOthers": {
         "description": "نوع المصدر بصيغة الجمع لأخرى"
+    },
+    "decoratorDismissedConfirmation": "تم تجاهل هذه البطاقة.",
+    "@decoratorDismissedConfirmation": {
+        "description": "رسالة تأكيد تظهر بدلاً من مزين الخلاصة بعد أن يتجاهله المستخدم."
     }
 }

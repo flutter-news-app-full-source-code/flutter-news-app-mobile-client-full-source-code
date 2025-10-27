@@ -2191,6 +2191,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Others'**
   String get sourceTypeOthers;
+
+  /// Confirmation message shown in place of a feed decorator after it has been dismissed by the user.
+  ///
+  /// In en, this message translates to:
+  /// **'This card has been dismissed.'**
+  String get decoratorDismissedConfirmation;
 }
 
 class _AppLocalizationsDelegate

@@ -1501,5 +1501,9 @@
     "sourceTypeOthers": "Others",
     "@sourceTypeOthers": {
         "description": "Plural source type for Other"
+    },
+    "decoratorDismissedConfirmation": "This card has been dismissed.",
+    "@decoratorDismissedConfirmation": {
+        "description": "Confirmation message shown in place of a feed decorator after it has been dismissed by the user."
     }
 }

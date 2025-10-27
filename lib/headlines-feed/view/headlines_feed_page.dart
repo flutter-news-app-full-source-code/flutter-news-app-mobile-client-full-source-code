@@ -315,15 +315,16 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                               adThemeStyle: AdThemeStyle.fromTheme(theme),
                               adConfig: adConfig,
                             );
-                          } else if (item is CallToActionItem) {
-                            // This case is now handled by FeedDecoratorLoaderWidget.
-                            return const SizedBox.shrink();
-                          } else if (item is ContentCollectionItem) {
-                            // This case is now handled by FeedDecoratorLoaderWidget.
-                            return const SizedBox.shrink();
                           } else if (item is DecoratorPlaceholder) {
-                            return const FeedDecoratorLoaderWidget();
+                            // The FeedDecoratorLoaderWidget is responsible for
+                            // determining which non-ad decorator to show and
+                            // managing its entire lifecycle. A ValueKey is
+                            // used to ensure its state is preserved correctly.
+                            return FeedDecoratorLoaderWidget(
+                              key: ValueKey(item.id),
+                            );
                           }
+                          // Return an empty box for any other unhandled item types.
                           return const SizedBox.shrink();
                         },
                       ),

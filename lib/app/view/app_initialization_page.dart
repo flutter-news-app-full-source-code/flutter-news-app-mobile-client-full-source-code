@@ -9,6 +9,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_ca
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_initialization_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_hot_restart_wrapper.dart';
@@ -50,6 +51,7 @@ class AppInitializationPage extends StatelessWidget {
     required this.userContentPreferencesRepository,
     required this.environment,
     required this.adService,
+    required this.feedDecoratorService,
     required this.feedCacheService,
     required this.inlineAdCacheService,
     required this.localAdRepository,
@@ -68,6 +70,7 @@ class AppInitializationPage extends StatelessWidget {
   final DataRepository<UserContentPreferences> userContentPreferencesRepository;
   final AppEnvironment environment;
   final AdService adService;
+  final FeedDecoratorService feedDecoratorService;
   final DataRepository<LocalAd> localAdRepository;
   final FeedCacheService feedCacheService;
   final GlobalKey<NavigatorState> navigatorKey;
@@ -108,6 +111,7 @@ class AppInitializationPage extends StatelessWidget {
                     userContentPreferencesRepository,
                 environment: environment,
                 adService: adService,
+                feedDecoratorService: feedDecoratorService,
                 feedCacheService: feedCacheService,
                 inlineAdCacheService: inlineAdCacheService,
                 localAdRepository: localAdRepository,

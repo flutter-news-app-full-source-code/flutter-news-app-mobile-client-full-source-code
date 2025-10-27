@@ -427,7 +427,7 @@ GoRouter createRouter({
                       countryRepository: context
                           .read<DataRepository<Country>>(),
                       appBloc: context.read<AppBloc>(),
-                      feedDecoratorService: FeedDecoratorService(),
+                      adService: context.read<AdService>(),
                       inlineAdCacheService: context
                           .read<InlineAdCacheService>(),
                     )..add(

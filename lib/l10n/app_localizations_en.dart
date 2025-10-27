@@ -1152,5 +1152,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourceTypeOthers => 'Others';
 
   @override
-  String get decoratorDismissedConfirmation => 'This card has been dismissed.';
+  String get decoratorDismissedConfirmation => 'Suggestion hidden.';
+
+  @override
+  String get decoratorDismissAction => 'Hide suggestion';
 }

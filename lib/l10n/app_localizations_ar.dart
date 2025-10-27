@@ -1150,5 +1150,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get sourceTypeOthers => 'أخرى';
 
   @override
-  String get decoratorDismissedConfirmation => 'تم تجاهل هذه البطاقة.';
+  String get decoratorDismissedConfirmation => 'تم إخفاء الاقتراح.';
+
+  @override
+  String get decoratorDismissAction => 'إخفاء الاقتراح';
 }

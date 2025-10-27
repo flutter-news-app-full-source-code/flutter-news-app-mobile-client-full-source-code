@@ -2192,11 +2192,17 @@ abstract class AppLocalizations {
   /// **'Others'**
   String get sourceTypeOthers;
 
-  /// Confirmation message shown in place of a feed decorator after it has been dismissed by the user.
+  /// User-friendly confirmation message shown in place of a feed decorator after it has been dismissed.
   ///
   /// In en, this message translates to:
-  /// **'This card has been dismissed.'**
+  /// **'Suggestion hidden.'**
   String get decoratorDismissedConfirmation;
+
+  /// The text for the menu item that allows a user to hide or dismiss a feed decorator.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide suggestion'**
+  String get decoratorDismissAction;
 }
 
 class _AppLocalizationsDelegate

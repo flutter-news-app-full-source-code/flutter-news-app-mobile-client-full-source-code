@@ -155,16 +155,101 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
           );
         } else if (decoratorItem is ContentCollectionItem) {
           _decoratorWidget = ContentCollectionDecoratorWidget(
-            item: decoratorItem,
-            // The follow/unfollow logic is handled by the AppBloc listener
-            // in the ContentCollectionDecoratorWidget itself.
-            onFollowToggle: (_) {},
+            item: decoratorItem, // The content collection item to display.
+            // The onFollowToggle callback is handled by this widget, which
+            // then dispatches an event to the AppBloc to update user preferences.
+            onFollowToggle: _onFollowToggle,
             onDismiss: () => _onDismissed(dueDecoratorType),
           );
         }
         _state = _DecoratorState.success;
       });
     }
+  }
+
+  /// Handles the toggling of follow/unfollow status for a [FeedItem]
+  /// (either [Topic] or [Source]) within a content collection decorator.
+  ///
+  /// This method updates the [UserContentPreferences] in the [AppBloc]
+  /// by creating a new preferences object with the modified followed list
+  /// and dispatching an [AppUserContentPreferencesChanged] event.
+  ///
+  /// The logic here ensures that the UI layer (this widget) constructs the
+  /// desired new state, and the [AppBloc] is responsible for persisting it,
+  /// maintaining consistency with the `AppSettingsChanged` pattern.
+  void _onFollowToggle(FeedItem item) {
+    _logger.fine(
+      '[FeedDecoratorLoaderWidget] _onFollowToggle called for item: '
+      '${item.id} (Type: ${item.runtimeType})',
+    );
+
+    final appBlocState = context.read<AppBloc>().state;
+    final userContentPreferences = appBlocState.userContentPreferences;
+
+    // Guard against null preferences. This should ideally not happen if
+    // initialization is complete, but it's a safeguard.
+    if (userContentPreferences == null) {
+      _logger.warning(
+        '[FeedDecoratorLoaderWidget] Cannot toggle follow status: '
+        'UserContentPreferences are null.',
+      );
+      return;
+    }
+
+    UserContentPreferences updatedPreferences = userContentPreferences;
+
+    if (item is Topic) {
+      // Create a mutable copy of the followed topics list.
+      final currentFollowedTopics = List<Topic>.from(
+        userContentPreferences.followedTopics,
+      );
+
+      if (currentFollowedTopics.any((t) => t.id == item.id)) {
+        // If already following, unfollow.
+        currentFollowedTopics.removeWhere((t) => t.id == item.id);
+        _logger.info(
+          '[FeedDecoratorLoaderWidget] Unfollowed topic: ${item.id}',
+        );
+      } else {
+        // If not following, follow.
+        currentFollowedTopics.add(item);
+        _logger.info('[FeedDecoratorLoaderWidget] Followed topic: ${item.id}');
+      }
+      // Create a new UserContentPreferences object with the updated topics.
+      updatedPreferences = userContentPreferences.copyWith(
+        followedTopics: currentFollowedTopics,
+      );
+    } else if (item is Source) {
+      // Create a mutable copy of the followed sources list.
+      final currentFollowedSources = List<Source>.from(
+        userContentPreferences.followedSources,
+      );
+
+      if (currentFollowedSources.any((s) => s.id == item.id)) {
+        // If already following, unfollow.
+        currentFollowedSources.removeWhere((s) => s.id == item.id);
+        _logger.info(
+          '[FeedDecoratorLoaderWidget] Unfollowed source: ${item.id}',
+        );
+      } else {
+        // If not following, follow.
+        currentFollowedSources.add(item);
+        _logger.info('[FeedDecoratorLoaderWidget] Followed source: ${item.id}');
+      }
+      // Create a new UserContentPreferences object with the updated sources.
+      updatedPreferences = userContentPreferences.copyWith(
+        followedSources: currentFollowedSources,
+      );
+    } else {
+      _logger.warning(
+        '[FeedDecoratorLoaderWidget] Unsupported FeedItem type for follow toggle: ${item.runtimeType}',
+      );
+      return;
+    }
+    // Dispatch the event to the AppBloc to persist the changes.
+    context.read<AppBloc>().add(
+      AppUserContentPreferencesChanged(preferences: updatedPreferences),
+    );
   }
 
   void _onDismissed(FeedDecoratorType decoratorType) {

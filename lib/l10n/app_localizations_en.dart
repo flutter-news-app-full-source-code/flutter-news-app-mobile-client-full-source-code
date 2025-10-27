@@ -1156,4 +1156,97 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get decoratorDismissAction => 'Hide suggestion';
+
+  @override
+  String get decoratorLinkAccountTitle_1 => 'Save Your Articles & Preferences';
+
+  @override
+  String get decoratorLinkAccountTitle_2 => 'Never Lose Your saved Preferences';
+
+  @override
+  String get decoratorLinkAccountDescription_1 =>
+      'Create a free account to save more articles, follow more topics, and sync your preferences across devices.';
+
+  @override
+  String get decoratorLinkAccountDescription_2 =>
+      'Sign up to unlock more saves, expand your followed content, and keep your news feed consistent everywhere.';
+
+  @override
+  String get decoratorLinkAccountCta_1 => 'Sign Up Now';
+
+  @override
+  String get decoratorLinkAccountCta_2 => 'Create Free Account';
+
+  @override
+  String get decoratorUpgradeTitle_1 =>
+      'Enjoy an Uninterrupted News Experience';
+
+  @override
+  String get decoratorUpgradeTitle_2 => 'Unlock Your Premium Access';
+
+  @override
+  String get decoratorUpgradeDescription_1 =>
+      'Go ad-free and greatly expand your limits for saved articles and followed content.';
+
+  @override
+  String get decoratorUpgradeDescription_2 =>
+      'Upgrade to Premium for an ad-free experience and the ability to save and follow much more of the content you love.';
+
+  @override
+  String get decoratorUpgradeCta_1 => 'Upgrade to Premium';
+
+  @override
+  String get decoratorUpgradeCta_2 => 'Learn More';
+
+  @override
+  String get decoratorRateAppTitle_1 => 'Enjoying the App?';
+
+  @override
+  String get decoratorRateAppTitle_2 => 'Share Your Feedback';
+
+  @override
+  String get decoratorRateAppDescription_1 =>
+      'Your rating helps us improve the news experience for everyone. Your opinion matters!';
+
+  @override
+  String get decoratorRateAppDescription_2 =>
+      'Your feedback helps us deliver better news. Take a moment to rate us now!';
+
+  @override
+  String get decoratorRateAppCta_1 => 'Rate Now';
+
+  @override
+  String get decoratorRateAppCta_2 => 'Give Feedback';
+
+  @override
+  String get decoratorEnableNotificationsTitle_1 => 'Never Miss Breaking News';
+
+  @override
+  String get decoratorEnableNotificationsTitle_2 => 'Stay Informed, Instantly';
+
+  @override
+  String get decoratorEnableNotificationsDescription_1 =>
+      'Get instant alerts for breaking news and updates from your followed topics and sources.';
+
+  @override
+  String get decoratorEnableNotificationsDescription_2 =>
+      'Enable notifications to receive personalized news updates directly to your device.';
+
+  @override
+  String get decoratorEnableNotificationsCta_1 => 'Enable Alerts';
+
+  @override
+  String get decoratorEnableNotificationsCta_2 => 'Turn On Notifications';
+
+  @override
+  String get decoratorSuggestedTopicsTitle_1 => 'Discover New Interests';
+
+  @override
+  String get decoratorSuggestedTopicsTitle_2 => 'Broaden Your Knowledge';
+
+  @override
+  String get decoratorSuggestedSourcesTitle_1 => 'Find New Perspectives';
+
+  @override
+  String get decoratorSuggestedSourcesTitle_2 => 'Discover Trusted Sources';
 }

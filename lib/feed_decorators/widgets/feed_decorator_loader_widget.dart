@@ -7,7 +7,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/widgets/call_to_action_decorator_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/widgets/content_collection_decorator_widget.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/widgets/decorator_dismissed_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:logging/logging.dart';
@@ -22,9 +21,6 @@ enum _DecoratorState {
 
   /// A decorator has been successfully loaded and is ready to be displayed.
   success,
-
-  /// The user has dismissed the decorator.
-  dismissed,
 
   /// No decorator is due to be shown, or loading failed. The widget should
   /// render nothing.
@@ -271,9 +267,9 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
       ),
     );
 
-    // Update internal state to show the dismissed widget.
+    // Update internal state to hide the widget completely.
     if (mounted) {
-      setState(() => _state = _DecoratorState.dismissed);
+      setState(() => _state = _DecoratorState.none);
     }
   }
 
@@ -427,7 +423,6 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
         ),
       ),
       _DecoratorState.success => _decoratorWidget ?? const SizedBox.shrink(),
-      _DecoratorState.dismissed => const DecoratorDismissedWidget(),
       _DecoratorState.none => const SizedBox.shrink(),
     };
   }

@@ -113,13 +113,13 @@ class _ContentCollectionViewState extends State<_ContentCollectionView> {
                   ),
                 ),
                 if (widget.onDismiss != null)
-                  PopupMenuButton<void>(
+                  PopupMenuButton<String>(
                     icon: const Icon(Icons.more_vert),
                     tooltip: l10n.decoratorDismissAction,
                     onSelected: (_) => widget.onDismiss!(),
                     itemBuilder: (BuildContext context) => [
-                      PopupMenuItem<void>(
-                        value: null,
+                      PopupMenuItem<String>(
+                        value: 'dismiss',
                         child: Text(l10n.decoratorDismissAction),
                       ),
                     ],

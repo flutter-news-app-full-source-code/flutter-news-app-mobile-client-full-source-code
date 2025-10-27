@@ -148,9 +148,16 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
         if (decoratorItem is CallToActionItem) {
           _decoratorWidget = CallToActionDecoratorWidget(
             item: decoratorItem,
-            onCallToAction: (url) => context.read<HeadlinesFeedBloc>().add(
-              CallToActionTapped(url: url),
-            ),
+            onCallToAction: (url) {
+              // Only dispatch the event if the URL is not the placeholder '#',
+              // effectively disabling the button for unimplemented features.
+              if (url != '#') {
+                context.read<HeadlinesFeedBloc>().add(
+                      CallToActionTapped(url: url),
+                    );
+              }
+              // TODO(fulleni): Implement navigation for upgrade, rateApp, etc.
+            },
             onDismiss: () => _onDismissed(dueDecoratorType),
           );
         } else if (decoratorItem is ContentCollectionItem) {
@@ -216,7 +223,7 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
         _logger.info('[FeedDecoratorLoaderWidget] Followed topic: ${topic.id}');
       }
       // Create a new UserContentPreferences object with the updated topics.
-      updatedPreferences = userContentPreferences.copyWith(
+      context.read<AppBloc>().add(AppUserContentPreferencesChanged(preferences: userContentPreferences.copyWith(
         followedTopics: currentFollowedTopics,
       );
     } else if (item is Source) {
@@ -238,21 +245,16 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
         _logger.info(
           '[FeedDecoratorLoaderWidget] Followed source: ${source.id}',
         );
-      }
-      // Create a new UserContentPreferences object with the updated sources.
-      updatedPreferences = userContentPreferences.copyWith(
+      }      // Create a new UserContentPreferences object with the updated sources.
+      context.read<AppBloc>().add(AppUserContentPreferencesChanged(preferences: userContentPreferences.copyWith(
         followedSources: currentFollowedSources,
-      );
+      ),),);
     } else {
       _logger.warning(
         '[FeedDecoratorLoaderWidget] Unsupported FeedItem type for follow toggle: ${item.runtimeType}',
       );
       return;
     }
-    // Dispatch the event to the AppBloc to persist the changes.
-    context.read<AppBloc>().add(
-      AppUserContentPreferencesChanged(preferences: updatedPreferences),
-    );
   }
 
   void _onDismissed(FeedDecoratorType decoratorType) {
@@ -323,19 +325,12 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
         switch (decoratorType) {
           case FeedDecoratorType.linkAccount:
             ctaUrl = Routes.accountLinking;
+          // Set a placeholder URL for unimplemented features. The button will be
+          // disabled in the UI, so this URL will not be used.
           case FeedDecoratorType.upgrade:
-            ctaUrl = Routes.upgrade;
           case FeedDecoratorType.rateApp:
-            ctaUrl = Routes.rateApp;
           case FeedDecoratorType.enableNotifications:
-            ctaUrl = Routes.enableNotifications;
-          // Default case for unhandled decorator types, though ideally all
-          // call-to-action types should be explicitly handled.
-          default:
-            _logger.warning(
-              'Unhandled CallToAction decorator type for CTA URL: $decoratorType',
-            );
-            return null;
+            ctaUrl = '#';
         }
 
         // Construct the CallToActionItem using randomized localized strings

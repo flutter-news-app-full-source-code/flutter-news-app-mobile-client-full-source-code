@@ -13,6 +13,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/account/view/fol
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/followed_contents/topics/followed_topics_list_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/saved_filters_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/saved_headlines_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
@@ -426,11 +427,7 @@ GoRouter createRouter({
                       countryRepository: context
                           .read<DataRepository<Country>>(),
                       appBloc: context.read<AppBloc>(),
-                      feedDecoratorService: FeedDecoratorService(
-                        topicsRepository: context.read<DataRepository<Topic>>(),
-                        sourcesRepository: context
-                            .read<DataRepository<Source>>(),
-                      ),
+                      feedDecoratorService: FeedDecoratorService(),
                       inlineAdCacheService: context
                           .read<InlineAdCacheService>(),
                     )..add(
@@ -519,11 +516,8 @@ GoRouter createRouter({
                     return HeadlinesFeedBloc(
                       headlinesRepository: context
                           .read<DataRepository<Headline>>(),
-                      feedDecoratorService: FeedDecoratorService(
-                        topicsRepository: context.read<DataRepository<Topic>>(),
-                        sourcesRepository: context
-                            .read<DataRepository<Source>>(),
-                      ),
+                      feedDecoratorService: FeedDecoratorService(),
+                      adService: context.read<AdService>(),
                       appBloc: appBloc,
                       inlineAdCacheService: context
                           .read<InlineAdCacheService>(),

@@ -1,10 +1,12 @@
 import 'package:core/core.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:logging/logging.dart';
+import 'package:uuid/uuid.dart';
 
 /// {@template ad_service}
 /// A service responsible for managing and providing ads to the application.
@@ -13,6 +15,9 @@ import 'package:logging/logging.dart';
 /// and the underlying ad network providers (e.g., AdMob, Local). It handles
 /// requesting different types of ads (inline native/banner, full-screen interstitial)
 /// and wrapping them in appropriate generic models for use throughout the app.
+///
+/// It is also responsible for injecting stateless `AdPlaceholder` markers into
+/// lists of feed items based on remote configuration rules.
 /// {@endtemplate}
 class AdService {
   /// {@macro ad_service}
@@ -30,6 +35,7 @@ class AdService {
   final Map<AdPlatformType, AdProvider> _adProviders;
   final AppEnvironment _environment;
   final Logger _logger;
+  final Uuid _uuid = const Uuid();
 
   // Configurable retry parameters for ad loading.
   // TODO(fulleni): Make this configurable through the remote config.
@@ -438,5 +444,136 @@ class AdService {
       'AdService: All retry attempts failed for $adType ad with ID: $adId.',
     );
     return null;
+  }
+
+  /// Injects stateless [AdPlaceholder] markers into a list of [FeedItem]s
+  /// based on configured ad frequency rules.
+  ///
+  /// This method ensures that ad placeholders for *inline* ads (native and banner)
+  /// are placed according to the `adPlacementInterval` (initial buffer before
+  /// the first ad) and `adFrequency` (subsequent ad spacing). It correctly
+  /// accounts for content items and decorators, ignoring previously injected
+  /// ad placeholders when calculating placement.
+  ///
+  /// [feedItems]: The list of feed items (headlines, other decorators)
+  ///   to inject ad placeholders into.
+  /// [user]: The current authenticated user, used to determine ad configuration.
+  /// [adConfig]: The remote configuration for ad display rules.
+  /// [imageStyle]: The desired image style for the ad, used to determine
+  ///   the placeholder's template type.
+  /// [adThemeStyle]: The current theme style for ads, passed through to the
+  ///   AdLoaderWidget for consistent styling.
+  /// [processedContentItemCount]: The count of *content items* (non-ad,
+  ///   non-decorator) that have already been processed in previous feed
+  ///   loads/pages. This is crucial for maintaining correct ad placement
+  ///   across pagination.
+  ///
+  /// Returns a new list of [FeedItem] objects, interspersed with ad placeholders.
+  Future<List<FeedItem>> injectAdPlaceholders({
+    required List<FeedItem> feedItems,
+    required User? user,
+    required AdConfig adConfig,
+    required HeadlineImageStyle imageStyle,
+    required AdThemeStyle adThemeStyle,
+    int processedContentItemCount = 0,
+  }) async {
+    // If feed ads are not enabled in the remote config, return the original list.
+    if (!adConfig.feedAdConfiguration.enabled) {
+      return feedItems;
+    }
+
+    final userRole = user?.appRole ?? AppUserRole.guestUser;
+
+    // Determine ad frequency rules based on user role.
+    final feedAdFrequencyConfig =
+        adConfig.feedAdConfiguration.visibleTo[userRole];
+
+    // Default to 0 for adFrequency and adPlacementInterval if no config is found
+    // for the user role, effectively disabling ads for that role.
+    final adFrequency = feedAdFrequencyConfig?.adFrequency ?? 0;
+    final adPlacementInterval = feedAdFrequencyConfig?.adPlacementInterval ?? 0;
+
+    // If ad frequency is zero or less, no ads should be injected.
+    if (adFrequency <= 0) {
+      return feedItems;
+    }
+
+    final result = <FeedItem>[];
+    // This counter tracks the absolute number of *content items* (headlines,
+    // topics, sources, countries, and decorators) processed so far, including
+    // those from previous pages. This is key for accurate ad placement.
+    var currentContentItemCount = processedContentItemCount;
+
+    // Get the primary ad platform and its identifiers
+    final primaryAdPlatform = adConfig.primaryAdPlatform;
+    final platformAdIdentifiers =
+        adConfig.platformAdIdentifiers[primaryAdPlatform];
+    if (platformAdIdentifiers == null) {
+      _logger.warning(
+        'No AdPlatformIdentifiers found for primary platform: $primaryAdPlatform. '
+        'Cannot inject ad placeholders.',
+      );
+      return feedItems;
+    }
+
+    // Get the ad type for feed ads (native or banner)
+    final feedAdType = adConfig.feedAdConfiguration.adType;
+
+    for (final item in feedItems) {
+      result.add(item);
+
+      // Only increment the content item counter if the current item is
+      // a primary content type or a decorator (not an ad placeholder).
+      // This ensures ad placement is based purely on content/decorator density.
+      if (item is! AdPlaceholder) {
+        currentContentItemCount++;
+      }
+
+      // Check if an ad should be injected at the current position.
+      // An ad is injected if:
+      // 1. We have passed the initial placement interval.
+      // 2. The number of content items *after* the initial interval is a
+      //    multiple of the ad frequency.
+      if (currentContentItemCount >= adPlacementInterval &&
+          (currentContentItemCount - adPlacementInterval) % adFrequency == 0) {
+        String? adIdentifier;
+
+        // Determine the specific ad ID based on the feed ad type.
+        switch (feedAdType) {
+          case AdType.native:
+            adIdentifier = platformAdIdentifiers.feedNativeAdId;
+          case AdType.banner:
+            adIdentifier = platformAdIdentifiers.feedBannerAdId;
+          case AdType.interstitial:
+          case AdType.video:
+            // Interstitial and video ads are not injected into the feed.
+            _logger.warning(
+              'Attempted to inject $feedAdType ad into feed. This is not supported.',
+            );
+            adIdentifier = null;
+        }
+
+        if (adIdentifier != null) {
+          // The actual ad loading will be handled by a dedicated `AdLoaderWidget`
+          // in the UI layer when this placeholder scrolls into view. This
+          // decouples ad loading from the BLoC's state and allows for efficient
+          // caching and disposal of native ad resources.
+          result.add(
+            AdPlaceholder(
+              id: _uuid.v4(),
+              adPlatformType: primaryAdPlatform,
+              adType: feedAdType,
+              adId: adIdentifier,
+            ),
+          );
+        } else {
+          _logger.warning(
+            'No valid ad ID found for platform $primaryAdPlatform and type '
+            '$feedAdType. Ad placeholder not injected.',
+          );
+        }
+      }
+    }
+    return result;
   }
 }

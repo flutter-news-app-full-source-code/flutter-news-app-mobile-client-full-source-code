@@ -5,9 +5,11 @@ import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/extensions/feed_decorator_type_l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/widgets/call_to_action_decorator_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/widgets/content_collection_decorator_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -308,47 +310,43 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
     FeedDecoratorType decoratorType,
     FeedDecoratorConfig decoratorConfig,
   ) async {
+    // Access localization strings for dynamic text.
+    final l10n = AppLocalizationsX(context).l10n;
+
     // This logic is a simplified version of the original service, as the
     // content for CTAs is defined statically.
     switch (decoratorConfig.category) {
       case FeedDecoratorCategory.callToAction:
-        const ctaContent = {
-          FeedDecoratorType.linkAccount: (
-            title: 'Create an Account',
-            description:
-                'Save your preferences and followed items by creating a free account.',
-            ctaText: 'Get Started',
-            ctaUrl: Routes.accountLinking,
-          ),
-          FeedDecoratorType.upgrade: (
-            title: 'Upgrade to Premium',
-            description: 'Unlock unlimited access to all features and content.',
-            ctaText: 'Upgrade Now',
-            ctaUrl: '/upgrade',
-          ),
-          FeedDecoratorType.rateApp: (
-            title: 'Enjoying the App?',
-            description: 'Let us know what you think by leaving a rating.',
-            ctaText: 'Rate App',
-            ctaUrl: '/rate-app',
-          ),
-          FeedDecoratorType.enableNotifications: (
-            title: 'Stay Up to Date',
-            description:
-                'Enable notifications to get the latest headlines delivered to you.',
-            ctaText: 'Enable',
-            ctaUrl: '/enable-notifications',
-          ),
-        };
-        final content = ctaContent[decoratorType];
-        if (content == null) return null;
+        // Determine the fixed CTA URL based on the decorator type.
+        // This is a route and not a localized string.
+        String ctaUrl;
+        switch (decoratorType) {
+          case FeedDecoratorType.linkAccount:
+            ctaUrl = Routes.accountLinking;
+          case FeedDecoratorType.upgrade:
+            ctaUrl = Routes.upgrade;
+          case FeedDecoratorType.rateApp:
+            ctaUrl = Routes.rateApp;
+          case FeedDecoratorType.enableNotifications:
+            ctaUrl = Routes.enableNotifications;
+          // Default case for unhandled decorator types, though ideally all
+          // call-to-action types should be explicitly handled.
+          default:
+            _logger.warning(
+              'Unhandled CallToAction decorator type for CTA URL: $decoratorType',
+            );
+            return null;
+        }
+
+        // Construct the CallToActionItem using randomized localized strings
+        // from the extension and the determined CTA URL.
         return CallToActionItem(
           id: _uuid.v4(),
           decoratorType: decoratorType,
-          title: content.title,
-          description: content.description,
-          callToActionText: content.ctaText,
-          callToActionUrl: content.ctaUrl,
+          title: decoratorType.getRandomTitle(l10n),
+          description: decoratorType.getRandomDescription(l10n),
+          callToActionText: decoratorType.getRandomCtaText(l10n),
+          callToActionUrl: ctaUrl,
         );
 
       case FeedDecoratorCategory.contentCollection:
@@ -378,7 +376,7 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
             return ContentCollectionItem<Topic>(
               id: _uuid.v4(),
               decoratorType: decoratorType,
-              title: 'Suggested Topics',
+              title: decoratorType.getRandomTitle(l10n),
               items: topics.items,
             );
           case FeedDecoratorType.suggestedSources:
@@ -396,7 +394,7 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
             return ContentCollectionItem<Source>(
               id: _uuid.v4(),
               decoratorType: decoratorType,
-              title: 'Suggested Sources',
+              title: decoratorType.getRandomTitle(l10n),
               items: sources.items,
             );
           // ignore: no_default_cases

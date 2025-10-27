@@ -1509,5 +1509,117 @@
     "decoratorDismissAction": "إخفاء الاقتراح",
     "@decoratorDismissAction": {
         "description": "النص الخاص بعنصر القائمة الذي يسمح للمستخدم بإخفاء أو تجاهل مزين الخلاصة."
+    },
+    "decoratorLinkAccountTitle_1": "احفظ مقالاتك وتفضيلاتك",
+    "@decoratorLinkAccountTitle_1": {
+        "description": "First variation of the title for the 'Link Account' decorator, focusing on the benefit of saving content."
+    },
+    "decoratorLinkAccountTitle_2": "لا تفقد تفضيلاتك و متابعاتك",
+    "@decoratorLinkAccountTitle_2": {
+        "description": "Second variation of the title for the 'Link Account' decorator, highlighting the benefit of persistence."
+    },
+    "decoratorLinkAccountDescription_1": "أنشئ حسابًا مجانيًا لحفظ المزيد من المقالات، ومتابعة المزيد من المواضيع، ومزامنة تفضيلاتك عبر الأجهزة.",
+    "@decoratorLinkAccountDescription_1": {
+        "description": "First variation of the description for the 'Link Account' decorator, hinting at increased limits and syncing."
+    },
+    "decoratorLinkAccountDescription_2": "سجل لفتح المزيد من الحفظ، وتوسيع المحتوى الذي تتابعه، والحفاظ على موجز أخبارك متسقًا في كل مكان.",
+    "@decoratorLinkAccountDescription_2": {
+        "description": "Second variation of the description for the 'Link Account' decorator, hinting at increased limits and consistency."
+    },
+    "decoratorLinkAccountCta_1": "سجل الآن",
+    "@decoratorLinkAccountCta_1": {
+        "description": "First variation of the call-to-action text for the 'Link Account' decorator."
+    },
+    "decoratorLinkAccountCta_2": "إنشاء حساب مجاني",
+    "@decoratorLinkAccountCta_2": {
+        "description": "Second variation of the call-to-action text for the 'Link Account' decorator."
+    },
+    "decoratorUpgradeTitle_1": "تجربة أخبار بلا انقطاع",
+    "@decoratorUpgradeTitle_1": {
+        "description": "First variation of the title for the 'Upgrade' decorator, focusing on an uninterrupted, ad-free experience."
+    },
+    "decoratorUpgradeTitle_2": "افتح وصولك المميز",
+    "@decoratorUpgradeTitle_2": {
+        "description": "Second variation of the title for the 'Upgrade' decorator, highlighting premium access."
+    },
+    "decoratorUpgradeDescription_1": "تخلص من الإعلانات ووسع حدودك بشكل كبير للمقالات المحفوظة والمحتوى المتابع.",
+    "@decoratorUpgradeDescription_1": {
+        "description": "First variation of the description for the 'Upgrade' decorator, highlighting ad-free and increased limits."
+    },
+    "decoratorUpgradeDescription_2": "قم بالترقية إلى بريميوم لتجربة خالية من الإعلانات والقدرة على حفظ ومتابعة المزيد من المحتوى الذي تحبه.",
+    "@decoratorUpgradeDescription_2": {
+        "description": "Second variation of the description for the 'Upgrade' decorator, emphasizing ad-free and the ability to save/follow more."
+    },
+    "decoratorUpgradeCta_1": "الترقية إلى بريميوم",
+    "@decoratorUpgradeCta_1": {
+        "description": "First variation of the call-to-action text for the 'Upgrade' decorator."
+    },
+    "decoratorUpgradeCta_2": "اعرف المزيد",
+    "@decoratorUpgradeCta_2": {
+        "description": "Second variation of the call-to-action text for the 'Upgrade' decorator."
+    },
+    "decoratorRateAppTitle_1": "تستمتع بالتطبيق؟",
+    "@decoratorRateAppTitle_1": {
+        "description": "First variation of the title for the 'Rate App' decorator, engaging the user positively."
+    },
+    "decoratorRateAppTitle_2": "شاركنا رأيك",
+    "@decoratorRateAppTitle_2": {
+        "description": "Second variation of the title for the 'Rate App' decorator, asking for feedback."
+    },
+    "decoratorRateAppDescription_1": "تقييمك يساعدنا على تحسين تجربة الأخبار للجميع. رأيك يهمنا!",
+    "@decoratorRateAppDescription_1": {
+        "description": "First variation of the description for the 'Rate App' decorator, explaining the impact of their rating."
+    },
+    "decoratorRateAppDescription_2": "ملاحظاتك تساعدنا في تقديم أخبار أفضل. خذ لحظة لتقييمنا الآن!",
+    "@decoratorRateAppDescription_2": {
+        "description": "Second variation of the description for the 'Rate App' decorator, emphasizing the value of their feedback."
+    },
+    "decoratorRateAppCta_1": "قيم الآن",
+    "@decoratorRateAppCta_1": {
+        "description": "First variation of the call-to-action text for the 'Rate App' decorator."
+    },
+    "decoratorRateAppCta_2": "أعط تقييمك",
+    "@decoratorRateAppCta_2": {
+        "description": "Second variation of the call-to-action text for the 'Rate App' decorator."
+    },
+    "decoratorEnableNotificationsTitle_1": "لا تفوت الأخبار العاجلة",
+    "@decoratorEnableNotificationsTitle_1": {
+        "description": "First variation of the title for the 'Enable Notifications' decorator, focusing on breaking news."
+    },
+    "decoratorEnableNotificationsTitle_2": "ابق على اطلاع، فورًا",
+    "@decoratorEnableNotificationsTitle_2": {
+        "description": "Second variation of the title for the 'Enable Notifications' decorator, emphasizing instant updates."
+    },
+    "decoratorEnableNotificationsDescription_1": "احصل على تنبيهات فورية للأخبار العاجلة والتحديثات من مواضيعك ومصادرك المتابعة.",
+    "@decoratorEnableNotificationsDescription_1": {
+        "description": "First variation of the description for the 'Enable Notifications' decorator, detailing types of alerts."
+    },
+    "decoratorEnableNotificationsDescription_2": "قم بتمكين الإشعارات لتلقي تحديثات الأخبار المخصصة مباشرة على جهازك.",
+    "@decoratorEnableNotificationsDescription_2": {
+        "description": "Second variation of the description for the 'Enable Notifications' decorator, highlighting personalized updates."
+    },
+    "decoratorEnableNotificationsCta_1": "تفعيل التنبيهات",
+    "@decoratorEnableNotificationsCta_1": {
+        "description": "First variation of the call-to-action text for the 'Enable Notifications' decorator."
+    },
+    "decoratorEnableNotificationsCta_2": "تشغيل الإشعارات",
+    "@decoratorEnableNotificationsCta_2": {
+        "description": "Second variation of the call-to-action text for the 'Enable Notifications' decorator."
+    },
+    "decoratorSuggestedTopicsTitle_1": "اكتشف اهتمامات جديدة",
+    "@decoratorSuggestedTopicsTitle_1": {
+        "description": "First variation of the title for the 'Suggested Topics' decorator, encouraging exploration."
+    },
+    "decoratorSuggestedTopicsTitle_2": "وسع آفاق معرفتك",
+    "@decoratorSuggestedTopicsTitle_2": {
+        "description": "Second variation of the title for the 'Suggested Topics' decorator, focusing on discovery."
+    },
+    "decoratorSuggestedSourcesTitle_1": "ابحث عن وجهات نظر جديدة",
+    "@decoratorSuggestedSourcesTitle_1": {
+        "description": "First variation of the title for the 'Suggested Sources' decorator, encouraging discovery of new sources."
+    },
+    "decoratorSuggestedSourcesTitle_2": "اكتشف مصادر موثوقة",
+    "@decoratorSuggestedSourcesTitle_2": {
+        "description": "Second variation of the title for the 'Suggested Sources' decorator, focusing on broadening reading."
     }
 }

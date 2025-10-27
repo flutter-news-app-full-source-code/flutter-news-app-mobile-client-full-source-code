@@ -1502,8 +1502,12 @@
     "@sourceTypeOthers": {
         "description": "نوع المصدر بصيغة الجمع لأخرى"
     },
-    "decoratorDismissedConfirmation": "تم تجاهل هذه البطاقة.",
+    "decoratorDismissedConfirmation": "تم إخفاء الاقتراح.",
     "@decoratorDismissedConfirmation": {
-        "description": "رسالة تأكيد تظهر بدلاً من مزين الخلاصة بعد أن يتجاهله المستخدم."
+        "description": "رسالة تأكيد سهلة الاستخدام تظهر بدلاً من مزين الخلاصة بعد أن يتجاهله المستخدم."
+    },
+    "decoratorDismissAction": "إخفاء الاقتراح",
+    "@decoratorDismissAction": {
+        "description": "النص الخاص بعنصر القائمة الذي يسمح للمستخدم بإخفاء أو تجاهل مزين الخلاصة."
     }
 }

@@ -1502,8 +1502,12 @@
     "@sourceTypeOthers": {
         "description": "Plural source type for Other"
     },
-    "decoratorDismissedConfirmation": "This card has been dismissed.",
+    "decoratorDismissedConfirmation": "Suggestion hidden.",
     "@decoratorDismissedConfirmation": {
-        "description": "Confirmation message shown in place of a feed decorator after it has been dismissed by the user."
+        "description": "User-friendly confirmation message shown in place of a feed decorator after it has been dismissed."
+    },
+    "decoratorDismissAction": "Hide suggestion",
+    "@decoratorDismissAction": {
+        "description": "The text for the menu item that allows a user to hide or dismiss a feed decorator."
     }
 }

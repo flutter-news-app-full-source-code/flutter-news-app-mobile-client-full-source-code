@@ -170,11 +170,33 @@ class _ContentCollectionViewState extends State<_ContentCollectionView> {
                         UserContentPreferences updatedPreferences;
 
                         if (toggledItem is Topic) {
-                          updatedPreferences = currentUserPreferences
-                              .toggleFollowedTopic(toggledItem);
+                          final followedTopics = List<Topic>.from(
+                            currentUserPreferences.followedTopics,
+                          );
+                          if (isFollowing) {
+                            followedTopics.removeWhere(
+                              (topic) => topic.id == toggledItem.id,
+                            );
+                          } else {
+                            followedTopics.add(toggledItem);
+                          }
+                          updatedPreferences = currentUserPreferences.copyWith(
+                            followedTopics: followedTopics,
+                          );
                         } else if (toggledItem is Source) {
-                          updatedPreferences = currentUserPreferences
-                              .toggleFollowedSource(toggledItem);
+                          final followedSources = List<Source>.from(
+                            currentUserPreferences.followedSources,
+                          );
+                          if (isFollowing) {
+                            followedSources.removeWhere(
+                              (source) => source.id == toggledItem.id,
+                            );
+                          } else {
+                            followedSources.add(toggledItem);
+                          }
+                          updatedPreferences = currentUserPreferences.copyWith(
+                            followedSources: followedSources,
+                          );
                         } else {
                           return;
                         }

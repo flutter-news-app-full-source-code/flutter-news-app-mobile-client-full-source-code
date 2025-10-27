@@ -135,13 +135,15 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
     }
 
     // Dispatch event to notify that the decorator has been shown.
-    context.read<AppBloc>().add(
-      AppUserFeedDecoratorShown(
-        userId: user.id,
-        feedDecoratorType: dueDecoratorType,
-      ),
-    );
-
+    // Guard the context access with a mounted check.
+    if (mounted) {
+      context.read<AppBloc>().add(
+        AppUserFeedDecoratorShown(
+          userId: user.id,
+          feedDecoratorType: dueDecoratorType,
+        ),
+      );
+    }
     // Build the final widget and update the state to success.
     if (mounted) {
       setState(() {
@@ -179,8 +181,7 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
   /// maintaining consistency with the `AppSettingsChanged` pattern.
   void _onFollowToggle(FeedItem item) {
     _logger.fine(
-      '[FeedDecoratorLoaderWidget] _onFollowToggle called for item: '
-      '${item.id} (Type: ${item.runtimeType})',
+      '[FeedDecoratorLoaderWidget] _onFollowToggle called for item of type: ${item.runtimeType}',
     );
 
     final appBlocState = context.read<AppBloc>().state;
@@ -199,42 +200,46 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
     UserContentPreferences updatedPreferences = userContentPreferences;
 
     if (item is Topic) {
+      final topic = item;
       // Create a mutable copy of the followed topics list.
       final currentFollowedTopics = List<Topic>.from(
         userContentPreferences.followedTopics,
       );
 
-      if (currentFollowedTopics.any((t) => t.id == item.id)) {
+      if (currentFollowedTopics.any((t) => t.id == topic.id)) {
         // If already following, unfollow.
-        currentFollowedTopics.removeWhere((t) => t.id == item.id);
+        currentFollowedTopics.removeWhere((t) => t.id == topic.id);
         _logger.info(
-          '[FeedDecoratorLoaderWidget] Unfollowed topic: ${item.id}',
+          '[FeedDecoratorLoaderWidget] Unfollowed topic: ${topic.id}',
         );
       } else {
         // If not following, follow.
-        currentFollowedTopics.add(item);
-        _logger.info('[FeedDecoratorLoaderWidget] Followed topic: ${item.id}');
+        currentFollowedTopics.add(topic);
+        _logger.info('[FeedDecoratorLoaderWidget] Followed topic: ${topic.id}');
       }
       // Create a new UserContentPreferences object with the updated topics.
       updatedPreferences = userContentPreferences.copyWith(
         followedTopics: currentFollowedTopics,
       );
     } else if (item is Source) {
+      final source = item;
       // Create a mutable copy of the followed sources list.
       final currentFollowedSources = List<Source>.from(
         userContentPreferences.followedSources,
       );
 
-      if (currentFollowedSources.any((s) => s.id == item.id)) {
+      if (currentFollowedSources.any((s) => s.id == source.id)) {
         // If already following, unfollow.
-        currentFollowedSources.removeWhere((s) => s.id == item.id);
+        currentFollowedSources.removeWhere((s) => s.id == source.id);
         _logger.info(
-          '[FeedDecoratorLoaderWidget] Unfollowed source: ${item.id}',
+          '[FeedDecoratorLoaderWidget] Unfollowed source: ${source.id}',
         );
       } else {
         // If not following, follow.
-        currentFollowedSources.add(item);
-        _logger.info('[FeedDecoratorLoaderWidget] Followed source: ${item.id}');
+        currentFollowedSources.add(source);
+        _logger.info(
+          '[FeedDecoratorLoaderWidget] Followed source: ${source.id}',
+        );
       }
       // Create a new UserContentPreferences object with the updated sources.
       updatedPreferences = userContentPreferences.copyWith(
@@ -311,8 +316,6 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
     // content for CTAs is defined statically.
     switch (decoratorConfig.category) {
       case FeedDecoratorCategory.callToAction:
-        // A map of static content for different call-to-action types.
-        // TODO(fulleni): random l10n selection for each type.
         const ctaContent = {
           FeedDecoratorType.linkAccount: (
             title: 'Create an Account',

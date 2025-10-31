@@ -118,5 +118,3 @@ This `Flutter News App Mobile Client` package is an integral part of the [**Flut
 ## 🚀 Getting Started & Running Locally
 
 For a complete guide on setting up your local environment, running the mobile client, and understanding the configuration, please see the **[Local Setup Guide](https://flutter-news-app-full-source-code.github.io/docs/mobile-client/local-setup/)** in our official documentation.
-
-Our documentation provides a detailed, step-by-step walkthrough to get you up and running smoothly.

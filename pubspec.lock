@@ -236,8 +236,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "v1.0.1"
-      resolved-ref: a54db1b8f49246b549e6211a4306aa57641172a9
+      ref: "v1.1.0"
+      resolved-ref: "306a81bd027876683f4d1771a9f9cabb4afef341"
       url: "https://github.com/flutter-news-app-full-source-code/data-inmemory.git"
     source: git
     version: "1.0.1"

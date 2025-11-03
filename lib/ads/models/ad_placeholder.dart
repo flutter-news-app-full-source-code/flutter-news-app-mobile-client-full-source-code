@@ -24,13 +24,13 @@ class AdPlaceholder extends FeedItem with EquatableMixin {
   /// from the ad cache or to load a new one if not found.
   final String id;
 
-  /// The platform type of the ad (e.g., AdMob, Local).
+  /// The platform type of the ad (e.g., AdMob, etc).
   final AdPlatformType adPlatformType;
 
   /// The type of the ad (e.g., native, banner).
   final AdType adType;
 
-  /// The platform-specific ad identifier (e.g., AdMob unit ID, Local ad ID).
+  /// The platform-specific ad identifier (e.g., AdMob unit ID, etc).
   final String? adId;
 
   @override

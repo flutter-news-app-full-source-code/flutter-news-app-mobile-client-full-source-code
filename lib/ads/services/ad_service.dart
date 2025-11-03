@@ -1,9 +1,9 @@
 import 'package:core/core.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
@@ -12,7 +12,7 @@ import 'package:uuid/uuid.dart';
 /// A service responsible for managing and providing ads to the application.
 ///
 /// This service acts as an intermediary between the application's UI/logic
-/// and the underlying ad network providers (e.g., AdMob, Local). It handles
+/// and the underlying ad network providers (e.g., AdMob, etc). It handles
 /// requesting different types of ads (inline native/banner, full-screen interstitial)
 /// and wrapping them in appropriate generic models for use throughout the app.
 ///

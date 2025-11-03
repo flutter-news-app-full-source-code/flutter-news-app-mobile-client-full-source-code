@@ -4,8 +4,8 @@ import 'package:data_repository/data_repository.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_initialization_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
@@ -54,7 +54,6 @@ class AppInitializationPage extends StatelessWidget {
     required this.feedDecoratorService,
     required this.feedCacheService,
     required this.inlineAdCacheService,
-    required this.localAdRepository,
     required this.navigatorKey,
     super.key,
   });
@@ -71,7 +70,6 @@ class AppInitializationPage extends StatelessWidget {
   final AppEnvironment environment;
   final AdService adService;
   final FeedDecoratorService feedDecoratorService;
-  final DataRepository<LocalAd> localAdRepository;
   final FeedCacheService feedCacheService;
   final GlobalKey<NavigatorState> navigatorKey;
   final InlineAdCacheService inlineAdCacheService;
@@ -114,7 +112,6 @@ class AppInitializationPage extends StatelessWidget {
                 feedDecoratorService: feedDecoratorService,
                 feedCacheService: feedCacheService,
                 inlineAdCacheService: inlineAdCacheService,
-                localAdRepository: localAdRepository,
                 navigatorKey: navigatorKey,
               );
 

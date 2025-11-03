@@ -5,9 +5,9 @@ import 'package:core/core.dart' hide AppStatus;
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/ad_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/interstitial_ad_manager.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inline_ad_cache_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
@@ -55,7 +55,6 @@ class App extends StatelessWidget {
     required AdService adService,
     required FeedDecoratorService feedDecoratorService,
     required FeedCacheService feedCacheService,
-    required DataRepository<LocalAd> localAdRepository,
     required GlobalKey<NavigatorState> navigatorKey,
     super.key,
   }) : _authenticationRepository = authenticationRepository,
@@ -70,7 +69,6 @@ class App extends StatelessWidget {
        _environment = environment,
        _adService = adService,
        _feedDecoratorService = feedDecoratorService,
-       _localAdRepository = localAdRepository,
        _feedCacheService = feedCacheService,
        _navigatorKey = navigatorKey,
        _inlineAdCacheService = inlineAdCacheService;
@@ -100,7 +98,6 @@ class App extends StatelessWidget {
   final AppEnvironment _environment;
   final AdService _adService;
   final FeedDecoratorService _feedDecoratorService;
-  final DataRepository<LocalAd> _localAdRepository;
   final FeedCacheService _feedCacheService;
   final GlobalKey<NavigatorState> _navigatorKey;
   final InlineAdCacheService _inlineAdCacheService;
@@ -123,7 +120,6 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _remoteConfigRepository),
         RepositoryProvider.value(value: _userAppSettingsRepository),
         RepositoryProvider.value(value: _userContentPreferencesRepository),
-        RepositoryProvider.value(value: _localAdRepository),
         RepositoryProvider.value(value: _inlineAdCacheService),
         RepositoryProvider.value(value: _feedCacheService),
         RepositoryProvider.value(value: _environment),

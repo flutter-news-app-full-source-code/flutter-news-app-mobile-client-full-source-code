@@ -213,16 +213,6 @@ class InterstitialAdManager {
         case AdPlatformType.admob:
           // AdMob does not require context to be shown.
           await _showAdMobAd(adToShow);
-        case AdPlatformType.local:
-          // Local ads require context. Get it just before use.
-          final context = _navigatorKey.currentContext;
-          if (context != null && context.mounted) {
-            await _showLocalAd(context, adToShow);
-          } else {
-            _logger.warning(
-              'Cannot show local ad: context is null or no longer mounted.',
-            );
-          }
         case AdPlatformType.demo:
           // Demo ads require context. Get it just before use.
           final context = _navigatorKey.currentContext;
@@ -272,19 +262,6 @@ class InterstitialAdManager {
       );
     await admobAd.show();
     return completer.future;
-  }
-
-  Future<void> _showLocalAd(BuildContext context, InterstitialAd ad) async {
-    if (ad.adObject is! LocalInterstitialAd) return;
-    // Await the result of showDialog, which completes when the dialog is popped.
-    await showDialog<void>(
-      context: context,
-      // Prevent dismissing by tapping outside
-      barrierDismissible: false,
-      builder: (_) => LocalInterstitialAdDialog(
-        localInterstitialAd: ad.adObject as LocalInterstitialAd,
-      ),
-    );
   }
 
   Future<void> _showDemoAd(BuildContext context) async {

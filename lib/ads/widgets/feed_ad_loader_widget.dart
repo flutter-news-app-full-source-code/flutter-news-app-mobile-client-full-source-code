@@ -13,8 +13,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/nativ
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/admob_inline_ad_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/demo_banner_ad_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/demo_native_ad_widget.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/local_banner_ad_widget.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/local_native_ad_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:logging/logging.dart';
@@ -357,21 +355,6 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
             inlineAd: _loadedAd!,
             headlineImageStyle: headlineImageStyle,
           );
-        case AdPlatformType.local:
-          if (_loadedAd is NativeAd && _loadedAd!.adObject is LocalNativeAd) {
-            return LocalNativeAdWidget(
-              localNativeAd: _loadedAd!.adObject as LocalNativeAd,
-              headlineImageStyle: headlineImageStyle,
-            );
-          } else if (_loadedAd is BannerAd &&
-              _loadedAd!.adObject is LocalBannerAd) {
-            return LocalBannerAdWidget(
-              localBannerAd: _loadedAd!.adObject as LocalBannerAd,
-              headlineImageStyle: headlineImageStyle,
-            );
-          }
-          // Fallback for unsupported local ad types or errors
-          return const SizedBox.shrink();
         case AdPlatformType.demo:
           // In demo environment, display placeholder ads directly.
           switch (widget.adPlaceholder.adType) {

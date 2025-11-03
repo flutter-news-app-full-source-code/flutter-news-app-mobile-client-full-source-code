@@ -19,7 +19,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/admob_ad_pro
     if (dart.library.io) 'package:flutter_news_app_mobile_client_full_source_code/ads/admob_ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/demo_ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/inline_ad_cache_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/local_ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
     as app_config;
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
@@ -160,28 +159,14 @@ Future<Widget> bootstrap(
       // calls and avoids issues with platform-specific ad SDKs on unsupported
       // platforms (e.g., AdMob on web).
       AdPlatformType.admob: demoAdProvider,
-      AdPlatformType.local: demoAdProvider,
       AdPlatformType.demo: demoAdProvider,
     };
   } else {
-    logger.fine('Using AdMobAdProvider and LocalAdProvider.');
+    logger.fine('Using Real AdProviders.');
     // For development and production environments (non-web), use real ad providers.
     adProviders = {
       // AdMob provider for Google Mobile Ads.
       AdPlatformType.admob: AdMobAdProvider(logger: logger),
-      // Local ad provider for custom/backend-served ads.
-      AdPlatformType.local: LocalAdProvider(
-        localAdRepository: DataRepository<LocalAd>(
-          dataClient: DataApi<LocalAd>(
-            httpClient: httpClient,
-            modelName: 'local_ad',
-            fromJson: LocalAd.fromJson,
-            toJson: LocalAd.toJson,
-            logger: logger,
-          ),
-        ),
-        logger: logger,
-      ),
       // The demo ad platform is not available in non-demo/non-web environments.
       // If AdService attempts to access it, it will receive null, which is
       // handled by AdService's internal logic (logging a warning).
@@ -226,7 +211,6 @@ Future<Widget> bootstrap(
   late final DataClient<UserContentPreferences> userContentPreferencesClient;
   late final DataClient<UserAppSettings> userAppSettingsClient;
   late final DataClient<User> userClient;
-  late final DataClient<LocalAd> localAdClient;
   if (appConfig.environment == app_config.AppEnvironment.demo) {
     logger.fine('Using in-memory clients for all data repositories.');
     headlinesClient = DataInMemory<Headline>(
@@ -296,12 +280,6 @@ Future<Widget> bootstrap(
       getId: (i) => i.id,
       logger: logger,
     );
-    localAdClient = DataInMemory<LocalAd>(
-      toJson: LocalAd.toJson,
-      getId: (i) => i.id,
-      initialData: localAdsFixturesData,
-      logger: logger,
-    );
   } else if (appConfig.environment == app_config.AppEnvironment.development) {
     logger.fine('Using API clients for all data repositories (Development).');
     headlinesClient = DataApi<Headline>(
@@ -351,13 +329,6 @@ Future<Widget> bootstrap(
       modelName: 'user',
       fromJson: User.fromJson,
       toJson: (user) => user.toJson(),
-      logger: logger,
-    );
-    localAdClient = DataApi<LocalAd>(
-      httpClient: httpClient,
-      modelName: 'local_ad',
-      fromJson: LocalAd.fromJson,
-      toJson: LocalAd.toJson,
       logger: logger,
     );
   } else {
@@ -412,20 +383,12 @@ Future<Widget> bootstrap(
       toJson: (user) => user.toJson(),
       logger: logger,
     );
-    localAdClient = DataApi<LocalAd>(
-      httpClient: httpClient,
-      modelName: 'local_ad',
-      fromJson: LocalAd.fromJson,
-      toJson: LocalAd.toJson,
-      logger: logger,
-    );
   }
   logger.fine('All data clients instantiated.');
 
   final headlinesRepository = DataRepository<Headline>(
     dataClient: headlinesClient,
   );
-  final localAdRepository = DataRepository<LocalAd>(dataClient: localAdClient);
   final topicsRepository = DataRepository<Topic>(dataClient: topicsClient);
   final countriesRepository = DataRepository<Country>(
     dataClient: countriesClient,
@@ -518,7 +481,6 @@ Future<Widget> bootstrap(
       feedDecoratorService: feedDecoratorService,
       inlineAdCacheService: inlineAdCacheService,
       feedCacheService: feedCacheService,
-      localAdRepository: localAdRepository,
       navigatorKey: navigatorKey,
     ),
   );

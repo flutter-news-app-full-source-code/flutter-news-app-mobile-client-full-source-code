@@ -55,7 +55,6 @@ class App extends StatelessWidget {
     required AdService adService,
     required FeedDecoratorService feedDecoratorService,
     required FeedCacheService feedCacheService,
-    required DataRepository<LocalAd> localAdRepository,
     required GlobalKey<NavigatorState> navigatorKey,
     super.key,
   }) : _authenticationRepository = authenticationRepository,
@@ -70,7 +69,6 @@ class App extends StatelessWidget {
        _environment = environment,
        _adService = adService,
        _feedDecoratorService = feedDecoratorService,
-       _localAdRepository = localAdRepository,
        _feedCacheService = feedCacheService,
        _navigatorKey = navigatorKey,
        _inlineAdCacheService = inlineAdCacheService;
@@ -100,7 +98,6 @@ class App extends StatelessWidget {
   final AppEnvironment _environment;
   final AdService _adService;
   final FeedDecoratorService _feedDecoratorService;
-  final DataRepository<LocalAd> _localAdRepository;
   final FeedCacheService _feedCacheService;
   final GlobalKey<NavigatorState> _navigatorKey;
   final InlineAdCacheService _inlineAdCacheService;
@@ -123,7 +120,6 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _remoteConfigRepository),
         RepositoryProvider.value(value: _userAppSettingsRepository),
         RepositoryProvider.value(value: _userContentPreferencesRepository),
-        RepositoryProvider.value(value: _localAdRepository),
         RepositoryProvider.value(value: _inlineAdCacheService),
         RepositoryProvider.value(value: _feedCacheService),
         RepositoryProvider.value(value: _environment),

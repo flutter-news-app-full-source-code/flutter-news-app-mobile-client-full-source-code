@@ -69,7 +69,7 @@ Empower users to tailor the app to their exact preferences, creating a sticky an
 
 ### 💸 Flexible, Provider-Agnostic Monetization
 Start generating revenue immediately with a sophisticated ad system designed for performance and flexibility.
-- **Multi-Provider Architecture:** Built on an abstraction that supports any ad network. It ships with production-ready providers for Google AdMob and a custom Local Ad Server, plus a Demo provider for easy testing.
+- **Multi-Provider Architecture:** Built on an abstraction that supports any ad network. It ships with production-ready providers for Google AdMob plus a Demo provider for easy testing.
 - **Theme-Aware Native Ads:** Ads automatically adapt to the user's theme settings, making them feel like a natural part of the UI instead of an intrusion.
 - **Performance Optimized:** An intelligent caching layer for inline and interstitial ads ensures a smooth, jank-free scrolling experience in feeds and during navigation.
 > **Your Advantage:** Deploy a highly extensible, revenue-ready ad system that respects the user experience and scales with your business needs, all without being locked into a single provider.

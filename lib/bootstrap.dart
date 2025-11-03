@@ -11,13 +11,13 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/ad_provider.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
 // Conditional import for AdMobAdProvider
 // This ensures the AdMob package is only imported when not on the web,
 // preventing potential issues or unnecessary logs on web platforms.
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/admob_ad_provider.dart'
     if (dart.library.io) 'package:flutter_news_app_mobile_client_full_source_code/ads/admob_ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/demo_ad_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
     as app_config;

@@ -12,7 +12,7 @@ import 'package:uuid/uuid.dart';
 /// A service responsible for managing and providing ads to the application.
 ///
 /// This service acts as an intermediary between the application's UI/logic
-/// and the underlying ad network providers (e.g., AdMob, Local). It handles
+/// and the underlying ad network providers (e.g., AdMob, etc). It handles
 /// requesting different types of ads (inline native/banner, full-screen interstitial)
 /// and wrapping them in appropriate generic models for use throughout the app.
 ///

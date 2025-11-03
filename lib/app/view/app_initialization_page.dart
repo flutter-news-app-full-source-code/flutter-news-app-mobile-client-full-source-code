@@ -54,7 +54,6 @@ class AppInitializationPage extends StatelessWidget {
     required this.feedDecoratorService,
     required this.feedCacheService,
     required this.inlineAdCacheService,
-    required this.localAdRepository,
     required this.navigatorKey,
     super.key,
   });
@@ -71,7 +70,6 @@ class AppInitializationPage extends StatelessWidget {
   final AppEnvironment environment;
   final AdService adService;
   final FeedDecoratorService feedDecoratorService;
-  final DataRepository<LocalAd> localAdRepository;
   final FeedCacheService feedCacheService;
   final GlobalKey<NavigatorState> navigatorKey;
   final InlineAdCacheService inlineAdCacheService;
@@ -114,7 +112,6 @@ class AppInitializationPage extends StatelessWidget {
                 feedDecoratorService: feedDecoratorService,
                 feedCacheService: feedCacheService,
                 inlineAdCacheService: inlineAdCacheService,
-                localAdRepository: localAdRepository,
                 navigatorKey: navigatorKey,
               );
 

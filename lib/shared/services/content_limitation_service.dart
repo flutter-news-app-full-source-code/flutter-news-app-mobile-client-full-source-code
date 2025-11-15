@@ -16,8 +16,8 @@ enum ContentAction {
   /// The action of following a country.
   followCountry,
 
-  /// The action of saving a filter.
-  saveFilter,
+  /// The action of saving a headline filter.
+  saveHeadlineFilter,
 }
 
 /// Defines the outcome of a content limitation check.
@@ -72,46 +72,30 @@ class ContentLimitationService {
     switch (action) {
       case ContentAction.bookmarkHeadline:
         final count = preferences.savedHeadlines.length;
-        final int limit;
-        switch (role) {
-          case AppUserRole.guestUser:
-            limit = limits.guestSavedHeadlinesLimit;
-          case AppUserRole.standardUser:
-            limit = limits.authenticatedSavedHeadlinesLimit;
-          case AppUserRole.premiumUser:
-            limit = limits.premiumSavedHeadlinesLimit;
-        }
+        final limit = limits.savedHeadlinesLimit[role];
+
+        // If no limit is defined for the role, allow the action.
+        if (limit == null) return LimitationStatus.allowed;
+
         if (count >= limit) {
           return _getLimitationStatusForRole(role);
         }
 
       // Check if the user has reached the limit for saving filters.
-      case ContentAction.saveFilter:
-        final count = preferences.savedFilters.length;
-        final int limit;
-        switch (role) {
-          case AppUserRole.guestUser:
-            limit = limits.guestSavedFiltersLimit;
-          case AppUserRole.standardUser:
-            limit = limits.authenticatedSavedFiltersLimit;
-          case AppUserRole.premiumUser:
-            limit = limits.premiumSavedFiltersLimit;
-        }
-        if (count >= limit) {
+      case ContentAction.saveHeadlineFilter:
+        final count = preferences.savedHeadlineFilters.length;
+        final limitConfig = limits.savedHeadlineFiltersLimit[role];
+
+        // If no limit config is defined for the role, allow the action.
+        if (limitConfig == null) return LimitationStatus.allowed;
+
+        if (count >= limitConfig.total) {
           return _getLimitationStatusForRole(role);
         }
       case ContentAction.followTopic:
       case ContentAction.followSource:
       case ContentAction.followCountry:
-        final int limit;
-        switch (role) {
-          case AppUserRole.guestUser:
-            limit = limits.guestFollowedItemsLimit;
-          case AppUserRole.standardUser:
-            limit = limits.authenticatedFollowedItemsLimit;
-          case AppUserRole.premiumUser:
-            limit = limits.premiumFollowedItemsLimit;
-        }
+        final limit = limits.followedItemsLimit[role];
 
         // Determine the count for the specific item type being followed.
         final int count;
@@ -125,10 +109,13 @@ class ContentLimitationService {
           case ContentAction.bookmarkHeadline:
             // This case is handled above and will not be reached here.
             count = 0;
-          case ContentAction.saveFilter:
+          case ContentAction.saveHeadlineFilter:
             // This case is handled above and will not be reached here.
             count = 0;
         }
+
+        // If no limit is defined for the role, allow the action.
+        if (limit == null) return LimitationStatus.allowed;
 
         if (count >= limit) {
           return _getLimitationStatusForRole(role);

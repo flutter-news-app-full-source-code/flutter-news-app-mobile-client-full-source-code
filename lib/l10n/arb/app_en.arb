@@ -1634,7 +1634,7 @@
     "@savedHeadlineFiltersEmptyHeadline": {
         "description": "The main headline text displayed on the saved filters page when the user has no saved filters."
     },
-    "savedHeadlineFiltersEmptySubheadline": "Create a filter from the feed and save it to see it here.",
+    "savedHeadlineFiltersEmptySubheadline": "Filters you create and save will appear here. Tap the button below to get started.",
     "@savedHeadlineFiltersEmptySubheadline": {
         "description": "The sub-headline text displayed on the saved filters page when the user has no saved filters."
     },
@@ -1642,7 +1642,7 @@
     "@savedFiltersMenuEdit": {
         "description": "The text for the 'Edit' option in the popup menu on a saved filter item."
     },
-    "saveFilterDialogPinToFeedLabel": "Pin to Feed",
+    "saveFilterDialogPinToFeedLabel": "Pin to Filter Bar",
     "@saveFilterDialogPinToFeedLabel": {
         "description": "Label for the switch that allows a user to pin a saved filter to their feed."
     },

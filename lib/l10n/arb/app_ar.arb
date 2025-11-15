@@ -1634,7 +1634,7 @@
     "@savedHeadlineFiltersEmptyHeadline": {
         "description": "The main headline text displayed on the saved filters page when the user has no saved filters."
     },
-    "savedHeadlineFiltersEmptySubheadline": "أنشئ فلترًا من الموجز واحفظه ليظهر هنا.",
+    "savedHeadlineFiltersEmptySubheadline": "الفلاتر التي تنشئها وتحفظها ستظهر هنا. اضغط على الزر أدناه للبدء.",
     "@savedHeadlineFiltersEmptySubheadline": {
         "description": "The sub-headline text displayed on the saved filters page when the user has no saved filters."
     },
@@ -1642,7 +1642,7 @@
     "@savedFiltersMenuEdit": {
         "description": "The text for the 'Edit' option in the popup menu on a saved filter item."
     },
-    "saveFilterDialogPinToFeedLabel": "تثبيت في الموجز",
+    "saveFilterDialogPinToFeedLabel": "تثبيت في شريط الفلاتر",
     "@saveFilterDialogPinToFeedLabel": {
         "description": "Label for the switch that allows a user to pin a saved filter to their feed."
     },

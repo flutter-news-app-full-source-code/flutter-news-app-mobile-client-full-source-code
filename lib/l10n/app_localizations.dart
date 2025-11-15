@@ -2393,7 +2393,7 @@ abstract class AppLocalizations {
   /// The sub-headline text displayed on the saved filters page when the user has no saved filters.
   ///
   /// In en, this message translates to:
-  /// **'Create a filter from the feed and save it to see it here.'**
+  /// **'Filters you create and save will appear here. Tap the button below to get started.'**
   String get savedHeadlineFiltersEmptySubheadline;
 
   /// The text for the 'Edit' option in the popup menu on a saved filter item.
@@ -2405,7 +2405,7 @@ abstract class AppLocalizations {
   /// Label for the switch that allows a user to pin a saved filter to their feed.
   ///
   /// In en, this message translates to:
-  /// **'Pin to Feed'**
+  /// **'Pin to Filter Bar'**
   String get saveFilterDialogPinToFeedLabel;
 
   /// The title for the section in the save filter dialog where users configure notification settings.

@@ -1261,13 +1261,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get savedHeadlineFiltersEmptySubheadline =>
-      'Create a filter from the feed and save it to see it here.';
+      'Filters you create and save will appear here. Tap the button below to get started.';
 
   @override
   String get savedFiltersMenuEdit => 'Edit';
 
   @override
-  String get saveFilterDialogPinToFeedLabel => 'Pin to Feed';
+  String get saveFilterDialogPinToFeedLabel => 'Pin to Filter Bar';
 
   @override
   String get saveFilterDialogNotificationsLabel => 'Notification Preferences';

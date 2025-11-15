@@ -1258,13 +1258,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get savedHeadlineFiltersEmptySubheadline =>
-      'أنشئ فلترًا من الموجز واحفظه ليظهر هنا.';
+      'الفلاتر التي تنشئها وتحفظها ستظهر هنا. اضغط على الزر أدناه للبدء.';
 
   @override
   String get savedFiltersMenuEdit => 'تعديل';
 
   @override
-  String get saveFilterDialogPinToFeedLabel => 'تثبيت في الموجز';
+  String get saveFilterDialogPinToFeedLabel => 'تثبيت في شريط الفلاتر';
 
   @override
   String get saveFilterDialogNotificationsLabel => 'تفضيلات الإشعارات';

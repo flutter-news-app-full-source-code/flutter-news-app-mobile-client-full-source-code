@@ -58,11 +58,7 @@ class _SavedHeadlinesFiltersView extends StatelessWidget {
           context.pushNamed(
             Routes.feedFilterName,
             extra: {
-              'initialFilter': const HeadlineFilterCriteria(
-                topics: [],
-                sources: [],
-                countries: [],
-              ),
+              'initialFilter': const HeadlineFilterCriteria(topics: [], sources: [], countries: []),
               'headlinesFeedBloc': context.read<HeadlinesFeedBloc>(),
               'filterToEdit': null,
             },
@@ -84,12 +80,11 @@ class _SavedHeadlinesFiltersView extends StatelessWidget {
 
           if (state.status == SavedHeadlinesFiltersStatus.failure) {
             return FailureStateWidget(
-              exception:
-                  state.error ??
+              exception: state.error ??
                   const UnknownException('Failed to load saved filters.'),
-              onRetry: () => context.read<SavedHeadlinesFiltersBloc>().add(
-                const SavedHeadlinesFiltersDataLoaded(),
-              ),
+              onRetry: () => context
+                  .read<SavedHeadlinesFiltersBloc>()
+                  .add(const SavedHeadlinesFiltersDataLoaded()),
             );
           }
 
@@ -104,41 +99,46 @@ class _SavedHeadlinesFiltersView extends StatelessWidget {
           return ReorderableListView.builder(
             padding: const EdgeInsets.only(bottom: AppSpacing.xxl * 2),
             itemCount: state.filters.length,
+            buildDefaultDragHandles: false,
             itemBuilder: (context, index) {
               final filter = state.filters[index];
               return ListTile(
                 key: ValueKey(filter.id),
-                leading: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.drag_handle),
-                    if (filter.isPinned) ...[
-                      const SizedBox(width: AppSpacing.sm),
-                      Icon(
-                        Icons.push_pin,
-                        size: 20,
-                        color: theme.colorScheme.secondary,
-                      ),
-                    ],
-                    if (filter.deliveryTypes.isNotEmpty) ...[
-                      const SizedBox(width: AppSpacing.sm),
-                      Icon(
-                        Icons.notifications_active,
-                        size: 20,
-                        color: theme.colorScheme.secondary,
-                      ),
-                    ],
-                  ],
+                leading: ReorderableDragStartListener(
+                  index: index,
+                  child: const Icon(Icons.drag_handle),
                 ),
                 title: Text(filter.name),
+                subtitle: (filter.isPinned || filter.deliveryTypes.isNotEmpty)
+                    ? Padding(
+                        padding: const EdgeInsets.only(top: AppSpacing.sm),
+                        child: Row(
+                          children: [
+                            if (filter.isPinned)
+                              _IndicatorChip(
+                                icon: Icons.push_pin,
+                                label: l10n.saveFilterDialogPinToFeedLabel,
+                              ),
+                            if (filter.deliveryTypes.isNotEmpty) ...[
+                              if (filter.isPinned)
+                                const SizedBox(width: AppSpacing.sm),
+                              _IndicatorChip(
+                                icon: Icons.notifications,
+                                label: l10n.saveFilterDialogNotificationsLabel,
+                              ),
+                            ],
+                          ],
+                        ),
+                      )
+                    : null,
                 onTap: () {
                   // Apply the selected filter to the feed.
                   context.read<HeadlinesFeedBloc>().add(
-                    SavedFilterSelected(
-                      filter: filter,
-                      adThemeStyle: AdThemeStyle.fromTheme(theme),
-                    ),
-                  );
+                        SavedFilterSelected(
+                          filter: filter,
+                          adThemeStyle: AdThemeStyle.fromTheme(theme),
+                        ),
+                      );
                   // Pop back to the feed page.
                   context.pop();
                 },
@@ -150,8 +150,8 @@ class _SavedHeadlinesFiltersView extends StatelessWidget {
                         Routes.feedFilterName,
                         extra: {
                           'initialFilter': filter.criteria,
-                          'headlinesFeedBloc': context
-                              .read<HeadlinesFeedBloc>(),
+                          'headlinesFeedBloc':
+                              context.read<HeadlinesFeedBloc>(),
                           'filterToEdit': filter,
                         },
                       );
@@ -178,22 +178,24 @@ class _SavedHeadlinesFiltersView extends StatelessWidget {
                       );
                       if (didConfirm == true && context.mounted) {
                         context.read<SavedHeadlinesFiltersBloc>().add(
-                          SavedHeadlinesFiltersDeleted(filterId: filter.id),
-                        );
+                              SavedHeadlinesFiltersDeleted(
+                                filterId: filter.id,
+                              ),
+                            );
                       }
                     }
                   },
                   itemBuilder: (BuildContext context) =>
                       <PopupMenuEntry<String>>[
-                        PopupMenuItem<String>(
-                          value: 'edit',
-                          child: Text(l10n.savedFiltersMenuEdit),
-                        ),
-                        PopupMenuItem<String>(
-                          value: 'delete',
-                          child: Text(l10n.savedFiltersMenuDelete),
-                        ),
-                      ],
+                    PopupMenuItem<String>(
+                      value: 'edit',
+                      child: Text(l10n.savedFiltersMenuEdit),
+                    ),
+                    PopupMenuItem<String>(
+                      value: 'delete',
+                      child: Text(l10n.savedFiltersMenuDelete),
+                    ),
+                  ],
                 ),
               );
             },
@@ -208,14 +210,41 @@ class _SavedHeadlinesFiltersView extends StatelessWidget {
               final item = reorderedFilters.removeAt(oldIndex);
               reorderedFilters.insert(newIndex, item);
               context.read<SavedHeadlinesFiltersBloc>().add(
-                SavedHeadlinesFiltersReordered(
-                  reorderedFilters: reorderedFilters,
-                ),
-              );
+                    SavedHeadlineFiltersReordered(
+                      reorderedFilters: reorderedFilters,
+                    ),
+                  );
             },
           );
         },
       ),
+    );
+  }
+}
+
+/// A small, styled chip used as a visual indicator for filter properties.
+class _IndicatorChip extends StatelessWidget {
+  const _IndicatorChip({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Chip(
+      avatar: Icon(
+        icon,
+        size: 16,
+        color: theme.colorScheme.secondary,
+      ),
+      label: Text(label),
+      labelStyle: theme.textTheme.labelSmall?.copyWith(
+        color: theme.colorScheme.secondary,
+      ),
+      backgroundColor: theme.colorScheme.secondaryContainer.withOpacity(0.25),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+      visualDensity: VisualDensity.compact,
     );
   }
 }

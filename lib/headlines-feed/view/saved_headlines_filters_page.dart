@@ -2,6 +2,8 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/saved_headlines_filters_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
@@ -49,7 +51,19 @@ class _SavedHeadlinesFiltersView extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.goNamed(Routes.feedFilterName),
+        onPressed: () {
+          // Navigate to the filter creation page, passing the necessary
+          // 'extra' parameters. This includes an empty initial filter and
+          // the HeadlinesFeedBloc instance for the page to communicate back.
+          context.pushNamed(
+            Routes.feedFilterName,
+            extra: {
+              'initialFilter': const HeadlineFilter(),
+              'headlinesFeedBloc': context.read<HeadlinesFeedBloc>(),
+              'filterToEdit': null,
+            },
+          );
+        },
         label: Text(l10n.savedHeadlineFiltersCreateNewButton),
         icon: const Icon(Icons.add),
       ),
@@ -88,30 +102,81 @@ class _SavedHeadlinesFiltersView extends StatelessWidget {
             itemCount: state.filters.length,
             itemBuilder: (context, index) {
               final filter = state.filters[index];
-              return Dismissible(
+              return ListTile(
                 key: ValueKey(filter.id),
-                direction: DismissDirection.endToStart,
-                onDismissed: (_) {
-                  context.read<SavedHeadlinesFiltersBloc>().add(
-                    SavedHeadlinesFiltersDeleted(filterId: filter.id),
-                  );
-                },
-                background: Container(
-                  color: theme.colorScheme.error,
-                  alignment: Alignment.centerRight,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.lg,
-                  ),
-                  child: Icon(
-                    Icons.delete_outline,
-                    color: theme.colorScheme.onError,
-                  ),
+                leading: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.drag_handle),
+                    if (filter.isPinned) ...[
+                      const SizedBox(width: AppSpacing.sm),
+                      Icon(
+                        Icons.push_pin,
+                        size: 20,
+                        color: theme.colorScheme.secondary,
+                      ),
+                    ],
+                    if (filter.deliveryTypes.isNotEmpty) ...[
+                      const SizedBox(width: AppSpacing.sm),
+                      Icon(
+                        Icons.notifications_active,
+                        size: 20,
+                        color: theme.colorScheme.secondary,
+                      ),
+                    ],
+                  ],
                 ),
-                child: ListTile(
-                  leading: const Icon(Icons.drag_handle),
-                  title: Text(filter.name),
-                  // TODO(fulleni): Add onTap to edit the filter name.
-                  onTap: () {},
+                title: Text(filter.name),
+                onTap: () {
+                  // Apply the selected filter to the feed.
+                  context.read<HeadlinesFeedBloc>().add(
+                    SavedFilterSelected(
+                      filter: filter,
+                      adThemeStyle: AdThemeStyle.fromTheme(theme),
+                    ),
+                  );
+                  // Pop back to the feed page.
+                  context.pop();
+                },
+                trailing: PopupMenuButton<String>(
+                  onSelected: (value) async {
+                    if (value == 'edit') {
+                      // Navigate to the filter page in 'edit' mode.
+                      context.pushNamed(
+                        Routes.feedFilterName,
+                        extra: {
+                          'initialFilter': HeadlineFilter.fromCriteria(
+                            filter.criteria,
+                          ),
+                          'headlinesFeedBloc': context
+                              .read<HeadlinesFeedBloc>(),
+                          'filterToEdit': filter,
+                        },
+                      );
+                    } else if (value == 'delete') {
+                      // Show a confirmation dialog before deleting.
+                      final didConfirm = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => const DeleteConfirmationDialog(),
+                      );
+                      if (didConfirm == true && context.mounted) {
+                        context.read<SavedHeadlinesFiltersBloc>().add(
+                          SavedHeadlinesFiltersDeleted(filterId: filter.id),
+                        );
+                      }
+                    }
+                  },
+                  itemBuilder: (BuildContext context) =>
+                      <PopupMenuEntry<String>>[
+                        PopupMenuItem<String>(
+                          value: 'edit',
+                          child: Text(l10n.savedFiltersMenuEdit),
+                        ),
+                        PopupMenuItem<String>(
+                          value: 'delete',
+                          child: Text(l10n.savedFiltersMenuDelete),
+                        ),
+                      ],
                 ),
               );
             },

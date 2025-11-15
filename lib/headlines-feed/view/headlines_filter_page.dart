@@ -141,7 +141,7 @@ Future<void> _saveAndApplyFilter(BuildContext context) async {
   // another filter based on their subscription level and current usage.
   final contentLimitationService = context.read<ContentLimitationService>();
   final limitationStatus = contentLimitationService.checkAction(
-    ContentAction.saveFilter,
+    ContentAction.saveHeadlineFilter,
   );
 
   // If the user has reached their limit, show the limitation bottom sheet
@@ -165,15 +165,25 @@ Future<void> _saveAndApplyFilter(BuildContext context) async {
       return SaveFilterDialog(
         onSave: (name) {
           // This callback is executed when the user submits the save dialog.
-          final newFilter = SavedFilter(
+          final newFilter = SavedHeadlineFilter(
             id: const Uuid().v4(),
             name: name,
-            topics: filterState.selectedTopics.toList(),
-            sources: filterState.selectedSources.toList(),
-            countries: filterState.selectedCountries.toList(),
+            // The userId will be populated by the backend upon persistence.
+            userId: '',
+            criteria: HeadlineFilterCriteria(
+              topics: filterState.selectedTopics.toList(),
+              sources: filterState.selectedSources.toList(),
+              countries: filterState.selectedCountries.toList(),
+            ),
+            // For this iteration, pinning and notifications are not yet
+            // implemented in the UI. Default to false/empty.
+            isPinned: false,
+            deliveryTypes: const {},
           );
           // Add the new filter to the global AppBloc state.
-          context.read<AppBloc>().add(SavedFilterAdded(filter: newFilter));
+          context.read<AppBloc>().add(
+            SavedHeadlineFilterAdded(filter: newFilter),
+          );
 
           // Apply the newly saved filter to the HeadlinesFeedBloc. The page
           // is not popped here; that action is deferred until after the
@@ -198,7 +208,7 @@ Future<void> _saveAndApplyFilter(BuildContext context) async {
 /// If a [savedFilter] is provided, it's passed to the event to ensure
 /// its chip is correctly selected on the feed. Otherwise, the filter is
 /// treated as a "custom" one.
-void _applyFilter(BuildContext context, {SavedFilter? savedFilter}) {
+void _applyFilter(BuildContext context, {SavedHeadlineFilter? savedFilter}) {
   final filterState = context.read<HeadlinesFilterBloc>().state;
   // The HeadlinesFeedBloc is now read directly from the context, which is
   // guaranteed to have it due to the BlocProvider.value in the router.
@@ -256,22 +266,22 @@ class _HeadlinesFilterView extends StatelessWidget {
                 filterState.selectedSources.isEmpty &&
                 filterState.selectedCountries.isEmpty;
 
-            final savedFilters =
-                appState.userContentPreferences?.savedFilters ?? [];
+            final savedHeadlineFilters =
+                appState.userContentPreferences?.savedHeadlineFilters ?? [];
 
             // Check if the current selection matches any existing saved filter.
-            final isDuplicate = savedFilters.any(
-              (savedFilter) =>
+            final isDuplicate = savedHeadlineFilters.any(
+              (savedHeadlineFilter) =>
                   setEquals(
-                    savedFilter.topics.toSet(),
+                    savedHeadlineFilter.criteria.topics.toSet(),
                     filterState.selectedTopics,
                   ) &&
                   setEquals(
-                    savedFilter.sources.toSet(),
+                    savedHeadlineFilter.criteria.sources.toSet(),
                     filterState.selectedSources,
                   ) &&
                   setEquals(
-                    savedFilter.countries.toSet(),
+                    savedHeadlineFilter.criteria.countries.toSet(),
                     filterState.selectedCountries,
                   ),
             );

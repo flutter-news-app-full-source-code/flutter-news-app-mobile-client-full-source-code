@@ -568,10 +568,14 @@ GoRouter createRouter({
                   GoRoute(
                     path: Routes.savedHeadlineFilters,
                     name: Routes.savedHeadlineFiltersName,
-                    pageBuilder: (context, state) => const MaterialPage(
-                      fullscreenDialog: true,
-                      child: SavedHeadlinesFiltersPage(),
-                    ),
+                    pageBuilder: (context, state) {
+                      // The SavedHeadlinesFiltersPage is presented as a
+                      // full-screen dialog for a modal-like user experience.
+                      return const MaterialPage(
+                        fullscreenDialog: true,
+                        child: SavedHeadlinesFiltersPage(),
+                      );
+                    },
                   ),
                   GoRoute(
                     path: Routes.feedFilter,

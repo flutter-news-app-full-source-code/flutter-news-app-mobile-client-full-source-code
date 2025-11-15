@@ -2365,6 +2365,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Discover Trusted Sources'**
   String get decoratorSuggestedSourcesTitle_2;
+
+  /// The title for the app bar on the saved filters management page.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved Filters'**
+  String get savedHeadlineFiltersPageTitle;
+
+  /// The text for the floating action button to create a new filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Filter'**
+  String get savedHeadlineFiltersCreateNewButton;
+
+  /// The main headline text displayed while the saved filters are loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading Your Filters...'**
+  String get savedHeadlineFiltersLoadingHeadline;
+
+  /// The main headline text displayed on the saved filters page when the user has no saved filters.
+  ///
+  /// In en, this message translates to:
+  /// **'No Saved Filters Yet'**
+  String get savedHeadlineFiltersEmptyHeadline;
+
+  /// The sub-headline text displayed on the saved filters page when the user has no saved filters.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a filter from the feed and save it to see it here.'**
+  String get savedHeadlineFiltersEmptySubheadline;
+
+  /// The text for the 'Edit' option in the popup menu on a saved filter item.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get savedFiltersMenuEdit;
+
+  /// Label for the switch that allows a user to pin a saved filter to their feed.
+  ///
+  /// In en, this message translates to:
+  /// **'Pin to Feed'**
+  String get saveFilterDialogPinToFeedLabel;
+
+  /// The title for the section in the save filter dialog where users configure notification settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification Preferences'**
+  String get saveFilterDialogNotificationsLabel;
+
+  /// The user-facing name for the 'breakingOnly' notification delivery type.
+  ///
+  /// In en, this message translates to:
+  /// **'Breaking News'**
+  String get notificationDeliveryTypeBreakingOnly;
+
+  /// The user-facing name for the 'dailyDigest' notification delivery type.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Digest'**
+  String get notificationDeliveryTypeDailyDigest;
+
+  /// The user-facing name for the 'weeklyRoundup' notification delivery type.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Roundup'**
+  String get notificationDeliveryTypeWeeklyRoundup;
 }
 
 class _AppLocalizationsDelegate

@@ -1246,4 +1246,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get decoratorSuggestedSourcesTitle_2 => 'Discover Trusted Sources';
+
+  @override
+  String get savedHeadlineFiltersPageTitle => 'Saved Filters';
+
+  @override
+  String get savedHeadlineFiltersCreateNewButton => 'Create Filter';
+
+  @override
+  String get savedHeadlineFiltersLoadingHeadline => 'Loading Your Filters...';
+
+  @override
+  String get savedHeadlineFiltersEmptyHeadline => 'No Saved Filters Yet';
+
+  @override
+  String get savedHeadlineFiltersEmptySubheadline =>
+      'Create a filter from the feed and save it to see it here.';
+
+  @override
+  String get savedFiltersMenuEdit => 'Edit';
+
+  @override
+  String get saveFilterDialogPinToFeedLabel => 'Pin to Feed';
+
+  @override
+  String get saveFilterDialogNotificationsLabel => 'Notification Preferences';
+
+  @override
+  String get notificationDeliveryTypeBreakingOnly => 'Breaking News';
+
+  @override
+  String get notificationDeliveryTypeDailyDigest => 'Daily Digest';
+
+  @override
+  String get notificationDeliveryTypeWeeklyRoundup => 'Weekly Roundup';
 }

@@ -1,8 +1,8 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/saved_headlines_filters_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
@@ -159,7 +159,22 @@ class _SavedHeadlinesFiltersView extends StatelessWidget {
                       // Show a confirmation dialog before deleting.
                       final didConfirm = await showDialog<bool>(
                         context: context,
-                        builder: (context) => const DeleteConfirmationDialog(),
+                        builder: (context) => AlertDialog(
+                          title: Text(l10n.deleteConfirmationDialogTitle),
+                          content: Text(l10n.deleteConfirmationDialogContent),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              child: Text(l10n.cancelButtonLabel),
+                            ),
+                            FilledButton(
+                              onPressed: () => Navigator.of(context).pop(true),
+                              child: Text(
+                                l10n.deleteConfirmationDialogConfirmButton,
+                              ),
+                            ),
+                          ],
+                        ),
                       );
                       if (didConfirm == true && context.mounted) {
                         context.read<SavedHeadlinesFiltersBloc>().add(

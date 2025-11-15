@@ -276,9 +276,9 @@ Future<void> _updateAndApplyFilter(
 /// treated as a "custom" one.
 void _applyFilter(BuildContext context, {SavedHeadlineFilter? savedFilter}) {
   final filterState = context.read<HeadlinesFilterBloc>().state;
-  // The HeadlinesFeedBloc is now read directly from the context, which is
-  // guaranteed to have it due to the BlocProvider.value in the router.
-  // This resolves the ProviderNotFoundException.
+  // The HeadlinesFeedBloc is now read directly from the context. This is
+  // guaranteed to be available because the BlocProvider was lifted to the
+  // ShellRoute level in the router, making it accessible to all child routes.
   final headlinesFeedBloc = context.read<HeadlinesFeedBloc>();
 
   // Create a new HeadlineFilter from the current selections in the filter bloc.

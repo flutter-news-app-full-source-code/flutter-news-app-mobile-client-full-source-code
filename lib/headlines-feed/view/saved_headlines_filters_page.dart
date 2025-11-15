@@ -53,8 +53,9 @@ class _SavedHeadlinesFiltersView extends StatelessWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           // Navigate to the filter creation page, passing the necessary
-          // 'extra' parameters. This includes an empty initial filter and
-          // the HeadlinesFeedBloc instance for the page to communicate back.
+          // 'extra' parameters. This includes an empty initial filter.
+          // The HeadlinesFeedBloc instance is no longer passed, as it is
+          // now available in the context via the router's ShellRoute.
           context.pushNamed(
             Routes.feedFilterName,
             extra: {
@@ -63,7 +64,6 @@ class _SavedHeadlinesFiltersView extends StatelessWidget {
                 sources: [],
                 countries: [],
               ),
-              'headlinesFeedBloc': context.read<HeadlinesFeedBloc>(),
               'filterToEdit': null,
             },
           );

@@ -33,8 +33,6 @@ abstract final class Routes {
   static const accountSavedHeadlinesName = 'accountSavedHeadlines';
   static const accountSavedFilters = 'saved-filters';
   static const accountSavedFiltersName = 'accountSavedFilters';
-  static const savedHeadlineFilters = 'saved-headline-filters';
-  static const savedHeadlineFiltersName = 'savedHeadlineFilters';
   static const settings = 'settings';
   static const settingsName = 'settings';
   static const manageFollowedItems = 'manage-followed-items';

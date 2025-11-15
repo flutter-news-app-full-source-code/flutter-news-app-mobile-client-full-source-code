@@ -571,7 +571,14 @@ GoRouter createRouter({
                       );
                     },
                   ),
-                  // Sub-route for the full-screen filter page.
+                  GoRoute(
+                    path: Routes.savedHeadlineFilters,
+                    name: Routes.savedHeadlineFiltersName,
+                    pageBuilder: (context, state) => const MaterialPage(
+                      fullscreenDialog: true,
+                      child: SavedHeadlinesFiltersPage(),
+                    ),
+                  ),
                   GoRoute(
                     path: Routes.feedFilter,
                     name: Routes.feedFilterName,
@@ -668,14 +675,6 @@ GoRouter createRouter({
                           );
                         },
                       ),
-                  GoRoute(
-                    path: Routes.savedHeadlineFilters,
-                    name: Routes.savedHeadlineFiltersName,
-                    pageBuilder: (context, state) => const MaterialPage(
-                      fullscreenDialog: true,
-                      child: SavedHeadlinesFiltersPage(),
-                    ),
-                  ),
                     ],
                   ),
                 ],
@@ -716,14 +715,6 @@ GoRouter createRouter({
                           );
                         },
                       ),
-                  GoRoute(
-                    path: Routes.savedHeadlineFilters,
-                    name: Routes.savedHeadlineFiltersName,
-                    pageBuilder: (context, state) => const MaterialPage(
-                      fullscreenDialog: true,
-                      child: SavedHeadlinesFiltersPage(),
-                    ),
-                  ),
                     ],
                   ),
                 ],

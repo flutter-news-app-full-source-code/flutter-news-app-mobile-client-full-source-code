@@ -80,8 +80,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
        _logger = Logger('HeadlinesFeedBloc'),
        super(
          HeadlinesFeedState(
-           savedFilters:
-               initialUserContentPreferences?.savedFilters ?? const [],
+           savedHeadlineFilters:
+               initialUserContentPreferences?.savedHeadlineFilters ?? const [],
          ),
        ) {
     // Subscribe to AppBloc to react to global state changes, primarily for
@@ -96,7 +96,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       // of the app and update this BLoC's state accordingly.
       if (appState.userContentPreferences != null &&
           state.savedFilters != appState.userContentPreferences!.savedFilters) {
-        add(
+        add( // TODO: This is incorrect, should be savedHeadlineFilters
+          // Will be fixed in a subsequent step.
           _AppContentPreferencesChanged(
             preferences: appState.userContentPreferences!,
           ),
@@ -126,7 +127,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     );
     on<CallToActionTapped>(_onCallToActionTapped, transformer: sequential());
     on<NavigationHandled>(_onNavigationHandled, transformer: sequential());
-    on<_AppContentPreferencesChanged>(_onAppContentPreferencesChanged);
+    on<_AppContentPreferencesChanged>(
+      _onAppContentPreferencesChanged,
+      transformer: sequential(),
+    );
     on<SavedFilterSelected>(_onSavedFilterSelected, transformer: restartable());
     on<AllFilterSelected>(_onAllFilterSelected, transformer: restartable());
     on<FollowedFilterSelected>(
@@ -457,15 +461,15 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     if (event.savedFilter != null) {
       newActiveFilterId = event.savedFilter!.id;
     } else {
-      final matchingSavedFilter = state.savedFilters.firstWhereOrNull((
+      final matchingSavedFilter = state.savedHeadlineFilters.firstWhereOrNull((
         savedFilter,
       ) {
         final appliedTopics = event.filter.topics?.toSet() ?? {};
-        final savedTopics = savedFilter.topics.toSet();
+        final savedTopics = savedFilter.criteria.topics.toSet();
         final appliedSources = event.filter.sources?.toSet() ?? {};
-        final savedSources = savedFilter.sources.toSet();
+        final savedSources = savedFilter.criteria.sources.toSet();
         final appliedCountries = event.filter.eventCountries?.toSet() ?? {};
-        final savedCountries = savedFilter.countries.toSet();
+        final savedCountries = savedFilter.criteria.countries.toSet();
 
         return const SetEquality<Topic>().equals(appliedTopics, savedTopics) &&
             const SetEquality<Source>().equals(appliedSources, savedSources) &&
@@ -685,19 +689,19 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     _AppContentPreferencesChanged event,
     Emitter<HeadlinesFeedState> emit,
   ) {
-    emit(state.copyWith(savedFilters: event.preferences.savedFilters));
+    emit(state.copyWith(savedHeadlineFilters: event.preferences.savedHeadlineFilters));
   }
 
   Future<void> _onSavedFilterSelected(
     SavedFilterSelected event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
-    final filterKey = event.filter.id;
+    final filterKey = event.filter.id; // TODO: This is incorrect, should be event.filter.id
     final cachedFeed = _feedCacheService.getFeed(filterKey);
     final newFilter = HeadlineFilter(
-      topics: event.filter.topics,
-      sources: event.filter.sources,
-      eventCountries: event.filter.countries,
+      topics: event.filter.criteria.topics,
+      sources: event.filter.criteria.sources,
+      eventCountries: event.filter.criteria.countries,
     );
 
     if (cachedFeed != null) {

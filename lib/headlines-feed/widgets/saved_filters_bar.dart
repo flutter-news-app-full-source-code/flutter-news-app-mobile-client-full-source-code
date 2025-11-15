@@ -79,7 +79,7 @@ class _SavedFiltersBarState extends State<SavedFiltersBar> {
             // indefinitely with old, stale keys.
             _chipKeys.clear();
 
-            final savedFilters = state.savedFilters;
+            final savedFilters = state.savedHeadlineFilters;
             final userPreferences = context
                 .watch<AppBloc>()
                 .state

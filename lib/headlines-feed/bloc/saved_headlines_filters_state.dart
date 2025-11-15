@@ -40,4 +40,17 @@ class SavedHeadlinesFiltersState extends Equatable {
 
   @override
   List<Object?> get props => [status, filters, error];
+
+  /// Creates a copy of this state with the given fields replaced.
+  SavedHeadlinesFiltersState copyWith({
+    SavedHeadlinesFiltersStatus? status,
+    List<SavedHeadlineFilter>? filters,
+    HttpException? error,
+  }) {
+    return SavedHeadlinesFiltersState(
+      status: status ?? this.status,
+      filters: filters ?? this.filters,
+      error: error ?? this.error,
+    );
+  }
 }

@@ -9,7 +9,7 @@ class HeadlinesFeedState extends Equatable {
     this.hasMore = true,
     this.cursor,
     this.filter = const HeadlineFilter(),
-    this.savedHeadlineFilters = const [],
+    this.savedFilters = const [],
     this.activeFilterId = 'all',
     this.error,
     this.navigationUrl,
@@ -30,7 +30,7 @@ class HeadlinesFeedState extends Equatable {
 
   /// The list of saved filters available to the user.
   /// This is synced from the [AppBloc].
-  final List<SavedHeadlineFilter> savedHeadlineFilters;
+  final List<SavedHeadlineFilter> savedFilters;
 
   /// The ID of the currently active filter.
   /// Can be a [SavedHeadlineFilter.id], 'all', or 'custom'.
@@ -42,7 +42,7 @@ class HeadlinesFeedState extends Equatable {
     bool? hasMore,
     String? cursor,
     HeadlineFilter? filter,
-    List<SavedHeadlineFilter>? savedHeadlineFilters,
+    List<SavedHeadlineFilter>? savedFilters,
     String? activeFilterId,
     HttpException? error,
     String? navigationUrl,
@@ -56,7 +56,7 @@ class HeadlinesFeedState extends Equatable {
       hasMore: hasMore ?? this.hasMore,
       cursor: clearCursor ? null : cursor ?? this.cursor,
       filter: filter ?? this.filter,
-      savedHeadlineFilters: savedHeadlineFilters ?? this.savedHeadlineFilters,
+      savedFilters: savedFilters ?? this.savedFilters,
       activeFilterId: clearActiveFilterId
           ? null
           : activeFilterId ?? this.activeFilterId,
@@ -74,7 +74,7 @@ class HeadlinesFeedState extends Equatable {
     hasMore,
     cursor,
     filter,
-    savedHeadlineFilters,
+    savedFilters,
     activeFilterId,
     error,
     navigationUrl,

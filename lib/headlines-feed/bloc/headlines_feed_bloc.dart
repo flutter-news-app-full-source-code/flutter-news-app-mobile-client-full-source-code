@@ -94,10 +94,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       // This subscription's responsibility is to listen for changes in user
       // preferences (like adding/removing a saved filter) from other parts
       // of the app and update this BLoC's state accordingly.
-      if (appState.userContentPreferences != null &&
-          state.savedFilters != appState.userContentPreferences!.savedFilters) {
-        add( // TODO: This is incorrect, should be savedHeadlineFilters
-          // Will be fixed in a subsequent step.
+      if (appState.userContentPreferences?.savedHeadlineFilters != null &&
+          state.savedHeadlineFilters != appState.userContentPreferences!.savedHeadlineFilters) {
+        add(
           _AppContentPreferencesChanged(
             preferences: appState.userContentPreferences!,
           ),
@@ -696,7 +695,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     SavedFilterSelected event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
-    final filterKey = event.filter.id; // TODO: This is incorrect, should be event.filter.id
+    final filterKey = event.filter.id;
     final cachedFeed = _feedCacheService.getFeed(filterKey);
     final newFilter = HeadlineFilter(
       topics: event.filter.criteria.topics,

@@ -1617,5 +1617,49 @@
     "decoratorSuggestedSourcesTitle_2": "Discover Trusted Sources",
     "@decoratorSuggestedSourcesTitle_2": {
         "description": "Second variation of the title for the 'Suggested Sources' decorator, focusing on broadening reading."
+    },
+    "savedHeadlineFiltersPageTitle": "Saved Filters",
+    "@savedHeadlineFiltersPageTitle": {
+        "description": "The title for the app bar on the saved filters management page."
+    },
+    "savedHeadlineFiltersCreateNewButton": "Create Filter",
+    "@savedHeadlineFiltersCreateNewButton": {
+        "description": "The text for the floating action button to create a new filter."
+    },
+    "savedHeadlineFiltersLoadingHeadline": "Loading Your Filters...",
+    "@savedHeadlineFiltersLoadingHeadline": {
+        "description": "The main headline text displayed while the saved filters are loading."
+    },
+    "savedHeadlineFiltersEmptyHeadline": "No Saved Filters Yet",
+    "@savedHeadlineFiltersEmptyHeadline": {
+        "description": "The main headline text displayed on the saved filters page when the user has no saved filters."
+    },
+    "savedHeadlineFiltersEmptySubheadline": "Create a filter from the feed and save it to see it here.",
+    "@savedHeadlineFiltersEmptySubheadline": {
+        "description": "The sub-headline text displayed on the saved filters page when the user has no saved filters."
+    },
+    "savedFiltersMenuEdit": "Edit",
+    "@savedFiltersMenuEdit": {
+        "description": "The text for the 'Edit' option in the popup menu on a saved filter item."
+    },
+    "saveFilterDialogPinToFeedLabel": "Pin to Feed",
+    "@saveFilterDialogPinToFeedLabel": {
+        "description": "Label for the switch that allows a user to pin a saved filter to their feed."
+    },
+    "saveFilterDialogNotificationsLabel": "Notification Preferences",
+    "@saveFilterDialogNotificationsLabel": {
+        "description": "The title for the section in the save filter dialog where users configure notification settings."
+    },
+    "notificationDeliveryTypeBreakingOnly": "Breaking News",
+    "@notificationDeliveryTypeBreakingOnly": {
+        "description": "The user-facing name for the 'breakingOnly' notification delivery type."
+    },
+    "notificationDeliveryTypeDailyDigest": "Daily Digest",
+    "@notificationDeliveryTypeDailyDigest": {
+        "description": "The user-facing name for the 'dailyDigest' notification delivery type."
+    },
+    "notificationDeliveryTypeWeeklyRoundup": "Weekly Roundup",
+    "@notificationDeliveryTypeWeeklyRoundup": {
+        "description": "The user-facing name for the 'weeklyRoundup' notification delivery type."
     }
 }

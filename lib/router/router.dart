@@ -40,6 +40,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/b
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/headline_filter.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/country_filter_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/saved_headlines_filters_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_feed_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_filter_page.dart';
@@ -667,6 +668,14 @@ GoRouter createRouter({
                           );
                         },
                       ),
+                  GoRoute(
+                    path: Routes.savedHeadlineFilters,
+                    name: Routes.savedHeadlineFiltersName,
+                    pageBuilder: (context, state) => const MaterialPage(
+                      fullscreenDialog: true,
+                      child: SavedHeadlinesFiltersPage(),
+                    ),
+                  ),
                     ],
                   ),
                 ],
@@ -707,6 +716,14 @@ GoRouter createRouter({
                           );
                         },
                       ),
+                  GoRoute(
+                    path: Routes.savedHeadlineFilters,
+                    name: Routes.savedHeadlineFiltersName,
+                    pageBuilder: (context, state) => const MaterialPage(
+                      fullscreenDialog: true,
+                      child: SavedHeadlinesFiltersPage(),
+                    ),
+                  ),
                     ],
                   ),
                 ],

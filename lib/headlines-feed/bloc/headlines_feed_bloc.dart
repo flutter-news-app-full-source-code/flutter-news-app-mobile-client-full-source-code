@@ -95,7 +95,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       // preferences (like adding/removing a saved filter) from other parts
       // of the app and update this BLoC's state accordingly.
       if (appState.userContentPreferences?.savedHeadlineFilters != null &&
-          state.savedHeadlineFilters != appState.userContentPreferences!.savedHeadlineFilters) {
+          state.savedHeadlineFilters !=
+              appState.userContentPreferences!.savedHeadlineFilters) {
         add(
           _AppContentPreferencesChanged(
             preferences: appState.userContentPreferences!,
@@ -457,8 +458,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     String newActiveFilterId;
 
     // Prioritize the explicitly passed savedFilter to prevent race conditions.
-    if (event.savedFilter != null) {
-      newActiveFilterId = event.savedFilter!.id;
+    if (event.savedHeadlineFilter != null) {
+      newActiveFilterId = event.savedHeadlineFilter!.id;
     } else {
       final matchingSavedFilter = state.savedHeadlineFilters.firstWhereOrNull((
         savedFilter,
@@ -688,7 +689,11 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     _AppContentPreferencesChanged event,
     Emitter<HeadlinesFeedState> emit,
   ) {
-    emit(state.copyWith(savedHeadlineFilters: event.preferences.savedHeadlineFilters));
+    emit(
+      state.copyWith(
+        savedHeadlineFilters: event.preferences.savedHeadlineFilters,
+      ),
+    );
   }
 
   Future<void> _onSavedFilterSelected(

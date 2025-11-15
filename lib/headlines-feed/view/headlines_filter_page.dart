@@ -291,7 +291,7 @@ void _applyFilter(BuildContext context, {SavedHeadlineFilter? savedFilter}) {
   headlinesFeedBloc.add(
     HeadlinesFeedFiltersApplied(
       filter: newFilter,
-      savedFilter: savedFilter,
+      savedHeadlineFilter: savedFilter,
       adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
     ),
   );

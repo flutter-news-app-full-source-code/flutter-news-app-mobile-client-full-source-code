@@ -181,11 +181,11 @@ Future<void> _createAndApplyFilter(BuildContext context) async {
     context: context,
     builder: (_) {
       return SaveFilterDialog(
-        onSave: (name) {
+        onSave: (result) {
           // This callback is executed when the user submits the save dialog.
           final newFilter = SavedHeadlineFilter(
             id: const Uuid().v4(),
-            name: name,
+            name: result.name,
             // The userId will be populated by the backend upon persistence.
             userId: '',
             criteria: HeadlineFilterCriteria(
@@ -193,10 +193,9 @@ Future<void> _createAndApplyFilter(BuildContext context) async {
               sources: filterState.selectedSources.toList(),
               countries: filterState.selectedCountries.toList(),
             ),
-            // For this iteration, pinning and notifications are not yet
-            // implemented in the UI. Default to false/empty.
-            isPinned: false,
-            deliveryTypes: const {},
+            // Use the values returned from the enhanced dialog.
+            isPinned: result.isPinned,
+            deliveryTypes: result.deliveryTypes,
           );
           // Add the new filter to the global AppBloc state.
           context.read<AppBloc>().add(
@@ -239,11 +238,14 @@ Future<void> _updateAndApplyFilter(
     context: context,
     builder: (_) {
       return SaveFilterDialog(
-        initialValue: filterToEdit.name,
-        onSave: (name) {
+        // Pass the full filter object to pre-populate the dialog.
+        filterToEdit: filterToEdit,
+        onSave: (result) {
           // Create the updated filter object with new criteria and metadata.
           final updatedFilter = filterToEdit.copyWith(
-            name: name,
+            name: result.name,
+            isPinned: result.isPinned,
+            deliveryTypes: result.deliveryTypes,
             criteria: HeadlineFilterCriteria(
               topics: filterState.selectedTopics.toList(),
               sources: filterState.selectedSources.toList(),

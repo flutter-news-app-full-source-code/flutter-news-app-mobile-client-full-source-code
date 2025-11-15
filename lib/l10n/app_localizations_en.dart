@@ -1014,9 +1014,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourceListFilterByHeadquartersPageTitle => 'Headquarters location';
 
   @override
-  String get accountSavedFiltersTile => 'Saved Filters';
-
-  @override
   String get savedFiltersPageTitle => 'Saved Filters';
 
   @override

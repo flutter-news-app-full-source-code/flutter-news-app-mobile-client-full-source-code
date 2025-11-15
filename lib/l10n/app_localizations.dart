@@ -1928,12 +1928,6 @@ abstract class AppLocalizations {
   /// **'Headquarters location'**
   String get sourceListFilterByHeadquartersPageTitle;
 
-  /// The title for the list tile on the account page that navigates to the saved filters management page.
-  ///
-  /// In en, this message translates to:
-  /// **'Saved Filters'**
-  String get accountSavedFiltersTile;
-
   /// The title for the app bar on the saved filters management page.
   ///
   /// In en, this message translates to:

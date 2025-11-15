@@ -31,8 +31,6 @@ abstract final class Routes {
   // --- Account Sub-Routes ---
   static const accountSavedHeadlines = 'saved-headlines';
   static const accountSavedHeadlinesName = 'accountSavedHeadlines';
-  static const accountSavedFilters = 'saved-filters';
-  static const accountSavedFiltersName = 'accountSavedFilters';
   static const settings = 'settings';
   static const settingsName = 'settings';
   static const manageFollowedItems = 'manage-followed-items';

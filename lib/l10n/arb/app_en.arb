@@ -1326,10 +1326,6 @@
     "@sourceListFilterByHeadquartersPageTitle": {
         "description": "Title for the page where users filter sources by headquarters country."
     },
-    "accountSavedFiltersTile": "Saved Filters",
-    "@accountSavedFiltersTile": {
-        "description": "The title for the list tile on the account page that navigates to the saved filters management page."
-    },
     "savedFiltersPageTitle": "Saved Filters",
     "@savedFiltersPageTitle": {
         "description": "The title for the app bar on the saved filters management page."

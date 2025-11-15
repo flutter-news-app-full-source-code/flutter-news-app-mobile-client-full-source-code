@@ -199,12 +199,6 @@ class AccountPage extends StatelessWidget {
           onTap: () => context.pushNamed(Routes.accountSavedHeadlinesName),
         ),
         const Divider(),
-        buildTile(
-          icon: Icons.filter_alt_outlined,
-          title: l10n.accountSavedFiltersTile,
-          onTap: () => context.pushNamed(Routes.accountSavedFiltersName),
-        ),
-        const Divider(),
       ],
     );
   }

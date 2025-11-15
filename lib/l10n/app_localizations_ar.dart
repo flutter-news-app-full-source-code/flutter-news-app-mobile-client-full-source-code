@@ -1013,9 +1013,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get sourceListFilterByHeadquartersPageTitle => 'مكان المقر';
 
   @override
-  String get accountSavedFiltersTile => 'الفلاتر المحفوظة';
-
-  @override
   String get savedFiltersPageTitle => 'الفلاتر المحفوظة';
 
   @override

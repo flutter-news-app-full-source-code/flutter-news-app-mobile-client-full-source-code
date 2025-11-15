@@ -1322,10 +1322,6 @@
     "@sourceListFilterPageFilterButtonTooltip": {
         "description": "Tooltip for the button that opens the source list filter page."
     },
-    "accountSavedFiltersTile": "الفلاتر المحفوظة",
-    "@accountSavedFiltersTile": {
-        "description": "The title for the list tile on the account page that navigates to the saved filters management page."
-    },
     "savedFiltersPageTitle": "الفلاتر المحفوظة",
     "@savedFiltersPageTitle": {
         "description": "The title for the app bar on the saved filters management page."

@@ -11,7 +11,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/account/view/fol
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/followed_contents/sources/followed_sources_list_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/followed_contents/topics/add_topic_to_follow_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/followed_contents/topics/followed_topics_list_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/account/view/saved_filters_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/saved_headlines_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
@@ -381,11 +380,6 @@ GoRouter createRouter({
                 },
               ),
             ],
-          ),
-          GoRoute(
-            path: Routes.accountSavedFilters,
-            name: Routes.accountSavedFiltersName,
-            builder: (context, state) => const SavedFiltersPage(),
           ),
         ],
       ),

@@ -18,6 +18,12 @@ enum ContentAction {
 
   /// The action of saving a headline filter.
   saveHeadlineFilter,
+
+  /// The action of pinning a headline filter.
+  pinHeadlineFilter,
+
+  /// The action of subscribing to notifications for a headline filter.
+  subscribeToHeadlineFilterNotifications,
 }
 
 /// Defines the outcome of a content limitation check.
@@ -92,6 +98,45 @@ class ContentLimitationService {
         if (count >= limitConfig.total) {
           return _getLimitationStatusForRole(role);
         }
+
+      case ContentAction.pinHeadlineFilter:
+        final count = preferences.savedHeadlineFilters
+            .where((filter) => filter.isPinned)
+            .length;
+        final limit = limits.savedHeadlineFiltersLimit[role]?.pinned;
+
+        if (limit == null) return LimitationStatus.allowed;
+
+        if (count >= limit) {
+          return _getLimitationStatusForRole(role);
+        }
+
+      case ContentAction.subscribeToHeadlineFilterNotifications:
+        final subscriptionLimits =
+            limits.savedHeadlineFiltersLimit[role]?.notificationSubscriptions;
+
+        // If no subscription limits are defined for the role, disallow.
+        if (subscriptionLimits == null) return LimitationStatus.allowed;
+
+        // Count current subscriptions for each delivery type.
+        final currentCounts =
+            <PushNotificationSubscriptionDeliveryType, int>{};
+        for (final filter in preferences.savedHeadlineFilters) {
+          for (final type in filter.deliveryTypes) {
+            currentCounts.update(type, (value) => value + 1, ifAbsent: () => 1);
+          }
+        }
+
+        // Check if the user has hit the limit for every available type.
+        // If they can still subscribe to at least one type, the action is allowed.
+        final canSubscribeToAny = subscriptionLimits.entries.any((entry) {
+          return (currentCounts[entry.key] ?? 0) < entry.value;
+        });
+
+        if (!canSubscribeToAny) {
+          return _getLimitationStatusForRole(role);
+        }
+
       case ContentAction.followTopic:
       case ContentAction.followSource:
       case ContentAction.followCountry:
@@ -111,6 +156,10 @@ class ContentLimitationService {
             count = 0;
           case ContentAction.saveHeadlineFilter:
             // This case is handled above and will not be reached here.
+            count = 0;
+          case ContentAction.pinHeadlineFilter:
+          case ContentAction.subscribeToHeadlineFilterNotifications:
+            // These cases are handled above and will not be reached here.
             count = 0;
         }
 

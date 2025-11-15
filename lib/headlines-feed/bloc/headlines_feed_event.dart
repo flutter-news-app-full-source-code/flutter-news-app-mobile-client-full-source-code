@@ -88,7 +88,7 @@ final class HeadlinesFeedFiltersApplied extends HeadlinesFeedEvent {
 
   /// The [HeadlineFilter] containing the selected categories, sources,
   /// and/or countries.
-  final HeadlineFilter filter;
+  final HeadlineFilterCriteria filter;
 
   /// The optional [SavedHeadlineFilter] that this filter corresponds to.
   /// This is used exclusively during the "save and apply" flow to prevent

@@ -7,7 +7,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_th
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_filter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/headline_filter.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/widgets/save_filter_dialog.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
@@ -34,7 +33,7 @@ class HeadlinesFilterPage extends StatelessWidget {
   });
 
   /// The filter state from the feed, used to initialize the filter page.
-  final HeadlineFilter initialFilter;
+  final HeadlineFilterCriteria initialFilter;
 
   /// An optional existing filter passed when in 'edit' mode.
   /// If this is not null, the page will update the existing filter instead of
@@ -51,9 +50,9 @@ class HeadlinesFilterPage extends StatelessWidget {
             countriesRepository: context.read<DataRepository<Country>>(),
           )..add(
             FilterDataLoaded(
-              initialSelectedTopics: initialFilter.topics ?? [],
-              initialSelectedSources: initialFilter.sources ?? [],
-              initialSelectedCountries: initialFilter.eventCountries ?? [],
+              initialSelectedTopics: initialFilter.topics,
+              initialSelectedSources: initialFilter.sources,
+              initialSelectedCountries: initialFilter.countries,
             ),
           ),
       child: _HeadlinesFilterView(
@@ -283,10 +282,10 @@ void _applyFilter(BuildContext context, {SavedHeadlineFilter? savedFilter}) {
   final headlinesFeedBloc = context.read<HeadlinesFeedBloc>();
 
   // Create a new HeadlineFilter from the current selections in the filter bloc.
-  final newFilter = HeadlineFilter(
+  final newFilter = HeadlineFilterCriteria(
     topics: filterState.selectedTopics.toList(),
     sources: filterState.selectedSources.toList(),
-    eventCountries: filterState.selectedCountries.toList(),
+    countries: filterState.selectedCountries.toList(),
   );
   headlinesFeedBloc.add(
     HeadlinesFeedFiltersApplied(
@@ -308,7 +307,7 @@ void _applyAndExit(BuildContext context) {
 class _HeadlinesFilterView extends StatelessWidget {
   const _HeadlinesFilterView({required this.initialFilter, this.filterToEdit});
 
-  final HeadlineFilter initialFilter;
+  final HeadlineFilterCriteria initialFilter;
   final SavedHeadlineFilter? filterToEdit;
 
   @override
@@ -425,11 +424,11 @@ class _HeadlinesFilterView extends StatelessWidget {
             const UnknownException('Failed to load filter data.'),
         onRetry: () {
           context.read<HeadlinesFilterBloc>().add(
-            FilterDataLoaded(
-              initialSelectedTopics: initialFilter.topics ?? [],
-              initialSelectedSources: initialFilter.sources ?? [],
-              initialSelectedCountries: initialFilter.eventCountries ?? [],
-            ),
+                FilterDataLoaded(
+                  initialSelectedTopics: initialFilter.topics,
+                  initialSelectedSources: initialFilter.sources,
+                  initialSelectedCountries: initialFilter.countries,
+                ),
           );
         },
       );

@@ -12,7 +12,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inl
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/cached_feed.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/headline_filter.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
 import 'package:logging/logging.dart';
 
@@ -150,6 +149,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   /// Subscription to the AppBloc's state stream.
   late final StreamSubscription<AppState> _appBlocSubscription;
 
+  static const _allFilterId = 'all';
+
   /// The number of headlines to fetch per page.
   static const _headlinesFetchLimit = 10;
 
@@ -157,21 +158,21 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   /// for the same filter.
   static const _refreshThrottleDuration = Duration(seconds: 30);
 
-  Map<String, dynamic> _buildFilter(HeadlineFilter filter) {
+  Map<String, dynamic> _buildFilter(HeadlineFilterCriteria filter) {
     final queryFilter = <String, dynamic>{};
-    if (filter.topics?.isNotEmpty ?? false) {
+    if (filter.topics.isNotEmpty) {
       queryFilter['topic.id'] = {
-        r'$in': filter.topics!.map((t) => t.id).toList(),
+        r'$in': filter.topics.map((t) => t.id).toList(),
       };
     }
-    if (filter.sources?.isNotEmpty ?? false) {
+    if (filter.sources.isNotEmpty) {
       queryFilter['source.id'] = {
-        r'$in': filter.sources!.map((s) => s.id).toList(),
+        r'$in': filter.sources.map((s) => s.id).toList(),
       };
     }
-    if (filter.eventCountries?.isNotEmpty ?? false) {
+    if (filter.countries.isNotEmpty) {
       queryFilter['eventCountry.id'] = {
-        r'$in': filter.eventCountries!.map((c) => c.id).toList(),
+        r'$in': filter.countries.map((c) => c.id).toList(),
       };
     }
     // Always filter for active content.
@@ -184,7 +185,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   }
 
   /// Generates a deterministic cache key based on the active filter.
-  String _generateFilterKey(String activeFilterId, HeadlineFilter filter) {
+  String _generateFilterKey(
+    String activeFilterId,
+    HeadlineFilterCriteria filter,
+  ) {
     // For built-in filters, use their static names.
     if (activeFilterId == 'all' || activeFilterId == 'followed') {
       return activeFilterId;
@@ -464,11 +468,11 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       final matchingSavedFilter = state.savedHeadlineFilters.firstWhereOrNull((
         savedFilter,
       ) {
-        final appliedTopics = event.filter.topics?.toSet() ?? {};
+        final appliedTopics = event.filter.topics.toSet();
         final savedTopics = savedFilter.criteria.topics.toSet();
-        final appliedSources = event.filter.sources?.toSet() ?? {};
+        final appliedSources = event.filter.sources.toSet();
         final savedSources = savedFilter.criteria.sources.toSet();
-        final appliedCountries = event.filter.eventCountries?.toSet() ?? {};
+        final appliedCountries = event.filter.countries.toSet();
         final savedCountries = savedFilter.criteria.countries.toSet();
 
         return const SetEquality<Topic>().equals(appliedTopics, savedTopics) &&
@@ -592,8 +596,12 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           feedItems: cachedFeed.feedItems,
           hasMore: cachedFeed.hasMore,
           cursor: cachedFeed.cursor,
-          filter: const HeadlineFilter(),
-          activeFilterId: 'all',
+          filter: const HeadlineFilterCriteria(
+            topics: [],
+            sources: [],
+            countries: [],
+          ),
+          activeFilterId: _allFilterId,
         ),
       );
       // Only trigger a background refresh if the cache is older than the
@@ -607,12 +615,16 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     _logger.info(
       'Filters Cleared: Cache MISS for "all" filter. Fetching new data.',
     );
-    const newFilter = HeadlineFilter();
+    const newFilter = HeadlineFilterCriteria(
+      topics: [],
+      sources: [],
+      countries: [],
+    );
     emit(
       state.copyWith(
         status: HeadlinesFeedStatus.loading,
         filter: newFilter,
-        activeFilterId: 'all',
+        activeFilterId: _allFilterId,
         feedItems: [],
         clearCursor: true,
       ),
@@ -702,11 +714,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   ) async {
     final filterKey = event.filter.id;
     final cachedFeed = _feedCacheService.getFeed(filterKey);
-    final newFilter = HeadlineFilter(
-      topics: event.filter.criteria.topics,
-      sources: event.filter.criteria.sources,
-      eventCountries: event.filter.criteria.countries,
-    );
+    final newFilter = event.filter.criteria;
 
     if (cachedFeed != null) {
       _logger.info(
@@ -761,16 +769,29 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           hasMore: cachedFeed.hasMore,
           cursor: cachedFeed.cursor,
           activeFilterId: 'all',
-          filter: const HeadlineFilter(),
+          filter: const HeadlineFilterCriteria(
+            topics: [],
+            sources: [],
+            countries: [],
+          ),
         ),
       );
       return;
     }
 
     _logger.info(
-      '"All" Filter Selected: Cache MISS. Delegating to filter clear.',
+      '"All" Filter Selected: Cache MISS. Delegating to filters cleared.',
     );
-    emit(state.copyWith(activeFilterId: 'all', filter: const HeadlineFilter()));
+    emit(
+      state.copyWith(
+        activeFilterId: 'all',
+        filter: const HeadlineFilterCriteria(
+          topics: [],
+          sources: [],
+          countries: [],
+        ),
+      ),
+    );
     add(HeadlinesFeedFiltersCleared(adThemeStyle: event.adThemeStyle));
   }
 
@@ -786,10 +807,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       return;
     }
 
-    final newFilter = HeadlineFilter(
+    final newFilter = HeadlineFilterCriteria(
       topics: userPreferences.followedTopics,
       sources: userPreferences.followedSources,
-      eventCountries: userPreferences.followedCountries,
+      countries: userPreferences.followedCountries,
     );
 
     if (cachedFeed != null) {

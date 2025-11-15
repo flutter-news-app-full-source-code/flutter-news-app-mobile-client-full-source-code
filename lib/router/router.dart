@@ -36,7 +36,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headline-details
 import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/view/headline_details_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_filter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/headline_filter.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/country_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/saved_headlines_filters_page.dart';
@@ -584,10 +583,12 @@ GoRouter createRouter({
                       // The 'extra' parameter now contains a map with the
                       // initial filter and the HeadlinesFeedBloc instance.
                       final extra = state.extra! as Map<String, dynamic>;
-                      final initialFilter =
-                          extra['initialFilter'] as HeadlineFilter;
+                      final initialFilter = extra['initialFilter'] as HeadlineFilterCriteria;
                       final headlinesFeedBloc =
                           extra['headlinesFeedBloc'] as HeadlinesFeedBloc;
+                      // The filter to edit, if any. This is passed when the user
+                      // taps 'Edit' on a saved filter.
+                      final filterToEdit = extra['filterToEdit'] as SavedHeadlineFilter?;
 
                       return MaterialPage(
                         fullscreenDialog: true,
@@ -602,6 +603,7 @@ GoRouter createRouter({
                           value: headlinesFeedBloc,
                           child: HeadlinesFilterPage(
                             initialFilter: initialFilter,
+                            filterToEdit: filterToEdit,
                           ),
                         ),
                       );

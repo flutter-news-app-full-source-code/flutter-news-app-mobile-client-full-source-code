@@ -58,7 +58,11 @@ class _SavedHeadlinesFiltersView extends StatelessWidget {
           context.pushNamed(
             Routes.feedFilterName,
             extra: {
-              'initialFilter': const HeadlineFilter(),
+              'initialFilter': const HeadlineFilterCriteria(
+                topics: [],
+                sources: [],
+                countries: [],
+              ),
               'headlinesFeedBloc': context.read<HeadlinesFeedBloc>(),
               'filterToEdit': null,
             },
@@ -145,9 +149,7 @@ class _SavedHeadlinesFiltersView extends StatelessWidget {
                       context.pushNamed(
                         Routes.feedFilterName,
                         extra: {
-                          'initialFilter': HeadlineFilter.fromCriteria(
-                            filter.criteria,
-                          ),
+                          'initialFilter': filter.criteria,
                           'headlinesFeedBloc': context
                               .read<HeadlinesFeedBloc>(),
                           'filterToEdit': filter,

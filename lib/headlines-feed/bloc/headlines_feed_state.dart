@@ -8,7 +8,11 @@ class HeadlinesFeedState extends Equatable {
     this.feedItems = const [],
     this.hasMore = true,
     this.cursor,
-    this.filter = const HeadlineFilter(),
+    this.filter = const HeadlineFilterCriteria(
+      topics: [],
+      sources: [],
+      countries: [],
+    ),
     this.savedHeadlineFilters = const [],
     this.activeFilterId = 'all',
     this.error,
@@ -21,7 +25,7 @@ class HeadlinesFeedState extends Equatable {
   final List<FeedItem> feedItems;
   final bool hasMore;
   final String? cursor;
-  final HeadlineFilter filter;
+  final HeadlineFilterCriteria filter;
   final HttpException? error;
 
   /// A URL to navigate to, typically set when a call-to-action is tapped.
@@ -41,7 +45,7 @@ class HeadlinesFeedState extends Equatable {
     List<FeedItem>? feedItems,
     bool? hasMore,
     String? cursor,
-    HeadlineFilter? filter,
+    HeadlineFilterCriteria? filter,
     List<SavedHeadlineFilter>? savedHeadlineFilters,
     String? activeFilterId,
     HttpException? error,

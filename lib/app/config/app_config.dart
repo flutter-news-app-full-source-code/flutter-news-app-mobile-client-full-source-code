@@ -10,6 +10,7 @@ class AppConfig {
   AppConfig({
     required this.environment,
     required this.baseUrl,
+    required this.oneSignalAppId,
     // Add other environment-specific configs here (e.g., analytics keys)
   });
 
@@ -20,6 +21,7 @@ class AppConfig {
   /// with a missing configuration. This is a critical safety check.
   factory AppConfig.production() {
     const baseUrl = String.fromEnvironment('BASE_URL');
+    const oneSignalAppId = String.fromEnvironment('ONE_SIGNAL_APP_ID');
     if (baseUrl.isEmpty) {
       // This check is crucial for production builds.
       throw const FormatException(
@@ -28,13 +30,26 @@ class AppConfig {
         '--dart-define=BASE_URL=https://your.api.com',
       );
     }
-    return AppConfig(environment: AppEnvironment.production, baseUrl: baseUrl);
+    if (oneSignalAppId.isEmpty) {
+      // This check is crucial for production builds.
+      throw const FormatException(
+        'FATAL: The ONE_SIGNAL_APP_ID compile-time variable was not provided '
+        'for this production build. Ensure the build command includes '
+        '--dart-define=ONE_SIGNAL_APP_ID=your-id',
+      );
+    }
+    return AppConfig(
+      environment: AppEnvironment.production,
+      baseUrl: baseUrl,
+      oneSignalAppId: oneSignalAppId,
+    );
   }
 
   /// A factory constructor for the demo environment.
   factory AppConfig.demo() => AppConfig(
     environment: AppEnvironment.demo,
     baseUrl: '', // No API access needed for in-memory demo
+    oneSignalAppId: 'YOUR_DEMO_ONESIGNAL_APP_ID', // Placeholder for demo
   );
 
   /// A factory constructor for the development environment.
@@ -44,8 +59,13 @@ class AppConfig {
       'BASE_URL',
       defaultValue: 'http://localhost:8080',
     ),
+    oneSignalAppId: const String.fromEnvironment(
+      'ONE_SIGNAL_APP_ID',
+      defaultValue: 'YOUR_DEV_ONESIGNAL_APP_ID', // Placeholder for dev
+    ),
   );
 
   final AppEnvironment environment;
   final String baseUrl;
+  final String oneSignalAppId;
 }

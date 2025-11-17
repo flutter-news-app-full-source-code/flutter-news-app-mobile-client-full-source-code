@@ -214,12 +214,11 @@ Future<void> _createAndApplyFilter(BuildContext context) async {
   // was successful and if the widget is still in the tree.
   // This check prevents the "Don't use 'BuildContext's across async gaps"
   // lint warning and ensures we don't try to pop a disposed context.
-  // We pop twice: once to close the filter page, and a second time to
-  // close the "Saved Filters" page, returning the user to the feed.
+  // We pop once to close the filter page. The user is returned to the
+  // SavedHeadlinesFiltersPage, from where they can navigate back to the feed.
   if (didSave == true && context.mounted) {
-    context
-      ..pop() // Pop HeadlinesFilterPage
-      ..pop(); // Pop SavedHeadlinesFiltersPage
+    // Pop HeadlinesFilterPage
+    context.pop();
   }
 }
 
@@ -305,7 +304,10 @@ void _applyAndExit(BuildContext context) {
   // This helper method now separates applying the filter from exiting.
   // It's called for the "Apply Only" flow.
   _applyFilter(context);
-  context.pop();
+  // Pop the filter page to return to the previous screen, which is the
+  // SavedHeadlinesFiltersPage. From there, the user can tap the back button
+  // to return to the feed with the filter applied.
+  context.pop(); 
 }
 
 class _HeadlinesFilterView extends StatelessWidget {

@@ -60,7 +60,10 @@ class ContentLimitationService {
   ///
   /// Returns a [LimitationStatus] indicating whether the action is allowed or
   /// if a specific limit has been reached.
-  LimitationStatus checkAction(ContentAction action) {
+  LimitationStatus checkAction(
+    ContentAction action, {
+    PushNotificationSubscriptionDeliveryType? deliveryType,
+  }) {
     final state = _appBloc.state;
     final user = state.user;
     final preferences = state.userContentPreferences;
@@ -115,26 +118,38 @@ class ContentLimitationService {
         final subscriptionLimits =
             limits.savedHeadlineFiltersLimit[role]?.notificationSubscriptions;
 
-        // If no subscription limits are defined for the role, disallow.
+        // If no subscription limits are defined for the role, allow the action.
         if (subscriptionLimits == null) return LimitationStatus.allowed;
 
-        // Count current subscriptions for each delivery type.
-        final currentCounts =
-            <PushNotificationSubscriptionDeliveryType, int>{};
+        final currentCounts = <PushNotificationSubscriptionDeliveryType, int>{};
         for (final filter in preferences.savedHeadlineFilters) {
           for (final type in filter.deliveryTypes) {
             currentCounts.update(type, (value) => value + 1, ifAbsent: () => 1);
           }
         }
 
-        // Check if the user has hit the limit for every available type.
-        // If they can still subscribe to at least one type, the action is allowed.
-        final canSubscribeToAny = subscriptionLimits.entries.any((entry) {
-          return (currentCounts[entry.key] ?? 0) < entry.value;
-        });
+        // If a specific delivery type is provided, check the limit for that
+        // type only. This is used by the SaveFilterDialog UI.
+        if (deliveryType != null) {
+          final limitForType = subscriptionLimits[deliveryType] ?? 0;
+          final currentCountForType = currentCounts[deliveryType] ?? 0;
 
-        if (!canSubscribeToAny) {
-          return _getLimitationStatusForRole(role);
+          if (currentCountForType >= limitForType) {
+            return _getLimitationStatusForRole(role);
+          }
+        } else {
+          // If no specific type is provided, perform a general check to see
+          // if the user can subscribe to *any* notification type. This maintains
+          // backward compatibility for broader checks.
+          final canSubscribeToAny = subscriptionLimits.entries.any((entry) {
+            final limit = entry.value;
+            final currentCount = currentCounts[entry.key] ?? 0;
+            return currentCount < limit;
+          });
+
+          if (!canSubscribeToAny) {
+            return _getLimitationStatusForRole(role);
+          }
         }
 
       case ContentAction.followTopic:

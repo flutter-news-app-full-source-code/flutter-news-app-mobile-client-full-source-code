@@ -43,9 +43,12 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
   late bool _isPinned;
   late Set<PushNotificationSubscriptionDeliveryType> _selectedDeliveryTypes;
 
-  // Flags to control the enabled state of UI elements based on limits.
-  bool _canPin = true;
-  bool _canSubscribe = true;
+  // --- State flags to control UI based on user limits ---
+  // Determines if the user can interact with the 'Pin to feed' switch.
+  late final bool _canPin;
+  // Determines if the user can interact with each notification type checkbox.
+  late final Map<PushNotificationSubscriptionDeliveryType, bool>
+  _canSubscribePerType;
 
   static const _maxNameLength = 15;
 
@@ -57,23 +60,35 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
     _isPinned = filter?.isPinned ?? false;
     _selectedDeliveryTypes = filter?.deliveryTypes ?? {};
 
-    // Check content limitations when the dialog is initialized.
-    // This will be used to disable UI elements if the user has reached a limit.
-    // Note: The ContentActions used here will be implemented in a subsequent step.
+    // Check content limitations to dynamically enable/disable UI controls.
     final contentLimitationService = context.read<ContentLimitationService>();
-    _canPin =
-        contentLimitationService.checkAction(
-          // This action will be fully implemented in the next step.
-          ContentAction.pinHeadlineFilter,
-        ) ==
-        LimitationStatus.allowed;
 
-    _canSubscribe =
-        contentLimitationService.checkAction(
-          // This action will be fully implemented in the next step.
-          ContentAction.subscribeToHeadlineFilterNotifications,
-        ) ==
-        LimitationStatus.allowed;
+    // The user can interact with the pin switch if they haven't reached their
+    // limit, OR if they are editing a filter that is already pinned (to allow
+    // them to un-pin it).
+    _canPin =
+        contentLimitationService.checkAction(ContentAction.pinHeadlineFilter) ==
+            LimitationStatus.allowed ||
+        (widget.filterToEdit?.isPinned ?? false);
+
+    // Determine subscribability for each notification type individually.
+    _canSubscribePerType = {};
+    for (final type in PushNotificationSubscriptionDeliveryType.values) {
+      final isAlreadySubscribed =
+          widget.filterToEdit?.deliveryTypes.contains(type) ?? false;
+
+      // Check if the user is allowed to subscribe to this specific type.
+      final limitationStatus = contentLimitationService.checkAction(
+        ContentAction.subscribeToHeadlineFilterNotifications,
+        deliveryType: type,
+      );
+
+      // The user can interact with the checkbox if they haven't reached their
+      // limit for this type, OR if they are already subscribed to it (to
+      // allow them to un-subscribe).
+      _canSubscribePerType[type] =
+          limitationStatus == LimitationStatus.allowed || isAlreadySubscribed;
+    }
   }
 
   @override
@@ -150,7 +165,7 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
               // Only show the notifications section if the feature is enabled
               // in the remote config.
               if (pushNotificationConfig?.enabled == true) ...[
-                const SizedBox(height: AppSpacing.lg),
+                const SizedBox(height: AppSpacing.md),
                 const Divider(),
                 const SizedBox(height: AppSpacing.md),
                 Text(
@@ -161,23 +176,27 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
                 // Generate a CheckboxListTile for each available delivery type.
                 ...PushNotificationSubscriptionDeliveryType.values.map((type) {
                   // Check if this specific delivery type is enabled globally.
-                  final isTypeEnabled =
+                  final isGloballyEnabled =
                       pushNotificationConfig?.deliveryConfigs[type] ?? false;
+                  final isAlreadySubscribed = _selectedDeliveryTypes.contains(
+                    type,
+                  );
 
-                  if (!isTypeEnabled) {
-                    return const SizedBox.shrink();
-                  }
+                  // The checkbox is interactable if it's globally enabled AND
+                  // the user has permission for this specific type.
+                  final canInteract =
+                      isGloballyEnabled &&
+                      (_canSubscribePerType[type] ?? false);
 
                   return CheckboxListTile(
                     title: Text(type.toL10n(l10n)),
-                    value: _selectedDeliveryTypes.contains(type),
-                    // The checkbox is enabled only if the user has not reached
-                    // their subscription limit AND the global push notification
-                    // system is active.
-                    onChanged:
-                        _canSubscribe &&
-                            (pushNotificationConfig?.enabled ?? false)
-                        ? (isSelected) {
+                    value: isAlreadySubscribed,
+                    // The checkbox is disabled if it's not globally enabled or
+                    // if the user has hit their limit (and isn't already
+                    // subscribed). This preserves the checked state for users
+                    // who had a subscription before a limit was imposed.
+                    onChanged: canInteract
+                        ? (bool? isSelected) {
                             setState(() {
                               if (isSelected == true) {
                                 _selectedDeliveryTypes.add(type);

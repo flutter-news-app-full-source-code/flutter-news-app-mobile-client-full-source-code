@@ -96,6 +96,7 @@ class _SourceFilterViewState extends State<_SourceFilterView> {
         final source = displayableSources[index];
         final isSelected = filterState.selectedSources.contains(source);
 
+        // ignore: avoid_positional_boolean_parameters
         void handleTap(bool? value) {
           if (value != null) {
             context.read<HeadlinesFilterBloc>().add(

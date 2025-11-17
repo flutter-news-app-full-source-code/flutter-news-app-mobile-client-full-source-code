@@ -217,10 +217,9 @@ Future<void> _createAndApplyFilter(BuildContext context) async {
   // We pop twice: once to close the filter page, and a second time to
   // close the "Saved Filters" page, returning the user directly to the feed.
   if (didSave == true && context.mounted) {
-    // Pop HeadlinesFilterPage.
-    context.pop();
-    // Pop SavedHeadlinesFiltersPage.
-    context.pop();
+    context
+      ..pop() // Pop HeadlinesFilterPage.
+      ..pop(); // Pop SavedHeadlinesFiltersPage.
   }
 }
 
@@ -272,8 +271,9 @@ Future<void> _updateAndApplyFilter(
   if (didSave == true && context.mounted) {
     // Pop twice: once to close the filter page, and a second time to
     // close the "Saved Filters" page, returning the user directly to the feed.
-    context.pop();
-    context.pop();
+    context
+      ..pop()
+      ..pop();
   }
 }
 
@@ -311,8 +311,9 @@ void _applyAndExit(BuildContext context) {
   _applyFilter(context);
   // Pop twice: once to close the filter page, and a second time to
   // close the "Saved Filters" page, returning the user directly to the feed.
-  context.pop(); // Pop HeadlinesFilterPage
-  context.pop(); // Pop SavedHeadlinesFiltersPage
+  context
+    ..pop() // Pop HeadlinesFilterPage
+    ..pop(); // Pop SavedHeadlinesFiltersPage
 }
 
 class _HeadlinesFilterView extends StatelessWidget {

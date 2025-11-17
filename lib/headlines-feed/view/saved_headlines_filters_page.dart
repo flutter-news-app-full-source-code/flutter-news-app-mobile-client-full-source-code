@@ -157,7 +157,7 @@ class _SavedHeadlinesFiltersView extends StatelessWidget {
                   onSelected: (value) async {
                     if (value == 'edit') {
                       // Navigate to the filter page in 'edit' mode.
-                      context.pushNamed(
+                      await context.pushNamed(
                         Routes.feedFilterName,
                         extra: {
                           'initialFilter': filter.criteria,

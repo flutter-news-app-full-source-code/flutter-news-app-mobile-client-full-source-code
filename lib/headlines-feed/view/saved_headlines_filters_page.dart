@@ -116,14 +116,11 @@ class _SavedHeadlinesFiltersView extends StatelessWidget {
                 title: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Use Flexible to ensure the Text widget truncates properly
-                    // within the Row, preventing layout overflow.
-                    Flexible(
-                      child: Text(
-                        filter.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                    Text(
+                      filter.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
                     ),
                     if (filter.isPinned) ...[
                       const SizedBox(width: AppSpacing.sm),

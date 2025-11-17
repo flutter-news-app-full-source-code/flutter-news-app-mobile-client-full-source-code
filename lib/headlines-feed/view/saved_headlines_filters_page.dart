@@ -161,8 +161,6 @@ class _SavedHeadlinesFiltersView extends StatelessWidget {
                         Routes.feedFilterName,
                         extra: {
                           'initialFilter': filter.criteria,
-                          'headlinesFeedBloc': context
-                              .read<HeadlinesFeedBloc>(),
                           'filterToEdit': filter,
                         },
                       );

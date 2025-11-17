@@ -7,6 +7,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/b
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headline_search_delegate.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/notification_indicator.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/user_avatar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -81,10 +82,18 @@ class FeedSliverAppBar extends StatelessWidget implements PreferredSizeWidget {
                 onTap: () {
                   context.pushNamed(Routes.accountName);
                 },
-                child: BlocSelector<AppBloc, AppState, User?>(
-                  selector: (state) => state.user,
-                  builder: (context, user) {
-                    return UserAvatar(user: user);
+                child: BlocSelector<AppBloc, AppState, bool>(
+                  selector: (state) => state.hasUnreadInAppNotifications,
+                  builder: (context, showIndicator) {
+                    return NotificationIndicator(
+                      showIndicator: showIndicator,
+                      child: BlocSelector<AppBloc, AppState, User?>(
+                        selector: (state) => state.user,
+                        builder: (context, user) {
+                          return UserAvatar(user: user);
+                        },
+                      ),
+                    );
                   },
                 ),
               ),

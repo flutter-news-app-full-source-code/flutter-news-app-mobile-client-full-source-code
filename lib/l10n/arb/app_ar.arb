@@ -1661,5 +1661,21 @@
     "notificationDeliveryTypeWeeklyRoundup": "الحصاد الأسبوعي",
     "@notificationDeliveryTypeWeeklyRoundup": {
         "description": "The user-facing name for the 'weeklyRoundup' notification delivery type."
+    },
+    "prePermissionDialogTitle": "تفعيل الإشعارات؟",
+    "@prePermissionDialogTitle": {
+        "description": "Title for the pre-permission dialog asking the user to enable notifications."
+    },
+    "prePermissionDialogBody": "لإرسال تنبيهات الأخبار العاجلة والملخصات لهذا الفلتر، يرجى السماح بالإشعارات.",
+    "@prePermissionDialogBody": {
+        "description": "Body text for the pre-permission dialog explaining why notifications are needed for saved filters."
+    },
+    "prePermissionDialogDenyButton": "ليس الآن",
+    "@prePermissionDialogDenyButton": {
+        "description": "Text for the button to deny notification permission in the pre-permission dialog."
+    },
+    "prePermissionDialogAllowButton": "السماح",
+    "@prePermissionDialogAllowButton": {
+        "description": "Text for the button to allow notification permission in the pre-permission dialog."
     }
 }

@@ -1277,4 +1277,17 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get notificationDeliveryTypeWeeklyRoundup => 'الحصاد الأسبوعي';
+
+  @override
+  String get prePermissionDialogTitle => 'تفعيل الإشعارات؟';
+
+  @override
+  String get prePermissionDialogBody =>
+      'لإرسال تنبيهات الأخبار العاجلة والملخصات لهذا الفلتر، يرجى السماح بالإشعارات.';
+
+  @override
+  String get prePermissionDialogDenyButton => 'ليس الآن';
+
+  @override
+  String get prePermissionDialogAllowButton => 'السماح';
 }

@@ -2431,6 +2431,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Weekly Roundup'**
   String get notificationDeliveryTypeWeeklyRoundup;
+
+  /// Title for the pre-permission dialog asking the user to enable notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Notifications?'**
+  String get prePermissionDialogTitle;
+
+  /// Body text for the pre-permission dialog explaining why notifications are needed for saved filters.
+  ///
+  /// In en, this message translates to:
+  /// **'To send you breaking news alerts and digests for this filter, please allow notifications.'**
+  String get prePermissionDialogBody;
+
+  /// Text for the button to deny notification permission in the pre-permission dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Now'**
+  String get prePermissionDialogDenyButton;
+
+  /// Text for the button to allow notification permission in the pre-permission dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow'**
+  String get prePermissionDialogAllowButton;
 }
 
 class _AppLocalizationsDelegate

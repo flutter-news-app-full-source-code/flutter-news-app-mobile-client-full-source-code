@@ -171,8 +171,12 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
                   return CheckboxListTile(
                     title: Text(type.toL10n(l10n)),
                     value: _selectedDeliveryTypes.contains(type),
-                    // Disable if the user has reached their subscription limit.
-                    onChanged: _canSubscribe
+                    // The checkbox is enabled only if the user has not reached
+                    // their subscription limit AND the global push notification
+                    // system is active.
+                    onChanged:
+                        _canSubscribe &&
+                            (pushNotificationConfig?.enabled ?? false)
                         ? (isSelected) {
                             setState(() {
                               if (isSelected == true) {

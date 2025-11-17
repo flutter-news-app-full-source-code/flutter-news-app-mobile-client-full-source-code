@@ -1,5 +1,6 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_hot_restart_wrapper.dart';
@@ -14,6 +15,10 @@ const appEnvironment = String.fromEnvironment('APP_ENVIRONMENT') == 'production'
           : AppEnvironment.demo);
 
 void main() async {
+  // Ensure Flutter widgets are initialized before any Firebase operations.
+  WidgetsFlutterBinding.ensureInitialized();
+  // Initialize Firebase services.
+  await Firebase.initializeApp();
   final appConfig = switch (appEnvironment) {
     AppEnvironment.production => AppConfig.production(),
     AppEnvironment.development => AppConfig.development(),

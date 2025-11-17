@@ -143,7 +143,9 @@ class _SavedHeadlinesFiltersView extends StatelessWidget {
                       adThemeStyle: AdThemeStyle.fromTheme(theme),
                     ),
                   );
-                  // Pop back to the feed page.
+                  // Pop the current page (SavedHeadlinesFiltersPage) to return
+                  // to the underlying HeadlinesFeedPage, which will now show
+                  // the content for the applied filter.
                   context.pop();
                 },
                 trailing: PopupMenuButton<String>(

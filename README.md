@@ -38,7 +38,7 @@ A beautiful, infinitely scrolling feed serves as the core of the user experience
 ### 🔎 Powerful Content Curation & Discovery
 Give users the tools to find exactly what they're looking for with a multi-faceted discovery system.
 - **Customizable Filter Bar:** A persistent, one-tap filter bar provides instant access to pre-defined and user-created content streams.
-- **Advanced Content Curation:** A dedicated management UI allows users to construct, save, and manage highly specific news feeds. Users can save frequently used filters for on-demand use and pin them for one-tap access on the main feed or .
+- **Advanced Content Curation:** A dedicated management UI allows users to construct, save, and manage highly specific news feeds. Users can save frequently used filters for on-demand use and pin them for one-tap access on the main feed.
 - **Proactive Notification Subscriptions:** When saving a filter, users can subscribe to receive push notifications—such as breaking news alerts or daily digests—for content that matches their specific criteria.
 - **Dedicated Discovery Hub:** Users can browse publishers by category in horizontally scrolling carousels, apply regional filters, and perform targeted searches.
 > **Your Advantage:** Deliver powerful content discovery tools that keep users engaged, increase session duration, and encourage return visits.

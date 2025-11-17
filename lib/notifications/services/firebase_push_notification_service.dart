@@ -1,0 +1,140 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:core/core.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/repositories/push_notification_device_repository.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
+import 'package:logging/logging.dart';
+
+/// A concrete implementation of [PushNotificationService] for Firebase Cloud
+/// Messaging (FCM).
+class FirebasePushNotificationService implements PushNotificationService {
+  /// Creates an instance of [FirebasePushNotificationService].
+  FirebasePushNotificationService({
+    required PushNotificationDeviceRepository pushNotificationDeviceRepository,
+    required Logger logger,
+  }) : _pushNotificationDeviceRepository = pushNotificationDeviceRepository,
+       _logger = logger;
+
+  final PushNotificationDeviceRepository _pushNotificationDeviceRepository;
+  final Logger _logger;
+
+  final _onMessageController = StreamController<PushNotificationPayload>();
+  final _onMessageOpenedAppController =
+      StreamController<PushNotificationPayload>();
+
+  @override
+  Stream<PushNotificationPayload> get onMessage => _onMessageController.stream;
+
+  @override
+  Stream<PushNotificationPayload> get onMessageOpenedApp =>
+      _onMessageOpenedAppController.stream;
+
+  @override
+  Future<void> initialize() async {
+    _logger.info('Initializing FirebasePushNotificationService...');
+
+    // Handle messages that are tapped and open the app from a terminated state.
+    final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+    if (initialMessage != null) {
+      _handleMessage(initialMessage, isOpenedApp: true);
+    }
+
+    // Handle messages received while the app is in the foreground.
+    FirebaseMessaging.onMessage.listen(
+      (message) => _handleMessage(message, isOpenedApp: false),
+    );
+
+    // Handle messages that are tapped and open the app from a background state.
+    FirebaseMessaging.onMessageOpenedApp.listen(
+      (message) => _handleMessage(message, isOpenedApp: true),
+    );
+
+    _logger.info('FirebasePushNotificationService initialized.');
+  }
+
+  void _handleMessage(RemoteMessage message, {required bool isOpenedApp}) {
+    _logger.fine(
+      'Received Firebase message (isOpenedApp: $isOpenedApp): '
+      '${message.toMap()}',
+    );
+    final payload = _toPushNotificationPayload(message);
+    if (isOpenedApp) {
+      _onMessageOpenedAppController.add(payload);
+    } else {
+      _onMessageController.add(payload);
+    }
+  }
+
+  @override
+  Future<PushNotificationPayload?> get initialMessage async {
+    final message = await FirebaseMessaging.instance.getInitialMessage();
+    return message != null ? _toPushNotificationPayload(message) : null;
+  }
+
+  @override
+  Future<bool> requestPermission() async {
+    _logger.info('Requesting push notification permission from user...');
+    final settings = await FirebaseMessaging.instance.requestPermission();
+    final granted =
+        settings.authorizationStatus == AuthorizationStatus.authorized;
+    _logger.info('Permission request result: ${settings.authorizationStatus}');
+    return granted;
+  }
+
+  @override
+  Future<bool> hasPermission() async {
+    final settings = await FirebaseMessaging.instance.getNotificationSettings();
+    return settings.authorizationStatus == AuthorizationStatus.authorized;
+  }
+
+  @override
+  Future<void> registerDevice({required String userId}) async {
+    _logger.info('Registering device for user: $userId');
+    try {
+      final token = await FirebaseMessaging.instance.getToken();
+      if (token == null) {
+        _logger.warning('Failed to get FCM token. Cannot register device.');
+        return;
+      }
+
+      _logger.fine('FCM token received: $token');
+      final device = PushNotificationDevice(
+        id: token, // Use token as a unique ID for the device
+        userId: userId,
+        platform: Platform.isIOS ? DevicePlatform.ios : DevicePlatform.android,
+        providerTokens: {PushNotificationProvider.firebase: token},
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+
+      await _pushNotificationDeviceRepository.registerDevice(device);
+      _logger.info('Device successfully registered with backend.');
+    } catch (e, s) {
+      _logger.severe('Failed to register device.', e, s);
+      // Re-throwing allows the caller (e.g., AppBloc) to know about the failure.
+      rethrow;
+    }
+  }
+
+  /// Converts a Firebase [RemoteMessage] to a generic [PushNotificationPayload].
+  PushNotificationPayload _toPushNotificationPayload(RemoteMessage message) {
+    return PushNotificationPayload(
+      title: message.notification?.title ?? '',
+      body: message.notification?.body ?? '',
+      imageUrl:
+          message.notification?.android?.imageUrl ??
+          message.notification?.apple?.imageUrl,
+      data: message.data,
+    );
+  }
+
+  @override
+  Future<void> close() async {
+    await _onMessageController.close();
+    await _onMessageOpenedAppController.close();
+  }
+}

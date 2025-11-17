@@ -214,8 +214,12 @@ Future<void> _createAndApplyFilter(BuildContext context) async {
   // was successful and if the widget is still in the tree.
   // This check prevents the "Don't use 'BuildContext's across async gaps"
   // lint warning and ensures we don't try to pop a disposed context.
+  // We pop twice: once to close the filter page, and a second time to
+  // close the "Saved Filters" page, returning the user to the feed.
   if (didSave == true && context.mounted) {
-    context.pop();
+    context
+      ..pop() // Pop HeadlinesFilterPage
+      ..pop(); // Pop SavedHeadlinesFiltersPage
   }
 }
 
@@ -424,11 +428,11 @@ class _HeadlinesFilterView extends StatelessWidget {
             const UnknownException('Failed to load filter data.'),
         onRetry: () {
           context.read<HeadlinesFilterBloc>().add(
-                FilterDataLoaded(
-                  initialSelectedTopics: initialFilter.topics,
-                  initialSelectedSources: initialFilter.sources,
-                  initialSelectedCountries: initialFilter.countries,
-                ),
+            FilterDataLoaded(
+              initialSelectedTopics: initialFilter.topics,
+              initialSelectedSources: initialFilter.sources,
+              initialSelectedCountries: initialFilter.countries,
+            ),
           );
         },
       );

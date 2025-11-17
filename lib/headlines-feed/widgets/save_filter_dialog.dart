@@ -58,7 +58,9 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
     final filter = widget.filterToEdit;
     _controller = TextEditingController(text: filter?.name);
     _isPinned = filter?.isPinned ?? false;
-    _selectedDeliveryTypes = filter?.deliveryTypes ?? {};
+    // Initialize with a new modifiable Set to prevent "Cannot modify
+    // unmodifiable Set" errors when editing an existing filter.
+    _selectedDeliveryTypes = Set.from(filter?.deliveryTypes ?? {});
 
     // Check content limitations to dynamically enable/disable UI controls.
     final contentLimitationService = context.read<ContentLimitationService>();
@@ -183,7 +185,8 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
                   );
 
                   // The checkbox is interactable if it's globally enabled AND
-                  // the user has permission for this specific type.
+                  // the user has permission for this specific type OR if they
+                  // are already subscribed (which allows them to unsubscribe).
                   final canInteract =
                       isGloballyEnabled &&
                       (_canSubscribePerType[type] ?? false);

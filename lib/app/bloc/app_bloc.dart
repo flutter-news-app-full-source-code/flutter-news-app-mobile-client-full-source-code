@@ -500,8 +500,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       return;
     }
 
-    final updatedSavedFilters =
-        List<SavedHeadlineFilter>.from(originalFilters)
+    final updatedSavedFilters = List<SavedHeadlineFilter>.from(originalFilters)
       ..[index] = event.filter;
 
     final updatedPreferences = state.userContentPreferences!.copyWith(

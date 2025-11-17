@@ -460,10 +460,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     Emitter<HeadlinesFeedState> emit,
   ) async {
     String newActiveFilterId;
- 
+
     // Determine the active filter ID based on the applied criteria.
     // This logic is crucial for correctly highlighting the filter chip in the UI.
- 
+
     // Case 1: A new filter was just saved ("Save & Apply").
     // The `savedHeadlineFilter` is passed explicitly to prevent a race condition
     // where the `state.savedHeadlineFilters` might not have updated yet.
@@ -484,15 +484,16 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       // Case 2: A filter was applied from the filter page ("Apply Only") or
       // by applying an un-pinned saved filter.
       // We check if the criteria match any *pinned* saved filter.
-      final matchingPinnedFilter =
-          state.savedHeadlineFilters.firstWhereOrNull((savedFilter) {
+      final matchingPinnedFilter = state.savedHeadlineFilters.firstWhereOrNull((
+        savedFilter,
+      ) {
         // Only consider pinned filters for direct ID matching.
         if (!savedFilter.isPinned) return false;
- 
+
         // Compare the criteria of the applied filter with the saved one.
         return savedFilter.criteria == event.filter;
       });
- 
+
       if (matchingPinnedFilter != null) {
         // If it matches a pinned filter, use its ID.
         newActiveFilterId = matchingPinnedFilter.id;
@@ -503,7 +504,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         _logger.fine('Applied filter is a one-time "custom" filter.');
       }
     }
- 
+
     final filterKey = _generateFilterKey(newActiveFilterId, event.filter);
     final cachedFeed = _feedCacheService.getFeed(filterKey);
 
@@ -732,7 +733,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   ) async {
     final filterKey = event.filter.id;
     final newFilter = event.filter.criteria;
- 
+
     // If the selected filter is pinned, we can attempt a cache hit and set
     // its ID as the active one directly.
     if (event.filter.isPinned) {
@@ -759,7 +760,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         return;
       }
     }
- 
+
     // For un-pinned filters, or a cache miss on a pinned filter, delegate
     // to the standard `HeadlinesFeedFiltersApplied` handler. This ensures
     // consistent logic for loading and setting the active filter state
@@ -767,7 +768,12 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     _logger.info(
       'Saved Filter Selected: Delegating to filter application for key "$filterKey".',
     );
-    add(HeadlinesFeedFiltersApplied(filter: newFilter, adThemeStyle: event.adThemeStyle));
+    add(
+      HeadlinesFeedFiltersApplied(
+        filter: newFilter,
+        adThemeStyle: event.adThemeStyle,
+      ),
+    );
   }
 
   Future<void> _onAllFilterSelected(

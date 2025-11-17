@@ -1013,9 +1013,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get sourceListFilterByHeadquartersPageTitle => 'مكان المقر';
 
   @override
-  String get accountSavedFiltersTile => 'الفلاتر المحفوظة';
-
-  @override
   String get savedFiltersPageTitle => 'الفلاتر المحفوظة';
 
   @override
@@ -1246,4 +1243,38 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get decoratorSuggestedSourcesTitle_2 => 'اكتشف مصادر موثوقة';
+
+  @override
+  String get savedHeadlineFiltersPageTitle => 'الفلاتر المحفوظة';
+
+  @override
+  String get savedHeadlineFiltersCreateNewButton => 'إنشاء فلتر';
+
+  @override
+  String get savedHeadlineFiltersLoadingHeadline => 'جارٍ تحميل فلاترك...';
+
+  @override
+  String get savedHeadlineFiltersEmptyHeadline => 'لا توجد فلاتر محفوظة بعد';
+
+  @override
+  String get savedHeadlineFiltersEmptySubheadline =>
+      'الفلاتر التي تنشئها وتحفظها ستظهر هنا. اضغط على الزر أدناه للبدء.';
+
+  @override
+  String get savedFiltersMenuEdit => 'تعديل';
+
+  @override
+  String get saveFilterDialogPinToFeedLabel => 'تثبيت في شريط الفلاتر';
+
+  @override
+  String get saveFilterDialogNotificationsLabel => 'تفضيلات الإشعارات';
+
+  @override
+  String get notificationDeliveryTypeBreakingOnly => 'الأخبار العاجلة';
+
+  @override
+  String get notificationDeliveryTypeDailyDigest => 'الملخص اليومي';
+
+  @override
+  String get notificationDeliveryTypeWeeklyRoundup => 'الحصاد الأسبوعي';
 }

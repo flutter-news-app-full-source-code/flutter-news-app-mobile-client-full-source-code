@@ -12,7 +12,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inl
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/cached_feed.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/headline_filter.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
 import 'package:logging/logging.dart';
 
@@ -80,8 +79,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
        _logger = Logger('HeadlinesFeedBloc'),
        super(
          HeadlinesFeedState(
-           savedFilters:
-               initialUserContentPreferences?.savedFilters ?? const [],
+           savedHeadlineFilters:
+               initialUserContentPreferences?.savedHeadlineFilters ?? const [],
          ),
        ) {
     // Subscribe to AppBloc to react to global state changes, primarily for
@@ -94,8 +93,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       // This subscription's responsibility is to listen for changes in user
       // preferences (like adding/removing a saved filter) from other parts
       // of the app and update this BLoC's state accordingly.
-      if (appState.userContentPreferences != null &&
-          state.savedFilters != appState.userContentPreferences!.savedFilters) {
+      if (appState.userContentPreferences?.savedHeadlineFilters != null &&
+          state.savedHeadlineFilters !=
+              appState.userContentPreferences!.savedHeadlineFilters) {
         add(
           _AppContentPreferencesChanged(
             preferences: appState.userContentPreferences!,
@@ -126,7 +126,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     );
     on<CallToActionTapped>(_onCallToActionTapped, transformer: sequential());
     on<NavigationHandled>(_onNavigationHandled, transformer: sequential());
-    on<_AppContentPreferencesChanged>(_onAppContentPreferencesChanged);
+    on<_AppContentPreferencesChanged>(
+      _onAppContentPreferencesChanged,
+      transformer: sequential(),
+    );
     on<SavedFilterSelected>(_onSavedFilterSelected, transformer: restartable());
     on<AllFilterSelected>(_onAllFilterSelected, transformer: restartable());
     on<FollowedFilterSelected>(
@@ -146,6 +149,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   /// Subscription to the AppBloc's state stream.
   late final StreamSubscription<AppState> _appBlocSubscription;
 
+  static const _allFilterId = 'all';
+
   /// The number of headlines to fetch per page.
   static const _headlinesFetchLimit = 10;
 
@@ -153,21 +158,21 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   /// for the same filter.
   static const _refreshThrottleDuration = Duration(seconds: 30);
 
-  Map<String, dynamic> _buildFilter(HeadlineFilter filter) {
+  Map<String, dynamic> _buildFilter(HeadlineFilterCriteria filter) {
     final queryFilter = <String, dynamic>{};
-    if (filter.topics?.isNotEmpty ?? false) {
+    if (filter.topics.isNotEmpty) {
       queryFilter['topic.id'] = {
-        r'$in': filter.topics!.map((t) => t.id).toList(),
+        r'$in': filter.topics.map((t) => t.id).toList(),
       };
     }
-    if (filter.sources?.isNotEmpty ?? false) {
+    if (filter.sources.isNotEmpty) {
       queryFilter['source.id'] = {
-        r'$in': filter.sources!.map((s) => s.id).toList(),
+        r'$in': filter.sources.map((s) => s.id).toList(),
       };
     }
-    if (filter.eventCountries?.isNotEmpty ?? false) {
+    if (filter.countries.isNotEmpty) {
       queryFilter['eventCountry.id'] = {
-        r'$in': filter.eventCountries!.map((c) => c.id).toList(),
+        r'$in': filter.countries.map((c) => c.id).toList(),
       };
     }
     // Always filter for active content.
@@ -180,7 +185,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   }
 
   /// Generates a deterministic cache key based on the active filter.
-  String _generateFilterKey(String activeFilterId, HeadlineFilter filter) {
+  String _generateFilterKey(
+    String activeFilterId,
+    HeadlineFilterCriteria filter,
+  ) {
     // For built-in filters, use their static names.
     if (activeFilterId == 'all' || activeFilterId == 'followed') {
       return activeFilterId;
@@ -453,29 +461,48 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   ) async {
     String newActiveFilterId;
 
-    // Prioritize the explicitly passed savedFilter to prevent race conditions.
-    if (event.savedFilter != null) {
-      newActiveFilterId = event.savedFilter!.id;
+    // Determine the active filter ID based on the applied criteria.
+    // This logic is crucial for correctly highlighting the filter chip in the UI.
+
+    // Case 1: A new filter was just saved ("Save & Apply").
+    // The `savedHeadlineFilter` is passed explicitly to prevent a race condition
+    // where the `state.savedHeadlineFilters` might not have updated yet.
+    // We only care about it if it's pinned.
+    if (event.savedHeadlineFilter != null) {
+      if (event.savedHeadlineFilter!.isPinned) {
+        newActiveFilterId = event.savedHeadlineFilter!.id;
+        _logger.fine('Filter applied via "Save & Apply" with a pinned filter.');
+      } else {
+        // If saved but not pinned, it's treated as a one-time custom filter.
+        newActiveFilterId = 'custom';
+        _logger.fine(
+          'Filter applied via "Save & Apply" with an un-pinned filter. '
+          'Treating as "custom".',
+        );
+      }
     } else {
-      final matchingSavedFilter = state.savedFilters.firstWhereOrNull((
+      // Case 2: A filter was applied from the filter page ("Apply Only") or
+      // by applying an un-pinned saved filter.
+      // We check if the criteria match any *pinned* saved filter.
+      final matchingPinnedFilter = state.savedHeadlineFilters.firstWhereOrNull((
         savedFilter,
       ) {
-        final appliedTopics = event.filter.topics?.toSet() ?? {};
-        final savedTopics = savedFilter.topics.toSet();
-        final appliedSources = event.filter.sources?.toSet() ?? {};
-        final savedSources = savedFilter.sources.toSet();
-        final appliedCountries = event.filter.eventCountries?.toSet() ?? {};
-        final savedCountries = savedFilter.countries.toSet();
+        // Only consider pinned filters for direct ID matching.
+        if (!savedFilter.isPinned) return false;
 
-        return const SetEquality<Topic>().equals(appliedTopics, savedTopics) &&
-            const SetEquality<Source>().equals(appliedSources, savedSources) &&
-            const SetEquality<Country>().equals(
-              appliedCountries,
-              savedCountries,
-            );
+        // Compare the criteria of the applied filter with the saved one.
+        return savedFilter.criteria == event.filter;
       });
 
-      newActiveFilterId = matchingSavedFilter?.id ?? 'custom';
+      if (matchingPinnedFilter != null) {
+        // If it matches a pinned filter, use its ID.
+        newActiveFilterId = matchingPinnedFilter.id;
+        _logger.fine('Applied filter matches a pinned saved filter.');
+      } else {
+        // Otherwise, it's a "custom" filter application.
+        newActiveFilterId = 'custom';
+        _logger.fine('Applied filter is a one-time "custom" filter.');
+      }
     }
 
     final filterKey = _generateFilterKey(newActiveFilterId, event.filter);
@@ -588,8 +615,12 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           feedItems: cachedFeed.feedItems,
           hasMore: cachedFeed.hasMore,
           cursor: cachedFeed.cursor,
-          filter: const HeadlineFilter(),
-          activeFilterId: 'all',
+          filter: const HeadlineFilterCriteria(
+            topics: [],
+            sources: [],
+            countries: [],
+          ),
+          activeFilterId: _allFilterId,
         ),
       );
       // Only trigger a background refresh if the cache is older than the
@@ -603,12 +634,16 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     _logger.info(
       'Filters Cleared: Cache MISS for "all" filter. Fetching new data.',
     );
-    const newFilter = HeadlineFilter();
+    const newFilter = HeadlineFilterCriteria(
+      topics: [],
+      sources: [],
+      countries: [],
+    );
     emit(
       state.copyWith(
         status: HeadlinesFeedStatus.loading,
         filter: newFilter,
-        activeFilterId: 'all',
+        activeFilterId: _allFilterId,
         feedItems: [],
         clearCursor: true,
       ),
@@ -685,7 +720,11 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     _AppContentPreferencesChanged event,
     Emitter<HeadlinesFeedState> emit,
   ) {
-    emit(state.copyWith(savedFilters: event.preferences.savedFilters));
+    emit(
+      state.copyWith(
+        savedHeadlineFilters: event.preferences.savedHeadlineFilters,
+      ),
+    );
   }
 
   Future<void> _onSavedFilterSelected(
@@ -693,42 +732,42 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     Emitter<HeadlinesFeedState> emit,
   ) async {
     final filterKey = event.filter.id;
-    final cachedFeed = _feedCacheService.getFeed(filterKey);
-    final newFilter = HeadlineFilter(
-      topics: event.filter.topics,
-      sources: event.filter.sources,
-      eventCountries: event.filter.countries,
-    );
+    final newFilter = event.filter.criteria;
 
-    if (cachedFeed != null) {
-      _logger.info(
-        'Saved Filter Selected: Cache HIT for key "$filterKey". '
-        'Emitting cached state.',
-      );
-      emit(
-        state.copyWith(
-          status: HeadlinesFeedStatus.success,
-          feedItems: cachedFeed.feedItems,
-          hasMore: cachedFeed.hasMore,
-          cursor: cachedFeed.cursor,
-          activeFilterId: filterKey,
-          filter: newFilter,
-        ),
-      );
-      // Only trigger a background refresh if the cache is older than the
-      // throttle duration.
-      if (DateTime.now().difference(cachedFeed.lastRefreshedAt) >
-          _refreshThrottleDuration) {
-        add(HeadlinesFeedRefreshRequested(adThemeStyle: event.adThemeStyle));
+    // If the selected filter is pinned, we can attempt a cache hit and set
+    // its ID as the active one directly.
+    if (event.filter.isPinned) {
+      final cachedFeed = _feedCacheService.getFeed(filterKey);
+      if (cachedFeed != null) {
+        _logger.info(
+          'Pinned Filter Selected: Cache HIT for key "$filterKey". Emitting cached state.',
+        );
+        emit(
+          state.copyWith(
+            status: HeadlinesFeedStatus.success,
+            feedItems: cachedFeed.feedItems,
+            hasMore: cachedFeed.hasMore,
+            cursor: cachedFeed.cursor,
+            activeFilterId: filterKey,
+            filter: newFilter,
+          ),
+        );
+        // Trigger a background refresh if the cache is stale.
+        if (DateTime.now().difference(cachedFeed.lastRefreshedAt) >
+            _refreshThrottleDuration) {
+          add(HeadlinesFeedRefreshRequested(adThemeStyle: event.adThemeStyle));
+        }
+        return;
       }
-      return;
     }
 
+    // For un-pinned filters, or a cache miss on a pinned filter, delegate
+    // to the standard `HeadlinesFeedFiltersApplied` handler. This ensures
+    // consistent logic for loading and setting the active filter state
+    // (which will be 'custom' for un-pinned filters).
     _logger.info(
-      'Saved Filter Selected: Cache MISS for key "$filterKey". '
-      'Delegating to filter application.',
+      'Saved Filter Selected: Delegating to filter application for key "$filterKey".',
     );
-    emit(state.copyWith(activeFilterId: event.filter.id));
     add(
       HeadlinesFeedFiltersApplied(
         filter: newFilter,
@@ -753,16 +792,29 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           hasMore: cachedFeed.hasMore,
           cursor: cachedFeed.cursor,
           activeFilterId: 'all',
-          filter: const HeadlineFilter(),
+          filter: const HeadlineFilterCriteria(
+            topics: [],
+            sources: [],
+            countries: [],
+          ),
         ),
       );
       return;
     }
 
     _logger.info(
-      '"All" Filter Selected: Cache MISS. Delegating to filter clear.',
+      '"All" Filter Selected: Cache MISS. Delegating to filters cleared.',
     );
-    emit(state.copyWith(activeFilterId: 'all', filter: const HeadlineFilter()));
+    emit(
+      state.copyWith(
+        activeFilterId: 'all',
+        filter: const HeadlineFilterCriteria(
+          topics: [],
+          sources: [],
+          countries: [],
+        ),
+      ),
+    );
     add(HeadlinesFeedFiltersCleared(adThemeStyle: event.adThemeStyle));
   }
 
@@ -778,10 +830,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       return;
     }
 
-    final newFilter = HeadlineFilter(
+    final newFilter = HeadlineFilterCriteria(
       topics: userPreferences.followedTopics,
       sources: userPreferences.followedSources,
-      eventCountries: userPreferences.followedCountries,
+      countries: userPreferences.followedCountries,
     );
 
     if (cachedFeed != null) {

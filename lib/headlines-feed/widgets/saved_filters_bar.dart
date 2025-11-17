@@ -75,11 +75,12 @@ class _SavedFiltersBarState extends State<SavedFiltersBar> {
         height: 52,
         child: BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
           builder: (context, state) {
-            // Clear the keys on each build to prevent the map from growing
-            // indefinitely with old, stale keys.
-            _chipKeys.clear();
+            // The _chipKeys map is intentionally not cleared on each build.
+            // This ensures that the GlobalKeys persist across rebuilds,
+            // allowing the BlocListener's post-frame callback to reliably
+            // find the widget's context and scroll to it.
 
-            final savedFilters = state.savedFilters;
+            final savedFilters = state.savedHeadlineFilters;
             final userPreferences = context
                 .watch<AppBloc>()
                 .state
@@ -107,132 +108,130 @@ class _SavedFiltersBarState extends State<SavedFiltersBar> {
               GlobalKey.new,
             );
 
-            final listView = ListView(
-              controller: _scrollController,
-              scrollDirection: Axis.horizontal,
-              padding: EdgeInsets.zero,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.filter_list),
-                  tooltip: l10n.savedFiltersBarOpenTooltip,
-                  onPressed: () {
-                    // Read the current filter and the HeadlinesFeedBloc
-                    // instance from the context.
-                    final headlinesFeedBloc = context.read<HeadlinesFeedBloc>();
-                    final currentFilter = headlinesFeedBloc.state.filter;
-
-                    // Navigate to the filter page, passing both the current
-                    // filter and the HeadlinesFeedBloc instance. This allows
-                    // the filter page to communicate back to the feed bloc
-                    // without relying on a shared ancestor context, which was
-                    // causing a ProviderNotFoundException.
-                    context.goNamed(
-                      Routes.feedFilterName,
-                      extra: {
-                        'initialFilter': currentFilter,
-                        'headlinesFeedBloc': headlinesFeedBloc,
-                      },
+            // Programmatically build the list of chips to ensure correct order.
+            final chips = <Widget>[
+              IconButton(
+                icon: const Icon(Icons.filter_list),
+                tooltip: l10n.savedFiltersBarOpenTooltip,
+                onPressed: () {
+                  // Navigate to the new saved filters management page.
+                  // This page acts as a central hub for viewing, applying,
+                  // and managing all saved filters.
+                  context.pushNamed(Routes.savedHeadlineFiltersName);
+                },
+              ),
+              const VerticalDivider(
+                width: AppSpacing.md,
+                indent: AppSpacing.md,
+                endIndent: AppSpacing.md,
+              ),
+              Padding(
+                key: allKey,
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+                child: ChoiceChip(
+                  label: Text(l10n.savedFiltersBarAllLabel),
+                  labelPadding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xs,
+                  ),
+                  selected: activeFilterId == _allFilterId,
+                  showCheckmark: false,
+                  onSelected: (_) {
+                    context.read<HeadlinesFeedBloc>().add(
+                      AllFilterSelected(
+                        adThemeStyle: AdThemeStyle.fromTheme(theme),
+                      ),
                     );
                   },
                 ),
-                const VerticalDivider(
-                  width: AppSpacing.md,
-                  indent: AppSpacing.md,
-                  endIndent: AppSpacing.md,
-                ),
+              ),
+            ];
+
+            // Conditionally add the "Followed" filter chip.
+            if (isFollowingItems) {
+              chips.add(
                 Padding(
-                  key: allKey,
+                  key: followedKey,
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.xs,
                   ),
                   child: ChoiceChip(
-                    label: Text(l10n.savedFiltersBarAllLabel),
+                    label: Text(l10n.savedFiltersBarFollowedLabel),
                     labelPadding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.xs,
                     ),
-                    selected: activeFilterId == _allFilterId,
+                    selected: activeFilterId == _followedFilterId,
                     showCheckmark: false,
                     onSelected: (_) {
                       context.read<HeadlinesFeedBloc>().add(
-                        AllFilterSelected(
+                        FollowedFilterSelected(
                           adThemeStyle: AdThemeStyle.fromTheme(theme),
                         ),
                       );
                     },
                   ),
                 ),
-                // Conditionally display the "Followed" filter chip.
-                if (isFollowingItems)
-                  Padding(
-                    key: followedKey,
-                    padding: const EdgeInsets.symmetric(
+              );
+            }
+
+            // Conditionally insert the "Custom" filter chip at the correct position.
+            if (activeFilterId == _customFilterId) {
+              chips.add(
+                Padding(
+                  key: customKey,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xs,
+                  ),
+                  child: ChoiceChip(
+                    label: Text(l10n.savedFiltersBarCustomLabel),
+                    labelPadding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.xs,
                     ),
-                    child: ChoiceChip(
-                      label: Text(l10n.savedFiltersBarFollowedLabel),
-                      labelPadding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.xs,
-                      ),
-                      selected: activeFilterId == _followedFilterId,
-                      showCheckmark: false,
-                      onSelected: (_) {
-                        context.read<HeadlinesFeedBloc>().add(
-                          FollowedFilterSelected(
-                            adThemeStyle: AdThemeStyle.fromTheme(theme),
-                          ),
-                        );
-                      },
+                    showCheckmark: false,
+                    selected: true,
+                    onSelected: null,
+                    selectedColor: theme.colorScheme.primary.withOpacity(0.2),
+                    labelStyle: TextStyle(
+                      color: theme.colorScheme.onSurface.withOpacity(0.7),
                     ),
                   ),
-                ...savedFilters.map((filter) {
-                  final filterKey = _chipKeys.putIfAbsent(
-                    filter.id,
-                    GlobalKey.new,
-                  );
-                  return Padding(
-                    key: filterKey,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.xs,
-                    ),
-                    child: ChoiceChip(
-                      label: Text(filter.name),
-                      labelPadding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.xs,
-                      ),
-                      selected: activeFilterId == filter.id,
-                      showCheckmark: false,
-                      onSelected: (_) {
-                        context.read<HeadlinesFeedBloc>().add(
-                          SavedFilterSelected(
-                            filter: filter,
-                            adThemeStyle: AdThemeStyle.fromTheme(theme),
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                }),
-                if (activeFilterId == _customFilterId)
-                  Padding(
-                    key: customKey,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.xs,
-                    ),
-                    child: ChoiceChip(
-                      label: Text(l10n.savedFiltersBarCustomLabel),
-                      labelPadding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.xs,
-                      ),
-                      showCheckmark: false,
-                      selected: true,
-                      onSelected: null,
-                      selectedColor: theme.colorScheme.primary.withOpacity(0.2),
-                      labelStyle: TextStyle(
-                        color: theme.colorScheme.onSurface.withOpacity(0.7),
-                      ),
-                    ),
+                ),
+              );
+            }
+
+            // Add only the pinned filters from the saved filters list.
+            chips.addAll(
+              savedFilters.where((filter) => filter.isPinned).map((filter) {
+                final filterKey = _chipKeys.putIfAbsent(
+                  filter.id,
+                  GlobalKey.new,
+                );
+                return Padding(
+                  key: filterKey,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xs,
                   ),
-              ],
+                  child: ChoiceChip(
+                    label: Text(
+                      filter.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    labelPadding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.xs,
+                    ),
+                    selected: activeFilterId == filter.id,
+                    showCheckmark: false,
+                    onSelected: (_) {
+                      context.read<HeadlinesFeedBloc>().add(
+                        SavedFilterSelected(
+                          filter: filter,
+                          adThemeStyle: AdThemeStyle.fromTheme(theme),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              }),
             );
 
             // Determine if the fade should be shown based on scroll position.
@@ -279,7 +278,12 @@ class _SavedFiltersBarState extends State<SavedFiltersBar> {
                 ).createShader(bounds);
               },
               blendMode: BlendMode.dstIn,
-              child: listView,
+              child: ListView(
+                controller: _scrollController,
+                scrollDirection: Axis.horizontal,
+                padding: EdgeInsets.zero,
+                children: chips,
+              ),
             );
           },
         ),

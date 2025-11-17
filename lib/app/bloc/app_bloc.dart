@@ -75,10 +75,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppPeriodicConfigFetchRequested>(_onAppPeriodicConfigFetchRequested);
     on<AppUserFeedDecoratorShown>(_onAppUserFeedDecoratorShown);
     on<AppUserContentPreferencesChanged>(_onAppUserContentPreferencesChanged);
-    on<SavedFilterAdded>(_onSavedFilterAdded);
-    on<SavedFilterUpdated>(_onSavedFilterUpdated);
-    on<SavedFilterDeleted>(_onSavedFilterDeleted);
-    on<SavedFiltersReordered>(_onSavedFiltersReordered);
+    on<SavedHeadlineFilterAdded>(_onSavedHeadlineFilterAdded);
+    on<SavedHeadlineFilterUpdated>(_onSavedHeadlineFilterUpdated);
+    on<SavedHeadlineFilterDeleted>(_onSavedHeadlineFilterDeleted);
+    on<SavedHeadlineFiltersReordered>(_onSavedHeadlineFiltersReordered);
     on<AppLogoutRequested>(_onLogoutRequested);
   }
 
@@ -439,124 +439,135 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     }
   }
 
-  /// Handles adding a new saved filter to the user's content preferences.
-  Future<void> _onSavedFilterAdded(
-    SavedFilterAdded event,
+  /// Handles adding a new saved headline filter to the user's content
+  /// preferences.
+  Future<void> _onSavedHeadlineFilterAdded(
+    SavedHeadlineFilterAdded event,
     Emitter<AppState> emit,
   ) async {
     _logger.fine(
-      '[AppBloc] SavedFilterAdded event received for filter: "${event.filter.name}".',
+      '[AppBloc] SavedHeadlineFilterAdded event received for filter: '
+      '"${event.filter.name}".',
     );
     // This method modifies the preferences in memory and then delegates the
     // persistence and final state update to the AppUserContentPreferencesChanged event.
     if (state.userContentPreferences == null) {
       _logger.warning(
-        '[AppBloc] Skipping SavedFilterAdded: UserContentPreferences not loaded.',
+        '[AppBloc] Skipping SavedHeadlineFilterAdded: UserContentPreferences '
+        'not loaded.',
       );
       return;
     }
 
-    final updatedSavedFilters = List<SavedFilter>.from(
-      state.userContentPreferences!.savedFilters,
+    final updatedSavedFilters = List<SavedHeadlineFilter>.from(
+      state.userContentPreferences!.savedHeadlineFilters,
     )..add(event.filter);
 
     final updatedPreferences = state.userContentPreferences!.copyWith(
-      savedFilters: updatedSavedFilters,
+      savedHeadlineFilters: updatedSavedFilters,
     );
 
     add(AppUserContentPreferencesChanged(preferences: updatedPreferences));
   }
 
-  /// Handles updating an existing saved filter (e.g., renaming it).
-  Future<void> _onSavedFilterUpdated(
-    SavedFilterUpdated event,
+  /// Handles updating an existing saved headline filter (e.g., renaming it).
+  Future<void> _onSavedHeadlineFilterUpdated(
+    SavedHeadlineFilterUpdated event,
     Emitter<AppState> emit,
   ) async {
     _logger.fine(
-      '[AppBloc] SavedFilterUpdated event received for filter id: ${event.filter.id}.',
+      '[AppBloc] SavedHeadlineFilterUpdated event received for filter id: '
+      '${event.filter.id}.',
     );
     // This method modifies the preferences in memory and then delegates the
     // persistence and final state update to the AppUserContentPreferencesChanged event.
     if (state.userContentPreferences == null) {
       _logger.warning(
-        '[AppBloc] Skipping SavedFilterUpdated: UserContentPreferences not loaded.',
+        '[AppBloc] Skipping SavedHeadlineFilterUpdated: '
+        'UserContentPreferences not loaded.',
       );
       return;
     }
 
-    final originalFilters = state.userContentPreferences!.savedFilters;
+    final originalFilters = state.userContentPreferences!.savedHeadlineFilters;
     final index = originalFilters.indexWhere((f) => f.id == event.filter.id);
 
     if (index == -1) {
       _logger.warning(
-        '[AppBloc] Skipping SavedFilterUpdated: Filter with id ${event.filter.id} not found.',
+        '[AppBloc] Skipping SavedHeadlineFilterUpdated: Filter with id '
+        '${event.filter.id} not found.',
       );
       return;
     }
 
-    final updatedSavedFilters = List<SavedFilter>.from(originalFilters)
+    final updatedSavedFilters = List<SavedHeadlineFilter>.from(originalFilters)
       ..[index] = event.filter;
 
     final updatedPreferences = state.userContentPreferences!.copyWith(
-      savedFilters: updatedSavedFilters,
+      savedHeadlineFilters: updatedSavedFilters,
     );
 
     add(AppUserContentPreferencesChanged(preferences: updatedPreferences));
   }
 
-  /// Handles deleting a saved filter from the user's content preferences.
-  Future<void> _onSavedFilterDeleted(
-    SavedFilterDeleted event,
+  /// Handles deleting a saved headline filter from the user's content
+  /// preferences.
+  Future<void> _onSavedHeadlineFilterDeleted(
+    SavedHeadlineFilterDeleted event,
     Emitter<AppState> emit,
   ) async {
     _logger.fine(
-      '[AppBloc] SavedFilterDeleted event received for filter id: ${event.filterId}.',
+      '[AppBloc] SavedHeadlineFilterDeleted event received for filter id: '
+      '${event.filterId}.',
     );
     // This method modifies the preferences in memory and then delegates the
     // persistence and final state update to the AppUserContentPreferencesChanged event.
     if (state.userContentPreferences == null) {
       _logger.warning(
-        '[AppBloc] Skipping SavedFilterDeleted: UserContentPreferences not loaded.',
+        '[AppBloc] Skipping SavedHeadlineFilterDeleted: '
+        'UserContentPreferences not loaded.',
       );
       return;
     }
 
-    final updatedSavedFilters = List<SavedFilter>.from(
-      state.userContentPreferences!.savedFilters,
+    final updatedSavedFilters = List<SavedHeadlineFilter>.from(
+      state.userContentPreferences!.savedHeadlineFilters,
     )..removeWhere((f) => f.id == event.filterId);
 
     if (updatedSavedFilters.length ==
-        state.userContentPreferences!.savedFilters.length) {
+        state.userContentPreferences!.savedHeadlineFilters.length) {
       _logger.warning(
-        '[AppBloc] Skipping SavedFilterDeleted: Filter with id ${event.filterId} not found.',
+        '[AppBloc] Skipping SavedHeadlineFilterDeleted: Filter with id '
+        '${event.filterId} not found.',
       );
       return;
     }
 
     final updatedPreferences = state.userContentPreferences!.copyWith(
-      savedFilters: updatedSavedFilters,
+      savedHeadlineFilters: updatedSavedFilters,
     );
 
     add(AppUserContentPreferencesChanged(preferences: updatedPreferences));
   }
 
-  /// Handles reordering the list of saved filters.
-  Future<void> _onSavedFiltersReordered(
-    SavedFiltersReordered event,
+  /// Handles reordering the list of saved headline filters.
+  Future<void> _onSavedHeadlineFiltersReordered(
+    SavedHeadlineFiltersReordered event,
     Emitter<AppState> emit,
   ) async {
-    _logger.fine('[AppBloc] SavedFiltersReordered event received.');
+    _logger.fine('[AppBloc] SavedHeadlineFiltersReordered event received.');
     // This method modifies the preferences in memory and then delegates the
     // persistence and final state update to the AppUserContentPreferencesChanged event.
     if (state.userContentPreferences == null) {
       _logger.warning(
-        '[AppBloc] Skipping SavedFiltersReordered: UserContentPreferences not loaded.',
+        '[AppBloc] Skipping SavedHeadlineFiltersReordered: '
+        'UserContentPreferences not loaded.',
       );
       return;
     }
 
     final updatedPreferences = state.userContentPreferences!.copyWith(
-      savedFilters: event.reorderedFilters,
+      savedHeadlineFilters: event.reorderedFilters,
     );
 
     add(AppUserContentPreferencesChanged(preferences: updatedPreferences));

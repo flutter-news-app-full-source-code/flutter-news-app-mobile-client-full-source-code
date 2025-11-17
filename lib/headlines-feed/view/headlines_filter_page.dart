@@ -7,7 +7,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_th
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_filter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/headline_filter.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/widgets/save_filter_dialog.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
@@ -27,10 +26,19 @@ import 'package:uuid/uuid.dart';
 /// {@endtemplate}
 class HeadlinesFilterPage extends StatelessWidget {
   /// {@macro headlines_filter_page}
-  const HeadlinesFilterPage({required this.initialFilter, super.key});
+  const HeadlinesFilterPage({
+    required this.initialFilter,
+    this.filterToEdit,
+    super.key,
+  });
 
   /// The filter state from the feed, used to initialize the filter page.
-  final HeadlineFilter initialFilter;
+  final HeadlineFilterCriteria initialFilter;
+
+  /// An optional existing filter passed when in 'edit' mode.
+  /// If this is not null, the page will update the existing filter instead of
+  /// creating a new one.
+  final SavedHeadlineFilter? filterToEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -42,12 +50,15 @@ class HeadlinesFilterPage extends StatelessWidget {
             countriesRepository: context.read<DataRepository<Country>>(),
           )..add(
             FilterDataLoaded(
-              initialSelectedTopics: initialFilter.topics ?? [],
-              initialSelectedSources: initialFilter.sources ?? [],
-              initialSelectedCountries: initialFilter.eventCountries ?? [],
+              initialSelectedTopics: initialFilter.topics,
+              initialSelectedSources: initialFilter.sources,
+              initialSelectedCountries: initialFilter.countries,
             ),
           ),
-      child: _HeadlinesFilterView(initialFilter: initialFilter),
+      child: _HeadlinesFilterView(
+        initialFilter: initialFilter,
+        filterToEdit: filterToEdit,
+      ),
     );
   }
 }
@@ -94,10 +105,18 @@ Widget _buildFilterTile({
 
 /// Shows the dialog to let the user choose between applying the filter
 /// for one-time use or saving it for future use.
-Future<void> _showApplyOptionsDialog(BuildContext context) async {
+Future<void> _onApplyTapped(
+  BuildContext context,
+  SavedHeadlineFilter? filterToEdit,
+) async {
   final l10n = AppLocalizationsX(context).l10n;
-  // Await the dialog to ensure the method completes only after the dialog
-  // is dismissed, which resolves the "unawaited_futures" lint warning.
+
+  // If we are editing, skip the 'Apply Only' vs 'Save' dialog.
+  if (filterToEdit != null) {
+    await _updateAndApplyFilter(context, filterToEdit);
+    return;
+  }
+
   await showDialog<void>(
     context: context,
     builder: (BuildContext dialogContext) {
@@ -120,7 +139,7 @@ Future<void> _showApplyOptionsDialog(BuildContext context) async {
               // Pop the dialog first.
               Navigator.of(dialogContext).pop();
               // Initiate the save and apply flow.
-              _saveAndApplyFilter(context);
+              _createAndApplyFilter(context);
             },
           ),
         ],
@@ -129,19 +148,17 @@ Future<void> _showApplyOptionsDialog(BuildContext context) async {
   );
 }
 
-/// Initiates the process of saving a filter by showing the naming dialog,
-/// and then applies it.
+/// Initiates the process of creating and saving a new filter.
 ///
-/// This function `await`s the result of the `SaveFilterDialog`. This is
-/// crucial to prevent a race condition where the `HeadlinesFilterPage` might
-/// be popped before the dialog is fully dismissed, which was causing a
-/// navigation stack error.
-Future<void> _saveAndApplyFilter(BuildContext context) async {
+/// It checks for content limitations, shows the naming dialog, creates the
+/// new [SavedHeadlineFilter], adds it to the global state, and applies it
+/// to the feed.
+Future<void> _createAndApplyFilter(BuildContext context) async {
   // Before showing the save dialog, check if the user is allowed to save
   // another filter based on their subscription level and current usage.
   final contentLimitationService = context.read<ContentLimitationService>();
   final limitationStatus = contentLimitationService.checkAction(
-    ContentAction.saveFilter,
+    ContentAction.saveHeadlineFilter,
   );
 
   // If the user has reached their limit, show the limitation bottom sheet
@@ -163,17 +180,26 @@ Future<void> _saveAndApplyFilter(BuildContext context) async {
     context: context,
     builder: (_) {
       return SaveFilterDialog(
-        onSave: (name) {
+        onSave: (result) {
           // This callback is executed when the user submits the save dialog.
-          final newFilter = SavedFilter(
+          final newFilter = SavedHeadlineFilter(
             id: const Uuid().v4(),
-            name: name,
-            topics: filterState.selectedTopics.toList(),
-            sources: filterState.selectedSources.toList(),
-            countries: filterState.selectedCountries.toList(),
+            name: result.name,
+            // The userId will be populated by the backend upon persistence.
+            userId: '',
+            criteria: HeadlineFilterCriteria(
+              topics: filterState.selectedTopics.toList(),
+              sources: filterState.selectedSources.toList(),
+              countries: filterState.selectedCountries.toList(),
+            ),
+            // Use the values returned from the enhanced dialog.
+            isPinned: result.isPinned,
+            deliveryTypes: result.deliveryTypes,
           );
           // Add the new filter to the global AppBloc state.
-          context.read<AppBloc>().add(SavedFilterAdded(filter: newFilter));
+          context.read<AppBloc>().add(
+            SavedHeadlineFilterAdded(filter: newFilter),
+          );
 
           // Apply the newly saved filter to the HeadlinesFeedBloc. The page
           // is not popped here; that action is deferred until after the
@@ -188,8 +214,66 @@ Future<void> _saveAndApplyFilter(BuildContext context) async {
   // was successful and if the widget is still in the tree.
   // This check prevents the "Don't use 'BuildContext's across async gaps"
   // lint warning and ensures we don't try to pop a disposed context.
+  // We pop twice: once to close the filter page, and a second time to
+  // close the "Saved Filters" page, returning the user directly to the feed.
   if (didSave == true && context.mounted) {
-    context.pop();
+    context
+      ..pop() // Pop HeadlinesFilterPage.
+      ..pop(); // Pop SavedHeadlinesFiltersPage.
+  }
+}
+
+/// Initiates the process of updating an existing filter.
+///
+/// It shows the `SaveFilterDialog` pre-filled with the existing filter's
+/// metadata, allowing the user to change the name, pinned status, or
+/// notification settings.
+Future<void> _updateAndApplyFilter(
+  BuildContext context,
+  SavedHeadlineFilter filterToEdit,
+) async {
+  final filterState = context.read<HeadlinesFilterBloc>().state;
+
+  // Show the dialog, pre-filled with the existing filter's name.
+  // The dialog will be enhanced in a later step to handle pinning and
+  // notifications.
+  final didSave = await showDialog<bool>(
+    context: context,
+    builder: (_) {
+      return SaveFilterDialog(
+        // Pass the full filter object to pre-populate the dialog.
+        filterToEdit: filterToEdit,
+        onSave: (result) {
+          // Create the updated filter object with new criteria and metadata.
+          final updatedFilter = filterToEdit.copyWith(
+            name: result.name,
+            isPinned: result.isPinned,
+            deliveryTypes: result.deliveryTypes,
+            criteria: HeadlineFilterCriteria(
+              topics: filterState.selectedTopics.toList(),
+              sources: filterState.selectedSources.toList(),
+              countries: filterState.selectedCountries.toList(),
+            ),
+          );
+
+          // Dispatch an update event to the global AppBloc.
+          context.read<AppBloc>().add(
+            SavedHeadlineFilterUpdated(filter: updatedFilter),
+          );
+
+          // Apply the updated filter to the feed.
+          _applyFilter(context, savedFilter: updatedFilter);
+        },
+      );
+    },
+  );
+
+  if (didSave == true && context.mounted) {
+    // Pop twice: once to close the filter page, and a second time to
+    // close the "Saved Filters" page, returning the user directly to the feed.
+    context
+      ..pop()
+      ..pop();
   }
 }
 
@@ -198,23 +282,23 @@ Future<void> _saveAndApplyFilter(BuildContext context) async {
 /// If a [savedFilter] is provided, it's passed to the event to ensure
 /// its chip is correctly selected on the feed. Otherwise, the filter is
 /// treated as a "custom" one.
-void _applyFilter(BuildContext context, {SavedFilter? savedFilter}) {
+void _applyFilter(BuildContext context, {SavedHeadlineFilter? savedFilter}) {
   final filterState = context.read<HeadlinesFilterBloc>().state;
-  // The HeadlinesFeedBloc is now read directly from the context, which is
-  // guaranteed to have it due to the BlocProvider.value in the router.
-  // This resolves the ProviderNotFoundException.
+  // The HeadlinesFeedBloc is now read directly from the context. This is
+  // guaranteed to be available because the BlocProvider was lifted to the
+  // ShellRoute level in the router, making it accessible to all child routes.
   final headlinesFeedBloc = context.read<HeadlinesFeedBloc>();
 
   // Create a new HeadlineFilter from the current selections in the filter bloc.
-  final newFilter = HeadlineFilter(
+  final newFilter = HeadlineFilterCriteria(
     topics: filterState.selectedTopics.toList(),
     sources: filterState.selectedSources.toList(),
-    eventCountries: filterState.selectedCountries.toList(),
+    countries: filterState.selectedCountries.toList(),
   );
   headlinesFeedBloc.add(
     HeadlinesFeedFiltersApplied(
       filter: newFilter,
-      savedFilter: savedFilter,
+      savedHeadlineFilter: savedFilter,
       adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
     ),
   );
@@ -225,13 +309,19 @@ void _applyAndExit(BuildContext context) {
   // This helper method now separates applying the filter from exiting.
   // It's called for the "Apply Only" flow.
   _applyFilter(context);
-  context.pop();
+  // Pop twice: once to close the filter page, and a second time to
+  // close the "Saved Filters" page, returning the user directly to the feed.
+  context
+    ..pop() // Pop HeadlinesFilterPage
+    ..pop(); // Pop SavedHeadlinesFiltersPage
 }
 
 class _HeadlinesFilterView extends StatelessWidget {
-  const _HeadlinesFilterView({required this.initialFilter});
+  const _HeadlinesFilterView({required this.initialFilter, this.filterToEdit});
 
-  final HeadlineFilter initialFilter;
+  final HeadlineFilterCriteria initialFilter;
+  final SavedHeadlineFilter? filterToEdit;
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
@@ -256,25 +346,31 @@ class _HeadlinesFilterView extends StatelessWidget {
                 filterState.selectedSources.isEmpty &&
                 filterState.selectedCountries.isEmpty;
 
-            final savedFilters =
-                appState.userContentPreferences?.savedFilters ?? [];
+            // When editing, a duplicate check is not needed.
+            final isEditing = filterToEdit != null;
+
+            final savedHeadlineFilters =
+                appState.userContentPreferences?.savedHeadlineFilters ?? [];
 
             // Check if the current selection matches any existing saved filter.
-            final isDuplicate = savedFilters.any(
-              (savedFilter) =>
-                  setEquals(
-                    savedFilter.topics.toSet(),
-                    filterState.selectedTopics,
-                  ) &&
-                  setEquals(
-                    savedFilter.sources.toSet(),
-                    filterState.selectedSources,
-                  ) &&
-                  setEquals(
-                    savedFilter.countries.toSet(),
-                    filterState.selectedCountries,
-                  ),
-            );
+            // This check is skipped if we are in edit mode.
+            final isDuplicate =
+                !isEditing &&
+                savedHeadlineFilters.any(
+                  (savedHeadlineFilter) =>
+                      setEquals(
+                        savedHeadlineFilter.criteria.topics.toSet(),
+                        filterState.selectedTopics,
+                      ) &&
+                      setEquals(
+                        savedHeadlineFilter.criteria.sources.toSet(),
+                        filterState.selectedSources,
+                      ) &&
+                      setEquals(
+                        savedHeadlineFilter.criteria.countries.toSet(),
+                        filterState.selectedCountries,
+                      ),
+                );
 
             final isApplyEnabled = !isFilterEmpty && !isDuplicate;
 
@@ -306,8 +402,8 @@ class _HeadlinesFilterView extends StatelessWidget {
                     icon: const Icon(Icons.check),
                     tooltip: l10n.headlinesFeedFilterApplyButton,
                     // Disable the button if the filter is empty or a duplicate.
-                    onPressed: isApplyEnabled
-                        ? () => _showApplyOptionsDialog(context)
+                    onPressed: isApplyEnabled || isEditing
+                        ? () => _onApplyTapped(context, filterToEdit)
                         : null,
                   ),
                 ],
@@ -341,9 +437,9 @@ class _HeadlinesFilterView extends StatelessWidget {
         onRetry: () {
           context.read<HeadlinesFilterBloc>().add(
             FilterDataLoaded(
-              initialSelectedTopics: initialFilter.topics ?? [],
-              initialSelectedSources: initialFilter.sources ?? [],
-              initialSelectedCountries: initialFilter.eventCountries ?? [],
+              initialSelectedTopics: initialFilter.topics,
+              initialSelectedSources: initialFilter.sources,
+              initialSelectedCountries: initialFilter.countries,
             ),
           );
         },

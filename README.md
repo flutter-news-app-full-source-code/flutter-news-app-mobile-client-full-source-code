@@ -26,8 +26,8 @@ Explore the high-level domains below to see how.
 <details>
 <summary><strong>📰 Content Discovery & User Engagement</strong></summary>
 
-### 📱 Dynamic, High-Performance News Feed
-A beautiful, infinitely scrolling feed serves as the core of the user experience. It's not just a list; it's an intelligent content delivery system.
+### 📱 Dynamic & Personalized News Feed
+A beautiful, infinitely scrolling feed serves as the core of the user experience. It's not just a list; it's an intelligent, user-driven content delivery system.
 - **Instantaneous Content Switching:** An intelligent, session-based cache pre-fetches and holds data, eliminating loading spinners when users switch between their preferred content views.
 - **Personalized Viewing:** Users control their experience with settings for information density and image presentation, adapting the feed to their reading style.
 - **Smart In-Feed Prompts:** The feed dynamically injects context-aware items like calls-to-action and content suggestions, driven by configurable rules to avoid user fatigue.
@@ -35,10 +35,11 @@ A beautiful, infinitely scrolling feed serves as the core of the user experience
 
 ---
 
-### 🔎 Powerful & Intuitive Search
+### 🔎 Powerful Content Curation & Discovery
 Give users the tools to find exactly what they're looking for with a multi-faceted discovery system.
 - **Customizable Filter Bar:** A persistent, one-tap filter bar provides instant access to pre-defined and user-created content streams.
-- **Advanced Content Curation:** A dedicated UI allows users to construct and save highly specific news feeds by combining various content categories, publishers, and regions of interest.
+- **Advanced Content Curation:** A dedicated management UI allows users to construct, save, and manage highly specific news feeds. Users can save frequently used filters for on-demand use and pin them for one-tap access on the main feed.
+- **Proactive Notification Subscriptions:** When saving a filter, users can subscribe to receive push notifications—such as breaking news alerts or daily digests—for content that matches their specific criteria.
 - **Dedicated Discovery Hub:** Users can browse publishers by category in horizontally scrolling carousels, apply regional filters, and perform targeted searches.
 > **Your Advantage:** Deliver powerful content discovery tools that keep users engaged, increase session duration, and encourage return visits.
 

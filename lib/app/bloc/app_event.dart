@@ -129,40 +129,40 @@ class AppUserFeedDecoratorShown extends AppEvent {
   List<Object> get props => [userId, feedDecoratorType, isCompleted];
 }
 
-/// {@template saved_filter_added}
-/// Dispatched when a new feed filter is saved by the user.
+/// {@template saved_headline_filter_added}
+/// Dispatched when a new headline feed filter is saved by the user.
 /// {@endtemplate}
-class SavedFilterAdded extends AppEvent {
-  /// {@macro saved_filter_added}
-  const SavedFilterAdded({required this.filter});
+class SavedHeadlineFilterAdded extends AppEvent {
+  /// {@macro saved_headline_filter_added}
+  const SavedHeadlineFilterAdded({required this.filter});
 
-  /// The new [SavedFilter] to be added.
-  final SavedFilter filter;
+  /// The new [SavedHeadlineFilter] to be added.
+  final SavedHeadlineFilter filter;
 
   @override
   List<Object> get props => [filter];
 }
 
-/// {@template saved_filter_updated}
-/// Dispatched when an existing saved feed filter is updated (e.g., renamed).
+/// {@template saved_headline_filter_updated}
+/// Dispatched when an existing saved headline filter is updated.
 /// {@endtemplate}
-class SavedFilterUpdated extends AppEvent {
-  /// {@macro saved_filter_updated}
-  const SavedFilterUpdated({required this.filter});
+class SavedHeadlineFilterUpdated extends AppEvent {
+  /// {@macro saved_headline_filter_updated}
+  const SavedHeadlineFilterUpdated({required this.filter});
 
-  /// The updated [SavedFilter] object.
-  final SavedFilter filter;
+  /// The updated [SavedHeadlineFilter] object.
+  final SavedHeadlineFilter filter;
 
   @override
   List<Object> get props => [filter];
 }
 
-/// {@template saved_filter_deleted}
-/// Dispatched when a saved feed filter is deleted by the user.
+/// {@template saved_headline_filter_deleted}
+/// Dispatched when a saved headline filter is deleted by the user.
 /// {@endtemplate}
-class SavedFilterDeleted extends AppEvent {
-  /// {@macro saved_filter_deleted}
-  const SavedFilterDeleted({required this.filterId});
+class SavedHeadlineFilterDeleted extends AppEvent {
+  /// {@macro saved_headline_filter_deleted}
+  const SavedHeadlineFilterDeleted({required this.filterId});
 
   /// The ID of the filter to be deleted.
   final String filterId;
@@ -171,15 +171,15 @@ class SavedFilterDeleted extends AppEvent {
   List<Object> get props => [filterId];
 }
 
-/// {@template saved_filters_reordered}
-/// Dispatched when the user reorders their saved filters in the UI.
+/// {@template saved_headline_filters_reordered}
+/// Dispatched when the user reorders their saved headline filters in the UI.
 /// {@endtemplate}
-class SavedFiltersReordered extends AppEvent {
-  /// {@macro saved_filters_reordered}
-  const SavedFiltersReordered({required this.reorderedFilters});
+class SavedHeadlineFiltersReordered extends AppEvent {
+  /// {@macro saved_headline_filters_reordered}
+  const SavedHeadlineFiltersReordered({required this.reorderedFilters});
 
-  /// The complete list of saved filters in their new order.
-  final List<SavedFilter> reorderedFilters;
+  /// The complete list of saved headline filters in their new order.
+  final List<SavedHeadlineFilter> reorderedFilters;
 
   @override
   List<Object> get props => [reorderedFilters];

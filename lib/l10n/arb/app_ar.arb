@@ -1322,10 +1322,6 @@
     "@sourceListFilterPageFilterButtonTooltip": {
         "description": "Tooltip for the button that opens the source list filter page."
     },
-    "accountSavedFiltersTile": "الفلاتر المحفوظة",
-    "@accountSavedFiltersTile": {
-        "description": "The title for the list tile on the account page that navigates to the saved filters management page."
-    },
     "savedFiltersPageTitle": "الفلاتر المحفوظة",
     "@savedFiltersPageTitle": {
         "description": "The title for the app bar on the saved filters management page."
@@ -1621,5 +1617,49 @@
     "decoratorSuggestedSourcesTitle_2": "اكتشف مصادر موثوقة",
     "@decoratorSuggestedSourcesTitle_2": {
         "description": "Second variation of the title for the 'Suggested Sources' decorator, focusing on broadening reading."
+    },
+    "savedHeadlineFiltersPageTitle": "الفلاتر المحفوظة",
+    "@savedHeadlineFiltersPageTitle": {
+        "description": "The title for the app bar on the saved filters management page."
+    },
+    "savedHeadlineFiltersCreateNewButton": "إنشاء فلتر",
+    "@savedHeadlineFiltersCreateNewButton": {
+        "description": "The text for the floating action button to create a new filter."
+    },
+    "savedHeadlineFiltersLoadingHeadline": "جارٍ تحميل فلاترك...",
+    "@savedHeadlineFiltersLoadingHeadline": {
+        "description": "The main headline text displayed while the saved filters are loading."
+    },
+    "savedHeadlineFiltersEmptyHeadline": "لا توجد فلاتر محفوظة بعد",
+    "@savedHeadlineFiltersEmptyHeadline": {
+        "description": "The main headline text displayed on the saved filters page when the user has no saved filters."
+    },
+    "savedHeadlineFiltersEmptySubheadline": "الفلاتر التي تنشئها وتحفظها ستظهر هنا. اضغط على الزر أدناه للبدء.",
+    "@savedHeadlineFiltersEmptySubheadline": {
+        "description": "The sub-headline text displayed on the saved filters page when the user has no saved filters."
+    },
+    "savedFiltersMenuEdit": "تعديل",
+    "@savedFiltersMenuEdit": {
+        "description": "The text for the 'Edit' option in the popup menu on a saved filter item."
+    },
+    "saveFilterDialogPinToFeedLabel": "تثبيت في شريط الفلاتر",
+    "@saveFilterDialogPinToFeedLabel": {
+        "description": "Label for the switch that allows a user to pin a saved filter to their feed."
+    },
+    "saveFilterDialogNotificationsLabel": "تفضيلات الإشعارات",
+    "@saveFilterDialogNotificationsLabel": {
+        "description": "The title for the section in the save filter dialog where users configure notification settings."
+    },
+    "notificationDeliveryTypeBreakingOnly": "الأخبار العاجلة",
+    "@notificationDeliveryTypeBreakingOnly": {
+        "description": "The user-facing name for the 'breakingOnly' notification delivery type."
+    },
+    "notificationDeliveryTypeDailyDigest": "الملخص اليومي",
+    "@notificationDeliveryTypeDailyDigest": {
+        "description": "The user-facing name for the 'dailyDigest' notification delivery type."
+    },
+    "notificationDeliveryTypeWeeklyRoundup": "الحصاد الأسبوعي",
+    "@notificationDeliveryTypeWeeklyRoundup": {
+        "description": "The user-facing name for the 'weeklyRoundup' notification delivery type."
     }
 }

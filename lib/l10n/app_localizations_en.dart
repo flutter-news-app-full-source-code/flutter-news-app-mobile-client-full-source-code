@@ -1014,9 +1014,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourceListFilterByHeadquartersPageTitle => 'Headquarters location';
 
   @override
-  String get accountSavedFiltersTile => 'Saved Filters';
-
-  @override
   String get savedFiltersPageTitle => 'Saved Filters';
 
   @override
@@ -1249,4 +1246,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get decoratorSuggestedSourcesTitle_2 => 'Discover Trusted Sources';
+
+  @override
+  String get savedHeadlineFiltersPageTitle => 'Saved Filters';
+
+  @override
+  String get savedHeadlineFiltersCreateNewButton => 'Create Filter';
+
+  @override
+  String get savedHeadlineFiltersLoadingHeadline => 'Loading Your Filters...';
+
+  @override
+  String get savedHeadlineFiltersEmptyHeadline => 'No Saved Filters Yet';
+
+  @override
+  String get savedHeadlineFiltersEmptySubheadline =>
+      'Filters you create and save will appear here. Tap the button below to get started.';
+
+  @override
+  String get savedFiltersMenuEdit => 'Edit';
+
+  @override
+  String get saveFilterDialogPinToFeedLabel => 'Pin to Filter Bar';
+
+  @override
+  String get saveFilterDialogNotificationsLabel => 'Notification Preferences';
+
+  @override
+  String get notificationDeliveryTypeBreakingOnly => 'Breaking News';
+
+  @override
+  String get notificationDeliveryTypeDailyDigest => 'Daily Digest';
+
+  @override
+  String get notificationDeliveryTypeWeeklyRoundup => 'Weekly Roundup';
 }

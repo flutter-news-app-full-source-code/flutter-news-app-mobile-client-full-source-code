@@ -15,6 +15,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_status_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/repositories/push_notification_device_repository.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/router.dart';
@@ -50,6 +52,8 @@ class App extends StatelessWidget {
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
+    required PushNotificationService pushNotificationService,
+    required PushNotificationDeviceRepository pushNotificationDeviceRepository,
     required AppEnvironment environment,
     required InlineAdCacheService inlineAdCacheService,
     required AdService adService,
@@ -66,6 +70,8 @@ class App extends StatelessWidget {
        _remoteConfigRepository = remoteConfigRepository,
        _userAppSettingsRepository = userAppSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
+       _pushNotificationService = pushNotificationService,
+       _pushNotificationDeviceRepository = pushNotificationDeviceRepository,
        _environment = environment,
        _adService = adService,
        _feedDecoratorService = feedDecoratorService,
@@ -95,6 +101,8 @@ class App extends StatelessWidget {
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
+  final PushNotificationService _pushNotificationService;
+  final PushNotificationDeviceRepository _pushNotificationDeviceRepository;
   final AppEnvironment _environment;
   final AdService _adService;
   final FeedDecoratorService _feedDecoratorService;
@@ -120,6 +128,8 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _remoteConfigRepository),
         RepositoryProvider.value(value: _userAppSettingsRepository),
         RepositoryProvider.value(value: _userContentPreferencesRepository),
+        RepositoryProvider.value(value: _pushNotificationService),
+        RepositoryProvider.value(value: _pushNotificationDeviceRepository),
         RepositoryProvider.value(value: _inlineAdCacheService),
         RepositoryProvider.value(value: _feedCacheService),
         RepositoryProvider.value(value: _environment),
@@ -142,6 +152,7 @@ class App extends StatelessWidget {
               userContentPreferencesRepository:
                   _userContentPreferencesRepository,
               logger: context.read<Logger>(),
+              pushNotificationService: _pushNotificationService,
               userRepository: _userRepository,
               inlineAdCacheService: _inlineAdCacheService,
             )..add(const AppStarted()),

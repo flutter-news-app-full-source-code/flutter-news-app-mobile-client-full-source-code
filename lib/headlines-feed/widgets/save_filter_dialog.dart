@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -99,13 +100,54 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
     super.dispose();
   }
 
-  void _submitForm() {
+  Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
+      // If the user has selected any notification types but permission has
+      // not been granted, we initiate the lazy permission request flow.
+      if (_selectedDeliveryTypes.isNotEmpty) {
+        final notificationService = context.read<PushNotificationService>();
+        final hasPermission = await notificationService.hasPermission();
+
+        if (!hasPermission) {
+          // Show a pre-permission dialog to explain why we need notifications.
+          final l10n = AppLocalizationsX(context).l10n;
+          final wantsToAllow = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(l10n.prePermissionDialogTitle),
+              content: Text(l10n.prePermissionDialogBody),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text(l10n.prePermissionDialogDenyButton),
+                ),
+                FilledButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: Text(l10n.prePermissionDialogAllowButton),
+                ),
+              ],
+            ),
+          );
+
+          // If the user declines the pre-dialog, stop the process.
+          if (wantsToAllow != true) return;
+
+          // Request permission via the OS dialog.
+          final permissionGranted = await notificationService
+              .requestPermission();
+
+          // If the user denies permission at the OS level, stop.
+          if (!permissionGranted) return;
+        }
+      }
+
+      // Once permissions are confirmed (or were not needed), proceed with saving.
       widget.onSave((
         name: _controller.text.trim(),
         isPinned: _isPinned,
         deliveryTypes: _selectedDeliveryTypes,
       ));
+
       // Pop the dialog and return `true` to signal to the caller that the
       // save operation was successfully initiated. This allows the caller
       // to coordinate subsequent navigation actions, preventing race conditions.
@@ -153,7 +195,7 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
                   }
                   return null;
                 },
-                onFieldSubmitted: (_) => _submitForm(),
+                onFieldSubmitted: (_) async => _submitForm(),
               ),
               const SizedBox(height: AppSpacing.lg),
               SwitchListTile(

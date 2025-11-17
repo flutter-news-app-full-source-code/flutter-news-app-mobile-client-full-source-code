@@ -460,32 +460,50 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     Emitter<HeadlinesFeedState> emit,
   ) async {
     String newActiveFilterId;
-
-    // Prioritize the explicitly passed savedFilter to prevent race conditions.
+ 
+    // Determine the active filter ID based on the applied criteria.
+    // This logic is crucial for correctly highlighting the filter chip in the UI.
+ 
+    // Case 1: A new filter was just saved ("Save & Apply").
+    // The `savedHeadlineFilter` is passed explicitly to prevent a race condition
+    // where the `state.savedHeadlineFilters` might not have updated yet.
+    // We only care about it if it's pinned.
     if (event.savedHeadlineFilter != null) {
-      newActiveFilterId = event.savedHeadlineFilter!.id;
+      if (event.savedHeadlineFilter!.isPinned) {
+        newActiveFilterId = event.savedHeadlineFilter!.id;
+        _logger.fine('Filter applied via "Save & Apply" with a pinned filter.');
+      } else {
+        // If saved but not pinned, it's treated as a one-time custom filter.
+        newActiveFilterId = 'custom';
+        _logger.fine(
+          'Filter applied via "Save & Apply" with an un-pinned filter. '
+          'Treating as "custom".',
+        );
+      }
     } else {
-      final matchingSavedFilter = state.savedHeadlineFilters.firstWhereOrNull((
-        savedFilter,
-      ) {
-        final appliedTopics = event.filter.topics.toSet();
-        final savedTopics = savedFilter.criteria.topics.toSet();
-        final appliedSources = event.filter.sources.toSet();
-        final savedSources = savedFilter.criteria.sources.toSet();
-        final appliedCountries = event.filter.countries.toSet();
-        final savedCountries = savedFilter.criteria.countries.toSet();
-
-        return const SetEquality<Topic>().equals(appliedTopics, savedTopics) &&
-            const SetEquality<Source>().equals(appliedSources, savedSources) &&
-            const SetEquality<Country>().equals(
-              appliedCountries,
-              savedCountries,
-            );
+      // Case 2: A filter was applied from the filter page ("Apply Only") or
+      // by applying an un-pinned saved filter.
+      // We check if the criteria match any *pinned* saved filter.
+      final matchingPinnedFilter =
+          state.savedHeadlineFilters.firstWhereOrNull((savedFilter) {
+        // Only consider pinned filters for direct ID matching.
+        if (!savedFilter.isPinned) return false;
+ 
+        // Compare the criteria of the applied filter with the saved one.
+        return savedFilter.criteria == event.filter;
       });
-
-      newActiveFilterId = matchingSavedFilter?.id ?? 'custom';
+ 
+      if (matchingPinnedFilter != null) {
+        // If it matches a pinned filter, use its ID.
+        newActiveFilterId = matchingPinnedFilter.id;
+        _logger.fine('Applied filter matches a pinned saved filter.');
+      } else {
+        // Otherwise, it's a "custom" filter application.
+        newActiveFilterId = 'custom';
+        _logger.fine('Applied filter is a one-time "custom" filter.');
+      }
     }
-
+ 
     final filterKey = _generateFilterKey(newActiveFilterId, event.filter);
     final cachedFeed = _feedCacheService.getFeed(filterKey);
 
@@ -713,44 +731,43 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     Emitter<HeadlinesFeedState> emit,
   ) async {
     final filterKey = event.filter.id;
-    final cachedFeed = _feedCacheService.getFeed(filterKey);
     final newFilter = event.filter.criteria;
-
-    if (cachedFeed != null) {
-      _logger.info(
-        'Saved Filter Selected: Cache HIT for key "$filterKey". '
-        'Emitting cached state.',
-      );
-      emit(
-        state.copyWith(
-          status: HeadlinesFeedStatus.success,
-          feedItems: cachedFeed.feedItems,
-          hasMore: cachedFeed.hasMore,
-          cursor: cachedFeed.cursor,
-          activeFilterId: filterKey,
-          filter: newFilter,
-        ),
-      );
-      // Only trigger a background refresh if the cache is older than the
-      // throttle duration.
-      if (DateTime.now().difference(cachedFeed.lastRefreshedAt) >
-          _refreshThrottleDuration) {
-        add(HeadlinesFeedRefreshRequested(adThemeStyle: event.adThemeStyle));
+ 
+    // If the selected filter is pinned, we can attempt a cache hit and set
+    // its ID as the active one directly.
+    if (event.filter.isPinned) {
+      final cachedFeed = _feedCacheService.getFeed(filterKey);
+      if (cachedFeed != null) {
+        _logger.info(
+          'Pinned Filter Selected: Cache HIT for key "$filterKey". Emitting cached state.',
+        );
+        emit(
+          state.copyWith(
+            status: HeadlinesFeedStatus.success,
+            feedItems: cachedFeed.feedItems,
+            hasMore: cachedFeed.hasMore,
+            cursor: cachedFeed.cursor,
+            activeFilterId: filterKey,
+            filter: newFilter,
+          ),
+        );
+        // Trigger a background refresh if the cache is stale.
+        if (DateTime.now().difference(cachedFeed.lastRefreshedAt) >
+            _refreshThrottleDuration) {
+          add(HeadlinesFeedRefreshRequested(adThemeStyle: event.adThemeStyle));
+        }
+        return;
       }
-      return;
     }
-
+ 
+    // For un-pinned filters, or a cache miss on a pinned filter, delegate
+    // to the standard `HeadlinesFeedFiltersApplied` handler. This ensures
+    // consistent logic for loading and setting the active filter state
+    // (which will be 'custom' for un-pinned filters).
     _logger.info(
-      'Saved Filter Selected: Cache MISS for key "$filterKey". '
-      'Delegating to filter application.',
+      'Saved Filter Selected: Delegating to filter application for key "$filterKey".',
     );
-    emit(state.copyWith(activeFilterId: event.filter.id));
-    add(
-      HeadlinesFeedFiltersApplied(
-        filter: newFilter,
-        adThemeStyle: event.adThemeStyle,
-      ),
-    );
+    add(HeadlinesFeedFiltersApplied(filter: newFilter, adThemeStyle: event.adThemeStyle));
   }
 
   Future<void> _onAllFilterSelected(

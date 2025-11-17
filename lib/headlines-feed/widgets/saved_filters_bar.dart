@@ -211,7 +211,11 @@ class _SavedFiltersBarState extends State<SavedFiltersBar> {
                     horizontal: AppSpacing.xs,
                   ),
                   child: ChoiceChip(
-                    label: Text(filter.name),
+                    label: Text(
+                      filter.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     labelPadding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.xs,
                     ),

@@ -27,7 +27,12 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/services/dem
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/package_info_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_initialization_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/bloc_observer.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/core/utils/nullable_datetime_converter.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/data/push_notification_device_client.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/repositories/push_notification_device_repository.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/firebase_push_notification_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/one_signal_push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/data/clients/country_inmemory_client.dart';
 import 'package:http_client/http_client.dart';
@@ -211,6 +216,7 @@ Future<Widget> bootstrap(
   late final DataClient<UserContentPreferences> userContentPreferencesClient;
   late final DataClient<UserAppSettings> userAppSettingsClient;
   late final DataClient<User> userClient;
+  late final DataClient<PushNotificationDevice> pushNotificationDeviceClient;
   if (appConfig.environment == app_config.AppEnvironment.demo) {
     logger.fine('Using in-memory clients for all data repositories.');
     headlinesClient = DataInMemory<Headline>(
@@ -280,6 +286,11 @@ Future<Widget> bootstrap(
       getId: (i) => i.id,
       logger: logger,
     );
+    pushNotificationDeviceClient = DataInMemory<PushNotificationDevice>(
+      toJson: (i) => i.toJson(),
+      getId: (i) => i.id,
+      logger: logger,
+    );
   } else if (appConfig.environment == app_config.AppEnvironment.development) {
     logger.fine('Using API clients for all data repositories (Development).');
     headlinesClient = DataApi<Headline>(
@@ -329,6 +340,10 @@ Future<Widget> bootstrap(
       modelName: 'user',
       fromJson: User.fromJson,
       toJson: (user) => user.toJson(),
+      logger: logger,
+    );
+    pushNotificationDeviceClient = PushNotificationDeviceClient(
+      httpClient: httpClient,
       logger: logger,
     );
   } else {
@@ -383,6 +398,10 @@ Future<Widget> bootstrap(
       toJson: (user) => user.toJson(),
       logger: logger,
     );
+    pushNotificationDeviceClient = PushNotificationDeviceClient(
+      httpClient: httpClient,
+      logger: logger,
+    );
   }
   logger.fine('All data clients instantiated.');
 
@@ -402,7 +421,44 @@ Future<Widget> bootstrap(
     dataClient: userAppSettingsClient,
   );
   final userRepository = DataRepository<User>(dataClient: userClient);
-  logger.fine('All data repositories initialized.');
+  final pushNotificationDeviceRepository = PushNotificationDeviceRepository(
+    dataClient: pushNotificationDeviceClient,
+  );
+  logger
+    ..fine('All data repositories initialized.')
+    ..info('7. Initializing Push Notification service...');
+
+  // Initialize the PushNotificationService based on the remote config.
+  // This is a crucial step for the provider-agnostic architecture.
+  late final PushNotificationService pushNotificationService;
+  final pushNotificationConfig = remoteConfigRepository.latestItem?.pushNotificationConfig;
+
+  if (pushNotificationConfig?.enabled == true) {
+    switch (pushNotificationConfig!.primaryProvider) {
+      case PushNotificationProvider.firebase:
+        logger.fine('Using FirebasePushNotificationService.');
+        pushNotificationService = FirebasePushNotificationService(
+          pushNotificationDeviceRepository: pushNotificationDeviceRepository,
+          logger: logger,
+        );
+      case PushNotificationProvider.oneSignal:
+        logger.fine('Using OneSignalPushNotificationService.');
+        // TODO(fulleni): The OneSignal App ID should be sourced from a secure
+        pushNotificationService = OneSignalPushNotificationService(
+          appId: appConfig.oneSignalAppId,
+          pushNotificationDeviceRepository: pushNotificationDeviceRepository,
+          logger: logger,
+        );
+    }
+    // Initialize the selected provider. This is non-blocking.
+    unawaited(pushNotificationService.initialize());
+    logger.fine('PushNotificationService initialized.');
+  } else {
+    logger.warning('Push notifications are disabled in RemoteConfig.');
+    // Provide a dummy/no-op implementation if notifications are disabled
+    // to prevent null pointer exceptions when accessed.
+    pushNotificationService = _NoOpPushNotificationService();
+  }
 
   // Conditionally instantiate DemoDataMigrationService
   final demoDataMigrationService =
@@ -467,6 +523,8 @@ Future<Widget> bootstrap(
       // All other repositories and services are passed directly to the
       // initialization page, which will then pass them to the main App widget
       // upon successful initialization.
+      pushNotificationService: pushNotificationService,
+      pushNotificationDeviceRepository: pushNotificationDeviceRepository,
       authenticationRepository: authenticationRepository,
       headlinesRepository: headlinesRepository,
       topicsRepository: topicsRepository,
@@ -484,4 +542,44 @@ Future<Widget> bootstrap(
       navigatorKey: navigatorKey,
     ),
   );
+}
+
+/// A no-op implementation of [PushNotificationService] used when push
+/// notifications are disabled in the remote configuration.
+///
+/// This prevents null pointer exceptions if other parts of the app attempt
+/// to access the service when it's not configured.
+class _NoOpPushNotificationService implements PushNotificationService {
+  @override
+  Future<void> initialize() async {}
+
+  @override
+  Future<bool> requestPermission() async => false;
+
+  @override
+  Future<bool> hasPermission() async => false;
+
+  @override
+  Future<void> registerDevice({
+    required String userId,
+    required String providerToken,
+    required DevicePlatform platform,
+    required PushNotificationProvider provider,
+  }) async {}
+
+  @override
+  Stream<PushNotificationPayload> get onMessage => const Stream.empty();
+
+  @override
+  Stream<PushNotificationPayload> get onMessageOpenedApp =>
+      const Stream.empty();
+
+  @override
+  Future<PushNotificationPayload?> get initialMessage async => null;
+
+  @override
+  Future<void> close() async {}
+
+  @override
+  List<Object?> get props => [];
 }

@@ -18,6 +18,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/s
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/router.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
 import 'package:go_router/go_router.dart';
@@ -56,7 +57,8 @@ class App extends StatelessWidget {
     required FeedDecoratorService feedDecoratorService,
     required FeedCacheService feedCacheService,
     required GlobalKey<NavigatorState> navigatorKey,
-    required PushNotificationService pushNotificationService, super.key,
+    required PushNotificationService pushNotificationService,
+    super.key,
   }) : _authenticationRepository = authenticationRepository,
        _headlinesRepository = headlinesRepository,
        _topicsRepository = topicsRepository,
@@ -172,6 +174,7 @@ class _AppView extends StatefulWidget {
 class _AppViewState extends State<_AppView> {
   late final ValueNotifier<AppLifeCycleStatus> _statusNotifier;
   StreamSubscription<User?>? _userSubscription;
+  StreamSubscription<PushNotificationPayload>? _onMessageOpenedAppSubscription;
   StreamSubscription<PushNotificationPayload>? _onMessageSubscription;
   AppStatusService? _appStatusService;
   InterstitialAdManager? _interstitialAdManager;
@@ -204,6 +207,23 @@ class _AppViewState extends State<_AppView> {
       (_) => context.read<AppBloc>().add(const AppInAppNotificationReceived()),
     );
 
+    // Subscribe to notifications that are tapped and open the app.
+    // This is the core of the deep-linking functionality.
+    _onMessageOpenedAppSubscription = pushNotificationService.onMessageOpenedApp
+        .listen((payload) {
+          _routerLogger.fine(
+            'Notification opened app with payload: ${payload.data}',
+          );
+          final contentType = payload.data['contentType'] as String?;
+          final id = payload.data['id'] as String?;
+
+          if (contentType == 'headline' && id != null) {
+            _router.goNamed(
+              Routes.globalArticleDetailsName,
+              pathParameters: {'id': id},
+            );
+          }
+        });
     // Instantiate and initialize the AppStatusService.
     // This service monitors the app's lifecycle (e.g., resuming from
     // background) and periodically triggers remote configuration fetches,
@@ -237,6 +257,7 @@ class _AppViewState extends State<_AppView> {
   void dispose() {
     _statusNotifier.dispose();
     _userSubscription?.cancel();
+    _onMessageOpenedAppSubscription?.cancel();
     _onMessageSubscription?.cancel();
     _appStatusService?.dispose();
     _interstitialAdManager?.dispose();

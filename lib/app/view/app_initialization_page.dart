@@ -13,10 +13,9 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app
 import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_hot_restart_wrapper.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/notifications/repositories/push_notification_device_repository.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -58,7 +57,6 @@ class AppInitializationPage extends StatelessWidget {
     required this.inlineAdCacheService,
     required this.navigatorKey,
     required this.pushNotificationService,
-    required this.pushNotificationDeviceRepository,
     super.key,
   });
 
@@ -78,7 +76,6 @@ class AppInitializationPage extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey;
   final InlineAdCacheService inlineAdCacheService;
   final PushNotificationService pushNotificationService;
-  final PushNotificationDeviceRepository pushNotificationDeviceRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -115,8 +112,6 @@ class AppInitializationPage extends StatelessWidget {
                     userContentPreferencesRepository,
                 environment: environment,
                 pushNotificationService: pushNotificationService,
-                pushNotificationDeviceRepository:
-                    pushNotificationDeviceRepository,
                 adService: adService,
                 feedDecoratorService: feedDecoratorService,
                 feedCacheService: feedCacheService,

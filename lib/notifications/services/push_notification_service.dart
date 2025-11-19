@@ -1,13 +1,15 @@
 import 'package:core/core.dart';
+import 'package:equatable/equatable.dart';
 
 /// {@template push_notification_service}
 /// An abstract class defining the contract for a push notification service.
 ///
 /// This service is responsible for initializing the notification provider,
 /// handling permissions, managing device tokens, and processing incoming
-/// notification messages.
+/// notification messages. It extends [Equatable] to allow for easy comparison
+/// in testing environments.
 /// {@endtemplate}
-abstract class PushNotificationService {
+abstract class PushNotificationService extends Equatable {
   /// Initializes the push notification service.
   ///
   /// This method should be called once during application startup to configure
@@ -29,15 +31,9 @@ abstract class PushNotificationService {
   /// Registers the device with the backend for a specific user.
   ///
   /// This method retrieves the device token from the provider and sends it
-  /// to the application's backend to associate it with the given [userId].
-  /// The [providerToken] is the FCM token or OneSignal player ID.
-  /// The [platform] indicates the device's operating system.
-  Future<void> registerDevice({
-    required String userId,
-    required String providerToken,
-    required DevicePlatform platform,
-    required PushNotificationProvider provider,
-  });
+  /// to the application's backend to associate it with the given [userId]. The
+  /// concrete implementation is responsible for obtaining the token.
+  Future<void> registerDevice({required String userId});
 
   /// A stream of notifications received while the app is in the foreground.
   ///
@@ -56,4 +52,10 @@ abstract class PushNotificationService {
   /// Returns the [PushNotificationPayload] if the app was opened by a
   /// notification, otherwise returns `null`.
   Future<PushNotificationPayload?> get initialMessage;
+
+  /// Closes any open resources, such as stream controllers.
+  ///
+  /// This should be called when the service is no longer needed to prevent
+  /// memory leaks.
+  Future<void> close();
 }

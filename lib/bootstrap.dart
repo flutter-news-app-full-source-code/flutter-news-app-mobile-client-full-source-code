@@ -437,7 +437,14 @@ Future<Widget> bootstrap(
   final remoteConfig = await remoteConfigRepository.read(id: kRemoteConfigId);
   final pushNotificationConfig = remoteConfig.pushNotificationConfig;
 
-  if (pushNotificationConfig.enabled == true) {
+  // In the demo environment, always use the NoOpPushNotificationService.
+  // This service is enhanced to simulate a successful permission flow,
+  // allowing the full UI journey to be tested without a real backend.
+  if (appConfig.environment == app_config.AppEnvironment.demo) {
+    logger.fine('Using NoOpPushNotificationService for demo environment.');
+    pushNotificationService = NoOpPushNotificationService();
+  } else if (pushNotificationConfig.enabled == true) {
+    // For other environments, select the provider based on RemoteConfig.
     switch (pushNotificationConfig.primaryProvider) {
       case PushNotificationProvider.firebase:
         logger.fine('Using FirebasePushNotificationService.');

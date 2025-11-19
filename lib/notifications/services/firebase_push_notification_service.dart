@@ -143,4 +143,7 @@ class FirebasePushNotificationService implements PushNotificationService {
 
   @override
   List<Object?> get props => [_pushNotificationDeviceRepository, _logger];
+
+  @override
+  bool? get stringify => true;
 }

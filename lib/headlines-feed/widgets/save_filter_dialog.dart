@@ -137,7 +137,16 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
               .requestPermission();
 
           // If the user denies permission at the OS level, stop.
-          if (!permissionGranted) return;
+          if (!permissionGranted) {
+            // Provide UI feedback to the user.
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(l10n.mustBeLoggedInToUseFeatureError),
+                backgroundColor: Theme.of(context).colorScheme.error,
+              ),
+            );
+            return;
+          }
         }
       }
 

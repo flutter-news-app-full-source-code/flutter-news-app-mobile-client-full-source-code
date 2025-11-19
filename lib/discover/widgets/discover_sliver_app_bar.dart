@@ -6,8 +6,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_blo
 import 'package:flutter_news_app_mobile_client_full_source_code/discover/bloc/source_search_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/discover/view/source_search_delegate.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/notification_indicator.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/notification_indicator.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/user_avatar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';

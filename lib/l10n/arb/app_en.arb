@@ -1678,5 +1678,9 @@
     "prePermissionDialogAllowButton": "Allow",
     "@prePermissionDialogAllowButton": {
         "description": "Text for the button to allow notification permission in the pre-permission dialog."
+    },
+    "notificationPermissionDeniedError": "Notification permission was denied. You can enable it in your device settings.",
+    "@notificationPermissionDeniedError": {
+        "description": "Error message shown when the user denies notification permissions at the OS level."
     }
 }

@@ -1290,4 +1290,8 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get prePermissionDialogAllowButton => 'السماح';
+
+  @override
+  String get notificationPermissionDeniedError =>
+      'تم رفض إذن الإشعارات. يمكنك تمكينه في إعدادات جهازك.';
 }

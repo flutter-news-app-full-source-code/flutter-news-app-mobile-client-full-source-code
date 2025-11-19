@@ -1293,4 +1293,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get prePermissionDialogAllowButton => 'Allow';
+
+  @override
+  String get notificationPermissionDeniedError =>
+      'Notification permission was denied. You can enable it in your device settings.';
 }

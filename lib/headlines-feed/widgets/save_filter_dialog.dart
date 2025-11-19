@@ -141,7 +141,7 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
             // Provide UI feedback to the user.
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(l10n.mustBeLoggedInToUseFeatureError),
+                content: Text(l10n.notificationPermissionDeniedError),
                 backgroundColor: Theme.of(context).colorScheme.error,
               ),
             );

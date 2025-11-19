@@ -1677,5 +1677,9 @@
     "prePermissionDialogAllowButton": "السماح",
     "@prePermissionDialogAllowButton": {
         "description": "Text for the button to allow notification permission in the pre-permission dialog."
+    },
+    "notificationPermissionDeniedError": "تم رفض إذن الإشعارات. يمكنك تمكينه في إعدادات جهازك.",
+    "@notificationPermissionDeniedError": {
+        "description": "Error message shown when the user denies notification permissions at the OS level."
     }
 }

@@ -2455,6 +2455,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Allow'**
   String get prePermissionDialogAllowButton;
+
+  /// Error message shown when the user denies notification permissions at the OS level.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification permission was denied. You can enable it in your device settings.'**
+  String get notificationPermissionDeniedError;
 }
 
 class _AppLocalizationsDelegate

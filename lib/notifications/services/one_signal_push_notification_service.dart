@@ -2,13 +2,12 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:core/core.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/notifications/repositories/push_notification_device_repository.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:logging/logging.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 /// A concrete implementation of [PushNotificationService] for OneSignal.
-class OneSignalPushNotificationService implements PushNotificationService {
+class OneSignalPushNotificationService extends PushNotificationService {
   /// Creates an instance of [OneSignalPushNotificationService].
   OneSignalPushNotificationService({
     required String appId,
@@ -71,9 +70,7 @@ class OneSignalPushNotificationService implements PushNotificationService {
   @override
   Future<bool> requestPermission() async {
     _logger.info('Requesting push notification permission from user...');
-    final accepted = await OneSignal.Notifications.requestPermission(
-      fallbackToSettings: true,
-    );
+    final accepted = await OneSignal.Notifications.requestPermission(true);
     _logger.info('Permission request result: $accepted');
     return accepted;
   }
@@ -81,7 +78,7 @@ class OneSignalPushNotificationService implements PushNotificationService {
   @override
   Future<bool> hasPermission() async {
     final permission = await OneSignal.Notifications.getPermission();
-    return permission;
+    return permission ?? false;
   }
 
   @override
@@ -110,7 +107,9 @@ class OneSignalPushNotificationService implements PushNotificationService {
         updatedAt: DateTime.now(),
       );
 
-      await _pushNotificationDeviceRepository.registerDevice(device);
+      // Use the standard `update` method from the repository for an
+      // idempotent "upsert" operation. The player ID is the resource ID.
+      await _pushNotificationDeviceRepository.update(id: token, item: device);
       _logger.info('Device successfully registered with backend.');
     } catch (e, s) {
       _logger.severe('Failed to register device.', e, s);
@@ -125,7 +124,7 @@ class OneSignalPushNotificationService implements PushNotificationService {
     // OneSignal's additionalData is where custom payloads are stored.
     final data =
         osNotification.additionalData?.map(
-          (key, value) => MapEntry(key, value),
+          MapEntry.new,
         ) ??
         {};
 
@@ -142,4 +141,11 @@ class OneSignalPushNotificationService implements PushNotificationService {
     await _onMessageController.close();
     await _onMessageOpenedAppController.close();
   }
+
+  @override
+  List<Object?> get props => [
+    _appId,
+    _pushNotificationDeviceRepository,
+    _logger,
+  ];
 }

@@ -82,7 +82,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<SavedHeadlineFilterUpdated>(_onSavedHeadlineFilterUpdated);
     on<SavedHeadlineFilterDeleted>(_onSavedHeadlineFilterDeleted);
     on<SavedHeadlineFiltersReordered>(_onSavedHeadlineFiltersReordered);
-    on<AppPushNotificationDeviceRegistered>(_onAppPushNotificationDeviceRegistered);
+    on<AppPushNotificationDeviceRegistered>(
+      _onAppPushNotificationDeviceRegistered,
+    );
     on<AppInAppNotificationReceived>(_onAppInAppNotificationReceived);
     on<AppLogoutRequested>(_onLogoutRequested);
   }
@@ -107,6 +109,21 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     _logger.fine(
       '[AppBloc] AppStarted event received. State is already initialized.',
     );
+
+    // If a user is already logged in when the app starts, register their
+    // device for push notifications.
+    if (state.user != null) {
+      _logger.info(
+        '[AppBloc] App started with user ${state.user!.id}. '
+        'Attempting to register device for push notifications.',
+      );
+      try {
+        await _pushNotificationService.registerDevice(userId: state.user!.id);
+        add(const AppPushNotificationDeviceRegistered());
+      } catch (e, s) {
+        _logger.severe('[AppBloc] Failed to register device on start.', e, s);
+      }
+    }
   }
 
   /// Handles all logic related to user authentication state changes.
@@ -232,7 +249,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         } catch (e, s) {
           _logger.severe(
             '[AppBloc] Failed to register push notification device for user ${user.id}.',
-            e, s,
+            e,
+            s,
           );
         }
       // If the transition fails (e.g., due to a network error while

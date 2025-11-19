@@ -2,22 +2,19 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:core/core.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/notifications/repositories/push_notification_device_repository.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:logging/logging.dart';
 
 /// A concrete implementation of [PushNotificationService] for Firebase Cloud
 /// Messaging (FCM).
-class FirebasePushNotificationService implements PushNotificationService {
+class FirebasePushNotificationService extends PushNotificationService {
   /// Creates an instance of [FirebasePushNotificationService].
   FirebasePushNotificationService({
     required PushNotificationDeviceRepository pushNotificationDeviceRepository,
     required Logger logger,
-  }) : _pushNotificationDeviceRepository = pushNotificationDeviceRepository,
-       _logger = logger;
+  })  : _pushNotificationDeviceRepository = pushNotificationDeviceRepository,
+        _logger = logger;
 
   final PushNotificationDeviceRepository _pushNotificationDeviceRepository;
   final Logger _logger;
@@ -101,17 +98,20 @@ class FirebasePushNotificationService implements PushNotificationService {
         return;
       }
 
-      _logger.fine('FCM token received: $token');
+      _logger.fine('FCM token received for registration: $token');
       final device = PushNotificationDevice(
         id: token, // Use token as a unique ID for the device
         userId: userId,
         platform: Platform.isIOS ? DevicePlatform.ios : DevicePlatform.android,
         providerTokens: {PushNotificationProvider.firebase: token},
+        // Timestamps are managed by the backend, but we provide initial values.
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
 
-      await _pushNotificationDeviceRepository.registerDevice(device);
+      // Use the standard `update` method from the repository for an
+      // idempotent "upsert" operation. The device token is the resource ID.
+      await _pushNotificationDeviceRepository.update(id: token, item: device);
       _logger.info('Device successfully registered with backend.');
     } catch (e, s) {
       _logger.severe('Failed to register device.', e, s);
@@ -125,8 +125,7 @@ class FirebasePushNotificationService implements PushNotificationService {
     return PushNotificationPayload(
       title: message.notification?.title ?? '',
       body: message.notification?.body ?? '',
-      imageUrl:
-          message.notification?.android?.imageUrl ??
+      imageUrl: message.notification?.android?.imageUrl ??
           message.notification?.apple?.imageUrl,
       data: message.data,
     );
@@ -137,4 +136,7 @@ class FirebasePushNotificationService implements PushNotificationService {
     await _onMessageController.close();
     await _onMessageOpenedAppController.close();
   }
+
+  @override
+  List<Object?> get props => [_pushNotificationDeviceRepository, _logger];
 }

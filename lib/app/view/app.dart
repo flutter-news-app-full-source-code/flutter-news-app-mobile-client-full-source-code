@@ -13,12 +13,10 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_e
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_status_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/notifications/repositories/push_notification_device_repository.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/router.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
@@ -52,15 +50,13 @@ class App extends StatelessWidget {
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
-    required PushNotificationService pushNotificationService,
-    required PushNotificationDeviceRepository pushNotificationDeviceRepository,
     required AppEnvironment environment,
     required InlineAdCacheService inlineAdCacheService,
     required AdService adService,
     required FeedDecoratorService feedDecoratorService,
     required FeedCacheService feedCacheService,
     required GlobalKey<NavigatorState> navigatorKey,
-    super.key,
+    required PushNotificationService pushNotificationService, super.key,
   }) : _authenticationRepository = authenticationRepository,
        _headlinesRepository = headlinesRepository,
        _topicsRepository = topicsRepository,
@@ -71,7 +67,6 @@ class App extends StatelessWidget {
        _userAppSettingsRepository = userAppSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
        _pushNotificationService = pushNotificationService,
-       _pushNotificationDeviceRepository = pushNotificationDeviceRepository,
        _environment = environment,
        _adService = adService,
        _feedDecoratorService = feedDecoratorService,
@@ -101,8 +96,6 @@ class App extends StatelessWidget {
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
-  final PushNotificationService _pushNotificationService;
-  final PushNotificationDeviceRepository _pushNotificationDeviceRepository;
   final AppEnvironment _environment;
   final AdService _adService;
   final FeedDecoratorService _feedDecoratorService;
@@ -110,6 +103,7 @@ class App extends StatelessWidget {
   final GlobalKey<NavigatorState> _navigatorKey;
   final InlineAdCacheService _inlineAdCacheService;
 
+  final PushNotificationService _pushNotificationService;
   @override
   Widget build(BuildContext context) {
     // The MultiRepositoryProvider makes all essential repositories and services
@@ -129,7 +123,6 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _userAppSettingsRepository),
         RepositoryProvider.value(value: _userContentPreferencesRepository),
         RepositoryProvider.value(value: _pushNotificationService),
-        RepositoryProvider.value(value: _pushNotificationDeviceRepository),
         RepositoryProvider.value(value: _inlineAdCacheService),
         RepositoryProvider.value(value: _feedCacheService),
         RepositoryProvider.value(value: _environment),
@@ -157,12 +150,6 @@ class App extends StatelessWidget {
               inlineAdCacheService: _inlineAdCacheService,
             )..add(const AppStarted()),
           ),
-          // The AuthenticationBloc is provided to handle auth UI events.
-          BlocProvider(
-            create: (context) => AuthenticationBloc(
-              authenticationRepository: context.read<AuthRepository>(),
-            ),
-          ),
         ],
         child: _AppView(environment: _environment, navigatorKey: _navigatorKey),
       ),
@@ -185,6 +172,7 @@ class _AppView extends StatefulWidget {
 class _AppViewState extends State<_AppView> {
   late final ValueNotifier<AppLifeCycleStatus> _statusNotifier;
   StreamSubscription<User?>? _userSubscription;
+  StreamSubscription<PushNotificationPayload>? _onMessageSubscription;
   AppStatusService? _appStatusService;
   InterstitialAdManager? _interstitialAdManager;
   late final ContentLimitationService _contentLimitationService;
@@ -195,6 +183,7 @@ class _AppViewState extends State<_AppView> {
   void initState() {
     super.initState();
     final appBloc = context.read<AppBloc>();
+    final pushNotificationService = context.read<PushNotificationService>();
 
     // This notifier is used by GoRouter's refreshListenable to trigger
     // route re-evaluation when the app's lifecycle status changes (e.g.,
@@ -206,6 +195,13 @@ class _AppViewState extends State<_AppView> {
     // and drives the entire app lifecycle by dispatching AppUserChanged events.
     _userSubscription = context.read<AuthRepository>().authStateChanges.listen(
       (user) => context.read<AppBloc>().add(AppUserChanged(user)),
+    );
+
+    // Subscribe to foreground push notifications. When a message is received,
+    // dispatch an event to the AppBloc to update the UI state (e.g., show an
+    // indicator dot).
+    _onMessageSubscription = pushNotificationService.onMessage.listen(
+      (_) => context.read<AppBloc>().add(const AppInAppNotificationReceived()),
     );
 
     // Instantiate and initialize the AppStatusService.
@@ -241,8 +237,10 @@ class _AppViewState extends State<_AppView> {
   void dispose() {
     _statusNotifier.dispose();
     _userSubscription?.cancel();
+    _onMessageSubscription?.cancel();
     _appStatusService?.dispose();
     _interstitialAdManager?.dispose();
+    context.read<PushNotificationService>().close();
     super.dispose();
   }
 

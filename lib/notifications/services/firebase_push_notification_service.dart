@@ -2,21 +2,24 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:core/core.dart';
+import 'package:data_repository/data_repository.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:logging/logging.dart';
 
 /// A concrete implementation of [PushNotificationService] for Firebase Cloud
 /// Messaging (FCM).
-class FirebasePushNotificationService extends PushNotificationService {
+class FirebasePushNotificationService implements PushNotificationService {
   /// Creates an instance of [FirebasePushNotificationService].
   FirebasePushNotificationService({
-    required PushNotificationDeviceRepository pushNotificationDeviceRepository,
+    required DataRepository<PushNotificationDevice>
+    pushNotificationDeviceRepository,
     required Logger logger,
-  })  : _pushNotificationDeviceRepository = pushNotificationDeviceRepository,
-        _logger = logger;
+  }) : _pushNotificationDeviceRepository = pushNotificationDeviceRepository,
+       _logger = logger;
 
-  final PushNotificationDeviceRepository _pushNotificationDeviceRepository;
+  final DataRepository<PushNotificationDevice>
+  _pushNotificationDeviceRepository;
   final Logger _logger;
 
   final _onMessageController = StreamController<PushNotificationPayload>();
@@ -125,7 +128,8 @@ class FirebasePushNotificationService extends PushNotificationService {
     return PushNotificationPayload(
       title: message.notification?.title ?? '',
       body: message.notification?.body ?? '',
-      imageUrl: message.notification?.android?.imageUrl ??
+      imageUrl:
+          message.notification?.android?.imageUrl ??
           message.notification?.apple?.imageUrl,
       data: message.data,
     );

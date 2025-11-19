@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:core/core.dart';
+import 'package:data_repository/data_repository.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:logging/logging.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
@@ -12,15 +13,14 @@ class OneSignalPushNotificationService extends PushNotificationService {
   OneSignalPushNotificationService({
     required String appId,
     required DataRepository<PushNotificationDevice>
-    pushNotificationDeviceRepository,
+        pushNotificationDeviceRepository,
     required Logger logger,
-  }) : _appId = appId,
-       _pushNotificationDeviceRepository = pushNotificationDeviceRepository,
-       _logger = logger;
+  })  : _appId = appId,
+        _pushNotificationDeviceRepository = pushNotificationDeviceRepository,
+        _logger = logger;
 
   final String _appId;
-  final DataRepository<PushNotificationDevice>
-  _pushNotificationDeviceRepository;
+  final DataRepository<PushNotificationDevice> _pushNotificationDeviceRepository;
   final Logger _logger;
 
   final _onMessageController = StreamController<PushNotificationPayload>();
@@ -88,8 +88,7 @@ class OneSignalPushNotificationService extends PushNotificationService {
     try {
       // OneSignal automatically handles token retrieval and storage.
       // We just need to get the OneSignal Player ID (push subscription ID).
-      final state = OneSignal.User.pushSubscription;
-      final token = state.id;
+      final token = OneSignal.User.pushSubscription.id;
 
       if (token == null) {
         _logger.warning(
@@ -141,8 +140,8 @@ class OneSignalPushNotificationService extends PushNotificationService {
 
   @override
   List<Object?> get props => [
-    _appId,
-    _pushNotificationDeviceRepository,
-    _logger,
-  ];
+        _appId,
+        _pushNotificationDeviceRepository,
+        _logger,
+      ];
 }

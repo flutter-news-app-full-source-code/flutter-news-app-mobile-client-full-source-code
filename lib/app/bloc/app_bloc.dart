@@ -10,9 +10,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/initialization_result.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/notifications/repositories/push_notification_device_repository.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/extensions.dart';
 import 'package:logging/logging.dart';
 
@@ -44,11 +43,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
-    required PushNotificationService pushNotificationService,
-    required PushNotificationDeviceRepository pushNotificationDeviceRepository,
     required InlineAdCacheService inlineAdCacheService,
     required Logger logger,
     required DataRepository<User> userRepository,
+    required PushNotificationService pushNotificationService,
   }) : _remoteConfigRepository = remoteConfigRepository,
        _appInitializer = appInitializer,
        _authRepository = authRepository,
@@ -56,7 +54,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _userContentPreferencesRepository = userContentPreferencesRepository,
        _userRepository = userRepository,
        _pushNotificationService = pushNotificationService,
-       _pushNotificationDeviceRepository = pushNotificationDeviceRepository,
        _inlineAdCacheService = inlineAdCacheService,
        _logger = logger,
        super(
@@ -98,8 +95,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
   final DataRepository<User> _userRepository;
-  final PushNotificationService _pushNotificationService;
-  final PushNotificationDeviceRepository _pushNotificationDeviceRepository;
   final InlineAdCacheService _inlineAdCacheService;
 
   /// Handles the [AppStarted] event.
@@ -221,25 +216,23 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           ),
         );
 
-        // If the user is authenticated (not a guest), attempt to register
-        // their device for push notifications.
-        if (!user!.isGuest) {
-          _logger.info(
-            '[AppBloc] User ${user.id} authenticated. Attempting to register '
-            'device for push notifications.',
+        // After any successful user transition (including guest), attempt to
+        // register their device for push notifications. This ensures that
+        // guests can receive notifications for their saved filters.
+        _logger.info(
+          '[AppBloc] User ${user.id} detected. Attempting to register device '
+          'for push notifications.',
+        );
+        try {
+          // The PushNotificationService will handle getting the token and
+          // calling the repository's update method.
+          await _pushNotificationService.registerDevice(userId: user.id);
+          add(const AppPushNotificationDeviceRegistered());
+        } catch (e, s) {
+          _logger.severe(
+            '[AppBloc] Failed to register push notification device for user ${user.id}.',
+            e, s,
           );
-          try {
-            // The PushNotificationService will handle getting the token and
-            // calling the PushNotificationDeviceRepository.
-            await _pushNotificationService.registerDevice(userId: user.id);
-            add(const AppPushNotificationDeviceRegistered());
-          } catch (e, s) {
-            _logger.severe(
-              '[AppBloc] Failed to register push notification device for user '
-              '${user.id}.',
-              e, s,
-            );
-          }
         }
       // If the transition fails (e.g., due to a network error while
       // fetching user data), emit a critical error state.
@@ -606,5 +599,26 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       '[AppBloc] Dispatched AppUserContentPreferencesChanged '
       'with reordered filters.',
     );
+  }
+
+  /// Handles the [AppPushNotificationDeviceRegistered] event.
+  ///
+  /// This handler is primarily for logging and does not change the state.
+  void _onAppPushNotificationDeviceRegistered(
+    AppPushNotificationDeviceRegistered event,
+    Emitter<AppState> emit,
+  ) {
+    _logger.info('[AppBloc] Push notification device registration noted.');
+  }
+
+  /// Handles the [AppInAppNotificationReceived] event.
+  ///
+  /// This handler updates the state to indicate that a new, unread in-app
+  /// notification has been received, which can be used to show a UI indicator.
+  void _onAppInAppNotificationReceived(
+    AppInAppNotificationReceived event,
+    Emitter<AppState> emit,
+  ) {
+    emit(state.copyWith(hasUnreadInAppNotifications: true));
   }
 }

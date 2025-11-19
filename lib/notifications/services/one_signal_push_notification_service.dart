@@ -46,6 +46,16 @@ class OneSignalPushNotificationService extends PushNotificationService {
     OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
     OneSignal.initialize(_appId);
 
+    // Listen for changes to the push subscription state. If the token (player
+    // ID) changes, re-register the device with the new token to ensure
+    // continued notification delivery.
+    OneSignal.User.pushSubscription.addObserver((state) {
+      if (state.current.id != state.previous.id) {
+        _logger.info('OneSignal push subscription ID changed. Re-registering.');
+        registerDevice(userId: ''); // userId will be updated by AppBloc
+      }
+    });
+
     // Handles notifications received while the app is in the foreground.
     OneSignal.Notifications.addForegroundWillDisplayListener((event) {
       _logger.fine(

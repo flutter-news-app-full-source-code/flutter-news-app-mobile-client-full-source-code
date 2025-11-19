@@ -37,6 +37,14 @@ class FirebasePushNotificationService implements PushNotificationService {
   Future<void> initialize() async {
     _logger.info('Initializing FirebasePushNotificationService...');
 
+    // Listen for token refresh events from FCM. If the token changes while
+    // the app is running, re-register the device with the new token to
+    // ensure continued notification delivery.
+    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
+      _logger.info('FCM token refreshed. Re-registering device.');
+      registerDevice(userId: ''); // userId will be updated by AppBloc
+    });
+
     // Handle messages that are tapped and open the app from a terminated state.
     final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null) {

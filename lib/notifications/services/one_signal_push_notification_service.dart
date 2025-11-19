@@ -13,14 +13,15 @@ class OneSignalPushNotificationService extends PushNotificationService {
   OneSignalPushNotificationService({
     required String appId,
     required DataRepository<PushNotificationDevice>
-        pushNotificationDeviceRepository,
+    pushNotificationDeviceRepository,
     required Logger logger,
-  })  : _appId = appId,
-        _pushNotificationDeviceRepository = pushNotificationDeviceRepository,
-        _logger = logger;
+  }) : _appId = appId,
+       _pushNotificationDeviceRepository = pushNotificationDeviceRepository,
+       _logger = logger;
 
   final String _appId;
-  final DataRepository<PushNotificationDevice> _pushNotificationDeviceRepository;
+  final DataRepository<PushNotificationDevice>
+  _pushNotificationDeviceRepository;
   final Logger _logger;
 
   final _onMessageController = StreamController<PushNotificationPayload>();
@@ -43,7 +44,7 @@ class OneSignalPushNotificationService extends PushNotificationService {
   Future<void> initialize() async {
     _logger.info('Initializing OneSignalPushNotificationService...');
     OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
-    await OneSignal.initialize(_appId);
+    OneSignal.initialize(_appId);
 
     // Handles notifications received while the app is in the foreground.
     OneSignal.Notifications.addForegroundWillDisplayListener((event) {
@@ -140,8 +141,8 @@ class OneSignalPushNotificationService extends PushNotificationService {
 
   @override
   List<Object?> get props => [
-        _appId,
-        _pushNotificationDeviceRepository,
-        _logger,
-      ];
+    _appId,
+    _pushNotificationDeviceRepository,
+    _logger,
+  ];
 }

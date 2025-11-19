@@ -14,10 +14,10 @@ class NoOpPushNotificationService extends PushNotificationService {
   Future<void> initialize() async {}
 
   @override
-  Future<bool> requestPermission() async => false;
+  Future<bool> requestPermission() async => true;
 
   @override
-  Future<bool> hasPermission() async => false;
+  Future<bool> hasPermission() async => true;
 
   @override
   Future<void> registerDevice({required String userId}) async {}

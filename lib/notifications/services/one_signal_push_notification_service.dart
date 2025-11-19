@@ -11,14 +11,16 @@ class OneSignalPushNotificationService extends PushNotificationService {
   /// Creates an instance of [OneSignalPushNotificationService].
   OneSignalPushNotificationService({
     required String appId,
-    required PushNotificationDeviceRepository pushNotificationDeviceRepository,
+    required DataRepository<PushNotificationDevice>
+    pushNotificationDeviceRepository,
     required Logger logger,
   }) : _appId = appId,
        _pushNotificationDeviceRepository = pushNotificationDeviceRepository,
        _logger = logger;
 
   final String _appId;
-  final PushNotificationDeviceRepository _pushNotificationDeviceRepository;
+  final DataRepository<PushNotificationDevice>
+  _pushNotificationDeviceRepository;
   final Logger _logger;
 
   final _onMessageController = StreamController<PushNotificationPayload>();
@@ -41,7 +43,7 @@ class OneSignalPushNotificationService extends PushNotificationService {
   Future<void> initialize() async {
     _logger.info('Initializing OneSignalPushNotificationService...');
     OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
-    OneSignal.initialize(_appId);
+    await OneSignal.initialize(_appId);
 
     // Handles notifications received while the app is in the foreground.
     OneSignal.Notifications.addForegroundWillDisplayListener((event) {
@@ -77,8 +79,7 @@ class OneSignalPushNotificationService extends PushNotificationService {
 
   @override
   Future<bool> hasPermission() async {
-    final permission = await OneSignal.Notifications.getPermission();
-    return permission ?? false;
+    return OneSignal.Notifications.permission;
   }
 
   @override
@@ -122,11 +123,7 @@ class OneSignalPushNotificationService extends PushNotificationService {
     OSNotification osNotification,
   ) {
     // OneSignal's additionalData is where custom payloads are stored.
-    final data =
-        osNotification.additionalData?.map(
-          MapEntry.new,
-        ) ??
-        {};
+    final data = osNotification.additionalData?.map(MapEntry.new) ?? {};
 
     return PushNotificationPayload(
       title: osNotification.title ?? '',

@@ -95,6 +95,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
   final DataRepository<User> _userRepository;
+  final PushNotificationService _pushNotificationService;
   final InlineAdCacheService _inlineAdCacheService;
 
   /// Handles the [AppStarted] event.

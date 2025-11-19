@@ -341,6 +341,13 @@ Future<Widget> bootstrap(
       toJson: (user) => user.toJson(),
       logger: logger,
     );
+    pushNotificationDeviceClient = DataApi<PushNotificationDevice>(
+      httpClient: httpClient,
+      modelName: 'push_notification_devices',
+      fromJson: PushNotificationDevice.fromJson,
+      toJson: (device) => device.toJson(),
+      logger: logger,
+    );
   } else {
     logger.fine('Using API clients for all data repositories (Production).');
     // Default to API clients for production
@@ -393,16 +400,14 @@ Future<Widget> bootstrap(
       toJson: (user) => user.toJson(),
       logger: logger,
     );
+    pushNotificationDeviceClient = DataApi<PushNotificationDevice>(
+      httpClient: httpClient,
+      modelName: 'push_notification_devices',
+      fromJson: PushNotificationDevice.fromJson,
+      toJson: (device) => device.toJson(),
+      logger: logger,
+    );
   }
-
-  // This client is always remote, as device registration is a backend operation.
-  pushNotificationDeviceClient = DataApi<PushNotificationDevice>(
-    httpClient: httpClient,
-    modelName: 'push_notification_devices',
-    fromJson: PushNotificationDevice.fromJson,
-    toJson: (device) => device.toJson(),
-    logger: logger,
-  );
   logger.fine('All data clients instantiated.');
 
   final headlinesRepository = DataRepository<Headline>(

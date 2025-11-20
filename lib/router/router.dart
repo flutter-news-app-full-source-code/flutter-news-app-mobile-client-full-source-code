@@ -3,6 +3,7 @@ import 'package:core/core.dart' hide AppStatus;
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/in_app_notification_center_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/account_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/followed_contents/countries/add_country_to_follow_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/followed_contents/countries/followed_countries_list_page.dart';
@@ -235,7 +236,18 @@ GoRouter createRouter({
           GoRoute(
             path: Routes.notificationsCenter,
             name: Routes.notificationsCenterName,
-            builder: (context, state) => const InAppNotificationCenterPage(),
+            builder: (context, state) {
+              // Provide the InAppNotificationCenterBloc here so it's available
+              // in the BuildContext when InAppNotificationCenterPage's initState runs.
+              return BlocProvider(
+                create: (context) => InAppNotificationCenterBloc(
+                  inAppNotificationRepository: context.read<DataRepository<InAppNotification>>(),
+                  appBloc: context.read<AppBloc>(),
+                  logger: context.read<Logger>(),
+                )..add(const InAppNotificationCenterSubscriptionRequested()),
+                child: const InAppNotificationCenterPage(),
+              );
+            },
           ),
           // The settings section within the account modal. It uses a
           // ShellRoute to provide a SettingsBloc to all its children.

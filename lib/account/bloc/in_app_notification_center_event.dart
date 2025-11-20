@@ -36,7 +36,7 @@ class InAppNotificationCenterMarkAllAsRead
 class InAppNotificationCenterTabChanged extends InAppNotificationCenterEvent {
   const InAppNotificationCenterTabChanged(this.tabIndex);
 
-  /// The index of the newly selected tab.
+  /// The index of the newly selected tab. 0: Breaking News, 1: Digests.
   final int tabIndex;
 
   @override

@@ -82,7 +82,6 @@ class InAppNotificationCenterBloc
       emit(
         state.copyWith(
           status: InAppNotificationCenterStatus.success,
-          notifications: allNotifications,
           breakingNewsNotifications: breakingNews,
           digestNotifications: digests,
         ),
@@ -138,10 +137,6 @@ class InAppNotificationCenterBloc
       );
 
       // Update the local state to reflect the change immediately.
-      final updatedList = state.notifications
-          .map((n) => n.id == notification.id ? updatedNotification : n)
-          .toList();
-
       final updatedBreakingNewsList = state.breakingNewsNotifications
           .map((n) => n.id == notification.id ? updatedNotification : n)
           .toList();
@@ -152,7 +147,6 @@ class InAppNotificationCenterBloc
 
       emit(
         state.copyWith(
-          notifications: updatedList,
           breakingNewsNotifications: updatedBreakingNewsList,
           digestNotifications: updatedDigestList,
         ),
@@ -214,10 +208,6 @@ class InAppNotificationCenterBloc
       );
 
       // Update local state with all notifications marked as read.
-      final fullyUpdatedList = state.notifications
-          .map((n) => n.isRead ? n : n.copyWith(readAt: now))
-          .toList();
-
       final fullyUpdatedBreakingNewsList = state.breakingNewsNotifications
           .map((n) => n.isRead ? n : n.copyWith(readAt: now))
           .toList();
@@ -225,10 +215,8 @@ class InAppNotificationCenterBloc
       final fullyUpdatedDigestList = state.digestNotifications
           .map((n) => n.isRead ? n : n.copyWith(readAt: now))
           .toList();
-
       emit(
         state.copyWith(
-          notifications: fullyUpdatedList,
           breakingNewsNotifications: fullyUpdatedBreakingNewsList,
           digestNotifications: fullyUpdatedDigestList,
         ),

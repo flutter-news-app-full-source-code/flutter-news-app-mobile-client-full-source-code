@@ -35,7 +35,7 @@ class _InAppNotificationCenterPageState
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this)
+    _tabController = TabController(length: 2, vsync: this)
       ..addListener(() {
         if (!_tabController.indexIsChanging) {
           context.read<InAppNotificationCenterBloc>().add(
@@ -72,7 +72,7 @@ class _InAppNotificationCenterPageState
             >(
               builder: (context, state) {
                 final hasUnread = state.notifications.any((n) => !n.isRead);
-                return TextButton(
+                return IconButton(
                   onPressed: hasUnread
                       ? () {
                           context.read<InAppNotificationCenterBloc>().add(
@@ -80,7 +80,7 @@ class _InAppNotificationCenterPageState
                           );
                         }
                       : null,
-                  child: Text(l10n.notificationCenterMarkAllAsReadButton),
+                  icon: const Icon(Icons.done_all),
                 );
               },
             ),
@@ -88,7 +88,6 @@ class _InAppNotificationCenterPageState
           bottom: TabBar(
             controller: _tabController,
             tabs: [
-              Tab(text: l10n.notificationCenterTabAll),
               Tab(text: l10n.notificationCenterTabBreakingNews),
               Tab(text: l10n.notificationCenterTabDigests),
             ],
@@ -139,7 +138,6 @@ class _InAppNotificationCenterPageState
                 return TabBarView(
                   controller: _tabController,
                   children: [
-                    _NotificationList(notifications: state.notifications),
                     _NotificationList(
                       notifications: state.breakingNewsNotifications,
                     ),

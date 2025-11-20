@@ -27,6 +27,7 @@ class OneSignalPushNotificationService extends PushNotificationService {
   final _onMessageController = StreamController<PushNotificationPayload>();
   final _onMessageOpenedAppController =
       StreamController<PushNotificationPayload>();
+  final _onTokenRefreshedController = StreamController<String>();
 
   // OneSignal doesn't have a direct equivalent of `getInitialMessage`.
   // We rely on the `setNotificationOpenedHandler`.
@@ -41,6 +42,9 @@ class OneSignalPushNotificationService extends PushNotificationService {
       _onMessageOpenedAppController.stream;
 
   @override
+  Stream<String> get onTokenRefreshed => _onTokenRefreshedController.stream;
+
+  @override
   Future<void> initialize() async {
     _logger.info('Initializing OneSignalPushNotificationService...');
     OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
@@ -49,10 +53,12 @@ class OneSignalPushNotificationService extends PushNotificationService {
     // Listen for changes to the push subscription state. If the token (player
     // ID) changes, re-register the device with the new token to ensure
     // continued notification delivery.
-    OneSignal.User.pushSubscription.addObserver((state) {
-      if (state.current.id != state.previous.id) {
-        _logger.info('OneSignal push subscription ID changed. Re-registering.');
-        registerDevice(userId: ''); // userId will be updated by AppBloc
+    OneSignal.User.pushSubscription.addObserver((state) async {
+      if (state.current.id != state.previous.id && state.current.id != null) {
+        _logger.info(
+          'OneSignal push subscription ID changed. Emitting new token.',
+        );
+        _onTokenRefreshedController.add(state.current.id!);
       }
     });
 
@@ -109,8 +115,25 @@ class OneSignalPushNotificationService extends PushNotificationService {
       }
 
       _logger.fine('OneSignal Player ID received: $token');
-      final device = PushNotificationDevice(
-        id: token, // Use player ID as a unique ID for the device
+      // The device ID is now a composite key of userId and provider name to
+      // ensure idempotency and align with the backend's delete-then-create
+      // pattern.
+      final deviceId = '${userId}_${PushNotificationProvider.oneSignal.name}';
+
+      // First, attempt to delete any existing device registration for this user
+      // and provider. This ensures a clean state and handles token updates
+      // by effectively performing a "delete-then-create".
+      try {
+        await _pushNotificationDeviceRepository.delete(id: deviceId);
+        _logger.info('Existing device registration deleted for $deviceId.');
+      } on NotFoundException {
+        _logger.info('No existing device registration found for $deviceId. Proceeding with creation.');
+      } catch (e, s) {
+        _logger.warning('Failed to delete existing device registration for $deviceId. Proceeding with creation anyway. Error: $e', e, s);
+      }
+
+      final newDevice = PushNotificationDevice(
+        id: deviceId,
         userId: userId,
         platform: Platform.isIOS ? DevicePlatform.ios : DevicePlatform.android,
         providerTokens: {PushNotificationProvider.oneSignal: token},
@@ -118,9 +141,7 @@ class OneSignalPushNotificationService extends PushNotificationService {
         updatedAt: DateTime.now(),
       );
 
-      // Use the standard `update` method from the repository for an
-      // idempotent "upsert" operation. The player ID is the resource ID.
-      await _pushNotificationDeviceRepository.update(id: token, item: device);
+      await _pushNotificationDeviceRepository.create(item: newDevice);
       _logger.info('Device successfully registered with backend.');
     } catch (e, s) {
       _logger.severe('Failed to register device.', e, s);
@@ -147,6 +168,7 @@ class OneSignalPushNotificationService extends PushNotificationService {
   Future<void> close() async {
     await _onMessageController.close();
     await _onMessageOpenedAppController.close();
+    await _onTokenRefreshedController.close();
   }
 
   @override

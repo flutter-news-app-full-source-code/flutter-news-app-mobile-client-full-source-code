@@ -87,6 +87,14 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     );
     on<AppInAppNotificationReceived>(_onAppInAppNotificationReceived);
     on<AppLogoutRequested>(_onLogoutRequested);
+    on<AppPushNotificationTokenRefreshed>(_onAppPushNotificationTokenRefreshed);
+
+    // Listen to token refresh events from the push notification service.
+    // When a token is refreshed, dispatch an event to trigger device
+    // re-registration with the backend.
+    _pushNotificationService.onTokenRefreshed.listen((_) {
+      add(const AppPushNotificationTokenRefreshed());
+    });
   }
 
   final Logger _logger;
@@ -117,6 +125,14 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         '[AppBloc] App started with user ${state.user!.id}. '
         'Attempting to register device for push notifications.',
       );
+      // The PushNotificationService will handle getting the token and
+      // calling the repository's create method. This call is now wrapped in a
+      // try-catch to prevent unhandled exceptions from crashing the app if
+      // registration fails.
+      //
+      // The `registerDevice` method now implements a "delete-then-create"
+      // pattern to ensure idempotency and align with backend expectations.
+      // It uses a composite ID of userId and provider name.
       try {
         await _pushNotificationService.registerDevice(userId: state.user!.id);
         add(const AppPushNotificationDeviceRegistered());
@@ -242,11 +258,19 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           'for push notifications.',
         );
         try {
-          // The PushNotificationService will handle getting the token and
-          // calling the repository's update method.
+          // The PushNotificationService will handle getting the token and calling
+          // the repository's create method. This call is now wrapped in a
+          // try-catch to prevent unhandled exceptions from crashing the app if
+          // registration fails.
+          //
+          // The `registerDevice` method now implements a "delete-then-create"
+          // pattern to ensure idempotency and align with backend expectations.
+          // It uses a composite ID of userId and provider name.
           await _pushNotificationService.registerDevice(userId: user.id);
           add(const AppPushNotificationDeviceRegistered());
         } catch (e, s) {
+          // Log the error but allow the app to continue functioning.
+          // The user can still use the app even if push registration fails.
           _logger.severe(
             '[AppBloc] Failed to register push notification device for user ${user.id}.',
             e,
@@ -639,5 +663,27 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     Emitter<AppState> emit,
   ) {
     emit(state.copyWith(hasUnreadInAppNotifications: true));
+  }
+
+  /// Handles the [AppPushNotificationTokenRefreshed] event.
+  ///
+  /// This event is triggered when the underlying push notification provider
+  /// (e.g., FCM, OneSignal) refreshes its device token. The AppBloc then
+  /// attempts to re-register the device with the backend using the current
+  /// user's ID.
+  Future<void> _onAppPushNotificationTokenRefreshed(
+    AppPushNotificationTokenRefreshed event,
+    Emitter<AppState> emit,
+  ) async {
+    if (state.user == null) {
+      _logger.info(
+        '[AppBloc] Skipping token re-registration: User is null.',
+      );
+      return;
+    }
+    _logger.info(
+      '[AppBloc] Push notification token refreshed. Re-registering device.',
+    );
+    await _pushNotificationService.registerDevice(userId: state.user!.id);
   }
 }

@@ -46,6 +46,12 @@ abstract class PushNotificationService extends Equatable {
   /// terminated.
   Stream<PushNotificationPayload> get onMessageOpenedApp;
 
+  /// A stream that emits a new device token when it is refreshed by the
+  /// underlying push notification provider.
+  ///
+  /// This is used by the AppBloc to trigger device re-registration.
+  Stream<String> get onTokenRefreshed;
+
   /// Gets the initial notification that caused the app to open from a
   /// terminated state.
   ///

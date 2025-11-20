@@ -25,6 +25,7 @@ class FirebasePushNotificationService implements PushNotificationService {
   final _onMessageController = StreamController<PushNotificationPayload>();
   final _onMessageOpenedAppController =
       StreamController<PushNotificationPayload>();
+  final _onTokenRefreshedController = StreamController<String>();
 
   @override
   Stream<PushNotificationPayload> get onMessage => _onMessageController.stream;
@@ -34,15 +35,18 @@ class FirebasePushNotificationService implements PushNotificationService {
       _onMessageOpenedAppController.stream;
 
   @override
+  Stream<String> get onTokenRefreshed => _onTokenRefreshedController.stream;
+
+  @override
   Future<void> initialize() async {
     _logger.info('Initializing FirebasePushNotificationService...');
 
     // Listen for token refresh events from FCM. If the token changes while
     // the app is running, re-register the device with the new token to
     // ensure continued notification delivery.
-    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
-      _logger.info('FCM token refreshed. Re-registering device.');
-      registerDevice(userId: ''); // userId will be updated by AppBloc
+    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+      _logger.info('FCM token refreshed. Emitting new token.');
+      _onTokenRefreshedController.add(newToken);
     });
 
     // Handle messages that are tapped and open the app from a terminated state.
@@ -110,8 +114,25 @@ class FirebasePushNotificationService implements PushNotificationService {
       }
 
       _logger.fine('FCM token received for registration: $token');
-      final device = PushNotificationDevice(
-        id: token, // Use token as a unique ID for the device
+      // The device ID is now a composite key of userId and provider name to
+      // ensure idempotency and align with the backend's delete-then-create
+      // pattern.
+      final deviceId = '${userId}_${PushNotificationProvider.firebase.name}';
+
+      // First, attempt to delete any existing device registration for this user
+      // and provider. This ensures a clean state and handles token updates
+      // by effectively performing a "delete-then-create".
+      try {
+        await _pushNotificationDeviceRepository.delete(id: deviceId);
+        _logger.info('Existing device registration deleted for $deviceId.');
+      } on NotFoundException {
+        _logger.info('No existing device registration found for $deviceId. Proceeding with creation.');
+      } catch (e, s) {
+        _logger.warning('Failed to delete existing device registration for $deviceId. Proceeding with creation anyway. Error: $e', e, s);
+      }
+
+      final newDevice = PushNotificationDevice(
+        id: deviceId,
         userId: userId,
         platform: Platform.isIOS ? DevicePlatform.ios : DevicePlatform.android,
         providerTokens: {PushNotificationProvider.firebase: token},
@@ -120,9 +141,7 @@ class FirebasePushNotificationService implements PushNotificationService {
         updatedAt: DateTime.now(),
       );
 
-      // Use the standard `update` method from the repository for an
-      // idempotent "upsert" operation. The device token is the resource ID.
-      await _pushNotificationDeviceRepository.update(id: token, item: device);
+      await _pushNotificationDeviceRepository.create(item: newDevice);
       _logger.info('Device successfully registered with backend.');
     } catch (e, s) {
       _logger.severe('Failed to register device.', e, s);
@@ -147,6 +166,7 @@ class FirebasePushNotificationService implements PushNotificationService {
   Future<void> close() async {
     await _onMessageController.close();
     await _onMessageOpenedAppController.close();
+    await _onTokenRefreshedController.close();
   }
 
   @override

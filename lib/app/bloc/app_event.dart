@@ -205,3 +205,15 @@ class AppInAppNotificationReceived extends AppEvent {
   /// {@macro app_in_app_notification_received}
   const AppInAppNotificationReceived();
 }
+
+/// {@template app_push_notification_token_refreshed}
+/// Dispatched when the underlying push notification provider refreshes its
+/// device token.
+///
+/// This event triggers the AppBloc to re-register the device with the backend
+/// using the current user's ID.
+/// {@endtemplate}
+class AppPushNotificationTokenRefreshed extends AppEvent {
+  /// {@macro app_push_notification_token_refreshed}
+  const AppPushNotificationTokenRefreshed();
+}

@@ -5,7 +5,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_blo
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/user_avatar.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/shared.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -168,38 +168,63 @@ class AccountPage extends StatelessWidget {
   /// account-related sections.
   Widget _buildNavigationList(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-
-    // Helper to create a ListTile with consistent styling.
-    Widget buildTile({
-      required IconData icon,
-      required String title,
-      required VoidCallback onTap,
-    }) {
-      return ListTile(
-        leading: Icon(icon, color: theme.colorScheme.primary),
-        title: Text(title, style: textTheme.titleMedium),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: onTap,
-      );
-    }
-
     return Column(
       children: [
         buildTile(
+          context: context,
           icon: Icons.tune_outlined,
           title: l10n.accountContentPreferencesTile,
           onTap: () => context.pushNamed(Routes.manageFollowedItemsName),
         ),
         const Divider(),
         buildTile(
+          context: context,
           icon: Icons.bookmark_outline,
           title: l10n.accountSavedHeadlinesTile,
           onTap: () => context.pushNamed(Routes.accountSavedHeadlinesName),
         ),
         const Divider(),
+        BlocSelector<AppBloc, AppState, bool>(
+          selector: (state) => state.hasUnreadInAppNotifications,
+          builder: (context, showIndicator) {
+            return buildTile(
+              context: context,
+              icon: Icons.notifications_none_outlined,
+              title: l10n.accountNotificationsTile,
+              onTap: () {
+                // Navigate to the new Notification Center page.
+                context.pushNamed(Routes.notificationsName);
+              },
+              // Wrap the title with NotificationIndicator to show the red dot.
+              // This ensures the indicator is aligned with the text.
+              showIndicator: showIndicator,
+            );
+          },
+        ),
+        const Divider(),
       ],
+    );
+  }
+
+  /// Helper to create a ListTile with consistent styling and optional indicator.
+  Widget buildTile({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    bool showIndicator = false,
+  }) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+
+    return ListTile(
+      leading: Icon(icon, color: theme.colorScheme.primary),
+      title: NotificationIndicator(
+        showIndicator: showIndicator,
+        child: Text(title, style: textTheme.titleMedium),
+      ),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: onTap,
     );
   }
 }

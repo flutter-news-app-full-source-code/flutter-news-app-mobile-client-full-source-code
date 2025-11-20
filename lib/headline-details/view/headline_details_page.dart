@@ -5,6 +5,7 @@ import 'package:core/core.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/in_app_notification_center_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/in_article_ad_loader_widget.dart';
@@ -23,11 +24,17 @@ import 'package:ui_kit/ui_kit.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class HeadlineDetailsPage extends StatefulWidget {
-  const HeadlineDetailsPage({super.key, this.headlineId, this.initialHeadline})
-    : assert(headlineId != null || initialHeadline != null);
+  const HeadlineDetailsPage({
+    super.key,
+    this.headlineId,
+    this.initialHeadline,
+    this.notificationId,
+  }) : assert(headlineId != null || initialHeadline != null);
 
   final String? headlineId;
   final Headline? initialHeadline;
+  // The ID of the in-app notification that triggered this navigation.
+  final String? notificationId;
 
   @override
   State<HeadlineDetailsPage> createState() => _HeadlineDetailsPageState();
@@ -50,6 +57,15 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     } else if (widget.headlineId != null) {
       context.read<HeadlineDetailsBloc>().add(
         FetchHeadlineById(widget.headlineId!),
+      );
+    }
+
+    // If a notificationId is provided, it means the user deep-linked from a
+    // push notification. We dispatch an event to mark that specific
+    // notification as read.
+    if (widget.notificationId != null) {
+      context.read<InAppNotificationCenterBloc>().add(
+        InAppNotificationCenterMarkOneAsRead(widget.notificationId!),
       );
     }
   }

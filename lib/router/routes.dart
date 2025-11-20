@@ -35,6 +35,8 @@ abstract final class Routes {
   static const settingsName = 'settings';
   static const manageFollowedItems = 'manage-followed-items';
   static const manageFollowedItemsName = 'manageFollowedItems';
+  static const notifications = 'notifications';
+  static const notificationsName = 'notifications';
 
   // --- Relative Sub-Routes ---
   // These routes are defined with relative paths and are intended to be
@@ -45,8 +47,6 @@ abstract final class Routes {
 
   // Feed
   static const articleDetailsName = 'articleDetails';
-  static const notifications = 'notifications';
-  static const notificationsName = 'notifications';
   static const feedFilter = 'filter';
   static const feedFilterName = 'feedFilter';
   static const feedFilterTopics = 'topics';

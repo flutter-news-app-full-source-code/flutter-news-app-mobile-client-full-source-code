@@ -76,7 +76,7 @@
     "@accountBackupTile": {
         "description": "Title for the tile prompting anonymous users to create an account"
     },
-    "accountContentPreferencesTile": "Content Preferences",
+    "accountContentPreferencesTile": "Followed content",
     "@accountContentPreferencesTile": {
         "description": "Title for the content preferences navigation tile in the account page"
     },
@@ -1661,8 +1661,7 @@
     "notificationDeliveryTypeWeeklyRoundup": "Weekly Roundup",
     "@notificationDeliveryTypeWeeklyRoundup": {
         "description": "The user-facing name for the 'weeklyRoundup' notification delivery type."
-    }
-    ,
+    },
     "prePermissionDialogTitle": "Enable Notifications?",
     "@prePermissionDialogTitle": {
         "description": "Title for the pre-permission dialog asking the user to enable notifications."
@@ -1682,5 +1681,45 @@
     "notificationPermissionDeniedError": "Notification permission was denied. You can enable it in your device settings.",
     "@notificationPermissionDeniedError": {
         "description": "Error message shown when the user denies notification permissions at the OS level."
+    },
+    "notificationCenterPageTitle": "Notifications",
+    "@notificationCenterPageTitle": {
+        "description": "Title for the in-app notification center page."
+    },
+    "notificationCenterMarkAllAsReadButton": "Mark all as read",
+    "@notificationCenterMarkAllAsReadButton": {
+        "description": "Text for the button to mark all notifications as read."
+    },
+    "notificationCenterLoadingHeadline": "Loading Notifications...",
+    "@notificationCenterLoadingHeadline": {
+        "description": "Headline for the loading state on the notification center page."
+    },
+    "notificationCenterLoadingSubheadline": "Please wait...",
+    "@notificationCenterLoadingSubheadline": {
+        "description": "Subheadline for the loading state on the notification center page."
+    },
+    "notificationCenterFailureHeadline": "Failed to Load Notifications",
+    "@notificationCenterFailureHeadline": {
+        "description": "Headline for the failure state on the notification center page."
+    },
+    "notificationCenterFailureSubheadline": "Could not retrieve your notifications. Please try again.",
+    "@notificationCenterFailureSubheadline": {
+        "description": "Subheadline for the failure state on the notification center page."
+    },
+    "notificationCenterEmptyHeadline": "No Notifications",
+    "@notificationCenterEmptyHeadline": {
+        "description": "Headline for the empty state on the notification center page."
+    },
+    "notificationCenterEmptySubheadline": "You have no new notifications.",
+    "@notificationCenterEmptySubheadline": {
+        "description": "Subheadline for the empty state on the notification center page."
+    },
+    "notificationCenterTabBreakingNews": "Breaking News",
+    "@notificationCenterTabBreakingNews": {
+        "description": "Label for the 'Breaking News' tab in the notification center."
+    },
+    "notificationCenterTabDigests": "Digests",
+    "@notificationCenterTabDigests": {
+        "description": "Label for the 'Digests' tab in the notification center."
     }
 }

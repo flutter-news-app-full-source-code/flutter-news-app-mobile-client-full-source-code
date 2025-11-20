@@ -57,6 +57,7 @@ class AppInitializationPage extends StatelessWidget {
     required this.inlineAdCacheService,
     required this.navigatorKey,
     required this.pushNotificationService,
+    required this.inAppNotificationRepository,
     super.key,
   });
 
@@ -76,6 +77,7 @@ class AppInitializationPage extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey;
   final InlineAdCacheService inlineAdCacheService;
   final PushNotificationService pushNotificationService;
+  final DataRepository<InAppNotification> inAppNotificationRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -112,6 +114,7 @@ class AppInitializationPage extends StatelessWidget {
                     userContentPreferencesRepository,
                 environment: environment,
                 pushNotificationService: pushNotificationService,
+                inAppNotificationRepository: inAppNotificationRepository,
                 adService: adService,
                 feedDecoratorService: feedDecoratorService,
                 feedCacheService: feedCacheService,

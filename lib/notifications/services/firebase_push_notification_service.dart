@@ -22,10 +22,11 @@ class FirebasePushNotificationService implements PushNotificationService {
   _pushNotificationDeviceRepository;
   final Logger _logger;
 
-  final _onMessageController = StreamController<PushNotificationPayload>();
+  final _onMessageController =
+      StreamController<PushNotificationPayload>.broadcast();
   final _onMessageOpenedAppController =
-      StreamController<PushNotificationPayload>();
-  final _onTokenRefreshedController = StreamController<String>();
+      StreamController<PushNotificationPayload>.broadcast();
+  final _onTokenRefreshedController = StreamController<String>.broadcast();
 
   @override
   Stream<PushNotificationPayload> get onMessage => _onMessageController.stream;
@@ -74,11 +75,10 @@ class FirebasePushNotificationService implements PushNotificationService {
       '${message.toMap()}',
     );
     final payload = _toPushNotificationPayload(message);
-    if (isOpenedApp) {
-      _onMessageOpenedAppController.add(payload);
-    } else {
-      _onMessageController.add(payload);
-    }
+
+    (isOpenedApp ? _onMessageOpenedAppController : _onMessageController).add(
+      payload,
+    );
   }
 
   @override
@@ -106,6 +106,7 @@ class FirebasePushNotificationService implements PushNotificationService {
   @override
   Future<void> registerDevice({required String userId}) async {
     _logger.info('Registering device for user: $userId');
+
     try {
       final token = await FirebaseMessaging.instance.getToken();
       if (token == null) {

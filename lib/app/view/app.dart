@@ -52,6 +52,7 @@ class App extends StatelessWidget {
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
     required AppEnvironment environment,
+    required DataRepository<InAppNotification> inAppNotificationRepository,
     required InlineAdCacheService inlineAdCacheService,
     required AdService adService,
     required FeedDecoratorService feedDecoratorService,
@@ -69,6 +70,7 @@ class App extends StatelessWidget {
        _userAppSettingsRepository = userAppSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
        _pushNotificationService = pushNotificationService,
+       _inAppNotificationRepository = inAppNotificationRepository,
        _environment = environment,
        _adService = adService,
        _feedDecoratorService = feedDecoratorService,
@@ -99,6 +101,7 @@ class App extends StatelessWidget {
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
   final AppEnvironment _environment;
+  final DataRepository<InAppNotification> _inAppNotificationRepository;
   final AdService _adService;
   final FeedDecoratorService _feedDecoratorService;
   final FeedCacheService _feedCacheService;
@@ -125,6 +128,7 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _userAppSettingsRepository),
         RepositoryProvider.value(value: _userContentPreferencesRepository),
         RepositoryProvider.value(value: _pushNotificationService),
+        RepositoryProvider.value(value: _inAppNotificationRepository),
         RepositoryProvider.value(value: _inlineAdCacheService),
         RepositoryProvider.value(value: _feedCacheService),
         RepositoryProvider.value(value: _environment),
@@ -148,6 +152,7 @@ class App extends StatelessWidget {
                   _userContentPreferencesRepository,
               logger: context.read<Logger>(),
               pushNotificationService: _pushNotificationService,
+              inAppNotificationRepository: _inAppNotificationRepository,
               userRepository: _userRepository,
               inlineAdCacheService: _inlineAdCacheService,
             )..add(const AppStarted()),
@@ -217,17 +222,19 @@ class _AppViewState extends State<_AppView> {
           final contentType =
               payload.data['contentType'] as String?; // e.g., 'headline'
           final id = payload.data['headlineId'] as String?;
+          final notificationId = payload.data['notificationId'] as String?;
 
           if (contentType == 'headline' && id != null) {
             // Use pushNamed instead of goNamed.
             // goNamed replaces the entire navigation stack, which causes issues
             // when the app is launched from a terminated state. The new page
             // would lack the necessary ancestor widgets (like RepositoryProviders).
-            // pushNamed correctly pushes the details page on top of the
-            // existing stack (e.g., the feed), ensuring a valid context.
+            // pushNamed correctly pushes the details page on top of the existing
+            // stack (e.g., the feed), ensuring a valid context.
             _router.pushNamed(
               Routes.globalArticleDetailsName,
               pathParameters: {'id': id},
+              extra: {'notificationId': notificationId},
             );
           }
         });

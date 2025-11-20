@@ -22,15 +22,19 @@ class DemoDataInitializerService {
     required DataRepository<UserAppSettings> userAppSettingsRepository,
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
+    required DataRepository<InAppNotification> inAppNotificationRepository,
     required this.userAppSettingsFixturesData,
     required this.userContentPreferencesFixturesData,
+    required this.inAppNotificationsFixturesData,
   }) : _userAppSettingsRepository = userAppSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
+       _inAppNotificationRepository = inAppNotificationRepository,
        _logger = Logger('DemoDataInitializerService');
 
   final DataRepository<UserAppSettings> _userAppSettingsRepository;
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
+  final DataRepository<InAppNotification> _inAppNotificationRepository;
   final Logger _logger;
 
   /// A list of [UserAppSettings] fixture data to be used as a template.
@@ -42,6 +46,11 @@ class DemoDataInitializerService {
   ///
   /// The first item in this list will be cloned for new users.
   final List<UserContentPreferences> userContentPreferencesFixturesData;
+
+  /// A list of [InAppNotification] fixture data to be used as a template.
+  ///
+  /// All items in this list will be cloned for new users.
+  final List<InAppNotification> inAppNotificationsFixturesData;
 
   /// Initializes essential user-specific data in the in-memory clients
   /// for the given [user].
@@ -59,6 +68,7 @@ class DemoDataInitializerService {
     await Future.wait([
       _ensureUserAppSettingsExist(user.id),
       _ensureUserContentPreferencesExist(user.id),
+      _ensureInAppNotificationsExist(user.id),
     ]);
 
     _logger.info(
@@ -144,6 +154,61 @@ class DemoDataInitializerService {
         s,
       );
       rethrow;
+    }
+  }
+
+  /// Ensures that [InAppNotification]s exist for the given [userId].
+  ///
+  /// This method clones all notifications from the fixture data, assigns the
+  /// new user's ID to each one, and creates them in the in-memory repository.
+  /// This provides new demo users with a pre-populated notification center.
+  Future<void> _ensureInAppNotificationsExist(String userId) async {
+    try {
+      // Check if notifications already exist for this user.
+      final existingNotifications = await _inAppNotificationRepository.readAll(
+        userId: userId,
+      );
+      if (existingNotifications.items.isNotEmpty) {
+        _logger.info('InAppNotifications already exist for user ID: $userId.');
+        return;
+      }
+
+      _logger.info(
+        'No InAppNotifications found for user ID: $userId. Creating from fixture.',
+      );
+
+      if (inAppNotificationsFixturesData.isEmpty) {
+        _logger.warning(
+          'inAppNotificationsFixturesData is empty. No notifications to create.',
+        );
+        return;
+      }
+
+      // Exclude the first notification, which will be used for the simulated push.
+      final notificationsToCreate = inAppNotificationsFixturesData
+          .skip(1)
+          .toList();
+
+      final userNotifications = notificationsToCreate
+          .map((n) => n.copyWith(userId: userId))
+          .toList();
+
+      await Future.wait(
+        userNotifications.map(
+          (n) => _inAppNotificationRepository.create(item: n, userId: userId),
+        ),
+      );
+      _logger.info(
+        '${userNotifications.length} InAppNotifications from fixture created for user ID: $userId.',
+      );
+    } catch (e, s) {
+      _logger.severe(
+        'Error ensuring InAppNotifications exist for user ID: $userId: $e',
+        e,
+        s,
+      );
+      // We don't rethrow here as failing to create notifications
+      // is not a critical failure for the app's startup.
     }
   }
 }

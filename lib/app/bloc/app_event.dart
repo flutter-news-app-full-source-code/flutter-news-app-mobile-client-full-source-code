@@ -217,3 +217,21 @@ class AppPushNotificationTokenRefreshed extends AppEvent {
   /// {@macro app_push_notification_token_refreshed}
   const AppPushNotificationTokenRefreshed();
 }
+
+/// {@template app_in_app_notification_marked_as_read}
+/// Dispatched when a single in-app notification is marked as read.
+/// {@endtemplate}
+class AppInAppNotificationMarkedAsRead extends AppEvent {
+  /// {@macro app_in_app_notification_marked_as_read}
+  const AppInAppNotificationMarkedAsRead();
+}
+
+/// {@template app_all_in_app_notifications_marked_as_read}
+/// Dispatched when all in-app notifications are marked as read.
+///
+/// This event is used to clear the global unread notification indicator.
+/// {@endtemplate}
+class AppAllInAppNotificationsMarkedAsRead extends AppEvent {
+  /// {@macro app_all_in_app_notifications_marked_as_read}
+  const AppAllInAppNotificationsMarkedAsRead();
+}

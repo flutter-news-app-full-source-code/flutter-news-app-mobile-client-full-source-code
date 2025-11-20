@@ -215,7 +215,7 @@ abstract class AppLocalizations {
   /// Title for the content preferences navigation tile in the account page
   ///
   /// In en, this message translates to:
-  /// **'Content Preferences'**
+  /// **'Followed content'**
   String get accountContentPreferencesTile;
 
   /// Title for the saved headlines navigation tile in the account page
@@ -2461,6 +2461,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Notification permission was denied. You can enable it in your device settings.'**
   String get notificationPermissionDeniedError;
+
+  /// Title for the in-app notification center page.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notificationCenterPageTitle;
+
+  /// Text for the button to mark all notifications as read.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark all as read'**
+  String get notificationCenterMarkAllAsReadButton;
+
+  /// Headline for the loading state on the notification center page.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading Notifications...'**
+  String get notificationCenterLoadingHeadline;
+
+  /// Subheadline for the loading state on the notification center page.
+  ///
+  /// In en, this message translates to:
+  /// **'Please wait...'**
+  String get notificationCenterLoadingSubheadline;
+
+  /// Headline for the failure state on the notification center page.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to Load Notifications'**
+  String get notificationCenterFailureHeadline;
+
+  /// Subheadline for the failure state on the notification center page.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not retrieve your notifications. Please try again.'**
+  String get notificationCenterFailureSubheadline;
+
+  /// Headline for the empty state on the notification center page.
+  ///
+  /// In en, this message translates to:
+  /// **'No Notifications'**
+  String get notificationCenterEmptyHeadline;
+
+  /// Subheadline for the empty state on the notification center page.
+  ///
+  /// In en, this message translates to:
+  /// **'You have no new notifications.'**
+  String get notificationCenterEmptySubheadline;
+
+  /// Label for the 'Breaking News' tab in the notification center.
+  ///
+  /// In en, this message translates to:
+  /// **'Breaking News'**
+  String get notificationCenterTabBreakingNews;
+
+  /// Label for the 'Digests' tab in the notification center.
+  ///
+  /// In en, this message translates to:
+  /// **'Digests'**
+  String get notificationCenterTabDigests;
 }
 
 class _AppLocalizationsDelegate

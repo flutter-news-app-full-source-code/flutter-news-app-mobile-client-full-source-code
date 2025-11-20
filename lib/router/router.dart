@@ -3,6 +3,7 @@ import 'package:core/core.dart' hide AppStatus;
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/in_app_notification_center_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/account_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/followed_contents/countries/add_country_to_follow_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/followed_contents/countries/followed_countries_list_page.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/account/view/fol
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/followed_contents/sources/followed_sources_list_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/followed_contents/topics/add_topic_to_follow_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/followed_contents/topics/followed_topics_list_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/account/view/in_app_notification_center_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/saved_headlines_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
@@ -231,6 +233,23 @@ GoRouter createRouter({
         pageBuilder: (context, state) =>
             const MaterialPage(fullscreenDialog: true, child: AccountPage()),
         routes: [
+          GoRoute(
+            path: Routes.notificationsCenter,
+            name: Routes.notificationsCenterName,
+            builder: (context, state) {
+              // Provide the InAppNotificationCenterBloc here so it's available
+              // in the BuildContext when InAppNotificationCenterPage's initState runs.
+              return BlocProvider(
+                create: (context) => InAppNotificationCenterBloc(
+                  inAppNotificationRepository: context
+                      .read<DataRepository<InAppNotification>>(),
+                  appBloc: context.read<AppBloc>(),
+                  logger: context.read<Logger>(),
+                )..add(const InAppNotificationCenterSubscriptionRequested()),
+                child: const InAppNotificationCenterPage(),
+              );
+            },
+          ),
           // The settings section within the account modal. It uses a
           // ShellRoute to provide a SettingsBloc to all its children.
           ShellRoute(
@@ -353,8 +372,12 @@ GoRouter createRouter({
                 path: Routes.accountArticleDetails,
                 name: Routes.accountArticleDetailsName,
                 builder: (context, state) {
-                  final headlineFromExtra = state.extra as Headline?;
+                  final extra = state.extra;
+                  final headlineFromExtra = extra is Headline ? extra : null;
                   final headlineIdFromPath = state.pathParameters['id'];
+                  final notificationId = extra is Map<String, dynamic>
+                      ? extra['notificationId'] as String?
+                      : null;
                   return MultiBlocProvider(
                     providers: [
                       BlocProvider(
@@ -373,6 +396,7 @@ GoRouter createRouter({
                     child: HeadlineDetailsPage(
                       initialHeadline: headlineFromExtra,
                       headlineId: headlineFromExtra?.id ?? headlineIdFromPath,
+                      notificationId: notificationId,
                     ),
                   );
                 },
@@ -440,8 +464,14 @@ GoRouter createRouter({
         path: Routes.globalArticleDetails,
         name: Routes.globalArticleDetailsName,
         builder: (context, state) {
-          final headlineFromExtra = state.extra as Headline?;
+          // The 'extra' can be a Headline object (from feed navigation) or a Map
+          // (from a push notification deep-link).
+          final extra = state.extra;
+          final headlineFromExtra = extra is Headline ? extra : null;
           final headlineIdFromPath = state.pathParameters['id'];
+          final notificationId = extra is Map<String, dynamic>
+              ? extra['notificationId'] as String?
+              : null;
 
           return MultiBlocProvider(
             providers: [
@@ -459,6 +489,7 @@ GoRouter createRouter({
             child: HeadlineDetailsPage(
               initialHeadline: headlineFromExtra,
               headlineId: headlineFromExtra?.id ?? headlineIdFromPath,
+              notificationId: notificationId,
             ),
           );
         },
@@ -533,8 +564,14 @@ GoRouter createRouter({
                         path: 'article/:id',
                         name: Routes.articleDetailsName,
                         builder: (context, state) {
-                          final headlineFromExtra = state.extra as Headline?;
+                          final extra = state.extra;
+                          final headlineFromExtra = extra is Headline
+                              ? extra
+                              : null;
                           final headlineIdFromPath = state.pathParameters['id'];
+                          final notificationId = extra is Map<String, dynamic>
+                              ? extra['notificationId'] as String?
+                              : null;
 
                           return MultiBlocProvider(
                             providers: [
@@ -555,17 +592,8 @@ GoRouter createRouter({
                               initialHeadline: headlineFromExtra,
                               headlineId:
                                   headlineFromExtra?.id ?? headlineIdFromPath,
+                              notificationId: notificationId,
                             ),
-                          );
-                        },
-                      ),
-                      // Sub-route for notifications page.
-                      GoRoute(
-                        path: Routes.notifications,
-                        name: Routes.notificationsName,
-                        builder: (context, state) {
-                          return const Placeholder(
-                            child: Center(child: Text('NOTIFICATIONS PAGE')),
                           );
                         },
                       ),

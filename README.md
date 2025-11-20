@@ -50,7 +50,7 @@ A robust, backend-driven notification system keeps users informed and brings the
 - **Multi-Provider Architecture:** Built on an abstraction that supports any push notification service. It ships with production-ready providers for Firebase (FCM) and OneSignal.
 - **Remote Provider Switching:** The primary notification provider is selected via remote configuration, allowing you to switch services on the fly without shipping an app update.
 - **Intelligent Deep-Linking:** Tapping a notification opens the app and navigates directly to the relevant content, such as a specific news article, providing a seamless user experience.
-- **Foreground Notification Handling:** Displays a subtle in-app indicator when a notification arrives while the user is active, avoiding intrusive alerts.
+- **Integrated Notification Center:** Includes a full-featured in-app notification center where users can view their history. Foreground notifications are handled gracefully, appearing as an unread indicator that leads the user to this central hub, avoiding intrusive system alerts during active use.
 > **Your Advantage:** You get a highly flexible and scalable notification system that avoids vendor lock-in and is ready to re-engage users from day one.
 
 </details>

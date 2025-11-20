@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:core/core.dart';
+import 'package:data_repository/data_repository.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 
 /// {@template no_op_push_notification_service}
@@ -11,7 +15,25 @@ import 'package:flutter_news_app_mobile_client_full_source_code/notifications/se
 /// empty implementations for all required methods.
 /// {@endtemplate}
 class NoOpPushNotificationService extends PushNotificationService {
+  /// Creates an instance of [NoOpPushNotificationService].
+  NoOpPushNotificationService({
+    required DataRepository<InAppNotification> inAppNotificationRepository,
+    required List<InAppNotification> inAppNotificationsFixturesData,
+    required this.environment,
+  }) : _inAppNotificationRepository = inAppNotificationRepository,
+       _inAppNotificationsFixturesData = inAppNotificationsFixturesData;
   final ValueNotifier<bool> _permissionState = ValueNotifier(false);
+  final _onMessageController =
+      StreamController<PushNotificationPayload>.broadcast();
+
+  final DataRepository<InAppNotification> _inAppNotificationRepository;
+  final List<InAppNotification> _inAppNotificationsFixturesData;
+
+  /// The current application environment.
+  final AppEnvironment environment;
+
+  @override
+  Stream<PushNotificationPayload> get onMessage => _onMessageController.stream;
 
   @override
   Future<void> initialize() async {}
@@ -33,10 +55,36 @@ class NoOpPushNotificationService extends PushNotificationService {
   }
 
   @override
-  Future<void> registerDevice({required String userId}) async {}
+  Future<void> registerDevice({required String userId}) async {
+    // In demo mode, simulate receiving a push notification a few seconds
+    // after the user "registers" their device (i.e., logs in).
+    if (environment != AppEnvironment.demo) {
+      return;
+    }
+    unawaited(
+      Future.delayed(const Duration(seconds: 10), () async {
+        if (_inAppNotificationsFixturesData.isEmpty) return;
+
+        // Use the first notification from the fixtures as the simulated push.
+        final notificationToSimulate = _inAppNotificationsFixturesData.first;
+
+        // To align with the backend architecture, this NoOp service
+        // simulates the backend's behavior: it first persists the notification
+        // to the in-memory repository, and *then* emits the push payload.
+        await _inAppNotificationRepository.create(
+          item: notificationToSimulate,
+          userId: userId,
+        );
+
+        _onMessageController.add(notificationToSimulate.payload);
+      }),
+    );
+  }
 
   @override
-  Stream<PushNotificationPayload> get onMessage => const Stream.empty();
+  Future<void> close() async {
+    await _onMessageController.close();
+  }
 
   @override
   Stream<PushNotificationPayload> get onMessageOpenedApp =>
@@ -49,8 +97,9 @@ class NoOpPushNotificationService extends PushNotificationService {
   Future<PushNotificationPayload?> get initialMessage async => null;
 
   @override
-  Future<void> close() async {}
-
-  @override
-  List<Object?> get props => [];
+  List<Object?> get props => [
+    _inAppNotificationRepository,
+    _inAppNotificationsFixturesData,
+    environment,
+  ];
 }

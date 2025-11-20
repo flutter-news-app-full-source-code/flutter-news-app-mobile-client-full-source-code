@@ -69,7 +69,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountBackupTile => 'Create Account to Save Data';
 
   @override
-  String get accountContentPreferencesTile => 'Content Preferences';
+  String get accountContentPreferencesTile => 'Followed content';
 
   @override
   String get accountSavedHeadlinesTile => 'Saved Headlines';
@@ -1297,4 +1297,37 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notificationPermissionDeniedError =>
       'Notification permission was denied. You can enable it in your device settings.';
+
+  @override
+  String get notificationCenterPageTitle => 'Notifications';
+
+  @override
+  String get notificationCenterMarkAllAsReadButton => 'Mark all as read';
+
+  @override
+  String get notificationCenterLoadingHeadline => 'Loading Notifications...';
+
+  @override
+  String get notificationCenterLoadingSubheadline => 'Please wait...';
+
+  @override
+  String get notificationCenterFailureHeadline =>
+      'Failed to Load Notifications';
+
+  @override
+  String get notificationCenterFailureSubheadline =>
+      'Could not retrieve your notifications. Please try again.';
+
+  @override
+  String get notificationCenterEmptyHeadline => 'No Notifications';
+
+  @override
+  String get notificationCenterEmptySubheadline =>
+      'You have no new notifications.';
+
+  @override
+  String get notificationCenterTabBreakingNews => 'Breaking News';
+
+  @override
+  String get notificationCenterTabDigests => 'Digests';
 }

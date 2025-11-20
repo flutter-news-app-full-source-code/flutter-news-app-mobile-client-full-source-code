@@ -24,10 +24,11 @@ class OneSignalPushNotificationService extends PushNotificationService {
   _pushNotificationDeviceRepository;
   final Logger _logger;
 
-  final _onMessageController = StreamController<PushNotificationPayload>();
+  final _onMessageController =
+      StreamController<PushNotificationPayload>.broadcast();
   final _onMessageOpenedAppController =
-      StreamController<PushNotificationPayload>();
-  final _onTokenRefreshedController = StreamController<String>();
+      StreamController<PushNotificationPayload>.broadcast();
+  final _onTokenRefreshedController = StreamController<String>.broadcast();
 
   // OneSignal doesn't have a direct equivalent of `getInitialMessage`.
   // We rely on the `setNotificationOpenedHandler`.
@@ -47,7 +48,7 @@ class OneSignalPushNotificationService extends PushNotificationService {
   @override
   Future<void> initialize() async {
     _logger.info('Initializing OneSignalPushNotificationService...');
-    OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+    await OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
     OneSignal.initialize(_appId);
 
     // Listen for changes to the push subscription state. If the token (player
@@ -70,7 +71,7 @@ class OneSignalPushNotificationService extends PushNotificationService {
       // Prevent OneSignal from displaying the notification automatically.
       event.preventDefault();
       // We handle it by adding to our stream.
-      _onMessageController.add(_toPushNotificationPayload(event.notification));
+      _handleMessage(event.notification, isOpenedApp: false);
     });
 
     // Handles notifications that are tapped by the user.
@@ -78,9 +79,7 @@ class OneSignalPushNotificationService extends PushNotificationService {
       _logger.fine(
         'OneSignal notification clicked: ${event.notification.jsonRepresentation()}',
       );
-      _onMessageOpenedAppController.add(
-        _toPushNotificationPayload(event.notification),
-      );
+      _handleMessage(event.notification, isOpenedApp: true);
     });
 
     _logger.info('OneSignalPushNotificationService initialized.');
@@ -102,6 +101,7 @@ class OneSignalPushNotificationService extends PushNotificationService {
   @override
   Future<void> registerDevice({required String userId}) async {
     _logger.info('Registering device for user: $userId');
+
     try {
       // OneSignal automatically handles token retrieval and storage.
       // We just need to get the OneSignal Player ID (push subscription ID).
@@ -153,6 +153,17 @@ class OneSignalPushNotificationService extends PushNotificationService {
       _logger.severe('Failed to register device.', e, s);
       rethrow;
     }
+  }
+
+  void _handleMessage(
+    OSNotification notification, {
+    required bool isOpenedApp,
+  }) {
+    final payload = _toPushNotificationPayload(notification);
+
+    (isOpenedApp ? _onMessageOpenedAppController : _onMessageController).add(
+      payload,
+    );
   }
 
   /// Converts a OneSignal [OSNotification] to a generic [PushNotificationPayload].

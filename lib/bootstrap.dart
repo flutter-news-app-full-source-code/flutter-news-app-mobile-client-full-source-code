@@ -343,7 +343,7 @@ Future<Widget> bootstrap(
     );
     pushNotificationDeviceClient = DataApi<PushNotificationDevice>(
       httpClient: httpClient,
-      modelName: 'push_notification_devices',
+      modelName: 'push_notification_device',
       fromJson: PushNotificationDevice.fromJson,
       toJson: (device) => device.toJson(),
       logger: logger,
@@ -402,7 +402,7 @@ Future<Widget> bootstrap(
     );
     pushNotificationDeviceClient = DataApi<PushNotificationDevice>(
       httpClient: httpClient,
-      modelName: 'push_notification_devices',
+      modelName: 'push_notification_device',
       fromJson: PushNotificationDevice.fromJson,
       toJson: (device) => device.toJson(),
       logger: logger,

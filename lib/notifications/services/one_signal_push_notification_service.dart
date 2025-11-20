@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
@@ -14,20 +15,30 @@ class OneSignalPushNotificationService extends PushNotificationService {
     required String appId,
     required DataRepository<PushNotificationDevice>
     pushNotificationDeviceRepository,
+    required DataRepository<InAppNotification> inAppNotificationRepository,
     required Logger logger,
   }) : _appId = appId,
        _pushNotificationDeviceRepository = pushNotificationDeviceRepository,
+       _inAppNotificationRepository = inAppNotificationRepository,
        _logger = logger;
 
   final String _appId;
   final DataRepository<PushNotificationDevice>
   _pushNotificationDeviceRepository;
+  final DataRepository<InAppNotification> _inAppNotificationRepository;
   final Logger _logger;
 
-  final _onMessageController = StreamController<PushNotificationPayload>();
+  final _onMessageController =
+      StreamController<PushNotificationPayload>.broadcast();
   final _onMessageOpenedAppController =
-      StreamController<PushNotificationPayload>();
-  final _onTokenRefreshedController = StreamController<String>();
+      StreamController<PushNotificationPayload>.broadcast();
+  final _onTokenRefreshedController = StreamController<String>.broadcast();
+  final _onInAppNotificationReceivedController =
+      StreamController<InAppNotification>.broadcast();
+
+  // Store the userId from the last successful registration.
+  // This is used to associate incoming notifications with the correct user.
+  String? _currentUserId;
 
   // OneSignal doesn't have a direct equivalent of `getInitialMessage`.
   // We rely on the `setNotificationOpenedHandler`.
@@ -43,6 +54,10 @@ class OneSignalPushNotificationService extends PushNotificationService {
 
   @override
   Stream<String> get onTokenRefreshed => _onTokenRefreshedController.stream;
+
+  @override
+  Stream<InAppNotification> get onInAppNotificationReceived =>
+      _onInAppNotificationReceivedController.stream;
 
   @override
   Future<void> initialize() async {
@@ -63,24 +78,22 @@ class OneSignalPushNotificationService extends PushNotificationService {
     });
 
     // Handles notifications received while the app is in the foreground.
-    OneSignal.Notifications.addForegroundWillDisplayListener((event) {
+    OneSignal.Notifications.addForegroundWillDisplayListener((event) async {
       _logger.fine(
         'OneSignal foreground message received: ${event.notification.jsonRepresentation()}',
       );
       // Prevent OneSignal from displaying the notification automatically.
       event.preventDefault();
       // We handle it by adding to our stream.
-      _onMessageController.add(_toPushNotificationPayload(event.notification));
+      await _handleMessage(event.notification, isOpenedApp: false);
     });
 
     // Handles notifications that are tapped by the user.
-    OneSignal.Notifications.addClickListener((event) {
+    OneSignal.Notifications.addClickListener((event) async {
       _logger.fine(
         'OneSignal notification clicked: ${event.notification.jsonRepresentation()}',
       );
-      _onMessageOpenedAppController.add(
-        _toPushNotificationPayload(event.notification),
-      );
+      await _handleMessage(event.notification, isOpenedApp: true);
     });
 
     _logger.info('OneSignalPushNotificationService initialized.');
@@ -102,6 +115,9 @@ class OneSignalPushNotificationService extends PushNotificationService {
   @override
   Future<void> registerDevice({required String userId}) async {
     _logger.info('Registering device for user: $userId');
+    // Store the userId to be used for persisting incoming notifications.
+    _currentUserId = userId;
+
     try {
       // OneSignal automatically handles token retrieval and storage.
       // We just need to get the OneSignal Player ID (push subscription ID).
@@ -155,6 +171,38 @@ class OneSignalPushNotificationService extends PushNotificationService {
     }
   }
 
+  Future<void> _handleMessage(
+    OSNotification notification, {
+    required bool isOpenedApp,
+  }) async {
+    final payload = _toPushNotificationPayload(notification);
+
+    // Persist the notification if a user is logged in.
+    if (_currentUserId != null) {
+      try {
+        final newNotification = InAppNotification(
+          // Generate a random ID for the notification.
+          id: Random().nextInt(999999).toString(),
+          userId: _currentUserId!,
+          payload: payload,
+          createdAt: DateTime.now(),
+        );
+
+        final createdNotification = await _inAppNotificationRepository.create(
+          item: newNotification,
+          userId: _currentUserId,
+        );
+        _onInAppNotificationReceivedController.add(createdNotification);
+      } catch (e, s) {
+        _logger.severe('Failed to persist in-app notification.', e, s);
+      }
+    }
+
+    (isOpenedApp ? _onMessageOpenedAppController : _onMessageController).add(
+      payload,
+    );
+  }
+
   /// Converts a OneSignal [OSNotification] to a generic [PushNotificationPayload].
   PushNotificationPayload _toPushNotificationPayload(
     OSNotification osNotification,
@@ -175,12 +223,14 @@ class OneSignalPushNotificationService extends PushNotificationService {
     await _onMessageController.close();
     await _onMessageOpenedAppController.close();
     await _onTokenRefreshedController.close();
+    await _onInAppNotificationReceivedController.close();
   }
 
   @override
   List<Object?> get props => [
     _appId,
     _pushNotificationDeviceRepository,
+    _inAppNotificationRepository,
     _logger,
   ];
 }

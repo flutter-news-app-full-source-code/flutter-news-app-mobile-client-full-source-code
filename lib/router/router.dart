@@ -221,11 +221,6 @@ GoRouter createRouter({
               ),
             ],
           ),
-          GoRoute(
-            path: Routes.notifications,
-            name: Routes.notificationsName,
-            builder: (context, state) => const InAppNotificationCenterPage(),
-          ),
         ],
       ),
 
@@ -237,6 +232,11 @@ GoRouter createRouter({
         pageBuilder: (context, state) =>
             const MaterialPage(fullscreenDialog: true, child: AccountPage()),
         routes: [
+          GoRoute(
+            path: Routes.notifications,
+            name: Routes.notificationsName,
+            builder: (context, state) => const InAppNotificationCenterPage(),
+          ),
           // The settings section within the account modal. It uses a
           // ShellRoute to provide a SettingsBloc to all its children.
           ShellRoute(

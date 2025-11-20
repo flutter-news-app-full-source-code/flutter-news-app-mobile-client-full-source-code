@@ -57,6 +57,7 @@ class AppInitializationPage extends StatelessWidget {
     required this.inlineAdCacheService,
     required this.navigatorKey,
     required this.pushNotificationService,
+    required this.inAppNotificationRepository,
     super.key,
   });
 
@@ -76,6 +77,7 @@ class AppInitializationPage extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey;
   final InlineAdCacheService inlineAdCacheService;
   final PushNotificationService pushNotificationService;
+  final DataRepository<InAppNotification> inAppNotificationRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -112,6 +114,7 @@ class AppInitializationPage extends StatelessWidget {
                     userContentPreferencesRepository,
                 environment: environment,
                 pushNotificationService: pushNotificationService,
+                inAppNotificationRepository: inAppNotificationRepository,
                 adService: adService,
                 feedDecoratorService: feedDecoratorService,
                 feedCacheService: feedCacheService,
@@ -147,25 +150,25 @@ class AppInitializationPage extends StatelessWidget {
                   AppLifeCycleStatus.underMaintenance =>
                     const MaintenancePage(),
                   AppLifeCycleStatus.updateRequired => UpdateRequiredPage(
-                    currentAppVersion: failureData.currentAppVersion,
-                    latestRequiredVersion: failureData.latestAppVersion,
-                  ),
+                      currentAppVersion: failureData.currentAppVersion,
+                      latestRequiredVersion: failureData.latestAppVersion,
+                    ),
                   AppLifeCycleStatus.criticalError => CriticalErrorPage(
-                    exception: failureData.error,
-                    onRetry: () {
-                      // For a critical error, we trigger a full app restart
-                      // to ensure a clean state.
-                      AppHotRestartWrapper.restartApp(context);
-                    },
-                  ),
+                      exception: failureData.error,
+                      onRetry: () {
+                        // For a critical error, we trigger a full app restart
+                        // to ensure a clean state.
+                        AppHotRestartWrapper.restartApp(context);
+                      },
+                    ),
                   // The other AppLifeCycleStatus values are not possible failure
                   // states from the initializer, so we default to a critical
                   // error page as a safe fallback.
                   // ignore: no_default_cases
                   _ => CriticalErrorPage(
-                    exception: failureData.error,
-                    onRetry: () => AppHotRestartWrapper.restartApp(context),
-                  ),
+                      exception: failureData.error,
+                      onRetry: () => AppHotRestartWrapper.restartApp(context),
+                    ),
                 },
               );
 

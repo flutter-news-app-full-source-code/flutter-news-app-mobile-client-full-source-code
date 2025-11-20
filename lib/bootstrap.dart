@@ -479,7 +479,6 @@ Future<Widget> bootstrap(
         logger.fine('Using FirebasePushNotificationService.');
         pushNotificationService = FirebasePushNotificationService(
           pushNotificationDeviceRepository: pushNotificationDeviceRepository,
-          inAppNotificationRepository: inAppNotificationRepository,
           logger: logger,
         );
       case PushNotificationProvider.oneSignal:
@@ -487,7 +486,6 @@ Future<Widget> bootstrap(
         pushNotificationService = OneSignalPushNotificationService(
           appId: appConfig.oneSignalAppId,
           pushNotificationDeviceRepository: pushNotificationDeviceRepository,
-          inAppNotificationRepository: inAppNotificationRepository,
           logger: logger,
         );
     }

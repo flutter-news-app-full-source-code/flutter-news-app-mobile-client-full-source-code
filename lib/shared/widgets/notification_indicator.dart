@@ -34,7 +34,7 @@ class NotificationIndicator extends StatelessWidget {
               width: AppSpacing.sm,
               height: AppSpacing.sm,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.error,
+                color: Theme.of(context).colorScheme.primary,
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: Theme.of(context).colorScheme.surface,

@@ -76,7 +76,7 @@
     "@accountBackupTile": {
         "description": "Title for the tile prompting anonymous users to create an account"
     },
-    "accountContentPreferencesTile": "Content Preferences",
+    "accountContentPreferencesTile": "Followed content",
     "@accountContentPreferencesTile": {
         "description": "Title for the content preferences navigation tile in the account page"
     },
@@ -1713,10 +1713,6 @@
     "notificationCenterEmptySubheadline": "You have no new notifications.",
     "@notificationCenterEmptySubheadline": {
         "description": "Subheadline for the empty state on the notification center page."
-    },
-    "notificationCenterTabAll": "All",
-    "@notificationCenterTabAll": {
-        "description": "Label for the 'All' tab in the notification center."
     },
     "notificationCenterTabBreakingNews": "Breaking News",
     "@notificationCenterTabBreakingNews": {

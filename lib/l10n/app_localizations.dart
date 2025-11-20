@@ -215,7 +215,7 @@ abstract class AppLocalizations {
   /// Title for the content preferences navigation tile in the account page
   ///
   /// In en, this message translates to:
-  /// **'Content Preferences'**
+  /// **'Followed content'**
   String get accountContentPreferencesTile;
 
   /// Title for the saved headlines navigation tile in the account page
@@ -2509,12 +2509,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You have no new notifications.'**
   String get notificationCenterEmptySubheadline;
-
-  /// Label for the 'All' tab in the notification center.
-  ///
-  /// In en, this message translates to:
-  /// **'All'**
-  String get notificationCenterTabAll;
 
   /// Label for the 'Breaking News' tab in the notification center.
   ///

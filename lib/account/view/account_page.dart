@@ -172,7 +172,7 @@ class AccountPage extends StatelessWidget {
       children: [
         buildTile(
           context: context,
-          icon: Icons.tune_outlined,
+          icon: Icons.check_outlined,
           title: l10n.accountContentPreferencesTile,
           onTap: () => context.pushNamed(Routes.manageFollowedItemsName),
         ),

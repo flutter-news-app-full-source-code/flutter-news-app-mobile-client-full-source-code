@@ -69,10 +69,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get accountBackupTile => 'أنشئ حسابًا لحفظ البيانات';
 
   @override
-  String get accountContentPreferencesTile => 'تفضيلات المحتوى';
+  String get accountContentPreferencesTile => 'المتابعات';
 
   @override
-  String get accountSavedHeadlinesTile => 'العناوين المحفوظة';
+  String get accountSavedHeadlinesTile => 'المحفوظات';
 
   @override
   String accountRoleLabel(String role) {
@@ -1322,10 +1322,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get notificationCenterEmptySubheadline => 'ليس لديك إشعارات جديدة.';
 
   @override
-  String get notificationCenterTabAll => 'الكل';
-
-  @override
-  String get notificationCenterTabBreakingNews => 'الأخبار العاجلة';
+  String get notificationCenterTabBreakingNews => 'العواجل';
 
   @override
   String get notificationCenterTabDigests => 'الملخصات';

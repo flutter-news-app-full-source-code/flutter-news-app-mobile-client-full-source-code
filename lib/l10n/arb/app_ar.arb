@@ -76,11 +76,11 @@
     "@accountBackupTile": {
         "description": "Title for the tile prompting anonymous users to create an account"
     },
-    "accountContentPreferencesTile": "تفضيلات المحتوى",
+    "accountContentPreferencesTile": "المتابعات",
     "@accountContentPreferencesTile": {
         "description": "Title for the content preferences navigation tile in the account page"
     },
-    "accountSavedHeadlinesTile": "العناوين المحفوظة",
+    "accountSavedHeadlinesTile": "المحفوظات",
     "@accountSavedHeadlinesTile": {
         "description": "Title for the saved headlines navigation tile in the account page"
     },
@@ -1714,11 +1714,7 @@
     "@notificationCenterEmptySubheadline": {
         "description": "Subheadline for the empty state on the notification center page."
     },
-    "notificationCenterTabAll": "الكل",
-    "@notificationCenterTabAll": {
-        "description": "Label for the 'All' tab in the notification center."
-    },
-    "notificationCenterTabBreakingNews": "الأخبار العاجلة",
+    "notificationCenterTabBreakingNews": "العواجل",
     "@notificationCenterTabBreakingNews": {
         "description": "Label for the 'Breaking News' tab in the notification center."
     },

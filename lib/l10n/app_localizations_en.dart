@@ -69,7 +69,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountBackupTile => 'Create Account to Save Data';
 
   @override
-  String get accountContentPreferencesTile => 'Content Preferences';
+  String get accountContentPreferencesTile => 'Followed content';
 
   @override
   String get accountSavedHeadlinesTile => 'Saved Headlines';
@@ -1324,9 +1324,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notificationCenterEmptySubheadline =>
       'You have no new notifications.';
-
-  @override
-  String get notificationCenterTabAll => 'All';
 
   @override
   String get notificationCenterTabBreakingNews => 'Breaking News';

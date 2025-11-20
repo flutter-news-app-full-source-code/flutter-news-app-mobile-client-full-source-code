@@ -42,3 +42,16 @@ class InAppNotificationCenterTabChanged extends InAppNotificationCenterEvent {
   @override
   List<Object> get props => [tabIndex];
 }
+
+/// Dispatched when a single in-app notification is marked as read by its ID,
+/// typically from a deep-link without navigating from the notification center.
+class InAppNotificationCenterMarkOneAsRead
+    extends InAppNotificationCenterEvent {
+  const InAppNotificationCenterMarkOneAsRead(this.notificationId);
+
+  /// The ID of the notification to be marked as read.
+  final String notificationId;
+
+  @override
+  List<Object> get props => [notificationId];
+}

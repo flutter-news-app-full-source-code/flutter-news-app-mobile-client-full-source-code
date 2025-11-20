@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:core/core.dart';
 import 'package:collection/collection.dart';
+import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
@@ -34,6 +34,7 @@ class InAppNotificationCenterBloc
     on<InAppNotificationCenterMarkedAsRead>(_onMarkedAsRead);
     on<InAppNotificationCenterMarkAllAsRead>(_onMarkAllAsRead);
     on<InAppNotificationCenterTabChanged>(_onTabChanged);
+    on<InAppNotificationCenterMarkOneAsRead>(_onMarkOneAsRead);
   }
 
   final DataRepository<InAppNotification> _inAppNotificationRepository;
@@ -128,6 +129,18 @@ class InAppNotificationCenterBloc
       (n) => n.id == event.notificationId,
     );
 
+    await _markOneAsRead(notification, emit);
+  }
+
+  /// Handles marking a single notification as read from a deep-link.
+  Future<void> _onMarkOneAsRead(
+    InAppNotificationCenterMarkOneAsRead event,
+    Emitter<InAppNotificationCenterState> emit,
+  ) async {
+    final notification = state.notifications.firstWhereOrNull(
+      (n) => n.id == event.notificationId,
+    );
+
     if (notification == null) {
       _logger.warning(
         'Attempted to mark a notification as read that does not exist in the '
@@ -139,6 +152,18 @@ class InAppNotificationCenterBloc
     // If already read, do nothing.
     if (notification.isRead) return;
 
+    await _markOneAsRead(notification, emit);
+  }
+
+  /// A shared helper method to mark a single notification as read.
+  ///
+  /// This is used by both [_onMarkedAsRead] (from the notification center UI)
+  /// and [_onMarkOneAsRead] (from a deep-link).
+  Future<void> _markOneAsRead(
+    InAppNotification? notification,
+    Emitter<InAppNotificationCenterState> emit,
+  ) async {
+    if (notification == null) return;
     final updatedNotification = notification.copyWith(readAt: DateTime.now());
 
     try {

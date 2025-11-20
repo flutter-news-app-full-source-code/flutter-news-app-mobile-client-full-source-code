@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:core/core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
@@ -44,6 +45,10 @@ class NoOpPushNotificationService extends PushNotificationService {
 
   @override
   Stream<String> get onTokenRefreshed => const Stream.empty();
+
+  @override
+  Stream<InAppNotification> get onInAppNotificationReceived =>
+      const Stream.empty();
 
   @override
   Future<PushNotificationPayload?> get initialMessage async => null;

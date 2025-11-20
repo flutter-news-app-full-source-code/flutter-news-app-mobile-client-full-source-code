@@ -1681,5 +1681,49 @@
     "notificationPermissionDeniedError": "تم رفض إذن الإشعارات. يمكنك تمكينه في إعدادات جهازك.",
     "@notificationPermissionDeniedError": {
         "description": "Error message shown when the user denies notification permissions at the OS level."
+    },
+    "notificationCenterPageTitle": "الإشعارات",
+    "@notificationCenterPageTitle": {
+        "description": "Title for the in-app notification center page."
+    },
+    "notificationCenterMarkAllAsReadButton": "وضع علامة على الكل كمقروء",
+    "@notificationCenterMarkAllAsReadButton": {
+        "description": "Text for the button to mark all notifications as read."
+    },
+    "notificationCenterLoadingHeadline": "جارٍ تحميل الإشعارات...",
+    "@notificationCenterLoadingHeadline": {
+        "description": "Headline for the loading state on the notification center page."
+    },
+    "notificationCenterLoadingSubheadline": "يرجى الانتظار...",
+    "@notificationCenterLoadingSubheadline": {
+        "description": "Subheadline for the loading state on the notification center page."
+    },
+    "notificationCenterFailureHeadline": "فشل تحميل الإشعارات",
+    "@notificationCenterFailureHeadline": {
+        "description": "Headline for the failure state on the notification center page."
+    },
+    "notificationCenterFailureSubheadline": "تعذر استرداد إشعاراتك. يرجى المحاولة مرة أخرى.",
+    "@notificationCenterFailureSubheadline": {
+        "description": "Subheadline for the failure state on the notification center page."
+    },
+    "notificationCenterEmptyHeadline": "لا توجد إشعارات",
+    "@notificationCenterEmptyHeadline": {
+        "description": "Headline for the empty state on the notification center page."
+    },
+    "notificationCenterEmptySubheadline": "ليس لديك إشعارات جديدة.",
+    "@notificationCenterEmptySubheadline": {
+        "description": "Subheadline for the empty state on the notification center page."
+    },
+    "notificationCenterTabAll": "الكل",
+    "@notificationCenterTabAll": {
+        "description": "Label for the 'All' tab in the notification center."
+    },
+    "notificationCenterTabBreakingNews": "الأخبار العاجلة",
+    "@notificationCenterTabBreakingNews": {
+        "description": "Label for the 'Breaking News' tab in the notification center."
+    },
+    "notificationCenterTabDigests": "الملخصات",
+    "@notificationCenterTabDigests": {
+        "description": "Label for the 'Digests' tab in the notification center."
     }
 }

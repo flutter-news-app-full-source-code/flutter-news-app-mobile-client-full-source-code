@@ -1294,4 +1294,39 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get notificationPermissionDeniedError =>
       'تم رفض إذن الإشعارات. يمكنك تمكينه في إعدادات جهازك.';
+
+  @override
+  String get notificationCenterPageTitle => 'الإشعارات';
+
+  @override
+  String get notificationCenterMarkAllAsReadButton =>
+      'وضع علامة على الكل كمقروء';
+
+  @override
+  String get notificationCenterLoadingHeadline => 'جارٍ تحميل الإشعارات...';
+
+  @override
+  String get notificationCenterLoadingSubheadline => 'يرجى الانتظار...';
+
+  @override
+  String get notificationCenterFailureHeadline => 'فشل تحميل الإشعارات';
+
+  @override
+  String get notificationCenterFailureSubheadline =>
+      'تعذر استرداد إشعاراتك. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get notificationCenterEmptyHeadline => 'لا توجد إشعارات';
+
+  @override
+  String get notificationCenterEmptySubheadline => 'ليس لديك إشعارات جديدة.';
+
+  @override
+  String get notificationCenterTabAll => 'الكل';
+
+  @override
+  String get notificationCenterTabBreakingNews => 'الأخبار العاجلة';
+
+  @override
+  String get notificationCenterTabDigests => 'الملخصات';
 }

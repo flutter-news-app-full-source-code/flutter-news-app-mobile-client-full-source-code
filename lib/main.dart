@@ -15,19 +15,30 @@ const appEnvironment = String.fromEnvironment('APP_ENVIRONMENT') == 'production'
           ? AppEnvironment.development
           : AppEnvironment.demo);
 
-void main() async {
-  // Ensure Flutter widgets are initialized before any Firebase operations.
-  WidgetsFlutterBinding.ensureInitialized();
-  // Initialize Firebase services only on non-web platforms, as it's used
-  // for push notifications which are not supported in the web demo.
-  if (!kIsWeb) {
-    await Firebase.initializeApp();
-  }
+Future<void> main() async {
   final appConfig = switch (appEnvironment) {
     AppEnvironment.production => AppConfig.production(),
     AppEnvironment.development => AppConfig.development(),
     AppEnvironment.demo => AppConfig.demo(),
   };
+
+  // Ensure Flutter widgets are initialized before any Firebase operations.
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase services only on non-web platforms.
+  // Firebase is manually initialized using options from AppConfig,
+  // removing the dependency on the auto-generated firebase_options.dart file.
+  if (!kIsWeb) {
+    await Firebase.initializeApp(
+      options: FirebaseOptions(
+        apiKey: appConfig.firebaseApiKey,
+        appId: appConfig.firebaseAppId,
+        messagingSenderId: appConfig.firebaseMessagingSenderId,
+        projectId: appConfig.firebaseProjectId,
+        storageBucket: appConfig.firebaseStorageBucket,
+      ),
+    );
+  }
 
   final appWidget = await bootstrap(appConfig, appEnvironment);
 

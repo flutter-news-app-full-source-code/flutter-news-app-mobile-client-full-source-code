@@ -215,6 +215,7 @@ Future<Widget> bootstrap(
   late final DataClient<UserContentPreferences> userContentPreferencesClient;
   late final DataClient<UserAppSettings> userAppSettingsClient;
   late final DataClient<User> userClient;
+  late final DataClient<InAppNotification> inAppNotificationClient;
   late final DataClient<PushNotificationDevice> pushNotificationDeviceClient;
   if (appConfig.environment == app_config.AppEnvironment.demo) {
     logger.fine('Using in-memory clients for all data repositories.');
@@ -285,6 +286,12 @@ Future<Widget> bootstrap(
       getId: (i) => i.id,
       logger: logger,
     );
+    inAppNotificationClient = DataInMemory<InAppNotification>(
+      toJson: (i) => i.toJson(),
+      getId: (i) => i.id,
+      initialData: inAppNotificationsFixturesData,
+      logger: logger,
+    );
     pushNotificationDeviceClient = DataInMemory<PushNotificationDevice>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
@@ -339,6 +346,13 @@ Future<Widget> bootstrap(
       modelName: 'user',
       fromJson: User.fromJson,
       toJson: (user) => user.toJson(),
+      logger: logger,
+    );
+    inAppNotificationClient = DataApi<InAppNotification>(
+      httpClient: httpClient,
+      modelName: 'in_app_notification',
+      fromJson: InAppNotification.fromJson,
+      toJson: (notification) => notification.toJson(),
       logger: logger,
     );
     pushNotificationDeviceClient = DataApi<PushNotificationDevice>(
@@ -400,6 +414,13 @@ Future<Widget> bootstrap(
       toJson: (user) => user.toJson(),
       logger: logger,
     );
+    inAppNotificationClient = DataApi<InAppNotification>(
+      httpClient: httpClient,
+      modelName: 'in_app_notification',
+      fromJson: InAppNotification.fromJson,
+      toJson: (notification) => notification.toJson(),
+      logger: logger,
+    );
     pushNotificationDeviceClient = DataApi<PushNotificationDevice>(
       httpClient: httpClient,
       modelName: 'push_notification_device',
@@ -426,6 +447,9 @@ Future<Widget> bootstrap(
     dataClient: userAppSettingsClient,
   );
   final userRepository = DataRepository<User>(dataClient: userClient);
+  final inAppNotificationRepository = DataRepository<InAppNotification>(
+    dataClient: inAppNotificationClient,
+  );
   final pushNotificationDeviceRepository =
       DataRepository<PushNotificationDevice>(
         dataClient: pushNotificationDeviceClient,
@@ -455,6 +479,7 @@ Future<Widget> bootstrap(
         logger.fine('Using FirebasePushNotificationService.');
         pushNotificationService = FirebasePushNotificationService(
           pushNotificationDeviceRepository: pushNotificationDeviceRepository,
+          inAppNotificationRepository: inAppNotificationRepository,
           logger: logger,
         );
       case PushNotificationProvider.oneSignal:
@@ -462,6 +487,7 @@ Future<Widget> bootstrap(
         pushNotificationService = OneSignalPushNotificationService(
           appId: appConfig.oneSignalAppId,
           pushNotificationDeviceRepository: pushNotificationDeviceRepository,
+          inAppNotificationRepository: inAppNotificationRepository,
           logger: logger,
         );
     }
@@ -548,6 +574,7 @@ Future<Widget> bootstrap(
       userAppSettingsRepository: userAppSettingsRepository,
       userContentPreferencesRepository: userContentPreferencesRepository,
       pushNotificationService: pushNotificationService,
+      inAppNotificationRepository: inAppNotificationRepository,
       environment: environment,
       adService: adService,
       feedDecoratorService: feedDecoratorService,

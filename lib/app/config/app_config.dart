@@ -29,6 +29,17 @@ import 'dart:io' show Platform;
 /// - A required key is missing.
 /// - A key still contains a placeholder value (e.g., 'YOUR_DEV_...').
 /// This prevents runtime errors and ensures a correctly configured build.
+///
+/// ## Handling Single-Platform Builds
+/// The validation logic requires that all platform-specific keys (for both
+/// Android and iOS) are provided. If you are developing for a single platform
+/// (e.g., only Android), you must still provide non-placeholder values for the
+/// other platform's keys to satisfy the validator.
+///
+/// For any unused platform keys, you can provide a simple dummy string like
+/// `"unused-ios-key"`. As long as the value does not contain the "YOUR_"
+/// prefix, the validation will pass. These dummy values will not be used when
+/// building for your target platform.
 /// {@endtemplate}
 class AppConfig {
   /// {@macro app_config}

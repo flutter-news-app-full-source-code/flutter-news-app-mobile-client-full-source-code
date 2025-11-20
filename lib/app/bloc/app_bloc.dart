@@ -699,7 +699,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         emit(state.copyWith(hasUnreadInAppNotifications: false));
       }
     } catch (e, s) {
-      _logger.severe('Failed to check for remaining unread notifications.', e, s);
+      _logger.severe(
+        'Failed to check for remaining unread notifications.',
+        e,
+        s,
+      );
       // Do not change state on error to avoid inconsistent UI.
     }
   }

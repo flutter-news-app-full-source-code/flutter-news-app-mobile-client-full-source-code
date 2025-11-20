@@ -52,8 +52,7 @@ class App extends StatelessWidget {
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
     required AppEnvironment environment,
-    required DataRepository<InAppNotification>
-    inAppNotificationRepository,
+    required DataRepository<InAppNotification> inAppNotificationRepository,
     required InlineAdCacheService inlineAdCacheService,
     required AdService adService,
     required FeedDecoratorService feedDecoratorService,

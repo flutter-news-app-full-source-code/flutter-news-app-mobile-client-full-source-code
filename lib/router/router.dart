@@ -224,8 +224,7 @@ GoRouter createRouter({
           GoRoute(
             path: Routes.notifications,
             name: Routes.notificationsName,
-            builder: (context, state) =>
-                const InAppNotificationCenterPage(),
+            builder: (context, state) => const InAppNotificationCenterPage(),
           ),
         ],
       ),

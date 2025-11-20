@@ -47,12 +47,14 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required Logger logger,
     required DataRepository<User> userRepository,
     required PushNotificationService pushNotificationService,
+    required DataRepository<InAppNotification> inAppNotificationRepository,
   }) : _remoteConfigRepository = remoteConfigRepository,
        _appInitializer = appInitializer,
        _authRepository = authRepository,
        _userAppSettingsRepository = userAppSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
        _userRepository = userRepository,
+       _inAppNotificationRepository = inAppNotificationRepository,
        _pushNotificationService = pushNotificationService,
        _inlineAdCacheService = inlineAdCacheService,
        _logger = logger,
@@ -85,15 +87,23 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppPushNotificationDeviceRegistered>(
       _onAppPushNotificationDeviceRegistered,
     );
-    on<AppInAppNotificationReceived>(_onAppInAppNotificationReceived);
     on<AppLogoutRequested>(_onLogoutRequested);
     on<AppPushNotificationTokenRefreshed>(_onAppPushNotificationTokenRefreshed);
+    on<AppInAppNotificationReceived>(_onAppInAppNotificationReceived);
+    on<AppAllInAppNotificationsMarkedAsRead>(
+      _onAllInAppNotificationsMarkedAsRead,
+    );
+    on<AppInAppNotificationMarkedAsRead>(_onInAppNotificationMarkedAsRead);
 
     // Listen to token refresh events from the push notification service.
     // When a token is refreshed, dispatch an event to trigger device
     // re-registration with the backend.
     _pushNotificationService.onTokenRefreshed.listen((_) {
       add(const AppPushNotificationTokenRefreshed());
+    });
+
+    _pushNotificationService.onInAppNotificationReceived.listen((_) {
+      add(const AppInAppNotificationReceived());
     });
   }
 
@@ -105,6 +115,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
   final DataRepository<User> _userRepository;
+  final DataRepository<InAppNotification> _inAppNotificationRepository;
   final PushNotificationService _pushNotificationService;
   final InlineAdCacheService _inlineAdCacheService;
 
@@ -623,6 +634,44 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     Emitter<AppState> emit,
   ) {
     emit(state.copyWith(hasUnreadInAppNotifications: true));
+  }
+
+  /// Handles the [AppAllInAppNotificationsMarkedAsRead] event.
+  ///
+  /// This handler is responsible for resetting the global unread notification
+  /// indicator when all notifications have been marked as read.
+  Future<void> _onAllInAppNotificationsMarkedAsRead(
+    AppAllInAppNotificationsMarkedAsRead event,
+    Emitter<AppState> emit,
+  ) async {
+    // After marking all as read, we can confidently set the flag to false.
+    emit(state.copyWith(hasUnreadInAppNotifications: false));
+  }
+
+  /// Handles the [AppInAppNotificationMarkedAsRead] event.
+  ///
+  /// This handler checks if there are any remaining unread notifications after
+  /// one has been marked as read. If no unread notifications are left, it
+  /// resets the global unread indicator.
+  Future<void> _onInAppNotificationMarkedAsRead(
+    AppInAppNotificationMarkedAsRead event,
+    Emitter<AppState> emit,
+  ) async {
+    if (state.user == null) return;
+
+    try {
+      final unreadCount = await _inAppNotificationRepository.count(
+        userId: state.user!.id,
+        filter: {'readAt': null},
+      );
+
+      if (unreadCount == 0) {
+        emit(state.copyWith(hasUnreadInAppNotifications: false));
+      }
+    } catch (e, s) {
+      _logger.severe('Failed to check for remaining unread notifications.', e, s);
+      // Do not change state on error to avoid inconsistent UI.
+    }
   }
 
   /// Handles the [AppPushNotificationTokenRefreshed] event.

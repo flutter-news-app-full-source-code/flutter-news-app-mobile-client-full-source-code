@@ -193,7 +193,7 @@ class AccountPage extends StatelessWidget {
               title: l10n.accountNotificationsTile,
               onTap: () {
                 // Navigate to the new Notification Center page.
-                context.pushNamed(Routes.notificationsName);
+                context.pushNamed(Routes.notificationsCenterName);
               },
               // Wrap the title with NotificationIndicator to show the red dot.
               // This ensures the indicator is aligned with the text.

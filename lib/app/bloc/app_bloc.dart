@@ -121,24 +121,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // If a user is already logged in when the app starts, register their
     // device for push notifications.
     if (state.user != null) {
-      _logger.info(
-        '[AppBloc] App started with user ${state.user!.id}. '
-        'Attempting to register device for push notifications.',
-      );
-      // The PushNotificationService will handle getting the token and
-      // calling the repository's create method. This call is now wrapped in a
-      // try-catch to prevent unhandled exceptions from crashing the app if
-      // registration fails.
-      //
-      // The `registerDevice` method now implements a "delete-then-create"
-      // pattern to ensure idempotency and align with backend expectations.
-      // It uses a composite ID of userId and provider name.
-      try {
-        await _pushNotificationService.registerDevice(userId: state.user!.id);
-        add(const AppPushNotificationDeviceRegistered());
-      } catch (e, s) {
-        _logger.severe('[AppBloc] Failed to register device on start.', e, s);
-      }
+      await _registerDeviceForPushNotifications(state.user!.id);
     }
   }
 
@@ -252,31 +235,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
         // After any successful user transition (including guest), attempt to
         // register their device for push notifications. This ensures that
-        // guests can receive notifications for their saved filters.
-        _logger.info(
-          '[AppBloc] User ${user.id} detected. Attempting to register device '
-          'for push notifications.',
-        );
-        try {
-          // The PushNotificationService will handle getting the token and calling
-          // the repository's create method. This call is now wrapped in a
-          // try-catch to prevent unhandled exceptions from crashing the app if
-          // registration fails.
-          //
-          // The `registerDevice` method now implements a "delete-then-create"
-          // pattern to ensure idempotency and align with backend expectations.
-          // It uses a composite ID of userId and provider name.
-          await _pushNotificationService.registerDevice(userId: user.id);
-          add(const AppPushNotificationDeviceRegistered());
-        } catch (e, s) {
-          // Log the error but allow the app to continue functioning.
-          // The user can still use the app even if push registration fails.
-          _logger.severe(
-            '[AppBloc] Failed to register push notification device for user ${user.id}.',
-            e,
-            s,
-          );
-        }
+        // guests can also receive notifications.
+        await _registerDeviceForPushNotifications(user.id);
       // If the transition fails (e.g., due to a network error while
       // fetching user data), emit a critical error state.
       case InitializationFailure(:final status, :final error):
@@ -682,6 +642,32 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     _logger.info(
       '[AppBloc] Push notification token refreshed. Re-registering device.',
     );
-    await _pushNotificationService.registerDevice(userId: state.user!.id);
+    await _registerDeviceForPushNotifications(state.user!.id);
+  }
+
+  /// A private helper method to encapsulate the logic for registering a
+  /// device for push notifications.
+  ///
+  /// This method is called from multiple places (`_onAppStarted`,
+  /// `_onAppUserChanged`, `_onAppPushNotificationTokenRefreshed`) to avoid
+  /// code duplication. It includes robust error handling to prevent unhandled
+  /// exceptions from crashing the BLoC.
+  Future<void> _registerDeviceForPushNotifications(String userId) async {
+    _logger.info(
+      '[AppBloc] Attempting to register device for push notifications for user $userId.',
+    );
+    try {
+      // The PushNotificationService handles getting the token and calling the
+      // repository's create method. The `registerDevice` method implements a
+      // "delete-then-create" pattern for idempotency.
+      await _pushNotificationService.registerDevice(userId: userId);
+      add(const AppPushNotificationDeviceRegistered());
+    } catch (e, s) {
+      _logger.severe(
+        '[AppBloc] Failed to register push notification device for user $userId.',
+        e,
+        s,
+      );
+    }
   }
 }

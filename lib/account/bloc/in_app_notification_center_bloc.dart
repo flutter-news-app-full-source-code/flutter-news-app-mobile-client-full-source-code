@@ -61,23 +61,21 @@ class InAppNotificationCenterBloc
 
       final allNotifications = response.items;
 
-      // Filter notifications into their respective categories based on the
-      // deliveryType specified in the payload's data map.
-      final breakingNews = allNotifications
-          .where(
-            (n) =>
-                n.payload.data['deliveryType'] ==
-                PushNotificationSubscriptionDeliveryType.breakingOnly.name,
-          )
-          .toList();
+      final breakingNews = <InAppNotification>[];
+      final digests = <InAppNotification>[];
 
-      final digests = allNotifications.where((n) {
-        final deliveryType = n.payload.data['deliveryType'] as String?;
-        return deliveryType ==
-                PushNotificationSubscriptionDeliveryType.dailyDigest.name ||
-            deliveryType ==
-                PushNotificationSubscriptionDeliveryType.weeklyRoundup.name;
-      }).toList();
+      // Filter notifications into their respective categories based on the
+      // contentType specified in the payload's data map.
+      for (final n in allNotifications) {
+        final contentType = n.payload.data['contentType'] as String?;
+        if (contentType == 'digest') {
+          digests.add(n);
+        } else {
+          // Treat 'headline' and any other unknown types as breaking news
+          // to ensure all notifications are visible to the user.
+          breakingNews.add(n);
+        }
+      }
 
       emit(
         state.copyWith(

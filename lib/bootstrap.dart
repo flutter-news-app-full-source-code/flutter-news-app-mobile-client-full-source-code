@@ -289,9 +289,8 @@ Future<Widget> bootstrap(
     inAppNotificationClient = DataInMemory<InAppNotification>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
-      initialData: inAppNotificationsFixturesData,
       logger: logger,
-    );
+    ); 
     pushNotificationDeviceClient = DataInMemory<PushNotificationDevice>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
@@ -521,9 +520,11 @@ Future<Widget> bootstrap(
       ? DemoDataInitializerService(
           userAppSettingsRepository: userAppSettingsRepository,
           userContentPreferencesRepository: userContentPreferencesRepository,
+          inAppNotificationRepository: inAppNotificationRepository,
           userAppSettingsFixturesData: userAppSettingsFixturesData,
           userContentPreferencesFixturesData:
               userContentPreferencesFixturesData,
+          inAppNotificationsFixturesData: inAppNotificationsFixturesData,
         )
       : null;
   logger

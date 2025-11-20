@@ -47,10 +47,6 @@ class NoOpPushNotificationService extends PushNotificationService {
   Stream<String> get onTokenRefreshed => const Stream.empty();
 
   @override
-  Stream<InAppNotification> get onInAppNotificationReceived =>
-      const Stream.empty();
-
-  @override
   Future<PushNotificationPayload?> get initialMessage async => null;
 
   @override

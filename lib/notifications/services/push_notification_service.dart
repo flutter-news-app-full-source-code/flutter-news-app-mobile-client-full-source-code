@@ -52,12 +52,6 @@ abstract class PushNotificationService extends Equatable {
   /// This is used by the AppBloc to trigger device re-registration.
   Stream<String> get onTokenRefreshed;
 
-  /// A stream of in-app notifications that have been received and persisted.
-  ///
-  /// This stream is used by the AppBloc to update the global unread indicator
-  /// and by the Notification Center to display new notifications.
-  Stream<InAppNotification> get onInAppNotificationReceived;
-
   /// Gets the initial notification that caused the app to open from a
   /// terminated state.
   ///

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:auth_repository/auth_repository.dart';
 import 'package:core/core.dart';
@@ -102,8 +103,37 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       add(const AppPushNotificationTokenRefreshed());
     });
 
-    _pushNotificationService.onInAppNotificationReceived.listen((_) {
-      add(const AppInAppNotificationReceived());
+    // Listen to raw foreground push notifications.
+    _pushNotificationService.onMessage.listen((payload) async {
+      _logger.fine('AppBloc received foreground push notification payload.');
+      if (state.user != null) {
+        try {
+          final newNotification = InAppNotification(
+            // Generate a random ID for the notification.
+            // In a real-world scenario, this would likely be a UUID.
+            id: Random().nextInt(999999).toString(),
+            userId: state.user!.id,
+            payload: payload,
+            createdAt: DateTime.now(),
+          );
+
+          await _inAppNotificationRepository.create(
+            item: newNotification,
+            userId: state.user!.id,
+          );
+          _logger.info(
+            'Successfully persisted in-app notification for user ${state.user!.id}.',
+          );
+          // Notify the app that a new notification has been received to update UI.
+          add(const AppInAppNotificationReceived());
+        } catch (e, s) {
+          _logger.severe(
+            'Failed to persist in-app notification from foreground message.',
+            e,
+            s,
+          );
+        }
+      }
     });
   }
 

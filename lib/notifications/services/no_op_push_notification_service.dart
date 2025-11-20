@@ -61,7 +61,7 @@ class NoOpPushNotificationService extends PushNotificationService {
     if (environment != AppEnvironment.demo) {
       return;
     }
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 10), () {
       if (_inAppNotificationsFixturesData.isEmpty) return;
 
       // Use the first notification from the fixtures as the simulated push.

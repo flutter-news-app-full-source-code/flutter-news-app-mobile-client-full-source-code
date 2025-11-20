@@ -35,8 +35,8 @@ abstract final class Routes {
   static const settingsName = 'settings';
   static const manageFollowedItems = 'manage-followed-items';
   static const manageFollowedItemsName = 'manageFollowedItems';
-  static const notifications = 'notifications';
-  static const notificationsName = 'notifications';
+  static const notificationsCenter = 'notifications-center';
+  static const notificationsCenterName = 'notificationsCenter';
 
   // --- Relative Sub-Routes ---
   // These routes are defined with relative paths and are intended to be

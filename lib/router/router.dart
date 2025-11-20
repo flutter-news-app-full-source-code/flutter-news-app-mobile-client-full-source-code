@@ -11,6 +11,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/account/view/fol
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/followed_contents/sources/followed_sources_list_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/followed_contents/topics/add_topic_to_follow_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/followed_contents/topics/followed_topics_list_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/account/view/in_app_notification_center_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/saved_headlines_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
@@ -45,7 +46,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/v
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_list_filter_page.dart'
     as feed_filter;
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/topic_filter_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/account/view/in_app_notification_center_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/go_router_observer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
@@ -233,8 +233,8 @@ GoRouter createRouter({
             const MaterialPage(fullscreenDialog: true, child: AccountPage()),
         routes: [
           GoRoute(
-            path: Routes.notifications,
-            name: Routes.notificationsName,
+            path: Routes.notificationsCenter,
+            name: Routes.notificationsCenterName,
             builder: (context, state) => const InAppNotificationCenterPage(),
           ),
           // The settings section within the account modal. It uses a
@@ -562,16 +562,6 @@ GoRouter createRouter({
                               headlineId:
                                   headlineFromExtra?.id ?? headlineIdFromPath,
                             ),
-                          );
-                        },
-                      ),
-                      // Sub-route for notifications page.
-                      GoRoute(
-                        path: Routes.notifications,
-                        name: Routes.notificationsName,
-                        builder: (context, state) {
-                          return const Placeholder(
-                            child: Center(child: Text('NOTIFICATIONS PAGE')),
                           );
                         },
                       ),

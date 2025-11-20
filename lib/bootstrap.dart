@@ -290,7 +290,7 @@ Future<Widget> bootstrap(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
       logger: logger,
-    ); 
+    );
     pushNotificationDeviceClient = DataInMemory<PushNotificationDevice>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
@@ -470,7 +470,11 @@ Future<Widget> bootstrap(
   // allowing the full UI journey to be tested without a real backend.
   if (appConfig.environment == app_config.AppEnvironment.demo) {
     logger.fine('Using NoOpPushNotificationService for demo environment.');
-    pushNotificationService = NoOpPushNotificationService();
+    pushNotificationService = NoOpPushNotificationService(
+      inAppNotificationRepository: inAppNotificationRepository,
+      inAppNotificationsFixturesData: inAppNotificationsFixturesData,
+      environment: appConfig.environment,
+    );
   } else if (pushNotificationConfig.enabled == true) {
     // For other environments, select the provider based on RemoteConfig.
     switch (pushNotificationConfig.primaryProvider) {
@@ -495,7 +499,11 @@ Future<Widget> bootstrap(
     logger.warning('Push notifications are disabled in RemoteConfig.');
     // Provide a dummy/no-op implementation if notifications are disabled
     // to prevent null pointer exceptions when accessed.
-    pushNotificationService = NoOpPushNotificationService();
+    pushNotificationService = NoOpPushNotificationService(
+      inAppNotificationRepository: inAppNotificationRepository,
+      inAppNotificationsFixturesData: inAppNotificationsFixturesData,
+      environment: appConfig.environment,
+    );
   }
 
   // Conditionally instantiate DemoDataMigrationService

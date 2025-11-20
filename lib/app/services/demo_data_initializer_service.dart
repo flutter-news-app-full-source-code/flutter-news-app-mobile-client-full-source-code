@@ -177,12 +177,22 @@ class DemoDataInitializerService {
         'No InAppNotifications found for user ID: $userId. Creating from fixture.',
       );
 
-      // Clone each notification from the fixture data, assigning the new user's ID.
-      final userNotifications = inAppNotificationsFixturesData
+      if (inAppNotificationsFixturesData.isEmpty) {
+        _logger.warning(
+          'inAppNotificationsFixturesData is empty. No notifications to create.',
+        );
+        return;
+      }
+
+      // Exclude the first notification, which will be used for the simulated push.
+      final notificationsToCreate = inAppNotificationsFixturesData
+          .skip(1)
+          .toList();
+
+      final userNotifications = notificationsToCreate
           .map((n) => n.copyWith(userId: userId))
           .toList();
 
-      // Create all the new notifications for the user.
       await Future.wait(
         userNotifications.map(
           (n) => _inAppNotificationRepository.create(item: n, userId: userId),

@@ -1,15 +1,12 @@
 import 'package:core/core.dart';
-import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/in_app_notification_center_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/widgets/in_app_notification_list_item.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/interstitial_ad_manager.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:go_router/go_router.dart';
-import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template in_app_notification_center_page}
@@ -57,87 +54,88 @@ class _InAppNotificationCenterPageState
 
     return Scaffold(
       appBar: AppBar(
-          title: Text(l10n.notificationCenterPageTitle),
-          actions: [
-            BlocBuilder<
-              InAppNotificationCenterBloc,
-              InAppNotificationCenterState
-            >(
-              builder: (context, state) {
-                final hasUnread = state.notifications.any((n) => !n.isRead);
-                return IconButton(
-                  onPressed: hasUnread
-                      ? () {
-                          context.read<InAppNotificationCenterBloc>().add(
-                            const InAppNotificationCenterMarkAllAsRead(),
-                          );
-                        }
-                      : null,
-                  icon: const Icon(Icons.done_all),
-                );
-              },
-            ),
-          ],
-          bottom: TabBar(
-            controller: _tabController,
-            tabs: [
-              Tab(text: l10n.notificationCenterTabBreakingNews),
-              Tab(text: l10n.notificationCenterTabDigests),
-            ],
-          ),
-        ),
-      body: BlocConsumer<
-          InAppNotificationCenterBloc,
-          InAppNotificationCenterState
-        >(
-        listener: (context, state) {
-          if (state.status == InAppNotificationCenterStatus.failure &&
-              state.error != null) {
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(
-                  content: Text(state.error!.message),
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                ),
+        title: Text(l10n.notificationCenterPageTitle),
+        actions: [
+          BlocBuilder<
+            InAppNotificationCenterBloc,
+            InAppNotificationCenterState
+          >(
+            builder: (context, state) {
+              final hasUnread = state.notifications.any((n) => !n.isRead);
+              return IconButton(
+                onPressed: hasUnread
+                    ? () {
+                        context.read<InAppNotificationCenterBloc>().add(
+                          const InAppNotificationCenterMarkAllAsRead(),
+                        );
+                      }
+                    : null,
+                icon: const Icon(Icons.done_all),
               );
-          }
-        },
-        builder: (context, state) {
-          if (state.status == InAppNotificationCenterStatus.loading) {
-            return LoadingStateWidget(
-              icon: Icons.notifications_none_outlined,
-              headline: l10n.notificationCenterLoadingHeadline,
-              subheadline: l10n.notificationCenterLoadingSubheadline,
-            );
-          }
-
-          if (state.status == InAppNotificationCenterStatus.failure) {
-            return FailureStateWidget(
-              exception:
-                  state.error ??
-                  OperationFailedException(
-                    l10n.notificationCenterFailureHeadline,
-                  ),
-              onRetry: () {
-                context.read<InAppNotificationCenterBloc>().add(
-                  const InAppNotificationCenterSubscriptionRequested(),
-                );
-              },
-            );
-          }
-
-          return TabBarView(
-            controller: _tabController,
-            children: [
-              _NotificationList(
-                notifications: state.breakingNewsNotifications,
-              ),
-              _NotificationList(notifications: state.digestNotifications),
-            ],
-          );
-        },
+            },
+          ),
+        ],
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: [
+            Tab(text: l10n.notificationCenterTabBreakingNews),
+            Tab(text: l10n.notificationCenterTabDigests),
+          ],
+        ),
       ),
+      body:
+          BlocConsumer<
+            InAppNotificationCenterBloc,
+            InAppNotificationCenterState
+          >(
+            listener: (context, state) {
+              if (state.status == InAppNotificationCenterStatus.failure &&
+                  state.error != null) {
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(
+                    SnackBar(
+                      content: Text(state.error!.message),
+                      backgroundColor: Theme.of(context).colorScheme.error,
+                    ),
+                  );
+              }
+            },
+            builder: (context, state) {
+              if (state.status == InAppNotificationCenterStatus.loading) {
+                return LoadingStateWidget(
+                  icon: Icons.notifications_none_outlined,
+                  headline: l10n.notificationCenterLoadingHeadline,
+                  subheadline: l10n.notificationCenterLoadingSubheadline,
+                );
+              }
+
+              if (state.status == InAppNotificationCenterStatus.failure) {
+                return FailureStateWidget(
+                  exception:
+                      state.error ??
+                      OperationFailedException(
+                        l10n.notificationCenterFailureHeadline,
+                      ),
+                  onRetry: () {
+                    context.read<InAppNotificationCenterBloc>().add(
+                      const InAppNotificationCenterSubscriptionRequested(),
+                    );
+                  },
+                );
+              }
+
+              return TabBarView(
+                controller: _tabController,
+                children: [
+                  _NotificationList(
+                    notifications: state.breakingNewsNotifications,
+                  ),
+                  _NotificationList(notifications: state.digestNotifications),
+                ],
+              );
+            },
+          ),
     );
   }
 }

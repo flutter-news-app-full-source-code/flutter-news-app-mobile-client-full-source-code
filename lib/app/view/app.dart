@@ -52,6 +52,8 @@ class App extends StatelessWidget {
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
     required AppEnvironment environment,
+    required DataRepository<InAppNotification>
+    inAppNotificationRepository,
     required InlineAdCacheService inlineAdCacheService,
     required AdService adService,
     required FeedDecoratorService feedDecoratorService,
@@ -69,6 +71,7 @@ class App extends StatelessWidget {
        _userAppSettingsRepository = userAppSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
        _pushNotificationService = pushNotificationService,
+       _inAppNotificationRepository = inAppNotificationRepository,
        _environment = environment,
        _adService = adService,
        _feedDecoratorService = feedDecoratorService,
@@ -99,6 +102,7 @@ class App extends StatelessWidget {
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
   final AppEnvironment _environment;
+  final DataRepository<InAppNotification> _inAppNotificationRepository;
   final AdService _adService;
   final FeedDecoratorService _feedDecoratorService;
   final FeedCacheService _feedCacheService;
@@ -125,6 +129,7 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _userAppSettingsRepository),
         RepositoryProvider.value(value: _userContentPreferencesRepository),
         RepositoryProvider.value(value: _pushNotificationService),
+        RepositoryProvider.value(value: _inAppNotificationRepository),
         RepositoryProvider.value(value: _inlineAdCacheService),
         RepositoryProvider.value(value: _feedCacheService),
         RepositoryProvider.value(value: _environment),
@@ -148,6 +153,7 @@ class App extends StatelessWidget {
                   _userContentPreferencesRepository,
               logger: context.read<Logger>(),
               pushNotificationService: _pushNotificationService,
+              inAppNotificationRepository: _inAppNotificationRepository,
               userRepository: _userRepository,
               inlineAdCacheService: _inlineAdCacheService,
             )..add(const AppStarted()),

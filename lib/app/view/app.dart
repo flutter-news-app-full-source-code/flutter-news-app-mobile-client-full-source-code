@@ -214,8 +214,9 @@ class _AppViewState extends State<_AppView> {
           _routerLogger.fine(
             'Notification opened app with payload: ${payload.data}',
           );
-          final contentType = payload.data['contentType'] as String?;
-          final id = payload.data['id'] as String?;
+          final contentType =
+              payload.data['contentType'] as String?; // e.g., 'headline'
+          final id = payload.data['headlineId'] as String?;
 
           if (contentType == 'headline' && id != null) {
             _router.goNamed(

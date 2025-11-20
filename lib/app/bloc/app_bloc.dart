@@ -676,9 +676,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     Emitter<AppState> emit,
   ) async {
     if (state.user == null) {
-      _logger.info(
-        '[AppBloc] Skipping token re-registration: User is null.',
-      );
+      _logger.info('[AppBloc] Skipping token re-registration: User is null.');
       return;
     }
     _logger.info(

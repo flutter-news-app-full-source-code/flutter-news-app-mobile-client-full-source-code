@@ -127,9 +127,15 @@ class OneSignalPushNotificationService extends PushNotificationService {
         await _pushNotificationDeviceRepository.delete(id: deviceId);
         _logger.info('Existing device registration deleted for $deviceId.');
       } on NotFoundException {
-        _logger.info('No existing device registration found for $deviceId. Proceeding with creation.');
+        _logger.info(
+          'No existing device registration found for $deviceId. Proceeding with creation.',
+        );
       } catch (e, s) {
-        _logger.warning('Failed to delete existing device registration for $deviceId. Proceeding with creation anyway. Error: $e', e, s);
+        _logger.warning(
+          'Failed to delete existing device registration for $deviceId. Proceeding with creation anyway. Error: $e',
+          e,
+          s,
+        );
       }
 
       final newDevice = PushNotificationDevice(

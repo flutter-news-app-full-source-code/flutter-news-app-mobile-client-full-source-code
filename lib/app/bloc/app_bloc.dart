@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:auth_repository/auth_repository.dart';
 import 'package:core/core.dart';
@@ -15,6 +14,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/extensions.dart';
 import 'package:logging/logging.dart';
+import 'package:uuid/uuid.dart';
 
 part 'app_event.dart';
 part 'app_state.dart';
@@ -49,6 +49,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required DataRepository<User> userRepository,
     required PushNotificationService pushNotificationService,
     required DataRepository<InAppNotification> inAppNotificationRepository,
+    Uuid? uuid,
   }) : _remoteConfigRepository = remoteConfigRepository,
        _appInitializer = appInitializer,
        _authRepository = authRepository,
@@ -57,6 +58,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _userRepository = userRepository,
        _inAppNotificationRepository = inAppNotificationRepository,
        _pushNotificationService = pushNotificationService,
+       _uuid = uuid ?? const Uuid(),
        _inlineAdCacheService = inlineAdCacheService,
        _logger = logger,
        super(
@@ -110,8 +112,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         try {
           final newNotification = InAppNotification(
             // Generate a random ID for the notification.
-            // In a real-world scenario, this would likely be a UUID.
-            id: Random().nextInt(999999).toString(),
+            id: _uuid.v4(),
             userId: state.user!.id,
             payload: payload,
             createdAt: DateTime.now(),
@@ -147,6 +148,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final DataRepository<User> _userRepository;
   final DataRepository<InAppNotification> _inAppNotificationRepository;
   final PushNotificationService _pushNotificationService;
+  final Uuid _uuid;
   final InlineAdCacheService _inlineAdCacheService;
 
   /// Handles the [AppStarted] event.

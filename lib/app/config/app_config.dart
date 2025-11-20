@@ -1,5 +1,6 @@
-import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'dart:io' show Platform;
+
+import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 
 /// {@template app_config}
 /// A centralized configuration class that provides all necessary

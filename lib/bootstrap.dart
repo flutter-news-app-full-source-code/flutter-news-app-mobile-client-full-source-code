@@ -29,6 +29,10 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_ini
 import 'package:flutter_news_app_mobile_client_full_source_code/bloc_observer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/firebase_push_notification_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/no_op_push_notification_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/one_signal_push_notification_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/data/clients/country_inmemory_client.dart';
 import 'package:http_client/http_client.dart';
 import 'package:kv_storage_service/kv_storage_service.dart';
@@ -211,6 +215,7 @@ Future<Widget> bootstrap(
   late final DataClient<UserContentPreferences> userContentPreferencesClient;
   late final DataClient<UserAppSettings> userAppSettingsClient;
   late final DataClient<User> userClient;
+  late final DataClient<PushNotificationDevice> pushNotificationDeviceClient;
   if (appConfig.environment == app_config.AppEnvironment.demo) {
     logger.fine('Using in-memory clients for all data repositories.');
     headlinesClient = DataInMemory<Headline>(
@@ -280,6 +285,11 @@ Future<Widget> bootstrap(
       getId: (i) => i.id,
       logger: logger,
     );
+    pushNotificationDeviceClient = DataInMemory<PushNotificationDevice>(
+      toJson: (i) => i.toJson(),
+      getId: (i) => i.id,
+      logger: logger,
+    );
   } else if (appConfig.environment == app_config.AppEnvironment.development) {
     logger.fine('Using API clients for all data repositories (Development).');
     headlinesClient = DataApi<Headline>(
@@ -329,6 +339,13 @@ Future<Widget> bootstrap(
       modelName: 'user',
       fromJson: User.fromJson,
       toJson: (user) => user.toJson(),
+      logger: logger,
+    );
+    pushNotificationDeviceClient = DataApi<PushNotificationDevice>(
+      httpClient: httpClient,
+      modelName: 'push_notification_device',
+      fromJson: PushNotificationDevice.fromJson,
+      toJson: (device) => device.toJson(),
       logger: logger,
     );
   } else {
@@ -383,6 +400,13 @@ Future<Widget> bootstrap(
       toJson: (user) => user.toJson(),
       logger: logger,
     );
+    pushNotificationDeviceClient = DataApi<PushNotificationDevice>(
+      httpClient: httpClient,
+      modelName: 'push_notification_device',
+      fromJson: PushNotificationDevice.fromJson,
+      toJson: (device) => device.toJson(),
+      logger: logger,
+    );
   }
   logger.fine('All data clients instantiated.');
 
@@ -402,7 +426,54 @@ Future<Widget> bootstrap(
     dataClient: userAppSettingsClient,
   );
   final userRepository = DataRepository<User>(dataClient: userClient);
-  logger.fine('All data repositories initialized.');
+  final pushNotificationDeviceRepository =
+      DataRepository<PushNotificationDevice>(
+        dataClient: pushNotificationDeviceClient,
+      );
+  logger
+    ..fine('All data repositories initialized.')
+    ..info('7. Initializing Push Notification service...');
+
+  // Initialize the PushNotificationService based on the remote config.
+  // This is a crucial step for the provider-agnostic architecture.
+  late final PushNotificationService pushNotificationService;
+  // Fetch the latest config directly. Since this is post-initialization,
+  // we assume it's available.
+  final remoteConfig = await remoteConfigRepository.read(id: kRemoteConfigId);
+  final pushNotificationConfig = remoteConfig.pushNotificationConfig;
+
+  // In the demo environment, always use the NoOpPushNotificationService.
+  // This service is enhanced to simulate a successful permission flow,
+  // allowing the full UI journey to be tested without a real backend.
+  if (appConfig.environment == app_config.AppEnvironment.demo) {
+    logger.fine('Using NoOpPushNotificationService for demo environment.');
+    pushNotificationService = NoOpPushNotificationService();
+  } else if (pushNotificationConfig.enabled == true) {
+    // For other environments, select the provider based on RemoteConfig.
+    switch (pushNotificationConfig.primaryProvider) {
+      case PushNotificationProvider.firebase:
+        logger.fine('Using FirebasePushNotificationService.');
+        pushNotificationService = FirebasePushNotificationService(
+          pushNotificationDeviceRepository: pushNotificationDeviceRepository,
+          logger: logger,
+        );
+      case PushNotificationProvider.oneSignal:
+        logger.fine('Using OneSignalPushNotificationService.');
+        pushNotificationService = OneSignalPushNotificationService(
+          appId: appConfig.oneSignalAppId,
+          pushNotificationDeviceRepository: pushNotificationDeviceRepository,
+          logger: logger,
+        );
+    }
+    // Initialize the selected provider.
+    await pushNotificationService.initialize();
+    logger.fine('PushNotificationService initialized.');
+  } else {
+    logger.warning('Push notifications are disabled in RemoteConfig.');
+    // Provide a dummy/no-op implementation if notifications are disabled
+    // to prevent null pointer exceptions when accessed.
+    pushNotificationService = NoOpPushNotificationService();
+  }
 
   // Conditionally instantiate DemoDataMigrationService
   final demoDataMigrationService =
@@ -476,6 +547,7 @@ Future<Widget> bootstrap(
       remoteConfigRepository: remoteConfigRepository,
       userAppSettingsRepository: userAppSettingsRepository,
       userContentPreferencesRepository: userContentPreferencesRepository,
+      pushNotificationService: pushNotificationService,
       environment: environment,
       adService: adService,
       feedDecoratorService: feedDecoratorService,

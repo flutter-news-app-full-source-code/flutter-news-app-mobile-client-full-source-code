@@ -184,3 +184,36 @@ class SavedHeadlineFiltersReordered extends AppEvent {
   @override
   List<Object> get props => [reorderedFilters];
 }
+
+/// {@template app_push_notification_device_registered}
+/// Dispatched when a push notification device has been successfully registered
+/// with the backend.
+///
+/// This event is for logging and potential future state changes, but does not
+/// directly alter the UI state in the current implementation.
+/// {@endtemplate}
+class AppPushNotificationDeviceRegistered extends AppEvent {
+  /// {@macro app_push_notification_device_registered}
+  const AppPushNotificationDeviceRegistered();
+}
+
+/// {@template app_in_app_notification_received}
+/// Dispatched when a push notification is received while the app is in the
+/// foreground, used to show an unread indicator.
+/// {@endtemplate}
+class AppInAppNotificationReceived extends AppEvent {
+  /// {@macro app_in_app_notification_received}
+  const AppInAppNotificationReceived();
+}
+
+/// {@template app_push_notification_token_refreshed}
+/// Dispatched when the underlying push notification provider refreshes its
+/// device token.
+///
+/// This event triggers the AppBloc to re-register the device with the backend
+/// using the current user's ID.
+/// {@endtemplate}
+class AppPushNotificationTokenRefreshed extends AppEvent {
+  /// {@macro app_push_notification_token_refreshed}
+  const AppPushNotificationTokenRefreshed();
+}

@@ -1662,4 +1662,25 @@
     "@notificationDeliveryTypeWeeklyRoundup": {
         "description": "The user-facing name for the 'weeklyRoundup' notification delivery type."
     }
+    ,
+    "prePermissionDialogTitle": "Enable Notifications?",
+    "@prePermissionDialogTitle": {
+        "description": "Title for the pre-permission dialog asking the user to enable notifications."
+    },
+    "prePermissionDialogBody": "To send you breaking news alerts and digests for this filter, please allow notifications.",
+    "@prePermissionDialogBody": {
+        "description": "Body text for the pre-permission dialog explaining why notifications are needed for saved filters."
+    },
+    "prePermissionDialogDenyButton": "Not Now",
+    "@prePermissionDialogDenyButton": {
+        "description": "Text for the button to deny notification permission in the pre-permission dialog."
+    },
+    "prePermissionDialogAllowButton": "Allow",
+    "@prePermissionDialogAllowButton": {
+        "description": "Text for the button to allow notification permission in the pre-permission dialog."
+    },
+    "notificationPermissionDeniedError": "Notification permission was denied. You can enable it in your device settings.",
+    "@notificationPermissionDeniedError": {
+        "description": "Error message shown when the user denies notification permissions at the OS level."
+    }
 }

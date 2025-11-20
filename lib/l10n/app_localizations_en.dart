@@ -1280,4 +1280,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notificationDeliveryTypeWeeklyRoundup => 'Weekly Roundup';
+
+  @override
+  String get prePermissionDialogTitle => 'Enable Notifications?';
+
+  @override
+  String get prePermissionDialogBody =>
+      'To send you breaking news alerts and digests for this filter, please allow notifications.';
+
+  @override
+  String get prePermissionDialogDenyButton => 'Not Now';
+
+  @override
+  String get prePermissionDialogAllowButton => 'Allow';
+
+  @override
+  String get notificationPermissionDeniedError =>
+      'Notification permission was denied. You can enable it in your device settings.';
 }

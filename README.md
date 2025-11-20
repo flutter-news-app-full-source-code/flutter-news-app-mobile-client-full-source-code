@@ -38,10 +38,20 @@ A beautiful, infinitely scrolling feed serves as the core of the user experience
 ### 🔎 Powerful Content Curation & Discovery
 Give users the tools to find exactly what they're looking for with a multi-faceted discovery system.
 - **Customizable Filter Bar:** A persistent, one-tap filter bar provides instant access to pre-defined and user-created content streams.
-- **Advanced Content Curation:** A dedicated management UI allows users to construct, save, and manage highly specific news feeds. Users can save frequently used filters for on-demand use and pin them for one-tap access on the main feed.
+- **Advanced Content Curation:** A dedicated saved filter hub allows users to construct, save, and manage highly specific news feeds. Users can save frequently used filters for on-demand use and pin them for one-tap access on the main feed.
 - **Proactive Notification Subscriptions:** When saving a filter, users can subscribe to receive push notifications—such as breaking news alerts or daily digests—for content that matches their specific criteria.
 - **Dedicated Discovery Hub:** Users can browse publishers by category in horizontally scrolling carousels, apply regional filters, and perform targeted searches.
 > **Your Advantage:** Deliver powerful content discovery tools that keep users engaged, increase session duration, and encourage return visits.
+
+---
+
+### 🔔 Proactive & Flexible Push Notifications
+A robust, backend-driven notification system keeps users informed and brings them back to the content they care about.
+- **Multi-Provider Architecture:** Built on an abstraction that supports any push notification service. It ships with production-ready providers for Firebase (FCM) and OneSignal.
+- **Remote Provider Switching:** The primary notification provider is selected via remote configuration, allowing you to switch services on the fly without shipping an app update.
+- **Intelligent Deep-Linking:** Tapping a notification opens the app and navigates directly to the relevant content, such as a specific news article, providing a seamless user experience.
+- **Foreground Notification Handling:** Displays a subtle in-app indicator when a notification arrives while the user is active, avoiding intrusive alerts.
+> **Your Advantage:** You get a highly flexible and scalable notification system that avoids vendor lock-in and is ready to re-engage users from day one.
 
 </details>
 

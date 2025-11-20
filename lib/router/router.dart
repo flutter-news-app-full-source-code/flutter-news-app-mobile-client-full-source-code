@@ -167,59 +167,58 @@ GoRouter createRouter({
       GoRoute(path: '/', builder: (context, state) => const SizedBox.shrink()),
 
       // --- Authentication and Account Linking Flows ---
-      // These are top-level routes that exist outside the main app shell.
-      GoRoute(
-        path: Routes.authentication,
-        name: Routes.authenticationName,
-        builder: (BuildContext context, GoRouterState state) {
-          // Provide the AuthenticationBloc only to this part of the tree.
+      // These are top-level routes that exist outside the main app shell. They
+      // use ShellRoutes to provide the AuthenticationBloc to all child routes.
+      ShellRoute(
+        builder: (context, state, child) {
           return BlocProvider(
             create: (context) => AuthenticationBloc(
               authenticationRepository: context.read<AuthRepository>(),
             ),
-            child: const AuthenticationPage(),
+            child: child,
           );
         },
         routes: [
           GoRoute(
-            path: Routes.requestCode,
-            name: Routes.requestCodeName,
-            builder: (context, state) => const RequestCodePage(),
+            path: Routes.authentication,
+            name: Routes.authenticationName,
+            builder: (BuildContext context, GoRouterState state) =>
+                const AuthenticationPage(),
+            routes: [
+              GoRoute(
+                path: Routes.requestCode,
+                name: Routes.requestCodeName,
+                builder: (context, state) => const RequestCodePage(),
+              ),
+              GoRoute(
+                path: '${Routes.verifyCode}/:email',
+                name: Routes.verifyCodeName,
+                builder: (context, state) {
+                  final email = state.pathParameters['email']!;
+                  return EmailCodeVerificationPage(email: email);
+                },
+              ),
+            ],
           ),
           GoRoute(
-            path: '${Routes.verifyCode}/:email',
-            name: Routes.verifyCodeName,
-            builder: (context, state) {
-              final email = state.pathParameters['email']!;
-              return EmailCodeVerificationPage(email: email);
-            },
-          ),
-        ],
-      ),
-      GoRoute(
-        path: Routes.accountLinking,
-        name: Routes.accountLinkingName,
-        builder: (context, state) {
-          return BlocProvider(
-            create: (context) => AuthenticationBloc(
-              authenticationRepository: context.read<AuthRepository>(),
-            ),
-            child: const AccountLinkingPage(),
-          );
-        },
-        routes: [
-          GoRoute(
-            path: Routes.requestCode,
-            name: Routes.accountLinkingRequestCodeName,
-            builder: (context, state) => const RequestCodePage(),
-          ),
-          GoRoute(
-            path: '${Routes.verifyCode}/:email',
-            name: Routes.accountLinkingVerifyCodeName,
-            builder: (context, state) {
-              final email = state.pathParameters['email']!;
-              return EmailCodeVerificationPage(email: email);
-            },
+            path: Routes.accountLinking,
+            name: Routes.accountLinkingName,
+            builder: (context, state) => const AccountLinkingPage(),
+            routes: [
+              GoRoute(
+                path: Routes.requestCode,
+                name: Routes.accountLinkingRequestCodeName,
+                builder: (context, state) => const RequestCodePage(),
+              ),
+              GoRoute(
+                path: '${Routes.verifyCode}/:email',
+                name: Routes.accountLinkingVerifyCodeName,
+                builder: (context, state) {
+                  final email = state.pathParameters['email']!;
+                  return EmailCodeVerificationPage(email: email);
+                },
+              ),
+            ],
           ),
         ],
       ),

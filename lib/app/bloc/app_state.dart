@@ -19,6 +19,7 @@ class AppState extends Equatable {
     this.selectedBottomNavigationIndex = 0,
     this.currentAppVersion,
     this.latestAppVersion,
+    this.hasUnreadInAppNotifications = false,
   });
 
   /// The current status of the application, indicating its lifecycle stage.
@@ -54,6 +55,9 @@ class AppState extends Equatable {
 
   /// The latest required app version, passed from [InitializationFailure].
   final String? latestAppVersion;
+
+  /// A flag indicating if there are unread in-app notifications.
+  final bool hasUnreadInAppNotifications;
 
   /// The current theme mode (light, dark, or system), derived from [settings].
   /// Defaults to [ThemeMode.system] if [settings] are not yet loaded.
@@ -123,6 +127,7 @@ class AppState extends Equatable {
     selectedBottomNavigationIndex,
     currentAppVersion,
     latestAppVersion,
+    hasUnreadInAppNotifications,
   ];
 
   /// Creates a copy of this [AppState] with the given fields replaced with
@@ -139,6 +144,7 @@ class AppState extends Equatable {
     int? selectedBottomNavigationIndex,
     String? currentAppVersion,
     String? latestAppVersion,
+    bool? hasUnreadInAppNotifications,
   }) {
     return AppState(
       status: status ?? this.status,
@@ -153,6 +159,8 @@ class AppState extends Equatable {
           selectedBottomNavigationIndex ?? this.selectedBottomNavigationIndex,
       currentAppVersion: currentAppVersion ?? this.currentAppVersion,
       latestAppVersion: latestAppVersion ?? this.latestAppVersion,
+      hasUnreadInAppNotifications:
+          hasUnreadInAppNotifications ?? this.hasUnreadInAppNotifications,
     );
   }
 }

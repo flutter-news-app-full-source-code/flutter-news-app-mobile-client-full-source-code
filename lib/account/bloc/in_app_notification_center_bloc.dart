@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:core/core.dart';
+import 'package:collection/collection.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
@@ -117,10 +118,17 @@ class InAppNotificationCenterBloc
     InAppNotificationCenterMarkedAsRead event,
     Emitter<InAppNotificationCenterState> emit,
   ) async {
-    final notification = state.notifications.firstWhere(
+    final notification = state.notifications.firstWhereOrNull(
       (n) => n.id == event.notificationId,
-      orElse: () => throw Exception('Notification not found in state'),
     );
+
+    if (notification == null) {
+      _logger.warning(
+        'Attempted to mark a notification as read that does not exist in the '
+        'current state: ${event.notificationId}',
+      );
+      return;
+    }
 
     // If already read, do nothing.
     if (notification.isRead) return;

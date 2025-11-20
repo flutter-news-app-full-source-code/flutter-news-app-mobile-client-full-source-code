@@ -61,17 +61,24 @@ class NoOpPushNotificationService extends PushNotificationService {
     if (environment != AppEnvironment.demo) {
       return;
     }
-    Future.delayed(const Duration(seconds: 10), () {
-      if (_inAppNotificationsFixturesData.isEmpty) return;
+    unawaited(
+      Future.delayed(const Duration(seconds: 10), () async {
+        if (_inAppNotificationsFixturesData.isEmpty) return;
 
-      // Use the first notification from the fixtures as the simulated push.
-      final notificationToSimulate = _inAppNotificationsFixturesData.first;
+        // Use the first notification from the fixtures as the simulated push.
+        final notificationToSimulate = _inAppNotificationsFixturesData.first;
 
-      // The AppBloc listens to the `onMessage` stream. When a payload is
-      // emitted, the BLoC will create a new InAppNotification, save it,
-      // and update the UI to show the unread indicator.
-      _onMessageController.add(notificationToSimulate.payload);
-    });
+        // To align with the backend architecture, this NoOp service
+        // simulates the backend's behavior: it first persists the notification
+        // to the in-memory repository, and *then* emits the push payload.
+        await _inAppNotificationRepository.create(
+          item: notificationToSimulate,
+          userId: userId,
+        );
+
+        _onMessageController.add(notificationToSimulate.payload);
+      }),
+    );
   }
 
   @override

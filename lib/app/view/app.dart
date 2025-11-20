@@ -222,17 +222,19 @@ class _AppViewState extends State<_AppView> {
           final contentType =
               payload.data['contentType'] as String?; // e.g., 'headline'
           final id = payload.data['headlineId'] as String?;
+          final notificationId = payload.data['notificationId'] as String?;
 
           if (contentType == 'headline' && id != null) {
             // Use pushNamed instead of goNamed.
             // goNamed replaces the entire navigation stack, which causes issues
             // when the app is launched from a terminated state. The new page
             // would lack the necessary ancestor widgets (like RepositoryProviders).
-            // pushNamed correctly pushes the details page on top of the
-            // existing stack (e.g., the feed), ensuring a valid context.
+            // pushNamed correctly pushes the details page on top of the existing
+            // stack (e.g., the feed), ensuring a valid context.
             _router.pushNamed(
               Routes.globalArticleDetailsName,
               pathParameters: {'id': id},
+              extra: {'notificationId': notificationId},
             );
           }
         });

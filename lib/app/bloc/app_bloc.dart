@@ -14,7 +14,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/extensions.dart';
 import 'package:logging/logging.dart';
-import 'package:uuid/uuid.dart';
 
 part 'app_event.dart';
 part 'app_state.dart';
@@ -49,7 +48,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required DataRepository<User> userRepository,
     required PushNotificationService pushNotificationService,
     required DataRepository<InAppNotification> inAppNotificationRepository,
-    Uuid? uuid,
   }) : _remoteConfigRepository = remoteConfigRepository,
        _appInitializer = appInitializer,
        _authRepository = authRepository,
@@ -58,7 +56,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _userRepository = userRepository,
        _inAppNotificationRepository = inAppNotificationRepository,
        _pushNotificationService = pushNotificationService,
-       _uuid = uuid ?? const Uuid(),
        _inlineAdCacheService = inlineAdCacheService,
        _logger = logger,
        super(
@@ -108,33 +105,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // Listen to raw foreground push notifications.
     _pushNotificationService.onMessage.listen((payload) async {
       _logger.fine('AppBloc received foreground push notification payload.');
-      if (state.user != null) {
-        try {
-          final newNotification = InAppNotification(
-            // Generate a random ID for the notification.
-            id: _uuid.v4(),
-            userId: state.user!.id,
-            payload: payload,
-            createdAt: DateTime.now(),
-          );
-
-          await _inAppNotificationRepository.create(
-            item: newNotification,
-            userId: state.user!.id,
-          );
-          _logger.info(
-            'Successfully persisted in-app notification for user ${state.user!.id}.',
-          );
-          // Notify the app that a new notification has been received to update UI.
-          add(const AppInAppNotificationReceived());
-        } catch (e, s) {
-          _logger.severe(
-            'Failed to persist in-app notification from foreground message.',
-            e,
-            s,
-          );
-        }
-      }
+      // The backend now persists the notification when it sends the push. The
+      // client's only responsibility is to react to the incoming message
+      // and update the UI to show an unread indicator.
+      add(const AppInAppNotificationReceived());
     });
   }
 
@@ -148,7 +122,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final DataRepository<User> _userRepository;
   final DataRepository<InAppNotification> _inAppNotificationRepository;
   final PushNotificationService _pushNotificationService;
-  final Uuid _uuid;
   final InlineAdCacheService _inlineAdCacheService;
 
   /// Handles the [AppStarted] event.

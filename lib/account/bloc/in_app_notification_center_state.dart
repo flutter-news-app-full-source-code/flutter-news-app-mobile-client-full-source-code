@@ -69,6 +69,16 @@ class InAppNotificationCenterState extends Equatable {
   /// The cursor for fetching the next page of digest notifications.
   final String? digestCursor;
 
+  /// A convenience getter to determine if the current tab has any read items.
+  bool get hasReadItemsInCurrentTab {
+    final isBreakingNewsTab = currentTabIndex == 0;
+    if (isBreakingNewsTab) {
+      return breakingNewsNotifications.any((n) => n.isRead);
+    } else {
+      return digestNotifications.any((n) => n.isRead);
+    }
+  }
+
   @override
   List<Object> get props => [
     status,

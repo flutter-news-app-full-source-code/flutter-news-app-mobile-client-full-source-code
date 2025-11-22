@@ -1,5 +1,6 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_source_row.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_tap_handler.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -38,6 +39,7 @@ class HeadlineTileImageStart extends StatelessWidget {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizationsX(context).l10n;
 
     return Card(
       margin: const EdgeInsets.symmetric(
@@ -88,12 +90,24 @@ class HeadlineTileImageStart extends StatelessWidget {
                   children: [
                     HeadlineSourceRow(headline: headline),
                     const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      headline.title,
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          if (headline.isBreaking)
+                            TextSpan(
+                              text: '${l10n.breakingNewsPrefix} - ',
+                              style: textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: colorScheme.primary,
+                              ),
+                            ),
+                          TextSpan(text: headline.title),
+                        ],
+                      ),
                       style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w500,
                       ),
-                      maxLines: 2,
+                      maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],

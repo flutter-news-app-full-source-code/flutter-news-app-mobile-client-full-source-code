@@ -16,6 +16,9 @@ enum InAppNotificationCenterStatus {
 
   /// The state when an error has occurred.
   failure,
+
+  /// The state when read notifications are being deleted.
+  deleting,
 }
 
 /// {@template in_app_notification_center_state}

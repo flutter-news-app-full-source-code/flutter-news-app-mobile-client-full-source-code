@@ -55,3 +55,10 @@ class InAppNotificationCenterMarkOneAsRead
   @override
   List<Object> get props => [notificationId];
 }
+
+/// Dispatched when the user scrolls to the end of a notification list and
+/// more data needs to be fetched.
+class InAppNotificationCenterFetchMoreRequested
+    extends InAppNotificationCenterEvent {
+  const InAppNotificationCenterFetchMoreRequested();
+}

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:collection/collection.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
@@ -30,85 +31,135 @@ class InAppNotificationCenterBloc
        _appBloc = appBloc,
        _logger = logger,
        super(const InAppNotificationCenterState()) {
-    on<InAppNotificationCenterSubscriptionRequested>(_onSubscriptionRequested);
+    on<InAppNotificationCenterSubscriptionRequested>(
+      _onSubscriptionRequested,
+      transformer: droppable(),
+    );
     on<InAppNotificationCenterMarkedAsRead>(_onMarkedAsRead);
     on<InAppNotificationCenterMarkAllAsRead>(_onMarkAllAsRead);
     on<InAppNotificationCenterTabChanged>(_onTabChanged);
     on<InAppNotificationCenterMarkOneAsRead>(_onMarkOneAsRead);
+    on<InAppNotificationCenterFetchMoreRequested>(
+      _onFetchMoreRequested,
+      transformer: droppable(),
+    );
   }
+
+  /// The number of notifications to fetch per page.
+  static const _notificationsFetchLimit = 10;
 
   final DataRepository<InAppNotification> _inAppNotificationRepository;
   final AppBloc _appBloc;
   final Logger _logger;
 
-  /// Handles the request to load all notifications for the current user.
+  /// Handles the initial subscription request to fetch notifications for both
+  /// tabs concurrently.
   Future<void> _onSubscriptionRequested(
     InAppNotificationCenterSubscriptionRequested event,
     Emitter<InAppNotificationCenterState> emit,
   ) async {
     emit(state.copyWith(status: InAppNotificationCenterStatus.loading));
-
     final userId = _appBloc.state.user?.id;
     if (userId == null) {
-      _logger.warning('Cannot fetch notifications: user is not logged in.');
+      _logger.warning(
+        'Cannot fetch more notifications: user is not logged in.',
+      );
       emit(state.copyWith(status: InAppNotificationCenterStatus.failure));
       return;
     }
 
     try {
-      final response = await _inAppNotificationRepository.readAll(
-        userId: userId,
-        sort: [const SortOption('createdAt', SortOrder.desc)],
-      );
+      // Fetch both tabs' initial data in parallel and wait for their results.
+      final results = await Future.wait([
+        _fetchNotifications(userId: userId, filter: _breakingNewsFilter),
+        _fetchNotifications(userId: userId, filter: _digestFilter),
+      ]);
 
-      final allNotifications = response.items;
+      final breakingNewsResponse = results[0];
+      final digestResponse = results[1];
 
-      final breakingNews = <InAppNotification>[];
-      final digests = <InAppNotification>[];
-
-      // Filter notifications into their respective categories, prioritizing
-      // 'notificationType' from the backend, then falling back to 'contentType'.
-      for (final n in allNotifications) {
-        final notificationType = n.payload.data['notificationType'] as String?;
-        final contentType = n.payload.data['contentType'] as String?;
-
-        if (notificationType ==
-                PushNotificationSubscriptionDeliveryType.dailyDigest.name ||
-            notificationType ==
-                PushNotificationSubscriptionDeliveryType.weeklyRoundup.name ||
-            contentType == 'digest') {
-          digests.add(n);
-        } else {
-          // All other types (including 'breakingOnly' notificationType,
-          // 'headline' contentType, or any unknown types) go to breaking news.
-          breakingNews.add(n);
-        }
-      }
-
+      // Perform a single, atomic state update with both results.
       emit(
         state.copyWith(
           status: InAppNotificationCenterStatus.success,
-          breakingNewsNotifications: breakingNews,
-          digestNotifications: digests,
+          breakingNewsNotifications: breakingNewsResponse.items,
+          breakingNewsHasMore: breakingNewsResponse.hasMore,
+          breakingNewsCursor: breakingNewsResponse.cursor,
+          digestNotifications: digestResponse.items,
+          digestHasMore: digestResponse.hasMore,
+          digestCursor: digestResponse.cursor,
         ),
       );
-    } on HttpException catch (e, s) {
-      _logger.severe('Failed to fetch in-app notifications.', e, s);
-      emit(
-        state.copyWith(status: InAppNotificationCenterStatus.failure, error: e),
+    } catch (error, stackTrace) {
+      _handleFetchError(emit, error, stackTrace);
+    }
+  }
+
+  /// Handles fetching the next page of notifications for the current tab.
+  Future<void> _onFetchMoreRequested(
+    InAppNotificationCenterFetchMoreRequested event,
+    Emitter<InAppNotificationCenterState> emit,
+  ) async {
+    final isBreakingNewsTab = state.currentTabIndex == 0;
+    final hasMore = isBreakingNewsTab
+        ? state.breakingNewsHasMore
+        : state.digestHasMore;
+
+    if (state.status == InAppNotificationCenterStatus.loadingMore || !hasMore) {
+      return;
+    }
+
+    emit(state.copyWith(status: InAppNotificationCenterStatus.loadingMore));
+
+    final userId = _appBloc.state.user?.id;
+    if (userId == null) {
+      _logger.warning(
+        'Cannot fetch more notifications: user is not logged in.',
       );
-    } catch (e, s) {
-      _logger.severe(
-        'An unexpected error occurred while fetching in-app notifications.',
-        e,
-        s,
+      emit(state.copyWith(status: InAppNotificationCenterStatus.failure));
+      return;
+    }
+
+    final filter = isBreakingNewsTab ? _breakingNewsFilter : _digestFilter;
+    final cursor = isBreakingNewsTab
+        ? state.breakingNewsCursor
+        : state.digestCursor;
+
+    try {
+      final response = await _fetchNotifications(
+        userId: userId,
+        filter: filter,
+        cursor: cursor,
       );
-      emit(
-        state.copyWith(
-          status: InAppNotificationCenterStatus.failure,
-          error: UnknownException(e.toString()),
-        ),
-      );
+
+      // Append the new items to the correct list.
+      if (isBreakingNewsTab) {
+        emit(
+          state.copyWith(
+            status: InAppNotificationCenterStatus.success,
+            breakingNewsNotifications: [
+              ...state.breakingNewsNotifications,
+              ...response.items,
+            ],
+            breakingNewsHasMore: response.hasMore,
+            breakingNewsCursor: response.cursor,
+          ),
+        );
+      } else {
+        emit(
+          state.copyWith(
+            status: InAppNotificationCenterStatus.success,
+            digestNotifications: [
+              ...state.digestNotifications,
+              ...response.items,
+            ],
+            digestHasMore: response.hasMore,
+            digestCursor: response.cursor,
+          ),
+        );
+      }
+    } catch (error, stackTrace) {
+      _handleFetchError(emit, error, stackTrace);
     }
   }
 
@@ -117,6 +168,8 @@ class InAppNotificationCenterBloc
     InAppNotificationCenterTabChanged event,
     Emitter<InAppNotificationCenterState> emit,
   ) async {
+    // If the tab is changed, we don't need to re-fetch data as it was
+    // already fetched on initial load. We just update the index.
     emit(state.copyWith(currentTabIndex: event.tabIndex));
   }
 
@@ -279,5 +332,69 @@ class InAppNotificationCenterBloc
         ),
       );
     }
+  }
+
+  /// A generic method to fetch notifications based on a filter.
+  Future<PaginatedResponse<InAppNotification>> _fetchNotifications({
+    required String userId,
+    required Map<String, dynamic> filter,
+    String? cursor,
+  }) async {
+    // This method now simply fetches and returns the data, or throws on error.
+    // The responsibility of emitting state is moved to the event handlers.
+    return _inAppNotificationRepository.readAll(
+      userId: userId,
+      filter: filter,
+      pagination: PaginationOptions(
+        limit: _notificationsFetchLimit,
+        cursor: cursor,
+      ),
+      sort: [const SortOption('createdAt', SortOrder.desc)],
+    );
+  }
+
+  /// Filter for "Breaking News" notifications.
+  ///
+  /// This filter uses the `$nin` (not in) operator to exclude notifications
+  /// that are explicitly typed as digests. All other notifications are
+  /// considered "breaking news" for the purpose of this tab.
+  Map<String, dynamic> get _breakingNewsFilter => {
+    'payload.data.notificationType': {
+      r'$nin': [
+        PushNotificationSubscriptionDeliveryType.dailyDigest.name,
+        PushNotificationSubscriptionDeliveryType.weeklyRoundup.name,
+      ],
+    },
+  };
+
+  /// Filter for "Digests" notifications.
+  ///
+  /// This filter uses the `$in` operator to select notifications that are
+  /// explicitly typed as either a daily or weekly digest.
+  Map<String, dynamic> get _digestFilter => {
+    'payload.data.notificationType': {
+      r'$in': [
+        PushNotificationSubscriptionDeliveryType.dailyDigest.name,
+        PushNotificationSubscriptionDeliveryType.weeklyRoundup.name,
+      ],
+    },
+  };
+
+  /// Centralized error handler for fetch operations.
+  void _handleFetchError(
+    Emitter<InAppNotificationCenterState> emit,
+    Object error,
+    StackTrace stackTrace,
+  ) {
+    _logger.severe('Failed to fetch notifications.', error, stackTrace);
+    final httpException = error is HttpException
+        ? error
+        : UnknownException(error.toString());
+    emit(
+      state.copyWith(
+        status: InAppNotificationCenterStatus.failure,
+        error: httpException,
+      ),
+    );
   }
 }

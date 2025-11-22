@@ -102,7 +102,9 @@ class _InAppNotificationCenterPageState
               }
             },
             builder: (context, state) {
-              if (state.status == InAppNotificationCenterStatus.loading) {
+              if (state.status == InAppNotificationCenterStatus.loading &&
+                  state.breakingNewsNotifications.isEmpty &&
+                  state.digestNotifications.isEmpty) {
                 return LoadingStateWidget(
                   icon: Icons.notifications_none_outlined,
                   headline: l10n.notificationCenterLoadingHeadline,
@@ -110,7 +112,9 @@ class _InAppNotificationCenterPageState
                 );
               }
 
-              if (state.status == InAppNotificationCenterStatus.failure) {
+              if (state.status == InAppNotificationCenterStatus.failure &&
+                  state.breakingNewsNotifications.isEmpty &&
+                  state.digestNotifications.isEmpty) {
                 return FailureStateWidget(
                   exception:
                       state.error ??
@@ -129,9 +133,15 @@ class _InAppNotificationCenterPageState
                 controller: _tabController,
                 children: [
                   _NotificationList(
+                    status: state.status,
                     notifications: state.breakingNewsNotifications,
+                    hasMore: state.breakingNewsHasMore,
                   ),
-                  _NotificationList(notifications: state.digestNotifications),
+                  _NotificationList(
+                    status: state.status,
+                    notifications: state.digestNotifications,
+                    hasMore: state.digestHasMore,
+                  ),
                 ],
               );
             },
@@ -140,16 +150,61 @@ class _InAppNotificationCenterPageState
   }
 }
 
-class _NotificationList extends StatelessWidget {
-  const _NotificationList({required this.notifications});
+class _NotificationList extends StatefulWidget {
+  const _NotificationList({
+    required this.notifications,
+    required this.hasMore,
+    required this.status,
+  });
 
+  final InAppNotificationCenterStatus status;
   final List<InAppNotification> notifications;
+  final bool hasMore;
+
+  @override
+  State<_NotificationList> createState() => _NotificationListState();
+}
+
+class _NotificationListState extends State<_NotificationList> {
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    final bloc = context.read<InAppNotificationCenterBloc>();
+    if (_isBottom &&
+        widget.hasMore &&
+        bloc.state.status != InAppNotificationCenterStatus.loadingMore) {
+      bloc.add(const InAppNotificationCenterFetchMoreRequested());
+    }
+  }
+
+  bool get _isBottom {
+    if (!_scrollController.hasClients) return false;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.offset;
+    return currentScroll >= (maxScroll * 0.98);
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
 
-    if (notifications.isEmpty) {
+    // Show empty state only if not in the middle of an initial load.
+    if (widget.notifications.isEmpty &&
+        widget.status != InAppNotificationCenterStatus.loading) {
       return InitialStateWidget(
         icon: Icons.notifications_off_outlined,
         headline: l10n.notificationCenterEmptyHeadline,
@@ -158,10 +213,21 @@ class _NotificationList extends StatelessWidget {
     }
 
     return ListView.separated(
-      itemCount: notifications.length,
+      controller: _scrollController,
+      itemCount: widget.hasMore
+          ? widget.notifications.length + 1
+          : widget.notifications.length,
       separatorBuilder: (context, index) => const Divider(height: 1),
       itemBuilder: (context, index) {
-        final notification = notifications[index];
+        if (index >= widget.notifications.length) {
+          return widget.status == InAppNotificationCenterStatus.loadingMore
+              ? const Padding(
+                  padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              : const SizedBox.shrink();
+        }
+        final notification = widget.notifications[index];
         return InAppNotificationListItem(
           notification: notification,
           onTap: () async {

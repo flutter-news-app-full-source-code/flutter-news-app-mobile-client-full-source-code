@@ -1341,4 +1341,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteButtonLabel => 'Delete';
+
+  @override
+  String get breakingNewsPrefix => 'Breaking News';
 }

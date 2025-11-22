@@ -1721,5 +1721,17 @@
     "notificationCenterTabDigests": "الملخصات",
     "@notificationCenterTabDigests": {
         "description": "Label for the 'Digests' tab in the notification center."
+    },
+    "deleteReadNotificationsButtonTooltip": "حذف جميع الإشعارات المقروءة",
+    "@deleteReadNotificationsButtonTooltip": {
+        "description": "Tooltip for the button to delete all read notifications in the current tab."
+    },
+    "deleteReadNotificationsDialogContent": "هل أنت متأكد أنك تريد حذف جميع الإشعارات المقروءة في علامة التبويب هذه؟ لا يمكن التراجع عن هذا الإجراء.",
+    "@deleteReadNotificationsDialogContent": {
+        "description": "The main text in the dialog confirming the deletion of read notifications."
+    },
+    "deleteButtonLabel": "حذف",
+    "@deleteButtonLabel": {
+        "description": "Generic label for a delete button."
     }
 }

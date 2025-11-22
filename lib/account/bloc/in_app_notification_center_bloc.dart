@@ -340,15 +340,15 @@ class InAppNotificationCenterBloc
     InAppNotificationCenterReadItemsDeleted event,
     Emitter<InAppNotificationCenterState> emit,
   ) async {
-    
     final userId = _appBloc.state.user?.id;
     final isBreakingNewsTab = state.currentTabIndex == 0;
     final notificationsForTab = isBreakingNewsTab
         ? state.breakingNewsNotifications
         : state.digestNotifications;
 
-    final readNotifications =
-        notificationsForTab.where((n) => n.isRead).toList();
+    final readNotifications = notificationsForTab
+        .where((n) => n.isRead)
+        .toList();
 
     if (readNotifications.isEmpty) {
       _logger.info('No read notifications to delete in the current tab.');
@@ -359,12 +359,14 @@ class InAppNotificationCenterBloc
 
     // Optimistic UI update: remove the read items from the state immediately.
     if (isBreakingNewsTab) {
-      final updatedList =
-          state.breakingNewsNotifications.where((n) => !n.isRead).toList();
+      final updatedList = state.breakingNewsNotifications
+          .where((n) => !n.isRead)
+          .toList();
       emit(state.copyWith(breakingNewsNotifications: updatedList));
     } else {
-      final updatedList =
-          state.digestNotifications.where((n) => !n.isRead).toList();
+      final updatedList = state.digestNotifications
+          .where((n) => !n.isRead)
+          .toList();
       emit(state.copyWith(digestNotifications: updatedList));
     }
 

@@ -89,8 +89,9 @@ class _InAppNotificationCenterPageState
                           context: context,
                           builder: (context) => AlertDialog(
                             title: Text(l10n.deleteConfirmationDialogTitle),
-                            content:
-                                Text(l10n.deleteReadNotificationsDialogContent),
+                            content: Text(
+                              l10n.deleteReadNotificationsDialogContent,
+                            ),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(context, false),
@@ -105,26 +106,11 @@ class _InAppNotificationCenterPageState
                         );
                         if (confirmed == true && context.mounted) {
                           context.read<InAppNotificationCenterBloc>().add(
-                                const InAppNotificationCenterReadItemsDeleted(),
-                              );
+                            const InAppNotificationCenterReadItemsDeleted(),
+                          );
                         }
                       }
                     : null,
-              );
-            },
-          ),
-          BlocBuilder<InAppNotificationCenterBloc, InAppNotificationCenterState>(
-            builder: (context, state) {
-              final hasUnread = state.notifications.any((n) => !n.isRead);
-              return IconButton(
-                onPressed: hasUnread
-                    ? () {
-                        context.read<InAppNotificationCenterBloc>().add(
-                          const InAppNotificationCenterMarkAllAsRead(),
-                        );
-                      }
-                    : null,
-                icon: const Icon(Icons.done_all),
               );
             },
           ),

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:bloc/bloc.dart';
 import 'package:collection/collection.dart';
 import 'package:core/core.dart';
@@ -35,6 +36,10 @@ class InAppNotificationCenterBloc
     on<InAppNotificationCenterMarkAllAsRead>(_onMarkAllAsRead);
     on<InAppNotificationCenterTabChanged>(_onTabChanged);
     on<InAppNotificationCenterMarkOneAsRead>(_onMarkOneAsRead);
+    on<InAppNotificationCenterFetchMoreRequested>(
+      _onFetchMoreRequested,
+      transformer: droppable(),
+    );
   }
 
   final DataRepository<InAppNotification> _inAppNotificationRepository;
@@ -42,6 +47,8 @@ class InAppNotificationCenterBloc
   final Logger _logger;
 
   /// Handles the request to load all notifications for the current user.
+  /// This now only fetches the first page of notifications. Subsequent pages
+  /// are loaded by [_onFetchMoreRequested].
   Future<void> _onSubscriptionRequested(
     InAppNotificationCenterSubscriptionRequested event,
     Emitter<InAppNotificationCenterState> emit,
@@ -58,6 +65,8 @@ class InAppNotificationCenterBloc
     try {
       final response = await _inAppNotificationRepository.readAll(
         userId: userId,
+        // Fetch the first page with a defined limit.
+        pagination: const PaginationOptions(limit: 20),
         sort: [const SortOption('createdAt', SortOrder.desc)],
       );
 
@@ -65,31 +74,28 @@ class InAppNotificationCenterBloc
 
       final breakingNews = <InAppNotification>[];
       final digests = <InAppNotification>[];
+      _filterAndAddNotifications(
+        notifications: allNotifications,
+        breakingNewsList: breakingNews,
+        digestList: digests,
+      );
 
-      // Filter notifications into their respective categories, prioritizing
-      // 'notificationType' from the backend, then falling back to 'contentType'.
-      for (final n in allNotifications) {
-        final notificationType = n.payload.data['notificationType'] as String?;
-        final contentType = n.payload.data['contentType'] as String?;
-
-        if (notificationType ==
-                PushNotificationSubscriptionDeliveryType.dailyDigest.name ||
-            notificationType ==
-                PushNotificationSubscriptionDeliveryType.weeklyRoundup.name ||
-            contentType == 'digest') {
-          digests.add(n);
-        } else {
-          // All other types (including 'breakingOnly' notificationType,
-          // 'headline' contentType, or any unknown types) go to breaking news.
-          breakingNews.add(n);
-        }
-      }
+      // Since we are fetching all notifications together and then filtering,
+      // the pagination cursor and hasMore status will be the same for both lists.
+      // This assumes the backend doesn't support filtering by notification type
+      // in the query itself.
+      final hasMore = response.hasMore;
+      final cursor = response.cursor;
 
       emit(
         state.copyWith(
           status: InAppNotificationCenterStatus.success,
           breakingNewsNotifications: breakingNews,
           digestNotifications: digests,
+          breakingNewsHasMore: hasMore,
+          breakingNewsCursor: cursor,
+          digestHasMore: hasMore,
+          digestCursor: cursor,
         ),
       );
     } on HttpException catch (e, s) {
@@ -100,6 +106,89 @@ class InAppNotificationCenterBloc
     } catch (e, s) {
       _logger.severe(
         'An unexpected error occurred while fetching in-app notifications.',
+        e,
+        s,
+      );
+      emit(
+        state.copyWith(
+          status: InAppNotificationCenterStatus.failure,
+          error: UnknownException(e.toString()),
+        ),
+      );
+    }
+  }
+
+  /// Handles fetching the next page of notifications when the user scrolls.
+  Future<void> _onFetchMoreRequested(
+    InAppNotificationCenterFetchMoreRequested event,
+    Emitter<InAppNotificationCenterState> emit,
+  ) async {
+    final isBreakingNewsTab = state.currentTabIndex == 0;
+    final hasMore = isBreakingNewsTab
+        ? state.breakingNewsHasMore
+        : state.digestHasMore;
+
+    if (state.status == InAppNotificationCenterStatus.loadingMore || !hasMore) {
+      return;
+    }
+
+    emit(state.copyWith(status: InAppNotificationCenterStatus.loadingMore));
+
+    final userId = _appBloc.state.user?.id;
+    if (userId == null) {
+      _logger.warning(
+        'Cannot fetch more notifications: user is not logged in.',
+      );
+      emit(state.copyWith(status: InAppNotificationCenterStatus.failure));
+      return;
+    }
+
+    final cursor = isBreakingNewsTab
+        ? state.breakingNewsCursor
+        : state.digestCursor;
+
+    try {
+      final response = await _inAppNotificationRepository.readAll(
+        userId: userId,
+        pagination: PaginationOptions(limit: 20, cursor: cursor),
+        sort: [const SortOption('createdAt', SortOrder.desc)],
+      );
+
+      final newNotifications = response.items;
+      final newBreakingNews = <InAppNotification>[];
+      final newDigests = <InAppNotification>[];
+
+      _filterAndAddNotifications(
+        notifications: newNotifications,
+        breakingNewsList: newBreakingNews,
+        digestList: newDigests,
+      );
+
+      final nextCursor = response.cursor;
+      final nextHasMore = response.hasMore;
+
+      emit(
+        state.copyWith(
+          status: InAppNotificationCenterStatus.success,
+          breakingNewsNotifications: [
+            ...state.breakingNewsNotifications,
+            ...newBreakingNews,
+          ],
+          digestNotifications: [...state.digestNotifications, ...newDigests],
+          breakingNewsHasMore: nextHasMore,
+          breakingNewsCursor: nextCursor,
+          digestHasMore: nextHasMore,
+          digestCursor: nextCursor,
+        ),
+      );
+    } on HttpException catch (e, s) {
+      _logger.severe('Failed to fetch more in-app notifications.', e, s);
+      emit(
+        state.copyWith(status: InAppNotificationCenterStatus.failure, error: e),
+      );
+    } catch (e, s) {
+      _logger.severe(
+        'An unexpected error occurred while fetching more in-app notifications.',
         e,
         s,
       );
@@ -278,6 +367,30 @@ class InAppNotificationCenterBloc
           error: UnknownException(e.toString()),
         ),
       );
+    }
+  }
+
+  /// A helper method to filter a list of notifications into "Breaking News"
+  /// and "Digests" categories and add them to the provided lists.
+  void _filterAndAddNotifications({
+    required List<InAppNotification> notifications,
+    required List<InAppNotification> breakingNewsList,
+    required List<InAppNotification> digestList,
+  }) {
+    for (final n in notifications) {
+      final notificationType = n.payload.data['notificationType'] as String?;
+      final contentType = n.payload.data['contentType'] as String?;
+
+      if (notificationType ==
+              PushNotificationSubscriptionDeliveryType.dailyDigest.name ||
+          notificationType ==
+              PushNotificationSubscriptionDeliveryType.weeklyRoundup.name ||
+          contentType == 'digest') {
+        digestList.add(n);
+      } else {
+        // All other types go to breaking news.
+        breakingNewsList.add(n);
+      }
     }
   }
 }

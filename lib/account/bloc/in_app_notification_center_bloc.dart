@@ -340,51 +340,66 @@ class InAppNotificationCenterBloc
     InAppNotificationCenterReadItemsDeleted event,
     Emitter<InAppNotificationCenterState> emit,
   ) async {
-    final userId = _appBloc.state.user?.id;
-    final isBreakingNewsTab = state.currentTabIndex == 0;
-    final notificationsForTab = isBreakingNewsTab
-        ? state.breakingNewsNotifications
-        : state.digestNotifications;
-
-    final readNotifications = notificationsForTab
-        .where((n) => n.isRead)
-        .toList();
-
-    if (readNotifications.isEmpty) {
-      _logger.info('No read notifications to delete in the current tab.');
-      return;
-    }
-
-    final idsToDelete = readNotifications.map((n) => n.id).toList();
-
-    // Optimistic UI update: remove the read items from the state immediately.
-    if (isBreakingNewsTab) {
-      final updatedList = state.breakingNewsNotifications
-          .where((n) => !n.isRead)
-          .toList();
-      emit(state.copyWith(breakingNewsNotifications: updatedList));
-    } else {
-      final updatedList = state.digestNotifications
-          .where((n) => !n.isRead)
-          .toList();
-      emit(state.copyWith(digestNotifications: updatedList));
-    }
-
-    _logger.info(
-      'Optimistically removed ${idsToDelete.length} read notifications from UI. '
-      'Deleting from repository in the background.',
-    );
-
-    // Perform the actual deletion in the background.
+    final userId = _appBloc.state.user!.id;
     try {
+      emit(state.copyWith(status: InAppNotificationCenterStatus.deleting));
+
+      final isBreakingNewsTab = state.currentTabIndex == 0;
+      final notificationsForTab = isBreakingNewsTab
+          ? state.breakingNewsNotifications
+          : state.digestNotifications;
+
+      final readNotifications = notificationsForTab
+          .where((n) => n.isRead)
+          .toList();
+
+      if (readNotifications.isEmpty) {
+        _logger.info('No read notifications to delete in the current tab.');
+        emit(state.copyWith(status: InAppNotificationCenterStatus.success));
+        return;
+      }
+
+      final idsToDelete = readNotifications.map((n) => n.id).toList();
+
+      _logger.info('Deleting ${idsToDelete.length} read notifications...');
+
       await Future.wait(
         idsToDelete.map(
           (id) => _inAppNotificationRepository.delete(id: id, userId: userId),
         ),
       );
-    } catch (e, s) {
-      _logger.severe('Failed to delete one or more notifications.', e, s);
-      // Do not revert state to avoid UI flicker. The error is logged.
+
+      _logger.info('Deletion successful. Refreshing notification list.');
+
+      // After deletion, re-fetch the current tab's data to ensure consistency.
+      final filter = isBreakingNewsTab ? _breakingNewsFilter : _digestFilter;
+      final response = await _fetchNotifications(
+        userId: userId,
+        filter: filter,
+      );
+
+      // Update the state with the refreshed list.
+      if (isBreakingNewsTab) {
+        emit(
+          state.copyWith(
+            breakingNewsNotifications: response.items,
+            breakingNewsHasMore: response.hasMore,
+            breakingNewsCursor: response.cursor,
+          ),
+        );
+      } else {
+        emit(
+          state.copyWith(
+            digestNotifications: response.items,
+            digestHasMore: response.hasMore,
+            digestCursor: response.cursor,
+          ),
+        );
+      }
+
+      emit(state.copyWith(status: InAppNotificationCenterStatus.success));
+    } catch (error, stackTrace) {
+      _handleFetchError(emit, error, stackTrace);
     }
   }
 

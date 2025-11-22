@@ -1330,4 +1330,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notificationCenterTabDigests => 'Digests';
+
+  @override
+  String get deleteReadNotificationsButtonTooltip =>
+      'Delete all read notifications';
+
+  @override
+  String get deleteReadNotificationsDialogContent =>
+      'Are you sure you want to delete all read notifications in this tab? This action cannot be undone.';
+
+  @override
+  String get deleteButtonLabel => 'Delete';
 }

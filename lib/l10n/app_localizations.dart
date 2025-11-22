@@ -2521,6 +2521,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Digests'**
   String get notificationCenterTabDigests;
+
+  /// Tooltip for the button to delete all read notifications in the current tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete all read notifications'**
+  String get deleteReadNotificationsButtonTooltip;
+
+  /// The main text in the dialog confirming the deletion of read notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete all read notifications in this tab? This action cannot be undone.'**
+  String get deleteReadNotificationsDialogContent;
+
+  /// Generic label for a delete button.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get deleteButtonLabel;
 }
 
 class _AppLocalizationsDelegate

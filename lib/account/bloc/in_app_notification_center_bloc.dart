@@ -70,24 +70,31 @@ class InAppNotificationCenterBloc
       return;
     }
 
-    // Fetch both tabs' initial data in parallel.
-    await Future.wait([
-      _fetchNotifications(
-        emit: emit,
-        userId: userId,
-        filter: _breakingNewsFilter,
-        isInitialFetch: true,
-      ),
-      _fetchNotifications(
-        emit: emit,
-        userId: userId,
-        filter: _digestFilter,
-        isInitialFetch: true,
-      ),
-    ]);
+    try {
+      // Fetch both tabs' initial data in parallel and wait for their results.
+      final results = await Future.wait([
+        _fetchNotifications(userId: userId, filter: _breakingNewsFilter),
+        _fetchNotifications(userId: userId, filter: _digestFilter),
+      ]);
 
-    // After both fetches are complete, set the status to success.
-    emit(state.copyWith(status: InAppNotificationCenterStatus.success));
+      final breakingNewsResponse = results[0];
+      final digestResponse = results[1];
+
+      // Perform a single, atomic state update with both results.
+      emit(
+        state.copyWith(
+          status: InAppNotificationCenterStatus.success,
+          breakingNewsNotifications: breakingNewsResponse.items,
+          breakingNewsHasMore: breakingNewsResponse.hasMore,
+          breakingNewsCursor: breakingNewsResponse.cursor,
+          digestNotifications: digestResponse.items,
+          digestHasMore: digestResponse.hasMore,
+          digestCursor: digestResponse.cursor,
+        ),
+      );
+    } catch (error, stackTrace) {
+      _handleFetchError(emit, error, stackTrace);
+    }
   }
 
   /// Handles fetching the next page of notifications for the current tab.
@@ -120,15 +127,42 @@ class InAppNotificationCenterBloc
         ? state.breakingNewsCursor
         : state.digestCursor;
 
-    await _fetchNotifications(
-      emit: emit,
-      userId: userId,
-      filter: filter,
-      cursor: cursor,
-    );
+    try {
+      final response = await _fetchNotifications(
+        userId: userId,
+        filter: filter,
+        cursor: cursor,
+      );
 
-    // After fetch, set status back to success.
-    emit(state.copyWith(status: InAppNotificationCenterStatus.success));
+      // Append the new items to the correct list.
+      if (isBreakingNewsTab) {
+        emit(
+          state.copyWith(
+            status: InAppNotificationCenterStatus.success,
+            breakingNewsNotifications: [
+              ...state.breakingNewsNotifications,
+              ...response.items,
+            ],
+            breakingNewsHasMore: response.hasMore,
+            breakingNewsCursor: response.cursor,
+          ),
+        );
+      } else {
+        emit(
+          state.copyWith(
+            status: InAppNotificationCenterStatus.success,
+            digestNotifications: [
+              ...state.digestNotifications,
+              ...response.items,
+            ],
+            digestHasMore: response.hasMore,
+            digestCursor: response.cursor,
+          ),
+        );
+      }
+    } catch (error, stackTrace) {
+      _handleFetchError(emit, error, stackTrace);
+    }
   }
 
   /// Handles the event to change the active tab.
@@ -303,64 +337,22 @@ class InAppNotificationCenterBloc
   }
 
   /// A generic method to fetch notifications based on a filter.
-  Future<void> _fetchNotifications({
-    required Emitter<InAppNotificationCenterState> emit,
+  Future<PaginatedResponse<InAppNotification>> _fetchNotifications({
     required String userId,
     required Map<String, dynamic> filter,
     String? cursor,
-    bool isInitialFetch = false,
-  }) {
-    final isBreakingNewsFilter = filter == _breakingNewsFilter;
-
-    return _inAppNotificationRepository
-        .readAll(
-          userId: userId,
-          filter: filter,
-          pagination: PaginationOptions(
-            limit: _notificationsFetchLimit,
-            cursor: cursor,
-          ),
-          sort: [const SortOption('createdAt', SortOrder.desc)],
-        )
-        .then((response) {
-          final newNotifications = response.items;
-          final nextCursor = response.cursor;
-          final hasMore = response.hasMore;
-
-          if (isBreakingNewsFilter) {
-            emit(
-              state.copyWith(
-                breakingNewsNotifications: isInitialFetch
-                    ? newNotifications
-                    : [...state.breakingNewsNotifications, ...newNotifications],
-                breakingNewsHasMore: hasMore,
-                breakingNewsCursor: nextCursor,
-              ),
-            );
-          } else {
-            emit(
-              state.copyWith(
-                digestNotifications: isInitialFetch
-                    ? newNotifications
-                    : [...state.digestNotifications, ...newNotifications],
-                digestHasMore: hasMore,
-                digestCursor: nextCursor,
-              ),
-            );
-          }
-        })
-        .catchError((Object e, StackTrace s) {
-          _logger.severe('Failed to fetch notifications.', e, s);
-          final httpException = e is HttpException
-              ? e
-              : UnknownException(e.toString());
-          emit(
-            state.copyWith(
-              status: InAppNotificationCenterStatus.failure,
-              error: httpException,
-            ),
-          );
-        });
+  }) async {
+    // This method now simply fetches and returns the data, or throws on error.
+    // The responsibility of emitting state is moved to the event handlers.
+    return _inAppNotificationRepository.readAll(
+      userId: userId,
+      filter: filter,
+      pagination: PaginationOptions(
+        limit: _notificationsFetchLimit,
+        cursor: cursor,
+      ),
+      sort: [const SortOption('createdAt', SortOrder.desc)],
+    );
   }
 
   /// Filter for "Breaking News" notifications.
@@ -389,4 +381,22 @@ class InAppNotificationCenterBloc
       ],
     },
   };
+
+  /// Centralized error handler for fetch operations.
+  void _handleFetchError(
+    Emitter<InAppNotificationCenterState> emit,
+    Object error,
+    StackTrace stackTrace,
+  ) {
+    _logger.severe('Failed to fetch notifications.', error, stackTrace);
+    final httpException = error is HttpException
+        ? error
+        : UnknownException(error.toString());
+    emit(
+      state.copyWith(
+        status: InAppNotificationCenterStatus.failure,
+        error: httpException,
+      ),
+    );
+  }
 }

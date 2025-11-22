@@ -1733,5 +1733,9 @@
     "deleteButtonLabel": "حذف",
     "@deleteButtonLabel": {
         "description": "Generic label for a delete button."
+    },
+    "breakingNewsPrefix": "خبر عاجل",
+    "@breakingNewsPrefix": {
+        "description": "Prefix text shown for breaking news headlines."
     }
 }

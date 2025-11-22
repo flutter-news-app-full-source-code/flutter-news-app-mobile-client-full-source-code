@@ -1337,4 +1337,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get deleteButtonLabel => 'حذف';
+
+  @override
+  String get breakingNewsPrefix => 'خبر عاجل';
 }

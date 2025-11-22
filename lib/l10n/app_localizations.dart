@@ -2539,6 +2539,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete'**
   String get deleteButtonLabel;
+
+  /// Prefix text shown for breaking news headlines.
+  ///
+  /// In en, this message translates to:
+  /// **'Breaking News'**
+  String get breakingNewsPrefix;
 }
 
 class _AppLocalizationsDelegate

@@ -43,6 +43,7 @@ class InAppNotificationCenterBloc
       _onFetchMoreRequested,
       transformer: droppable(),
     );
+    on<InAppNotificationCenterReadItemsDeleted>(_onReadItemsDeleted);
   }
 
   /// The number of notifications to fetch per page.
@@ -331,6 +332,57 @@ class InAppNotificationCenterBloc
           error: UnknownException(e.toString()),
         ),
       );
+    }
+  }
+
+  /// Handles deleting all read notifications in the current tab.
+  Future<void> _onReadItemsDeleted(
+    InAppNotificationCenterReadItemsDeleted event,
+    Emitter<InAppNotificationCenterState> emit,
+  ) async {
+    
+    final userId = _appBloc.state.user?.id;
+    final isBreakingNewsTab = state.currentTabIndex == 0;
+    final notificationsForTab = isBreakingNewsTab
+        ? state.breakingNewsNotifications
+        : state.digestNotifications;
+
+    final readNotifications =
+        notificationsForTab.where((n) => n.isRead).toList();
+
+    if (readNotifications.isEmpty) {
+      _logger.info('No read notifications to delete in the current tab.');
+      return;
+    }
+
+    final idsToDelete = readNotifications.map((n) => n.id).toList();
+
+    // Optimistic UI update: remove the read items from the state immediately.
+    if (isBreakingNewsTab) {
+      final updatedList =
+          state.breakingNewsNotifications.where((n) => !n.isRead).toList();
+      emit(state.copyWith(breakingNewsNotifications: updatedList));
+    } else {
+      final updatedList =
+          state.digestNotifications.where((n) => !n.isRead).toList();
+      emit(state.copyWith(digestNotifications: updatedList));
+    }
+
+    _logger.info(
+      'Optimistically removed ${idsToDelete.length} read notifications from UI. '
+      'Deleting from repository in the background.',
+    );
+
+    // Perform the actual deletion in the background.
+    try {
+      await Future.wait(
+        idsToDelete.map(
+          (id) => _inAppNotificationRepository.delete(id: id, userId: userId),
+        ),
+      );
+    } catch (e, s) {
+      _logger.severe('Failed to delete one or more notifications.', e, s);
+      // Do not revert state to avoid UI flicker. The error is logged.
     }
   }
 

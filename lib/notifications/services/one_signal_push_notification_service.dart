@@ -6,6 +6,7 @@ import 'package:data_repository/data_repository.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:logging/logging.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 /// A concrete implementation of [PushNotificationService] for OneSignal.
 class OneSignalPushNotificationService extends PushNotificationService {
@@ -115,31 +116,47 @@ class OneSignalPushNotificationService extends PushNotificationService {
       }
 
       _logger.fine('OneSignal Player ID received: $token');
-      // The device ID is now a composite key of userId and provider name to
-      // ensure idempotency and align with the backend's delete-then-create
-      // pattern.
-      final deviceId = '${userId}_${PushNotificationProvider.oneSignal.name}';
 
-      // First, attempt to delete any existing device registration for this user
-      // and provider. This ensures a clean state and handles token updates
-      // by effectively performing a "delete-then-create".
+      // To ensure a user only receives notifications on their most recently
+      // used device, we proactively clear all of their previous device
+      // registrations before creating a new one. This prevents "ghost"
+      // notifications from being sent to old, unused installations (e.g.,
+      // after a user gets a new phone or reinstalls the app).
       try {
-        await _pushNotificationDeviceRepository.delete(id: deviceId);
-        _logger.info('Existing device registration deleted for $deviceId.');
-      } on NotFoundException {
-        _logger.info(
-          'No existing device registration found for $deviceId. Proceeding with creation.',
+        final existingDevices = await _pushNotificationDeviceRepository.readAll(
+          userId: userId,
         );
+
+        if (existingDevices.items.isNotEmpty) {
+          _logger.info(
+            'Found ${existingDevices.items.length} existing device(s) for user $userId. Deleting...',
+          );
+          await Future.wait(
+            existingDevices.items.map(
+              (device) => _pushNotificationDeviceRepository.delete(
+                id: device.id,
+                userId: userId,
+              ),
+            ),
+          );
+          _logger.info('All existing devices for user $userId deleted.');
+        }
       } catch (e, s) {
+        // If the proactive cleanup fails (e.g., due to a temporary network
+        // issue), we log the error but do not halt the registration process.
+        // The backend's passive, self-healing mechanism (which prunes invalid
+        // tokens upon send failure) will eventually clean up any orphaned
+        // device records. This ensures that a failure in cleanup does not
+        // prevent the user from receiving notifications on their new device.
         _logger.warning(
-          'Failed to delete existing device registration for $deviceId. Proceeding with creation anyway. Error: $e',
+          'Could not clean up existing devices for user $userId, proceeding with registration. Error: $e',
           e,
           s,
         );
       }
 
       final newDevice = PushNotificationDevice(
-        id: deviceId,
+        id: const Uuid().v4(),
         userId: userId,
         platform: Platform.isIOS ? DevicePlatform.ios : DevicePlatform.android,
         providerTokens: {PushNotificationProvider.oneSignal: token},

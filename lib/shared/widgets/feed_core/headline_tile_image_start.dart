@@ -97,7 +97,7 @@ class HeadlineTileImageStart extends StatelessWidget {
                             TextSpan(
                               text: '${l10n.breakingNewsPrefix} - ',
                               style: textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.w500,
                                 color: colorScheme.primary,
                               ),
                             ),

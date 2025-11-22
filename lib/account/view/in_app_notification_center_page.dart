@@ -71,6 +71,60 @@ class _InAppNotificationCenterPageState
                       }
                     : null,
                 icon: const Icon(Icons.done_all),
+                tooltip: l10n.notificationCenterMarkAllAsReadButton,
+              );
+            },
+          ),
+          BlocBuilder<
+            InAppNotificationCenterBloc,
+            InAppNotificationCenterState
+          >(
+            builder: (context, state) {
+              return IconButton(
+                tooltip: l10n.deleteReadNotificationsButtonTooltip,
+                icon: const Icon(Icons.delete_sweep_outlined),
+                onPressed: state.hasReadItemsInCurrentTab
+                    ? () async {
+                        final confirmed = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Text(l10n.deleteConfirmationDialogTitle),
+                            content:
+                                Text(l10n.deleteReadNotificationsDialogContent),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: Text(l10n.cancelButtonLabel),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: Text(l10n.deleteButtonLabel),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (confirmed == true && context.mounted) {
+                          context.read<InAppNotificationCenterBloc>().add(
+                                const InAppNotificationCenterReadItemsDeleted(),
+                              );
+                        }
+                      }
+                    : null,
+              );
+            },
+          ),
+          BlocBuilder<InAppNotificationCenterBloc, InAppNotificationCenterState>(
+            builder: (context, state) {
+              final hasUnread = state.notifications.any((n) => !n.isRead);
+              return IconButton(
+                onPressed: hasUnread
+                    ? () {
+                        context.read<InAppNotificationCenterBloc>().add(
+                          const InAppNotificationCenterMarkAllAsRead(),
+                        );
+                      }
+                    : null,
+                icon: const Icon(Icons.done_all),
               );
             },
           ),

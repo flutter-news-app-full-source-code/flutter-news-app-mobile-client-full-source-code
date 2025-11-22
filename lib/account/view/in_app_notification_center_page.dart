@@ -197,7 +197,7 @@ class _InAppNotificationCenterPageState
                     ),
               ),
               if (isDeleting)
-                Container(
+                ColoredBox(
                   color: Colors.black.withOpacity(0.5),
                   child: const Center(child: CircularProgressIndicator()),
                 ),

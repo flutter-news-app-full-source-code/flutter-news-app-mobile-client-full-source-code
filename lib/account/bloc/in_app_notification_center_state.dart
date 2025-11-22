@@ -8,6 +8,9 @@ enum InAppNotificationCenterStatus {
   /// The state when notifications are being loaded.
   loading,
 
+  /// The state when more notifications are being loaded for pagination.
+  loadingMore,
+
   /// The state when notifications have been successfully loaded.
   success,
 
@@ -25,6 +28,10 @@ class InAppNotificationCenterState extends Equatable {
     this.breakingNewsNotifications = const [],
     this.digestNotifications = const [],
     this.currentTabIndex = 0,
+    this.breakingNewsHasMore = true,
+    this.breakingNewsCursor,
+    this.digestHasMore = true,
+    this.digestCursor,
     this.error,
   });
 
@@ -50,12 +57,28 @@ class InAppNotificationCenterState extends Equatable {
   /// An error that occurred during notification loading or processing.
   final HttpException? error;
 
+  /// A flag indicating if there are more breaking news notifications to fetch.
+  final bool breakingNewsHasMore;
+
+  /// The cursor for fetching the next page of breaking news notifications.
+  final String? breakingNewsCursor;
+
+  /// A flag indicating if there are more digest notifications to fetch.
+  final bool digestHasMore;
+
+  /// The cursor for fetching the next page of digest notifications.
+  final String? digestCursor;
+
   @override
   List<Object> get props => [
     status,
     currentTabIndex,
     breakingNewsNotifications,
     digestNotifications,
+    breakingNewsHasMore,
+    breakingNewsCursor ?? Object(),
+    digestHasMore,
+    digestCursor ?? Object(),
     error ?? Object(), // Include error in props, handle nullability
   ];
 
@@ -67,6 +90,10 @@ class InAppNotificationCenterState extends Equatable {
     int? currentTabIndex,
     List<InAppNotification>? breakingNewsNotifications,
     List<InAppNotification>? digestNotifications,
+    bool? breakingNewsHasMore,
+    String? breakingNewsCursor,
+    bool? digestHasMore,
+    String? digestCursor,
   }) {
     return InAppNotificationCenterState(
       status: status ?? this.status,
@@ -75,6 +102,10 @@ class InAppNotificationCenterState extends Equatable {
       breakingNewsNotifications:
           breakingNewsNotifications ?? this.breakingNewsNotifications,
       digestNotifications: digestNotifications ?? this.digestNotifications,
+      breakingNewsHasMore: breakingNewsHasMore ?? this.breakingNewsHasMore,
+      breakingNewsCursor: breakingNewsCursor ?? this.breakingNewsCursor,
+      digestHasMore: digestHasMore ?? this.digestHasMore,
+      digestCursor: digestCursor ?? this.digestCursor,
     );
   }
 }

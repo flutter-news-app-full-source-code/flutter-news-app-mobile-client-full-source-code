@@ -36,8 +36,8 @@ class _InAppNotificationCenterPageState
       ..addListener(() {
         if (!_tabController.indexIsChanging) {
           context.read<InAppNotificationCenterBloc>().add(
-            InAppNotificationCenterTabChanged(_tabController.index),
-          );
+                InAppNotificationCenterTabChanged(_tabController.index),
+              );
         }
       });
   }
@@ -56,18 +56,16 @@ class _InAppNotificationCenterPageState
       appBar: AppBar(
         title: Text(l10n.notificationCenterPageTitle),
         actions: [
-          BlocBuilder<
-            InAppNotificationCenterBloc,
-            InAppNotificationCenterState
-          >(
+          BlocBuilder<InAppNotificationCenterBloc,
+              InAppNotificationCenterState>(
             builder: (context, state) {
               final hasUnread = state.notifications.any((n) => !n.isRead);
               return IconButton(
                 onPressed: hasUnread
                     ? () {
                         context.read<InAppNotificationCenterBloc>().add(
-                          const InAppNotificationCenterMarkAllAsRead(),
-                        );
+                              const InAppNotificationCenterMarkAllAsRead(),
+                            );
                       }
                     : null,
                 icon: const Icon(Icons.done_all),
@@ -83,73 +81,124 @@ class _InAppNotificationCenterPageState
           ],
         ),
       ),
-      body:
-          BlocConsumer<
-            InAppNotificationCenterBloc,
-            InAppNotificationCenterState
-          >(
-            listener: (context, state) {
-              if (state.status == InAppNotificationCenterStatus.failure &&
-                  state.error != null) {
-                ScaffoldMessenger.of(context)
-                  ..hideCurrentSnackBar()
-                  ..showSnackBar(
-                    SnackBar(
-                      content: Text(state.error!.message),
-                      backgroundColor: Theme.of(context).colorScheme.error,
-                    ),
-                  );
-              }
-            },
-            builder: (context, state) {
-              if (state.status == InAppNotificationCenterStatus.loading) {
-                return LoadingStateWidget(
-                  icon: Icons.notifications_none_outlined,
-                  headline: l10n.notificationCenterLoadingHeadline,
-                  subheadline: l10n.notificationCenterLoadingSubheadline,
-                );
-              }
+      body: BlocConsumer<InAppNotificationCenterBloc,
+          InAppNotificationCenterState>(
+        listener: (context, state) {
+          if (state.status == InAppNotificationCenterStatus.failure &&
+              state.error != null) {
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(state.error!.message),
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
+              );
+          }
+        },
+        builder: (context, state) {
+          if (state.status == InAppNotificationCenterStatus.loading &&
+              state.breakingNewsNotifications.isEmpty &&
+              state.digestNotifications.isEmpty) {
+            return LoadingStateWidget(
+              icon: Icons.notifications_none_outlined,
+              headline: l10n.notificationCenterLoadingHeadline,
+              subheadline: l10n.notificationCenterLoadingSubheadline,
+            );
+          }
 
-              if (state.status == InAppNotificationCenterStatus.failure) {
-                return FailureStateWidget(
-                  exception:
-                      state.error ??
-                      OperationFailedException(
-                        l10n.notificationCenterFailureHeadline,
-                      ),
-                  onRetry: () {
-                    context.read<InAppNotificationCenterBloc>().add(
+          if (state.status == InAppNotificationCenterStatus.failure &&
+              state.breakingNewsNotifications.isEmpty &&
+              state.digestNotifications.isEmpty) {
+            return FailureStateWidget(
+              exception: state.error ??
+                  OperationFailedException(
+                    l10n.notificationCenterFailureHeadline,
+                  ),
+              onRetry: () {
+                context.read<InAppNotificationCenterBloc>().add(
                       const InAppNotificationCenterSubscriptionRequested(),
                     );
-                  },
-                );
-              }
+              },
+            );
+          }
 
-              return TabBarView(
-                controller: _tabController,
-                children: [
-                  _NotificationList(
-                    notifications: state.breakingNewsNotifications,
-                  ),
-                  _NotificationList(notifications: state.digestNotifications),
-                ],
-              );
-            },
-          ),
+          return TabBarView(
+            controller: _tabController,
+            children: [
+              _NotificationList(
+                status: state.status,
+                notifications: state.breakingNewsNotifications,
+                hasMore: state.breakingNewsHasMore,
+              ),
+              _NotificationList(
+                status: state.status,
+                notifications: state.digestNotifications,
+                hasMore: state.digestHasMore,
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }
 
-class _NotificationList extends StatelessWidget {
-  const _NotificationList({required this.notifications});
+class _NotificationList extends StatefulWidget {
+  const _NotificationList({
+    required this.notifications,
+    required this.hasMore,
+    required this.status,
+  });
 
+  final InAppNotificationCenterStatus status;
   final List<InAppNotification> notifications;
+  final bool hasMore;
+
+  @override
+  State<_NotificationList> createState() => _NotificationListState();
+}
+
+class _NotificationListState extends State<_NotificationList> {
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    final bloc = context.read<InAppNotificationCenterBloc>();
+    if (_isBottom &&
+        widget.hasMore &&
+        bloc.state.status != InAppNotificationCenterStatus.loadingMore) {
+      bloc.add(const InAppNotificationCenterFetchMoreRequested());
+    }
+  }
+
+  bool get _isBottom {
+    if (!_scrollController.hasClients) return false;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.offset;
+    return currentScroll >= (maxScroll * 0.98);
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
 
-    if (notifications.isEmpty) {
+    // Show empty state only if not in the middle of an initial load.
+    if (widget.notifications.isEmpty &&
+        widget.status != InAppNotificationCenterStatus.loading) {
       return InitialStateWidget(
         icon: Icons.notifications_off_outlined,
         headline: l10n.notificationCenterEmptyHeadline,
@@ -158,16 +207,31 @@ class _NotificationList extends StatelessWidget {
     }
 
     return ListView.separated(
-      itemCount: notifications.length,
+      controller: _scrollController,
+      itemCount: widget.hasMore
+          ? widget.notifications.length + 1
+          : widget.notifications.length,
       separatorBuilder: (context, index) => const Divider(height: 1),
       itemBuilder: (context, index) {
-        final notification = notifications[index];
+        if (index >= widget.notifications.length) {
+          return widget.status == InAppNotificationCenterStatus.loadingMore
+              ? const Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: AppSpacing.lg,
+                  ),
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              : const SizedBox.shrink();
+        }
+        final notification = widget.notifications[index];
         return InAppNotificationListItem(
           notification: notification,
           onTap: () async {
             context.read<InAppNotificationCenterBloc>().add(
-              InAppNotificationCenterMarkedAsRead(notification.id),
-            );
+                  InAppNotificationCenterMarkedAsRead(notification.id),
+                );
 
             final payload = notification.payload;
             final contentType = payload.data['contentType'] as String?;

@@ -91,21 +91,30 @@ class InAppNotificationCenterState extends Equatable {
     List<InAppNotification>? breakingNewsNotifications,
     List<InAppNotification>? digestNotifications,
     bool? breakingNewsHasMore,
-    String? breakingNewsCursor,
+    // Use a nullable wrapper to explicitly set the cursor to null.
+    Object? breakingNewsCursor,
     bool? digestHasMore,
-    String? digestCursor,
+    Object? digestCursor,
   }) {
     return InAppNotificationCenterState(
       status: status ?? this.status,
-      error: error ?? this.error,
+      // Allow explicitly setting the error to null.
+      // ignore: avoid_redundant_argument_values
+      error: error,
       currentTabIndex: currentTabIndex ?? this.currentTabIndex,
       breakingNewsNotifications:
           breakingNewsNotifications ?? this.breakingNewsNotifications,
       digestNotifications: digestNotifications ?? this.digestNotifications,
       breakingNewsHasMore: breakingNewsHasMore ?? this.breakingNewsHasMore,
-      breakingNewsCursor: breakingNewsCursor ?? this.breakingNewsCursor,
+      breakingNewsCursor: breakingNewsCursor == null
+          ? this
+                .breakingNewsCursor // No change
+          : breakingNewsCursor as String?, // New value
       digestHasMore: digestHasMore ?? this.digestHasMore,
-      digestCursor: digestCursor ?? this.digestCursor,
+      digestCursor: digestCursor == null
+          ? this
+                .digestCursor // No change
+          : digestCursor as String?, // New value
     );
   }
 }

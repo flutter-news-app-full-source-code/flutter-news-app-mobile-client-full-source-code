@@ -36,8 +36,8 @@ class _InAppNotificationCenterPageState
       ..addListener(() {
         if (!_tabController.indexIsChanging) {
           context.read<InAppNotificationCenterBloc>().add(
-                InAppNotificationCenterTabChanged(_tabController.index),
-              );
+            InAppNotificationCenterTabChanged(_tabController.index),
+          );
         }
       });
   }
@@ -56,16 +56,18 @@ class _InAppNotificationCenterPageState
       appBar: AppBar(
         title: Text(l10n.notificationCenterPageTitle),
         actions: [
-          BlocBuilder<InAppNotificationCenterBloc,
-              InAppNotificationCenterState>(
+          BlocBuilder<
+            InAppNotificationCenterBloc,
+            InAppNotificationCenterState
+          >(
             builder: (context, state) {
               final hasUnread = state.notifications.any((n) => !n.isRead);
               return IconButton(
                 onPressed: hasUnread
                     ? () {
                         context.read<InAppNotificationCenterBloc>().add(
-                              const InAppNotificationCenterMarkAllAsRead(),
-                            );
+                          const InAppNotificationCenterMarkAllAsRead(),
+                        );
                       }
                     : null,
                 icon: const Icon(Icons.done_all),
@@ -81,65 +83,69 @@ class _InAppNotificationCenterPageState
           ],
         ),
       ),
-      body: BlocConsumer<InAppNotificationCenterBloc,
-          InAppNotificationCenterState>(
-        listener: (context, state) {
-          if (state.status == InAppNotificationCenterStatus.failure &&
-              state.error != null) {
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(
-                  content: Text(state.error!.message),
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                ),
-              );
-          }
-        },
-        builder: (context, state) {
-          if (state.status == InAppNotificationCenterStatus.loading &&
-              state.breakingNewsNotifications.isEmpty &&
-              state.digestNotifications.isEmpty) {
-            return LoadingStateWidget(
-              icon: Icons.notifications_none_outlined,
-              headline: l10n.notificationCenterLoadingHeadline,
-              subheadline: l10n.notificationCenterLoadingSubheadline,
-            );
-          }
+      body:
+          BlocConsumer<
+            InAppNotificationCenterBloc,
+            InAppNotificationCenterState
+          >(
+            listener: (context, state) {
+              if (state.status == InAppNotificationCenterStatus.failure &&
+                  state.error != null) {
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(
+                    SnackBar(
+                      content: Text(state.error!.message),
+                      backgroundColor: Theme.of(context).colorScheme.error,
+                    ),
+                  );
+              }
+            },
+            builder: (context, state) {
+              if (state.status == InAppNotificationCenterStatus.loading &&
+                  state.breakingNewsNotifications.isEmpty &&
+                  state.digestNotifications.isEmpty) {
+                return LoadingStateWidget(
+                  icon: Icons.notifications_none_outlined,
+                  headline: l10n.notificationCenterLoadingHeadline,
+                  subheadline: l10n.notificationCenterLoadingSubheadline,
+                );
+              }
 
-          if (state.status == InAppNotificationCenterStatus.failure &&
-              state.breakingNewsNotifications.isEmpty &&
-              state.digestNotifications.isEmpty) {
-            return FailureStateWidget(
-              exception: state.error ??
-                  OperationFailedException(
-                    l10n.notificationCenterFailureHeadline,
-                  ),
-              onRetry: () {
-                context.read<InAppNotificationCenterBloc>().add(
+              if (state.status == InAppNotificationCenterStatus.failure &&
+                  state.breakingNewsNotifications.isEmpty &&
+                  state.digestNotifications.isEmpty) {
+                return FailureStateWidget(
+                  exception:
+                      state.error ??
+                      OperationFailedException(
+                        l10n.notificationCenterFailureHeadline,
+                      ),
+                  onRetry: () {
+                    context.read<InAppNotificationCenterBloc>().add(
                       const InAppNotificationCenterSubscriptionRequested(),
                     );
-              },
-            );
-          }
+                  },
+                );
+              }
 
-          return TabBarView(
-            controller: _tabController,
-            children: [
-              _NotificationList(
-                status: state.status,
-                notifications: state.breakingNewsNotifications,
-                hasMore: state.breakingNewsHasMore,
-              ),
-              _NotificationList(
-                status: state.status,
-                notifications: state.digestNotifications,
-                hasMore: state.digestHasMore,
-              ),
-            ],
-          );
-        },
-      ),
+              return TabBarView(
+                controller: _tabController,
+                children: [
+                  _NotificationList(
+                    status: state.status,
+                    notifications: state.breakingNewsNotifications,
+                    hasMore: state.breakingNewsHasMore,
+                  ),
+                  _NotificationList(
+                    status: state.status,
+                    notifications: state.digestNotifications,
+                    hasMore: state.digestHasMore,
+                  ),
+                ],
+              );
+            },
+          ),
     );
   }
 }
@@ -216,12 +222,8 @@ class _NotificationListState extends State<_NotificationList> {
         if (index >= widget.notifications.length) {
           return widget.status == InAppNotificationCenterStatus.loadingMore
               ? const Padding(
-                  padding: EdgeInsets.symmetric(
-                    vertical: AppSpacing.lg,
-                  ),
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
+                  padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                  child: Center(child: CircularProgressIndicator()),
                 )
               : const SizedBox.shrink();
         }
@@ -230,8 +232,8 @@ class _NotificationListState extends State<_NotificationList> {
           notification: notification,
           onTap: () async {
             context.read<InAppNotificationCenterBloc>().add(
-                  InAppNotificationCenterMarkedAsRead(notification.id),
-                );
+              InAppNotificationCenterMarkedAsRead(notification.id),
+            );
 
             final payload = notification.payload;
             final contentType = payload.data['contentType'] as String?;

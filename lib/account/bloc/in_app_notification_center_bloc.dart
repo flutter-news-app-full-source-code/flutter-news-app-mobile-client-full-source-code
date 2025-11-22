@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:bloc/bloc.dart';
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:collection/collection.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
@@ -22,13 +22,8 @@ part 'in_app_notification_center_state.dart';
 /// {@endtemplate}
 class InAppNotificationCenterBloc
     extends Bloc<InAppNotificationCenterEvent, InAppNotificationCenterState> {
-  /// The number of notifications to fetch per page.
-  static const _notificationsFetchLimit = 10;
-
   /// {@macro in_app_notification_center_bloc}
   InAppNotificationCenterBloc({
-    // The BLoC should not be responsible for creating its own dependencies.
-    // They should be provided from the outside.
     required DataRepository<InAppNotification> inAppNotificationRepository,
     required AppBloc appBloc,
     required Logger logger,
@@ -49,6 +44,9 @@ class InAppNotificationCenterBloc
       transformer: droppable(),
     );
   }
+
+  /// The number of notifications to fetch per page.
+  static const _notificationsFetchLimit = 10;
 
   final DataRepository<InAppNotification> _inAppNotificationRepository;
   final AppBloc _appBloc;

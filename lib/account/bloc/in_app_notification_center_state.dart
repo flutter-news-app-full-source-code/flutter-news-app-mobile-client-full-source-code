@@ -107,14 +107,12 @@ class InAppNotificationCenterState extends Equatable {
       digestNotifications: digestNotifications ?? this.digestNotifications,
       breakingNewsHasMore: breakingNewsHasMore ?? this.breakingNewsHasMore,
       breakingNewsCursor: breakingNewsCursor == null
-          ? this
-                .breakingNewsCursor // No change
-          : breakingNewsCursor as String?, // New value
+          ? this.breakingNewsCursor
+          : breakingNewsCursor as String?,
       digestHasMore: digestHasMore ?? this.digestHasMore,
       digestCursor: digestCursor == null
-          ? this
-                .digestCursor // No change
-          : digestCursor as String?, // New value
+          ? this.digestCursor
+          : digestCursor as String?,
     );
   }
 }

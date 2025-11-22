@@ -1326,4 +1326,15 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get notificationCenterTabDigests => 'الملخصات';
+
+  @override
+  String get deleteReadNotificationsButtonTooltip =>
+      'حذف جميع الإشعارات المقروءة';
+
+  @override
+  String get deleteReadNotificationsDialogContent =>
+      'هل أنت متأكد أنك تريد حذف جميع الإشعارات المقروءة في علامة التبويب هذه؟ لا يمكن التراجع عن هذا الإجراء.';
+
+  @override
+  String get deleteButtonLabel => 'حذف';
 }

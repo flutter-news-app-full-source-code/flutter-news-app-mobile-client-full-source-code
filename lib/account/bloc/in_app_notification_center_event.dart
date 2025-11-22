@@ -62,3 +62,10 @@ class InAppNotificationCenterFetchMoreRequested
     extends InAppNotificationCenterEvent {
   const InAppNotificationCenterFetchMoreRequested();
 }
+
+/// Dispatched when the user requests to delete all read items in the
+/// currently active tab.
+class InAppNotificationCenterReadItemsDeleted
+    extends InAppNotificationCenterEvent {
+  const InAppNotificationCenterReadItemsDeleted();
+}

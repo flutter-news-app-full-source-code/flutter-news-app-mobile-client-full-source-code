@@ -1721,5 +1721,17 @@
     "notificationCenterTabDigests": "Digests",
     "@notificationCenterTabDigests": {
         "description": "Label for the 'Digests' tab in the notification center."
+    },
+    "deleteReadNotificationsButtonTooltip": "Delete all read notifications",
+    "@deleteReadNotificationsButtonTooltip": {
+        "description": "Tooltip for the button to delete all read notifications in the current tab."
+    },
+    "deleteReadNotificationsDialogContent": "Are you sure you want to delete all read notifications in this tab? This action cannot be undone.",
+    "@deleteReadNotificationsDialogContent": {
+        "description": "The main text in the dialog confirming the deletion of read notifications."
+    },
+    "deleteButtonLabel": "Delete",
+    "@deleteButtonLabel": {
+        "description": "Generic label for a delete button."
     }
 }

@@ -52,100 +52,159 @@ class _InAppNotificationCenterPageState
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.notificationCenterPageTitle),
-        actions: [
-          BlocBuilder<
-            InAppNotificationCenterBloc,
-            InAppNotificationCenterState
-          >(
-            builder: (context, state) {
-              final hasUnread = state.notifications.any((n) => !n.isRead);
-              return IconButton(
-                onPressed: hasUnread
-                    ? () {
-                        context.read<InAppNotificationCenterBloc>().add(
-                          const InAppNotificationCenterMarkAllAsRead(),
-                        );
-                      }
-                    : null,
-                icon: const Icon(Icons.done_all),
-              );
-            },
-          ),
-        ],
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: [
-            Tab(text: l10n.notificationCenterTabBreakingNews),
-            Tab(text: l10n.notificationCenterTabDigests),
-          ],
-        ),
-      ),
-      body:
-          BlocConsumer<
-            InAppNotificationCenterBloc,
-            InAppNotificationCenterState
-          >(
-            listener: (context, state) {
-              if (state.status == InAppNotificationCenterStatus.failure &&
-                  state.error != null) {
-                ScaffoldMessenger.of(context)
-                  ..hideCurrentSnackBar()
-                  ..showSnackBar(
-                    SnackBar(
-                      content: Text(state.error!.message),
-                      backgroundColor: Theme.of(context).colorScheme.error,
+    return BlocBuilder<
+      InAppNotificationCenterBloc,
+      InAppNotificationCenterState
+    >(
+      builder: (context, state) {
+        final isDeleting =
+            state.status == InAppNotificationCenterStatus.deleting;
+
+        return WillPopScope(
+          onWillPop: () async => !isDeleting,
+          child: Stack(
+            children: [
+              Scaffold(
+                appBar: AppBar(
+                  title: Text(l10n.notificationCenterPageTitle),
+                  actions: [
+                    IconButton(
+                      onPressed:
+                          !isDeleting &&
+                              state.notifications.any((n) => !n.isRead)
+                          ? () {
+                              context.read<InAppNotificationCenterBloc>().add(
+                                const InAppNotificationCenterMarkAllAsRead(),
+                              );
+                            }
+                          : null,
+                      icon: const Icon(Icons.done_all),
+                      tooltip: l10n.notificationCenterMarkAllAsReadButton,
                     ),
-                  );
-              }
-            },
-            builder: (context, state) {
-              if (state.status == InAppNotificationCenterStatus.loading &&
-                  state.breakingNewsNotifications.isEmpty &&
-                  state.digestNotifications.isEmpty) {
-                return LoadingStateWidget(
-                  icon: Icons.notifications_none_outlined,
-                  headline: l10n.notificationCenterLoadingHeadline,
-                  subheadline: l10n.notificationCenterLoadingSubheadline,
-                );
-              }
-
-              if (state.status == InAppNotificationCenterStatus.failure &&
-                  state.breakingNewsNotifications.isEmpty &&
-                  state.digestNotifications.isEmpty) {
-                return FailureStateWidget(
-                  exception:
-                      state.error ??
-                      OperationFailedException(
-                        l10n.notificationCenterFailureHeadline,
-                      ),
-                  onRetry: () {
-                    context.read<InAppNotificationCenterBloc>().add(
-                      const InAppNotificationCenterSubscriptionRequested(),
-                    );
-                  },
-                );
-              }
-
-              return TabBarView(
-                controller: _tabController,
-                children: [
-                  _NotificationList(
-                    status: state.status,
-                    notifications: state.breakingNewsNotifications,
-                    hasMore: state.breakingNewsHasMore,
+                    IconButton(
+                      tooltip: l10n.deleteReadNotificationsButtonTooltip,
+                      icon: const Icon(Icons.delete_sweep_outlined),
+                      onPressed: !isDeleting && state.hasReadItemsInCurrentTab
+                          ? () async {
+                              final confirmed = await showDialog<bool>(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: Text(
+                                    l10n.deleteConfirmationDialogTitle,
+                                  ),
+                                  content: Text(
+                                    l10n.deleteReadNotificationsDialogContent,
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(context, false),
+                                      child: Text(l10n.cancelButtonLabel),
+                                    ),
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(context, true),
+                                      child: Text(l10n.deleteButtonLabel),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              if (confirmed == true && context.mounted) {
+                                context.read<InAppNotificationCenterBloc>().add(
+                                  const InAppNotificationCenterReadItemsDeleted(),
+                                );
+                              }
+                            }
+                          : null,
+                    ),
+                  ],
+                  bottom: TabBar(
+                    controller: _tabController,
+                    tabs: [
+                      Tab(text: l10n.notificationCenterTabBreakingNews),
+                      Tab(text: l10n.notificationCenterTabDigests),
+                    ],
                   ),
-                  _NotificationList(
-                    status: state.status,
-                    notifications: state.digestNotifications,
-                    hasMore: state.digestHasMore,
-                  ),
-                ],
-              );
-            },
+                ),
+                body:
+                    BlocConsumer<
+                      InAppNotificationCenterBloc,
+                      InAppNotificationCenterState
+                    >(
+                      listener: (context, state) {
+                        if (state.status ==
+                                InAppNotificationCenterStatus.failure &&
+                            state.error != null) {
+                          ScaffoldMessenger.of(context)
+                            ..hideCurrentSnackBar()
+                            ..showSnackBar(
+                              SnackBar(
+                                content: Text(state.error!.message),
+                                backgroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.error,
+                              ),
+                            );
+                        }
+                      },
+                      builder: (context, state) {
+                        if (state.status ==
+                                InAppNotificationCenterStatus.loading &&
+                            state.breakingNewsNotifications.isEmpty &&
+                            state.digestNotifications.isEmpty) {
+                          return LoadingStateWidget(
+                            icon: Icons.notifications_none_outlined,
+                            headline: l10n.notificationCenterLoadingHeadline,
+                            subheadline:
+                                l10n.notificationCenterLoadingSubheadline,
+                          );
+                        }
+
+                        if (state.status ==
+                                InAppNotificationCenterStatus.failure &&
+                            state.breakingNewsNotifications.isEmpty &&
+                            state.digestNotifications.isEmpty) {
+                          return FailureStateWidget(
+                            exception:
+                                state.error ??
+                                OperationFailedException(
+                                  l10n.notificationCenterFailureHeadline,
+                                ),
+                            onRetry: () {
+                              context.read<InAppNotificationCenterBloc>().add(
+                                const InAppNotificationCenterSubscriptionRequested(),
+                              );
+                            },
+                          );
+                        }
+
+                        return TabBarView(
+                          controller: _tabController,
+                          children: [
+                            _NotificationList(
+                              status: state.status,
+                              notifications: state.breakingNewsNotifications,
+                              hasMore: state.breakingNewsHasMore,
+                            ),
+                            _NotificationList(
+                              status: state.status,
+                              notifications: state.digestNotifications,
+                              hasMore: state.digestHasMore,
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+              ),
+              if (isDeleting)
+                ColoredBox(
+                  color: Colors.black.withOpacity(0.5),
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
+            ],
           ),
+        );
+      },
     );
   }
 }

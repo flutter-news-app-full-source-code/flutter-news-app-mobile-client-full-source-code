@@ -22,6 +22,9 @@ part 'in_app_notification_center_state.dart';
 /// {@endtemplate}
 class InAppNotificationCenterBloc
     extends Bloc<InAppNotificationCenterEvent, InAppNotificationCenterState> {
+  /// The number of notifications to fetch per page.
+  static const _notificationsFetchLimit = 10;
+
   /// {@macro in_app_notification_center_bloc}
   InAppNotificationCenterBloc({
     required DataRepository<InAppNotification> inAppNotificationRepository,
@@ -66,7 +69,7 @@ class InAppNotificationCenterBloc
       final response = await _inAppNotificationRepository.readAll(
         userId: userId,
         // Fetch the first page with a defined limit.
-        pagination: const PaginationOptions(limit: 20),
+        pagination: const PaginationOptions(limit: _notificationsFetchLimit),
         sort: [const SortOption('createdAt', SortOrder.desc)],
       );
 
@@ -150,7 +153,10 @@ class InAppNotificationCenterBloc
     try {
       final response = await _inAppNotificationRepository.readAll(
         userId: userId,
-        pagination: PaginationOptions(limit: 20, cursor: cursor),
+        pagination: PaginationOptions(
+          limit: _notificationsFetchLimit,
+          cursor: cursor,
+        ),
         sort: [const SortOption('createdAt', SortOrder.desc)],
       );
 

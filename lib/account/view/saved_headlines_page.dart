@@ -102,8 +102,8 @@ class SavedHeadlinesPage extends StatelessWidget {
             itemBuilder: (context, index) {
               final headline = savedHeadlines[index];
               final imageStyle =
-                  appState.settings?.feedPreferences.headlineImageStyle ??
-                  HeadlineImageStyle.smallThumbnail;
+                  appState.settings?.feedSettings.feedItemImageStyle ??
+                  FeedItemImageStyle.smallThumbnail;
 
               final trailingButton = IconButton(
                 icon: Icon(Icons.delete_outline, color: colorScheme.error),
@@ -127,19 +127,19 @@ class SavedHeadlinesPage extends StatelessWidget {
 
               Widget tile;
               switch (imageStyle) {
-                case HeadlineImageStyle.hidden:
+                case FeedItemImageStyle.hidden:
                   tile = HeadlineTileTextOnly(
                     headline: headline,
                     onHeadlineTap: () => onHeadlineTap(headline),
                     trailing: trailingButton,
                   );
-                case HeadlineImageStyle.smallThumbnail:
+                case FeedItemImageStyle.smallThumbnail:
                   tile = HeadlineTileImageStart(
                     headline: headline,
                     onHeadlineTap: () => onHeadlineTap(headline),
                     trailing: trailingButton,
                   );
-                case HeadlineImageStyle.largeThumbnail:
+                case FeedItemImageStyle.largeThumbnail:
                   tile = HeadlineTileImageTop(
                     headline: headline,
                     onHeadlineTap: () => onHeadlineTap(headline),

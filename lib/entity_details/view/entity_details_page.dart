@@ -325,20 +325,20 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                         final imageStyle = context
                             .read<AppBloc>()
                             .state
-                            .headlineImageStyle;
+                            .feedItemImageStyle;
                         Widget tile;
                         switch (imageStyle) {
-                          case HeadlineImageStyle.hidden:
+                          case FeedItemImageStyle.hidden:
                             tile = HeadlineTileTextOnly(
                               headline: item,
                               onHeadlineTap: () => onHeadlineTap(item),
                             );
-                          case HeadlineImageStyle.smallThumbnail:
+                          case FeedItemImageStyle.smallThumbnail:
                             tile = HeadlineTileImageStart(
                               headline: item,
                               onHeadlineTap: () => onHeadlineTap(item),
                             );
-                          case HeadlineImageStyle.largeThumbnail:
+                          case FeedItemImageStyle.largeThumbnail:
                             tile = HeadlineTileImageTop(
                               headline: item,
                               onHeadlineTap: () => onHeadlineTap(item),
@@ -353,7 +353,8 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                             .read<AppBloc>()
                             .state
                             .remoteConfig
-                            ?.adConfig;
+                            ?.features
+                            .ads;
 
                         // Ensure adConfig is not null before building the AdLoaderWidget.
                         if (adConfig == null) {

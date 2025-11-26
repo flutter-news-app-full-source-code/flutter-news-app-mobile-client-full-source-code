@@ -30,13 +30,13 @@ abstract class AdProvider {
   /// The [adPlatformIdentifiers] provides the platform-specific ad unit IDs.
   /// The [adId] is the specific identifier for the ad slot (e.g., native ad unit ID).
   /// The [adThemeStyle] provides UI-agnostic theme properties for ad styling.
-  /// The [headlineImageStyle] provides the user's preference for feed layout,
+  /// The [feedItemImageStyle] provides the user's preference for feed layout,
   /// which can be used to request an appropriately sized ad.
   Future<NativeAd?> loadNativeAd({
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
     required AdThemeStyle adThemeStyle,
-    HeadlineImageStyle? headlineImageStyle,
+    FeedItemImageStyle? feedItemImageStyle,
   });
 
   /// Loads an inline banner ad.
@@ -48,13 +48,13 @@ abstract class AdProvider {
   /// The [adPlatformIdentifiers] provides the platform-specific ad unit IDs.
   /// The [adId] is the specific identifier for the ad slot (e.g., banner ad unit ID).
   /// The [adThemeStyle] provides UI-agnostic theme properties for ad styling.
-  /// The [headlineImageStyle] provides the user's preference for feed layout,
+  /// The [feedItemImageStyle] provides the user's preference for feed layout,
   /// which can be used to request an appropriately sized ad.
   Future<BannerAd?> loadBannerAd({
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
     required AdThemeStyle adThemeStyle,
-    HeadlineImageStyle? headlineImageStyle,
+    FeedItemImageStyle? feedItemImageStyle,
   });
 
   /// Loads a full-screen interstitial ad.

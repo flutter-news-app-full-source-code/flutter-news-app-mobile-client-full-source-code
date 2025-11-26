@@ -48,7 +48,7 @@ class AppInitializationPage extends StatelessWidget {
     required this.countriesRepository,
     required this.sourcesRepository,
     required this.remoteConfigRepository,
-    required this.userAppSettingsRepository,
+    required this.appSettingsRepository,
     required this.userContentPreferencesRepository,
     required this.environment,
     required this.adService,
@@ -68,7 +68,7 @@ class AppInitializationPage extends StatelessWidget {
   final DataRepository<Source> sourcesRepository;
   final DataRepository<User> userRepository;
   final DataRepository<RemoteConfig> remoteConfigRepository;
-  final DataRepository<UserAppSettings> userAppSettingsRepository;
+  final DataRepository<AppSettings> appSettingsRepository;
   final DataRepository<UserContentPreferences> userContentPreferencesRepository;
   final AppEnvironment environment;
   final AdService adService;
@@ -109,7 +109,7 @@ class AppInitializationPage extends StatelessWidget {
                 countriesRepository: countriesRepository,
                 sourcesRepository: sourcesRepository,
                 remoteConfigRepository: remoteConfigRepository,
-                userAppSettingsRepository: userAppSettingsRepository,
+                appSettingsRepository: appSettingsRepository,
                 userContentPreferencesRepository:
                     userContentPreferencesRepository,
                 environment: environment,
@@ -150,25 +150,25 @@ class AppInitializationPage extends StatelessWidget {
                   AppLifeCycleStatus.underMaintenance =>
                     const MaintenancePage(),
                   AppLifeCycleStatus.updateRequired => UpdateRequiredPage(
-                    currentAppVersion: failureData.currentAppVersion,
-                    latestRequiredVersion: failureData.latestAppVersion,
-                  ),
+                      currentAppVersion: failureData.currentAppVersion,
+                      latestRequiredVersion: failureData.latestAppVersion,
+                    ),
                   AppLifeCycleStatus.criticalError => CriticalErrorPage(
-                    exception: failureData.error,
-                    onRetry: () {
-                      // For a critical error, we trigger a full app restart
-                      // to ensure a clean state.
-                      AppHotRestartWrapper.restartApp(context);
-                    },
-                  ),
+                      exception: failureData.error,
+                      onRetry: () {
+                        // For a critical error, we trigger a full app restart
+                        // to ensure a clean state.
+                        AppHotRestartWrapper.restartApp(context);
+                      },
+                    ),
                   // The other AppLifeCycleStatus values are not possible failure
                   // states from the initializer, so we default to a critical
                   // error page as a safe fallback.
                   // ignore: no_default_cases
                   _ => CriticalErrorPage(
-                    exception: failureData.error,
-                    onRetry: () => AppHotRestartWrapper.restartApp(context),
-                  ),
+                      exception: failureData.error,
+                      onRetry: () => AppHotRestartWrapper.restartApp(context),
+                    ),
                 },
               );
 

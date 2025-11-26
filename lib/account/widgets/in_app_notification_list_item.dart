@@ -6,7 +6,7 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@template in_app_notification_list_item}
 /// A widget that displays a single in-app notification in a list.
 ///
-/// It shows the notification's title, body, and the time it was received.
+/// It shows the notification's title and the time it was received.
 /// Unread notifications are visually distinguished with a leading dot and
 /// a bolder title.
 /// {@endtemplate}
@@ -50,23 +50,11 @@ class InAppNotificationListItem extends StatelessWidget {
           fontWeight: isUnread ? FontWeight.bold : FontWeight.normal,
         ),
       ),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            notification.payload.body,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            timeago.format(notification.createdAt),
-            style: textTheme.bodySmall,
-          ),
-        ],
+      subtitle: Text(
+        timeago.format(notification.createdAt),
+        style: textTheme.bodySmall,
       ),
       onTap: onTap,
-      isThreeLine: true,
     );
   }
 }

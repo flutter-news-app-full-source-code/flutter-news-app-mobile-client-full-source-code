@@ -25,7 +25,7 @@ import 'package:pub_semver/pub_semver.dart';
 /// 1. Fetch `RemoteConfig`.
 /// 2. Check for blocking states (maintenance, forced update).
 /// 3. Fetch the initial `User`.
-/// 4. If a user exists, fetch their `UserAppSettings` and
+/// 4. If a user exists, fetch their `AppSettings` and
 ///    `UserContentPreferences` in parallel.
 /// 5. Handle demo-specific data initialization.
 /// 6. Return a single, immutable `InitializationResult` (either `Success` or
@@ -40,27 +40,27 @@ class AppInitializer {
   /// Requires all repositories and services needed for the startup sequence.
   AppInitializer({
     required AuthRepository authenticationRepository,
-    required DataRepository<UserAppSettings> userAppSettingsRepository,
+    required DataRepository<AppSettings> appSettingsRepository,
     required DataRepository<UserContentPreferences>
-    userContentPreferencesRepository,
+        userContentPreferencesRepository,
     required DataRepository<RemoteConfig> remoteConfigRepository,
     required local_config.AppEnvironment environment,
     required PackageInfoService packageInfoService,
     required Logger logger,
     this.demoDataMigrationService,
     this.demoDataInitializerService,
-  }) : _authenticationRepository = authenticationRepository,
-       _userAppSettingsRepository = userAppSettingsRepository,
-       _userContentPreferencesRepository = userContentPreferencesRepository,
-       _remoteConfigRepository = remoteConfigRepository,
-       _environment = environment,
-       _packageInfoService = packageInfoService,
-       _logger = logger;
+  })  : _authenticationRepository = authenticationRepository,
+        _appSettingsRepository = appSettingsRepository,
+        _userContentPreferencesRepository = userContentPreferencesRepository,
+        _remoteConfigRepository = remoteConfigRepository,
+        _environment = environment,
+        _packageInfoService = packageInfoService,
+        _logger = logger;
 
   final AuthRepository _authenticationRepository;
-  final DataRepository<UserAppSettings> _userAppSettingsRepository;
+  final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
-  _userContentPreferencesRepository;
+      _userContentPreferencesRepository;
   final DataRepository<RemoteConfig> _remoteConfigRepository;
   final local_config.AppEnvironment _environment;
   final PackageInfoService _packageInfoService;
@@ -102,7 +102,7 @@ class AppInitializer {
 
     // --- Gate 2: Check for Maintenance Mode ---
     // If maintenance mode is enabled, halt the entire startup process.
-    if (remoteConfig.appStatus.isUnderMaintenance) {
+    if (remoteConfig.app.maintenance.isUnderMaintenance) {
       _logger.warning('[AppInitializer] App is under maintenance. Halting.');
       return const InitializationFailure(
         status: AppLifeCycleStatus.underMaintenance,
@@ -111,7 +111,7 @@ class AppInitializer {
 
     // --- Gate 3: Check for Forced Update ---
     // If a forced update is required, halt the startup process.
-    if (remoteConfig.appStatus.isLatestVersionOnly) {
+    if (remoteConfig.app.update.isLatestVersionOnly) {
       _logger.fine('[AppInitializer] Version check required.');
       final currentVersionString = await _packageInfoService.getAppVersion();
       if (currentVersionString == null) {
@@ -123,7 +123,7 @@ class AppInitializer {
         try {
           final currentVersion = Version.parse(currentVersionString);
           final latestRequiredVersion = Version.parse(
-            remoteConfig.appStatus.latestAppVersion,
+            remoteConfig.app.update.latestAppVersion,
           );
           if (currentVersion < latestRequiredVersion) {
             _logger.warning(
@@ -133,7 +133,7 @@ class AppInitializer {
             return InitializationFailure(
               status: AppLifeCycleStatus.updateRequired,
               currentAppVersion: currentVersionString,
-              latestAppVersion: remoteConfig.appStatus.latestAppVersion,
+              latestAppVersion: remoteConfig.app.update.latestAppVersion,
             );
           }
           _logger.fine(
@@ -180,16 +180,16 @@ class AppInitializer {
     try {
       // Fetch settings and preferences concurrently for performance.
       var [
-        userAppSettings as UserAppSettings?,
+        appSettings as AppSettings?,
         userContentPreferences as UserContentPreferences?,
       ] = await Future.wait<dynamic>([
-        _userAppSettingsRepository.read(id: user.id, userId: user.id),
+        _appSettingsRepository.read(id: user.id, userId: user.id),
         _userContentPreferencesRepository.read(id: user.id, userId: user.id),
       ]);
 
       _logger.fine(
         '[AppInitializer] Parallel fetch complete. '
-        'Settings: ${userAppSettings != null}, '
+        'Settings: ${appSettings != null}, '
         'Preferences: ${userContentPreferences != null}',
       );
 
@@ -197,7 +197,7 @@ class AppInitializer {
       // If in demo mode and the user data is missing (e.g., first sign-in),
       // create it from fixtures.
       if (_environment == local_config.AppEnvironment.demo &&
-          (userAppSettings == null || userContentPreferences == null)) {
+          (appSettings == null || userContentPreferences == null)) {
         _logger.info(
           '[AppInitializer] Demo mode: User data missing. '
           'Initializing from fixtures for user ${user.id}.',
@@ -206,8 +206,8 @@ class AppInitializer {
 
         // Re-fetch the data after initialization.
         _logger.fine('[AppInitializer] Re-fetching data after demo init...');
-        [userAppSettings, userContentPreferences] = await Future.wait<dynamic>([
-          _userAppSettingsRepository.read(id: user.id, userId: user.id),
+        [appSettings, userContentPreferences] = await Future.wait<dynamic>([
+          _appSettingsRepository.read(id: user.id, userId: user.id),
           _userContentPreferencesRepository.read(id: user.id, userId: user.id),
         ]);
       }
@@ -218,7 +218,7 @@ class AppInitializer {
       return InitializationSuccess(
         remoteConfig: remoteConfig,
         user: user,
-        settings: userAppSettings,
+        settings: appSettings,
         userContentPreferences: userContentPreferences,
       );
     } on HttpException catch (e, s) {
@@ -250,7 +250,7 @@ class AppInitializer {
   ///     articles) from the old anonymous user ID to the new authenticated
   ///     user ID.
   /// 2.  **Re-fetching All User Data:** After any potential migration, it
-  ///     re-fetches all user-specific data (`UserAppSettings`,
+  ///     re-fetches all user-specific data (`AppSettings`,
   ///     `UserContentPreferences`) for the `newUser`. This is crucial to
   ///     ensure the app's state is fresh and not polluted with data from the
   ///     previous user.
@@ -267,8 +267,7 @@ class AppInitializer {
     );
 
     // --- Data Migration Logic ---
-    final isMigration =
-        oldUser != null &&
+    final isMigration = oldUser != null &&
         oldUser.appRole == AppUserRole.guestUser &&
         newUser.appRole == AppUserRole.standardUser;
 
@@ -325,10 +324,10 @@ class AppInitializer {
 
     try {
       final [
-        userAppSettings as UserAppSettings?,
+        appSettings as AppSettings?,
         userContentPreferences as UserContentPreferences?,
       ] = await Future.wait<dynamic>([
-        _userAppSettingsRepository.read(id: newUser.id, userId: newUser.id),
+        _appSettingsRepository.read(id: newUser.id, userId: newUser.id),
         _userContentPreferencesRepository.read(
           id: newUser.id,
           userId: newUser.id,
@@ -339,7 +338,7 @@ class AppInitializer {
       return InitializationSuccess(
         remoteConfig: remoteConfig,
         user: newUser,
-        settings: userAppSettings,
+        settings: appSettings,
         userContentPreferences: userContentPreferences,
       );
     } on HttpException catch (e, s) {

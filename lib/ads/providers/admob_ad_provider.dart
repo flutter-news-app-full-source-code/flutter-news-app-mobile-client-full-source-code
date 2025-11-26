@@ -50,7 +50,7 @@ class AdMobAdProvider implements AdProvider {
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
     required AdThemeStyle adThemeStyle,
-    HeadlineImageStyle? headlineImageStyle,
+    FeedItemImageStyle? feedItemImageStyle,
   }) async {
     _logger.info('AdMobAdProvider: loadNativeAd called for adId: $adId');
     if (adId == null || adId.isEmpty) {
@@ -65,7 +65,7 @@ class AdMobAdProvider implements AdProvider {
     );
 
     // Determine the template type based on the user's feed style preference.
-    final templateType = headlineImageStyle == HeadlineImageStyle.largeThumbnail
+    final templateType = feedItemImageStyle == FeedItemImageStyle.largeThumbnail
         ? NativeAdTemplateType.medium
         : NativeAdTemplateType.small;
 
@@ -149,7 +149,7 @@ class AdMobAdProvider implements AdProvider {
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
     required AdThemeStyle adThemeStyle,
-    HeadlineImageStyle? headlineImageStyle,
+    FeedItemImageStyle? feedItemImageStyle,
   }) async {
     _logger.info('AdMobAdProvider: loadBannerAd called for adId: $adId');
     if (adId == null || adId.isEmpty) {
@@ -164,7 +164,7 @@ class AdMobAdProvider implements AdProvider {
     );
 
     // Determine the ad size based on the user's feed style preference.
-    final adSize = headlineImageStyle == HeadlineImageStyle.largeThumbnail
+    final adSize = feedItemImageStyle == FeedItemImageStyle.largeThumbnail
         ? admob.AdSize.mediumRectangle
         : admob.AdSize.banner;
 

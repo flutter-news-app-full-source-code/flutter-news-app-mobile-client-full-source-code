@@ -38,7 +38,7 @@ final class InitializationSuccess extends InitializationResult {
 
   /// The user's specific application settings (theme, font, etc.).
   /// Null if the user is unauthenticated.
-  final UserAppSettings? settings;
+  final AppSettings? settings;
 
   /// The user's specific content preferences (followed items, saved articles).
   /// Null if the user is unauthenticated.

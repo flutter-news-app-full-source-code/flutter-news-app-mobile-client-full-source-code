@@ -37,8 +37,8 @@ class AppUserChanged extends AppEvent {
 ///
 /// This event is typically used when external changes might have occurred
 /// or when a manual refresh of settings is desired.
-class AppUserAppSettingsRefreshed extends AppEvent {
-  const AppUserAppSettingsRefreshed();
+class AppAppSettingsRefreshed extends AppEvent {
+  const AppAppSettingsRefreshed();
 }
 
 /// Dispatched to request a refresh of the user's content preferences.
@@ -51,13 +51,13 @@ class AppUserContentPreferencesRefreshed extends AppEvent {
 
 /// Dispatched when the user's application settings have been updated.
 ///
-/// This event carries the complete, updated [UserAppSettings] object,
+/// This event carries the complete, updated [AppSettings] object,
 /// allowing the [AppBloc] to update its state and persist the changes.
 class AppSettingsChanged extends AppEvent {
   const AppSettingsChanged(this.settings);
 
-  /// The updated [UserAppSettings] object.
-  final UserAppSettings settings;
+  /// The updated [AppSettings] object.
+  final AppSettings settings;
 
   @override
   List<Object?> get props => [settings];

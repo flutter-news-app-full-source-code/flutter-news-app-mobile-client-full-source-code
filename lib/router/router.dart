@@ -1,5 +1,5 @@
 import 'package:auth_repository/auth_repository.dart';
-import 'package:core/core.dart' hide AppStatus;
+import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -261,7 +261,7 @@ GoRouter createRouter({
                 create: (context) {
                   final settingsBloc = SettingsBloc(
                     userAppSettingsRepository: context
-                        .read<DataRepository<UserAppSettings>>(),
+                        .read<DataRepository<AppSettings>>(),
                     inlineAdCacheService: context.read<InlineAdCacheService>(),
                   );
                   if (userId != null) {

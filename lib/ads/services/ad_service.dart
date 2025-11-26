@@ -107,16 +107,15 @@ class AdService {
     required AdType adType,
     required AdThemeStyle adThemeStyle,
     required AppUserRole userRole,
-    HeadlineImageStyle? headlineImageStyle,
+    FeedItemImageStyle? feedItemImageStyle,
   }) async {
     _logger.info('AdService: getFeedAd called for adType: $adType');
     return _loadInlineAd(
       adConfig: adConfig,
       adType: adType,
       adThemeStyle: adThemeStyle,
-      feedAd: true,
-      headlineImageStyle: headlineImageStyle,
       userRole: userRole,
+      feedItemImageStyle: feedItemImageStyle,
     );
   }
 
@@ -143,13 +142,12 @@ class AdService {
       return null;
     }
 
-    // Check if interstitial ads are enabled for the current user role.
-    final interstitialConfig = adConfig.interstitialAdConfiguration;
+    final interstitialConfig = adConfig.navigationAdConfiguration;
     // Check if the interstitial ads are globally enabled AND if the current
     // user role has a defined configuration in the visibleTo map.
     final isInterstitialEnabledForRole =
         interstitialConfig.enabled &&
-        interstitialConfig.visibleTo.containsKey(userRole);
+            interstitialConfig.visibleTo.containsKey(userRole);
 
     if (!isInterstitialEnabledForRole) {
       _logger.info(
@@ -191,7 +189,7 @@ class AdService {
     }
 
     // Use the correct interstitial ad ID from AdPlatformIdentifiers
-    final adId = platformAdIdentifiers.feedToArticleInterstitialAdId;
+    final adId = platformAdIdentifiers.interstitialAdId;
 
     if (adId == null || adId.isEmpty) {
       _logger.warning(
@@ -227,36 +225,6 @@ class AdService {
     }
   }
 
-  /// Retrieves a loaded inline ad (native or banner) for an in-article placement.
-  ///
-  /// This method delegates ad loading to the appropriate [AdProvider] based on
-  /// the [adConfig]'s `primaryAdPlatform` and the `defaultInArticleAdType`
-  /// from the `articleAdConfiguration`.
-  ///
-  /// Returns an [InlineAd] if an ad is available, otherwise `null`.
-  ///
-  /// - [adConfig]: The remote configuration for ad display rules.
-  /// - [adThemeStyle]: UI-agnostic theme properties for ad styling.
-  /// - [userRole]: The current role of the user, used to determine ad visibility.
-  /// - [slotType]: The specific in-article ad slot type.
-  Future<InlineAd?> getInArticleAd({
-    required AdConfig adConfig,
-    required AdThemeStyle adThemeStyle,
-    required AppUserRole userRole,
-    required InArticleAdSlotType slotType,
-  }) async {
-    _logger.info('AdService: getInArticleAd called.');
-    return _loadInlineAd(
-      adConfig: adConfig,
-      adType: AdType.banner,
-      adThemeStyle: adThemeStyle,
-      feedAd: false,
-      bannerAdShape: adConfig.articleAdConfiguration.bannerAdShape,
-      userRole: userRole,
-      slotType: slotType,
-    );
-  }
-
   /// Private helper method to consolidate logic for loading inline ads (native/banner).
   ///
   /// This method handles the common steps of checking ad enablement, selecting
@@ -266,26 +234,20 @@ class AdService {
   /// - [adConfig]: The remote configuration for ad display rules.
   /// - [adType]: The specific type of inline ad to load ([AdType.native] or [AdType.banner]).
   /// - [adThemeStyle]: UI-agnostic theme properties for ad styling.
-  /// - [feedAd]: A boolean indicating if this is for a feed ad (true) or in-article ad (false).
-  /// - [headlineImageStyle]: The user's preference for feed layout,
+  /// - [feedItemImageStyle]: The user's preference for feed layout,
   ///   which can be used to request an appropriately sized ad.
-  /// - [bannerAdShape]: The preferred shape for banner ads, used for in-article banners.
   /// - [userRole]: The current role of the user, used to determine ad visibility.
-  /// - [slotType]: The specific in-article ad slot type, used for in-article ads.
   ///
   /// Returns an [InlineAd] if an ad is successfully loaded, otherwise `null`.
   Future<InlineAd?> _loadInlineAd({
     required AdConfig adConfig,
     required AdType adType,
     required AdThemeStyle adThemeStyle,
-    required bool feedAd,
     required AppUserRole userRole,
-    HeadlineImageStyle? headlineImageStyle,
-    BannerAdShape? bannerAdShape,
-    InArticleAdSlotType? slotType,
+    FeedItemImageStyle? feedItemImageStyle,
   }) async {
     _logger.info(
-      'AdService: _loadInlineAd called for adType: $adType, feedAd: $feedAd',
+      'AdService: _loadInlineAd called for adType: $adType',
     );
     // Check if ads are globally enabled.
     if (!adConfig.enabled) {
@@ -293,33 +255,14 @@ class AdService {
       return null;
     }
 
-    // Check if ads are enabled for the specific context and user role.
-    var isContextEnabled = false;
-    if (feedAd) {
-      final feedAdConfig = adConfig.feedAdConfiguration;
-      // Check if feed ads are globally enabled AND if the current user role
-      // has a defined configuration in the visibleTo map.
-      isContextEnabled =
-          feedAdConfig.enabled && feedAdConfig.visibleTo.containsKey(userRole);
-    } else {
-      // For in-article ads, check global article ad enablement and then
-      // specific slot enablement for the user role.
-      final articleAdConfig = adConfig.articleAdConfiguration;
-      final isArticleAdEnabledForRole = articleAdConfig.visibleTo.containsKey(
-        userRole,
-      );
-      final isSlotEnabledForRole =
-          articleAdConfig.visibleTo[userRole]?[slotType] ?? false;
-      isContextEnabled =
-          articleAdConfig.enabled &&
-          isArticleAdEnabledForRole &&
-          isSlotEnabledForRole;
-    }
+    final feedAdConfig = adConfig.feedAdConfiguration;
+    final isFeedAdEnabledForRole =
+        feedAdConfig.enabled && feedAdConfig.visibleTo.containsKey(userRole);
 
-    if (!isContextEnabled) {
+    if (!isFeedAdEnabledForRole) {
       _logger.info(
-        'AdService: Ads are disabled for current context (feedAd: $feedAd, '
-        'slotType: $slotType) and user role $userRole in RemoteConfig.',
+        'AdService: Feed ads are disabled for user role $userRole '
+        'or globally in RemoteConfig.',
       );
       return null;
     }
@@ -364,18 +307,13 @@ class AdService {
       return null;
     }
 
-    final adId = feedAd
-        ? (adType == AdType.native
-              ? platformAdIdentifiers.feedNativeAdId
-              : platformAdIdentifiers.feedBannerAdId)
-        : (adType == AdType.native
-              ? platformAdIdentifiers.inArticleNativeAdId
-              : platformAdIdentifiers.inArticleBannerAdId);
+    final adId = adType == AdType.native
+        ? platformAdIdentifiers.nativeAdId
+        : platformAdIdentifiers.bannerAdId;
 
     if (adId == null || adId.isEmpty) {
       _logger.warning(
-        'AdService: No ad ID configured for platform $primaryAdPlatform and ad type $adType '
-        'for ${feedAd ? 'feed' : 'in-article'} placement.',
+        'AdService: No ad ID configured for platform $primaryAdPlatform and ad type $adType.',
       );
       return null;
     }
@@ -383,21 +321,16 @@ class AdService {
     for (var attempt = 0; attempt <= _maxAdLoadRetries; attempt++) {
       if (attempt > 0) {
         _logger.info(
-          'AdService: Retrying $adType ad load (attempt $attempt) for ID: $adId '
-          'after $_adLoadRetryDelay delay.',
+          'AdService: Retrying $adType ad load (attempt $attempt) for ID: $adId after $_adLoadRetryDelay delay.',
         );
         await Future<void>.delayed(_adLoadRetryDelay);
       }
 
       try {
         _logger.info(
-          'AdService: Requesting $adType ad from $primaryAdPlatform AdProvider with ID: $adId '
-          'for ${feedAd ? 'feed' : 'in-article'} placement.',
+          'AdService: Requesting $adType ad from $primaryAdPlatform AdProvider with ID: $adId.',
         );
         InlineAd? loadedAd;
-        // For in-article banner ads, bannerAdShape dictates the visual style.
-        // For feed ads, headlineImageStyle is still relevant.
-        final effectiveHeadlineImageStyle = feedAd ? headlineImageStyle : null;
 
         switch (adType) {
           case AdType.native:
@@ -405,14 +338,14 @@ class AdService {
               adPlatformIdentifiers: platformAdIdentifiers,
               adId: adId,
               adThemeStyle: adThemeStyle,
-              headlineImageStyle: effectiveHeadlineImageStyle,
+              feedItemImageStyle: feedItemImageStyle,
             );
           case AdType.banner:
             loadedAd = await adProvider.loadBannerAd(
               adPlatformIdentifiers: platformAdIdentifiers,
               adId: adId,
               adThemeStyle: adThemeStyle,
-              headlineImageStyle: effectiveHeadlineImageStyle,
+              feedItemImageStyle: feedItemImageStyle,
             );
           case AdType.interstitial:
           case AdType.video:
@@ -458,7 +391,7 @@ class AdService {
   /// [feedItems]: The list of feed items (headlines, other decorators)
   ///   to inject ad placeholders into.
   /// [user]: The current authenticated user, used to determine ad configuration.
-  /// [adConfig]: The remote configuration for ad display rules.
+  /// [remoteConfig]: The remote configuration for ad display rules.
   /// [imageStyle]: The desired image style for the ad, used to determine
   ///   the placeholder's template type.
   /// [adThemeStyle]: The current theme style for ads, passed through to the
@@ -469,24 +402,24 @@ class AdService {
   ///   across pagination.
   ///
   /// Returns a new list of [FeedItem] objects, interspersed with ad placeholders.
-  Future<List<FeedItem>> injectAdPlaceholders({
+  Future<List<FeedItem>> injectFeedAdPlaceholders({
     required List<FeedItem> feedItems,
     required User? user,
-    required AdConfig adConfig,
-    required HeadlineImageStyle imageStyle,
+    required RemoteConfig remoteConfig,
+    required FeedItemImageStyle imageStyle,
     required AdThemeStyle adThemeStyle,
     int processedContentItemCount = 0,
   }) async {
     // If feed ads are not enabled in the remote config, return the original list.
-    if (!adConfig.feedAdConfiguration.enabled) {
+    if (!remoteConfig.features.ads.feedAdConfiguration.enabled) {
       return feedItems;
     }
 
     final userRole = user?.appRole ?? AppUserRole.guestUser;
 
     // Determine ad frequency rules based on user role.
-    final feedAdFrequencyConfig =
-        adConfig.feedAdConfiguration.visibleTo[userRole];
+    final feedAdFrequencyConfig = remoteConfig
+        .features.ads.feedAdConfiguration.visibleTo[userRole];
 
     // Default to 0 for adFrequency and adPlacementInterval if no config is found
     // for the user role, effectively disabling ads for that role.
@@ -505,9 +438,9 @@ class AdService {
     var currentContentItemCount = processedContentItemCount;
 
     // Get the primary ad platform and its identifiers
-    final primaryAdPlatform = adConfig.primaryAdPlatform;
+    final primaryAdPlatform = remoteConfig.features.ads.primaryAdPlatform;
     final platformAdIdentifiers =
-        adConfig.platformAdIdentifiers[primaryAdPlatform];
+        remoteConfig.features.ads.platformAdIdentifiers[primaryAdPlatform];
     if (platformAdIdentifiers == null) {
       _logger.warning(
         'No AdPlatformIdentifiers found for primary platform: $primaryAdPlatform. '
@@ -517,7 +450,7 @@ class AdService {
     }
 
     // Get the ad type for feed ads (native or banner)
-    final feedAdType = adConfig.feedAdConfiguration.adType;
+    final feedAdType = remoteConfig.features.ads.feedAdConfiguration.adType;
 
     for (final item in feedItems) {
       result.add(item);
@@ -541,9 +474,9 @@ class AdService {
         // Determine the specific ad ID based on the feed ad type.
         switch (feedAdType) {
           case AdType.native:
-            adIdentifier = platformAdIdentifiers.feedNativeAdId;
+            adIdentifier = platformAdIdentifiers.nativeAdId;
           case AdType.banner:
-            adIdentifier = platformAdIdentifiers.feedBannerAdId;
+            adIdentifier = platformAdIdentifiers.bannerAdId;
           case AdType.interstitial:
           case AdType.video:
             // Interstitial and video ads are not injected into the feed.

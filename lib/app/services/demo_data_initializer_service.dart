@@ -4,7 +4,7 @@ import 'package:logging/logging.dart';
 
 /// {@template demo_data_initializer_service}
 /// A service responsible for ensuring that essential user-specific data
-/// (like [UserAppSettings] and [UserContentPreferences]) exists for a new user
+/// (like [AppSettings] and [UserContentPreferences]) exists for a new user
 /// in the demo environment.
 ///
 /// Instead of creating default empty objects, this service now acts as a
@@ -19,28 +19,28 @@ import 'package:logging/logging.dart';
 class DemoDataInitializerService {
   /// {@macro demo_data_initializer_service}
   DemoDataInitializerService({
-    required DataRepository<UserAppSettings> userAppSettingsRepository,
+    required DataRepository<AppSettings> appSettingsRepository,
     required DataRepository<UserContentPreferences>
-    userContentPreferencesRepository,
+        userContentPreferencesRepository,
     required DataRepository<InAppNotification> inAppNotificationRepository,
-    required this.userAppSettingsFixturesData,
+    required this.appSettingsFixturesData,
     required this.userContentPreferencesFixturesData,
     required this.inAppNotificationsFixturesData,
-  }) : _userAppSettingsRepository = userAppSettingsRepository,
-       _userContentPreferencesRepository = userContentPreferencesRepository,
-       _inAppNotificationRepository = inAppNotificationRepository,
-       _logger = Logger('DemoDataInitializerService');
+  })  : _appSettingsRepository = appSettingsRepository,
+        _userContentPreferencesRepository = userContentPreferencesRepository,
+        _inAppNotificationRepository = inAppNotificationRepository,
+        _logger = Logger('DemoDataInitializerService');
 
-  final DataRepository<UserAppSettings> _userAppSettingsRepository;
+  final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
-  _userContentPreferencesRepository;
+      _userContentPreferencesRepository;
   final DataRepository<InAppNotification> _inAppNotificationRepository;
   final Logger _logger;
 
-  /// A list of [UserAppSettings] fixture data to be used as a template.
+  /// A list of [AppSettings] fixture data to be used as a template.
   ///
   /// The first item in this list will be cloned for new users.
-  final List<UserAppSettings> userAppSettingsFixturesData;
+  final List<AppSettings> appSettingsFixturesData;
 
   /// A list of [UserContentPreferences] fixture data to be used as a template.
   ///
@@ -55,7 +55,7 @@ class DemoDataInitializerService {
   /// Initializes essential user-specific data in the in-memory clients
   /// for the given [user].
   ///
-  /// This method checks if [UserAppSettings] and [UserContentPreferences]
+  /// This method checks if [AppSettings] and [UserContentPreferences]
   /// exist for the provided user ID. If any are missing, it creates them
   /// with default values.
   ///
@@ -66,7 +66,7 @@ class DemoDataInitializerService {
     _logger.info('Initializing user-specific data for user ID: ${user.id}');
 
     await Future.wait([
-      _ensureUserAppSettingsExist(user.id),
+      _ensureAppSettingsExist(user.id),
       _ensureUserContentPreferencesExist(user.id),
       _ensureInAppNotificationsExist(user.id),
     ]);
@@ -76,39 +76,39 @@ class DemoDataInitializerService {
     );
   }
 
-  /// Ensures that [UserAppSettings] exist for the given [userId].
+  /// Ensures that [AppSettings] exist for the given [userId].
   /// If not found, creates default settings.
-  Future<void> _ensureUserAppSettingsExist(String userId) async {
+  Future<void> _ensureAppSettingsExist(String userId) async {
     try {
-      await _userAppSettingsRepository.read(id: userId, userId: userId);
-      _logger.info('UserAppSettings found for user ID: $userId.');
+      await _appSettingsRepository.read(id: userId, userId: userId);
+      _logger.info('AppSettings found for user ID: $userId.');
     } on NotFoundException {
       _logger.info(
-        'UserAppSettings not found for user ID: '
+        'AppSettings not found for user ID: '
         '$userId. Creating settings from fixture.',
       );
       // Clone the first item from the fixture data, assigning the new user's ID.
       // This ensures every new demo user gets a rich, pre-populated set of settings.
-      if (userAppSettingsFixturesData.isEmpty) {
+      if (appSettingsFixturesData.isEmpty) {
         throw StateError(
-          'Cannot create settings from fixture: userAppSettingsFixturesData is empty.',
+          'Cannot create settings from fixture: appSettingsFixturesData is empty.',
         );
       }
-      final fixtureSettings = userAppSettingsFixturesData.first.copyWith(
+      final fixtureSettings = appSettingsFixturesData.first.copyWith(
         id: userId,
       );
 
-      await _userAppSettingsRepository.create(
+      await _appSettingsRepository.create(
         item: fixtureSettings,
         userId: userId,
       );
       _logger.info(
-        'UserAppSettings from fixture created for '
+        'AppSettings from fixture created for '
         'user ID: $userId.',
       );
     } catch (e, s) {
       _logger.severe(
-        'Error ensuring UserAppSettings exist '
+        'Error ensuring AppSettings exist '
         'for user ID: $userId: $e',
         e,
         s,
@@ -135,8 +135,8 @@ class DemoDataInitializerService {
           'Cannot create preferences from fixture: userContentPreferencesFixturesData is empty.',
         );
       }
-      final fixturePreferences = userContentPreferencesFixturesData.first
-          .copyWith(id: userId);
+      final fixturePreferences =
+          userContentPreferencesFixturesData.first.copyWith(id: userId);
 
       await _userContentPreferencesRepository.create(
         item: fixturePreferences,
@@ -185,13 +185,11 @@ class DemoDataInitializerService {
       }
 
       // Exclude the first notification, which will be used for the simulated push.
-      final notificationsToCreate = inAppNotificationsFixturesData
-          .skip(1)
-          .toList();
+      final notificationsToCreate =
+          inAppNotificationsFixturesData.skip(1).toList();
 
-      final userNotifications = notificationsToCreate
-          .map((n) => n.copyWith(userId: userId))
-          .toList();
+      final userNotifications =
+          notificationsToCreate.map((n) => n.copyWith(userId: userId)).toList();
 
       await Future.wait(
         userNotifications.map(

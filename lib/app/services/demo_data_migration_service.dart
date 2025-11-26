@@ -13,16 +13,16 @@ import 'package:logging/logging.dart';
 class DemoDataMigrationService {
   /// {@macro demo_data_migration_service}
   DemoDataMigrationService({
-    required DataRepository<UserAppSettings> userAppSettingsRepository,
+    required DataRepository<AppSettings> appSettingsRepository,
     required DataRepository<UserContentPreferences>
-    userContentPreferencesRepository,
-  }) : _userAppSettingsRepository = userAppSettingsRepository,
-       _userContentPreferencesRepository = userContentPreferencesRepository,
-       _logger = Logger('DemoDataMigrationService');
+        userContentPreferencesRepository,
+  })  : _appSettingsRepository = appSettingsRepository,
+        _userContentPreferencesRepository = userContentPreferencesRepository,
+        _logger = Logger('DemoDataMigrationService');
 
-  final DataRepository<UserAppSettings> _userAppSettingsRepository;
+  final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
-  _userContentPreferencesRepository;
+      _userContentPreferencesRepository;
   final Logger _logger;
 
   /// Migrates user settings and content preferences from an old anonymous
@@ -39,9 +39,9 @@ class DemoDataMigrationService {
       'anonymous user ID: $oldUserId to authenticated user ID: $newUserId',
     );
 
-    // Migrate UserAppSettings
+    // Migrate AppSettings
     try {
-      final oldSettings = await _userAppSettingsRepository.read(
+      final oldSettings = await _appSettingsRepository.read(
         id: oldUserId,
         userId: oldUserId,
       );
@@ -49,7 +49,7 @@ class DemoDataMigrationService {
 
       try {
         // Attempt to update first (if a default entry already exists)
-        await _userAppSettingsRepository.update(
+        await _appSettingsRepository.update(
           id: newUserId,
           item: newSettings,
           userId: newUserId,
@@ -57,14 +57,14 @@ class DemoDataMigrationService {
       } on NotFoundException {
         // If update fails because item not found, try to create
         try {
-          await _userAppSettingsRepository.create(
+          await _appSettingsRepository.create(
             item: newSettings,
             userId: newUserId,
           );
         } on ConflictException {
           // If create fails due to conflict (item was created concurrently),
           // re-attempt update. This handles a race condition.
-          await _userAppSettingsRepository.update(
+          await _appSettingsRepository.update(
             id: newUserId,
             item: newSettings,
             userId: newUserId,
@@ -72,19 +72,19 @@ class DemoDataMigrationService {
         }
       }
 
-      await _userAppSettingsRepository.delete(id: oldUserId, userId: oldUserId);
+      await _appSettingsRepository.delete(id: oldUserId, userId: oldUserId);
       _logger.info(
-        '[DemoDataMigrationService] UserAppSettings migrated successfully '
+        '[DemoDataMigrationService] AppSettings migrated successfully '
         'from $oldUserId to $newUserId.',
       );
     } on NotFoundException {
       _logger.info(
-        '[DemoDataMigrationService] No UserAppSettings found for old user ID: '
+        '[DemoDataMigrationService] No AppSettings found for old user ID: '
         '$oldUserId. Skipping migration for settings.',
       );
     } catch (e, s) {
       _logger.severe(
-        '[DemoDataMigrationService] Error migrating UserAppSettings from '
+        '[DemoDataMigrationService] Error migrating AppSettings from '
         '$oldUserId to $newUserId: $e',
         e,
         s,

@@ -51,7 +51,7 @@ class InterstitialAdManager {
   int _transitionCount = 0;
 
   /// The current remote configuration for ads.
-  AdConfig? _adConfig;
+  RemoteConfig? _remoteConfig;
 
   /// The current user role.
   AppUserRole? _userRole;
@@ -64,14 +64,14 @@ class InterstitialAdManager {
 
   /// Handles changes in the [AppState].
   void _onAppStateChanged(AppState state) {
-    final newAdConfig = state.remoteConfig?.adConfig;
+    final newRemoteConfig = state.remoteConfig;
     final newUserRole = state.user?.appRole;
 
     // If the ad config or user role has changed, update internal state
     // and potentially pre-load a new ad.
-    if (newAdConfig != _adConfig || newUserRole != _userRole) {
+    if (newRemoteConfig != _remoteConfig || newUserRole != _userRole) {
       _logger.info('Ad config or user role changed. Updating internal state.');
-      _adConfig = newAdConfig;
+      _remoteConfig = newRemoteConfig;
       _userRole = newUserRole;
       // A config change might mean we need to load an ad now.
       _maybePreloadAd(state);
@@ -88,10 +88,10 @@ class InterstitialAdManager {
       return;
     }
 
-    final adConfig = _adConfig;
-    if (adConfig == null ||
-        !adConfig.enabled ||
-        !adConfig.interstitialAdConfiguration.enabled) {
+    final remoteConfig = _remoteConfig;
+    if (remoteConfig == null ||
+        !remoteConfig.features.ads.enabled ||
+        !remoteConfig.features.ads.navigationAdConfiguration.enabled) {
       _logger.info('Interstitial ads are disabled. Skipping pre-load.');
       return;
     }
@@ -125,7 +125,7 @@ class InterstitialAdManager {
       final adThemeStyle = AdThemeStyle.fromTheme(themeData);
 
       final ad = await _adService.getInterstitialAd(
-        adConfig: adConfig,
+        adConfig: remoteConfig.features.ads,
         adThemeStyle: adThemeStyle,
         userRole: _userRole ?? AppUserRole.guestUser,
       );
@@ -162,19 +162,22 @@ class InterstitialAdManager {
     _transitionCount++;
     _logger.info('Potential ad trigger. Transition count: $_transitionCount');
 
-    final adConfig = _adConfig;
-    if (adConfig == null) {
+    final remoteConfig = _remoteConfig;
+    if (remoteConfig == null) {
       _logger.warning('No ad config available. Cannot determine ad frequency.');
       return;
     }
 
-    final frequencyConfig =
-        adConfig.interstitialAdConfiguration.visibleTo[_userRole];
+    final frequencyConfig = remoteConfig
+        .features
+        .ads
+        .navigationAdConfiguration
+        .visibleTo[_userRole];
 
     // If no frequency config is found for the user role, or if it's explicitly
     // disabled (transitionsBeforeShowingInterstitialAds == 0), then no ad should be shown.
     final requiredTransitions =
-        frequencyConfig?.transitionsBeforeShowingInterstitialAds ?? 0;
+        frequencyConfig?.internalNavigationsBeforeShowingInterstitialAd ?? 0;
 
     if (requiredTransitions > 0 && _transitionCount >= requiredTransitions) {
       _logger.info('Transition count meets threshold. Attempting to show ad.');

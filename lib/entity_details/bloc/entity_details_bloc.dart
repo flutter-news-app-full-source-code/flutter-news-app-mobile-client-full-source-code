@@ -128,8 +128,8 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       final processedFeedItems = await _adService.injectAdPlaceholders(
         feedItems: headlineResponse.items,
         user: currentUser,
-        adConfig: remoteConfig.adConfig,
-        imageStyle: _appBloc.state.headlineImageStyle,
+        adConfig: remoteConfig.features.ads,
+        imageStyle: _appBloc.state.feedItemImageStyle,
         adThemeStyle: event.adThemeStyle,
       );
 
@@ -301,8 +301,8 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       final newProcessedFeedItems = await _adService.injectAdPlaceholders(
         feedItems: headlineResponse.items,
         user: currentUser,
-        adConfig: remoteConfig.adConfig,
-        imageStyle: _appBloc.state.headlineImageStyle,
+        adConfig: remoteConfig.features.ads,
+        imageStyle: _appBloc.state.feedItemImageStyle,
         // Use the AdThemeStyle passed directly from the UI via the event.
         // This ensures that ads are styled consistently with the current,
         // fully-resolved theme of the widget, preventing visual discrepancies.

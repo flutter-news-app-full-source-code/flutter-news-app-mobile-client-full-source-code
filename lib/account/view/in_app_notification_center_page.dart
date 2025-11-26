@@ -295,10 +295,10 @@ class _NotificationListState extends State<_NotificationList> {
             );
 
             final payload = notification.payload;
-            final contentType = payload.data['contentType'] as String?;
-            final id = payload.data['headlineId'] as String?;
+            final contentType = payload.contentType;
+            final contentId = payload.contentId;
 
-            if (contentType == 'headline' && id != null) {
+            if (contentType == ContentType.headline && contentId.isNotEmpty) {
               await context
                   .read<InterstitialAdManager>()
                   .onPotentialAdTrigger();
@@ -307,7 +307,7 @@ class _NotificationListState extends State<_NotificationList> {
 
               await context.pushNamed(
                 Routes.globalArticleDetailsName,
-                pathParameters: {'id': id},
+                pathParameters: {'id': contentId},
               );
             }
           },

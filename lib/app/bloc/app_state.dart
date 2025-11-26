@@ -31,7 +31,7 @@ class AppState extends Equatable {
 
   /// The user's application settings, including display preferences and language.
   /// This is null until successfully fetched from the backend.
-  final UserAppSettings? settings;
+  final AppSettings? settings;
 
   /// The remote configuration fetched from the backend.
   /// Contains global settings like maintenance mode, update requirements, and ad configurations.
@@ -103,11 +103,11 @@ class AppState extends Equatable {
     return settings?.displaySettings.fontWeight ?? AppFontWeight.regular;
   }
 
-  /// The current headline image style, derived from [settings].
-  /// Defaults to [HeadlineImageStyle.smallThumbnail] if [settings] are not yet loaded.
-  HeadlineImageStyle get headlineImageStyle {
-    return settings?.feedPreferences.headlineImageStyle ??
-        HeadlineImageStyle.smallThumbnail;
+  /// The current feed item image style, derived from [settings].
+  /// Defaults to [FeedItemImageStyle.smallThumbnail] if [settings] are not yet loaded.
+  FeedItemImageStyle get feedItemImageStyle {
+    return settings?.feedSettings.feedItemImageStyle ??
+        FeedItemImageStyle.smallThumbnail;
   }
 
   /// The currently selected locale for localization, derived from [settings].
@@ -118,24 +118,24 @@ class AppState extends Equatable {
 
   @override
   List<Object?> get props => [
-    status,
-    user,
-    settings,
-    remoteConfig,
-    error,
-    userContentPreferences,
-    selectedBottomNavigationIndex,
-    currentAppVersion,
-    latestAppVersion,
-    hasUnreadInAppNotifications,
-  ];
+        status,
+        user,
+        settings,
+        remoteConfig,
+        error,
+        userContentPreferences,
+        selectedBottomNavigationIndex,
+        currentAppVersion,
+        latestAppVersion,
+        hasUnreadInAppNotifications,
+      ];
 
   /// Creates a copy of this [AppState] with the given fields replaced with
   /// the new values.
   AppState copyWith({
     AppLifeCycleStatus? status,
     User? user,
-    UserAppSettings? settings,
+    AppSettings? settings,
     RemoteConfig? remoteConfig,
     HttpException? error,
     bool clearError = false,

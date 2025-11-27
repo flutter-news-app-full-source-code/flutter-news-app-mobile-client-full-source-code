@@ -16,6 +16,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_tap_handler.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/router.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
@@ -50,7 +51,7 @@ class App extends StatelessWidget {
     required DataRepository<RemoteConfig> remoteConfigRepository,
     required DataRepository<AppSettings> appSettingsRepository,
     required DataRepository<UserContentPreferences>
-        userContentPreferencesRepository,
+    userContentPreferencesRepository,
     required AppEnvironment environment,
     required DataRepository<InAppNotification> inAppNotificationRepository,
     required InlineAdCacheService inlineAdCacheService,
@@ -60,23 +61,23 @@ class App extends StatelessWidget {
     required GlobalKey<NavigatorState> navigatorKey,
     required PushNotificationService pushNotificationService,
     super.key,
-  })  : _authenticationRepository = authenticationRepository,
-        _headlinesRepository = headlinesRepository,
-        _topicsRepository = topicsRepository,
-        _countriesRepository = countriesRepository,
-        _sourcesRepository = sourcesRepository,
-        _userRepository = userRepository,
-        _remoteConfigRepository = remoteConfigRepository,
-        _appSettingsRepository = appSettingsRepository,
-        _userContentPreferencesRepository = userContentPreferencesRepository,
-        _pushNotificationService = pushNotificationService,
-        _inAppNotificationRepository = inAppNotificationRepository,
-        _environment = environment,
-        _adService = adService,
-        _feedDecoratorService = feedDecoratorService,
-        _feedCacheService = feedCacheService,
-        _navigatorKey = navigatorKey,
-        _inlineAdCacheService = inlineAdCacheService;
+  }) : _authenticationRepository = authenticationRepository,
+       _headlinesRepository = headlinesRepository,
+       _topicsRepository = topicsRepository,
+       _countriesRepository = countriesRepository,
+       _sourcesRepository = sourcesRepository,
+       _userRepository = userRepository,
+       _remoteConfigRepository = remoteConfigRepository,
+       _appSettingsRepository = appSettingsRepository,
+       _userContentPreferencesRepository = userContentPreferencesRepository,
+       _pushNotificationService = pushNotificationService,
+       _inAppNotificationRepository = inAppNotificationRepository,
+       _environment = environment,
+       _adService = adService,
+       _feedDecoratorService = feedDecoratorService,
+       _feedCacheService = feedCacheService,
+       _navigatorKey = navigatorKey,
+       _inlineAdCacheService = inlineAdCacheService;
 
   /// The initial user, pre-fetched during startup.
   final User? user;
@@ -99,7 +100,7 @@ class App extends StatelessWidget {
   final DataRepository<RemoteConfig> _remoteConfigRepository;
   final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
-      _userContentPreferencesRepository;
+  _userContentPreferencesRepository;
   final AppEnvironment _environment;
   final DataRepository<InAppNotification> _inAppNotificationRepository;
   final AdService _adService;
@@ -202,8 +203,8 @@ class _AppViewState extends State<_AppView> {
     // This stream is the single source of truth for the user's auth state
     // and drives the entire app lifecycle by dispatching AppUserChanged events.
     _userSubscription = context.read<AuthRepository>().authStateChanges.listen(
-          (user) => context.read<AppBloc>().add(AppUserChanged(user)),
-        );
+      (user) => context.read<AppBloc>().add(AppUserChanged(user)),
+    );
 
     // Subscribe to foreground push notifications. When a message is received,
     // dispatch an event to the AppBloc to update the UI state (e.g., show an
@@ -214,29 +215,23 @@ class _AppViewState extends State<_AppView> {
 
     // Subscribe to notifications that are tapped and open the app.
     // This is the core of the deep-linking functionality.
-    _onMessageOpenedAppSubscription =
-        pushNotificationService.onMessageOpenedApp.listen((payload) {
-      _routerLogger.fine(
-        'Notification opened app with payload: $payload',
-      );
-      final contentType = payload.contentType;
-      final contentId = payload.contentId;
-      final notificationId = payload.notificationId;
+    _onMessageOpenedAppSubscription = pushNotificationService.onMessageOpenedApp
+        .listen((payload) async {
+          _routerLogger.fine('Notification opened app with payload: $payload');
+          final contentType = payload.contentType;
+          final contentId = payload.contentId;
 
-      if (contentType == ContentType.headline && contentId.isNotEmpty) {
-        // Use pushNamed instead of goNamed.
-        // goNamed replaces the entire navigation stack, which causes issues
-        // when the app is launched from a terminated state. The new page
-        // would lack the necessary ancestor widgets (like RepositoryProviders).
-        // pushNamed correctly pushes the details page on top of the existing
-        // stack (e.g., the feed), ensuring a valid context.
-        _router.pushNamed(
-          Routes.globalArticleDetailsName,
-          pathParameters: {'id': contentId},
-          extra: {'notificationId': notificationId},
-        );
-      }
-    });
+          if (contentType == ContentType.headline && contentId.isNotEmpty) {
+            // Guard against using BuildContext across async gaps by checking
+            // if the widget is still mounted before using its context.
+            if (mounted) {
+              await HeadlineTapHandler.handleTapFromSystemNotification(
+                context,
+                contentId,
+              );
+            }
+          }
+        });
     // Instantiate and initialize the AppStatusService.
     // This service monitors the app's lifecycle (e.g., resuming from
     // background) and periodically triggers remote configuration fetches,

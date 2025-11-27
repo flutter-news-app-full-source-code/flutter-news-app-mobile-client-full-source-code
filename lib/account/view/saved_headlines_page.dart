@@ -23,7 +23,6 @@ class SavedHeadlinesPage extends StatelessWidget {
     final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-    final colorScheme = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -88,26 +87,6 @@ class SavedHeadlinesPage extends StatelessWidget {
                   appState.settings?.feedSettings.feedItemImageStyle ??
                   FeedItemImageStyle.smallThumbnail;
 
-              final trailingButton = IconButton(
-                icon: Icon(Icons.delete_outline, color: colorScheme.error),
-                tooltip: l10n.headlineDetailsRemoveFromSavedTooltip,
-                onPressed: () {
-                  final updatedSavedHeadlines = List<Headline>.from(
-                    savedHeadlines,
-                  )..removeWhere((h) => h.id == headline.id);
-
-                  final updatedPreferences = userContentPreferences.copyWith(
-                    savedHeadlines: updatedSavedHeadlines,
-                  );
-
-                  context.read<AppBloc>().add(
-                    AppUserContentPreferencesChanged(
-                      preferences: updatedPreferences,
-                    ),
-                  );
-                },
-              );
-
               Widget tile;
               switch (imageStyle) {
                 case FeedItemImageStyle.hidden:
@@ -115,21 +94,18 @@ class SavedHeadlinesPage extends StatelessWidget {
                     headline: headline,
                     onHeadlineTap: () =>
                         HeadlineTapHandler.handleHeadlineTap(context, headline),
-                    trailing: trailingButton,
                   );
                 case FeedItemImageStyle.smallThumbnail:
                   tile = HeadlineTileImageStart(
                     headline: headline,
                     onHeadlineTap: () =>
                         HeadlineTapHandler.handleHeadlineTap(context, headline),
-                    trailing: trailingButton,
                   );
                 case FeedItemImageStyle.largeThumbnail:
                   tile = HeadlineTileImageTop(
                     headline: headline,
                     onHeadlineTap: () =>
                         HeadlineTapHandler.handleHeadlineTap(context, headline),
-                    trailing: trailingButton,
                   );
               }
               return tile;

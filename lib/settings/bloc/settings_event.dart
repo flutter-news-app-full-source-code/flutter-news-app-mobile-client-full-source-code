@@ -116,6 +116,20 @@ class SettingsFeedItemImageStyleChanged extends SettingsEvent {
   List<Object?> get props => [imageStyle];
 }
 
+/// {@template settings_feed_item_click_behavior_changed}
+/// Event added when the user changes how feed item links are opened.
+/// {@endtemplate}
+class SettingsFeedItemClickBehaviorChanged extends SettingsEvent {
+  /// {@macro settings_feed_item_click_behavior_changed}
+  const SettingsFeedItemClickBehaviorChanged(this.clickBehavior);
+
+  /// The newly selected click behavior.
+  final FeedItemClickBehavior clickBehavior;
+
+  @override
+  List<Object?> get props => [clickBehavior];
+}
+
 /// {@template settings_language_changed}
 /// Event added when the user changes the application language.
 /// {@endtemplate}

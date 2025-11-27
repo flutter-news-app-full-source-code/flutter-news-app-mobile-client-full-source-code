@@ -396,7 +396,7 @@
     "@settingsAppearanceTitle": {
         "description": "Title for the appearance settings section/page"
     },
-    "settingsFeedDisplayTitle": "عرض الموجز",
+    "settingsFeedDisplayTitle": "الموجز",
     "@settingsFeedDisplayTitle": {
         "description": "Title for the feed display settings section/page"
     },

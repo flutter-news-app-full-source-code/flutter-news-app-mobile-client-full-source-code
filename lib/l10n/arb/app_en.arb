@@ -396,9 +396,9 @@
     "@settingsAppearanceTitle": {
         "description": "Title for the appearance settings section/page"
     },
-    "settingsFeedDisplayTitle": "Feed Display",
+    "settingsFeedDisplayTitle": "Feed",
     "@settingsFeedDisplayTitle": {
-        "description": "Title for the feed display settings section/page"
+        "description": "Title for the feed settings section/page"
     },
     "settingsArticleDisplayTitle": "Article Display",
     "@settingsArticleDisplayTitle": {

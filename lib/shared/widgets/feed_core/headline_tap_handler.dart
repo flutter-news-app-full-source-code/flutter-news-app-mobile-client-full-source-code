@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:url_launcher/url_launcher_string.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/in_app_browser.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// {@template headline_tap_handler}
 /// A utility class for handling headline taps, including interstitial ad
@@ -44,12 +45,16 @@ abstract final class HeadlineTapHandler {
       behavior = appState.remoteConfig?.features.feed.itemClickBehavior;
     }
 
-    final mode = behavior == FeedItemClickBehavior.internalNavigation
-        ? LaunchMode.inAppWebView
-        : LaunchMode.externalApplication;
-
-    if (await canLaunchUrlString(headline.url)) {
-      await launchUrlString(headline.url, mode: mode);
+    // Use the new InAppBrowser for internal navigation, otherwise use url_launcher.
+    if (behavior == FeedItemClickBehavior.internalNavigation) {
+      await InAppBrowser.show(context, url: headline.url);
+    } else {
+      if (await canLaunchUrl(Uri.parse(headline.url))) {
+        await launchUrl(
+          Uri.parse(headline.url),
+          mode: LaunchMode.externalApplication,
+        );
+      }
     }
   }
 
@@ -127,8 +132,8 @@ abstract final class HeadlineTapHandler {
       final headline = await context.read<DataRepository<Headline>>().read(
         id: headlineId,
       );
-      if (context.mounted && await canLaunchUrlString(headline.url)) {
-        await launchUrlString(headline.url, mode: LaunchMode.inAppWebView);
+      if (context.mounted) {
+        await InAppBrowser.show(context, url: headline.url);
       }
     } finally {
       if (navigator.canPop()) navigator.pop();

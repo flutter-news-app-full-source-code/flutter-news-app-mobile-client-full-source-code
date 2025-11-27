@@ -2,16 +2,14 @@
 
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart'; 
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/feed_ad_loader_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/bloc/entity_details_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/feed_core.dart';
@@ -248,18 +246,6 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
             ],
           );
 
-          Future<void> onHeadlineTap(Headline headline) async {
-            await context.read<InterstitialAdManager>().onPotentialAdTrigger();
-
-            if (!context.mounted) return;
-
-            await context.pushNamed(
-              Routes.globalArticleDetailsName,
-              pathParameters: {'id': headline.id},
-              extra: headline,
-            );
-          }
-
           return CustomScrollView(
             controller: _scrollController,
             slivers: [
@@ -331,17 +317,23 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                           case FeedItemImageStyle.hidden:
                             tile = HeadlineTileTextOnly(
                               headline: item,
-                              onHeadlineTap: () => onHeadlineTap(item),
+                              onHeadlineTap: () =>
+                                  HeadlineTapHandler.handleHeadlineTap(
+                                      context, item),
                             );
                           case FeedItemImageStyle.smallThumbnail:
                             tile = HeadlineTileImageStart(
                               headline: item,
-                              onHeadlineTap: () => onHeadlineTap(item),
+                              onHeadlineTap: () =>
+                                  HeadlineTapHandler.handleHeadlineTap(
+                                      context, item),
                             );
                           case FeedItemImageStyle.largeThumbnail:
                             tile = HeadlineTileImageTop(
                               headline: item,
-                              onHeadlineTap: () => onHeadlineTap(item),
+                              onHeadlineTap: () =>
+                                  HeadlineTapHandler.handleHeadlineTap(
+                                      context, item),
                             );
                         }
                         return tile;

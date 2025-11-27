@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:auth_repository/auth_repository.dart';
 import 'package:core/core.dart';
+import 'package:data_repository/data_repository.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
     as local_config;
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
@@ -9,7 +10,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/models/initi
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_initializer_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/package_info_service.dart';
-import 'package:data_repository/data_repository.dart';
 import 'package:logging/logging.dart';
 import 'package:pub_semver/pub_semver.dart';
 

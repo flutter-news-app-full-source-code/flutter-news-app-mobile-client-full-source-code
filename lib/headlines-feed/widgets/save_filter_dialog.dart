@@ -163,7 +163,7 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
       // save operation was successfully initiated. This allows the caller
       // to coordinate subsequent navigation actions, preventing race conditions.
       if (!mounted) return;
-      Navigator.of(this.context).pop(true);
+      Navigator.of(context).pop(true);
     }
   }
 

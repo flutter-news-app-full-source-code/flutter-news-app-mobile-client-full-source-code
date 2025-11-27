@@ -46,8 +46,7 @@ class ThemeSettingsPage extends StatelessWidget {
 
     // Ensure we have loaded state before building controls
     // This page should only be reached if settings are successfully loaded.
-    if (state.status != SettingsStatus.success ||
-        state.appSettings == null) {
+    if (state.status != SettingsStatus.success || state.appSettings == null) {
       return Scaffold(
         appBar: AppBar(title: Text(l10n.settingsAppearanceTitle)),
         body: const Center(child: CircularProgressIndicator()),
@@ -62,7 +61,7 @@ class ThemeSettingsPage extends StatelessWidget {
           // A more robust check might involve comparing previous and current userAppSettings
           // For now, refreshing on any success after an interaction is reasonable.
           // Ensure AppBloc is available in context before reading
-          context.read<AppBloc>().add(const AppAppSettingsRefreshed());
+          context.read<AppBloc>().add(const AppSettingsRefreshed());
         }
         // Optionally, show a SnackBar for errors if not handled globally
         // if (settingsState.status == SettingsStatus.failure && settingsState.error != null) {

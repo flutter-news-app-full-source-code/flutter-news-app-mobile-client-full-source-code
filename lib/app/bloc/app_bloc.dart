@@ -42,39 +42,39 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required AuthRepository authRepository,
     required DataRepository<AppSettings> appSettingsRepository,
     required DataRepository<UserContentPreferences>
-        userContentPreferencesRepository,
+    userContentPreferencesRepository,
     required InlineAdCacheService inlineAdCacheService,
     required Logger logger,
     required DataRepository<User> userRepository,
     required PushNotificationService pushNotificationService,
     required DataRepository<InAppNotification> inAppNotificationRepository,
-  })  : _remoteConfigRepository = remoteConfigRepository,
-        _appInitializer = appInitializer,
-        _authRepository = authRepository,
-        _appSettingsRepository = appSettingsRepository,
-        _userContentPreferencesRepository = userContentPreferencesRepository,
-        _userRepository = userRepository,
-        _inAppNotificationRepository = inAppNotificationRepository,
-        _pushNotificationService = pushNotificationService,
-        _inlineAdCacheService = inlineAdCacheService,
-        _logger = logger,
-        super(
-          AppState(
-            status: user == null
-                ? AppLifeCycleStatus.unauthenticated
-                : user.isGuest
-                    ? AppLifeCycleStatus.anonymous
-                    : AppLifeCycleStatus.authenticated,
-            user: user,
-            remoteConfig: remoteConfig,
-            settings: settings,
-            userContentPreferences: userContentPreferences,
-          ),
-        ) {
+  }) : _remoteConfigRepository = remoteConfigRepository,
+       _appInitializer = appInitializer,
+       _authRepository = authRepository,
+       _appSettingsRepository = appSettingsRepository,
+       _userContentPreferencesRepository = userContentPreferencesRepository,
+       _userRepository = userRepository,
+       _inAppNotificationRepository = inAppNotificationRepository,
+       _pushNotificationService = pushNotificationService,
+       _inlineAdCacheService = inlineAdCacheService,
+       _logger = logger,
+       super(
+         AppState(
+           status: user == null
+               ? AppLifeCycleStatus.unauthenticated
+               : user.isGuest
+               ? AppLifeCycleStatus.anonymous
+               : AppLifeCycleStatus.authenticated,
+           user: user,
+           remoteConfig: remoteConfig,
+           settings: settings,
+           userContentPreferences: userContentPreferences,
+         ),
+       ) {
     // Register event handlers for various app-level events.
     on<AppStarted>(_onAppStarted);
     on<AppUserChanged>(_onAppUserChanged);
-    on<AppAppSettingsRefreshed>(_onUserAppSettingsRefreshed);
+    on<AppSettingsRefreshed>(_onUserAppSettingsRefreshed);
     on<AppUserContentPreferencesRefreshed>(_onUserContentPreferencesRefreshed);
     on<AppSettingsChanged>(_onAppSettingsChanged);
     on<AppPeriodicConfigFetchRequested>(_onAppPeriodicConfigFetchRequested);
@@ -118,7 +118,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final AuthRepository _authRepository;
   final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
-      _userContentPreferencesRepository;
+  _userContentPreferencesRepository;
   final DataRepository<User> _userRepository;
   final DataRepository<InAppNotification> _inAppNotificationRepository;
   final PushNotificationService _pushNotificationService;
@@ -230,13 +230,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // Update the state based on the result of the transition.
     switch (transitionResult) {
       case InitializationSuccess(
-          // On a successful transition, update the state with the newly
-          // fetched user data. The status is determined by the user's role
-          // (guest or standard). Any previous error state is cleared.
-          :final user,
-          :final settings,
-          :final userContentPreferences,
-        ):
+        // On a successful transition, update the state with the newly
+        // fetched user data. The status is determined by the user's role
+        // (guest or standard). Any previous error state is cleared.
+        :final user,
+        :final settings,
+        :final userContentPreferences,
+      ):
         emit(
           state.copyWith(
             status: user!.isGuest
@@ -262,13 +262,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   /// Handles refreshing/loading app settings (theme, font).
   Future<void> _onUserAppSettingsRefreshed(
-    AppAppSettingsRefreshed event,
+    AppSettingsRefreshed event,
     Emitter<AppState> emit,
   ) async {
     if (state.user == null) {
-      _logger.info(
-        '[AppBloc] Skipping AppAppSettingsRefreshed: User is null.',
-      );
+      _logger.info('[AppBloc] Skipping AppSettingsRefreshed: User is null.');
       return;
     }
 
@@ -376,8 +374,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         final restoredStatus = state.user == null
             ? AppLifeCycleStatus.unauthenticated
             : (state.user!.isGuest
-                ? AppLifeCycleStatus.anonymous
-                : AppLifeCycleStatus.authenticated);
+                  ? AppLifeCycleStatus.anonymous
+                  : AppLifeCycleStatus.authenticated);
         emit(
           state.copyWith(status: restoredStatus, remoteConfig: remoteConfig),
         );
@@ -401,7 +399,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       final now = DateTime.now();
       final currentStatus =
           originalUser.feedDecoratorStatus[event.feedDecoratorType] ??
-              const UserFeedDecoratorStatus(isCompleted: false);
+          const UserFeedDecoratorStatus(isCompleted: false);
 
       final updatedDecoratorStatus = currentStatus.copyWith(
         // Always update the last shown timestamp.
@@ -414,12 +412,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
       final newFeedDecoratorStatus =
           Map<FeedDecoratorType, UserFeedDecoratorStatus>.from(
-        originalUser.feedDecoratorStatus,
-      )..update(
-          event.feedDecoratorType,
-          (_) => updatedDecoratorStatus,
-          ifAbsent: () => updatedDecoratorStatus,
-        );
+            originalUser.feedDecoratorStatus,
+          )..update(
+            event.feedDecoratorType,
+            (_) => updatedDecoratorStatus,
+            ifAbsent: () => updatedDecoratorStatus,
+          );
 
       final updatedUser = originalUser.copyWith(
         feedDecoratorStatus: newFeedDecoratorStatus,

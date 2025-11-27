@@ -19,7 +19,8 @@ class LanguageSettingsPage extends StatelessWidget {
     final settingsBloc = context.watch<SettingsBloc>();
     final settingsState = settingsBloc.state;
 
-    if (settingsState.status != SettingsStatus.success || settingsState.appSettings == null) {
+    if (settingsState.status != SettingsStatus.success ||
+        settingsState.appSettings == null) {
       return Scaffold(
         appBar: AppBar(title: Text(l10n.settingsTitle)),
         body: const Center(child: CircularProgressIndicator()),
@@ -36,7 +37,7 @@ class LanguageSettingsPage extends StatelessWidget {
     return BlocListener<SettingsBloc, SettingsState>(
       listener: (context, state) {
         if (state.status == SettingsStatus.success) {
-          context.read<AppBloc>().add(const AppAppSettingsRefreshed());
+          context.read<AppBloc>().add(const AppSettingsRefreshed());
         }
       },
       child: Scaffold(

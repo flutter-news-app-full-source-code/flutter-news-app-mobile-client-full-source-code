@@ -45,10 +45,9 @@ class ThemeSettingsPage extends StatelessWidget {
     final state = settingsBloc.state;
 
     // Ensure we have loaded state before building controls
-    // This page should only be reached if settings are successfully loaded
-    // by the parent ShellRoute providing SettingsBloc.
+    // This page should only be reached if settings are successfully loaded.
     if (state.status != SettingsStatus.success ||
-        state.userAppSettings == null) {
+        state.appSettings == null) {
       return Scaffold(
         appBar: AppBar(title: Text(l10n.settingsAppearanceTitle)),
         body: const Center(child: CircularProgressIndicator()),
@@ -63,7 +62,7 @@ class ThemeSettingsPage extends StatelessWidget {
           // A more robust check might involve comparing previous and current userAppSettings
           // For now, refreshing on any success after an interaction is reasonable.
           // Ensure AppBloc is available in context before reading
-          context.read<AppBloc>().add(const AppUserAppSettingsRefreshed());
+          context.read<AppBloc>().add(const AppAppSettingsRefreshed());
         }
         // Optionally, show a SnackBar for errors if not handled globally
         // if (settingsState.status == SettingsStatus.failure && settingsState.error != null) {
@@ -81,7 +80,7 @@ class ThemeSettingsPage extends StatelessWidget {
             _buildDropdownSetting<AppBaseTheme>(
               context: context,
               title: l10n.settingsAppearanceThemeModeLabel,
-              currentValue: state.userAppSettings!.displaySettings.baseTheme,
+              currentValue: state.appSettings!.displaySettings.baseTheme,
               items: AppBaseTheme.values,
               itemToString: (mode) => _baseThemeToString(mode, l10n),
               onChanged: (value) {
@@ -96,7 +95,7 @@ class ThemeSettingsPage extends StatelessWidget {
             _buildDropdownSetting<AppAccentTheme>(
               context: context,
               title: l10n.settingsAppearanceThemeNameLabel,
-              currentValue: state.userAppSettings!.displaySettings.accentTheme,
+              currentValue: state.appSettings!.displaySettings.accentTheme,
               items: AppAccentTheme.values,
               itemToString: (name) => _accentThemeToString(name, l10n),
               onChanged: (value) {

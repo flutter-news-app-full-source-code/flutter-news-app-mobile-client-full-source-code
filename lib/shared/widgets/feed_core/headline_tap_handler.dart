@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:ui_kit/ui_kit.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 /// {@template headline_tap_handler}
@@ -97,10 +98,18 @@ abstract final class HeadlineTapHandler {
   ///
   /// - [context]: The current [BuildContext] to access BLoCs and for navigation.
   /// - [headlineId]: The ID of the [Headline] item that was tapped.
+  /// - [notificationId]: The optional ID of the notification itself, used to
+  ///   mark it as read.
   static Future<void> handleTapFromSystemNotification(
     BuildContext context,
-    String headlineId,
-  ) async {
+    String headlineId, {
+    String? notificationId,
+  }) async {
+    // If a notificationId is provided, dispatch an event to mark it as read.
+    if (notificationId != null) {
+      context.read<AppBloc>().add(AppNotificationTapped(notificationId));
+    }
+
     if (context.mounted) {
       showDialog<void>(
         context: context,

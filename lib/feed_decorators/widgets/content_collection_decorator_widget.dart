@@ -113,16 +113,19 @@ class _ContentCollectionViewState extends State<_ContentCollectionView> {
                   ),
                 ),
                 if (widget.onDismiss != null)
-                  PopupMenuButton<String>(
-                    icon: const Icon(Icons.more_vert),
-                    tooltip: l10n.decoratorDismissAction,
-                    onSelected: (_) => widget.onDismiss!(),
-                    itemBuilder: (BuildContext context) => [
-                      PopupMenuItem<String>(
-                        value: 'dismiss',
-                        child: Text(l10n.decoratorDismissAction),
-                      ),
-                    ],
+                  Directionality(
+                    textDirection: Directionality.of(context),
+                    child: PopupMenuButton<String>(
+                      icon: const Icon(Icons.more_horiz),
+                      tooltip: l10n.decoratorDismissAction,
+                      onSelected: (_) => widget.onDismiss!(),
+                      itemBuilder: (BuildContext context) => [
+                        PopupMenuItem<String>(
+                          value: 'dismiss',
+                          child: Text(l10n.decoratorDismissAction),
+                        ),
+                      ],
+                    ),
                   ),
               ],
             ),

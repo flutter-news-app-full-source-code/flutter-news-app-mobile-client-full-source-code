@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_search_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/feed_core.dart';
-import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template headline_search_delegate}
@@ -102,17 +100,8 @@ class HeadlineSearchDelegate extends SearchDelegate<void> {
                   final headline = state.headlines[index];
                   return HeadlineTileImageStart(
                     headline: headline,
-                    onHeadlineTap: () {
-                      // Navigate to the article details page.
-                      // Using `pushNamed` with the nested route name ensures
-                      // that the "Feed" tab in the bottom navigation bar
-                      // remains selected, providing a consistent UX.
-                      context.pushNamed(
-                        Routes.articleDetailsName,
-                        pathParameters: {'id': headline.id},
-                        extra: headline,
-                      );
-                    },
+                    onHeadlineTap: () =>
+                        HeadlineTapHandler.handleHeadlineTap(context, headline),
                   );
                 },
               );

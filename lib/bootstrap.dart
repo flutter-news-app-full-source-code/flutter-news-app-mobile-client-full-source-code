@@ -335,7 +335,7 @@ Future<Widget> bootstrap(
     );
     appSettingsClient = DataApi<AppSettings>(
       httpClient: httpClient,
-      modelName: 'user_app_settings',
+      modelName: 'app_settings',
       fromJson: AppSettings.fromJson,
       toJson: (settings) => settings.toJson(),
       logger: logger,

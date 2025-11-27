@@ -196,8 +196,8 @@ class SourceListBloc extends Bloc<SourceListEvent, SourceListState> {
       state.copyWith(
         status: SourceListStatus.loading,
         selectedCountries: event.selectedCountries,
-        sources: [], // Clear existing sources
-        nextCursor: null, // Reset pagination
+        sources: [],
+        nextCursor: null,
       ),
     );
 

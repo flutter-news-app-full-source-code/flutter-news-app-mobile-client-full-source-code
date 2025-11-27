@@ -11,36 +11,19 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class DemoBannerAdWidget extends StatelessWidget {
   /// {@macro demo_banner_ad_widget}
-  const DemoBannerAdWidget({
-    this.headlineImageStyle,
-    this.bannerAdShape,
-    super.key,
-  });
+  const DemoBannerAdWidget({this.feedItemImageStyle, super.key});
 
   /// The user's preference for feed layout, used to determine the ad's visual size.
-  final HeadlineImageStyle? headlineImageStyle;
-
-  /// The preferred shape for banner ads, used for in-article banners.
-  final BannerAdShape? bannerAdShape;
+  final FeedItemImageStyle? feedItemImageStyle;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    // Determine the height. Prioritize bannerAdShape for in-article context.
-    // Fall back to headlineImageStyle for feed context.
-    final int adHeight;
-    if (bannerAdShape != null) {
-      adHeight = switch (bannerAdShape) {
-        BannerAdShape.square => 250,
-        BannerAdShape.rectangle => 50,
-        _ => 50,
-      };
-    } else {
-      adHeight = headlineImageStyle == HeadlineImageStyle.largeThumbnail
-          ? 250
-          : 50;
-    }
+    // Determine the height based on the feedItemImageStyle.
+    final adHeight = feedItemImageStyle == FeedItemImageStyle.largeThumbnail
+        ? 250
+        : 50;
 
     return Card(
       margin: const EdgeInsets.symmetric(

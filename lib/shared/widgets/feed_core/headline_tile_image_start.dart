@@ -14,7 +14,6 @@ class HeadlineTileImageStart extends StatelessWidget {
     required this.headline,
     super.key,
     this.onHeadlineTap,
-    this.trailing,
     this.currentContextEntityType,
     this.currentContextEntityId,
   });
@@ -24,9 +23,6 @@ class HeadlineTileImageStart extends StatelessWidget {
 
   /// Callback when the main content of the headline (e.g., title area) is tapped.
   final VoidCallback? onHeadlineTap;
-
-  /// An optional widget to display at the end of the tile.
-  final Widget? trailing;
 
   /// The type of the entity currently being viewed in detail (e.g., on a category page).
   final ContentType? currentContextEntityType;
@@ -113,10 +109,6 @@ class HeadlineTileImageStart extends StatelessWidget {
                   ],
                 ),
               ),
-              if (trailing != null) ...[
-                const SizedBox(width: AppSpacing.sm),
-                trailing!,
-              ],
             ],
           ),
         ),

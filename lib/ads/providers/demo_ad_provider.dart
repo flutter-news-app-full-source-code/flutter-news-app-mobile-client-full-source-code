@@ -35,7 +35,7 @@ class DemoAdProvider implements AdProvider {
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
     required AdThemeStyle adThemeStyle,
-    HeadlineImageStyle? headlineImageStyle,
+    FeedItemImageStyle? feedItemImageStyle,
   }) async {
     _logger.info('Simulating native ad load for demo environment.');
     // Simulate a delay for loading.
@@ -45,7 +45,7 @@ class DemoAdProvider implements AdProvider {
       id: _uuid.v4(),
       provider: AdPlatformType.demo,
       adObject: Object(),
-      templateType: headlineImageStyle == HeadlineImageStyle.largeThumbnail
+      templateType: feedItemImageStyle == FeedItemImageStyle.largeThumbnail
           ? NativeAdTemplateType.medium
           : NativeAdTemplateType.small,
     );
@@ -56,7 +56,7 @@ class DemoAdProvider implements AdProvider {
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
     required AdThemeStyle adThemeStyle,
-    HeadlineImageStyle? headlineImageStyle,
+    FeedItemImageStyle? feedItemImageStyle,
   }) async {
     _logger.info('Simulating banner ad load for demo environment.');
     // Simulate a delay for loading.

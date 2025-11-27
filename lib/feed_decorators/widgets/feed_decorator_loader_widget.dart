@@ -124,7 +124,8 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
       return;
     }
 
-    final decoratorConfig = remoteConfig.feedDecoratorConfig[dueDecoratorType];
+    final decoratorConfig =
+        remoteConfig.features.feed.decorators[dueDecoratorType];
     if (decoratorConfig == null) {
       _logger.warning('Config not found for due decorator: $dueDecoratorType');
       if (mounted) setState(() => _state = _DecoratorState.none);
@@ -172,7 +173,7 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
           );
         } else if (decoratorItem is ContentCollectionItem) {
           _decoratorWidget = ContentCollectionDecoratorWidget(
-            item: decoratorItem, // The content collection item to display.
+            item: decoratorItem,
             // The onFollowToggle callback is handled by this widget, which
             // then dispatches an event to the AppBloc to update user preferences.
             onFollowToggle: _onFollowToggle,
@@ -300,7 +301,7 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
     final userRole = user.appRole;
     final dueCandidates = <({FeedDecoratorType type, int priority})>[];
 
-    for (final entry in remoteConfig.feedDecoratorConfig.entries) {
+    for (final entry in remoteConfig.features.feed.decorators.entries) {
       final decoratorType = entry.key;
       final decoratorConfig = entry.value;
 

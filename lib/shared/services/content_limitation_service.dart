@@ -75,13 +75,13 @@ class ContentLimitationService {
       return LimitationStatus.allowed;
     }
 
-    final limits = remoteConfig.userPreferenceConfig;
+    final limits = remoteConfig.user.limits;
     final role = user.appRole;
 
     switch (action) {
       case ContentAction.bookmarkHeadline:
         final count = preferences.savedHeadlines.length;
-        final limit = limits.savedHeadlinesLimit[role];
+        final limit = limits.savedHeadlines[role];
 
         // If no limit is defined for the role, allow the action.
         if (limit == null) return LimitationStatus.allowed;
@@ -93,7 +93,7 @@ class ContentLimitationService {
       // Check if the user has reached the limit for saving filters.
       case ContentAction.saveHeadlineFilter:
         final count = preferences.savedHeadlineFilters.length;
-        final limitConfig = limits.savedHeadlineFiltersLimit[role];
+        final limitConfig = limits.savedHeadlineFilters[role];
 
         // If no limit config is defined for the role, allow the action.
         if (limitConfig == null) return LimitationStatus.allowed;
@@ -106,7 +106,7 @@ class ContentLimitationService {
         final count = preferences.savedHeadlineFilters
             .where((filter) => filter.isPinned)
             .length;
-        final limit = limits.savedHeadlineFiltersLimit[role]?.pinned;
+        final limit = limits.savedHeadlineFilters[role]?.pinned;
 
         if (limit == null) return LimitationStatus.allowed;
 
@@ -116,7 +116,7 @@ class ContentLimitationService {
 
       case ContentAction.subscribeToHeadlineFilterNotifications:
         final subscriptionLimits =
-            limits.savedHeadlineFiltersLimit[role]?.notificationSubscriptions;
+            limits.savedHeadlineFilters[role]?.notificationSubscriptions;
 
         // If no subscription limits are defined for the role, allow the action.
         if (subscriptionLimits == null) return LimitationStatus.allowed;
@@ -155,7 +155,7 @@ class ContentLimitationService {
       case ContentAction.followTopic:
       case ContentAction.followSource:
       case ContentAction.followCountry:
-        final limit = limits.followedItemsLimit[role];
+        final limit = limits.followedItems[role];
 
         // Determine the count for the specific item type being followed.
         final int count;

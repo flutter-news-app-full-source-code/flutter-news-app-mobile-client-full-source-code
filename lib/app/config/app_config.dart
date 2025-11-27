@@ -105,7 +105,7 @@ class AppConfig {
   //  formatted dummies required to satisfy Firebase initialization.
   factory AppConfig.demo() => AppConfig(
     environment: AppEnvironment.demo,
-    baseUrl: '', // No API access needed for in-memory demo
+    baseUrl: '',
     // Placeholders for demo
     oneSignalAndroidAppId: 'YOUR_DEMO_ONESIGNAL_ANDROID_APP_ID',
     oneSignalIosAppId: 'YOUR_DEMO_ONESIGNAL_IOS_APP_ID',

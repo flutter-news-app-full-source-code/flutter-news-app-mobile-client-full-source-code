@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:auth_repository/auth_repository.dart';
-import 'package:core/core.dart' hide AppStatus;
+import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,8 +18,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/s
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/router.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_tap_handler.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
@@ -48,7 +48,7 @@ class App extends StatelessWidget {
     required DataRepository<Source> sourcesRepository,
     required DataRepository<User> userRepository,
     required DataRepository<RemoteConfig> remoteConfigRepository,
-    required DataRepository<UserAppSettings> userAppSettingsRepository,
+    required DataRepository<AppSettings> appSettingsRepository,
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
     required AppEnvironment environment,
@@ -67,7 +67,7 @@ class App extends StatelessWidget {
        _sourcesRepository = sourcesRepository,
        _userRepository = userRepository,
        _remoteConfigRepository = remoteConfigRepository,
-       _userAppSettingsRepository = userAppSettingsRepository,
+       _appSettingsRepository = appSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
        _pushNotificationService = pushNotificationService,
        _inAppNotificationRepository = inAppNotificationRepository,
@@ -85,7 +85,7 @@ class App extends StatelessWidget {
   final RemoteConfig remoteConfig;
 
   /// The user's settings, pre-fetched during startup.
-  final UserAppSettings? settings;
+  final AppSettings? settings;
 
   /// The user's content preferences, pre-fetched during startup.
   final UserContentPreferences? userContentPreferences;
@@ -97,7 +97,7 @@ class App extends StatelessWidget {
   final DataRepository<Source> _sourcesRepository;
   final DataRepository<User> _userRepository;
   final DataRepository<RemoteConfig> _remoteConfigRepository;
-  final DataRepository<UserAppSettings> _userAppSettingsRepository;
+  final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
   final AppEnvironment _environment;
@@ -125,7 +125,7 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _feedDecoratorService),
         RepositoryProvider.value(value: _userRepository),
         RepositoryProvider.value(value: _remoteConfigRepository),
-        RepositoryProvider.value(value: _userAppSettingsRepository),
+        RepositoryProvider.value(value: _appSettingsRepository),
         RepositoryProvider.value(value: _userContentPreferencesRepository),
         RepositoryProvider.value(value: _pushNotificationService),
         RepositoryProvider.value(value: _inAppNotificationRepository),
@@ -147,7 +147,7 @@ class App extends StatelessWidget {
               remoteConfigRepository: _remoteConfigRepository,
               appInitializer: context.read<AppInitializer>(),
               authRepository: context.read<AuthRepository>(),
-              userAppSettingsRepository: _userAppSettingsRepository,
+              appSettingsRepository: _appSettingsRepository,
               userContentPreferencesRepository:
                   _userContentPreferencesRepository,
               logger: context.read<Logger>(),
@@ -201,41 +201,42 @@ class _AppViewState extends State<_AppView> {
     // Subscribe to the authentication repository's authStateChanges stream.
     // This stream is the single source of truth for the user's auth state
     // and drives the entire app lifecycle by dispatching AppUserChanged events.
-    _userSubscription = context.read<AuthRepository>().authStateChanges.listen(
-      (user) => context.read<AppBloc>().add(AppUserChanged(user)),
-    );
+    _userSubscription = context.read<AuthRepository>().authStateChanges.listen((
+      user,
+    ) {
+      if (mounted) {
+        context.read<AppBloc>().add(AppUserChanged(user));
+      }
+    });
 
     // Subscribe to foreground push notifications. When a message is received,
     // dispatch an event to the AppBloc to update the UI state (e.g., show an
     // indicator dot).
-    _onMessageSubscription = pushNotificationService.onMessage.listen(
-      (_) => context.read<AppBloc>().add(const AppInAppNotificationReceived()),
-    );
+    _onMessageSubscription = pushNotificationService.onMessage.listen((_) {
+      if (mounted) {
+        context.read<AppBloc>().add(const AppInAppNotificationReceived());
+      }
+    });
 
     // Subscribe to notifications that are tapped and open the app.
     // This is the core of the deep-linking functionality.
     _onMessageOpenedAppSubscription = pushNotificationService.onMessageOpenedApp
-        .listen((payload) {
-          _routerLogger.fine(
-            'Notification opened app with payload: ${payload.data}',
-          );
-          final contentType =
-              payload.data['contentType'] as String?; // e.g., 'headline'
-          final id = payload.data['headlineId'] as String?;
-          final notificationId = payload.data['notificationId'] as String?;
+        .listen((payload) async {
+          _routerLogger.fine('Notification opened app with payload: $payload');
+          final contentType = payload.contentType;
+          final contentId = payload.contentId;
+          final notificationId = payload.notificationId;
 
-          if (contentType == 'headline' && id != null) {
-            // Use pushNamed instead of goNamed.
-            // goNamed replaces the entire navigation stack, which causes issues
-            // when the app is launched from a terminated state. The new page
-            // would lack the necessary ancestor widgets (like RepositoryProviders).
-            // pushNamed correctly pushes the details page on top of the existing
-            // stack (e.g., the feed), ensuring a valid context.
-            _router.pushNamed(
-              Routes.globalArticleDetailsName,
-              pathParameters: {'id': id},
-              extra: {'notificationId': notificationId},
-            );
+          if (contentType == ContentType.headline && contentId.isNotEmpty) {
+            // Guard against using BuildContext across async gaps by checking
+            // if the widget is still mounted before using its context.
+            if (mounted) {
+              await HeadlineTapHandler.handleTapFromSystemNotification(
+                context,
+                contentId,
+                notificationId: notificationId,
+              );
+            }
           }
         });
     // Instantiate and initialize the AppStatusService.
@@ -355,9 +356,9 @@ class _AppViewState extends State<_AppView> {
               supportedLocales: AppLocalizations.supportedLocales,
               locale: state.locale,
               home: UpdateRequiredPage(
-                iosUpdateUrl: state.remoteConfig?.appStatus.iosUpdateUrl,
+                iosUpdateUrl: state.remoteConfig?.app.update.iosUpdateUrl,
                 androidUpdateUrl:
-                    state.remoteConfig?.appStatus.androidUpdateUrl,
+                    state.remoteConfig?.app.update.androidUpdateUrl,
                 currentAppVersion: state.currentAppVersion,
                 latestRequiredVersion: state.latestAppVersion,
               ),

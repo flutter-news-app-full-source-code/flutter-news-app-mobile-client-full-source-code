@@ -396,9 +396,9 @@
     "@settingsAppearanceTitle": {
         "description": "Title for the appearance settings section/page"
     },
-    "settingsFeedDisplayTitle": "Feed Display",
+    "settingsFeedDisplayTitle": "Feed",
     "@settingsFeedDisplayTitle": {
-        "description": "Title for the feed display settings section/page"
+        "description": "Title for the feed settings section/page"
     },
     "settingsArticleDisplayTitle": "Article Display",
     "@settingsArticleDisplayTitle": {
@@ -1737,5 +1737,41 @@
     "breakingNewsPrefix": "Breaking News",
     "@breakingNewsPrefix": {
         "description": "Prefix text shown for breaking news headlines."
+    },
+    "settingsFeedClickBehaviorLabel": "Open links using",
+    "@settingsFeedClickBehaviorLabel": {
+        "description": "Label for the setting that controls how article links are opened."
+    },
+    "settingsFeedClickBehaviorDefault": "App default",
+    "@settingsFeedClickBehaviorDefault": {
+        "description": "Option to use the app's default link-opening behavior."
+    },
+    "settingsFeedClickBehaviorInApp": "In-app browser",
+    "@settingsFeedClickBehaviorInApp": {
+        "description": "Option to open links in a browser within the app."
+    },
+    "settingsFeedClickBehaviorSystem": "System browser",
+    "@settingsFeedClickBehaviorSystem": {
+        "description": "Option to open links in the device's default system browser."
+    },
+    "continueToArticleButtonLabel": "Continue to Article",
+    "@continueToArticleButtonLabel": {
+        "description": "Button text on an interstitial ad to proceed to the article."
+    },
+    "headlineActionsModalTitle": "Actions",
+    "@headlineActionsModalTitle": {
+        "description": "Title for the modal bottom sheet that shows headline actions like share and bookmark."
+    },
+    "shareActionLabel": "Share",
+    "@shareActionLabel": {
+        "description": "Label for the share action."
+    },
+    "bookmarkActionLabel": "Bookmark",
+    "@bookmarkActionLabel": {
+        "description": "Label for the action to add a headline to bookmarks."
+    },
+    "removeBookmarkActionLabel": "Remove Bookmark",
+    "@removeBookmarkActionLabel": {
+        "description": "Label for the action to remove a headline from bookmarks."
     }
 }

@@ -67,7 +67,6 @@ Future<Widget> bootstrap(
     ..config('--- Starting Bootstrap Process ---')
     ..config('App Environment: $environment');
 
-  WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = const AppBlocObserver();
   timeago.setLocaleMessages('en', EnTimeagoMessages());
   timeago.setLocaleMessages('ar', ArTimeagoMessages());
@@ -213,7 +212,7 @@ Future<Widget> bootstrap(
   late final DataClient<Country> countriesClient;
   late final DataClient<Source> sourcesClient;
   late final DataClient<UserContentPreferences> userContentPreferencesClient;
-  late final DataClient<UserAppSettings> userAppSettingsClient;
+  late final DataClient<AppSettings> appSettingsClient;
   late final DataClient<User> userClient;
   late final DataClient<InAppNotification> inAppNotificationClient;
   late final DataClient<PushNotificationDevice> pushNotificationDeviceClient;
@@ -276,7 +275,7 @@ Future<Widget> bootstrap(
       getId: (i) => i.id,
       logger: logger,
     );
-    userAppSettingsClient = DataInMemory<UserAppSettings>(
+    appSettingsClient = DataInMemory<AppSettings>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
       logger: logger,
@@ -296,74 +295,8 @@ Future<Widget> bootstrap(
       getId: (i) => i.id,
       logger: logger,
     );
-  } else if (appConfig.environment == app_config.AppEnvironment.development) {
-    logger.fine('Using API clients for all data repositories (Development).');
-    headlinesClient = DataApi<Headline>(
-      httpClient: httpClient,
-      modelName: 'headline',
-      fromJson: Headline.fromJson,
-      toJson: (headline) => headline.toJson(),
-      logger: logger,
-    );
-    topicsClient = DataApi<Topic>(
-      httpClient: httpClient,
-      modelName: 'topic',
-      fromJson: Topic.fromJson,
-      toJson: (topic) => topic.toJson(),
-      logger: logger,
-    );
-    countriesClient = DataApi<Country>(
-      httpClient: httpClient,
-      modelName: 'country',
-      fromJson: Country.fromJson,
-      toJson: (country) => country.toJson(),
-      logger: logger,
-    );
-    sourcesClient = DataApi<Source>(
-      httpClient: httpClient,
-      modelName: 'source',
-      fromJson: Source.fromJson,
-      toJson: (source) => source.toJson(),
-      logger: logger,
-    );
-    userContentPreferencesClient = DataApi<UserContentPreferences>(
-      httpClient: httpClient,
-      modelName: 'user_content_preferences',
-      fromJson: UserContentPreferences.fromJson,
-      toJson: (prefs) => prefs.toJson(),
-      logger: logger,
-    );
-    userAppSettingsClient = DataApi<UserAppSettings>(
-      httpClient: httpClient,
-      modelName: 'user_app_settings',
-      fromJson: UserAppSettings.fromJson,
-      toJson: (settings) => settings.toJson(),
-      logger: logger,
-    );
-    userClient = DataApi<User>(
-      httpClient: httpClient,
-      modelName: 'user',
-      fromJson: User.fromJson,
-      toJson: (user) => user.toJson(),
-      logger: logger,
-    );
-    inAppNotificationClient = DataApi<InAppNotification>(
-      httpClient: httpClient,
-      modelName: 'in_app_notification',
-      fromJson: InAppNotification.fromJson,
-      toJson: (notification) => notification.toJson(),
-      logger: logger,
-    );
-    pushNotificationDeviceClient = DataApi<PushNotificationDevice>(
-      httpClient: httpClient,
-      modelName: 'push_notification_device',
-      fromJson: PushNotificationDevice.fromJson,
-      toJson: (device) => device.toJson(),
-      logger: logger,
-    );
   } else {
-    logger.fine('Using API clients for all data repositories (Production).');
-    // Default to API clients for production
+    logger.fine('Using API clients for all data repositories.');
     headlinesClient = DataApi<Headline>(
       httpClient: httpClient,
       modelName: 'headline',
@@ -399,10 +332,10 @@ Future<Widget> bootstrap(
       toJson: (prefs) => prefs.toJson(),
       logger: logger,
     );
-    userAppSettingsClient = DataApi<UserAppSettings>(
+    appSettingsClient = DataApi<AppSettings>(
       httpClient: httpClient,
-      modelName: 'user_app_settings',
-      fromJson: UserAppSettings.fromJson,
+      modelName: 'app_settings',
+      fromJson: AppSettings.fromJson,
       toJson: (settings) => settings.toJson(),
       logger: logger,
     );
@@ -442,8 +375,8 @@ Future<Widget> bootstrap(
       DataRepository<UserContentPreferences>(
         dataClient: userContentPreferencesClient,
       );
-  final userAppSettingsRepository = DataRepository<UserAppSettings>(
-    dataClient: userAppSettingsClient,
+  final appSettingsRepository = DataRepository<AppSettings>(
+    dataClient: appSettingsClient,
   );
   final userRepository = DataRepository<User>(dataClient: userClient);
   final inAppNotificationRepository = DataRepository<InAppNotification>(
@@ -463,7 +396,7 @@ Future<Widget> bootstrap(
   // Fetch the latest config directly. Since this is post-initialization,
   // we assume it's available.
   final remoteConfig = await remoteConfigRepository.read(id: kRemoteConfigId);
-  final pushNotificationConfig = remoteConfig.pushNotificationConfig;
+  final pushNotificationConfig = remoteConfig.features.pushNotifications;
 
   // In the demo environment, always use the NoOpPushNotificationService.
   // This service is enhanced to simulate a successful permission flow,
@@ -510,7 +443,7 @@ Future<Widget> bootstrap(
   final demoDataMigrationService =
       appConfig.environment == app_config.AppEnvironment.demo
       ? DemoDataMigrationService(
-          userAppSettingsRepository: userAppSettingsRepository,
+          appSettingsRepository: appSettingsRepository,
           userContentPreferencesRepository: userContentPreferencesRepository,
         )
       : null;
@@ -526,10 +459,10 @@ Future<Widget> bootstrap(
   final demoDataInitializerService =
       appConfig.environment == app_config.AppEnvironment.demo
       ? DemoDataInitializerService(
-          userAppSettingsRepository: userAppSettingsRepository,
+          appSettingsRepository: appSettingsRepository,
           userContentPreferencesRepository: userContentPreferencesRepository,
           inAppNotificationRepository: inAppNotificationRepository,
-          userAppSettingsFixturesData: userAppSettingsFixturesData,
+          appSettingsFixturesData: appSettingsFixturesData,
           userContentPreferencesFixturesData:
               userContentPreferencesFixturesData,
           inAppNotificationsFixturesData: inAppNotificationsFixturesData,
@@ -542,7 +475,7 @@ Future<Widget> bootstrap(
     ..info('9. Initializing AppInitializer service...');
   final appInitializer = AppInitializer(
     authenticationRepository: authenticationRepository,
-    userAppSettingsRepository: userAppSettingsRepository,
+    appSettingsRepository: appSettingsRepository,
     userContentPreferencesRepository: userContentPreferencesRepository,
     remoteConfigRepository: remoteConfigRepository,
     environment: environment,
@@ -578,7 +511,7 @@ Future<Widget> bootstrap(
       countriesRepository: countriesRepository,
       sourcesRepository: sourcesRepository,
       remoteConfigRepository: remoteConfigRepository,
-      userAppSettingsRepository: userAppSettingsRepository,
+      appSettingsRepository: appSettingsRepository,
       userContentPreferencesRepository: userContentPreferencesRepository,
       pushNotificationService: pushNotificationService,
       inAppNotificationRepository: inAppNotificationRepository,

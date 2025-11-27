@@ -1,11 +1,9 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/feed_core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -25,7 +23,6 @@ class SavedHeadlinesPage extends StatelessWidget {
     final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-    final colorScheme = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -74,21 +71,6 @@ class SavedHeadlinesPage extends StatelessWidget {
             );
           }
 
-          Future<void> onHeadlineTap(Headline headline) async {
-            // Await for the ad to be shown and dismissed.
-            await context.read<InterstitialAdManager>().onPotentialAdTrigger();
-
-            // Check if the widget is still in the tree before navigating.
-            if (!context.mounted) return;
-
-            // Proceed with navigation after the ad is closed.
-            await context.pushNamed(
-              Routes.accountArticleDetailsName,
-              pathParameters: {'id': headline.id},
-              extra: headline,
-            );
-          }
-
           return ListView.separated(
             padding: const EdgeInsets.symmetric(
               vertical: AppSpacing.paddingSmall,
@@ -102,48 +84,28 @@ class SavedHeadlinesPage extends StatelessWidget {
             itemBuilder: (context, index) {
               final headline = savedHeadlines[index];
               final imageStyle =
-                  appState.settings?.feedPreferences.headlineImageStyle ??
-                  HeadlineImageStyle.smallThumbnail;
-
-              final trailingButton = IconButton(
-                icon: Icon(Icons.delete_outline, color: colorScheme.error),
-                tooltip: l10n.headlineDetailsRemoveFromSavedTooltip,
-                onPressed: () {
-                  final updatedSavedHeadlines = List<Headline>.from(
-                    savedHeadlines,
-                  )..removeWhere((h) => h.id == headline.id);
-
-                  final updatedPreferences = userContentPreferences.copyWith(
-                    savedHeadlines: updatedSavedHeadlines,
-                  );
-
-                  context.read<AppBloc>().add(
-                    AppUserContentPreferencesChanged(
-                      preferences: updatedPreferences,
-                    ),
-                  );
-                },
-              );
+                  appState.settings?.feedSettings.feedItemImageStyle ??
+                  FeedItemImageStyle.smallThumbnail;
 
               Widget tile;
               switch (imageStyle) {
-                case HeadlineImageStyle.hidden:
+                case FeedItemImageStyle.hidden:
                   tile = HeadlineTileTextOnly(
                     headline: headline,
-                    onHeadlineTap: () => onHeadlineTap(headline),
-                    trailing: trailingButton,
+                    onHeadlineTap: () =>
+                        HeadlineTapHandler.handleHeadlineTap(context, headline),
                   );
-                case HeadlineImageStyle.smallThumbnail:
+                case FeedItemImageStyle.smallThumbnail:
                   tile = HeadlineTileImageStart(
                     headline: headline,
-                    onHeadlineTap: () => onHeadlineTap(headline),
-                    trailing: trailingButton,
+                    onHeadlineTap: () =>
+                        HeadlineTapHandler.handleHeadlineTap(context, headline),
                   );
-                case HeadlineImageStyle.largeThumbnail:
+                case FeedItemImageStyle.largeThumbnail:
                   tile = HeadlineTileImageTop(
                     headline: headline,
-                    onHeadlineTap: () => onHeadlineTap(headline),
-                    trailing: trailingButton,
+                    onHeadlineTap: () =>
+                        HeadlineTapHandler.handleHeadlineTap(context, headline),
                   );
               }
               return tile;

@@ -71,11 +71,12 @@ class CallToActionDecoratorWidget extends StatelessWidget {
             ),
           ),
           if (onDismiss != null)
-            Positioned(
+            Positioned.directional(
               top: AppSpacing.xs,
-              right: AppSpacing.xs,
+              end: AppSpacing.xs,
+              textDirection: Directionality.of(context),
               child: PopupMenuButton<void>(
-                icon: const Icon(Icons.more_vert),
+                icon: const Icon(Icons.more_horiz),
                 tooltip: l10n.decoratorDismissAction,
                 onSelected: (_) => onDismiss!(),
                 itemBuilder: (BuildContext context) => [

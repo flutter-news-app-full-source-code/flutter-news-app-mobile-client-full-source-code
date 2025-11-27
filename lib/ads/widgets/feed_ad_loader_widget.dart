@@ -47,7 +47,7 @@ class FeedAdLoaderWidget extends StatefulWidget {
     required this.contextKey,
     required this.adPlaceholder,
     required this.adThemeStyle,
-    required this.adConfig,
+    required this.remoteConfig,
     super.key,
   });
 
@@ -63,7 +63,7 @@ class FeedAdLoaderWidget extends StatefulWidget {
   final AdThemeStyle adThemeStyle;
 
   /// The full remote configuration for ads, used to determine ad loading rules.
-  final AdConfig adConfig;
+  final RemoteConfig remoteConfig;
 
   @override
   State<FeedAdLoaderWidget> createState() => _FeedAdLoaderWidgetState();
@@ -101,7 +101,7 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
     // reload.
     if (widget.contextKey != oldWidget.contextKey ||
         widget.adPlaceholder.id != oldWidget.adPlaceholder.id ||
-        widget.adConfig != oldWidget.adConfig) {
+        widget.remoteConfig != oldWidget.remoteConfig) {
       _logger.info(
         'FeedAdLoaderWidget updated for new placeholder ID '
         '(${widget.adPlaceholder.id}) or contextKey (${widget.contextKey}). '
@@ -247,14 +247,15 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
       }
 
       final appBlocState = context.read<AppBloc>().state;
-      final headlineImageStyle = appBlocState.headlineImageStyle;
+      final feedItemImageStyle =
+          appBlocState.settings!.feedSettings.feedItemImageStyle;
       final userRole = appBlocState.user?.appRole ?? AppUserRole.guestUser;
 
       final loadedAd = await _adService.getFeedAd(
-        adConfig: widget.adConfig,
+        adConfig: widget.remoteConfig.features.ads,
         adType: widget.adPlaceholder.adType,
         adThemeStyle: widget.adThemeStyle,
-        headlineImageStyle: headlineImageStyle,
+        feedItemImageStyle: feedItemImageStyle,
         userRole: userRole,
       );
 
@@ -316,7 +317,12 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
-    final headlineImageStyle = context.read<AppBloc>().state.headlineImageStyle;
+    final feedItemImageStyle = context
+        .read<AppBloc>()
+        .state
+        .settings!
+        .feedSettings
+        .feedItemImageStyle;
 
     if (_isLoading || _hasError || _loadedAd == null) {
       // Show a user-friendly message when loading, on error, or if no ad is
@@ -351,15 +357,15 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
         case AdPlatformType.admob:
           return AdmobInlineAdWidget(
             inlineAd: _loadedAd!,
-            headlineImageStyle: headlineImageStyle,
+            feedItemImageStyle: feedItemImageStyle,
           );
         case AdPlatformType.demo:
           // In demo environment, display placeholder ads directly.
           switch (widget.adPlaceholder.adType) {
             case AdType.native:
-              return DemoNativeAdWidget(headlineImageStyle: headlineImageStyle);
+              return DemoNativeAdWidget(feedItemImageStyle: feedItemImageStyle);
             case AdType.banner:
-              return DemoBannerAdWidget(headlineImageStyle: headlineImageStyle);
+              return DemoBannerAdWidget(feedItemImageStyle: feedItemImageStyle);
             case AdType.interstitial:
             case AdType.video:
               // Interstitial and video ads are not inline, so they won't be

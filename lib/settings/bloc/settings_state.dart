@@ -23,17 +23,15 @@ class SettingsState extends Equatable {
   /// {@macro settings_state}
   const SettingsState({
     this.status = SettingsStatus.initial,
-    this.userAppSettings,
+    this.appSettings,
     this.error,
   });
 
   /// The current status of loading/updating settings.
   final SettingsStatus status;
 
-  /// Current user application settings.
-  /// Null if settings haven't been loaded or if there's no authenticated user
-  /// context for settings yet.
-  final UserAppSettings? userAppSettings;
+  /// Current user application settings. Null if settings haven't been loaded.
+  final AppSettings? appSettings;
 
   /// An optional error object if the status is [SettingsStatus.failure].
   final Object? error;
@@ -41,20 +39,18 @@ class SettingsState extends Equatable {
   /// Creates a copy of the current state with updated values.
   SettingsState copyWith({
     SettingsStatus? status,
-    UserAppSettings? userAppSettings,
+    AppSettings? appSettings,
     Object? error,
     bool clearError = false,
-    bool clearUserAppSettings = false,
+    bool clearAppSettings = false,
   }) {
     return SettingsState(
       status: status ?? this.status,
-      userAppSettings: clearUserAppSettings
-          ? null
-          : userAppSettings ?? this.userAppSettings,
+      appSettings: clearAppSettings ? null : appSettings ?? this.appSettings,
       error: clearError ? null : error ?? this.error,
     );
   }
 
   @override
-  List<Object?> get props => [status, userAppSettings, error];
+  List<Object?> get props => [status, appSettings, error];
 }

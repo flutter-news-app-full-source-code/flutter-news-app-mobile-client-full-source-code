@@ -1,4 +1,4 @@
-import 'package:core/core.dart' hide AppStatus;
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
@@ -44,20 +44,18 @@ class AccountPage extends StatelessWidget {
           // This declutters the main content card and follows common UI patterns.
           if (isAnonymous)
             IconButton(
-              icon: const Icon(Icons.login),
+              icon: const Icon(Icons.sync),
               tooltip: l10n.anonymousLimitButton,
               onPressed: () => context.goNamed(Routes.accountLinkingName),
             )
           else
             IconButton(
-              icon: const Icon(Icons.logout), // Non-directional icon for logout
+              icon: const Icon(Icons.logout),
               tooltip: l10n.accountSignOutTile,
               onPressed: () =>
                   context.read<AppBloc>().add(const AppLogoutRequested()),
             ),
-          const SizedBox(
-            width: AppSpacing.lg,
-          ), // Consistent right padding for the AppBar actions
+          const SizedBox(width: AppSpacing.lg),
         ],
       ),
       body: SingleChildScrollView(

@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template demo_interstitial_ad_dialog}
@@ -21,7 +21,6 @@ class DemoInterstitialAdDialog extends StatefulWidget {
 }
 
 class _DemoInterstitialAdDialogState extends State<DemoInterstitialAdDialog> {
-  //TODO(fulleni): make teh countdown configurable throuigh teh remote config.
   static const int _countdownDuration = 5;
   int _countdown = _countdownDuration;
   Timer? _timer;
@@ -53,7 +52,7 @@ class _DemoInterstitialAdDialogState extends State<DemoInterstitialAdDialog> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizationsX(context).l10n;
     final canClose = _countdown == 0;
 
     return Dialog.fullscreen(

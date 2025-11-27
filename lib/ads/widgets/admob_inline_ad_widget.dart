@@ -26,8 +26,7 @@ class AdmobInlineAdWidget extends StatelessWidget {
   /// {@macro admob_inline_ad_widget}
   const AdmobInlineAdWidget({
     required this.inlineAd,
-    this.headlineImageStyle,
-    this.bannerAdShape,
+    this.feedItemImageStyle,
     super.key,
   });
 
@@ -37,10 +36,7 @@ class AdmobInlineAdWidget extends StatelessWidget {
 
   /// The user's preference for feed layout, used to determine the ad's visual
   /// size. This is only relevant for native ads.
-  final HeadlineImageStyle? headlineImageStyle;
-
-  /// The preferred shape for banner ads, used for in-article banners.
-  final BannerAdShape? bannerAdShape;
+  final FeedItemImageStyle? feedItemImageStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -76,19 +72,9 @@ class AdmobInlineAdWidget extends StatelessWidget {
         NativeAdTemplateType.medium => 250,
       };
     } else if (inlineAd is BannerAd) {
-      // For banner ads, prioritize bannerAdShape if provided (for in-article ads).
-      // Otherwise, fall back to headlineImageStyle (for feed ads).
-      if (bannerAdShape != null) {
-        adHeight = switch (bannerAdShape) {
-          BannerAdShape.square => 250,
-          BannerAdShape.rectangle => 50,
-          _ => 50,
-        };
-      } else {
-        adHeight = headlineImageStyle == HeadlineImageStyle.largeThumbnail
-            ? 250 // Assumes large thumbnail feed style wants a medium rectangle banner
-            : 50;
-      }
+      adHeight = feedItemImageStyle == FeedItemImageStyle.largeThumbnail
+          ? 250 // Assumes large thumbnail feed style wants a medium rectangle banner
+          : 50;
     } else {
       // Fallback height for unknown inline ad types.
       logger.warning(

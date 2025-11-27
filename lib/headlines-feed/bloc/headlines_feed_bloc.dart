@@ -258,11 +258,11 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       );
 
       // For pagination, only inject ad placeholders.
-      final newProcessedFeedItems = await _adService.injectAdPlaceholders(
+      final newProcessedFeedItems = await _adService.injectFeedAdPlaceholders(
         feedItems: headlineResponse.items,
         user: currentUser,
-        adConfig: remoteConfig.adConfig,
-        imageStyle: _appBloc.state.settings!.feedPreferences.headlineImageStyle,
+        remoteConfig: remoteConfig,
+        imageStyle: _appBloc.state.settings!.feedSettings.feedItemImageStyle,
         adThemeStyle: event.adThemeStyle,
         processedContentItemCount: cachedFeed.feedItems
             .whereType<Headline>()
@@ -319,7 +319,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           'Refresh throttled for filter "$filterKey". '
           'Time since last: $timeSinceLastRefresh.',
         );
-        return; // Ignore the request.
+        return;
       }
     }
 
@@ -424,11 +424,11 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       );
 
       // Step 2: Inject ad placeholders into the resulting list.
-      final fullyDecoratedFeed = await _adService.injectAdPlaceholders(
+      final fullyDecoratedFeed = await _adService.injectFeedAdPlaceholders(
         feedItems: feedWithDecorator,
         user: currentUser,
-        adConfig: appConfig.adConfig,
-        imageStyle: settings!.feedPreferences.headlineImageStyle,
+        remoteConfig: appConfig,
+        imageStyle: settings!.feedSettings.feedItemImageStyle,
         adThemeStyle: event.adThemeStyle,
       );
 
@@ -568,11 +568,11 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       );
 
       // Step 2: Inject ad placeholders into the resulting list.
-      final fullyDecoratedFeed = await _adService.injectAdPlaceholders(
+      final fullyDecoratedFeed = await _adService.injectFeedAdPlaceholders(
         feedItems: feedWithDecorator,
         user: currentUser,
-        adConfig: appConfig.adConfig,
-        imageStyle: settings!.feedPreferences.headlineImageStyle,
+        remoteConfig: appConfig,
+        imageStyle: settings!.feedSettings.feedItemImageStyle,
         adThemeStyle: event.adThemeStyle,
       );
 
@@ -672,11 +672,11 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       );
 
       // Step 2: Inject ad placeholders into the resulting list.
-      final fullyDecoratedFeed = await _adService.injectAdPlaceholders(
+      final fullyDecoratedFeed = await _adService.injectFeedAdPlaceholders(
         feedItems: feedWithDecorator,
         user: currentUser,
-        adConfig: appConfig.adConfig,
-        imageStyle: settings!.feedPreferences.headlineImageStyle,
+        remoteConfig: appConfig,
+        imageStyle: settings!.feedSettings.feedItemImageStyle,
         adThemeStyle: event.adThemeStyle,
       );
 

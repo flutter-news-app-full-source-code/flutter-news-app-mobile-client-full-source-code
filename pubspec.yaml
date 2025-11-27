@@ -72,6 +72,7 @@ dependencies:
     sdk: flutter
   flutter_adaptive_scaffold: ^0.3.2
   flutter_bloc: ^9.1.1
+  flutter_inappwebview: 6.1.5
   flutter_launcher_icons: ^0.14.4
   flutter_localizations:
     sdk: flutter
@@ -145,7 +146,7 @@ dependency_overrides:
   core:
     git:
       url: https://github.com/flutter-news-app-full-source-code/core.git
-      ref: 643aa3830261d04806569defd013639c92eaf5a3
+      ref: 3779a8b1dbd8450d524574cf5376b7cc2ed514e7
   http_client:
     git:
       url: https://github.com/flutter-news-app-full-source-code/http-client.git

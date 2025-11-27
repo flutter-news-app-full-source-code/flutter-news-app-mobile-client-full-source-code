@@ -3,10 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/in_app_notification_center_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/widgets/in_app_notification_list_item.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_tap_handler.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template in_app_notification_center_page}
@@ -295,19 +293,14 @@ class _NotificationListState extends State<_NotificationList> {
             );
 
             final payload = notification.payload;
-            final contentType = payload.data['contentType'] as String?;
-            final id = payload.data['headlineId'] as String?;
+            final contentType = payload.contentType;
+            final contentId = payload.contentId;
 
-            if (contentType == 'headline' && id != null) {
-              await context
-                  .read<InterstitialAdManager>()
-                  .onPotentialAdTrigger();
-
-              if (!context.mounted) return;
-
-              await context.pushNamed(
-                Routes.globalArticleDetailsName,
-                pathParameters: {'id': id},
+            if (contentType == ContentType.headline && contentId.isNotEmpty) {
+              // Use the handler to fetch the headline by ID and open it.
+              await HeadlineTapHandler.handleHeadlineTapById(
+                context,
+                contentId,
               );
             }
           },

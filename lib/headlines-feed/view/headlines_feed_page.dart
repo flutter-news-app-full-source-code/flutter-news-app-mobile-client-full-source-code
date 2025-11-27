@@ -11,7 +11,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/b
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/widgets/feed_sliver_app_bar.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/widgets/saved_filters_bar.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/feed_core.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/shared.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -262,11 +262,11 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                             final imageStyle = context
                                 .watch<AppBloc>()
                                 .state
-                                .headlineImageStyle;
-                            Widget tile;
+                                .feedItemImageStyle;
+
                             switch (imageStyle) {
-                              case HeadlineImageStyle.hidden:
-                                tile = HeadlineTileTextOnly(
+                              case FeedItemImageStyle.hidden:
+                                return HeadlineTileTextOnly(
                                   headline: item,
                                   onHeadlineTap: () =>
                                       HeadlineTapHandler.handleHeadlineTap(
@@ -274,8 +274,8 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                                         item,
                                       ),
                                 );
-                              case HeadlineImageStyle.smallThumbnail:
-                                tile = HeadlineTileImageStart(
+                              case FeedItemImageStyle.smallThumbnail:
+                                return HeadlineTileImageStart(
                                   headline: item,
                                   onHeadlineTap: () =>
                                       HeadlineTapHandler.handleHeadlineTap(
@@ -283,8 +283,8 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                                         item,
                                       ),
                                 );
-                              case HeadlineImageStyle.largeThumbnail:
-                                tile = HeadlineTileImageTop(
+                              case FeedItemImageStyle.largeThumbnail:
+                                return HeadlineTileImageTop(
                                   headline: item,
                                   onHeadlineTap: () =>
                                       HeadlineTapHandler.handleHeadlineTap(
@@ -293,17 +293,15 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                                       ),
                                 );
                             }
-                            return tile;
                           } else if (item is AdPlaceholder) {
                             // Access the AppBloc to get the remoteConfig for ads.
-                            final adConfig = context
+                            final remoteConfig = context
                                 .read<AppBloc>()
                                 .state
-                                .remoteConfig
-                                ?.adConfig;
+                                .remoteConfig;
 
                             // Ensure adConfig is not null before building the AdLoaderWidget.
-                            if (adConfig == null) {
+                            if (remoteConfig?.features.ads == null) {
                               // Return an empty widget or a placeholder if adConfig is not available.
                               return const SizedBox.shrink();
                             }
@@ -313,7 +311,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                               contextKey: state.activeFilterId!,
                               adPlaceholder: item,
                               adThemeStyle: AdThemeStyle.fromTheme(theme),
-                              adConfig: adConfig,
+                              remoteConfig: remoteConfig!,
                             );
                           } else if (item is DecoratorPlaceholder) {
                             // The FeedDecoratorLoaderWidget is responsible for

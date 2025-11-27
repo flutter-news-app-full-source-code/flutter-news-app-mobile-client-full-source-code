@@ -25,10 +25,10 @@ Future<void> main() async {
   // Ensure Flutter widgets are initialized before any Firebase operations.
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase services only on non-web platforms.
+  // Initialize Firebase services only on non-web platforms and non-demo env.
   // Firebase is manually initialized using options from AppConfig,
   // removing the dependency on the auto-generated firebase_options.dart file.
-  if (!kIsWeb) {
+  if (!kIsWeb && !(appEnvironment == AppEnvironment.demo)) {
     await Firebase.initializeApp(
       options: FirebaseOptions(
         apiKey: appConfig.firebaseApiKey,

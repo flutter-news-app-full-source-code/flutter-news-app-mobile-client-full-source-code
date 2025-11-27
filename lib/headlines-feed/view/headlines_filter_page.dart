@@ -219,7 +219,7 @@ Future<void> _createAndApplyFilter(BuildContext context) async {
   if (didSave == true && context.mounted) {
     context
       ..pop() // Pop HeadlinesFilterPage.
-      ..pop(); // Pop SavedHeadlinesFiltersPage.
+      ..pop();
   }
 }
 
@@ -313,7 +313,7 @@ void _applyAndExit(BuildContext context) {
   // close the "Saved Filters" page, returning the user directly to the feed.
   context
     ..pop() // Pop HeadlinesFilterPage
-    ..pop(); // Pop SavedHeadlinesFiltersPage
+    ..pop();
 }
 
 class _HeadlinesFilterView extends StatelessWidget {

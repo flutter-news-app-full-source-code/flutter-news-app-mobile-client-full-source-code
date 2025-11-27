@@ -1,5 +1,5 @@
 import 'package:auth_repository/auth_repository.dart';
-import 'package:core/core.dart' hide AppStatus;
+import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -33,9 +33,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/discover/view/so
 import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/bloc/entity_details_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/view/entity_details_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/headline_details_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/bloc/similar_headlines_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headline-details/view/headline_details_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_filter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
@@ -260,8 +257,8 @@ GoRouter createRouter({
               return BlocProvider<SettingsBloc>(
                 create: (context) {
                   final settingsBloc = SettingsBloc(
-                    userAppSettingsRepository: context
-                        .read<DataRepository<UserAppSettings>>(),
+                    appSettingsRepository: context
+                        .read<DataRepository<AppSettings>>(),
                     inlineAdCacheService: context.read<InlineAdCacheService>(),
                   );
                   if (userId != null) {
@@ -367,41 +364,6 @@ GoRouter createRouter({
             path: Routes.accountSavedHeadlines,
             name: Routes.accountSavedHeadlinesName,
             builder: (context, state) => const SavedHeadlinesPage(),
-            routes: [
-              GoRoute(
-                path: Routes.accountArticleDetails,
-                name: Routes.accountArticleDetailsName,
-                builder: (context, state) {
-                  final extra = state.extra;
-                  final headlineFromExtra = extra is Headline ? extra : null;
-                  final headlineIdFromPath = state.pathParameters['id'];
-                  final notificationId = extra is Map<String, dynamic>
-                      ? extra['notificationId'] as String?
-                      : null;
-                  return MultiBlocProvider(
-                    providers: [
-                      BlocProvider(
-                        create: (context) => HeadlineDetailsBloc(
-                          headlinesRepository: context
-                              .read<DataRepository<Headline>>(),
-                        ),
-                      ),
-                      BlocProvider(
-                        create: (context) => SimilarHeadlinesBloc(
-                          headlinesRepository: context
-                              .read<DataRepository<Headline>>(),
-                        ),
-                      ),
-                    ],
-                    child: HeadlineDetailsPage(
-                      initialHeadline: headlineFromExtra,
-                      headlineId: headlineFromExtra?.id ?? headlineIdFromPath,
-                      notificationId: notificationId,
-                    ),
-                  );
-                },
-              ),
-            ],
           ),
         ],
       ),
@@ -457,40 +419,6 @@ GoRouter createRouter({
               ),
             ],
             child: EntityDetailsPage(args: args),
-          );
-        },
-      ),
-      GoRoute(
-        path: Routes.globalArticleDetails,
-        name: Routes.globalArticleDetailsName,
-        builder: (context, state) {
-          // The 'extra' can be a Headline object (from feed navigation) or a Map
-          // (from a push notification deep-link).
-          final extra = state.extra;
-          final headlineFromExtra = extra is Headline ? extra : null;
-          final headlineIdFromPath = state.pathParameters['id'];
-          final notificationId = extra is Map<String, dynamic>
-              ? extra['notificationId'] as String?
-              : null;
-
-          return MultiBlocProvider(
-            providers: [
-              BlocProvider(
-                create: (context) => HeadlineDetailsBloc(
-                  headlinesRepository: context.read<DataRepository<Headline>>(),
-                ),
-              ),
-              BlocProvider(
-                create: (context) => SimilarHeadlinesBloc(
-                  headlinesRepository: context.read<DataRepository<Headline>>(),
-                ),
-              ),
-            ],
-            child: HeadlineDetailsPage(
-              initialHeadline: headlineFromExtra,
-              headlineId: headlineFromExtra?.id ?? headlineIdFromPath,
-              notificationId: notificationId,
-            ),
           );
         },
       ),
@@ -559,44 +487,6 @@ GoRouter createRouter({
                     name: Routes.feedName,
                     builder: (context, state) => const HeadlinesFeedPage(),
                     routes: [
-                      // Sub-route for article details within the feed context.
-                      GoRoute(
-                        path: 'article/:id',
-                        name: Routes.articleDetailsName,
-                        builder: (context, state) {
-                          final extra = state.extra;
-                          final headlineFromExtra = extra is Headline
-                              ? extra
-                              : null;
-                          final headlineIdFromPath = state.pathParameters['id'];
-                          final notificationId = extra is Map<String, dynamic>
-                              ? extra['notificationId'] as String?
-                              : null;
-
-                          return MultiBlocProvider(
-                            providers: [
-                              BlocProvider(
-                                create: (context) => HeadlineDetailsBloc(
-                                  headlinesRepository: context
-                                      .read<DataRepository<Headline>>(),
-                                ),
-                              ),
-                              BlocProvider(
-                                create: (context) => SimilarHeadlinesBloc(
-                                  headlinesRepository: context
-                                      .read<DataRepository<Headline>>(),
-                                ),
-                              ),
-                            ],
-                            child: HeadlineDetailsPage(
-                              initialHeadline: headlineFromExtra,
-                              headlineId:
-                                  headlineFromExtra?.id ?? headlineIdFromPath,
-                              notificationId: notificationId,
-                            ),
-                          );
-                        },
-                      ),
                       GoRoute(
                         path: Routes.savedHeadlineFilters,
                         name: Routes.savedHeadlineFiltersName,

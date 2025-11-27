@@ -35,12 +35,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   AppBloc({
     required User? user,
     required RemoteConfig remoteConfig,
-    required UserAppSettings? settings,
+    required AppSettings? settings,
     required UserContentPreferences? userContentPreferences,
     required DataRepository<RemoteConfig> remoteConfigRepository,
     required AppInitializer appInitializer,
     required AuthRepository authRepository,
-    required DataRepository<UserAppSettings> userAppSettingsRepository,
+    required DataRepository<AppSettings> appSettingsRepository,
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
     required InlineAdCacheService inlineAdCacheService,
@@ -51,7 +51,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   }) : _remoteConfigRepository = remoteConfigRepository,
        _appInitializer = appInitializer,
        _authRepository = authRepository,
-       _userAppSettingsRepository = userAppSettingsRepository,
+       _appSettingsRepository = appSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
        _userRepository = userRepository,
        _inAppNotificationRepository = inAppNotificationRepository,
@@ -74,7 +74,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // Register event handlers for various app-level events.
     on<AppStarted>(_onAppStarted);
     on<AppUserChanged>(_onAppUserChanged);
-    on<AppUserAppSettingsRefreshed>(_onUserAppSettingsRefreshed);
+    on<AppSettingsRefreshed>(_onUserAppSettingsRefreshed);
     on<AppUserContentPreferencesRefreshed>(_onUserContentPreferencesRefreshed);
     on<AppSettingsChanged>(_onAppSettingsChanged);
     on<AppPeriodicConfigFetchRequested>(_onAppPeriodicConfigFetchRequested);
@@ -94,6 +94,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       _onAllInAppNotificationsMarkedAsRead,
     );
     on<AppInAppNotificationMarkedAsRead>(_onInAppNotificationMarkedAsRead);
+    on<AppNotificationTapped>(_onAppNotificationTapped);
 
     // Listen to token refresh events from the push notification service.
     // When a token is refreshed, dispatch an event to trigger device
@@ -116,7 +117,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final DataRepository<RemoteConfig> _remoteConfigRepository;
   final AppInitializer _appInitializer;
   final AuthRepository _authRepository;
-  final DataRepository<UserAppSettings> _userAppSettingsRepository;
+  final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
   final DataRepository<User> _userRepository;
@@ -137,6 +138,24 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // If a user is already logged in when the app starts, register their
     // device for push notifications.
     if (state.user != null) {
+      // Check for existing unread notifications on startup.
+      // This ensures the notification dot is shown correctly if the user
+      // has unread notifications from a previous session.
+      try {
+        final unreadCount = await _inAppNotificationRepository.count(
+          userId: state.user!.id,
+          filter: {'readAt': null},
+        );
+        if (unreadCount > 0) {
+          emit(state.copyWith(hasUnreadInAppNotifications: true));
+        }
+      } catch (e, s) {
+        _logger.severe(
+          'Failed to check for unread notifications on app start.',
+          e,
+          s,
+        );
+      }
       await _registerDeviceForPushNotifications(state.user!.id);
     }
   }
@@ -262,17 +281,15 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   /// Handles refreshing/loading app settings (theme, font).
   Future<void> _onUserAppSettingsRefreshed(
-    AppUserAppSettingsRefreshed event,
+    AppSettingsRefreshed event,
     Emitter<AppState> emit,
   ) async {
     if (state.user == null) {
-      _logger.info(
-        '[AppBloc] Skipping AppUserAppSettingsRefreshed: User is null.',
-      );
+      _logger.info('[AppBloc] Skipping AppSettingsRefreshed: User is null.');
       return;
     }
 
-    final settings = await _userAppSettingsRepository.read(
+    final settings = await _appSettingsRepository.read(
       id: state.user!.id,
       userId: state.user!.id,
     );
@@ -306,7 +323,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   ) async {
     if (state.user == null || state.settings == null) {
       _logger.warning(
-        '[AppBloc] Skipping AppSettingsChanged: User or UserAppSettings not loaded.',
+        '[AppBloc] Skipping AppSettingsChanged: User or AppSettings not loaded.',
       );
       return;
     }
@@ -319,17 +336,17 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     emit(state.copyWith(settings: updatedSettings));
 
     try {
-      await _userAppSettingsRepository.update(
+      await _appSettingsRepository.update(
         id: updatedSettings.id,
         item: updatedSettings,
         userId: updatedSettings.id,
       );
       _logger.info(
-        '[AppBloc] UserAppSettings successfully updated for user ${updatedSettings.id}.',
+        '[AppBloc] AppSettings successfully updated for user ${updatedSettings.id}.',
       );
     } catch (e, s) {
       _logger.severe(
-        'Failed to persist UserAppSettings for user ${updatedSettings.id}.',
+        'Failed to persist AppSettings for user ${updatedSettings.id}.',
         e,
         s,
       );
@@ -355,7 +372,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         id: kRemoteConfigId,
       );
 
-      if (remoteConfig.appStatus.isUnderMaintenance) {
+      if (remoteConfig.app.maintenance.isUnderMaintenance) {
         _logger.warning(
           '[AppBloc] Maintenance mode detected. Updating status.',
         );
@@ -369,7 +386,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       }
 
       if (state.status == AppLifeCycleStatus.underMaintenance &&
-          !remoteConfig.appStatus.isUnderMaintenance) {
+          !remoteConfig.app.maintenance.isUnderMaintenance) {
         _logger.info(
           '[AppBloc] Maintenance mode lifted. Restoring previous status.',
         );
@@ -680,6 +697,44 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         s,
       );
       // Do not change state on error to avoid inconsistent UI.
+    }
+  }
+
+  /// Handles marking a specific notification as read when it's tapped.
+  Future<void> _onAppNotificationTapped(
+    AppNotificationTapped event,
+    Emitter<AppState> emit,
+  ) async {
+    final userId = state.user?.id;
+    if (userId == null) {
+      _logger.warning(
+        '[AppBloc] Cannot mark notification as read: user is not logged in.',
+      );
+      return;
+    }
+
+    try {
+      // First, read the existing notification to get the full object.
+      final notification = await _inAppNotificationRepository.read(
+        id: event.notificationId,
+        userId: userId,
+      );
+
+      // If already read, do nothing.
+      if (notification.isRead) return;
+
+      // Then, update it with the 'readAt' timestamp.
+      await _inAppNotificationRepository.update(
+        id: notification.id,
+        item: notification.copyWith(readAt: DateTime.now()),
+        userId: userId,
+      );
+
+      _logger.info(
+        '[AppBloc] Marked notification ${event.notificationId} as read.',
+      );
+    } catch (e, s) {
+      _logger.severe('Failed to mark notification as read.', e, s);
     }
   }
 

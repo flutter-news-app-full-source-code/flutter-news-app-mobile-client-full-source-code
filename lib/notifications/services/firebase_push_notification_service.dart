@@ -174,13 +174,20 @@ class FirebasePushNotificationService implements PushNotificationService {
 
   /// Converts a Firebase [RemoteMessage] to a generic [PushNotificationPayload].
   PushNotificationPayload _toPushNotificationPayload(RemoteMessage message) {
+    final data = message.data;
     return PushNotificationPayload(
       title: message.notification?.title ?? '',
-      body: message.notification?.body ?? '',
+      notificationId: data['notificationId'] as String? ?? '',
+      notificationType: PushNotificationSubscriptionDeliveryType.values.byName(
+        data['notificationType'] as String? ?? 'breakingOnly',
+      ),
+      contentType: ContentType.values.byName(
+        data['contentType'] as String? ?? 'headline',
+      ),
+      contentId: data['contentId'] as String? ?? '',
       imageUrl:
           message.notification?.android?.imageUrl ??
           message.notification?.apple?.imageUrl,
-      data: message.data,
     );
   }
 

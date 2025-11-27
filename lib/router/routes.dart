@@ -25,8 +25,6 @@ abstract final class Routes {
   // --- Global, Top-Level Routes ---
   static const entityDetails = '/entity-details/:type/:id';
   static const entityDetailsName = 'entityDetails';
-  static const globalArticleDetails = '/article/:id';
-  static const globalArticleDetailsName = 'globalArticleDetails';
 
   // --- Account Sub-Routes ---
   static const accountSavedHeadlines = 'saved-headlines';
@@ -46,7 +44,6 @@ abstract final class Routes {
   static const multiSelectSearchName = 'multiSelectSearch';
 
   // Feed
-  static const articleDetailsName = 'articleDetails';
   static const feedFilter = 'filter';
   static const feedFilterName = 'feedFilter';
   static const feedFilterTopics = 'topics';
@@ -64,10 +61,6 @@ abstract final class Routes {
   static const sourceListName = 'sourceList';
   static const sourceListFilter = 'filter';
   static const discoverSourceListFilterName = 'discoverSourceListFilter';
-
-  // Account
-  static const accountArticleDetails = 'article/:id';
-  static const accountArticleDetailsName = 'accountArticleDetails';
 
   // Settings
   static const settingsAppearance = 'appearance';

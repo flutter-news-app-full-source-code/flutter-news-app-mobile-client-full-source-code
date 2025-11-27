@@ -11,18 +11,18 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class DemoNativeAdWidget extends StatelessWidget {
   /// {@macro demo_native_ad_widget}
-  const DemoNativeAdWidget({this.headlineImageStyle, super.key});
+  const DemoNativeAdWidget({this.feedItemImageStyle, super.key});
 
   /// The user's preference for feed layout, used to determine the ad's visual size.
-  final HeadlineImageStyle? headlineImageStyle;
+  final FeedItemImageStyle? feedItemImageStyle;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
 
-    // Determine the height based on the headlineImageStyle, mimicking real ad widgets.
-    final adHeight = headlineImageStyle == HeadlineImageStyle.largeThumbnail
+    // Determine the height based on the feedItemImageStyle, mimicking real ad widgets.
+    final adHeight = feedItemImageStyle == FeedItemImageStyle.largeThumbnail
         ? 250
         : 120;
 

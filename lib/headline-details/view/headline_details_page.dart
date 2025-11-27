@@ -664,7 +664,7 @@ class _HeadlineDetailsPageState extends State<HeadlineDetailsPage> {
     return [
       buildChip(
         label: DateFormat('yyyy-MM-dd').format(headline.createdAt),
-        onPressed: null, // This makes the chip non-interactive.
+        onPressed: null,
       ),
       buildChip(
         label: headline.source.name,

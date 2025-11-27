@@ -34,7 +34,7 @@ class DemoAdProvider implements AdProvider {
   Future<NativeAd?> loadNativeAd({
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
-    required AdThemeStyle adThemeStyle, // ignore: avoid_unused_param
+    required AdThemeStyle adThemeStyle,
     FeedItemImageStyle? feedItemImageStyle,
   }) async {
     _logger.info('Simulating native ad load for demo environment.');
@@ -55,8 +55,8 @@ class DemoAdProvider implements AdProvider {
   Future<BannerAd?> loadBannerAd({
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
-    required AdThemeStyle adThemeStyle, // ignore: avoid_unused_param
-    FeedItemImageStyle? feedItemImageStyle, // ignore: avoid_unused_param
+    required AdThemeStyle adThemeStyle,
+    FeedItemImageStyle? feedItemImageStyle,
   }) async {
     _logger.info('Simulating banner ad load for demo environment.');
     // Simulate a delay for loading.

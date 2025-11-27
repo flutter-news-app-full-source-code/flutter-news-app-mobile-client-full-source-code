@@ -173,7 +173,7 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
           );
         } else if (decoratorItem is ContentCollectionItem) {
           _decoratorWidget = ContentCollectionDecoratorWidget(
-            item: decoratorItem, // The content collection item to display.
+            item: decoratorItem,
             // The onFollowToggle callback is handled by this widget, which
             // then dispatches an event to the AppBloc to update user preferences.
             onFollowToggle: _onFollowToggle,

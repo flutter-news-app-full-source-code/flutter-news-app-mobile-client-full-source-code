@@ -112,7 +112,7 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
           // Show a pre-permission dialog to explain why we need notifications.
           final l10n = AppLocalizationsX(context).l10n;
           final wantsToAllow = await showDialog<bool>(
-            context: context, // The context is still valid here.
+            context: context,
             builder: (context) => AlertDialog(
               title: Text(l10n.prePermissionDialogTitle),
               content: Text(l10n.prePermissionDialogBody),
@@ -163,7 +163,7 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
       // save operation was successfully initiated. This allows the caller
       // to coordinate subsequent navigation actions, preventing race conditions.
       if (!mounted) return;
-      Navigator.of(this.context).pop(true); // Return true on success.
+      Navigator.of(this.context).pop(true);
     }
   }
 

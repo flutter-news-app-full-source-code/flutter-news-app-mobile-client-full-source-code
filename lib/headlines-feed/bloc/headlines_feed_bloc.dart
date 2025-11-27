@@ -319,7 +319,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           'Refresh throttled for filter "$filterKey". '
           'Time since last: $timeSinceLastRefresh.',
         );
-        return; // Ignore the request.
+        return;
       }
     }
 

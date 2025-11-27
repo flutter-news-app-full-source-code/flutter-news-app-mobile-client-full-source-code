@@ -92,7 +92,7 @@ class InAppNotificationCenterState extends Equatable {
     breakingNewsCursor ?? Object(),
     digestHasMore,
     digestCursor ?? Object(),
-    error ?? Object(), // Include error in props, handle nullability
+    error ?? Object(),
   ];
 
   /// Creates a copy of this state with the given fields replaced with the new

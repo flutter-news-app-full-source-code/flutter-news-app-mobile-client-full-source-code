@@ -235,3 +235,18 @@ class AppAllInAppNotificationsMarkedAsRead extends AppEvent {
   /// {@macro app_all_in_app_notifications_marked_as_read}
   const AppAllInAppNotificationsMarkedAsRead();
 }
+
+/// {@template app_notification_tapped}
+/// Dispatched when a push notification is tapped by the user from the system
+/// tray, signaling that it should be marked as read.
+/// {@endtemplate}
+class AppNotificationTapped extends AppEvent {
+  /// {@macro app_notification_tapped}
+  const AppNotificationTapped(this.notificationId);
+
+  /// The unique ID of the notification that was tapped.
+  final String notificationId;
+
+  @override
+  List<Object> get props => [notificationId];
+}

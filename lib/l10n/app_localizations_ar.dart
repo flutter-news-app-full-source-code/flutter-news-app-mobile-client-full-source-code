@@ -317,7 +317,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsAppearanceTitle => 'المظهر';
 
   @override
-  String get settingsFeedDisplayTitle => 'عرض الموجز';
+  String get settingsFeedDisplayTitle => 'الموجز';
 
   @override
   String get settingsArticleDisplayTitle => 'عرض المقال';

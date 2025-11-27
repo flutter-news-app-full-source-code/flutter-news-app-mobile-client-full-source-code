@@ -319,7 +319,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAppearanceTitle => 'Appearance';
 
   @override
-  String get settingsFeedDisplayTitle => 'Feed Display';
+  String get settingsFeedDisplayTitle => 'Feed';
 
   @override
   String get settingsArticleDisplayTitle => 'Article Display';

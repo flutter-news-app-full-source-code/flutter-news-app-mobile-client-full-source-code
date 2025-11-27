@@ -674,10 +674,10 @@ abstract class AppLocalizations {
   /// **'Appearance'**
   String get settingsAppearanceTitle;
 
-  /// Title for the feed display settings section/page
+  /// Title for the feed settings section/page
   ///
   /// In en, this message translates to:
-  /// **'Feed Display'**
+  /// **'Feed'**
   String get settingsFeedDisplayTitle;
 
   /// Title for the article display settings section/page

@@ -191,10 +191,16 @@ class OneSignalPushNotificationService extends PushNotificationService {
     final data = osNotification.additionalData?.map(MapEntry.new) ?? {};
 
     return PushNotificationPayload(
-      title: osNotification.title ?? '',
-      body: osNotification.body ?? '',
+      title: osNotification.title ?? data['title'] as String? ?? '',
+      notificationId: data['notificationId'] as String? ?? '',
+      notificationType: PushNotificationSubscriptionDeliveryType.values.byName(
+        data['notificationType'] as String? ?? 'breakingOnly',
+      ),
+      contentType: ContentType.values.byName(
+        data['contentType'] as String? ?? 'headline',
+      ),
+      contentId: data['contentId'] as String? ?? '',
       imageUrl: osNotification.bigPicture,
-      data: data,
     );
   }
 

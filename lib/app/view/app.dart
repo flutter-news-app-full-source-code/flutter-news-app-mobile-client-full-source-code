@@ -220,6 +220,7 @@ class _AppViewState extends State<_AppView> {
           _routerLogger.fine('Notification opened app with payload: $payload');
           final contentType = payload.contentType;
           final contentId = payload.contentId;
+          final notificationId = payload.notificationId;
 
           if (contentType == ContentType.headline && contentId.isNotEmpty) {
             // Guard against using BuildContext across async gaps by checking
@@ -228,6 +229,7 @@ class _AppViewState extends State<_AppView> {
               await HeadlineTapHandler.handleTapFromSystemNotification(
                 context,
                 contentId,
+                notificationId: notificationId,
               );
             }
           }

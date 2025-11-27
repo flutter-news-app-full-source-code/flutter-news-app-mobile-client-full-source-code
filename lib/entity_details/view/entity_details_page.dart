@@ -349,15 +349,13 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                         // Retrieve the user's preferred headline image style from the AppBloc.
                         // This is the single source of truth for this setting.
                         // Access the AppBloc to get the remoteConfig for ads.
-                        final adConfig = context
+                        final remoteConfig = context
                             .read<AppBloc>()
                             .state
-                            .remoteConfig
-                            ?.features
-                            .ads;
+                            .remoteConfig;
 
                         // Ensure adConfig is not null before building the AdLoaderWidget.
-                        if (adConfig == null) {
+                        if (remoteConfig?.features.ads == null) {
                           // Return an empty widget or a placeholder if adConfig is not available.
                           return const SizedBox.shrink();
                         }
@@ -368,7 +366,7 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                           adThemeStyle: AdThemeStyle.fromTheme(
                             Theme.of(context),
                           ),
-                          adConfig: adConfig,
+                          remoteConfig: remoteConfig!,
                         );
                       }
                       return const SizedBox.shrink();

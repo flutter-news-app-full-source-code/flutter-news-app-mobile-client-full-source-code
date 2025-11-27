@@ -702,6 +702,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         userId: userId,
       );
 
+      // If already read, do nothing.
+      if (notification.isRead) return;
+
       // Then, update it with the 'readAt' timestamp.
       await _inAppNotificationRepository.update(
         id: notification.id,

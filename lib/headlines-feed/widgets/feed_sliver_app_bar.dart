@@ -85,16 +85,13 @@ class FeedSliverAppBar extends StatelessWidget implements PreferredSizeWidget {
                 child: BlocSelector<AppBloc, AppState, bool>(
                   selector: (state) => state.hasUnreadInAppNotifications,
                   builder: (context, showIndicator) {
-                    return Directionality(
-                      textDirection: Directionality.of(context),
-                      child: NotificationIndicator(
-                        showIndicator: showIndicator,
-                        child: BlocSelector<AppBloc, AppState, User?>(
-                          selector: (state) => state.user,
-                          builder: (context, user) {
-                            return UserAvatar(user: user);
-                          },
-                        ),
+                    return NotificationIndicator(
+                      showIndicator: showIndicator,
+                      child: BlocSelector<AppBloc, AppState, User?>(
+                        selector: (state) => state.user,
+                        builder: (context, user) {
+                          return UserAvatar(user: user);
+                        },
                       ),
                     );
                   },

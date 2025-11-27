@@ -27,9 +27,10 @@ class NotificationIndicator extends StatelessWidget {
       children: [
         child,
         if (showIndicator)
-          Positioned(
-            top: 0,
-            right: 0,
+          Positioned.directional(
+            textDirection: Directionality.of(context),
+            top: 2,
+            end: 2,
             child: Container(
               width: AppSpacing.sm,
               height: AppSpacing.sm,

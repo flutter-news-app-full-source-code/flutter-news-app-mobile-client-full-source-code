@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
@@ -68,23 +70,25 @@ abstract final class HeadlineTapHandler {
     BuildContext context,
     String headlineId,
   ) async {
-    // Show a loading dialog as fetching the headline may take time.
-    if (context.mounted) {
-      await showDialog<void>(
+    // Show a loading dialog that is resilient to context changes.
+    final navigator = Navigator.of(context);
+    unawaited(
+      showDialog<void>(
         context: context,
         barrierDismissible: false,
-        builder: (BuildContext context) =>
-            const Center(child: CircularProgressIndicator()),
-      );
-    }
-
-    final headline = await context.read<DataRepository<Headline>>().read(
-      id: headlineId,
+        builder: (_) => const Center(child: CircularProgressIndicator()),
+      ),
     );
 
-    if (!context.mounted) return;
-    Navigator.of(context).pop(); // Dismiss the loading dialog.
-    await handleHeadlineTap(context, headline);
+    try {
+      final headline = await context.read<DataRepository<Headline>>().read(
+        id: headlineId,
+      );
+      if (!context.mounted) return;
+      await handleHeadlineTap(context, headline);
+    } finally {
+      if (navigator.canPop()) navigator.pop();
+    }
   }
 
   /// Handles a tap on a headline from a system notification.
@@ -109,24 +113,25 @@ abstract final class HeadlineTapHandler {
       context.read<AppBloc>().add(AppNotificationTapped(notificationId));
     }
 
-    if (context.mounted) {
-      await showDialog<void>(
+    // Show a loading dialog that is resilient to context changes.
+    final navigator = Navigator.of(context);
+    unawaited(
+      showDialog<void>(
         context: context,
         barrierDismissible: false,
-        builder: (BuildContext context) =>
-            const Center(child: CircularProgressIndicator()),
-      );
-    }
-
-    final headline = await context.read<DataRepository<Headline>>().read(
-      id: headlineId,
+        builder: (_) => const Center(child: CircularProgressIndicator()),
+      ),
     );
 
-    if (!context.mounted) return;
-    Navigator.of(context).pop(); // Dismiss the loading dialog.
-
-    if (await canLaunchUrlString(headline.url)) {
-      await launchUrlString(headline.url, mode: LaunchMode.inAppWebView);
+    try {
+      final headline = await context.read<DataRepository<Headline>>().read(
+        id: headlineId,
+      );
+      if (context.mounted && await canLaunchUrlString(headline.url)) {
+        await launchUrlString(headline.url, mode: LaunchMode.inAppWebView);
+      }
+    } finally {
+      if (navigator.canPop()) navigator.pop();
     }
   }
 }

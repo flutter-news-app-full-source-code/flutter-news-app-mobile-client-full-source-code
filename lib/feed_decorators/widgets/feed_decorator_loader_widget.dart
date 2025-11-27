@@ -124,7 +124,8 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
       return;
     }
 
-    final decoratorConfig = remoteConfig.feedDecoratorConfig[dueDecoratorType];
+    final decoratorConfig =
+        remoteConfig.features.feed.decorators[dueDecoratorType];
     if (decoratorConfig == null) {
       _logger.warning('Config not found for due decorator: $dueDecoratorType');
       if (mounted) setState(() => _state = _DecoratorState.none);
@@ -300,7 +301,7 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
     final userRole = user.appRole;
     final dueCandidates = <({FeedDecoratorType type, int priority})>[];
 
-    for (final entry in remoteConfig.feedDecoratorConfig.entries) {
+    for (final entry in remoteConfig.features.feed.decorators.entries) {
       final decoratorType = entry.key;
       final decoratorConfig = entry.value;
 

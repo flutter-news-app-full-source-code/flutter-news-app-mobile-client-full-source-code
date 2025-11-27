@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:auth_repository/auth_repository.dart';
 import 'package:core/core.dart';
-import 'package:data_repository/data_repository.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
     as local_config;
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
@@ -10,6 +9,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/models/initi
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_initializer_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/package_info_service.dart';
+import 'package:data_repository/data_repository.dart';
 import 'package:logging/logging.dart';
 import 'package:pub_semver/pub_semver.dart';
 
@@ -42,25 +42,25 @@ class AppInitializer {
     required AuthRepository authenticationRepository,
     required DataRepository<AppSettings> appSettingsRepository,
     required DataRepository<UserContentPreferences>
-        userContentPreferencesRepository,
+    userContentPreferencesRepository,
     required DataRepository<RemoteConfig> remoteConfigRepository,
     required local_config.AppEnvironment environment,
     required PackageInfoService packageInfoService,
     required Logger logger,
     this.demoDataMigrationService,
     this.demoDataInitializerService,
-  })  : _authenticationRepository = authenticationRepository,
-        _appSettingsRepository = appSettingsRepository,
-        _userContentPreferencesRepository = userContentPreferencesRepository,
-        _remoteConfigRepository = remoteConfigRepository,
-        _environment = environment,
-        _packageInfoService = packageInfoService,
-        _logger = logger;
+  }) : _authenticationRepository = authenticationRepository,
+       _appSettingsRepository = appSettingsRepository,
+       _userContentPreferencesRepository = userContentPreferencesRepository,
+       _remoteConfigRepository = remoteConfigRepository,
+       _environment = environment,
+       _packageInfoService = packageInfoService,
+       _logger = logger;
 
   final AuthRepository _authenticationRepository;
   final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
-      _userContentPreferencesRepository;
+  _userContentPreferencesRepository;
   final DataRepository<RemoteConfig> _remoteConfigRepository;
   final local_config.AppEnvironment _environment;
   final PackageInfoService _packageInfoService;
@@ -267,7 +267,8 @@ class AppInitializer {
     );
 
     // --- Data Migration Logic ---
-    final isMigration = oldUser != null &&
+    final isMigration =
+        oldUser != null &&
         oldUser.appRole == AppUserRole.guestUser &&
         newUser.appRole == AppUserRole.standardUser;
 

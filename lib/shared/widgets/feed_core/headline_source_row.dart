@@ -11,12 +11,15 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@template headline_source_row}
 /// A widget to display the source and publish date of a headline.
 /// {@endtemplate}
-class HeadlineSourceRow extends StatelessWidget {
+class HeadlineSourceRow extends StatefulWidget {
   /// {@macro headline_source_row}
-  const HeadlineSourceRow({required this.headline, super.key});
+  const HeadlineSourceRow({required this.headline, this.trailing, super.key});
 
   /// The headline data to display.
   final Headline headline;
+
+  /// An optional widget to display at the end of the row.
+  final Widget? trailing;
 
   Future<void> _handleEntityTap(BuildContext context) async {
     await context.read<InterstitialAdManager>().onPotentialAdTrigger();
@@ -31,6 +34,11 @@ class HeadlineSourceRow extends StatelessWidget {
   }
 
   @override
+  State<HeadlineSourceRow> createState() => _HeadlineSourceRowState();
+}
+
+class _HeadlineSourceRowState extends State<HeadlineSourceRow> {
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
@@ -38,7 +46,7 @@ class HeadlineSourceRow extends StatelessWidget {
     final currentLocale = context.watch<AppBloc>().state.locale;
 
     final formattedDate = timeago.format(
-      headline.createdAt,
+      widget.headline.createdAt,
       locale: currentLocale.languageCode,
     );
 
@@ -56,7 +64,7 @@ class HeadlineSourceRow extends StatelessWidget {
       children: [
         Expanded(
           child: InkWell(
-            onTap: () => _handleEntityTap(context),
+            onTap: () => widget._handleEntityTap(context),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -66,7 +74,7 @@ class HeadlineSourceRow extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(AppSpacing.xs / 2),
                     child: Image.network(
-                      headline.source.logoUrl,
+                      widget.headline.source.logoUrl,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) => Icon(
                         Icons.source_outlined,
@@ -79,7 +87,7 @@ class HeadlineSourceRow extends StatelessWidget {
                 const SizedBox(width: AppSpacing.xs),
                 Flexible(
                   child: Text(
-                    headline.source.name,
+                    widget.headline.source.name,
                     style: sourceTextStyle,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -88,7 +96,14 @@ class HeadlineSourceRow extends StatelessWidget {
             ),
           ),
         ),
-        if (formattedDate.isNotEmpty) Text(formattedDate, style: dateTextStyle),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (formattedDate.isNotEmpty)
+              Text(formattedDate, style: dateTextStyle),
+            if (widget.trailing != null) widget.trailing!,
+          ],
+        ),
       ],
     );
   }

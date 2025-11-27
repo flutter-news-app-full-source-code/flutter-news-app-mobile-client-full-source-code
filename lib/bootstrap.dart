@@ -67,7 +67,6 @@ Future<Widget> bootstrap(
     ..config('--- Starting Bootstrap Process ---')
     ..config('App Environment: $environment');
 
-  WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = const AppBlocObserver();
   timeago.setLocaleMessages('en', EnTimeagoMessages());
   timeago.setLocaleMessages('ar', ArTimeagoMessages());

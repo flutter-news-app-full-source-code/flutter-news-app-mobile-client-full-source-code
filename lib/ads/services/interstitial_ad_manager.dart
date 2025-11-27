@@ -47,8 +47,11 @@ class InterstitialAdManager {
   /// The currently pre-loaded interstitial ad.
   InterstitialAd? _preloadedAd;
 
-  /// Tracks the number of eligible page transitions since the last ad was shown.
-  int _transitionCount = 0;
+  /// Tracks internal page transitions since the last internal ad was shown.
+  int _internalTransitionCount = 0;
+
+  /// Tracks external URL navigations since the last external ad was shown.
+  int _externalTransitionCount = 0;
 
   /// The current remote configuration for ads.
   RemoteConfig? _remoteConfig;
@@ -159,34 +162,80 @@ class InterstitialAdManager {
   /// Returns a [Future] that completes when the ad is dismissed, allowing the
   /// caller to await the ad's lifecycle before proceeding with navigation.
   Future<void> onPotentialAdTrigger() async {
-    _transitionCount++;
-    _logger.info('Potential ad trigger. Transition count: $_transitionCount');
+    _internalTransitionCount++;
+    _logger.info(
+      'Internal navigation trigger. Count: $_internalTransitionCount',
+    );
 
     final remoteConfig = _remoteConfig;
     if (remoteConfig == null) {
-      _logger.warning('No ad config available. Cannot determine ad frequency.');
+      _logger.warning(
+        'No remote config available. Cannot determine ad frequency.',
+      );
       return;
     }
 
     final frequencyConfig = remoteConfig
-        .features
-        .ads
-        .navigationAdConfiguration
+        .features.ads.navigationAdConfiguration
         .visibleTo[_userRole];
 
-    // If no frequency config is found for the user role, or if it's explicitly
-    // disabled (transitionsBeforeShowingInterstitialAds == 0), then no ad should be shown.
     final requiredTransitions =
         frequencyConfig?.internalNavigationsBeforeShowingInterstitialAd ?? 0;
 
-    if (requiredTransitions > 0 && _transitionCount >= requiredTransitions) {
-      _logger.info('Transition count meets threshold. Attempting to show ad.');
+    if (requiredTransitions > 0 &&
+        _internalTransitionCount >= requiredTransitions) {
+      _logger.info(
+        'Internal transition count meets threshold. Attempting to show ad.',
+      );
       await _showAd();
-      // Reset counter after showing (or attempting to show)
-      _transitionCount = 0;
+      _internalTransitionCount = 0;
     } else {
       _logger.info(
-        'Transition count ($_transitionCount) has not met threshold ($requiredTransitions).',
+        'Internal transition count ($_internalTransitionCount) has not met '
+        'threshold ($requiredTransitions).',
+      );
+    }
+  }
+
+  /// Called by the UI before an external navigation (opening a URL) occurs.
+  ///
+  /// This method increments the external navigation counter and shows a
+  /// pre-loaded ad if the frequency criteria are met.
+  ///
+  /// Returns a [Future] that completes when the ad is dismissed, allowing the
+  /// caller to await the ad's lifecycle before proceeding with navigation.
+  Future<void> onExternalNavigationTrigger() async {
+    _externalTransitionCount++;
+    _logger.info(
+      'External navigation trigger. Count: $_externalTransitionCount',
+    );
+
+    final remoteConfig = _remoteConfig;
+    if (remoteConfig == null) {
+      _logger.warning(
+        'No remote config available. Cannot determine ad frequency.',
+      );
+      return;
+    }
+
+    final frequencyConfig = remoteConfig
+        .features.ads.navigationAdConfiguration
+        .visibleTo[_userRole];
+
+    final requiredTransitions =
+        frequencyConfig?.externalNavigationsBeforeShowingInterstitialAd ?? 0;
+
+    if (requiredTransitions > 0 &&
+        _externalTransitionCount >= requiredTransitions) {
+      _logger.info(
+        'External navigation count meets threshold. Attempting to show ad.',
+      );
+      await _showAd();
+      _externalTransitionCount = 0;
+    } else {
+      _logger.info(
+        'External navigation count ($_externalTransitionCount) has not met '
+        'threshold ($requiredTransitions).',
       );
     }
   }

@@ -22,8 +22,10 @@ class HeadlineActionsBottomSheet extends StatelessWidget {
     final l10n = AppLocalizationsX(context).l10n;
     return BlocBuilder<AppBloc, AppState>(
       builder: (context, state) {
-        final isBookmarked = state.userContentPreferences?.savedHeadlines
-                .any((saved) => saved.id == headline.id) ??
+        final isBookmarked =
+            state.userContentPreferences?.savedHeadlines.any(
+              (saved) => saved.id == headline.id,
+            ) ??
             false;
 
         return Wrap(
@@ -58,8 +60,9 @@ class HeadlineActionsBottomSheet extends StatelessWidget {
                 final userContentPreferences = state.userContentPreferences;
                 if (userContentPreferences == null) return;
 
-                final currentSaved =
-                    List<Headline>.from(userContentPreferences.savedHeadlines);
+                final currentSaved = List<Headline>.from(
+                  userContentPreferences.savedHeadlines,
+                );
 
                 if (isBookmarked) {
                   currentSaved.removeWhere((h) => h.id == headline.id);
@@ -68,12 +71,12 @@ class HeadlineActionsBottomSheet extends StatelessWidget {
                 }
 
                 context.read<AppBloc>().add(
-                      AppUserContentPreferencesChanged(
-                        preferences: userContentPreferences.copyWith(
-                          savedHeadlines: currentSaved,
-                        ),
-                      ),
-                    );
+                  AppUserContentPreferencesChanged(
+                    preferences: userContentPreferences.copyWith(
+                      savedHeadlines: currentSaved,
+                    ),
+                  ),
+                );
                 Navigator.of(context).pop();
               },
             ),

@@ -70,7 +70,7 @@ abstract final class HeadlineTapHandler {
   ) async {
     // Show a loading dialog as fetching the headline may take time.
     if (context.mounted) {
-      showDialog<void>(
+      await showDialog<void>(
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) =>
@@ -110,7 +110,7 @@ abstract final class HeadlineTapHandler {
     }
 
     if (context.mounted) {
-      showDialog<void>(
+      await showDialog<void>(
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) =>

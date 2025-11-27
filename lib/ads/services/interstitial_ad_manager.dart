@@ -176,7 +176,9 @@ class InterstitialAdManager {
     }
 
     final frequencyConfig = remoteConfig
-        .features.ads.navigationAdConfiguration
+        .features
+        .ads
+        .navigationAdConfiguration
         .visibleTo[_userRole];
 
     final requiredTransitions =
@@ -219,7 +221,9 @@ class InterstitialAdManager {
     }
 
     final frequencyConfig = remoteConfig
-        .features.ads.navigationAdConfiguration
+        .features
+        .ads
+        .navigationAdConfiguration
         .visibleTo[_userRole];
 
     final requiredTransitions =

@@ -118,17 +118,17 @@ class AppState extends Equatable {
 
   @override
   List<Object?> get props => [
-        status,
-        user,
-        settings,
-        remoteConfig,
-        error,
-        userContentPreferences,
-        selectedBottomNavigationIndex,
-        currentAppVersion,
-        latestAppVersion,
-        hasUnreadInAppNotifications,
-      ];
+    status,
+    user,
+    settings,
+    remoteConfig,
+    error,
+    userContentPreferences,
+    selectedBottomNavigationIndex,
+    currentAppVersion,
+    latestAppVersion,
+    hasUnreadInAppNotifications,
+  ];
 
   /// Creates a copy of this [AppState] with the given fields replaced with
   /// the new values.

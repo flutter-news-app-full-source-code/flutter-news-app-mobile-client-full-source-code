@@ -15,14 +15,14 @@ class DemoDataMigrationService {
   DemoDataMigrationService({
     required DataRepository<AppSettings> appSettingsRepository,
     required DataRepository<UserContentPreferences>
-        userContentPreferencesRepository,
-  })  : _appSettingsRepository = appSettingsRepository,
-        _userContentPreferencesRepository = userContentPreferencesRepository,
-        _logger = Logger('DemoDataMigrationService');
+    userContentPreferencesRepository,
+  }) : _appSettingsRepository = appSettingsRepository,
+       _userContentPreferencesRepository = userContentPreferencesRepository,
+       _logger = Logger('DemoDataMigrationService');
 
   final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
-      _userContentPreferencesRepository;
+  _userContentPreferencesRepository;
   final Logger _logger;
 
   /// Migrates user settings and content preferences from an old anonymous

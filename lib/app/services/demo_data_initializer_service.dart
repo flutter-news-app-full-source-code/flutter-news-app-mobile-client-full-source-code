@@ -21,19 +21,19 @@ class DemoDataInitializerService {
   DemoDataInitializerService({
     required DataRepository<AppSettings> appSettingsRepository,
     required DataRepository<UserContentPreferences>
-        userContentPreferencesRepository,
+    userContentPreferencesRepository,
     required DataRepository<InAppNotification> inAppNotificationRepository,
     required this.appSettingsFixturesData,
     required this.userContentPreferencesFixturesData,
     required this.inAppNotificationsFixturesData,
-  })  : _appSettingsRepository = appSettingsRepository,
-        _userContentPreferencesRepository = userContentPreferencesRepository,
-        _inAppNotificationRepository = inAppNotificationRepository,
-        _logger = Logger('DemoDataInitializerService');
+  }) : _appSettingsRepository = appSettingsRepository,
+       _userContentPreferencesRepository = userContentPreferencesRepository,
+       _inAppNotificationRepository = inAppNotificationRepository,
+       _logger = Logger('DemoDataInitializerService');
 
   final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
-      _userContentPreferencesRepository;
+  _userContentPreferencesRepository;
   final DataRepository<InAppNotification> _inAppNotificationRepository;
   final Logger _logger;
 
@@ -135,8 +135,8 @@ class DemoDataInitializerService {
           'Cannot create preferences from fixture: userContentPreferencesFixturesData is empty.',
         );
       }
-      final fixturePreferences =
-          userContentPreferencesFixturesData.first.copyWith(id: userId);
+      final fixturePreferences = userContentPreferencesFixturesData.first
+          .copyWith(id: userId);
 
       await _userContentPreferencesRepository.create(
         item: fixturePreferences,
@@ -185,11 +185,13 @@ class DemoDataInitializerService {
       }
 
       // Exclude the first notification, which will be used for the simulated push.
-      final notificationsToCreate =
-          inAppNotificationsFixturesData.skip(1).toList();
+      final notificationsToCreate = inAppNotificationsFixturesData
+          .skip(1)
+          .toList();
 
-      final userNotifications =
-          notificationsToCreate.map((n) => n.copyWith(userId: userId)).toList();
+      final userNotifications = notificationsToCreate
+          .map((n) => n.copyWith(userId: userId))
+          .toList();
 
       await Future.wait(
         userNotifications.map(

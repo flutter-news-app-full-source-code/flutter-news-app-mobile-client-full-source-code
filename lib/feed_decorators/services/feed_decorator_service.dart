@@ -48,9 +48,8 @@ class FeedDecoratorService {
   }) {
     final decoratedFeed = List<FeedItem>.from(feedItems);
 
-    final areDecoratorsEnabled = remoteConfig.features.feed.decorators.values.any(
-      (config) => config.enabled,
-    );
+    final areDecoratorsEnabled = remoteConfig.features.feed.decorators.values
+        .any((config) => config.enabled);
 
     if (areDecoratorsEnabled) {
       _logger.info('Feed decorators enabled. Injecting placeholder.');

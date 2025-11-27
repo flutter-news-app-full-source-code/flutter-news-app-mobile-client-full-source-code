@@ -2,7 +2,7 @@
 
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart'; 
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/feed_ad_loader_widget.dart';
@@ -318,21 +318,27 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                               headline: item,
                               onHeadlineTap: () =>
                                   HeadlineTapHandler.handleHeadlineTap(
-                                      context, item),
+                                    context,
+                                    item,
+                                  ),
                             );
                           case FeedItemImageStyle.smallThumbnail:
                             tile = HeadlineTileImageStart(
                               headline: item,
                               onHeadlineTap: () =>
                                   HeadlineTapHandler.handleHeadlineTap(
-                                      context, item),
+                                    context,
+                                    item,
+                                  ),
                             );
                           case FeedItemImageStyle.largeThumbnail:
                             tile = HeadlineTileImageTop(
                               headline: item,
                               onHeadlineTap: () =>
                                   HeadlineTapHandler.handleHeadlineTap(
-                                      context, item),
+                                    context,
+                                    item,
+                                  ),
                             );
                         }
                         return tile;

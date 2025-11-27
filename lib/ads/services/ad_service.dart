@@ -147,7 +147,7 @@ class AdService {
     // user role has a defined configuration in the visibleTo map.
     final isInterstitialEnabledForRole =
         interstitialConfig.enabled &&
-            interstitialConfig.visibleTo.containsKey(userRole);
+        interstitialConfig.visibleTo.containsKey(userRole);
 
     if (!isInterstitialEnabledForRole) {
       _logger.info(
@@ -246,9 +246,7 @@ class AdService {
     required AppUserRole userRole,
     FeedItemImageStyle? feedItemImageStyle,
   }) async {
-    _logger.info(
-      'AdService: _loadInlineAd called for adType: $adType',
-    );
+    _logger.info('AdService: _loadInlineAd called for adType: $adType');
     // Check if ads are globally enabled.
     if (!adConfig.enabled) {
       _logger.info('AdService: Ads are globally disabled in RemoteConfig.');
@@ -418,8 +416,8 @@ class AdService {
     final userRole = user?.appRole ?? AppUserRole.guestUser;
 
     // Determine ad frequency rules based on user role.
-    final feedAdFrequencyConfig = remoteConfig
-        .features.ads.feedAdConfiguration.visibleTo[userRole];
+    final feedAdFrequencyConfig =
+        remoteConfig.features.ads.feedAdConfiguration.visibleTo[userRole];
 
     // Default to 0 for adFrequency and adPlacementInterval if no config is found
     // for the user role, effectively disabling ads for that role.

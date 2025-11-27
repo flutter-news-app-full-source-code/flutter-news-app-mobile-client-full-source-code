@@ -97,7 +97,9 @@ class _DemoInterstitialAdDialogState extends State<DemoInterstitialAdDialog> {
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('${l10n.continueToArticleButtonLabel} ($_countdown)'),
+                        Text(
+                          '${l10n.continueToArticleButtonLabel} ($_countdown)',
+                        ),
                       ],
                     ),
             ),

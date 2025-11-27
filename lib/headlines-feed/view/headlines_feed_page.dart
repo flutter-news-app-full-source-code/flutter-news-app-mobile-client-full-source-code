@@ -261,11 +261,10 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                           if (item is Headline) {
                             final imageStyle = context
                                 .watch<AppBloc>()
-                                .state
-                                .headlineImageStyle;
+                                .state.feedItemImageStyle;
                             Widget tile;
                             switch (imageStyle) {
-                              case HeadlineImageStyle.hidden:
+                              case FeedItemImageStyle.hidden:
                                 tile = HeadlineTileTextOnly(
                                   headline: item,
                                   onHeadlineTap: () =>
@@ -274,7 +273,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                                         item,
                                       ),
                                 );
-                              case HeadlineImageStyle.smallThumbnail:
+                              case FeedItemImageStyle.smallThumbnail:
                                 tile = HeadlineTileImageStart(
                                   headline: item,
                                   onHeadlineTap: () =>
@@ -283,7 +282,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                                         item,
                                       ),
                                 );
-                              case HeadlineImageStyle.largeThumbnail:
+                              case FeedItemImageStyle.largeThumbnail:
                                 tile = HeadlineTileImageTop(
                                   headline: item,
                                   onHeadlineTap: () =>
@@ -296,14 +295,12 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                             return tile;
                           } else if (item is AdPlaceholder) {
                             // Access the AppBloc to get the remoteConfig for ads.
-                            final adConfig = context
+                            final remoteConfig = context
                                 .read<AppBloc>()
-                                .state
-                                .remoteConfig
-                                ?.adConfig;
+                                .state.remoteConfig;
 
                             // Ensure adConfig is not null before building the AdLoaderWidget.
-                            if (adConfig == null) {
+                            if (remoteConfig?.features.ads == null) {
                               // Return an empty widget or a placeholder if adConfig is not available.
                               return const SizedBox.shrink();
                             }
@@ -313,7 +310,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                               contextKey: state.activeFilterId!,
                               adPlaceholder: item,
                               adThemeStyle: AdThemeStyle.fromTheme(theme),
-                              adConfig: adConfig,
+                              remoteConfig: remoteConfig!,
                             );
                           } else if (item is DecoratorPlaceholder) {
                             // The FeedDecoratorLoaderWidget is responsible for

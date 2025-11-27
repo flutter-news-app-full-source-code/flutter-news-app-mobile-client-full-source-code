@@ -26,6 +26,20 @@ class FeedSettingsPage extends StatelessWidget {
     }
   }
 
+  String _clickBehaviorToString(
+    FeedItemClickBehavior behavior,
+    AppLocalizations l10n,
+  ) {
+    switch (behavior) {
+      case FeedItemClickBehavior.defaultBehavior:
+        return l10n.settingsFeedClickBehaviorDefault;
+      case FeedItemClickBehavior.internalNavigation:
+        return l10n.settingsFeedClickBehaviorInApp;
+      case FeedItemClickBehavior.externalNavigation:
+        return l10n.settingsFeedClickBehaviorSystem;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
@@ -61,6 +75,22 @@ class FeedSettingsPage extends StatelessWidget {
               onChanged: (value) {
                 if (value != null) {
                   settingsBloc.add(SettingsFeedItemImageStyleChanged(value));
+                }
+              },
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            // --- Feed Item Click Behavior ---
+            _buildDropdownSetting<FeedItemClickBehavior>(
+              context: context,
+              title: l10n.settingsFeedClickBehaviorLabel,
+              currentValue:
+                  state.appSettings!.feedSettings.feedItemClickBehavior,
+              items: FeedItemClickBehavior.values,
+              itemToString: (behavior) =>
+                  _clickBehaviorToString(behavior, l10n),
+              onChanged: (value) {
+                if (value != null) {
+                  settingsBloc.add(SettingsFeedItemClickBehaviorChanged(value));
                 }
               },
             ),

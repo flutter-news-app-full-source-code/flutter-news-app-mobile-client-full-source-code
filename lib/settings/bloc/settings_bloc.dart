@@ -50,6 +50,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       _onFeedItemImageStyleChanged,
       transformer: sequential(),
     );
+    on<SettingsFeedItemClickBehaviorChanged>(
+      _onFeedItemClickBehaviorChanged,
+      transformer: sequential(),
+    );
     on<SettingsLanguageChanged>(_onLanguageChanged, transformer: sequential());
   }
 
@@ -204,6 +208,22 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     // displayed, the cache must be cleared, forcing a new ad load with the
     // appropriate template.
     _inlineAdCacheService.clearAllAds();
+    await _persistSettings(updatedSettings, emit);
+  }
+
+  Future<void> _onFeedItemClickBehaviorChanged(
+    SettingsFeedItemClickBehaviorChanged event,
+    Emitter<SettingsState> emit,
+  ) async {
+    if (state.appSettings == null) return;
+
+    final updatedSettings = state.appSettings!.copyWith(
+      feedSettings: state.appSettings!.feedSettings.copyWith(
+        feedItemClickBehavior: event.clickBehavior,
+      ),
+    );
+    emit(state.copyWith(appSettings: updatedSettings, clearError: true));
+    // No need to clear ad cache as this setting does not affect ad appearance.
     await _persistSettings(updatedSettings, emit);
   }
 

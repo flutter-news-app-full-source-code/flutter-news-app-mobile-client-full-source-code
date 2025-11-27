@@ -19,15 +19,14 @@ class LanguageSettingsPage extends StatelessWidget {
     final settingsBloc = context.watch<SettingsBloc>();
     final settingsState = settingsBloc.state;
 
-    if (settingsState.status != SettingsStatus.success ||
-        settingsState.userAppSettings == null) {
+    if (settingsState.status != SettingsStatus.success || settingsState.appSettings == null) {
       return Scaffold(
         appBar: AppBar(title: Text(l10n.settingsTitle)),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
-    final currentLanguage = settingsState.userAppSettings!.language;
+    final currentLanguage = settingsState.appSettings!.language;
 
     // Filter languagesFixturesData to only include English and Arabic
     final supportedLanguages = languagesFixturesData
@@ -37,7 +36,7 @@ class LanguageSettingsPage extends StatelessWidget {
     return BlocListener<SettingsBloc, SettingsState>(
       listener: (context, state) {
         if (state.status == SettingsStatus.success) {
-          context.read<AppBloc>().add(const AppUserAppSettingsRefreshed());
+          context.read<AppBloc>().add(const AppAppSettingsRefreshed());
         }
       },
       child: Scaffold(

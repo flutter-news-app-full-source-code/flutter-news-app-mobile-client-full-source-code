@@ -19,9 +19,9 @@ part 'settings_state.dart';
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   /// {@macro settings_bloc}
   SettingsBloc({
-    required DataRepository<UserAppSettings> userAppSettingsRepository,
+    required DataRepository<AppSettings> appSettingsRepository,
     required InlineAdCacheService inlineAdCacheService,
-  }) : _userAppSettingsRepository = userAppSettingsRepository,
+  }) : _appSettingsRepository = appSettingsRepository,
        _inlineAdCacheService = inlineAdCacheService,
        super(const SettingsState()) {
     // Register event handlers
@@ -46,22 +46,22 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       _onAppFontWeightChanged,
       transformer: sequential(),
     );
-    on<SettingsHeadlineImageStyleChanged>(
-      _onHeadlineImageStyleChanged,
+    on<SettingsFeedItemImageStyleChanged>(
+      _onFeedItemImageStyleChanged,
       transformer: sequential(),
     );
     on<SettingsLanguageChanged>(_onLanguageChanged, transformer: sequential());
   }
 
-  final DataRepository<UserAppSettings> _userAppSettingsRepository;
+  final DataRepository<AppSettings> _appSettingsRepository;
   final InlineAdCacheService _inlineAdCacheService;
 
   Future<void> _persistSettings(
-    UserAppSettings settingsToSave,
+    AppSettings settingsToSave,
     Emitter<SettingsState> emit,
   ) async {
     try {
-      await _userAppSettingsRepository.update(
+      await _appSettingsRepository.update(
         id: settingsToSave.id,
         item: settingsToSave,
         userId: settingsToSave.id,
@@ -72,7 +72,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       // that uses the ht data in memory impl
       // as for the api impl, the backend handle
       // this use case.
-      await _userAppSettingsRepository.create(
+      await _appSettingsRepository.create(
         item: settingsToSave,
         userId: settingsToSave.id,
       );
@@ -89,14 +89,14 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   ) async {
     emit(state.copyWith(status: SettingsStatus.loading, clearError: true));
     try {
-      final appSettings = await _userAppSettingsRepository.read(
+      final appSettings = await _appSettingsRepository.read(
         id: event.userId,
         userId: event.userId,
       );
       emit(
         state.copyWith(
           status: SettingsStatus.success,
-          userAppSettings: appSettings,
+          appSettings: appSettings,
         ),
       );
     } on HttpException {
@@ -112,14 +112,14 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     SettingsAppThemeModeChanged event,
     Emitter<SettingsState> emit,
   ) async {
-    if (state.userAppSettings == null) return;
+    if (state.appSettings == null) return;
 
-    final updatedSettings = state.userAppSettings!.copyWith(
-      displaySettings: state.userAppSettings!.displaySettings.copyWith(
+    final updatedSettings = state.appSettings!.copyWith(
+      displaySettings: state.appSettings!.displaySettings.copyWith(
         baseTheme: event.themeMode,
       ),
     );
-    emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));
+    emit(state.copyWith(appSettings: updatedSettings, clearError: true));
     await _persistSettings(updatedSettings, emit);
   }
 
@@ -127,14 +127,14 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     SettingsAppThemeNameChanged event,
     Emitter<SettingsState> emit,
   ) async {
-    if (state.userAppSettings == null) return;
+    if (state.appSettings == null) return;
 
-    final updatedSettings = state.userAppSettings!.copyWith(
-      displaySettings: state.userAppSettings!.displaySettings.copyWith(
+    final updatedSettings = state.appSettings!.copyWith(
+      displaySettings: state.appSettings!.displaySettings.copyWith(
         accentTheme: event.themeName,
       ),
     );
-    emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));
+    emit(state.copyWith(appSettings: updatedSettings, clearError: true));
     // When the theme's accent color changes, ads must be reloaded to reflect
     // the new styling. Clearing the cache ensures that any visible or
     // soon-to-be-visible ads are fetched again with the updated theme.
@@ -146,14 +146,14 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     SettingsAppFontSizeChanged event,
     Emitter<SettingsState> emit,
   ) async {
-    if (state.userAppSettings == null) return;
+    if (state.appSettings == null) return;
 
-    final updatedSettings = state.userAppSettings!.copyWith(
-      displaySettings: state.userAppSettings!.displaySettings.copyWith(
+    final updatedSettings = state.appSettings!.copyWith(
+      displaySettings: state.appSettings!.displaySettings.copyWith(
         textScaleFactor: event.fontSize,
       ),
     );
-    emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));
+    emit(state.copyWith(appSettings: updatedSettings, clearError: true));
     await _persistSettings(updatedSettings, emit);
   }
 
@@ -161,14 +161,14 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     SettingsAppFontTypeChanged event,
     Emitter<SettingsState> emit,
   ) async {
-    if (state.userAppSettings == null) return;
+    if (state.appSettings == null) return;
 
-    final updatedSettings = state.userAppSettings!.copyWith(
-      displaySettings: state.userAppSettings!.displaySettings.copyWith(
+    final updatedSettings = state.appSettings!.copyWith(
+      displaySettings: state.appSettings!.displaySettings.copyWith(
         fontFamily: event.fontType,
       ),
     );
-    emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));
+    emit(state.copyWith(appSettings: updatedSettings, clearError: true));
     await _persistSettings(updatedSettings, emit);
   }
 
@@ -176,29 +176,29 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     SettingsAppFontWeightChanged event,
     Emitter<SettingsState> emit,
   ) async {
-    if (state.userAppSettings == null) return;
+    if (state.appSettings == null) return;
 
-    final updatedSettings = state.userAppSettings!.copyWith(
-      displaySettings: state.userAppSettings!.displaySettings.copyWith(
+    final updatedSettings = state.appSettings!.copyWith(
+      displaySettings: state.appSettings!.displaySettings.copyWith(
         fontWeight: event.fontWeight,
       ),
     );
-    emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));
+    emit(state.copyWith(appSettings: updatedSettings, clearError: true));
     await _persistSettings(updatedSettings, emit);
   }
 
-  Future<void> _onHeadlineImageStyleChanged(
-    SettingsHeadlineImageStyleChanged event,
+  Future<void> _onFeedItemImageStyleChanged(
+    SettingsFeedItemImageStyleChanged event,
     Emitter<SettingsState> emit,
   ) async {
-    if (state.userAppSettings == null) return;
+    if (state.appSettings == null) return;
 
-    final updatedSettings = state.userAppSettings!.copyWith(
-      feedPreferences: state.userAppSettings!.feedPreferences.copyWith(
-        headlineImageStyle: event.imageStyle,
+    final updatedSettings = state.appSettings!.copyWith(
+      feedSettings: state.appSettings!.feedSettings.copyWith(
+        feedItemImageStyle: event.imageStyle,
       ),
     );
-    emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));
+    emit(state.copyWith(appSettings: updatedSettings, clearError: true));
     // The headline image style directly influences which native ad template
     // (small or medium) is requested. To ensure the correct ad format is
     // displayed, the cache must be cleared, forcing a new ad load with the
@@ -211,12 +211,12 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     SettingsLanguageChanged event,
     Emitter<SettingsState> emit,
   ) async {
-    if (state.userAppSettings == null) return;
+    if (state.appSettings == null) return;
 
-    final updatedSettings = state.userAppSettings!.copyWith(
+    final updatedSettings = state.appSettings!.copyWith(
       language: event.language,
     );
-    emit(state.copyWith(userAppSettings: updatedSettings, clearError: true));
+    emit(state.copyWith(appSettings: updatedSettings, clearError: true));
     await _persistSettings(updatedSettings, emit);
   }
 }

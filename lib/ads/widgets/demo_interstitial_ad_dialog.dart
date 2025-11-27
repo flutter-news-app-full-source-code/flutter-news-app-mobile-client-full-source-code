@@ -84,27 +84,6 @@ class _DemoInterstitialAdDialogState extends State<DemoInterstitialAdDialog> {
             ),
           ),
           Positioned(
-            bottom: AppSpacing.lg + MediaQuery.of(context).padding.bottom,
-            left: AppSpacing.lg,
-            right: AppSpacing.lg,
-            child: FilledButton(
-              onPressed: canClose ? () => Navigator.of(context).pop() : null,
-              style: FilledButton.styleFrom(
-                minimumSize: const Size.fromHeight(48),
-              ),
-              child: canClose
-                  ? Text(l10n.continueToArticleButtonLabel)
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '${l10n.continueToArticleButtonLabel} ($_countdown)',
-                        ),
-                      ],
-                    ),
-            ),
-          ),
-          Positioned(
             top: AppSpacing.lg,
             right: AppSpacing.lg,
             child: canClose

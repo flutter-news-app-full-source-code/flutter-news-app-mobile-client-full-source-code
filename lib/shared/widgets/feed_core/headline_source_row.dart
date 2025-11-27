@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/headline_actions_bottom_sheet.dart';
 import 'package:go_router/go_router.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:ui_kit/ui_kit.dart';
@@ -13,13 +14,10 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class HeadlineSourceRow extends StatefulWidget {
   /// {@macro headline_source_row}
-  const HeadlineSourceRow({required this.headline, this.trailing, super.key});
+  const HeadlineSourceRow({required this.headline, super.key});
 
   /// The headline data to display.
   final Headline headline;
-
-  /// An optional widget to display at the end of the row.
-  final Widget? trailing;
 
   Future<void> _handleEntityTap(BuildContext context) async {
     await context.read<InterstitialAdManager>().onPotentialAdTrigger();
@@ -100,8 +98,20 @@ class _HeadlineSourceRowState extends State<HeadlineSourceRow> {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (formattedDate.isNotEmpty)
-              Text(formattedDate, style: dateTextStyle),
-            if (widget.trailing != null) widget.trailing!,
+              Padding(
+                padding: const EdgeInsets.only(right: AppSpacing.xs),
+                child: Text(formattedDate, style: dateTextStyle),
+              ),
+            IconButton(
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              icon: const Icon(Icons.more_horiz),
+              onPressed: () => showModalBottomSheet<void>(
+                context: context,
+                builder: (_) =>
+                    HeadlineActionsBottomSheet(headline: widget.headline),
+              ),
+            ),
           ],
         ),
       ],

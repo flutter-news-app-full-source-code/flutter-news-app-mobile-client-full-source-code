@@ -112,7 +112,7 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
           // Show a pre-permission dialog to explain why we need notifications.
           final l10n = AppLocalizationsX(context).l10n;
           final wantsToAllow = await showDialog<bool>(
-            context: context,
+            context: context, // The context is still valid here.
             builder: (context) => AlertDialog(
               title: Text(l10n.prePermissionDialogTitle),
               content: Text(l10n.prePermissionDialogBody),
@@ -139,6 +139,8 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
           // If the user denies permission at the OS level, stop.
           if (!permissionGranted) {
             // Provide UI feedback to the user.
+            // Guard against using context across async gaps.
+            if (!mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(l10n.notificationPermissionDeniedError),
@@ -160,7 +162,8 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
       // Pop the dialog and return `true` to signal to the caller that the
       // save operation was successfully initiated. This allows the caller
       // to coordinate subsequent navigation actions, preventing race conditions.
-      Navigator.of(context).pop(true); // Return true on success.
+      if (!mounted) return;
+      Navigator.of(this.context).pop(true); // Return true on success.
     }
   }
 
@@ -170,7 +173,8 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
     final isEditing = widget.filterToEdit != null;
     final pushNotificationConfig = context
         .select((AppBloc bloc) => bloc.state.remoteConfig)
-        ?.pushNotificationConfig;
+        ?.features
+        .pushNotifications;
 
     return AlertDialog(
       insetPadding: const EdgeInsets.all(AppSpacing.lg),

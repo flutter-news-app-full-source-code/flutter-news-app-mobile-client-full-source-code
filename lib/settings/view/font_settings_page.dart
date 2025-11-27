@@ -56,8 +56,7 @@ class FontSettingsPage extends StatelessWidget {
     final settingsBloc = context.watch<SettingsBloc>();
     final state = settingsBloc.state;
 
-    if (state.status != SettingsStatus.success ||
-        state.userAppSettings == null) {
+    if (state.status != SettingsStatus.success || state.appSettings == null) {
       return Scaffold(
         appBar: AppBar(title: Text(l10n.settingsAppearanceTitle)),
         body: const Center(child: CircularProgressIndicator()),
@@ -68,7 +67,7 @@ class FontSettingsPage extends StatelessWidget {
       listener: (context, settingsState) {
         // Renamed state to avoid conflict
         if (settingsState.status == SettingsStatus.success) {
-          context.read<AppBloc>().add(const AppUserAppSettingsRefreshed());
+          context.read<AppBloc>().add(const AppAppSettingsRefreshed());
         }
       },
       child: Scaffold(
@@ -80,8 +79,7 @@ class FontSettingsPage extends StatelessWidget {
             _buildDropdownSetting<AppTextScaleFactor>(
               context: context,
               title: l10n.settingsAppearanceAppFontSizeLabel,
-              currentValue:
-                  state.userAppSettings!.displaySettings.textScaleFactor,
+              currentValue: state.appSettings!.displaySettings.textScaleFactor,
               items: AppTextScaleFactor.values,
               itemToString: (size) => _textScaleFactorToString(size, l10n),
               onChanged: (value) {
@@ -96,7 +94,7 @@ class FontSettingsPage extends StatelessWidget {
             _buildDropdownSetting<String>(
               context: context,
               title: l10n.settingsAppearanceAppFontTypeLabel,
-              currentValue: state.userAppSettings!.displaySettings.fontFamily,
+              currentValue: state.appSettings!.displaySettings.fontFamily,
               items: const [
                 'SystemDefault',
                 'Roboto',
@@ -119,7 +117,7 @@ class FontSettingsPage extends StatelessWidget {
             _buildDropdownSetting<AppFontWeight>(
               context: context,
               title: l10n.settingsAppearanceFontWeightLabel,
-              currentValue: state.userAppSettings!.displaySettings.fontWeight,
+              currentValue: state.appSettings!.displaySettings.fontWeight,
               items: AppFontWeight.values,
               itemToString: (weight) => _fontWeightToString(weight, l10n),
               onChanged: (value) {

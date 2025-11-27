@@ -138,6 +138,24 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // If a user is already logged in when the app starts, register their
     // device for push notifications.
     if (state.user != null) {
+      // Check for existing unread notifications on startup.
+      // This ensures the notification dot is shown correctly if the user
+      // has unread notifications from a previous session.
+      try {
+        final unreadCount = await _inAppNotificationRepository.count(
+          userId: state.user!.id,
+          filter: {'readAt': null},
+        );
+        if (unreadCount > 0) {
+          emit(state.copyWith(hasUnreadInAppNotifications: true));
+        }
+      } catch (e, s) {
+        _logger.severe(
+          'Failed to check for unread notifications on app start.',
+          e,
+          s,
+        );
+      }
       await _registerDeviceForPushNotifications(state.user!.id);
     }
   }

@@ -1344,4 +1344,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get breakingNewsPrefix => 'Breaking News';
+
+  @override
+  String get settingsFeedClickBehaviorLabel => 'Open links using';
+
+  @override
+  String get settingsFeedClickBehaviorDefault => 'App default';
+
+  @override
+  String get settingsFeedClickBehaviorInApp => 'In-app browser';
+
+  @override
+  String get settingsFeedClickBehaviorSystem => 'System browser';
+
+  @override
+  String get continueToArticleButtonLabel => 'Continue to Article';
+
+  @override
+  String get headlineActionsModalTitle => 'Actions';
+
+  @override
+  String get shareActionLabel => 'Share';
+
+  @override
+  String get bookmarkActionLabel => 'Bookmark';
+
+  @override
+  String get removeBookmarkActionLabel => 'Remove Bookmark';
 }

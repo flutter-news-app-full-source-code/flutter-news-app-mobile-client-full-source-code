@@ -1340,4 +1340,31 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get breakingNewsPrefix => 'خبر عاجل';
+
+  @override
+  String get settingsFeedClickBehaviorLabel => 'فتح الروابط باستخدام';
+
+  @override
+  String get settingsFeedClickBehaviorDefault => 'إفتراضي';
+
+  @override
+  String get settingsFeedClickBehaviorInApp => 'متصفح داخل التطبيق';
+
+  @override
+  String get settingsFeedClickBehaviorSystem => 'متصفح النظام';
+
+  @override
+  String get continueToArticleButtonLabel => 'متابعة إلى المقال';
+
+  @override
+  String get headlineActionsModalTitle => 'إجراءات';
+
+  @override
+  String get shareActionLabel => 'مشاركة';
+
+  @override
+  String get bookmarkActionLabel => 'حفظ';
+
+  @override
+  String get removeBookmarkActionLabel => 'إزالة من المحفوظات';
 }

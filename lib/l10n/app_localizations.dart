@@ -2545,6 +2545,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Breaking News'**
   String get breakingNewsPrefix;
+
+  /// Label for the setting that controls how article links are opened.
+  ///
+  /// In en, this message translates to:
+  /// **'Open links using'**
+  String get settingsFeedClickBehaviorLabel;
+
+  /// Option to use the app's default link-opening behavior.
+  ///
+  /// In en, this message translates to:
+  /// **'App default'**
+  String get settingsFeedClickBehaviorDefault;
+
+  /// Option to open links in a browser within the app.
+  ///
+  /// In en, this message translates to:
+  /// **'In-app browser'**
+  String get settingsFeedClickBehaviorInApp;
+
+  /// Option to open links in the device's default system browser.
+  ///
+  /// In en, this message translates to:
+  /// **'System browser'**
+  String get settingsFeedClickBehaviorSystem;
+
+  /// Button text on an interstitial ad to proceed to the article.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to Article'**
+  String get continueToArticleButtonLabel;
+
+  /// Title for the modal bottom sheet that shows headline actions like share and bookmark.
+  ///
+  /// In en, this message translates to:
+  /// **'Actions'**
+  String get headlineActionsModalTitle;
+
+  /// Label for the share action.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get shareActionLabel;
+
+  /// Label for the action to add a headline to bookmarks.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmark'**
+  String get bookmarkActionLabel;
+
+  /// Label for the action to remove a headline from bookmarks.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Bookmark'**
+  String get removeBookmarkActionLabel;
 }
 
 class _AppLocalizationsDelegate

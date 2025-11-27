@@ -263,53 +263,36 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                                 .watch<AppBloc>()
                                 .state
                                 .feedItemImageStyle;
-                            Widget tile;
-
-                            final trailing = IconButton(
-                              icon: const Icon(Icons.more_vert),
-                              onPressed: () {
-                                showModalBottomSheet<void>(
-                                  context: context,
-                                  builder: (_) => HeadlineActionsBottomSheet(
-                                    headline: item,
-                                  ),
-                                );
-                              },
-                            );
 
                             switch (imageStyle) {
                               case FeedItemImageStyle.hidden:
-                                tile = HeadlineTileTextOnly(
+                                return HeadlineTileTextOnly(
                                   headline: item,
                                   onHeadlineTap: () =>
                                       HeadlineTapHandler.handleHeadlineTap(
                                         context,
                                         item,
                                       ),
-                                  trailing: trailing,
                                 );
                               case FeedItemImageStyle.smallThumbnail:
-                                tile = HeadlineTileImageStart(
+                                return HeadlineTileImageStart(
                                   headline: item,
                                   onHeadlineTap: () =>
                                       HeadlineTapHandler.handleHeadlineTap(
                                         context,
                                         item,
                                       ),
-                                  trailing: trailing,
                                 );
                               case FeedItemImageStyle.largeThumbnail:
-                                tile = HeadlineTileImageTop(
+                                return HeadlineTileImageTop(
                                   headline: item,
                                   onHeadlineTap: () =>
                                       HeadlineTapHandler.handleHeadlineTap(
                                         context,
                                         item,
                                       ),
-                                  trailing: trailing,
                                 );
                             }
-                            return tile;
                           } else if (item is AdPlaceholder) {
                             // Access the AppBloc to get the remoteConfig for ads.
                             final remoteConfig = context

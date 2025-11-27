@@ -10,6 +10,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/widgets/feed_sliver_app_bar.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/widgets/saved_filters_bar.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/headline_actions_bottom_sheet.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/feed_core.dart';
 import 'package:go_router/go_router.dart';
@@ -261,8 +262,22 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                           if (item is Headline) {
                             final imageStyle = context
                                 .watch<AppBloc>()
-                                .state.feedItemImageStyle;
+                                .state
+                                .feedItemImageStyle;
                             Widget tile;
+
+                            final trailing = IconButton(
+                              icon: const Icon(Icons.more_vert),
+                              onPressed: () {
+                                showModalBottomSheet<void>(
+                                  context: context,
+                                  builder: (_) => HeadlineActionsBottomSheet(
+                                    headline: item,
+                                  ),
+                                );
+                              },
+                            );
+
                             switch (imageStyle) {
                               case FeedItemImageStyle.hidden:
                                 tile = HeadlineTileTextOnly(
@@ -272,6 +287,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                                         context,
                                         item,
                                       ),
+                                  trailing: trailing,
                                 );
                               case FeedItemImageStyle.smallThumbnail:
                                 tile = HeadlineTileImageStart(
@@ -281,6 +297,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                                         context,
                                         item,
                                       ),
+                                  trailing: trailing,
                                 );
                               case FeedItemImageStyle.largeThumbnail:
                                 tile = HeadlineTileImageTop(
@@ -290,6 +307,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                                         context,
                                         item,
                                       ),
+                                  trailing: trailing,
                                 );
                             }
                             return tile;
@@ -297,7 +315,8 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
                             // Access the AppBloc to get the remoteConfig for ads.
                             final remoteConfig = context
                                 .read<AppBloc>()
-                                .state.remoteConfig;
+                                .state
+                                .remoteConfig;
 
                             // Ensure adConfig is not null before building the AdLoaderWidget.
                             if (remoteConfig?.features.ads == null) {

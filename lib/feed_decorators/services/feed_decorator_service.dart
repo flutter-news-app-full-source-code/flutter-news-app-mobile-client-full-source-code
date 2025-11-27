@@ -48,7 +48,7 @@ class FeedDecoratorService {
   }) {
     final decoratedFeed = List<FeedItem>.from(feedItems);
 
-    final areDecoratorsEnabled = remoteConfig.feedDecoratorConfig.values.any(
+    final areDecoratorsEnabled = remoteConfig.features.feed.decorators.values.any(
       (config) => config.enabled,
     );
 

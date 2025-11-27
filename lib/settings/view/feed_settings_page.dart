@@ -1,4 +1,4 @@
-import 'package:core/core.dart' show HeadlineImageStyle;
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
@@ -15,13 +15,13 @@ class FeedSettingsPage extends StatelessWidget {
   const FeedSettingsPage({super.key});
 
   // Helper to map HeadlineImageStyle enum to user-friendly strings
-  String _imageStyleToString(HeadlineImageStyle style, AppLocalizations l10n) {
+  String _imageStyleToString(FeedItemImageStyle style, AppLocalizations l10n) {
     switch (style) {
-      case HeadlineImageStyle.hidden:
+      case FeedItemImageStyle.hidden:
         return l10n.settingsFeedTileTypeTextOnly;
-      case HeadlineImageStyle.smallThumbnail:
+      case FeedItemImageStyle.smallThumbnail:
         return l10n.settingsFeedTileTypeImageStart;
-      case HeadlineImageStyle.largeThumbnail:
+      case FeedItemImageStyle.largeThumbnail:
         return l10n.settingsFeedTileTypeImageTop;
     }
   }
@@ -33,7 +33,7 @@ class FeedSettingsPage extends StatelessWidget {
     final state = settingsBloc.state;
 
     // Ensure we have loaded state before building controls
-    if (state.status != SettingsStatus.success) {
+    if (state.status != SettingsStatus.success || state.appSettings == null) {
       return Scaffold(
         appBar: AppBar(title: Text(l10n.settingsFeedDisplayTitle)),
         body: const Center(child: CircularProgressIndicator()),
@@ -43,7 +43,7 @@ class FeedSettingsPage extends StatelessWidget {
     return BlocListener<SettingsBloc, SettingsState>(
       listener: (context, settingsState) {
         if (settingsState.status == SettingsStatus.success) {
-          context.read<AppBloc>().add(const AppUserAppSettingsRefreshed());
+          context.read<AppBloc>().add(const AppAppSettingsRefreshed());
         }
       },
       child: Scaffold(
@@ -52,16 +52,15 @@ class FeedSettingsPage extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.lg),
           children: [
             // --- Feed Tile Type ---
-            _buildDropdownSetting<HeadlineImageStyle>(
+            _buildDropdownSetting<FeedItemImageStyle>(
               context: context,
               title: l10n.settingsFeedTileTypeLabel,
-              currentValue:
-                  state.userAppSettings!.feedPreferences.headlineImageStyle,
-              items: HeadlineImageStyle.values,
+              currentValue: state.appSettings!.feedSettings.feedItemImageStyle,
+              items: FeedItemImageStyle.values,
               itemToString: (style) => _imageStyleToString(style, l10n),
               onChanged: (value) {
                 if (value != null) {
-                  settingsBloc.add(SettingsHeadlineImageStyleChanged(value));
+                  settingsBloc.add(SettingsFeedItemImageStyleChanged(value));
                 }
               },
             ),

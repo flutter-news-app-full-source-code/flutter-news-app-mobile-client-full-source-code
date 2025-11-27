@@ -102,15 +102,17 @@ class _HeadlineSourceRowState extends State<HeadlineSourceRow> {
                 padding: const EdgeInsets.only(right: AppSpacing.xs),
                 child: Text(formattedDate, style: dateTextStyle),
               ),
-            IconButton(
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              icon: const Icon(Icons.more_horiz),
-              onPressed: () => showModalBottomSheet<void>(
+            // Use InkWell + Icon instead of IconButton to have precise control
+            // over padding and constraints, avoiding the default minimum
+            // touch target size that misaligns the row height on native.
+            InkWell(
+              customBorder: const CircleBorder(),
+              onTap: () => showModalBottomSheet<void>(
                 context: context,
                 builder: (_) =>
                     HeadlineActionsBottomSheet(headline: widget.headline),
               ),
+              child: const Icon(Icons.more_horiz, size: 20),
             ),
           ],
         ),

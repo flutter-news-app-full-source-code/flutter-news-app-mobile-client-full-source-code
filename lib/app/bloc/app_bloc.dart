@@ -94,6 +94,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       _onAllInAppNotificationsMarkedAsRead,
     );
     on<AppInAppNotificationMarkedAsRead>(_onInAppNotificationMarkedAsRead);
+    on<AppNotificationTapped>(_onAppNotificationTapped);
 
     // Listen to token refresh events from the push notification service.
     // When a token is refreshed, dispatch an event to trigger device
@@ -678,6 +679,41 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         s,
       );
       // Do not change state on error to avoid inconsistent UI.
+    }
+  }
+
+  /// Handles marking a specific notification as read when it's tapped.
+  Future<void> _onAppNotificationTapped(
+    AppNotificationTapped event,
+    Emitter<AppState> emit,
+  ) async {
+    final userId = state.user?.id;
+    if (userId == null) {
+      _logger.warning(
+        '[AppBloc] Cannot mark notification as read: user is not logged in.',
+      );
+      return;
+    }
+
+    try {
+      // First, read the existing notification to get the full object.
+      final notification = await _inAppNotificationRepository.read(
+        id: event.notificationId,
+        userId: userId,
+      );
+
+      // Then, update it with the 'readAt' timestamp.
+      await _inAppNotificationRepository.update(
+        id: notification.id,
+        item: notification.copyWith(readAt: DateTime.now()),
+        userId: userId,
+      );
+
+      _logger.info(
+        '[AppBloc] Marked notification ${event.notificationId} as read.',
+      );
+    } catch (e, s) {
+      _logger.severe('Failed to mark notification as read.', e, s);
     }
   }
 

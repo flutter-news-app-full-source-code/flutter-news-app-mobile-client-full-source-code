@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:ui_kit/ui_kit.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 /// {@template headline_tap_handler}
@@ -69,12 +70,14 @@ abstract final class HeadlineTapHandler {
     String headlineId,
   ) async {
     // Show a loading dialog as fetching the headline may take time.
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) =>
-          const Center(child: CircularProgressIndicator()),
-    );
+    if (context.mounted) {
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) =>
+            const Center(child: CircularProgressIndicator()),
+      );
+    }
 
     final headline = await context.read<DataRepository<Headline>>().read(
       id: headlineId,
@@ -83,5 +86,40 @@ abstract final class HeadlineTapHandler {
     if (!context.mounted) return;
     Navigator.of(context).pop(); // Dismiss the loading dialog.
     await handleHeadlineTap(context, headline);
+  }
+
+  /// Handles a tap on a headline from a system notification.
+  ///
+  /// This method is specifically for taps that originate from the OS
+  /// notification tray. It fetches the headline by its ID and then **always**
+  /// opens it in an in-app browser, overriding any user or remote settings.
+  /// This provides a smoother, more integrated user experience for notification
+  /// interactions.
+  ///
+  /// - [context]: The current [BuildContext] to access BLoCs and for navigation.
+  /// - [headlineId]: The ID of the [Headline] item that was tapped.
+  static Future<void> handleTapFromSystemNotification(
+    BuildContext context,
+    String headlineId,
+  ) async {
+    if (context.mounted) {
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) =>
+            const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final headline = await context.read<DataRepository<Headline>>().read(
+      id: headlineId,
+    );
+
+    if (!context.mounted) return;
+    Navigator.of(context).pop(); // Dismiss the loading dialog.
+
+    if (await canLaunchUrlString(headline.url)) {
+      await launchUrlString(headline.url, mode: LaunchMode.inAppWebView);
+    }
   }
 }

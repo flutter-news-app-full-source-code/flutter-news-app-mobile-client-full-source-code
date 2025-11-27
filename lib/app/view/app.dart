@@ -201,16 +201,22 @@ class _AppViewState extends State<_AppView> {
     // Subscribe to the authentication repository's authStateChanges stream.
     // This stream is the single source of truth for the user's auth state
     // and drives the entire app lifecycle by dispatching AppUserChanged events.
-    _userSubscription = context.read<AuthRepository>().authStateChanges.listen(
-      (user) => context.read<AppBloc>().add(AppUserChanged(user)),
-    );
+    _userSubscription = context.read<AuthRepository>().authStateChanges.listen((
+      user,
+    ) {
+      if (mounted) {
+        context.read<AppBloc>().add(AppUserChanged(user));
+      }
+    });
 
     // Subscribe to foreground push notifications. When a message is received,
     // dispatch an event to the AppBloc to update the UI state (e.g., show an
     // indicator dot).
-    _onMessageSubscription = pushNotificationService.onMessage.listen(
-      (_) => context.read<AppBloc>().add(const AppInAppNotificationReceived()),
-    );
+    _onMessageSubscription = pushNotificationService.onMessage.listen((_) {
+      if (mounted) {
+        context.read<AppBloc>().add(const AppInAppNotificationReceived());
+      }
+    });
 
     // Subscribe to notifications that are tapped and open the app.
     // This is the core of the deep-linking functionality.

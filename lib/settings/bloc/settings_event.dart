@@ -102,15 +102,15 @@ class SettingsAppFontWeightChanged extends SettingsEvent {
 
 // --- Feed Settings Events ---
 
-/// {@template settings_headline_image_style_changed}
+/// {@template settings_feed_item_image_style_changed}
 /// Event added when the user changes the headline image style in the feed.
 /// {@endtemplate}
-class SettingsHeadlineImageStyleChanged extends SettingsEvent {
-  /// {@macro settings_headline_image_style_changed}
-  const SettingsHeadlineImageStyleChanged(this.imageStyle);
+class SettingsFeedItemImageStyleChanged extends SettingsEvent {
+  /// {@macro settings_feed_item_image_style_changed}
+  const SettingsFeedItemImageStyleChanged(this.imageStyle);
 
   /// The newly selected headline image style.
-  final HeadlineImageStyle imageStyle;
+  final FeedItemImageStyle imageStyle;
 
   @override
   List<Object?> get props => [imageStyle];

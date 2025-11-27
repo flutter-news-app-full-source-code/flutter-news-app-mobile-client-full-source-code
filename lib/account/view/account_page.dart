@@ -44,7 +44,7 @@ class AccountPage extends StatelessWidget {
           // This declutters the main content card and follows common UI patterns.
           if (isAnonymous)
             IconButton(
-              icon: const Icon(Icons.login),
+              icon: const Icon(Icons.sync),
               tooltip: l10n.anonymousLimitButton,
               onPressed: () => context.goNamed(Routes.accountLinkingName),
             )

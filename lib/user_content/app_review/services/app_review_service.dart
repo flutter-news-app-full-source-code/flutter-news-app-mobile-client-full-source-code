@@ -135,8 +135,31 @@ class AppReviewService {
 
     if (isPositive) {
       _logger.info('User responded positively. Requesting native review.');
-      await _nativeReviewService.requestReview();
-      // Mark the funnel as complete for this user.
+
+      // Create the AppReview record first to log the positive interaction.
+      final review = AppReview(
+        id: const Uuid().v4(),
+        userId: userId,
+        feedback: AppReviewFeedback.positive,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      await _appReviewRepository.create(item: review, userId: userId);
+
+      // Now, request the native review prompt.
+      final wasRequested = await _nativeReviewService.requestReview();
+
+      // If the OS-level prompt was successfully requested, update our record.
+      if (wasRequested) {
+        await _appReviewRepository.update(
+          id: review.id,
+          item: review.copyWith(wasStoreReviewRequested: true),
+          userId: userId,
+        );
+      }
+
+      // Mark the funnel as complete for this user, regardless of whether the
+      // OS showed the prompt, to respect the user's interaction.
       appBloc.add(
         AppUserFeedDecoratorShown(
           userId: userId,
@@ -146,6 +169,16 @@ class AppReviewService {
       );
     } else {
       _logger.info('User responded negatively. Showing feedback sheet.');
+      // Create the AppReview record first to log the negative interaction.
+      final review = AppReview(
+        id: const Uuid().v4(),
+        userId: userId,
+        feedback: AppReviewFeedback.negative,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      await _appReviewRepository.create(item: review, userId: userId);
+
       // Show the detailed feedback bottom sheet.
       // Guard against using context across async gaps.
       if (!context.mounted) return;
@@ -153,8 +186,11 @@ class AppReviewService {
         showModalBottomSheet<void>(
           context: context,
           builder: (_) => ProvideFeedbackBottomSheet(
-            onFeedbackSubmitted: (details) =>
-                _handleNegativeFeedback(userId: userId, details: details),
+            onFeedbackSubmitted: (details) => _handleNegativeFeedback(
+              reviewId: review.id,
+              userId: userId,
+              details: details,
+            ),
           ),
         ),
       );
@@ -163,20 +199,24 @@ class AppReviewService {
 
   /// Handles the submission of detailed negative feedback.
   Future<void> _handleNegativeFeedback({
+    required String reviewId,
     required String userId,
     required String details,
   }) async {
     _logger.info('User submitted negative feedback: "$details"');
     try {
-      // For simplicity, we create a new AppReview record each time.
-      // A more complex implementation could update an existing one.
-      await _appReviewRepository.create(
-        item: AppReview(
-          id: const Uuid().v4(),
-          userId: userId,
-          feedback: AppReviewFeedback.negative,
+      // Read the existing review record that was created when the user
+      // responded "No".
+      final existingReview = await _appReviewRepository.read(
+        id: reviewId,
+        userId: userId,
+      );
+
+      // Update the existing record with the feedback details.
+      await _appReviewRepository.update(
+        id: reviewId,
+        item: existingReview.copyWith(
           feedbackDetails: details,
-          createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
         ),
         userId: userId,

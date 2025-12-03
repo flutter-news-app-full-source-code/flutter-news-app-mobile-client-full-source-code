@@ -1371,4 +1371,98 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get removeBookmarkActionLabel => 'Remove Bookmark';
+
+  @override
+  String get reportActionLabel => 'Report';
+
+  @override
+  String get reportContentTitle => 'Report Content';
+
+  @override
+  String get reportReasonSelectionPrompt =>
+      'Please select a reason for your report:';
+
+  @override
+  String get reportAdditionalCommentsLabel => 'Additional Comments (Optional)';
+
+  @override
+  String get reportSubmitButtonLabel => 'Submit Report';
+
+  @override
+  String get reportSuccessSnackbar =>
+      'Report submitted. Thank you for your feedback.';
+
+  @override
+  String get reportFailureSnackbar =>
+      'Failed to submit report. Please try again.';
+
+  @override
+  String get commentsTitle => 'Comments';
+
+  @override
+  String get commentPostButtonLabel => 'Post';
+
+  @override
+  String get commentInputHint => 'Add a comment...';
+
+  @override
+  String get commentRequiresReactionError =>
+      'Please select a reaction to post a comment.';
+
+  @override
+  String get likeActionLabel => 'Like';
+
+  @override
+  String get dislikeActionLabel => 'Dislike';
+
+  @override
+  String get commentActionLabel => 'Comment';
+
+  @override
+  String get moreActionLabel => 'More';
+
+  @override
+  String get rateAppPromptTitle => 'Enjoying the app?';
+
+  @override
+  String get rateAppPromptBody =>
+      'Your feedback helps us improve. Would you mind rating us?';
+
+  @override
+  String get rateAppPromptYesButton => 'Yes';
+
+  @override
+  String get rateAppPromptNoButton => 'No';
+
+  @override
+  String get feedbackPromptTitle => 'How can we improve?';
+
+  @override
+  String get feedbackPromptReasonUI => 'UI / Design';
+
+  @override
+  String get feedbackPromptReasonPerformance => 'Performance / Speed';
+
+  @override
+  String get feedbackPromptReasonContent => 'Content Quality';
+
+  @override
+  String get feedbackPromptReasonOther => 'Other';
+
+  @override
+  String get feedbackPromptSubmitButton => 'Submit Feedback';
+
+  @override
+  String get rateAppNegativeFollowUpTitle_1 => 'How are we doing now?';
+
+  @override
+  String get rateAppNegativeFollowUpTitle_2 => 'Have we improved?';
+
+  @override
+  String get rateAppNegativeFollowUpBody_1 =>
+      'We\'ve been working on your feedback. Would you reconsider your rating?';
+
+  @override
+  String get rateAppNegativeFollowUpBody_2 =>
+      'We value your opinion. Let us know if things are better.';
 }

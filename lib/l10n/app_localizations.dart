@@ -2599,6 +2599,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove Bookmark'**
   String get removeBookmarkActionLabel;
+
+  /// Label for the action to report content.
+  ///
+  /// In en, this message translates to:
+  /// **'Report'**
+  String get reportActionLabel;
+
+  /// Title for the report content bottom sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Report Content'**
+  String get reportContentTitle;
+
+  /// Prompt asking the user to select a reason for reporting.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a reason for your report:'**
+  String get reportReasonSelectionPrompt;
+
+  /// Label for the optional additional comments field in the report form.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional Comments (Optional)'**
+  String get reportAdditionalCommentsLabel;
+
+  /// Label for the button to submit a content report.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Report'**
+  String get reportSubmitButtonLabel;
+
+  /// Snackbar message shown after a report is successfully submitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Report submitted. Thank you for your feedback.'**
+  String get reportSuccessSnackbar;
+
+  /// Snackbar message shown when submitting a report fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to submit report. Please try again.'**
+  String get reportFailureSnackbar;
+
+  /// Title for the comments section or bottom sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Comments'**
+  String get commentsTitle;
+
+  /// Label for the button to post a new comment.
+  ///
+  /// In en, this message translates to:
+  /// **'Post'**
+  String get commentPostButtonLabel;
+
+  /// Hint text for the comment input field.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a comment...'**
+  String get commentInputHint;
+
+  /// Error message shown when a user tries to comment without selecting a reaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a reaction to post a comment.'**
+  String get commentRequiresReactionError;
+
+  /// Tooltip or label for the 'Like' action.
+  ///
+  /// In en, this message translates to:
+  /// **'Like'**
+  String get likeActionLabel;
+
+  /// Tooltip or label for the 'Dislike' action.
+  ///
+  /// In en, this message translates to:
+  /// **'Dislike'**
+  String get dislikeActionLabel;
+
+  /// Tooltip or label for the 'Comment' action.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment'**
+  String get commentActionLabel;
+
+  /// Tooltip or label for the 'More' actions icon.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get moreActionLabel;
+
+  /// Title for the in-app bottom sheet that prompts the user to rate the app.
+  ///
+  /// In en, this message translates to:
+  /// **'Enjoying the app?'**
+  String get rateAppPromptTitle;
+
+  /// Body text for the in-app rating prompt bottom sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Your feedback helps us improve. Would you mind rating us?'**
+  String get rateAppPromptBody;
+
+  /// Button text for a positive response to the rating prompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get rateAppPromptYesButton;
+
+  /// Button text for a negative response to the rating prompt.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get rateAppPromptNoButton;
+
+  /// Title for the bottom sheet that asks for detailed feedback after a negative rating prompt response.
+  ///
+  /// In en, this message translates to:
+  /// **'How can we improve?'**
+  String get feedbackPromptTitle;
+
+  /// Feedback reason related to UI and design.
+  ///
+  /// In en, this message translates to:
+  /// **'UI / Design'**
+  String get feedbackPromptReasonUI;
+
+  /// Feedback reason related to app performance.
+  ///
+  /// In en, this message translates to:
+  /// **'Performance / Speed'**
+  String get feedbackPromptReasonPerformance;
+
+  /// Feedback reason related to the quality of news content.
+  ///
+  /// In en, this message translates to:
+  /// **'Content Quality'**
+  String get feedbackPromptReasonContent;
+
+  /// Feedback reason for issues not listed.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get feedbackPromptReasonOther;
+
+  /// Button text to submit detailed feedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Feedback'**
+  String get feedbackPromptSubmitButton;
+
+  /// First variation of the follow-up title for the 'Rate App' prompt after a user has given negative feedback.
+  ///
+  /// In en, this message translates to:
+  /// **'How are we doing now?'**
+  String get rateAppNegativeFollowUpTitle_1;
+
+  /// Second variation of the follow-up title for the 'Rate App' prompt after a user has given negative feedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Have we improved?'**
+  String get rateAppNegativeFollowUpTitle_2;
+
+  /// First variation of the follow-up body text for the 'Rate App' prompt after a user has given negative feedback.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ve been working on your feedback. Would you reconsider your rating?'**
+  String get rateAppNegativeFollowUpBody_1;
+
+  /// Second variation of the follow-up body text for the 'Rate App' prompt after a user has given negative feedback.
+  ///
+  /// In en, this message translates to:
+  /// **'We value your opinion. Let us know if things are better.'**
+  String get rateAppNegativeFollowUpBody_2;
 }
 
 class _AppLocalizationsDelegate

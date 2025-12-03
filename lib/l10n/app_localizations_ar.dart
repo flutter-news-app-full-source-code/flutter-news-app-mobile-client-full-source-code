@@ -1367,4 +1367,95 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get removeBookmarkActionLabel => 'إزالة من المحفوظات';
+
+  @override
+  String get reportActionLabel => 'إبلاغ';
+
+  @override
+  String get reportContentTitle => 'الإبلاغ عن محتوى';
+
+  @override
+  String get reportReasonSelectionPrompt => 'الرجاء تحديد سبب الإبلاغ:';
+
+  @override
+  String get reportAdditionalCommentsLabel => 'تعليقات إضافية (اختياري)';
+
+  @override
+  String get reportSubmitButtonLabel => 'إرسال البلاغ';
+
+  @override
+  String get reportSuccessSnackbar => 'تم إرسال البلاغ. شكراً لملاحظاتك.';
+
+  @override
+  String get reportFailureSnackbar =>
+      'فشل إرسال البلاغ. الرجاء المحاولة مرة أخرى.';
+
+  @override
+  String get commentsTitle => 'التعليقات';
+
+  @override
+  String get commentPostButtonLabel => 'نشر';
+
+  @override
+  String get commentInputHint => 'أضف تعليقاً...';
+
+  @override
+  String get commentRequiresReactionError => 'الرجاء تحديد تفاعل لنشر تعليق.';
+
+  @override
+  String get likeActionLabel => 'إعجاب';
+
+  @override
+  String get dislikeActionLabel => 'عدم إعجاب';
+
+  @override
+  String get commentActionLabel => 'تعليق';
+
+  @override
+  String get moreActionLabel => 'المزيد';
+
+  @override
+  String get rateAppPromptTitle => 'هل تستمتع بالتطبيق؟';
+
+  @override
+  String get rateAppPromptBody =>
+      'تساعدنا ملاحظاتك على التحسين. هل تمانع في تقييمنا؟';
+
+  @override
+  String get rateAppPromptYesButton => 'نعم';
+
+  @override
+  String get rateAppPromptNoButton => 'لا';
+
+  @override
+  String get feedbackPromptTitle => 'كيف يمكننا التحسين؟';
+
+  @override
+  String get feedbackPromptReasonUI => 'واجهة المستخدم / التصميم';
+
+  @override
+  String get feedbackPromptReasonPerformance => 'الأداء / السرعة';
+
+  @override
+  String get feedbackPromptReasonContent => 'جودة المحتوى';
+
+  @override
+  String get feedbackPromptReasonOther => 'أخرى';
+
+  @override
+  String get feedbackPromptSubmitButton => 'إرسال الملاحظات';
+
+  @override
+  String get rateAppNegativeFollowUpTitle_1 => 'كيف حالنا الآن؟';
+
+  @override
+  String get rateAppNegativeFollowUpTitle_2 => 'هل تحسن الأداء؟';
+
+  @override
+  String get rateAppNegativeFollowUpBody_1 =>
+      'لقد عملنا على ملاحظاتك. هل تعيد النظر في تقييمك؟';
+
+  @override
+  String get rateAppNegativeFollowUpBody_2 =>
+      'نحن نقدر رأيك. أخبرنا إذا كانت الأمور أفضل.';
 }

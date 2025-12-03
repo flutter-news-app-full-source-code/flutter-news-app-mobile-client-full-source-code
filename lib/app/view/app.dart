@@ -21,7 +21,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/router/router.da
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_tap_handler.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/native_review_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -60,7 +60,7 @@ class App extends StatelessWidget {
     required InlineAdCacheService inlineAdCacheService,
     required AdService adService,
     required FeedDecoratorService feedDecoratorService,
-    required InAppReviewService appReviewService,
+    required AppReviewService appReviewService,
     required FeedCacheService feedCacheService,
     required GlobalKey<NavigatorState> navigatorKey,
     required PushNotificationService pushNotificationService,
@@ -116,7 +116,7 @@ class App extends StatelessWidget {
   final DataRepository<InAppNotification> _inAppNotificationRepository;
   final AdService _adService;
   final FeedDecoratorService _feedDecoratorService;
-  final InAppReviewService _appReviewService;
+  final AppReviewService _appReviewService;
   final FeedCacheService _feedCacheService;
   final GlobalKey<NavigatorState> _navigatorKey;
   final InlineAdCacheService _inlineAdCacheService;

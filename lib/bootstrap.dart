@@ -34,6 +34,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/notifications/se
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/one_signal_push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/data/clients/country_inmemory_client.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/native_review_service.dart';
 import 'package:http_client/http_client.dart';
 import 'package:in_app_review/in_app_review.dart';
@@ -226,13 +227,13 @@ Future<Widget> bootstrap(
     headlinesClient = DataInMemory<Headline>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
-      initialData: getHeadlinesFixturesData() ,
+      initialData: getHeadlinesFixturesData(),
       logger: logger,
     );
     topicsClient = DataInMemory<Topic>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
-      initialData: getTopicsFixturesData() ,
+      initialData: getTopicsFixturesData(),
       logger: logger,
     );
     // Wrap the generic DataInMemory<Country> with CountryInMemoryClient.
@@ -430,9 +431,7 @@ Future<Widget> bootstrap(
   final engagementRepository = DataRepository<Engagement>(
     dataClient: engagementClient,
   );
-  final reportRepository = DataRepository<Report>(
-    dataClient: reportClient,
-  );
+  final reportRepository = DataRepository<Report>(dataClient: reportClient);
   final appReviewRepository = DataRepository<AppReview>(
     dataClient: appReviewClient,
   );
@@ -494,12 +493,14 @@ Future<Widget> bootstrap(
     inAppReview: InAppReview.instance,
     logger: logger,
   );
-  final appReviewService = InAppReviewService(
+  
+  final appReviewService = AppReviewService(
     appReviewRepository: appReviewRepository,
     nativeReviewService: nativeReviewService,
     kvStorageService: kvStorage,
     logger: logger,
   );
+
   logger.fine('AppReviewService initialized.');
 
   // Conditionally instantiate DemoDataMigrationService
@@ -533,7 +534,7 @@ Future<Widget> bootstrap(
           appReviewRepository: appReviewRepository,
           appSettingsFixturesData: appSettingsFixturesData,
           userContentPreferencesFixturesData:
-              userContentPreferencesFixturesData,
+              getUserContentPreferencesFixturesData(),
           inAppNotificationsFixturesData: inAppNotificationsFixturesData,
         )
       : null;

@@ -1889,5 +1889,13 @@
     "rateAppNegativeFollowUpBody_2": "We value your opinion. Let us know if things are better.",
     "@rateAppNegativeFollowUpBody_2": {
         "description": "Second variation of the follow-up body text for the 'Rate App' prompt after a user has given negative feedback."
+    },
+    "noCommentsYet": "No comments yet.",
+    "@noCommentsYet": {
+        "description": "Message displayed when there are no comments on a headline."
+    },
+    "commentInputNoReactionHint": "React to add a comment",
+    "@commentInputNoReactionHint": {
+        "description": "Hint text for the comment input field when the user has not yet reacted."
     }
 }

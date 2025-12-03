@@ -1458,4 +1458,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get rateAppNegativeFollowUpBody_2 =>
       'نحن نقدر رأيك. أخبرنا إذا كانت الأمور أفضل.';
+
+  @override
+  String get noCommentsYet => 'لا توجد تعليقات حتى الآن.';
+
+  @override
+  String get commentInputNoReactionHint => 'تفاعل لإضافة تعليق';
 }

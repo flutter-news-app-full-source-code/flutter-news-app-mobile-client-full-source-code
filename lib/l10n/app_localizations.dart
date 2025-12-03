@@ -2773,6 +2773,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We value your opinion. Let us know if things are better.'**
   String get rateAppNegativeFollowUpBody_2;
+
+  /// Message displayed when there are no comments on a headline.
+  ///
+  /// In en, this message translates to:
+  /// **'No comments yet.'**
+  String get noCommentsYet;
+
+  /// Hint text for the comment input field when the user has not yet reacted.
+  ///
+  /// In en, this message translates to:
+  /// **'React to add a comment'**
+  String get commentInputNoReactionHint;
 }
 
 class _AppLocalizationsDelegate

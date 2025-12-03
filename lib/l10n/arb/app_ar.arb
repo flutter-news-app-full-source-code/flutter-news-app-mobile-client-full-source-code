@@ -1889,5 +1889,13 @@
     "rateAppNegativeFollowUpBody_2": "نحن نقدر رأيك. أخبرنا إذا كانت الأمور أفضل.",
     "@rateAppNegativeFollowUpBody_2": {
         "description": "الصيغة الثانية لنص المتابعة لطلب 'تقييم التطبيق' بعد أن يقدم المستخدم ملاحظات سلبية."
+    },
+     "noCommentsYet": "لا توجد تعليقات حتى الآن.",
+    "@noCommentsYet": {
+        "description": "Message displayed when there are no comments on a headline."
+    },
+    "commentInputNoReactionHint": "تفاعل لإضافة تعليق",
+    "@commentInputNoReactionHint": {
+        "description": "Hint text for the comment input field when the user has not yet reacted."
     }
 }

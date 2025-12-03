@@ -1465,4 +1465,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get rateAppNegativeFollowUpBody_2 =>
       'We value your opinion. Let us know if things are better.';
+
+  @override
+  String get noCommentsYet => 'No comments yet.';
+
+  @override
+  String get commentInputNoReactionHint => 'React to add a comment';
 }

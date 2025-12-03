@@ -92,44 +92,42 @@ class HeadlineTileImageTop extends StatelessWidget {
               AppSpacing.md,
               AppSpacing.md,
               AppSpacing.md,
-              AppSpacing.md,
+              0,
             ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: InkWell(
-                    onTap:
-                        onHeadlineTap ??
-                        () => HeadlineTapHandler.handleHeadlineTap(
-                          context,
-                          headline,
-                        ),
-                    child: Text.rich(
+            child: InkWell(
+              onTap:
+                  onHeadlineTap ??
+                  () => HeadlineTapHandler.handleHeadlineTap(context, headline),
+              child: Text.rich(
+                TextSpan(
+                  children: [
+                    if (headline.isBreaking)
                       TextSpan(
-                        children: [
-                          if (headline.isBreaking)
-                            TextSpan(
-                              text: '${l10n.breakingNewsPrefix} - ',
-                              style: textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w500,
-                                color: colorScheme.primary,
-                              ),
-                            ),
-                          TextSpan(text: headline.title),
-                        ],
+                        text: '${l10n.breakingNewsPrefix} - ',
+                        style: textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w500,
+                          color: colorScheme.primary,
+                        ),
                       ),
-                      style: textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w500,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
+                    TextSpan(text: headline.title),
+                  ],
                 ),
-                HeadlineActionsRow(headline: headline),
-              ],
+                style: textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.md,
+              AppSpacing.md,
+              AppSpacing.md,
+              0,
+            ),
+            child: HeadlineActionsRow(headline: headline),
           ),
         ],
       ),

@@ -80,7 +80,10 @@ class HeadlineTileTextOnly extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    HeadlineActionsRow(headline: headline),
+                    Padding(
+                      padding: const EdgeInsets.only(top: AppSpacing.md),
+                      child: HeadlineActionsRow(headline: headline),
+                    ),
                   ],
                 ),
               ),

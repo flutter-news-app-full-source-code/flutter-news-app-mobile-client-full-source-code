@@ -118,7 +118,10 @@ class HeadlineTileImageStart extends StatelessWidget {
                   ),
                 ],
               ),
-              HeadlineActionsRow(headline: headline),
+              Padding(
+                padding: const EdgeInsets.only(top: AppSpacing.md),
+                child: HeadlineActionsRow(headline: headline),
+              ),
             ],
           ),
         ),

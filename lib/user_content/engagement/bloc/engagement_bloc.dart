@@ -83,6 +83,7 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
     Emitter<EngagementState> emit,
   ) async {
     final userId = _appBloc.state.user?.id;
+    final originalUserEngagement = state.userEngagement;
     if (userId == null) return;
 
     emit(state.copyWith(status: EngagementStatus.actionInProgress));
@@ -90,30 +91,33 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
     try {
       if (state.userEngagement != null) {
         // User is updating or removing their reaction.
-        if (event.reactionType == null ||
-            state.userEngagement!.reaction.reactionType == event.reactionType) {
-          // Remove reaction.
-          await _engagementRepository.delete(id: state.userEngagement!.id);
+        final isTogglingOff =
+            event.reactionType == null ||
+            state.userEngagement!.reaction.reactionType == event.reactionType;
+
+        if (isTogglingOff) {
+          // Optimistically remove the reaction from the UI.
           emit(
             state.copyWith(
               status: EngagementStatus.success,
               clearUserEngagement: true,
             ),
           );
+          await _engagementRepository.delete(id: state.userEngagement!.id);
         } else {
-          // Update reaction.
+          // Optimistically update the reaction in the UI.
           final updatedEngagement = state.userEngagement!.copyWith(
             reaction: Reaction(reactionType: event.reactionType!),
-          );
-          await _engagementRepository.update(
-            id: updatedEngagement.id,
-            item: updatedEngagement,
           );
           emit(
             state.copyWith(
               status: EngagementStatus.success,
               userEngagement: updatedEngagement,
             ),
+          );
+          await _engagementRepository.update(
+            id: updatedEngagement.id,
+            item: updatedEngagement,
           );
         }
       } else if (event.reactionType != null) {
@@ -127,7 +131,16 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
         );
+        // Optimistically add the new reaction to the UI.
+        emit(
+          state.copyWith(
+            status: EngagementStatus.success,
+            userEngagement: newEngagement,
+          ),
+        );
         final created = await _engagementRepository.create(item: newEngagement);
+        // Update the state with the server-confirmed engagement, which might
+        // have a different ID or timestamps.
         emit(
           state.copyWith(
             status: EngagementStatus.success,
@@ -135,10 +148,16 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
           ),
         );
       }
-      add(const EngagementStarted()); // Refresh the list
     } on HttpException catch (e, s) {
       _logger.severe('Failed to update reaction', e, s);
-      emit(state.copyWith(status: EngagementStatus.failure, error: e));
+      // On failure, roll back to the original state.
+      emit(
+        state.copyWith(
+          status: EngagementStatus.failure,
+          error: e,
+          userEngagement: originalUserEngagement,
+        ),
+      );
     }
   }
 
@@ -146,8 +165,44 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
     EngagementCommentPosted event,
     Emitter<EngagementState> emit,
   ) async {
-    // Logic to post a comment, which requires a reaction.
-    // This will be implemented in a subsequent phase.
+    final userId = _appBloc.state.user?.id;
+    final language = _appBloc.state.settings?.language;
+    if (userId == null || state.userEngagement == null || language == null) {
+      return; // Cannot post a comment without a user, reaction, or language.
+    }
+
+    emit(state.copyWith(status: EngagementStatus.actionInProgress));
+
+    try {
+      final newComment = Comment(language: language, content: event.content);
+
+      final updatedEngagement = state.userEngagement!.copyWith(
+        comment: newComment,
+      );
+
+      // Optimistically add the comment to the UI.
+      final optimisticEngagements = List<Engagement>.from(state.engagements)
+        ..removeWhere((e) => e.id == state.userEngagement!.id)
+        ..insert(0, updatedEngagement);
+
+      emit(
+        state.copyWith(
+          status: EngagementStatus.success,
+          userEngagement: updatedEngagement,
+          engagements: optimisticEngagements,
+        ),
+      );
+
+      await _engagementRepository.update(
+        id: updatedEngagement.id,
+        item: updatedEngagement,
+      );
+    } on HttpException catch (e, s) {
+      _logger.severe('Failed to post comment', e, s);
+      // On failure, we can simply show an error. The optimistic update will
+      // be corrected on the next full refresh.
+      emit(state.copyWith(status: EngagementStatus.failure, error: e));
+    }
   }
 
   Future<void> _onEngagementQuickReactionToggled(
@@ -155,33 +210,36 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
     Emitter<EngagementState> emit,
   ) async {
     final userId = _appBloc.state.user?.id;
+    final originalUserEngagement = state.userEngagement;
     if (userId == null) return;
 
     emit(state.copyWith(status: EngagementStatus.actionInProgress));
 
     try {
-      final existingEngagement = state.engagements.firstWhere(
-        (e) => e.userId == userId,
-        orElse: () => Engagement(
-          id: '',
-          userId: '',
-          entityId: '',
-          entityType: _entityType,
-          reaction: const Reaction(reactionType: ReactionType.like),
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        ),
-      );
-
-      if (existingEngagement.id.isNotEmpty) {
+      if (state.userEngagement != null) {
         // User has an existing engagement.
-        if (existingEngagement.reaction.reactionType == event.reactionType) {
-          // Toggling off the same reaction.
-          await _engagementRepository.delete(id: existingEngagement.id);
+        final isTogglingOff =
+            state.userEngagement!.reaction.reactionType == event.reactionType;
+
+        if (isTogglingOff) {
+          // Optimistically remove the reaction.
+          emit(
+            state.copyWith(
+              status: EngagementStatus.success,
+              clearUserEngagement: true,
+            ),
+          );
+          await _engagementRepository.delete(id: state.userEngagement!.id);
         } else {
-          // Changing to a new quick reaction.
-          final updated = existingEngagement.copyWith(
+          // Optimistically update to the new reaction.
+          final updated = state.userEngagement!.copyWith(
             reaction: Reaction(reactionType: event.reactionType),
+          );
+          emit(
+            state.copyWith(
+              status: EngagementStatus.success,
+              userEngagement: updated,
+            ),
           );
           await _engagementRepository.update(id: updated.id, item: updated);
         }
@@ -196,12 +254,27 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
         );
-        await _engagementRepository.create(item: newEngagement);
+        // Optimistically add the new reaction.
+        emit(
+          state.copyWith(
+            status: EngagementStatus.success,
+            userEngagement: newEngagement,
+          ),
+        );
+        final created = await _engagementRepository.create(item: newEngagement);
+        // Update state with the server-confirmed object.
+        emit(state.copyWith(userEngagement: created));
       }
-      add(const EngagementStarted()); // Refresh the list
     } on HttpException catch (e, s) {
       _logger.severe('Failed to toggle quick reaction', e, s);
-      emit(state.copyWith(status: EngagementStatus.failure, error: e));
+      // On failure, roll back to the original state.
+      emit(
+        state.copyWith(
+          status: EngagementStatus.failure,
+          error: e,
+          userEngagement: originalUserEngagement,
+        ),
+      );
     }
   }
 }

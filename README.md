@@ -53,6 +53,15 @@ A robust, backend-driven notification system keeps users informed and brings the
 - **Integrated Notification Center:** Includes a full-featured in-app notification center where users can view their history. Foreground notifications are handled gracefully, appearing as an unread indicator that leads the user to this central hub, avoiding intrusive system alerts during active use.
 > **Your Advantage:** You get a highly flexible and scalable notification system that avoids vendor lock-in and is ready to re-engage users from day one.
 
+---
+
+### 💬 Community & Feedback Systems
+A complete suite of tools to build a vibrant user community and gather valuable feedback directly within the app.
+- **Configurable Headline Engagement:** Enable immediate user interaction directly on each headline within the feed. The entire engagement system is controlled via remote configuration, allowing you to dynamically adjust the depth of user interaction—from simple reactions to full comment threads—without an app update.
+- **Intelligent Review Funnel:** A sophisticated, multi-layered system that strategically prompts users for an app review. Its behavior is entirely driven by remote configuration, including cooldown periods and positive interaction thresholds. It first gauges user sentiment with a private, in-app prompt: positive responses trigger the native OS review dialog, while negative responses open a private feedback form.
+- **Moderated Content Reporting:** Empower your community to maintain content quality with a built-in reporting system. Users can easily report headlines, sources, or individual comments through a guided process. All reports are submitted to the backend and are designed to be managed and actioned from the companion web dashboard.
+> **Your Advantage:** Deploy a full-featured community and feedback system from day one. Skip the complexity of building engagement UI, state management for reactions, and the nuanced logic of a best-practice app review funnel.
+
 </details>
 
 <details>

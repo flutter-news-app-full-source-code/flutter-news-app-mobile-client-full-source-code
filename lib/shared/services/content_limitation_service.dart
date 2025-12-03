@@ -172,15 +172,13 @@ class ContentLimitationService {
             count = preferences.followedSources.length;
           case ContentAction.followCountry:
             count = preferences.followedCountries.length;
+          // These cases are handled above and will not be reached here.
           case ContentAction.bookmarkHeadline:
-            // This case is handled above and will not be reached here.
-            count = 0;
           case ContentAction.saveHeadlineFilter:
-            // This case is handled above and will not be reached here.
-            count = 0;
           case ContentAction.pinHeadlineFilter:
+          case ContentAction.postComment:
           case ContentAction.subscribeToHeadlineFilterNotifications:
-            // These cases are handled above and will not be reached here.
+          case ContentAction.submitReport:
             count = 0;
         }
 

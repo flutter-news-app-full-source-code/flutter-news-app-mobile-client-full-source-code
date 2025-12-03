@@ -1,9 +1,12 @@
 import 'package:core/core.dart';
+import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/headline_actions_bottom_sheet.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/user_content/engagement/bloc/engagement_bloc.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -21,6 +24,25 @@ class HeadlineActionsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => EngagementBloc(
+        entityId: headline.id,
+        entityType: EngageableType.headline,
+        engagementRepository: context.read<DataRepository<Engagement>>(),
+        appBloc: context.read<AppBloc>(),
+      )..add(const EngagementStarted()),
+      child: _HeadlineActionsRowView(headline: headline),
+    );
+  }
+}
+
+class _HeadlineActionsRowView extends StatelessWidget {
+  const _HeadlineActionsRowView({required this.headline});
+
+  final Headline headline;
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
     final isBookmarked = context.select<AppBloc, bool>(
       (bloc) =>
@@ -30,10 +52,11 @@ class HeadlineActionsRow extends StatelessWidget {
           false,
     );
 
-    // This is a placeholder for the real engagement data.
-    // In a future phase, this will come from the EngagementBloc.
-    const reaction = ReactionType.like;
-    const commentCount = 0;
+    final engagementState = context.watch<EngagementBloc>().state;
+    final userReaction = engagementState.userEngagement?.reaction.reactionType;
+    final commentCount = engagementState.engagements
+        .where((e) => e.comment != null)
+        .length;
 
     return Padding(
       padding: const EdgeInsets.only(top: AppSpacing.md),
@@ -43,32 +66,32 @@ class HeadlineActionsRow extends StatelessWidget {
           Row(
             children: [
               _ActionButton(
-                icon: reaction == ReactionType.like
+                icon: userReaction == ReactionType.like
                     ? Icons.thumb_up
                     : Icons.thumb_up_outlined,
                 tooltip: l10n.likeActionLabel,
-                onPressed: () {
-                  // TODO(fulleni): Implement like action.
-                },
+                onPressed: () => context.read<EngagementBloc>().add(
+                  const EngagementQuickReactionToggled(ReactionType.like),
+                ),
               ),
               const SizedBox(width: AppSpacing.md),
               _ActionButton(
-                icon: reaction == ReactionType.angry
+                icon: userReaction == ReactionType.skeptical
                     ? Icons.thumb_down
                     : Icons.thumb_down_outlined,
                 tooltip: l10n.dislikeActionLabel,
-                onPressed: () {
-                  // TODO(fulleni): Implement dislike action.
-                },
+                onPressed: () => context.read<EngagementBloc>().add(
+                  const EngagementQuickReactionToggled(ReactionType.skeptical),
+                ),
               ),
               const SizedBox(width: AppSpacing.md),
               _ActionButton(
                 icon: Icons.chat_bubble_outline,
                 tooltip: l10n.commentActionLabel,
+                onPressed: () => context.read<HeadlinesFeedBloc>().add(
+                  HeadlinesFeedEngagementTapped(headline: headline),
+                ),
                 count: commentCount,
-                onPressed: () {
-                  // TODO(fulleni): Implement open comments action.
-                },
               ),
             ],
           ),
@@ -112,7 +135,7 @@ class HeadlineActionsRow extends StatelessWidget {
     bool isBookmarked,
     Headline headline,
   ) {
-    final appBloc = context.read<AppBloc>();
+    final appBloc = context.read<AppBloc>(); // No need to listen
     final userContentPreferences = appBloc.state.userContentPreferences;
     if (userContentPreferences == null) return;
 

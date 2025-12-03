@@ -56,14 +56,34 @@ class _ReactionIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO(fulleni): Replace with actual icons/emojis.
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    final iconData = switch (reaction) {
+      ReactionType.like => Icons.thumb_up_outlined,
+      ReactionType.insightful => Icons.lightbulb_outline,
+      ReactionType.amusing => Icons.sentiment_satisfied_outlined,
+      ReactionType.sad => Icons.sentiment_dissatisfied_outlined,
+      ReactionType.angry => Icons.local_fire_department_outlined,
+      ReactionType.skeptical => Icons.question_mark_outlined,
+    };
+
     return GestureDetector(
       onTap: onTap,
-      child: CircleAvatar(
-        backgroundColor: isSelected
-            ? Theme.of(context).colorScheme.primaryContainer
-            : null,
-        child: Text(reaction.name.substring(0, 2)),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.all(AppSpacing.sm),
+        decoration: BoxDecoration(
+          color: isSelected ? colorScheme.primaryContainer : null,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          iconData,
+          color: isSelected
+              ? colorScheme.onPrimaryContainer
+              : colorScheme.onSurfaceVariant,
+          size: 28,
+        ),
       ),
     );
   }

@@ -1773,5 +1773,121 @@
     "removeBookmarkActionLabel": "إزالة من المحفوظات",
     "@removeBookmarkActionLabel": {
         "description": "Label for the action to remove a headline from bookmarks."
+    },
+    "reportActionLabel": "إبلاغ",
+    "@reportActionLabel": {
+        "description": "تسمية لإجراء الإبلاغ عن محتوى."
+    },
+    "reportContentTitle": "الإبلاغ عن محتوى",
+    "@reportContentTitle": {
+        "description": "عنوان نافذة الإبلاغ عن محتوى."
+    },
+    "reportReasonSelectionPrompt": "الرجاء تحديد سبب الإبلاغ:",
+    "@reportReasonSelectionPrompt": {
+        "description": "نص يطلب من المستخدم تحديد سبب الإبلاغ."
+    },
+    "reportAdditionalCommentsLabel": "تعليقات إضافية (اختياري)",
+    "@reportAdditionalCommentsLabel": {
+        "description": "تسمية حقل التعليقات الإضافية الاختياري في نموذج الإبلاغ."
+    },
+    "reportSubmitButtonLabel": "إرسال البلاغ",
+    "@reportSubmitButtonLabel": {
+        "description": "تسمية زر إرسال بلاغ المحتوى."
+    },
+    "reportSuccessSnackbar": "تم إرسال البلاغ. شكراً لملاحظاتك.",
+    "@reportSuccessSnackbar": {
+        "description": "رسالة تظهر بعد إرسال البلاغ بنجاح."
+    },
+    "reportFailureSnackbar": "فشل إرسال البلاغ. الرجاء المحاولة مرة أخرى.",
+    "@reportFailureSnackbar": {
+        "description": "رسالة تظهر عند فشل إرسال البلاغ."
+    },
+    "commentsTitle": "التعليقات",
+    "@commentsTitle": {
+        "description": "عنوان قسم أو نافذة التعليقات."
+    },
+    "commentPostButtonLabel": "نشر",
+    "@commentPostButtonLabel": {
+        "description": "تسمية زر نشر تعليق جديد."
+    },
+    "commentInputHint": "أضف تعليقاً...",
+    "@commentInputHint": {
+        "description": "نص تلميحي لحقل إدخال التعليق."
+    },
+    "commentRequiresReactionError": "الرجاء تحديد تفاعل لنشر تعليق.",
+    "@commentRequiresReactionError": {
+        "description": "رسالة خطأ تظهر عندما يحاول المستخدم التعليق بدون تحديد تفاعل."
+    },
+    "likeActionLabel": "إعجاب",
+    "@likeActionLabel": {
+        "description": "تلميح أو تسمية لإجراء 'الإعجاب'."
+    },
+    "dislikeActionLabel": "عدم إعجاب",
+    "@dislikeActionLabel": {
+        "description": "تلميح أو تسمية لإجراء 'عدم الإعجاب'."
+    },
+    "commentActionLabel": "تعليق",
+    "@commentActionLabel": {
+        "description": "تلميح أو تسمية لإجراء 'التعليق'."
+    },
+    "moreActionLabel": "المزيد",
+    "@moreActionLabel": {
+        "description": "تلميح أو تسمية أيقونة 'المزيد' من الإجراءات."
+    },
+    "rateAppPromptTitle": "هل تستمتع بالتطبيق؟",
+    "@rateAppPromptTitle": {
+        "description": "عنوان النافذة التي تطلب من المستخدم تقييم التطبيق."
+    },
+    "rateAppPromptBody": "تساعدنا ملاحظاتك على التحسين. هل تمانع في تقييمنا؟",
+    "@rateAppPromptBody": {
+        "description": "نص النافذة التي تطلب من المستخدم تقييم التطبيق."
+    },
+    "rateAppPromptYesButton": "نعم",
+    "@rateAppPromptYesButton": {
+        "description": "نص زر الاستجابة الإيجابية لطلب التقييم."
+    },
+    "rateAppPromptNoButton": "لا",
+    "@rateAppPromptNoButton": {
+        "description": "نص زر الاستجابة السلبية لطلب التقييم."
+    },
+    "feedbackPromptTitle": "كيف يمكننا التحسين؟",
+    "@feedbackPromptTitle": {
+        "description": "عنوان النافذة التي تطلب ملاحظات تفصيلية بعد استجابة سلبية لطلب التقييم."
+    },
+    "feedbackPromptReasonUI": "واجهة المستخدم / التصميم",
+    "@feedbackPromptReasonUI": {
+        "description": "سبب الملاحظات المتعلق بواجهة المستخدم والتصميم."
+    },
+    "feedbackPromptReasonPerformance": "الأداء / السرعة",
+    "@feedbackPromptReasonPerformance": {
+        "description": "سبب الملاحظات المتعلق بأداء التطبيق."
+    },
+    "feedbackPromptReasonContent": "جودة المحتوى",
+    "@feedbackPromptReasonContent": {
+        "description": "سبب الملاحظات المتعلق بجودة محتوى الأخبار."
+    },
+    "feedbackPromptReasonOther": "أخرى",
+    "@feedbackPromptReasonOther": {
+        "description": "سبب الملاحظات للمشكلات غير المدرجة."
+    },
+    "feedbackPromptSubmitButton": "إرسال الملاحظات",
+    "@feedbackPromptSubmitButton": {
+        "description": "نص زر إرسال الملاحظات التفصيلية."
+    },
+    "rateAppNegativeFollowUpTitle_1": "كيف حالنا الآن؟",
+    "@rateAppNegativeFollowUpTitle_1": {
+        "description": "الصيغة الأولى لعنوان المتابعة لطلب 'تقييم التطبيق' بعد أن يقدم المستخدم ملاحظات سلبية."
+    },
+    "rateAppNegativeFollowUpTitle_2": "هل تحسن الأداء؟",
+    "@rateAppNegativeFollowUpTitle_2": {
+        "description": "الصيغة الثانية لعنوان المتابعة لطلب 'تقييم التطبيق' بعد أن يقدم المستخدم ملاحظات سلبية."
+    },
+    "rateAppNegativeFollowUpBody_1": "لقد عملنا على ملاحظاتك. هل تعيد النظر في تقييمك؟",
+    "@rateAppNegativeFollowUpBody_1": {
+        "description": "الصيغة الأولى لنص المتابعة لطلب 'تقييم التطبيق' بعد أن يقدم المستخدم ملاحظات سلبية."
+    },
+    "rateAppNegativeFollowUpBody_2": "نحن نقدر رأيك. أخبرنا إذا كانت الأمور أفضل.",
+    "@rateAppNegativeFollowUpBody_2": {
+        "description": "الصيغة الثانية لنص المتابعة لطلب 'تقييم التطبيق' بعد أن يقدم المستخدم ملاحظات سلبية."
     }
 }

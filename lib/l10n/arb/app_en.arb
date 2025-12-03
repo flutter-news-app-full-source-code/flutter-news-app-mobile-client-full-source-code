@@ -1773,5 +1773,121 @@
     "removeBookmarkActionLabel": "Remove Bookmark",
     "@removeBookmarkActionLabel": {
         "description": "Label for the action to remove a headline from bookmarks."
+    },
+    "reportActionLabel": "Report",
+    "@reportActionLabel": {
+        "description": "Label for the action to report content."
+    },
+    "reportContentTitle": "Report Content",
+    "@reportContentTitle": {
+        "description": "Title for the report content bottom sheet."
+    },
+    "reportReasonSelectionPrompt": "Please select a reason for your report:",
+    "@reportReasonSelectionPrompt": {
+        "description": "Prompt asking the user to select a reason for reporting."
+    },
+    "reportAdditionalCommentsLabel": "Additional Comments (Optional)",
+    "@reportAdditionalCommentsLabel": {
+        "description": "Label for the optional additional comments field in the report form."
+    },
+    "reportSubmitButtonLabel": "Submit Report",
+    "@reportSubmitButtonLabel": {
+        "description": "Label for the button to submit a content report."
+    },
+    "reportSuccessSnackbar": "Report submitted. Thank you for your feedback.",
+    "@reportSuccessSnackbar": {
+        "description": "Snackbar message shown after a report is successfully submitted."
+    },
+    "reportFailureSnackbar": "Failed to submit report. Please try again.",
+    "@reportFailureSnackbar": {
+        "description": "Snackbar message shown when submitting a report fails."
+    },
+    "commentsTitle": "Comments",
+    "@commentsTitle": {
+        "description": "Title for the comments section or bottom sheet."
+    },
+    "commentPostButtonLabel": "Post",
+    "@commentPostButtonLabel": {
+        "description": "Label for the button to post a new comment."
+    },
+    "commentInputHint": "Add a comment...",
+    "@commentInputHint": {
+        "description": "Hint text for the comment input field."
+    },
+    "commentRequiresReactionError": "Please select a reaction to post a comment.",
+    "@commentRequiresReactionError": {
+        "description": "Error message shown when a user tries to comment without selecting a reaction."
+    },
+    "likeActionLabel": "Like",
+    "@likeActionLabel": {
+        "description": "Tooltip or label for the 'Like' action."
+    },
+    "dislikeActionLabel": "Dislike",
+    "@dislikeActionLabel": {
+        "description": "Tooltip or label for the 'Dislike' action."
+    },
+    "commentActionLabel": "Comment",
+    "@commentActionLabel": {
+        "description": "Tooltip or label for the 'Comment' action."
+    },
+    "moreActionLabel": "More",
+    "@moreActionLabel": {
+        "description": "Tooltip or label for the 'More' actions icon."
+    },
+    "rateAppPromptTitle": "Enjoying the app?",
+    "@rateAppPromptTitle": {
+        "description": "Title for the in-app bottom sheet that prompts the user to rate the app."
+    },
+    "rateAppPromptBody": "Your feedback helps us improve. Would you mind rating us?",
+    "@rateAppPromptBody": {
+        "description": "Body text for the in-app rating prompt bottom sheet."
+    },
+    "rateAppPromptYesButton": "Yes",
+    "@rateAppPromptYesButton": {
+        "description": "Button text for a positive response to the rating prompt."
+    },
+    "rateAppPromptNoButton": "No",
+    "@rateAppPromptNoButton": {
+        "description": "Button text for a negative response to the rating prompt."
+    },
+    "feedbackPromptTitle": "How can we improve?",
+    "@feedbackPromptTitle": {
+        "description": "Title for the bottom sheet that asks for detailed feedback after a negative rating prompt response."
+    },
+    "feedbackPromptReasonUI": "UI / Design",
+    "@feedbackPromptReasonUI": {
+        "description": "Feedback reason related to UI and design."
+    },
+    "feedbackPromptReasonPerformance": "Performance / Speed",
+    "@feedbackPromptReasonPerformance": {
+        "description": "Feedback reason related to app performance."
+    },
+    "feedbackPromptReasonContent": "Content Quality",
+    "@feedbackPromptReasonContent": {
+        "description": "Feedback reason related to the quality of news content."
+    },
+    "feedbackPromptReasonOther": "Other",
+    "@feedbackPromptReasonOther": {
+        "description": "Feedback reason for issues not listed."
+    },
+    "feedbackPromptSubmitButton": "Submit Feedback",
+    "@feedbackPromptSubmitButton": {
+        "description": "Button text to submit detailed feedback."
+    },
+    "rateAppNegativeFollowUpTitle_1": "How are we doing now?",
+    "@rateAppNegativeFollowUpTitle_1": {
+        "description": "First variation of the follow-up title for the 'Rate App' prompt after a user has given negative feedback."
+    },
+    "rateAppNegativeFollowUpTitle_2": "Have we improved?",
+    "@rateAppNegativeFollowUpTitle_2": {
+        "description": "Second variation of the follow-up title for the 'Rate App' prompt after a user has given negative feedback."
+    },
+    "rateAppNegativeFollowUpBody_1": "We've been working on your feedback. Would you reconsider your rating?",
+    "@rateAppNegativeFollowUpBody_1": {
+        "description": "First variation of the follow-up body text for the 'Rate App' prompt after a user has given negative feedback."
+    },
+    "rateAppNegativeFollowUpBody_2": "We value your opinion. Let us know if things are better.",
+    "@rateAppNegativeFollowUpBody_2": {
+        "description": "Second variation of the follow-up body text for the 'Rate App' prompt after a user has given negative feedback."
     }
 }

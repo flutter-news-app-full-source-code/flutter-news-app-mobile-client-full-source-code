@@ -13,6 +13,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/models/initi
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/extensions.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/native_review_service.dart';
 import 'package:logging/logging.dart';
 
 part 'app_event.dart';
@@ -48,6 +49,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required DataRepository<User> userRepository,
     required PushNotificationService pushNotificationService,
     required DataRepository<InAppNotification> inAppNotificationRepository,
+    required InAppReviewService appReviewService,
   }) : _remoteConfigRepository = remoteConfigRepository,
        _appInitializer = appInitializer,
        _authRepository = authRepository,
@@ -56,6 +58,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _userRepository = userRepository,
        _inAppNotificationRepository = inAppNotificationRepository,
        _pushNotificationService = pushNotificationService,
+       _appReviewService = appReviewService,
        _inlineAdCacheService = inlineAdCacheService,
        _logger = logger,
        super(
@@ -93,6 +96,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppAllInAppNotificationsMarkedAsRead>(
       _onAllInAppNotificationsMarkedAsRead,
     );
+    on<AppPositiveInteractionOcurred>(_onAppPositiveInteractionOcurred);
     on<AppInAppNotificationMarkedAsRead>(_onInAppNotificationMarkedAsRead);
     on<AppNotificationTapped>(_onAppNotificationTapped);
 
@@ -123,6 +127,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final DataRepository<User> _userRepository;
   final DataRepository<InAppNotification> _inAppNotificationRepository;
   final PushNotificationService _pushNotificationService;
+  final InAppReviewService _appReviewService;
   final InlineAdCacheService _inlineAdCacheService;
 
   /// Handles the [AppStarted] event.
@@ -736,6 +741,21 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     } catch (e, s) {
       _logger.severe('Failed to mark notification as read.', e, s);
     }
+  }
+
+  /// Handles the [AppPositiveInteractionOcurred] event.
+  ///
+  /// This handler increments the user's positive interaction count and then
+  /// delegates to the [AppReviewService] to check if a review prompt should
+  /// be shown.
+  Future<void> _onAppPositiveInteractionOcurred(
+    AppPositiveInteractionOcurred event,
+    Emitter<AppState> emit,
+  ) async {
+    await _appReviewService.incrementPositiveInteractionCount();
+    await _appReviewService.checkEligibilityAndTrigger(
+      context: event.context,
+    );
   }
 
   /// Handles the [AppPushNotificationTokenRefreshed] event.

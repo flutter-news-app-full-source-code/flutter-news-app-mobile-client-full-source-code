@@ -11,7 +11,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template headline_actions_row}
-/// A widget that displays a row of action icons for a headline.
+/// A widget that displays a row of action icons for a headline feed tile.
 ///
 /// This includes actions like like/dislike, comment, bookmark, share, and more.
 /// {@endtemplate}

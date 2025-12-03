@@ -1,5 +1,6 @@
 part of 'app_bloc.dart';
 
+
 /// Abstract base class for all events in the [AppBloc].
 ///
 /// All concrete app events must extend this class.
@@ -249,4 +250,20 @@ class AppNotificationTapped extends AppEvent {
 
   @override
   List<Object> get props => [notificationId];
+}
+
+/// {@template app_positive_interaction_ocurred}
+/// Dispatched when a user performs a positive interaction, such as saving an
+/// article or following a topic.
+///
+/// This event is used to track user engagement and trigger the app review
+/// funnel.
+/// {@endtemplate}
+class AppPositiveInteractionOcurred extends AppEvent {
+  /// {@macro app_positive_interaction_ocurred}
+  const AppPositiveInteractionOcurred({required this.context});
+
+  final BuildContext context;
+  @override
+  List<Object> get props => [context];
 }

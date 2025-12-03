@@ -10,6 +10,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_th
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/user_content/engagement/engagement.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/cached_feed.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
@@ -135,6 +136,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     on<FollowedFilterSelected>(
       _onFollowedFilterSelected,
       transformer: restartable(),
+    );
+    on<HeadlinesFeedEngagementTapped>(
+      _onHeadlinesFeedEngagementTapped,
+      transformer: sequential(),
     );
   }
 
@@ -865,6 +870,14 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     // If it's a cache miss, set the state and trigger a full refresh.
     emit(state.copyWith(activeFilterId: 'followed', filter: newFilter));
     add(HeadlinesFeedRefreshRequested(adThemeStyle: event.adThemeStyle));
+  }
+
+  void _onHeadlinesFeedEngagementTapped(
+    HeadlinesFeedEngagementTapped event,
+    Emitter<HeadlinesFeedState> emit,
+  ) {
+    // TODO(fulleni): This event handler is currently a placeholder.
+    // The UI will directly show the bottom sheet.
   }
 
   @override

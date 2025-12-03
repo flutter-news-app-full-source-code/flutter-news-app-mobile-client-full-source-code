@@ -13,6 +13,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/feed_core.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/user_content/reporting/view/report_content_bottom_sheet.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 class EntityDetailsPageArguments {
@@ -169,6 +170,9 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                 context.read<EntityDetailsBloc>().add(
                   const EntityDetailsToggleFollowRequested(),
                 );
+                context.read<AppBloc>().add(
+                  AppPositiveInteractionOcurred(context: context),
+                );
               } else {
                 // If the user is following, check the limit first.
                 final limitationService = context
@@ -193,6 +197,9 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                 if (status == LimitationStatus.allowed) {
                   context.read<EntityDetailsBloc>().add(
                     const EntityDetailsToggleFollowRequested(),
+                  );
+                  context.read<AppBloc>().add(
+                    AppPositiveInteractionOcurred(context: context),
                   );
                 } else {
                   showModalBottomSheet<void>(
@@ -255,7 +262,30 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                 snap: false,
                 actions: [
                   followButton,
-                  const SizedBox(width: AppSpacing.sm),
+                  PopupMenuButton<String>(
+                    onSelected: (value) {
+                      if (value == 'report') {
+                        showModalBottomSheet<void>(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (_) => ReportContentBottomSheet(
+                            entityId: widget.args.entityId,
+                            reportableEntity:
+                                widget.args.contentType == ContentType.topic
+                                ? ReportableEntity.source
+                                : ReportableEntity.source,
+                          ),
+                        );
+                      }
+                    },
+                    itemBuilder: (BuildContext context) =>
+                        <PopupMenuEntry<String>>[
+                          PopupMenuItem<String>(
+                            value: 'report',
+                            child: Text(l10n.reportActionLabel),
+                          ),
+                        ],
+                  ),
                 ],
               ),
               if (state.feedItems.isEmpty &&

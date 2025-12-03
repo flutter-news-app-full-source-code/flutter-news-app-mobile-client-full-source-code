@@ -24,6 +24,12 @@ enum ContentAction {
 
   /// The action of subscribing to notifications for a headline filter.
   subscribeToHeadlineFilterNotifications,
+
+  /// The action of posting a comment.
+  postComment,
+
+  /// The action of submitting a report.
+  submitReport,
 }
 
 /// Defines the outcome of a content limitation check.
@@ -181,6 +187,24 @@ class ContentLimitationService {
         // If no limit is defined for the role, allow the action.
         if (limit == null) return LimitationStatus.allowed;
 
+        if (count >= limit) {
+          return _getLimitationStatusForRole(role);
+        }
+
+      case ContentAction.postComment:
+        final count = 0; // Not tracked per-session yet.
+        final limit = limits.commentsPerDay[role];
+
+        if (limit == null) return LimitationStatus.allowed;
+        if (count >= limit) {
+          return _getLimitationStatusForRole(role);
+        }
+
+      case ContentAction.submitReport:
+        final count = 0; // Not tracked per-session yet.
+        final limit = limits.reportsPerDay[role];
+
+        if (limit == null) return LimitationStatus.allowed;
         if (count >= limit) {
           return _getLimitationStatusForRole(role);
         }

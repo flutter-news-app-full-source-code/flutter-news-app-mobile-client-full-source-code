@@ -67,9 +67,7 @@ class _EngagementBottomSheetView extends StatelessWidget {
                     .add(EngagementReactionUpdated(reaction)),
               ),
               const Divider(height: AppSpacing.lg),
-              Expanded(
-                child: _buildContent(context, state, scrollController),
-              ),
+              Expanded(child: _buildContent(context, state, scrollController)),
               const _CommentInputField(),
             ],
           ),
@@ -91,7 +89,7 @@ class _EngagementBottomSheetView extends StatelessWidget {
     }
 
     if (state.status == EngagementStatus.failure) {
-      return Center(child: Text(l10n.errorLabel));
+      return Center(child: Text(l10n.unknownError));
     }
 
     final comments = state.engagements.where((e) => e.comment != null).toList();
@@ -120,9 +118,7 @@ class _EngagementBottomSheetView extends StatelessWidget {
         );
 
         return ListTile(
-          leading: const CircleAvatar(
-            child: Icon(Icons.person_outline),
-          ),
+          leading: const CircleAvatar(child: Icon(Icons.person_outline)),
           title: Row(
             children: [
               Text(
@@ -196,9 +192,9 @@ class _CommentInputFieldState extends State<_CommentInputField> {
             color: canPost ? theme.colorScheme.primary : null,
             onPressed: canPost
                 ? () {
-                    context
-                        .read<EngagementBloc>()
-                        .add(EngagementCommentPosted(_controller.text));
+                    context.read<EngagementBloc>().add(
+                      EngagementCommentPosted(_controller.text),
+                    );
                     _controller.clear();
                     FocusScope.of(context).unfocus();
                   }

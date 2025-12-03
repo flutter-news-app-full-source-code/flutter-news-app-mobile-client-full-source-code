@@ -11,6 +11,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/b
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/widgets/feed_sliver_app_bar.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/widgets/saved_filters_bar.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/shared.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -114,10 +115,22 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
 
     return BlocListener<HeadlinesFeedBloc, HeadlinesFeedState>(
       listener: (context, state) {
+        // This listener handles navigation actions triggered by the BLoC.
         if (state.navigationUrl != null) {
-          // Use context.push for navigation to allow returning.
-          // This is suitable for call-to-action flows like linking an account.
-          context.push(state.navigationUrl!);
+          if (state.navigationArguments != null) {
+            // Handle navigation with arguments, like opening the engagement sheet.
+            // We use pushNamed to navigate to a specific route with extra data.
+            context.pushNamed(
+              Routes.engagementName,
+              pathParameters: {
+                'headlineId': (state.navigationArguments! as Headline).id,
+              },
+              extra: state.navigationArguments,
+            );
+          } else {
+            // Handle simple URL navigation for call-to-actions.
+            context.push(state.navigationUrl!);
+          }
           // Notify the BLoC that navigation has been handled to clear the URL.
           context.read<HeadlinesFeedBloc>().add(NavigationHandled());
         }

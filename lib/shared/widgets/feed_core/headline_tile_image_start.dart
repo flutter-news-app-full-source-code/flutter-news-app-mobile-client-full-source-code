@@ -73,13 +73,13 @@ class HeadlineTileImageStart extends StatelessWidget {
                         },
                         errorBuilder: (context, error, stackTrace) =>
                             ColoredBox(
-                          color: colorScheme.surfaceContainerHighest,
-                          child: Icon(
-                            Icons.broken_image_outlined,
-                            color: colorScheme.onSurfaceVariant,
-                            size: AppSpacing.xl,
-                          ),
-                        ),
+                              color: colorScheme.surfaceContainerHighest,
+                              child: Icon(
+                                Icons.broken_image_outlined,
+                                color: colorScheme.onSurfaceVariant,
+                                size: AppSpacing.xl,
+                              ),
+                            ),
                       ),
                     ),
                   ),

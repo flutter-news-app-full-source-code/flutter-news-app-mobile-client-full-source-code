@@ -23,12 +23,12 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
     required DataRepository<Engagement> engagementRepository,
     required AppBloc appBloc,
     Logger? logger,
-  })  : _entityId = entityId,
-        _entityType = entityType,
-        _engagementRepository = engagementRepository,
-        _appBloc = appBloc,
-        _logger = logger ?? Logger('EngagementBloc'),
-        super(const EngagementState()) {
+  }) : _entityId = entityId,
+       _entityType = entityType,
+       _engagementRepository = engagementRepository,
+       _appBloc = appBloc,
+       _logger = logger ?? Logger('EngagementBloc'),
+       super(const EngagementState()) {
     on<EngagementStarted>(_onEngagementStarted);
     on<EngagementReactionUpdated>(_onEngagementReactionUpdated);
     on<EngagementCommentPosted>(_onEngagementCommentPosted);
@@ -91,8 +91,7 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
       if (state.userEngagement != null) {
         // User is updating or removing their reaction.
         if (event.reactionType == null ||
-            state.userEngagement!.reaction.reactionType ==
-                event.reactionType) {
+            state.userEngagement!.reaction.reactionType == event.reactionType) {
           // Remove reaction.
           await _engagementRepository.delete(id: state.userEngagement!.id);
           emit(
@@ -128,8 +127,7 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
         );
-        final created =
-            await _engagementRepository.create(item: newEngagement);
+        final created = await _engagementRepository.create(item: newEngagement);
         emit(
           state.copyWith(
             status: EngagementStatus.success,

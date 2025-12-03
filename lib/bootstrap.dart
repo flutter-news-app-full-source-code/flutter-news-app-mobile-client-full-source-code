@@ -493,7 +493,7 @@ Future<Widget> bootstrap(
     inAppReview: InAppReview.instance,
     logger: logger,
   );
-  
+
   final appReviewService = AppReviewService(
     appReviewRepository: appReviewRepository,
     nativeReviewService: nativeReviewService,

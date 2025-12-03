@@ -192,7 +192,7 @@ class ContentLimitationService {
         }
 
       case ContentAction.postComment:
-        final count = 0; // Not tracked per-session yet.
+        const count = 0; // Not tracked per-session yet.
         final limit = limits.commentsPerDay[role];
 
         if (limit == null) return LimitationStatus.allowed;
@@ -201,7 +201,7 @@ class ContentLimitationService {
         }
 
       case ContentAction.submitReport:
-        final count = 0; // Not tracked per-session yet.
+        const count = 0; // Not tracked per-session yet.
         final limit = limits.reportsPerDay[role];
 
         if (limit == null) return LimitationStatus.allowed;

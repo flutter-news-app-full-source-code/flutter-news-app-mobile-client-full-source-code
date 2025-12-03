@@ -1,5 +1,5 @@
 part of 'engagement_bloc.dart';
-  
+
 /// The status of the engagement feature.
 enum EngagementStatus {
   /// Initial state, no data loaded.
@@ -56,8 +56,9 @@ class EngagementState extends Equatable {
     return EngagementState(
       status: status ?? this.status,
       engagements: engagements ?? this.engagements,
-      userEngagement:
-          clearUserEngagement ? null : userEngagement ?? this.userEngagement,
+      userEngagement: clearUserEngagement
+          ? null
+          : userEngagement ?? this.userEngagement,
       error: error ?? this.error,
     );
   }

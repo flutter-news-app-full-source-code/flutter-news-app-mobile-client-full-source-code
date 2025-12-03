@@ -1,6 +1,5 @@
 part of 'app_bloc.dart';
 
-
 /// Abstract base class for all events in the [AppBloc].
 ///
 /// All concrete app events must extend this class.

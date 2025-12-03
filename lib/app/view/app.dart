@@ -108,7 +108,7 @@ class App extends StatelessWidget {
   final DataRepository<RemoteConfig> _remoteConfigRepository;
   final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
-      _userContentPreferencesRepository;
+  _userContentPreferencesRepository;
   final DataRepository<Engagement> _engagementRepository;
   final DataRepository<Report> _reportRepository;
   final DataRepository<AppReview> _appReviewRepository;

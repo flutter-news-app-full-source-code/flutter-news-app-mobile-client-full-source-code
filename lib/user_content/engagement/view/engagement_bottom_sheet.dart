@@ -53,7 +53,10 @@ class _EngagementBottomSheetView extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.md),
           child: Column(
             children: [
-              Text(l10n.commentsTitle, style: Theme.of(context).textTheme.titleLarge),
+              Text(
+                l10n.commentsTitle,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
               const SizedBox(height: AppSpacing.md),
               ReactionSelector(
                 selectedReaction: state.userEngagement?.reaction.reactionType,
@@ -62,9 +65,7 @@ class _EngagementBottomSheetView extends StatelessWidget {
                     .add(EngagementReactionUpdated(reaction)),
               ),
               const Divider(height: AppSpacing.lg),
-              Expanded(
-                child: _buildContent(context, state, scrollController),
-              ),
+              Expanded(child: _buildContent(context, state, scrollController)),
               _CommentInputField(),
             ],
           ),
@@ -86,8 +87,7 @@ class _EngagementBottomSheetView extends StatelessWidget {
       return Center(child: Text(context.l10n.errorLabel));
     }
 
-    final comments =
-        state.engagements.where((e) => e.comment != null).toList();
+    final comments = state.engagements.where((e) => e.comment != null).toList();
 
     if (comments.isEmpty) {
       return Center(child: Text(context.l10n.noCommentsYet));
@@ -100,9 +100,7 @@ class _EngagementBottomSheetView extends StatelessWidget {
         final engagement = comments[index];
         return ListTile(
           leading: CircleAvatar(
-            child: Text(
-              engagement.reaction.reactionType.name.substring(0, 2),
-            ),
+            child: Text(engagement.reaction.reactionType.name.substring(0, 2)),
           ),
           title: Text(engagement.comment!.content),
           subtitle: Text('User ${engagement.userId.substring(0, 4)}'),

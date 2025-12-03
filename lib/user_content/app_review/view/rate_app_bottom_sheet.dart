@@ -41,7 +41,7 @@ class RateAppBottomSheet extends StatelessWidget {
         : l10n.rateAppPromptTitle;
     final body = hasGivenNegativeFeedback
         ? l10n.rateAppNegativeFollowUpBody_1
-          : l10n.rateAppPromptBody;
+        : l10n.rateAppPromptBody;
 
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.paddingLarge),

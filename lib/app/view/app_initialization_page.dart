@@ -17,6 +17,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/s
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -57,6 +58,10 @@ class AppInitializationPage extends StatelessWidget {
     required this.inlineAdCacheService,
     required this.navigatorKey,
     required this.pushNotificationService,
+    required this.engagementRepository,
+    required this.reportRepository,
+    required this.appReviewRepository,
+    required this.appReviewService,
     required this.inAppNotificationRepository,
     super.key,
   });
@@ -77,6 +82,10 @@ class AppInitializationPage extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey;
   final InlineAdCacheService inlineAdCacheService;
   final PushNotificationService pushNotificationService;
+  final DataRepository<Engagement> engagementRepository;
+  final DataRepository<Report> reportRepository;
+  final DataRepository<AppReview> appReviewRepository;
+  final AppReviewService appReviewService;
   final DataRepository<InAppNotification> inAppNotificationRepository;
 
   @override
@@ -120,6 +129,10 @@ class AppInitializationPage extends StatelessWidget {
                 feedCacheService: feedCacheService,
                 inlineAdCacheService: inlineAdCacheService,
                 navigatorKey: navigatorKey,
+                engagementRepository: engagementRepository,
+                reportRepository: reportRepository,
+                appReviewRepository: appReviewRepository,
+                appReviewService: appReviewService,
               );
 
             case final AppInitializationFailed failureState:

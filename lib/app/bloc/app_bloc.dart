@@ -13,7 +13,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/models/initi
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/extensions.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/app_review.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:logging/logging.dart';
 
 part 'app_event.dart';

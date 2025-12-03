@@ -51,7 +51,7 @@ class App extends StatelessWidget {
     required DataRepository<RemoteConfig> remoteConfigRepository,
     required DataRepository<AppSettings> appSettingsRepository,
     required DataRepository<UserContentPreferences>
-    userContentPreferencesRepository,
+        userContentPreferencesRepository,
     required DataRepository<Engagement> engagementRepository,
     required DataRepository<Report> reportRepository,
     required DataRepository<AppReview> appReviewRepository,
@@ -65,27 +65,27 @@ class App extends StatelessWidget {
     required GlobalKey<NavigatorState> navigatorKey,
     required PushNotificationService pushNotificationService,
     super.key,
-  }) : _authenticationRepository = authenticationRepository,
-       _headlinesRepository = headlinesRepository,
-       _topicsRepository = topicsRepository,
-       _countriesRepository = countriesRepository,
-       _sourcesRepository = sourcesRepository,
-       _userRepository = userRepository,
-       _remoteConfigRepository = remoteConfigRepository,
-       _appSettingsRepository = appSettingsRepository,
-       _userContentPreferencesRepository = userContentPreferencesRepository,
-       _engagementRepository = engagementRepository,
-       _reportRepository = reportRepository,
-       _appReviewRepository = appReviewRepository,
-       _pushNotificationService = pushNotificationService,
-       _inAppNotificationRepository = inAppNotificationRepository,
-       _environment = environment,
-       _adService = adService,
-       _appReviewService = appReviewService,
-       _feedDecoratorService = feedDecoratorService,
-       _feedCacheService = feedCacheService,
-       _navigatorKey = navigatorKey,
-       _inlineAdCacheService = inlineAdCacheService;
+  })  : _authenticationRepository = authenticationRepository,
+        _headlinesRepository = headlinesRepository,
+        _topicsRepository = topicsRepository,
+        _countriesRepository = countriesRepository,
+        _sourcesRepository = sourcesRepository,
+        _userRepository = userRepository,
+        _remoteConfigRepository = remoteConfigRepository,
+        _appSettingsRepository = appSettingsRepository,
+        _userContentPreferencesRepository = userContentPreferencesRepository,
+        _engagementRepository = engagementRepository,
+        _reportRepository = reportRepository,
+        _appReviewRepository = appReviewRepository,
+        _pushNotificationService = pushNotificationService,
+        _inAppNotificationRepository = inAppNotificationRepository,
+        _environment = environment,
+        _adService = adService,
+        _appReviewService = appReviewService,
+        _feedDecoratorService = feedDecoratorService,
+        _feedCacheService = feedCacheService,
+        _navigatorKey = navigatorKey,
+        _inlineAdCacheService = inlineAdCacheService;
 
   /// The initial user, pre-fetched during startup.
   final User? user;
@@ -108,7 +108,7 @@ class App extends StatelessWidget {
   final DataRepository<RemoteConfig> _remoteConfigRepository;
   final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
-  _userContentPreferencesRepository;
+      _userContentPreferencesRepository;
   final DataRepository<Engagement> _engagementRepository;
   final DataRepository<Report> _reportRepository;
   final DataRepository<AppReview> _appReviewRepository;

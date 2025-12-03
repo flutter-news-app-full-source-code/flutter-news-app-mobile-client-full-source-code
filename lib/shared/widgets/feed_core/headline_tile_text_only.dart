@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_source_row.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_tap_handler.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/user_content/engagement/widgets/headline_actions_row.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template headline_tile_text_only}
@@ -79,6 +80,7 @@ class HeadlineTileTextOnly extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    HeadlineActionsRow(headline: headline),
                   ],
                 ),
               ),

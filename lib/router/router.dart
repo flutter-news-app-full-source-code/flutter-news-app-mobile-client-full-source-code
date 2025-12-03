@@ -56,6 +56,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/no
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/theme_settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/multi_select_search_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/user_content/engagement/view/engagement_bottom_sheet.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 
@@ -632,6 +633,24 @@ GoRouter createRouter({
                           return discover_filter.SourceListFilterPage(
                             sourceListBloc: sourceListBloc,
                           );
+                        },
+                      ),
+                      GoRoute(
+                        path: Routes.engagement,
+                        name: Routes.engagementName,
+                        pageBuilder: (context, state) {
+                          final headline = state.extra as Headline?;
+                          if (headline == null) {
+                            // This is a fallback and should ideally not be hit
+                            // if navigation is done correctly.
+                            return const MaterialPage(
+                              child: Scaffold(
+                                body: Center(child: Text('Headline missing')),
+                              ),
+                            );
+                          }
+                          return MaterialPage(
+                              child: EngagementBottomSheet(headline: headline));
                         },
                       ),
                     ],

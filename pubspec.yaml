@@ -84,6 +84,7 @@ dependencies:
     git:
       url: https://github.com/flutter-news-app-full-source-code/http-client.git
       ref: v1.0.1
+  in_app_review: ^2.0.11
   intl: ^0.20.2
   js_interop: ^0.0.1
   kv_storage_service:
@@ -146,7 +147,7 @@ dependency_overrides:
   core:
     git:
       url: https://github.com/flutter-news-app-full-source-code/core.git
-      ref: 3779a8b1dbd8450d524574cf5376b7cc2ed514e7
+      ref: 8bae6eb17369b76f72961870a22ee13d3073fa61
   http_client:
     git:
       url: https://github.com/flutter-news-app-full-source-code/http-client.git

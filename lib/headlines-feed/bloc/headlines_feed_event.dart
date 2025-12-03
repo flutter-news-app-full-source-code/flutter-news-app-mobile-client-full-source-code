@@ -191,3 +191,17 @@ final class _AppContentPreferencesChanged extends HeadlinesFeedEvent {
   @override
   List<Object> get props => [preferences];
 }
+
+/// {@template headlines_feed_engagement_tapped}
+/// Dispatched when the user taps the comment icon on a headline.
+/// {@endtemplate}
+final class HeadlinesFeedEngagementTapped extends HeadlinesFeedEvent {
+  /// {@macro headlines_feed_engagement_tapped}
+  const HeadlinesFeedEngagementTapped({required this.headline});
+
+  /// The headline for which to show the engagement sheet.
+  final Headline headline;
+
+  @override
+  List<Object> get props => [headline];
+}

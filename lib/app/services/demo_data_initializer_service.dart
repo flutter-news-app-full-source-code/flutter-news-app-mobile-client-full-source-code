@@ -22,12 +22,18 @@ class DemoDataInitializerService {
     required DataRepository<AppSettings> appSettingsRepository,
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
+    required DataRepository<Engagement> engagementRepository,
+    required DataRepository<Report> reportRepository,
+    required DataRepository<AppReview> appReviewRepository,
     required DataRepository<InAppNotification> inAppNotificationRepository,
     required this.appSettingsFixturesData,
     required this.userContentPreferencesFixturesData,
     required this.inAppNotificationsFixturesData,
   }) : _appSettingsRepository = appSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
+       _engagementRepository = engagementRepository,
+       _reportRepository = reportRepository,
+       _appReviewRepository = appReviewRepository,
        _inAppNotificationRepository = inAppNotificationRepository,
        _logger = Logger('DemoDataInitializerService');
 
@@ -35,6 +41,9 @@ class DemoDataInitializerService {
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
   final DataRepository<InAppNotification> _inAppNotificationRepository;
+  final DataRepository<Engagement> _engagementRepository;
+  final DataRepository<Report> _reportRepository;
+  final DataRepository<AppReview> _appReviewRepository;
   final Logger _logger;
 
   /// A list of [AppSettings] fixture data to be used as a template.

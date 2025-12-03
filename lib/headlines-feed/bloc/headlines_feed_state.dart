@@ -17,6 +17,7 @@ class HeadlinesFeedState extends Equatable {
     this.activeFilterId = 'all',
     this.error,
     this.navigationUrl,
+    this.navigationArguments,
   });
 
   final HeadlinesFeedStatus status;
@@ -31,6 +32,10 @@ class HeadlinesFeedState extends Equatable {
   /// A URL to navigate to, typically set when a call-to-action is tapped.
   /// The UI should consume this and then clear it.
   final String? navigationUrl;
+
+  /// Optional arguments to pass during navigation. This is used to pass
+  /// complex objects like the `Headline` model to the engagement sheet.
+  final Object? navigationArguments;
 
   /// The list of saved headlines filters available to the user.
   /// This is synced from the [AppBloc].
@@ -51,8 +56,10 @@ class HeadlinesFeedState extends Equatable {
     HttpException? error,
     String? navigationUrl,
     bool clearCursor = false,
+    Object? navigationArguments,
     bool clearActiveFilterId = false,
     bool clearNavigationUrl = false,
+    bool clearNavigationArguments = false,
   }) {
     return HeadlinesFeedState(
       status: status ?? this.status,
@@ -61,26 +68,28 @@ class HeadlinesFeedState extends Equatable {
       cursor: clearCursor ? null : cursor ?? this.cursor,
       filter: filter ?? this.filter,
       savedHeadlineFilters: savedHeadlineFilters ?? this.savedHeadlineFilters,
-      activeFilterId: clearActiveFilterId
-          ? null
-          : activeFilterId ?? this.activeFilterId,
+      activeFilterId:
+          clearActiveFilterId ? null : activeFilterId ?? this.activeFilterId,
       error: error ?? this.error,
-      navigationUrl: clearNavigationUrl
+      navigationUrl:
+          clearNavigationUrl ? null : navigationUrl ?? this.navigationUrl,
+      navigationArguments: clearNavigationArguments
           ? null
-          : navigationUrl ?? this.navigationUrl,
+          : navigationArguments ?? this.navigationArguments,
     );
   }
 
   @override
   List<Object?> get props => [
-    status,
-    feedItems,
-    hasMore,
-    cursor,
-    filter,
-    savedHeadlineFilters,
-    activeFilterId,
-    error,
-    navigationUrl,
-  ];
+        status,
+        feedItems,
+        hasMore,
+        cursor,
+        filter,
+        savedHeadlineFilters,
+        activeFilterId,
+        error,
+        navigationUrl,
+        navigationArguments,
+      ];
 }

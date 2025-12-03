@@ -1,0 +1,196 @@
+import 'package:core/core.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/headline_actions_bottom_sheet.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:ui_kit/ui_kit.dart';
+
+/// {@template headline_actions_row}
+/// A widget that displays a row of action icons for a headline.
+///
+/// This includes actions like like/dislike, comment, bookmark, share, and more.
+/// {@endtemplate}
+class HeadlineActionsRow extends StatelessWidget {
+  /// {@macro headline_actions_row}
+  const HeadlineActionsRow({required this.headline, super.key});
+
+  /// The headline for which to display actions.
+  final Headline headline;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizationsX(context).l10n;
+    final isBookmarked = context.select<AppBloc, bool>(
+      (bloc) =>
+          bloc.state.userContentPreferences?.savedHeadlines.any(
+            (h) => h.id == headline.id,
+          ) ??
+          false,
+    );
+
+    // This is a placeholder for the real engagement data.
+    // In a future phase, this will come from the EngagementBloc.
+    const reaction = ReactionType.like;
+    const commentCount = 0;
+
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.md),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              _ActionButton(
+                icon: reaction == ReactionType.like
+                    ? Icons.thumb_up
+                    : Icons.thumb_up_outlined,
+                tooltip: l10n.likeActionLabel,
+                onPressed: () {
+                  // TODO(fulleni): Implement like action.
+                },
+              ),
+              const SizedBox(width: AppSpacing.md),
+              _ActionButton(
+                icon: reaction == ReactionType.angry
+                    ? Icons.thumb_down
+                    : Icons.thumb_down_outlined,
+                tooltip: l10n.dislikeActionLabel,
+                onPressed: () {
+                  // TODO(fulleni): Implement dislike action.
+                },
+              ),
+              const SizedBox(width: AppSpacing.md),
+              _ActionButton(
+                icon: Icons.chat_bubble_outline,
+                tooltip: l10n.commentActionLabel,
+                count: commentCount,
+                onPressed: () {
+                  // TODO(fulleni): Implement open comments action.
+                },
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              _ActionButton(
+                icon: isBookmarked
+                    ? Icons.bookmark
+                    : Icons.bookmark_border_outlined,
+                tooltip: isBookmarked
+                    ? l10n.removeBookmarkActionLabel
+                    : l10n.bookmarkActionLabel,
+                onPressed: () =>
+                    _onBookmarkTapped(context, isBookmarked, headline),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              _ActionButton(
+                icon: Icons.share_outlined,
+                tooltip: l10n.shareActionLabel,
+                onPressed: () => Share.share(headline.url),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              _ActionButton(
+                icon: Icons.more_horiz,
+                tooltip: l10n.moreActionLabel,
+                onPressed: () => showModalBottomSheet<void>(
+                  context: context,
+                  builder: (_) =>
+                      HeadlineActionsBottomSheet(headline: headline),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _onBookmarkTapped(
+    BuildContext context,
+    bool isBookmarked,
+    Headline headline,
+  ) {
+    final appBloc = context.read<AppBloc>();
+    final userContentPreferences = appBloc.state.userContentPreferences;
+    if (userContentPreferences == null) return;
+
+    final currentSaved = List<Headline>.from(
+      userContentPreferences.savedHeadlines,
+    );
+
+    if (isBookmarked) {
+      currentSaved.removeWhere((h) => h.id == headline.id);
+    } else {
+      currentSaved.insert(0, headline);
+      appBloc.add(AppPositiveInteractionOcurred(context: context));
+    }
+
+    appBloc.add(
+      AppUserContentPreferencesChanged(
+        preferences: userContentPreferences.copyWith(
+          savedHeadlines: currentSaved,
+        ),
+      ),
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  const _ActionButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onPressed,
+    this.count,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onPressed;
+  final int? count;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final iconColor = theme.colorScheme.onSurfaceVariant;
+
+    final button = IconButton(
+      icon: Icon(icon, color: iconColor),
+      tooltip: tooltip,
+      onPressed: onPressed,
+      splashRadius: 24,
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints(),
+    );
+
+    if (count != null && count! > 0) {
+      return Stack(
+        clipBehavior: Clip.none,
+        children: [
+          button,
+          Positioned(
+            top: -4,
+            right: -8,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                count.toString(),
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return button;
+  }
+}

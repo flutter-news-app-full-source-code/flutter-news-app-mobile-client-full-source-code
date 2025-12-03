@@ -21,6 +21,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/router/router.da
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_tap_handler.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/native_review_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -51,11 +52,15 @@ class App extends StatelessWidget {
     required DataRepository<AppSettings> appSettingsRepository,
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
+    required DataRepository<Engagement> engagementRepository,
+    required DataRepository<Report> reportRepository,
+    required DataRepository<AppReview> appReviewRepository,
     required AppEnvironment environment,
     required DataRepository<InAppNotification> inAppNotificationRepository,
     required InlineAdCacheService inlineAdCacheService,
     required AdService adService,
     required FeedDecoratorService feedDecoratorService,
+    required InAppReviewService appReviewService,
     required FeedCacheService feedCacheService,
     required GlobalKey<NavigatorState> navigatorKey,
     required PushNotificationService pushNotificationService,
@@ -69,10 +74,14 @@ class App extends StatelessWidget {
        _remoteConfigRepository = remoteConfigRepository,
        _appSettingsRepository = appSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
+       _engagementRepository = engagementRepository,
+       _reportRepository = reportRepository,
+       _appReviewRepository = appReviewRepository,
        _pushNotificationService = pushNotificationService,
        _inAppNotificationRepository = inAppNotificationRepository,
        _environment = environment,
        _adService = adService,
+       _appReviewService = appReviewService,
        _feedDecoratorService = feedDecoratorService,
        _feedCacheService = feedCacheService,
        _navigatorKey = navigatorKey,
@@ -99,11 +108,15 @@ class App extends StatelessWidget {
   final DataRepository<RemoteConfig> _remoteConfigRepository;
   final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
-  _userContentPreferencesRepository;
+      _userContentPreferencesRepository;
+  final DataRepository<Engagement> _engagementRepository;
+  final DataRepository<Report> _reportRepository;
+  final DataRepository<AppReview> _appReviewRepository;
   final AppEnvironment _environment;
   final DataRepository<InAppNotification> _inAppNotificationRepository;
   final AdService _adService;
   final FeedDecoratorService _feedDecoratorService;
+  final InAppReviewService _appReviewService;
   final FeedCacheService _feedCacheService;
   final GlobalKey<NavigatorState> _navigatorKey;
   final InlineAdCacheService _inlineAdCacheService;
@@ -127,9 +140,13 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _remoteConfigRepository),
         RepositoryProvider.value(value: _appSettingsRepository),
         RepositoryProvider.value(value: _userContentPreferencesRepository),
+        RepositoryProvider.value(value: _engagementRepository),
+        RepositoryProvider.value(value: _reportRepository),
+        RepositoryProvider.value(value: _appReviewRepository),
         RepositoryProvider.value(value: _pushNotificationService),
         RepositoryProvider.value(value: _inAppNotificationRepository),
         RepositoryProvider.value(value: _inlineAdCacheService),
+        RepositoryProvider.value(value: _appReviewService),
         RepositoryProvider.value(value: _feedCacheService),
         RepositoryProvider.value(value: _environment),
         // NOTE: The AppInitializer is provided at the root in bootstrap.dart
@@ -154,6 +171,7 @@ class App extends StatelessWidget {
               pushNotificationService: _pushNotificationService,
               inAppNotificationRepository: _inAppNotificationRepository,
               userRepository: _userRepository,
+              appReviewService: _appReviewService,
               inlineAdCacheService: _inlineAdCacheService,
             )..add(const AppStarted()),
           ),

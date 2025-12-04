@@ -54,8 +54,7 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
     if (userId == null || _selectedReason == null) return;
 
     final limitationService = context.read<ContentLimitationService>();
-    final status =
-        await limitationService.checkAction(ContentAction.submitReport);
+    final status = limitationService.checkAction(ContentAction.submitReport);
 
     if (status != LimitationStatus.allowed) {
       await showModalBottomSheet<void>(
@@ -84,7 +83,11 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
           ..showSnackBar(
-            SnackBar(content: Text(context.l10n.reportSuccessSnackbar)),
+            SnackBar(
+              content: Text(
+                AppLocalizationsX(context).l10n.reportSuccessSnackbar,
+              ),
+            ),
           );
         Navigator.of(context).pop();
       }
@@ -94,7 +97,11 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
           ..showSnackBar(
-            SnackBar(content: Text(context.l10n.reportFailureSnackbar)),
+            SnackBar(
+              content: Text(
+                AppLocalizationsX(context).l10n.reportFailureSnackbar,
+              ),
+            ),
           );
       }
     }
@@ -104,16 +111,16 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
     switch (widget.reportableEntity) {
       case ReportableEntity.headline:
         return HeadlineReportReason.values.asNameMap().map(
-              (key, value) => MapEntry(value.toL10n(l10n), key),
-            );
+          (key, value) => MapEntry(value.toL10n(l10n), key),
+        );
       case ReportableEntity.source:
         return SourceReportReason.values.asNameMap().map(
-              (key, value) => MapEntry(value.toL10n(l10n), key),
-            );
-      case ReportableEntity.comment:
+          (key, value) => MapEntry(value.toL10n(l10n), key),
+        );
+      case ReportableEntity.engagement:
         return CommentReportReason.values.asNameMap().map(
-              (key, value) => MapEntry(value.toL10n(l10n), key),
-            );
+          (key, value) => MapEntry(value.toL10n(l10n), key),
+        );
     }
   }
 
@@ -212,6 +219,8 @@ extension on SourceReportReason {
         return l10n.sourceReportReasonFrequentPaywalls;
       case SourceReportReason.impersonation:
         return l10n.sourceReportReasonImpersonation;
+      case SourceReportReason.spreadsMisinformation:
+        return l10n.sourceReportReasonMisinformation;
     }
   }
 }

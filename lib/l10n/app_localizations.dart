@@ -2785,6 +2785,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'React to add a comment'**
   String get commentInputNoReactionHint;
+
+  /// Report reason for factually incorrect content.
+  ///
+  /// In en, this message translates to:
+  /// **'Misinformation or Fake News'**
+  String get headlineReportReasonMisinformation;
+
+  /// No description provided for @headlineReportReasonClickbait.
+  ///
+  /// In en, this message translates to:
+  /// **'Clickbait or Misleading Title'**
+  String get headlineReportReasonClickbait;
+
+  /// Report reason for offensive content.
+  ///
+  /// In en, this message translates to:
+  /// **'Offensive or Hate Speech'**
+  String get headlineReportReasonOffensive;
+
+  /// Report reason for spam or fraudulent content.
+  ///
+  /// In en, this message translates to:
+  /// **'Spam or Scam'**
+  String get headlineReportReasonSpam;
+
+  /// Report reason for a non-working article URL.
+  ///
+  /// In en, this message translates to:
+  /// **'Broken Link'**
+  String get headlineReportReasonBrokenLink;
+
+  /// Report reason for content that requires a subscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Paywalled Content'**
+  String get headlineReportReasonPaywalled;
+
+  /// Report reason for a source with poor content.
+  ///
+  /// In en, this message translates to:
+  /// **'Low-Quality Journalism'**
+  String get sourceReportReasonLowQuality;
+
+  /// Report reason for a source with a bad user experience due to ads.
+  ///
+  /// In en, this message translates to:
+  /// **'Excessive Ads or Popups'**
+  String get sourceReportReasonHighAdDensity;
+
+  /// Report reason for a source that often requires a subscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Frequent Paywalls'**
+  String get sourceReportReasonFrequentPaywalls;
+
+  /// Report reason for a source pretending to be another entity.
+  ///
+  /// In en, this message translates to:
+  /// **'Impersonation'**
+  String get sourceReportReasonImpersonation;
+
+  /// Report reason for a comment that is spam.
+  ///
+  /// In en, this message translates to:
+  /// **'Spam or Advertising'**
+  String get commentReportReasonSpam;
+
+  /// Report reason for a comment that is abusive.
+  ///
+  /// In en, this message translates to:
+  /// **'Harassment or Bullying'**
+  String get commentReportReasonHarassment;
+
+  /// Report reason for a comment containing hate speech.
+  ///
+  /// In en, this message translates to:
+  /// **'Hate Speech'**
+  String get commentReportReasonHateSpeech;
 }
 
 class _AppLocalizationsDelegate

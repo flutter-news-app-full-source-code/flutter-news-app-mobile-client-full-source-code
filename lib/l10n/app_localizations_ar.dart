@@ -1464,4 +1464,44 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get commentInputNoReactionHint => 'تفاعل لإضافة تعليق';
+
+  @override
+  String get headlineReportReasonMisinformation =>
+      'معلومات مضللة أو أخبار كاذبة';
+
+  @override
+  String get headlineReportReasonClickbait => 'عنوان مضلل أو طعم نقر';
+
+  @override
+  String get headlineReportReasonOffensive => 'محتوى مسيء أو خطاب كراهية';
+
+  @override
+  String get headlineReportReasonSpam => 'بريد عشوائي أو احتيال';
+
+  @override
+  String get headlineReportReasonBrokenLink => 'رابط معطل';
+
+  @override
+  String get headlineReportReasonPaywalled => 'محتوى مدفوع';
+
+  @override
+  String get sourceReportReasonLowQuality => 'صحافة منخفضة الجودة';
+
+  @override
+  String get sourceReportReasonHighAdDensity => 'إعلانات أو نوافذ منبثقة مفرطة';
+
+  @override
+  String get sourceReportReasonFrequentPaywalls => 'جدران دفع متكررة';
+
+  @override
+  String get sourceReportReasonImpersonation => 'انتحال شخصية';
+
+  @override
+  String get commentReportReasonSpam => 'إعلانات';
+
+  @override
+  String get commentReportReasonHarassment => 'تحرش أو تنمر';
+
+  @override
+  String get commentReportReasonHateSpeech => 'خطاب كراهية';
 }

@@ -1471,4 +1471,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get commentInputNoReactionHint => 'React to add a comment';
+
+  @override
+  String get headlineReportReasonMisinformation =>
+      'Misinformation or Fake News';
+
+  @override
+  String get headlineReportReasonClickbait => 'Clickbait or Misleading Title';
+
+  @override
+  String get headlineReportReasonOffensive => 'Offensive or Hate Speech';
+
+  @override
+  String get headlineReportReasonSpam => 'Spam or Scam';
+
+  @override
+  String get headlineReportReasonBrokenLink => 'Broken Link';
+
+  @override
+  String get headlineReportReasonPaywalled => 'Paywalled Content';
+
+  @override
+  String get sourceReportReasonLowQuality => 'Low-Quality Journalism';
+
+  @override
+  String get sourceReportReasonHighAdDensity => 'Excessive Ads or Popups';
+
+  @override
+  String get sourceReportReasonFrequentPaywalls => 'Frequent Paywalls';
+
+  @override
+  String get sourceReportReasonImpersonation => 'Impersonation';
+
+  @override
+  String get commentReportReasonSpam => 'Spam or Advertising';
+
+  @override
+  String get commentReportReasonHarassment => 'Harassment or Bullying';
+
+  @override
+  String get commentReportReasonHateSpeech => 'Hate Speech';
 }

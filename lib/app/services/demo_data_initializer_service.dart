@@ -29,6 +29,9 @@ class DemoDataInitializerService {
     required this.appSettingsFixturesData,
     required this.userContentPreferencesFixturesData,
     required this.inAppNotificationsFixturesData,
+    required this.engagementFixturesData,
+    required this.reportFixturesData,
+    required this.appReviewFixturesData,
   }) : _appSettingsRepository = appSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
        _engagementRepository = engagementRepository,
@@ -61,6 +64,15 @@ class DemoDataInitializerService {
   /// All items in this list will be cloned for new users.
   final List<InAppNotification> inAppNotificationsFixturesData;
 
+  /// A list of [Engagement] fixture data to be used as a template.
+  final List<Engagement> engagementFixturesData;
+
+  /// A list of [Report] fixture data to be used as a template.
+  final List<Report> reportFixturesData;
+
+  /// A list of [AppReview] fixture data to be used as a template.
+  final List<AppReview> appReviewFixturesData;
+
   /// Initializes essential user-specific data in the in-memory clients
   /// for the given [user].
   ///
@@ -78,6 +90,9 @@ class DemoDataInitializerService {
       _ensureAppSettingsExist(user.id),
       _ensureUserContentPreferencesExist(user.id),
       _ensureInAppNotificationsExist(user.id),
+      _ensureEngagementsExist(user.id),
+      _ensureReportsExist(user.id),
+      _ensureAppReviewsExist(user.id),
     ]);
 
     _logger.info(
@@ -218,6 +233,120 @@ class DemoDataInitializerService {
       );
       // We don't rethrow here as failing to create notifications
       // is not a critical failure for the app's startup.
+    }
+  }
+
+  /// Ensures that [Engagement]s exist for the given [userId].
+  Future<void> _ensureEngagementsExist(String userId) async {
+    try {
+      final existing = await _engagementRepository.readAll(userId: userId);
+      if (existing.items.isNotEmpty) {
+        _logger.info('Engagements already exist for user ID: $userId.');
+        return;
+      }
+
+      _logger.info(
+        'No Engagements found for user ID: $userId. Creating from fixture.',
+      );
+
+      if (engagementFixturesData.isEmpty) {
+        _logger.warning('engagementFixturesData is empty. No items to create.');
+        return;
+      }
+
+      final userItems =
+          engagementFixturesData.map((i) => i.copyWith(userId: userId));
+
+      await Future.wait(
+        userItems.map(
+          (item) => _engagementRepository.create(item: item, userId: userId),
+        ),
+      );
+      _logger.info(
+        '${userItems.length} Engagements from fixture created for user ID: $userId.',
+      );
+    } catch (e, s) {
+      _logger.severe(
+        'Error ensuring Engagements exist for user ID: $userId: $e',
+        e,
+        s,
+      );
+    }
+  }
+
+  /// Ensures that [Report]s exist for the given [userId].
+  Future<void> _ensureReportsExist(String userId) async {
+    try {
+      final existing = await _reportRepository.readAll(userId: userId);
+      if (existing.items.isNotEmpty) {
+        _logger.info('Reports already exist for user ID: $userId.');
+        return;
+      }
+
+      _logger.info(
+        'No Reports found for user ID: $userId. Creating from fixture.',
+      );
+
+      if (reportFixturesData.isEmpty) {
+        _logger.warning('reportFixturesData is empty. No items to create.');
+        return;
+      }
+
+      final userItems =
+          reportFixturesData.map((i) => i.copyWith(reporterUserId: userId));
+
+      await Future.wait(
+        userItems.map(
+          (item) => _reportRepository.create(item: item, userId: userId),
+        ),
+      );
+      _logger.info(
+        '${userItems.length} Reports from fixture created for user ID: $userId.',
+      );
+    } catch (e, s) {
+      _logger.severe(
+        'Error ensuring Reports exist for user ID: $userId: $e',
+        e,
+        s,
+      );
+    }
+  }
+
+  /// Ensures that [AppReview]s exist for the given [userId].
+  Future<void> _ensureAppReviewsExist(String userId) async {
+    try {
+      final existing = await _appReviewRepository.readAll(userId: userId);
+      if (existing.items.isNotEmpty) {
+        _logger.info('AppReviews already exist for user ID: $userId.');
+        return;
+      }
+
+      _logger.info(
+        'No AppReviews found for user ID: $userId. Creating from fixture.',
+      );
+
+      if (appReviewFixturesData.isEmpty) {
+        _logger.warning('appReviewFixturesData is empty. No items to create.');
+        return;
+      }
+
+      final userItems =
+          appReviewFixturesData.map((i) => i.copyWith(userId: userId));
+
+      await Future.wait(
+        userItems.map(
+          (item) => _appReviewRepository.create(item: item, userId: userId),
+        ),
+      );
+      _logger.info(
+        '${userItems.length} AppReviews from fixture created for user ID: $userId.',
+      );
+    } catch (e, s) {
+      _logger.severe(
+        'Error ensuring AppReviews exist for user ID: $userId: $e',
+        e,
+        s,
+      );
     }
   }
 }

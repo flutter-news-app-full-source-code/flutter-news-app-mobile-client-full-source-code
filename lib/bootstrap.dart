@@ -536,6 +536,9 @@ Future<Widget> bootstrap(
           userContentPreferencesFixturesData:
               getUserContentPreferencesFixturesData(),
           inAppNotificationsFixturesData: inAppNotificationsFixturesData,
+          engagementFixturesData: getEngagementsFixturesData(),
+          reportFixturesData: getReportsFixturesData(),
+          appReviewFixturesData: getAppReviewsFixturesData(),
         )
       : null;
   logger

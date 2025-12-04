@@ -1504,6 +1504,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourceReportReasonImpersonation => 'Impersonation';
 
   @override
+  String get sourceReportReasonMisinformation => 'Misinformation';
+
+  @override
   String get commentReportReasonSpam => 'Spam or Advertising';
 
   @override

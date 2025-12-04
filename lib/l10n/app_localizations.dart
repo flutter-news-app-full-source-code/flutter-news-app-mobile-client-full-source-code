@@ -2846,6 +2846,12 @@ abstract class AppLocalizations {
   /// **'Impersonation'**
   String get sourceReportReasonImpersonation;
 
+  /// Report reason for a source pretending to be another entity.
+  ///
+  /// In en, this message translates to:
+  /// **'Misinformation'**
+  String get sourceReportReasonMisinformation;
+
   /// Report reason for a comment that is spam.
   ///
   /// In en, this message translates to:

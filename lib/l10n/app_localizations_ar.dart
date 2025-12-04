@@ -1497,6 +1497,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get sourceReportReasonImpersonation => 'انتحال شخصية';
 
   @override
+  String get sourceReportReasonMisinformation => 'معلومات مضللة أو أخبار كاذبة';
+
+  @override
   String get commentReportReasonSpam => 'إعلانات';
 
   @override

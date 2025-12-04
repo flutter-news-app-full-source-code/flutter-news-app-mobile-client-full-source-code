@@ -1938,6 +1938,10 @@
     "@sourceReportReasonImpersonation": {
         "description": "Report reason for a source pretending to be another entity."
     },
+    "sourceReportReasonMisinformation": "Misinformation",
+    "@sourceReportReasonMisinformation": {
+        "description": "Report reason for a source pretending to be another entity."
+    },
     "commentReportReasonSpam": "Spam or Advertising",
     "@commentReportReasonSpam": {
         "description": "Report reason for a comment that is spam."

@@ -1890,7 +1890,7 @@
     "@rateAppNegativeFollowUpBody_2": {
         "description": "الصيغة الثانية لنص المتابعة لطلب 'تقييم التطبيق' بعد أن يقدم المستخدم ملاحظات سلبية."
     },
-     "noCommentsYet": "لا توجد تعليقات حتى الآن.",
+    "noCommentsYet": "لا توجد تعليقات حتى الآن.",
     "@noCommentsYet": {
         "description": "Message displayed when there are no comments on a headline."
     },
@@ -1936,6 +1936,10 @@
     },
     "sourceReportReasonImpersonation": "انتحال شخصية",
     "@sourceReportReasonImpersonation": {
+        "description": "Report reason for a source pretending to be another entity."
+    },
+    "sourceReportReasonMisinformation": "معلومات مضللة أو أخبار كاذبة",
+    "@sourceReportReasonMisinformation": {
         "description": "Report reason for a source pretending to be another entity."
     },
     "commentReportReasonSpam": "إعلانات",

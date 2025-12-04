@@ -2792,7 +2792,7 @@ abstract class AppLocalizations {
   /// **'Misinformation or Fake News'**
   String get headlineReportReasonMisinformation;
 
-  /// No description provided for @headlineReportReasonClickbait.
+  /// Report reason for a clickbait headline.
   ///
   /// In en, this message translates to:
   /// **'Clickbait or Misleading Title'**

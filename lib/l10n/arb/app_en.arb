@@ -1903,7 +1903,7 @@
         "description": "Report reason for factually incorrect content."
     },
     "headlineReportReasonClickbait": "Clickbait or Misleading Title",
-    "@headlineReportAriaReasonClickbait": {
+    "@headlineReportReasonClickbait": {
         "description": "Report reason for a clickbait headline."
     },
     "headlineReportReasonOffensive": "Offensive or Hate Speech",

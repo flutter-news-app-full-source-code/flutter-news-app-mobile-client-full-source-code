@@ -216,7 +216,7 @@ class AppReviewService {
       await _appReviewRepository.update(
         id: reviewId,
         item: existingReview.copyWith(
-          feedbackDetails: details,
+          feedbackDetails: ValueWrapper(details) ,
           updatedAt: DateTime.now(),
         ),
         userId: userId,

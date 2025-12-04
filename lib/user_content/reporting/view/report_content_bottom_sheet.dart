@@ -54,7 +54,8 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
     if (userId == null || _selectedReason == null) return;
 
     final limitationService = context.read<ContentLimitationService>();
-    final status = limitationService.checkAction(ContentAction.submitReport);
+    final status =
+        await limitationService.checkAction(ContentAction.submitReport);
 
     if (status != LimitationStatus.allowed) {
       await showModalBottomSheet<void>(
@@ -102,23 +103,17 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
   Map<String, String> _getReasons(AppLocalizations l10n) {
     switch (widget.reportableEntity) {
       case ReportableEntity.headline:
-        return {
-          l10n.headlineReportReasonMisinformation:
-              HeadlineReportReason.misinformationOrFakeNews.name,
-          l10n.headlineReportReasonClickbait:
-              HeadlineReportReason.clickbaitTitle.name,
-          l10n.headlineReportReasonOffensive:
-              HeadlineReportReason.offensiveOrHateSpeech.name,
-          l10n.headlineReportReasonSpam: HeadlineReportReason.spamOrScam.name,
-          l10n.headlineReportReasonBrokenLink:
-              HeadlineReportReason.brokenLink.name,
-          l10n.headlineReportReasonPaywalled:
-              HeadlineReportReason.paywalled.name,
-        };
+        return HeadlineReportReason.values.asNameMap().map(
+              (key, value) => MapEntry(value.toL10n(l10n), key),
+            );
       case ReportableEntity.source:
+        return SourceReportReason.values.asNameMap().map(
+              (key, value) => MapEntry(value.toL10n(l10n), key),
+            );
       case ReportableEntity.comment:
-        // TODO(user_content): Implement reasons for source and comment.
-        return {};
+        return CommentReportReason.values.asNameMap().map(
+              (key, value) => MapEntry(value.toL10n(l10n), key),
+            );
     }
   }
 
@@ -184,5 +179,52 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
         ),
       ),
     );
+  }
+}
+
+extension on HeadlineReportReason {
+  String toL10n(AppLocalizations l10n) {
+    switch (this) {
+      case HeadlineReportReason.misinformationOrFakeNews:
+        return l10n.headlineReportReasonMisinformation;
+      case HeadlineReportReason.clickbaitTitle:
+        return l10n.headlineReportReasonClickbait;
+      case HeadlineReportReason.offensiveOrHateSpeech:
+        return l10n.headlineReportReasonOffensive;
+      case HeadlineReportReason.spamOrScam:
+        return l10n.headlineReportReasonSpam;
+      case HeadlineReportReason.brokenLink:
+        return l10n.headlineReportReasonBrokenLink;
+      case HeadlineReportReason.paywalled:
+        return l10n.headlineReportReasonPaywalled;
+    }
+  }
+}
+
+extension on SourceReportReason {
+  String toL10n(AppLocalizations l10n) {
+    switch (this) {
+      case SourceReportReason.lowQualityJournalism:
+        return l10n.sourceReportReasonLowQuality;
+      case SourceReportReason.highAdDensity:
+        return l10n.sourceReportReasonHighAdDensity;
+      case SourceReportReason.frequentPaywalls:
+        return l10n.sourceReportReasonFrequentPaywalls;
+      case SourceReportReason.impersonation:
+        return l10n.sourceReportReasonImpersonation;
+    }
+  }
+}
+
+extension on CommentReportReason {
+  String toL10n(AppLocalizations l10n) {
+    switch (this) {
+      case CommentReportReason.spamOrAdvertising:
+        return l10n.commentReportReasonSpam;
+      case CommentReportReason.harassmentOrBullying:
+        return l10n.commentReportReasonHarassment;
+      case CommentReportReason.hateSpeech:
+        return l10n.commentReportReasonHateSpeech;
+    }
   }
 }

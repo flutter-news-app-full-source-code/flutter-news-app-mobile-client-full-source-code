@@ -177,7 +177,7 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
       final newComment = Comment(language: language, content: event.content);
 
       final updatedEngagement = state.userEngagement!.copyWith(
-        comment: newComment,
+        comment: ValueWrapper(newComment),
       );
 
       // Optimistically add the comment to the UI.

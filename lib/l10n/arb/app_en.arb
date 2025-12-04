@@ -1897,5 +1897,57 @@
     "commentInputNoReactionHint": "React to add a comment",
     "@commentInputNoReactionHint": {
         "description": "Hint text for the comment input field when the user has not yet reacted."
+    },
+    "headlineReportReasonMisinformation": "Misinformation or Fake News",
+    "@headlineReportReasonMisinformation": {
+        "description": "Report reason for factually incorrect content."
+    },
+    "headlineReportReasonClickbait": "Clickbait or Misleading Title",
+    "@headlineReportAriaReasonClickbait": {
+        "description": "Report reason for a clickbait headline."
+    },
+    "headlineReportReasonOffensive": "Offensive or Hate Speech",
+    "@headlineReportReasonOffensive": {
+        "description": "Report reason for offensive content."
+    },
+    "headlineReportReasonSpam": "Spam or Scam",
+    "@headlineReportReasonSpam": {
+        "description": "Report reason for spam or fraudulent content."
+    },
+    "headlineReportReasonBrokenLink": "Broken Link",
+    "@headlineReportReasonBrokenLink": {
+        "description": "Report reason for a non-working article URL."
+    },
+    "headlineReportReasonPaywalled": "Paywalled Content",
+    "@headlineReportReasonPaywalled": {
+        "description": "Report reason for content that requires a subscription."
+    },
+    "sourceReportReasonLowQuality": "Low-Quality Journalism",
+    "@sourceReportReasonLowQuality": {
+        "description": "Report reason for a source with poor content."
+    },
+    "sourceReportReasonHighAdDensity": "Excessive Ads or Popups",
+    "@sourceReportReasonHighAdDensity": {
+        "description": "Report reason for a source with a bad user experience due to ads."
+    },
+    "sourceReportReasonFrequentPaywalls": "Frequent Paywalls",
+    "@sourceReportReasonFrequentPaywalls": {
+        "description": "Report reason for a source that often requires a subscription."
+    },
+    "sourceReportReasonImpersonation": "Impersonation",
+    "@sourceReportReasonImpersonation": {
+        "description": "Report reason for a source pretending to be another entity."
+    },
+    "commentReportReasonSpam": "Spam or Advertising",
+    "@commentReportReasonSpam": {
+        "description": "Report reason for a comment that is spam."
+    },
+    "commentReportReasonHarassment": "Harassment or Bullying",
+    "@commentReportReasonHarassment": {
+        "description": "Report reason for a comment that is abusive."
+    },
+    "commentReportReasonHateSpeech": "Hate Speech",
+    "@commentReportReasonHateSpeech": {
+        "description": "Report reason for a comment containing hate speech."
     }
 }

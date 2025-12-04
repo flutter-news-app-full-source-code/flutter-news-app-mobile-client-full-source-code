@@ -1897,5 +1897,57 @@
     "commentInputNoReactionHint": "تفاعل لإضافة تعليق",
     "@commentInputNoReactionHint": {
         "description": "Hint text for the comment input field when the user has not yet reacted."
+    },
+    "headlineReportReasonMisinformation": "معلومات مضللة أو أخبار كاذبة",
+    "@headlineReportReasonMisinformation": {
+        "description": "Report reason for factually incorrect content."
+    },
+    "headlineReportReasonClickbait": "عنوان مضلل أو طعم نقر",
+    "@headlineReportReasonClickbait": {
+        "description": "Report reason for a clickbait headline."
+    },
+    "headlineReportReasonOffensive": "محتوى مسيء أو خطاب كراهية",
+    "@headlineReportReasonOffensive": {
+        "description": "Report reason for offensive content."
+    },
+    "headlineReportReasonSpam": "بريد عشوائي أو احتيال",
+    "@headlineReportReasonSpam": {
+        "description": "Report reason for spam or fraudulent content."
+    },
+    "headlineReportReasonBrokenLink": "رابط معطل",
+    "@headlineReportReasonBrokenLink": {
+        "description": "Report reason for a non-working article URL."
+    },
+    "headlineReportReasonPaywalled": "محتوى مدفوع",
+    "@headlineReportReasonPaywalled": {
+        "description": "Report reason for content that requires a subscription."
+    },
+    "sourceReportReasonLowQuality": "صحافة منخفضة الجودة",
+    "@sourceReportReasonLowQuality": {
+        "description": "Report reason for a source with poor content."
+    },
+    "sourceReportReasonHighAdDensity": "إعلانات أو نوافذ منبثقة مفرطة",
+    "@sourceReportReasonHighAdDensity": {
+        "description": "Report reason for a source with a bad user experience due to ads."
+    },
+    "sourceReportReasonFrequentPaywalls": "جدران دفع متكررة",
+    "@sourceReportReasonFrequentPaywalls": {
+        "description": "Report reason for a source that often requires a subscription."
+    },
+    "sourceReportReasonImpersonation": "انتحال شخصية",
+    "@sourceReportReasonImpersonation": {
+        "description": "Report reason for a source pretending to be another entity."
+    },
+    "commentReportReasonSpam": "إعلانات",
+    "@commentReportReasonSpam": {
+        "description": "Report reason for a comment that is spam."
+    },
+    "commentReportReasonHarassment": "تحرش أو تنمر",
+    "@commentReportReasonHarassment": {
+        "description": "Report reason for a comment that is abusive."
+    },
+    "commentReportReasonHateSpeech": "خطاب كراهية",
+    "@commentReportReasonHateSpeech": {
+        "description": "Report reason for a comment containing hate speech."
     }
 }

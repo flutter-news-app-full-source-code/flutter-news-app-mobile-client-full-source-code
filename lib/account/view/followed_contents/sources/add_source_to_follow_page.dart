@@ -4,10 +4,116 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/available_sources_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:ui_kit/ui_kit.dart';
+
+class _FollowButton extends StatefulWidget {
+  const _FollowButton({
+    required this.source,
+    required this.isFollowed,
+  });
+
+  final Source source;
+  final bool isFollowed;
+
+  @override
+  State<_FollowButton> createState() => _FollowButtonState();
+}
+
+class _FollowButtonState extends State<_FollowButton> {
+  bool _isLoading = false;
+
+  Future<void> _onFollowToggled() async {
+    setState(() => _isLoading = true);
+
+    final l10n = AppLocalizations.of(context);
+    final appBloc = context.read<AppBloc>();
+    final userContentPreferences = appBloc.state.userContentPreferences;
+
+    if (userContentPreferences == null) {
+      setState(() => _isLoading = false);
+      return;
+    }
+
+    final updatedFollowedSources =
+        List<Source>.from(userContentPreferences.followedSources);
+
+    try {
+      if (widget.isFollowed) {
+        updatedFollowedSources.removeWhere((s) => s.id == widget.source.id);
+      } else {
+        final limitationService = context.read<ContentLimitationService>();
+        final status =
+            await limitationService.checkAction(ContentAction.followSource);
+
+        if (status != LimitationStatus.allowed) {
+          if (mounted) {
+            await showModalBottomSheet<void>(
+              context: context,
+              builder: (_) => ContentLimitationBottomSheet(
+                title: l10n.limitReachedTitle,
+                body: l10n.limitReachedBodyFollow,
+                buttonText: l10n.manageMyContentButton,
+              ),
+            );
+          }
+          return;
+        }
+        updatedFollowedSources.add(widget.source);
+      }
+
+      final updatedPreferences = userContentPreferences.copyWith(
+        followedSources: updatedFollowedSources,
+      );
+
+      appBloc.add(
+        AppUserContentPreferencesChanged(preferences: updatedPreferences),
+      );
+    } on ForbiddenException catch (e) {
+      if (mounted) {
+        await showModalBottomSheet<void>(
+          context: context,
+          builder: (_) => ContentLimitationBottomSheet(
+            title: l10n.limitReachedTitle,
+            body: e.message,
+            buttonText: l10n.gotItButton,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
+
+    if (_isLoading) {
+      return const SizedBox(
+        width: 24,
+        height: 24,
+        child: CircularProgressIndicator(strokeWidth: 2),
+      );
+    }
+
+    return IconButton(
+      icon: widget.isFollowed
+          ? Icon(Icons.check_circle, color: colorScheme.primary)
+          : const Icon(Icons.add_circle_outline),
+      tooltip: widget.isFollowed
+          ? l10n.unfollowSourceTooltip(widget.source.name)
+          : l10n.followSourceTooltip(widget.source.name),
+      onPressed: _onFollowToggled,
+    );
+  }
+}
 
 /// {@template add_source_to_follow_page}
 /// A page that allows users to browse and select sources to follow.
@@ -84,72 +190,9 @@ class AddSourceToFollowPage extends StatelessWidget {
                           ),
                         ),
                         title: Text(source.name),
-                        trailing: IconButton(
-                          icon: isFollowed
-                              ? Icon(
-                                  Icons.check_circle,
-                                  color: Theme.of(context).colorScheme.primary,
-                                )
-                              : const Icon(Icons.add_circle_outline),
-                          tooltip: isFollowed
-                              ? l10n.unfollowSourceTooltip(source.name)
-                              : l10n.followSourceTooltip(source.name),
-                          onPressed: () {
-                            // Ensure user preferences are available before
-                            // proceeding.
-                            if (userContentPreferences == null) return;
-
-                            // Create a mutable copy of the followed sources list.
-                            final updatedFollowedSources = List<Source>.from(
-                              followedSources,
-                            );
-
-                            // If the user is unfollowing, always allow it.
-                            if (isFollowed) {
-                              updatedFollowedSources.removeWhere(
-                                (s) => s.id == source.id,
-                              );
-                              final updatedPreferences = userContentPreferences
-                                  .copyWith(
-                                    followedSources: updatedFollowedSources,
-                                  );
-
-                              context.read<AppBloc>().add(
-                                AppUserContentPreferencesChanged(
-                                  preferences: updatedPreferences,
-                                ),
-                              );
-                            } else {
-                              // If the user is following, check the limit first.
-                              final limitationService = context
-                                  .read<ContentLimitationService>();
-                              final status = limitationService.checkAction(
-                                ContentAction.followSource,
-                              );
-
-                              if (status == LimitationStatus.allowed) {
-                                updatedFollowedSources.add(source);
-                                final updatedPreferences =
-                                    userContentPreferences.copyWith(
-                                      followedSources: updatedFollowedSources,
-                                    );
-
-                                context.read<AppBloc>().add(
-                                  AppUserContentPreferencesChanged(
-                                    preferences: updatedPreferences,
-                                  ),
-                                );
-                              } else {
-                                // If the limit is reached, show the bottom sheet.
-                                showModalBottomSheet<void>(
-                                  context: context,
-                                  builder: (_) => ContentLimitationBottomSheet(
-                                    status: status,
-                                  ),
-                                );
-                              }
-                            }
-                          },
+                        trailing: _FollowButton(
+                          source: source,
+                          isFollowed: isFollowed,
                         ),
                       ),
                     );

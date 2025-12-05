@@ -11,7 +11,13 @@ import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/
 /// {@endtemplate}
 class ProductionContentLimitationService implements ContentLimitationService {
   @override
-  Future<LimitationStatus> checkAction(ContentAction action) async {
+  LimitationStatus checkAction(ContentAction action) {
     return LimitationStatus.allowed;
+  }
+
+  @override
+  void incrementActionCount(ContentAction action) {
+    // No-op for production, as counts are managed by the backend.
+    return;
   }
 }

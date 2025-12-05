@@ -21,7 +21,7 @@ class DemoContentLimitationService implements ContentLimitationService {
   final Map<ContentAction, int> _dailyCounts = {};
 
   @override
-  Future<LimitationStatus> checkAction(ContentAction action) async {
+  LimitationStatus checkAction(ContentAction action) {
     final state = _appBloc.state;
     final user = state.user;
     final preferences = state.userContentPreferences;
@@ -35,24 +35,9 @@ class DemoContentLimitationService implements ContentLimitationService {
     final role = user.appRole;
 
     switch (action) {
-      case ContentAction.bookmarkHeadline:
-        final count = preferences.savedHeadlines.length;
-        final limit = limits.savedHeadlines[role];
-        if (limit != null && count >= limit) {
-          return _getLimitationStatusForRole(role);
-        }
-
       case ContentAction.saveHeadlineFilter:
         final count = preferences.savedHeadlineFilters.length;
         final limit = limits.savedHeadlineFilters[role]?.total;
-        if (limit != null && count >= limit) {
-          return _getLimitationStatusForRole(role);
-        }
-
-      case ContentAction.pinHeadlineFilter:
-        final count =
-            preferences.savedHeadlineFilters.where((f) => f.isPinned).length;
-        final limit = limits.savedHeadlineFilters[role]?.pinned;
         if (limit != null && count >= limit) {
           return _getLimitationStatusForRole(role);
         }
@@ -71,7 +56,13 @@ class DemoContentLimitationService implements ContentLimitationService {
             count = preferences.followedSources.length;
           case ContentAction.followCountry:
             count = preferences.followedCountries.length;
-          default:
+          case ContentAction.bookmarkHeadline:
+          case ContentAction.pinHeadlineFilter:
+          case ContentAction.postComment:
+          case ContentAction.reactToContent:
+          case ContentAction.saveHeadlineFilter:
+          case ContentAction.subscribeToHeadlineFilterNotifications:
+          case ContentAction.submitReport:
             count = 0;
         }
         if (count >= limit) {
@@ -84,7 +75,6 @@ class DemoContentLimitationService implements ContentLimitationService {
         if (limit != null && count >= limit) {
           return _getLimitationStatusForRole(role);
         }
-        _dailyCounts[action] = count + 1;
 
       case ContentAction.reactToContent:
         final count = _dailyCounts[action] ?? 0;
@@ -92,7 +82,6 @@ class DemoContentLimitationService implements ContentLimitationService {
         if (limit != null && count >= limit) {
           return _getLimitationStatusForRole(role);
         }
-        _dailyCounts[action] = count + 1;
 
       case ContentAction.submitReport:
         final count = _dailyCounts[action] ?? 0;
@@ -100,14 +89,33 @@ class DemoContentLimitationService implements ContentLimitationService {
         if (limit != null && count >= limit) {
           return _getLimitationStatusForRole(role);
         }
-        _dailyCounts[action] = count + 1;
 
       // This action is not limited by this service.
       case ContentAction.subscribeToHeadlineFilterNotifications:
         break;
+      case ContentAction.bookmarkHeadline:
+        final count = preferences.savedHeadlines.length;
+        final limit = limits.savedHeadlines[role];
+        if (limit != null && count >= limit) {
+          return _getLimitationStatusForRole(role);
+        }
+      case ContentAction.pinHeadlineFilter:
+        final count = preferences.savedHeadlineFilters
+            .where((f) => f.isPinned)
+            .length;
+        final limit = limits.savedHeadlineFilters[role]?.pinned;
+        if (limit != null && count >= limit) {
+          return _getLimitationStatusForRole(role);
+        }
     }
 
     return LimitationStatus.allowed;
+  }
+
+  @override
+  void incrementActionCount(ContentAction action)  {
+    final currentCount = _dailyCounts[action] ?? 0;
+    _dailyCounts[action] = currentCount + 1;
   }
 
   /// Maps an [AppUserRole] to the corresponding [LimitationStatus].

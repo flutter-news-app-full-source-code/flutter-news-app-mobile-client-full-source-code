@@ -1,4 +1,3 @@
-
 /// Defines the specific type of content-related action a user is trying to
 /// perform, which may be subject to limitations.
 enum ContentAction {
@@ -25,6 +24,9 @@ enum ContentAction {
 
   /// The action of posting a comment.
   postComment,
+
+  /// The action of reacting to a piece of content.
+  reactToContent,
 
   /// The action of submitting a report.
   submitReport,
@@ -58,5 +60,8 @@ abstract class ContentLimitationService {
   ///
   /// Returns a [LimitationStatus] indicating whether the action is allowed or
   /// if a specific limit has been reached.
-  Future<LimitationStatus> checkAction(ContentAction action);
+  LimitationStatus checkAction(ContentAction action);
+
+  /// Increments the count for a given action, used by the demo service.
+  void incrementActionCount(ContentAction action);
 }

@@ -1507,4 +1507,47 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get commentReportReasonHateSpeech => 'خطاب كراهية';
+
+  @override
+  String get limitReachedTitle => 'تم الوصول إلى الحد الأقصى';
+
+  @override
+  String get limitReachedBodyFollow =>
+      'لقد وصلت إلى الحد الأقصى للعناصر المتابعة. لمتابعة المزيد، يرجى مراجعة المحتوى المتابع الحالي.';
+
+  @override
+  String get limitReachedBodySave =>
+      'لقد وصلت إلى الحد الأقصى للمقالات المحفوظة. لحفظ المزيد، يرجى مراجعة مقالاتك المحفوظة الحالية.';
+
+  @override
+  String get limitReachedBodySaveFilters =>
+      'لقد وصلت إلى الحد الأقصى للفلاتر المحفوظة. لإنشاء فلاتر جديدة، يرجى مراجعة الفلاتر الحالية.';
+
+  @override
+  String get limitReachedBodyPinFilters =>
+      'لقد وصلت إلى الحد الأقصى للفلاتر المثبتة. لتثبيت فلتر جديد، يرجى إلغاء تثبيت فلتر حالي.';
+
+  @override
+  String get limitReachedBodyComments =>
+      'لقد وصلت إلى الحد اليومي لنشر التعليقات. يرجى المحاولة مرة أخرى غدًا.';
+
+  @override
+  String get limitReachedBodyReactions =>
+      'لقد وصلت إلى الحد اليومي للتفاعلات. يرجى المحاولة مرة أخرى غدًا.';
+
+  @override
+  String get limitReachedBodyReports =>
+      'لقد وصلت إلى الحد اليومي لتقديم البلاغات. يرجى المحاولة مرة أخرى غدًا.';
+
+  @override
+  String get manageMyContentButton => 'إدارة المحتوى الخاص بي';
+
+  @override
+  String get upgradeButton => 'ترقية';
+
+  @override
+  String get createAccountButton => 'إنشاء حساب';
+
+  @override
+  String get gotItButton => 'حسنًا';
 }

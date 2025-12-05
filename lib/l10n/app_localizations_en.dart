@@ -1514,4 +1514,47 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get commentReportReasonHateSpeech => 'Hate Speech';
+
+  @override
+  String get limitReachedTitle => 'Limit Reached';
+
+  @override
+  String get limitReachedBodyFollow =>
+      'You have reached your limit for followed items. To follow more, please review your existing followed content.';
+
+  @override
+  String get limitReachedBodySave =>
+      'You have reached your limit for saved articles. To save more, please review your existing saved articles.';
+
+  @override
+  String get limitReachedBodySaveFilters =>
+      'You have reached your limit for saved filters. To create new ones, please review your existing filters.';
+
+  @override
+  String get limitReachedBodyPinFilters =>
+      'You have reached your limit for pinned filters. To pin a new one, please un-pin an existing filter.';
+
+  @override
+  String get limitReachedBodyComments =>
+      'You have reached your daily limit for posting comments. Please try again tomorrow.';
+
+  @override
+  String get limitReachedBodyReactions =>
+      'You have reached your daily limit for reactions. Please try again tomorrow.';
+
+  @override
+  String get limitReachedBodyReports =>
+      'You have reached your daily limit for submitting reports. Please try again tomorrow.';
+
+  @override
+  String get manageMyContentButton => 'Manage My Content';
+
+  @override
+  String get upgradeButton => 'Upgrade';
+
+  @override
+  String get createAccountButton => 'Create Account';
+
+  @override
+  String get gotItButton => 'Got It';
 }

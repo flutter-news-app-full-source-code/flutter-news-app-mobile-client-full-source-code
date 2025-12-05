@@ -2869,6 +2869,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hate Speech'**
   String get commentReportReasonHateSpeech;
+
+  /// Generic title for when a user hits a content limit.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit Reached'**
+  String get limitReachedTitle;
+
+  /// Body text when a user tries to follow more items than their plan allows.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached your limit for followed items. To follow more, please review your existing followed content.'**
+  String get limitReachedBodyFollow;
+
+  /// Body text when a user tries to save more articles than their plan allows.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached your limit for saved articles. To save more, please review your existing saved articles.'**
+  String get limitReachedBodySave;
+
+  /// Body text when a user tries to save more filters than their plan allows.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached your limit for saved filters. To create new ones, please review your existing filters.'**
+  String get limitReachedBodySaveFilters;
+
+  /// Body text when a user tries to pin more filters than their plan allows.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached your limit for pinned filters. To pin a new one, please un-pin an existing filter.'**
+  String get limitReachedBodyPinFilters;
+
+  /// Body text when a user tries to post more comments than their daily limit allows.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached your daily limit for posting comments. Please try again tomorrow.'**
+  String get limitReachedBodyComments;
+
+  /// Body text when a user tries to react more than their daily limit allows.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached your daily limit for reactions. Please try again tomorrow.'**
+  String get limitReachedBodyReactions;
+
+  /// Body text when a user tries to submit more reports than their daily limit allows.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached your daily limit for submitting reports. Please try again tomorrow.'**
+  String get limitReachedBodyReports;
+
+  /// Button text that navigates the user to a page where they can manage their content (e.g., unfollow items).
+  ///
+  /// In en, this message translates to:
+  /// **'Manage My Content'**
+  String get manageMyContentButton;
+
+  /// Button text prompting the user to upgrade their subscription plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade'**
+  String get upgradeButton;
+
+  /// Button text prompting an anonymous user to create an account.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get createAccountButton;
+
+  /// A simple acknowledgement button.
+  ///
+  /// In en, this message translates to:
+  /// **'Got It'**
+  String get gotItButton;
 }
 
 class _AppLocalizationsDelegate

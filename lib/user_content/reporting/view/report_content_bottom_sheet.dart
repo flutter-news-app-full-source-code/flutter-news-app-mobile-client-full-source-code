@@ -5,8 +5,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
+import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
 import 'package:uuid/uuid.dart';
@@ -60,9 +62,8 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
       entityId: widget.entityId,
       entityType: widget.reportableEntity,
       reason: _selectedReason!,
-      additionalComments: _textController.text.isNotEmpty
-          ? _textController.text
-          : null,
+      additionalComments:
+          _textController.text.isNotEmpty ? _textController.text : null,
       status: ModerationStatus.pendingReview,
       createdAt: DateTime.now(),
     );
@@ -71,18 +72,27 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
       setState(() => _isSubmitting = true);
       final limitationService = context.read<ContentLimitationService>();
       final l10n = AppLocalizations.of(context);
-      final status = limitationService.checkAction(
+      final status = await limitationService.checkAction(
         ContentAction.submitReport,
       );
 
       if (status != LimitationStatus.allowed) {
         if (mounted) {
+          final userRole = context.read<AppBloc>().state.user?.appRole;
+          final content = _getBottomSheetContent(
+            context: context,
+            l10n: l10n,
+            status: status,
+            userRole: userRole,
+            defaultBody: l10n.limitReachedBodyReports,
+          );
           await showModalBottomSheet<void>(
             context: context,
             builder: (_) => ContentLimitationBottomSheet(
-              title: l10n.limitReachedTitle,
-              body: l10n.limitReachedBodyReports,
-              buttonText: l10n.gotItButton,
+              title: content.title,
+              body: content.body,
+              buttonText: content.buttonText,
+              onButtonPressed: content.onPressed,
             ),
           );
         }
@@ -139,16 +149,16 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
     switch (widget.reportableEntity) {
       case ReportableEntity.headline:
         return HeadlineReportReason.values.asNameMap().map(
-          (key, value) => MapEntry(value.toL10n(l10n), key),
-        );
+              (key, value) => MapEntry(value.toL10n(l10n), key),
+            );
       case ReportableEntity.source:
         return SourceReportReason.values.asNameMap().map(
-          (key, value) => MapEntry(value.toL10n(l10n), key),
-        );
+              (key, value) => MapEntry(value.toL10n(l10n), key),
+            );
       case ReportableEntity.comment:
         return CommentReportReason.values.asNameMap().map(
-          (key, value) => MapEntry(value.toL10n(l10n), key),
-        );
+              (key, value) => MapEntry(value.toL10n(l10n), key),
+            );
     }
   }
 
@@ -240,6 +250,50 @@ extension on HeadlineReportReason {
       case HeadlineReportReason.paywalled:
         return l10n.headlineReportReasonPaywalled;
     }
+  }
+}
+
+/// Determines the content for the [ContentLimitationBottomSheet] based on
+/// the user's role and the limitation status.
+({
+  String title,
+  String body,
+  String buttonText,
+  VoidCallback? onPressed,
+}) _getBottomSheetContent({
+  required BuildContext context,
+  required AppLocalizations l10n,
+  required LimitationStatus status,
+  required AppUserRole? userRole,
+  required String defaultBody,
+}) {
+  switch (status) {
+    case LimitationStatus.anonymousLimitReached:
+      return (
+        title: l10n.anonymousLimitTitle,
+        body: l10n.anonymousLimitBody,
+        buttonText: l10n.anonymousLimitButton,
+        onPressed: () {
+          Navigator.of(context).pop();
+          context.pushNamed(Routes.accountLinkingName);
+        },
+      );
+    case LimitationStatus.standardUserLimitReached:
+      return (
+        title: l10n.standardLimitTitle,
+        body: l10n.standardLimitBody,
+        buttonText: l10n.standardLimitButton,
+        onPressed: null, // Upgrade feature not implemented
+      );
+    case LimitationStatus.premiumUserLimitReached:
+      return (
+        title: l10n.premiumLimitTitle,
+        body: defaultBody,
+        buttonText: l10n.gotItButton, // Premium users just get an info dialog
+        onPressed: () => Navigator.of(context).pop(),
+      );
+    case LimitationStatus.allowed:
+      return (title: '', body: '', buttonText: '', onPressed: null);
   }
 }
 

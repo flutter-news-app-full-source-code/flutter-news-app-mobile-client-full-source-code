@@ -68,7 +68,18 @@ class _EngagementBottomSheetView extends StatelessWidget {
               ),
               const Divider(height: AppSpacing.lg),
               Expanded(child: _buildContent(context, state, scrollController)),
-              const _CommentInputField(),
+              BlocBuilder<AppBloc, AppState>(
+                builder: (context, appState) {
+                  final communityConfig =
+                      appState.remoteConfig?.features.community;
+                  if (communityConfig?.enabled == true &&
+                      communityConfig?.engagement.engagementMode ==
+                          EngagementMode.reactionsAndComments) {
+                    return const _CommentInputField();
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
             ],
           ),
         );

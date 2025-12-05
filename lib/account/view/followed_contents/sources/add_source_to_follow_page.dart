@@ -47,7 +47,7 @@ class _FollowButtonState extends State<_FollowButton> {
       } else {
         final limitationService = context.read<ContentLimitationService>();
         final status =
-            await limitationService.checkAction(ContentAction.followSource);
+            limitationService.checkAction(ContentAction.followSource);
 
         if (status != LimitationStatus.allowed) {
           if (mounted) {

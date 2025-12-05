@@ -11,10 +11,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/c
 import 'package:ui_kit/ui_kit.dart';
 
 class _FollowButton extends StatefulWidget {
-  const _FollowButton({
-    required this.topic,
-    required this.isFollowed,
-  });
+  const _FollowButton({required this.topic, required this.isFollowed});
 
   final Topic topic;
   final bool isFollowed;
@@ -38,16 +35,18 @@ class _FollowButtonState extends State<_FollowButton> {
       return;
     }
 
-    final updatedFollowedTopics =
-        List<Topic>.from(userContentPreferences.followedTopics);
+    final updatedFollowedTopics = List<Topic>.from(
+      userContentPreferences.followedTopics,
+    );
 
     try {
       if (widget.isFollowed) {
         updatedFollowedTopics.removeWhere((t) => t.id == widget.topic.id);
       } else {
         final limitationService = context.read<ContentLimitationService>();
-        final status =
-            await limitationService.checkAction(ContentAction.followTopic);
+        final status = limitationService.checkAction(
+          ContentAction.followTopic,
+        );
 
         if (status != LimitationStatus.allowed) {
           if (mounted) {
@@ -182,9 +181,6 @@ class AddTopicToFollowPage extends StatelessWidget {
                   itemCount: topics.length,
                   itemBuilder: (context, index) {
                     final topic = topics[index];
-                    final isFollowed = followedTopics.any(
-                      (ft) => ft.id == topic.id,
-                    );
                     final colorScheme = Theme.of(context).colorScheme;
 
                     return Card(
@@ -244,9 +240,9 @@ class AddTopicToFollowPage extends StatelessWidget {
                         ),
                         title: Text(topic.name, style: textTheme.titleMedium),
                         trailing: IconButton(
-                            icon: const Icon(Icons.more_vert),
-                            onPressed: () {},
-                            ),
+                          icon: const Icon(Icons.more_vert),
+                          onPressed: () {},
+                        ),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: AppSpacing.paddingMedium,
                           vertical: AppSpacing.xs,

@@ -74,7 +74,7 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
   Future<void> _checkLimits() async {
     final contentLimitationService = context.read<ContentLimitationService>();
 
-    final canPinStatus = await contentLimitationService.checkAction(
+    final canPinStatus = contentLimitationService.checkAction(
       ContentAction.pinHeadlineFilter,
     );
     if (mounted) {
@@ -88,7 +88,7 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
     for (final type in PushNotificationSubscriptionDeliveryType.values) {
       final isAlreadySubscribed =
           widget.filterToEdit?.deliveryTypes.contains(type) ?? false;
-      final limitationStatus = await contentLimitationService.checkAction(
+      final limitationStatus = contentLimitationService.checkAction(
         ContentAction.subscribeToHeadlineFilterNotifications,
       );
       if (mounted) {
@@ -158,7 +158,7 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
 
       try {
         final limitationService = context.read<ContentLimitationService>();
-        final status = await limitationService.checkAction(
+        final status = limitationService.checkAction(
           ContentAction.saveHeadlineFilter,
         );
 

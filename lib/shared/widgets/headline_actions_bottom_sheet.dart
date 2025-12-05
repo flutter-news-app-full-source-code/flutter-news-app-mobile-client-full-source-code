@@ -50,7 +50,7 @@ class _HeadlineActionsBottomSheetState
       } else {
         final limitationService = context.read<ContentLimitationService>();
         final status =
-            await limitationService.checkAction(ContentAction.bookmarkHeadline);
+            limitationService.checkAction(ContentAction.bookmarkHeadline);
 
         if (status != LimitationStatus.allowed) {
           if (mounted) {

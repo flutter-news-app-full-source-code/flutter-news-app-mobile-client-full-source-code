@@ -202,7 +202,7 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
 
                       if (action == null) return;
 
-                      final status = await limitationService.checkAction(
+                      final status = limitationService.checkAction(
                         action,
                       );
 

@@ -71,8 +71,9 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
       setState(() => _isSubmitting = true);
       final limitationService = context.read<ContentLimitationService>();
       final l10n = AppLocalizations.of(context);
-      final status =
-          await limitationService.checkAction(ContentAction.submitReport);
+      final status = limitationService.checkAction(
+        ContentAction.submitReport,
+      );
 
       if (status != LimitationStatus.allowed) {
         if (mounted) {
@@ -90,10 +91,6 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
 
       await context.read<DataRepository<Report>>().create(item: report);
 
-      // Increment count only on successful creation.
-      await limitationService.incrementActionCount(
-        ContentAction.submitReport,
-      );
       if (mounted) {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
@@ -207,11 +204,14 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: FilledButton(
-                    onPressed:
-                        _selectedReason != null && !_isSubmitting ? _submitReport : null,
+                    onPressed: _selectedReason != null && !_isSubmitting
+                        ? _submitReport
+                        : null,
                     child: _isSubmitting
                         ? const SizedBox.square(
-                            dimension: 24, child: CircularProgressIndicator())
+                            dimension: 24,
+                            child: CircularProgressIndicator(),
+                          )
                         : Text(l10n.reportSubmitButtonLabel),
                   ),
                 ),

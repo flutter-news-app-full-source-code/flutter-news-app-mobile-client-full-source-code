@@ -251,7 +251,7 @@ class _SourceListTile extends StatelessWidget {
           } else {
             // If the user is following, check the limit first.
             final limitationService = context.read<ContentLimitationService>();
-            final status = await limitationService.checkAction(
+            final status = limitationService.checkAction(
               ContentAction.followSource,
             );
 

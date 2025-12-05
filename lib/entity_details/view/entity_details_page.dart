@@ -47,6 +47,7 @@ class EntityDetailsView extends StatefulWidget {
 
 class _EntityDetailsViewState extends State<EntityDetailsView> {
   final _scrollController = ScrollController();
+  bool _isFollowingInProgress = false;
 
   @override
   void initState() {
@@ -157,59 +158,89 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
           }
 
           final followButton = IconButton(
-            icon: Icon(
-              state.isFollowing ? Icons.check_circle : Icons.add_circle_outline,
-              color: colorScheme.primary,
-            ),
+            icon: _isFollowingInProgress
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Icon(
+                    state.isFollowing
+                        ? Icons.check_circle
+                        : Icons.add_circle_outline,
+                    color: colorScheme.primary,
+                  ),
             tooltip: state.isFollowing
                 ? l10n.unfollowButtonLabel
                 : l10n.followButtonLabel,
-            onPressed: () {
-              // If the user is unfollowing, always allow it.
-              if (state.isFollowing) {
-                context.read<EntityDetailsBloc>().add(
-                  const EntityDetailsToggleFollowRequested(),
-                );
-                context.read<AppBloc>().add(
-                  AppPositiveInteractionOcurred(context: context),
-                );
-              } else {
-                // If the user is following, check the limit first.
-                final limitationService = context
-                    .read<ContentLimitationService>();
-                final contentType = state.contentType;
+            onPressed: _isFollowingInProgress
+                ? null
+                : () async {
+                    setState(() => _isFollowingInProgress = true);
+                    try {
+                      // If the user is unfollowing, always allow it.
+                      if (state.isFollowing) {
+                        context.read<EntityDetailsBloc>().add(
+                          const EntityDetailsToggleFollowRequested(),
+                        );
+                        return;
+                      }
 
-                if (contentType == null) return;
+                      // If the user is following, check the limit first.
+                      final limitationService = context
+                          .read<ContentLimitationService>();
+                      final contentType = state.contentType;
 
-                final action = switch (contentType) {
-                  ContentType.topic => ContentAction.followTopic,
-                  ContentType.source => ContentAction.followSource,
-                  ContentType.country => ContentAction.followCountry,
-                  _ => null,
-                };
+                      if (contentType == null) return;
 
-                if (action == null) {
-                  return;
-                }
+                      final action = switch (contentType) {
+                        ContentType.topic => ContentAction.followTopic,
+                        ContentType.source => ContentAction.followSource,
+                        ContentType.country => ContentAction.followCountry,
+                        _ => null,
+                      };
 
-                final status = limitationService.checkAction(action);
+                      if (action == null) return;
 
-                if (status == LimitationStatus.allowed) {
-                  context.read<EntityDetailsBloc>().add(
-                    const EntityDetailsToggleFollowRequested(),
-                  );
-                  context.read<AppBloc>().add(
-                    AppPositiveInteractionOcurred(context: context),
-                  );
-                } else {
-                  showModalBottomSheet<void>(
-                    context: context,
-                    builder: (_) =>
-                        ContentLimitationBottomSheet(status: status),
-                  );
-                }
-              }
-            },
+                      final status = await limitationService.checkAction(
+                        action,
+                      );
+
+                      if (status != LimitationStatus.allowed) {
+                        if (!mounted) return;
+                        await showModalBottomSheet<void>(
+                          context: context,
+                          builder: (_) => ContentLimitationBottomSheet(
+                            title: l10n.limitReachedTitle,
+                            body: l10n.limitReachedBodyFollow,
+                            buttonText: l10n.manageMyContentButton,
+                          ),
+                        );
+                        return;
+                      }
+
+                      context.read<EntityDetailsBloc>().add(
+                        const EntityDetailsToggleFollowRequested(),
+                      );
+                      context.read<AppBloc>().add(
+                        AppPositiveInteractionOcurred(context: context),
+                      );
+                    } on ForbiddenException catch (e) {
+                      if (!mounted) return;
+                      await showModalBottomSheet<void>(
+                        context: context,
+                        builder: (_) => ContentLimitationBottomSheet(
+                          title: l10n.limitReachedTitle,
+                          body: e.message,
+                          buttonText: l10n.gotItButton,
+                        ),
+                      );
+                    } finally {
+                      if (mounted) {
+                        setState(() => _isFollowingInProgress = false);
+                      }
+                    }
+                  },
           );
 
           final entityIconUrl = switch (state.entity) {
@@ -262,30 +293,30 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                 snap: false,
                 actions: [
                   followButton,
-                  PopupMenuButton<String>(
-                    onSelected: (value) {
-                      if (value == 'report') {
-                        showModalBottomSheet<void>(
-                          context: context,
-                          isScrollControlled: true,
-                          builder: (_) => ReportContentBottomSheet(
-                            entityId: widget.args.entityId,
-                            reportableEntity:
-                                widget.args.contentType == ContentType.topic
-                                ? ReportableEntity.source
-                                : ReportableEntity.source,
-                          ),
-                        );
-                      }
-                    },
-                    itemBuilder: (BuildContext context) =>
-                        <PopupMenuEntry<String>>[
-                          PopupMenuItem<String>(
-                            value: 'report',
-                            child: Text(l10n.reportActionLabel),
-                          ),
-                        ],
-                  ),
+                  if (widget.args.contentType != ContentType.topic)
+                    PopupMenuButton<String>(
+                      onSelected: (value) {
+                        if (value == 'report') {
+                          showModalBottomSheet<void>(
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (_) => ReportContentBottomSheet(
+                              entityId: widget.args.entityId,
+                              reportableEntity: ReportableEntity.source,
+                            ),
+                          );
+                        }
+                      },
+                      itemBuilder: (BuildContext context) =>
+                          <PopupMenuEntry<String>>[
+                            PopupMenuItem<String>(
+                              value: 'report',
+                              child: Text(l10n.reportActionLabel),
+                            ),
+                          ],
+                    )
+                  else
+                    const SizedBox.shrink(),
                 ],
               ),
               if (state.feedItems.isEmpty &&

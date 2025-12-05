@@ -5,8 +5,10 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_blo
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template save_filter_dialog}
@@ -27,13 +29,11 @@ class SaveFilterDialog extends StatefulWidget {
   /// the form is valid. It provides the new name, pinned status, and
   /// selected notification delivery types.
   final ValueChanged<
-    ({
-      String name,
-      bool isPinned,
-      Set<PushNotificationSubscriptionDeliveryType> deliveryTypes,
-    })
-  >
-  onSave;
+      ({
+        String name,
+        bool isPinned,
+        Set<PushNotificationSubscriptionDeliveryType> deliveryTypes,
+      })> onSave;
 
   @override
   State<SaveFilterDialog> createState() => _SaveFilterDialogState();
@@ -48,7 +48,7 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
   bool _isSaving = false;
   bool _canPin = true;
   late final Map<PushNotificationSubscriptionDeliveryType, bool>
-  _canSubscribePerType;
+      _canSubscribePerType;
 
   static const _maxNameLength = 15;
 
@@ -74,28 +74,27 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
   Future<void> _checkLimits() async {
     final contentLimitationService = context.read<ContentLimitationService>();
 
-    final canPinStatus = contentLimitationService.checkAction(
+    final canPinStatus = await contentLimitationService.checkAction(
       ContentAction.pinHeadlineFilter,
     );
     if (mounted) {
       setState(() {
-        _canPin =
-            canPinStatus == LimitationStatus.allowed ||
-            (widget.filterToEdit?.isPinned ?? false);
+        _canPin = canPinStatus == LimitationStatus.allowed ||
+            (widget.filterToEdit?.isPinned == true);
       });
     }
 
     for (final type in PushNotificationSubscriptionDeliveryType.values) {
       final isAlreadySubscribed =
           widget.filterToEdit?.deliveryTypes.contains(type) ?? false;
-      final limitationStatus = contentLimitationService.checkAction(
+      final limitationStatus = await contentLimitationService.checkAction(
         ContentAction.subscribeToHeadlineFilterNotifications,
       );
       if (mounted) {
         setState(() {
           _canSubscribePerType[type] =
               limitationStatus == LimitationStatus.allowed ||
-              isAlreadySubscribed;
+                  isAlreadySubscribed;
         });
       }
     }
@@ -135,8 +134,8 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
           if (wantsToAllow != true) return;
 
           // Request permission via the OS dialog.
-          final permissionGranted = await notificationService
-              .requestPermission();
+          final permissionGranted =
+              await notificationService.requestPermission();
 
           // If the user denies permission at the OS level, stop.
           if (!permissionGranted) {
@@ -158,18 +157,28 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
 
       try {
         final limitationService = context.read<ContentLimitationService>();
-        final status = limitationService.checkAction(
+        final status = await limitationService.checkAction(
           ContentAction.saveHeadlineFilter,
         );
 
         if (status != LimitationStatus.allowed && widget.filterToEdit == null) {
           if (mounted) {
+            final userRole = context.read<AppBloc>().state.user?.appRole;
+            final content = _getBottomSheetContent(
+              context: context,
+              l10n: l10n,
+              status: status,
+              userRole: userRole,
+              defaultBody: l10n.limitReachedBodySaveFilters,
+            );
+
             await showModalBottomSheet<void>(
               context: context,
               builder: (_) => ContentLimitationBottomSheet(
-                title: l10n.limitReachedTitle,
-                body: l10n.limitReachedBodySaveFilters,
-                buttonText: l10n.manageMyContentButton,
+                title: content.title,
+                body: content.body,
+                buttonText: content.buttonText,
+                onButtonPressed: content.onPressed,
               ),
             );
           }
@@ -284,8 +293,7 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
                   // the user has permission for this specific type OR if they
                   // are already subscribed (which allows them to unsubscribe).
                   final canInteract =
-                      isGloballyEnabled &&
-                      (_canSubscribePerType[type] ?? false);
+                      isGloballyEnabled && (_canSubscribePerType[type] ?? false);
 
                   return CheckboxListTile(
                     title: Text(type.toL10n(l10n)),
@@ -329,6 +337,53 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
         ),
       ],
     );
+  }
+}
+
+/// Determines the content for the [ContentLimitationBottomSheet] based on
+/// the user's role and the limitation status.
+({
+  String title,
+  String body,
+  String buttonText,
+  VoidCallback? onPressed
+}) _getBottomSheetContent({
+  required BuildContext context,
+  required AppLocalizations l10n,
+  required LimitationStatus status,
+  required AppUserRole? userRole,
+  required String defaultBody,
+}) {
+  switch (status) {
+    case LimitationStatus.anonymousLimitReached:
+      return (
+        title: l10n.anonymousLimitTitle,
+        body: l10n.anonymousLimitBody,
+        buttonText: l10n.anonymousLimitButton,
+        onPressed: () {
+          Navigator.of(context).pop();
+          context.pushNamed(Routes.accountLinkingName);
+        },
+      );
+    case LimitationStatus.standardUserLimitReached:
+      return (
+        title: l10n.standardLimitTitle,
+        body: l10n.standardLimitBody,
+        buttonText: l10n.standardLimitButton,
+        onPressed: null, // Upgrade feature not implemented
+      );
+    case LimitationStatus.premiumUserLimitReached:
+      return (
+        title: l10n.premiumLimitTitle,
+        body: defaultBody,
+        buttonText: l10n.premiumLimitButton,
+        onPressed: () {
+          Navigator.of(context).pop();
+          context.goNamed(Routes.manageFollowedItemsName);
+        },
+      );
+    case LimitationStatus.allowed:
+      return (title: '', body: '', buttonText: '', onPressed: null);
   }
 }
 

@@ -27,6 +27,7 @@ class EngagementState extends Equatable {
     this.status = EngagementStatus.initial,
     this.engagements = const [],
     this.userEngagement,
+    this.limitationStatus = LimitationStatus.allowed,
     this.error,
   });
 
@@ -39,11 +40,20 @@ class EngagementState extends Equatable {
   /// The current user's engagement for the headline, if any.
   final Engagement? userEngagement;
 
+  /// The status of the content limitation check.
+  final LimitationStatus limitationStatus;
+
   /// The error that occurred, if any.
   final HttpException? error;
 
   @override
-  List<Object?> get props => [status, engagements, userEngagement, error];
+  List<Object?> get props => [
+    status,
+    engagements,
+    userEngagement,
+    limitationStatus,
+    error,
+  ];
 
   /// Creates a copy of this state with the given fields replaced.
   EngagementState copyWith({
@@ -51,6 +61,7 @@ class EngagementState extends Equatable {
     List<Engagement>? engagements,
     Engagement? userEngagement,
     HttpException? error,
+    LimitationStatus? limitationStatus,
     bool clearUserEngagement = false,
   }) {
     return EngagementState(
@@ -59,6 +70,7 @@ class EngagementState extends Equatable {
       userEngagement: clearUserEngagement
           ? null
           : userEngagement ?? this.userEngagement,
+      limitationStatus: limitationStatus ?? this.limitationStatus,
       error: error ?? this.error,
     );
   }

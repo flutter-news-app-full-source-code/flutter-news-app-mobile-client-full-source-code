@@ -18,6 +18,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/s
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/router.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/demo_content_limitation_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/production_content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_tap_handler.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
@@ -274,9 +276,13 @@ class _AppViewState extends State<_AppView> {
       adService: context.read<AdService>(),
       navigatorKey: widget.navigatorKey,
     );
-    _contentLimitationService = ContentLimitationService(
-      appBloc: context.read<AppBloc>(),
-    );
+
+    // Conditionally instantiate the ContentLimitationService based on the
+    // environment.
+    _contentLimitationService =
+        widget.environment == AppEnvironment.demo
+            ? DemoContentLimitationService(appBloc: appBloc)
+            : ProductionContentLimitationService();
 
     // Create the GoRouter instance once and store it.
     _router = createRouter(

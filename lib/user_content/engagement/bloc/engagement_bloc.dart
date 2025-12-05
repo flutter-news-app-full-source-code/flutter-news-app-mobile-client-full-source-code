@@ -5,6 +5,7 @@ import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
 
@@ -21,11 +22,13 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
     required String entityId,
     required EngageableType entityType,
     required DataRepository<Engagement> engagementRepository,
+    required ContentLimitationService contentLimitationService,
     required AppBloc appBloc,
     Logger? logger,
   }) : _entityId = entityId,
        _entityType = entityType,
        _engagementRepository = engagementRepository,
+       _contentLimitationService = contentLimitationService,
        _appBloc = appBloc,
        _logger = logger ?? Logger('EngagementBloc'),
        super(const EngagementState()) {
@@ -38,6 +41,7 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
   final String _entityId;
   final EngageableType _entityType;
   final DataRepository<Engagement> _engagementRepository;
+  final ContentLimitationService _contentLimitationService;
   final AppBloc _appBloc;
   final Logger _logger;
 
@@ -54,15 +58,7 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
       final userId = _appBloc.state.user?.id;
       final userEngagement = engagements.firstWhere(
         (e) => e.userId == userId,
-        orElse: () => Engagement(
-          id: '',
-          userId: '',
-          entityId: '',
-          entityType: _entityType,
-          reaction: const Reaction(reactionType: ReactionType.like),
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        ),
+        orElse: () => null,
       );
 
       emit(
@@ -88,6 +84,18 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
 
     emit(state.copyWith(status: EngagementStatus.actionInProgress));
 
+    final preCheckStatus = await _contentLimitationService.checkAction(
+      ContentAction.reactToContent,
+    );
+    if (preCheckStatus != LimitationStatus.allowed) {
+      emit(
+        state.copyWith(
+          status: EngagementStatus.failure,
+          limitationStatus: preCheckStatus,
+        ),
+      );
+      return;
+    }
     try {
       if (state.userEngagement != null) {
         // User is updating or removing their reaction.
@@ -150,12 +158,19 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
       }
     } on HttpException catch (e, s) {
       _logger.severe('Failed to update reaction', e, s);
+      var limitationStatus = LimitationStatus.allowed;
+      if (e is ForbiddenException) {
+        limitationStatus = LimitationStatus.standardUserLimitReached;
+      }
       // On failure, roll back to the original state.
       emit(
         state.copyWith(
           status: EngagementStatus.failure,
           error: e,
           userEngagement: originalUserEngagement,
+          // Reset the main status to success if it's just a limit issue
+          // to allow the UI to recover.
+          limitationStatus: limitationStatus,
         ),
       );
     }
@@ -172,6 +187,19 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
     }
 
     emit(state.copyWith(status: EngagementStatus.actionInProgress));
+
+    final preCheckStatus = await _contentLimitationService.checkAction(
+      ContentAction.postComment,
+    );
+    if (preCheckStatus != LimitationStatus.allowed) {
+      emit(
+        state.copyWith(
+          status: EngagementStatus.failure,
+          limitationStatus: preCheckStatus,
+        ),
+      );
+      return;
+    }
 
     try {
       final newComment = Comment(language: language, content: event.content);
@@ -199,9 +227,19 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
       );
     } on HttpException catch (e, s) {
       _logger.severe('Failed to post comment', e, s);
+      var limitationStatus = LimitationStatus.allowed;
+      if (e is ForbiddenException) {
+        limitationStatus = LimitationStatus.standardUserLimitReached;
+      }
       // On failure, we can simply show an error. The optimistic update will
       // be corrected on the next full refresh.
-      emit(state.copyWith(status: EngagementStatus.failure, error: e));
+      emit(
+        state.copyWith(
+          status: EngagementStatus.failure,
+          error: e,
+          limitationStatus: limitationStatus,
+        ),
+      );
     }
   }
 
@@ -214,6 +252,19 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
     if (userId == null) return;
 
     emit(state.copyWith(status: EngagementStatus.actionInProgress));
+
+    final preCheckStatus = await _contentLimitationService.checkAction(
+      ContentAction.reactToContent,
+    );
+    if (preCheckStatus != LimitationStatus.allowed) {
+      emit(
+        state.copyWith(
+          status: EngagementStatus.failure,
+          limitationStatus: preCheckStatus,
+        ),
+      );
+      return;
+    }
 
     try {
       if (state.userEngagement != null) {
@@ -267,12 +318,19 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
       }
     } on HttpException catch (e, s) {
       _logger.severe('Failed to toggle quick reaction', e, s);
+      var limitationStatus = LimitationStatus.allowed;
+      if (e is ForbiddenException) {
+        limitationStatus = LimitationStatus.standardUserLimitReached;
+      }
       // On failure, roll back to the original state.
       emit(
         state.copyWith(
           status: EngagementStatus.failure,
           error: e,
           userEngagement: originalUserEngagement,
+          // Reset the main status to success if it's just a limit issue
+          // to allow the UI to recover.
+          limitationStatus: limitationStatus,
         ),
       );
     }

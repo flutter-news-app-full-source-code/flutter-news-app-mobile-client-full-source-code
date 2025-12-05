@@ -44,9 +44,7 @@ class _FollowButtonState extends State<_FollowButton> {
         updatedFollowedTopics.removeWhere((t) => t.id == widget.topic.id);
       } else {
         final limitationService = context.read<ContentLimitationService>();
-        final status = limitationService.checkAction(
-          ContentAction.followTopic,
-        );
+        final status = limitationService.checkAction(ContentAction.followTopic);
 
         if (status != LimitationStatus.allowed) {
           if (mounted) {
@@ -181,6 +179,9 @@ class AddTopicToFollowPage extends StatelessWidget {
                   itemCount: topics.length,
                   itemBuilder: (context, index) {
                     final topic = topics[index];
+                    final isFollowed = followedTopics.any(
+                      (ft) => ft.id == topic.id,
+                    );
                     final colorScheme = Theme.of(context).colorScheme;
 
                     return Card(
@@ -239,9 +240,9 @@ class AddTopicToFollowPage extends StatelessWidget {
                                 ),
                         ),
                         title: Text(topic.name, style: textTheme.titleMedium),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.more_vert),
-                          onPressed: () {},
+                        trailing: _FollowButton(
+                          topic: topic,
+                          isFollowed: isFollowed,
                         ),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: AppSpacing.paddingMedium,

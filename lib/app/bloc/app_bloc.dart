@@ -752,8 +752,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     AppPositiveInteractionOcurred event,
     Emitter<AppState> emit,
   ) async {
-    await _appReviewService.incrementPositiveInteractionCount();
-    await _appReviewService.checkEligibilityAndTrigger(context: event.context);
+    final newCount = state.positiveInteractionCount + 1;
+    emit(state.copyWith(positiveInteractionCount: newCount));
+    await _appReviewService.checkEligibilityAndTrigger(
+      context: event.context,
+      positiveInteractionCount: newCount,
+    );
   }
 
   /// Handles the [AppPushNotificationTokenRefreshed] event.

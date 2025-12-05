@@ -125,7 +125,7 @@ class HeadlineTileImageTop extends StatelessWidget {
               AppSpacing.md,
               AppSpacing.md,
               AppSpacing.md,
-              0,
+              AppSpacing.md,
             ),
             child: HeadlineActionsRow(headline: headline),
           ),

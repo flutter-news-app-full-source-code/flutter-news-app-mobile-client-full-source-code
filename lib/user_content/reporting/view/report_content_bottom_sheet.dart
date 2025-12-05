@@ -42,6 +42,7 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
   final _logger = Logger('ReportContentBottomSheet');
   final _textController = TextEditingController();
   String? _selectedReason;
+  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -52,17 +53,6 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
   Future<void> _submitReport() async {
     final userId = context.read<AppBloc>().state.user?.id;
     if (userId == null || _selectedReason == null) return;
-
-    final limitationService = context.read<ContentLimitationService>();
-    final status = limitationService.checkAction(ContentAction.submitReport);
-
-    if (status != LimitationStatus.allowed) {
-      await showModalBottomSheet<void>(
-        context: context,
-        builder: (_) => ContentLimitationBottomSheet(status: status),
-      );
-      return;
-    }
 
     final report = Report(
       id: const Uuid().v4(),
@@ -78,7 +68,32 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
     );
 
     try {
+      setState(() => _isSubmitting = true);
+      final limitationService = context.read<ContentLimitationService>();
+      final l10n = AppLocalizations.of(context);
+      final status =
+          await limitationService.checkAction(ContentAction.submitReport);
+
+      if (status != LimitationStatus.allowed) {
+        if (mounted) {
+          await showModalBottomSheet<void>(
+            context: context,
+            builder: (_) => ContentLimitationBottomSheet(
+              title: l10n.limitReachedTitle,
+              body: l10n.limitReachedBodyReports,
+              buttonText: l10n.gotItButton,
+            ),
+          );
+        }
+        return;
+      }
+
       await context.read<DataRepository<Report>>().create(item: report);
+
+      // Increment count only on successful creation.
+      await limitationService.incrementActionCount(
+        ContentAction.submitReport,
+      );
       if (mounted) {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
@@ -91,7 +106,19 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
           );
         Navigator.of(context).pop();
       }
-    } catch (e, s) {
+    } on ForbiddenException catch (e) {
+      if (mounted) {
+        final l10n = AppLocalizations.of(context);
+        await showModalBottomSheet<void>(
+          context: context,
+          builder: (_) => ContentLimitationBottomSheet(
+            title: l10n.limitReachedTitle,
+            body: e.message,
+            buttonText: l10n.gotItButton,
+          ),
+        );
+      }
+    } on Exception catch (e, s) {
       _logger.severe('Failed to submit report', e, s);
       if (mounted) {
         ScaffoldMessenger.of(context)
@@ -103,6 +130,10 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
               ),
             ),
           );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
       }
     }
   }
@@ -117,7 +148,7 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
         return SourceReportReason.values.asNameMap().map(
           (key, value) => MapEntry(value.toL10n(l10n), key),
         );
-      case ReportableEntity.engagement:
+      case ReportableEntity.comment:
         return CommentReportReason.values.asNameMap().map(
           (key, value) => MapEntry(value.toL10n(l10n), key),
         );
@@ -176,8 +207,12 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: FilledButton(
-                    onPressed: _selectedReason != null ? _submitReport : null,
-                    child: Text(l10n.reportSubmitButtonLabel),
+                    onPressed:
+                        _selectedReason != null && !_isSubmitting ? _submitReport : null,
+                    child: _isSubmitting
+                        ? const SizedBox.square(
+                            dimension: 24, child: CircularProgressIndicator())
+                        : Text(l10n.reportSubmitButtonLabel),
                   ),
                 ),
               ],

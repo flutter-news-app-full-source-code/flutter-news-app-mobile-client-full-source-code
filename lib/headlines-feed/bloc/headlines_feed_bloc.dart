@@ -71,19 +71,19 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     required InlineAdCacheService inlineAdCacheService,
     required FeedCacheService feedCacheService,
     UserContentPreferences? initialUserContentPreferences,
-  })  : _headlinesRepository = headlinesRepository,
-        _feedDecoratorService = feedDecoratorService,
-        _adService = adService,
-        _appBloc = appBloc,
-        _inlineAdCacheService = inlineAdCacheService,
-        _feedCacheService = feedCacheService,
-        _logger = Logger('HeadlinesFeedBloc'),
-        super(
-          HeadlinesFeedState(
-            savedHeadlineFilters:
-                initialUserContentPreferences?.savedHeadlineFilters ?? const [],
-          ),
-        ) {
+  }) : _headlinesRepository = headlinesRepository,
+       _feedDecoratorService = feedDecoratorService,
+       _adService = adService,
+       _appBloc = appBloc,
+       _inlineAdCacheService = inlineAdCacheService,
+       _feedCacheService = feedCacheService,
+       _logger = Logger('HeadlinesFeedBloc'),
+       super(
+         HeadlinesFeedState(
+           savedHeadlineFilters:
+               initialUserContentPreferences?.savedHeadlineFilters ?? const [],
+         ),
+       ) {
     // Subscribe to AppBloc to react to global state changes, primarily for
     // keeping the feed's list of saved filters synchronized with the global
     // app state.
@@ -269,8 +269,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         remoteConfig: remoteConfig,
         imageStyle: _appBloc.state.settings!.feedSettings.feedItemImageStyle,
         adThemeStyle: event.adThemeStyle,
-        processedContentItemCount:
-            cachedFeed.feedItems.whereType<Headline>().length,
+        processedContentItemCount: cachedFeed.feedItems
+            .whereType<Headline>()
+            .length,
       );
 
       _logger.fine(
@@ -488,15 +489,15 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       // Case 2: A filter was applied from the filter page ("Apply Only") or
       // by applying an un-pinned saved filter.
       // We check if the criteria match any *pinned* saved filter.
-      final matchingPinnedFilter = state.savedHeadlineFilters.firstWhereOrNull(
-        (savedFilter) {
-          // Only consider pinned filters for direct ID matching.
-          if (!savedFilter.isPinned) return false;
+      final matchingPinnedFilter = state.savedHeadlineFilters.firstWhereOrNull((
+        savedFilter,
+      ) {
+        // Only consider pinned filters for direct ID matching.
+        if (!savedFilter.isPinned) return false;
 
-          // Compare the criteria of the applied filter with the saved one.
-          return savedFilter.criteria == event.filter;
-        },
-      );
+        // Compare the criteria of the applied filter with the saved one.
+        return savedFilter.criteria == event.filter;
+      });
 
       if (matchingPinnedFilter != null) {
         // If it matches a pinned filter, use its ID.
@@ -717,7 +718,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     NavigationHandled event,
     Emitter<HeadlinesFeedState> emit,
   ) {
-    emit(state.copyWith(clearNavigationUrl: true, clearNavigationArguments: true));
+    emit(
+      state.copyWith(clearNavigationUrl: true, clearNavigationArguments: true),
+    );
   }
 
   void _onAppContentPreferencesChanged(

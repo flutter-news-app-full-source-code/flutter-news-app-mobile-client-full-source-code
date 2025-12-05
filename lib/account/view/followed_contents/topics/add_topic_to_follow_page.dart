@@ -46,8 +46,7 @@ class _FollowButtonState extends State<_FollowButton> {
         updatedFollowedTopics.removeWhere((t) => t.id == widget.topic.id);
       } else {
         final limitationService = context.read<ContentLimitationService>();
-        final status =
-            limitationService.checkAction(ContentAction.followTopic);
+        final status = limitationService.checkAction(ContentAction.followTopic);
 
         if (status != LimitationStatus.allowed) {
           if (mounted) {
@@ -127,12 +126,8 @@ class _FollowButtonState extends State<_FollowButton> {
 
 /// Determines the content for the [ContentLimitationBottomSheet] based on
 /// the user's role and the limitation status.
-({
-  String title,
-  String body,
-  String buttonText,
-  VoidCallback? onPressed,
-}) _getBottomSheetContent({
+({String title, String body, String buttonText, VoidCallback? onPressed})
+_getBottomSheetContent({
   required BuildContext context,
   required AppLocalizations l10n,
   required LimitationStatus status,

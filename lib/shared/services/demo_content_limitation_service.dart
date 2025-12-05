@@ -113,7 +113,7 @@ class DemoContentLimitationService implements ContentLimitationService {
   }
 
   @override
-  void incrementActionCount(ContentAction action)  {
+  void incrementActionCount(ContentAction action) {
     final currentCount = _dailyCounts[action] ?? 0;
     _dailyCounts[action] = currentCount + 1;
   }

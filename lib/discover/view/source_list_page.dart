@@ -259,8 +259,8 @@ class _SourceListTile extends StatelessWidget {
             if (status == LimitationStatus.allowed) {
               if (context.mounted) {
                 context.read<SourceListBloc>().add(
-                      SourceListFollowToggled(source: source),
-                    );
+                  SourceListFollowToggled(source: source),
+                );
               }
             } else {
               if (!context.mounted) return;
@@ -301,12 +301,8 @@ class _SourceListTile extends StatelessWidget {
 
 /// Determines the content for the [ContentLimitationBottomSheet] based on
 /// the user's role and the limitation status.
-({
-  String title,
-  String body,
-  String buttonText,
-  VoidCallback? onPressed,
-}) _getBottomSheetContent({
+({String title, String body, String buttonText, VoidCallback? onPressed})
+_getBottomSheetContent({
   required BuildContext context,
   required AppLocalizations l10n,
   required LimitationStatus status,

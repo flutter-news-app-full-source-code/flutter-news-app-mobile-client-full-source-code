@@ -52,7 +52,7 @@ class _HeadlineActionsBottomSheetState
         currentSaved.removeWhere((h) => h.id == widget.headline.id);
       } else {
         final limitationService = context.read<ContentLimitationService>();
-        final status = await limitationService.checkAction(
+        final status = limitationService.checkAction(
           ContentAction.bookmarkHeadline,
         );
 
@@ -162,12 +162,8 @@ class _HeadlineActionsBottomSheetState
 
 /// Determines the content for the [ContentLimitationBottomSheet] based on
 /// the user's role and the limitation status.
-({
-  String title,
-  String body,
-  String buttonText,
-  VoidCallback? onPressed
-}) _getBottomSheetContent({
+({String title, String body, String buttonText, VoidCallback? onPressed})
+_getBottomSheetContent({
   required BuildContext context,
   required AppLocalizations l10n,
   required LimitationStatus status,

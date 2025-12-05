@@ -13,10 +13,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 class _FollowButton extends StatefulWidget {
-  const _FollowButton({
-    required this.country,
-    required this.isFollowed,
-  });
+  const _FollowButton({required this.country, required this.isFollowed});
 
   final Country country;
   final bool isFollowed;
@@ -40,16 +37,18 @@ class _FollowButtonState extends State<_FollowButton> {
       return;
     }
 
-    final updatedFollowedCountries =
-        List<Country>.from(userContentPreferences.followedCountries);
+    final updatedFollowedCountries = List<Country>.from(
+      userContentPreferences.followedCountries,
+    );
 
     try {
       if (widget.isFollowed) {
         updatedFollowedCountries.removeWhere((c) => c.id == widget.country.id);
       } else {
         final limitationService = context.read<ContentLimitationService>();
-        final status =
-            limitationService.checkAction(ContentAction.followCountry);
+        final status = limitationService.checkAction(
+          ContentAction.followCountry,
+        );
 
         if (status != LimitationStatus.allowed) {
           if (mounted) {
@@ -129,12 +128,8 @@ class _FollowButtonState extends State<_FollowButton> {
 
 /// Determines the content for the [ContentLimitationBottomSheet] based on
 /// the user's role and the limitation status.
-({
-  String title,
-  String body,
-  String buttonText,
-  VoidCallback? onPressed,
-}) _getBottomSheetContent({
+({String title, String body, String buttonText, VoidCallback? onPressed})
+_getBottomSheetContent({
   required BuildContext context,
   required AppLocalizations l10n,
   required LimitationStatus status,

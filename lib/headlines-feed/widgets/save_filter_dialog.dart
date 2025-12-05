@@ -29,11 +29,13 @@ class SaveFilterDialog extends StatefulWidget {
   /// the form is valid. It provides the new name, pinned status, and
   /// selected notification delivery types.
   final ValueChanged<
-      ({
-        String name,
-        bool isPinned,
-        Set<PushNotificationSubscriptionDeliveryType> deliveryTypes,
-      })> onSave;
+    ({
+      String name,
+      bool isPinned,
+      Set<PushNotificationSubscriptionDeliveryType> deliveryTypes,
+    })
+  >
+  onSave;
 
   @override
   State<SaveFilterDialog> createState() => _SaveFilterDialogState();
@@ -48,7 +50,7 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
   bool _isSaving = false;
   bool _canPin = true;
   late final Map<PushNotificationSubscriptionDeliveryType, bool>
-      _canSubscribePerType;
+  _canSubscribePerType;
 
   static const _maxNameLength = 15;
 
@@ -74,12 +76,13 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
   Future<void> _checkLimits() async {
     final contentLimitationService = context.read<ContentLimitationService>();
 
-    final canPinStatus = await contentLimitationService.checkAction(
+    final canPinStatus = contentLimitationService.checkAction(
       ContentAction.pinHeadlineFilter,
     );
     if (mounted) {
       setState(() {
-        _canPin = canPinStatus == LimitationStatus.allowed ||
+        _canPin =
+            canPinStatus == LimitationStatus.allowed ||
             (widget.filterToEdit?.isPinned == true);
       });
     }
@@ -87,14 +90,14 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
     for (final type in PushNotificationSubscriptionDeliveryType.values) {
       final isAlreadySubscribed =
           widget.filterToEdit?.deliveryTypes.contains(type) ?? false;
-      final limitationStatus = await contentLimitationService.checkAction(
+      final limitationStatus = contentLimitationService.checkAction(
         ContentAction.subscribeToHeadlineFilterNotifications,
       );
       if (mounted) {
         setState(() {
           _canSubscribePerType[type] =
               limitationStatus == LimitationStatus.allowed ||
-                  isAlreadySubscribed;
+              isAlreadySubscribed;
         });
       }
     }
@@ -134,8 +137,8 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
           if (wantsToAllow != true) return;
 
           // Request permission via the OS dialog.
-          final permissionGranted =
-              await notificationService.requestPermission();
+          final permissionGranted = await notificationService
+              .requestPermission();
 
           // If the user denies permission at the OS level, stop.
           if (!permissionGranted) {
@@ -157,7 +160,7 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
 
       try {
         final limitationService = context.read<ContentLimitationService>();
-        final status = await limitationService.checkAction(
+        final status = limitationService.checkAction(
           ContentAction.saveHeadlineFilter,
         );
 
@@ -293,7 +296,8 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
                   // the user has permission for this specific type OR if they
                   // are already subscribed (which allows them to unsubscribe).
                   final canInteract =
-                      isGloballyEnabled && (_canSubscribePerType[type] ?? false);
+                      isGloballyEnabled &&
+                      (_canSubscribePerType[type] ?? false);
 
                   return CheckboxListTile(
                     title: Text(type.toL10n(l10n)),
@@ -342,12 +346,8 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
 
 /// Determines the content for the [ContentLimitationBottomSheet] based on
 /// the user's role and the limitation status.
-({
-  String title,
-  String body,
-  String buttonText,
-  VoidCallback? onPressed
-}) _getBottomSheetContent({
+({String title, String body, String buttonText, VoidCallback? onPressed})
+_getBottomSheetContent({
   required BuildContext context,
   required AppLocalizations l10n,
   required LimitationStatus status,

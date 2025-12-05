@@ -62,8 +62,9 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
       entityId: widget.entityId,
       entityType: widget.reportableEntity,
       reason: _selectedReason!,
-      additionalComments:
-          _textController.text.isNotEmpty ? _textController.text : null,
+      additionalComments: _textController.text.isNotEmpty
+          ? _textController.text
+          : null,
       status: ModerationStatus.pendingReview,
       createdAt: DateTime.now(),
     );
@@ -72,9 +73,7 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
       setState(() => _isSubmitting = true);
       final limitationService = context.read<ContentLimitationService>();
       final l10n = AppLocalizations.of(context);
-      final status = await limitationService.checkAction(
-        ContentAction.submitReport,
-      );
+      final status = limitationService.checkAction(ContentAction.submitReport);
 
       if (status != LimitationStatus.allowed) {
         if (mounted) {
@@ -149,16 +148,16 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
     switch (widget.reportableEntity) {
       case ReportableEntity.headline:
         return HeadlineReportReason.values.asNameMap().map(
-              (key, value) => MapEntry(value.toL10n(l10n), key),
-            );
+          (key, value) => MapEntry(value.toL10n(l10n), key),
+        );
       case ReportableEntity.source:
         return SourceReportReason.values.asNameMap().map(
-              (key, value) => MapEntry(value.toL10n(l10n), key),
-            );
+          (key, value) => MapEntry(value.toL10n(l10n), key),
+        );
       case ReportableEntity.comment:
         return CommentReportReason.values.asNameMap().map(
-              (key, value) => MapEntry(value.toL10n(l10n), key),
-            );
+          (key, value) => MapEntry(value.toL10n(l10n), key),
+        );
     }
   }
 
@@ -255,12 +254,8 @@ extension on HeadlineReportReason {
 
 /// Determines the content for the [ContentLimitationBottomSheet] based on
 /// the user's role and the limitation status.
-({
-  String title,
-  String body,
-  String buttonText,
-  VoidCallback? onPressed,
-}) _getBottomSheetContent({
+({String title, String body, String buttonText, VoidCallback? onPressed})
+_getBottomSheetContent({
   required BuildContext context,
   required AppLocalizations l10n,
   required LimitationStatus status,

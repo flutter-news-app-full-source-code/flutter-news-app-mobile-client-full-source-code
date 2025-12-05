@@ -74,7 +74,8 @@ class AppReviewService {
 
     // Check positive interaction threshold.
     if (positiveInteractionCount == 0 ||
-        positiveInteractionCount % appReviewConfig.interactionCycleThreshold != 0) {
+        positiveInteractionCount % appReviewConfig.interactionCycleThreshold !=
+            0) {
       _logger.fine(
         'Interaction count ($positiveInteractionCount) does not meet threshold '
         'cycle of ${appReviewConfig.interactionCycleThreshold}.',
@@ -188,7 +189,7 @@ class AppReviewService {
       await _appReviewRepository.update(
         id: reviewId,
         item: existingReview.copyWith(
-          feedbackDetails: ValueWrapper(details) ,
+          feedbackDetails: ValueWrapper(details),
           updatedAt: DateTime.now(),
         ),
         userId: userId,

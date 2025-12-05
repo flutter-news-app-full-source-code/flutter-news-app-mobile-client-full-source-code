@@ -204,14 +204,15 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
 
                       if (action == null) return;
 
-                      final status = limitationService.checkAction(
-                        action,
-                      );
+                      final status = limitationService.checkAction(action);
 
                       if (status != LimitationStatus.allowed) {
                         if (!mounted) return;
-                        final userRole =
-                            context.read<AppBloc>().state.user?.appRole;
+                        final userRole = context
+                            .read<AppBloc>()
+                            .state
+                            .user
+                            ?.appRole;
                         final content = _getBottomSheetContent(
                           context: context,
                           l10n: l10n,
@@ -470,12 +471,8 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
 
 /// Determines the content for the [ContentLimitationBottomSheet] based on
 /// the user's role and the limitation status.
-({
-  String title,
-  String body,
-  String buttonText,
-  VoidCallback? onPressed,
-}) _getBottomSheetContent({
+({String title, String body, String buttonText, VoidCallback? onPressed})
+_getBottomSheetContent({
   required BuildContext context,
   required AppLocalizations l10n,
   required LimitationStatus status,

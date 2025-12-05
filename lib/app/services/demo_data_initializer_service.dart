@@ -254,8 +254,9 @@ class DemoDataInitializerService {
         return;
       }
 
-      final userItems =
-          engagementFixturesData.map((i) => i.copyWith(userId: userId));
+      final userItems = engagementFixturesData.map(
+        (i) => i.copyWith(userId: userId),
+      );
 
       await Future.wait(
         userItems.map(
@@ -292,8 +293,9 @@ class DemoDataInitializerService {
         return;
       }
 
-      final userItems =
-          reportFixturesData.map((i) => i.copyWith(reporterUserId: userId));
+      final userItems = reportFixturesData.map(
+        (i) => i.copyWith(reporterUserId: userId),
+      );
 
       await Future.wait(
         userItems.map(
@@ -330,8 +332,9 @@ class DemoDataInitializerService {
         return;
       }
 
-      final userItems =
-          appReviewFixturesData.map((i) => i.copyWith(userId: userId));
+      final userItems = appReviewFixturesData.map(
+        (i) => i.copyWith(userId: userId),
+      );
 
       await Future.wait(
         userItems.map(

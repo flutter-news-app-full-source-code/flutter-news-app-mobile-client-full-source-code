@@ -9,6 +9,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/widgets/call_to_action_decorator_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/widgets/content_collection_decorator_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:logging/logging.dart';
@@ -195,7 +197,7 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
   /// The logic here ensures that the UI layer (this widget) constructs the
   /// desired new state, and the [AppBloc] is responsible for persisting it,
   /// maintaining consistency with the `AppSettingsChanged` pattern.
-  void _onFollowToggle(FeedItem item) {
+  Future<void> _onFollowToggle(FeedItem item) async {
     _logger.fine(
       '[FeedDecoratorLoaderWidget] _onFollowToggle called for item of type: ${item.runtimeType}',
     );
@@ -213,64 +215,99 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
       return;
     }
 
-    if (item is Topic) {
-      final topic = item;
-      // Create a mutable copy of the followed topics list.
-      final currentFollowedTopics = List<Topic>.from(
-        userContentPreferences.followedTopics,
-      );
+    final l10n = AppLocalizationsX(context).l10n;
 
-      if (currentFollowedTopics.any((t) => t.id == topic.id)) {
-        // If already following, unfollow.
-        currentFollowedTopics.removeWhere((t) => t.id == topic.id);
-        _logger.info(
-          '[FeedDecoratorLoaderWidget] Unfollowed topic: ${topic.id}',
+    try {
+      if (item is Topic) {
+        final topic = item;
+        final currentFollowedTopics = List<Topic>.from(
+          userContentPreferences.followedTopics,
+        );
+        final isFollowing = currentFollowedTopics.any((t) => t.id == topic.id);
+
+        if (isFollowing) {
+          currentFollowedTopics.removeWhere((t) => t.id == topic.id);
+        } else {
+          final limitationService = context.read<ContentLimitationService>();
+          final status = await limitationService.checkAction(
+            ContentAction.followTopic,
+          );
+          if (status != LimitationStatus.allowed) {
+            if (mounted) {
+              await showModalBottomSheet<void>(
+                context: context,
+                builder: (_) => ContentLimitationBottomSheet(
+                  title: l10n.limitReachedTitle,
+                  body: l10n.limitReachedBodyFollow,
+                  buttonText: l10n.manageMyContentButton,
+                ),
+              );
+            }
+            return;
+          }
+          currentFollowedTopics.add(topic);
+        }
+        context.read<AppBloc>().add(
+          AppUserContentPreferencesChanged(
+            preferences: userContentPreferences.copyWith(
+              followedTopics: currentFollowedTopics,
+            ),
+          ),
+        );
+      } else if (item is Source) {
+        final source = item;
+        final currentFollowedSources = List<Source>.from(
+          userContentPreferences.followedSources,
+        );
+        final isFollowing = currentFollowedSources.any(
+          (s) => s.id == source.id,
+        );
+
+        if (isFollowing) {
+          currentFollowedSources.removeWhere((s) => s.id == source.id);
+        } else {
+          final limitationService = context.read<ContentLimitationService>();
+          final status = await limitationService.checkAction(
+            ContentAction.followSource,
+          );
+          if (status != LimitationStatus.allowed) {
+            if (mounted) {
+              await showModalBottomSheet<void>(
+                context: context,
+                builder: (_) => ContentLimitationBottomSheet(
+                  title: l10n.limitReachedTitle,
+                  body: l10n.limitReachedBodyFollow,
+                  buttonText: l10n.manageMyContentButton,
+                ),
+              );
+            }
+            return;
+          }
+          currentFollowedSources.add(source);
+        }
+        context.read<AppBloc>().add(
+          AppUserContentPreferencesChanged(
+            preferences: userContentPreferences.copyWith(
+              followedSources: currentFollowedSources,
+            ),
+          ),
         );
       } else {
-        // If not following, follow.
-        currentFollowedTopics.add(topic);
-        _logger.info('[FeedDecoratorLoaderWidget] Followed topic: ${topic.id}');
+        _logger.warning(
+          '[FeedDecoratorLoaderWidget] Unsupported FeedItem type for follow toggle: ${item.runtimeType}',
+        );
       }
-      // Create a new UserContentPreferences object with the updated topics.
-      context.read<AppBloc>().add(
-        AppUserContentPreferencesChanged(
-          preferences: userContentPreferences.copyWith(
-            followedTopics: currentFollowedTopics,
+    } on ForbiddenException catch (e) {
+      if (mounted) {
+        await showModalBottomSheet<void>(
+          context: context,
+          builder: (_) => ContentLimitationBottomSheet(
+            title: l10n.limitReachedTitle,
+            body: e.message,
+            buttonText: l10n.gotItButton,
           ),
-        ),
-      );
-    } else if (item is Source) {
-      final source = item;
-      // Create a mutable copy of the followed sources list.
-      final currentFollowedSources = List<Source>.from(
-        userContentPreferences.followedSources,
-      );
-
-      if (currentFollowedSources.any((s) => s.id == source.id)) {
-        // If already following, unfollow.
-        currentFollowedSources.removeWhere((s) => s.id == source.id);
-        _logger.info(
-          '[FeedDecoratorLoaderWidget] Unfollowed source: ${source.id}',
         );
-      } else {
-        // If not following, follow.
-        currentFollowedSources.add(source);
-        _logger.info(
-          '[FeedDecoratorLoaderWidget] Followed source: ${source.id}',
-        );
-      } // Create a new UserContentPreferences object with the updated sources.
-      context.read<AppBloc>().add(
-        AppUserContentPreferencesChanged(
-          preferences: userContentPreferences.copyWith(
-            followedSources: currentFollowedSources,
-          ),
-        ),
-      );
-    } else {
-      _logger.warning(
-        '[FeedDecoratorLoaderWidget] Unsupported FeedItem type for follow toggle: ${item.runtimeType}',
-      );
-      return;
+      }
     }
   }
 

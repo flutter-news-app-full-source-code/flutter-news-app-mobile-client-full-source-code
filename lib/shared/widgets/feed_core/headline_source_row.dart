@@ -48,12 +48,12 @@ class _HeadlineSourceRowState extends State<HeadlineSourceRow> {
     );
 
     final sourceTextStyle = textTheme.bodySmall?.copyWith(
-      color: colorScheme.onSurfaceVariant,
+      color: colorScheme.onSurfaceVariant.withOpacity(0.8),
       fontWeight: FontWeight.w500,
     );
 
     final dateTextStyle = textTheme.bodySmall?.copyWith(
-      color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+      color: colorScheme.onSurfaceVariant.withOpacity(0.6),
     );
 
     return Row(

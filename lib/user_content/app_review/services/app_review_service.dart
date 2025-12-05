@@ -8,7 +8,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_blo
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/native_review_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/view/provide_feedback_bottom_sheet.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/view/rate_app_bottom_sheet.dart';
-import 'package:kv_storage_service/kv_storage_service.dart';
 import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
 
@@ -23,40 +22,14 @@ class AppReviewService {
   AppReviewService({
     required DataRepository<AppReview> appReviewRepository,
     required NativeReviewService nativeReviewService,
-    required KVStorageService kvStorageService,
     Logger? logger,
   }) : _appReviewRepository = appReviewRepository,
        _nativeReviewService = nativeReviewService,
-       _kvStorageService = kvStorageService,
        _logger = logger ?? Logger('AppReviewService');
 
   final DataRepository<AppReview> _appReviewRepository;
   final NativeReviewService _nativeReviewService;
-  final KVStorageService _kvStorageService;
   final Logger _logger;
-
-  static const _positiveInteractionCountKey = 'positive_interaction_count_key';
-
-  /// Increments the count of positive user interactions.
-  ///
-  /// This count is persisted in [KVStorageService] and is used to determine
-  /// eligibility for the review prompt based on the `positiveInteractionThreshold`.
-  Future<void> incrementPositiveInteractionCount() async {
-    try {
-      final currentCount =
-          await _kvStorageService.readInt(key: _positiveInteractionCountKey) ??
-          0;
-      await _kvStorageService.writeInt(
-        key: _positiveInteractionCountKey,
-        value: currentCount + 1,
-      );
-      _logger.fine(
-        'Positive interaction count incremented to ${currentCount + 1}.',
-      );
-    } catch (e, s) {
-      _logger.severe('Failed to increment positive interaction count.', e, s);
-    }
-  }
 
   /// Checks if the user is eligible for a review prompt and, if so, triggers it.
   ///
@@ -64,6 +37,7 @@ class AppReviewService {
   /// called after a positive user interaction (e.g., saving an article).
   Future<void> checkEligibilityAndTrigger({
     required BuildContext context,
+    required int positiveInteractionCount,
   }) async {
     final appState = context.read<AppBloc>().state;
     final user = appState.user;
@@ -99,13 +73,11 @@ class AppReviewService {
     }
 
     // Check positive interaction threshold.
-    final interactionCount =
-        await _kvStorageService.readInt(key: _positiveInteractionCountKey) ?? 0;
-    if (interactionCount < appReviewConfig.positiveInteractionThreshold ||
-        interactionCount % appReviewConfig.positiveInteractionThreshold != 0) {
+    if (positiveInteractionCount == 0 ||
+        positiveInteractionCount % appReviewConfig.interactionCycleThreshold != 0) {
       _logger.fine(
-        'Interaction count ($interactionCount) does not meet threshold '
-        '(${appReviewConfig.positiveInteractionThreshold}).',
+        'Interaction count ($positiveInteractionCount) does not meet threshold '
+        'cycle of ${appReviewConfig.interactionCycleThreshold}.',
       );
       return;
     }

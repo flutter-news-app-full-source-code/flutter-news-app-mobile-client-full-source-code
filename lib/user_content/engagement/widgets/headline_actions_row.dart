@@ -47,7 +47,7 @@ class _HeadlineActionsRowView extends StatelessWidget {
     final l10n = AppLocalizationsX(context).l10n;
 
     final engagementState = context.watch<EngagementBloc>().state;
-    final userReaction = engagementState.userEngagement?.reaction.reactionType;
+    final userReaction = engagementState.userEngagement?.reaction?.reactionType;
     final commentCount = engagementState.engagements
         .where((e) => e.comment != null)
         .length;

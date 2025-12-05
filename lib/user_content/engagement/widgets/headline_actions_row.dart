@@ -3,11 +3,10 @@ import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/headline_actions_bottom_sheet.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/engagement/bloc/engagement_bloc.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/user_content/engagement/view/engagement_bottom_sheet.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template headline_actions_row}
@@ -44,19 +43,21 @@ class _HeadlineActionsRowView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
-    final isBookmarked = context.select<AppBloc, bool>(
-      (bloc) =>
-          bloc.state.userContentPreferences?.savedHeadlines.any(
-            (h) => h.id == headline.id,
-          ) ??
-          false,
-    );
 
     final engagementState = context.watch<EngagementBloc>().state;
     final userReaction = engagementState.userEngagement?.reaction.reactionType;
     final commentCount = engagementState.engagements
         .where((e) => e.comment != null)
         .length;
+    final remoteConfig = context.select(
+      (AppBloc bloc) => bloc.state.remoteConfig,
+    );
+    final communityConfig = remoteConfig?.features.community;
+
+    final isCommentingEnabled =
+        communityConfig?.enabled == true &&
+        communityConfig?.engagement.engagementMode ==
+            EngagementMode.reactionsAndComments;
 
     return Padding(
       padding: const EdgeInsets.only(top: AppSpacing.md),
@@ -85,40 +86,27 @@ class _HeadlineActionsRowView extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppSpacing.md),
-              _ActionButton(
-                icon: Icons.chat_bubble_outline,
-                tooltip: l10n.commentActionLabel,
-                onPressed: () => context.read<HeadlinesFeedBloc>().add(
-                  HeadlinesFeedEngagementTapped(headline: headline),
+              if (isCommentingEnabled)
+                _ActionButton(
+                  icon: Icons.chat_bubble_outline,
+                  tooltip: l10n.commentActionLabel,
+                  onPressed: () => showModalBottomSheet<void>(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (_) => EngagementBottomSheet(headline: headline),
+                  ),
+                  count: commentCount,
                 ),
-                count: commentCount,
-              ),
             ],
           ),
           Row(
             children: [
               _ActionButton(
-                icon: isBookmarked
-                    ? Icons.bookmark
-                    : Icons.bookmark_border_outlined,
-                tooltip: isBookmarked
-                    ? l10n.removeBookmarkActionLabel
-                    : l10n.bookmarkActionLabel,
-                onPressed: () =>
-                    _onBookmarkTapped(context, isBookmarked, headline),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              _ActionButton(
-                icon: Icons.share_outlined,
-                tooltip: l10n.shareActionLabel,
-                onPressed: () => Share.share(headline.url),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              _ActionButton(
                 icon: Icons.more_horiz,
                 tooltip: l10n.moreActionLabel,
                 onPressed: () => showModalBottomSheet<void>(
                   context: context,
+                  isScrollControlled: true,
                   builder: (_) =>
                       HeadlineActionsBottomSheet(headline: headline),
                 ),
@@ -126,35 +114,6 @@ class _HeadlineActionsRowView extends StatelessWidget {
             ],
           ),
         ],
-      ),
-    );
-  }
-
-  void _onBookmarkTapped(
-    BuildContext context,
-    bool isBookmarked,
-    Headline headline,
-  ) {
-    final appBloc = context.read<AppBloc>(); // No need to listen
-    final userContentPreferences = appBloc.state.userContentPreferences;
-    if (userContentPreferences == null) return;
-
-    final currentSaved = List<Headline>.from(
-      userContentPreferences.savedHeadlines,
-    );
-
-    if (isBookmarked) {
-      currentSaved.removeWhere((h) => h.id == headline.id);
-    } else {
-      currentSaved.insert(0, headline);
-      appBloc.add(AppPositiveInteractionOcurred(context: context));
-    }
-
-    appBloc.add(
-      AppUserContentPreferencesChanged(
-        preferences: userContentPreferences.copyWith(
-          savedHeadlines: currentSaved,
-        ),
       ),
     );
   }

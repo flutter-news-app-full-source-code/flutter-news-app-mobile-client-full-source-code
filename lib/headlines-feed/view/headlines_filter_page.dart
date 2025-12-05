@@ -156,18 +156,23 @@ Future<void> _onApplyTapped(
 Future<void> _createAndApplyFilter(BuildContext context) async {
   // Before showing the save dialog, check if the user is allowed to save
   // another filter based on their subscription level and current usage.
+  final l10n = AppLocalizations.of(context);
   final contentLimitationService = context.read<ContentLimitationService>();
-  final limitationStatus = contentLimitationService.checkAction(
+  final limitationStatus = await contentLimitationService.checkAction(
     ContentAction.saveHeadlineFilter,
   );
 
   // If the user has reached their limit, show the limitation bottom sheet
   // and halt the save process.
   if (limitationStatus != LimitationStatus.allowed) {
+    if (!context.mounted) return;
     await showModalBottomSheet<void>(
       context: context,
-      builder: (context) =>
-          ContentLimitationBottomSheet(status: limitationStatus),
+      builder: (context) => ContentLimitationBottomSheet(
+        title: l10n.limitReachedTitle,
+        body: l10n.limitReachedBodySaveFilters,
+        buttonText: l10n.manageMyContentButton,
+      ),
     );
     return;
   }

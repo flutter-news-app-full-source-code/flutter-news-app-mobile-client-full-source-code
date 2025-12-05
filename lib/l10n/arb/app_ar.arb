@@ -1953,5 +1953,53 @@
     "commentReportReasonHateSpeech": "خطاب كراهية",
     "@commentReportReasonHateSpeech": {
         "description": "Report reason for a comment containing hate speech."
+    },
+    "limitReachedTitle": "تم الوصول إلى الحد الأقصى",
+    "@limitReachedTitle": {
+        "description": "Generic title for when a user hits a content limit."
+    },
+    "limitReachedBodyFollow": "لقد وصلت إلى الحد الأقصى للعناصر المتابعة. لمتابعة المزيد، يرجى مراجعة المحتوى المتابع الحالي.",
+    "@limitReachedBodyFollow": {
+        "description": "Body text when a user tries to follow more items than their plan allows."
+    },
+    "limitReachedBodySave": "لقد وصلت إلى الحد الأقصى للمقالات المحفوظة. لحفظ المزيد، يرجى مراجعة مقالاتك المحفوظة الحالية.",
+    "@limitReachedBodySave": {
+        "description": "Body text when a user tries to save more articles than their plan allows."
+    },
+    "limitReachedBodySaveFilters": "لقد وصلت إلى الحد الأقصى للفلاتر المحفوظة. لإنشاء فلاتر جديدة، يرجى مراجعة الفلاتر الحالية.",
+    "@limitReachedBodySaveFilters": {
+        "description": "Body text when a user tries to save more filters than their plan allows."
+    },
+    "limitReachedBodyPinFilters": "لقد وصلت إلى الحد الأقصى للفلاتر المثبتة. لتثبيت فلتر جديد، يرجى إلغاء تثبيت فلتر حالي.",
+    "@limitReachedBodyPinFilters": {
+        "description": "Body text when a user tries to pin more filters than their plan allows."
+    },
+    "limitReachedBodyComments": "لقد وصلت إلى الحد اليومي لنشر التعليقات. يرجى المحاولة مرة أخرى غدًا.",
+    "@limitReachedBodyComments": {
+        "description": "Body text when a user tries to post more comments than their daily limit allows."
+    },
+    "limitReachedBodyReactions": "لقد وصلت إلى الحد اليومي للتفاعلات. يرجى المحاولة مرة أخرى غدًا.",
+    "@limitReachedBodyReactions": {
+        "description": "Body text when a user tries to react more than their daily limit allows."
+    },
+    "limitReachedBodyReports": "لقد وصلت إلى الحد اليومي لتقديم البلاغات. يرجى المحاولة مرة أخرى غدًا.",
+    "@limitReachedBodyReports": {
+        "description": "Body text when a user tries to submit more reports than their daily limit allows."
+    },
+    "manageMyContentButton": "إدارة المحتوى الخاص بي",
+    "@manageMyContentButton": {
+        "description": "Button text that navigates the user to a page where they can manage their content (e.g., unfollow items)."
+    },
+    "upgradeButton": "ترقية",
+    "@upgradeButton": {
+        "description": "Button text prompting the user to upgrade their subscription plan."
+    },
+    "createAccountButton": "إنشاء حساب",
+    "@createAccountButton": {
+        "description": "Button text prompting an anonymous user to create an account."
+    },
+    "gotItButton": "حسنًا",
+    "@gotItButton": {
+        "description": "A simple acknowledgement button."
     }
 }

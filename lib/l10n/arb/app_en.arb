@@ -1953,5 +1953,54 @@
     "commentReportReasonHateSpeech": "Hate Speech",
     "@commentReportReasonHateSpeech": {
         "description": "Report reason for a comment containing hate speech."
+    },
+    "limitReachedTitle": "Limit Reached",
+    "@limitReachedTitle": {
+        "description": "Generic title for when a user hits a content limit."
+    },
+    "limitReachedBodyFollow": "You have reached your limit for followed items. To follow more, please review your existing followed content.",
+    "@limitReachedBodyFollow": {
+        "description": "Body text when a user tries to follow more items than their plan allows."
+    },
+    "limitReachedBodySave": "You have reached your limit for saved articles. To save more, please review your existing saved articles.",
+    "@limitReachedBodySave": {
+        "description": "Body text when a user tries to save more articles than their plan allows."
+    },
+    "limitReachedBodySaveFilters": "You have reached your limit for saved filters. To create new ones, please review your existing filters.",
+    "@limitReachedBodySaveFilters": {
+        "description": "Body text when a user tries to save more filters than their plan allows."
+    }
+    ,
+    "limitReachedBodyPinFilters": "You have reached your limit for pinned filters. To pin a new one, please un-pin an existing filter.",
+    "@limitReachedBodyPinFilters": {
+        "description": "Body text when a user tries to pin more filters than their plan allows."
+    },
+    "limitReachedBodyComments": "You have reached your daily limit for posting comments. Please try again tomorrow.",
+    "@limitReachedBodyComments": {
+        "description": "Body text when a user tries to post more comments than their daily limit allows."
+    },
+    "limitReachedBodyReactions": "You have reached your daily limit for reactions. Please try again tomorrow.",
+    "@limitReachedBodyReactions": {
+        "description": "Body text when a user tries to react more than their daily limit allows."
+    },
+    "limitReachedBodyReports": "You have reached your daily limit for submitting reports. Please try again tomorrow.",
+    "@limitReachedBodyReports": {
+        "description": "Body text when a user tries to submit more reports than their daily limit allows."
+    },
+    "manageMyContentButton": "Manage My Content",
+    "@manageMyContentButton": {
+        "description": "Button text that navigates the user to a page where they can manage their content (e.g., unfollow items)."
+    },
+    "upgradeButton": "Upgrade",
+    "@upgradeButton": {
+        "description": "Button text prompting the user to upgrade their subscription plan."
+    },
+    "createAccountButton": "Create Account",
+    "@createAccountButton": {
+        "description": "Button text prompting an anonymous user to create an account."
+    },
+    "gotItButton": "Got It",
+    "@gotItButton": {
+        "description": "A simple acknowledgement button."
     }
 }

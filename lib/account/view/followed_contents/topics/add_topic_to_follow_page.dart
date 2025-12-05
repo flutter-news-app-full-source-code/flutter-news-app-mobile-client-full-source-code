@@ -6,8 +6,10 @@ import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/ava
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 class _FollowButton extends StatefulWidget {
@@ -44,16 +46,27 @@ class _FollowButtonState extends State<_FollowButton> {
         updatedFollowedTopics.removeWhere((t) => t.id == widget.topic.id);
       } else {
         final limitationService = context.read<ContentLimitationService>();
-        final status = limitationService.checkAction(ContentAction.followTopic);
+        final status =
+            limitationService.checkAction(ContentAction.followTopic);
 
         if (status != LimitationStatus.allowed) {
           if (mounted) {
+            final userRole = context.read<AppBloc>().state.user?.appRole;
+            final content = _getBottomSheetContent(
+              context: context,
+              l10n: l10n,
+              status: status,
+              userRole: userRole,
+              defaultBody: l10n.limitReachedBodyFollow,
+            );
+
             await showModalBottomSheet<void>(
               context: context,
               builder: (_) => ContentLimitationBottomSheet(
-                title: l10n.limitReachedTitle,
-                body: l10n.limitReachedBodyFollow,
-                buttonText: l10n.manageMyContentButton,
+                title: content.title,
+                body: content.body,
+                buttonText: content.buttonText,
+                onButtonPressed: content.onPressed,
               ),
             );
           }
@@ -109,6 +122,53 @@ class _FollowButtonState extends State<_FollowButton> {
           : l10n.followTopicTooltip(widget.topic.name),
       onPressed: _onFollowToggled,
     );
+  }
+}
+
+/// Determines the content for the [ContentLimitationBottomSheet] based on
+/// the user's role and the limitation status.
+({
+  String title,
+  String body,
+  String buttonText,
+  VoidCallback? onPressed,
+}) _getBottomSheetContent({
+  required BuildContext context,
+  required AppLocalizations l10n,
+  required LimitationStatus status,
+  required AppUserRole? userRole,
+  required String defaultBody,
+}) {
+  switch (status) {
+    case LimitationStatus.anonymousLimitReached:
+      return (
+        title: l10n.anonymousLimitTitle,
+        body: l10n.anonymousLimitBody,
+        buttonText: l10n.anonymousLimitButton,
+        onPressed: () {
+          Navigator.of(context).pop();
+          context.pushNamed(Routes.accountLinkingName);
+        },
+      );
+    case LimitationStatus.standardUserLimitReached:
+      return (
+        title: l10n.standardLimitTitle,
+        body: l10n.standardLimitBody,
+        buttonText: l10n.standardLimitButton,
+        onPressed: null, // Upgrade feature not implemented
+      );
+    case LimitationStatus.premiumUserLimitReached:
+      return (
+        title: l10n.premiumLimitTitle,
+        body: defaultBody,
+        buttonText: l10n.premiumLimitButton,
+        onPressed: () {
+          Navigator.of(context).pop();
+          context.goNamed(Routes.manageFollowedItemsName);
+        },
+      );
+    case LimitationStatus.allowed:
+      return (title: '', body: '', buttonText: '', onPressed: null);
   }
 }
 

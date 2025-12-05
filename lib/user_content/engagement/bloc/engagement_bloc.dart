@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:collection/collection.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
@@ -56,16 +57,15 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
       );
       final engagements = response.items;
       final userId = _appBloc.state.user?.id;
-      final userEngagement = engagements.firstWhere(
+      final userEngagement = engagements.firstWhereOrNull(
         (e) => e.userId == userId,
-        orElse: () => null,
       );
 
       emit(
         state.copyWith(
           status: EngagementStatus.success,
           engagements: engagements,
-          userEngagement: userEngagement.id.isNotEmpty ? userEngagement : null,
+          userEngagement: userEngagement,
         ),
       );
     } on HttpException catch (e, s) {
@@ -84,7 +84,7 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
 
     emit(state.copyWith(status: EngagementStatus.actionInProgress));
 
-    final preCheckStatus = await _contentLimitationService.checkAction(
+    final preCheckStatus = _contentLimitationService.checkAction(
       ContentAction.reactToContent,
     );
     if (preCheckStatus != LimitationStatus.allowed) {
@@ -101,7 +101,7 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
         // User is updating or removing their reaction.
         final isTogglingOff =
             event.reactionType == null ||
-            state.userEngagement!.reaction.reactionType == event.reactionType;
+            state.userEngagement!.reaction?.reactionType == event.reactionType;
 
         if (isTogglingOff) {
           // Optimistically remove the reaction from the UI.
@@ -115,7 +115,7 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
         } else {
           // Optimistically update the reaction in the UI.
           final updatedEngagement = state.userEngagement!.copyWith(
-            reaction: Reaction(reactionType: event.reactionType!),
+            reaction: ValueWrapper(Reaction(reactionType: event.reactionType!)),
           );
           emit(
             state.copyWith(
@@ -188,7 +188,7 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
 
     emit(state.copyWith(status: EngagementStatus.actionInProgress));
 
-    final preCheckStatus = await _contentLimitationService.checkAction(
+    final preCheckStatus = _contentLimitationService.checkAction(
       ContentAction.postComment,
     );
     if (preCheckStatus != LimitationStatus.allowed) {
@@ -253,7 +253,7 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
 
     emit(state.copyWith(status: EngagementStatus.actionInProgress));
 
-    final preCheckStatus = await _contentLimitationService.checkAction(
+    final preCheckStatus = _contentLimitationService.checkAction(
       ContentAction.reactToContent,
     );
     if (preCheckStatus != LimitationStatus.allowed) {
@@ -270,7 +270,7 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
       if (state.userEngagement != null) {
         // User has an existing engagement.
         final isTogglingOff =
-            state.userEngagement!.reaction.reactionType == event.reactionType;
+            state.userEngagement!.reaction?.reactionType == event.reactionType;
 
         if (isTogglingOff) {
           // Optimistically remove the reaction.
@@ -284,7 +284,7 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
         } else {
           // Optimistically update to the new reaction.
           final updated = state.userEngagement!.copyWith(
-            reaction: Reaction(reactionType: event.reactionType),
+            reaction: ValueWrapper(Reaction(reactionType: event.reactionType)),
           );
           emit(
             state.copyWith(

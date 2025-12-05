@@ -73,13 +73,14 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
 
   Future<void> _checkLimits() async {
     final contentLimitationService = context.read<ContentLimitationService>();
-    final l10n = AppLocalizations.of(context);
 
-    final canPinStatus =
-        await contentLimitationService.checkAction(ContentAction.pinHeadlineFilter);
+    final canPinStatus = await contentLimitationService.checkAction(
+      ContentAction.pinHeadlineFilter,
+    );
     if (mounted) {
       setState(() {
-        _canPin = canPinStatus == LimitationStatus.allowed ||
+        _canPin =
+            canPinStatus == LimitationStatus.allowed ||
             (widget.filterToEdit?.isPinned ?? false);
       });
     }
@@ -93,13 +94,15 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
       if (mounted) {
         setState(() {
           _canSubscribePerType[type] =
-              limitationStatus == LimitationStatus.allowed || isAlreadySubscribed;
+              limitationStatus == LimitationStatus.allowed ||
+              isAlreadySubscribed;
         });
       }
     }
   }
 
   Future<void> _submitForm() async {
+    final l10n = AppLocalizationsX(context).l10n;
     if (_formKey.currentState!.validate()) {
       // If the user has selected any notification types but permission has
       // not been granted, we initiate the lazy permission request flow.
@@ -152,10 +155,12 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
       }
 
       setState(() => _isSaving = true);
+
       try {
         final limitationService = context.read<ContentLimitationService>();
-        final status =
-            await limitationService.checkAction(ContentAction.saveHeadlineFilter);
+        final status = await limitationService.checkAction(
+          ContentAction.saveHeadlineFilter,
+        );
 
         if (status != LimitationStatus.allowed && widget.filterToEdit == null) {
           if (mounted) {
@@ -317,7 +322,9 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
           onPressed: _isSaving ? null : _submitForm,
           child: _isSaving
               ? const SizedBox.square(
-                  dimension: 24, child: CircularProgressIndicator())
+                  dimension: 24,
+                  child: CircularProgressIndicator(),
+                )
               : Text(l10n.saveButtonLabel),
         ),
       ],

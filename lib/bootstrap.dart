@@ -33,7 +33,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/notifications/se
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/no_op_push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/one_signal_push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/data/clients/country_inmemory_client.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/data/clients/clients.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/native_review_service.dart';
 import 'package:http_client/http_client.dart';
@@ -497,7 +497,6 @@ Future<Widget> bootstrap(
   final appReviewService = AppReviewService(
     appReviewRepository: appReviewRepository,
     nativeReviewService: nativeReviewService,
-    kvStorageService: kvStorage,
     logger: logger,
   );
 

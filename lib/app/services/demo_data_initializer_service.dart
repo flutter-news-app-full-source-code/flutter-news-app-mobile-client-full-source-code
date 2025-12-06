@@ -21,7 +21,7 @@ class DemoDataInitializerService {
   DemoDataInitializerService({
     required DataRepository<AppSettings> appSettingsRepository,
     required DataRepository<UserContentPreferences>
-    userContentPreferencesRepository,
+        userContentPreferencesRepository,
     required DataRepository<Engagement> engagementRepository,
     required DataRepository<Report> reportRepository,
     required DataRepository<AppReview> appReviewRepository,
@@ -32,17 +32,17 @@ class DemoDataInitializerService {
     required this.engagementFixturesData,
     required this.reportFixturesData,
     required this.appReviewFixturesData,
-  }) : _appSettingsRepository = appSettingsRepository,
-       _userContentPreferencesRepository = userContentPreferencesRepository,
-       _engagementRepository = engagementRepository,
-       _reportRepository = reportRepository,
-       _appReviewRepository = appReviewRepository,
-       _inAppNotificationRepository = inAppNotificationRepository,
-       _logger = Logger('DemoDataInitializerService');
+  })  : _appSettingsRepository = appSettingsRepository,
+        _userContentPreferencesRepository = userContentPreferencesRepository,
+        _engagementRepository = engagementRepository,
+        _reportRepository = reportRepository,
+        _appReviewRepository = appReviewRepository,
+        _inAppNotificationRepository = inAppNotificationRepository,
+        _logger = Logger('DemoDataInitializerService');
 
   final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
-  _userContentPreferencesRepository;
+      _userContentPreferencesRepository;
   final DataRepository<InAppNotification> _inAppNotificationRepository;
   final DataRepository<Engagement> _engagementRepository;
   final DataRepository<Report> _reportRepository;
@@ -159,8 +159,8 @@ class DemoDataInitializerService {
           'Cannot create preferences from fixture: userContentPreferencesFixturesData is empty.',
         );
       }
-      final fixturePreferences = userContentPreferencesFixturesData.first
-          .copyWith(id: userId);
+      final fixturePreferences =
+          userContentPreferencesFixturesData.first.copyWith(id: userId);
 
       await _userContentPreferencesRepository.create(
         item: fixturePreferences,
@@ -209,13 +209,11 @@ class DemoDataInitializerService {
       }
 
       // Exclude the first notification, which will be used for the simulated push.
-      final notificationsToCreate = inAppNotificationsFixturesData
-          .skip(1)
-          .toList();
+      final notificationsToCreate =
+          inAppNotificationsFixturesData.skip(1).toList();
 
-      final userNotifications = notificationsToCreate
-          .map((n) => n.copyWith(userId: userId))
-          .toList();
+      final userNotifications =
+          notificationsToCreate.map((n) => n.copyWith(userId: userId)).toList();
 
       await Future.wait(
         userNotifications.map(
@@ -254,7 +252,12 @@ class DemoDataInitializerService {
         return;
       }
 
-      final userItems = engagementFixturesData.map(
+      // Filter engagements to only those not belonging to the fixture user.
+      final engagementsToCreate = engagementFixturesData
+          .where((e) => e.userId != 'fixture_user_id')
+          .toList();
+
+      final userItems = engagementsToCreate.map(
         (i) => i.copyWith(userId: userId),
       );
 

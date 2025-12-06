@@ -15,20 +15,20 @@ class DemoDataMigrationService {
   DemoDataMigrationService({
     required DataRepository<AppSettings> appSettingsRepository,
     required DataRepository<UserContentPreferences>
-    userContentPreferencesRepository,
+        userContentPreferencesRepository,
     required DataRepository<Engagement> engagementRepository,
     required DataRepository<Report> reportRepository,
     required DataRepository<AppReview> appReviewRepository,
-  }) : _appSettingsRepository = appSettingsRepository,
-       _userContentPreferencesRepository = userContentPreferencesRepository,
-       _engagementRepository = engagementRepository,
-       _reportRepository = reportRepository,
-       _appReviewRepository = appReviewRepository,
-       _logger = Logger('DemoDataMigrationService');
+  })  : _appSettingsRepository = appSettingsRepository,
+        _userContentPreferencesRepository = userContentPreferencesRepository,
+        _engagementRepository = engagementRepository,
+        _reportRepository = reportRepository,
+        _appReviewRepository = appReviewRepository,
+        _logger = Logger('DemoDataMigrationService');
 
   final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
-  _userContentPreferencesRepository;
+      _userContentPreferencesRepository;
   final DataRepository<Engagement> _engagementRepository;
   final DataRepository<Report> _reportRepository;
   final DataRepository<AppReview> _appReviewRepository;
@@ -162,14 +162,18 @@ class DemoDataMigrationService {
       );
       for (final oldEngagement in oldEngagements.items) {
         final newEngagement = oldEngagement.copyWith(userId: newUserId);
-        await _engagementRepository.create(
-          item: newEngagement,
-          userId: newUserId,
-        );
-        await _engagementRepository.delete(
-          id: oldEngagement.id,
-          userId: oldUserId,
-        );
+        try {
+          await _engagementRepository.create(
+            item: newEngagement,
+            userId: newUserId,
+          );
+          await _engagementRepository.delete(
+            id: oldEngagement.id,
+            userId: oldUserId,
+          );
+        } on ConflictException {
+          /* ignore, already exists */
+        }
       }
       _logger.info(
         '[DemoDataMigrationService] ${oldEngagements.items.length} '

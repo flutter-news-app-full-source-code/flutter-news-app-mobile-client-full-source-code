@@ -168,65 +168,70 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
     final textTheme = theme.textTheme;
     final reasons = _getReasons(l10n);
 
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        AppSpacing.lg,
-        AppSpacing.lg,
-        AppSpacing.lg + MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.reportContentTitle, style: textTheme.headlineSmall),
-            const SizedBox(height: AppSpacing.md),
-            Text(l10n.reportReasonSelectionPrompt, style: textTheme.bodyLarge),
-            const SizedBox(height: AppSpacing.md),
-            ...reasons.entries.map((entry) {
-              return RadioListTile<String>(
-                title: Text(entry.key),
-                value: entry.value,
-                groupValue: _selectedReason,
-                onChanged: (value) => setState(() => _selectedReason = value),
-                contentPadding: EdgeInsets.zero,
-              );
-            }),
-            const SizedBox(height: AppSpacing.md),
-            TextFormField(
-              controller: _textController,
-              decoration: InputDecoration(
-                labelText: l10n.reportAdditionalCommentsLabel,
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.lg,
+          AppSpacing.lg,
+          AppSpacing.lg + MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.reportContentTitle, style: textTheme.headlineSmall),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                l10n.reportReasonSelectionPrompt,
+                style: textTheme.bodyLarge,
               ),
-              maxLines: 3,
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text(l10n.cancelButtonLabel),
-                  ),
+              const SizedBox(height: AppSpacing.md),
+              ...reasons.entries.map((entry) {
+                return RadioListTile<String>(
+                  title: Text(entry.key),
+                  value: entry.value,
+                  groupValue: _selectedReason,
+                  onChanged: (value) => setState(() => _selectedReason = value),
+                  contentPadding: EdgeInsets.zero,
+                );
+              }),
+              const SizedBox(height: AppSpacing.md),
+              TextFormField(
+                controller: _textController,
+                decoration: InputDecoration(
+                  labelText: l10n.reportAdditionalCommentsLabel,
                 ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: FilledButton(
-                    onPressed: _selectedReason != null && !_isSubmitting
-                        ? _submitReport
-                        : null,
-                    child: _isSubmitting
-                        ? const SizedBox.square(
-                            dimension: 24,
-                            child: CircularProgressIndicator(),
-                          )
-                        : Text(l10n.reportSubmitButtonLabel),
+                maxLines: 3,
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text(l10n.cancelButtonLabel),
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: _selectedReason != null && !_isSubmitting
+                          ? _submitReport
+                          : null,
+                      child: _isSubmitting
+                          ? const SizedBox.square(
+                              dimension: 24,
+                              child: CircularProgressIndicator(),
+                            )
+                          : Text(l10n.reportSubmitButtonLabel),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -271,7 +276,7 @@ _getBottomSheetContent({
         onPressed: () {
           Navigator.of(context).pop();
           context.pushNamed(Routes.accountLinkingName);
-        },
+        }, // Navigate to account creation/linking
       );
     case LimitationStatus.standardUserLimitReached:
       return (

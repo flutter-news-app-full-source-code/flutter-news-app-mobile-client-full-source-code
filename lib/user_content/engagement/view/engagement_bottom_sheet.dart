@@ -170,8 +170,8 @@ class _CommentInputFieldState extends State<_CommentInputField> {
     final theme = Theme.of(context);
     final state = context.watch<EngagementBloc>().state;
 
-    final hasReaction = state.userEngagement != null;
-    final canPost = hasReaction && _controller.text.isNotEmpty;
+    // A user can post a comment if they are logged in and have entered text.
+    final canPost = _controller.text.isNotEmpty;
 
     return Padding(
       // Add padding for the keyboard.
@@ -185,9 +185,7 @@ class _CommentInputFieldState extends State<_CommentInputField> {
             child: TextFormField(
               controller: _controller,
               decoration: InputDecoration(
-                hintText: hasReaction
-                    ? l10n.commentInputHint
-                    : l10n.commentInputNoReactionHint,
+                hintText: l10n.commentInputHint,
                 border: const OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(24)),
                 ),
@@ -195,7 +193,6 @@ class _CommentInputFieldState extends State<_CommentInputField> {
                   horizontal: AppSpacing.md,
                 ),
               ),
-              enabled: hasReaction,
               onChanged: (_) => setState(() {}),
             ),
           ),
@@ -206,8 +203,8 @@ class _CommentInputFieldState extends State<_CommentInputField> {
             onPressed: canPost
                 ? () {
                     context.read<EngagementBloc>().add(
-                      EngagementCommentPosted(_controller.text),
-                    );
+                          EngagementCommentPosted(_controller.text),
+                        );
                     _controller.clear();
                     FocusScope.of(context).unfocus();
                   }

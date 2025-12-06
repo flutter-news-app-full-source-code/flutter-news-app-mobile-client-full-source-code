@@ -26,13 +26,13 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
     required ContentLimitationService contentLimitationService,
     required AppBloc appBloc,
     Logger? logger,
-  }) : _entityId = entityId,
-       _entityType = entityType,
-       _engagementRepository = engagementRepository,
-       _contentLimitationService = contentLimitationService,
-       _appBloc = appBloc,
-       _logger = logger ?? Logger('EngagementBloc'),
-       super(const EngagementState()) {
+  })  : _entityId = entityId,
+        _entityType = entityType,
+        _engagementRepository = engagementRepository,
+        _contentLimitationService = contentLimitationService,
+        _appBloc = appBloc,
+        _logger = logger ?? Logger('EngagementBloc'),
+        super(const EngagementState()) {
     on<EngagementStarted>(_onEngagementStarted);
     on<EngagementReactionUpdated>(_onEngagementReactionUpdated);
     on<EngagementCommentPosted>(_onEngagementCommentPosted);
@@ -99,10 +99,10 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
     try {
       if (state.userEngagement != null) {
         // User is updating or removing their reaction.
-        final isTogglingOff =
-            event.reactionType == null ||
+        final isTogglingOff = event.reactionType == null ||
             state.userEngagement!.reaction?.reactionType == event.reactionType;
 
+        Engagement? updatedEngagement;
         if (isTogglingOff) {
           // Optimistically remove the reaction from the UI.
           emit(
@@ -114,7 +114,7 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
           await _engagementRepository.delete(id: state.userEngagement!.id);
         } else {
           // Optimistically update the reaction in the UI.
-          final updatedEngagement = state.userEngagement!.copyWith(
+          updatedEngagement = state.userEngagement!.copyWith(
             reaction: ValueWrapper(Reaction(reactionType: event.reactionType!)),
           );
           emit(
@@ -128,6 +128,12 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
             item: updatedEngagement,
           );
         }
+        _appBloc.add(
+          AppEngagementChanged(
+            entityId: _entityId,
+            engagement: isTogglingOff ? null : updatedEngagement,
+          ),
+        );
       } else if (event.reactionType != null) {
         // User is adding a new reaction.
         final newEngagement = Engagement(
@@ -155,6 +161,12 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
             userEngagement: created,
           ),
         );
+        _appBloc.add(
+          AppEngagementChanged(
+            entityId: _entityId,
+            engagement: created,
+          ),
+        );
       }
     } on HttpException catch (e, s) {
       _logger.severe('Failed to update reaction', e, s);
@@ -173,6 +185,13 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
           limitationStatus: limitationStatus,
         ),
       );
+      // Also dispatch the change on failure to revert the UI in the feed
+      _appBloc.add(
+        AppEngagementChanged(
+          entityId: _entityId,
+          engagement: originalUserEngagement,
+        ),
+      );
     }
   }
 
@@ -182,8 +201,8 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
   ) async {
     final userId = _appBloc.state.user?.id;
     final language = _appBloc.state.settings?.language;
-    if (userId == null || state.userEngagement == null || language == null) {
-      return; // Cannot post a comment without a user, reaction, or language.
+    if (userId == null || language == null) {
+      return; // Cannot post a comment without a user or language.
     }
 
     emit(state.copyWith(status: EngagementStatus.actionInProgress));
@@ -203,27 +222,53 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
 
     try {
       final newComment = Comment(language: language, content: event.content);
+      Engagement updatedEngagement;
 
-      final updatedEngagement = state.userEngagement!.copyWith(
-        comment: ValueWrapper(newComment),
+      if (state.userEngagement != null) {
+        // User has an existing engagement (e.g., a reaction), so update it.
+        updatedEngagement = state.userEngagement!.copyWith(
+          comment: ValueWrapper(newComment),
+        );
+
+        emit(state.copyWith(status: EngagementStatus.success));
+
+        await _engagementRepository.update(
+          id: updatedEngagement.id,
+          item: updatedEngagement,
+        );
+      } else {
+        // No existing engagement, create a new one with just the comment.
+        updatedEngagement = Engagement(
+          id: const Uuid().v4(),
+          userId: userId,
+          entityId: _entityId,
+          entityType: _entityType,
+          comment: newComment,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+
+        emit(state.copyWith(status: EngagementStatus.success));
+        await _engagementRepository.create(item: updatedEngagement);
+      }
+
+      // Re-fetch to get the full list with the new comment included.
+      final response = await _engagementRepository.readAll(
+        filter: {'entityId': _entityId},
       );
-
-      // Optimistically add the comment to the UI.
-      final optimisticEngagements = List<Engagement>.from(state.engagements)
-        ..removeWhere((e) => e.id == state.userEngagement!.id)
-        ..insert(0, updatedEngagement);
-
       emit(
         state.copyWith(
-          status: EngagementStatus.success,
-          userEngagement: updatedEngagement,
-          engagements: optimisticEngagements,
+          engagements: response.items,
+          userEngagement:
+              response.items.firstWhereOrNull((e) => e.userId == userId),
         ),
       );
 
-      await _engagementRepository.update(
-        id: updatedEngagement.id,
-        item: updatedEngagement,
+      _appBloc.add(
+        AppEngagementChanged(
+          entityId: _entityId,
+          engagement: updatedEngagement,
+        ),
       );
     } on HttpException catch (e, s) {
       _logger.severe('Failed to post comment', e, s);
@@ -280,6 +325,12 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
               clearUserEngagement: true,
             ),
           );
+          // Also dispatch the change on toggle off
+          _appBloc.add(
+            AppEngagementChanged(
+              entityId: _entityId,
+            ),
+          );
           await _engagementRepository.delete(id: state.userEngagement!.id);
         } else {
           // Optimistically update to the new reaction.
@@ -293,6 +344,12 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
             ),
           );
           await _engagementRepository.update(id: updated.id, item: updated);
+          _appBloc.add(
+            AppEngagementChanged(
+              entityId: _entityId,
+              engagement: updated,
+            ),
+          );
         }
       } else {
         // No existing engagement, create a new one.
@@ -315,6 +372,12 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
         final created = await _engagementRepository.create(item: newEngagement);
         // Update state with the server-confirmed object.
         emit(state.copyWith(userEngagement: created));
+        _appBloc.add(
+          AppEngagementChanged(
+            entityId: _entityId,
+            engagement: created,
+          ),
+        );
       }
     } on HttpException catch (e, s) {
       _logger.severe('Failed to toggle quick reaction', e, s);
@@ -331,6 +394,13 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
           // Reset the main status to success if it's just a limit issue
           // to allow the UI to recover.
           limitationStatus: limitationStatus,
+        ),
+      );
+      // Also dispatch the change on failure to revert the UI in the feed
+      _appBloc.add(
+        AppEngagementChanged(
+          entityId: _entityId,
+          engagement: originalUserEngagement,
         ),
       );
     }

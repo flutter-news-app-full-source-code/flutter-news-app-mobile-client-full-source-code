@@ -66,24 +66,26 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   HeadlinesFeedBloc({
     required DataRepository<Headline> headlinesRepository,
     required FeedDecoratorService feedDecoratorService,
+    required DataRepository<Engagement> engagementRepository,
     required AdService adService,
     required AppBloc appBloc,
     required InlineAdCacheService inlineAdCacheService,
     required FeedCacheService feedCacheService,
     UserContentPreferences? initialUserContentPreferences,
-  }) : _headlinesRepository = headlinesRepository,
-       _feedDecoratorService = feedDecoratorService,
-       _adService = adService,
-       _appBloc = appBloc,
-       _inlineAdCacheService = inlineAdCacheService,
-       _feedCacheService = feedCacheService,
-       _logger = Logger('HeadlinesFeedBloc'),
-       super(
-         HeadlinesFeedState(
-           savedHeadlineFilters:
-               initialUserContentPreferences?.savedHeadlineFilters ?? const [],
-         ),
-       ) {
+  })  : _headlinesRepository = headlinesRepository,
+        _feedDecoratorService = feedDecoratorService,
+        _engagementRepository = engagementRepository,
+        _adService = adService,
+        _appBloc = appBloc,
+        _inlineAdCacheService = inlineAdCacheService,
+        _feedCacheService = feedCacheService,
+        _logger = Logger('HeadlinesFeedBloc'),
+        super(
+          HeadlinesFeedState(
+            savedHeadlineFilters:
+                initialUserContentPreferences?.savedHeadlineFilters ?? const [],
+          ),
+        ) {
     // Subscribe to AppBloc to react to global state changes, primarily for
     // keeping the feed's list of saved filters synchronized with the global
     // app state.
@@ -103,6 +105,18 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           ),
         );
       }
+    });
+
+    // Listen to the engagement repository's update stream.
+    // When an engagement is created, updated, or deleted, this BLoC will
+    // re-fetch the specific headline to update its comment count and reaction
+    // state, ensuring the UI is always in sync.
+    _engagementRepositorySubscription =
+        _engagementRepository.entityUpdated.listen((_) {
+      // The adThemeStyle is required for a refresh. If it's not in the state
+      // yet (e.g., no UI event has occurred), we can't trigger the refresh.
+      if (state.adThemeStyle == null) return;
+      add(HeadlinesFeedRefreshRequested(adThemeStyle: state.adThemeStyle!));
     });
 
     on<HeadlinesFeedStarted>(
@@ -145,6 +159,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
   final DataRepository<Headline> _headlinesRepository;
   final FeedDecoratorService _feedDecoratorService;
+  final DataRepository<Engagement> _engagementRepository;
   final AdService _adService;
   final AppBloc _appBloc;
   final InlineAdCacheService _inlineAdCacheService;
@@ -153,6 +168,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
   /// Subscription to the AppBloc's state stream.
   late final StreamSubscription<AppState> _appBlocSubscription;
+  late final StreamSubscription<Type> _engagementRepositorySubscription;
 
   static const _allFilterId = 'all';
 
@@ -214,6 +230,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     HeadlinesFeedStarted event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
+    // Persist the ad theme style in the state for background processes.
+    emit(state.copyWith(adThemeStyle: event.adThemeStyle));
     add(HeadlinesFeedRefreshRequested(adThemeStyle: event.adThemeStyle));
   }
 
@@ -269,9 +287,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         remoteConfig: remoteConfig,
         imageStyle: _appBloc.state.settings!.feedSettings.feedItemImageStyle,
         adThemeStyle: event.adThemeStyle,
-        processedContentItemCount: cachedFeed.feedItems
-            .whereType<Headline>()
-            .length,
+        processedContentItemCount:
+            cachedFeed.feedItems.whereType<Headline>().length,
       );
 
       _logger.fine(
@@ -316,9 +333,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
     // Apply throttling logic.
     if (cachedFeed != null) {
-      final timeSinceLastRefresh = DateTime.now().difference(
-        cachedFeed.lastRefreshedAt,
-      );
+      final timeSinceLastRefresh =
+          DateTime.now().difference(cachedFeed.lastRefreshedAt);
       if (timeSinceLastRefresh < _refreshThrottleDuration) {
         _logger.info(
           'Refresh throttled for filter "$filterKey". '
@@ -331,7 +347,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     // On a full refresh, clear the ad cache for the current context to ensure
     // fresh ads are loaded.
     _inlineAdCacheService.clearAdsForContext(contextKey: filterKey);
-    emit(state.copyWith(status: HeadlinesFeedStatus.loading));
+    emit(state.copyWith(
+      status: HeadlinesFeedStatus.loading,
+      adThemeStyle: event.adThemeStyle,
+    ));
     try {
       final currentUser = _appBloc.state.user;
       final appConfig = _appBloc.state.remoteConfig;
@@ -358,9 +377,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
         if (cachedHeadlines.isNotEmpty) {
           final firstCachedHeadlineId = cachedHeadlines.first.id;
-          final matchIndex = newHeadlines.indexWhere(
-            (h) => h.id == firstCachedHeadlineId,
-          );
+          final matchIndex =
+              newHeadlines.indexWhere((h) => h.id == firstCachedHeadlineId);
 
           if (matchIndex != -1) {
             // Prepend only the new items found before the match.
@@ -489,9 +507,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       // Case 2: A filter was applied from the filter page ("Apply Only") or
       // by applying an un-pinned saved filter.
       // We check if the criteria match any *pinned* saved filter.
-      final matchingPinnedFilter = state.savedHeadlineFilters.firstWhereOrNull((
-        savedFilter,
-      ) {
+      final matchingPinnedFilter =
+          state.savedHeadlineFilters.firstWhereOrNull((savedFilter) {
         // Only consider pinned filters for direct ID matching.
         if (!savedFilter.isPinned) return false;
 
@@ -545,6 +562,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         filter: event.filter,
         activeFilterId: newActiveFilterId,
         status: HeadlinesFeedStatus.loading,
+        adThemeStyle: event.adThemeStyle,
         feedItems: [],
         clearCursor: true,
       ),
@@ -649,6 +667,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         status: HeadlinesFeedStatus.loading,
         filter: newFilter,
         activeFilterId: _allFilterId,
+        adThemeStyle: event.adThemeStyle,
         feedItems: [],
         clearCursor: true,
       ),
@@ -778,6 +797,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     add(
       HeadlinesFeedFiltersApplied(
         filter: newFilter,
+        savedHeadlineFilter: event.filter.isPinned ? null : event.filter,
         adThemeStyle: event.adThemeStyle,
       ),
     );
@@ -891,6 +911,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   @override
   Future<void> close() {
     _appBlocSubscription.cancel();
+    _engagementRepositorySubscription.cancel();
     return super.close();
   }
 }

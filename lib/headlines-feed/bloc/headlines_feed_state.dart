@@ -18,6 +18,7 @@ class HeadlinesFeedState extends Equatable {
     this.error,
     this.navigationUrl,
     this.navigationArguments,
+    this.adThemeStyle,
   });
 
   final HeadlinesFeedStatus status;
@@ -45,6 +46,9 @@ class HeadlinesFeedState extends Equatable {
   /// Can be a [SavedHeadlineFilter.id], 'all', or 'custom'.
   final String? activeFilterId;
 
+  /// The current ad theme style.
+  final AdThemeStyle? adThemeStyle;
+
   HeadlinesFeedState copyWith({
     HeadlinesFeedStatus? status,
     List<FeedItem>? feedItems,
@@ -59,6 +63,7 @@ class HeadlinesFeedState extends Equatable {
     Object? navigationArguments,
     bool clearActiveFilterId = false,
     bool clearNavigationUrl = false,
+    AdThemeStyle? adThemeStyle,
     bool clearNavigationArguments = false,
   }) {
     return HeadlinesFeedState(
@@ -78,6 +83,7 @@ class HeadlinesFeedState extends Equatable {
       navigationArguments: clearNavigationArguments
           ? null
           : navigationArguments ?? this.navigationArguments,
+      adThemeStyle: adThemeStyle ?? this.adThemeStyle,
     );
   }
 
@@ -93,5 +99,6 @@ class HeadlinesFeedState extends Equatable {
     error,
     navigationUrl,
     navigationArguments,
+    adThemeStyle,
   ];
 }

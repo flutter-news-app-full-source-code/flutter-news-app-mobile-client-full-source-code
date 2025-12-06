@@ -65,7 +65,7 @@ class _ReactionIcon extends StatelessWidget {
       ReactionType.amusing => Icons.sentiment_satisfied_outlined,
       ReactionType.sad => Icons.sentiment_dissatisfied_outlined,
       ReactionType.angry => Icons.local_fire_department_outlined,
-      ReactionType.skeptical => Icons.question_mark_outlined,
+      ReactionType.skeptical => Icons.thumb_down_outlined,
     };
 
     return GestureDetector(

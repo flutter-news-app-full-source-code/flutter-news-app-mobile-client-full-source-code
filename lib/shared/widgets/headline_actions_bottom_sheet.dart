@@ -92,6 +92,11 @@ class _HeadlineActionsBottomSheetState
           ),
         ),
       );
+      // Close the bottom sheet after the action is dispatched.
+      // The UI will update reactively based on the AppBloc's state change.
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
     } on ForbiddenException catch (e) {
       if (mounted) {
         await showModalBottomSheet<void>(
@@ -141,19 +146,26 @@ class _HeadlineActionsBottomSheetState
         ListTile(
           leading: const Icon(Icons.share_outlined),
           title: Text(l10n.shareActionLabel),
-          onTap: () => Share.share(widget.headline.url),
+          onTap: () {
+            // Pop the sheet before sharing to avoid it being open in the background.
+            Navigator.of(context).pop();
+            Share.share(widget.headline.url);
+          },
         ),
         ListTile(
           leading: const Icon(Icons.flag_outlined),
           title: Text(l10n.reportActionLabel),
-          onTap: () => showModalBottomSheet<void>(
-            context: context,
-            isScrollControlled: true,
-            builder: (_) => ReportContentBottomSheet(
-              entityId: widget.headline.id,
-              reportableEntity: ReportableEntity.headline,
-            ),
-          ),
+          onTap: () {
+            Navigator.of(context).pop();
+            showModalBottomSheet<void>(
+              context: context,
+              isScrollControlled: true,
+              builder: (_) => ReportContentBottomSheet(
+                entityId: widget.headline.id,
+                reportableEntity: ReportableEntity.headline,
+              ),
+            );
+          },
         ),
       ],
     );

@@ -1969,8 +1969,7 @@
     "limitReachedBodySaveFilters": "You have reached your limit for saved filters. To create new ones, please review your existing filters.",
     "@limitReachedBodySaveFilters": {
         "description": "Body text when a user tries to save more filters than their plan allows."
-    }
-    ,
+    },
     "limitReachedBodyPinFilters": "You have reached your limit for pinned filters. To pin a new one, please un-pin an existing filter.",
     "@limitReachedBodyPinFilters": {
         "description": "Body text when a user tries to pin more filters than their plan allows."
@@ -2002,5 +2001,18 @@
     "gotItButton": "Got It",
     "@gotItButton": {
         "description": "A simple acknowledgement button."
+    },
+    "commentsPageTitle": "Comments",
+    "@commentsPageTitle": {
+        "description": "Title for the page or bottom sheet that displays comments for a headline."
+    },
+    "commentsCount": "{count,plural, =1{1 Comment}other{{count} Comments}}",
+    "@commentsCount": {
+        "description": "Label for a button that shows the number of comments and opens the comments view.",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
     }
 }

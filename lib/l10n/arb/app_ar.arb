@@ -2001,5 +2001,18 @@
     "gotItButton": "حسنًا",
     "@gotItButton": {
         "description": "A simple acknowledgement button."
+    },
+     "commentsPageTitle": "التعليقات",
+    "@commentsPageTitle": {
+        "description": "عنوان الصفحة أو الورقة السفلية التي تعرض التعليقات على عنوان رئيسي."
+    },
+    "commentsCount": "{count,plural, zero{0 تعليقات} one{تعليق واحد} two{تعليقان} few{{count} تعليقات} many{{count} تعليقًا} other{{count} تعليق}}",
+    "@commentsCount": {
+        "description": "تسمية زر يعرض عدد التعليقات ويفتح عرض التعليقات.",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
     }
 }

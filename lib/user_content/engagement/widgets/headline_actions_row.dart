@@ -53,14 +53,19 @@ class _HeadlineActionsRowView extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final isCommentingEnabled = communityConfig!.engagement.engagementMode ==
+    final isCommentingEnabled =
+        communityConfig!.engagement.engagementMode ==
         EngagementMode.reactionsAndComments;
 
     return BlocBuilder<EngagementBloc, EngagementState>(
       builder: (context, state) {
         final userReaction = state.userEngagement?.reaction?.reactionType;
-        final commentCount =
-            state.engagements.where((e) => e.comment != null).length;
+        final commentCount = state.engagements
+            .where((e) => e.comment != null)
+            .length;
+        
+        final theme = Theme.of(context);
+        final mutedColor = theme.colorScheme.onSurfaceVariant.withOpacity(0.6);
 
         return Padding(
           padding: const EdgeInsets.only(top: AppSpacing.md),
@@ -69,6 +74,7 @@ class _HeadlineActionsRowView extends StatelessWidget {
             children: [
               Expanded(
                 child: InlineReactionSelector(
+                  unselectedColor: mutedColor,
                   selectedReaction: userReaction,
                   onReactionSelected: (reaction) => context
                       .read<EngagementBloc>()
@@ -81,11 +87,23 @@ class _HeadlineActionsRowView extends StatelessWidget {
                   onPressed: () => showModalBottomSheet<void>(
                     context: context,
                     isScrollControlled: true,
-                    // Provide the AppBloc to the CommentsBottomSheet context
-                    // as it's being built in a new route.
-                    builder: (_) => BlocProvider.value(
-                      value: context.read<AppBloc>(),
-                      child: CommentsBottomSheet(headline: headline),
+                    // Provide all necessary dependencies to the new route's context.
+                    builder: (_) => MultiRepositoryProvider(
+                      providers: [
+                        // Provide the Engagement repository.
+                        RepositoryProvider.value(
+                          value: context.read<DataRepository<Engagement>>(),
+                        ),
+                        // Provide the ContentLimitationService.
+                        RepositoryProvider.value(
+                          value: context.read<ContentLimitationService>(),
+                        ),
+                      ],
+                      // Also provide the AppBloc.
+                      child: BlocProvider.value(
+                        value: context.read<AppBloc>(),
+                        child: CommentsBottomSheet(headline: headline),
+                      ),
                     ),
                   ),
                 ),
@@ -106,12 +124,27 @@ class _CommentsButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
-    return TextButton(
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final colorScheme = theme.colorScheme;
+
+    final mutedTextStyle = textTheme.bodySmall?.copyWith(
+      color: colorScheme.onSurfaceVariant.withOpacity(0.6),
+    );
+
+    return TextButton.icon(
       onPressed: onPressed,
-      child: Text(
+      icon: const Icon(Icons.chat_bubble_outline, size: 16),
+      label: Text(
         commentCount > 0
             ? l10n.commentsCount(commentCount)
             : l10n.commentActionLabel,
+      ),
+      style: TextButton.styleFrom(
+        // Apply the muted color to both the icon and the text.
+        foregroundColor: mutedTextStyle?.color,
+        // Apply the text style for font size and weight.
+        textStyle: mutedTextStyle,
       ),
     );
   }

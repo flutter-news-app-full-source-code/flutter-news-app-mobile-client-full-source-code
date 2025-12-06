@@ -123,17 +123,8 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
               userEngagement: updatedEngagement,
             ),
           );
-          await _engagementRepository.update(
-            id: updatedEngagement.id,
-            item: updatedEngagement,
-          );
+          await _engagementRepository.update(id: updatedEngagement.id, item: updatedEngagement);
         }
-        _appBloc.add(
-          AppEngagementChanged(
-            entityId: _entityId,
-            engagement: isTogglingOff ? null : updatedEngagement,
-          ),
-        );
       } else if (event.reactionType != null) {
         // User is adding a new reaction.
         final newEngagement = Engagement(
@@ -161,12 +152,6 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
             userEngagement: created,
           ),
         );
-        _appBloc.add(
-          AppEngagementChanged(
-            entityId: _entityId,
-            engagement: created,
-          ),
-        );
       }
     } on HttpException catch (e, s) {
       _logger.severe('Failed to update reaction', e, s);
@@ -183,13 +168,6 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
           // Reset the main status to success if it's just a limit issue
           // to allow the UI to recover.
           limitationStatus: limitationStatus,
-        ),
-      );
-      // Also dispatch the change on failure to revert the UI in the feed
-      _appBloc.add(
-        AppEngagementChanged(
-          entityId: _entityId,
-          engagement: originalUserEngagement,
         ),
       );
     }
@@ -263,13 +241,6 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
               response.items.firstWhereOrNull((e) => e.userId == userId),
         ),
       );
-
-      _appBloc.add(
-        AppEngagementChanged(
-          entityId: _entityId,
-          engagement: updatedEngagement,
-        ),
-      );
     } on HttpException catch (e, s) {
       _logger.severe('Failed to post comment', e, s);
       var limitationStatus = LimitationStatus.allowed;
@@ -325,12 +296,6 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
               clearUserEngagement: true,
             ),
           );
-          // Also dispatch the change on toggle off
-          _appBloc.add(
-            AppEngagementChanged(
-              entityId: _entityId,
-            ),
-          );
           await _engagementRepository.delete(id: state.userEngagement!.id);
         } else {
           // Optimistically update to the new reaction.
@@ -344,12 +309,6 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
             ),
           );
           await _engagementRepository.update(id: updated.id, item: updated);
-          _appBloc.add(
-            AppEngagementChanged(
-              entityId: _entityId,
-              engagement: updated,
-            ),
-          );
         }
       } else {
         // No existing engagement, create a new one.
@@ -372,12 +331,6 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
         final created = await _engagementRepository.create(item: newEngagement);
         // Update state with the server-confirmed object.
         emit(state.copyWith(userEngagement: created));
-        _appBloc.add(
-          AppEngagementChanged(
-            entityId: _entityId,
-            engagement: created,
-          ),
-        );
       }
     } on HttpException catch (e, s) {
       _logger.severe('Failed to toggle quick reaction', e, s);
@@ -394,13 +347,6 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
           // Reset the main status to success if it's just a limit issue
           // to allow the UI to recover.
           limitationStatus: limitationStatus,
-        ),
-      );
-      // Also dispatch the change on failure to revert the UI in the feed
-      _appBloc.add(
-        AppEngagementChanged(
-          entityId: _entityId,
-          engagement: originalUserEngagement,
         ),
       );
     }

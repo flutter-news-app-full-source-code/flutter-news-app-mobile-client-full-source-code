@@ -6,21 +6,18 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_blo
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/engagement/bloc/engagement_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/user_content/engagement/widgets/reaction_selector.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:ui_kit/ui_kit.dart';
 
-/// {@template engagement_bottom_sheet}
-/// A bottom sheet that serves as the main hub for user engagement.
-///
-/// It displays a list of reactions, a list of comments, and an input field
-/// for adding new comments.
+/// {@template comments_bottom_sheet}
+/// A bottom sheet that displays comments for a headline and allows users
+/// to post new comments.
 /// {@endtemplate}
-class EngagementBottomSheet extends StatelessWidget {
-  /// {@macro engagement_bottom_sheet}
-  const EngagementBottomSheet({required this.headline, super.key});
+class CommentsBottomSheet extends StatelessWidget {
+  /// {@macro comments_bottom_sheet}
+  const CommentsBottomSheet({required this.headline, super.key});
 
-  /// The headline for which to display engagement.
+  /// The headline for which to display comments.
   final Headline headline;
 
   @override
@@ -33,18 +30,17 @@ class EngagementBottomSheet extends StatelessWidget {
         appBloc: context.read<AppBloc>(),
         contentLimitationService: context.read<ContentLimitationService>(),
       )..add(const EngagementStarted()),
-      child: const _EngagementBottomSheetView(),
+      child: const _CommentsBottomSheetView(),
     );
   }
 }
 
-class _EngagementBottomSheetView extends StatelessWidget {
-  const _EngagementBottomSheetView();
+class _CommentsBottomSheetView extends StatelessWidget {
+  const _CommentsBottomSheetView();
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
-    final state = context.watch<EngagementBloc>().state;
 
     return DraggableScrollableSheet(
       expand: false,
@@ -52,35 +48,31 @@ class _EngagementBottomSheetView extends StatelessWidget {
       minChildSize: 0.4,
       maxChildSize: 0.9,
       builder: (context, scrollController) {
-        return Container(
-          padding: const EdgeInsets.all(AppSpacing.md),
+        return Padding(
           // Add padding for the keyboard.
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
           child: Column(
             children: [
-              Text(
-                l10n.commentsTitle,
-                style: Theme.of(context).textTheme.titleLarge,
+              Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Text(
+                  l10n.commentsPageTitle,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
               ),
-              const SizedBox(height: AppSpacing.sm),
-              ReactionSelector(
-                selectedReaction: state.userEngagement?.reaction?.reactionType,
-                onReactionSelected: (reaction) => context
-                    .read<EngagementBloc>()
-                    .add(EngagementReactionUpdated(reaction)),
+              const Divider(height: 1),
+              Expanded(
+                child: BlocBuilder<EngagementBloc, EngagementState>(
+                  builder: (context, state) {
+                    return _buildContent(context, state, scrollController);
+                  },
+                ),
               ),
-              const Divider(height: AppSpacing.lg),
-              Expanded(child: _buildContent(context, state, scrollController)),
-              BlocBuilder<AppBloc, AppState>(
-                builder: (context, appState) {
-                  final communityConfig =
-                      appState.remoteConfig?.features.community;
-                  if (communityConfig?.enabled == true &&
-                      communityConfig?.engagement.engagementMode ==
-                          EngagementMode.reactionsAndComments) {
-                    return const _CommentInputField();
-                  }
-                  return const SizedBox.shrink();
-                },
+              const Padding(
+                padding: EdgeInsets.all(AppSpacing.md),
+                child: _CommentInputField(),
               ),
             ],
           ),
@@ -102,12 +94,16 @@ class _EngagementBottomSheetView extends StatelessWidget {
     }
 
     if (state.status == EngagementStatus.failure) {
-      return Center(child: Text(l10n.unknownError));
+      return FailureStateWidget(
+        onRetry: () =>
+            context.read<EngagementBloc>().add(const EngagementStarted()),
+        exception: state.error!,
+      );
     }
 
     final comments = state.engagements.where((e) => e.comment != null).toList();
 
-    if (comments.isEmpty && state.status != EngagementStatus.loading) {
+    if (comments.isEmpty) {
       return Center(
         child: Text(
           l10n.noCommentsYet,
@@ -118,9 +114,10 @@ class _EngagementBottomSheetView extends StatelessWidget {
       );
     }
 
-    return ListView.builder(
+    return ListView.separated(
       controller: scrollController,
       itemCount: comments.length,
+      separatorBuilder: (context, index) => const Divider(height: 1),
       itemBuilder: (context, index) {
         final engagement = comments[index];
         final comment = engagement.comment!;
@@ -158,60 +155,58 @@ class _CommentInputField extends StatefulWidget {
   const _CommentInputField();
 
   @override
-  State<_CommentInputField> createState() => _CommentInputFieldState();
+  State<_CommentInputField> createState() => __CommentInputFieldState();
 }
 
-class _CommentInputFieldState extends State<_CommentInputField> {
+class __CommentInputFieldState extends State<_CommentInputField> {
   final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
-    final state = context.watch<EngagementBloc>().state;
 
-    // A user can post a comment if they are logged in and have entered text.
+    // A user can post a comment if they have entered text.
     final canPost = _controller.text.isNotEmpty;
 
-    return Padding(
-      // Add padding for the keyboard.
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-        top: AppSpacing.sm,
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextFormField(
-              controller: _controller,
-              decoration: InputDecoration(
-                hintText: l10n.commentInputHint,
-                border: const OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(24)),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                ),
+    return Row(
+      children: [
+        Expanded(
+          child: TextFormField(
+            controller: _controller,
+            decoration: InputDecoration(
+              hintText: l10n.commentInputHint,
+              border: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(24)),
               ),
-              onChanged: (_) => setState(() {}),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+              ),
             ),
+            onChanged: (_) => setState(() {}),
           ),
-          const SizedBox(width: AppSpacing.sm),
-          IconButton(
-            icon: const Icon(Icons.send),
-            color: canPost ? theme.colorScheme.primary : null,
-            onPressed: canPost
-                ? () {
-                    context.read<EngagementBloc>().add(
-                          EngagementCommentPosted(_controller.text),
-                        );
-                    _controller.clear();
-                    FocusScope.of(context).unfocus();
-                  }
-                : null,
-          ),
-        ],
-      ),
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        IconButton(
+          icon: const Icon(Icons.send),
+          color: canPost ? theme.colorScheme.primary : null,
+          onPressed: canPost
+              ? () {
+                  context.read<EngagementBloc>().add(
+                    EngagementCommentPosted(_controller.text),
+                  );
+                  _controller.clear();
+                  FocusScope.of(context).unfocus();
+                }
+              : null,
+        ),
+      ],
     );
   }
 }

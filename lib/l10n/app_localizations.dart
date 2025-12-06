@@ -2941,6 +2941,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Got It'**
   String get gotItButton;
+
+  /// Title for the page or bottom sheet that displays comments for a headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Comments'**
+  String get commentsPageTitle;
+
+  /// Label for a button that shows the number of comments and opens the comments view.
+  ///
+  /// In en, this message translates to:
+  /// **'{count,plural, =1{1 Comment}other{{count} Comments}}'**
+  String commentsCount(int count);
 }
 
 class _AppLocalizationsDelegate

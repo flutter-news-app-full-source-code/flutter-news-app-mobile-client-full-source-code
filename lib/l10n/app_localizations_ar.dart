@@ -1550,4 +1550,22 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get gotItButton => 'حسنًا';
+
+  @override
+  String get commentsPageTitle => 'التعليقات';
+
+  @override
+  String commentsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count تعليق',
+      many: '$count تعليقًا',
+      few: '$count تعليقات',
+      two: 'تعليقان',
+      one: 'تعليق واحد',
+      zero: '0 تعليقات',
+    );
+    return '$_temp0';
+  }
 }

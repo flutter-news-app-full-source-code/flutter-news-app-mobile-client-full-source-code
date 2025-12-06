@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/interstitial_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/headline_actions_bottom_sheet.dart';
 import 'package:go_router/go_router.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:ui_kit/ui_kit.dart';
@@ -101,6 +102,24 @@ class _HeadlineSourceRowState extends State<HeadlineSourceRow> {
                 padding: const EdgeInsets.only(right: AppSpacing.md),
                 child: Text(formattedDate, style: dateTextStyle),
               ),
+            IconButton(
+              icon: Icon(
+                Icons.more_vert,
+                // Use the same color as the date text for visual consistency.
+                color: dateTextStyle?.color,
+              ),
+              // Adjust icon size to be more harmonious with the text.
+              iconSize: AppSpacing.lg,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              onPressed: () => showModalBottomSheet<void>(
+                context: context,
+                builder: (_) => BlocProvider.value(
+                  value: context.read<AppBloc>(),
+                  child: HeadlineActionsBottomSheet(headline: widget.headline),
+                ),
+              ),
+            ),
           ],
         ),
       ],

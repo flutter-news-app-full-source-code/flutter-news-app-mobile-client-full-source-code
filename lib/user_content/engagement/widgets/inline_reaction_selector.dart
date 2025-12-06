@@ -12,11 +12,15 @@ class InlineReactionSelector extends StatelessWidget {
   const InlineReactionSelector({
     this.selectedReaction,
     this.onReactionSelected,
+    this.unselectedColor,
     super.key,
   });
 
   /// The currently selected reaction, if any.
   final ReactionType? selectedReaction;
+
+  /// The color for unselected reaction icons.
+  final Color? unselectedColor;
 
   /// Callback for when a reaction is selected.
   final ValueChanged<ReactionType?>? onReactionSelected;
@@ -25,21 +29,19 @@ class InlineReactionSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
-      children: List.generate(
-        ReactionType.values.length,
-        (index) {
-          final reaction = ReactionType.values[index];
-          final isSelected = selectedReaction == reaction;
-          return Padding(
-            padding: const EdgeInsets.only(right: AppSpacing.sm),
-            child: _ReactionIcon(
-              reaction: reaction,
-              isSelected: isSelected,
-              onTap: () => onReactionSelected?.call(isSelected ? null : reaction),
-            ),
-          );
-        },
-      ),
+      children: List.generate(ReactionType.values.length, (index) {
+        final reaction = ReactionType.values[index];
+        final isSelected = selectedReaction == reaction;
+        return Padding(
+          padding: const EdgeInsets.only(right: AppSpacing.sm),
+          child: _ReactionIcon(
+            reaction: reaction,
+            isSelected: isSelected,
+            unselectedColor: unselectedColor,
+            onTap: () => onReactionSelected?.call(isSelected ? null : reaction),
+          ),
+        );
+      }),
     );
   }
 }
@@ -48,11 +50,12 @@ class _ReactionIcon extends StatelessWidget {
   const _ReactionIcon({
     required this.reaction,
     required this.isSelected,
-    required this.onTap,
+    required this.onTap, this.unselectedColor,
   });
 
   final ReactionType reaction;
   final bool isSelected;
+  final Color? unselectedColor;
   final VoidCallback onTap;
 
   @override
@@ -77,7 +80,7 @@ class _ReactionIcon extends StatelessWidget {
           iconData,
           color: isSelected
               ? colorScheme.primary
-              : colorScheme.onSurfaceVariant,
+              : unselectedColor ?? colorScheme.onSurfaceVariant,
           size: 22,
           semanticLabel: reaction.name,
         ),

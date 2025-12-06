@@ -2,12 +2,14 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:ui_kit/ui_kit.dart';
 
-/// {@template reaction_selector}
-/// A horizontally scrollable list of reaction icons.
+/// {@template inline_reaction_selector}
+/// A row of reaction icons designed for inline placement within a feed tile.
+///
+/// This widget is intentionally subtle to not distract from the main content.
 /// {@endtemplate}
-class ReactionSelector extends StatelessWidget {
-  /// {@macro reaction_selector}
-  const ReactionSelector({
+class InlineReactionSelector extends StatelessWidget {
+  /// {@macro inline_reaction_selector}
+  const InlineReactionSelector({
     this.selectedReaction,
     this.onReactionSelected,
     super.key,
@@ -21,21 +23,20 @@ class ReactionSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 48,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: ReactionType.values.length,
-        separatorBuilder: (context, index) =>
-            const SizedBox(width: AppSpacing.md),
-        itemBuilder: (context, index) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: List.generate(
+        ReactionType.values.length,
+        (index) {
           final reaction = ReactionType.values[index];
           final isSelected = selectedReaction == reaction;
-
-          return _ReactionIcon(
-            reaction: reaction,
-            isSelected: isSelected,
-            onTap: () => onReactionSelected?.call(isSelected ? null : reaction),
+          return Padding(
+            padding: const EdgeInsets.only(right: AppSpacing.sm),
+            child: _ReactionIcon(
+              reaction: reaction,
+              isSelected: isSelected,
+              onTap: () => onReactionSelected?.call(isSelected ? null : reaction),
+            ),
           );
         },
       ),
@@ -71,18 +72,14 @@ class _ReactionIcon extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(AppSpacing.sm),
-        decoration: BoxDecoration(
-          color: isSelected ? colorScheme.primaryContainer : null,
-          shape: BoxShape.circle,
-        ),
+        duration: const Duration(milliseconds: 150),
         child: Icon(
           iconData,
           color: isSelected
-              ? colorScheme.onPrimaryContainer
+              ? colorScheme.primary
               : colorScheme.onSurfaceVariant,
-          size: 28,
+          size: 22,
+          semanticLabel: reaction.name,
         ),
       ),
     );

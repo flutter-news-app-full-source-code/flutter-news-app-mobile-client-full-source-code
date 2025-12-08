@@ -26,13 +26,13 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
     required ContentLimitationService contentLimitationService,
     required AppBloc appBloc,
     Logger? logger,
-  })  : _entityId = entityId,
-        _entityType = entityType,
-        _engagementRepository = engagementRepository,
-        _contentLimitationService = contentLimitationService,
-        _appBloc = appBloc,
-        _logger = logger ?? Logger('EngagementBloc'),
-        super(const EngagementState()) {
+  }) : _entityId = entityId,
+       _entityType = entityType,
+       _engagementRepository = engagementRepository,
+       _contentLimitationService = contentLimitationService,
+       _appBloc = appBloc,
+       _logger = logger ?? Logger('EngagementBloc'),
+       super(const EngagementState()) {
     on<EngagementStarted>(_onEngagementStarted);
     on<EngagementReactionUpdated>(_onEngagementReactionUpdated);
     on<EngagementCommentPosted>(_onEngagementCommentPosted);
@@ -51,12 +51,13 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
     Emitter<EngagementState> emit,
   ) async {
     emit(state.copyWith(status: EngagementStatus.loading));
+    final userId = _appBloc.state.user?.id;
     try {
       final response = await _engagementRepository.readAll(
         filter: {'entityId': _entityId},
+        userId: userId,
       );
       final engagements = response.items;
-      final userId = _appBloc.state.user?.id;
       final userEngagement = engagements.firstWhereOrNull(
         (e) => e.userId == userId,
       );
@@ -99,7 +100,8 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
     try {
       if (state.userEngagement != null) {
         // User is updating or removing their reaction.
-        final isTogglingOff = event.reactionType == null ||
+        final isTogglingOff =
+            event.reactionType == null ||
             state.userEngagement!.reaction?.reactionType == event.reactionType;
 
         Engagement? updatedEngagement;
@@ -123,7 +125,10 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
               userEngagement: updatedEngagement,
             ),
           );
-          await _engagementRepository.update(id: updatedEngagement.id, item: updatedEngagement);
+          await _engagementRepository.update(
+            id: updatedEngagement.id,
+            item: updatedEngagement,
+          );
         }
       } else if (event.reactionType != null) {
         // User is adding a new reaction.
@@ -227,18 +232,23 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
         );
 
         emit(state.copyWith(status: EngagementStatus.success));
-        await _engagementRepository.create(item: updatedEngagement);
+        await _engagementRepository.create(
+          item: updatedEngagement,
+          userId: userId,
+        );
       }
 
       // Re-fetch to get the full list with the new comment included.
       final response = await _engagementRepository.readAll(
         filter: {'entityId': _entityId},
+        userId: userId,
       );
       emit(
         state.copyWith(
           engagements: response.items,
-          userEngagement:
-              response.items.firstWhereOrNull((e) => e.userId == userId),
+          userEngagement: response.items.firstWhereOrNull(
+            (e) => e.userId == userId,
+          ),
         ),
       );
     } on HttpException catch (e, s) {

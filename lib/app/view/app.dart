@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bloc/bloc.dart';
 import 'package:auth_repository/auth_repository.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
@@ -14,22 +15,20 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_l
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_status_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/router.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/demo_content_limitation_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/production_content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_tap_handler.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/status/view/maintenance_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/status/view/update_required_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template app_widget}
-/// The root widget of the main application.
 ///
 /// This widget is built only after a successful startup sequence, as
 /// orchestrated by [AppInitializationPage]. It is responsible for setting up
@@ -59,6 +58,7 @@ class App extends StatelessWidget {
     required DataRepository<AppReview> appReviewRepository,
     required AppEnvironment environment,
     required DataRepository<InAppNotification> inAppNotificationRepository,
+    required ContentLimitationService contentLimitationService,
     required InlineAdCacheService inlineAdCacheService,
     required AdService adService,
     required FeedDecoratorService feedDecoratorService,
@@ -81,6 +81,7 @@ class App extends StatelessWidget {
        _appReviewRepository = appReviewRepository,
        _pushNotificationService = pushNotificationService,
        _inAppNotificationRepository = inAppNotificationRepository,
+       _contentLimitationService = contentLimitationService,
        _environment = environment,
        _adService = adService,
        _appReviewService = appReviewService,
@@ -117,6 +118,7 @@ class App extends StatelessWidget {
   final AppEnvironment _environment;
   final DataRepository<InAppNotification> _inAppNotificationRepository;
   final AdService _adService;
+  final ContentLimitationService _contentLimitationService;
   final FeedDecoratorService _feedDecoratorService;
   final AppReviewService _appReviewService;
   final FeedCacheService _feedCacheService;
@@ -146,6 +148,7 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _reportRepository),
         RepositoryProvider.value(value: _appReviewRepository),
         RepositoryProvider.value(value: _pushNotificationService),
+        RepositoryProvider.value(value: _contentLimitationService),
         RepositoryProvider.value(value: _inAppNotificationRepository),
         RepositoryProvider.value(value: _inlineAdCacheService),
         RepositoryProvider.value(value: _appReviewService),
@@ -203,7 +206,6 @@ class _AppViewState extends State<_AppView> {
   StreamSubscription<PushNotificationPayload>? _onMessageSubscription;
   AppStatusService? _appStatusService;
   InterstitialAdManager? _interstitialAdManager;
-  late final ContentLimitationService _contentLimitationService;
   late final GoRouter _router;
   final _routerLogger = Logger('GoRouter');
 
@@ -277,12 +279,9 @@ class _AppViewState extends State<_AppView> {
       navigatorKey: widget.navigatorKey,
     );
 
-    // Conditionally instantiate the ContentLimitationService based on the
-    // environment.
-    _contentLimitationService = widget.environment == AppEnvironment.demo
-        ? DemoContentLimitationService(appBloc: appBloc)
-        : ProductionContentLimitationService();
-
+    // Initialize the ContentLimitationService, which was created in bootstrap.
+    // Its lifecycle is now tied to this state object.
+    context.read<ContentLimitationService>().init(appBloc: appBloc);
     // Create the GoRouter instance once and store it.
     _router = createRouter(
       authStatusNotifier: _statusNotifier,
@@ -300,6 +299,7 @@ class _AppViewState extends State<_AppView> {
     _appStatusService?.dispose();
     _interstitialAdManager?.dispose();
     context.read<PushNotificationService>().close();
+    context.read<ContentLimitationService>().dispose();
     super.dispose();
   }
 
@@ -443,9 +443,6 @@ class _AppViewState extends State<_AppView> {
                 RepositoryProvider<InterstitialAdManager>.value(
                   value: _interstitialAdManager!,
                 ),
-              RepositoryProvider<ContentLimitationService>.value(
-                value: _contentLimitationService,
-              ),
             ],
             child: MaterialApp.router(
               debugShowCheckedModeBanner: false,

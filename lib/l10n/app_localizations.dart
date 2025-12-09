@@ -2876,48 +2876,6 @@ abstract class AppLocalizations {
   /// **'Limit Reached'**
   String get limitReachedTitle;
 
-  /// Body text when a user tries to follow more items than their plan allows.
-  ///
-  /// In en, this message translates to:
-  /// **'You have reached your limit for followed items. To follow more, please review your existing followed content.'**
-  String get limitReachedBodyFollow;
-
-  /// Body text when a user tries to save more articles than their plan allows.
-  ///
-  /// In en, this message translates to:
-  /// **'You have reached your limit for saved articles. To save more, please review your existing saved articles.'**
-  String get limitReachedBodySave;
-
-  /// Body text when a user tries to save more filters than their plan allows.
-  ///
-  /// In en, this message translates to:
-  /// **'You have reached your limit for saved filters. To create new ones, please review your existing filters.'**
-  String get limitReachedBodySaveFilters;
-
-  /// Body text when a user tries to pin more filters than their plan allows.
-  ///
-  /// In en, this message translates to:
-  /// **'You have reached your limit for pinned filters. To pin a new one, please un-pin an existing filter.'**
-  String get limitReachedBodyPinFilters;
-
-  /// Body text when a user tries to post more comments than their daily limit allows.
-  ///
-  /// In en, this message translates to:
-  /// **'You have reached your daily limit for posting comments. Please try again tomorrow.'**
-  String get limitReachedBodyComments;
-
-  /// Body text when a user tries to react more than their daily limit allows.
-  ///
-  /// In en, this message translates to:
-  /// **'You have reached your daily limit for reactions. Please try again tomorrow.'**
-  String get limitReachedBodyReactions;
-
-  /// Body text when a user tries to submit more reports than their daily limit allows.
-  ///
-  /// In en, this message translates to:
-  /// **'You have reached your daily limit for submitting reports. Please try again tomorrow.'**
-  String get limitReachedBodyReports;
-
   /// Button text that navigates the user to a page where they can manage their content (e.g., unfollow items).
   ///
   /// In en, this message translates to:
@@ -2953,6 +2911,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count,plural, =1{1 Comment}other{{count} Comments}}'**
   String commentsCount(int count);
+
+  /// Title for the bottom sheet when a guest user tries to perform an action reserved for authenticated users (e.g., comment, react).
+  ///
+  /// In en, this message translates to:
+  /// **'Account Required'**
+  String get limitReachedGuestUserTitle;
+
+  /// Body text for the bottom sheet when a guest user tries to perform an action reserved for authenticated users.
+  ///
+  /// In en, this message translates to:
+  /// **'Please create a free account or sign in to engage with the community and use this feature.'**
+  String get limitReachedGuestUserBody;
+
+  /// Body text when a user tries to follow more items (topics, sources, countries) than their plan allows.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached your limit for followed items. To follow more, please review your existing followed content.'**
+  String get limitReachedBodyFollow;
+
+  /// Body text when a user tries to save more articles than their plan allows.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached your limit for saved articles. To save more, please review your existing saved articles.'**
+  String get limitReachedBodySave;
+
+  /// Body text when a user tries to save more filters than their plan allows.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached your limit for saved filters. To create new ones, please review your existing filters.'**
+  String get limitReachedBodySaveFilters;
+
+  /// Body text when a user tries to pin more filters than their plan allows.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached your limit for pinned filters. To pin a new one, please un-pin an existing filter.'**
+  String get limitReachedBodyPinFilters;
+
+  /// Body text when a user tries to subscribe to more notifications than their plan allows.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached your limit for notification subscriptions. To subscribe to new alerts, please review your existing subscriptions.'**
+  String get limitReachedBodySubscribeToNotifications;
+
+  /// Body text when a user tries to post more comments than their daily limit allows.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached your daily limit for posting comments. Please try again tomorrow.'**
+  String get limitReachedBodyComments;
+
+  /// Body text when a user tries to react more than their daily limit allows.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached your daily limit for reactions. Please try again tomorrow.'**
+  String get limitReachedBodyReactions;
+
+  /// Body text when a user tries to submit more reports than their daily limit allows.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached your daily limit for submitting reports. Please try again tomorrow.'**
+  String get limitReachedBodyReports;
 }
 
 class _AppLocalizationsDelegate

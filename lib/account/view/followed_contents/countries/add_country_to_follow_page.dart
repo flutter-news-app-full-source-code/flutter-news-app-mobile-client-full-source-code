@@ -46,7 +46,7 @@ class _FollowButtonState extends State<_FollowButton> {
         updatedFollowedCountries.removeWhere((c) => c.id == widget.country.id);
       } else {
         final limitationService = context.read<ContentLimitationService>();
-        final status = limitationService.checkAction(
+        final status = await limitationService.checkAction(
           ContentAction.followCountry,
         );
 
@@ -54,7 +54,7 @@ class _FollowButtonState extends State<_FollowButton> {
           if (mounted) {
             final userRole = context.read<AppBloc>().state.user?.appRole;
             final content = _getBottomSheetContent(
-              context: context,
+              buildContext: context,
               l10n: l10n,
               status: status,
               userRole: userRole,
@@ -130,7 +130,7 @@ class _FollowButtonState extends State<_FollowButton> {
 /// the user's role and the limitation status.
 ({String title, String body, String buttonText, VoidCallback? onPressed})
 _getBottomSheetContent({
-  required BuildContext context,
+  required BuildContext buildContext,
   required AppLocalizations l10n,
   required LimitationStatus status,
   required AppUserRole? userRole,
@@ -143,8 +143,8 @@ _getBottomSheetContent({
         body: l10n.anonymousLimitBody,
         buttonText: l10n.anonymousLimitButton,
         onPressed: () {
-          Navigator.of(context).pop();
-          context.pushNamed(Routes.accountLinkingName);
+          Navigator.of(buildContext).pop();
+          buildContext.pushNamed(Routes.accountLinkingName);
         },
       );
     case LimitationStatus.standardUserLimitReached:
@@ -160,8 +160,8 @@ _getBottomSheetContent({
         body: defaultBody,
         buttonText: l10n.premiumLimitButton,
         onPressed: () {
-          Navigator.of(context).pop();
-          context.goNamed(Routes.manageFollowedItemsName);
+          Navigator.of(buildContext).pop();
+          buildContext.goNamed(Routes.manageFollowedItemsName);
         },
       );
     case LimitationStatus.allowed:

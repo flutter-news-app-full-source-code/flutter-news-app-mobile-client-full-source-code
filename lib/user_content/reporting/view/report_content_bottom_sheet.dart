@@ -73,7 +73,9 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
       setState(() => _isSubmitting = true);
       final limitationService = context.read<ContentLimitationService>();
       final l10n = AppLocalizations.of(context);
-      final status = limitationService.checkAction(ContentAction.submitReport);
+      final status = await limitationService.checkAction(
+        ContentAction.submitReport,
+      );
 
       if (status != LimitationStatus.allowed) {
         if (mounted) {
@@ -83,7 +85,7 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
             l10n: l10n,
             status: status,
             userRole: userRole,
-            defaultBody: l10n.limitReachedBodyReports,
+            action: ContentAction.submitReport,
           );
           await showModalBottomSheet<void>(
             context: context,
@@ -265,7 +267,7 @@ _getBottomSheetContent({
   required AppLocalizations l10n,
   required LimitationStatus status,
   required AppUserRole? userRole,
-  required String defaultBody,
+  required ContentAction action,
 }) {
   switch (status) {
     case LimitationStatus.anonymousLimitReached:
@@ -279,16 +281,19 @@ _getBottomSheetContent({
         }, // Navigate to account creation/linking
       );
     case LimitationStatus.standardUserLimitReached:
+      // TODO(fulleni): Implement upgrade flow.
       return (
         title: l10n.standardLimitTitle,
         body: l10n.standardLimitBody,
         buttonText: l10n.standardLimitButton,
-        onPressed: null, // Upgrade feature not implemented
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
       );
     case LimitationStatus.premiumUserLimitReached:
       return (
         title: l10n.premiumLimitTitle,
-        body: defaultBody,
+        body: l10n.limitReachedBodyReports,
         buttonText: l10n.gotItButton, // Premium users just get an info dialog
         onPressed: () => Navigator.of(context).pop(),
       );

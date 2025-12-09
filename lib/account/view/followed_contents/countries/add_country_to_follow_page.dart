@@ -54,7 +54,7 @@ class _FollowButtonState extends State<_FollowButton> {
           if (mounted) {
             final userRole = context.read<AppBloc>().state.user?.appRole;
             final content = _getBottomSheetContent(
-              buildContext: context,
+              context: context,
               l10n: l10n,
               status: status,
               userRole: userRole,
@@ -130,7 +130,7 @@ class _FollowButtonState extends State<_FollowButton> {
 /// the user's role and the limitation status.
 ({String title, String body, String buttonText, VoidCallback? onPressed})
 _getBottomSheetContent({
-  required BuildContext buildContext,
+  required BuildContext context,
   required AppLocalizations l10n,
   required LimitationStatus status,
   required AppUserRole? userRole,
@@ -143,16 +143,17 @@ _getBottomSheetContent({
         body: l10n.anonymousLimitBody,
         buttonText: l10n.anonymousLimitButton,
         onPressed: () {
-          Navigator.of(buildContext).pop();
-          buildContext.pushNamed(Routes.accountLinkingName);
+          Navigator.of(context).pop();
+          context.pushNamed(Routes.accountLinkingName);
         },
       );
     case LimitationStatus.standardUserLimitReached:
+      // TODO(flutter-news-app): Implement upgrade flow.
       return (
         title: l10n.standardLimitTitle,
         body: l10n.standardLimitBody,
         buttonText: l10n.standardLimitButton,
-        onPressed: null, // Upgrade feature not implemented
+        onPressed: () => Navigator.of(context).pop(),
       );
     case LimitationStatus.premiumUserLimitReached:
       return (
@@ -160,8 +161,8 @@ _getBottomSheetContent({
         body: defaultBody,
         buttonText: l10n.premiumLimitButton,
         onPressed: () {
-          Navigator.of(buildContext).pop();
-          buildContext.goNamed(Routes.manageFollowedItemsName);
+          Navigator.of(context).pop();
+          context.goNamed(Routes.manageFollowedItemsName);
         },
       );
     case LimitationStatus.allowed:

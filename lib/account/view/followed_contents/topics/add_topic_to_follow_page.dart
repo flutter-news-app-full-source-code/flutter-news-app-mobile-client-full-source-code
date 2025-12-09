@@ -46,7 +46,9 @@ class _FollowButtonState extends State<_FollowButton> {
         updatedFollowedTopics.removeWhere((t) => t.id == widget.topic.id);
       } else {
         final limitationService = context.read<ContentLimitationService>();
-        final status = limitationService.checkAction(ContentAction.followTopic);
+        final status = await limitationService.checkAction(
+          ContentAction.followTopic,
+        );
 
         if (status != LimitationStatus.allowed) {
           if (mounted) {
@@ -146,11 +148,12 @@ _getBottomSheetContent({
         },
       );
     case LimitationStatus.standardUserLimitReached:
+      // TODO(flutter-news-app): Implement upgrade flow.
       return (
         title: l10n.standardLimitTitle,
         body: l10n.standardLimitBody,
         buttonText: l10n.standardLimitButton,
-        onPressed: null, // Upgrade feature not implemented
+        onPressed: () => Navigator.of(context).pop(),
       );
     case LimitationStatus.premiumUserLimitReached:
       return (

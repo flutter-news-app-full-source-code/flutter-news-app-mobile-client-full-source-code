@@ -1958,34 +1958,6 @@
     "@limitReachedTitle": {
         "description": "Generic title for when a user hits a content limit."
     },
-    "limitReachedBodyFollow": "لقد وصلت إلى الحد الأقصى للعناصر المتابعة. لمتابعة المزيد، يرجى مراجعة المحتوى المتابع الحالي.",
-    "@limitReachedBodyFollow": {
-        "description": "Body text when a user tries to follow more items than their plan allows."
-    },
-    "limitReachedBodySave": "لقد وصلت إلى الحد الأقصى للمقالات المحفوظة. لحفظ المزيد، يرجى مراجعة مقالاتك المحفوظة الحالية.",
-    "@limitReachedBodySave": {
-        "description": "Body text when a user tries to save more articles than their plan allows."
-    },
-    "limitReachedBodySaveFilters": "لقد وصلت إلى الحد الأقصى للفلاتر المحفوظة. لإنشاء فلاتر جديدة، يرجى مراجعة الفلاتر الحالية.",
-    "@limitReachedBodySaveFilters": {
-        "description": "Body text when a user tries to save more filters than their plan allows."
-    },
-    "limitReachedBodyPinFilters": "لقد وصلت إلى الحد الأقصى للفلاتر المثبتة. لتثبيت فلتر جديد، يرجى إلغاء تثبيت فلتر حالي.",
-    "@limitReachedBodyPinFilters": {
-        "description": "Body text when a user tries to pin more filters than their plan allows."
-    },
-    "limitReachedBodyComments": "لقد وصلت إلى الحد اليومي لنشر التعليقات. يرجى المحاولة مرة أخرى غدًا.",
-    "@limitReachedBodyComments": {
-        "description": "Body text when a user tries to post more comments than their daily limit allows."
-    },
-    "limitReachedBodyReactions": "لقد وصلت إلى الحد اليومي للتفاعلات. يرجى المحاولة مرة أخرى غدًا.",
-    "@limitReachedBodyReactions": {
-        "description": "Body text when a user tries to react more than their daily limit allows."
-    },
-    "limitReachedBodyReports": "لقد وصلت إلى الحد اليومي لتقديم البلاغات. يرجى المحاولة مرة أخرى غدًا.",
-    "@limitReachedBodyReports": {
-        "description": "Body text when a user tries to submit more reports than their daily limit allows."
-    },
     "manageMyContentButton": "إدارة المحتوى الخاص بي",
     "@manageMyContentButton": {
         "description": "Button text that navigates the user to a page where they can manage their content (e.g., unfollow items)."
@@ -2002,7 +1974,7 @@
     "@gotItButton": {
         "description": "A simple acknowledgement button."
     },
-     "commentsPageTitle": "التعليقات",
+    "commentsPageTitle": "التعليقات",
     "@commentsPageTitle": {
         "description": "عنوان الصفحة أو الورقة السفلية التي تعرض التعليقات على عنوان رئيسي."
     },
@@ -2014,5 +1986,45 @@
                 "type": "int"
             }
         }
+    },
+    "limitReachedGuestUserTitle": "الحساب مطلوب",
+    "@limitReachedGuestUserTitle": {
+        "description": "عنوان للنافذة السفلية عندما يحاول مستخدم زائر القيام بإجراء محجوز للمستخدمين المصادق عليهم (مثل التعليق، التفاعل)."
+    },
+    "limitReachedGuestUserBody": "يرجى إنشاء حساب مجاني أو تسجيل الدخول للتفاعل مع المجتمع واستخدام هذه الميزة.",
+    "@limitReachedGuestUserBody": {
+        "description": "نص للنافذة السفلية عندما يحاول مستخدم زائر القيام بإجراء محجوز للمستخدمين المصادق عليهم."
+    },
+    "limitReachedBodyFollow": "لقد وصلت إلى الحد الأقصى للعناصر المتابعة. لمتابعة المزيد، يرجى مراجعة المحتوى المتابع الحالي.",
+    "@limitReachedBodyFollow": {
+        "description": "نص يظهر عندما يحاول المستخدم متابعة عناصر (مواضيع، مصادر، دول) أكثر مما تسمح به خطته."
+    },
+    "limitReachedBodySave": "لقد وصلت إلى الحد الأقصى للمقالات المحفوظة. لحفظ المزيد، يرجى مراجعة مقالاتك المحفوظة الحالية.",
+    "@limitReachedBodySave": {
+        "description": "نص يظهر عندما يحاول المستخدم حفظ مقالات أكثر مما تسمح به خطته."
+    },
+    "limitReachedBodySaveFilters": "لقد وصلت إلى الحد الأقصى للفلاتر المحفوظة. لإنشاء فلاتر جديدة، يرجى مراجعة الفلاتر الحالية.",
+    "@limitReachedBodySaveFilters": {
+        "description": "نص يظهر عندما يحاول المستخدم حفظ فلاتر أكثر مما تسمح به خطته."
+    },
+    "limitReachedBodyPinFilters": "لقد وصلت إلى الحد الأقصى للفلاتر المثبتة. لتثبيت فلتر جديد، يرجى إلغاء تثبيت فلتر حالي.",
+    "@limitReachedBodyPinFilters": {
+        "description": "نص يظهر عندما يحاول المستخدم تثبيت فلاتر أكثر مما تسمح به خطته."
+    },
+    "limitReachedBodySubscribeToNotifications": "لقد وصلت إلى الحد الأقصى لاشتراكات الإشعارات. للاشتراك في تنبيهات جديدة، يرجى مراجعة اشتراكاتك الحالية.",
+    "@limitReachedBodySubscribeToNotifications": {
+        "description": "نص يظهر عندما يحاول المستخدم الاشتراك في إشعارات أكثر مما تسمح به خطته."
+    },
+    "limitReachedBodyComments": "لقد وصلت إلى الحد اليومي لنشر التعليقات. يرجى المحاولة مرة أخرى غدًا.",
+    "@limitReachedBodyComments": {
+        "description": "نص يظهر عندما يحاول المستخدم نشر تعليقات أكثر من حده اليومي."
+    },
+    "limitReachedBodyReactions": "لقد وصلت إلى الحد اليومي للتفاعلات. يرجى المحاولة مرة أخرى غدًا.",
+    "@limitReachedBodyReactions": {
+        "description": "نص يظهر عندما يحاول المستخدم التفاعل أكثر من حده اليومي."
+    },
+    "limitReachedBodyReports": "لقد وصلت إلى الحد اليومي لتقديم البلاغات. يرجى المحاولة مرة أخرى غدًا.",
+    "@limitReachedBodyReports": {
+        "description": "نص يظهر عندما يحاول المستخدم تقديم بلاغات أكثر من حده اليومي."
     }
 }

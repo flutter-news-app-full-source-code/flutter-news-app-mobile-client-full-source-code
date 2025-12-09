@@ -1958,34 +1958,6 @@
     "@limitReachedTitle": {
         "description": "Generic title for when a user hits a content limit."
     },
-    "limitReachedBodyFollow": "You have reached your limit for followed items. To follow more, please review your existing followed content.",
-    "@limitReachedBodyFollow": {
-        "description": "Body text when a user tries to follow more items than their plan allows."
-    },
-    "limitReachedBodySave": "You have reached your limit for saved articles. To save more, please review your existing saved articles.",
-    "@limitReachedBodySave": {
-        "description": "Body text when a user tries to save more articles than their plan allows."
-    },
-    "limitReachedBodySaveFilters": "You have reached your limit for saved filters. To create new ones, please review your existing filters.",
-    "@limitReachedBodySaveFilters": {
-        "description": "Body text when a user tries to save more filters than their plan allows."
-    },
-    "limitReachedBodyPinFilters": "You have reached your limit for pinned filters. To pin a new one, please un-pin an existing filter.",
-    "@limitReachedBodyPinFilters": {
-        "description": "Body text when a user tries to pin more filters than their plan allows."
-    },
-    "limitReachedBodyComments": "You have reached your daily limit for posting comments. Please try again tomorrow.",
-    "@limitReachedBodyComments": {
-        "description": "Body text when a user tries to post more comments than their daily limit allows."
-    },
-    "limitReachedBodyReactions": "You have reached your daily limit for reactions. Please try again tomorrow.",
-    "@limitReachedBodyReactions": {
-        "description": "Body text when a user tries to react more than their daily limit allows."
-    },
-    "limitReachedBodyReports": "You have reached your daily limit for submitting reports. Please try again tomorrow.",
-    "@limitReachedBodyReports": {
-        "description": "Body text when a user tries to submit more reports than their daily limit allows."
-    },
     "manageMyContentButton": "Manage My Content",
     "@manageMyContentButton": {
         "description": "Button text that navigates the user to a page where they can manage their content (e.g., unfollow items)."
@@ -2014,5 +1986,45 @@
                 "type": "int"
             }
         }
+    },
+    "limitReachedGuestUserTitle": "Account Required",
+    "@limitReachedGuestUserTitle": {
+        "description": "Title for the bottom sheet when a guest user tries to perform an action reserved for authenticated users (e.g., comment, react)."
+    },
+    "limitReachedGuestUserBody": "Please create a free account or sign in to engage with the community and use this feature.",
+    "@limitReachedGuestUserBody": {
+        "description": "Body text for the bottom sheet when a guest user tries to perform an action reserved for authenticated users."
+    },
+    "limitReachedBodyFollow": "You have reached your limit for followed items. To follow more, please review your existing followed content.",
+    "@limitReachedBodyFollow": {
+        "description": "Body text when a user tries to follow more items (topics, sources, countries) than their plan allows."
+    },
+    "limitReachedBodySave": "You have reached your limit for saved articles. To save more, please review your existing saved articles.",
+    "@limitReachedBodySave": {
+        "description": "Body text when a user tries to save more articles than their plan allows."
+    },
+    "limitReachedBodySaveFilters": "You have reached your limit for saved filters. To create new ones, please review your existing filters.",
+    "@limitReachedBodySaveFilters": {
+        "description": "Body text when a user tries to save more filters than their plan allows."
+    },
+    "limitReachedBodyPinFilters": "You have reached your limit for pinned filters. To pin a new one, please un-pin an existing filter.",
+    "@limitReachedBodyPinFilters": {
+        "description": "Body text when a user tries to pin more filters than their plan allows."
+    },
+    "limitReachedBodySubscribeToNotifications": "You have reached your limit for notification subscriptions. To subscribe to new alerts, please review your existing subscriptions.",
+    "@limitReachedBodySubscribeToNotifications": {
+        "description": "Body text when a user tries to subscribe to more notifications than their plan allows."
+    },
+    "limitReachedBodyComments": "You have reached your daily limit for posting comments. Please try again tomorrow.",
+    "@limitReachedBodyComments": {
+        "description": "Body text when a user tries to post more comments than their daily limit allows."
+    },
+    "limitReachedBodyReactions": "You have reached your daily limit for reactions. Please try again tomorrow.",
+    "@limitReachedBodyReactions": {
+        "description": "Body text when a user tries to react more than their daily limit allows."
+    },
+    "limitReachedBodyReports": "You have reached your daily limit for submitting reports. Please try again tomorrow.",
+    "@limitReachedBodyReports": {
+        "description": "Body text when a user tries to submit more reports than their daily limit allows."
     }
 }

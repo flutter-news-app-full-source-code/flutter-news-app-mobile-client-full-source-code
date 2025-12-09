@@ -85,7 +85,7 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
 
     emit(state.copyWith(status: EngagementStatus.actionInProgress));
 
-    final preCheckStatus = _contentLimitationService.checkAction(
+    final preCheckStatus = await _contentLimitationService.checkAction(
       ContentAction.reactToContent,
     );
     if (preCheckStatus != LimitationStatus.allowed) {
@@ -190,7 +190,7 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
 
     emit(state.copyWith(status: EngagementStatus.actionInProgress));
 
-    final preCheckStatus = _contentLimitationService.checkAction(
+    final preCheckStatus = await _contentLimitationService.checkAction(
       ContentAction.postComment,
     );
     if (preCheckStatus != LimitationStatus.allowed) {
@@ -279,7 +279,7 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
 
     emit(state.copyWith(status: EngagementStatus.actionInProgress));
 
-    final preCheckStatus = _contentLimitationService.checkAction(
+    final preCheckStatus = await _contentLimitationService.checkAction(
       ContentAction.reactToContent,
     );
     if (preCheckStatus != LimitationStatus.allowed) {

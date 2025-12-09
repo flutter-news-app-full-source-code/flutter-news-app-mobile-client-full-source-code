@@ -71,10 +71,10 @@ class ContentLimitationService {
     required DataRepository<Report> reportRepository,
     required Duration cacheDuration,
     required Logger logger,
-  })  : _engagementRepository = engagementRepository,
-        _reportRepository = reportRepository,
-        _cacheDuration = cacheDuration,
-        _logger = logger;
+  }) : _engagementRepository = engagementRepository,
+       _reportRepository = reportRepository,
+       _cacheDuration = cacheDuration,
+       _logger = logger;
 
   final DataRepository<Engagement> _engagementRepository;
   final DataRepository<Report> _reportRepository;
@@ -146,30 +146,31 @@ class ContentLimitationService {
       );
 
       // Fetch all counts concurrently for performance.
-      final [commentCount, reactionCount, reportCount] =
-          await Future.wait<int>([
-        _engagementRepository.count(
-          userId: userId,
-          filter: {
-            'comment': {r'$exists': true, r'$ne': null},
-            'createdAt': {r'$gte': twentyFourHoursAgo.toIso8601String()},
-          },
-        ),
-        _engagementRepository.count(
-          userId: userId,
-          filter: {
-            'reaction': {r'$exists': true, r'$ne': null},
-            'createdAt': {r'$gte': twentyFourHoursAgo.toIso8601String()},
-          },
-        ),
-        _reportRepository.count(
-          userId: userId,
-          filter: {
-            'reporterUserId': userId,
-            'createdAt': {r'$gte': twentyFourHoursAgo.toIso8601String()},
-          },
-        ),
-      ]);
+      final [commentCount, reactionCount, reportCount] = await Future.wait<int>(
+        [
+          _engagementRepository.count(
+            userId: userId,
+            filter: {
+              'comment': {r'$exists': true, r'$ne': null},
+              'createdAt': {r'$gte': twentyFourHoursAgo.toIso8601String()},
+            },
+          ),
+          _engagementRepository.count(
+            userId: userId,
+            filter: {
+              'reaction': {r'$exists': true, r'$ne': null},
+              'createdAt': {r'$gte': twentyFourHoursAgo.toIso8601String()},
+            },
+          ),
+          _reportRepository.count(
+            userId: userId,
+            filter: {
+              'reporterUserId': userId,
+              'createdAt': {r'$gte': twentyFourHoursAgo.toIso8601String()},
+            },
+          ),
+        ],
+      );
 
       _commentCount = commentCount;
       _reactionCount = reactionCount;
@@ -231,7 +232,8 @@ class ContentLimitationService {
     }
 
     // Check daily limits, refreshing cache if necessary.
-    final isCacheStale = _countsLastFetchedAt == null ||
+    final isCacheStale =
+        _countsLastFetchedAt == null ||
         DateTime.now().difference(_countsLastFetchedAt!) > _cacheDuration;
 
     if (isCacheStale && _cachedForUserId == user.id) {
@@ -261,8 +263,7 @@ class ContentLimitationService {
 
       case ContentAction.saveHeadlineFilter:
         final limit = limits.savedHeadlineFilters[role]?.total;
-        if (limit != null &&
-            preferences.savedHeadlineFilters.length >= limit) {
+        if (limit != null && preferences.savedHeadlineFilters.length >= limit) {
           return _getLimitationStatusForRole(role);
         }
 
@@ -279,8 +280,7 @@ class ContentLimitationService {
             limits.savedHeadlineFilters[role]?.notificationSubscriptions;
         if (subscriptionLimits == null) return LimitationStatus.allowed;
 
-        final currentCounts =
-            <PushNotificationSubscriptionDeliveryType, int>{};
+        final currentCounts = <PushNotificationSubscriptionDeliveryType, int>{};
         for (final filter in preferences.savedHeadlineFilters) {
           for (final type in filter.deliveryTypes) {
             currentCounts.update(type, (v) => v + 1, ifAbsent: () => 1);

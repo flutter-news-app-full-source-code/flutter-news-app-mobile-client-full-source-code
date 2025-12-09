@@ -63,7 +63,7 @@ class _HeadlineActionsRowView extends StatelessWidget {
         final commentCount = state.engagements
             .where((e) => e.comment != null)
             .length;
-        
+
         final theme = Theme.of(context);
         final mutedColor = theme.colorScheme.onSurfaceVariant.withOpacity(0.6);
 

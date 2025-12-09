@@ -476,7 +476,8 @@ GoRouter createRouter({
                         feedCacheService: context.read<FeedCacheService>(),
                         initialUserContentPreferences:
                             initialUserContentPreferences,
-                        engagementRepository: context.read<DataRepository<Engagement>>(),
+                        engagementRepository: context
+                            .read<DataRepository<Engagement>>(),
                       );
                     },
                     child: child,

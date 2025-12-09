@@ -50,7 +50,8 @@ class _ReactionIcon extends StatelessWidget {
   const _ReactionIcon({
     required this.reaction,
     required this.isSelected,
-    required this.onTap, this.unselectedColor,
+    required this.onTap,
+    this.unselectedColor,
   });
 
   final ReactionType reaction;

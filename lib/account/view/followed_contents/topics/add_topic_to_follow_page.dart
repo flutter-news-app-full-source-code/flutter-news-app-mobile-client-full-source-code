@@ -148,7 +148,7 @@ _getBottomSheetContent({
         },
       );
     case LimitationStatus.standardUserLimitReached:
-      // TODO(flutter-news-app): Implement upgrade flow.
+      // TODO(fulleni): Implement upgrade flow.
       return (
         title: l10n.standardLimitTitle,
         body: l10n.standardLimitBody,

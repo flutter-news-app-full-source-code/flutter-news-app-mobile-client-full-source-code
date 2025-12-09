@@ -169,9 +169,9 @@ Future<void> _createAndApplyFilter(BuildContext context) async {
     await showModalBottomSheet<void>(
       context: context,
       builder: (context) => ContentLimitationBottomSheet(
-        title: l10n.limitReachedTitle,
+        title: l10n.premiumLimitTitle,
         body: l10n.limitReachedBodySaveFilters,
-        buttonText: l10n.manageMyContentButton,
+        buttonText: l10n.premiumLimitButton,
       ),
     );
     return;

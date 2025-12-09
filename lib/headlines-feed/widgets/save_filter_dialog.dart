@@ -76,7 +76,7 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
   Future<void> _checkLimits() async {
     final contentLimitationService = context.read<ContentLimitationService>();
 
-    final canPinStatus = contentLimitationService.checkAction(
+    final canPinStatus = await contentLimitationService.checkAction(
       ContentAction.pinHeadlineFilter,
     );
     if (mounted) {
@@ -90,8 +90,9 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
     for (final type in PushNotificationSubscriptionDeliveryType.values) {
       final isAlreadySubscribed =
           widget.filterToEdit?.deliveryTypes.contains(type) ?? false;
-      final limitationStatus = contentLimitationService.checkAction(
+      final limitationStatus = await contentLimitationService.checkAction(
         ContentAction.subscribeToHeadlineFilterNotifications,
+        deliveryType: type,
       );
       if (mounted) {
         setState(() {
@@ -160,7 +161,7 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
 
       try {
         final limitationService = context.read<ContentLimitationService>();
-        final status = limitationService.checkAction(
+        final status = await limitationService.checkAction(
           ContentAction.saveHeadlineFilter,
         );
 
@@ -172,7 +173,7 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
               l10n: l10n,
               status: status,
               userRole: userRole,
-              defaultBody: l10n.limitReachedBodySaveFilters,
+              action: ContentAction.saveHeadlineFilter,
             );
 
             await showModalBottomSheet<void>(
@@ -352,7 +353,7 @@ _getBottomSheetContent({
   required AppLocalizations l10n,
   required LimitationStatus status,
   required AppUserRole? userRole,
-  required String defaultBody,
+  required ContentAction action,
 }) {
   switch (status) {
     case LimitationStatus.anonymousLimitReached:
@@ -366,20 +367,30 @@ _getBottomSheetContent({
         },
       );
     case LimitationStatus.standardUserLimitReached:
+      // TODO(flutter-news-app): Implement upgrade flow.
       return (
         title: l10n.standardLimitTitle,
         body: l10n.standardLimitBody,
         buttonText: l10n.standardLimitButton,
-        onPressed: null, // Upgrade feature not implemented
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
       );
     case LimitationStatus.premiumUserLimitReached:
+      final body = switch (action) {
+        ContentAction.saveHeadlineFilter => l10n.limitReachedBodySaveFilters,
+        ContentAction.pinHeadlineFilter => l10n.limitReachedBodyPinFilters,
+        ContentAction.subscribeToHeadlineFilterNotifications =>
+          l10n.limitReachedBodySubscribeToNotifications,
+        _ => l10n.premiumLimitBody,
+      };
       return (
         title: l10n.premiumLimitTitle,
-        body: defaultBody,
+        body: body,
         buttonText: l10n.premiumLimitButton,
         onPressed: () {
           Navigator.of(context).pop();
-          context.goNamed(Routes.manageFollowedItemsName);
+          context.goNamed(Routes.savedHeadlineFiltersName);
         },
       );
     case LimitationStatus.allowed:

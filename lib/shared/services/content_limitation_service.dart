@@ -67,23 +67,21 @@ enum LimitationStatus {
 class ContentLimitationService {
   /// {@macro content_limitation_service}
   ContentLimitationService({
-    required AppBloc appBloc,
     required DataRepository<Engagement> engagementRepository,
     required DataRepository<Report> reportRepository,
     required Duration cacheDuration,
     required Logger logger,
-  })  : _appBloc = appBloc,
-        _engagementRepository = engagementRepository,
+  })  : _engagementRepository = engagementRepository,
         _reportRepository = reportRepository,
         _cacheDuration = cacheDuration,
         _logger = logger;
 
-  final AppBloc _appBloc;
   final DataRepository<Engagement> _engagementRepository;
   final DataRepository<Report> _reportRepository;
   final Duration _cacheDuration;
   final Logger _logger;
 
+  late final AppBloc _appBloc;
   StreamSubscription<AppState>? _appBlocSubscription;
 
   // Internal cache for daily action counts.
@@ -97,11 +95,12 @@ class ContentLimitationService {
   ///
   /// This triggers the proactive fetching of daily action counts whenever the
   /// user's authentication state changes.
-  void init() {
+  void init({required AppBloc appBloc}) {
     _logger.info('ContentLimitationService initializing...');
-    _appBlocSubscription = _appBloc.stream.listen(_onAppStateChanged);
+    _appBloc = appBloc;
+    _appBlocSubscription = appBloc.stream.listen(_onAppStateChanged);
     // Trigger initial fetch if a user is already present.
-    if (_appBloc.state.user != null) {
+    if (appBloc.state.user != null) {
       _fetchDailyCounts(_appBloc.state.user!.id);
     }
   }

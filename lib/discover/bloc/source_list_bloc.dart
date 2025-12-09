@@ -229,10 +229,10 @@ class SourceListBloc extends Bloc<SourceListEvent, SourceListState> {
   }
 
   /// Handles toggling the follow status of a source.
-  void _onSourceListFollowToggled(
+  Future<void> _onSourceListFollowToggled(
     SourceListFollowToggled event,
     Emitter<SourceListState> emit,
-  ) {
+  ) async {
     _logger.fine('[SourceListBloc] Follow toggled for ${event.source.id}.');
     final preferences = _appBloc.state.userContentPreferences;
     if (preferences == null) {
@@ -248,7 +248,7 @@ class SourceListBloc extends Bloc<SourceListEvent, SourceListState> {
 
     // Only check limits when attempting to follow, not when unfollowing.
     if (!isFollowing) {
-      final status = _contentLimitationService.checkAction(
+      final status = await _contentLimitationService.checkAction(
         ContentAction.followSource,
       );
       if (status != LimitationStatus.allowed) {

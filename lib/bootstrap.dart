@@ -34,6 +34,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/notifications/se
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/one_signal_push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/data/clients/clients.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/native_review_service.dart';
 import 'package:http_client/http_client.dart';
@@ -500,6 +501,15 @@ Future<Widget> bootstrap(
     logger: logger,
   );
 
+  // Initialize ContentLimitationService.
+  final contentLimitationService = ContentLimitationService(
+    engagementRepository: engagementRepository,
+    reportRepository: reportRepository,
+    cacheDuration: const Duration(minutes: 5),
+    logger: logger,
+  );
+  logger.fine('ContentLimitationService initialized.');
+
   logger.fine('AppReviewService initialized.');
 
   // Conditionally instantiate DemoDataMigrationService
@@ -597,6 +607,7 @@ Future<Widget> bootstrap(
       reportRepository: reportRepository,
       appReviewRepository: appReviewRepository,
       appReviewService: appReviewService,
+      contentLimitationService: contentLimitationService,
     ),
   );
 }

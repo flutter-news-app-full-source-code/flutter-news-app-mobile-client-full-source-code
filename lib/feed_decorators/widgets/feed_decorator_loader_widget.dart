@@ -229,7 +229,7 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
           currentFollowedTopics.removeWhere((t) => t.id == topic.id);
         } else {
           final limitationService = context.read<ContentLimitationService>();
-          final status = limitationService.checkAction(
+          final status = await limitationService.checkAction(
             ContentAction.followTopic,
           );
           if (status != LimitationStatus.allowed) {
@@ -267,7 +267,7 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
           currentFollowedSources.removeWhere((s) => s.id == source.id);
         } else {
           final limitationService = context.read<ContentLimitationService>();
-          final status = limitationService.checkAction(
+          final status = await limitationService.checkAction(
             ContentAction.followSource,
           );
           if (status != LimitationStatus.allowed) {

@@ -158,7 +158,7 @@ Future<void> _createAndApplyFilter(BuildContext context) async {
   // another filter based on their subscription level and current usage.
   final l10n = AppLocalizations.of(context);
   final contentLimitationService = context.read<ContentLimitationService>();
-  final limitationStatus = contentLimitationService.checkAction(
+  final limitationStatus = await contentLimitationService.checkAction(
     ContentAction.saveHeadlineFilter,
   );
 

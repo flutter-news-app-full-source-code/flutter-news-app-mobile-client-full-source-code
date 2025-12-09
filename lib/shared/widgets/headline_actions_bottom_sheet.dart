@@ -52,7 +52,7 @@ class _HeadlineActionsBottomSheetState
         currentSaved.removeWhere((h) => h.id == widget.headline.id);
       } else {
         final limitationService = context.read<ContentLimitationService>();
-        final status = limitationService.checkAction(
+        final status = await limitationService.checkAction(
           ContentAction.bookmarkHeadline,
         );
 
@@ -64,7 +64,7 @@ class _HeadlineActionsBottomSheetState
               l10n: l10n,
               status: status,
               userRole: userRole,
-              defaultBody: l10n.limitReachedBodySave,
+              action: ContentAction.bookmarkHeadline,
             );
 
             await showModalBottomSheet<void>(
@@ -155,16 +155,43 @@ class _HeadlineActionsBottomSheetState
         ListTile(
           leading: const Icon(Icons.flag_outlined),
           title: Text(l10n.reportActionLabel),
-          onTap: () {
-            Navigator.of(context).pop();
-            showModalBottomSheet<void>(
-              context: context,
-              isScrollControlled: true,
-              builder: (_) => ReportContentBottomSheet(
-                entityId: widget.headline.id,
-                reportableEntity: ReportableEntity.headline,
-              ),
+          onTap: () async {
+            final limitationService = context.read<ContentLimitationService>();
+            final status = await limitationService.checkAction(
+              ContentAction.submitReport,
             );
+
+            if (!mounted) return;
+
+            if (status != LimitationStatus.allowed) {
+              final userRole = context.read<AppBloc>().state.user?.appRole;
+              final content = _getBottomSheetContent(
+                context: context,
+                l10n: l10n,
+                status: status,
+                userRole: userRole,
+                action: ContentAction.submitReport,
+              );
+              await showModalBottomSheet<void>(
+                context: context,
+                builder: (_) => ContentLimitationBottomSheet(
+                  title: content.title,
+                  body: content.body,
+                  buttonText: content.buttonText,
+                  onButtonPressed: content.onPressed,
+                ),
+              );
+            } else {
+              Navigator.of(context).pop();
+              await showModalBottomSheet<void>(
+                context: context,
+                isScrollControlled: true,
+                builder: (_) => ReportContentBottomSheet(
+                  entityId: widget.headline.id,
+                  reportableEntity: ReportableEntity.headline,
+                ),
+              );
+            }
           },
         ),
       ],
@@ -180,7 +207,7 @@ _getBottomSheetContent({
   required AppLocalizations l10n,
   required LimitationStatus status,
   required AppUserRole? userRole,
-  required String defaultBody,
+  required ContentAction action,
 }) {
   switch (status) {
     case LimitationStatus.anonymousLimitReached:
@@ -194,20 +221,31 @@ _getBottomSheetContent({
         },
       );
     case LimitationStatus.standardUserLimitReached:
+      // TODO(fulleni): Implement upgrade flow.
       return (
         title: l10n.standardLimitTitle,
         body: l10n.standardLimitBody,
         buttonText: l10n.standardLimitButton,
-        onPressed: null, // Upgrade feature not implemented
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
       );
     case LimitationStatus.premiumUserLimitReached:
+      final body = switch (action) {
+        ContentAction.bookmarkHeadline => l10n.limitReachedBodySave,
+        ContentAction.submitReport => l10n.limitReachedBodyReports,
+        _ => l10n.premiumLimitBody,
+      };
+      final destinationRoute = action == ContentAction.bookmarkHeadline
+          ? Routes.accountSavedHeadlinesName
+          : Routes.accountName;
       return (
         title: l10n.premiumLimitTitle,
-        body: defaultBody,
+        body: body,
         buttonText: l10n.premiumLimitButton,
         onPressed: () {
           Navigator.of(context).pop();
-          context.goNamed(Routes.manageFollowedItemsName);
+          context.goNamed(destinationRoute);
         },
       );
     case LimitationStatus.allowed:

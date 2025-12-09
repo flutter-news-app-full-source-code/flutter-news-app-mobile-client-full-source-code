@@ -252,7 +252,7 @@ class _SourceListTile extends StatelessWidget {
           } else {
             // If the user is following, check the limit first.
             final limitationService = context.read<ContentLimitationService>();
-            final status = limitationService.checkAction(
+            final status = await limitationService.checkAction(
               ContentAction.followSource,
             );
 
@@ -270,7 +270,7 @@ class _SourceListTile extends StatelessWidget {
                 l10n: l10n,
                 status: status,
                 userRole: userRole,
-                defaultBody: l10n.limitReachedBodyFollow,
+                action: ContentAction.followSource,
               );
 
               // If the limit is reached, show the informative bottom sheet.
@@ -307,7 +307,7 @@ _getBottomSheetContent({
   required AppLocalizations l10n,
   required LimitationStatus status,
   required AppUserRole? userRole,
-  required String defaultBody,
+  required ContentAction action,
 }) {
   switch (status) {
     case LimitationStatus.anonymousLimitReached:
@@ -321,16 +321,17 @@ _getBottomSheetContent({
         },
       );
     case LimitationStatus.standardUserLimitReached:
+      // TODO(fulleni): Implement upgrade flow.
       return (
         title: l10n.standardLimitTitle,
         body: l10n.standardLimitBody,
         buttonText: l10n.standardLimitButton,
-        onPressed: null, // Upgrade feature not implemented
+        onPressed: () => Navigator.of(context).pop(),
       );
     case LimitationStatus.premiumUserLimitReached:
       return (
         title: l10n.premiumLimitTitle,
-        body: defaultBody,
+        body: l10n.limitReachedBodyFollow,
         buttonText: l10n.premiumLimitButton,
         onPressed: () {
           Navigator.of(context).pop();

@@ -279,7 +279,7 @@ class _AppViewState extends State<_AppView> {
       navigatorKey: widget.navigatorKey,
     );
 
-    // Initialize the ContentLimitationService, which was created in bootstrap.
+    // Initialize the ContentLimitationService.
     // Its lifecycle is now tied to this state object.
     context.read<ContentLimitationService>().init(appBloc: appBloc);
     // Create the GoRouter instance once and store it.

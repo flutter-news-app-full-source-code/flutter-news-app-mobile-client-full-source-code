@@ -204,7 +204,9 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
 
                       if (action == null) return;
 
-                      final status = limitationService.checkAction(action);
+                      final status = await limitationService.checkAction(
+                        action,
+                      );
 
                       if (status != LimitationStatus.allowed) {
                         if (!mounted) return;
@@ -218,7 +220,7 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                           l10n: l10n,
                           status: status,
                           userRole: userRole,
-                          defaultBody: l10n.limitReachedBodyFollow,
+                          action: action,
                         );
 
                         await showModalBottomSheet<void>(
@@ -477,7 +479,7 @@ _getBottomSheetContent({
   required AppLocalizations l10n,
   required LimitationStatus status,
   required AppUserRole? userRole,
-  required String defaultBody,
+  required ContentAction action,
 }) {
   switch (status) {
     case LimitationStatus.anonymousLimitReached:
@@ -491,16 +493,17 @@ _getBottomSheetContent({
         },
       );
     case LimitationStatus.standardUserLimitReached:
+      // TODO(fulleni): Implement upgrade flow.
       return (
         title: l10n.standardLimitTitle,
         body: l10n.standardLimitBody,
         buttonText: l10n.standardLimitButton,
-        onPressed: null, // Upgrade feature not implemented
+        onPressed: () => Navigator.of(context).pop(),
       );
     case LimitationStatus.premiumUserLimitReached:
       return (
         title: l10n.premiumLimitTitle,
-        body: defaultBody,
+        body: l10n.limitReachedBodyFollow,
         buttonText: l10n.premiumLimitButton,
         onPressed: () {
           Navigator.of(context).pop();

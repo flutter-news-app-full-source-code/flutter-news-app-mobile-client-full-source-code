@@ -2026,5 +2026,21 @@
     "limitReachedBodyReports": "لقد وصلت إلى الحد اليومي لتقديم البلاغات. يرجى المحاولة مرة أخرى غدًا.",
     "@limitReachedBodyReports": {
         "description": "نص يظهر عندما يحاول المستخدم تقديم بلاغات أكثر من حده اليومي."
+    },
+    "commentEditButtonLabel": "تحديث",
+    "@commentEditButtonLabel": {
+        "description": "Label for the button to update an existing comment."
+    },
+    "commentPostFailureSnackbar": "فشل نشر التعليق. يرجى المحاولة مرة أخرى.",
+    "@commentPostFailureSnackbar": {
+        "description": "Snackbar message shown when posting a comment fails."
+    },
+    "commentUpdateFailureSnackbar": "فشل تحديث التعليق. يرجى المحاولة مرة أخرى.",
+    "@commentUpdateFailureSnackbar": {
+        "description": "Snackbar message shown when updating a comment fails."
+    },
+    "commentInputDisabledHint": "سجل الدخول للانضمام إلى المحادثة",
+    "@commentInputDisabledHint": {
+        "description": "Hint text for the comment input field when the user is a guest."
     }
 }

@@ -156,6 +156,10 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       _onHeadlinesFeedCommentPosted,
       transformer: sequential(),
     );
+    on<HeadlinesFeedCommentUpdated>(
+      _onHeadlinesFeedCommentUpdated,
+      transformer: sequential(),
+    );
   }
 
   final DataRepository<Headline> _headlinesRepository;
@@ -1054,11 +1058,20 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           Map<String, List<Engagement>>.from(state.engagementsMap)
             ..[event.headlineId] = newEngagementsForHeadline;
 
+      // Update the cache with the new engagement map.
+      final filterKey = _generateFilterKey(state.activeFilterId!, state.filter);
+      final cachedFeed = _feedCacheService.getFeed(filterKey);
+      if (cachedFeed != null) {
+        _feedCacheService.updateFeed(
+          filterKey,
+          cachedFeed.copyWith(engagementsMap: newEngagementsMap),
+        );
+      }
+
       emit(state.copyWith(engagementsMap: newEngagementsMap));
       _appBloc.add(AppPositiveInteractionOcurred(context: event.context));
     } catch (e, s) {
       _logger.severe('Failed to update reaction.', e, s);
-      // Optionally, revert state on failure. For now, we log and absorb.
     }
   }
 
@@ -1103,6 +1116,15 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         Map<String, List<Engagement>>.from(state.engagementsMap)
           ..[event.headlineId] = newEngagementsForHeadline;
 
+    final filterKey = _generateFilterKey(state.activeFilterId!, state.filter);
+    final cachedFeed = _feedCacheService.getFeed(filterKey);
+    if (cachedFeed != null) {
+      _feedCacheService.updateFeed(
+        filterKey,
+        cachedFeed.copyWith(engagementsMap: newEngagementsMap),
+      );
+    }
+
     emit(state.copyWith(engagementsMap: newEngagementsMap));
 
     try {
@@ -1122,6 +1144,66 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     } catch (e, s) {
       _logger.severe('Failed to post comment.', e, s);
       // Revert optimistic update on failure
+      emit(state.copyWith(engagementsMap: state.engagementsMap));
+    }
+  }
+
+  Future<void> _onHeadlinesFeedCommentUpdated(
+    HeadlinesFeedCommentUpdated event,
+    Emitter<HeadlinesFeedState> emit,
+  ) async {
+    final userId = _appBloc.state.user?.id;
+    final language = _appBloc.state.settings?.language;
+    if (userId == null || language == null) return;
+
+    final currentEngagements = state.engagementsMap[event.headlineId] ?? [];
+    final userEngagement =
+        currentEngagements.firstWhereOrNull((e) => e.userId == userId);
+
+    // If there's no existing engagement or no comment to update, do nothing.
+    if (userEngagement == null || userEngagement.comment == null) {
+      _logger.warning(
+        'Comment update requested for headline ${event.headlineId} but no '
+        'existing comment found for user $userId.',
+      );
+      return;
+    }
+
+    final updatedComment =
+        userEngagement.comment!.copyWith(content: event.content);
+    final updatedEngagement =
+        userEngagement.copyWith(comment: ValueWrapper(updatedComment));
+
+    // Optimistic UI update
+    final newEngagementsForHeadline =
+        List<Engagement>.from(currentEngagements)
+          ..removeWhere((e) => e.userId == userId)
+          ..add(updatedEngagement);
+
+    final newEngagementsMap =
+        Map<String, List<Engagement>>.from(state.engagementsMap)
+      ..[event.headlineId] = newEngagementsForHeadline;
+
+    final filterKey = _generateFilterKey(state.activeFilterId!, state.filter);
+    final cachedFeed = _feedCacheService.getFeed(filterKey);
+    if (cachedFeed != null) {
+      _feedCacheService.updateFeed(
+        filterKey,
+        cachedFeed.copyWith(engagementsMap: newEngagementsMap),
+      );
+    }
+
+    emit(state.copyWith(engagementsMap: newEngagementsMap));
+
+    try {
+      await _engagementRepository.update(
+        id: updatedEngagement.id,
+        item: updatedEngagement,
+        userId: userId,
+      );
+      _appBloc.add(AppPositiveInteractionOcurred(context: event.context));
+    } catch (e, s) {
+      _logger.severe('Failed to update comment.', e, s);
       emit(state.copyWith(engagementsMap: state.engagementsMap));
     }
   }

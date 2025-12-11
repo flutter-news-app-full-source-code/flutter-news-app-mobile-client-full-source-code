@@ -253,3 +253,27 @@ final class HeadlinesFeedCommentPosted extends HeadlinesFeedEvent {
   @override
   List<Object> get props => [headlineId, content, context];
 }
+
+/// {@template headlines_feed_comment_updated}
+/// Dispatched when the user updates their existing comment on a headline.
+/// {@endtemplate}
+final class HeadlinesFeedCommentUpdated extends HeadlinesFeedEvent {
+  /// {@macro headlines_feed_comment_updated}
+  const HeadlinesFeedCommentUpdated(
+    this.headlineId,
+    this.content, {
+    required this.context,
+  });
+
+  /// The ID of the headline being commented on.
+  final String headlineId;
+
+  /// The updated text content of the comment.
+  final String content;
+
+  /// The build context, used for triggering side effects like review prompts.
+  final BuildContext context;
+
+  @override
+  List<Object> get props => [headlineId, content, context];
+}

@@ -305,7 +305,13 @@ class __CommentInputFieldState extends State<_CommentInputField> {
           onPressed: canPost && isEnabled
               ? () {
                   if (_isEditing) {
-                    // TODO(user): Implement comment update event in HeadlinesFeedBloc
+                    context.read<HeadlinesFeedBloc>().add(
+                          HeadlinesFeedCommentUpdated(
+                            widget.headlineId,
+                            _controller.text,
+                            context: context,
+                          ),
+                        );
                   } else {
                     context.read<HeadlinesFeedBloc>().add(
                           HeadlinesFeedCommentPosted(

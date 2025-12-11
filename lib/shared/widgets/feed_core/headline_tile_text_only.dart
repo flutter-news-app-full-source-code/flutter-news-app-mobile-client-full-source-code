@@ -1,5 +1,7 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_source_row.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_tap_handler.dart';
@@ -82,7 +84,15 @@ class HeadlineTileTextOnly extends StatelessWidget {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: AppSpacing.md),
-                      child: HeadlineActionsRow(headline: headline),
+                      child: BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
+                        builder: (context, state) {
+                          return HeadlineActionsRow(
+                            headline: headline,
+                            engagements:
+                                state.engagementsMap[headline.id] ?? [],
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),

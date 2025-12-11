@@ -64,7 +64,7 @@ class _HeadlineActionsRowViewState extends State<_HeadlineActionsRowView> {
 
     final isCommentingEnabled =
         communityConfig!.engagement.engagementMode ==
-            EngagementMode.reactionsAndComments;
+        EngagementMode.reactionsAndComments;
 
     return BlocListener<EngagementBloc, EngagementState>(
       listener: (context, state) {
@@ -93,8 +93,9 @@ class _HeadlineActionsRowViewState extends State<_HeadlineActionsRowView> {
       child: BlocBuilder<EngagementBloc, EngagementState>(
         builder: (context, state) {
           final userReaction = state.userEngagement?.reaction?.reactionType;
-          final commentCount =
-              state.engagements.where((e) => e.comment != null).length;
+          final commentCount = state.engagements
+              .where((e) => e.comment != null)
+              .length;
 
           final theme = Theme.of(context);
           final mutedColor = theme.colorScheme.onSurfaceVariant.withOpacity(
@@ -120,24 +121,11 @@ class _HeadlineActionsRowViewState extends State<_HeadlineActionsRowView> {
                     onPressed: () => showModalBottomSheet<void>(
                       context: context,
                       isScrollControlled: true,
-                      // Provide all necessary dependencies to the new route's context.
-                      builder: (_) => MultiRepositoryProvider(
-                        providers: [
-                          // Provide the Engagement repository.
-                          RepositoryProvider.value(
-                            value: context.read<DataRepository<Engagement>>(),
-                          ),
-                          // Provide the ContentLimitationService.
-                          RepositoryProvider.value(
-                            value: context.read<ContentLimitationService>(),
-                          ),
-                        ],
-                        // Also provide the AppBloc.
-                        child: BlocProvider.value(
-                          value: context.read<AppBloc>(),
-                          child:
-                              CommentsBottomSheet(headline: widget.headline),
-                        ),
+                      // Share the existing EngagementBloc instance with the
+                      // bottom sheet.
+                      builder: (_) => BlocProvider.value(
+                        value: context.read<EngagementBloc>(),
+                        child: const CommentsBottomSheet(),
                       ),
                     ),
                   ),
@@ -158,9 +146,9 @@ class _HeadlineActionsRowViewState extends State<_HeadlineActionsRowView> {
         action: ContentAction.reactToContent,
       );
     } else {
-      context
-          .read<EngagementBloc>()
-          .add(EngagementReactionUpdated(reaction, context: context));
+      context.read<EngagementBloc>().add(
+        EngagementReactionUpdated(reaction, context: context),
+      );
     }
   }
 
@@ -192,7 +180,7 @@ class _HeadlineActionsRowViewState extends State<_HeadlineActionsRowView> {
   }
 
   ({String title, String body, String buttonText, VoidCallback? onPressed})
-      _getBottomSheetContent({
+  _getBottomSheetContent({
     required BuildContext context,
     required AppLocalizations l10n,
     required LimitationStatus status,

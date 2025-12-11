@@ -271,17 +271,24 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
         emit(state.copyWith(userEngagement: result));
       }
 
-      // Re-fetch to get the full list with the new comment included.
-      final response = await _engagementRepository.readAll(
-        filter: {'entityId': _entityId},
+      // Instead of a full re-fetch, which is inefficient, we perform an
+      // optimistic update on the local state. This ensures the UI updates
+      // instantly and correctly reflects the new comment.
+      final updatedEngagements = List<Engagement>.from(state.engagements);
+      final existingIndex = updatedEngagements.indexWhere(
+        (e) => e.id == updatedEngagement.id,
       );
+
+      if (existingIndex != -1) {
+        updatedEngagements[existingIndex] = updatedEngagement;
+      } else {
+        updatedEngagements.add(updatedEngagement);
+      }
+
       emit(
         state.copyWith(
           status: EngagementStatus.success,
-          engagements: response.items,
-          userEngagement: response.items.firstWhereOrNull(
-            (e) => e.userId == userId,
-          ),
+          engagements: updatedEngagements,
         ),
       );
       _appBloc.add(AppPositiveInteractionOcurred(context: event.context));

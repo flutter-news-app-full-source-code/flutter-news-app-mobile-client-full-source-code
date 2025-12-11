@@ -129,16 +129,12 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
 
         // This listener handles navigation actions triggered by the BLoC.
         if (state.navigationUrl != null) {
-          if (state.navigationArguments is Headline) {
-            final headline = state.navigationArguments! as Headline;
-            final engagements = state.engagementsMap[headline.id] ?? [];
+          final navArgs = state.navigationArguments;
+          if (navArgs is Headline) {
             showModalBottomSheet<void>(
               context: context,
               isScrollControlled: true,
-              builder: (_) => CommentsBottomSheet(
-                headlineId: headline.id,
-                engagements: engagements,
-              ),
+              builder: (_) => CommentsBottomSheet(headlineId: navArgs.id),
             );
           } else {
             // Handle simple URL navigation for call-to-actions.

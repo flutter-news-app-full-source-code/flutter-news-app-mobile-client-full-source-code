@@ -1579,4 +1579,18 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get limitReachedBodyReports =>
       'لقد وصلت إلى الحد اليومي لتقديم البلاغات. يرجى المحاولة مرة أخرى غدًا.';
+
+  @override
+  String get commentEditButtonLabel => 'تحديث';
+
+  @override
+  String get commentPostFailureSnackbar =>
+      'فشل نشر التعليق. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get commentUpdateFailureSnackbar =>
+      'فشل تحديث التعليق. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get commentInputDisabledHint => 'سجل الدخول للانضمام إلى المحادثة';
 }

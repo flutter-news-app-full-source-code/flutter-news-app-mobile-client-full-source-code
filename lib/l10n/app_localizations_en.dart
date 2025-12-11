@@ -1582,4 +1582,18 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get limitReachedBodyReports =>
       'You have reached your daily limit for submitting reports. Please try again tomorrow.';
+
+  @override
+  String get commentEditButtonLabel => 'Update';
+
+  @override
+  String get commentPostFailureSnackbar =>
+      'Failed to post comment. Please try again.';
+
+  @override
+  String get commentUpdateFailureSnackbar =>
+      'Failed to update comment. Please try again.';
+
+  @override
+  String get commentInputDisabledHint => 'Sign in to join the conversation';
 }

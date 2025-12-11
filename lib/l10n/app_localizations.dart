@@ -2971,6 +2971,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You have reached your daily limit for submitting reports. Please try again tomorrow.'**
   String get limitReachedBodyReports;
+
+  /// Label for the button to update an existing comment.
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get commentEditButtonLabel;
+
+  /// Snackbar message shown when posting a comment fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to post comment. Please try again.'**
+  String get commentPostFailureSnackbar;
+
+  /// Snackbar message shown when updating a comment fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update comment. Please try again.'**
+  String get commentUpdateFailureSnackbar;
+
+  /// Hint text for the comment input field when the user is a guest.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to join the conversation'**
+  String get commentInputDisabledHint;
 }
 
 class _AppLocalizationsDelegate

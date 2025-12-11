@@ -27,13 +27,13 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
     required ContentLimitationService contentLimitationService,
     required AppBloc appBloc,
     Logger? logger,
-  }) : _entityId = entityId,
-       _entityType = entityType,
-       _engagementRepository = engagementRepository,
-       _contentLimitationService = contentLimitationService,
-       _appBloc = appBloc,
-       _logger = logger ?? Logger('EngagementBloc'),
-       super(const EngagementState()) {
+  })  : _entityId = entityId,
+        _entityType = entityType,
+        _engagementRepository = engagementRepository,
+        _contentLimitationService = contentLimitationService,
+        _appBloc = appBloc,
+        _logger = logger ?? Logger('EngagementBloc'),
+        super(const EngagementState()) {
     on<EngagementStarted>(_onEngagementStarted);
     on<EngagementReactionUpdated>(_onEngagementReactionUpdated);
     on<EngagementCommentPosted>(_onEngagementCommentPosted);
@@ -100,8 +100,7 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
     try {
       if (state.userEngagement != null) {
         // User is updating or removing their reaction.
-        final isTogglingOff =
-            event.reactionType == null ||
+        final isTogglingOff = event.reactionType == null ||
             state.userEngagement!.reaction?.reactionType == event.reactionType;
 
         if (isTogglingOff) {
@@ -231,27 +230,21 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
     emit(state.copyWith(status: EngagementStatus.actionInProgress));
     try {
       final newComment = Comment(language: language, content: event.content);
-      Engagement updatedEngagement;
+      Engagement engagementToUpsert;
 
       if (state.userEngagement != null) {
         // User has an existing engagement (e.g., a reaction), so update it.
-        updatedEngagement = state.userEngagement!.copyWith(
+        engagementToUpsert = state.userEngagement!.copyWith(
           comment: ValueWrapper(newComment),
         );
-
-        // Optimistic UI update
-        emit(state.copyWith(userEngagement: updatedEngagement));
-
-        final result = await _engagementRepository.update(
-          id: updatedEngagement.id,
-          item: updatedEngagement,
+        await _engagementRepository.update(
+          id: engagementToUpsert.id,
+          item: engagementToUpsert,
           userId: userId,
         );
-        // Final state update with server result
-        emit(state.copyWith(userEngagement: result));
       } else {
         // No existing engagement, create a new one with just the comment.
-        updatedEngagement = Engagement(
+        engagementToUpsert = Engagement(
           id: const Uuid().v4(),
           userId: userId,
           entityId: _entityId,
@@ -260,35 +253,30 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
         );
-
-        // Optimistic UI update
-        emit(state.copyWith(userEngagement: updatedEngagement));
-
-        final result = await _engagementRepository.create(
-          item: updatedEngagement,
+        await _engagementRepository.create(
+          item: engagementToUpsert,
           userId: userId,
         );
-        emit(state.copyWith(userEngagement: result));
       }
 
       // Instead of a full re-fetch, which is inefficient, we perform an
       // optimistic update on the local state. This ensures the UI updates
       // instantly and correctly reflects the new comment.
       final updatedEngagements = List<Engagement>.from(state.engagements);
-      final existingIndex = updatedEngagements.indexWhere(
-        (e) => e.id == updatedEngagement.id,
-      );
+      final existingIndex =
+          updatedEngagements.indexWhere((e) => e.userId == userId);
 
       if (existingIndex != -1) {
-        updatedEngagements[existingIndex] = updatedEngagement;
+        updatedEngagements[existingIndex] = engagementToUpsert;
       } else {
-        updatedEngagements.add(updatedEngagement);
+        updatedEngagements.add(engagementToUpsert);
       }
 
       emit(
         state.copyWith(
           status: EngagementStatus.success,
           engagements: updatedEngagements,
+          userEngagement: engagementToUpsert,
         ),
       );
       _appBloc.add(AppPositiveInteractionOcurred(context: event.context));
@@ -332,24 +320,25 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
         comment: ValueWrapper(updatedComment),
       );
 
-      // Optimistic UI update
-      emit(state.copyWith(userEngagement: updatedEngagement));
-
-      final result = await _engagementRepository.update(
+      await _engagementRepository.update(
         id: updatedEngagement.id,
         item: updatedEngagement,
         userId: userId,
       );
 
-      // Re-fetch to get the full list with the updated comment included.
-      final response = await _engagementRepository.readAll(
-        filter: {'entityId': _entityId},
-      );
+      final updatedEngagements =
+          List<Engagement>.from(state.engagements).map((e) {
+        if (e.userId == userId) {
+          return updatedEngagement;
+        }
+        return e;
+      }).toList();
+
       emit(
         state.copyWith(
           status: EngagementStatus.success,
-          engagements: response.items,
-          userEngagement: result,
+          engagements: updatedEngagements,
+          userEngagement: updatedEngagement,
         ),
       );
       _appBloc.add(AppPositiveInteractionOcurred(context: event.context));

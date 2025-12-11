@@ -1,4 +1,11 @@
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart' hide UiKitLocalizations;
 
 /// {@template content_limitation_bottom_sheet}
@@ -72,5 +79,77 @@ class _ContentLimitationBottomSheetState
         ),
       ),
     );
+  }
+}
+
+/// A shared helper function to show the content limitation bottom sheet.
+///
+/// This function centralizes the logic for determining the sheet's content
+/// based on the user's role and the specific limitation they have encountered.
+void showContentLimitationBottomSheet({
+  required BuildContext context,
+  required LimitationStatus status,
+  required ContentAction action,
+}) {
+  final l10n = AppLocalizations.of(context);
+  final userRole = context.read<AppBloc>().state.user?.appRole;
+
+  final content = _getBottomSheetContent(
+    context: context,
+    l10n: l10n,
+    status: status,
+    userRole: userRole,
+    action: action,
+  );
+
+  showModalBottomSheet<void>(
+    context: context,
+    builder: (_) => ContentLimitationBottomSheet(
+      title: content.title,
+      body: content.body,
+      buttonText: content.buttonText,
+      onButtonPressed: content.onPressed,
+    ),
+  );
+}
+
+/// Determines the content for the [ContentLimitationBottomSheet] based on
+/// the user's role and the limitation status.
+({String title, String body, String buttonText, VoidCallback? onPressed})
+_getBottomSheetContent({
+  required BuildContext context,
+  required AppLocalizations l10n,
+  required LimitationStatus status,
+  required AppUserRole? userRole,
+  required ContentAction action,
+}) {
+  switch (status) {
+    case LimitationStatus.anonymousLimitReached:
+      return (
+        title: l10n.limitReachedGuestUserTitle,
+        body: l10n.limitReachedGuestUserBody,
+        buttonText: l10n.anonymousLimitButton,
+        onPressed: () => context.goNamed(Routes.accountLinkingName),
+      );
+    case LimitationStatus.standardUserLimitReached:
+    case LimitationStatus.premiumUserLimitReached:
+      final body = switch (action) {
+        ContentAction.bookmarkHeadline => l10n.limitReachedBodySave,
+        ContentAction.followTopic ||
+        ContentAction.followSource ||
+        ContentAction.followCountry => l10n.limitReachedBodyFollow,
+        ContentAction.postComment => l10n.limitReachedBodyComments,
+        ContentAction.reactToContent => l10n.limitReachedBodyReactions,
+        ContentAction.submitReport => l10n.limitReachedBodyReports,
+        _ => l10n.premiumLimitBody,
+      };
+      return (
+        title: l10n.limitReachedTitle,
+        body: body,
+        buttonText: l10n.gotItButton,
+        onPressed: () => Navigator.of(context).pop(),
+      );
+    case LimitationStatus.allowed:
+      return (title: '', body: '', buttonText: '', onPressed: null);
   }
 }

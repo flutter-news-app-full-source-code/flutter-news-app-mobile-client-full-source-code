@@ -10,6 +10,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/widgets/feed_sliver_app_bar.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/widgets/saved_filters_bar.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/user_content/engagement/view/comments_bottom_sheet.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/shared.dart';
 import 'package:go_router/go_router.dart';
@@ -116,7 +117,17 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
       listener: (context, state) {
         // This listener handles navigation actions triggered by the BLoC.
         if (state.navigationUrl != null) {
-          if (state.navigationArguments != null) {
+          if (state.navigationArguments is Headline) {
+            final headline = state.navigationArguments as Headline;
+            final engagements = state.engagementsMap[headline.id] ?? [];
+            showModalBottomSheet<void>(
+              context: context,
+              isScrollControlled: true,
+              builder: (_) => CommentsBottomSheet(
+                headlineId: headline.id,
+                engagements: engagements,
+              ),
+            );
           } else {
             // Handle simple URL navigation for call-to-actions.
             context.push(state.navigationUrl!);

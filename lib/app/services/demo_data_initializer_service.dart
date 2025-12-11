@@ -83,7 +83,7 @@ class DemoDataInitializerService {
   /// This prevents "READ FAILED" errors when the application attempts to
   /// access these user-specific data points for a newly signed-in anonymous
   /// user in the demo environment.
-  Future<void> initializeUserSpecificData(User user) async {
+  Future<void> initializeUserSpecificData(User user) async { 
     _logger.info('Initializing user-specific data for user ID: ${user.id}');
 
     await Future.wait([
@@ -105,9 +105,9 @@ class DemoDataInitializerService {
   Future<void> _ensureAppSettingsExist(String userId) async {
     try {
       await _appSettingsRepository.read(id: userId, userId: userId);
-      _logger.info('AppSettings found for user ID: $userId.');
+      _logger.finer('AppSettings found for user ID: $userId.');
     } on NotFoundException {
-      _logger.info(
+      _logger.fine(
         'AppSettings not found for user ID: '
         '$userId. Creating settings from fixture.',
       );
@@ -126,7 +126,7 @@ class DemoDataInitializerService {
         item: fixtureSettings,
         userId: userId,
       );
-      _logger.info(
+      _logger.fine(
         'AppSettings from fixture created for '
         'user ID: $userId.',
       );
@@ -146,9 +146,9 @@ class DemoDataInitializerService {
   Future<void> _ensureUserContentPreferencesExist(String userId) async {
     try {
       await _userContentPreferencesRepository.read(id: userId, userId: userId);
-      _logger.info('UserContentPreferences found for user ID: $userId.');
+      _logger.finer('UserContentPreferences found for user ID: $userId.');
     } on NotFoundException {
-      _logger.info(
+      _logger.fine(
         'UserContentPreferences not found for '
         'user ID: $userId. Creating preferences from fixture.',
       );
@@ -166,7 +166,7 @@ class DemoDataInitializerService {
         item: fixturePreferences,
         userId: userId,
       );
-      _logger.info(
+      _logger.fine(
         'UserContentPreferences from fixture created '
         'for user ID: $userId.',
       );
@@ -193,11 +193,11 @@ class DemoDataInitializerService {
         userId: userId,
       );
       if (existingNotifications.items.isNotEmpty) {
-        _logger.info('InAppNotifications already exist for user ID: $userId.');
+        _logger.finer('InAppNotifications already exist for user ID: $userId.');
         return;
       }
 
-      _logger.info(
+      _logger.fine(
         'No InAppNotifications found for user ID: $userId. Creating from fixture.',
       );
 
@@ -222,7 +222,7 @@ class DemoDataInitializerService {
           (n) => _inAppNotificationRepository.create(item: n, userId: userId),
         ),
       );
-      _logger.info(
+      _logger.fine(
         '${userNotifications.length} InAppNotifications from fixture created for user ID: $userId.',
       );
     } catch (e, s) {
@@ -241,11 +241,11 @@ class DemoDataInitializerService {
     try {
       final existing = await _engagementRepository.readAll(userId: userId);
       if (existing.items.isNotEmpty) {
-        _logger.info('Engagements already exist for user ID: $userId.');
+        _logger.finer('Engagements already exist for user ID: $userId.');
         return;
       }
 
-      _logger.info(
+      _logger.fine(
         'No Engagements found for user ID: $userId. Creating from fixture.',
       );
 
@@ -268,7 +268,7 @@ class DemoDataInitializerService {
           (item) => _engagementRepository.create(item: item, userId: userId),
         ),
       );
-      _logger.info(
+      _logger.fine(
         '${userItems.length} Engagements from fixture created for user ID: $userId.',
       );
     } catch (e, s) {
@@ -285,11 +285,11 @@ class DemoDataInitializerService {
     try {
       final existing = await _reportRepository.readAll(userId: userId);
       if (existing.items.isNotEmpty) {
-        _logger.info('Reports already exist for user ID: $userId.');
+        _logger.finer('Reports already exist for user ID: $userId.');
         return;
       }
 
-      _logger.info(
+      _logger.fine(
         'No Reports found for user ID: $userId. Creating from fixture.',
       );
 
@@ -307,7 +307,7 @@ class DemoDataInitializerService {
           (item) => _reportRepository.create(item: item, userId: userId),
         ),
       );
-      _logger.info(
+      _logger.fine(
         '${userItems.length} Reports from fixture created for user ID: $userId.',
       );
     } catch (e, s) {
@@ -324,11 +324,11 @@ class DemoDataInitializerService {
     try {
       final existing = await _appReviewRepository.readAll(userId: userId);
       if (existing.items.isNotEmpty) {
-        _logger.info('AppReviews already exist for user ID: $userId.');
+        _logger.finer('AppReviews already exist for user ID: $userId.');
         return;
       }
 
-      _logger.info(
+      _logger.fine(
         'No AppReviews found for user ID: $userId. Creating from fixture.',
       );
 
@@ -346,7 +346,7 @@ class DemoDataInitializerService {
           (item) => _appReviewRepository.create(item: item, userId: userId),
         ),
       );
-      _logger.info(
+      _logger.fine(
         '${userItems.length} AppReviews from fixture created for user ID: $userId.',
       );
     } catch (e, s) {

@@ -43,7 +43,7 @@ class DemoDataMigrationService {
     required String oldUserId,
     required String newUserId,
   }) async {
-    _logger.info(
+    _logger.fine(
       '[DemoDataMigrationService] Attempting to migrate data from '
       'anonymous user ID: $oldUserId to authenticated user ID: $newUserId',
     );
@@ -82,12 +82,12 @@ class DemoDataMigrationService {
       }
 
       await _appSettingsRepository.delete(id: oldUserId, userId: oldUserId);
-      _logger.info(
+      _logger.fine(
         '[DemoDataMigrationService] AppSettings migrated successfully '
         'from $oldUserId to $newUserId.',
       );
     } on NotFoundException {
-      _logger.info(
+      _logger.fine(
         '[DemoDataMigrationService] No AppSettings found for old user ID: '
         '$oldUserId. Skipping migration for settings.',
       );
@@ -137,12 +137,12 @@ class DemoDataMigrationService {
         id: oldUserId,
         userId: oldUserId,
       );
-      _logger.info(
+      _logger.fine(
         '[DemoDataMigrationService] UserContentPreferences migrated '
         'successfully from $oldUserId to $newUserId.',
       );
     } on NotFoundException {
-      _logger.info(
+      _logger.fine(
         '[DemoDataMigrationService] No UserContentPreferences found for old '
         'user ID: $oldUserId. Skipping migration for preferences.',
       );
@@ -175,7 +175,7 @@ class DemoDataMigrationService {
           /* ignore, already exists */
         }
       }
-      _logger.info(
+      _logger.fine(
         '[DemoDataMigrationService] ${oldEngagements.items.length} '
         'engagements migrated successfully from $oldUserId to $newUserId.',
       );
@@ -196,7 +196,7 @@ class DemoDataMigrationService {
         await _reportRepository.create(item: newReport, userId: newUserId);
         await _reportRepository.delete(id: oldReport.id, userId: oldUserId);
       }
-      _logger.info(
+      _logger.fine(
         '[DemoDataMigrationService] ${oldReports.items.length} '
         'reports migrated successfully from $oldUserId to $newUserId.',
       );
@@ -225,7 +225,7 @@ class DemoDataMigrationService {
           userId: oldUserId,
         );
       }
-      _logger.info(
+      _logger.fine(
         '[DemoDataMigrationService] ${oldAppReviews.items.length} '
         'app reviews migrated successfully from $oldUserId to $newUserId.',
       );

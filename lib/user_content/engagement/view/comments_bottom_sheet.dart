@@ -1,5 +1,4 @@
 import 'package:core/core.dart';
-import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
@@ -18,23 +17,11 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class CommentsBottomSheet extends StatelessWidget {
   /// {@macro comments_bottom_sheet}
-  const CommentsBottomSheet({required this.headline, super.key});
-
-  /// The headline for which to display comments.
-  final Headline headline;
+  const CommentsBottomSheet({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => EngagementBloc(
-        entityId: headline.id,
-        entityType: EngageableType.headline,
-        engagementRepository: context.read<DataRepository<Engagement>>(),
-        appBloc: context.read<AppBloc>(),
-        contentLimitationService: context.read<ContentLimitationService>(),
-      )..add(const EngagementStarted()),
-      child: const _CommentsBottomSheetView(),
-    );
+    return const _CommentsBottomSheetView();
   }
 }
 
@@ -205,7 +192,7 @@ class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
   }
 
   ({String title, String body, String buttonText, VoidCallback? onPressed})
-      _getBottomSheetContent({
+  _getBottomSheetContent({
     required BuildContext context,
     required AppLocalizations l10n,
     required LimitationStatus status,
@@ -257,8 +244,12 @@ class __CommentInputFieldState extends State<_CommentInputField> {
   void initState() {
     super.initState();
     // Pre-fill the input field if the user has an existing comment.
-    final existingComment =
-        context.read<EngagementBloc>().state.userEngagement?.comment?.content;
+    final existingComment = context
+        .read<EngagementBloc>()
+        .state
+        .userEngagement
+        ?.comment
+        ?.content;
     if (existingComment != null) {
       _controller.text = existingComment;
     }
@@ -280,7 +271,7 @@ class __CommentInputFieldState extends State<_CommentInputField> {
     final theme = Theme.of(context);
     final isGuest =
         context.select((AppBloc bloc) => bloc.state.user?.appRole) ==
-            AppUserRole.guestUser;
+        AppUserRole.guestUser;
 
     // A user can post a comment if they have entered text.
     final canPost = _controller.text.isNotEmpty;
@@ -331,18 +322,18 @@ class __CommentInputFieldState extends State<_CommentInputField> {
                         ? () {
                             if (_isEditing) {
                               context.read<EngagementBloc>().add(
-                                    EngagementCommentUpdated(
-                                      _controller.text,
-                                      context: context,
-                                    ),
-                                  );
+                                EngagementCommentUpdated(
+                                  _controller.text,
+                                  context: context,
+                                ),
+                              );
                             } else {
                               context.read<EngagementBloc>().add(
-                                    EngagementCommentPosted(
-                                      _controller.text,
-                                      context: context,
-                                    ),
-                                  );
+                                EngagementCommentPosted(
+                                  _controller.text,
+                                  context: context,
+                                ),
+                              );
                             }
                             FocusScope.of(context).unfocus();
                           }

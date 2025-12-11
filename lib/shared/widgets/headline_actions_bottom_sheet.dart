@@ -34,7 +34,6 @@ class _HeadlineActionsBottomSheetState
   Future<void> _onBookmarkTapped(bool isBookmarked) async {
     setState(() => _isBookmarking = true);
 
-    final l10n = AppLocalizations.of(context);
     final appBloc = context.read<AppBloc>();
     final userContentPreferences = appBloc.state.userContentPreferences;
 
@@ -57,24 +56,13 @@ class _HeadlineActionsBottomSheetState
         );
 
         if (status != LimitationStatus.allowed) {
+          // Pop the current sheet before showing the new one.
+          Navigator.of(context).pop();
           if (mounted) {
-            final userRole = context.read<AppBloc>().state.user?.appRole;
-            final content = _getBottomSheetContent(
+            _showContentLimitationBottomSheet(
               context: context,
-              l10n: l10n,
               status: status,
-              userRole: userRole,
               action: ContentAction.bookmarkHeadline,
-            );
-
-            await showModalBottomSheet<void>(
-              context: context,
-              builder: (_) => ContentLimitationBottomSheet(
-                title: content.title,
-                body: content.body,
-                buttonText: content.buttonText,
-                onButtonPressed: content.onPressed,
-              ),
             );
           }
           return;
@@ -96,17 +84,6 @@ class _HeadlineActionsBottomSheetState
       // The UI will update reactively based on the AppBloc's state change.
       if (mounted) {
         Navigator.of(context).pop();
-      }
-    } on ForbiddenException catch (e) {
-      if (mounted) {
-        await showModalBottomSheet<void>(
-          context: context,
-          builder: (_) => ContentLimitationBottomSheet(
-            title: l10n.limitReachedTitle,
-            body: e.message,
-            buttonText: l10n.gotItButton,
-          ),
-        );
       }
     } finally {
       if (mounted) {
@@ -164,22 +141,12 @@ class _HeadlineActionsBottomSheetState
             if (!mounted) return;
 
             if (status != LimitationStatus.allowed) {
-              final userRole = context.read<AppBloc>().state.user?.appRole;
-              final content = _getBottomSheetContent(
+              // Pop the current sheet before showing the new one.
+              Navigator.of(context).pop();
+              _showContentLimitationBottomSheet(
                 context: context,
-                l10n: l10n,
                 status: status,
-                userRole: userRole,
                 action: ContentAction.submitReport,
-              );
-              await showModalBottomSheet<void>(
-                context: context,
-                builder: (_) => ContentLimitationBottomSheet(
-                  title: content.title,
-                  body: content.body,
-                  buttonText: content.buttonText,
-                  onButtonPressed: content.onPressed,
-                ),
               );
             } else {
               Navigator.of(context).pop();
@@ -197,58 +164,69 @@ class _HeadlineActionsBottomSheetState
       ],
     );
   }
-}
 
-/// Determines the content for the [ContentLimitationBottomSheet] based on
-/// the user's role and the limitation status.
-({String title, String body, String buttonText, VoidCallback? onPressed})
-_getBottomSheetContent({
-  required BuildContext context,
-  required AppLocalizations l10n,
-  required LimitationStatus status,
-  required AppUserRole? userRole,
-  required ContentAction action,
-}) {
-  switch (status) {
-    case LimitationStatus.anonymousLimitReached:
-      return (
-        title: l10n.anonymousLimitTitle,
-        body: l10n.anonymousLimitBody,
-        buttonText: l10n.anonymousLimitButton,
-        onPressed: () {
-          Navigator.of(context).pop();
-          context.pushNamed(Routes.accountLinkingName);
-        },
-      );
-    case LimitationStatus.standardUserLimitReached:
-      // TODO(fulleni): Implement upgrade flow.
-      return (
-        title: l10n.standardLimitTitle,
-        body: l10n.standardLimitBody,
-        buttonText: l10n.standardLimitButton,
-        onPressed: () {
-          Navigator.of(context).pop();
-        },
-      );
-    case LimitationStatus.premiumUserLimitReached:
-      final body = switch (action) {
-        ContentAction.bookmarkHeadline => l10n.limitReachedBodySave,
-        ContentAction.submitReport => l10n.limitReachedBodyReports,
-        _ => l10n.premiumLimitBody,
-      };
-      final destinationRoute = action == ContentAction.bookmarkHeadline
-          ? Routes.accountSavedHeadlinesName
-          : Routes.accountName;
-      return (
-        title: l10n.premiumLimitTitle,
-        body: body,
-        buttonText: l10n.premiumLimitButton,
-        onPressed: () {
-          Navigator.of(context).pop();
-          context.goNamed(destinationRoute);
-        },
-      );
-    case LimitationStatus.allowed:
-      return (title: '', body: '', buttonText: '', onPressed: null);
+  void _showContentLimitationBottomSheet({
+    required BuildContext context,
+    required LimitationStatus status,
+    required ContentAction action,
+  }) {
+    final l10n = AppLocalizations.of(context);
+    final userRole = context.read<AppBloc>().state.user?.appRole;
+
+    final content = _getBottomSheetContent(
+      context: context,
+      l10n: l10n,
+      status: status,
+      userRole: userRole,
+      action: action,
+    );
+
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (_) => ContentLimitationBottomSheet(
+        title: content.title,
+        body: content.body,
+        buttonText: content.buttonText,
+        onButtonPressed: content.onPressed,
+      ),
+    );
+  }
+
+  ({String title, String body, String buttonText, VoidCallback? onPressed})
+  _getBottomSheetContent({
+    required BuildContext context,
+    required AppLocalizations l10n,
+    required LimitationStatus status,
+    required AppUserRole? userRole,
+    required ContentAction action,
+  }) {
+    switch (status) {
+      case LimitationStatus.anonymousLimitReached:
+        return (
+          title: l10n.limitReachedGuestUserTitle,
+          body: l10n.limitReachedGuestUserBody,
+          buttonText: l10n.anonymousLimitButton,
+          onPressed: () {
+            Navigator.of(context).pop();
+            context.pushNamed(Routes.accountLinkingName);
+          },
+        );
+      case LimitationStatus.standardUserLimitReached:
+        return (
+          title: l10n.standardLimitTitle,
+          body: l10n.standardLimitBody,
+          buttonText: l10n.standardLimitButton,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      case LimitationStatus.premiumUserLimitReached:
+        return (
+          title: l10n.premiumLimitTitle,
+          body: l10n.premiumLimitBody,
+          buttonText: l10n.premiumLimitButton,
+          onPressed: () => Navigator.of(context).pop(),
+        );
+      case LimitationStatus.allowed:
+        return (title: '', body: '', buttonText: '', onPressed: null);
+    }
   }
 }

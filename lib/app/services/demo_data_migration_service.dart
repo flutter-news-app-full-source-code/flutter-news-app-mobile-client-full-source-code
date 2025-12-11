@@ -167,14 +167,16 @@ class DemoDataMigrationService {
             item: newEngagement,
             userId: newUserId,
           );
-          await _engagementRepository.delete(
-            id: oldEngagement.id,
-            userId: oldUserId,
-          );
         } on ConflictException {
           /* ignore, already exists */
         }
       }
+      // Delete all old engagements at once after migration.
+      await Future.wait(
+        oldEngagements.items.map(
+          (e) => _engagementRepository.delete(id: e.id, userId: oldUserId),
+        ),
+      );
       _logger.fine(
         '[DemoDataMigrationService] ${oldEngagements.items.length} '
         'engagements migrated successfully from $oldUserId to $newUserId.',

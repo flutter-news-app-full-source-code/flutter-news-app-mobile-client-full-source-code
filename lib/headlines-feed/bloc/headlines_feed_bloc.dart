@@ -94,23 +94,18 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     // Subscribe to AppBloc to react to global state changes, primarily for
     // keeping the feed's list of saved filters synchronized with the global
     // app state.
-    _appBlocSubscription = _appBloc.stream.listen((appState) {
-      // This subscription is now responsible for handling *updates* to the
-      // user's preferences while the bloc is active. The initial state is
-      // handled by the constructor.
-      // This subscription's responsibility is to listen for changes in user
-      // preferences (like adding/removing a saved filter) from other parts
-      // of the app and update this BLoC's state accordingly.
-      if (appState.userContentPreferences?.savedHeadlineFilters != null &&
-          state.savedHeadlineFilters !=
-              appState.userContentPreferences!.savedHeadlineFilters) {
-        add(
-          _AppContentPreferencesChanged(
-            preferences: appState.userContentPreferences!,
-          ),
-        );
-      }
-    });
+    _appBlocSubscription = _appBloc.stream
+        .map((appState) => appState.userContentPreferences)
+        .distinct()
+        .listen((preferences) {
+          // This subscription's responsibility is to listen for changes in
+          // user preferences (like adding/removing a saved filter) from other
+          // parts of the app and update this BLoC's state accordingly.
+          if (preferences != null &&
+              state.savedHeadlineFilters != preferences.savedHeadlineFilters) {
+            add(_AppContentPreferencesChanged(preferences: preferences));
+          }
+        });
 
     on<HeadlinesFeedStarted>(
       _onHeadlinesFeedStarted,
@@ -173,7 +168,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   final Logger _logger;
 
   /// Subscription to the AppBloc's state stream.
-  late final StreamSubscription<AppState> _appBlocSubscription;
+  late final StreamSubscription<UserContentPreferences?> _appBlocSubscription;
 
   static const _allFilterId = 'all';
 
@@ -308,7 +303,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         headlineResponse.items.map((h) => h.id).toList(),
       );
       final updatedEngagementsMap = Map<String, List<Engagement>>.from(
-        cachedFeed.engagementsMap,
+        state.engagementsMap,
       )..addAll(newEngagements);
 
       // For pagination, only inject ad placeholders.
@@ -335,7 +330,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         feedItems: updatedFeedItems,
         hasMore: headlineResponse.hasMore,
         cursor: headlineResponse.cursor,
-        engagementsMap: updatedEngagementsMap,
       );
 
       _feedCacheService.updateFeed(filterKey, updatedCachedFeed);
@@ -407,7 +401,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         headlineResponse.items.map((h) => h.id).toList(),
       );
       final updatedEngagementsMap = Map<String, List<Engagement>>.from(
-        cachedFeed?.engagementsMap ?? {},
+        state.engagementsMap,
       )..addAll(newEngagements);
 
       _logger.info(
@@ -443,12 +437,12 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
               final updatedCachedFeed = cachedFeed.copyWith(
                 feedItems: updatedFeedItems,
                 lastRefreshedAt: DateTime.now(),
-                engagementsMap: updatedEngagementsMap,
               );
               _feedCacheService.updateFeed(filterKey, updatedCachedFeed);
               emit(
                 state.copyWith(
                   status: HeadlinesFeedStatus.success,
+                  engagementsMap: updatedEngagementsMap,
                   feedItems: updatedFeedItems,
                 ),
               );
@@ -464,7 +458,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
                 state.copyWith(
                   status: HeadlinesFeedStatus.success,
                   feedItems: cachedFeed.feedItems,
-                  engagementsMap: updatedEngagementsMap,
                 ),
               );
               // This early return is critical. It prevents the BLoC from
@@ -506,7 +499,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         feedItems: fullyDecoratedFeed,
         hasMore: headlineResponse.hasMore,
         cursor: headlineResponse.cursor,
-        engagementsMap: newEngagements,
         lastRefreshedAt: DateTime.now(),
       );
 
@@ -519,7 +511,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           hasMore: newCachedFeed.hasMore,
           cursor: newCachedFeed.cursor,
           filter: state.filter,
-          engagementsMap: newCachedFeed.engagementsMap,
+          engagementsMap: updatedEngagementsMap,
         ),
       );
     } on HttpException catch (e) {
@@ -590,7 +582,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           feedItems: cachedFeed.feedItems,
           hasMore: cachedFeed.hasMore,
           cursor: cachedFeed.cursor,
-          engagementsMap: cachedFeed.engagementsMap,
           filter: event.filter,
           activeFilterId: newActiveFilterId,
         ),
@@ -636,6 +627,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       final newEngagements = await _fetchEngagementsForHeadlines(
         headlineResponse.items.map((h) => h.id).toList(),
       );
+      final updatedEngagementsMap = Map<String, List<Engagement>>.from(
+        state.engagementsMap,
+      )..addAll(newEngagements);
 
       final settings = _appBloc.state.settings;
 
@@ -658,7 +652,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         feedItems: fullyDecoratedFeed,
         hasMore: headlineResponse.hasMore,
         cursor: headlineResponse.cursor,
-        engagementsMap: newEngagements,
         lastRefreshedAt: DateTime.now(),
       );
 
@@ -670,7 +663,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           feedItems: newCachedFeed.feedItems,
           hasMore: newCachedFeed.hasMore,
           cursor: newCachedFeed.cursor,
-          engagementsMap: newCachedFeed.engagementsMap,
+          engagementsMap: updatedEngagementsMap,
         ),
       );
     } on HttpException catch (e) {
@@ -695,7 +688,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           feedItems: cachedFeed.feedItems,
           hasMore: cachedFeed.hasMore,
           cursor: cachedFeed.cursor,
-          engagementsMap: cachedFeed.engagementsMap,
           filter: const HeadlineFilterCriteria(
             topics: [],
             sources: [],
@@ -748,6 +740,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       final newEngagements = await _fetchEngagementsForHeadlines(
         headlineResponse.items.map((h) => h.id).toList(),
       );
+      final updatedEngagementsMap = Map<String, List<Engagement>>.from(
+        state.engagementsMap,
+      )..addAll(newEngagements);
 
       final settings = _appBloc.state.settings;
 
@@ -770,7 +765,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         feedItems: fullyDecoratedFeed,
         hasMore: headlineResponse.hasMore,
         cursor: headlineResponse.cursor,
-        engagementsMap: newEngagements,
         lastRefreshedAt: DateTime.now(),
       );
 
@@ -782,7 +776,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           feedItems: newCachedFeed.feedItems,
           hasMore: newCachedFeed.hasMore,
           cursor: newCachedFeed.cursor,
-          engagementsMap: newCachedFeed.engagementsMap,
+          engagementsMap: updatedEngagementsMap,
         ),
       );
     } on HttpException catch (e) {
@@ -838,7 +832,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
             feedItems: cachedFeed.feedItems,
             hasMore: cachedFeed.hasMore,
             cursor: cachedFeed.cursor,
-            engagementsMap: cachedFeed.engagementsMap,
             activeFilterId: filterKey,
             filter: newFilter,
           ),
@@ -883,7 +876,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           feedItems: cachedFeed.feedItems,
           hasMore: cachedFeed.hasMore,
           cursor: cachedFeed.cursor,
-          engagementsMap: cachedFeed.engagementsMap,
           activeFilterId: 'all',
           filter: const HeadlineFilterCriteria(
             topics: [],
@@ -939,7 +931,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           feedItems: cachedFeed.feedItems,
           hasMore: cachedFeed.hasMore,
           cursor: cachedFeed.cursor,
-          engagementsMap: cachedFeed.engagementsMap,
           activeFilterId: 'followed',
           filter: newFilter,
         ),
@@ -1066,16 +1057,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         state.engagementsMap,
       )..[event.headlineId] = newEngagementsForHeadline;
 
-      // Update the cache with the new engagement map.
-      final filterKey = _generateFilterKey(state.activeFilterId!, state.filter);
-      final cachedFeed = _feedCacheService.getFeed(filterKey);
-      if (cachedFeed != null) {
-        _feedCacheService.updateFeed(
-          filterKey,
-          cachedFeed.copyWith(engagementsMap: newEngagementsMap),
-        );
-      }
-
       emit(state.copyWith(engagementsMap: newEngagementsMap));
       _appBloc.add(AppPositiveInteractionOcurred(context: event.context));
     } catch (e, s) {
@@ -1132,15 +1113,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     final newEngagementsMap = Map<String, List<Engagement>>.from(
       state.engagementsMap,
     )..[event.headlineId] = newEngagementsForHeadline;
-
-    final filterKey = _generateFilterKey(state.activeFilterId!, state.filter);
-    final cachedFeed = _feedCacheService.getFeed(filterKey);
-    if (cachedFeed != null) {
-      _feedCacheService.updateFeed(
-        filterKey,
-        cachedFeed.copyWith(engagementsMap: newEngagementsMap),
-      );
-    }
 
     emit(state.copyWith(engagementsMap: newEngagementsMap));
 
@@ -1202,15 +1174,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     final newEngagementsMap = Map<String, List<Engagement>>.from(
       state.engagementsMap,
     )..[event.headlineId] = newEngagementsForHeadline;
-
-    final filterKey = _generateFilterKey(state.activeFilterId!, state.filter);
-    final cachedFeed = _feedCacheService.getFeed(filterKey);
-    if (cachedFeed != null) {
-      _feedCacheService.updateFeed(
-        filterKey,
-        cachedFeed.copyWith(engagementsMap: newEngagementsMap),
-      );
-    }
 
     emit(state.copyWith(engagementsMap: newEngagementsMap));
 

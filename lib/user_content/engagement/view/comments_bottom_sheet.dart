@@ -17,21 +17,18 @@ class CommentsBottomSheet extends StatelessWidget {
   /// {@macro comments_bottom_sheet}
   const CommentsBottomSheet({
     required this.headlineId,
-    required this.engagements,
     super.key,
   });
 
   /// The ID of the headline for which comments are being displayed.
   final String headlineId;
 
-  /// The list of all engagements for the headline, passed from the parent.
-  final List<Engagement> engagements;
-
   @override
   Widget build(BuildContext context) {
-    return _CommentsBottomSheetView(
-      headlineId: headlineId,
-      engagements: engagements,
+    // Provide the HeadlinesFeedBloc to the view.
+    return BlocProvider.value(
+      value: context.read<HeadlinesFeedBloc>(),
+      child: _CommentsBottomSheetView(headlineId: headlineId),
     );
   }
 }
@@ -39,14 +36,12 @@ class CommentsBottomSheet extends StatelessWidget {
 class _CommentsBottomSheetView extends StatefulWidget {
   const _CommentsBottomSheetView({
     required this.headlineId,
-    required this.engagements,
   });
   // A key to manage the state of the input field, allowing parent widgets
   // to trigger actions like editing.
   static final _inputFieldKey = GlobalKey<__CommentInputFieldState>();
 
   final String headlineId;
-  final List<Engagement> engagements;
 
   @override
   State<_CommentsBottomSheetView> createState() =>
@@ -57,55 +52,38 @@ class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-
-    // This listener now observes the central HeadlinesFeedBloc for any
-    // potential failures related to posting comments.
-    return BlocListener<HeadlinesFeedBloc, HeadlinesFeedState>(
-      listener: (context, state) {
-        // A simple failure check is sufficient here. More complex UI feedback
-        // can be added if needed.
-        if (state.status == HeadlinesFeedStatus.failure) {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(content: Text(l10n.commentPostFailureSnackbar)),
-            );
-        }
+    return DraggableScrollableSheet(
+      expand: false,
+      initialChildSize: 0.6,
+      minChildSize: 0.4,
+      maxChildSize: 0.9,
+      builder: (context, sheetScrollController) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Text(
+                  l10n.commentsPageTitle,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ),
+              const Divider(height: 1),
+              Expanded(child: _buildContent(context, sheetScrollController)),
+              Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: _CommentInputField(
+                  key: _CommentsBottomSheetView._inputFieldKey,
+                  headlineId: widget.headlineId,
+                ),
+              ),
+            ],
+          ),
+        );
       },
-      child: DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.6,
-        minChildSize: 0.4,
-        maxChildSize: 0.9,
-        builder: (context, sheetScrollController) {
-          return Padding(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom,
-            ),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  child: Text(
-                    l10n.commentsPageTitle,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                ),
-                const Divider(height: 1),
-                Expanded(child: _buildContent(context, sheetScrollController)),
-                Padding(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  child: _CommentInputField(
-                    key: _CommentsBottomSheetView._inputFieldKey,
-                    headlineId: widget.headlineId,
-                    engagements: widget.engagements,
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
     );
   }
 
@@ -113,82 +91,91 @@ class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
     BuildContext context,
     ScrollController scrollController,
   ) {
-    final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context);
+    return BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
+      builder: (context, state) {
+        final theme = Theme.of(context);
+        final l10n = AppLocalizations.of(context);
 
-    final comments = widget.engagements.where((e) => e.comment != null).toList()
-      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        final engagements = state.engagementsMap[widget.headlineId] ?? [];
+        final comments = engagements.where((e) => e.comment != null).toList()
+          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
-    if (comments.isEmpty) {
-      return Center(
-        child: Text(
-          l10n.noCommentsYet,
-          style: theme.textTheme.bodyLarge?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
-      );
-    }
+        if (state.status == HeadlinesFeedStatus.loading) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-    return ListView.separated(
-      controller: scrollController,
-      itemCount: comments.length,
-      separatorBuilder: (context, index) => const Divider(height: 1),
-      itemBuilder: (context, index) {
-        final engagement = comments[index];
-        final comment = engagement.comment!;
-        final currentLocale = context.watch<AppBloc>().state.locale;
-        final formattedDate = timeago.format(
-          engagement.updatedAt,
-          locale: currentLocale.languageCode,
-        );
-
-        final user = context.select((AppBloc bloc) => bloc.state.user);
-        final isOwnComment = user != null && engagement.userId == user.id;
-
-        return ListTile(
-          leading: const CircleAvatar(child: Icon(Icons.person_outline)),
-          title: Row(
-            children: [
-              Text(
-                'User ${engagement.userId.substring(0, 4)}',
-                style: theme.textTheme.titleSmall,
+        if (comments.isEmpty) {
+          return Center(
+            child: Text(
+              l10n.noCommentsYet,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
               ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: Text(
-                  '• $formattedDate',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+            ),
+          );
+        }
+
+        return ListView.separated(
+          controller: scrollController,
+          itemCount: comments.length,
+          separatorBuilder: (context, index) => const Divider(height: 1),
+          itemBuilder: (context, index) {
+            final engagement = comments[index];
+            final comment = engagement.comment!;
+            final currentLocale = context.watch<AppBloc>().state.locale;
+            final formattedDate = timeago.format(
+              engagement.updatedAt,
+              locale: currentLocale.languageCode,
+            );
+
+            final user = context.select((AppBloc bloc) => bloc.state.user);
+            final isOwnComment = user != null && engagement.userId == user.id;
+
+            return ListTile(
+              leading: const CircleAvatar(child: Icon(Icons.person_outline)),
+              title: Row(
+                children: [
+                  Text(
+                    'User ${engagement.userId.substring(0, 4)}',
+                    style: theme.textTheme.titleSmall,
                   ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              if (isOwnComment)
-                IconButton(
-                  icon: const Icon(Icons.edit_outlined, size: 20),
-                  onPressed: () {
-                    _CommentsBottomSheetView._inputFieldKey.currentState
-                        ?.startEditing();
-                  },
-                ),
-              IconButton(
-                icon: const Icon(Icons.flag_outlined, size: 20),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  showModalBottomSheet<void>(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (_) => ReportContentBottomSheet(
-                      entityId: engagement.id,
-                      reportableEntity: ReportableEntity.comment,
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Text(
+                      '• $formattedDate',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  );
-                },
+                  ),
+                  if (isOwnComment)
+                    IconButton(
+                      icon: const Icon(Icons.edit_outlined, size: 20),
+                      onPressed: () {
+                        _CommentsBottomSheetView._inputFieldKey.currentState
+                            ?.startEditing();
+                      },
+                    ),
+                  IconButton(
+                    icon: const Icon(Icons.flag_outlined, size: 20),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      showModalBottomSheet<void>(
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (_) => ReportContentBottomSheet(
+                          entityId: engagement.id,
+                          reportableEntity: ReportableEntity.comment,
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
-            ],
-          ),
-          subtitle: Text(comment.content),
+              subtitle: Text(comment.content),
+            );
+          },
         );
       },
     );
@@ -198,12 +185,10 @@ class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
 class _CommentInputField extends StatefulWidget {
   const _CommentInputField({
     required this.headlineId,
-    required this.engagements,
     super.key,
   });
 
   final String headlineId;
-  final List<Engagement> engagements;
 
   @override
   State<_CommentInputField> createState() => __CommentInputFieldState();
@@ -235,7 +220,10 @@ class __CommentInputFieldState extends State<_CommentInputField> {
     final user = context.read<AppBloc>().state.user;
     if (user == null) return;
 
-    final userEngagement = widget.engagements.firstWhereOrNull(
+    final engagements =
+        context.read<HeadlinesFeedBloc>().state.engagementsMap[widget.headlineId] ??
+            [];
+    final userEngagement = engagements.firstWhereOrNull(
       (e) => e.userId == user.id,
     );
     final existingComment = userEngagement?.comment?.content;
@@ -264,67 +252,74 @@ class __CommentInputFieldState extends State<_CommentInputField> {
     final user = context.select((AppBloc bloc) => bloc.state.user);
     final isGuest = user?.appRole == AppUserRole.guestUser;
 
-    final userEngagement = widget.engagements.firstWhereOrNull(
-      (e) => e.userId == user?.id,
-    );
-    final hasExistingComment = userEngagement?.comment != null;
-    final isEnabled = !isGuest && (!hasExistingComment || _isEditing);
+    return BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
+      builder: (context, state) {
+        final engagements = state.engagementsMap[widget.headlineId] ?? [];
+        final userEngagement = engagements.firstWhereOrNull(
+          (e) => e.userId == user?.id,
+        );
+        final hasExistingComment = userEngagement?.comment != null;
+        final isEnabled = !isGuest && (!hasExistingComment || _isEditing);
 
-    final canPost = _controller.text.isNotEmpty;
+        final canPost = _controller.text.isNotEmpty;
 
-    return Row(
-      children: [
-        Expanded(
-          child: TextFormField(
-            focusNode: _focusNode,
-            controller: _controller,
-            enabled: isEnabled,
-            decoration: InputDecoration(
-              hintText: isEnabled
-                  ? l10n.commentInputHint
-                  : (isGuest
-                        ? l10n.commentInputDisabledHint
-                        : l10n.noCommentsYet),
-              border: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(24)),
-              ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
+        return Row(
+          children: [
+            Expanded(
+              child: TextFormField(
+                focusNode: _focusNode,
+                controller: _controller,
+                enabled: isEnabled,
+                decoration: InputDecoration(
+                  hintText: isEnabled
+                      ? (_isEditing
+                          ? l10n.commentEditButtonLabel
+                          : l10n.commentInputHint)
+                      : (isGuest
+                          ? l10n.commentInputDisabledHint
+                          : l10n.commentInputExistingHint),
+                  border: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(24)),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
-        const SizedBox(width: AppSpacing.sm),
-        IconButton(
-          icon: Icon(_isEditing ? Icons.check : Icons.send),
-          color: canPost ? theme.colorScheme.primary : null,
-          tooltip: _isEditing
-              ? l10n.commentEditButtonLabel
-              : l10n.commentPostButtonLabel,
-          onPressed: canPost && isEnabled
-              ? () {
-                  if (_isEditing) {
-                    context.read<HeadlinesFeedBloc>().add(
-                      HeadlinesFeedCommentUpdated(
-                        widget.headlineId,
-                        _controller.text,
-                        context: context,
-                      ),
-                    );
-                  } else {
-                    context.read<HeadlinesFeedBloc>().add(
-                      HeadlinesFeedCommentPosted(
-                        widget.headlineId,
-                        _controller.text,
-                        context: context,
-                      ),
-                    );
-                  }
-                  resetAfterSubmit();
-                }
-              : null,
-        ),
-      ],
+            const SizedBox(width: AppSpacing.sm),
+            IconButton(
+              icon: Icon(_isEditing ? Icons.check : Icons.send),
+              color: canPost ? theme.colorScheme.primary : null,
+              tooltip: _isEditing
+                  ? l10n.commentEditButtonLabel
+                  : l10n.commentPostButtonLabel,
+              onPressed: canPost && isEnabled
+                  ? () {
+                      if (_isEditing) {
+                        context.read<HeadlinesFeedBloc>().add(
+                              HeadlinesFeedCommentUpdated(
+                                widget.headlineId,
+                                _controller.text,
+                                context: context,
+                              ),
+                            );
+                      } else {
+                        context.read<HeadlinesFeedBloc>().add(
+                              HeadlinesFeedCommentPosted(
+                                widget.headlineId,
+                                _controller.text,
+                                context: context,
+                              ),
+                            );
+                      }
+                      resetAfterSubmit();
+                    }
+                  : null,
+            ),
+          ],
+        );
+      },
     );
   }
 }

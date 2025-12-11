@@ -205,3 +205,51 @@ final class HeadlinesFeedEngagementTapped extends HeadlinesFeedEvent {
   @override
   List<Object> get props => [headline];
 }
+
+/// {@template headlines_feed_reaction_updated}
+/// Dispatched when the user selects or updates their reaction on a headline.
+/// {@endtemplate}
+final class HeadlinesFeedReactionUpdated extends HeadlinesFeedEvent {
+  /// {@macro headlines_feed_reaction_updated}
+  const HeadlinesFeedReactionUpdated(
+    this.headlineId,
+    this.reactionType, {
+    required this.context,
+  });
+
+  /// The ID of the headline being reacted to.
+  final String headlineId;
+
+  /// The new reaction type selected by the user. Can be null if toggling off.
+  final ReactionType? reactionType;
+
+  /// The build context, used for triggering side effects like review prompts.
+  final BuildContext context;
+
+  @override
+  List<Object?> get props => [headlineId, reactionType, context];
+}
+
+/// {@template headlines_feed_comment_posted}
+/// Dispatched when the user posts a new comment on a headline.
+/// {@endtemplate}
+final class HeadlinesFeedCommentPosted extends HeadlinesFeedEvent {
+  /// {@macro headlines_feed_comment_posted}
+  const HeadlinesFeedCommentPosted(
+    this.headlineId,
+    this.content, {
+    required this.context,
+  });
+
+  /// The ID of the headline being commented on.
+  final String headlineId;
+
+  /// The text content of the comment.
+  final String content;
+
+  /// The build context, used for triggering side effects like review prompts.
+  final BuildContext context;
+
+  @override
+  List<Object> get props => [headlineId, content, context];
+}

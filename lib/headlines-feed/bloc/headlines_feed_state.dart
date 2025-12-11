@@ -19,6 +19,7 @@ class HeadlinesFeedState extends Equatable {
     this.navigationUrl,
     this.navigationArguments,
     this.adThemeStyle,
+    this.engagementsMap = const {},
   });
 
   final HeadlinesFeedStatus status;
@@ -49,6 +50,10 @@ class HeadlinesFeedState extends Equatable {
   /// The current ad theme style.
   final AdThemeStyle? adThemeStyle;
 
+  /// A map of engagements, where the key is the entity ID (e.g., headline ID)
+  /// and the value is the list of engagements for that entity.
+  final Map<String, List<Engagement>> engagementsMap;
+
   HeadlinesFeedState copyWith({
     HeadlinesFeedStatus? status,
     List<FeedItem>? feedItems,
@@ -65,6 +70,7 @@ class HeadlinesFeedState extends Equatable {
     bool clearNavigationUrl = false,
     AdThemeStyle? adThemeStyle,
     bool clearNavigationArguments = false,
+    Map<String, List<Engagement>>? engagementsMap,
   }) {
     return HeadlinesFeedState(
       status: status ?? this.status,
@@ -84,6 +90,7 @@ class HeadlinesFeedState extends Equatable {
           ? null
           : navigationArguments ?? this.navigationArguments,
       adThemeStyle: adThemeStyle ?? this.adThemeStyle,
+      engagementsMap: engagementsMap ?? this.engagementsMap,
     );
   }
 
@@ -100,5 +107,6 @@ class HeadlinesFeedState extends Equatable {
     navigationUrl,
     navigationArguments,
     adThemeStyle,
+    engagementsMap,
   ];
 }

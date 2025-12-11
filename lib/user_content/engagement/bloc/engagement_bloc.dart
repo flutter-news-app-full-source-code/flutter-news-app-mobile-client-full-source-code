@@ -14,6 +14,7 @@ import 'package:uuid/uuid.dart';
 part 'engagement_event.dart';
 part 'engagement_state.dart';
 
+@Deprecated('Use HeadlinesFeedBloc for engagement management.')
 /// {@template engagement_bloc}
 /// Manages the state for user engagement (reactions and comments) on a
 /// single engageable entity, such as a headline.
@@ -27,13 +28,13 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
     required ContentLimitationService contentLimitationService,
     required AppBloc appBloc,
     Logger? logger,
-  })  : _entityId = entityId,
-        _entityType = entityType,
-        _engagementRepository = engagementRepository,
-        _contentLimitationService = contentLimitationService,
-        _appBloc = appBloc,
-        _logger = logger ?? Logger('EngagementBloc'),
-        super(const EngagementState()) {
+  }) : _entityId = entityId,
+       _entityType = entityType,
+       _engagementRepository = engagementRepository,
+       _contentLimitationService = contentLimitationService,
+       _appBloc = appBloc,
+       _logger = logger ?? Logger('EngagementBloc'),
+       super(const EngagementState()) {
     on<EngagementStarted>(_onEngagementStarted);
     on<EngagementReactionUpdated>(_onEngagementReactionUpdated);
     on<EngagementCommentPosted>(_onEngagementCommentPosted);
@@ -100,7 +101,8 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
     try {
       if (state.userEngagement != null) {
         // User is updating or removing their reaction.
-        final isTogglingOff = event.reactionType == null ||
+        final isTogglingOff =
+            event.reactionType == null ||
             state.userEngagement!.reaction?.reactionType == event.reactionType;
 
         if (isTogglingOff) {
@@ -263,8 +265,9 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
       // optimistic update on the local state. This ensures the UI updates
       // instantly and correctly reflects the new comment.
       final updatedEngagements = List<Engagement>.from(state.engagements);
-      final existingIndex =
-          updatedEngagements.indexWhere((e) => e.userId == userId);
+      final existingIndex = updatedEngagements.indexWhere(
+        (e) => e.userId == userId,
+      );
 
       if (existingIndex != -1) {
         updatedEngagements[existingIndex] = engagementToUpsert;
@@ -326,8 +329,9 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
         userId: userId,
       );
 
-      final updatedEngagements =
-          List<Engagement>.from(state.engagements).map((e) {
+      final updatedEngagements = List<Engagement>.from(state.engagements).map((
+        e,
+      ) {
         if (e.userId == userId) {
           return updatedEngagement;
         }

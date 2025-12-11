@@ -14,6 +14,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/cached_feed.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:logging/logging.dart';
 
 part 'headlines_feed_event.dart';
@@ -66,17 +67,21 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   HeadlinesFeedBloc({
     required DataRepository<Headline> headlinesRepository,
     required FeedDecoratorService feedDecoratorService,
+    required DataRepository<Engagement> engagementRepository,
     required AdService adService,
     required AppBloc appBloc,
     required InlineAdCacheService inlineAdCacheService,
     required FeedCacheService feedCacheService,
+    required ContentLimitationService contentLimitationService,
     UserContentPreferences? initialUserContentPreferences,
   }) : _headlinesRepository = headlinesRepository,
        _feedDecoratorService = feedDecoratorService,
+       _engagementRepository = engagementRepository,
        _adService = adService,
        _appBloc = appBloc,
        _inlineAdCacheService = inlineAdCacheService,
        _feedCacheService = feedCacheService,
+       _contentLimitationService = contentLimitationService,
        _logger = Logger('HeadlinesFeedBloc'),
        super(
          HeadlinesFeedState(
@@ -141,6 +146,14 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       _onHeadlinesFeedEngagementTapped,
       transformer: sequential(),
     );
+    on<HeadlinesFeedReactionUpdated>(
+      _onHeadlinesFeedReactionUpdated,
+      transformer: sequential(),
+    );
+    on<HeadlinesFeedCommentPosted>(
+      _onHeadlinesFeedCommentPosted,
+      transformer: sequential(),
+    );
   }
 
   final DataRepository<Headline> _headlinesRepository;
@@ -149,6 +162,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   final AppBloc _appBloc;
   final InlineAdCacheService _inlineAdCacheService;
   final FeedCacheService _feedCacheService;
+  final DataRepository<Engagement> _engagementRepository;
+  final ContentLimitationService _contentLimitationService;
   final Logger _logger;
 
   /// Subscription to the AppBloc's state stream.
@@ -187,6 +202,29 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     // and are not included in the backend query for headlines. Source filtering
     // is performed solely by `source.id` when specific sources are selected.
     return queryFilter;
+  }
+
+  /// Fetches engagements for a list of headline IDs and returns them as a map.
+  Future<Map<String, List<Engagement>>> _fetchEngagementsForHeadlines(
+    List<String> headlineIds,
+  ) async {
+    if (headlineIds.isEmpty) return {};
+    try {
+      final response = await _engagementRepository.readAll(
+        filter: {
+          'entityId': {r'$in': headlineIds},
+        },
+      );
+      // Group engagements by their entityId.
+      return groupBy(response.items, (e) => e.entityId);
+    } catch (e, s) {
+      _logger.severe(
+        'Failed to fetch engagements for headlines.',
+        e,
+        s,
+      );
+      return {}; // Return empty map on failure to avoid breaking the feed.
+    }
   }
 
   /// Generates a deterministic cache key based on the active filter.
@@ -264,6 +302,11 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
+      final newEngagements = await _fetchEngagementsForHeadlines(
+        headlineResponse.items.map((h) => h.id).toList(),
+      );
+      final updatedEngagementsMap = {...cachedFeed.engagementsMap}..addAll(newEngagements);
+
       // For pagination, only inject ad placeholders.
       final newProcessedFeedItems = await _adService.injectFeedAdPlaceholders(
         feedItems: headlineResponse.items,
@@ -288,6 +331,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         feedItems: updatedFeedItems,
         hasMore: headlineResponse.hasMore,
         cursor: headlineResponse.cursor,
+        engagementsMap: updatedEngagementsMap,
       );
 
       _feedCacheService.updateFeed(filterKey, updatedCachedFeed);
@@ -302,6 +346,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           feedItems: updatedFeedItems,
           hasMore: headlineResponse.hasMore,
           cursor: headlineResponse.cursor,
+          engagementsMap: updatedEngagementsMap,
         ),
       );
     } on HttpException catch (e) {
@@ -354,6 +399,11 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
+      final newEngagements = await _fetchEngagementsForHeadlines(
+        headlineResponse.items.map((h) => h.id).toList(),
+      );
+      final updatedEngagementsMap = {...cachedFeed?.engagementsMap ?? {}}..addAll(newEngagements);
+
       _logger.info(
         'Refresh: Fetched ${headlineResponse.items.length} latest headlines '
         'for filter "$filterKey".',
@@ -387,6 +437,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
               final updatedCachedFeed = cachedFeed.copyWith(
                 feedItems: updatedFeedItems,
                 lastRefreshedAt: DateTime.now(),
+                engagementsMap: updatedEngagementsMap,
               );
               _feedCacheService.updateFeed(filterKey, updatedCachedFeed);
               emit(
@@ -407,6 +458,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
                 state.copyWith(
                   status: HeadlinesFeedStatus.success,
                   feedItems: cachedFeed.feedItems,
+                  engagementsMap: updatedEngagementsMap,
                 ),
               );
               // This early return is critical. It prevents the BLoC from
@@ -448,6 +500,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         feedItems: fullyDecoratedFeed,
         hasMore: headlineResponse.hasMore,
         cursor: headlineResponse.cursor,
+        engagementsMap: newEngagements,
         lastRefreshedAt: DateTime.now(),
       );
 
@@ -460,6 +513,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           hasMore: newCachedFeed.hasMore,
           cursor: newCachedFeed.cursor,
           filter: state.filter,
+          engagementsMap: newCachedFeed.engagementsMap,
         ),
       );
     } on HttpException catch (e) {
@@ -530,6 +584,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           feedItems: cachedFeed.feedItems,
           hasMore: cachedFeed.hasMore,
           cursor: cachedFeed.cursor,
+          engagementsMap: cachedFeed.engagementsMap,
           filter: event.filter,
           activeFilterId: newActiveFilterId,
         ),
@@ -593,6 +648,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         feedItems: fullyDecoratedFeed,
         hasMore: headlineResponse.hasMore,
         cursor: headlineResponse.cursor,
+        engagementsMap: newEngagements,
         lastRefreshedAt: DateTime.now(),
       );
 
@@ -604,6 +660,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           feedItems: newCachedFeed.feedItems,
           hasMore: newCachedFeed.hasMore,
           cursor: newCachedFeed.cursor,
+          engagementsMap: newCachedFeed.engagementsMap,
         ),
       );
     } on HttpException catch (e) {
@@ -628,6 +685,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           feedItems: cachedFeed.feedItems,
           hasMore: cachedFeed.hasMore,
           cursor: cachedFeed.cursor,
+          engagementsMap: cachedFeed.engagementsMap,
           filter: const HeadlineFilterCriteria(
             topics: [],
             sources: [],
@@ -698,6 +756,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         feedItems: fullyDecoratedFeed,
         hasMore: headlineResponse.hasMore,
         cursor: headlineResponse.cursor,
+        engagementsMap: newEngagements,
         lastRefreshedAt: DateTime.now(),
       );
 
@@ -709,6 +768,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           feedItems: newCachedFeed.feedItems,
           hasMore: newCachedFeed.hasMore,
           cursor: newCachedFeed.cursor,
+          engagementsMap: newCachedFeed.engagementsMap,
         ),
       );
     } on HttpException catch (e) {
@@ -764,6 +824,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
             feedItems: cachedFeed.feedItems,
             hasMore: cachedFeed.hasMore,
             cursor: cachedFeed.cursor,
+            engagementsMap: cachedFeed.engagementsMap,
             activeFilterId: filterKey,
             filter: newFilter,
           ),
@@ -808,6 +869,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           feedItems: cachedFeed.feedItems,
           hasMore: cachedFeed.hasMore,
           cursor: cachedFeed.cursor,
+          engagementsMap: cachedFeed.engagementsMap,
           activeFilterId: 'all',
           filter: const HeadlineFilterCriteria(
             topics: [],
@@ -863,6 +925,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           feedItems: cachedFeed.feedItems,
           hasMore: cachedFeed.hasMore,
           cursor: cachedFeed.cursor,
+          engagementsMap: cachedFeed.engagementsMap,
           activeFilterId: 'followed',
           filter: newFilter,
         ),
@@ -896,6 +959,162 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         navigationArguments: event.headline,
       ),
     );
+  }
+
+  Future<void> _onHeadlinesFeedReactionUpdated(
+    HeadlinesFeedReactionUpdated event,
+    Emitter<HeadlinesFeedState> emit,
+  ) async {
+    final userId = _appBloc.state.user?.id;
+    if (userId == null) return;
+
+    final preCheckStatus = await _contentLimitationService.checkAction(
+      ContentAction.reactToContent,
+    );
+    if (preCheckStatus != LimitationStatus.allowed) {
+      // Optionally, emit a state to show a limitation message.
+      // For now, we just log and return.
+      _logger.warning('Reaction limit reached for user $userId.');
+      return;
+    }
+
+    final currentEngagements = state.engagementsMap[event.headlineId] ?? [];
+    final userEngagement = currentEngagements.firstWhereOrNull(
+      (e) => e.userId == userId,
+    );
+
+    try {
+      Engagement? updatedEngagement;
+
+      if (userEngagement != null) {
+        final isTogglingOff = event.reactionType == null ||
+            userEngagement.reaction?.reactionType == event.reactionType;
+
+        if (isTogglingOff) {
+          if (userEngagement.comment == null) {
+            await _engagementRepository.delete(
+              id: userEngagement.id,
+              userId: userId,
+            );
+            updatedEngagement = null; // It's deleted
+          } else {
+            updatedEngagement = userEngagement.copyWith(
+              reaction: const ValueWrapper(null),
+            );
+            await _engagementRepository.update(
+              id: updatedEngagement.id,
+              item: updatedEngagement,
+              userId: userId,
+            );
+          }
+        } else {
+          updatedEngagement = userEngagement.copyWith(
+            reaction: ValueWrapper(Reaction(reactionType: event.reactionType!)),
+          );
+          await _engagementRepository.update(
+            id: updatedEngagement.id,
+            item: updatedEngagement,
+            userId: userId,
+          );
+        }
+      } else if (event.reactionType != null) {
+        updatedEngagement = Engagement(
+          id: const Uuid().v4(),
+          userId: userId,
+          entityId: event.headlineId,
+          entityType: EngageableType.headline,
+          reaction: Reaction(reactionType: event.reactionType!),
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+        await _engagementRepository.create(
+          item: updatedEngagement,
+          userId: userId,
+        );
+      }
+
+      // Optimistically update the state
+      final newEngagementsForHeadline = List<Engagement>.from(currentEngagements)
+        ..removeWhere((e) => e.userId == userId);
+      if (updatedEngagement != null) {
+        newEngagementsForHeadline.add(updatedEngagement);
+      }
+
+      final newEngagementsMap =
+          Map<String, List<Engagement>>.from(state.engagementsMap)
+        ..[event.headlineId] = newEngagementsForHeadline;
+
+      emit(state.copyWith(engagementsMap: newEngagementsMap));
+      _appBloc.add(AppPositiveInteractionOcurred(context: event.context));
+    } catch (e, s) {
+      _logger.severe('Failed to update reaction.', e, s);
+      // Optionally, revert state on failure. For now, we log and absorb.
+    }
+  }
+
+  Future<void> _onHeadlinesFeedCommentPosted(
+    HeadlinesFeedCommentPosted event,
+    Emitter<HeadlinesFeedState> emit,
+  ) async {
+    final userId = _appBloc.state.user?.id;
+    final language = _appBloc.state.settings?.language;
+    if (userId == null || language == null) return;
+
+    final preCheckStatus = await _contentLimitationService.checkAction(
+      ContentAction.postComment,
+    );
+    if (preCheckStatus != LimitationStatus.allowed) {
+      _logger.warning('Comment limit reached for user $userId.');
+      return;
+    }
+
+    final currentEngagements = state.engagementsMap[event.headlineId] ?? [];
+    final userEngagement = currentEngagements.firstWhereOrNull(
+      (e) => e.userId == userId,
+    );
+
+    final newComment = Comment(language: language, content: event.content);
+    final engagementToUpsert = (userEngagement ??
+            Engagement(
+              id: const Uuid().v4(),
+              userId: userId,
+              entityId: event.headlineId,
+              entityType: EngageableType.headline,
+              createdAt: DateTime.now(),
+              updatedAt: DateTime.now(),
+            ))
+        .copyWith(comment: ValueWrapper(newComment));
+
+    // Optimistic UI update
+    final newEngagementsForHeadline = List<Engagement>.from(currentEngagements)
+      ..removeWhere((e) => e.userId == userId)
+      ..add(engagementToUpsert);
+
+    final newEngagementsMap =
+        Map<String, List<Engagement>>.from(state.engagementsMap)
+      ..[event.headlineId] = newEngagementsForHeadline;
+
+    emit(state.copyWith(engagementsMap: newEngagementsMap));
+
+    try {
+      if (userEngagement != null) {
+        await _engagementRepository.update(
+          id: engagementToUpsert.id,
+          item: engagementToUpsert,
+          userId: userId,
+        );
+      } else {
+        await _engagementRepository.create(
+          item: engagementToUpsert,
+          userId: userId,
+        );
+      }
+      _appBloc.add(AppPositiveInteractionOcurred(context: event.context));
+    } catch (e, s) {
+      _logger.severe('Failed to post comment.', e, s);
+      // Revert optimistic update on failure
+      emit(state.copyWith(engagementsMap: state.engagementsMap));
+    }
   }
 
   @override

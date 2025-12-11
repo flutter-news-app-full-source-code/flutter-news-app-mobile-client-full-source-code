@@ -33,18 +33,12 @@ class HeadlineActionsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _HeadlineActionsRowView(
-      headline: headline,
-      engagements: engagements,
-    );
+    return _HeadlineActionsRowView(headline: headline, engagements: engagements);
   }
 }
 
 class _HeadlineActionsRowView extends StatelessWidget {
-  const _HeadlineActionsRowView({
-    required this.headline,
-    required this.engagements,
-  });
+  const _HeadlineActionsRowView({required this.headline, required this.engagements});
 
   final Headline headline;
   final List<Engagement> engagements;
@@ -73,7 +67,9 @@ class _HeadlineActionsRowView extends StatelessWidget {
     final commentCount = engagements.where((e) => e.comment != null).length;
 
     final theme = Theme.of(context);
-    final mutedColor = theme.colorScheme.onSurfaceVariant.withOpacity(0.6);
+    final mutedColor = theme.colorScheme.onSurfaceVariant.withOpacity(
+      0.6,
+    );
 
     return Padding(
       padding: const EdgeInsets.only(top: AppSpacing.md),
@@ -94,10 +90,7 @@ class _HeadlineActionsRowView extends StatelessWidget {
               onPressed: () => showModalBottomSheet<void>(
                 context: context,
                 isScrollControlled: true,
-                builder: (_) => CommentsBottomSheet(
-                  headlineId: headline.id,
-                  engagements: engagements,
-                ),
+                builder: (_) => CommentsBottomSheet(headlineId: headline.id),
               ),
             ),
         ],
@@ -115,8 +108,8 @@ class _HeadlineActionsRowView extends StatelessWidget {
       );
     } else {
       context.read<HeadlinesFeedBloc>().add(
-        HeadlinesFeedReactionUpdated(headline.id, reaction, context: context),
-      );
+            HeadlinesFeedReactionUpdated(headline.id, reaction, context: context),
+          );
     }
   }
 
@@ -148,7 +141,7 @@ class _HeadlineActionsRowView extends StatelessWidget {
   }
 
   ({String title, String body, String buttonText, VoidCallback? onPressed})
-  _getBottomSheetContent({
+      _getBottomSheetContent({
     required BuildContext context,
     required AppLocalizations l10n,
     required LimitationStatus status,

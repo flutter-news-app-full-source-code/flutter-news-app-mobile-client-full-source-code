@@ -20,6 +20,8 @@ class HeadlinesFeedState extends Equatable {
     this.navigationArguments,
     this.adThemeStyle,
     this.engagementsMap = const {},
+    this.limitationStatus = LimitationStatus.allowed,
+    this.limitedAction,
   });
 
   final HeadlinesFeedStatus status;
@@ -54,6 +56,12 @@ class HeadlinesFeedState extends Equatable {
   /// and the value is the list of engagements for that entity.
   final Map<String, List<Engagement>> engagementsMap;
 
+  /// The status of the most recent content limitation check.
+  final LimitationStatus limitationStatus;
+
+  /// The specific action that was limited, if any.
+  final ContentAction? limitedAction;
+
   HeadlinesFeedState copyWith({
     HeadlinesFeedStatus? status,
     List<FeedItem>? feedItems,
@@ -71,6 +79,9 @@ class HeadlinesFeedState extends Equatable {
     AdThemeStyle? adThemeStyle,
     bool clearNavigationArguments = false,
     Map<String, List<Engagement>>? engagementsMap,
+    LimitationStatus? limitationStatus,
+    ContentAction? limitedAction,
+    bool clearLimitedAction = false,
   }) {
     return HeadlinesFeedState(
       status: status ?? this.status,
@@ -89,6 +100,9 @@ class HeadlinesFeedState extends Equatable {
           : navigationArguments ?? this.navigationArguments,
       adThemeStyle: adThemeStyle ?? this.adThemeStyle,
       engagementsMap: engagementsMap ?? this.engagementsMap,
+      limitationStatus: limitationStatus ?? this.limitationStatus,
+      limitedAction:
+          clearLimitedAction ? null : limitedAction ?? this.limitedAction,
     );
   }
 
@@ -106,5 +120,7 @@ class HeadlinesFeedState extends Equatable {
         navigationArguments,
         adThemeStyle,
         engagementsMap,
+    limitationStatus,
+    limitedAction,
       ];
 }

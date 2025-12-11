@@ -10,6 +10,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/widgets/feed_sliver_app_bar.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/widgets/saved_filters_bar.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/engagement/view/comments_bottom_sheet.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/shared.dart';
@@ -114,7 +116,19 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
     final theme = Theme.of(context);
 
     return BlocListener<HeadlinesFeedBloc, HeadlinesFeedState>(
+      listenWhen: (previous, current) =>
+          previous.navigationUrl != current.navigationUrl ||
+          previous.limitationStatus != current.limitationStatus,
       listener: (context, state) {
+        if (state.limitationStatus != LimitationStatus.allowed) {
+          _showContentLimitationBottomSheet(
+            context: context,
+            status: state.limitationStatus,
+            action: state.limitedAction ?? ContentAction.reactToContent,
+          );
+          return;
+        }
+
         // This listener handles navigation actions triggered by the BLoC.
         if (state.navigationUrl != null) {
           if (state.navigationArguments is Headline) {
@@ -348,5 +362,61 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
         ),
       ),
     );
+  }
+}
+
+void _showContentLimitationBottomSheet({
+  required BuildContext context,
+  required LimitationStatus status,
+  required ContentAction action,
+}) {
+  final l10n = AppLocalizations.of(context);
+  final userRole = context.read<AppBloc>().state.user?.appRole;
+
+  final content = _getBottomSheetContent(
+    context: context,
+    l10n: l10n,
+    status: status,
+    userRole: userRole,
+    action: action,
+  );
+
+  showModalBottomSheet<void>(
+    context: context,
+    builder: (_) => ContentLimitationBottomSheet(
+      title: content.title,
+      body: content.body,
+      buttonText: content.buttonText,
+      onButtonPressed: content.onPressed,
+    ),
+  );
+}
+
+({String title, String body, String buttonText, VoidCallback? onPressed})
+_getBottomSheetContent({
+  required BuildContext context,
+  required AppLocalizations l10n,
+  required LimitationStatus status,
+  required AppUserRole? userRole,
+  required ContentAction action,
+}) {
+  switch (status) {
+    case LimitationStatus.anonymousLimitReached:
+      return (
+        title: l10n.limitReachedGuestUserTitle,
+        body: l10n.limitReachedGuestUserBody,
+        buttonText: l10n.anonymousLimitButton,
+        onPressed: () => context.goNamed(Routes.accountLinkingName),
+      );
+    // Other cases for standard/premium users would go here.
+    case LimitationStatus.standardUserLimitReached:
+    case LimitationStatus.premiumUserLimitReached:
+    case LimitationStatus.allowed:
+      return (
+        title: l10n.limitReachedTitle,
+        body: l10n.limitReachedBodyReactions,
+        buttonText: l10n.gotItButton,
+        onPressed: () => Navigator.of(context).pop(),
+      );
   }
 }

@@ -985,10 +985,16 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     final preCheckStatus = await _contentLimitationService.checkAction(
       ContentAction.reactToContent,
     );
+
     if (preCheckStatus != LimitationStatus.allowed) {
-      // Optionally, emit a state to show a limitation message.
-      // For now, we just log and return.
       _logger.warning('Reaction limit reached for user $userId.');
+      emit(
+        state.copyWith(
+          limitationStatus: preCheckStatus,
+          limitedAction: ContentAction.reactToContent,
+        ),
+      );
+      emit(state.copyWith(clearLimitedAction: true));
       return;
     }
 
@@ -1087,6 +1093,13 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         await _contentLimitationService.checkAction(ContentAction.postComment);
     if (preCheckStatus != LimitationStatus.allowed) {
       _logger.warning('Comment limit reached for user $userId.');
+      emit(
+        state.copyWith(
+          limitationStatus: preCheckStatus,
+          limitedAction: ContentAction.postComment,
+        ),
+      );
+      emit(state.copyWith(clearLimitedAction: true));
       return;
     }
 

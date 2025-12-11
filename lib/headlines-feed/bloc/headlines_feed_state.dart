@@ -79,13 +79,11 @@ class HeadlinesFeedState extends Equatable {
       cursor: clearCursor ? null : cursor ?? this.cursor,
       filter: filter ?? this.filter,
       savedHeadlineFilters: savedHeadlineFilters ?? this.savedHeadlineFilters,
-      activeFilterId: clearActiveFilterId
-          ? null
-          : activeFilterId ?? this.activeFilterId,
+      activeFilterId:
+          clearActiveFilterId ? null : activeFilterId ?? this.activeFilterId,
       error: error ?? this.error,
-      navigationUrl: clearNavigationUrl
-          ? null
-          : navigationUrl ?? this.navigationUrl,
+      navigationUrl:
+          clearNavigationUrl ? null : navigationUrl ?? this.navigationUrl,
       navigationArguments: clearNavigationArguments
           ? null
           : navigationArguments ?? this.navigationArguments,
@@ -96,17 +94,17 @@ class HeadlinesFeedState extends Equatable {
 
   @override
   List<Object?> get props => [
-    status,
-    feedItems,
-    hasMore,
-    cursor,
-    filter,
-    savedHeadlineFilters,
-    activeFilterId,
-    error,
-    navigationUrl,
-    navigationArguments,
-    adThemeStyle,
-    engagementsMap,
-  ];
+        status,
+        feedItems,
+        hasMore,
+        cursor,
+        filter,
+        savedHeadlineFilters,
+        activeFilterId,
+        error,
+        navigationUrl,
+        navigationArguments,
+        adThemeStyle,
+        engagementsMap,
+      ];
 }

@@ -1,15 +1,11 @@
+import 'package:collection/collection.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/data/clients/clients.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/user_content/engagement/bloc/engagement_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/reporting/view/report_content_bottom_sheet.dart';
-import 'package:go_router/go_router.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:ui_kit/ui_kit.dart';
 
@@ -19,20 +15,39 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class CommentsBottomSheet extends StatelessWidget {
   /// {@macro comments_bottom_sheet}
-  const CommentsBottomSheet({super.key});
+  const CommentsBottomSheet({
+    required this.headlineId,
+    required this.engagements,
+    super.key,
+  });
+
+  /// The ID of the headline for which comments are being displayed.
+  final String headlineId;
+
+  /// The list of all engagements for the headline, passed from the parent.
+  final List<Engagement> engagements;
 
   @override
   Widget build(BuildContext context) {
-    return const _CommentsBottomSheetView();
+    return _CommentsBottomSheetView(
+      headlineId: headlineId,
+      engagements: engagements,
+    );
   }
 }
 
 class _CommentsBottomSheetView extends StatefulWidget {
-  // A key to reset the state of the input field when a comment is posted.
+  // A key to manage the state of the input field, allowing parent widgets
+  // to trigger actions like editing.
   static final _inputFieldKey = GlobalKey<__CommentInputFieldState>();
 
-  // ignore: unused_element
-  const _CommentsBottomSheetView();
+  const _CommentsBottomSheetView({
+    required this.headlineId,
+    required this.engagements,
+  });
+
+  final String headlineId;
+  final List<Engagement> engagements;
 
   @override
   State<_CommentsBottomSheetView> createState() =>
@@ -40,31 +55,22 @@ class _CommentsBottomSheetView extends StatefulWidget {
 }
 
 class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
-  final _scrollController = ScrollController();
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
-    return BlocListener<EngagementBloc, EngagementState>(
+    // This listener now observes the central HeadlinesFeedBloc for any
+    // potential failures related to posting comments.
+    return BlocListener<HeadlinesFeedBloc, HeadlinesFeedState>(
       listener: (context, state) {
-        if (state.limitationStatus != LimitationStatus.allowed) {
-          _showContentLimitationBottomSheet(
-            context: context,
-            status: state.limitationStatus,
-            action: ContentAction.postComment,
-          );
-        } else if (state.status == EngagementStatus.failure &&
-            state.error != null) {
+        // A simple failure check is sufficient here. More complex UI feedback
+        // can be added if needed.
+        if (state.status == HeadlinesFeedStatus.failure) {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(
               SnackBar(content: Text(l10n.commentPostFailureSnackbar)),
             );
-        } else if (state.status == EngagementStatus.success) {
-          // When a post/update is successful, reset the input field state.
-          _CommentsBottomSheetView._inputFieldKey.currentState
-              ?.resetAfterSubmit();
         }
       },
       child: DraggableScrollableSheet(
@@ -74,7 +80,6 @@ class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
         maxChildSize: 0.9,
         builder: (context, sheetScrollController) {
           return Padding(
-            // Add padding for the keyboard.
             padding: EdgeInsets.only(
               bottom: MediaQuery.of(context).viewInsets.bottom,
             ),
@@ -89,15 +94,14 @@ class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
                 ),
                 const Divider(height: 1),
                 Expanded(
-                  child: BlocBuilder<EngagementBloc, EngagementState>(
-                    builder: (context, state) =>
-                        _buildContent(context, state, sheetScrollController),
-                  ),
+                  child: _buildContent(context, sheetScrollController),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(AppSpacing.md),
                   child: _CommentInputField(
                     key: _CommentsBottomSheetView._inputFieldKey,
+                    headlineId: widget.headlineId,
+                    engagements: widget.engagements,
                   ),
                 ),
               ],
@@ -110,25 +114,13 @@ class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
 
   Widget _buildContent(
     BuildContext context,
-    EngagementState state,
     ScrollController scrollController,
   ) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
 
-    if (state.status == EngagementStatus.loading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (state.status == EngagementStatus.failure) {
-      return FailureStateWidget(
-        onRetry: () =>
-            context.read<EngagementBloc>().add(const EngagementStarted()),
-        exception: state.error!,
-      );
-    }
-
-    final comments = state.engagements.where((e) => e.comment != null).toList();
+    final comments = widget.engagements.where((e) => e.comment != null).toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
     if (comments.isEmpty) {
       return Center(
@@ -154,6 +146,9 @@ class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
           locale: currentLocale.languageCode,
         );
 
+        final user = context.select((AppBloc bloc) => bloc.state.user);
+        final isOwnComment = user != null && engagement.userId == user.id;
+
         return ListTile(
           leading: const CircleAvatar(child: Icon(Icons.person_outline)),
           title: Row(
@@ -172,7 +167,7 @@ class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              if (engagement.userId == context.read<AppBloc>().state.user?.id)
+              if (isOwnComment)
                 IconButton(
                   icon: const Icon(Icons.edit_outlined, size: 20),
                   onPressed: () {
@@ -183,7 +178,6 @@ class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
               IconButton(
                 icon: const Icon(Icons.flag_outlined, size: 20),
                 onPressed: () {
-                  // Pop the current sheet before showing the new one.
                   Navigator.of(context).pop();
                   showModalBottomSheet<void>(
                     context: context,
@@ -202,75 +196,17 @@ class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
       },
     );
   }
-
-  void _showContentLimitationBottomSheet({
-    required BuildContext context,
-    required LimitationStatus status,
-    required ContentAction action,
-  }) {
-    final l10n = AppLocalizations.of(context);
-    final userRole = context.read<AppBloc>().state.user?.appRole;
-
-    final content = _getBottomSheetContent(
-      context: context,
-      l10n: l10n,
-      status: status,
-      userRole: userRole,
-      action: action,
-    );
-
-    showModalBottomSheet<void>(
-      context: context,
-      builder: (_) => ContentLimitationBottomSheet(
-        title: content.title,
-        body: content.body,
-        buttonText: content.buttonText,
-        onButtonPressed: content.onPressed,
-      ),
-    );
-  }
-
-  ({String title, String body, String buttonText, VoidCallback? onPressed})
-  _getBottomSheetContent({
-    required BuildContext context,
-    required AppLocalizations l10n,
-    required LimitationStatus status,
-    required AppUserRole? userRole,
-    required ContentAction action,
-  }) {
-    switch (status) {
-      case LimitationStatus.anonymousLimitReached:
-        return (
-          title: l10n.limitReachedGuestUserTitle,
-          body: l10n.limitReachedGuestUserBody,
-          buttonText: l10n.anonymousLimitButton,
-          onPressed: () {
-            Navigator.of(context).pop();
-            context.pushNamed(Routes.accountLinkingName);
-          },
-        );
-      case LimitationStatus.standardUserLimitReached:
-        return (
-          title: l10n.standardLimitTitle,
-          body: l10n.standardLimitBody,
-          buttonText: l10n.standardLimitButton,
-          onPressed: () => Navigator.of(context).pop(),
-        );
-      case LimitationStatus.premiumUserLimitReached:
-        return (
-          title: l10n.premiumLimitTitle,
-          body: l10n.premiumLimitBody,
-          buttonText: l10n.premiumLimitButton,
-          onPressed: () => Navigator.of(context).pop(),
-        );
-      case LimitationStatus.allowed:
-        return (title: '', body: '', buttonText: '', onPressed: null);
-    }
-  }
 }
 
 class _CommentInputField extends StatefulWidget {
-  const _CommentInputField({super.key});
+  const _CommentInputField({
+    required this.headlineId,
+    required this.engagements,
+    super.key,
+  });
+
+  final String headlineId;
+  final List<Engagement> engagements;
 
   @override
   State<_CommentInputField> createState() => __CommentInputFieldState();
@@ -284,7 +220,11 @@ class __CommentInputFieldState extends State<_CommentInputField> {
   @override
   void initState() {
     super.initState();
-    _controller.addListener(() => setState(() {}));
+    _controller.addListener(() {
+      if (mounted) {
+        setState(() {});
+      }
+    });
   }
 
   @override
@@ -295,12 +235,13 @@ class __CommentInputFieldState extends State<_CommentInputField> {
   }
 
   void startEditing() {
-    final existingComment = context
-        .read<EngagementBloc>()
-        .state
-        .userEngagement
-        ?.comment
-        ?.content;
+    final user = context.read<AppBloc>().state.user;
+    if (user == null) return;
+
+    final userEngagement =
+        widget.engagements.firstWhereOrNull((e) => e.userId == user.id);
+    final existingComment = userEngagement?.comment?.content;
+
     if (existingComment != null) {
       setState(() {
         _controller.text = existingComment;
@@ -312,7 +253,9 @@ class __CommentInputFieldState extends State<_CommentInputField> {
 
   void resetAfterSubmit() {
     _controller.clear();
-    setState(() => _isEditing = false);
+    if (mounted) {
+      setState(() => _isEditing = false);
+    }
     _focusNode.unfocus();
   }
 
@@ -320,84 +263,61 @@ class __CommentInputFieldState extends State<_CommentInputField> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final isGuest =
-        context.select((AppBloc bloc) => bloc.state.user?.appRole) ==
-        AppUserRole.guestUser;
-    final hasExistingComment =
-        context.select(
-          (EngagementBloc bloc) => bloc.state.userEngagement?.comment,
-        ) !=
-        null;
+    final user = context.select((AppBloc bloc) => bloc.state.user);
+    final isGuest = user?.appRole == AppUserRole.guestUser;
+
+    final userEngagement =
+        widget.engagements.firstWhereOrNull((e) => e.userId == user?.id);
+    final hasExistingComment = userEngagement?.comment != null;
     final isEnabled = !isGuest && (!hasExistingComment || _isEditing);
 
-    // A user can post a comment if they have entered text.
     final canPost = _controller.text.isNotEmpty;
 
     return Row(
       children: [
         Expanded(
-          child: BlocBuilder<EngagementBloc, EngagementState>(
-            builder: (context, state) {
-              final isActionInProgress =
-                  state.status == EngagementStatus.actionInProgress;
-
-              return TextFormField(
-                focusNode: _focusNode,
-                controller: _controller,
-                enabled: isEnabled && !isActionInProgress,
-                decoration: InputDecoration(
-                  hintText: isEnabled
-                      ? l10n.commentInputHint
-                      : l10n.noCommentsYet,
-                  border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(24)),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                  ),
-                ),
-              );
-            },
+          child: TextFormField(
+            focusNode: _focusNode,
+            controller: _controller,
+            enabled: isEnabled,
+            decoration: InputDecoration(
+              hintText: isEnabled
+                  ? l10n.commentInputHint
+                  : (isGuest
+                      ? l10n.commentInputDisabledHint
+                      : l10n.noCommentsYet),
+              border: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(24)),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+              ),
+            ),
           ),
         ),
         const SizedBox(width: AppSpacing.sm),
-        BlocBuilder<EngagementBloc, EngagementState>(
-          builder: (context, state) {
-            final isActionInProgress =
-                state.status == EngagementStatus.actionInProgress;
-            return isActionInProgress
-                ? const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : IconButton(
-                    icon: Icon(_isEditing ? Icons.check : Icons.send),
-                    color: canPost ? theme.colorScheme.primary : null,
-                    tooltip: _isEditing
-                        ? l10n.commentEditButtonLabel
-                        : l10n.commentPostButtonLabel,
-                    onPressed: canPost && isEnabled
-                        ? () {
-                            if (_isEditing) {
-                              context.read<EngagementBloc>().add(
-                                EngagementCommentUpdated(
-                                  _controller.text,
-                                  context: context,
-                                ),
-                              );
-                            } else {
-                              context.read<EngagementBloc>().add(
-                                EngagementCommentPosted(
-                                  _controller.text,
-                                  context: context,
-                                ),
-                              );
-                            }
-                          }
-                        : null,
-                  );
-          },
+        IconButton(
+          icon: Icon(_isEditing ? Icons.check : Icons.send),
+          color: canPost ? theme.colorScheme.primary : null,
+          tooltip: _isEditing
+              ? l10n.commentEditButtonLabel
+              : l10n.commentPostButtonLabel,
+          onPressed: canPost && isEnabled
+              ? () {
+                  if (_isEditing) {
+                    // TODO(user): Implement comment update event in HeadlinesFeedBloc
+                  } else {
+                    context.read<HeadlinesFeedBloc>().add(
+                          HeadlinesFeedCommentPosted(
+                            widget.headlineId,
+                            _controller.text,
+                            context: context,
+                          ),
+                        );
+                  }
+                  resetAfterSubmit();
+                }
+              : null,
         ),
       ],
     );

@@ -762,11 +762,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     Emitter<AppState> emit,
   ) async {
     final newCount = state.positiveInteractionCount + 1;
-    emit(state.copyWith(positiveInteractionCount: newCount));
     await _appReviewService.checkEligibilityAndTrigger(
       context: event.context,
       positiveInteractionCount: newCount,
     );
+    // The count only updated after the eligibility check is complete.
+    emit(state.copyWith(positiveInteractionCount: newCount));
   }
 
   /// Handles the [AppPushNotificationTokenRefreshed] event.

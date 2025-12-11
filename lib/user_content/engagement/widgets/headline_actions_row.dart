@@ -1,13 +1,13 @@
+import 'package:collection/collection.dart';
 import 'package:core/core.dart';
-import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/user_content/engagement/bloc/engagement_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/engagement/view/comments_bottom_sheet.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/engagement/widgets/inline_reaction_selector.dart';
 import 'package:go_router/go_router.dart';
@@ -19,37 +19,30 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class HeadlineActionsRow extends StatelessWidget {
   /// {@macro headline_actions_row}
-  const HeadlineActionsRow({required this.headline, super.key});
+  const HeadlineActionsRow({
+    required this.headline,
+    required this.engagements,
+    super.key,
+  });
 
   /// The headline for which to display actions.
   final Headline headline;
 
+  /// The list of engagements for this headline.
+  final List<Engagement> engagements;
+
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => EngagementBloc(
-        entityId: headline.id,
-        entityType: EngageableType.headline,
-        engagementRepository: context.read<DataRepository<Engagement>>(),
-        appBloc: context.read<AppBloc>(),
-        contentLimitationService: context.read<ContentLimitationService>(),
-      )..add(const EngagementStarted()),
-      child: _HeadlineActionsRowView(headline: headline),
-    );
+    return _HeadlineActionsRowView(headline: headline, engagements: engagements);
   }
 }
 
-class _HeadlineActionsRowView extends StatefulWidget {
-  const _HeadlineActionsRowView({required this.headline});
+class _HeadlineActionsRowView extends StatelessWidget {
+  const _HeadlineActionsRowView({required this.headline, required this.engagements});
 
   final Headline headline;
+  final List<Engagement> engagements;
 
-  @override
-  State<_HeadlineActionsRowView> createState() =>
-      _HeadlineActionsRowViewState();
-}
-
-class _HeadlineActionsRowViewState extends State<_HeadlineActionsRowView> {
   @override
   Widget build(BuildContext context) {
     final remoteConfig = context.select(
@@ -66,73 +59,44 @@ class _HeadlineActionsRowViewState extends State<_HeadlineActionsRowView> {
         communityConfig!.engagement.engagementMode ==
         EngagementMode.reactionsAndComments;
 
-    return BlocListener<EngagementBloc, EngagementState>(
-      listener: (context, state) {
-        if (state.limitationStatus != LimitationStatus.allowed) {
-          final l10n = AppLocalizations.of(context);
-          final userRole = context.read<AppBloc>().state.user?.appRole;
-          final content = _getBottomSheetContent(
-            context: context,
-            l10n: l10n,
-            status: state.limitationStatus,
-            userRole: userRole,
-            action: ContentAction.reactToContent, // This is for reactions
-          );
+    final userId = context.select((AppBloc bloc) => bloc.state.user?.id);
+    final userEngagement = engagements.firstWhereOrNull(
+      (e) => e.userId == userId,
+    );
+    final userReaction = userEngagement?.reaction?.reactionType;
+    final commentCount = engagements.where((e) => e.comment != null).length;
 
-          showModalBottomSheet<void>(
-            context: context,
-            builder: (_) => ContentLimitationBottomSheet(
-              title: content.title,
-              body: content.body,
-              buttonText: content.buttonText,
-              onButtonPressed: content.onPressed,
+    final theme = Theme.of(context);
+    final mutedColor = theme.colorScheme.onSurfaceVariant.withOpacity(
+      0.6,
+    );
+
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.md),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: InlineReactionSelector(
+              unselectedColor: mutedColor,
+              selectedReaction: userReaction,
+              onReactionSelected: (reaction) =>
+                  _onReactionSelected(context, reaction),
             ),
-          );
-        }
-      },
-      child: BlocBuilder<EngagementBloc, EngagementState>(
-        builder: (context, state) {
-          final userReaction = state.userEngagement?.reaction?.reactionType;
-          final commentCount = state.engagements
-              .where((e) => e.comment != null)
-              .length;
-
-          final theme = Theme.of(context);
-          final mutedColor = theme.colorScheme.onSurfaceVariant.withOpacity(
-            0.6,
-          );
-
-          return Padding(
-            padding: const EdgeInsets.only(top: AppSpacing.md),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: InlineReactionSelector(
-                    unselectedColor: mutedColor,
-                    selectedReaction: userReaction,
-                    onReactionSelected: (reaction) =>
-                        _onReactionSelected(context, reaction),
-                  ),
+          ),
+          if (isCommentingEnabled)
+            _CommentsButton(
+              commentCount: commentCount,
+              onPressed: () => showModalBottomSheet<void>(
+                context: context,
+                isScrollControlled: true,
+                builder: (_) => CommentsBottomSheet(
+                  headlineId: headline.id,
+                  engagements: engagements,
                 ),
-                if (isCommentingEnabled)
-                  _CommentsButton(
-                    commentCount: commentCount,
-                    onPressed: () => showModalBottomSheet<void>(
-                      context: context,
-                      isScrollControlled: true,
-                      // Share the existing EngagementBloc instance with the
-                      // bottom sheet.
-                      builder: (_) => BlocProvider.value(
-                        value: context.read<EngagementBloc>(),
-                        child: const CommentsBottomSheet(),
-                      ),
-                    ),
-                  ),
-              ],
+              ),
             ),
-          );
-        },
+        ],
       ),
     );
   }
@@ -146,8 +110,8 @@ class _HeadlineActionsRowViewState extends State<_HeadlineActionsRowView> {
         action: ContentAction.reactToContent,
       );
     } else {
-      context.read<EngagementBloc>().add(
-        EngagementReactionUpdated(reaction, context: context),
+      context.read<HeadlinesFeedBloc>().add(
+        HeadlinesFeedReactionUpdated(headline.id, reaction, context: context),
       );
     }
   }

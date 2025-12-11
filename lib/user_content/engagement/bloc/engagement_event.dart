@@ -21,13 +21,15 @@ class EngagementStarted extends EngagementEvent {
 /// {@endtemplate}
 class EngagementReactionUpdated extends EngagementEvent {
   /// {@macro engagement_reaction_updated}
-  const EngagementReactionUpdated(this.reactionType);
+  const EngagementReactionUpdated(this.reactionType, {required this.context});
 
   /// The new reaction type selected by the user.
   final ReactionType? reactionType;
 
+  final BuildContext context;
+
   @override
-  List<Object?> get props => [reactionType];
+  List<Object?> get props => [reactionType, context];
 }
 
 /// {@template engagement_comment_posted}
@@ -35,24 +37,29 @@ class EngagementReactionUpdated extends EngagementEvent {
 /// {@endtemplate}
 class EngagementCommentPosted extends EngagementEvent {
   /// {@macro engagement_comment_posted}
-  const EngagementCommentPosted(this.content);
+  const EngagementCommentPosted(this.content, {required this.context});
 
   /// The text content of the comment.
   final String content;
 
+  final BuildContext context;
+
   @override
-  List<Object> get props => [content];
+  List<Object> get props => [content, context];
 }
 
-/// {@template engagement_quick_reaction_toggled}
-/// Dispatched when a user taps a quick reaction (like/dislike) on the feed.
+/// {@template engagement_comment_updated}
+/// Dispatched when the user updates their existing comment.
 /// {@endtemplate}
-class EngagementQuickReactionToggled extends EngagementEvent {
-  /// {@macro engagement_quick_reaction_toggled}
-  const EngagementQuickReactionToggled(this.reactionType);
+class EngagementCommentUpdated extends EngagementEvent {
+  /// {@macro engagement_comment_updated}
+  const EngagementCommentUpdated(this.content, {required this.context});
 
-  final ReactionType reactionType;
+  /// The updated text content of the comment.
+  final String content;
+
+  final BuildContext context;
 
   @override
-  List<Object> get props => [reactionType];
+  List<Object> get props => [content, context];
 }

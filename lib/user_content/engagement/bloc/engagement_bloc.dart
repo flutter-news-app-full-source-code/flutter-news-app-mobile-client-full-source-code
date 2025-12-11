@@ -5,6 +5,7 @@ import 'package:collection/collection.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:logging/logging.dart';
@@ -36,7 +37,7 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
     on<EngagementStarted>(_onEngagementStarted);
     on<EngagementReactionUpdated>(_onEngagementReactionUpdated);
     on<EngagementCommentPosted>(_onEngagementCommentPosted);
-    on<EngagementQuickReactionToggled>(_onEngagementQuickReactionToggled);
+    on<EngagementCommentUpdated>(_onEngagementCommentUpdated);
   }
 
   final String _entityId;
@@ -83,20 +84,20 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
     final originalUserEngagement = state.userEngagement;
     if (userId == null) return;
 
-    emit(state.copyWith(status: EngagementStatus.actionInProgress));
-
     final preCheckStatus = await _contentLimitationService.checkAction(
       ContentAction.reactToContent,
     );
     if (preCheckStatus != LimitationStatus.allowed) {
       emit(
         state.copyWith(
-          status: EngagementStatus.failure,
+          status: EngagementStatus.success, // Keep UI stable
           limitationStatus: preCheckStatus,
         ),
       );
       return;
     }
+
+    emit(state.copyWith(status: EngagementStatus.actionInProgress));
     try {
       if (state.userEngagement != null) {
         // User is updating or removing their reaction.
@@ -104,30 +105,53 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
             event.reactionType == null ||
             state.userEngagement!.reaction?.reactionType == event.reactionType;
 
-        Engagement? updatedEngagement;
         if (isTogglingOff) {
-          // Optimistically remove the reaction from the UI.
+          // Optimistically remove the reaction.
+          final engagementToDelete = state.userEngagement!;
           emit(
             state.copyWith(
               status: EngagementStatus.success,
               clearUserEngagement: true,
             ),
           );
-          await _engagementRepository.delete(id: state.userEngagement!.id);
+          // If the engagement only had a reaction, delete it.
+          // Otherwise, just remove the reaction field.
+          if (engagementToDelete.comment == null) {
+            await _engagementRepository.delete(
+              id: engagementToDelete.id,
+              userId: userId,
+            );
+          } else {
+            final updated = engagementToDelete.copyWith(
+              reaction: const ValueWrapper(null),
+            );
+            await _engagementRepository.update(
+              id: updated.id,
+              item: updated,
+              userId: userId,
+            );
+          }
         } else {
-          // Optimistically update the reaction in the UI.
-          updatedEngagement = state.userEngagement!.copyWith(
+          // Optimistically update the reaction.
+          final updatedEngagement = state.userEngagement!.copyWith(
             reaction: ValueWrapper(Reaction(reactionType: event.reactionType!)),
           );
           emit(
             state.copyWith(
               status: EngagementStatus.success,
               userEngagement: updatedEngagement,
+              // Also update the main list for immediate UI feedback.
+              engagements: state.engagements
+                  .map(
+                    (e) => e.id == updatedEngagement.id ? updatedEngagement : e,
+                  )
+                  .toList(),
             ),
           );
           await _engagementRepository.update(
-            id: updatedEngagement.id,
+            id: state.userEngagement!.id,
             item: updatedEngagement,
+            userId: userId,
           );
         }
       } else if (event.reactionType != null) {
@@ -146,18 +170,24 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
           state.copyWith(
             status: EngagementStatus.success,
             userEngagement: newEngagement,
+            engagements: [...state.engagements, newEngagement],
           ),
         );
-        final created = await _engagementRepository.create(item: newEngagement);
-        // Update the state with the server-confirmed engagement, which might
-        // have a different ID or timestamps.
+        final created = await _engagementRepository.create(
+          item: newEngagement,
+          userId: userId,
+        );
+        // Update state with the server-confirmed object.
         emit(
           state.copyWith(
-            status: EngagementStatus.success,
             userEngagement: created,
+            engagements: state.engagements
+                .map((e) => e.id == newEngagement.id ? created : e)
+                .toList(),
           ),
         );
       }
+      _appBloc.add(AppPositiveInteractionOcurred(context: event.context));
     } on HttpException catch (e, s) {
       _logger.severe('Failed to update reaction', e, s);
       var limitationStatus = LimitationStatus.allowed;
@@ -170,8 +200,6 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
           status: EngagementStatus.failure,
           error: e,
           userEngagement: originalUserEngagement,
-          // Reset the main status to success if it's just a limit issue
-          // to allow the UI to recover.
           limitationStatus: limitationStatus,
         ),
       );
@@ -188,21 +216,20 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
       return; // Cannot post a comment without a user or language.
     }
 
-    emit(state.copyWith(status: EngagementStatus.actionInProgress));
-
     final preCheckStatus = await _contentLimitationService.checkAction(
       ContentAction.postComment,
     );
     if (preCheckStatus != LimitationStatus.allowed) {
       emit(
         state.copyWith(
-          status: EngagementStatus.failure,
+          status: EngagementStatus.success, // Keep UI stable
           limitationStatus: preCheckStatus,
         ),
       );
       return;
     }
 
+    emit(state.copyWith(status: EngagementStatus.actionInProgress));
     try {
       final newComment = Comment(language: language, content: event.content);
       Engagement updatedEngagement;
@@ -213,12 +240,16 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
           comment: ValueWrapper(newComment),
         );
 
-        emit(state.copyWith(status: EngagementStatus.success));
+        // Optimistic UI update
+        emit(state.copyWith(userEngagement: updatedEngagement));
 
-        await _engagementRepository.update(
+        final result = await _engagementRepository.update(
           id: updatedEngagement.id,
           item: updatedEngagement,
+          userId: userId,
         );
+        // Final state update with server result
+        emit(state.copyWith(userEngagement: result));
       } else {
         // No existing engagement, create a new one with just the comment.
         updatedEngagement = Engagement(
@@ -231,11 +262,14 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
           updatedAt: DateTime.now(),
         );
 
-        emit(state.copyWith(status: EngagementStatus.success));
-        await _engagementRepository.create(
+        // Optimistic UI update
+        emit(state.copyWith(userEngagement: updatedEngagement));
+
+        final result = await _engagementRepository.create(
           item: updatedEngagement,
           userId: userId,
         );
+        emit(state.copyWith(userEngagement: result));
       }
 
       // Re-fetch to get the full list with the new comment included.
@@ -245,20 +279,20 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
       );
       emit(
         state.copyWith(
+          status: EngagementStatus.success,
           engagements: response.items,
           userEngagement: response.items.firstWhereOrNull(
             (e) => e.userId == userId,
           ),
         ),
       );
+      _appBloc.add(AppPositiveInteractionOcurred(context: event.context));
     } on HttpException catch (e, s) {
       _logger.severe('Failed to post comment', e, s);
       var limitationStatus = LimitationStatus.allowed;
       if (e is ForbiddenException) {
         limitationStatus = LimitationStatus.standardUserLimitReached;
       }
-      // On failure, we can simply show an error. The optimistic update will
-      // be corrected on the next full refresh.
       emit(
         state.copyWith(
           status: EngagementStatus.failure,
@@ -266,99 +300,70 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
           limitationStatus: limitationStatus,
         ),
       );
+      // Re-throw to be caught by BlocListener in UI for snackbar.
+      rethrow;
     }
   }
 
-  Future<void> _onEngagementQuickReactionToggled(
-    EngagementQuickReactionToggled event,
+  Future<void> _onEngagementCommentUpdated(
+    EngagementCommentUpdated event,
     Emitter<EngagementState> emit,
   ) async {
     final userId = _appBloc.state.user?.id;
-    final originalUserEngagement = state.userEngagement;
-    if (userId == null) return;
-
-    emit(state.copyWith(status: EngagementStatus.actionInProgress));
-
-    final preCheckStatus = await _contentLimitationService.checkAction(
-      ContentAction.reactToContent,
-    );
-    if (preCheckStatus != LimitationStatus.allowed) {
-      emit(
-        state.copyWith(
-          status: EngagementStatus.failure,
-          limitationStatus: preCheckStatus,
-        ),
-      );
+    final language = _appBloc.state.settings?.language;
+    if (userId == null ||
+        language == null ||
+        state.userEngagement?.comment == null) {
       return;
     }
 
     try {
-      if (state.userEngagement != null) {
-        // User has an existing engagement.
-        final isTogglingOff =
-            state.userEngagement!.reaction?.reactionType == event.reactionType;
+      emit(state.copyWith(status: EngagementStatus.actionInProgress));
 
-        if (isTogglingOff) {
-          // Optimistically remove the reaction.
-          emit(
-            state.copyWith(
-              status: EngagementStatus.success,
-              clearUserEngagement: true,
-            ),
-          );
-          await _engagementRepository.delete(id: state.userEngagement!.id);
-        } else {
-          // Optimistically update to the new reaction.
-          final updated = state.userEngagement!.copyWith(
-            reaction: ValueWrapper(Reaction(reactionType: event.reactionType)),
-          );
-          emit(
-            state.copyWith(
-              status: EngagementStatus.success,
-              userEngagement: updated,
-            ),
-          );
-          await _engagementRepository.update(id: updated.id, item: updated);
-        }
-      } else {
-        // No existing engagement, create a new one.
-        final newEngagement = Engagement(
-          id: const Uuid().v4(),
-          userId: userId,
-          entityId: _entityId,
-          entityType: _entityType,
-          reaction: Reaction(reactionType: event.reactionType),
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        );
-        // Optimistically add the new reaction.
-        emit(
-          state.copyWith(
-            status: EngagementStatus.success,
-            userEngagement: newEngagement,
-          ),
-        );
-        final created = await _engagementRepository.create(item: newEngagement);
-        // Update state with the server-confirmed object.
-        emit(state.copyWith(userEngagement: created));
-      }
+      final updatedComment = state.userEngagement!.comment!.copyWith(
+        content: event.content,
+      );
+      final updatedEngagement = state.userEngagement!.copyWith(
+        comment: ValueWrapper(updatedComment),
+      );
+
+      // Optimistic UI update
+      emit(state.copyWith(userEngagement: updatedEngagement));
+
+      final result = await _engagementRepository.update(
+        id: updatedEngagement.id,
+        item: updatedEngagement,
+        userId: userId,
+      );
+
+      // Re-fetch to get the full list with the updated comment included.
+      final response = await _engagementRepository.readAll(
+        filter: {'entityId': _entityId},
+        userId: userId,
+      );
+      emit(
+        state.copyWith(
+          status: EngagementStatus.success,
+          engagements: response.items,
+          userEngagement: result,
+        ),
+      );
+      _appBloc.add(AppPositiveInteractionOcurred(context: event.context));
     } on HttpException catch (e, s) {
-      _logger.severe('Failed to toggle quick reaction', e, s);
+      _logger.severe('Failed to update comment', e, s);
       var limitationStatus = LimitationStatus.allowed;
       if (e is ForbiddenException) {
         limitationStatus = LimitationStatus.standardUserLimitReached;
       }
-      // On failure, roll back to the original state.
       emit(
         state.copyWith(
           status: EngagementStatus.failure,
           error: e,
-          userEngagement: originalUserEngagement,
-          // Reset the main status to success if it's just a limit issue
-          // to allow the UI to recover.
           limitationStatus: limitationStatus,
         ),
       );
+      // Re-throw to be caught by BlocListener in UI for snackbar.
+      rethrow;
     }
   }
 }

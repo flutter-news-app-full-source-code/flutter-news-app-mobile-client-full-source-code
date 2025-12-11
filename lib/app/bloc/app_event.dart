@@ -266,3 +266,41 @@ class AppPositiveInteractionOcurred extends AppEvent {
   @override
   List<Object> get props => [context];
 }
+
+/// {@template app_bookmark_toggled}
+/// Dispatched when a user bookmarks or un-bookmarks a headline.
+/// {@endtemplate}
+class AppBookmarkToggled extends AppEvent {
+  /// {@macro app_bookmark_toggled}
+  const AppBookmarkToggled({
+    required this.headline,
+    required this.isBookmarked,
+    required this.context,
+  });
+
+  /// The headline being bookmarked or un-bookmarked.
+  final Headline headline;
+
+  /// Whether the headline is currently bookmarked.
+  final bool isBookmarked;
+
+  /// The build context, used for triggering side effects.
+  final BuildContext context;
+
+  @override
+  List<Object> get props => [headline, isBookmarked, context];
+}
+
+/// {@template app_content_reported}
+/// Dispatched when a user reports a piece of content.
+/// {@endtemplate}
+class AppContentReported extends AppEvent {
+  /// {@macro app_content_reported}
+  const AppContentReported({required this.report});
+
+  /// The report object to be submitted.
+  final Report report;
+
+  @override
+  List<Object> get props => [report];
+}

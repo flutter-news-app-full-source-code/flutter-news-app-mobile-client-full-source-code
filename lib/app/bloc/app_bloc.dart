@@ -15,6 +15,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/notifications/se
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/extensions.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:logging/logging.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 
 part 'app_event.dart';
 part 'app_state.dart';
@@ -48,6 +49,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required Logger logger,
     required DataRepository<User> userRepository,
     required PushNotificationService pushNotificationService,
+    required DataRepository<Report> reportRepository,
+    required ContentLimitationService contentLimitationService,
     required DataRepository<InAppNotification> inAppNotificationRepository,
     required AppReviewService appReviewService,
   }) : _remoteConfigRepository = remoteConfigRepository,
@@ -58,6 +61,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _userRepository = userRepository,
        _inAppNotificationRepository = inAppNotificationRepository,
        _pushNotificationService = pushNotificationService,
+       _reportRepository = reportRepository,
+       _contentLimitationService = contentLimitationService,
        _appReviewService = appReviewService,
        _inlineAdCacheService = inlineAdCacheService,
        _logger = logger,
@@ -99,6 +104,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppPositiveInteractionOcurred>(_onAppPositiveInteractionOcurred);
     on<AppInAppNotificationMarkedAsRead>(_onInAppNotificationMarkedAsRead);
     on<AppNotificationTapped>(_onAppNotificationTapped);
+    on<AppBookmarkToggled>(_onAppBookmarkToggled);
+    on<AppContentReported>(_onAppContentReported);
 
     // Listen to token refresh events from the push notification service.
     // When a token is refreshed, dispatch an event to trigger device
@@ -127,6 +134,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final DataRepository<User> _userRepository;
   final DataRepository<InAppNotification> _inAppNotificationRepository;
   final PushNotificationService _pushNotificationService;
+  final DataRepository<Report> _reportRepository;
+  final ContentLimitationService _contentLimitationService;
   final AppReviewService _appReviewService;
   final InlineAdCacheService _inlineAdCacheService;
 
@@ -778,6 +787,74 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       '[AppBloc] Push notification token refreshed. Re-registering device.',
     );
     await _registerDeviceForPushNotifications(state.user!.id);
+  }
+
+  Future<void> _onAppBookmarkToggled(
+    AppBookmarkToggled event,
+    Emitter<AppState> emit,
+  ) async {
+    final userContentPreferences = state.userContentPreferences;
+    if (userContentPreferences == null) return;
+
+    final currentSaved = List<Headline>.from(
+      userContentPreferences.savedHeadlines,
+    );
+
+    if (event.isBookmarked) {
+      currentSaved.removeWhere((h) => h.id == event.headline.id);
+    } else {
+      final limitationStatus = await _contentLimitationService.checkAction(
+        ContentAction.bookmarkHeadline,
+      );
+
+      if (limitationStatus != LimitationStatus.allowed) {
+        emit(
+          state.copyWith(
+            limitationStatus: limitationStatus,
+            limitedAction: ContentAction.bookmarkHeadline,
+          ),
+        );
+        emit(state.copyWith(clearLimitedAction: true));
+        return;
+      }
+      currentSaved.insert(0, event.headline);
+      add(AppPositiveInteractionOcurred(context: event.context));
+    }
+
+    add(
+      AppUserContentPreferencesChanged(
+        preferences: userContentPreferences.copyWith(
+          savedHeadlines: currentSaved,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _onAppContentReported(
+    AppContentReported event,
+    Emitter<AppState> emit,
+  ) async {
+    final limitationStatus = await _contentLimitationService.checkAction(
+      ContentAction.submitReport,
+    );
+
+    if (limitationStatus != LimitationStatus.allowed) {
+      emit(
+        state.copyWith(
+          limitationStatus: limitationStatus,
+          limitedAction: ContentAction.submitReport,
+        ),
+      );
+      emit(state.copyWith(clearLimitedAction: true));
+      return;
+    }
+
+    try {
+      await _reportRepository.create(item: event.report);
+    } catch (e, s) {
+      _logger.severe('Failed to submit report in AppBloc', e, s);
+      // Optionally emit a failure state to show a snackbar.
+    }
   }
 
   /// A private helper method to encapsulate the logic for registering a

@@ -21,6 +21,8 @@ class AppState extends Equatable {
     this.latestAppVersion,
     this.hasUnreadInAppNotifications = false,
     this.positiveInteractionCount = 0,
+    this.limitationStatus = LimitationStatus.allowed,
+    this.limitedAction,
   });
 
   /// The current status of the application, indicating its lifecycle stage.
@@ -62,6 +64,12 @@ class AppState extends Equatable {
 
   /// The number of positive interactions the user has performed in the session.
   final int positiveInteractionCount;
+
+  /// The status of the most recent content limitation check.
+  final LimitationStatus limitationStatus;
+
+  /// The specific action that was limited, if any.
+  final ContentAction? limitedAction;
 
   /// The current theme mode (light, dark, or system), derived from [settings].
   /// Defaults to [ThemeMode.system] if [settings] are not yet loaded.
@@ -151,6 +159,9 @@ class AppState extends Equatable {
     String? latestAppVersion,
     bool? hasUnreadInAppNotifications,
     int? positiveInteractionCount,
+    LimitationStatus? limitationStatus,
+    ContentAction? limitedAction,
+    bool clearLimitedAction = false,
   }) {
     return AppState(
       status: status ?? this.status,
@@ -169,6 +180,9 @@ class AppState extends Equatable {
           hasUnreadInAppNotifications ?? this.hasUnreadInAppNotifications,
       positiveInteractionCount:
           positiveInteractionCount ?? this.positiveInteractionCount,
+      limitationStatus: limitationStatus ?? this.limitationStatus,
+      limitedAction:
+          clearLimitedAction ? null : limitedAction ?? this.limitedAction,
     );
   }
 }

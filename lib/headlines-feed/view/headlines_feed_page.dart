@@ -121,7 +121,7 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
           previous.limitationStatus != current.limitationStatus,
       listener: (context, state) {
         if (state.limitationStatus != LimitationStatus.allowed) {
-          _showContentLimitationBottomSheet(
+          showContentLimitationBottomSheet(
             context: context,
             status: state.limitationStatus,
             action: state.limitedAction ?? ContentAction.reactToContent,
@@ -362,61 +362,5 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
         ),
       ),
     );
-  }
-}
-
-void _showContentLimitationBottomSheet({
-  required BuildContext context,
-  required LimitationStatus status,
-  required ContentAction action,
-}) {
-  final l10n = AppLocalizations.of(context);
-  final userRole = context.read<AppBloc>().state.user?.appRole;
-
-  final content = _getBottomSheetContent(
-    context: context,
-    l10n: l10n,
-    status: status,
-    userRole: userRole,
-    action: action,
-  );
-
-  showModalBottomSheet<void>(
-    context: context,
-    builder: (_) => ContentLimitationBottomSheet(
-      title: content.title,
-      body: content.body,
-      buttonText: content.buttonText,
-      onButtonPressed: content.onPressed,
-    ),
-  );
-}
-
-({String title, String body, String buttonText, VoidCallback? onPressed})
-_getBottomSheetContent({
-  required BuildContext context,
-  required AppLocalizations l10n,
-  required LimitationStatus status,
-  required AppUserRole? userRole,
-  required ContentAction action,
-}) {
-  switch (status) {
-    case LimitationStatus.anonymousLimitReached:
-      return (
-        title: l10n.limitReachedGuestUserTitle,
-        body: l10n.limitReachedGuestUserBody,
-        buttonText: l10n.anonymousLimitButton,
-        onPressed: () => context.goNamed(Routes.accountLinkingName),
-      );
-    // Other cases for standard/premium users would go here.
-    case LimitationStatus.standardUserLimitReached:
-    case LimitationStatus.premiumUserLimitReached:
-    case LimitationStatus.allowed:
-      return (
-        title: l10n.limitReachedTitle,
-        body: l10n.limitReachedBodyReactions,
-        buttonText: l10n.gotItButton,
-        onPressed: () => Navigator.of(context).pop(),
-      );
   }
 }

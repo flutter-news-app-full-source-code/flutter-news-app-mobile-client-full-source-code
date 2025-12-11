@@ -76,21 +76,21 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     required FeedCacheService feedCacheService,
     required ContentLimitationService contentLimitationService,
     UserContentPreferences? initialUserContentPreferences,
-  })  : _headlinesRepository = headlinesRepository,
-        _feedDecoratorService = feedDecoratorService,
-        _engagementRepository = engagementRepository,
-        _adService = adService,
-        _appBloc = appBloc,
-        _inlineAdCacheService = inlineAdCacheService,
-        _feedCacheService = feedCacheService,
-        _contentLimitationService = contentLimitationService,
-        _logger = Logger('HeadlinesFeedBloc'),
-        super(
-          HeadlinesFeedState(
-            savedHeadlineFilters:
-                initialUserContentPreferences?.savedHeadlineFilters ?? const [],
-          ),
-        ) {
+  }) : _headlinesRepository = headlinesRepository,
+       _feedDecoratorService = feedDecoratorService,
+       _engagementRepository = engagementRepository,
+       _adService = adService,
+       _appBloc = appBloc,
+       _inlineAdCacheService = inlineAdCacheService,
+       _feedCacheService = feedCacheService,
+       _contentLimitationService = contentLimitationService,
+       _logger = Logger('HeadlinesFeedBloc'),
+       super(
+         HeadlinesFeedState(
+           savedHeadlineFilters:
+               initialUserContentPreferences?.savedHeadlineFilters ?? const [],
+         ),
+       ) {
     // Subscribe to AppBloc to react to global state changes, primarily for
     // keeping the feed's list of saved filters synchronized with the global
     // app state.
@@ -224,11 +224,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       // Group engagements by their entityId.
       return groupBy(response.items, (e) => e.entityId);
     } catch (e, s) {
-      _logger.severe(
-        'Failed to fetch engagements for headlines.',
-        e,
-        s,
-      );
+      _logger.severe('Failed to fetch engagements for headlines.', e, s);
       return {}; // Return empty map on failure to avoid breaking the feed.
     }
   }
@@ -311,9 +307,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       final newEngagements = await _fetchEngagementsForHeadlines(
         headlineResponse.items.map((h) => h.id).toList(),
       );
-      final updatedEngagementsMap =
-          Map<String, List<Engagement>>.from(cachedFeed.engagementsMap)
-            ..addAll(newEngagements);
+      final updatedEngagementsMap = Map<String, List<Engagement>>.from(
+        cachedFeed.engagementsMap,
+      )..addAll(newEngagements);
 
       // For pagination, only inject ad placeholders.
       final newProcessedFeedItems = await _adService.injectFeedAdPlaceholders(
@@ -322,8 +318,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         remoteConfig: remoteConfig,
         imageStyle: _appBloc.state.settings!.feedSettings.feedItemImageStyle,
         adThemeStyle: event.adThemeStyle,
-        processedContentItemCount:
-            cachedFeed.feedItems.whereType<Headline>().length,
+        processedContentItemCount: cachedFeed.feedItems
+            .whereType<Headline>()
+            .length,
       );
 
       _logger.fine(
@@ -370,8 +367,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
     // Apply throttling logic.
     if (cachedFeed != null) {
-      final timeSinceLastRefresh =
-          DateTime.now().difference(cachedFeed.lastRefreshedAt);
+      final timeSinceLastRefresh = DateTime.now().difference(
+        cachedFeed.lastRefreshedAt,
+      );
       if (timeSinceLastRefresh < _refreshThrottleDuration) {
         _logger.info(
           'Refresh throttled for filter "$filterKey". '
@@ -408,9 +406,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       final newEngagements = await _fetchEngagementsForHeadlines(
         headlineResponse.items.map((h) => h.id).toList(),
       );
-      final updatedEngagementsMap =
-          Map<String, List<Engagement>>.from(cachedFeed?.engagementsMap ?? {})
-            ..addAll(newEngagements);
+      final updatedEngagementsMap = Map<String, List<Engagement>>.from(
+        cachedFeed?.engagementsMap ?? {},
+      )..addAll(newEngagements);
 
       _logger.info(
         'Refresh: Fetched ${headlineResponse.items.length} latest headlines '
@@ -423,8 +421,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
         if (cachedHeadlines.isNotEmpty) {
           final firstCachedHeadlineId = cachedHeadlines.first.id;
-          final matchIndex =
-              newHeadlines.indexWhere((h) => h.id == firstCachedHeadlineId);
+          final matchIndex = newHeadlines.indexWhere(
+            (h) => h.id == firstCachedHeadlineId,
+          );
 
           if (matchIndex != -1) {
             // Prepend only the new items found before the match.
@@ -557,8 +556,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       // Case 2: A filter was applied from the filter page ("Apply Only") or
       // by applying an un-pinned saved filter.
       // We check if the criteria match any *pinned* saved filter.
-      final matchingPinnedFilter =
-          state.savedHeadlineFilters.firstWhereOrNull((savedFilter) {
+      final matchingPinnedFilter = state.savedHeadlineFilters.firstWhereOrNull((
+        savedFilter,
+      ) {
         // Only consider pinned filters for direct ID matching.
         if (!savedFilter.isPinned) return false;
 
@@ -999,14 +999,16 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     }
 
     final currentEngagements = state.engagementsMap[event.headlineId] ?? [];
-    final userEngagement =
-        currentEngagements.firstWhereOrNull((e) => e.userId == userId);
+    final userEngagement = currentEngagements.firstWhereOrNull(
+      (e) => e.userId == userId,
+    );
 
     try {
       Engagement? updatedEngagement;
 
       if (userEngagement != null) {
-        final isTogglingOff = event.reactionType == null ||
+        final isTogglingOff =
+            event.reactionType == null ||
             userEngagement.reaction?.reactionType == event.reactionType;
 
         if (isTogglingOff) {
@@ -1053,16 +1055,16 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       }
 
       // Optimistically update the state
-      final newEngagementsForHeadline =
-          List<Engagement>.from(currentEngagements)
-            ..removeWhere((e) => e.userId == userId);
+      final newEngagementsForHeadline = List<Engagement>.from(
+        currentEngagements,
+      )..removeWhere((e) => e.userId == userId);
       if (updatedEngagement != null) {
         newEngagementsForHeadline.add(updatedEngagement);
       }
 
-      final newEngagementsMap =
-          Map<String, List<Engagement>>.from(state.engagementsMap)
-            ..[event.headlineId] = newEngagementsForHeadline;
+      final newEngagementsMap = Map<String, List<Engagement>>.from(
+        state.engagementsMap,
+      )..[event.headlineId] = newEngagementsForHeadline;
 
       // Update the cache with the new engagement map.
       final filterKey = _generateFilterKey(state.activeFilterId!, state.filter);
@@ -1089,8 +1091,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     final language = _appBloc.state.settings?.language;
     if (userId == null || language == null) return;
 
-    final preCheckStatus =
-        await _contentLimitationService.checkAction(ContentAction.postComment);
+    final preCheckStatus = await _contentLimitationService.checkAction(
+      ContentAction.postComment,
+    );
     if (preCheckStatus != LimitationStatus.allowed) {
       _logger.warning('Comment limit reached for user $userId.');
       emit(
@@ -1104,30 +1107,31 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     }
 
     final currentEngagements = state.engagementsMap[event.headlineId] ?? [];
-    final userEngagement =
-        currentEngagements.firstWhereOrNull((e) => e.userId == userId);
+    final userEngagement = currentEngagements.firstWhereOrNull(
+      (e) => e.userId == userId,
+    );
 
     final newComment = Comment(language: language, content: event.content);
-    final engagementToUpsert = (userEngagement ??
-            Engagement(
-              id: const Uuid().v4(),
-              userId: userId,
-              entityId: event.headlineId,
-              entityType: EngageableType.headline,
-              createdAt: DateTime.now(),
-              updatedAt: DateTime.now(),
-            ))
-        .copyWith(comment: ValueWrapper(newComment));
+    final engagementToUpsert =
+        (userEngagement ??
+                Engagement(
+                  id: const Uuid().v4(),
+                  userId: userId,
+                  entityId: event.headlineId,
+                  entityType: EngageableType.headline,
+                  createdAt: DateTime.now(),
+                  updatedAt: DateTime.now(),
+                ))
+            .copyWith(comment: ValueWrapper(newComment));
 
     // Optimistic UI update
-    final newEngagementsForHeadline =
-        List<Engagement>.from(currentEngagements)
-          ..removeWhere((e) => e.userId == userId)
-          ..add(engagementToUpsert);
+    final newEngagementsForHeadline = List<Engagement>.from(currentEngagements)
+      ..removeWhere((e) => e.userId == userId)
+      ..add(engagementToUpsert);
 
-    final newEngagementsMap =
-        Map<String, List<Engagement>>.from(state.engagementsMap)
-          ..[event.headlineId] = newEngagementsForHeadline;
+    final newEngagementsMap = Map<String, List<Engagement>>.from(
+      state.engagementsMap,
+    )..[event.headlineId] = newEngagementsForHeadline;
 
     final filterKey = _generateFilterKey(state.activeFilterId!, state.filter);
     final cachedFeed = _feedCacheService.getFeed(filterKey);
@@ -1170,8 +1174,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     if (userId == null || language == null) return;
 
     final currentEngagements = state.engagementsMap[event.headlineId] ?? [];
-    final userEngagement =
-        currentEngagements.firstWhereOrNull((e) => e.userId == userId);
+    final userEngagement = currentEngagements.firstWhereOrNull(
+      (e) => e.userId == userId,
+    );
 
     // If there's no existing engagement or no comment to update, do nothing.
     if (userEngagement == null || userEngagement.comment == null) {
@@ -1182,20 +1187,21 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       return;
     }
 
-    final updatedComment =
-        userEngagement.comment!.copyWith(content: event.content);
-    final updatedEngagement =
-        userEngagement.copyWith(comment: ValueWrapper(updatedComment));
+    final updatedComment = userEngagement.comment!.copyWith(
+      content: event.content,
+    );
+    final updatedEngagement = userEngagement.copyWith(
+      comment: ValueWrapper(updatedComment),
+    );
 
     // Optimistic UI update
-    final newEngagementsForHeadline =
-        List<Engagement>.from(currentEngagements)
-          ..removeWhere((e) => e.userId == userId)
-          ..add(updatedEngagement);
+    final newEngagementsForHeadline = List<Engagement>.from(currentEngagements)
+      ..removeWhere((e) => e.userId == userId)
+      ..add(updatedEngagement);
 
-    final newEngagementsMap =
-        Map<String, List<Engagement>>.from(state.engagementsMap)
-      ..[event.headlineId] = newEngagementsForHeadline;
+    final newEngagementsMap = Map<String, List<Engagement>>.from(
+      state.engagementsMap,
+    )..[event.headlineId] = newEngagementsForHeadline;
 
     final filterKey = _generateFilterKey(state.activeFilterId!, state.filter);
     final cachedFeed = _feedCacheService.getFeed(filterKey);

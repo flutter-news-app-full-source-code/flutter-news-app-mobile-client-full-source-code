@@ -24,7 +24,7 @@ class HeadlineActionsBottomSheet extends StatefulWidget {
 
 class _HeadlineActionsBottomSheetState
     extends State<HeadlineActionsBottomSheet> {
-  bool _isBookmarking = false;
+  final bool _isBookmarking = false;
 
   @override
   Widget build(BuildContext context) {

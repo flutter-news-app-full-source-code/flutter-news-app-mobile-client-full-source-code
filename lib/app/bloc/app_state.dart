@@ -181,8 +181,9 @@ class AppState extends Equatable {
       positiveInteractionCount:
           positiveInteractionCount ?? this.positiveInteractionCount,
       limitationStatus: limitationStatus ?? this.limitationStatus,
-      limitedAction:
-          clearLimitedAction ? null : limitedAction ?? this.limitedAction,
+      limitedAction: clearLimitedAction
+          ? null
+          : limitedAction ?? this.limitedAction,
     );
   }
 }

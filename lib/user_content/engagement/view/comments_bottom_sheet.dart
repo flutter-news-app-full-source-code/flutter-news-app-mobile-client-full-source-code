@@ -37,14 +37,13 @@ class CommentsBottomSheet extends StatelessWidget {
 }
 
 class _CommentsBottomSheetView extends StatefulWidget {
-  // A key to manage the state of the input field, allowing parent widgets
-  // to trigger actions like editing.
-  static final _inputFieldKey = GlobalKey<__CommentInputFieldState>();
-
   const _CommentsBottomSheetView({
     required this.headlineId,
     required this.engagements,
   });
+  // A key to manage the state of the input field, allowing parent widgets
+  // to trigger actions like editing.
+  static final _inputFieldKey = GlobalKey<__CommentInputFieldState>();
 
   final String headlineId;
   final List<Engagement> engagements;
@@ -93,9 +92,7 @@ class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
                   ),
                 ),
                 const Divider(height: 1),
-                Expanded(
-                  child: _buildContent(context, sheetScrollController),
-                ),
+                Expanded(child: _buildContent(context, sheetScrollController)),
                 Padding(
                   padding: const EdgeInsets.all(AppSpacing.md),
                   child: _CommentInputField(
@@ -238,8 +235,9 @@ class __CommentInputFieldState extends State<_CommentInputField> {
     final user = context.read<AppBloc>().state.user;
     if (user == null) return;
 
-    final userEngagement =
-        widget.engagements.firstWhereOrNull((e) => e.userId == user.id);
+    final userEngagement = widget.engagements.firstWhereOrNull(
+      (e) => e.userId == user.id,
+    );
     final existingComment = userEngagement?.comment?.content;
 
     if (existingComment != null) {
@@ -266,8 +264,9 @@ class __CommentInputFieldState extends State<_CommentInputField> {
     final user = context.select((AppBloc bloc) => bloc.state.user);
     final isGuest = user?.appRole == AppUserRole.guestUser;
 
-    final userEngagement =
-        widget.engagements.firstWhereOrNull((e) => e.userId == user?.id);
+    final userEngagement = widget.engagements.firstWhereOrNull(
+      (e) => e.userId == user?.id,
+    );
     final hasExistingComment = userEngagement?.comment != null;
     final isEnabled = !isGuest && (!hasExistingComment || _isEditing);
 
@@ -284,8 +283,8 @@ class __CommentInputFieldState extends State<_CommentInputField> {
               hintText: isEnabled
                   ? l10n.commentInputHint
                   : (isGuest
-                      ? l10n.commentInputDisabledHint
-                      : l10n.noCommentsYet),
+                        ? l10n.commentInputDisabledHint
+                        : l10n.noCommentsYet),
               border: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(24)),
               ),
@@ -306,20 +305,20 @@ class __CommentInputFieldState extends State<_CommentInputField> {
               ? () {
                   if (_isEditing) {
                     context.read<HeadlinesFeedBloc>().add(
-                          HeadlinesFeedCommentUpdated(
-                            widget.headlineId,
-                            _controller.text,
-                            context: context,
-                          ),
-                        );
+                      HeadlinesFeedCommentUpdated(
+                        widget.headlineId,
+                        _controller.text,
+                        context: context,
+                      ),
+                    );
                   } else {
                     context.read<HeadlinesFeedBloc>().add(
-                          HeadlinesFeedCommentPosted(
-                            widget.headlineId,
-                            _controller.text,
-                            context: context,
-                          ),
-                        );
+                      HeadlinesFeedCommentPosted(
+                        widget.headlineId,
+                        _controller.text,
+                        context: context,
+                      ),
+                    );
                   }
                   resetAfterSubmit();
                 }

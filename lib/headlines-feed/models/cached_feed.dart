@@ -55,8 +55,13 @@ class CachedFeed extends Equatable {
   }
 
   @override
-  List<Object?> get props =>
-      [feedItems, hasMore, cursor, lastRefreshedAt, engagementsMap];
+  List<Object?> get props => [
+    feedItems,
+    hasMore,
+    cursor,
+    lastRefreshedAt,
+    engagementsMap,
+  ];
 
   @override
   String toString() {

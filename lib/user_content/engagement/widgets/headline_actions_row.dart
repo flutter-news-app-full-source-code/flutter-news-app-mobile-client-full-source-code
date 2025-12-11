@@ -33,12 +33,18 @@ class HeadlineActionsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _HeadlineActionsRowView(headline: headline, engagements: engagements);
+    return _HeadlineActionsRowView(
+      headline: headline,
+      engagements: engagements,
+    );
   }
 }
 
 class _HeadlineActionsRowView extends StatelessWidget {
-  const _HeadlineActionsRowView({required this.headline, required this.engagements});
+  const _HeadlineActionsRowView({
+    required this.headline,
+    required this.engagements,
+  });
 
   final Headline headline;
   final List<Engagement> engagements;
@@ -67,9 +73,7 @@ class _HeadlineActionsRowView extends StatelessWidget {
     final commentCount = engagements.where((e) => e.comment != null).length;
 
     final theme = Theme.of(context);
-    final mutedColor = theme.colorScheme.onSurfaceVariant.withOpacity(
-      0.6,
-    );
+    final mutedColor = theme.colorScheme.onSurfaceVariant.withOpacity(0.6);
 
     return Padding(
       padding: const EdgeInsets.only(top: AppSpacing.md),

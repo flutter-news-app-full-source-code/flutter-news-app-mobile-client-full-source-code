@@ -56,7 +56,6 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
     try {
       final response = await _engagementRepository.readAll(
         filter: {'entityId': _entityId},
-        userId: userId,
       );
       final engagements = response.items;
       final userEngagement = engagements.firstWhereOrNull(
@@ -275,7 +274,6 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
       // Re-fetch to get the full list with the new comment included.
       final response = await _engagementRepository.readAll(
         filter: {'entityId': _entityId},
-        userId: userId,
       );
       emit(
         state.copyWith(
@@ -339,7 +337,6 @@ class EngagementBloc extends Bloc<EngagementEvent, EngagementState> {
       // Re-fetch to get the full list with the updated comment included.
       final response = await _engagementRepository.readAll(
         filter: {'entityId': _entityId},
-        userId: userId,
       );
       emit(
         state.copyWith(

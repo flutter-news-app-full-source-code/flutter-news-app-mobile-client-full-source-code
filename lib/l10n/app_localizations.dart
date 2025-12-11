@@ -2995,6 +2995,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign in to join the conversation'**
   String get commentInputDisabledHint;
+
+  /// Hint text for the comment input field when the user has already posted a comment.
+  ///
+  /// In en, this message translates to:
+  /// **'You have already commented on this headline.'**
+  String get commentInputExistingHint;
 }
 
 class _AppLocalizationsDelegate

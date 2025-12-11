@@ -1593,4 +1593,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get commentInputDisabledHint => 'سجل الدخول للانضمام إلى المحادثة';
+
+  @override
+  String get commentInputExistingHint => 'لقد علقت بالفعل على هذا العنوان.';
 }

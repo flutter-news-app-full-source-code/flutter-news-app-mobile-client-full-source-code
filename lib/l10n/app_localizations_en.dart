@@ -1596,4 +1596,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get commentInputDisabledHint => 'Sign in to join the conversation';
+
+  @override
+  String get commentInputExistingHint =>
+      'You have already commented on this headline.';
 }

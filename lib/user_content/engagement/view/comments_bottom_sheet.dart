@@ -4,9 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/data/clients/clients.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/engagement/bloc/engagement_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/user_content/reporting/view/report_content_bottom_sheet.dart';
 import 'package:go_router/go_router.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:ui_kit/ui_kit.dart';
@@ -26,6 +28,10 @@ class CommentsBottomSheet extends StatelessWidget {
 }
 
 class _CommentsBottomSheetView extends StatefulWidget {
+  // A key to reset the state of the input field when a comment is posted.
+  static final _inputFieldKey = GlobalKey<__CommentInputFieldState>();
+
+  // ignore: unused_element
   const _CommentsBottomSheetView();
 
   @override
@@ -34,6 +40,8 @@ class _CommentsBottomSheetView extends StatefulWidget {
 }
 
 class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
+  final _scrollController = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -53,6 +61,10 @@ class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
             ..showSnackBar(
               SnackBar(content: Text(l10n.commentPostFailureSnackbar)),
             );
+        } else if (state.status == EngagementStatus.success) {
+          // When a post/update is successful, reset the input field state.
+          _CommentsBottomSheetView._inputFieldKey.currentState
+              ?.resetAfterSubmit();
         }
       },
       child: DraggableScrollableSheet(
@@ -60,7 +72,7 @@ class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
         initialChildSize: 0.6,
         minChildSize: 0.4,
         maxChildSize: 0.9,
-        builder: (context, scrollController) {
+        builder: (context, sheetScrollController) {
           return Padding(
             // Add padding for the keyboard.
             padding: EdgeInsets.only(
@@ -78,14 +90,15 @@ class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
                 const Divider(height: 1),
                 Expanded(
                   child: BlocBuilder<EngagementBloc, EngagementState>(
-                    builder: (context, state) {
-                      return _buildContent(context, state, scrollController);
-                    },
+                    builder: (context, state) =>
+                        _buildContent(context, state, sheetScrollController),
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.all(AppSpacing.md),
-                  child: _CommentInputField(),
+                Padding(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: _CommentInputField(
+                    key: _CommentsBottomSheetView._inputFieldKey,
+                  ),
                 ),
               ],
             ),
@@ -150,11 +163,37 @@ class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
                 style: theme.textTheme.titleSmall,
               ),
               const SizedBox(width: AppSpacing.sm),
-              Text(
-                '• $formattedDate',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+              Expanded(
+                child: Text(
+                  '• $formattedDate',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
+              ),
+              if (engagement.userId == context.read<AppBloc>().state.user?.id)
+                IconButton(
+                  icon: const Icon(Icons.edit_outlined, size: 20),
+                  onPressed: () {
+                    _CommentsBottomSheetView._inputFieldKey.currentState
+                        ?.startEditing();
+                  },
+                ),
+              IconButton(
+                icon: const Icon(Icons.flag_outlined, size: 20),
+                onPressed: () {
+                  // Pop the current sheet before showing the new one.
+                  Navigator.of(context).pop();
+                  showModalBottomSheet<void>(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (_) => ReportContentBottomSheet(
+                      entityId: engagement.id,
+                      reportableEntity: ReportableEntity.comment,
+                    ),
+                  );
+                },
               ),
             ],
           ),
@@ -231,19 +270,31 @@ class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
 }
 
 class _CommentInputField extends StatefulWidget {
-  const _CommentInputField();
+  const _CommentInputField({super.key});
 
   @override
   State<_CommentInputField> createState() => __CommentInputFieldState();
 }
 
 class __CommentInputFieldState extends State<_CommentInputField> {
+  final _focusNode = FocusNode();
   final _controller = TextEditingController();
+  bool _isEditing = false;
 
   @override
   void initState() {
     super.initState();
-    // Pre-fill the input field if the user has an existing comment.
+    _controller.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void startEditing() {
     final existingComment = context
         .read<EngagementBloc>()
         .state
@@ -251,19 +302,19 @@ class __CommentInputFieldState extends State<_CommentInputField> {
         ?.comment
         ?.content;
     if (existingComment != null) {
-      _controller.text = existingComment;
+      setState(() {
+        _controller.text = existingComment;
+        _isEditing = true;
+      });
+      _focusNode.requestFocus();
     }
-    _controller.addListener(() => setState(() {}));
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+  void resetAfterSubmit() {
+    _controller.clear();
+    setState(() => _isEditing = false);
+    _focusNode.unfocus();
   }
-
-  bool get _isEditing =>
-      context.read<EngagementBloc>().state.userEngagement?.comment != null;
 
   @override
   Widget build(BuildContext context) {
@@ -272,6 +323,12 @@ class __CommentInputFieldState extends State<_CommentInputField> {
     final isGuest =
         context.select((AppBloc bloc) => bloc.state.user?.appRole) ==
         AppUserRole.guestUser;
+    final hasExistingComment =
+        context.select(
+          (EngagementBloc bloc) => bloc.state.userEngagement?.comment,
+        ) !=
+        null;
+    final isEnabled = !isGuest && (!hasExistingComment || _isEditing);
 
     // A user can post a comment if they have entered text.
     final canPost = _controller.text.isNotEmpty;
@@ -283,13 +340,15 @@ class __CommentInputFieldState extends State<_CommentInputField> {
             builder: (context, state) {
               final isActionInProgress =
                   state.status == EngagementStatus.actionInProgress;
+
               return TextFormField(
+                focusNode: _focusNode,
                 controller: _controller,
-                enabled: !isGuest && !isActionInProgress,
+                enabled: isEnabled && !isActionInProgress,
                 decoration: InputDecoration(
-                  hintText: isGuest
-                      ? l10n.commentInputDisabledHint
-                      : l10n.commentInputHint,
+                  hintText: isEnabled
+                      ? l10n.commentInputHint
+                      : l10n.noCommentsYet,
                   border: const OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(24)),
                   ),
@@ -318,7 +377,7 @@ class __CommentInputFieldState extends State<_CommentInputField> {
                     tooltip: _isEditing
                         ? l10n.commentEditButtonLabel
                         : l10n.commentPostButtonLabel,
-                    onPressed: canPost && !isGuest
+                    onPressed: canPost && isEnabled
                         ? () {
                             if (_isEditing) {
                               context.read<EngagementBloc>().add(
@@ -335,7 +394,6 @@ class __CommentInputFieldState extends State<_CommentInputField> {
                                 ),
                               );
                             }
-                            FocusScope.of(context).unfocus();
                           }
                         : null,
                   );

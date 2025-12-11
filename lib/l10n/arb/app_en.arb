@@ -2042,5 +2042,9 @@
     "commentInputDisabledHint": "Sign in to join the conversation",
     "@commentInputDisabledHint": {
         "description": "Hint text for the comment input field when the user is a guest."
+    },
+    "commentInputExistingHint": "You have already commented on this headline.",
+    "@commentInputExistingHint": {
+        "description": "Hint text for the comment input field when the user has already posted a comment."
     }
 }

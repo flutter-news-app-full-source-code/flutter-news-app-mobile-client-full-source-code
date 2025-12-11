@@ -2042,5 +2042,9 @@
     "commentInputDisabledHint": "سجل الدخول للانضمام إلى المحادثة",
     "@commentInputDisabledHint": {
         "description": "Hint text for the comment input field when the user is a guest."
+    },
+    "commentInputExistingHint": "لقد علقت بالفعل على هذا العنوان.",
+    "@commentInputExistingHint": {
+        "description": "Hint text for the comment input field when the user has already posted a comment."
     }
 }

@@ -66,7 +66,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   HeadlinesFeedBloc({
     required DataRepository<Headline> headlinesRepository,
     required FeedDecoratorService feedDecoratorService,
-    required DataRepository<Engagement> engagementRepository,
     required AdService adService,
     required AppBloc appBloc,
     required InlineAdCacheService inlineAdCacheService,
@@ -74,7 +73,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     UserContentPreferences? initialUserContentPreferences,
   }) : _headlinesRepository = headlinesRepository,
        _feedDecoratorService = feedDecoratorService,
-       _engagementRepository = engagementRepository,
        _adService = adService,
        _appBloc = appBloc,
        _inlineAdCacheService = inlineAdCacheService,
@@ -106,18 +104,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         );
       }
     });
-
-    // Listen to the engagement repository's update stream.
-    // When an engagement is created, updated, or deleted, this BLoC will
-    // re-fetch the specific headline to update its comment count and reaction
-    // state, ensuring the UI is always in sync.
-    _engagementRepositorySubscription = _engagementRepository.entityUpdated
-        .listen((_) {
-          // The adThemeStyle is required for a refresh. If it's not in the state
-          // yet (e.g., no UI event has occurred), we can't trigger the refresh.
-          if (state.adThemeStyle == null) return;
-          add(HeadlinesFeedRefreshRequested(adThemeStyle: state.adThemeStyle!));
-        });
 
     on<HeadlinesFeedStarted>(
       _onHeadlinesFeedStarted,
@@ -159,7 +145,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
   final DataRepository<Headline> _headlinesRepository;
   final FeedDecoratorService _feedDecoratorService;
-  final DataRepository<Engagement> _engagementRepository;
   final AdService _adService;
   final AppBloc _appBloc;
   final InlineAdCacheService _inlineAdCacheService;
@@ -168,7 +153,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
   /// Subscription to the AppBloc's state stream.
   late final StreamSubscription<AppState> _appBlocSubscription;
-  late final StreamSubscription<Type> _engagementRepositorySubscription;
 
   static const _allFilterId = 'all';
 
@@ -917,7 +901,6 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   @override
   Future<void> close() {
     _appBlocSubscription.cancel();
-    _engagementRepositorySubscription.cancel();
     return super.close();
   }
 }

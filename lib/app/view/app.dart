@@ -177,6 +177,9 @@ class App extends StatelessWidget {
               userRepository: _userRepository,
               appReviewService: _appReviewService,
               inlineAdCacheService: _inlineAdCacheService,
+              contentLimitationService: context
+                  .read<ContentLimitationService>(),
+              reportRepository: context.read<DataRepository<Report>>(),
             )..add(const AppStarted()),
           ),
         ],

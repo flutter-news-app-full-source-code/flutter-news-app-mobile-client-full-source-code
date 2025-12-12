@@ -10,6 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/initialization_result.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/extensions.dart';
@@ -46,6 +47,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
     required InlineAdCacheService inlineAdCacheService,
+    required FeedCacheService feedCacheService,
     required Logger logger,
     required DataRepository<User> userRepository,
     required PushNotificationService pushNotificationService,
@@ -60,6 +62,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _userContentPreferencesRepository = userContentPreferencesRepository,
        _userRepository = userRepository,
        _inAppNotificationRepository = inAppNotificationRepository,
+       _feedCacheService = feedCacheService,
        _pushNotificationService = pushNotificationService,
        _reportRepository = reportRepository,
        _contentLimitationService = contentLimitationService,
@@ -138,6 +141,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final ContentLimitationService _contentLimitationService;
   final AppReviewService _appReviewService;
   final InlineAdCacheService _inlineAdCacheService;
+  final FeedCacheService _feedCacheService;
 
   /// Handles the [AppStarted] event.
   ///
@@ -220,6 +224,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // data to ensure a clean state for the next session. This prevents
       // stale data from causing issues on subsequent logins.
       _inlineAdCacheService.clearAllAds();
+      // Also clear the feed cache to ensure the next user (or a new anonymous
+      // session) gets fresh data instead of seeing the previous user's feed.
+      _feedCacheService.clearAll();
+      _logger.info('[AppBloc] Cleared inline ad and feed caches on logout.');
 
       emit(
         state.copyWith(
@@ -228,6 +236,17 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         ),
       );
       return;
+    }
+
+    // If the user is changing (e.g., anonymous to authenticated), clear caches
+    // to prevent showing stale data from the previous user session.
+    if (oldUser != null && oldUser.id != newUser.id) {
+      _inlineAdCacheService.clearAllAds();
+      _feedCacheService.clearAll();
+      _logger.info(
+        '[AppBloc] User changed from ${oldUser.id} to ${newUser.id}. '
+        'Cleared inline ad and feed caches.',
+      );
     }
 
     // A user is present, so we are logging in or transitioning roles.

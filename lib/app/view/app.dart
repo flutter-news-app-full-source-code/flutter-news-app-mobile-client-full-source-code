@@ -180,6 +180,7 @@ class App extends StatelessWidget {
               contentLimitationService: context
                   .read<ContentLimitationService>(),
               reportRepository: context.read<DataRepository<Report>>(),
+              feedCacheService: context.read<FeedCacheService>(),
             )..add(const AppStarted()),
           ),
         ],

@@ -107,6 +107,10 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
+    final remoteConfig = context.watch<AppBloc>().state.remoteConfig;
+    final isSourceReportingEnabled =
+        remoteConfig?.features.community.reporting.sourceReportingEnabled ??
+        false;
 
     return Scaffold(
       body: BlocBuilder<EntityDetailsBloc, EntityDetailsState>(
@@ -309,7 +313,8 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                 snap: false,
                 actions: [
                   followButton,
-                  if (widget.args.contentType != ContentType.topic)
+                  if (widget.args.contentType == ContentType.source &&
+                      isSourceReportingEnabled)
                     PopupMenuButton<String>(
                       onSelected: (value) {
                         if (value == 'report') {
@@ -325,11 +330,11 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                       },
                       itemBuilder: (BuildContext context) =>
                           <PopupMenuEntry<String>>[
-                            PopupMenuItem<String>(
-                              value: 'report',
-                              child: Text(l10n.reportActionLabel),
-                            ),
-                          ],
+                        PopupMenuItem<String>(
+                          value: 'report',
+                          child: Text(l10n.reportActionLabel),
+                        ),
+                      ],
                     )
                   else
                     const SizedBox.shrink(),

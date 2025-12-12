@@ -15,10 +15,7 @@ import 'package:ui_kit/ui_kit.dart';
 /// {@endtemplate}
 class CommentsBottomSheet extends StatelessWidget {
   /// {@macro comments_bottom_sheet}
-  const CommentsBottomSheet({
-    required this.headlineId,
-    super.key,
-  });
+  const CommentsBottomSheet({required this.headlineId, super.key});
 
   /// The ID of the headline for which comments are being displayed.
   final String headlineId;
@@ -34,9 +31,7 @@ class CommentsBottomSheet extends StatelessWidget {
 }
 
 class _CommentsBottomSheetView extends StatefulWidget {
-  const _CommentsBottomSheetView({
-    required this.headlineId,
-  });
+  const _CommentsBottomSheetView({required this.headlineId});
   // A key to manage the state of the input field, allowing parent widgets
   // to trigger actions like editing.
   static final _inputFieldKey = GlobalKey<__CommentInputFieldState>();
@@ -96,6 +91,9 @@ class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
         final theme = Theme.of(context);
         final l10n = AppLocalizations.of(context);
 
+        final user = context.select((AppBloc bloc) => bloc.state.user);
+        final currentLocale = context.watch<AppBloc>().state.locale;
+
         final engagements = state.engagementsMap[widget.headlineId] ?? [];
         final comments = engagements.where((e) => e.comment != null).toList()
           ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
@@ -122,13 +120,11 @@ class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
           itemBuilder: (context, index) {
             final engagement = comments[index];
             final comment = engagement.comment!;
-            final currentLocale = context.watch<AppBloc>().state.locale;
             final formattedDate = timeago.format(
               engagement.updatedAt,
               locale: currentLocale.languageCode,
             );
 
-            final user = context.select((AppBloc bloc) => bloc.state.user);
             final isOwnComment = user != null && engagement.userId == user.id;
 
             return ListTile(
@@ -183,10 +179,7 @@ class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
 }
 
 class _CommentInputField extends StatefulWidget {
-  const _CommentInputField({
-    required this.headlineId,
-    super.key,
-  });
+  const _CommentInputField({required this.headlineId, super.key});
 
   final String headlineId;
 
@@ -221,8 +214,11 @@ class __CommentInputFieldState extends State<_CommentInputField> {
     if (user == null) return;
 
     final engagements =
-        context.read<HeadlinesFeedBloc>().state.engagementsMap[widget.headlineId] ??
-            [];
+        context
+            .read<HeadlinesFeedBloc>()
+            .state
+            .engagementsMap[widget.headlineId] ??
+        [];
     final userEngagement = engagements.firstWhereOrNull(
       (e) => e.userId == user.id,
     );
@@ -273,11 +269,11 @@ class __CommentInputFieldState extends State<_CommentInputField> {
                 decoration: InputDecoration(
                   hintText: isEnabled
                       ? (_isEditing
-                          ? l10n.commentEditButtonLabel
-                          : l10n.commentInputHint)
+                            ? l10n.commentEditButtonLabel
+                            : l10n.commentInputHint)
                       : (isGuest
-                          ? l10n.commentInputDisabledHint
-                          : l10n.commentInputExistingHint),
+                            ? l10n.commentInputDisabledHint
+                            : l10n.commentInputExistingHint),
                   border: const OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(24)),
                   ),
@@ -298,20 +294,20 @@ class __CommentInputFieldState extends State<_CommentInputField> {
                   ? () {
                       if (_isEditing) {
                         context.read<HeadlinesFeedBloc>().add(
-                              HeadlinesFeedCommentUpdated(
-                                widget.headlineId,
-                                _controller.text,
-                                context: context,
-                              ),
-                            );
+                          HeadlinesFeedCommentUpdated(
+                            widget.headlineId,
+                            _controller.text,
+                            context: context,
+                          ),
+                        );
                       } else {
                         context.read<HeadlinesFeedBloc>().add(
-                              HeadlinesFeedCommentPosted(
-                                widget.headlineId,
-                                _controller.text,
-                                context: context,
-                              ),
-                            );
+                          HeadlinesFeedCommentPosted(
+                            widget.headlineId,
+                            _controller.text,
+                            context: context,
+                          ),
+                        );
                       }
                       resetAfterSubmit();
                     }

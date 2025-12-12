@@ -1429,10 +1429,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your feedback helps us improve. Would you mind rating us?';
 
   @override
-  String get rateAppPromptYesButton => 'Yes';
+  String get rateAppPromptYesButton => 'It\'s Great!';
 
   @override
-  String get rateAppPromptNoButton => 'No';
+  String get rateAppPromptNoButton => 'Needs Work';
 
   @override
   String get feedbackPromptTitle => 'How can we improve?';

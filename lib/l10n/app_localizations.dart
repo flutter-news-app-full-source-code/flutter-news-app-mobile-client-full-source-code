@@ -2705,13 +2705,13 @@ abstract class AppLocalizations {
   /// Button text for a positive response to the rating prompt.
   ///
   /// In en, this message translates to:
-  /// **'Yes'**
+  /// **'It\'s Great!'**
   String get rateAppPromptYesButton;
 
   /// Button text for a negative response to the rating prompt.
   ///
   /// In en, this message translates to:
-  /// **'No'**
+  /// **'Needs Work'**
   String get rateAppPromptNoButton;
 
   /// Title for the bottom sheet that asks for detailed feedback after a negative rating prompt response.

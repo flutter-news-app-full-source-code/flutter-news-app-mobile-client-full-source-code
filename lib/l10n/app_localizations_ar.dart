@@ -1422,10 +1422,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'تساعدنا ملاحظاتك على التحسين. هل تمانع في تقييمنا؟';
 
   @override
-  String get rateAppPromptYesButton => 'نعم';
+  String get rateAppPromptYesButton => 'التطبيق رائع!';
 
   @override
-  String get rateAppPromptNoButton => 'لا';
+  String get rateAppPromptNoButton => 'يحتاج لتحسين';
 
   @override
   String get feedbackPromptTitle => 'كيف يمكننا التحسين؟';

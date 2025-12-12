@@ -234,13 +234,10 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
           );
           if (status != LimitationStatus.allowed) {
             if (mounted) {
-              await showModalBottomSheet<void>(
+              showContentLimitationBottomSheet(
                 context: context,
-                builder: (_) => ContentLimitationBottomSheet(
-                  title: l10n.limitReachedTitle,
-                  body: l10n.limitReachedBodyFollow,
-                  buttonText: l10n.manageMyContentButton,
-                ),
+                status: status,
+                action: ContentAction.followTopic,
               );
             }
             return;
@@ -272,13 +269,10 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
           );
           if (status != LimitationStatus.allowed) {
             if (mounted) {
-              await showModalBottomSheet<void>(
+              showContentLimitationBottomSheet(
                 context: context,
-                builder: (_) => ContentLimitationBottomSheet(
-                  title: l10n.limitReachedTitle,
-                  body: l10n.limitReachedBodyFollow,
-                  buttonText: l10n.manageMyContentButton,
-                ),
+                status: status,
+                action: ContentAction.followSource,
               );
             }
             return;

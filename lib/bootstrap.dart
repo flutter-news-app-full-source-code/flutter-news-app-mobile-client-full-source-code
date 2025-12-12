@@ -508,9 +508,9 @@ Future<Widget> bootstrap(
     cacheDuration: const Duration(minutes: 5),
     logger: logger,
   );
-  logger.fine('ContentLimitationService initialized.');
-
-  logger.fine('AppReviewService initialized.');
+  logger
+    ..fine('ContentLimitationService initialized.')
+    ..fine('AppReviewService initialized.');
 
   // Conditionally instantiate DemoDataMigrationService
   final demoDataMigrationService =
@@ -519,8 +519,6 @@ Future<Widget> bootstrap(
           appSettingsRepository: appSettingsRepository,
           userContentPreferencesRepository: userContentPreferencesRepository,
           engagementRepository: engagementRepository,
-          reportRepository: reportRepository,
-          appReviewRepository: appReviewRepository,
         )
       : null;
   logger.fine(
@@ -538,16 +536,10 @@ Future<Widget> bootstrap(
           appSettingsRepository: appSettingsRepository,
           userContentPreferencesRepository: userContentPreferencesRepository,
           inAppNotificationRepository: inAppNotificationRepository,
-          engagementRepository: engagementRepository,
-          reportRepository: reportRepository,
-          appReviewRepository: appReviewRepository,
           appSettingsFixturesData: appSettingsFixturesData,
           userContentPreferencesFixturesData:
               getUserContentPreferencesFixturesData(),
           inAppNotificationsFixturesData: inAppNotificationsFixturesData,
-          engagementFixturesData: getEngagementsFixturesData(),
-          reportFixturesData: getReportsFixturesData(),
-          appReviewFixturesData: getAppReviewsFixturesData(),
         )
       : null;
   logger

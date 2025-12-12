@@ -17,21 +17,15 @@ class DemoDataMigrationService {
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
     required DataRepository<Engagement> engagementRepository,
-    required DataRepository<Report> reportRepository,
-    required DataRepository<AppReview> appReviewRepository,
   }) : _appSettingsRepository = appSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
        _engagementRepository = engagementRepository,
-       _reportRepository = reportRepository,
-       _appReviewRepository = appReviewRepository,
        _logger = Logger('DemoDataMigrationService');
 
   final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
   final DataRepository<Engagement> _engagementRepository;
-  final DataRepository<Report> _reportRepository;
-  final DataRepository<AppReview> _appReviewRepository;
   final Logger _logger;
 
   /// Migrates user settings and content preferences from an old anonymous
@@ -190,54 +184,5 @@ class DemoDataMigrationService {
       );
     }
 
-    // Migrate Reports
-    try {
-      final oldReports = await _reportRepository.readAll(userId: oldUserId);
-      for (final oldReport in oldReports.items) {
-        final newReport = oldReport.copyWith(reporterUserId: newUserId);
-        await _reportRepository.create(item: newReport, userId: newUserId);
-        await _reportRepository.delete(id: oldReport.id, userId: oldUserId);
-      }
-      _logger.fine(
-        '[DemoDataMigrationService] ${oldReports.items.length} '
-        'reports migrated successfully from $oldUserId to $newUserId.',
-      );
-    } catch (e, s) {
-      _logger.severe(
-        '[DemoDataMigrationService] Error migrating reports from '
-        '$oldUserId to $newUserId: $e',
-        e,
-        s,
-      );
-    }
-
-    // Migrate AppReviews
-    try {
-      final oldAppReviews = await _appReviewRepository.readAll(
-        userId: oldUserId,
-      );
-      for (final oldAppReview in oldAppReviews.items) {
-        final newAppReview = oldAppReview.copyWith(userId: newUserId);
-        await _appReviewRepository.create(
-          item: newAppReview,
-          userId: newUserId,
-        );
-        await _appReviewRepository.delete(
-          id: oldAppReview.id,
-          userId: oldUserId,
-        );
-      }
-      _logger.fine(
-        '[DemoDataMigrationService] ${oldAppReviews.items.length} '
-        'app reviews migrated successfully from $oldUserId to $newUserId.',
-      );
-    } catch (e, s) {
-      _logger.severe(
-        '[DemoDataMigrationService] Error migrating app reviews from '
-        '$oldUserId to $newUserId: $e',
-        e,
-        s,
-      );
-    }
   }
 }

@@ -20,6 +20,9 @@ class AppState extends Equatable {
     this.currentAppVersion,
     this.latestAppVersion,
     this.hasUnreadInAppNotifications = false,
+    this.positiveInteractionCount = 0,
+    this.limitationStatus = LimitationStatus.allowed,
+    this.limitedAction,
   });
 
   /// The current status of the application, indicating its lifecycle stage.
@@ -58,6 +61,15 @@ class AppState extends Equatable {
 
   /// A flag indicating if there are unread in-app notifications.
   final bool hasUnreadInAppNotifications;
+
+  /// The number of positive interactions the user has performed in the session.
+  final int positiveInteractionCount;
+
+  /// The status of the most recent content limitation check.
+  final LimitationStatus limitationStatus;
+
+  /// The specific action that was limited, if any.
+  final ContentAction? limitedAction;
 
   /// The current theme mode (light, dark, or system), derived from [settings].
   /// Defaults to [ThemeMode.system] if [settings] are not yet loaded.
@@ -128,6 +140,7 @@ class AppState extends Equatable {
     currentAppVersion,
     latestAppVersion,
     hasUnreadInAppNotifications,
+    positiveInteractionCount,
   ];
 
   /// Creates a copy of this [AppState] with the given fields replaced with
@@ -145,6 +158,10 @@ class AppState extends Equatable {
     String? currentAppVersion,
     String? latestAppVersion,
     bool? hasUnreadInAppNotifications,
+    int? positiveInteractionCount,
+    LimitationStatus? limitationStatus,
+    ContentAction? limitedAction,
+    bool clearLimitedAction = false,
   }) {
     return AppState(
       status: status ?? this.status,
@@ -161,6 +178,12 @@ class AppState extends Equatable {
       latestAppVersion: latestAppVersion ?? this.latestAppVersion,
       hasUnreadInAppNotifications:
           hasUnreadInAppNotifications ?? this.hasUnreadInAppNotifications,
+      positiveInteractionCount:
+          positiveInteractionCount ?? this.positiveInteractionCount,
+      limitationStatus: limitationStatus ?? this.limitationStatus,
+      limitedAction: clearLimitedAction
+          ? null
+          : limitedAction ?? this.limitedAction,
     );
   }
 }

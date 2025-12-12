@@ -12,6 +12,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/w
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/widgets/saved_filters_bar.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/shared.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/user_content/engagement/view/comments_bottom_sheet.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -113,11 +114,32 @@ class _HeadlinesFeedPageState extends State<HeadlinesFeedPage>
     final theme = Theme.of(context);
 
     return BlocListener<HeadlinesFeedBloc, HeadlinesFeedState>(
+      listenWhen: (previous, current) =>
+          previous.navigationUrl != current.navigationUrl ||
+          previous.limitationStatus != current.limitationStatus,
       listener: (context, state) {
+        if (state.limitationStatus != LimitationStatus.allowed) {
+          showContentLimitationBottomSheet(
+            context: context,
+            status: state.limitationStatus,
+            action: state.limitedAction ?? ContentAction.reactToContent,
+          );
+          return;
+        }
+
+        // This listener handles navigation actions triggered by the BLoC.
         if (state.navigationUrl != null) {
-          // Use context.push for navigation to allow returning.
-          // This is suitable for call-to-action flows like linking an account.
-          context.push(state.navigationUrl!);
+          final navArgs = state.navigationArguments;
+          if (navArgs is Headline) {
+            showModalBottomSheet<void>(
+              context: context,
+              isScrollControlled: true,
+              builder: (_) => CommentsBottomSheet(headlineId: navArgs.id),
+            );
+          } else {
+            // Handle simple URL navigation for call-to-actions.
+            context.push(state.navigationUrl!);
+          }
           // Notify the BLoC that navigation has been handled to clear the URL.
           context.read<HeadlinesFeedBloc>().add(NavigationHandled());
         }

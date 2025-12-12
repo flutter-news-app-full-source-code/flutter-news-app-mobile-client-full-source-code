@@ -6,6 +6,7 @@ import 'package:collection/collection.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inline_ad_cache_service.dart';
@@ -13,7 +14,10 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_blo
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/cached_feed.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:logging/logging.dart';
+import 'package:uuid/uuid.dart';
 
 part 'headlines_feed_event.dart';
 part 'headlines_feed_state.dart';
@@ -65,17 +69,21 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   HeadlinesFeedBloc({
     required DataRepository<Headline> headlinesRepository,
     required FeedDecoratorService feedDecoratorService,
+    required DataRepository<Engagement> engagementRepository,
     required AdService adService,
     required AppBloc appBloc,
     required InlineAdCacheService inlineAdCacheService,
     required FeedCacheService feedCacheService,
+    required ContentLimitationService contentLimitationService,
     UserContentPreferences? initialUserContentPreferences,
   }) : _headlinesRepository = headlinesRepository,
        _feedDecoratorService = feedDecoratorService,
+       _engagementRepository = engagementRepository,
        _adService = adService,
        _appBloc = appBloc,
        _inlineAdCacheService = inlineAdCacheService,
        _feedCacheService = feedCacheService,
+       _contentLimitationService = contentLimitationService,
        _logger = Logger('HeadlinesFeedBloc'),
        super(
          HeadlinesFeedState(
@@ -86,23 +94,18 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     // Subscribe to AppBloc to react to global state changes, primarily for
     // keeping the feed's list of saved filters synchronized with the global
     // app state.
-    _appBlocSubscription = _appBloc.stream.listen((appState) {
-      // This subscription is now responsible for handling *updates* to the
-      // user's preferences while the bloc is active. The initial state is
-      // handled by the constructor.
-      // This subscription's responsibility is to listen for changes in user
-      // preferences (like adding/removing a saved filter) from other parts
-      // of the app and update this BLoC's state accordingly.
-      if (appState.userContentPreferences?.savedHeadlineFilters != null &&
-          state.savedHeadlineFilters !=
-              appState.userContentPreferences!.savedHeadlineFilters) {
-        add(
-          _AppContentPreferencesChanged(
-            preferences: appState.userContentPreferences!,
-          ),
-        );
-      }
-    });
+    _appBlocSubscription = _appBloc.stream
+        .map((appState) => appState.userContentPreferences)
+        .distinct()
+        .listen((preferences) {
+          // This subscription's responsibility is to listen for changes in
+          // user preferences (like adding/removing a saved filter) from other
+          // parts of the app and update this BLoC's state accordingly.
+          if (preferences != null &&
+              state.savedHeadlineFilters != preferences.savedHeadlineFilters) {
+            add(_AppContentPreferencesChanged(preferences: preferences));
+          }
+        });
 
     on<HeadlinesFeedStarted>(
       _onHeadlinesFeedStarted,
@@ -136,6 +139,22 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       _onFollowedFilterSelected,
       transformer: restartable(),
     );
+    on<HeadlinesFeedEngagementTapped>(
+      _onHeadlinesFeedEngagementTapped,
+      transformer: sequential(),
+    );
+    on<HeadlinesFeedReactionUpdated>(
+      _onHeadlinesFeedReactionUpdated,
+      transformer: sequential(),
+    );
+    on<HeadlinesFeedCommentPosted>(
+      _onHeadlinesFeedCommentPosted,
+      transformer: sequential(),
+    );
+    on<HeadlinesFeedCommentUpdated>(
+      _onHeadlinesFeedCommentUpdated,
+      transformer: sequential(),
+    );
   }
 
   final DataRepository<Headline> _headlinesRepository;
@@ -144,10 +163,12 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   final AppBloc _appBloc;
   final InlineAdCacheService _inlineAdCacheService;
   final FeedCacheService _feedCacheService;
+  final DataRepository<Engagement> _engagementRepository;
+  final ContentLimitationService _contentLimitationService;
   final Logger _logger;
 
   /// Subscription to the AppBloc's state stream.
-  late final StreamSubscription<AppState> _appBlocSubscription;
+  late final StreamSubscription<UserContentPreferences?> _appBlocSubscription;
 
   static const _allFilterId = 'all';
 
@@ -184,6 +205,25 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     return queryFilter;
   }
 
+  /// Fetches engagements for a list of headline IDs and returns them as a map.
+  Future<Map<String, List<Engagement>>> _fetchEngagementsForHeadlines(
+    List<String> headlineIds,
+  ) async {
+    if (headlineIds.isEmpty) return {};
+    try {
+      final response = await _engagementRepository.readAll(
+        filter: {
+          'entityId': {r'$in': headlineIds},
+        },
+      );
+      // Group engagements by their entityId.
+      return groupBy(response.items, (e) => e.entityId);
+    } catch (e, s) {
+      _logger.severe('Failed to fetch engagements for headlines.', e, s);
+      return {}; // Return empty map on failure to avoid breaking the feed.
+    }
+  }
+
   /// Generates a deterministic cache key based on the active filter.
   String _generateFilterKey(
     String activeFilterId,
@@ -209,6 +249,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     HeadlinesFeedStarted event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
+    // Persist the ad theme style in the state for background processes.
+    emit(state.copyWith(adThemeStyle: event.adThemeStyle));
     add(HeadlinesFeedRefreshRequested(adThemeStyle: event.adThemeStyle));
   }
 
@@ -257,6 +299,13 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
 
+      final newEngagements = await _fetchEngagementsForHeadlines(
+        headlineResponse.items.map((h) => h.id).toList(),
+      );
+      final updatedEngagementsMap = Map<String, List<Engagement>>.from(
+        state.engagementsMap,
+      )..addAll(newEngagements);
+
       // For pagination, only inject ad placeholders.
       final newProcessedFeedItems = await _adService.injectFeedAdPlaceholders(
         feedItems: headlineResponse.items,
@@ -295,6 +344,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           feedItems: updatedFeedItems,
           hasMore: headlineResponse.hasMore,
           cursor: headlineResponse.cursor,
+          engagementsMap: updatedEngagementsMap,
         ),
       );
     } on HttpException catch (e) {
@@ -326,7 +376,12 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     // On a full refresh, clear the ad cache for the current context to ensure
     // fresh ads are loaded.
     _inlineAdCacheService.clearAdsForContext(contextKey: filterKey);
-    emit(state.copyWith(status: HeadlinesFeedStatus.loading));
+    emit(
+      state.copyWith(
+        status: HeadlinesFeedStatus.loading,
+        adThemeStyle: event.adThemeStyle,
+      ),
+    );
     try {
       final currentUser = _appBloc.state.user;
       final appConfig = _appBloc.state.remoteConfig;
@@ -341,6 +396,13 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         pagination: const PaginationOptions(limit: _headlinesFetchLimit),
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
+
+      final newEngagements = await _fetchEngagementsForHeadlines(
+        headlineResponse.items.map((h) => h.id).toList(),
+      );
+      final updatedEngagementsMap = Map<String, List<Engagement>>.from(
+        state.engagementsMap,
+      )..addAll(newEngagements);
 
       _logger.info(
         'Refresh: Fetched ${headlineResponse.items.length} latest headlines '
@@ -380,6 +442,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
               emit(
                 state.copyWith(
                   status: HeadlinesFeedStatus.success,
+                  engagementsMap: updatedEngagementsMap,
                   feedItems: updatedFeedItems,
                 ),
               );
@@ -448,6 +511,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           hasMore: newCachedFeed.hasMore,
           cursor: newCachedFeed.cursor,
           filter: state.filter,
+          engagementsMap: updatedEngagementsMap,
         ),
       );
     } on HttpException catch (e) {
@@ -540,6 +604,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         filter: event.filter,
         activeFilterId: newActiveFilterId,
         status: HeadlinesFeedStatus.loading,
+        adThemeStyle: event.adThemeStyle,
         feedItems: [],
         clearCursor: true,
       ),
@@ -558,6 +623,13 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         pagination: const PaginationOptions(limit: _headlinesFetchLimit),
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
+
+      final newEngagements = await _fetchEngagementsForHeadlines(
+        headlineResponse.items.map((h) => h.id).toList(),
+      );
+      final updatedEngagementsMap = Map<String, List<Engagement>>.from(
+        state.engagementsMap,
+      )..addAll(newEngagements);
 
       final settings = _appBloc.state.settings;
 
@@ -591,6 +663,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           feedItems: newCachedFeed.feedItems,
           hasMore: newCachedFeed.hasMore,
           cursor: newCachedFeed.cursor,
+          engagementsMap: updatedEngagementsMap,
         ),
       );
     } on HttpException catch (e) {
@@ -644,6 +717,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         status: HeadlinesFeedStatus.loading,
         filter: newFilter,
         activeFilterId: _allFilterId,
+        adThemeStyle: event.adThemeStyle,
         feedItems: [],
         clearCursor: true,
       ),
@@ -662,6 +736,13 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         pagination: const PaginationOptions(limit: _headlinesFetchLimit),
         sort: [const SortOption('updatedAt', SortOrder.desc)],
       );
+
+      final newEngagements = await _fetchEngagementsForHeadlines(
+        headlineResponse.items.map((h) => h.id).toList(),
+      );
+      final updatedEngagementsMap = Map<String, List<Engagement>>.from(
+        state.engagementsMap,
+      )..addAll(newEngagements);
 
       final settings = _appBloc.state.settings;
 
@@ -695,6 +776,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           feedItems: newCachedFeed.feedItems,
           hasMore: newCachedFeed.hasMore,
           cursor: newCachedFeed.cursor,
+          engagementsMap: updatedEngagementsMap,
         ),
       );
     } on HttpException catch (e) {
@@ -713,7 +795,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     NavigationHandled event,
     Emitter<HeadlinesFeedState> emit,
   ) {
-    emit(state.copyWith(clearNavigationUrl: true));
+    emit(
+      state.copyWith(clearNavigationUrl: true, clearNavigationArguments: true),
+    );
   }
 
   void _onAppContentPreferencesChanged(
@@ -771,6 +855,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     add(
       HeadlinesFeedFiltersApplied(
         filter: newFilter,
+        savedHeadlineFilter: event.filter.isPinned ? null : event.filter,
         adThemeStyle: event.adThemeStyle,
       ),
     );
@@ -865,6 +950,244 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     // If it's a cache miss, set the state and trigger a full refresh.
     emit(state.copyWith(activeFilterId: 'followed', filter: newFilter));
     add(HeadlinesFeedRefreshRequested(adThemeStyle: event.adThemeStyle));
+  }
+
+  void _onHeadlinesFeedEngagementTapped(
+    HeadlinesFeedEngagementTapped event,
+    Emitter<HeadlinesFeedState> emit,
+  ) {
+    // The UI will listen for this state change and trigger navigation.
+    emit(
+      state.copyWith(
+        navigationUrl:
+            '${Routes.feed}/${Routes.engagement.replaceFirst(':', '')}${event.headline.id}',
+        navigationArguments: event.headline,
+      ),
+    );
+  }
+
+  Future<void> _onHeadlinesFeedReactionUpdated(
+    HeadlinesFeedReactionUpdated event,
+    Emitter<HeadlinesFeedState> emit,
+  ) async {
+    final userId = _appBloc.state.user?.id;
+    if (userId == null) return;
+
+    final preCheckStatus = await _contentLimitationService.checkAction(
+      ContentAction.reactToContent,
+    );
+
+    if (preCheckStatus != LimitationStatus.allowed) {
+      _logger.warning('Reaction limit reached for user $userId.');
+      emit(
+        state.copyWith(
+          limitationStatus: preCheckStatus,
+          limitedAction: ContentAction.reactToContent,
+        ),
+      );
+      emit(state.copyWith(clearLimitedAction: true));
+      return;
+    }
+
+    final currentEngagements = state.engagementsMap[event.headlineId] ?? [];
+    final userEngagement = currentEngagements.firstWhereOrNull(
+      (e) => e.userId == userId,
+    );
+
+    try {
+      Engagement? updatedEngagement;
+
+      if (userEngagement != null) {
+        final isTogglingOff =
+            event.reactionType == null ||
+            userEngagement.reaction?.reactionType == event.reactionType;
+
+        if (isTogglingOff) {
+          if (userEngagement.comment == null) {
+            await _engagementRepository.delete(
+              id: userEngagement.id,
+              userId: userId,
+            );
+            updatedEngagement = null; // It's deleted
+          } else {
+            updatedEngagement = userEngagement.copyWith(
+              reaction: const ValueWrapper(null),
+            );
+            await _engagementRepository.update(
+              id: updatedEngagement.id,
+              item: updatedEngagement,
+              userId: userId,
+            );
+          }
+        } else {
+          updatedEngagement = userEngagement.copyWith(
+            reaction: ValueWrapper(Reaction(reactionType: event.reactionType!)),
+          );
+          await _engagementRepository.update(
+            id: updatedEngagement.id,
+            item: updatedEngagement,
+            userId: userId,
+          );
+        }
+      } else if (event.reactionType != null) {
+        updatedEngagement = Engagement(
+          id: const Uuid().v4(),
+          userId: userId,
+          entityId: event.headlineId,
+          entityType: EngageableType.headline,
+          reaction: Reaction(reactionType: event.reactionType!),
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+        await _engagementRepository.create(
+          item: updatedEngagement,
+          userId: userId,
+        );
+      }
+
+      // Optimistically update the state
+      final newEngagementsForHeadline = List<Engagement>.from(
+        currentEngagements,
+      )..removeWhere((e) => e.userId == userId);
+      if (updatedEngagement != null) {
+        newEngagementsForHeadline.add(updatedEngagement);
+      }
+
+      final newEngagementsMap = Map<String, List<Engagement>>.from(
+        state.engagementsMap,
+      )..[event.headlineId] = newEngagementsForHeadline;
+
+      emit(state.copyWith(engagementsMap: newEngagementsMap));
+      _appBloc.add(AppPositiveInteractionOcurred(context: event.context));
+    } catch (e, s) {
+      _logger.severe('Failed to update reaction.', e, s);
+    }
+  }
+
+  Future<void> _onHeadlinesFeedCommentPosted(
+    HeadlinesFeedCommentPosted event,
+    Emitter<HeadlinesFeedState> emit,
+  ) async {
+    final userId = _appBloc.state.user?.id;
+    final language = _appBloc.state.settings?.language;
+    if (userId == null || language == null) return;
+
+    final preCheckStatus = await _contentLimitationService.checkAction(
+      ContentAction.postComment,
+    );
+    if (preCheckStatus != LimitationStatus.allowed) {
+      _logger.warning('Comment limit reached for user $userId.');
+      emit(
+        state.copyWith(
+          limitationStatus: preCheckStatus,
+          limitedAction: ContentAction.postComment,
+        ),
+      );
+      emit(state.copyWith(clearLimitedAction: true));
+      return;
+    }
+
+    final currentEngagements = state.engagementsMap[event.headlineId] ?? [];
+    final userEngagement = currentEngagements.firstWhereOrNull(
+      (e) => e.userId == userId,
+    );
+
+    final newComment = Comment(language: language, content: event.content);
+    final engagementToUpsert =
+        (userEngagement ??
+                Engagement(
+                  id: const Uuid().v4(),
+                  userId: userId,
+                  entityId: event.headlineId,
+                  entityType: EngageableType.headline,
+                  createdAt: DateTime.now(),
+                  updatedAt: DateTime.now(),
+                ))
+            .copyWith(comment: ValueWrapper(newComment));
+
+    // Optimistic UI update
+    final newEngagementsForHeadline = List<Engagement>.from(currentEngagements)
+      ..removeWhere((e) => e.userId == userId)
+      ..add(engagementToUpsert);
+
+    final newEngagementsMap = Map<String, List<Engagement>>.from(
+      state.engagementsMap,
+    )..[event.headlineId] = newEngagementsForHeadline;
+
+    emit(state.copyWith(engagementsMap: newEngagementsMap));
+
+    try {
+      if (userEngagement != null) {
+        await _engagementRepository.update(
+          id: engagementToUpsert.id,
+          item: engagementToUpsert,
+          userId: userId,
+        );
+      } else {
+        await _engagementRepository.create(
+          item: engagementToUpsert,
+          userId: userId,
+        );
+      }
+      _appBloc.add(AppPositiveInteractionOcurred(context: event.context));
+    } catch (e, s) {
+      _logger.severe('Failed to post comment.', e, s);
+      // Revert optimistic update on failure
+      emit(state.copyWith(engagementsMap: state.engagementsMap));
+    }
+  }
+
+  Future<void> _onHeadlinesFeedCommentUpdated(
+    HeadlinesFeedCommentUpdated event,
+    Emitter<HeadlinesFeedState> emit,
+  ) async {
+    final userId = _appBloc.state.user?.id;
+    final language = _appBloc.state.settings?.language;
+    if (userId == null || language == null) return;
+
+    final currentEngagements = state.engagementsMap[event.headlineId] ?? [];
+    final userEngagement = currentEngagements.firstWhereOrNull(
+      (e) => e.userId == userId,
+    );
+
+    // If there's no existing engagement or no comment to update, do nothing.
+    if (userEngagement == null || userEngagement.comment == null) {
+      _logger.warning(
+        'Comment update requested for headline ${event.headlineId} but no '
+        'existing comment found for user $userId.',
+      );
+      return;
+    }
+
+    final updatedComment = userEngagement.comment!.copyWith(
+      content: event.content,
+    );
+    final updatedEngagement = userEngagement.copyWith(
+      comment: ValueWrapper(updatedComment),
+    );
+
+    // Optimistic UI update
+    final newEngagementsForHeadline = List<Engagement>.from(currentEngagements)
+      ..removeWhere((e) => e.userId == userId)
+      ..add(updatedEngagement);
+
+    final newEngagementsMap = Map<String, List<Engagement>>.from(
+      state.engagementsMap,
+    )..[event.headlineId] = newEngagementsForHeadline;
+
+    emit(state.copyWith(engagementsMap: newEngagementsMap));
+
+    try {
+      await _engagementRepository.update(
+        id: updatedEngagement.id,
+        item: updatedEngagement,
+        userId: userId,
+      );
+      _appBloc.add(AppPositiveInteractionOcurred(context: event.context));
+    } catch (e, s) {
+      _logger.severe('Failed to update comment.', e, s);
+      emit(state.copyWith(engagementsMap: state.engagementsMap));
+    }
   }
 
   @override

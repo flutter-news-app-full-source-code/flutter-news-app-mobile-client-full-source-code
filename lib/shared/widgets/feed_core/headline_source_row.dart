@@ -49,12 +49,12 @@ class _HeadlineSourceRowState extends State<HeadlineSourceRow> {
     );
 
     final sourceTextStyle = textTheme.bodySmall?.copyWith(
-      color: colorScheme.onSurfaceVariant,
+      color: colorScheme.onSurfaceVariant.withOpacity(0.8),
       fontWeight: FontWeight.w500,
     );
 
     final dateTextStyle = textTheme.bodySmall?.copyWith(
-      color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+      color: colorScheme.onSurfaceVariant.withOpacity(0.6),
     );
 
     return Row(
@@ -99,20 +99,26 @@ class _HeadlineSourceRowState extends State<HeadlineSourceRow> {
           children: [
             if (formattedDate.isNotEmpty)
               Padding(
-                padding: const EdgeInsets.only(right: AppSpacing.xs),
+                padding: const EdgeInsets.only(right: AppSpacing.md),
                 child: Text(formattedDate, style: dateTextStyle),
               ),
-            // Use InkWell + Icon instead of IconButton to have precise control
-            // over padding and constraints, avoiding the default minimum
-            // touch target size that misaligns the row height on native.
-            InkWell(
-              customBorder: const CircleBorder(),
-              onTap: () => showModalBottomSheet<void>(
-                context: context,
-                builder: (_) =>
-                    HeadlineActionsBottomSheet(headline: widget.headline),
+            IconButton(
+              icon: Icon(
+                Icons.more_vert,
+                // Use the same color as the date text for visual consistency.
+                color: dateTextStyle?.color,
               ),
-              child: const Icon(Icons.more_horiz, size: 20),
+              // Adjust icon size to be more harmonious with the text.
+              iconSize: AppSpacing.lg,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              onPressed: () => showModalBottomSheet<void>(
+                context: context,
+                builder: (_) => BlocProvider.value(
+                  value: context.read<AppBloc>(),
+                  child: HeadlineActionsBottomSheet(headline: widget.headline),
+                ),
+              ),
             ),
           ],
         ),

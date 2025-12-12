@@ -20,13 +20,14 @@ import 'package:flutter_news_app_mobile_client_full_source_code/notifications/se
 import 'package:flutter_news_app_mobile_client_full_source_code/router/router.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_tap_handler.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/status/view/maintenance_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/status/view/update_required_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template app_widget}
-/// The root widget of the main application.
 ///
 /// This widget is built only after a successful startup sequence, as
 /// orchestrated by [AppInitializationPage]. It is responsible for setting up
@@ -51,11 +52,16 @@ class App extends StatelessWidget {
     required DataRepository<AppSettings> appSettingsRepository,
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
+    required DataRepository<Engagement> engagementRepository,
+    required DataRepository<Report> reportRepository,
+    required DataRepository<AppReview> appReviewRepository,
     required AppEnvironment environment,
     required DataRepository<InAppNotification> inAppNotificationRepository,
+    required ContentLimitationService contentLimitationService,
     required InlineAdCacheService inlineAdCacheService,
     required AdService adService,
     required FeedDecoratorService feedDecoratorService,
+    required AppReviewService appReviewService,
     required FeedCacheService feedCacheService,
     required GlobalKey<NavigatorState> navigatorKey,
     required PushNotificationService pushNotificationService,
@@ -69,10 +75,15 @@ class App extends StatelessWidget {
        _remoteConfigRepository = remoteConfigRepository,
        _appSettingsRepository = appSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
+       _engagementRepository = engagementRepository,
+       _reportRepository = reportRepository,
+       _appReviewRepository = appReviewRepository,
        _pushNotificationService = pushNotificationService,
        _inAppNotificationRepository = inAppNotificationRepository,
+       _contentLimitationService = contentLimitationService,
        _environment = environment,
        _adService = adService,
+       _appReviewService = appReviewService,
        _feedDecoratorService = feedDecoratorService,
        _feedCacheService = feedCacheService,
        _navigatorKey = navigatorKey,
@@ -100,10 +111,15 @@ class App extends StatelessWidget {
   final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
+  final DataRepository<Engagement> _engagementRepository;
+  final DataRepository<Report> _reportRepository;
+  final DataRepository<AppReview> _appReviewRepository;
   final AppEnvironment _environment;
   final DataRepository<InAppNotification> _inAppNotificationRepository;
   final AdService _adService;
+  final ContentLimitationService _contentLimitationService;
   final FeedDecoratorService _feedDecoratorService;
+  final AppReviewService _appReviewService;
   final FeedCacheService _feedCacheService;
   final GlobalKey<NavigatorState> _navigatorKey;
   final InlineAdCacheService _inlineAdCacheService;
@@ -127,9 +143,14 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _remoteConfigRepository),
         RepositoryProvider.value(value: _appSettingsRepository),
         RepositoryProvider.value(value: _userContentPreferencesRepository),
+        RepositoryProvider.value(value: _engagementRepository),
+        RepositoryProvider.value(value: _reportRepository),
+        RepositoryProvider.value(value: _appReviewRepository),
         RepositoryProvider.value(value: _pushNotificationService),
+        RepositoryProvider.value(value: _contentLimitationService),
         RepositoryProvider.value(value: _inAppNotificationRepository),
         RepositoryProvider.value(value: _inlineAdCacheService),
+        RepositoryProvider.value(value: _appReviewService),
         RepositoryProvider.value(value: _feedCacheService),
         RepositoryProvider.value(value: _environment),
         // NOTE: The AppInitializer is provided at the root in bootstrap.dart
@@ -154,7 +175,12 @@ class App extends StatelessWidget {
               pushNotificationService: _pushNotificationService,
               inAppNotificationRepository: _inAppNotificationRepository,
               userRepository: _userRepository,
+              appReviewService: _appReviewService,
               inlineAdCacheService: _inlineAdCacheService,
+              contentLimitationService: context
+                  .read<ContentLimitationService>(),
+              reportRepository: context.read<DataRepository<Report>>(),
+              feedCacheService: context.read<FeedCacheService>(),
             )..add(const AppStarted()),
           ),
         ],
@@ -183,7 +209,6 @@ class _AppViewState extends State<_AppView> {
   StreamSubscription<PushNotificationPayload>? _onMessageSubscription;
   AppStatusService? _appStatusService;
   InterstitialAdManager? _interstitialAdManager;
-  late final ContentLimitationService _contentLimitationService;
   late final GoRouter _router;
   final _routerLogger = Logger('GoRouter');
 
@@ -256,10 +281,10 @@ class _AppViewState extends State<_AppView> {
       adService: context.read<AdService>(),
       navigatorKey: widget.navigatorKey,
     );
-    _contentLimitationService = ContentLimitationService(
-      appBloc: context.read<AppBloc>(),
-    );
 
+    // Initialize the ContentLimitationService.
+    // Its lifecycle is now tied to this state object.
+    context.read<ContentLimitationService>().init(appBloc: appBloc);
     // Create the GoRouter instance once and store it.
     _router = createRouter(
       authStatusNotifier: _statusNotifier,
@@ -277,6 +302,7 @@ class _AppViewState extends State<_AppView> {
     _appStatusService?.dispose();
     _interstitialAdManager?.dispose();
     context.read<PushNotificationService>().close();
+    context.read<ContentLimitationService>().dispose();
     super.dispose();
   }
 
@@ -420,9 +446,6 @@ class _AppViewState extends State<_AppView> {
                 RepositoryProvider<InterstitialAdManager>.value(
                   value: _interstitialAdManager!,
                 ),
-              RepositoryProvider<ContentLimitationService>.value(
-                value: _contentLimitationService,
-              ),
             ],
             child: MaterialApp.router(
               debugShowCheckedModeBanner: false,

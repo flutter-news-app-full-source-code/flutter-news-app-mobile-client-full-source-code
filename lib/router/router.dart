@@ -55,6 +55,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/la
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/notification_settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/theme_settings_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/multi_select_search_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
@@ -363,7 +364,27 @@ GoRouter createRouter({
           GoRoute(
             path: Routes.accountSavedHeadlines,
             name: Routes.accountSavedHeadlinesName,
-            builder: (context, state) => const SavedHeadlinesPage(),
+            builder: (context, state) => BlocProvider<HeadlinesFeedBloc>(
+              create: (context) {
+                final appBloc = context.read<AppBloc>();
+                final initialUserContentPreferences =
+                    appBloc.state.userContentPreferences;
+                return HeadlinesFeedBloc(
+                  headlinesRepository: context.read<DataRepository<Headline>>(),
+                  feedDecoratorService: FeedDecoratorService(),
+                  adService: context.read<AdService>(),
+                  appBloc: appBloc,
+                  inlineAdCacheService: context.read<InlineAdCacheService>(),
+                  feedCacheService: context.read<FeedCacheService>(),
+                  initialUserContentPreferences: initialUserContentPreferences,
+                  engagementRepository: context
+                      .read<DataRepository<Engagement>>(),
+                  contentLimitationService: context
+                      .read<ContentLimitationService>(),
+                );
+              },
+              child: const SavedHeadlinesPage(),
+            ),
           ),
         ],
       ),
@@ -476,6 +497,10 @@ GoRouter createRouter({
                         feedCacheService: context.read<FeedCacheService>(),
                         initialUserContentPreferences:
                             initialUserContentPreferences,
+                        engagementRepository: context
+                            .read<DataRepository<Engagement>>(),
+                        contentLimitationService: context
+                            .read<ContentLimitationService>(),
                       );
                     },
                     child: child,

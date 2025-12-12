@@ -33,8 +33,12 @@ import 'package:flutter_news_app_mobile_client_full_source_code/notifications/se
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/no_op_push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/one_signal_push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/data/clients/country_inmemory_client.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/data/clients/clients.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/native_review_service.dart';
 import 'package:http_client/http_client.dart';
+import 'package:in_app_review/in_app_review.dart';
 import 'package:kv_storage_service/kv_storage_service.dart';
 import 'package:kv_storage_shared_preferences/kv_storage_shared_preferences.dart';
 import 'package:logging/logging.dart';
@@ -216,18 +220,21 @@ Future<Widget> bootstrap(
   late final DataClient<User> userClient;
   late final DataClient<InAppNotification> inAppNotificationClient;
   late final DataClient<PushNotificationDevice> pushNotificationDeviceClient;
+  late final DataClient<Engagement> engagementClient;
+  late final DataClient<Report> reportClient;
+  late final DataClient<AppReview> appReviewClient;
   if (appConfig.environment == app_config.AppEnvironment.demo) {
     logger.fine('Using in-memory clients for all data repositories.');
     headlinesClient = DataInMemory<Headline>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
-      initialData: headlinesFixturesData,
+      initialData: getHeadlinesFixturesData(),
       logger: logger,
     );
     topicsClient = DataInMemory<Topic>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
-      initialData: topicsFixturesData,
+      initialData: getTopicsFixturesData(),
       logger: logger,
     );
     // Wrap the generic DataInMemory<Country> with CountryInMemoryClient.
@@ -259,15 +266,15 @@ Future<Widget> bootstrap(
         initialData: countriesFixturesData,
         logger: logger,
       ),
-      allSources: sourcesFixturesData,
-      allHeadlines: headlinesFixturesData,
+      allSources: getSourcesFixturesData(),
+      allHeadlines: getHeadlinesFixturesData(),
     );
 
     //
     sourcesClient = DataInMemory<Source>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
-      initialData: sourcesFixturesData,
+      initialData: getSourcesFixturesData(),
       logger: logger,
     );
     userContentPreferencesClient = DataInMemory<UserContentPreferences>(
@@ -291,6 +298,21 @@ Future<Widget> bootstrap(
       logger: logger,
     );
     pushNotificationDeviceClient = DataInMemory<PushNotificationDevice>(
+      toJson: (i) => i.toJson(),
+      getId: (i) => i.id,
+      logger: logger,
+    );
+    engagementClient = DataInMemory<Engagement>(
+      toJson: (i) => i.toJson(),
+      getId: (i) => i.id,
+      logger: logger,
+    );
+    reportClient = DataInMemory<Report>(
+      toJson: (i) => i.toJson(),
+      getId: (i) => i.id,
+      logger: logger,
+    );
+    appReviewClient = DataInMemory<AppReview>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
       logger: logger,
@@ -360,6 +382,27 @@ Future<Widget> bootstrap(
       toJson: (device) => device.toJson(),
       logger: logger,
     );
+    engagementClient = DataApi<Engagement>(
+      httpClient: httpClient,
+      modelName: 'engagement',
+      fromJson: Engagement.fromJson,
+      toJson: (engagement) => engagement.toJson(),
+      logger: logger,
+    );
+    reportClient = DataApi<Report>(
+      httpClient: httpClient,
+      modelName: 'report',
+      fromJson: Report.fromJson,
+      toJson: (report) => report.toJson(),
+      logger: logger,
+    );
+    appReviewClient = DataApi<AppReview>(
+      httpClient: httpClient,
+      modelName: 'app_review',
+      fromJson: AppReview.fromJson,
+      toJson: (review) => review.toJson(),
+      logger: logger,
+    );
   }
   logger.fine('All data clients instantiated.');
 
@@ -386,6 +429,13 @@ Future<Widget> bootstrap(
       DataRepository<PushNotificationDevice>(
         dataClient: pushNotificationDeviceClient,
       );
+  final engagementRepository = DataRepository<Engagement>(
+    dataClient: engagementClient,
+  );
+  final reportRepository = DataRepository<Report>(dataClient: reportClient);
+  final appReviewRepository = DataRepository<AppReview>(
+    dataClient: appReviewClient,
+  );
   logger
     ..fine('All data repositories initialized.')
     ..info('7. Initializing Push Notification service...');
@@ -439,6 +489,29 @@ Future<Widget> bootstrap(
     );
   }
 
+  // Initialize AppReviewService
+  final nativeReviewService = InAppReviewService(
+    inAppReview: InAppReview.instance,
+    logger: logger,
+  );
+
+  final appReviewService = AppReviewService(
+    appReviewRepository: appReviewRepository,
+    nativeReviewService: nativeReviewService,
+    logger: logger,
+  );
+
+  // Initialize ContentLimitationService.
+  final contentLimitationService = ContentLimitationService(
+    engagementRepository: engagementRepository,
+    reportRepository: reportRepository,
+    cacheDuration: const Duration(minutes: 5),
+    logger: logger,
+  );
+  logger
+    ..fine('ContentLimitationService initialized.')
+    ..fine('AppReviewService initialized.');
+
   // Conditionally instantiate DemoDataMigrationService
   final demoDataMigrationService =
       appConfig.environment == app_config.AppEnvironment.demo
@@ -464,7 +537,7 @@ Future<Widget> bootstrap(
           inAppNotificationRepository: inAppNotificationRepository,
           appSettingsFixturesData: appSettingsFixturesData,
           userContentPreferencesFixturesData:
-              userContentPreferencesFixturesData,
+              getUserContentPreferencesFixturesData(),
           inAppNotificationsFixturesData: inAppNotificationsFixturesData,
         )
       : null;
@@ -521,6 +594,11 @@ Future<Widget> bootstrap(
       inlineAdCacheService: inlineAdCacheService,
       feedCacheService: feedCacheService,
       navigatorKey: navigatorKey,
+      engagementRepository: engagementRepository,
+      reportRepository: reportRepository,
+      appReviewRepository: appReviewRepository,
+      appReviewService: appReviewService,
+      contentLimitationService: contentLimitationService,
     ),
   );
 }

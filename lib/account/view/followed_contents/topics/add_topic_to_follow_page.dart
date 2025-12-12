@@ -4,10 +4,112 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/available_topics_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:ui_kit/ui_kit.dart';
+
+class _FollowButton extends StatefulWidget {
+  const _FollowButton({required this.topic, required this.isFollowed});
+
+  final Topic topic;
+  final bool isFollowed;
+
+  @override
+  State<_FollowButton> createState() => _FollowButtonState();
+}
+
+class _FollowButtonState extends State<_FollowButton> {
+  bool _isLoading = false;
+
+  Future<void> _onFollowToggled() async {
+    setState(() => _isLoading = true);
+
+    final l10n = AppLocalizations.of(context);
+    final appBloc = context.read<AppBloc>();
+    final userContentPreferences = appBloc.state.userContentPreferences;
+
+    if (userContentPreferences == null) {
+      setState(() => _isLoading = false);
+      return;
+    }
+
+    final updatedFollowedTopics = List<Topic>.from(
+      userContentPreferences.followedTopics,
+    );
+
+    try {
+      if (widget.isFollowed) {
+        updatedFollowedTopics.removeWhere((t) => t.id == widget.topic.id);
+      } else {
+        final limitationService = context.read<ContentLimitationService>();
+        final status = await limitationService.checkAction(
+          ContentAction.followTopic,
+        );
+
+        if (status != LimitationStatus.allowed) {
+          if (mounted) {
+            showContentLimitationBottomSheet(
+              context: context,
+              status: status,
+              action: ContentAction.followTopic,
+            );
+          }
+          return;
+        }
+        updatedFollowedTopics.add(widget.topic);
+      }
+
+      final updatedPreferences = userContentPreferences.copyWith(
+        followedTopics: updatedFollowedTopics,
+      );
+
+      appBloc.add(
+        AppUserContentPreferencesChanged(preferences: updatedPreferences),
+      );
+    } on ForbiddenException catch (e) {
+      if (mounted) {
+        await showModalBottomSheet<void>(
+          context: context,
+          builder: (_) => ContentLimitationBottomSheet(
+            title: l10n.limitReachedTitle,
+            body: e.message,
+            buttonText: l10n.gotItButton,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
+
+    if (_isLoading) {
+      return const SizedBox(
+        width: 24,
+        height: 24,
+        child: CircularProgressIndicator(strokeWidth: 2),
+      );
+    }
+
+    return IconButton(
+      icon: widget.isFollowed
+          ? Icon(Icons.check_circle, color: colorScheme.primary)
+          : Icon(Icons.add_circle_outline, color: colorScheme.onSurfaceVariant),
+      tooltip: widget.isFollowed
+          ? l10n.unfollowTopicTooltip(widget.topic.name)
+          : l10n.followTopicTooltip(widget.topic.name),
+      onPressed: _onFollowToggled,
+    );
+  }
+}
 
 /// {@template add_topic_to_follow_page}
 /// A page that allows users to browse and select topics to follow.
@@ -137,75 +239,9 @@ class AddTopicToFollowPage extends StatelessWidget {
                                 ),
                         ),
                         title: Text(topic.name, style: textTheme.titleMedium),
-                        trailing: IconButton(
-                          icon: isFollowed
-                              ? Icon(
-                                  Icons.check_circle,
-                                  color: colorScheme.primary,
-                                )
-                              : Icon(
-                                  Icons.add_circle_outline,
-                                  color: colorScheme.onSurfaceVariant,
-                                ),
-                          tooltip: isFollowed
-                              ? l10n.unfollowTopicTooltip(topic.name)
-                              : l10n.followTopicTooltip(topic.name),
-                          onPressed: () {
-                            // Ensure user preferences are available before
-                            // proceeding.
-                            if (userContentPreferences == null) return;
-
-                            // Create a mutable copy of the followed topics list.
-                            final updatedFollowedTopics = List<Topic>.from(
-                              followedTopics,
-                            );
-
-                            // If the user is unfollowing, always allow it.
-                            if (isFollowed) {
-                              updatedFollowedTopics.removeWhere(
-                                (t) => t.id == topic.id,
-                              );
-                              final updatedPreferences = userContentPreferences
-                                  .copyWith(
-                                    followedTopics: updatedFollowedTopics,
-                                  );
-
-                              context.read<AppBloc>().add(
-                                AppUserContentPreferencesChanged(
-                                  preferences: updatedPreferences,
-                                ),
-                              );
-                            } else {
-                              // If the user is following, check the limit first.
-                              final limitationService = context
-                                  .read<ContentLimitationService>();
-                              final status = limitationService.checkAction(
-                                ContentAction.followTopic,
-                              );
-
-                              if (status == LimitationStatus.allowed) {
-                                updatedFollowedTopics.add(topic);
-                                final updatedPreferences =
-                                    userContentPreferences.copyWith(
-                                      followedTopics: updatedFollowedTopics,
-                                    );
-
-                                context.read<AppBloc>().add(
-                                  AppUserContentPreferencesChanged(
-                                    preferences: updatedPreferences,
-                                  ),
-                                );
-                              } else {
-                                // If the limit is reached, show the bottom sheet.
-                                showModalBottomSheet<void>(
-                                  context: context,
-                                  builder: (_) => ContentLimitationBottomSheet(
-                                    status: status,
-                                  ),
-                                );
-                              }
-                            }
-                          },
+                        trailing: _FollowButton(
+                          topic: topic,
+                          isFollowed: isFollowed,
                         ),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: AppSpacing.paddingMedium,

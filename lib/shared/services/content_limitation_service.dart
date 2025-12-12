@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:core/core.dart';
+import 'package:data_repository/data_repository.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:logging/logging.dart';
 
 /// Defines the specific type of content-related action a user is trying to
 /// perform, which may be subject to limitations.
@@ -16,14 +20,23 @@ enum ContentAction {
   /// The action of following a country.
   followCountry,
 
-  /// The action of saving a headline filter.
-  saveHeadlineFilter,
+  /// The action of saving a filter.
+  saveFilter,
 
-  /// The action of pinning a headline filter.
-  pinHeadlineFilter,
+  /// The action of pinning a filter.
+  pinFilter,
 
-  /// The action of subscribing to notifications for a headline filter.
-  subscribeToHeadlineFilterNotifications,
+  /// The action of subscribing to notifications for a saved filter.
+  subscribeToSavedFilterNotifications,
+
+  /// The action of posting a comment.
+  postComment,
+
+  /// The action of reacting to a piece of content.
+  reactToContent,
+
+  /// The action of submitting a report.
+  submitReport,
 }
 
 /// Defines the outcome of a content limitation check.
@@ -46,31 +59,153 @@ enum LimitationStatus {
 /// a content-related action based on their role and remote configuration limits.
 ///
 /// This service acts as the single source of truth for content limitations,
-/// ensuring that rules for actions like bookmarking or following are applied
-/// consistently throughout the application.
+/// ensuring that rules are applied consistently throughout the application.
+///
+/// It is a stateful, caching service that proactively fetches daily action
+/// counts for the current user to provide fast, client-side limit checks.
 /// {@endtemplate}
 class ContentLimitationService {
   /// {@macro content_limitation_service}
-  const ContentLimitationService({required AppBloc appBloc})
-    : _appBloc = appBloc;
+  ContentLimitationService({
+    required DataRepository<Engagement> engagementRepository,
+    required DataRepository<Report> reportRepository,
+    required Duration cacheDuration,
+    required Logger logger,
+  }) : _engagementRepository = engagementRepository,
+       _reportRepository = reportRepository,
+       _cacheDuration = cacheDuration,
+       _logger = logger;
 
-  final AppBloc _appBloc;
+  final DataRepository<Engagement> _engagementRepository;
+  final DataRepository<Report> _reportRepository;
+  final Duration _cacheDuration;
+  final Logger _logger;
+
+  late final AppBloc _appBloc;
+  StreamSubscription<AppState>? _appBlocSubscription;
+
+  // Internal cache for daily action counts.
+  int? _commentCount;
+  int? _reactionCount;
+  int? _reportCount;
+  DateTime? _countsLastFetchedAt;
+  String? _cachedForUserId;
+
+  /// Initializes the service by subscribing to AppBloc state changes.
+  ///
+  /// This triggers the proactive fetching of daily action counts whenever the
+  /// user's authentication state changes.
+  void init({required AppBloc appBloc}) {
+    _logger.info('ContentLimitationService initializing...');
+    _appBloc = appBloc;
+    _appBlocSubscription = appBloc.stream.listen(_onAppStateChanged);
+    // Trigger initial fetch if a user is already present.
+    if (appBloc.state.user != null) {
+      _fetchDailyCounts(_appBloc.state.user!.id);
+    }
+  }
+
+  /// Disposes of the service, cancelling any active subscriptions.
+  void dispose() {
+    _logger.info('ContentLimitationService disposing...');
+    _appBlocSubscription?.cancel();
+  }
+
+  void _onAppStateChanged(AppState appState) {
+    final newUserId = appState.user?.id;
+
+    // If the user ID has changed (login/logout/transition), clear the cache
+    // and potentially trigger a new fetch.
+    if (newUserId != _cachedForUserId) {
+      _logger.info(
+        'User changed from $_cachedForUserId to $newUserId. '
+        'Clearing daily action count cache.',
+      );
+      _clearCache();
+      if (newUserId != null) {
+        _fetchDailyCounts(newUserId);
+      }
+    }
+  }
+
+  void _clearCache() {
+    _commentCount = null;
+    _reactionCount = null;
+    _reportCount = null;
+    _countsLastFetchedAt = null;
+    _cachedForUserId = null;
+  }
+
+  Future<void> _fetchDailyCounts(String userId) async {
+    _logger.info('Fetching daily action counts for user $userId...');
+    _cachedForUserId = userId;
+
+    try {
+      final twentyFourHoursAgo = DateTime.now().subtract(
+        const Duration(hours: 24),
+      );
+
+      // Fetch all counts concurrently for performance.
+      final [commentCount, reactionCount, reportCount] = await Future.wait<int>(
+        [
+          _engagementRepository.count(
+            userId: userId,
+            filter: {
+              'comment': {r'$exists': true, r'$ne': null},
+              'createdAt': {r'$gte': twentyFourHoursAgo.toIso8601String()},
+            },
+          ),
+          _engagementRepository.count(
+            userId: userId,
+            filter: {
+              'reaction': {r'$exists': true, r'$ne': null},
+              'createdAt': {r'$gte': twentyFourHoursAgo.toIso8601String()},
+            },
+          ),
+          _reportRepository.count(
+            userId: userId,
+            filter: {
+              'reporterUserId': userId,
+              'createdAt': {r'$gte': twentyFourHoursAgo.toIso8601String()},
+            },
+          ),
+        ],
+      );
+
+      _commentCount = commentCount;
+      _reactionCount = reactionCount;
+      _reportCount = reportCount;
+      _countsLastFetchedAt = DateTime.now();
+
+      _logger.info(
+        'Successfully fetched daily counts for user $userId: '
+        'Comments: $_commentCount, Reactions: $_reactionCount, Reports: $_reportCount',
+      );
+    } catch (e, s) {
+      _logger.severe(
+        'Failed to fetch daily action counts for user $userId.',
+        e,
+        s,
+      );
+      // Clear cache on failure to ensure a retry on the next check.
+      _clearCache();
+    }
+  }
 
   /// Checks if the current user is allowed to perform a given [action].
   ///
   /// Returns a [LimitationStatus] indicating whether the action is allowed or
   /// if a specific limit has been reached.
-  LimitationStatus checkAction(
+  Future<LimitationStatus> checkAction(
     ContentAction action, {
     PushNotificationSubscriptionDeliveryType? deliveryType,
-  }) {
+  }) async {
     final state = _appBloc.state;
     final user = state.user;
     final preferences = state.userContentPreferences;
     final remoteConfig = state.remoteConfig;
 
-    // Fail open: If essential data is missing, allow the action to prevent
-    // blocking users due to an incomplete app state.
+    // Fail open: If essential data is missing, allow the action.
     if (user == null || preferences == null || remoteConfig == null) {
       return LimitationStatus.allowed;
     }
@@ -78,121 +213,111 @@ class ContentLimitationService {
     final limits = remoteConfig.user.limits;
     final role = user.appRole;
 
+    // Business Rule: Guest users are not allowed to engage or report.
+    if (role == AppUserRole.guestUser) {
+      switch (action) {
+        case ContentAction.postComment:
+        case ContentAction.reactToContent:
+        case ContentAction.submitReport:
+          return LimitationStatus.anonymousLimitReached;
+        case ContentAction.bookmarkHeadline:
+        case ContentAction.followTopic:
+        case ContentAction.followSource:
+        case ContentAction.followCountry:
+        case ContentAction.saveFilter:
+        case ContentAction.pinFilter:
+        case ContentAction.subscribeToSavedFilterNotifications:
+          break; // Continue to normal check for guest.
+      }
+    }
+
+    // Check daily limits, refreshing cache if necessary.
+    final isCacheStale =
+        _countsLastFetchedAt == null ||
+        DateTime.now().difference(_countsLastFetchedAt!) > _cacheDuration;
+
+    if (isCacheStale && _cachedForUserId == user.id) {
+      await _fetchDailyCounts(user.id);
+    }
+
     switch (action) {
+      // Persisted preference checks (synchronous)
       case ContentAction.bookmarkHeadline:
-        final count = preferences.savedHeadlines.length;
         final limit = limits.savedHeadlines[role];
-
-        // If no limit is defined for the role, allow the action.
-        if (limit == null) return LimitationStatus.allowed;
-
-        if (count >= limit) {
+        if (limit != null && preferences.savedHeadlines.length >= limit) {
           return _getLimitationStatusForRole(role);
-        }
-
-      // Check if the user has reached the limit for saving filters.
-      case ContentAction.saveHeadlineFilter:
-        final count = preferences.savedHeadlineFilters.length;
-        final limitConfig = limits.savedHeadlineFilters[role];
-
-        // If no limit config is defined for the role, allow the action.
-        if (limitConfig == null) return LimitationStatus.allowed;
-
-        if (count >= limitConfig.total) {
-          return _getLimitationStatusForRole(role);
-        }
-
-      case ContentAction.pinHeadlineFilter:
-        final count = preferences.savedHeadlineFilters
-            .where((filter) => filter.isPinned)
-            .length;
-        final limit = limits.savedHeadlineFilters[role]?.pinned;
-
-        if (limit == null) return LimitationStatus.allowed;
-
-        if (count >= limit) {
-          return _getLimitationStatusForRole(role);
-        }
-
-      case ContentAction.subscribeToHeadlineFilterNotifications:
-        final subscriptionLimits =
-            limits.savedHeadlineFilters[role]?.notificationSubscriptions;
-
-        // If no subscription limits are defined for the role, allow the action.
-        if (subscriptionLimits == null) return LimitationStatus.allowed;
-
-        final currentCounts = <PushNotificationSubscriptionDeliveryType, int>{};
-        for (final filter in preferences.savedHeadlineFilters) {
-          for (final type in filter.deliveryTypes) {
-            currentCounts.update(type, (value) => value + 1, ifAbsent: () => 1);
-          }
-        }
-
-        // If a specific delivery type is provided, check the limit for that
-        // type only. This is used by the SaveFilterDialog UI.
-        if (deliveryType != null) {
-          final limitForType = subscriptionLimits[deliveryType] ?? 0;
-          final currentCountForType = currentCounts[deliveryType] ?? 0;
-
-          if (currentCountForType >= limitForType) {
-            return _getLimitationStatusForRole(role);
-          }
-        } else {
-          // If no specific type is provided, perform a general check to see
-          // if the user can subscribe to *any* notification type. This maintains
-          // backward compatibility for broader checks.
-          final canSubscribeToAny = subscriptionLimits.entries.any((entry) {
-            final limit = entry.value;
-            final currentCount = currentCounts[entry.key] ?? 0;
-            return currentCount < limit;
-          });
-
-          if (!canSubscribeToAny) {
-            return _getLimitationStatusForRole(role);
-          }
         }
 
       case ContentAction.followTopic:
       case ContentAction.followSource:
       case ContentAction.followCountry:
         final limit = limits.followedItems[role];
+        if (limit == null) return LimitationStatus.allowed;
+        final count = switch (action) {
+          ContentAction.followTopic => preferences.followedTopics.length,
+          ContentAction.followSource => preferences.followedSources.length,
+          ContentAction.followCountry => preferences.followedCountries.length,
+          _ => 0,
+        };
+        if (count >= limit) return _getLimitationStatusForRole(role);
 
-        // Determine the count for the specific item type being followed.
-        final int count;
-        switch (action) {
-          case ContentAction.followTopic:
-            count = preferences.followedTopics.length;
-          case ContentAction.followSource:
-            count = preferences.followedSources.length;
-          case ContentAction.followCountry:
-            count = preferences.followedCountries.length;
-          case ContentAction.bookmarkHeadline:
-            // This case is handled above and will not be reached here.
-            count = 0;
-          case ContentAction.saveHeadlineFilter:
-            // This case is handled above and will not be reached here.
-            count = 0;
-          case ContentAction.pinHeadlineFilter:
-          case ContentAction.subscribeToHeadlineFilterNotifications:
-            // These cases are handled above and will not be reached here.
-            count = 0;
+      case ContentAction.saveFilter:
+        final limit = limits.savedHeadlineFilters[role]?.total;
+        if (limit != null && preferences.savedHeadlineFilters.length >= limit) {
+          return _getLimitationStatusForRole(role);
         }
 
-        // If no limit is defined for the role, allow the action.
-        if (limit == null) return LimitationStatus.allowed;
+      case ContentAction.pinFilter:
+        final limit = limits.savedHeadlineFilters[role]?.pinned;
+        if (limit != null &&
+            preferences.savedHeadlineFilters.where((f) => f.isPinned).length >=
+                limit) {
+          return _getLimitationStatusForRole(role);
+        }
 
-        if (count >= limit) {
+      case ContentAction.subscribeToSavedFilterNotifications:
+        final subscriptionLimits =
+            limits.savedHeadlineFilters[role]?.notificationSubscriptions;
+        if (subscriptionLimits == null) return LimitationStatus.allowed;
+
+        final currentCounts = <PushNotificationSubscriptionDeliveryType, int>{};
+        for (final filter in preferences.savedHeadlineFilters) {
+          for (final type in filter.deliveryTypes) {
+            currentCounts.update(type, (v) => v + 1, ifAbsent: () => 1);
+          }
+        }
+
+        if (deliveryType != null) {
+          final limitForType = subscriptionLimits[deliveryType] ?? 0;
+          final currentCountForType = currentCounts[deliveryType] ?? 0;
+          if (currentCountForType >= limitForType) {
+            return _getLimitationStatusForRole(role);
+          }
+        }
+
+      // Daily action checks (asynchronous, cached)
+      case ContentAction.postComment:
+        final limit = limits.commentsPerDay[role];
+        if (limit != null && (_commentCount ?? 0) >= limit) {
+          return _getLimitationStatusForRole(role);
+        }
+
+      case ContentAction.reactToContent:
+        final limit = limits.reactionsPerDay[role];
+        if (limit != null && (_reactionCount ?? 0) >= limit) {
+          return _getLimitationStatusForRole(role);
+        }
+
+      case ContentAction.submitReport:
+        final limit = limits.reportsPerDay[role];
+        if (limit != null && (_reportCount ?? 0) >= limit) {
           return _getLimitationStatusForRole(role);
         }
     }
 
-    // If no limit was hit, the action is allowed.
     return LimitationStatus.allowed;
   }
 
-  /// Maps an [AppUserRole] to the corresponding [LimitationStatus].
-  ///
-  /// This helper function ensures a consistent mapping when a limit is reached.
   LimitationStatus _getLimitationStatusForRole(AppUserRole role) {
     switch (role) {
       case AppUserRole.guestUser:

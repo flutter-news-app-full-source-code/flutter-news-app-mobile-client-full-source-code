@@ -916,9 +916,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get anonymousLimitButton => 'تسجيل الدخول';
 
   @override
-  String get standardLimitTitle => 'افتح الوصول غير المحدود';
-
-  @override
   String get standardLimitBody =>
       'لقد وصلت إلى الحد الأقصى للباقة المجانية. قم بالترقية لحفظ ومتابعة المزيد.';
 
@@ -1367,4 +1364,238 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get removeBookmarkActionLabel => 'إزالة من المحفوظات';
+
+  @override
+  String get reportActionLabel => 'إبلاغ';
+
+  @override
+  String get reportContentTitle => 'الإبلاغ عن محتوى';
+
+  @override
+  String get reportReasonSelectionPrompt => 'الرجاء تحديد سبب الإبلاغ:';
+
+  @override
+  String get reportAdditionalCommentsLabel => 'تعليقات إضافية (اختياري)';
+
+  @override
+  String get reportSubmitButtonLabel => 'إرسال البلاغ';
+
+  @override
+  String get reportSuccessSnackbar => 'تم إرسال البلاغ. شكراً لملاحظاتك.';
+
+  @override
+  String get reportFailureSnackbar =>
+      'فشل إرسال البلاغ. الرجاء المحاولة مرة أخرى.';
+
+  @override
+  String get commentsTitle => 'التعليقات';
+
+  @override
+  String get commentPostButtonLabel => 'نشر';
+
+  @override
+  String get commentInputHint => 'أضف تعليقاً...';
+
+  @override
+  String get commentRequiresReactionError => 'الرجاء تحديد تفاعل لنشر تعليق.';
+
+  @override
+  String get likeActionLabel => 'إعجاب';
+
+  @override
+  String get dislikeActionLabel => 'عدم إعجاب';
+
+  @override
+  String get commentActionLabel => 'تعليق';
+
+  @override
+  String get moreActionLabel => 'المزيد';
+
+  @override
+  String get rateAppPromptTitle => 'هل تستمتع بالتطبيق؟';
+
+  @override
+  String get rateAppPromptBody =>
+      'تساعدنا ملاحظاتك على التحسين. هل تمانع في تقييمنا؟';
+
+  @override
+  String get rateAppPromptYesButton => 'التطبيق رائع!';
+
+  @override
+  String get rateAppPromptNoButton => 'يحتاج لتحسين';
+
+  @override
+  String get feedbackPromptTitle => 'كيف يمكننا التحسين؟';
+
+  @override
+  String get feedbackPromptReasonUI => 'واجهة المستخدم / التصميم';
+
+  @override
+  String get feedbackPromptReasonPerformance => 'الأداء / السرعة';
+
+  @override
+  String get feedbackPromptReasonContent => 'جودة المحتوى';
+
+  @override
+  String get feedbackPromptReasonOther => 'أخرى';
+
+  @override
+  String get feedbackPromptSubmitButton => 'إرسال الملاحظات';
+
+  @override
+  String get rateAppNegativeFollowUpTitle_1 => 'كيف حالنا الآن؟';
+
+  @override
+  String get rateAppNegativeFollowUpTitle_2 => 'هل تحسن الأداء؟';
+
+  @override
+  String get rateAppNegativeFollowUpBody_1 =>
+      'لقد عملنا على ملاحظاتك. هل تعيد النظر في تقييمك؟';
+
+  @override
+  String get rateAppNegativeFollowUpBody_2 =>
+      'نحن نقدر رأيك. أخبرنا إذا كانت الأمور أفضل.';
+
+  @override
+  String get noCommentsYet => 'لا توجد تعليقات حتى الآن.';
+
+  @override
+  String get commentInputNoReactionHint => 'تفاعل لإضافة تعليق';
+
+  @override
+  String get headlineReportReasonMisinformation =>
+      'معلومات مضللة أو أخبار كاذبة';
+
+  @override
+  String get headlineReportReasonClickbait => 'عنوان مضلل أو طعم نقر';
+
+  @override
+  String get headlineReportReasonOffensive => 'محتوى مسيء أو خطاب كراهية';
+
+  @override
+  String get headlineReportReasonSpam => 'بريد عشوائي أو احتيال';
+
+  @override
+  String get headlineReportReasonBrokenLink => 'رابط معطل';
+
+  @override
+  String get headlineReportReasonPaywalled => 'محتوى مدفوع';
+
+  @override
+  String get sourceReportReasonLowQuality => 'صحافة منخفضة الجودة';
+
+  @override
+  String get sourceReportReasonHighAdDensity => 'إعلانات أو نوافذ منبثقة مفرطة';
+
+  @override
+  String get sourceReportReasonFrequentPaywalls => 'جدران دفع متكررة';
+
+  @override
+  String get sourceReportReasonImpersonation => 'انتحال شخصية';
+
+  @override
+  String get sourceReportReasonMisinformation => 'معلومات مضللة أو أخبار كاذبة';
+
+  @override
+  String get commentReportReasonSpam => 'إعلانات';
+
+  @override
+  String get commentReportReasonHarassment => 'تحرش أو تنمر';
+
+  @override
+  String get commentReportReasonHateSpeech => 'خطاب كراهية';
+
+  @override
+  String get limitReachedTitle => 'تم الوصول إلى الحد الأقصى';
+
+  @override
+  String get manageMyContentButton => 'إدارة المحتوى الخاص بي';
+
+  @override
+  String get upgradeButton => 'ترقية';
+
+  @override
+  String get createAccountButton => 'إنشاء حساب';
+
+  @override
+  String get gotItButton => 'حسنًا';
+
+  @override
+  String get commentsPageTitle => 'التعليقات';
+
+  @override
+  String commentsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count تعليق',
+      many: '$count تعليقًا',
+      few: '$count تعليقات',
+      two: 'تعليقان',
+      one: 'تعليق واحد',
+      zero: '0 تعليقات',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get limitReachedGuestUserTitle => 'الحساب مطلوب';
+
+  @override
+  String get limitReachedGuestUserBody =>
+      'يرجى إنشاء حساب مجاني أو تسجيل الدخول للتفاعل مع المجتمع واستخدام هذه الميزة.';
+
+  @override
+  String get limitReachedBodyFollow =>
+      'لقد وصلت إلى الحد الأقصى للعناصر المتابعة. لمتابعة المزيد، يرجى مراجعة المحتوى المتابع الحالي.';
+
+  @override
+  String get limitReachedBodySave =>
+      'لقد وصلت إلى الحد الأقصى للمقالات المحفوظة. لحفظ المزيد، يرجى مراجعة مقالاتك المحفوظة الحالية.';
+
+  @override
+  String get limitReachedBodySaveFilters =>
+      'لقد وصلت إلى الحد الأقصى للفلاتر المحفوظة. لإنشاء فلاتر جديدة، يرجى مراجعة الفلاتر الحالية.';
+
+  @override
+  String get limitReachedBodyPinFilters =>
+      'لقد وصلت إلى الحد الأقصى للفلاتر المثبتة. لتثبيت فلتر جديد، يرجى إلغاء تثبيت فلتر حالي.';
+
+  @override
+  String get limitReachedBodySubscribeToNotifications =>
+      'لقد وصلت إلى الحد الأقصى لاشتراكات الإشعارات. للاشتراك في تنبيهات جديدة، يرجى مراجعة اشتراكاتك الحالية.';
+
+  @override
+  String get limitReachedBodyComments =>
+      'لقد وصلت إلى الحد اليومي لنشر التعليقات. يرجى المحاولة مرة أخرى غدًا.';
+
+  @override
+  String get limitReachedBodyReactions =>
+      'لقد وصلت إلى الحد اليومي للتفاعلات. يرجى المحاولة مرة أخرى غدًا.';
+
+  @override
+  String get limitReachedBodyReports =>
+      'لقد وصلت إلى الحد اليومي لتقديم البلاغات. يرجى المحاولة مرة أخرى غدًا.';
+
+  @override
+  String get commentEditButtonLabel => 'تحديث';
+
+  @override
+  String get commentPostFailureSnackbar =>
+      'فشل نشر التعليق. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get commentUpdateFailureSnackbar =>
+      'فشل تحديث التعليق. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get commentInputDisabledHint => 'سجل الدخول للانضمام إلى المحادثة';
+
+  @override
+  String get commentInputExistingHint => 'لقد علقت بالفعل على هذا العنوان.';
+
+  @override
+  String commenterName(String id) {
+    return 'مستخدم $id';
+  }
 }

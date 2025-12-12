@@ -1742,12 +1742,6 @@ abstract class AppLocalizations {
   /// **'Sign In'**
   String get anonymousLimitButton;
 
-  /// Title for the bottom sheet when a standard user hits a content limit.
-  ///
-  /// In en, this message translates to:
-  /// **'Unlock More Access'**
-  String get standardLimitTitle;
-
   /// Body text for the bottom sheet when a standard user hits a content limit.
   ///
   /// In en, this message translates to:
@@ -2599,6 +2593,414 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove Bookmark'**
   String get removeBookmarkActionLabel;
+
+  /// Label for the action to report content.
+  ///
+  /// In en, this message translates to:
+  /// **'Report'**
+  String get reportActionLabel;
+
+  /// Title for the report content bottom sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Report Content'**
+  String get reportContentTitle;
+
+  /// Prompt asking the user to select a reason for reporting.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a reason for your report:'**
+  String get reportReasonSelectionPrompt;
+
+  /// Label for the optional additional comments field in the report form.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional Comments (Optional)'**
+  String get reportAdditionalCommentsLabel;
+
+  /// Label for the button to submit a content report.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Report'**
+  String get reportSubmitButtonLabel;
+
+  /// Snackbar message shown after a report is successfully submitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Report submitted. Thank you for your feedback.'**
+  String get reportSuccessSnackbar;
+
+  /// Snackbar message shown when submitting a report fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to submit report. Please try again.'**
+  String get reportFailureSnackbar;
+
+  /// Title for the comments section or bottom sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Comments'**
+  String get commentsTitle;
+
+  /// Label for the button to post a new comment.
+  ///
+  /// In en, this message translates to:
+  /// **'Post'**
+  String get commentPostButtonLabel;
+
+  /// Hint text for the comment input field.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a comment...'**
+  String get commentInputHint;
+
+  /// Error message shown when a user tries to comment without selecting a reaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a reaction to post a comment.'**
+  String get commentRequiresReactionError;
+
+  /// Tooltip or label for the 'Like' action.
+  ///
+  /// In en, this message translates to:
+  /// **'Like'**
+  String get likeActionLabel;
+
+  /// Tooltip or label for the 'Dislike' action.
+  ///
+  /// In en, this message translates to:
+  /// **'Dislike'**
+  String get dislikeActionLabel;
+
+  /// Tooltip or label for the 'Comment' action.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment'**
+  String get commentActionLabel;
+
+  /// Tooltip or label for the 'More' actions icon.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get moreActionLabel;
+
+  /// Title for the in-app bottom sheet that prompts the user to rate the app.
+  ///
+  /// In en, this message translates to:
+  /// **'Enjoying the app?'**
+  String get rateAppPromptTitle;
+
+  /// Body text for the in-app rating prompt bottom sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Your feedback helps us improve. Would you mind rating us?'**
+  String get rateAppPromptBody;
+
+  /// Button text for a positive response to the rating prompt.
+  ///
+  /// In en, this message translates to:
+  /// **'It\'s Great!'**
+  String get rateAppPromptYesButton;
+
+  /// Button text for a negative response to the rating prompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs Work'**
+  String get rateAppPromptNoButton;
+
+  /// Title for the bottom sheet that asks for detailed feedback after a negative rating prompt response.
+  ///
+  /// In en, this message translates to:
+  /// **'How can we improve?'**
+  String get feedbackPromptTitle;
+
+  /// Feedback reason related to UI and design.
+  ///
+  /// In en, this message translates to:
+  /// **'UI / Design'**
+  String get feedbackPromptReasonUI;
+
+  /// Feedback reason related to app performance.
+  ///
+  /// In en, this message translates to:
+  /// **'Performance / Speed'**
+  String get feedbackPromptReasonPerformance;
+
+  /// Feedback reason related to the quality of news content.
+  ///
+  /// In en, this message translates to:
+  /// **'Content Quality'**
+  String get feedbackPromptReasonContent;
+
+  /// Feedback reason for issues not listed.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get feedbackPromptReasonOther;
+
+  /// Button text to submit detailed feedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Feedback'**
+  String get feedbackPromptSubmitButton;
+
+  /// First variation of the follow-up title for the 'Rate App' prompt after a user has given negative feedback.
+  ///
+  /// In en, this message translates to:
+  /// **'How are we doing now?'**
+  String get rateAppNegativeFollowUpTitle_1;
+
+  /// Second variation of the follow-up title for the 'Rate App' prompt after a user has given negative feedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Have we improved?'**
+  String get rateAppNegativeFollowUpTitle_2;
+
+  /// First variation of the follow-up body text for the 'Rate App' prompt after a user has given negative feedback.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ve been working on your feedback. Would you reconsider your rating?'**
+  String get rateAppNegativeFollowUpBody_1;
+
+  /// Second variation of the follow-up body text for the 'Rate App' prompt after a user has given negative feedback.
+  ///
+  /// In en, this message translates to:
+  /// **'We value your opinion. Let us know if things are better.'**
+  String get rateAppNegativeFollowUpBody_2;
+
+  /// Message displayed when there are no comments on a headline.
+  ///
+  /// In en, this message translates to:
+  /// **'No comments yet.'**
+  String get noCommentsYet;
+
+  /// Hint text for the comment input field when the user has not yet reacted.
+  ///
+  /// In en, this message translates to:
+  /// **'React to add a comment'**
+  String get commentInputNoReactionHint;
+
+  /// Report reason for factually incorrect content.
+  ///
+  /// In en, this message translates to:
+  /// **'Misinformation or Fake News'**
+  String get headlineReportReasonMisinformation;
+
+  /// Report reason for a clickbait headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Clickbait or Misleading Title'**
+  String get headlineReportReasonClickbait;
+
+  /// Report reason for offensive content.
+  ///
+  /// In en, this message translates to:
+  /// **'Offensive or Hate Speech'**
+  String get headlineReportReasonOffensive;
+
+  /// Report reason for spam or fraudulent content.
+  ///
+  /// In en, this message translates to:
+  /// **'Spam or Scam'**
+  String get headlineReportReasonSpam;
+
+  /// Report reason for a non-working article URL.
+  ///
+  /// In en, this message translates to:
+  /// **'Broken Link'**
+  String get headlineReportReasonBrokenLink;
+
+  /// Report reason for content that requires a subscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Paywalled Content'**
+  String get headlineReportReasonPaywalled;
+
+  /// Report reason for a source with poor content.
+  ///
+  /// In en, this message translates to:
+  /// **'Low-Quality Journalism'**
+  String get sourceReportReasonLowQuality;
+
+  /// Report reason for a source with a bad user experience due to ads.
+  ///
+  /// In en, this message translates to:
+  /// **'Excessive Ads or Popups'**
+  String get sourceReportReasonHighAdDensity;
+
+  /// Report reason for a source that often requires a subscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Frequent Paywalls'**
+  String get sourceReportReasonFrequentPaywalls;
+
+  /// Report reason for a source pretending to be another entity.
+  ///
+  /// In en, this message translates to:
+  /// **'Impersonation'**
+  String get sourceReportReasonImpersonation;
+
+  /// Report reason for a source pretending to be another entity.
+  ///
+  /// In en, this message translates to:
+  /// **'Misinformation'**
+  String get sourceReportReasonMisinformation;
+
+  /// Report reason for a comment that is spam.
+  ///
+  /// In en, this message translates to:
+  /// **'Spam or Advertising'**
+  String get commentReportReasonSpam;
+
+  /// Report reason for a comment that is abusive.
+  ///
+  /// In en, this message translates to:
+  /// **'Harassment or Bullying'**
+  String get commentReportReasonHarassment;
+
+  /// Report reason for a comment containing hate speech.
+  ///
+  /// In en, this message translates to:
+  /// **'Hate Speech'**
+  String get commentReportReasonHateSpeech;
+
+  /// Generic title for when a user hits a content limit.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit Reached'**
+  String get limitReachedTitle;
+
+  /// Button text that navigates the user to a page where they can manage their content (e.g., unfollow items).
+  ///
+  /// In en, this message translates to:
+  /// **'Manage My Content'**
+  String get manageMyContentButton;
+
+  /// Button text prompting the user to upgrade their subscription plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade'**
+  String get upgradeButton;
+
+  /// Button text prompting an anonymous user to create an account.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get createAccountButton;
+
+  /// A simple acknowledgement button.
+  ///
+  /// In en, this message translates to:
+  /// **'Got It'**
+  String get gotItButton;
+
+  /// Title for the page or bottom sheet that displays comments for a headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Comments'**
+  String get commentsPageTitle;
+
+  /// Label for a button that shows the number of comments and opens the comments view.
+  ///
+  /// In en, this message translates to:
+  /// **'{count,plural, =1{1 Comment}other{{count} Comments}}'**
+  String commentsCount(int count);
+
+  /// Title for the bottom sheet when a guest user tries to perform an action reserved for authenticated users (e.g., comment, react).
+  ///
+  /// In en, this message translates to:
+  /// **'Account Required'**
+  String get limitReachedGuestUserTitle;
+
+  /// Body text for the bottom sheet when a guest user tries to perform an action reserved for authenticated users.
+  ///
+  /// In en, this message translates to:
+  /// **'Please create a free account or sign in to engage with the community and use this feature.'**
+  String get limitReachedGuestUserBody;
+
+  /// Body text when a user tries to follow more items (topics, sources, countries) than their plan allows.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached your limit for followed items. To follow more, please review your existing followed content.'**
+  String get limitReachedBodyFollow;
+
+  /// Body text when a user tries to save more articles than their plan allows.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached your limit for saved articles. To save more, please review your existing saved articles.'**
+  String get limitReachedBodySave;
+
+  /// Body text when a user tries to save more filters than their plan allows.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached your limit for saved filters. To create new ones, please review your existing filters.'**
+  String get limitReachedBodySaveFilters;
+
+  /// Body text when a user tries to pin more filters than their plan allows.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached your limit for pinned filters. To pin a new one, please un-pin an existing filter.'**
+  String get limitReachedBodyPinFilters;
+
+  /// Body text when a user tries to subscribe to more notifications than their plan allows.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached your limit for notification subscriptions. To subscribe to new alerts, please review your existing subscriptions.'**
+  String get limitReachedBodySubscribeToNotifications;
+
+  /// Body text when a user tries to post more comments than their daily limit allows.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached your daily limit for posting comments. Please try again tomorrow.'**
+  String get limitReachedBodyComments;
+
+  /// Body text when a user tries to react more than their daily limit allows.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached your daily limit for reactions. Please try again tomorrow.'**
+  String get limitReachedBodyReactions;
+
+  /// Body text when a user tries to submit more reports than their daily limit allows.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached your daily limit for submitting reports. Please try again tomorrow.'**
+  String get limitReachedBodyReports;
+
+  /// Label for the button to update an existing comment.
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get commentEditButtonLabel;
+
+  /// Snackbar message shown when posting a comment fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to post comment. Please try again.'**
+  String get commentPostFailureSnackbar;
+
+  /// Snackbar message shown when updating a comment fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update comment. Please try again.'**
+  String get commentUpdateFailureSnackbar;
+
+  /// Hint text for the comment input field when the user is a guest.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to join the conversation'**
+  String get commentInputDisabledHint;
+
+  /// Hint text for the comment input field when the user has already posted a comment.
+  ///
+  /// In en, this message translates to:
+  /// **'You have already commented on this headline.'**
+  String get commentInputExistingHint;
+
+  /// Display name for a commenter when their full user object is not available, showing a partial ID.
+  ///
+  /// In en, this message translates to:
+  /// **'User {id}'**
+  String commenterName(String id);
 }
 
 class _AppLocalizationsDelegate

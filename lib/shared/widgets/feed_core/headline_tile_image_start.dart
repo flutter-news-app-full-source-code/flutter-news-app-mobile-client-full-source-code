@@ -1,8 +1,11 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_source_row.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_tap_handler.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/user_content/engagement/widgets/headline_actions_row.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template headline_tile_image_start}
@@ -42,76 +45,98 @@ class HeadlineTileImageStart extends StatelessWidget {
         horizontal: AppSpacing.paddingMedium,
         vertical: AppSpacing.xs,
       ),
-      child: InkWell(
-        onTap:
-            onHeadlineTap ??
-            () => HeadlineTapHandler.handleHeadlineTap(context, headline),
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                width: 72,
-                height: 72,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(AppSpacing.xs),
-                  child: Image.network(
-                    headline.imageUrl,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return ColoredBox(
-                        color: colorScheme.surfaceContainerHighest,
-                        child: const Center(
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) => ColoredBox(
-                      color: colorScheme.surfaceContainerHighest,
-                      child: Icon(
-                        Icons.broken_image_outlined,
-                        color: colorScheme.onSurfaceVariant,
-                        size: AppSpacing.xl,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            onTap:
+                onHeadlineTap ??
+                () => HeadlineTapHandler.handleHeadlineTap(context, headline),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 72,
+                    height: 72,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(AppSpacing.xs),
+                      child: Image.network(
+                        headline.imageUrl,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return ColoredBox(
+                            color: colorScheme.surfaceContainerHighest,
+                            child: const Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) =>
+                            ColoredBox(
+                              color: colorScheme.surfaceContainerHighest,
+                              child: Icon(
+                                Icons.broken_image_outlined,
+                                color: colorScheme.onSurfaceVariant,
+                                size: AppSpacing.xl,
+                              ),
+                            ),
                       ),
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    HeadlineSourceRow(headline: headline),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          if (headline.isBreaking)
-                            TextSpan(
-                              text: '${l10n.breakingNewsPrefix} - ',
-                              style: textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w500,
-                                color: colorScheme.primary,
-                              ),
-                            ),
-                          TextSpan(text: headline.title),
-                        ],
-                      ),
-                      style: textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w500,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        HeadlineSourceRow(headline: headline),
+                        const SizedBox(height: AppSpacing.sm),
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              if (headline.isBreaking)
+                                TextSpan(
+                                  text: '${l10n.breakingNewsPrefix} - ',
+                                  style: textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                    color: colorScheme.primary,
+                                  ),
+                                ),
+                              TextSpan(text: headline.title),
+                            ],
+                          ),
+                          style: textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.md,
+              0,
+              AppSpacing.md,
+              AppSpacing.xs,
+            ),
+            child: BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
+              builder: (context, state) {
+                return HeadlineActionsRow(
+                  headline: headline,
+                  engagements: state.engagementsMap[headline.id] ?? [],
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

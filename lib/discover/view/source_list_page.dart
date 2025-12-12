@@ -242,7 +242,7 @@ class _SourceListTile extends StatelessWidget {
         tooltip: isFollowing
             ? l10n.unfollowSourceTooltip(source.name)
             : l10n.followSourceTooltip(source.name),
-        onPressed: () {
+        onPressed: () async {
           // If the user is unfollowing, always allow it.
           if (isFollowing) {
             context.read<SourceListBloc>().add(
@@ -251,19 +251,22 @@ class _SourceListTile extends StatelessWidget {
           } else {
             // If the user is following, check the limit first.
             final limitationService = context.read<ContentLimitationService>();
-            final status = limitationService.checkAction(
+            final status = await limitationService.checkAction(
               ContentAction.followSource,
             );
 
             if (status == LimitationStatus.allowed) {
-              context.read<SourceListBloc>().add(
-                SourceListFollowToggled(source: source),
-              );
+              if (context.mounted) {
+                context.read<SourceListBloc>().add(
+                  SourceListFollowToggled(source: source),
+                );
+              }
             } else {
-              // If the limit is reached, show the informative bottom sheet.
-              showModalBottomSheet<void>(
+              if (!context.mounted) return;
+              showContentLimitationBottomSheet(
                 context: context,
-                builder: (_) => ContentLimitationBottomSheet(status: status),
+                status: status,
+                action: ContentAction.followSource,
               );
             }
           }

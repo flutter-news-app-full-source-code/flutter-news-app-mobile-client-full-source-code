@@ -11,8 +11,11 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inl
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/initialization_result.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/extensions.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:logging/logging.dart';
 
 part 'app_event.dart';
@@ -44,10 +47,14 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
     required InlineAdCacheService inlineAdCacheService,
+    required FeedCacheService feedCacheService,
     required Logger logger,
     required DataRepository<User> userRepository,
     required PushNotificationService pushNotificationService,
+    required DataRepository<Report> reportRepository,
+    required ContentLimitationService contentLimitationService,
     required DataRepository<InAppNotification> inAppNotificationRepository,
+    required AppReviewService appReviewService,
   }) : _remoteConfigRepository = remoteConfigRepository,
        _appInitializer = appInitializer,
        _authRepository = authRepository,
@@ -55,7 +62,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _userContentPreferencesRepository = userContentPreferencesRepository,
        _userRepository = userRepository,
        _inAppNotificationRepository = inAppNotificationRepository,
+       _feedCacheService = feedCacheService,
        _pushNotificationService = pushNotificationService,
+       _reportRepository = reportRepository,
+       _contentLimitationService = contentLimitationService,
+       _appReviewService = appReviewService,
        _inlineAdCacheService = inlineAdCacheService,
        _logger = logger,
        super(
@@ -93,8 +104,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppAllInAppNotificationsMarkedAsRead>(
       _onAllInAppNotificationsMarkedAsRead,
     );
+    on<AppPositiveInteractionOcurred>(_onAppPositiveInteractionOcurred);
     on<AppInAppNotificationMarkedAsRead>(_onInAppNotificationMarkedAsRead);
     on<AppNotificationTapped>(_onAppNotificationTapped);
+    on<AppBookmarkToggled>(_onAppBookmarkToggled);
+    on<AppContentReported>(_onAppContentReported);
 
     // Listen to token refresh events from the push notification service.
     // When a token is refreshed, dispatch an event to trigger device
@@ -123,7 +137,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final DataRepository<User> _userRepository;
   final DataRepository<InAppNotification> _inAppNotificationRepository;
   final PushNotificationService _pushNotificationService;
+  final DataRepository<Report> _reportRepository;
+  final ContentLimitationService _contentLimitationService;
+  final AppReviewService _appReviewService;
   final InlineAdCacheService _inlineAdCacheService;
+  final FeedCacheService _feedCacheService;
 
   /// Handles the [AppStarted] event.
   ///
@@ -206,6 +224,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // data to ensure a clean state for the next session. This prevents
       // stale data from causing issues on subsequent logins.
       _inlineAdCacheService.clearAllAds();
+      // Also clear the feed cache to ensure the next user (or a new anonymous
+      // session) gets fresh data instead of seeing the previous user's feed.
+      _feedCacheService.clearAll();
+      _logger.info('[AppBloc] Cleared inline ad and feed caches on logout.');
 
       emit(
         state.copyWith(
@@ -214,6 +236,17 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         ),
       );
       return;
+    }
+
+    // If the user is changing (e.g., anonymous to authenticated), clear caches
+    // to prevent showing stale data from the previous user session.
+    if (oldUser != null && oldUser.id != newUser.id) {
+      _inlineAdCacheService.clearAllAds();
+      _feedCacheService.clearAll();
+      _logger.info(
+        '[AppBloc] User changed from ${oldUser.id} to ${newUser.id}. '
+        'Cleared inline ad and feed caches.',
+      );
     }
 
     // A user is present, so we are logging in or transitioning roles.
@@ -738,6 +771,24 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     }
   }
 
+  /// Handles the [AppPositiveInteractionOcurred] event.
+  ///
+  /// This handler increments the user's positive interaction count and then
+  /// delegates to the [AppReviewService] to check if a review prompt should
+  /// be shown.
+  Future<void> _onAppPositiveInteractionOcurred(
+    AppPositiveInteractionOcurred event,
+    Emitter<AppState> emit,
+  ) async {
+    final newCount = state.positiveInteractionCount + 1;
+    await _appReviewService.checkEligibilityAndTrigger(
+      context: event.context,
+      positiveInteractionCount: newCount,
+    );
+    // The count only updated after the eligibility check is complete.
+    emit(state.copyWith(positiveInteractionCount: newCount));
+  }
+
   /// Handles the [AppPushNotificationTokenRefreshed] event.
   ///
   /// This event is triggered when the underlying push notification provider
@@ -756,6 +807,74 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       '[AppBloc] Push notification token refreshed. Re-registering device.',
     );
     await _registerDeviceForPushNotifications(state.user!.id);
+  }
+
+  Future<void> _onAppBookmarkToggled(
+    AppBookmarkToggled event,
+    Emitter<AppState> emit,
+  ) async {
+    final userContentPreferences = state.userContentPreferences;
+    if (userContentPreferences == null) return;
+
+    final currentSaved = List<Headline>.from(
+      userContentPreferences.savedHeadlines,
+    );
+
+    if (event.isBookmarked) {
+      currentSaved.removeWhere((h) => h.id == event.headline.id);
+    } else {
+      final limitationStatus = await _contentLimitationService.checkAction(
+        ContentAction.bookmarkHeadline,
+      );
+
+      if (limitationStatus != LimitationStatus.allowed) {
+        emit(
+          state.copyWith(
+            limitationStatus: limitationStatus,
+            limitedAction: ContentAction.bookmarkHeadline,
+          ),
+        );
+        emit(state.copyWith(clearLimitedAction: true));
+        return;
+      }
+      currentSaved.insert(0, event.headline);
+      add(AppPositiveInteractionOcurred(context: event.context));
+    }
+
+    add(
+      AppUserContentPreferencesChanged(
+        preferences: userContentPreferences.copyWith(
+          savedHeadlines: currentSaved,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _onAppContentReported(
+    AppContentReported event,
+    Emitter<AppState> emit,
+  ) async {
+    final limitationStatus = await _contentLimitationService.checkAction(
+      ContentAction.submitReport,
+    );
+
+    if (limitationStatus != LimitationStatus.allowed) {
+      emit(
+        state.copyWith(
+          limitationStatus: limitationStatus,
+          limitedAction: ContentAction.submitReport,
+        ),
+      );
+      emit(state.copyWith(clearLimitedAction: true));
+      return;
+    }
+
+    try {
+      await _reportRepository.create(item: event.report);
+    } catch (e, s) {
+      _logger.severe('Failed to submit report in AppBloc', e, s);
+      // Optionally emit a failure state to show a snackbar.
+    }
   }
 
   /// A private helper method to encapsulate the logic for registering a

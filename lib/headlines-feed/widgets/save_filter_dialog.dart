@@ -6,6 +6,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localiz
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template save_filter_dialog}
@@ -44,10 +45,8 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
   late bool _isPinned;
   late Set<PushNotificationSubscriptionDeliveryType> _selectedDeliveryTypes;
 
-  // --- State flags to control UI based on user limits ---
-  // Determines if the user can interact with the 'Pin to feed' switch.
-  late final bool _canPin;
-  // Determines if the user can interact with each notification type checkbox.
+  bool _isSaving = false;
+  bool _canPin = true;
   late final Map<PushNotificationSubscriptionDeliveryType, bool>
   _canSubscribePerType;
 
@@ -62,36 +61,8 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
     // Initialize with a new modifiable Set to prevent "Cannot modify
     // unmodifiable Set" errors when editing an existing filter.
     _selectedDeliveryTypes = Set.from(filter?.deliveryTypes ?? {});
-
-    // Check content limitations to dynamically enable/disable UI controls.
-    final contentLimitationService = context.read<ContentLimitationService>();
-
-    // The user can interact with the pin switch if they haven't reached their
-    // limit, OR if they are editing a filter that is already pinned (to allow
-    // them to un-pin it).
-    _canPin =
-        contentLimitationService.checkAction(ContentAction.pinHeadlineFilter) ==
-            LimitationStatus.allowed ||
-        (widget.filterToEdit?.isPinned ?? false);
-
-    // Determine subscribability for each notification type individually.
     _canSubscribePerType = {};
-    for (final type in PushNotificationSubscriptionDeliveryType.values) {
-      final isAlreadySubscribed =
-          widget.filterToEdit?.deliveryTypes.contains(type) ?? false;
-
-      // Check if the user is allowed to subscribe to this specific type.
-      final limitationStatus = contentLimitationService.checkAction(
-        ContentAction.subscribeToHeadlineFilterNotifications,
-        deliveryType: type,
-      );
-
-      // The user can interact with the checkbox if they haven't reached their
-      // limit for this type, OR if they are already subscribed to it (to
-      // allow them to un-subscribe).
-      _canSubscribePerType[type] =
-          limitationStatus == LimitationStatus.allowed || isAlreadySubscribed;
-    }
+    _checkLimits();
   }
 
   @override
@@ -100,7 +71,39 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
     super.dispose();
   }
 
+  Future<void> _checkLimits() async {
+    final contentLimitationService = context.read<ContentLimitationService>();
+
+    final canPinStatus = await contentLimitationService.checkAction(
+      ContentAction.pinFilter,
+    );
+    if (mounted) {
+      setState(() {
+        _canPin =
+            canPinStatus == LimitationStatus.allowed ||
+            (widget.filterToEdit?.isPinned == true);
+      });
+    }
+
+    for (final type in PushNotificationSubscriptionDeliveryType.values) {
+      final isAlreadySubscribed =
+          widget.filterToEdit?.deliveryTypes.contains(type) ?? false;
+      final limitationStatus = await contentLimitationService.checkAction(
+        ContentAction.subscribeToSavedFilterNotifications,
+        deliveryType: type,
+      );
+      if (mounted) {
+        setState(() {
+          _canSubscribePerType[type] =
+              limitationStatus == LimitationStatus.allowed ||
+              isAlreadySubscribed;
+        });
+      }
+    }
+  }
+
   Future<void> _submitForm() async {
+    final l10n = AppLocalizationsX(context).l10n;
     if (_formKey.currentState!.validate()) {
       // If the user has selected any notification types but permission has
       // not been granted, we initiate the lazy permission request flow.
@@ -152,18 +155,54 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
         }
       }
 
-      // Once permissions are confirmed (or were not needed), proceed with saving.
-      widget.onSave((
-        name: _controller.text.trim(),
-        isPinned: _isPinned,
-        deliveryTypes: _selectedDeliveryTypes,
-      ));
+      setState(() => _isSaving = true);
+
+      try {
+        final limitationService = context.read<ContentLimitationService>();
+        final status = await limitationService.checkAction(
+          ContentAction.saveFilter,
+        );
+
+        if (status != LimitationStatus.allowed && widget.filterToEdit == null) {
+          if (mounted) {
+            showContentLimitationBottomSheet(
+              context: context,
+              status: status,
+              action: ContentAction.saveFilter,
+            );
+          }
+          return;
+        }
+
+        widget.onSave((
+          name: _controller.text.trim(),
+          isPinned: _isPinned,
+          deliveryTypes: _selectedDeliveryTypes,
+        ));
+
+        if (mounted) {
+          Navigator.of(context).pop(true);
+        }
+      } on ForbiddenException catch (e) {
+        if (mounted) {
+          await showModalBottomSheet<void>(
+            context: context,
+            builder: (_) => ContentLimitationBottomSheet(
+              title: l10n.limitReachedTitle,
+              body: e.message,
+              buttonText: l10n.gotItButton,
+            ),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() => _isSaving = false);
+        }
+      }
 
       // Pop the dialog and return `true` to signal to the caller that the
       // save operation was successfully initiated. This allows the caller
       // to coordinate subsequent navigation actions, preventing race conditions.
-      if (!mounted) return;
-      Navigator.of(context).pop(true);
     }
   }
 
@@ -277,7 +316,15 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
           onPressed: () => Navigator.of(context).pop(),
           child: Text(l10n.cancelButtonLabel),
         ),
-        FilledButton(onPressed: _submitForm, child: Text(l10n.saveButtonLabel)),
+        FilledButton(
+          onPressed: _isSaving ? null : _submitForm,
+          child: _isSaving
+              ? const SizedBox.square(
+                  dimension: 24,
+                  child: CircularProgressIndicator(),
+                )
+              : Text(l10n.saveButtonLabel),
+        ),
       ],
     );
   }

@@ -1202,10 +1202,6 @@
     "@anonymousLimitButton": {
         "description": "Button text for the bottom sheet when an anonymous user hits a content limit."
     },
-    "standardLimitTitle": "Unlock More Access",
-    "@standardLimitTitle": {
-        "description": "Title for the bottom sheet when a standard user hits a content limit."
-    },
     "standardLimitBody": "You've reached your limit for the free plan. Upgrade to save and follow more.",
     "@standardLimitBody": {
         "description": "Body text for the bottom sheet when a standard user hits a content limit."
@@ -1773,5 +1769,288 @@
     "removeBookmarkActionLabel": "Remove Bookmark",
     "@removeBookmarkActionLabel": {
         "description": "Label for the action to remove a headline from bookmarks."
+    },
+    "reportActionLabel": "Report",
+    "@reportActionLabel": {
+        "description": "Label for the action to report content."
+    },
+    "reportContentTitle": "Report Content",
+    "@reportContentTitle": {
+        "description": "Title for the report content bottom sheet."
+    },
+    "reportReasonSelectionPrompt": "Please select a reason for your report:",
+    "@reportReasonSelectionPrompt": {
+        "description": "Prompt asking the user to select a reason for reporting."
+    },
+    "reportAdditionalCommentsLabel": "Additional Comments (Optional)",
+    "@reportAdditionalCommentsLabel": {
+        "description": "Label for the optional additional comments field in the report form."
+    },
+    "reportSubmitButtonLabel": "Submit Report",
+    "@reportSubmitButtonLabel": {
+        "description": "Label for the button to submit a content report."
+    },
+    "reportSuccessSnackbar": "Report submitted. Thank you for your feedback.",
+    "@reportSuccessSnackbar": {
+        "description": "Snackbar message shown after a report is successfully submitted."
+    },
+    "reportFailureSnackbar": "Failed to submit report. Please try again.",
+    "@reportFailureSnackbar": {
+        "description": "Snackbar message shown when submitting a report fails."
+    },
+    "commentsTitle": "Comments",
+    "@commentsTitle": {
+        "description": "Title for the comments section or bottom sheet."
+    },
+    "commentPostButtonLabel": "Post",
+    "@commentPostButtonLabel": {
+        "description": "Label for the button to post a new comment."
+    },
+    "commentInputHint": "Add a comment...",
+    "@commentInputHint": {
+        "description": "Hint text for the comment input field."
+    },
+    "commentRequiresReactionError": "Please select a reaction to post a comment.",
+    "@commentRequiresReactionError": {
+        "description": "Error message shown when a user tries to comment without selecting a reaction."
+    },
+    "likeActionLabel": "Like",
+    "@likeActionLabel": {
+        "description": "Tooltip or label for the 'Like' action."
+    },
+    "dislikeActionLabel": "Dislike",
+    "@dislikeActionLabel": {
+        "description": "Tooltip or label for the 'Dislike' action."
+    },
+    "commentActionLabel": "Comment",
+    "@commentActionLabel": {
+        "description": "Tooltip or label for the 'Comment' action."
+    },
+    "moreActionLabel": "More",
+    "@moreActionLabel": {
+        "description": "Tooltip or label for the 'More' actions icon."
+    },
+    "rateAppPromptTitle": "Enjoying the app?",
+    "@rateAppPromptTitle": {
+        "description": "Title for the in-app bottom sheet that prompts the user to rate the app."
+    },
+    "rateAppPromptBody": "Your feedback helps us improve. Would you mind rating us?",
+    "@rateAppPromptBody": {
+        "description": "Body text for the in-app rating prompt bottom sheet."
+    },
+    "rateAppPromptYesButton": "It's Great!",
+    "@rateAppPromptYesButton": {
+        "description": "Button text for a positive response to the rating prompt."
+    },
+    "rateAppPromptNoButton": "Needs Work",
+    "@rateAppPromptNoButton": {
+        "description": "Button text for a negative response to the rating prompt."
+    },
+    "feedbackPromptTitle": "How can we improve?",
+    "@feedbackPromptTitle": {
+        "description": "Title for the bottom sheet that asks for detailed feedback after a negative rating prompt response."
+    },
+    "feedbackPromptReasonUI": "UI / Design",
+    "@feedbackPromptReasonUI": {
+        "description": "Feedback reason related to UI and design."
+    },
+    "feedbackPromptReasonPerformance": "Performance / Speed",
+    "@feedbackPromptReasonPerformance": {
+        "description": "Feedback reason related to app performance."
+    },
+    "feedbackPromptReasonContent": "Content Quality",
+    "@feedbackPromptReasonContent": {
+        "description": "Feedback reason related to the quality of news content."
+    },
+    "feedbackPromptReasonOther": "Other",
+    "@feedbackPromptReasonOther": {
+        "description": "Feedback reason for issues not listed."
+    },
+    "feedbackPromptSubmitButton": "Submit Feedback",
+    "@feedbackPromptSubmitButton": {
+        "description": "Button text to submit detailed feedback."
+    },
+    "rateAppNegativeFollowUpTitle_1": "How are we doing now?",
+    "@rateAppNegativeFollowUpTitle_1": {
+        "description": "First variation of the follow-up title for the 'Rate App' prompt after a user has given negative feedback."
+    },
+    "rateAppNegativeFollowUpTitle_2": "Have we improved?",
+    "@rateAppNegativeFollowUpTitle_2": {
+        "description": "Second variation of the follow-up title for the 'Rate App' prompt after a user has given negative feedback."
+    },
+    "rateAppNegativeFollowUpBody_1": "We've been working on your feedback. Would you reconsider your rating?",
+    "@rateAppNegativeFollowUpBody_1": {
+        "description": "First variation of the follow-up body text for the 'Rate App' prompt after a user has given negative feedback."
+    },
+    "rateAppNegativeFollowUpBody_2": "We value your opinion. Let us know if things are better.",
+    "@rateAppNegativeFollowUpBody_2": {
+        "description": "Second variation of the follow-up body text for the 'Rate App' prompt after a user has given negative feedback."
+    },
+    "noCommentsYet": "No comments yet.",
+    "@noCommentsYet": {
+        "description": "Message displayed when there are no comments on a headline."
+    },
+    "commentInputNoReactionHint": "React to add a comment",
+    "@commentInputNoReactionHint": {
+        "description": "Hint text for the comment input field when the user has not yet reacted."
+    },
+    "headlineReportReasonMisinformation": "Misinformation or Fake News",
+    "@headlineReportReasonMisinformation": {
+        "description": "Report reason for factually incorrect content."
+    },
+    "headlineReportReasonClickbait": "Clickbait or Misleading Title",
+    "@headlineReportReasonClickbait": {
+        "description": "Report reason for a clickbait headline."
+    },
+    "headlineReportReasonOffensive": "Offensive or Hate Speech",
+    "@headlineReportReasonOffensive": {
+        "description": "Report reason for offensive content."
+    },
+    "headlineReportReasonSpam": "Spam or Scam",
+    "@headlineReportReasonSpam": {
+        "description": "Report reason for spam or fraudulent content."
+    },
+    "headlineReportReasonBrokenLink": "Broken Link",
+    "@headlineReportReasonBrokenLink": {
+        "description": "Report reason for a non-working article URL."
+    },
+    "headlineReportReasonPaywalled": "Paywalled Content",
+    "@headlineReportReasonPaywalled": {
+        "description": "Report reason for content that requires a subscription."
+    },
+    "sourceReportReasonLowQuality": "Low-Quality Journalism",
+    "@sourceReportReasonLowQuality": {
+        "description": "Report reason for a source with poor content."
+    },
+    "sourceReportReasonHighAdDensity": "Excessive Ads or Popups",
+    "@sourceReportReasonHighAdDensity": {
+        "description": "Report reason for a source with a bad user experience due to ads."
+    },
+    "sourceReportReasonFrequentPaywalls": "Frequent Paywalls",
+    "@sourceReportReasonFrequentPaywalls": {
+        "description": "Report reason for a source that often requires a subscription."
+    },
+    "sourceReportReasonImpersonation": "Impersonation",
+    "@sourceReportReasonImpersonation": {
+        "description": "Report reason for a source pretending to be another entity."
+    },
+    "sourceReportReasonMisinformation": "Misinformation",
+    "@sourceReportReasonMisinformation": {
+        "description": "Report reason for a source pretending to be another entity."
+    },
+    "commentReportReasonSpam": "Spam or Advertising",
+    "@commentReportReasonSpam": {
+        "description": "Report reason for a comment that is spam."
+    },
+    "commentReportReasonHarassment": "Harassment or Bullying",
+    "@commentReportReasonHarassment": {
+        "description": "Report reason for a comment that is abusive."
+    },
+    "commentReportReasonHateSpeech": "Hate Speech",
+    "@commentReportReasonHateSpeech": {
+        "description": "Report reason for a comment containing hate speech."
+    },
+    "limitReachedTitle": "Limit Reached",
+    "@limitReachedTitle": {
+        "description": "Generic title for when a user hits a content limit."
+    },
+    "manageMyContentButton": "Manage My Content",
+    "@manageMyContentButton": {
+        "description": "Button text that navigates the user to a page where they can manage their content (e.g., unfollow items)."
+    },
+    "upgradeButton": "Upgrade",
+    "@upgradeButton": {
+        "description": "Button text prompting the user to upgrade their subscription plan."
+    },
+    "createAccountButton": "Create Account",
+    "@createAccountButton": {
+        "description": "Button text prompting an anonymous user to create an account."
+    },
+    "gotItButton": "Got It",
+    "@gotItButton": {
+        "description": "A simple acknowledgement button."
+    },
+    "commentsPageTitle": "Comments",
+    "@commentsPageTitle": {
+        "description": "Title for the page or bottom sheet that displays comments for a headline."
+    },
+    "commentsCount": "{count,plural, =1{1 Comment}other{{count} Comments}}",
+    "@commentsCount": {
+        "description": "Label for a button that shows the number of comments and opens the comments view.",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "limitReachedGuestUserTitle": "Account Required",
+    "@limitReachedGuestUserTitle": {
+        "description": "Title for the bottom sheet when a guest user tries to perform an action reserved for authenticated users (e.g., comment, react)."
+    },
+    "limitReachedGuestUserBody": "Please create a free account or sign in to engage with the community and use this feature.",
+    "@limitReachedGuestUserBody": {
+        "description": "Body text for the bottom sheet when a guest user tries to perform an action reserved for authenticated users."
+    },
+    "limitReachedBodyFollow": "You have reached your limit for followed items. To follow more, please review your existing followed content.",
+    "@limitReachedBodyFollow": {
+        "description": "Body text when a user tries to follow more items (topics, sources, countries) than their plan allows."
+    },
+    "limitReachedBodySave": "You have reached your limit for saved articles. To save more, please review your existing saved articles.",
+    "@limitReachedBodySave": {
+        "description": "Body text when a user tries to save more articles than their plan allows."
+    },
+    "limitReachedBodySaveFilters": "You have reached your limit for saved filters. To create new ones, please review your existing filters.",
+    "@limitReachedBodySaveFilters": {
+        "description": "Body text when a user tries to save more filters than their plan allows."
+    },
+    "limitReachedBodyPinFilters": "You have reached your limit for pinned filters. To pin a new one, please un-pin an existing filter.",
+    "@limitReachedBodyPinFilters": {
+        "description": "Body text when a user tries to pin more filters than their plan allows."
+    },
+    "limitReachedBodySubscribeToNotifications": "You have reached your limit for notification subscriptions. To subscribe to new alerts, please review your existing subscriptions.",
+    "@limitReachedBodySubscribeToNotifications": {
+        "description": "Body text when a user tries to subscribe to more notifications than their plan allows."
+    },
+    "limitReachedBodyComments": "You have reached your daily limit for posting comments. Please try again tomorrow.",
+    "@limitReachedBodyComments": {
+        "description": "Body text when a user tries to post more comments than their daily limit allows."
+    },
+    "limitReachedBodyReactions": "You have reached your daily limit for reactions. Please try again tomorrow.",
+    "@limitReachedBodyReactions": {
+        "description": "Body text when a user tries to react more than their daily limit allows."
+    },
+    "limitReachedBodyReports": "You have reached your daily limit for submitting reports. Please try again tomorrow.",
+    "@limitReachedBodyReports": {
+        "description": "Body text when a user tries to submit more reports than their daily limit allows."
+    },
+    "commentEditButtonLabel": "Update",
+    "@commentEditButtonLabel": {
+        "description": "Label for the button to update an existing comment."
+    },
+    "commentPostFailureSnackbar": "Failed to post comment. Please try again.",
+    "@commentPostFailureSnackbar": {
+        "description": "Snackbar message shown when posting a comment fails."
+    },
+    "commentUpdateFailureSnackbar": "Failed to update comment. Please try again.",
+    "@commentUpdateFailureSnackbar": {
+        "description": "Snackbar message shown when updating a comment fails."
+    },
+    "commentInputDisabledHint": "Sign in to join the conversation",
+    "@commentInputDisabledHint": {
+        "description": "Hint text for the comment input field when the user is a guest."
+    },
+    "commentInputExistingHint": "You have already commented on this headline.",
+    "@commentInputExistingHint": {
+        "description": "Hint text for the comment input field when the user has already posted a comment."
+    },
+    "commenterName": "User {id}",
+    "@commenterName": {
+        "description": "Display name for a commenter when their full user object is not available, showing a partial ID.",
+        "placeholders": {
+            "id": {
+                "type": "String",
+                "example": "1a2b"
+            }
+        }
     }
 }

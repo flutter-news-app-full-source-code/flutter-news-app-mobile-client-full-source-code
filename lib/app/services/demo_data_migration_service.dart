@@ -34,7 +34,7 @@ class DemoDataMigrationService {
     required String oldUserId,
     required String newUserId,
   }) async {
-    _logger.info(
+    _logger.fine(
       '[DemoDataMigrationService] Attempting to migrate data from '
       'anonymous user ID: $oldUserId to authenticated user ID: $newUserId',
     );
@@ -73,12 +73,12 @@ class DemoDataMigrationService {
       }
 
       await _appSettingsRepository.delete(id: oldUserId, userId: oldUserId);
-      _logger.info(
+      _logger.fine(
         '[DemoDataMigrationService] AppSettings migrated successfully '
         'from $oldUserId to $newUserId.',
       );
     } on NotFoundException {
-      _logger.info(
+      _logger.fine(
         '[DemoDataMigrationService] No AppSettings found for old user ID: '
         '$oldUserId. Skipping migration for settings.',
       );
@@ -128,12 +128,12 @@ class DemoDataMigrationService {
         id: oldUserId,
         userId: oldUserId,
       );
-      _logger.info(
+      _logger.fine(
         '[DemoDataMigrationService] UserContentPreferences migrated '
         'successfully from $oldUserId to $newUserId.',
       );
     } on NotFoundException {
-      _logger.info(
+      _logger.fine(
         '[DemoDataMigrationService] No UserContentPreferences found for old '
         'user ID: $oldUserId. Skipping migration for preferences.',
       );

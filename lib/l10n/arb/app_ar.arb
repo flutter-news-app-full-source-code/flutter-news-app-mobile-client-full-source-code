@@ -1202,10 +1202,6 @@
     "@anonymousLimitButton": {
         "description": "Button text for the bottom sheet when an anonymous user hits a content limit."
     },
-    "standardLimitTitle": "افتح الوصول غير المحدود",
-    "@standardLimitTitle": {
-        "description": "Title for the bottom sheet when a standard user hits a content limit."
-    },
     "standardLimitBody": "لقد وصلت إلى الحد الأقصى للباقة المجانية. قم بالترقية لحفظ ومتابعة المزيد.",
     "@standardLimitBody": {
         "description": "Body text for the bottom sheet when a standard user hits a content limit."
@@ -1773,5 +1769,288 @@
     "removeBookmarkActionLabel": "إزالة من المحفوظات",
     "@removeBookmarkActionLabel": {
         "description": "Label for the action to remove a headline from bookmarks."
+    },
+    "reportActionLabel": "إبلاغ",
+    "@reportActionLabel": {
+        "description": "تسمية لإجراء الإبلاغ عن محتوى."
+    },
+    "reportContentTitle": "الإبلاغ عن محتوى",
+    "@reportContentTitle": {
+        "description": "عنوان نافذة الإبلاغ عن محتوى."
+    },
+    "reportReasonSelectionPrompt": "الرجاء تحديد سبب الإبلاغ:",
+    "@reportReasonSelectionPrompt": {
+        "description": "نص يطلب من المستخدم تحديد سبب الإبلاغ."
+    },
+    "reportAdditionalCommentsLabel": "تعليقات إضافية (اختياري)",
+    "@reportAdditionalCommentsLabel": {
+        "description": "تسمية حقل التعليقات الإضافية الاختياري في نموذج الإبلاغ."
+    },
+    "reportSubmitButtonLabel": "إرسال البلاغ",
+    "@reportSubmitButtonLabel": {
+        "description": "تسمية زر إرسال بلاغ المحتوى."
+    },
+    "reportSuccessSnackbar": "تم إرسال البلاغ. شكراً لملاحظاتك.",
+    "@reportSuccessSnackbar": {
+        "description": "رسالة تظهر بعد إرسال البلاغ بنجاح."
+    },
+    "reportFailureSnackbar": "فشل إرسال البلاغ. الرجاء المحاولة مرة أخرى.",
+    "@reportFailureSnackbar": {
+        "description": "رسالة تظهر عند فشل إرسال البلاغ."
+    },
+    "commentsTitle": "التعليقات",
+    "@commentsTitle": {
+        "description": "عنوان قسم أو نافذة التعليقات."
+    },
+    "commentPostButtonLabel": "نشر",
+    "@commentPostButtonLabel": {
+        "description": "تسمية زر نشر تعليق جديد."
+    },
+    "commentInputHint": "أضف تعليقاً...",
+    "@commentInputHint": {
+        "description": "نص تلميحي لحقل إدخال التعليق."
+    },
+    "commentRequiresReactionError": "الرجاء تحديد تفاعل لنشر تعليق.",
+    "@commentRequiresReactionError": {
+        "description": "رسالة خطأ تظهر عندما يحاول المستخدم التعليق بدون تحديد تفاعل."
+    },
+    "likeActionLabel": "إعجاب",
+    "@likeActionLabel": {
+        "description": "تلميح أو تسمية لإجراء 'الإعجاب'."
+    },
+    "dislikeActionLabel": "عدم إعجاب",
+    "@dislikeActionLabel": {
+        "description": "تلميح أو تسمية لإجراء 'عدم الإعجاب'."
+    },
+    "commentActionLabel": "تعليق",
+    "@commentActionLabel": {
+        "description": "تلميح أو تسمية لإجراء 'التعليق'."
+    },
+    "moreActionLabel": "المزيد",
+    "@moreActionLabel": {
+        "description": "تلميح أو تسمية أيقونة 'المزيد' من الإجراءات."
+    },
+    "rateAppPromptTitle": "هل تستمتع بالتطبيق؟",
+    "@rateAppPromptTitle": {
+        "description": "عنوان النافذة التي تطلب من المستخدم تقييم التطبيق."
+    },
+    "rateAppPromptBody": "تساعدنا ملاحظاتك على التحسين. هل تمانع في تقييمنا؟",
+    "@rateAppPromptBody": {
+        "description": "نص النافذة التي تطلب من المستخدم تقييم التطبيق."
+    },
+    "rateAppPromptYesButton": "التطبيق رائع!",
+    "@rateAppPromptYesButton": {
+        "description": "نص زر الاستجابة الإيجابية لطلب التقييم."
+    },
+    "rateAppPromptNoButton": "يحتاج لتحسين",
+    "@rateAppPromptNoButton": {
+        "description": "نص زر الاستجابة السلبية لطلب التقييم."
+    },
+    "feedbackPromptTitle": "كيف يمكننا التحسين؟",
+    "@feedbackPromptTitle": {
+        "description": "عنوان النافذة التي تطلب ملاحظات تفصيلية بعد استجابة سلبية لطلب التقييم."
+    },
+    "feedbackPromptReasonUI": "واجهة المستخدم / التصميم",
+    "@feedbackPromptReasonUI": {
+        "description": "سبب الملاحظات المتعلق بواجهة المستخدم والتصميم."
+    },
+    "feedbackPromptReasonPerformance": "الأداء / السرعة",
+    "@feedbackPromptReasonPerformance": {
+        "description": "سبب الملاحظات المتعلق بأداء التطبيق."
+    },
+    "feedbackPromptReasonContent": "جودة المحتوى",
+    "@feedbackPromptReasonContent": {
+        "description": "سبب الملاحظات المتعلق بجودة محتوى الأخبار."
+    },
+    "feedbackPromptReasonOther": "أخرى",
+    "@feedbackPromptReasonOther": {
+        "description": "سبب الملاحظات للمشكلات غير المدرجة."
+    },
+    "feedbackPromptSubmitButton": "إرسال الملاحظات",
+    "@feedbackPromptSubmitButton": {
+        "description": "نص زر إرسال الملاحظات التفصيلية."
+    },
+    "rateAppNegativeFollowUpTitle_1": "كيف حالنا الآن؟",
+    "@rateAppNegativeFollowUpTitle_1": {
+        "description": "الصيغة الأولى لعنوان المتابعة لطلب 'تقييم التطبيق' بعد أن يقدم المستخدم ملاحظات سلبية."
+    },
+    "rateAppNegativeFollowUpTitle_2": "هل تحسن الأداء؟",
+    "@rateAppNegativeFollowUpTitle_2": {
+        "description": "الصيغة الثانية لعنوان المتابعة لطلب 'تقييم التطبيق' بعد أن يقدم المستخدم ملاحظات سلبية."
+    },
+    "rateAppNegativeFollowUpBody_1": "لقد عملنا على ملاحظاتك. هل تعيد النظر في تقييمك؟",
+    "@rateAppNegativeFollowUpBody_1": {
+        "description": "الصيغة الأولى لنص المتابعة لطلب 'تقييم التطبيق' بعد أن يقدم المستخدم ملاحظات سلبية."
+    },
+    "rateAppNegativeFollowUpBody_2": "نحن نقدر رأيك. أخبرنا إذا كانت الأمور أفضل.",
+    "@rateAppNegativeFollowUpBody_2": {
+        "description": "الصيغة الثانية لنص المتابعة لطلب 'تقييم التطبيق' بعد أن يقدم المستخدم ملاحظات سلبية."
+    },
+    "noCommentsYet": "لا توجد تعليقات حتى الآن.",
+    "@noCommentsYet": {
+        "description": "Message displayed when there are no comments on a headline."
+    },
+    "commentInputNoReactionHint": "تفاعل لإضافة تعليق",
+    "@commentInputNoReactionHint": {
+        "description": "Hint text for the comment input field when the user has not yet reacted."
+    },
+    "headlineReportReasonMisinformation": "معلومات مضللة أو أخبار كاذبة",
+    "@headlineReportReasonMisinformation": {
+        "description": "Report reason for factually incorrect content."
+    },
+    "headlineReportReasonClickbait": "عنوان مضلل أو طعم نقر",
+    "@headlineReportReasonClickbait": {
+        "description": "Report reason for a clickbait headline."
+    },
+    "headlineReportReasonOffensive": "محتوى مسيء أو خطاب كراهية",
+    "@headlineReportReasonOffensive": {
+        "description": "Report reason for offensive content."
+    },
+    "headlineReportReasonSpam": "بريد عشوائي أو احتيال",
+    "@headlineReportReasonSpam": {
+        "description": "Report reason for spam or fraudulent content."
+    },
+    "headlineReportReasonBrokenLink": "رابط معطل",
+    "@headlineReportReasonBrokenLink": {
+        "description": "Report reason for a non-working article URL."
+    },
+    "headlineReportReasonPaywalled": "محتوى مدفوع",
+    "@headlineReportReasonPaywalled": {
+        "description": "Report reason for content that requires a subscription."
+    },
+    "sourceReportReasonLowQuality": "صحافة منخفضة الجودة",
+    "@sourceReportReasonLowQuality": {
+        "description": "Report reason for a source with poor content."
+    },
+    "sourceReportReasonHighAdDensity": "إعلانات أو نوافذ منبثقة مفرطة",
+    "@sourceReportReasonHighAdDensity": {
+        "description": "Report reason for a source with a bad user experience due to ads."
+    },
+    "sourceReportReasonFrequentPaywalls": "جدران دفع متكررة",
+    "@sourceReportReasonFrequentPaywalls": {
+        "description": "Report reason for a source that often requires a subscription."
+    },
+    "sourceReportReasonImpersonation": "انتحال شخصية",
+    "@sourceReportReasonImpersonation": {
+        "description": "Report reason for a source pretending to be another entity."
+    },
+    "sourceReportReasonMisinformation": "معلومات مضللة أو أخبار كاذبة",
+    "@sourceReportReasonMisinformation": {
+        "description": "Report reason for a source pretending to be another entity."
+    },
+    "commentReportReasonSpam": "إعلانات",
+    "@commentReportReasonSpam": {
+        "description": "Report reason for a comment that is spam."
+    },
+    "commentReportReasonHarassment": "تحرش أو تنمر",
+    "@commentReportReasonHarassment": {
+        "description": "Report reason for a comment that is abusive."
+    },
+    "commentReportReasonHateSpeech": "خطاب كراهية",
+    "@commentReportReasonHateSpeech": {
+        "description": "Report reason for a comment containing hate speech."
+    },
+    "limitReachedTitle": "تم الوصول إلى الحد الأقصى",
+    "@limitReachedTitle": {
+        "description": "Generic title for when a user hits a content limit."
+    },
+    "manageMyContentButton": "إدارة المحتوى الخاص بي",
+    "@manageMyContentButton": {
+        "description": "Button text that navigates the user to a page where they can manage their content (e.g., unfollow items)."
+    },
+    "upgradeButton": "ترقية",
+    "@upgradeButton": {
+        "description": "Button text prompting the user to upgrade their subscription plan."
+    },
+    "createAccountButton": "إنشاء حساب",
+    "@createAccountButton": {
+        "description": "Button text prompting an anonymous user to create an account."
+    },
+    "gotItButton": "حسنًا",
+    "@gotItButton": {
+        "description": "A simple acknowledgement button."
+    },
+    "commentsPageTitle": "التعليقات",
+    "@commentsPageTitle": {
+        "description": "عنوان الصفحة أو الورقة السفلية التي تعرض التعليقات على عنوان رئيسي."
+    },
+    "commentsCount": "{count,plural, zero{0 تعليقات} one{تعليق واحد} two{تعليقان} few{{count} تعليقات} many{{count} تعليقًا} other{{count} تعليق}}",
+    "@commentsCount": {
+        "description": "تسمية زر يعرض عدد التعليقات ويفتح عرض التعليقات.",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "limitReachedGuestUserTitle": "الحساب مطلوب",
+    "@limitReachedGuestUserTitle": {
+        "description": "عنوان للنافذة السفلية عندما يحاول مستخدم زائر القيام بإجراء محجوز للمستخدمين المصادق عليهم (مثل التعليق، التفاعل)."
+    },
+    "limitReachedGuestUserBody": "يرجى إنشاء حساب مجاني أو تسجيل الدخول للتفاعل مع المجتمع واستخدام هذه الميزة.",
+    "@limitReachedGuestUserBody": {
+        "description": "نص للنافذة السفلية عندما يحاول مستخدم زائر القيام بإجراء محجوز للمستخدمين المصادق عليهم."
+    },
+    "limitReachedBodyFollow": "لقد وصلت إلى الحد الأقصى للعناصر المتابعة. لمتابعة المزيد، يرجى مراجعة المحتوى المتابع الحالي.",
+    "@limitReachedBodyFollow": {
+        "description": "نص يظهر عندما يحاول المستخدم متابعة عناصر (مواضيع، مصادر، دول) أكثر مما تسمح به خطته."
+    },
+    "limitReachedBodySave": "لقد وصلت إلى الحد الأقصى للمقالات المحفوظة. لحفظ المزيد، يرجى مراجعة مقالاتك المحفوظة الحالية.",
+    "@limitReachedBodySave": {
+        "description": "نص يظهر عندما يحاول المستخدم حفظ مقالات أكثر مما تسمح به خطته."
+    },
+    "limitReachedBodySaveFilters": "لقد وصلت إلى الحد الأقصى للفلاتر المحفوظة. لإنشاء فلاتر جديدة، يرجى مراجعة الفلاتر الحالية.",
+    "@limitReachedBodySaveFilters": {
+        "description": "نص يظهر عندما يحاول المستخدم حفظ فلاتر أكثر مما تسمح به خطته."
+    },
+    "limitReachedBodyPinFilters": "لقد وصلت إلى الحد الأقصى للفلاتر المثبتة. لتثبيت فلتر جديد، يرجى إلغاء تثبيت فلتر حالي.",
+    "@limitReachedBodyPinFilters": {
+        "description": "نص يظهر عندما يحاول المستخدم تثبيت فلاتر أكثر مما تسمح به خطته."
+    },
+    "limitReachedBodySubscribeToNotifications": "لقد وصلت إلى الحد الأقصى لاشتراكات الإشعارات. للاشتراك في تنبيهات جديدة، يرجى مراجعة اشتراكاتك الحالية.",
+    "@limitReachedBodySubscribeToNotifications": {
+        "description": "نص يظهر عندما يحاول المستخدم الاشتراك في إشعارات أكثر مما تسمح به خطته."
+    },
+    "limitReachedBodyComments": "لقد وصلت إلى الحد اليومي لنشر التعليقات. يرجى المحاولة مرة أخرى غدًا.",
+    "@limitReachedBodyComments": {
+        "description": "نص يظهر عندما يحاول المستخدم نشر تعليقات أكثر من حده اليومي."
+    },
+    "limitReachedBodyReactions": "لقد وصلت إلى الحد اليومي للتفاعلات. يرجى المحاولة مرة أخرى غدًا.",
+    "@limitReachedBodyReactions": {
+        "description": "نص يظهر عندما يحاول المستخدم التفاعل أكثر من حده اليومي."
+    },
+    "limitReachedBodyReports": "لقد وصلت إلى الحد اليومي لتقديم البلاغات. يرجى المحاولة مرة أخرى غدًا.",
+    "@limitReachedBodyReports": {
+        "description": "نص يظهر عندما يحاول المستخدم تقديم بلاغات أكثر من حده اليومي."
+    },
+    "commentEditButtonLabel": "تحديث",
+    "@commentEditButtonLabel": {
+        "description": "Label for the button to update an existing comment."
+    },
+    "commentPostFailureSnackbar": "فشل نشر التعليق. يرجى المحاولة مرة أخرى.",
+    "@commentPostFailureSnackbar": {
+        "description": "Snackbar message shown when posting a comment fails."
+    },
+    "commentUpdateFailureSnackbar": "فشل تحديث التعليق. يرجى المحاولة مرة أخرى.",
+    "@commentUpdateFailureSnackbar": {
+        "description": "Snackbar message shown when updating a comment fails."
+    },
+    "commentInputDisabledHint": "سجل الدخول للانضمام إلى المحادثة",
+    "@commentInputDisabledHint": {
+        "description": "Hint text for the comment input field when the user is a guest."
+    },
+    "commentInputExistingHint": "لقد علقت بالفعل على هذا العنوان.",
+    "@commentInputExistingHint": {
+        "description": "Hint text for the comment input field when the user has already posted a comment."
+    },
+    "commenterName": "مستخدم {id}",
+    "@commenterName": {
+        "description": "Display name for a commenter when their full user object is not available, showing a partial ID.",
+        "placeholders": {
+            "id": {
+                "type": "String",
+                "example": "1a2b"
+            }
+        }
     }
 }

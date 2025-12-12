@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/user_content/reporting/view/report_content_bottom_sheet.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:ui_kit/ui_kit.dart';
 
 /// {@template headline_actions_bottom_sheet}
-/// A modal bottom sheet that displays actions for a given headline, such as
-/// sharing and bookmarking.
+/// A modal bottom sheet that displays secondary actions for a given headline,
+/// such as saving, sharing, and reporting.
 /// {@endtemplate}
-class HeadlineActionsBottomSheet extends StatelessWidget {
+class HeadlineActionsBottomSheet extends StatefulWidget {
   /// {@macro headline_actions_bottom_sheet}
   const HeadlineActionsBottomSheet({required this.headline, super.key});
 
@@ -18,71 +18,84 @@ class HeadlineActionsBottomSheet extends StatelessWidget {
   final Headline headline;
 
   @override
+  State<HeadlineActionsBottomSheet> createState() =>
+      _HeadlineActionsBottomSheetState();
+}
+
+class _HeadlineActionsBottomSheetState
+    extends State<HeadlineActionsBottomSheet> {
+  final bool _isBookmarking = false;
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
-    return BlocBuilder<AppBloc, AppState>(
-      builder: (context, state) {
-        final isBookmarked =
-            state.userContentPreferences?.savedHeadlines.any(
-              (saved) => saved.id == headline.id,
-            ) ??
-            false;
+    final isBookmarked = context.select<AppBloc, bool>(
+      (bloc) =>
+          bloc.state.userContentPreferences?.savedHeadlines.any(
+            (h) => h.id == widget.headline.id,
+          ) ??
+          false,
+    );
 
-        return Wrap(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: Text(
-                l10n.headlineActionsModalTitle,
-                style: Theme.of(context).textTheme.titleLarge,
+    final remoteConfig = context.watch<AppBloc>().state.remoteConfig;
+    final communityConfig = remoteConfig?.features.community;
+    final isHeadlineReportingEnabled =
+        (communityConfig?.enabled ?? false) &&
+        (communityConfig?.reporting.headlineReportingEnabled ?? false);
+
+    return Wrap(
+      children: [
+        ListTile(
+          leading: _isBookmarking
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Icon(isBookmarked ? Icons.bookmark : Icons.bookmark_border),
+          title: Text(
+            isBookmarked
+                ? l10n.removeBookmarkActionLabel
+                : l10n.bookmarkActionLabel,
+          ),
+          onTap: () {
+            context.read<AppBloc>().add(
+              AppBookmarkToggled(
+                headline: widget.headline,
+                isBookmarked: isBookmarked,
+                context: context,
               ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.share_outlined),
-              title: Text(l10n.shareActionLabel),
-              onTap: () {
-                Navigator.of(context).pop();
-                Share.share(headline.url);
-              },
-            ),
-            ListTile(
-              leading: Icon(
-                isBookmarked
-                    ? Icons.bookmark_added
-                    : Icons.bookmark_add_outlined,
-              ),
-              title: Text(
-                isBookmarked
-                    ? l10n.removeBookmarkActionLabel
-                    : l10n.bookmarkActionLabel,
-              ),
-              onTap: () {
-                final userContentPreferences = state.userContentPreferences;
-                if (userContentPreferences == null) return;
-
-                final currentSaved = List<Headline>.from(
-                  userContentPreferences.savedHeadlines,
-                );
-
-                if (isBookmarked) {
-                  currentSaved.removeWhere((h) => h.id == headline.id);
-                } else {
-                  currentSaved.insert(0, headline);
-                }
-
-                context.read<AppBloc>().add(
-                  AppUserContentPreferencesChanged(
-                    preferences: userContentPreferences.copyWith(
-                      savedHeadlines: currentSaved,
-                    ),
-                  ),
-                );
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
+            );
+            Navigator.of(context).pop();
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.share_outlined),
+          title: Text(l10n.shareActionLabel),
+          onTap: () {
+            // Pop the sheet before sharing to avoid it being open in the background.
+            Navigator.of(context).pop();
+            Share.share(widget.headline.url);
+          },
+        ),
+        if (isHeadlineReportingEnabled)
+          ListTile(
+            leading: const Icon(Icons.flag_outlined),
+            title: Text(l10n.reportActionLabel),
+            onTap: () async {
+              // Pop the current sheet before showing the new one.
+              Navigator.of(context).pop();
+              await showModalBottomSheet<void>(
+                context: context,
+                isScrollControlled: true,
+                builder: (_) => ReportContentBottomSheet(
+                  entityId: widget.headline.id,
+                  reportableEntity: ReportableEntity.headline,
+                ),
+              );
+            },
+          ),
+      ],
     );
   }
 }

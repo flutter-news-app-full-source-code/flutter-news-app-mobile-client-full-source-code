@@ -56,7 +56,7 @@ class CachedFeed extends Equatable {
         'feedItems: ${feedItems.length} items, '
         'hasMore: $hasMore, '
         'cursor: $cursor, '
-        'lastRefreshedAt: $lastRefreshedAt'
+        'lastRefreshedAt: $lastRefreshedAt, '
         ')';
   }
 }

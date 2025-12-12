@@ -917,9 +917,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get anonymousLimitButton => 'Sign In';
 
   @override
-  String get standardLimitTitle => 'Unlock More Access';
-
-  @override
   String get standardLimitBody =>
       'You\'ve reached your limit for the free plan. Upgrade to save and follow more.';
 
@@ -1371,4 +1368,238 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get removeBookmarkActionLabel => 'Remove Bookmark';
+
+  @override
+  String get reportActionLabel => 'Report';
+
+  @override
+  String get reportContentTitle => 'Report Content';
+
+  @override
+  String get reportReasonSelectionPrompt =>
+      'Please select a reason for your report:';
+
+  @override
+  String get reportAdditionalCommentsLabel => 'Additional Comments (Optional)';
+
+  @override
+  String get reportSubmitButtonLabel => 'Submit Report';
+
+  @override
+  String get reportSuccessSnackbar =>
+      'Report submitted. Thank you for your feedback.';
+
+  @override
+  String get reportFailureSnackbar =>
+      'Failed to submit report. Please try again.';
+
+  @override
+  String get commentsTitle => 'Comments';
+
+  @override
+  String get commentPostButtonLabel => 'Post';
+
+  @override
+  String get commentInputHint => 'Add a comment...';
+
+  @override
+  String get commentRequiresReactionError =>
+      'Please select a reaction to post a comment.';
+
+  @override
+  String get likeActionLabel => 'Like';
+
+  @override
+  String get dislikeActionLabel => 'Dislike';
+
+  @override
+  String get commentActionLabel => 'Comment';
+
+  @override
+  String get moreActionLabel => 'More';
+
+  @override
+  String get rateAppPromptTitle => 'Enjoying the app?';
+
+  @override
+  String get rateAppPromptBody =>
+      'Your feedback helps us improve. Would you mind rating us?';
+
+  @override
+  String get rateAppPromptYesButton => 'It\'s Great!';
+
+  @override
+  String get rateAppPromptNoButton => 'Needs Work';
+
+  @override
+  String get feedbackPromptTitle => 'How can we improve?';
+
+  @override
+  String get feedbackPromptReasonUI => 'UI / Design';
+
+  @override
+  String get feedbackPromptReasonPerformance => 'Performance / Speed';
+
+  @override
+  String get feedbackPromptReasonContent => 'Content Quality';
+
+  @override
+  String get feedbackPromptReasonOther => 'Other';
+
+  @override
+  String get feedbackPromptSubmitButton => 'Submit Feedback';
+
+  @override
+  String get rateAppNegativeFollowUpTitle_1 => 'How are we doing now?';
+
+  @override
+  String get rateAppNegativeFollowUpTitle_2 => 'Have we improved?';
+
+  @override
+  String get rateAppNegativeFollowUpBody_1 =>
+      'We\'ve been working on your feedback. Would you reconsider your rating?';
+
+  @override
+  String get rateAppNegativeFollowUpBody_2 =>
+      'We value your opinion. Let us know if things are better.';
+
+  @override
+  String get noCommentsYet => 'No comments yet.';
+
+  @override
+  String get commentInputNoReactionHint => 'React to add a comment';
+
+  @override
+  String get headlineReportReasonMisinformation =>
+      'Misinformation or Fake News';
+
+  @override
+  String get headlineReportReasonClickbait => 'Clickbait or Misleading Title';
+
+  @override
+  String get headlineReportReasonOffensive => 'Offensive or Hate Speech';
+
+  @override
+  String get headlineReportReasonSpam => 'Spam or Scam';
+
+  @override
+  String get headlineReportReasonBrokenLink => 'Broken Link';
+
+  @override
+  String get headlineReportReasonPaywalled => 'Paywalled Content';
+
+  @override
+  String get sourceReportReasonLowQuality => 'Low-Quality Journalism';
+
+  @override
+  String get sourceReportReasonHighAdDensity => 'Excessive Ads or Popups';
+
+  @override
+  String get sourceReportReasonFrequentPaywalls => 'Frequent Paywalls';
+
+  @override
+  String get sourceReportReasonImpersonation => 'Impersonation';
+
+  @override
+  String get sourceReportReasonMisinformation => 'Misinformation';
+
+  @override
+  String get commentReportReasonSpam => 'Spam or Advertising';
+
+  @override
+  String get commentReportReasonHarassment => 'Harassment or Bullying';
+
+  @override
+  String get commentReportReasonHateSpeech => 'Hate Speech';
+
+  @override
+  String get limitReachedTitle => 'Limit Reached';
+
+  @override
+  String get manageMyContentButton => 'Manage My Content';
+
+  @override
+  String get upgradeButton => 'Upgrade';
+
+  @override
+  String get createAccountButton => 'Create Account';
+
+  @override
+  String get gotItButton => 'Got It';
+
+  @override
+  String get commentsPageTitle => 'Comments';
+
+  @override
+  String commentsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Comments',
+      one: '1 Comment',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get limitReachedGuestUserTitle => 'Account Required';
+
+  @override
+  String get limitReachedGuestUserBody =>
+      'Please create a free account or sign in to engage with the community and use this feature.';
+
+  @override
+  String get limitReachedBodyFollow =>
+      'You have reached your limit for followed items. To follow more, please review your existing followed content.';
+
+  @override
+  String get limitReachedBodySave =>
+      'You have reached your limit for saved articles. To save more, please review your existing saved articles.';
+
+  @override
+  String get limitReachedBodySaveFilters =>
+      'You have reached your limit for saved filters. To create new ones, please review your existing filters.';
+
+  @override
+  String get limitReachedBodyPinFilters =>
+      'You have reached your limit for pinned filters. To pin a new one, please un-pin an existing filter.';
+
+  @override
+  String get limitReachedBodySubscribeToNotifications =>
+      'You have reached your limit for notification subscriptions. To subscribe to new alerts, please review your existing subscriptions.';
+
+  @override
+  String get limitReachedBodyComments =>
+      'You have reached your daily limit for posting comments. Please try again tomorrow.';
+
+  @override
+  String get limitReachedBodyReactions =>
+      'You have reached your daily limit for reactions. Please try again tomorrow.';
+
+  @override
+  String get limitReachedBodyReports =>
+      'You have reached your daily limit for submitting reports. Please try again tomorrow.';
+
+  @override
+  String get commentEditButtonLabel => 'Update';
+
+  @override
+  String get commentPostFailureSnackbar =>
+      'Failed to post comment. Please try again.';
+
+  @override
+  String get commentUpdateFailureSnackbar =>
+      'Failed to update comment. Please try again.';
+
+  @override
+  String get commentInputDisabledHint => 'Sign in to join the conversation';
+
+  @override
+  String get commentInputExistingHint =>
+      'You have already commented on this headline.';
+
+  @override
+  String commenterName(String id) {
+    return 'User $id';
+  }
 }

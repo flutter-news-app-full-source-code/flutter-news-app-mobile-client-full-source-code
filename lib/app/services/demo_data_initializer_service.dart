@@ -64,7 +64,6 @@ class DemoDataInitializerService {
   /// user in the demo environment.
   Future<void> initializeUserSpecificData(User user) async {
     _logger.info('Initializing user-specific data for user ID: ${user.id}');
-
     await Future.wait([
       _ensureAppSettingsExist(user.id),
       _ensureUserContentPreferencesExist(user.id),
@@ -81,9 +80,9 @@ class DemoDataInitializerService {
   Future<void> _ensureAppSettingsExist(String userId) async {
     try {
       await _appSettingsRepository.read(id: userId, userId: userId);
-      _logger.info('AppSettings found for user ID: $userId.');
+      _logger.finer('AppSettings found for user ID: $userId.');
     } on NotFoundException {
-      _logger.info(
+      _logger.fine(
         'AppSettings not found for user ID: '
         '$userId. Creating settings from fixture.',
       );
@@ -102,7 +101,7 @@ class DemoDataInitializerService {
         item: fixtureSettings,
         userId: userId,
       );
-      _logger.info(
+      _logger.fine(
         'AppSettings from fixture created for '
         'user ID: $userId.',
       );
@@ -122,9 +121,9 @@ class DemoDataInitializerService {
   Future<void> _ensureUserContentPreferencesExist(String userId) async {
     try {
       await _userContentPreferencesRepository.read(id: userId, userId: userId);
-      _logger.info('UserContentPreferences found for user ID: $userId.');
+      _logger.finer('UserContentPreferences found for user ID: $userId.');
     } on NotFoundException {
-      _logger.info(
+      _logger.fine(
         'UserContentPreferences not found for '
         'user ID: $userId. Creating preferences from fixture.',
       );
@@ -142,7 +141,7 @@ class DemoDataInitializerService {
         item: fixturePreferences,
         userId: userId,
       );
-      _logger.info(
+      _logger.fine(
         'UserContentPreferences from fixture created '
         'for user ID: $userId.',
       );
@@ -169,11 +168,11 @@ class DemoDataInitializerService {
         userId: userId,
       );
       if (existingNotifications.items.isNotEmpty) {
-        _logger.info('InAppNotifications already exist for user ID: $userId.');
+        _logger.finer('InAppNotifications already exist for user ID: $userId.');
         return;
       }
 
-      _logger.info(
+      _logger.fine(
         'No InAppNotifications found for user ID: $userId. Creating from fixture.',
       );
 
@@ -198,7 +197,7 @@ class DemoDataInitializerService {
           (n) => _inAppNotificationRepository.create(item: n, userId: userId),
         ),
       );
-      _logger.info(
+      _logger.fine(
         '${userNotifications.length} InAppNotifications from fixture created for user ID: $userId.',
       );
     } catch (e, s) {

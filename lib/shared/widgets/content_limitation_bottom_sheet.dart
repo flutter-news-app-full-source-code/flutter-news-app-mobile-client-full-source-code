@@ -1,5 +1,8 @@
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:go_router/go_router.dart';
@@ -9,126 +12,35 @@ import 'package:ui_kit/ui_kit.dart' hide UiKitLocalizations;
 /// A bottom sheet that informs the user about content limitations and provides
 /// relevant actions based on their status.
 /// {@endtemplate}
-class ContentLimitationBottomSheet extends StatelessWidget {
+class ContentLimitationBottomSheet extends StatefulWidget {
   /// {@macro content_limitation_bottom_sheet}
-  const ContentLimitationBottomSheet({required this.status, super.key});
-
-  /// The limitation status that determines the content of the bottom sheet.
-  final LimitationStatus status;
-
-  @override
-  Widget build(BuildContext context) {
-    // Use a switch to build the appropriate view based on the status.
-    // Each case returns a dedicated private widget for clarity.
-    switch (status) {
-      case LimitationStatus.anonymousLimitReached:
-        return const _AnonymousLimitView();
-      case LimitationStatus.standardUserLimitReached:
-        return const _StandardUserLimitView();
-      case LimitationStatus.premiumUserLimitReached:
-        return const _PremiumUserLimitView();
-      case LimitationStatus.allowed:
-        // If the action is allowed, no UI is needed.
-        return const SizedBox.shrink();
-    }
-  }
-}
-
-/// A private widget to show when an anonymous user hits a limit.
-class _AnonymousLimitView extends StatelessWidget {
-  const _AnonymousLimitView();
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizationsX(context).l10n;
-
-    return _BaseLimitView(
-      icon: Icons.person_add_alt_1_outlined,
-      title: l10n.anonymousLimitTitle,
-      body: l10n.anonymousLimitBody,
-      child: ElevatedButton(
-        onPressed: () {
-          // Pop the bottom sheet first.
-          Navigator.of(context).pop();
-          // Then navigate to the account linking page.
-          context.pushNamed(Routes.accountLinkingName);
-        },
-        style: ElevatedButton.styleFrom(
-          minimumSize: const Size.fromHeight(AppSpacing.xxl + AppSpacing.sm),
-        ),
-        child: Text(l10n.anonymousLimitButton),
-      ),
-    );
-  }
-}
-
-/// A private widget to show when a standard (free) user hits a limit.
-class _StandardUserLimitView extends StatelessWidget {
-  const _StandardUserLimitView();
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizationsX(context).l10n;
-
-    return _BaseLimitView(
-      icon: Icons.workspace_premium_outlined,
-      title: l10n.standardLimitTitle,
-      body: l10n.standardLimitBody,
-      child: ElevatedButton(
-        // TODO(fulleni): Implement account upgrade flow.
-        // The upgrade flow is not yet implemented, so the button is disabled.
-        onPressed: null,
-        style: ElevatedButton.styleFrom(
-          minimumSize: const Size.fromHeight(AppSpacing.xxl + AppSpacing.sm),
-        ),
-        child: Text(l10n.standardLimitButton),
-      ),
-    );
-  }
-}
-
-/// A private widget to show when a premium user hits a limit.
-class _PremiumUserLimitView extends StatelessWidget {
-  const _PremiumUserLimitView();
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizationsX(context).l10n;
-
-    return _BaseLimitView(
-      icon: Icons.inventory_2_outlined,
-      title: l10n.premiumLimitTitle,
-      body: l10n.premiumLimitBody,
-      child: ElevatedButton(
-        onPressed: () {
-          // Pop the bottom sheet first.
-          Navigator.of(context).pop();
-          // Then navigate to the page for managing followed items.
-          context.goNamed(Routes.manageFollowedItemsName);
-        },
-        style: ElevatedButton.styleFrom(
-          minimumSize: const Size.fromHeight(AppSpacing.xxl + AppSpacing.sm),
-        ),
-        child: Text(l10n.premiumLimitButton),
-      ),
-    );
-  }
-}
-
-/// A base layout for the content limitation views to reduce duplication.
-class _BaseLimitView extends StatelessWidget {
-  const _BaseLimitView({
-    required this.icon,
+  const ContentLimitationBottomSheet({
     required this.title,
     required this.body,
-    required this.child,
+    required this.buttonText,
+    this.onButtonPressed,
+    super.key,
   });
 
-  final IconData icon;
+  /// The title of the bottom sheet.
   final String title;
-  final String body;
-  final Widget child;
 
+  /// The body text of the bottom sheet.
+  final String body;
+
+  /// The text for the action button.
+  final String buttonText;
+
+  /// The callback executed when the action button is pressed.
+  final VoidCallback? onButtonPressed;
+
+  @override
+  State<ContentLimitationBottomSheet> createState() =>
+      _ContentLimitationBottomSheetState();
+}
+
+class _ContentLimitationBottomSheetState
+    extends State<ContentLimitationBottomSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -141,20 +53,112 @@ class _BaseLimitView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: AppSpacing.xxl * 1.5, color: colorScheme.primary),
+            Icon(
+              Icons.block,
+              size: AppSpacing.xxl * 1.5,
+              color: colorScheme.primary,
+            ),
             const SizedBox(height: AppSpacing.lg),
             Text(
-              title,
+              widget.title,
               style: textTheme.headlineSmall,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.md),
-            Text(body, style: textTheme.bodyLarge, textAlign: TextAlign.center),
+            Text(
+              widget.body,
+              style: textTheme.bodyLarge,
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(height: AppSpacing.lg),
-            child,
+            ElevatedButton(
+              onPressed: widget.onButtonPressed,
+              child: Text(widget.buttonText),
+            ),
           ],
         ),
       ),
     );
+  }
+}
+
+/// A shared helper function to show the content limitation bottom sheet.
+///
+/// This function centralizes the logic for determining the sheet's content
+/// based on the user's role and the specific limitation they have encountered.
+void showContentLimitationBottomSheet({
+  required BuildContext context,
+  required LimitationStatus status,
+  required ContentAction action,
+}) {
+  final l10n = AppLocalizations.of(context);
+  final userRole = context.read<AppBloc>().state.user?.appRole;
+
+  final content = _getBottomSheetContent(
+    context: context,
+    l10n: l10n,
+    status: status,
+    userRole: userRole,
+    action: action,
+  );
+
+  showModalBottomSheet<void>(
+    context: context,
+    builder: (_) => ContentLimitationBottomSheet(
+      title: content.title,
+      body: content.body,
+      buttonText: content.buttonText,
+      onButtonPressed: content.onPressed,
+    ),
+  );
+}
+
+/// Determines the content for the [ContentLimitationBottomSheet] based on
+/// the user's role and the limitation status.
+({String title, String body, String buttonText, VoidCallback? onPressed})
+_getBottomSheetContent({
+  required BuildContext context,
+  required AppLocalizations l10n,
+  required LimitationStatus status,
+  required AppUserRole? userRole,
+  required ContentAction action,
+}) {
+  switch (status) {
+    case LimitationStatus.anonymousLimitReached:
+      return (
+        title: l10n.limitReachedGuestUserTitle,
+        body: l10n.limitReachedGuestUserBody,
+        buttonText: l10n.createAccountButton,
+        onPressed: () {
+          Navigator.of(context).pop();
+          context.goNamed(Routes.accountLinkingName);
+        },
+      );
+    case LimitationStatus.standardUserLimitReached:
+    case LimitationStatus.premiumUserLimitReached:
+      final body = switch (action) {
+        ContentAction.bookmarkHeadline => l10n.limitReachedBodySave,
+        ContentAction.followTopic ||
+        ContentAction.followSource ||
+        ContentAction.followCountry => l10n.limitReachedBodyFollow,
+        ContentAction.postComment => l10n.limitReachedBodyComments,
+        ContentAction.reactToContent => l10n.limitReachedBodyReactions,
+        ContentAction.submitReport => l10n.limitReachedBodyReports,
+        ContentAction.saveFilter => l10n.limitReachedBodySaveFilters,
+        ContentAction.pinFilter => l10n.limitReachedBodyPinFilters,
+        ContentAction.subscribeToSavedFilterNotifications =>
+          l10n.limitReachedBodySubscribeToNotifications,
+      };
+      return (
+        title: l10n.limitReachedTitle,
+        body: body,
+        buttonText: l10n.gotItButton,
+        onPressed: () {
+          Navigator.of(context).pop();
+          // TODO(fulleni): Navigate to content management or upgrade page.
+        },
+      );
+    case LimitationStatus.allowed:
+      return (title: '', body: '', buttonText: '', onPressed: null);
   }
 }

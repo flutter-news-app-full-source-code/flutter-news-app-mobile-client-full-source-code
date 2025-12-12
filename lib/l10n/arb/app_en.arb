@@ -1202,10 +1202,6 @@
     "@anonymousLimitButton": {
         "description": "Button text for the bottom sheet when an anonymous user hits a content limit."
     },
-    "standardLimitTitle": "Unlock More Access",
-    "@standardLimitTitle": {
-        "description": "Title for the bottom sheet when a standard user hits a content limit."
-    },
     "standardLimitBody": "You've reached your limit for the free plan. Upgrade to save and follow more.",
     "@standardLimitBody": {
         "description": "Body text for the bottom sheet when a standard user hits a content limit."

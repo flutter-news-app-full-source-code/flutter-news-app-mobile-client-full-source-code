@@ -1202,10 +1202,6 @@
     "@anonymousLimitButton": {
         "description": "Button text for the bottom sheet when an anonymous user hits a content limit."
     },
-    "standardLimitTitle": "افتح الوصول غير المحدود",
-    "@standardLimitTitle": {
-        "description": "Title for the bottom sheet when a standard user hits a content limit."
-    },
     "standardLimitBody": "لقد وصلت إلى الحد الأقصى للباقة المجانية. قم بالترقية لحفظ ومتابعة المزيد.",
     "@standardLimitBody": {
         "description": "Body text for the bottom sheet when a standard user hits a content limit."

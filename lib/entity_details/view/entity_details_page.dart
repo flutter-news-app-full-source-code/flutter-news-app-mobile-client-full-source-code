@@ -108,9 +108,9 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
     final remoteConfig = context.watch<AppBloc>().state.remoteConfig;
-    final isSourceReportingEnabled =
-        remoteConfig?.features.community.reporting.sourceReportingEnabled ??
-        false;
+    final communityConfig = remoteConfig?.features.community;
+    final isSourceReportingEnabled = (communityConfig?.enabled ?? false) &&
+        (communityConfig?.reporting.sourceReportingEnabled ?? false);
 
     return Scaffold(
       body: BlocBuilder<EntityDetailsBloc, EntityDetailsState>(

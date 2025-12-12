@@ -45,15 +45,16 @@ class HeadlineTileImageStart extends StatelessWidget {
         horizontal: AppSpacing.paddingMedium,
         vertical: AppSpacing.xs,
       ),
-      child: InkWell(
-        onTap:
-            onHeadlineTap ??
-            () => HeadlineTapHandler.handleHeadlineTap(context, headline),
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          child: Column(
-            children: [
-              Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            onTap:
+                onHeadlineTap ??
+                () => HeadlineTapHandler.handleHeadlineTap(context, headline),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
@@ -87,53 +88,55 @@ class HeadlineTileImageStart extends StatelessWidget {
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
-                    child: SizedBox(
-                      height: 72,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          HeadlineSourceRow(headline: headline),
-                          Text.rich(
-                            TextSpan(
-                              children: [
-                                if (headline.isBreaking)
-                                  TextSpan(
-                                    text: '${l10n.breakingNewsPrefix} - ',
-                                    style: textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.w500,
-                                      color: colorScheme.primary,
-                                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        HeadlineSourceRow(headline: headline),
+                        const SizedBox(height: AppSpacing.sm),
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              if (headline.isBreaking)
+                                TextSpan(
+                                  text: '${l10n.breakingNewsPrefix} - ',
+                                  style: textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                    color: colorScheme.primary,
                                   ),
-                                TextSpan(text: headline.title),
-                              ],
-                            ),
-                            style: textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w500,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
+                                ),
+                              TextSpan(text: headline.title),
+                            ],
                           ),
-                        ],
-                      ),
+                          style: textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: AppSpacing.md),
-                child: BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
-                  builder: (context, state) {
-                    return HeadlineActionsRow(
-                      headline: headline,
-                      engagements: state.engagementsMap[headline.id] ?? [],
-                    );
-                  },
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.md,
+              0,
+              AppSpacing.md,
+              AppSpacing.xs,
+            ),
+            child: BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
+              builder: (context, state) {
+                return HeadlineActionsRow(
+                  headline: headline,
+                  engagements: state.engagementsMap[headline.id] ?? [],
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -37,6 +37,11 @@ class _HeadlineActionsBottomSheetState
           false,
     );
 
+    final remoteConfig = context.watch<AppBloc>().state.remoteConfig;
+    final isHeadlineReportingEnabled = remoteConfig
+            ?.features.community.reporting.headlineReportingEnabled ??
+        false;
+
     return Wrap(
       children: [
         ListTile(
@@ -72,22 +77,23 @@ class _HeadlineActionsBottomSheetState
             Share.share(widget.headline.url);
           },
         ),
-        ListTile(
-          leading: const Icon(Icons.flag_outlined),
-          title: Text(l10n.reportActionLabel),
-          onTap: () async {
-            // Pop the current sheet before showing the new one.
-            Navigator.of(context).pop();
-            await showModalBottomSheet<void>(
-              context: context,
-              isScrollControlled: true,
-              builder: (_) => ReportContentBottomSheet(
-                entityId: widget.headline.id,
-                reportableEntity: ReportableEntity.headline,
-              ),
-            );
-          },
-        ),
+        if (isHeadlineReportingEnabled)
+          ListTile(
+            leading: const Icon(Icons.flag_outlined),
+            title: Text(l10n.reportActionLabel),
+            onTap: () async {
+              // Pop the current sheet before showing the new one.
+              Navigator.of(context).pop();
+              await showModalBottomSheet<void>(
+                context: context,
+                isScrollControlled: true,
+                builder: (_) => ReportContentBottomSheet(
+                  entityId: widget.headline.id,
+                  reportableEntity: ReportableEntity.headline,
+                ),
+              );
+            },
+          ),
       ],
     );
   }

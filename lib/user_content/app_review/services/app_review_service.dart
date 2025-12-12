@@ -52,9 +52,18 @@ class AppReviewService {
       return;
     }
 
-    final appReviewConfig = remoteConfig.features.community.appReview;
-    if (!appReviewConfig.enabled) {
-      _logger.fine('App review feature is disabled.');
+    final communityConfig = remoteConfig.features.community;
+    // The app review feature should be disabled if the entire community
+    // feature set is disabled.
+    if (!communityConfig.enabled) {
+      _logger.fine(
+        'App review feature is disabled because the parent '
+        'community feature is disabled.',
+      );
+      return;
+    }
+    if (!communityConfig.appReview.enabled) {
+      _logger.fine('App review feature is disabled by its own config.');
       return;
     }
 
@@ -65,6 +74,7 @@ class AppReviewService {
       return;
     }
 
+    final appReviewConfig = communityConfig.appReview;
     // Check initial cooldown.
     final daysSinceCreation = DateTime.now().difference(user.createdAt).inDays;
     // For the demo environment, we ignore the initial cooldown period.

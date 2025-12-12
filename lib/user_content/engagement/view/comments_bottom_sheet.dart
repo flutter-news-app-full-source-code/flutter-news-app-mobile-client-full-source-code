@@ -7,6 +7,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/b
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/reporting/view/report_content_bottom_sheet.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/user_avatar.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template comments_bottom_sheet}
@@ -128,11 +129,15 @@ class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
             final isOwnComment = user != null && engagement.userId == user.id;
 
             return ListTile(
-              leading: const CircleAvatar(child: Icon(Icons.person_outline)),
+              leading: UserAvatar(user: user),
               title: Row(
                 children: [
                   Text(
-                    'User ${engagement.userId.substring(0, 4)}',
+                    isOwnComment
+                        ? (user.email.isNotEmpty
+                              ? user.email
+                              : l10n.accountNoNameUser)
+                        : l10n.commenterName(engagement.userId.substring(0, 4)),
                     style: theme.textTheme.titleSmall,
                   ),
                   const SizedBox(width: AppSpacing.sm),

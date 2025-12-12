@@ -5,12 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/engagement/view/comments_bottom_sheet.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/engagement/widgets/inline_reaction_selector.dart';
-import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template headline_actions_row}
@@ -33,12 +29,18 @@ class HeadlineActionsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _HeadlineActionsRowView(headline: headline, engagements: engagements);
+    return _HeadlineActionsRowView(
+      headline: headline,
+      engagements: engagements,
+    );
   }
 }
 
 class _HeadlineActionsRowView extends StatelessWidget {
-  const _HeadlineActionsRowView({required this.headline, required this.engagements});
+  const _HeadlineActionsRowView({
+    required this.headline,
+    required this.engagements,
+  });
 
   final Headline headline;
   final List<Engagement> engagements;
@@ -67,9 +69,7 @@ class _HeadlineActionsRowView extends StatelessWidget {
     final commentCount = engagements.where((e) => e.comment != null).length;
 
     final theme = Theme.of(context);
-    final mutedColor = theme.colorScheme.onSurfaceVariant.withOpacity(
-      0.6,
-    );
+    final mutedColor = theme.colorScheme.onSurfaceVariant.withOpacity(0.6);
 
     return Padding(
       padding: const EdgeInsets.only(top: AppSpacing.md),
@@ -99,83 +99,9 @@ class _HeadlineActionsRowView extends StatelessWidget {
   }
 
   void _onReactionSelected(BuildContext context, ReactionType? reaction) {
-    final user = context.read<AppBloc>().state.user;
-    if (user?.appRole == AppUserRole.guestUser) {
-      _showContentLimitationBottomSheet(
-        context: context,
-        status: LimitationStatus.anonymousLimitReached,
-        action: ContentAction.reactToContent,
-      );
-    } else {
-      context.read<HeadlinesFeedBloc>().add(
-            HeadlinesFeedReactionUpdated(headline.id, reaction, context: context),
-          );
-    }
-  }
-
-  void _showContentLimitationBottomSheet({
-    required BuildContext context,
-    required LimitationStatus status,
-    required ContentAction action,
-  }) {
-    final l10n = AppLocalizations.of(context);
-    final userRole = context.read<AppBloc>().state.user?.appRole;
-
-    final content = _getBottomSheetContent(
-      context: context,
-      l10n: l10n,
-      status: status,
-      userRole: userRole,
-      action: action,
+    context.read<HeadlinesFeedBloc>().add(
+      HeadlinesFeedReactionUpdated(headline.id, reaction, context: context),
     );
-
-    showModalBottomSheet<void>(
-      context: context,
-      builder: (_) => ContentLimitationBottomSheet(
-        title: content.title,
-        body: content.body,
-        buttonText: content.buttonText,
-        onButtonPressed: content.onPressed,
-      ),
-    );
-  }
-
-  ({String title, String body, String buttonText, VoidCallback? onPressed})
-      _getBottomSheetContent({
-    required BuildContext context,
-    required AppLocalizations l10n,
-    required LimitationStatus status,
-    required AppUserRole? userRole,
-    required ContentAction action,
-  }) {
-    switch (status) {
-      case LimitationStatus.anonymousLimitReached:
-        return (
-          title: l10n.limitReachedGuestUserTitle,
-          body: l10n.limitReachedGuestUserBody,
-          buttonText: l10n.anonymousLimitButton,
-          onPressed: () {
-            Navigator.of(context).pop();
-            context.pushNamed(Routes.accountLinkingName);
-          },
-        );
-      case LimitationStatus.standardUserLimitReached:
-        return (
-          title: l10n.standardLimitTitle,
-          body: l10n.standardLimitBody,
-          buttonText: l10n.standardLimitButton,
-          onPressed: () => Navigator.of(context).pop(),
-        );
-      case LimitationStatus.premiumUserLimitReached:
-        return (
-          title: l10n.premiumLimitTitle,
-          body: l10n.premiumLimitBody,
-          buttonText: l10n.premiumLimitButton,
-          onPressed: () => Navigator.of(context).pop(),
-        );
-      case LimitationStatus.allowed:
-        return (title: '', body: '', buttonText: '', onPressed: null);
-    }
   }
 }
 

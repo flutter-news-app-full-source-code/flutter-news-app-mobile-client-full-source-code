@@ -159,7 +159,7 @@ Future<void> _createAndApplyFilter(BuildContext context) async {
   final l10n = AppLocalizations.of(context);
   final contentLimitationService = context.read<ContentLimitationService>();
   final limitationStatus = await contentLimitationService.checkAction(
-    ContentAction.saveHeadlineFilter,
+    ContentAction.saveFilter,
   );
 
   // If the user has reached their limit, show the limitation bottom sheet

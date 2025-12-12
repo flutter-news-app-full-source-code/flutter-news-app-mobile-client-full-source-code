@@ -128,8 +128,11 @@ _getBottomSheetContent({
       return (
         title: l10n.limitReachedGuestUserTitle,
         body: l10n.limitReachedGuestUserBody,
-        buttonText: l10n.anonymousLimitButton,
-        onPressed: () => context.goNamed(Routes.accountLinkingName),
+        buttonText: l10n.createAccountButton,
+        onPressed: () {
+          Navigator.of(context).pop();
+          context.goNamed(Routes.accountLinkingName);
+        },
       );
     case LimitationStatus.standardUserLimitReached:
     case LimitationStatus.premiumUserLimitReached:
@@ -141,13 +144,19 @@ _getBottomSheetContent({
         ContentAction.postComment => l10n.limitReachedBodyComments,
         ContentAction.reactToContent => l10n.limitReachedBodyReactions,
         ContentAction.submitReport => l10n.limitReachedBodyReports,
-        _ => l10n.premiumLimitBody,
+        ContentAction.saveFilter => l10n.limitReachedBodySaveFilters,
+        ContentAction.pinFilter => l10n.limitReachedBodyPinFilters,
+        ContentAction.subscribeToSavedFilterNotifications =>
+          l10n.limitReachedBodySubscribeToNotifications,
       };
       return (
         title: l10n.limitReachedTitle,
         body: body,
         buttonText: l10n.gotItButton,
-        onPressed: () => Navigator.of(context).pop(),
+        onPressed: () {
+          Navigator.of(context).pop();
+          // TODO(fulleni): Navigate to content management or upgrade page.
+        },
       );
     case LimitationStatus.allowed:
       return (title: '', body: '', buttonText: '', onPressed: null);

@@ -20,14 +20,14 @@ enum ContentAction {
   /// The action of following a country.
   followCountry,
 
-  /// The action of saving a headline filter.
-  saveHeadlineFilter,
+  /// The action of saving a filter.
+  saveFilter,
 
-  /// The action of pinning a headline filter.
-  pinHeadlineFilter,
+  /// The action of pinning a filter.
+  pinFilter,
 
-  /// The action of subscribing to notifications for a headline filter.
-  subscribeToHeadlineFilterNotifications,
+  /// The action of subscribing to notifications for a saved filter.
+  subscribeToSavedFilterNotifications,
 
   /// The action of posting a comment.
   postComment,
@@ -224,9 +224,9 @@ class ContentLimitationService {
         case ContentAction.followTopic:
         case ContentAction.followSource:
         case ContentAction.followCountry:
-        case ContentAction.saveHeadlineFilter:
-        case ContentAction.pinHeadlineFilter:
-        case ContentAction.subscribeToHeadlineFilterNotifications:
+        case ContentAction.saveFilter:
+        case ContentAction.pinFilter:
+        case ContentAction.subscribeToSavedFilterNotifications:
           break; // Continue to normal check for guest.
       }
     }
@@ -261,13 +261,13 @@ class ContentLimitationService {
         };
         if (count >= limit) return _getLimitationStatusForRole(role);
 
-      case ContentAction.saveHeadlineFilter:
+      case ContentAction.saveFilter:
         final limit = limits.savedHeadlineFilters[role]?.total;
         if (limit != null && preferences.savedHeadlineFilters.length >= limit) {
           return _getLimitationStatusForRole(role);
         }
 
-      case ContentAction.pinHeadlineFilter:
+      case ContentAction.pinFilter:
         final limit = limits.savedHeadlineFilters[role]?.pinned;
         if (limit != null &&
             preferences.savedHeadlineFilters.where((f) => f.isPinned).length >=
@@ -275,7 +275,7 @@ class ContentLimitationService {
           return _getLimitationStatusForRole(role);
         }
 
-      case ContentAction.subscribeToHeadlineFilterNotifications:
+      case ContentAction.subscribeToSavedFilterNotifications:
         final subscriptionLimits =
             limits.savedHeadlineFilters[role]?.notificationSubscriptions;
         if (subscriptionLimits == null) return LimitationStatus.allowed;

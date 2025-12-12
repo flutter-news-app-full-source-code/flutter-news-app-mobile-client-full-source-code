@@ -39,7 +39,8 @@ class _HeadlineActionsBottomSheetState
 
     final remoteConfig = context.watch<AppBloc>().state.remoteConfig;
     final communityConfig = remoteConfig?.features.community;
-    final isHeadlineReportingEnabled = (communityConfig?.enabled ?? false) &&
+    final isHeadlineReportingEnabled =
+        (communityConfig?.enabled ?? false) &&
         (communityConfig?.reporting.headlineReportingEnabled ?? false);
 
     return Wrap(

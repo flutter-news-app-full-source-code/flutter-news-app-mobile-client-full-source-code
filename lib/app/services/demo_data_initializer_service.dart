@@ -21,7 +21,7 @@ class DemoDataInitializerService {
   DemoDataInitializerService({
     required DataRepository<AppSettings> appSettingsRepository,
     required DataRepository<UserContentPreferences>
-        userContentPreferencesRepository,
+    userContentPreferencesRepository,
     required DataRepository<InAppNotification> inAppNotificationRepository,
     required this.appSettingsFixturesData,
     required this.userContentPreferencesFixturesData,
@@ -33,7 +33,7 @@ class DemoDataInitializerService {
 
   final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
-      _userContentPreferencesRepository;
+  _userContentPreferencesRepository;
   final DataRepository<InAppNotification> _inAppNotificationRepository;
   final Logger _logger;
 
@@ -62,7 +62,7 @@ class DemoDataInitializerService {
   /// This prevents "READ FAILED" errors when the application attempts to
   /// access these user-specific data points for a newly signed-in anonymous
   /// user in the demo environment.
-  Future<void> initializeUserSpecificData(User user) async { 
+  Future<void> initializeUserSpecificData(User user) async {
     _logger.info('Initializing user-specific data for user ID: ${user.id}');
     await Future.wait([
       _ensureAppSettingsExist(user.id),

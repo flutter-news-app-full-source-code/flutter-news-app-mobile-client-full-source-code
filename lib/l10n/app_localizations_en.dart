@@ -1600,4 +1600,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get commentInputExistingHint =>
       'You have already commented on this headline.';
+
+  @override
+  String commenterName(String id) {
+    return 'User $id';
+  }
 }

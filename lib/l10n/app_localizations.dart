@@ -3001,6 +3001,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You have already commented on this headline.'**
   String get commentInputExistingHint;
+
+  /// Display name for a commenter when their full user object is not available, showing a partial ID.
+  ///
+  /// In en, this message translates to:
+  /// **'User {id}'**
+  String commenterName(String id);
 }
 
 class _AppLocalizationsDelegate

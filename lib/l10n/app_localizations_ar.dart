@@ -1596,4 +1596,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get commentInputExistingHint => 'لقد علقت بالفعل على هذا العنوان.';
+
+  @override
+  String commenterName(String id) {
+    return 'مستخدم $id';
+  }
 }

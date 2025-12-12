@@ -1842,11 +1842,11 @@
     "@rateAppPromptBody": {
         "description": "نص النافذة التي تطلب من المستخدم تقييم التطبيق."
     },
-    "rateAppPromptYesButton": "نعم",
+    "rateAppPromptYesButton": "التطبيق رائع!",
     "@rateAppPromptYesButton": {
         "description": "نص زر الاستجابة الإيجابية لطلب التقييم."
     },
-    "rateAppPromptNoButton": "لا",
+    "rateAppPromptNoButton": "يحتاج لتحسين",
     "@rateAppPromptNoButton": {
         "description": "نص زر الاستجابة السلبية لطلب التقييم."
     },

@@ -1842,11 +1842,11 @@
     "@rateAppPromptBody": {
         "description": "Body text for the in-app rating prompt bottom sheet."
     },
-    "rateAppPromptYesButton": "Yes",
+    "rateAppPromptYesButton": "It's Great!",
     "@rateAppPromptYesButton": {
         "description": "Button text for a positive response to the rating prompt."
     },
-    "rateAppPromptNoButton": "No",
+    "rateAppPromptNoButton": "Needs Work",
     "@rateAppPromptNoButton": {
         "description": "Button text for a negative response to the rating prompt."
     },

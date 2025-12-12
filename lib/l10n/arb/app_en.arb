@@ -2046,5 +2046,15 @@
     "commentInputExistingHint": "You have already commented on this headline.",
     "@commentInputExistingHint": {
         "description": "Hint text for the comment input field when the user has already posted a comment."
+    },
+    "commenterName": "User {id}",
+    "@commenterName": {
+        "description": "Display name for a commenter when their full user object is not available, showing a partial ID.",
+        "placeholders": {
+            "id": {
+                "type": "String",
+                "example": "1a2b"
+            }
+        }
     }
 }

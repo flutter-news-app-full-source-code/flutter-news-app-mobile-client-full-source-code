@@ -518,7 +518,6 @@ Future<Widget> bootstrap(
       ? DemoDataMigrationService(
           appSettingsRepository: appSettingsRepository,
           userContentPreferencesRepository: userContentPreferencesRepository,
-          engagementRepository: engagementRepository,
         )
       : null;
   logger.fine(

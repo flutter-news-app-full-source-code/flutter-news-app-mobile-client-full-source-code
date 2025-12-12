@@ -16,16 +16,13 @@ class DemoDataMigrationService {
     required DataRepository<AppSettings> appSettingsRepository,
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
-    required DataRepository<Engagement> engagementRepository,
   }) : _appSettingsRepository = appSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
-       _engagementRepository = engagementRepository,
        _logger = Logger('DemoDataMigrationService');
 
   final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
-  final DataRepository<Engagement> _engagementRepository;
   final Logger _logger;
 
   /// Migrates user settings and content preferences from an old anonymous
@@ -148,41 +145,5 @@ class DemoDataMigrationService {
         s,
       );
     }
-
-    // Migrate Engagements
-    try {
-      final oldEngagements = await _engagementRepository.readAll(
-        userId: oldUserId,
-      );
-      for (final oldEngagement in oldEngagements.items) {
-        final newEngagement = oldEngagement.copyWith(userId: newUserId);
-        try {
-          await _engagementRepository.create(
-            item: newEngagement,
-            userId: newUserId,
-          );
-        } on ConflictException {
-          /* ignore, already exists */
-        }
-      }
-      // Delete all old engagements at once after migration.
-      await Future.wait(
-        oldEngagements.items.map(
-          (e) => _engagementRepository.delete(id: e.id, userId: oldUserId),
-        ),
-      );
-      _logger.fine(
-        '[DemoDataMigrationService] ${oldEngagements.items.length} '
-        'engagements migrated successfully from $oldUserId to $newUserId.',
-      );
-    } catch (e, s) {
-      _logger.severe(
-        '[DemoDataMigrationService] Error migrating engagements from '
-        '$oldUserId to $newUserId: $e',
-        e,
-        s,
-      );
-    }
-
   }
 }

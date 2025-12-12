@@ -917,9 +917,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get anonymousLimitButton => 'Sign In';
 
   @override
-  String get standardLimitTitle => 'Unlock More Access';
-
-  @override
   String get standardLimitBody =>
       'You\'ve reached your limit for the free plan. Upgrade to save and follow more.';
 

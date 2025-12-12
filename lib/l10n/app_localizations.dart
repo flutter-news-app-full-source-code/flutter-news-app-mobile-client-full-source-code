@@ -1742,12 +1742,6 @@ abstract class AppLocalizations {
   /// **'Sign In'**
   String get anonymousLimitButton;
 
-  /// Title for the bottom sheet when a standard user hits a content limit.
-  ///
-  /// In en, this message translates to:
-  /// **'Unlock More Access'**
-  String get standardLimitTitle;
-
   /// Body text for the bottom sheet when a standard user hits a content limit.
   ///
   /// In en, this message translates to:

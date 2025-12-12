@@ -916,9 +916,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get anonymousLimitButton => 'تسجيل الدخول';
 
   @override
-  String get standardLimitTitle => 'افتح الوصول غير المحدود';
-
-  @override
   String get standardLimitBody =>
       'لقد وصلت إلى الحد الأقصى للباقة المجانية. قم بالترقية لحفظ ومتابعة المزيد.';
 

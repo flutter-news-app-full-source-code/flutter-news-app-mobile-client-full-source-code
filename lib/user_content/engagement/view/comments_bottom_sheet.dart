@@ -133,11 +133,7 @@ class __CommentsBottomSheetViewState extends State<_CommentsBottomSheetView> {
               title: Row(
                 children: [
                   Text(
-                    isOwnComment
-                        ? (user.email.isNotEmpty
-                              ? user.email
-                              : l10n.accountNoNameUser)
-                        : l10n.commenterName(engagement.userId.substring(0, 4)),
+                    l10n.commenterName(engagement.userId.substring(0, 4)),
                     style: theme.textTheme.titleSmall,
                   ),
                   const SizedBox(width: AppSpacing.sm),

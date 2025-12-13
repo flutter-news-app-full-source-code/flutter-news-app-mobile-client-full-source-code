@@ -122,12 +122,13 @@ class HeadlineTileImageTop extends StatelessWidget {
               ),
             ),
           ),
+          const SizedBox(height: AppSpacing.md),
           Padding(
             padding: const EdgeInsets.fromLTRB(
               AppSpacing.md,
+              0,
               AppSpacing.md,
-              AppSpacing.md,
-              AppSpacing.md,
+              AppSpacing.sm,
             ),
             child: BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
               builder: (context, state) {

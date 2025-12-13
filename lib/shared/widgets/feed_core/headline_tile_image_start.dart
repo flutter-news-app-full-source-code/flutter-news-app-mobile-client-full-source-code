@@ -48,14 +48,27 @@ class HeadlineTileImageStart extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.md,
+              AppSpacing.md,
+              AppSpacing.md,
+              0,
+            ),
+            child: HeadlineSourceRow(headline: headline),
+          ),
           InkWell(
-            onTap:
-                onHeadlineTap ??
+            onTap: onHeadlineTap ??
                 () => HeadlineTapHandler.handleHeadlineTap(context, headline),
             child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.md,
+                AppSpacing.sm,
+                AppSpacing.md,
+                AppSpacing.sm,
+              ),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SizedBox(
                     width: 72,
@@ -76,44 +89,37 @@ class HeadlineTileImageStart extends StatelessWidget {
                         },
                         errorBuilder: (context, error, stackTrace) =>
                             ColoredBox(
-                              color: colorScheme.surfaceContainerHighest,
-                              child: Icon(
-                                Icons.broken_image_outlined,
-                                color: colorScheme.onSurfaceVariant,
-                                size: AppSpacing.xl,
-                              ),
-                            ),
+                          color: colorScheme.surfaceContainerHighest,
+                          child: Icon(
+                            Icons.broken_image_outlined,
+                            color: colorScheme.onSurfaceVariant,
+                            size: AppSpacing.xl,
+                          ),
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        HeadlineSourceRow(headline: headline),
-                        const SizedBox(height: AppSpacing.sm),
-                        Text.rich(
-                          TextSpan(
-                            children: [
-                              if (headline.isBreaking)
-                                TextSpan(
-                                  text: '${l10n.breakingNewsPrefix} - ',
-                                  style: textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w500,
-                                    color: colorScheme.primary,
-                                  ),
-                                ),
-                              TextSpan(text: headline.title),
-                            ],
-                          ),
-                          style: textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w500,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
+                    child: Text.rich(
+                      TextSpan(
+                        children: [
+                          if (headline.isBreaking)
+                            TextSpan(
+                              text: '${l10n.breakingNewsPrefix} - ',
+                              style: textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w500,
+                                color: colorScheme.primary,
+                              ),
+                            ),
+                          TextSpan(text: headline.title),
+                        ],
+                      ),
+                      style: textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
@@ -125,7 +131,7 @@ class HeadlineTileImageStart extends StatelessWidget {
               AppSpacing.md,
               0,
               AppSpacing.md,
-              AppSpacing.xs,
+              AppSpacing.sm,
             ),
             child: BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
               builder: (context, state) {

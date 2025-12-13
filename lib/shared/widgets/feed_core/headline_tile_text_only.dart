@@ -82,17 +82,14 @@ class HeadlineTileTextOnly extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: AppSpacing.md),
-                      child: BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
-                        builder: (context, state) {
-                          return HeadlineActionsRow(
-                            headline: headline,
-                            engagements:
-                                state.engagementsMap[headline.id] ?? [],
-                          );
-                        },
-                      ),
+                    const SizedBox(height: AppSpacing.md),
+                    BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
+                      builder: (context, state) {
+                        return HeadlineActionsRow(
+                          headline: headline,
+                          engagements: state.engagementsMap[headline.id] ?? [],
+                        );
+                      },
                     ),
                   ],
                 ),

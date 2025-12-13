@@ -71,30 +71,27 @@ class _HeadlineActionsRowView extends StatelessWidget {
     final theme = Theme.of(context);
     final mutedColor = theme.colorScheme.onSurfaceVariant.withOpacity(0.6);
 
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSpacing.md),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: InlineReactionSelector(
-              unselectedColor: mutedColor,
-              selectedReaction: userReaction,
-              onReactionSelected: (reaction) =>
-                  _onReactionSelected(context, reaction),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: InlineReactionSelector(
+            unselectedColor: mutedColor,
+            selectedReaction: userReaction,
+            onReactionSelected: (reaction) =>
+                _onReactionSelected(context, reaction),
+          ),
+        ),
+        if (isCommentingEnabled)
+          _CommentsButton(
+            commentCount: commentCount,
+            onPressed: () => showModalBottomSheet<void>(
+              context: context,
+              isScrollControlled: true,
+              builder: (_) => CommentsBottomSheet(headlineId: headline.id),
             ),
           ),
-          if (isCommentingEnabled)
-            _CommentsButton(
-              commentCount: commentCount,
-              onPressed: () => showModalBottomSheet<void>(
-                context: context,
-                isScrollControlled: true,
-                builder: (_) => CommentsBottomSheet(headlineId: headline.id),
-              ),
-            ),
-        ],
-      ),
+      ],
     );
   }
 

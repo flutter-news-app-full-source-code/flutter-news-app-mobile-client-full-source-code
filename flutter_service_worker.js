@@ -26,8 +26,8 @@ const RESOURCES = {"flutter.js": "24bc71911b75b5f8135c949e27a2984e",
 "assets/AssetManifest.bin.json": "1dde4fd138be25d571c7125c5f2d5c51",
 "assets/assets/logo/flutter-news-app-full-source-code-dark-logo.png": "c065dacc3cb830545a187ddb2e688212",
 "assets/assets/logo/flutter-news-app-full-source-code-light-logo.png": "09ed53fc165b8de30a4fefeb539fd02b",
-"assets/fonts/MaterialIcons-Regular.otf": "81d918ce12f3ff9638d15c17f1b88935",
-"assets/NOTICES": "332f77c60b0d20744686fb61e41323d3",
+"assets/fonts/MaterialIcons-Regular.otf": "f37d7942b09c7105051403ea3e6128c8",
+"assets/NOTICES": "581c862ef5c00f8c6a3da6bfc2d4af03",
 "assets/packages/flutter_inappwebview_web/assets/web/web_support.js": "509ae636cfdd93e49b5a6eaf0f06d79f",
 "assets/packages/flutter_inappwebview/assets/t_rex_runner/t-rex.css": "5a8d0222407e388155d7d1395a75d5b9",
 "assets/packages/flutter_inappwebview/assets/t_rex_runner/t-rex.html": "16911fcc170c8af1c5457940bd0bf055",
@@ -46,9 +46,9 @@ const RESOURCES = {"flutter.js": "24bc71911b75b5f8135c949e27a2984e",
 "canvaskit/canvaskit.js.symbols": "a3c9f77715b642d0437d9c275caba91e",
 "canvaskit/skwasm.js.symbols": "3a4aadf4e8141f284bd524976b1d6bdc",
 "favicon.png": "ea3651526d2d838212e40c58d35027ef",
-"flutter_bootstrap.js": "f881e36b408502623b514b49e5d4643e",
-"version.json": "93e44c0221834c14c3f9fe06d40d19b5",
-"main.dart.js": "c35232802887bf0b0281b54c3f76efb0"};
+"flutter_bootstrap.js": "6c7d6a3a55aba7ec50e091643837ddaf",
+"version.json": "9b245047a34cb311d783898a39247956",
+"main.dart.js": "13e606128c9e77c6f6f97c6b365e1061"};
 // The application shell files that are downloaded before a service worker can
 // start.
 const CORE = ["main.dart.js",

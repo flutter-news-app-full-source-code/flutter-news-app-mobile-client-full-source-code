@@ -47,55 +47,47 @@ class HeadlineTileTextOnly extends StatelessWidget {
         horizontal: AppSpacing.paddingMedium,
         vertical: AppSpacing.xs,
       ),
-      child: InkWell(
-        onTap:
-            onHeadlineTap ??
-            () => HeadlineTapHandler.handleHeadlineTap(context, headline),
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            HeadlineSourceRow(headline: headline),
+            const SizedBox(height: AppSpacing.sm),
+            InkWell(
+              onTap: onHeadlineTap ??
+                  () => HeadlineTapHandler.handleHeadlineTap(context, headline),
+              child: Text.rich(
+                TextSpan(
                   children: [
-                    HeadlineSourceRow(headline: headline),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text.rich(
+                    if (headline.isBreaking)
                       TextSpan(
-                        children: [
-                          if (headline.isBreaking)
-                            TextSpan(
-                              text: '${l10n.breakingNewsPrefix} - ',
-                              style: textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w500,
-                                color: colorScheme.primary,
-                              ),
-                            ),
-                          TextSpan(text: headline.title),
-                        ],
+                        text: '${l10n.breakingNewsPrefix} - ',
+                        style: textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w500,
+                          color: colorScheme.primary,
+                        ),
                       ),
-                      style: textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w500,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
-                      builder: (context, state) {
-                        return HeadlineActionsRow(
-                          headline: headline,
-                          engagements: state.engagementsMap[headline.id] ?? [],
-                        );
-                      },
-                    ),
+                    TextSpan(text: headline.title),
                   ],
                 ),
+                style: textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
+              builder: (context, state) {
+                return HeadlineActionsRow(
+                  headline: headline,
+                  engagements: state.engagementsMap[headline.id] ?? [],
+                );
+              },
+            ),
+          ],
         ),
       ),
     );

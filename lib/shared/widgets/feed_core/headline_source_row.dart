@@ -61,37 +61,35 @@ class _HeadlineSourceRowState extends State<HeadlineSourceRow> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Expanded(
-          child: InkWell(
-            onTap: () => widget._handleEntityTap(context),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  width: AppSpacing.md,
-                  height: AppSpacing.md,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(AppSpacing.xs / 2),
-                    child: Image.network(
-                      widget.headline.source.logoUrl,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Icon(
-                        Icons.source_outlined,
-                        size: AppSpacing.md,
-                        color: colorScheme.onSurfaceVariant,
+          child: Row(
+            children: [
+              InkWell(
+                onTap: () => widget._handleEntityTap(context),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: AppSpacing.md,
+                      height: AppSpacing.md,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(AppSpacing.xs / 2),
+                        child: Image.network(
+                          widget.headline.source.logoUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Icon(
+                            Icons.source_outlined,
+                            size: AppSpacing.md,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    const SizedBox(width: AppSpacing.xs),
+                    Text(widget.headline.source.name, style: sourceTextStyle),
+                  ],
                 ),
-                const SizedBox(width: AppSpacing.xs),
-                Flexible(
-                  child: Text(
-                    widget.headline.source.name,
-                    style: sourceTextStyle,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
         Row(

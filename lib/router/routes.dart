@@ -75,8 +75,6 @@ abstract final class Routes {
   static const settingsFeedName = 'settingsFeed';
   static const settingsArticle = 'article';
   static const settingsArticleName = 'settingsArticle';
-  static const settingsNotifications = 'notifications';
-  static const settingsNotificationsName = 'settingsNotifications';
   static const settingsLanguage = 'language';
   static const settingsLanguageName = 'settingsLanguage';
 

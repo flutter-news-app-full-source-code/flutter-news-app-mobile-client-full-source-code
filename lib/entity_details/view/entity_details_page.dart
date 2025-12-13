@@ -107,7 +107,8 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
     final colorScheme = theme.colorScheme;
     final remoteConfig = context.watch<AppBloc>().state.remoteConfig;
     final communityConfig = remoteConfig?.features.community;
-    final isSourceReportingEnabled = (communityConfig?.enabled ?? false) &&
+    final isSourceReportingEnabled =
+        (communityConfig?.enabled ?? false) &&
         (communityConfig?.reporting.sourceReportingEnabled ?? false);
 
     return Scaffold(
@@ -311,11 +312,11 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
                       },
                       itemBuilder: (BuildContext context) =>
                           <PopupMenuEntry<String>>[
-                        PopupMenuItem<String>(
-                          value: 'report',
-                          child: Text(l10n.reportActionLabel),
-                        ),
-                      ],
+                            PopupMenuItem<String>(
+                              value: 'report',
+                              child: Text(l10n.reportActionLabel),
+                            ),
+                          ],
                     )
                   else
                     const SizedBox.shrink(),

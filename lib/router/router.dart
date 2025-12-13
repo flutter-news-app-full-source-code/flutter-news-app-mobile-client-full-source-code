@@ -52,7 +52,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/ap
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/feed_settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/font_settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/language_settings_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/notification_settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/theme_settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
@@ -303,12 +302,7 @@ GoRouter createRouter({
                     name: Routes.settingsFeedName,
                     builder: (context, state) => const FeedSettingsPage(),
                   ),
-                  GoRoute(
-                    path: Routes.settingsNotifications,
-                    name: Routes.settingsNotificationsName,
-                    builder: (context, state) =>
-                        const NotificationSettingsPage(),
-                  ),
+
                   GoRoute(
                     path: Routes.settingsLanguage,
                     name: Routes.settingsLanguageName,

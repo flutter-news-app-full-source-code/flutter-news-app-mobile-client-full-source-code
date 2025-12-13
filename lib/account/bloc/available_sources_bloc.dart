@@ -32,7 +32,6 @@ class AvailableSourcesBloc
     }
     emit(state.copyWith(status: AvailableSourcesStatus.loading));
     try {
-      // TODO(fulleni): Add pagination if necessary for very large datasets.
       // Filter to fetch only active sources.
       final response = await _sourcesRepository.readAll(
         filter: {'status': ContentStatus.active.name},

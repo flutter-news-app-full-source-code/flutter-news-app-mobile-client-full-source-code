@@ -5,6 +5,7 @@ import 'package:data_repository/data_repository.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:logging/logging.dart';
 
+//TODO(fulleni): use the ActionLimit enum from the core package unstead.
 /// Defines the specific type of content-related action a user is trying to
 /// perform, which may be subject to limitations.
 enum ContentAction {

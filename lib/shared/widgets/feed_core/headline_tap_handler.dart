@@ -5,6 +5,7 @@ import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/interstitial_ad_manager.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/in_app_browser.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -31,6 +32,17 @@ abstract final class HeadlineTapHandler {
     BuildContext context,
     Headline headline,
   ) async {
+    // Log the content view event immediately.
+    unawaited(
+      context.read<AnalyticsService>().logEvent(
+        AnalyticsEvent.contentViewed,
+        payload: ContentViewedPayload(
+          contentId: headline.id,
+          contentType: ContentType.headline,
+        ),
+      ),
+    );
+
     // Notify the ad manager of an external navigation and await ad dismissal.
     await context.read<InterstitialAdManager>().onExternalNavigationTrigger();
 
@@ -47,7 +59,11 @@ abstract final class HeadlineTapHandler {
 
     // Use the new InAppBrowser for internal navigation, otherwise use url_launcher.
     if (behavior == FeedItemClickBehavior.internalNavigation) {
-      await InAppBrowser.show(context, url: headline.url);
+      await InAppBrowser.show(
+        context,
+        url: headline.url,
+        contentId: headline.id,
+      );
     } else {
       if (await canLaunchUrl(Uri.parse(headline.url))) {
         await launchUrl(
@@ -133,7 +149,22 @@ abstract final class HeadlineTapHandler {
         id: headlineId,
       );
       if (context.mounted) {
-        await InAppBrowser.show(context, url: headline.url);
+        // Log content view for notification taps as well.
+        unawaited(
+          context.read<AnalyticsService>().logEvent(
+            AnalyticsEvent.contentViewed,
+            payload: ContentViewedPayload(
+              contentId: headline.id,
+              contentType: ContentType.headline,
+            ),
+          ),
+        );
+
+        await InAppBrowser.show(
+          context,
+          url: headline.url,
+          contentId: headline.id,
+        );
       }
     } finally {
       if (navigator.canPop()) navigator.pop();

@@ -8,6 +8,7 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inline_ad_cache_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/initialization_result.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
@@ -55,6 +56,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required ContentLimitationService contentLimitationService,
     required DataRepository<InAppNotification> inAppNotificationRepository,
     required AppReviewService appReviewService,
+    required AnalyticsService analyticsService,
   }) : _remoteConfigRepository = remoteConfigRepository,
        _appInitializer = appInitializer,
        _authRepository = authRepository,
@@ -68,6 +70,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _contentLimitationService = contentLimitationService,
        _appReviewService = appReviewService,
        _inlineAdCacheService = inlineAdCacheService,
+       _analyticsService = analyticsService,
        _logger = logger,
        super(
          AppState(
@@ -142,6 +145,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final AppReviewService _appReviewService;
   final InlineAdCacheService _inlineAdCacheService;
   final FeedCacheService _feedCacheService;
+  final AnalyticsService _analyticsService;
 
   /// Handles the [AppStarted] event.
   ///
@@ -301,6 +305,19 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           ),
         );
 
+        // Analytics: Track user role changes
+        if (oldUser != null && oldUser.appRole != user.appRole) {
+          unawaited(
+            _analyticsService.logEvent(
+              AnalyticsEvent.userRoleChanged,
+              payload: UserRoleChangedPayload(
+                fromRole: oldUser.appRole,
+                toRole: user.appRole,
+              ),
+            ),
+          );
+        }
+
         // After any successful user transition (including guest), attempt to
         // register their device for push notifications. This ensures that
         // guests can also receive notifications.
@@ -362,10 +379,62 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     }
 
     final updatedSettings = event.settings;
+    final originalSettings = state.settings!;
+
+    // Analytics: Track setting changes
+    if (updatedSettings.displaySettings.baseTheme !=
+            originalSettings.displaySettings.baseTheme ||
+        updatedSettings.displaySettings.accentTheme !=
+            originalSettings.displaySettings.accentTheme) {
+      unawaited(
+        _analyticsService.logEvent(
+          AnalyticsEvent.themeChanged,
+          payload: ThemeChangedPayload(
+            baseTheme: updatedSettings.displaySettings.baseTheme,
+            accentTheme: updatedSettings.displaySettings.accentTheme,
+          ),
+        ),
+      );
+    }
+
+    if (updatedSettings.language.code != originalSettings.language.code) {
+      unawaited(
+        _analyticsService.logEvent(
+          AnalyticsEvent.languageChanged,
+          payload: LanguageChangedPayload(
+            languageCode: updatedSettings.language.code,
+          ),
+        ),
+      );
+    }
+
+    if (updatedSettings.feedSettings.feedItemDensity !=
+        originalSettings.feedSettings.feedItemDensity) {
+      unawaited(
+        _analyticsService.logEvent(
+          AnalyticsEvent.feedDensityChanged,
+          payload: FeedDensityChangedPayload(
+            density: updatedSettings.feedSettings.feedItemDensity,
+          ),
+        ),
+      );
+    }
+
+    if (updatedSettings.feedSettings.feedItemClickBehavior !=
+        originalSettings.feedSettings.feedItemClickBehavior) {
+      unawaited(
+        _analyticsService.logEvent(
+          AnalyticsEvent.browserChoiceChanged,
+          payload: BrowserChoiceChangedPayload(
+            browserType: updatedSettings.feedSettings.feedItemClickBehavior,
+          ),
+        ),
+      );
+    }
+
     // Optimistically update the UI with the new settings immediately.
     // This provides a responsive user experience. The original settings are
     // saved in case the persistence fails and we need to roll back.
-    final originalSettings = state.settings;
     emit(state.copyWith(settings: updatedSettings));
 
     try {
@@ -560,6 +629,21 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       savedHeadlineFilters: updatedSavedFilters,
     );
 
+    // Analytics: Track filter creation
+    unawaited(
+      _analyticsService.logEvent(
+        AnalyticsEvent.headlineFilterCreated,
+        payload: HeadlineFilterCreatedPayload(
+          filterId: event.filter.id,
+          criteriaSummary: HeadlineFilterCriteriaSummary.fromCriteria(
+            event.filter.criteria,
+          ),
+          isPinned: event.filter.isPinned,
+          deliveryTypes: event.filter.deliveryTypes,
+        ),
+      ),
+    );
+
     add(AppUserContentPreferencesChanged(preferences: updatedPreferences));
   }
 
@@ -598,6 +682,21 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     final updatedPreferences = state.userContentPreferences!.copyWith(
       savedHeadlineFilters: updatedSavedFilters,
+    );
+
+    // Analytics: Track filter update
+    unawaited(
+      _analyticsService.logEvent(
+        AnalyticsEvent.headlineFilterUpdated,
+        payload: HeadlineFilterUpdatedPayload(
+          filterId: event.filter.id,
+          newName: event.filter.name,
+          pinStatusChangedTo: event.filter.isPinned,
+          newCriteriaSummary: HeadlineFilterCriteriaSummary.fromCriteria(
+            event.filter.criteria,
+          ),
+        ),
+      ),
     );
 
     add(AppUserContentPreferencesChanged(preferences: updatedPreferences));
@@ -822,6 +921,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     if (event.isBookmarked) {
       currentSaved.removeWhere((h) => h.id == event.headline.id);
+      unawaited(
+        _analyticsService.logEvent(
+          AnalyticsEvent.contentUnsaved,
+          payload: ContentUnsavedPayload(contentId: event.headline.id),
+        ),
+      );
     } else {
       final limitationStatus = await _contentLimitationService.checkAction(
         ContentAction.bookmarkHeadline,
@@ -838,6 +943,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
       currentSaved.insert(0, event.headline);
+      unawaited(
+        _analyticsService.logEvent(
+          AnalyticsEvent.contentSaved,
+          payload: ContentSavedPayload(contentId: event.headline.id),
+        ),
+      );
       add(AppPositiveInteractionOcurred(context: event.context));
     }
 
@@ -871,6 +982,16 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     try {
       await _reportRepository.create(item: event.report);
+      unawaited(
+        _analyticsService.logEvent(
+          AnalyticsEvent.reportSubmitted,
+          payload: ReportSubmittedPayload(
+            entityType: event.report.entityType,
+            entityId: event.report.entityId,
+            reason: event.report.reason,
+          ),
+        ),
+      );
     } catch (e, s) {
       _logger.severe('Failed to submit report in AppBloc', e, s);
       // Optionally emit a failure state to show a snackbar.

@@ -4,6 +4,7 @@ import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/native_review_service.dart';
@@ -23,13 +24,16 @@ class AppReviewService {
   AppReviewService({
     required DataRepository<AppReview> appReviewRepository,
     required NativeReviewService nativeReviewService,
+    required AnalyticsService analyticsService,
     Logger? logger,
   }) : _appReviewRepository = appReviewRepository,
        _nativeReviewService = nativeReviewService,
+       _analyticsService = analyticsService,
        _logger = logger ?? Logger('AppReviewService');
 
   final DataRepository<AppReview> _appReviewRepository;
   final NativeReviewService _nativeReviewService;
+  final AnalyticsService _analyticsService;
   final Logger _logger;
 
   /// Checks if the user is eligible for a review prompt and, if so, triggers it.
@@ -99,6 +103,7 @@ class AppReviewService {
     }
 
     _logger.info('User is eligible for review prompt. Showing bottom sheet.');
+    // Use unawaited to explicitly ignore the future returned by showModalBottomSheet.
     unawaited(
       showModalBottomSheet<void>(
         context: context,
@@ -121,7 +126,22 @@ class AppReviewService {
     final userId = appBloc.state.user?.id;
     if (userId == null) return;
 
+    // Determine if this is the first time the user is seeing the prompt by
+    // checking if the decorator status for 'rateApp' has been recorded yet.
+    final isFirstPrompt =
+        appBloc.state.user?.feedDecoratorStatus[FeedDecoratorType.rateApp] ==
+        null;
+
     if (isPositive) {
+      unawaited(
+        _analyticsService.logEvent(
+          AnalyticsEvent.appReviewPromptResponded,
+          payload: AppReviewPromptRespondedPayload(
+            feedback: AppReviewFeedback.positive,
+            isFirstPrompt: isFirstPrompt,
+          ),
+        ),
+      );
       _logger.info('User responded positively. Requesting native review.');
 
       // Create the AppReview record first to log the positive interaction.
@@ -132,17 +152,22 @@ class AppReviewService {
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
-      await _appReviewRepository.create(item: review, userId: userId);
+      unawaited(_appReviewRepository.create(item: review, userId: userId));
 
       // Now, request the native review prompt.
       final wasRequested = await _nativeReviewService.requestReview();
 
       // If the OS-level prompt was successfully requested, update our record.
       if (wasRequested) {
-        await _appReviewRepository.update(
-          id: review.id,
-          item: review.copyWith(wasStoreReviewRequested: true),
-          userId: userId,
+        unawaited(
+          _analyticsService.logEvent(AnalyticsEvent.appReviewStoreRequested),
+        );
+        unawaited(
+          _appReviewRepository.update(
+            id: review.id,
+            item: review.copyWith(wasStoreReviewRequested: true),
+            userId: userId,
+          ),
         );
       }
 
@@ -156,6 +181,15 @@ class AppReviewService {
         ),
       );
     } else {
+      unawaited(
+        _analyticsService.logEvent(
+          AnalyticsEvent.appReviewPromptResponded,
+          payload: AppReviewPromptRespondedPayload(
+            feedback: AppReviewFeedback.negative,
+            isFirstPrompt: isFirstPrompt,
+          ),
+        ),
+      );
       _logger.info('User responded negatively. Showing feedback sheet.');
       // Create the AppReview record first to log the negative interaction.
       final review = AppReview(
@@ -208,6 +242,17 @@ class AppReviewService {
           updatedAt: DateTime.now(),
         ),
         userId: userId,
+      );
+      unawaited(
+        _analyticsService.logEvent(
+          AnalyticsEvent.appReviewPromptResponded,
+          payload: AppReviewPromptRespondedPayload(
+            feedback: AppReviewFeedback.negative,
+            // This is a follow-up, so it's never the first prompt interaction.
+            isFirstPrompt: false,
+            feedbackDetails: details,
+          ),
+        ),
       );
       _logger.fine('Negative feedback persisted for user $userId.');
     } catch (e, s) {

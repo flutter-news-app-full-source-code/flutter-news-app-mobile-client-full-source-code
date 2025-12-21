@@ -7,6 +7,7 @@ import 'package:data_api/data_api.dart';
 import 'package:data_client/data_client.dart';
 import 'package:data_inmemory/data_inmemory.dart';
 import 'package:data_repository/data_repository.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,6 +20,12 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/ad
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/demo_ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inline_ad_cache_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/analytics_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/demo_analytics_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/firebase_analytics_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/mixpanel_analytics_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_engine.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
     as app_config;
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
@@ -150,8 +157,55 @@ Future<Widget> bootstrap(
   }
   logger
     ..fine('Authentication repository initialized.')
+    // 5. Initialize Analytics Service.
+    ..info('6. Initializing Analytics service...');
+
+  late final AnalyticsService analyticsService;
+  final analyticsConfig = (await remoteConfigRepository.read(
+    id: kRemoteConfigId,
+  )).features.analytics;
+
+  final analyticsProviders = <AnalyticsProvider, AnalyticsProviderInterface>{};
+
+  // Initialize providers based on environment and config
+  if (appConfig.environment == app_config.AppEnvironment.demo) {
+    analyticsProviders[AnalyticsProvider.demo] = DemoAnalyticsProvider(
+      logger: logger,
+    );
+  } else {
+    // Add Firebase
+    analyticsProviders[AnalyticsProvider.firebase] = FirebaseAnalyticsProvider(
+      firebaseAnalytics: FirebaseAnalytics.instance,
+      logger: logger,
+    );
+    // Add Mixpanel
+    analyticsProviders[AnalyticsProvider.mixpanel] = MixpanelAnalyticsProvider(
+      projectToken: appConfig.mixpanelProjectToken,
+      trackAutomaticEvents: true,
+      logger: logger,
+    );
+    // Add Demo for fallback
+    analyticsProviders[AnalyticsProvider.demo] = DemoAnalyticsProvider(
+      logger: logger,
+    );
+  }
+
+  analyticsService = AnalyticsEngine(
+    initialConfig: analyticsConfig,
+    providers: analyticsProviders,
+    logger: logger,
+  );
+
+  // Initialize the active provider
+  if (analyticsConfig.enabled) {
+    final activeProvider = analyticsProviders[analyticsConfig.activeProvider];
+    await activeProvider?.initialize();
+  }
+
+  logger
+    ..fine('Analytics service initialized.')
     // 5. Initialize AdProvider and AdService.
-    ..info('6. Initializing Ad providers and AdService...');
+    ..info('7. Initializing Ad providers and AdService...');
   late final Map<AdPlatformType, AdProvider> adProviders;
 
   // Conditionally instantiate ad providers based on the application environment.
@@ -173,7 +227,10 @@ Future<Widget> bootstrap(
     // For development and production environments (non-web), use real ad providers.
     adProviders = {
       // AdMob provider for Google Mobile Ads.
-      AdPlatformType.admob: AdMobAdProvider(logger: logger),
+      AdPlatformType.admob: AdMobAdProvider(
+        analyticsService: analyticsService,
+        logger: logger,
+      ),
       // The demo ad platform is not available in non-demo/non-web environments.
       // If AdService attempts to access it, it will receive null, which is
       // handled by AdService's internal logic (logging a warning).
@@ -183,6 +240,7 @@ Future<Widget> bootstrap(
   final adService = AdService(
     adProviders: adProviders,
     environment: appConfig.environment,
+    analyticsService: analyticsService,
     logger: logger,
   );
   await adService.initialize();
@@ -498,6 +556,7 @@ Future<Widget> bootstrap(
   final appReviewService = AppReviewService(
     appReviewRepository: appReviewRepository,
     nativeReviewService: nativeReviewService,
+    analyticsService: analyticsService,
     logger: logger,
   );
 
@@ -505,6 +564,7 @@ Future<Widget> bootstrap(
   final contentLimitationService = ContentLimitationService(
     engagementRepository: engagementRepository,
     reportRepository: reportRepository,
+    analyticsService: analyticsService,
     cacheDuration: const Duration(minutes: 5),
     logger: logger,
   );
@@ -570,6 +630,7 @@ Future<Widget> bootstrap(
   // by the AppInitializationBloc within AppInitializationPage.
   return MultiRepositoryProvider(
     providers: [
+      RepositoryProvider.value(value: analyticsService),
       RepositoryProvider.value(value: appInitializer),
       RepositoryProvider.value(value: logger),
     ],
@@ -599,6 +660,7 @@ Future<Widget> bootstrap(
       appReviewRepository: appReviewRepository,
       appReviewService: appReviewService,
       contentLimitationService: contentLimitationService,
+      analyticsService: analyticsService,
     ),
   );
 }

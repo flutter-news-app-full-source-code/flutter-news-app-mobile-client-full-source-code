@@ -63,6 +63,17 @@ A complete suite of tools to build a vibrant user community and gather valuable 
 > **Your Advantage:** Deploy a full-featured community and feedback system from day one. Skip the complexity of building engagement UI, state management for reactions, and the nuanced logic of a best-practice app review funnel.
 
 </details>
+<details>
+<summary><strong>📊 Analytics & Business Intelligence</strong></summary>
+
+### 📈 Pluggable, Multi-Provider Analytics
+A robust, type-safe analytics system designed to give you deep insight into user behavior and feature adoption.
+- **Multi-Provider Architecture:** Built on a powerful abstraction that supports any analytics service. It ships with production-ready providers for Firebase Analytics and Mixpanel, plus a Demo provider for easy development and testing.
+- **Remote Provider Switching:** The primary analytics provider is selected via remote configuration, allowing you to switch services on the fly without shipping an app update.
+- **Intelligent Event Throttling:** A smart "Analytics Engine" sits between your app and the provider, enforcing server-side rules for event sampling and filtering. This prevents you from exceeding provider rate limits on high-frequency events (like content views) and allows you to disable specific events remotely without an app update.
+> **Your Advantage:** You get a highly flexible and scalable analytics system that avoids vendor lock-in and provides granular control over your data stream.
+
+</details>
 
 <details>
 <summary><strong>👤 User Identity & Personalization</strong></summary>

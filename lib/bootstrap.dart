@@ -209,7 +209,7 @@ Future<Widget> bootstrap(
     ..fine('Analytics service initialized.')
     ..info('6. Initializing Ad providers and AdService...');
 
-  // 5. Initialize AdProvider and AdService.
+  // 6. Initialize AdProvider and AdService.
   late final Map<AdPlatformType, AdProvider> adProviders;
 
   // Conditionally instantiate ad providers based on the application environment.

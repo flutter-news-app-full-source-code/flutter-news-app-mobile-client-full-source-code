@@ -15,8 +15,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_e
 /// ## Platform-Specific Keys
 /// Some services, like Firebase and OneSignal, require unique keys for Android
 /// and iOS. This class handles that complexity internally. It reads both
-/// platform-specific keys (e.g., `FIREBASE_ANDROID_APP_ID` and
-/// `FIREBASE_IOS_APP_ID`) from the environment.
+/// platform-specific keys (for both Android and iOS) from the environment.
 ///
 /// It then exposes simple, platform-aware getters (e.g., `firebaseAppId`).
 /// These getters automatically return the correct key based on the current
@@ -58,6 +57,7 @@ class AppConfig {
     required this.firebaseMessagingSenderId,
     required this.firebaseProjectId,
     required this.firebaseStorageBucket,
+    required this.mixpanelProjectToken,
     // Add other environment-specific configs here (e.g., analytics keys)
   });
 
@@ -92,6 +92,9 @@ class AppConfig {
       firebaseStorageBucket: const String.fromEnvironment(
         'FIREBASE_STORAGE_BUCKET',
       ),
+      mixpanelProjectToken: const String.fromEnvironment(
+        'MIXPANEL_PROJECT_TOKEN',
+      ),
     );
     _validateConfiguration(config);
     return config;
@@ -120,6 +123,7 @@ class AppConfig {
     firebaseMessagingSenderId: '000000000000',
     firebaseProjectId: 'demo-project',
     firebaseStorageBucket: '',
+    mixpanelProjectToken: 'demo-mixpanel-token',
   );
 
   /// Creates an [AppConfig] for the **development** environment.
@@ -174,6 +178,10 @@ class AppConfig {
         'FIREBASE_STORAGE_BUCKET',
         defaultValue: 'YOUR_DEV_FIREBASE_STORAGE_BUCKET',
       ),
+      mixpanelProjectToken: const String.fromEnvironment(
+        'MIXPANEL_PROJECT_TOKEN',
+        defaultValue: 'YOUR_DEV_MIXPANEL_PROJECT_TOKEN',
+      ),
     );
     _validateConfiguration(config);
     return config;
@@ -215,6 +223,9 @@ class AppConfig {
 
   /// The App ID for the Firebase iOS app.
   final String firebaseIosAppId;
+
+  /// The Project Token for Mixpanel Analytics.
+  final String mixpanelProjectToken;
 
   // --- Platform-Aware Getters ---
 
@@ -263,6 +274,8 @@ class AppConfig {
       if (config.firebaseMessagingSenderId.contains('YOUR_'))
         'FIREBASE_MESSAGING_SENDER_ID',
       if (config.firebaseProjectId.contains('YOUR_')) 'FIREBASE_PROJECT_ID',
+      if (config.mixpanelProjectToken.contains('YOUR_'))
+        'MIXPANEL_PROJECT_TOKEN',
     ];
 
     if (placeholderKeys.isNotEmpty) {

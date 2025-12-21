@@ -2,6 +2,7 @@ import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_search_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headline_search_delegate.dart';
@@ -47,11 +48,12 @@ class FeedSliverAppBar extends StatelessWidget implements PreferredSizeWidget {
           // When the search bar is tapped, show the search delegate.
           // A new instance of HeadlineSearchBloc is created and provided
           // specifically for the lifecycle of this search session.
-          showSearch<void>(
+          showSearch(
             context: context,
             delegate: HeadlineSearchDelegate(
               headlineSearchBloc: HeadlineSearchBloc(
                 headlinesRepository: context.read<DataRepository<Headline>>(),
+                analyticsService: context.read<AnalyticsService>(),
               ),
             ),
           );

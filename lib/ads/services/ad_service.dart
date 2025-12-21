@@ -228,6 +228,7 @@ class AdService {
           payload: AdLoadFailedPayload(
             adProvider: primaryAdPlatform,
             adType: AdType.interstitial,
+            // TODO(fulleni): add a meaningful status code.
             errorCode: 0,
           ),
         ),

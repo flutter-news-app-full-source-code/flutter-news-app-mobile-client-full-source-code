@@ -16,10 +16,7 @@ abstract class AnalyticsService {
   ///
   /// Implementations must serialize the [payload] (if provided) to a Map
   /// and send it to the active analytics provider.
-  Future<void> logEvent(
-    AnalyticsEvent event, {
-    AnalyticsEventPayload? payload,
-  });
+  Future<void> logEvent(AnalyticsEvent event, {AnalyticsEventPayload? payload});
 
   /// Sets the user ID for the analytics session.
   ///

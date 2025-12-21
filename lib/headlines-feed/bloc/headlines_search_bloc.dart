@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:logging/logging.dart';
 import 'package:stream_transform/stream_transform.dart';
 
@@ -27,10 +28,13 @@ EventTransformer<E> debounce<E>(Duration duration) {
 class HeadlineSearchBloc
     extends Bloc<HeadlineSearchEvent, HeadlineSearchState> {
   /// {@macro headline_search_bloc}
-  HeadlineSearchBloc({required DataRepository<Headline> headlinesRepository})
-    : _headlinesRepository = headlinesRepository,
-      _logger = Logger('HeadlineSearchBloc'),
-      super(const HeadlineSearchState()) {
+  HeadlineSearchBloc({
+    required DataRepository<Headline> headlinesRepository,
+    required AnalyticsService analyticsService,
+  }) : _headlinesRepository = headlinesRepository,
+       _analyticsService = analyticsService,
+       _logger = Logger('HeadlineSearchBloc'),
+       super(const HeadlineSearchState()) {
     on<HeadlineSearchQueryChanged>(
       _onHeadlineSearchQueryChanged,
       // Apply a debounce transformer to prevent excessive API calls.
@@ -39,6 +43,7 @@ class HeadlineSearchBloc
   }
 
   final DataRepository<Headline> _headlinesRepository;
+  final AnalyticsService _analyticsService;
   final Logger _logger;
 
   /// Handles the [HeadlineSearchQueryChanged] event.
@@ -78,6 +83,17 @@ class HeadlineSearchBloc
           },
         },
         pagination: const PaginationOptions(limit: 20),
+      );
+
+      // Analytics: Track search performed
+      unawaited(
+        _analyticsService.logEvent(
+          AnalyticsEvent.searchPerformed,
+          payload: SearchPerformedPayload(
+            query: query,
+            resultCount: response.items.length,
+          ),
+        ),
       );
 
       // On success, emit the new state with the fetched headlines.

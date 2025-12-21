@@ -102,10 +102,12 @@ Future<Widget> bootstrap(
         kvStorage.readString(key: StorageKey.authToken.stringValue),
     logger: logger,
   );
+
   logger
     ..fine('HttpClient initialized for base URL: ${appConfig.baseUrl}')
-    // 3. Initialize RemoteConfigClient and Repository, and fetch RemoteConfig.
     ..info('3. Initializing RemoteConfig client and repository...');
+
+  // 3. Initialize RemoteConfigClient and Repository, and fetch RemoteConfig.
   // This is done early because RemoteConfig is now publicly accessible (unauthenticated).
   late DataClient<RemoteConfig> remoteConfigClient;
   if (appConfig.environment == app_config.AppEnvironment.demo) {
@@ -132,10 +134,11 @@ Future<Widget> bootstrap(
   );
   logger
     ..fine('RemoteConfig repository initialized.')
-    // 4. Conditionally initialize Auth services based on environment.
-    // This is done after RemoteConfig is fetched, as Auth services might depend
-    // on configurations defined in RemoteConfig.
-    ..info('5. Initializing Authentication services...');
+    ..info('4. Initializing Authentication services...');
+
+  // 4. Conditionally initialize Auth services based on environment.
+  // This is done after RemoteConfig is fetched, as Auth services might depend
+  // on configurations defined in RemoteConfig.
   late final AuthClient authClient;
   late final AuthRepository authenticationRepository;
   if (appConfig.environment == app_config.AppEnvironment.demo) {
@@ -157,9 +160,9 @@ Future<Widget> bootstrap(
   }
   logger
     ..fine('Authentication repository initialized.')
-    // 5. Initialize Analytics Service.
-    ..info('6. Initializing Analytics service...');
+    ..info('5. Initializing Analytics service...');
 
+  // 5. Initialize Analytics Service.
   late final AnalyticsService analyticsService;
   final analyticsConfig = (await remoteConfigRepository.read(
     id: kRemoteConfigId,
@@ -204,8 +207,9 @@ Future<Widget> bootstrap(
 
   logger
     ..fine('Analytics service initialized.')
-    // 5. Initialize AdProvider and AdService.
-    ..info('7. Initializing Ad providers and AdService...');
+    ..info('6. Initializing Ad providers and AdService...');
+
+  // 5. Initialize AdProvider and AdService.
   late final Map<AdPlatformType, AdProvider> adProviders;
 
   // Conditionally instantiate ad providers based on the application environment.
@@ -266,8 +270,9 @@ Future<Widget> bootstrap(
   final packageInfoService = PackageInfoServiceImpl(logger: logger);
   logger
     ..fine('PackageInfoService initialized.')
-    // 6. Initialize all other DataClients and Repositories.
-    ..info('8. Initializing Data clients and repositories...');
+    ..info('7. Initializing Data clients and repositories...');
+
+  // 7. Initialize all other DataClients and Repositories.
   // These now also have a guaranteed valid httpClient.
   late final DataClient<Headline> headlinesClient;
   late final DataClient<Topic> topicsClient;
@@ -496,9 +501,9 @@ Future<Widget> bootstrap(
   );
   logger
     ..fine('All data repositories initialized.')
-    ..info('7. Initializing Push Notification service...');
+    ..info('8. Initializing Push Notification service...');
 
-  // Initialize the PushNotificationService based on the remote config.
+  // 8. Initialize the PushNotificationService based on the remote config.
   // This is a crucial step for the provider-agnostic architecture.
   late final PushNotificationService pushNotificationService;
   // Fetch the latest config directly. Since this is post-initialization,

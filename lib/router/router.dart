@@ -17,6 +17,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/account/view/sav
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inline_ad_cache_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_shell.dart';
@@ -173,6 +174,7 @@ GoRouter createRouter({
           return BlocProvider(
             create: (context) => AuthenticationBloc(
               authenticationRepository: context.read<AuthRepository>(),
+              analyticsService: context.read<AnalyticsService>(),
             ),
             child: child,
           );
@@ -375,6 +377,7 @@ GoRouter createRouter({
                       .read<DataRepository<Engagement>>(),
                   contentLimitationService: context
                       .read<ContentLimitationService>(),
+                  analyticsService: context.read<AnalyticsService>(),
                 );
               },
               child: const SavedHeadlinesPage(),
@@ -424,6 +427,7 @@ GoRouter createRouter({
                       adService: context.read<AdService>(),
                       inlineAdCacheService: context
                           .read<InlineAdCacheService>(),
+                      analyticsService: context.read<AnalyticsService>(),
                     )..add(
                       EntityDetailsLoadRequested(
                         entityId: args.entityId,
@@ -495,6 +499,7 @@ GoRouter createRouter({
                             .read<DataRepository<Engagement>>(),
                         contentLimitationService: context
                             .read<ContentLimitationService>(),
+                        analyticsService: context.read<AnalyticsService>(),
                       );
                     },
                     child: child,

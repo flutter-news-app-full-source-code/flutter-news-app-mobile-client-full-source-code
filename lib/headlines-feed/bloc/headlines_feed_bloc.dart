@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inline_ad_cache_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/cached_feed.dart';
@@ -75,6 +76,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     required InlineAdCacheService inlineAdCacheService,
     required FeedCacheService feedCacheService,
     required ContentLimitationService contentLimitationService,
+    required AnalyticsService analyticsService,
     UserContentPreferences? initialUserContentPreferences,
   }) : _headlinesRepository = headlinesRepository,
        _feedDecoratorService = feedDecoratorService,
@@ -84,6 +86,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
        _inlineAdCacheService = inlineAdCacheService,
        _feedCacheService = feedCacheService,
        _contentLimitationService = contentLimitationService,
+       _analyticsService = analyticsService,
        _logger = Logger('HeadlinesFeedBloc'),
        super(
          HeadlinesFeedState(
@@ -165,6 +168,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   final FeedCacheService _feedCacheService;
   final DataRepository<Engagement> _engagementRepository;
   final ContentLimitationService _contentLimitationService;
+  final AnalyticsService _analyticsService;
   final Logger _logger;
 
   /// Subscription to the AppBloc's state stream.
@@ -568,6 +572,19 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         _logger.fine('Applied filter is a one-time "custom" filter.');
       }
     }
+
+    // Analytics: Track filter usage
+    unawaited(
+      _analyticsService.logEvent(
+        AnalyticsEvent.headlineFilterUsed,
+        payload: HeadlineFilterUsedPayload(
+          filterId: newActiveFilterId,
+          criteriaSummary: HeadlineFilterCriteriaSummary.fromCriteria(
+            event.filter,
+          ),
+        ),
+      ),
+    );
 
     final filterKey = _generateFilterKey(newActiveFilterId, event.filter);
     final cachedFeed = _feedCacheService.getFeed(filterKey);
@@ -1009,6 +1026,15 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
               userId: userId,
             );
             updatedEngagement = null; // It's deleted
+            unawaited(
+              _analyticsService.logEvent(
+                AnalyticsEvent.reactionDeleted,
+                payload: ReactionDeletedPayload(
+                  contentId: event.headlineId,
+                  reactionType: userEngagement.reaction!.reactionType,
+                ),
+              ),
+            );
           } else {
             updatedEngagement = userEngagement.copyWith(
               reaction: const ValueWrapper(null),
@@ -1017,6 +1043,15 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
               id: updatedEngagement.id,
               item: updatedEngagement,
               userId: userId,
+            );
+            unawaited(
+              _analyticsService.logEvent(
+                AnalyticsEvent.reactionDeleted,
+                payload: ReactionDeletedPayload(
+                  contentId: event.headlineId,
+                  reactionType: userEngagement.reaction!.reactionType,
+                ),
+              ),
             );
           }
         } else {
@@ -1027,6 +1062,15 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
             id: updatedEngagement.id,
             item: updatedEngagement,
             userId: userId,
+          );
+          unawaited(
+            _analyticsService.logEvent(
+              AnalyticsEvent.reactionCreated,
+              payload: ReactionCreatedPayload(
+                contentId: event.headlineId,
+                reactionType: event.reactionType!,
+              ),
+            ),
           );
         }
       } else if (event.reactionType != null) {
@@ -1042,6 +1086,15 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         await _engagementRepository.create(
           item: updatedEngagement,
           userId: userId,
+        );
+        unawaited(
+          _analyticsService.logEvent(
+            AnalyticsEvent.reactionCreated,
+            payload: ReactionCreatedPayload(
+              contentId: event.headlineId,
+              reactionType: event.reactionType!,
+            ),
+          ),
         );
       }
 
@@ -1129,6 +1182,12 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           userId: userId,
         );
       }
+      unawaited(
+        _analyticsService.logEvent(
+          AnalyticsEvent.commentCreated,
+          payload: CommentCreatedPayload(contentId: event.headlineId),
+        ),
+      );
       _appBloc.add(AppPositiveInteractionOcurred(context: event.context));
     } catch (e, s) {
       _logger.severe('Failed to post comment.', e, s);

@@ -1,6 +1,7 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/reporting/view/report_content_bottom_sheet.dart';
@@ -76,6 +77,16 @@ class _HeadlineActionsBottomSheetState
             // Pop the sheet before sharing to avoid it being open in the background.
             Navigator.of(context).pop();
             Share.share(widget.headline.url);
+            context.read<AnalyticsService>().logEvent(
+              AnalyticsEvent.contentShared,
+              payload: ContentSharedPayload(
+                contentId: widget.headline.id,
+                contentType: ContentType.headline.name,
+                // TODO(fulleni): We assume system share for now as we can't easily detect the
+                // specific app chosen by the user in the native sheet.
+                shareMedium: 'system',
+              ),
+            );
           },
         ),
         if (isHeadlineReportingEnabled)

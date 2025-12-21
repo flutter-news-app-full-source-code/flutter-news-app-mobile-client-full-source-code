@@ -7,6 +7,7 @@ import 'package:data_api/data_api.dart';
 import 'package:data_client/data_client.dart';
 import 'package:data_inmemory/data_inmemory.dart';
 import 'package:data_repository/data_repository.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,6 +20,12 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/ad
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/demo_ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inline_ad_cache_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/analytics_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/demo_analytics_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/firebase_analytics_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/mixpanel_analytics_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_engine.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
     as app_config;
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
@@ -95,10 +102,12 @@ Future<Widget> bootstrap(
         kvStorage.readString(key: StorageKey.authToken.stringValue),
     logger: logger,
   );
+
   logger
     ..fine('HttpClient initialized for base URL: ${appConfig.baseUrl}')
-    // 3. Initialize RemoteConfigClient and Repository, and fetch RemoteConfig.
     ..info('3. Initializing RemoteConfig client and repository...');
+
+  // 3. Initialize RemoteConfigClient and Repository, and fetch RemoteConfig.
   // This is done early because RemoteConfig is now publicly accessible (unauthenticated).
   late DataClient<RemoteConfig> remoteConfigClient;
   if (appConfig.environment == app_config.AppEnvironment.demo) {
@@ -125,10 +134,11 @@ Future<Widget> bootstrap(
   );
   logger
     ..fine('RemoteConfig repository initialized.')
-    // 4. Conditionally initialize Auth services based on environment.
-    // This is done after RemoteConfig is fetched, as Auth services might depend
-    // on configurations defined in RemoteConfig.
-    ..info('5. Initializing Authentication services...');
+    ..info('4. Initializing Authentication services...');
+
+  // 4. Conditionally initialize Auth services based on environment.
+  // This is done after RemoteConfig is fetched, as Auth services might depend
+  // on configurations defined in RemoteConfig.
   late final AuthClient authClient;
   late final AuthRepository authenticationRepository;
   if (appConfig.environment == app_config.AppEnvironment.demo) {
@@ -150,8 +160,56 @@ Future<Widget> bootstrap(
   }
   logger
     ..fine('Authentication repository initialized.')
-    // 5. Initialize AdProvider and AdService.
+    ..info('5. Initializing Analytics service...');
+
+  // 5. Initialize Analytics Service.
+  late final AnalyticsService analyticsService;
+  final analyticsConfig = (await remoteConfigRepository.read(
+    id: kRemoteConfigId,
+  )).features.analytics;
+
+  final analyticsProviders = <AnalyticsProvider, AnalyticsProviderInterface>{};
+
+  // Initialize providers based on environment and config
+  if (appConfig.environment == app_config.AppEnvironment.demo) {
+    analyticsProviders[AnalyticsProvider.demo] = DemoAnalyticsProvider(
+      logger: logger,
+    );
+  } else {
+    // Add Firebase
+    analyticsProviders[AnalyticsProvider.firebase] = FirebaseAnalyticsProvider(
+      firebaseAnalytics: FirebaseAnalytics.instance,
+      logger: logger,
+    );
+    // Add Mixpanel
+    analyticsProviders[AnalyticsProvider.mixpanel] = MixpanelAnalyticsProvider(
+      projectToken: appConfig.mixpanelProjectToken,
+      trackAutomaticEvents: true,
+      logger: logger,
+    );
+    // Add Demo for fallback
+    analyticsProviders[AnalyticsProvider.demo] = DemoAnalyticsProvider(
+      logger: logger,
+    );
+  }
+
+  analyticsService = AnalyticsEngine(
+    initialConfig: analyticsConfig,
+    providers: analyticsProviders,
+    logger: logger,
+  );
+
+  // Initialize the active provider
+  if (analyticsConfig.enabled) {
+    final activeProvider = analyticsProviders[analyticsConfig.activeProvider];
+    await activeProvider?.initialize();
+  }
+
+  logger
+    ..fine('Analytics service initialized.')
     ..info('6. Initializing Ad providers and AdService...');
+
+  // 6. Initialize AdProvider and AdService.
   late final Map<AdPlatformType, AdProvider> adProviders;
 
   // Conditionally instantiate ad providers based on the application environment.
@@ -173,7 +231,10 @@ Future<Widget> bootstrap(
     // For development and production environments (non-web), use real ad providers.
     adProviders = {
       // AdMob provider for Google Mobile Ads.
-      AdPlatformType.admob: AdMobAdProvider(logger: logger),
+      AdPlatformType.admob: AdMobAdProvider(
+        analyticsService: analyticsService,
+        logger: logger,
+      ),
       // The demo ad platform is not available in non-demo/non-web environments.
       // If AdService attempts to access it, it will receive null, which is
       // handled by AdService's internal logic (logging a warning).
@@ -183,6 +244,7 @@ Future<Widget> bootstrap(
   final adService = AdService(
     adProviders: adProviders,
     environment: appConfig.environment,
+    analyticsService: analyticsService,
     logger: logger,
   );
   await adService.initialize();
@@ -208,8 +270,9 @@ Future<Widget> bootstrap(
   final packageInfoService = PackageInfoServiceImpl(logger: logger);
   logger
     ..fine('PackageInfoService initialized.')
-    // 6. Initialize all other DataClients and Repositories.
-    ..info('8. Initializing Data clients and repositories...');
+    ..info('7. Initializing Data clients and repositories...');
+
+  // 7. Initialize all other DataClients and Repositories.
   // These now also have a guaranteed valid httpClient.
   late final DataClient<Headline> headlinesClient;
   late final DataClient<Topic> topicsClient;
@@ -438,9 +501,9 @@ Future<Widget> bootstrap(
   );
   logger
     ..fine('All data repositories initialized.')
-    ..info('7. Initializing Push Notification service...');
+    ..info('8. Initializing Push Notification service...');
 
-  // Initialize the PushNotificationService based on the remote config.
+  // 8. Initialize the PushNotificationService based on the remote config.
   // This is a crucial step for the provider-agnostic architecture.
   late final PushNotificationService pushNotificationService;
   // Fetch the latest config directly. Since this is post-initialization,
@@ -498,6 +561,7 @@ Future<Widget> bootstrap(
   final appReviewService = AppReviewService(
     appReviewRepository: appReviewRepository,
     nativeReviewService: nativeReviewService,
+    analyticsService: analyticsService,
     logger: logger,
   );
 
@@ -505,6 +569,7 @@ Future<Widget> bootstrap(
   final contentLimitationService = ContentLimitationService(
     engagementRepository: engagementRepository,
     reportRepository: reportRepository,
+    analyticsService: analyticsService,
     cacheDuration: const Duration(minutes: 5),
     logger: logger,
   );
@@ -570,6 +635,7 @@ Future<Widget> bootstrap(
   // by the AppInitializationBloc within AppInitializationPage.
   return MultiRepositoryProvider(
     providers: [
+      RepositoryProvider.value(value: analyticsService),
       RepositoryProvider.value(value: appInitializer),
       RepositoryProvider.value(value: logger),
     ],
@@ -599,6 +665,7 @@ Future<Widget> bootstrap(
       appReviewRepository: appReviewRepository,
       appReviewService: appReviewService,
       contentLimitationService: contentLimitationService,
+      analyticsService: analyticsService,
     ),
   );
 }

@@ -55,7 +55,8 @@ class HeadlineTileTextOnly extends StatelessWidget {
             HeadlineSourceRow(headline: headline),
             const SizedBox(height: AppSpacing.sm),
             InkWell(
-              onTap: onHeadlineTap ??
+              onTap:
+                  onHeadlineTap ??
                   () => HeadlineTapHandler.handleHeadlineTap(context, headline),
               child: Text.rich(
                 TextSpan(

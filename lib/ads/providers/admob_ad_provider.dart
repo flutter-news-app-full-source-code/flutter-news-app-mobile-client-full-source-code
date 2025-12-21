@@ -6,6 +6,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banne
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/ad_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
 import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
@@ -20,9 +21,11 @@ import 'package:uuid/uuid.dart';
 /// {@endtemplate}
 class AdMobAdProvider implements AdProvider {
   /// {@macro admob_ad_provider}
-  AdMobAdProvider({Logger? logger})
-    : _logger = logger ?? Logger('AdMobAdProvider');
+  AdMobAdProvider({required AnalyticsService analyticsService, Logger? logger})
+    : _analyticsService = analyticsService,
+      _logger = logger ?? Logger('AdMobAdProvider');
 
+  final AnalyticsService _analyticsService;
   final Logger _logger;
   final Uuid _uuid = const Uuid();
 
@@ -96,9 +99,25 @@ class AdMobAdProvider implements AdProvider {
         },
         onAdClicked: (ad) {
           _logger.info('AdMobAdProvider: Native Ad clicked.');
+          _analyticsService.logEvent(
+            AnalyticsEvent.adClicked,
+            payload: const AdClickedPayload(
+              adProvider: AdPlatformType.admob,
+              adType: AdType.native,
+              adPlacement: 'feed',
+            ),
+          );
         },
         onAdImpression: (ad) {
           _logger.info('AdMobAdProvider: Native Ad impression recorded.');
+          _analyticsService.logEvent(
+            AnalyticsEvent.adImpression,
+            payload: const AdImpressionPayload(
+              adProvider: AdPlatformType.admob,
+              adType: AdType.native,
+              adPlacement: 'feed',
+            ),
+          );
         },
         onAdClosed: (ad) {
           _logger.info('AdMobAdProvider: Native Ad closed.');
@@ -189,12 +208,28 @@ class AdMobAdProvider implements AdProvider {
         },
         onAdOpened: (ad) {
           _logger.info('AdMobAdProvider: Banner Ad opened.');
+          _analyticsService.logEvent(
+            AnalyticsEvent.adClicked,
+            payload: const AdClickedPayload(
+              adProvider: AdPlatformType.admob,
+              adType: AdType.banner,
+              adPlacement: 'feed',
+            ),
+          );
         },
         onAdClosed: (ad) {
           _logger.info('AdMobAdProvider: Banner Ad closed.');
         },
         onAdImpression: (ad) {
           _logger.info('AdMobAdProvider: Banner Ad impression recorded.');
+          _analyticsService.logEvent(
+            AnalyticsEvent.adImpression,
+            payload: const AdImpressionPayload(
+              adProvider: AdPlatformType.admob,
+              adType: AdType.banner,
+              adPlacement: 'feed',
+            ),
+          );
         },
       ),
     );

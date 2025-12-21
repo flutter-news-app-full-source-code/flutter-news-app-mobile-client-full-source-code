@@ -4,6 +4,7 @@ import 'package:auth_repository/auth_repository.dart';
 import 'package:bloc/bloc.dart';
 import 'package:core/core.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 
 part 'authentication_event.dart';
 part 'authentication_state.dart';
@@ -16,9 +17,12 @@ const _requestCodeCooldownDuration = Duration(seconds: 60);
 class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
   /// {@macro authentication_bloc}
-  AuthenticationBloc({required AuthRepository authenticationRepository})
-    : _authenticationRepository = authenticationRepository,
-      super(const AuthenticationState()) {
+  AuthenticationBloc({
+    required AuthRepository authenticationRepository,
+    required AnalyticsService analyticsService,
+  }) : _authenticationRepository = authenticationRepository,
+       _analyticsService = analyticsService,
+       super(const AuthenticationState()) {
     // Listen to authentication state changes from the repository
     _userAuthSubscription = _authenticationRepository.authStateChanges.listen(
       (user) => add(_AuthenticationUserChanged(user: user)),
@@ -37,6 +41,7 @@ class AuthenticationBloc
   }
 
   final AuthRepository _authenticationRepository;
+  final AnalyticsService _analyticsService;
   late final StreamSubscription<User?> _userAuthSubscription;
   Timer? _cooldownTimer;
 
@@ -110,8 +115,13 @@ class AuthenticationBloc
     try {
       await _authenticationRepository.verifySignInCode(event.email, event.code);
       // On success, the authStateChanges stream will fire. The global AppBloc
-      // listener will handle the entire post-login sequence, including data
-      // fetching and navigation. No state change is needed here.
+      // listener will handle the entire post-login sequence.
+      unawaited(
+        _analyticsService.logEvent(
+          AnalyticsEvent.userLogin,
+          payload: const UserLoginPayload(authMethod: 'email'),
+        ),
+      );
     } on HttpException catch (e) {
       emit(state.copyWith(status: AuthenticationStatus.failure, exception: e));
     } catch (e) {
@@ -132,9 +142,13 @@ class AuthenticationBloc
     emit(state.copyWith(status: AuthenticationStatus.loading));
     try {
       await _authenticationRepository.signInAnonymously();
-      // On success, the authStateChanges stream will fire. The global AppBloc
-      // listener will handle the entire post-login sequence, including data
-      // fetching and navigation. No state change is needed here.
+      // On success, the authStateChanges stream will fire.
+      unawaited(
+        _analyticsService.logEvent(
+          AnalyticsEvent.userLogin,
+          payload: const UserLoginPayload(authMethod: 'anonymous'),
+        ),
+      );
     } on HttpException catch (e) {
       emit(state.copyWith(status: AuthenticationStatus.failure, exception: e));
     } catch (e) {

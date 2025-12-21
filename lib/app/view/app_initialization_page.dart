@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inline_ad_cache_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_initialization_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
@@ -65,6 +66,7 @@ class AppInitializationPage extends StatelessWidget {
     required this.appReviewService,
     required this.contentLimitationService,
     required this.inAppNotificationRepository,
+    required this.analyticsService,
     super.key,
   });
 
@@ -90,6 +92,7 @@ class AppInitializationPage extends StatelessWidget {
   final AppReviewService appReviewService;
   final ContentLimitationService contentLimitationService;
   final DataRepository<InAppNotification> inAppNotificationRepository;
+  final AnalyticsService analyticsService;
 
   @override
   Widget build(BuildContext context) {
@@ -137,6 +140,7 @@ class AppInitializationPage extends StatelessWidget {
                 appReviewRepository: appReviewRepository,
                 appReviewService: appReviewService,
                 contentLimitationService: contentLimitationService,
+                analyticsService: analyticsService,
               );
 
             case final AppInitializationFailed failureState:

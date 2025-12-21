@@ -1,6 +1,7 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
@@ -93,6 +94,7 @@ void showContentLimitationBottomSheet({
 }) {
   final l10n = AppLocalizations.of(context);
   final userRole = context.read<AppBloc>().state.user?.appRole;
+  final analyticsService = context.read<AnalyticsService>();
 
   final content = _getBottomSheetContent(
     context: context,
@@ -100,6 +102,7 @@ void showContentLimitationBottomSheet({
     status: status,
     userRole: userRole,
     action: action,
+    analyticsService: analyticsService,
   );
 
   showModalBottomSheet<void>(
@@ -122,6 +125,7 @@ _getBottomSheetContent({
   required LimitationStatus status,
   required AppUserRole? userRole,
   required ContentAction action,
+  required AnalyticsService analyticsService,
 }) {
   switch (status) {
     case LimitationStatus.anonymousLimitReached:
@@ -130,6 +134,12 @@ _getBottomSheetContent({
         body: l10n.limitReachedGuestUserBody,
         buttonText: l10n.createAccountButton,
         onPressed: () {
+          analyticsService.logEvent(
+            AnalyticsEvent.limitExceededCtaClicked,
+            payload: const LimitExceededCtaClickedPayload(
+              ctaType: 'createAccount',
+            ),
+          );
           Navigator.of(context).pop();
           context.goNamed(Routes.accountLinkingName);
         },
@@ -154,6 +164,10 @@ _getBottomSheetContent({
         body: body,
         buttonText: l10n.gotItButton,
         onPressed: () {
+          analyticsService.logEvent(
+            AnalyticsEvent.limitExceededCtaClicked,
+            payload: const LimitExceededCtaClickedPayload(ctaType: 'dismiss'),
+          );
           Navigator.of(context).pop();
           // TODO(fulleni): Navigate to content management or upgrade page.
         },

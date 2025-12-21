@@ -9,6 +9,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inline_ad_cache_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 
 part 'entity_details_event.dart';
@@ -32,6 +33,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
     required AppBloc appBloc,
     required AdService adService,
     required InlineAdCacheService inlineAdCacheService,
+    required AnalyticsService analyticsService,
   }) : _headlinesRepository = headlinesRepository,
        _topicRepository = topicRepository,
        _sourceRepository = sourceRepository,
@@ -39,6 +41,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
        _appBloc = appBloc,
        _adService = adService,
        _inlineAdCacheService = inlineAdCacheService,
+       _analyticsService = analyticsService,
        super(const EntityDetailsState()) {
     on<EntityDetailsLoadRequested>(_onEntityDetailsLoadRequested);
     on<EntityDetailsToggleFollowRequested>(
@@ -56,6 +59,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
   final AppBloc _appBloc;
   final AdService _adService;
   final InlineAdCacheService _inlineAdCacheService;
+  final AnalyticsService _analyticsService;
 
   static const _headlinesLimit = 10;
 
@@ -91,6 +95,17 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
             'Unsupported ContentType for EntityDetails.',
           );
       }
+
+      // Analytics: Track content view
+      unawaited(
+        _analyticsService.logEvent(
+          AnalyticsEvent.contentViewed,
+          payload: ContentViewedPayload(
+            contentId: event.entityId,
+            contentType: contentTypeToLoad,
+          ),
+        ),
+      );
 
       // 2. Fetch Initial Headlines
       final filter = <String, dynamic>{};

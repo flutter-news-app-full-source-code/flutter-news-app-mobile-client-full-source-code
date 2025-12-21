@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/interstitial_ad_manager.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
@@ -65,6 +66,7 @@ class App extends StatelessWidget {
     required FeedCacheService feedCacheService,
     required GlobalKey<NavigatorState> navigatorKey,
     required PushNotificationService pushNotificationService,
+    required AnalyticsService analyticsService,
     super.key,
   }) : _authenticationRepository = authenticationRepository,
        _headlinesRepository = headlinesRepository,
@@ -87,7 +89,8 @@ class App extends StatelessWidget {
        _feedDecoratorService = feedDecoratorService,
        _feedCacheService = feedCacheService,
        _navigatorKey = navigatorKey,
-       _inlineAdCacheService = inlineAdCacheService;
+       _inlineAdCacheService = inlineAdCacheService,
+       _analyticsService = analyticsService;
 
   /// The initial user, pre-fetched during startup.
   final User? user;
@@ -123,8 +126,9 @@ class App extends StatelessWidget {
   final FeedCacheService _feedCacheService;
   final GlobalKey<NavigatorState> _navigatorKey;
   final InlineAdCacheService _inlineAdCacheService;
-
   final PushNotificationService _pushNotificationService;
+  final AnalyticsService _analyticsService;
+
   @override
   Widget build(BuildContext context) {
     // The MultiRepositoryProvider makes all essential repositories and services
@@ -153,6 +157,7 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _appReviewService),
         RepositoryProvider.value(value: _feedCacheService),
         RepositoryProvider.value(value: _environment),
+        RepositoryProvider.value(value: _analyticsService),
         // NOTE: The AppInitializer is provided at the root in bootstrap.dart
         // and is accessed via context.read() in the AppBloc.
       ],
@@ -181,6 +186,7 @@ class App extends StatelessWidget {
                   .read<ContentLimitationService>(),
               reportRepository: context.read<DataRepository<Report>>(),
               feedCacheService: context.read<FeedCacheService>(),
+              analyticsService: _analyticsService,
             )..add(const AppStarted()),
           ),
         ],

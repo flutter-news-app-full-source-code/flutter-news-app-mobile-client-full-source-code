@@ -21,11 +21,9 @@ import 'package:uuid/uuid.dart';
 /// {@endtemplate}
 class AdMobAdProvider implements AdProvider {
   /// {@macro admob_ad_provider}
-  AdMobAdProvider({
-    required AnalyticsService analyticsService,
-    Logger? logger,
-  }) : _analyticsService = analyticsService,
-       _logger = logger ?? Logger('AdMobAdProvider');
+  AdMobAdProvider({required AnalyticsService analyticsService, Logger? logger})
+    : _analyticsService = analyticsService,
+      _logger = logger ?? Logger('AdMobAdProvider');
 
   final AnalyticsService _analyticsService;
   final Logger _logger;

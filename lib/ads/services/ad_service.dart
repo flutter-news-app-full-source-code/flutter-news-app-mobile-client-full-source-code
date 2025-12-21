@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:core/core.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/ad_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
@@ -27,13 +30,16 @@ class AdService {
   AdService({
     required Map<AdPlatformType, AdProvider> adProviders,
     required AppEnvironment environment,
+    required AnalyticsService analyticsService,
     Logger? logger,
   }) : _adProviders = adProviders,
        _environment = environment,
+       _analyticsService = analyticsService,
        _logger = logger ?? Logger('AdService');
 
   final Map<AdPlatformType, AdProvider> _adProviders;
   final AppEnvironment _environment;
+  final AnalyticsService _analyticsService;
   final Logger _logger;
   final Uuid _uuid = const Uuid();
 
@@ -216,6 +222,16 @@ class AdService {
         return null;
       }
     } catch (e, s) {
+      unawaited(
+        _analyticsService.logEvent(
+          AnalyticsEvent.adLoadFailed,
+          payload: AdLoadFailedPayload(
+            adProvider: primaryAdPlatform,
+            adType: AdType.interstitial,
+            errorCode: 0,
+          ),
+        ),
+      );
       _logger.severe(
         'AdService: Error getting Interstitial ad from AdProvider: $e',
         e,
@@ -362,6 +378,16 @@ class AdService {
           // Continue to the next retry attempt.
         }
       } catch (e, s) {
+        unawaited(
+          _analyticsService.logEvent(
+            AnalyticsEvent.adLoadFailed,
+            payload: AdLoadFailedPayload(
+              adProvider: primaryAdPlatform,
+              adType: adType,
+              errorCode: 0,
+            ),
+          ),
+        );
         _logger.severe(
           'AdService: Error getting $adType ad from AdProvider on attempt $attempt: $e',
           e,

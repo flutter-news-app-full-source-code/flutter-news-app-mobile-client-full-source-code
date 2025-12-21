@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:logging/logging.dart';
 
-//TODO(fulleni): use the ActionLimit enum from the core package unstead.
 /// Defines the specific type of content-related action a user is trying to
 /// perform, which may be subject to limitations.
 enum ContentAction {
@@ -70,15 +70,18 @@ class ContentLimitationService {
   ContentLimitationService({
     required DataRepository<Engagement> engagementRepository,
     required DataRepository<Report> reportRepository,
+    required AnalyticsService analyticsService,
     required Duration cacheDuration,
     required Logger logger,
   }) : _engagementRepository = engagementRepository,
        _reportRepository = reportRepository,
+       _analyticsService = analyticsService,
        _cacheDuration = cacheDuration,
        _logger = logger;
 
   final DataRepository<Engagement> _engagementRepository;
   final DataRepository<Report> _reportRepository;
+  final AnalyticsService _analyticsService;
   final Duration _cacheDuration;
   final Logger _logger;
 
@@ -246,6 +249,7 @@ class ContentLimitationService {
       case ContentAction.bookmarkHeadline:
         final limit = limits.savedHeadlines[role];
         if (limit != null && preferences.savedHeadlines.length >= limit) {
+          _logLimitExceeded(LimitedAction.bookmarkHeadline);
           return _getLimitationStatusForRole(role);
         }
 
@@ -260,11 +264,20 @@ class ContentLimitationService {
           ContentAction.followCountry => preferences.followedCountries.length,
           _ => 0,
         };
-        if (count >= limit) return _getLimitationStatusForRole(role);
+        if (count >= limit) {
+          _logLimitExceeded(switch (action) {
+            ContentAction.followTopic => LimitedAction.followTopic,
+            ContentAction.followSource => LimitedAction.followSource,
+            ContentAction.followCountry => LimitedAction.followCountry,
+            _ => LimitedAction.followTopic,
+          });
+          return _getLimitationStatusForRole(role);
+        }
 
       case ContentAction.saveFilter:
         final limit = limits.savedHeadlineFilters[role]?.total;
         if (limit != null && preferences.savedHeadlineFilters.length >= limit) {
+          _logLimitExceeded(LimitedAction.saveFilter);
           return _getLimitationStatusForRole(role);
         }
 
@@ -273,6 +286,7 @@ class ContentLimitationService {
         if (limit != null &&
             preferences.savedHeadlineFilters.where((f) => f.isPinned).length >=
                 limit) {
+          _logLimitExceeded(LimitedAction.pinFilter);
           return _getLimitationStatusForRole(role);
         }
 
@@ -292,6 +306,9 @@ class ContentLimitationService {
           final limitForType = subscriptionLimits[deliveryType] ?? 0;
           final currentCountForType = currentCounts[deliveryType] ?? 0;
           if (currentCountForType >= limitForType) {
+            _logLimitExceeded(
+              LimitedAction.subscribeToSavedFilterNotifications,
+            );
             return _getLimitationStatusForRole(role);
           }
         }
@@ -300,23 +317,33 @@ class ContentLimitationService {
       case ContentAction.postComment:
         final limit = limits.commentsPerDay[role];
         if (limit != null && (_commentCount ?? 0) >= limit) {
+          _logLimitExceeded(LimitedAction.postComment);
           return _getLimitationStatusForRole(role);
         }
 
       case ContentAction.reactToContent:
         final limit = limits.reactionsPerDay[role];
         if (limit != null && (_reactionCount ?? 0) >= limit) {
+          _logLimitExceeded(LimitedAction.reactToContent);
           return _getLimitationStatusForRole(role);
         }
 
       case ContentAction.submitReport:
         final limit = limits.reportsPerDay[role];
         if (limit != null && (_reportCount ?? 0) >= limit) {
+          _logLimitExceeded(LimitedAction.submitReport);
           return _getLimitationStatusForRole(role);
         }
     }
 
     return LimitationStatus.allowed;
+  }
+
+  void _logLimitExceeded(LimitedAction limitType) {
+    _analyticsService.logEvent(
+      AnalyticsEvent.limitExceeded,
+      payload: LimitExceededPayload(limitType: limitType),
+    );
   }
 
   LimitationStatus _getLimitationStatusForRole(AppUserRole role) {

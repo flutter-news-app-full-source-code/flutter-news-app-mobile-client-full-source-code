@@ -1660,4 +1660,51 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get paywallLoading => 'Verifying purchase...';
+
+  @override
+  String get subscriptionDetailsPageTitle => 'Subscription Details';
+
+  @override
+  String get manageSubscriptionButton => 'Manage Subscription';
+
+  @override
+  String get subscriptionDetailsCurrentPlan => 'Current Plan';
+
+  @override
+  String subscriptionDetailsRenewsOn(String date) {
+    return 'Renews on $date';
+  }
+
+  @override
+  String subscriptionDetailsExpiresOn(String date) {
+    return 'Expires on $date';
+  }
+
+  @override
+  String get subscriptionDetailsWillNotRenew => 'Will not renew';
+
+  @override
+  String get subscriptionDetailsProvider => 'Provider';
+
+  @override
+  String get subscriptionDetailsManageButton => 'Manage in App Store';
+
+  @override
+  String get subscriptionDetailsLoading => 'Loading subscription details...';
+
+  @override
+  String get subscriptionDetailsError => 'Could not load subscription details.';
+
+  @override
+  String get subscriptionDetailsNoSubscription =>
+      'You do not have an active subscription.';
+
+  @override
+  String get demoAnnualPlanTitle => 'Annual Premium (Demo)';
+
+  @override
+  String get demoMonthlyPlanTitle => 'Monthly Premium (Demo)';
+
+  @override
+  String get demoPlanDescription => 'Unlock all features (Demo Mode)';
 }

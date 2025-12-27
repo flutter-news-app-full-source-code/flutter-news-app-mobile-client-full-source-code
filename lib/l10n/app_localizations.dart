@@ -3109,6 +3109,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Verifying purchase...'**
   String get paywallLoading;
+
+  /// Title for the subscription details page.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription Details'**
+  String get subscriptionDetailsPageTitle;
+
+  /// Button text to manage subscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Subscription'**
+  String get manageSubscriptionButton;
+
+  /// Label for the current subscription plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Plan'**
+  String get subscriptionDetailsCurrentPlan;
+
+  /// Text indicating the renewal date of a subscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Renews on {date}'**
+  String subscriptionDetailsRenewsOn(String date);
+
+  /// Text indicating the expiration date of a non-renewing subscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires on {date}'**
+  String subscriptionDetailsExpiresOn(String date);
+
+  /// Status text for a subscription that has been cancelled and will not auto-renew.
+  ///
+  /// In en, this message translates to:
+  /// **'Will not renew'**
+  String get subscriptionDetailsWillNotRenew;
+
+  /// Label for the subscription provider (e.g., Apple App Store).
+  ///
+  /// In en, this message translates to:
+  /// **'Provider'**
+  String get subscriptionDetailsProvider;
+
+  /// Button text to open the native subscription management UI.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage in App Store'**
+  String get subscriptionDetailsManageButton;
+
+  /// Text shown while subscription details are loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading subscription details...'**
+  String get subscriptionDetailsLoading;
+
+  /// Error message when subscription details fail to load.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load subscription details.'**
+  String get subscriptionDetailsError;
+
+  /// Message shown when the user has no active subscription.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have an active subscription.'**
+  String get subscriptionDetailsNoSubscription;
+
+  /// Title for the annual demo plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Annual Premium (Demo)'**
+  String get demoAnnualPlanTitle;
+
+  /// Title for the monthly demo plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Premium (Demo)'**
+  String get demoMonthlyPlanTitle;
+
+  /// Description for a demo subscription plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock all features (Demo Mode)'**
+  String get demoPlanDescription;
 }
 
 class _AppLocalizationsDelegate

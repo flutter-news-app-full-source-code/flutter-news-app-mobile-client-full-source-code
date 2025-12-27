@@ -1656,4 +1656,50 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get paywallLoading => 'جارٍ التحقق من الشراء...';
+
+  @override
+  String get subscriptionDetailsPageTitle => 'تفاصيل الاشتراك';
+
+  @override
+  String get manageSubscriptionButton => 'إدارة الاشتراك';
+
+  @override
+  String get subscriptionDetailsCurrentPlan => 'الخطة الحالية';
+
+  @override
+  String subscriptionDetailsRenewsOn(String date) {
+    return 'يتجدد في $date';
+  }
+
+  @override
+  String subscriptionDetailsExpiresOn(String date) {
+    return 'ينتهي في $date';
+  }
+
+  @override
+  String get subscriptionDetailsWillNotRenew => 'لن يتجدد';
+
+  @override
+  String get subscriptionDetailsProvider => 'المزود';
+
+  @override
+  String get subscriptionDetailsManageButton => 'إدارة في المتجر';
+
+  @override
+  String get subscriptionDetailsLoading => 'جارٍ تحميل تفاصيل الاشتراك...';
+
+  @override
+  String get subscriptionDetailsError => 'تعذر تحميل تفاصيل الاشتراك.';
+
+  @override
+  String get subscriptionDetailsNoSubscription => 'ليس لديك اشتراك نشط.';
+
+  @override
+  String get demoAnnualPlanTitle => 'بريميوم سنوي (تجريبي)';
+
+  @override
+  String get demoMonthlyPlanTitle => 'بريميوم شهري (تجريبي)';
+
+  @override
+  String get demoPlanDescription => 'فتح جميع الميزات (وضع تجريبي)';
 }

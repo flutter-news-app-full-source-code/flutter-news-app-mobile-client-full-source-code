@@ -42,8 +42,9 @@ import 'package:flutter_news_app_mobile_client_full_source_code/notifications/se
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/data/clients/clients.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/repositories/subscription_repository.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/demo_subscription_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/store_subscription_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/native_review_service.dart';
 import 'package:http_client/http_client.dart';
@@ -532,13 +533,20 @@ Future<Widget> bootstrap(
   );
 
   // Initialize Subscription Service & Repository
-  final subscriptionService = SubscriptionService(
-    environment: appConfig.environment,
-    logger: logger,
-  );
-  final subscriptionRepository = SubscriptionRepository(
-    transactionClient: purchaseTransactionClient,
-    logger: logger,
+  late final SubscriptionServiceInterface subscriptionService;
+  if (appConfig.environment == app_config.AppEnvironment.demo || kIsWeb) {
+    logger.fine('Using DemoSubscriptionService.');
+    subscriptionService = DemoSubscriptionService(
+      storageService: kvStorage,
+      logger: logger,
+    );
+  } else {
+    logger.fine('Using StoreSubscriptionService.');
+    subscriptionService = StoreSubscriptionService(logger: logger);
+  }
+
+  final purchaseTransactionRepository = DataRepository<PurchaseTransaction>(
+    dataClient: purchaseTransactionClient,
   );
 
   logger
@@ -645,7 +653,7 @@ Future<Widget> bootstrap(
           userContextRepository: userContextRepository,
           inAppNotificationRepository: inAppNotificationRepository,
           appSettingsFixturesData: appSettingsFixturesData,
-          userContextFixturesData: userContextsFixturesData, 
+          userContextFixturesData: userContextsFixturesData,
           userContentPreferencesFixturesData:
               getUserContentPreferencesFixturesData(),
           inAppNotificationsFixturesData: inAppNotificationsFixturesData,
@@ -685,7 +693,7 @@ Future<Widget> bootstrap(
       RepositoryProvider.value(value: appInitializer),
       RepositoryProvider.value(value: logger),
       RepositoryProvider.value(value: subscriptionService),
-      RepositoryProvider.value(value: subscriptionRepository),
+      RepositoryProvider.value(value: purchaseTransactionRepository),
     ],
     child: AppInitializationPage(
       // All other repositories and services are passed directly to the
@@ -715,6 +723,8 @@ Future<Widget> bootstrap(
       appReviewService: appReviewService,
       contentLimitationService: contentLimitationService,
       analyticsService: analyticsService,
+      subscriptionService: subscriptionService,
+      purchaseTransactionRepository: purchaseTransactionRepository,
     ),
   );
 }

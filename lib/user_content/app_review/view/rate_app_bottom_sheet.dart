@@ -31,7 +31,7 @@ class RateAppBottomSheet extends StatelessWidget {
         context
             .read<AppBloc>()
             .state
-            .user
+            .userContext
             ?.feedDecoratorStatus[FeedDecoratorType.rateApp]
             ?.lastShownAt !=
         null;

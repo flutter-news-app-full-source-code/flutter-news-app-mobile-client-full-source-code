@@ -178,7 +178,6 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
     }
 
     // Define the maximum age for a cached ad before it's considered stale.
-    // TODO(fulleni): This should be sourced from RemoteConfig.
     const adMaxAge = Duration(minutes: 1);
 
     // Attempt to retrieve the ad from the cache using the contextKey.

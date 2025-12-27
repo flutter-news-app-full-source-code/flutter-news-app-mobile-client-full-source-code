@@ -2118,5 +2118,21 @@
                 "example": "Month"
             }
         }
+    },
+    "paywallSuccessTitle": "مرحبًا بك في بريميوم!",
+    "@paywallSuccessTitle": {
+        "description": "Title of the success dialog."
+    },
+    "paywallSuccessBody": "لديك الآن وصول كامل إلى جميع الميزات.",
+    "@paywallSuccessBody": {
+        "description": "Body of the success dialog."
+    },
+    "paywallErrorTitle": "فشلت عملية الشراء",
+    "@paywallErrorTitle": {
+        "description": "Title of the error dialog."
+    },
+    "paywallLoading": "جارٍ التحقق من الشراء...",
+    "@paywallLoading": {
+        "description": "Loading text shown during purchase verification."
     }
 }

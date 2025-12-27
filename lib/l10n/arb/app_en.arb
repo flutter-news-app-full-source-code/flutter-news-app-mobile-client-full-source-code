@@ -2118,5 +2118,21 @@
                 "example": "Month"
             }
         }
+    },
+    "paywallSuccessTitle": "Welcome to Premium!",
+    "@paywallSuccessTitle": {
+        "description": "Title of the success dialog."
+    },
+    "paywallSuccessBody": "You now have full access to all features.",
+    "@paywallSuccessBody": {
+        "description": "Body of the success dialog."
+    },
+    "paywallErrorTitle": "Purchase Failed",
+    "@paywallErrorTitle": {
+        "description": "Title of the error dialog."
+    },
+    "paywallLoading": "Verifying purchase...",
+    "@paywallLoading": {
+        "description": "Loading text shown during purchase verification."
     }
 }

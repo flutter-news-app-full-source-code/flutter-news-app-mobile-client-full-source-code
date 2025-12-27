@@ -281,6 +281,7 @@ Future<Widget> bootstrap(
   late final DataClient<UserContentPreferences> userContentPreferencesClient;
   late final DataClient<AppSettings> appSettingsClient;
   late final DataClient<User> userClient;
+  late final DataClient<UserContext> userContextClient;
   late final DataClient<InAppNotification> inAppNotificationClient;
   late final DataClient<PushNotificationDevice> pushNotificationDeviceClient;
   late final DataClient<Engagement> engagementClient;
@@ -353,6 +354,11 @@ Future<Widget> bootstrap(
     userClient = DataInMemory<User>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
+      logger: logger,
+    );
+    userContextClient = DataInMemory<UserContext>(
+      toJson: (i) => i.toJson(),
+      getId: (i) => i.userId,
       logger: logger,
     );
     inAppNotificationClient = DataInMemory<InAppNotification>(
@@ -431,6 +437,13 @@ Future<Widget> bootstrap(
       toJson: (user) => user.toJson(),
       logger: logger,
     );
+    userContextClient = DataApi<UserContext>(
+      httpClient: httpClient,
+      modelName: 'user_context',
+      fromJson: UserContext.fromJson,
+      toJson: (context) => context.toJson(),
+      logger: logger,
+    );
     inAppNotificationClient = DataApi<InAppNotification>(
       httpClient: httpClient,
       modelName: 'in_app_notification',
@@ -485,6 +498,9 @@ Future<Widget> bootstrap(
     dataClient: appSettingsClient,
   );
   final userRepository = DataRepository<User>(dataClient: userClient);
+  final userContextRepository = DataRepository<UserContext>(
+    dataClient: userContextClient,
+  );
   final inAppNotificationRepository = DataRepository<InAppNotification>(
     dataClient: inAppNotificationClient,
   );
@@ -583,6 +599,7 @@ Future<Widget> bootstrap(
       ? DemoDataMigrationService(
           appSettingsRepository: appSettingsRepository,
           userContentPreferencesRepository: userContentPreferencesRepository,
+          userContextRepository: userContextRepository,
         )
       : null;
   logger.fine(
@@ -599,8 +616,10 @@ Future<Widget> bootstrap(
       ? DemoDataInitializerService(
           appSettingsRepository: appSettingsRepository,
           userContentPreferencesRepository: userContentPreferencesRepository,
+          userContextRepository: userContextRepository,
           inAppNotificationRepository: inAppNotificationRepository,
           appSettingsFixturesData: appSettingsFixturesData,
+          userContextFixturesData: getUserContextFixturesData(),
           userContentPreferencesFixturesData:
               getUserContentPreferencesFixturesData(),
           inAppNotificationsFixturesData: inAppNotificationsFixturesData,
@@ -615,6 +634,7 @@ Future<Widget> bootstrap(
     authenticationRepository: authenticationRepository,
     appSettingsRepository: appSettingsRepository,
     userContentPreferencesRepository: userContentPreferencesRepository,
+    userContextRepository: userContextRepository,
     remoteConfigRepository: remoteConfigRepository,
     environment: environment,
     packageInfoService: packageInfoService,
@@ -652,6 +672,7 @@ Future<Widget> bootstrap(
       remoteConfigRepository: remoteConfigRepository,
       appSettingsRepository: appSettingsRepository,
       userContentPreferencesRepository: userContentPreferencesRepository,
+      userContextRepository: userContextRepository,
       pushNotificationService: pushNotificationService,
       inAppNotificationRepository: inAppNotificationRepository,
       environment: environment,

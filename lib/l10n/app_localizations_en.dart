@@ -1602,4 +1602,50 @@ class AppLocalizationsEn extends AppLocalizations {
   String commenterName(String id) {
     return 'User $id';
   }
+
+  @override
+  String get paywallTitle => 'Unlock Full Access';
+
+  @override
+  String get paywallSubtitle =>
+      'Get more from your news feed with Premium limits and features.';
+
+  @override
+  String get paywallFeatureFollowMore => 'Follow More Topics & Sources';
+
+  @override
+  String get paywallFeatureSaveMore => 'Save More Articles';
+
+  @override
+  String get paywallFeatureAdvancedFilters => 'Advanced Filters & Alerts';
+
+  @override
+  String get paywallFeatureUnlimitedHistory => 'Unlimited Reading History';
+
+  @override
+  String get paywallMonthlyPlan => 'Monthly';
+
+  @override
+  String get paywallAnnualPlan => 'Annual';
+
+  @override
+  String get paywallBestValue => 'Best Value';
+
+  @override
+  String get paywallRestorePurchases => 'Restore Purchases';
+
+  @override
+  String get paywallTermsOfService => 'Terms of Service';
+
+  @override
+  String get paywallPrivacyPolicy => 'Privacy Policy';
+
+  @override
+  String get paywallDisclaimer =>
+      'Subscription automatically renews unless auto-renew is turned off at least 24-hours before the end of the current period.';
+
+  @override
+  String paywallSubscribeButton(String price, String period) {
+    return 'Subscribe for $price / $period';
+  }
 }

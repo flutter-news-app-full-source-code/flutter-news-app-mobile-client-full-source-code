@@ -1598,4 +1598,50 @@ class AppLocalizationsAr extends AppLocalizations {
   String commenterName(String id) {
     return 'مستخدم $id';
   }
+
+  @override
+  String get paywallTitle => 'افتح الوصول الكامل';
+
+  @override
+  String get paywallSubtitle =>
+      'احصل على المزيد من موجز الأخبار الخاص بك مع حدود وميزات بريميوم.';
+
+  @override
+  String get paywallFeatureFollowMore => 'تابع المزيد من المواضيع والمصادر';
+
+  @override
+  String get paywallFeatureSaveMore => 'احفظ المزيد من المقالات';
+
+  @override
+  String get paywallFeatureAdvancedFilters => 'فلاتر وتنبيهات متقدمة';
+
+  @override
+  String get paywallFeatureUnlimitedHistory => 'سجل قراءة غير محدود';
+
+  @override
+  String get paywallMonthlyPlan => 'شهري';
+
+  @override
+  String get paywallAnnualPlan => 'سنوي';
+
+  @override
+  String get paywallBestValue => 'أفضل قيمة';
+
+  @override
+  String get paywallRestorePurchases => 'استعادة المشتريات';
+
+  @override
+  String get paywallTermsOfService => 'شروط الخدمة';
+
+  @override
+  String get paywallPrivacyPolicy => 'سياسة الخصوصية';
+
+  @override
+  String get paywallDisclaimer =>
+      'يتم تجديد الاشتراك تلقائيًا ما لم يتم إيقاف التجديد التلقائي قبل 24 ساعة على الأقل من نهاية الفترة الحالية.';
+
+  @override
+  String paywallSubscribeButton(String price, String period) {
+    return 'اشترك مقابل $price / $period';
+  }
 }

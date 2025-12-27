@@ -3001,6 +3001,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'User {id}'**
   String commenterName(String id);
+
+  /// Title of the paywall screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock Full Access'**
+  String get paywallTitle;
+
+  /// Subtitle of the paywall screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Get more from your news feed with Premium limits and features.'**
+  String get paywallSubtitle;
+
+  /// Feature list item: Increased follow limits.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow More Topics & Sources'**
+  String get paywallFeatureFollowMore;
+
+  /// Feature list item: Increased save limits.
+  ///
+  /// In en, this message translates to:
+  /// **'Save More Articles'**
+  String get paywallFeatureSaveMore;
+
+  /// Feature list item: Advanced filtering and notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced Filters & Alerts'**
+  String get paywallFeatureAdvancedFilters;
+
+  /// Feature list item: Unlimited history.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited Reading History'**
+  String get paywallFeatureUnlimitedHistory;
+
+  /// Label for the monthly subscription plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get paywallMonthlyPlan;
+
+  /// Label for the annual subscription plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Annual'**
+  String get paywallAnnualPlan;
+
+  /// Badge text for the best value plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Best Value'**
+  String get paywallBestValue;
+
+  /// Button text to restore purchases.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Purchases'**
+  String get paywallRestorePurchases;
+
+  /// Link text for Terms of Service.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Service'**
+  String get paywallTermsOfService;
+
+  /// Link text for Privacy Policy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get paywallPrivacyPolicy;
+
+  /// Disclaimer text regarding auto-renewal.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription automatically renews unless auto-renew is turned off at least 24-hours before the end of the current period.'**
+  String get paywallDisclaimer;
+
+  /// Subscribe button text.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribe for {price} / {period}'**
+  String paywallSubscribeButton(String price, String period);
 }
 
 class _AppLocalizationsDelegate

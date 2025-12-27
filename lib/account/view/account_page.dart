@@ -170,6 +170,13 @@ class AccountPage extends StatelessWidget {
       children: [
         buildTile(
           context: context,
+          icon: Icons.workspace_premium,
+          title: l10n.upgradeButton,
+          onTap: () => context.pushNamed(Routes.paywallName),
+        ),
+        const Divider(),
+        buildTile(
+          context: context,
           icon: Icons.check_outlined,
           title: l10n.accountContentPreferencesTile,
           onTap: () => context.pushNamed(Routes.manageFollowedItemsName),

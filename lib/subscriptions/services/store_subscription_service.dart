@@ -10,11 +10,9 @@ import 'package:logging/logging.dart';
 /// {@endtemplate}
 class StoreSubscriptionService implements SubscriptionServiceInterface {
   /// {@macro store_subscription_service}
-  StoreSubscriptionService({
-    InAppPurchase? inAppPurchase,
-    Logger? logger,
-  }) : _iap = inAppPurchase ?? InAppPurchase.instance,
-       _logger = logger ?? Logger('StoreSubscriptionService');
+  StoreSubscriptionService({InAppPurchase? inAppPurchase, Logger? logger})
+    : _iap = inAppPurchase ?? InAppPurchase.instance,
+      _logger = logger ?? Logger('StoreSubscriptionService');
 
   final InAppPurchase _iap;
   final Logger _logger;

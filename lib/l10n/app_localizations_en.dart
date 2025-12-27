@@ -1724,4 +1724,21 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get subscriptionStatusBillingIssue =>
       'Your subscription is on hold due to a billing issue. Please update your payment method.';
+
+  @override
+  String get subscriptionUpgradeTitle => 'Upgrade Plan';
+
+  @override
+  String get subscriptionUpgradeDescription =>
+      'Switch to an annual plan and save.';
+
+  @override
+  String get subscriptionDowngradeTitle => 'Downgrade Plan';
+
+  @override
+  String get subscriptionDowngradeDescription =>
+      'Switch to a monthly billing cycle.';
+
+  @override
+  String get subscriptionSwitchButton => 'Switch Plan';
 }

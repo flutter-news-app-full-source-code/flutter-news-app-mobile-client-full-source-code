@@ -1719,4 +1719,20 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get subscriptionStatusBillingIssue =>
       'تم تعليق اشتراكك بسبب مشكلة في الفوترة. يرجى تحديث معلومات الدفع الخاصة بك.';
+
+  @override
+  String get subscriptionUpgradeTitle => 'ترقية الخطة';
+
+  @override
+  String get subscriptionUpgradeDescription => 'انتقل إلى خطة سنوية ووفر.';
+
+  @override
+  String get subscriptionDowngradeTitle => 'تخفيض الخطة';
+
+  @override
+  String get subscriptionDowngradeDescription =>
+      'التبديل إلى دورة فوترة شهرية.';
+
+  @override
+  String get subscriptionSwitchButton => 'تبديل الخطة';
 }

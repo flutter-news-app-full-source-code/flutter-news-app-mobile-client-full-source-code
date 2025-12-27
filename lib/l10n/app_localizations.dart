@@ -3223,6 +3223,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your subscription is on hold due to a billing issue. Please update your payment method.'**
   String get subscriptionStatusBillingIssue;
+
+  /// Title for the upgrade section in subscription details.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade Plan'**
+  String get subscriptionUpgradeTitle;
+
+  /// Description for the upgrade option.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to an annual plan and save.'**
+  String get subscriptionUpgradeDescription;
+
+  /// Title for the downgrade section in subscription details.
+  ///
+  /// In en, this message translates to:
+  /// **'Downgrade Plan'**
+  String get subscriptionDowngradeTitle;
+
+  /// Description for the downgrade option.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to a monthly billing cycle.'**
+  String get subscriptionDowngradeDescription;
+
+  /// Button text to initiate a plan switch.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch Plan'**
+  String get subscriptionSwitchButton;
 }
 
 class _AppLocalizationsDelegate

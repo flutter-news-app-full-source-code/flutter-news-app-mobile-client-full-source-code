@@ -249,14 +249,14 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
       final appBlocState = context.read<AppBloc>().state;
       final feedItemImageStyle =
           appBlocState.settings!.feedSettings.feedItemImageStyle;
-      final userRole = appBlocState.user?.appRole ?? AppUserRole.guestUser;
+      final userTier = appBlocState.user?.tier ?? AccessTier.guest;
 
       final loadedAd = await _adService.getFeedAd(
         adConfig: widget.remoteConfig.features.ads,
         adType: widget.adPlaceholder.adType,
         adThemeStyle: widget.adThemeStyle,
         feedItemImageStyle: feedItemImageStyle,
-        userRole: userRole,
+        userTier: userTier,
       );
 
       if (loadedAd != null) {

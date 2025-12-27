@@ -687,6 +687,7 @@ Future<Widget> bootstrap(
     appSettingsRepository: appSettingsRepository,
     userContentPreferencesRepository: userContentPreferencesRepository,
     userContextRepository: userContextRepository,
+    userSubscriptionRepository: userSubscriptionRepository,
     remoteConfigRepository: remoteConfigRepository,
     environment: environment,
     packageInfoService: packageInfoService,

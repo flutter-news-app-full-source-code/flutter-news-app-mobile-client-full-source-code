@@ -309,6 +309,7 @@ class _PaywallView extends StatelessWidget {
     return Column(
       children: [
         TextButton(
+          child: Text(l10n.paywallRestorePurchases),
           // TODO(fulleni): carefully handle the purchase restoration.
           onPressed: () {},
         ),

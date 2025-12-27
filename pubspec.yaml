@@ -35,7 +35,7 @@ dependencies:
   auth_inmemory:
     git:
       url: https://github.com/flutter-news-app-full-source-code/auth-inmemory.git
-      ref: v1.0.1
+      ref: 7fc38f09b941f2bbae3d7c9f21ff6848d3d9d258
   auth_repository:
     git:
       url: https://github.com/flutter-news-app-full-source-code/auth-repository.git

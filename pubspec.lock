@@ -79,11 +79,11 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "v1.0.1"
-      resolved-ref: b999691989447aff05a936414e6f6fdfbbb73a07
+      ref: "7fc38f09b941f2bbae3d7c9f21ff6848d3d9d258"
+      resolved-ref: "7fc38f09b941f2bbae3d7c9f21ff6848d3d9d258"
       url: "https://github.com/flutter-news-app-full-source-code/auth-inmemory.git"
     source: git
-    version: "1.0.1"
+    version: "1.1.0"
   auth_repository:
     dependency: "direct main"
     description:

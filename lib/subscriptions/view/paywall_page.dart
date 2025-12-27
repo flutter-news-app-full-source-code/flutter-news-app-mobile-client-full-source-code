@@ -87,18 +87,18 @@ class _PaywallView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _buildHeader(context),
+                    _buildHeader(context, l10n),
                     const SizedBox(height: AppSpacing.xxl),
-                    _buildFeaturesList(context),
+                    _buildFeaturesList(context, l10n),
                     const SizedBox(height: AppSpacing.xxl),
                     if (state.products.isNotEmpty)
-                      _buildPlans(context, state)
+                      _buildPlans(context, state, l10n)
                     else if (state.status == SubscriptionStatus.loadingProducts)
                       const Center(child: CircularProgressIndicator())
                     else
                       Center(child: Text(l10n.unknownError)),
                     const SizedBox(height: AppSpacing.xxl),
-                    _buildFooter(context),
+                    _buildFooter(context, l10n),
                   ],
                 ),
               ),
@@ -126,8 +126,7 @@ class _PaywallView extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    final l10n = AppLocalizationsX(context).l10n;
+  Widget _buildHeader(BuildContext context, AppLocalizations l10n) {
     final theme = Theme.of(context);
 
     return Column(
@@ -155,8 +154,7 @@ class _PaywallView extends StatelessWidget {
     );
   }
 
-  Widget _buildFeaturesList(BuildContext context) {
-    final l10n = AppLocalizationsX(context).l10n;
+  Widget _buildFeaturesList(BuildContext context, AppLocalizations l10n) {
     final features = [
       l10n.paywallFeatureFollowMore,
       l10n.paywallFeatureSaveMore,
@@ -166,26 +164,31 @@ class _PaywallView extends StatelessWidget {
 
     return Column(
       children: features
-          .map((feature) => Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.check_circle,
-                      color: Theme.of(context).colorScheme.primary,
-                      size: 20,
-                    ),
-                    const SizedBox(width: AppSpacing.md),
-                    Expanded(child: Text(feature)),
-                  ],
-                ),
-              ))
+          .map(
+            (feature) => Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.check_circle,
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 20,
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(child: Text(feature)),
+                ],
+              ),
+            ),
+          )
           .toList(),
     );
   }
 
-  Widget _buildPlans(BuildContext context, SubscriptionState state) {
-    final l10n = AppLocalizationsX(context).l10n;
+  Widget _buildPlans(
+    BuildContext context,
+    SubscriptionState state,
+    AppLocalizations l10n,
+  ) {
     final monthly = state.monthlyPlan;
     final annual = state.annualPlan;
 
@@ -195,22 +198,24 @@ class _PaywallView extends StatelessWidget {
           _buildPlanCard(
             context,
             annual,
+            l10n,
             isAnnual: true,
             isSelected: state.selectedProduct?.id == annual.id,
             onTap: () => context.read<SubscriptionBloc>().add(
-                  SubscriptionPurchaseRequested(product: annual),
-                ),
+              SubscriptionPurchaseRequested(product: annual),
+            ),
           ),
         const SizedBox(height: AppSpacing.md),
         if (monthly != null)
           _buildPlanCard(
             context,
             monthly,
+            l10n,
             isAnnual: false,
             isSelected: state.selectedProduct?.id == monthly.id,
             onTap: () => context.read<SubscriptionBloc>().add(
-                  SubscriptionPurchaseRequested(product: monthly),
-                ),
+              SubscriptionPurchaseRequested(product: monthly),
+            ),
           ),
       ],
     );
@@ -219,11 +224,11 @@ class _PaywallView extends StatelessWidget {
   Widget _buildPlanCard(
     BuildContext context,
     ProductDetails product, {
+    required AppLocalizations l10n,
     required bool isAnnual,
     required bool isSelected,
     required VoidCallback onTap,
   }) {
-    final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -253,15 +258,14 @@ class _PaywallView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      isAnnual ? l10n.paywallAnnualPlan : l10n.paywallMonthlyPlan,
+                      isAnnual
+                          ? l10n.paywallAnnualPlan
+                          : l10n.paywallMonthlyPlan,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Text(
-                      product.price,
-                      style: theme.textTheme.bodyLarge,
-                    ),
+                    Text(product.price, style: theme.textTheme.bodyLarge),
                   ],
                 ),
               ),
@@ -290,16 +294,15 @@ class _PaywallView extends StatelessWidget {
     );
   }
 
-  Widget _buildFooter(BuildContext context) {
-    final l10n = AppLocalizationsX(context).l10n;
+  Widget _buildFooter(BuildContext context, AppLocalizations l10n) {
     final theme = Theme.of(context);
 
     return Column(
       children: [
         TextButton(
           onPressed: () => context.read<SubscriptionBloc>().add(
-                const SubscriptionRestoreRequested(),
-              ),
+            const SubscriptionRestoreRequested(),
+          ),
           child: Text(l10n.paywallRestorePurchases),
         ),
         const SizedBox(height: AppSpacing.sm),
@@ -314,9 +317,17 @@ class _PaywallView extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildLink(context, l10n.paywallTermsOfService, 'https://example.com/terms'),
+            _buildLink(
+              context,
+              l10n.paywallTermsOfService,
+              'https://example.com/terms',
+            ),
             const Text(' • '),
-            _buildLink(context, l10n.paywallPrivacyPolicy, 'https://example.com/privacy'),
+            _buildLink(
+              context,
+              l10n.paywallPrivacyPolicy,
+              'https://example.com/privacy',
+            ),
           ],
         ),
       ],
@@ -328,9 +339,9 @@ class _PaywallView extends StatelessWidget {
       onTap: () => launchUrl(Uri.parse(url)),
       child: Text(
         text,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          decoration: TextDecoration.underline,
-        ),
+        style: Theme.of(
+          context,
+        ).textTheme.bodySmall?.copyWith(decoration: TextDecoration.underline),
       ),
     );
   }

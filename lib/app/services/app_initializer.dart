@@ -43,6 +43,7 @@ class AppInitializer {
     required DataRepository<AppSettings> appSettingsRepository,
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
+    required DataRepository<UserContext> userContextRepository,
     required DataRepository<RemoteConfig> remoteConfigRepository,
     required local_config.AppEnvironment environment,
     required PackageInfoService packageInfoService,
@@ -52,6 +53,7 @@ class AppInitializer {
   }) : _authenticationRepository = authenticationRepository,
        _appSettingsRepository = appSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
+       _userContextRepository = userContextRepository,
        _remoteConfigRepository = remoteConfigRepository,
        _environment = environment,
        _packageInfoService = packageInfoService,
@@ -61,6 +63,7 @@ class AppInitializer {
   final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
+  final DataRepository<UserContext> _userContextRepository;
   final DataRepository<RemoteConfig> _remoteConfigRepository;
   final local_config.AppEnvironment _environment;
   final PackageInfoService _packageInfoService;
@@ -182,22 +185,27 @@ class AppInitializer {
       var [
         appSettings as AppSettings?,
         userContentPreferences as UserContentPreferences?,
+        userContext as UserContext?,
       ] = await Future.wait<dynamic>([
         _appSettingsRepository.read(id: user.id, userId: user.id),
         _userContentPreferencesRepository.read(id: user.id, userId: user.id),
+        _userContextRepository.read(id: user.id, userId: user.id),
       ]);
 
       _logger.fine(
         '[AppInitializer] Parallel fetch complete. '
         'Settings: ${appSettings != null}, '
-        'Preferences: ${userContentPreferences != null}',
+        'Preferences: ${userContentPreferences != null}, '
+        'Context: ${userContext != null}',
       );
 
       // --- Demo-Specific Logic: Initialize Data on First Run ---
       // If in demo mode and the user data is missing (e.g., first sign-in),
       // create it from fixtures.
       if (_environment == local_config.AppEnvironment.demo &&
-          (appSettings == null || userContentPreferences == null)) {
+          (appSettings == null ||
+              userContentPreferences == null ||
+              userContext == null)) {
         _logger.info(
           '[AppInitializer] Demo mode: User data missing. '
           'Initializing from fixtures for user ${user.id}.',
@@ -206,9 +214,14 @@ class AppInitializer {
 
         // Re-fetch the data after initialization.
         _logger.fine('[AppInitializer] Re-fetching data after demo init...');
-        [appSettings, userContentPreferences] = await Future.wait<dynamic>([
+        [
+          appSettings,
+          userContentPreferences,
+          userContext,
+        ] = await Future.wait<dynamic>([
           _appSettingsRepository.read(id: user.id, userId: user.id),
           _userContentPreferencesRepository.read(id: user.id, userId: user.id),
+          _userContextRepository.read(id: user.id, userId: user.id),
         ]);
       }
 
@@ -220,6 +233,7 @@ class AppInitializer {
         user: user,
         settings: appSettings,
         userContentPreferences: userContentPreferences,
+        userContext: userContext,
       );
     } on HttpException catch (e, s) {
       _logger.severe(
@@ -268,9 +282,7 @@ class AppInitializer {
 
     // --- Data Migration Logic ---
     final isMigration =
-        oldUser != null &&
-        oldUser.appRole == AppUserRole.guestUser &&
-        newUser.appRole == AppUserRole.standardUser;
+        oldUser != null && oldUser.isAnonymous && !newUser.isAnonymous;
 
     if (isMigration) {
       _logger.info(
@@ -327,12 +339,14 @@ class AppInitializer {
       final [
         appSettings as AppSettings?,
         userContentPreferences as UserContentPreferences?,
+        userContext as UserContext?,
       ] = await Future.wait<dynamic>([
         _appSettingsRepository.read(id: newUser.id, userId: newUser.id),
         _userContentPreferencesRepository.read(
           id: newUser.id,
           userId: newUser.id,
         ),
+        _userContextRepository.read(id: newUser.id, userId: newUser.id),
       ]);
 
       _logger.fine('[AppInitializer] User transition data fetch complete.');
@@ -341,6 +355,7 @@ class AppInitializer {
         user: newUser,
         settings: appSettings,
         userContentPreferences: userContentPreferences,
+        userContext: userContext,
       );
     } on HttpException catch (e, s) {
       _logger.severe(

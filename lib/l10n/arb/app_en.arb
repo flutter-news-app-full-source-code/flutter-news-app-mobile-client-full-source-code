@@ -2200,5 +2200,25 @@
     "demoPlanDescription": "Unlock all features (Demo Mode)",
     "@demoPlanDescription": {
         "description": "Description for a demo subscription plan."
+    },
+    "subscriptionUpgradeButton": "Upgrade",
+    "@subscriptionUpgradeButton": {
+        "description": "Button text for upgrading a subscription plan."
+    },
+    "subscriptionDowngradeButton": "Downgrade",
+    "@subscriptionDowngradeButton": {
+        "description": "Button text for downgrading a subscription plan."
+    },
+    "subscriptionCurrentPlan": "Current Plan",
+    "@subscriptionCurrentPlan": {
+        "description": "Text indicating the user's current subscription plan."
+    },
+    "subscriptionStatusGracePeriod": "Your subscription is in a grace period. Please update your payment method to retain access.",
+    "@subscriptionStatusGracePeriod": {
+        "description": "Banner message when a user's subscription payment has failed but access is temporarily retained."
+    },
+    "subscriptionStatusBillingIssue": "Your subscription is on hold due to a billing issue. Please update your payment method.",
+    "@subscriptionStatusBillingIssue": {
+        "description": "Banner message when a user's subscription is paused due to a payment issue."
     }
 }

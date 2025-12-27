@@ -20,7 +20,11 @@ abstract class SubscriptionServiceInterface {
   Future<List<ProductDetails>> queryProductDetails(Set<String> productIds);
 
   /// Initiates the purchase flow for a specific [product].
-  Future<void> buyNonConsumable(ProductDetails product);
+  Future<void> buyNonConsumable({
+    required ProductDetails product,
+    String? applicationUserName,
+    PurchaseDetails? oldPurchaseDetails,
+  });
 
   /// Restores previously purchased non-consumable items.
   Future<void> restorePurchases();

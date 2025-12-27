@@ -645,8 +645,7 @@ Future<Widget> bootstrap(
           userContextRepository: userContextRepository,
           inAppNotificationRepository: inAppNotificationRepository,
           appSettingsFixturesData: appSettingsFixturesData,
-          userContextFixturesData:
-              [], // TODO(fulleni): create user context fixtures in the core package ,
+          userContextFixturesData: userContextsFixturesData, 
           userContentPreferencesFixturesData:
               getUserContentPreferencesFixturesData(),
           inAppNotificationsFixturesData: inAppNotificationsFixturesData,

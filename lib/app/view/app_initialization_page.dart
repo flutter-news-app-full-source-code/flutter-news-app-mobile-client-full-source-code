@@ -71,6 +71,7 @@ class AppInitializationPage extends StatelessWidget {
     required this.analyticsService,
     required this.subscriptionService,
     required this.purchaseTransactionRepository,
+    required this.userSubscriptionRepository,
     super.key,
   });
 
@@ -100,6 +101,7 @@ class AppInitializationPage extends StatelessWidget {
   final AnalyticsService analyticsService;
   final SubscriptionServiceInterface subscriptionService;
   final DataRepository<PurchaseTransaction> purchaseTransactionRepository;
+  final DataRepository<UserSubscription> userSubscriptionRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -152,6 +154,7 @@ class AppInitializationPage extends StatelessWidget {
                 analyticsService: analyticsService,
                 subscriptionService: subscriptionService,
                 purchaseTransactionRepository: purchaseTransactionRepository,
+                userSubscriptionRepository: userSubscriptionRepository,
               );
 
             case final AppInitializationFailed failureState:

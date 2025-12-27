@@ -35,7 +35,12 @@ class _PaywallView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
-    final userSubscription = context.watch<AppBloc>().state.userSubscription;
+    // TODO(fulleni): handle route redirection 
+    // Paywall is for acquisition only. If user has an active subscription,
+    // they shouldn't be here (or should be redirected).
+    // For now, we just hide the "Current Plan" banner since this page
+    // is strictly for new subscriptions.
+    // Management happens in SubscriptionDetailsPage.
     final theme = Theme.of(context);
 
     return BlocConsumer<SubscriptionBloc, SubscriptionState>(
@@ -91,16 +96,15 @@ class _PaywallView extends StatelessWidget {
                   children: [
                     _buildHeader(context, l10n),
                     const SizedBox(height: AppSpacing.lg),
-                    if (userSubscription != null) ...[
-                      _buildCurrentPlanBanner(context, userSubscription, l10n),
-                      const SizedBox(height: AppSpacing.lg),
-                    ],
                     _buildFeaturesList(context, l10n),
                     const SizedBox(height: AppSpacing.xxl),
                     if (state.products.isNotEmpty)
                       _buildPlans(context, state, l10n)
                     else if (state.status == SubscriptionStatus.loadingProducts)
-                      const Center(child: CircularProgressIndicator())
+                      const Padding(
+                        padding: EdgeInsets.all(AppSpacing.lg),
+                        child: Center(child: CircularProgressIndicator()),
+                      )
                     else
                       Center(child: Text(l10n.unknownError)),
                     const SizedBox(height: AppSpacing.xxl),
@@ -127,6 +131,39 @@ class _PaywallView extends StatelessWidget {
                 ),
             ],
           ),
+          bottomNavigationBar: state.products.isNotEmpty
+              ? SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: ElevatedButton(
+                      onPressed: isLoading || state.selectedProduct == null
+                          ? null
+                          : () {
+                              final product = state.selectedProduct!;
+                              final currentSubId = context
+                                  .read<AppBloc>()
+                                  .state
+                                  .userSubscription
+                                  ?.originalTransactionId;
+                              context.read<SubscriptionBloc>().add(
+                                SubscriptionPurchaseRequested(
+                                  product: product,
+                                  oldPurchaseDetails: currentSubId != null
+                                      ? state.activePurchaseDetails
+                                      : null,
+                                ),
+                              );
+                            },
+                      child: Text(
+                        l10n.paywallSubscribeButton(
+                          state.selectedProduct?.price ?? '',
+                          '', // Period is hard to extract generically, leaving empty for now or needs logic
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              : null,
         );
       },
     );
@@ -157,50 +194,6 @@ class _PaywallView extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
       ],
-    );
-  }
-
-  Widget _buildCurrentPlanBanner(
-    BuildContext context,
-    core.UserSubscription subscription,
-    AppLocalizations l10n,
-  ) {
-    final theme = Theme.of(context);
-    final isMonthly = subscription.originalTransactionId.contains('monthly');
-    final planName = isMonthly
-        ? l10n.paywallMonthlyPlan
-        : l10n.paywallAnnualPlan;
-
-    final statusText = switch (subscription.status) {
-      core.SubscriptionStatus.active => l10n.subscriptionDetailsRenewsOn(
-        subscription.validUntil.toString(),
-      ),
-      core.SubscriptionStatus.gracePeriod => l10n.subscriptionStatusGracePeriod,
-      core.SubscriptionStatus.billingIssue =>
-        l10n.subscriptionStatusBillingIssue,
-      core.SubscriptionStatus.canceled => l10n.subscriptionDetailsExpiresOn(
-        subscription.validUntil.toString(),
-      ),
-      core.SubscriptionStatus.expired => 'Expired',
-    };
-
-    return Card(
-      color: theme.colorScheme.secondaryContainer,
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Column(
-          children: [
-            Text(
-              '${l10n.subscriptionDetailsCurrentPlan}: $planName',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            Text(statusText, style: theme.textTheme.bodyMedium),
-          ],
-        ),
-      ),
     );
   }
 
@@ -241,11 +234,6 @@ class _PaywallView extends StatelessWidget {
   ) {
     final monthly = state.monthlyPlan;
     final annual = state.annualPlan;
-    final currentSubId = context
-        .read<AppBloc>()
-        .state
-        .userSubscription
-        ?.originalTransactionId;
 
     return Column(
       children: [
@@ -256,14 +244,9 @@ class _PaywallView extends StatelessWidget {
             l10n: l10n,
             isRecommended: true,
             isSelected: state.selectedProduct?.id == annual.id,
-            isCurrent: currentSubId == annual.id,
+            isCurrent: false, // Acquisition only
             onTap: () => context.read<SubscriptionBloc>().add(
-              SubscriptionPurchaseRequested(
-                product: annual,
-                oldPurchaseDetails: currentSubId != null
-                    ? state.activePurchaseDetails
-                    : null,
-              ),
+              SubscriptionPlanSelected(annual),
             ),
           ),
         const SizedBox(height: AppSpacing.md),
@@ -274,14 +257,9 @@ class _PaywallView extends StatelessWidget {
             l10n: l10n,
             isRecommended: false,
             isSelected: state.selectedProduct?.id == monthly.id,
-            isCurrent: currentSubId == monthly.id,
+            isCurrent: false, // Acquisition only
             onTap: () => context.read<SubscriptionBloc>().add(
-              SubscriptionPurchaseRequested(
-                product: monthly,
-                oldPurchaseDetails: currentSubId != null
-                    ? state.activePurchaseDetails
-                    : null,
-              ),
+              SubscriptionPlanSelected(monthly),
             ),
           ),
       ],
@@ -299,8 +277,6 @@ class _PaywallView extends StatelessWidget {
   }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final isUpgrade = !isCurrent && isRecommended;
-    final isDowngrade = !isCurrent && !isRecommended;
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -350,16 +326,7 @@ class _PaywallView extends StatelessWidget {
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: colorScheme.primary,
                   ),
-                )
-              else if (isUpgrade)
-                Text(
-                  l10n.subscriptionUpgradeButton,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.primary,
-                  ),
-                )
-              else if (isDowngrade)
-                Text(l10n.subscriptionDowngradeButton),
+                ),
               if (isRecommended && !isCurrent)
                 Container(
                   padding: const EdgeInsets.symmetric(

@@ -48,10 +48,36 @@ class DemoSubscriptionService implements SubscriptionServiceInterface {
   }
 
   @override
-  Future<void> buyNonConsumable(ProductDetails product) async {
+  Future<void> buyNonConsumable({
+    required ProductDetails product,
+    String? applicationUserName,
+    PurchaseDetails? oldPurchaseDetails,
+  }) async {
     _logger.info(
       '[DemoSubscriptionService] Simulating purchase for ${product.id}',
     );
+
+    // If this is an upgrade/downgrade, remove the old product.
+    if (oldPurchaseDetails != null) {
+      await _removePurchase(oldPurchaseDetails.productID);
+    }
+
+    // Simulate the store checking for existing ownership of the new product.
+    final purchasedIds = await _getPurchasedIds();
+    if (purchasedIds.contains(product.id)) {
+      _logger.warning('[DemoSubscriptionService] Already owns ${product.id}');
+      final errorPurchase = _createMockPurchase(
+        product.id,
+        status: PurchaseStatus.error,
+        error: IAPError(
+          source: 'demo',
+          code: 'duplicate_purchase',
+          message: 'You already own this item.',
+        ),
+      );
+      _purchaseStreamController.add([errorPurchase]);
+      return;
+    }
 
     // Simulate network delay
     await Future<void>.delayed(const Duration(seconds: 1));
@@ -107,6 +133,7 @@ class DemoSubscriptionService implements SubscriptionServiceInterface {
   PurchaseDetails _createMockPurchase(
     String productId, {
     PurchaseStatus status = PurchaseStatus.purchased,
+    IAPError? error,
   }) {
     return PurchaseDetails(
       purchaseID: 'demo_purchase_${DateTime.now().millisecondsSinceEpoch}',
@@ -136,6 +163,17 @@ class DemoSubscriptionService implements SubscriptionServiceInterface {
     final currentIds = await _getPurchasedIds();
     if (!currentIds.contains(productId)) {
       final newIds = [...currentIds, productId];
+      await _storageService.writeString(
+        key: _storageKey,
+        value: newIds.join(','),
+      );
+    }
+  }
+
+  Future<void> _removePurchase(String productId) async {
+    final currentIds = await _getPurchasedIds();
+    if (currentIds.contains(productId)) {
+      final newIds = currentIds..remove(productId);
       await _storageService.writeString(
         key: _storageKey,
         value: newIds.join(','),

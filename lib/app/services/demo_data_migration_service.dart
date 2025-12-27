@@ -16,13 +16,16 @@ class DemoDataMigrationService {
     required DataRepository<AppSettings> appSettingsRepository,
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
+    required DataRepository<UserContext> userContextRepository,
   }) : _appSettingsRepository = appSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
+       _userContextRepository = userContextRepository,
        _logger = Logger('DemoDataMigrationService');
 
   final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
+  final DataRepository<UserContext> _userContextRepository;
   final Logger _logger;
 
   /// Migrates user settings and content preferences from an old anonymous
@@ -141,6 +144,53 @@ class DemoDataMigrationService {
       _logger.severe(
         '[DemoDataMigrationService] Error migrating UserContentPreferences '
         'from $oldUserId to $newUserId: $e',
+        e,
+        s,
+      );
+    }
+
+    // Migrate UserContext
+    try {
+      final oldContext = await _userContextRepository.read(
+        id: oldUserId,
+        userId: oldUserId,
+      );
+      final newContext = oldContext.copyWith(userId: newUserId);
+
+      try {
+        // Attempt to update first (if a default entry already exists)
+        await _userContextRepository.update(
+          id: newUserId,
+          item: newContext,
+          userId: newUserId,
+        );
+      } on NotFoundException {
+        // If update fails because item not found, try to create
+        try {
+          await _userContextRepository.create(
+            item: newContext,
+            userId: newUserId,
+          );
+        } on ConflictException {
+          await _userContextRepository.update(
+            id: newUserId,
+            item: newContext,
+            userId: newUserId,
+          );
+        }
+      }
+
+      await _userContextRepository.delete(id: oldUserId, userId: oldUserId);
+      _logger.fine(
+        '[DemoDataMigrationService] UserContext migrated successfully from $oldUserId to $newUserId.',
+      );
+    } on NotFoundException {
+      _logger.fine(
+        '[DemoDataMigrationService] No UserContext found for old user ID: $oldUserId. Skipping migration.',
+      );
+    } catch (e, s) {
+      _logger.severe(
+        '[DemoDataMigrationService] Error migrating UserContext from $oldUserId to $newUserId: $e',
         e,
         s,
       );

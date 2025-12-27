@@ -6,6 +6,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_l
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/shared.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/widgets/subscription_status_banner.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -64,6 +65,10 @@ class AccountPage extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              if (appState.userSubscription != null)
+                SubscriptionStatusBanner(
+                  subscription: appState.userSubscription!,
+                ),
               _buildUserHeader(context, user, isAnonymous),
               const SizedBox(height: AppSpacing.lg),
               _buildNavigationList(context),

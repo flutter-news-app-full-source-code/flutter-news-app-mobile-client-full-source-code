@@ -38,6 +38,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   /// pre-fetched initial data.
   AppBloc({
     required User? user,
+    required UserContext? userContext,
     required RemoteConfig remoteConfig,
     required AppSettings? settings,
     required UserContentPreferences? userContentPreferences,
@@ -47,6 +48,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required DataRepository<AppSettings> appSettingsRepository,
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
+    required DataRepository<UserContext> userContextRepository,
     required InlineAdCacheService inlineAdCacheService,
     required FeedCacheService feedCacheService,
     required Logger logger,
@@ -62,6 +64,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _authRepository = authRepository,
        _appSettingsRepository = appSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
+       _userContextRepository = userContextRepository,
        _userRepository = userRepository,
        _inAppNotificationRepository = inAppNotificationRepository,
        _feedCacheService = feedCacheService,
@@ -76,10 +79,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
          AppState(
            status: user == null
                ? AppLifeCycleStatus.unauthenticated
-               : user.isGuest
+               : user.isAnonymous
                ? AppLifeCycleStatus.anonymous
                : AppLifeCycleStatus.authenticated,
            user: user,
+           userContext: userContext,
            remoteConfig: remoteConfig,
            settings: settings,
            userContentPreferences: userContentPreferences,
@@ -137,6 +141,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
+  final DataRepository<UserContext> _userContextRepository;
   final DataRepository<User> _userRepository;
   final DataRepository<InAppNotification> _inAppNotificationRepository;
   final PushNotificationService _pushNotificationService;
@@ -211,7 +216,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     // Critical Change: Detect not just user ID changes, but also role changes.
     // This is essential for the "anonymous to authenticated" flow.
-    if (oldUser?.id == newUser?.id && oldUser?.appRole == newUser?.appRole) {
+    if (oldUser?.id == newUser?.id &&
+        oldUser?.role == newUser?.role &&
+        oldUser?.tier == newUser?.tier &&
+        oldUser?.isAnonymous == newUser?.isAnonymous) {
       _logger.info(
         '[AppBloc] AppUserChanged triggered, but user ID and role are the same. '
         'Skipping transition.',
@@ -292,13 +300,15 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         :final user,
         :final settings,
         :final userContentPreferences,
+        :final userContext,
       ):
         emit(
           state.copyWith(
-            status: user!.isGuest
+            status: user!.isAnonymous
                 ? AppLifeCycleStatus.anonymous
                 : AppLifeCycleStatus.authenticated,
             user: user,
+            userContext: userContext,
             settings: settings,
             userContentPreferences: userContentPreferences,
             clearError: true,
@@ -306,13 +316,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         );
 
         // Analytics: Track user role changes
-        if (oldUser != null && oldUser.appRole != user.appRole) {
+        if (oldUser != null && oldUser.role != user.role) {
           unawaited(
             _analyticsService.logEvent(
               AnalyticsEvent.userRoleChanged,
               payload: UserRoleChangedPayload(
-                fromRole: oldUser.appRole,
-                toRole: user.appRole,
+                fromRole: oldUser.role,
+                toRole: user.role,
               ),
             ),
           );
@@ -494,7 +504,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         );
         final restoredStatus = state.user == null
             ? AppLifeCycleStatus.unauthenticated
-            : (state.user!.isGuest
+            : (state.user!.isAnonymous
                   ? AppLifeCycleStatus.anonymous
                   : AppLifeCycleStatus.authenticated);
         emit(
@@ -515,11 +525,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     AppUserFeedDecoratorShown event,
     Emitter<AppState> emit,
   ) async {
-    if (state.user != null && state.user!.id == event.userId) {
-      final originalUser = state.user!;
+    if (state.userContext != null &&
+        state.userContext!.userId == event.userId) {
+      final originalContext = state.userContext!;
       final now = DateTime.now();
       final currentStatus =
-          originalUser.feedDecoratorStatus[event.feedDecoratorType] ??
+          originalContext.feedDecoratorStatus[event.feedDecoratorType] ??
           const UserFeedDecoratorStatus(isCompleted: false);
 
       final updatedDecoratorStatus = currentStatus.copyWith(
@@ -533,24 +544,25 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
       final newFeedDecoratorStatus =
           Map<FeedDecoratorType, UserFeedDecoratorStatus>.from(
-            originalUser.feedDecoratorStatus,
+            //
+            originalContext.feedDecoratorStatus,
           )..update(
             event.feedDecoratorType,
             (_) => updatedDecoratorStatus,
             ifAbsent: () => updatedDecoratorStatus,
           );
 
-      final updatedUser = originalUser.copyWith(
+      final updatedContext = originalContext.copyWith(
         feedDecoratorStatus: newFeedDecoratorStatus,
       );
 
-      emit(state.copyWith(user: updatedUser));
+      emit(state.copyWith(userContext: updatedContext));
 
       try {
-        await _userRepository.update(
-          id: updatedUser.id,
-          item: updatedUser,
-          userId: updatedUser.id,
+        await _userContextRepository.update(
+          id: updatedContext.userId,
+          item: updatedContext,
+          userId: updatedContext.userId,
         );
         _logger.info(
           '[AppBloc] User ${event.userId} FeedDecorator ${event.feedDecoratorType} '
@@ -558,7 +570,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         );
       } catch (e) {
         _logger.severe('Failed to update feed decorator status: $e');
-        emit(state.copyWith(user: originalUser));
+        emit(state.copyWith(userContext: originalContext));
       }
     }
   }

@@ -14,7 +14,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/models/initi
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/extensions.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:logging/logging.dart';
@@ -52,7 +51,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required InlineAdCacheService inlineAdCacheService,
     required FeedCacheService feedCacheService,
     required Logger logger,
-    required DataRepository<User> userRepository,
     required PushNotificationService pushNotificationService,
     required DataRepository<Report> reportRepository,
     required ContentLimitationService contentLimitationService,
@@ -65,7 +63,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _appSettingsRepository = appSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
        _userContextRepository = userContextRepository,
-       _userRepository = userRepository,
        _inAppNotificationRepository = inAppNotificationRepository,
        _feedCacheService = feedCacheService,
        _pushNotificationService = pushNotificationService,
@@ -127,7 +124,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // Listen to raw foreground push notifications.
     _pushNotificationService.onMessage.listen((payload) async {
       _logger.fine('AppBloc received foreground push notification payload.');
-      // The backend now persists the notification when it sends the push. The
+      // The backend persists the notification when it sends the push. The
       // client's only responsibility is to react to the incoming message
       // and update the UI to show an unread indicator.
       add(const AppInAppNotificationReceived());
@@ -142,7 +139,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
   final DataRepository<UserContext> _userContextRepository;
-  final DataRepository<User> _userRepository;
   final DataRepository<InAppNotification> _inAppNotificationRepository;
   final PushNotificationService _pushNotificationService;
   final DataRepository<Report> _reportRepository;

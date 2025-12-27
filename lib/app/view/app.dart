@@ -189,7 +189,6 @@ class App extends StatelessWidget {
               logger: context.read<Logger>(),
               pushNotificationService: _pushNotificationService,
               inAppNotificationRepository: _inAppNotificationRepository,
-              userRepository: _userRepository,
               appReviewService: _appReviewService,
               inlineAdCacheService: _inlineAdCacheService,
               contentLimitationService: context

@@ -40,6 +40,7 @@ class App extends StatelessWidget {
   /// {@macro app_widget}
   const App({
     required this.user,
+    required this.userContext,
     required this.remoteConfig,
     required this.settings,
     required this.userContentPreferences,
@@ -53,6 +54,7 @@ class App extends StatelessWidget {
     required DataRepository<AppSettings> appSettingsRepository,
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
+    required DataRepository<UserContext> userContextRepository,
     required DataRepository<Engagement> engagementRepository,
     required DataRepository<Report> reportRepository,
     required DataRepository<AppReview> appReviewRepository,
@@ -77,6 +79,7 @@ class App extends StatelessWidget {
        _remoteConfigRepository = remoteConfigRepository,
        _appSettingsRepository = appSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
+       _userContextRepository = userContextRepository,
        _engagementRepository = engagementRepository,
        _reportRepository = reportRepository,
        _appReviewRepository = appReviewRepository,
@@ -94,6 +97,9 @@ class App extends StatelessWidget {
 
   /// The initial user, pre-fetched during startup.
   final User? user;
+
+  /// The initial user context, pre-fetched during startup.
+  final UserContext? userContext;
 
   /// The global remote configuration, pre-fetched during startup.
   final RemoteConfig remoteConfig;
@@ -114,6 +120,7 @@ class App extends StatelessWidget {
   final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
+  final DataRepository<UserContext> _userContextRepository;
   final DataRepository<Engagement> _engagementRepository;
   final DataRepository<Report> _reportRepository;
   final DataRepository<AppReview> _appReviewRepository;
@@ -147,6 +154,7 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _remoteConfigRepository),
         RepositoryProvider.value(value: _appSettingsRepository),
         RepositoryProvider.value(value: _userContentPreferencesRepository),
+        RepositoryProvider.value(value: _userContextRepository),
         RepositoryProvider.value(value: _engagementRepository),
         RepositoryProvider.value(value: _reportRepository),
         RepositoryProvider.value(value: _appReviewRepository),
@@ -167,6 +175,7 @@ class App extends StatelessWidget {
           BlocProvider(
             create: (context) => AppBloc(
               user: user,
+              userContext: userContext,
               remoteConfig: remoteConfig,
               settings: settings,
               userContentPreferences: userContentPreferences,
@@ -176,6 +185,7 @@ class App extends StatelessWidget {
               appSettingsRepository: _appSettingsRepository,
               userContentPreferencesRepository:
                   _userContentPreferencesRepository,
+              userContextRepository: _userContextRepository,
               logger: context.read<Logger>(),
               pushNotificationService: _pushNotificationService,
               inAppNotificationRepository: _inAppNotificationRepository,

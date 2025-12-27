@@ -91,12 +91,12 @@ class AccountPage extends StatelessWidget {
       statusText = user?.email ?? l10n.accountNoNameUser;
 
       final String roleDisplayName;
-      switch (user?.appRole) {
-        case AppUserRole.standardUser:
+      switch (user?.tier) {
+        case AccessTier.standard:
           roleDisplayName = l10n.accountRoleStandard;
-        case AppUserRole.premiumUser:
+        case AccessTier.premium:
           roleDisplayName = l10n.accountRolePremium;
-        case AppUserRole.guestUser:
+        case AccessTier.guest:
           roleDisplayName = l10n.accountGuestAccount;
         case null:
           roleDisplayName = '';

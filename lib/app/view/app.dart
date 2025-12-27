@@ -45,6 +45,7 @@ class App extends StatelessWidget {
     required this.remoteConfig,
     required this.settings,
     required this.userContentPreferences,
+    required this.userSubscription,
     required AuthRepository authenticationRepository,
     required DataRepository<Headline> headlinesRepository,
     required DataRepository<Topic> topicsRepository,
@@ -99,7 +100,8 @@ class App extends StatelessWidget {
        _inlineAdCacheService = inlineAdCacheService,
        _analyticsService = analyticsService,
        _subscriptionService = subscriptionService,
-       _purchaseTransactionRepository = purchaseTransactionRepository;
+       _purchaseTransactionRepository = purchaseTransactionRepository,
+       _userSubscriptionRepository = userSubscriptionRepository;
 
   /// The initial user, pre-fetched during startup.
   final User? user;
@@ -115,6 +117,9 @@ class App extends StatelessWidget {
 
   /// The user's content preferences, pre-fetched during startup.
   final UserContentPreferences? userContentPreferences;
+
+  /// The user's subscription, pre-fetched during startup.
+  final UserSubscription? userSubscription;
 
   final AuthRepository _authenticationRepository;
   final DataRepository<Headline> _headlinesRepository;
@@ -191,6 +196,7 @@ class App extends StatelessWidget {
               remoteConfig: remoteConfig,
               settings: settings,
               userContentPreferences: userContentPreferences,
+              userSubscription: userSubscription,
               remoteConfigRepository: _remoteConfigRepository,
               appInitializer: context.read<AppInitializer>(),
               authRepository: context.read<AuthRepository>(),

@@ -52,7 +52,7 @@ class AppReviewService {
 
     if (user == null || userContext == null || remoteConfig == null) {
       _logger.warning(
-        'Cannot check eligibility: user or remoteConfig is null.',
+        'Cannot check eligibility: user or userContext or remoteConfig is null.',
       );
       return;
     }

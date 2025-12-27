@@ -291,6 +291,7 @@ Future<Widget> bootstrap(
   late final DataClient<Report> reportClient;
   late final DataClient<AppReview> appReviewClient;
   late final DataClient<PurchaseTransaction> purchaseTransactionClient;
+  late final DataClient<UserSubscription> userSubscriptionClient;
   if (appConfig.environment == app_config.AppEnvironment.demo) {
     logger.fine('Using in-memory clients for all data repositories.');
     headlinesClient = DataInMemory<Headline>(
@@ -395,6 +396,12 @@ Future<Widget> bootstrap(
       getId: (i) => i.planId, // Using planId as ID for demo purposes
       logger: logger,
     );
+    userSubscriptionClient = DataInMemory<UserSubscription>(
+      toJson: (i) => i.toJson(),
+      getId: (i) => i.id,
+      initialData: userSubscriptionsFixturesData,
+      logger: logger,
+    );
   } else {
     logger.fine('Using API clients for all data repositories.');
     headlinesClient = DataApi<Headline>(
@@ -495,6 +502,13 @@ Future<Widget> bootstrap(
       toJson: (transaction) => transaction.toJson(),
       logger: logger,
     );
+    userSubscriptionClient = DataApi<UserSubscription>(
+      httpClient: httpClient,
+      modelName: 'user_subscription',
+      fromJson: UserSubscription.fromJson,
+      toJson: (subscription) => subscription.toJson(),
+      logger: logger,
+    );
   }
   logger.fine('All data clients instantiated.');
 
@@ -547,6 +561,10 @@ Future<Widget> bootstrap(
 
   final purchaseTransactionRepository = DataRepository<PurchaseTransaction>(
     dataClient: purchaseTransactionClient,
+  );
+
+  final userSubscriptionRepository = DataRepository<UserSubscription>(
+    dataClient: userSubscriptionClient,
   );
 
   logger
@@ -694,6 +712,7 @@ Future<Widget> bootstrap(
       RepositoryProvider.value(value: logger),
       RepositoryProvider.value(value: subscriptionService),
       RepositoryProvider.value(value: purchaseTransactionRepository),
+      RepositoryProvider.value(value: userSubscriptionRepository),
     ],
     child: AppInitializationPage(
       // All other repositories and services are passed directly to the
@@ -725,6 +744,7 @@ Future<Widget> bootstrap(
       analyticsService: analyticsService,
       subscriptionService: subscriptionService,
       purchaseTransactionRepository: purchaseTransactionRepository,
+      userSubscriptionRepository: userSubscriptionRepository,
     ),
   );
 }

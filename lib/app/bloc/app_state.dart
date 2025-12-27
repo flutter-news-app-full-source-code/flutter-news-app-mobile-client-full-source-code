@@ -12,6 +12,7 @@ class AppState extends Equatable {
   const AppState({
     required this.status,
     this.user,
+    this.userContext,
     this.remoteConfig,
     this.error,
     this.userContentPreferences,
@@ -31,6 +32,9 @@ class AppState extends Equatable {
   /// The currently authenticated or anonymous user.
   /// Null if no user is logged in or recognized.
   final User? user;
+
+  /// The user's context (ephemeral state like feed decorator status).
+  final UserContext? userContext;
 
   /// The user's application settings, including display preferences and language.
   /// This is null until successfully fetched from the backend.
@@ -132,6 +136,7 @@ class AppState extends Equatable {
   List<Object?> get props => [
     status,
     user,
+    userContext,
     settings,
     remoteConfig,
     error,
@@ -148,6 +153,7 @@ class AppState extends Equatable {
   AppState copyWith({
     AppLifeCycleStatus? status,
     User? user,
+    UserContext? userContext,
     AppSettings? settings,
     RemoteConfig? remoteConfig,
     HttpException? error,
@@ -166,6 +172,7 @@ class AppState extends Equatable {
     return AppState(
       status: status ?? this.status,
       user: clearUser ? null : user ?? this.user,
+      userContext: clearUser ? null : userContext ?? this.userContext,
       settings: clearUser ? null : settings ?? this.settings,
       remoteConfig: remoteConfig ?? this.remoteConfig,
       error: clearError ? null : error ?? this.error,

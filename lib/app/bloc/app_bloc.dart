@@ -41,6 +41,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required RemoteConfig remoteConfig,
     required AppSettings? settings,
     required UserContentPreferences? userContentPreferences,
+    required UserSubscription? userSubscription,
     required DataRepository<RemoteConfig> remoteConfigRepository,
     required AppInitializer appInitializer,
     required AuthRepository authRepository,
@@ -84,6 +85,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
            remoteConfig: remoteConfig,
            settings: settings,
            userContentPreferences: userContentPreferences,
+           userSubscription: userSubscription,
          ),
        ) {
     // Register event handlers for various app-level events.
@@ -297,6 +299,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         :final settings,
         :final userContentPreferences,
         :final userContext,
+        :final userSubscription,
       ):
         emit(
           state.copyWith(
@@ -307,6 +310,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             userContext: userContext,
             settings: settings,
             userContentPreferences: userContentPreferences,
+            userSubscription: userSubscription,
             clearError: true,
           ),
         );

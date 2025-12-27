@@ -57,6 +57,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/se
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/theme_settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/multi_select_search_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/view/paywall_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 
@@ -222,6 +223,11 @@ GoRouter createRouter({
             ],
           ),
         ],
+      ),
+      GoRoute(
+        path: Routes.paywall,
+        name: Routes.paywallName,
+        builder: (context, state) => const PaywallPage(),
       ),
 
       // --- Account Modal ---

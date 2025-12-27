@@ -21,6 +21,8 @@ abstract final class Routes {
   static const accountName = 'account';
   static const discover = '/discover';
   static const discoverName = 'discover';
+  static const subscriptionDetails = 'subscription-details';
+  static const subscriptionDetailsName = 'subscriptionDetails';
   static const paywall = '/paywall';
   static const paywallName = 'paywall';
 

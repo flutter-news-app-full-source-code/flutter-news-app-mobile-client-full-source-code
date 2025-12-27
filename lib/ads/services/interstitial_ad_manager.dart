@@ -56,8 +56,8 @@ class InterstitialAdManager {
   /// The current remote configuration for ads.
   RemoteConfig? _remoteConfig;
 
-  /// The current user role.
-  AppUserRole? _userRole;
+  /// The current user tier.
+  AccessTier? _userTier;
 
   /// Disposes the manager and cancels stream subscriptions.
   void dispose() {
@@ -68,14 +68,14 @@ class InterstitialAdManager {
   /// Handles changes in the [AppState].
   void _onAppStateChanged(AppState state) {
     final newRemoteConfig = state.remoteConfig;
-    final newUserRole = state.user?.appRole;
+    final newUserTier = state.user?.tier;
 
-    // If the ad config or user role has changed, update internal state
+    // If the ad config or user tier has changed, update internal state
     // and potentially pre-load a new ad.
-    if (newRemoteConfig != _remoteConfig || newUserRole != _userRole) {
-      _logger.info('Ad config or user role changed. Updating internal state.');
+    if (newRemoteConfig != _remoteConfig || newUserTier != _userTier) {
+      _logger.info('Ad config or user tier changed. Updating internal state.');
       _remoteConfig = newRemoteConfig;
-      _userRole = newUserRole;
+      _userTier = newUserTier;
       // A config change might mean we need to load an ad now.
       _maybePreloadAd(state);
     }
@@ -130,7 +130,7 @@ class InterstitialAdManager {
       final ad = await _adService.getInterstitialAd(
         adConfig: remoteConfig.features.ads,
         adThemeStyle: adThemeStyle,
-        userRole: _userRole ?? AppUserRole.guestUser,
+        userTier: _userTier ?? AccessTier.guest,
       );
 
       if (ad != null) {
@@ -179,7 +179,7 @@ class InterstitialAdManager {
         .features
         .ads
         .navigationAdConfiguration
-        .visibleTo[_userRole];
+        .visibleTo[_userTier];
 
     final requiredTransitions =
         frequencyConfig?.internalNavigationsBeforeShowingInterstitialAd ?? 0;
@@ -224,7 +224,7 @@ class InterstitialAdManager {
         .features
         .ads
         .navigationAdConfiguration
-        .visibleTo[_userRole];
+        .visibleTo[_userTier];
 
     final requiredTransitions =
         frequencyConfig?.externalNavigationsBeforeShowingInterstitialAd ?? 0;

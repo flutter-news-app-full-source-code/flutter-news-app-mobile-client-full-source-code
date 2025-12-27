@@ -38,9 +38,7 @@ class SubscriptionStatusBanner extends StatelessWidget {
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(AppSpacing.sm),
-        border: Border.all(
-          color: iconColor.withOpacity(0.5),
-        ),
+        border: Border.all(color: iconColor.withOpacity(0.5)),
       ),
       child: Row(
         children: [

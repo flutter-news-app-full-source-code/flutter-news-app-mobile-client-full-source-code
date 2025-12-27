@@ -1,4 +1,3 @@
-import 'package:core/core.dart' as core;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
@@ -35,7 +34,7 @@ class _PaywallView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
-    // TODO(fulleni): handle route redirection 
+    // TODO(fulleni): handle route redirection
     // Paywall is for acquisition only. If user has an active subscription,
     // they shouldn't be here (or should be redirected).
     // For now, we just hide the "Current Plan" banner since this page

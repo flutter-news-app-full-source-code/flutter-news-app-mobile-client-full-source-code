@@ -127,6 +127,7 @@ class AppInitializationPage extends StatelessWidget {
                 remoteConfig: successData.remoteConfig,
                 settings: successData.settings,
                 userContentPreferences: successData.userContentPreferences,
+                userSubscription: successData.userSubscription,
                 authenticationRepository: authenticationRepository,
                 headlinesRepository: headlinesRepository,
                 topicsRepository: topicsRepository,

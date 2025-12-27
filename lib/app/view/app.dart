@@ -23,6 +23,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_tap_handler.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/maintenance_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/update_required_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/purchase_handler.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:go_router/go_router.dart';
@@ -242,6 +243,7 @@ class _AppViewState extends State<_AppView> {
   StreamSubscription<PushNotificationPayload>? _onMessageSubscription;
   AppStatusService? _appStatusService;
   InterstitialAdManager? _interstitialAdManager;
+  PurchaseHandler? _purchaseHandler;
   late final GoRouter _router;
   final _routerLogger = Logger('GoRouter');
 
@@ -307,6 +309,19 @@ class _AppViewState extends State<_AppView> {
       environment: widget.environment,
     );
 
+    // Initialize the global purchase handler.
+    // This ensures that purchase events (like "Ask to Buy" or interrupted
+    // purchases) are handled correctly, even if the paywall is not open.
+    _purchaseHandler = PurchaseHandler(
+      subscriptionService: context.read<SubscriptionServiceInterface>(),
+      purchaseTransactionRepository: context
+          .read<DataRepository<PurchaseTransaction>>(),
+      userSubscriptionRepository: context
+          .read<DataRepository<UserSubscription>>(),
+      userRepository: context.read<DataRepository<User>>(),
+      appBloc: appBloc,
+      logger: Logger('PurchaseHandler'),
+    )..listen();
     // Create instances of services that need to be managed by this State's
     // lifecycle. This prevents them from being re-created on every build.
     _interstitialAdManager = InterstitialAdManager(
@@ -334,6 +349,7 @@ class _AppViewState extends State<_AppView> {
     _onMessageSubscription?.cancel();
     _appStatusService?.dispose();
     _interstitialAdManager?.dispose();
+    _purchaseHandler?.dispose();
     context.read<PushNotificationService>().close();
     context.read<ContentLimitationService>().dispose();
     super.dispose();

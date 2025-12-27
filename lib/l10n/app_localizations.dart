@@ -3193,6 +3193,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unlock all features (Demo Mode)'**
   String get demoPlanDescription;
+
+  /// Button text for upgrading a subscription plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade'**
+  String get subscriptionUpgradeButton;
+
+  /// Button text for downgrading a subscription plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Downgrade'**
+  String get subscriptionDowngradeButton;
+
+  /// Text indicating the user's current subscription plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Plan'**
+  String get subscriptionCurrentPlan;
+
+  /// Banner message when a user's subscription payment has failed but access is temporarily retained.
+  ///
+  /// In en, this message translates to:
+  /// **'Your subscription is in a grace period. Please update your payment method to retain access.'**
+  String get subscriptionStatusGracePeriod;
+
+  /// Banner message when a user's subscription is paused due to a payment issue.
+  ///
+  /// In en, this message translates to:
+  /// **'Your subscription is on hold due to a billing issue. Please update your payment method.'**
+  String get subscriptionStatusBillingIssue;
 }
 
 class _AppLocalizationsDelegate

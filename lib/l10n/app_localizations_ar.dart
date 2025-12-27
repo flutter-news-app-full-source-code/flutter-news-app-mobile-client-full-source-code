@@ -1702,4 +1702,21 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get demoPlanDescription => 'فتح جميع الميزات (وضع تجريبي)';
+
+  @override
+  String get subscriptionUpgradeButton => 'ترقية';
+
+  @override
+  String get subscriptionDowngradeButton => 'تخفيض';
+
+  @override
+  String get subscriptionCurrentPlan => 'الخطة الحالية';
+
+  @override
+  String get subscriptionStatusGracePeriod =>
+      'اشتراكك في فترة سماح. يرجى تحديث طريقة الدفع للاحتفاظ بالوصول.';
+
+  @override
+  String get subscriptionStatusBillingIssue =>
+      'تم تعليق اشتراكك بسبب مشكلة في الفوترة. يرجى تحديث معلومات الدفع الخاصة بك.';
 }

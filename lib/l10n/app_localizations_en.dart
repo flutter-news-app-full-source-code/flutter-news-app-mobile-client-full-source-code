@@ -1707,4 +1707,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get demoPlanDescription => 'Unlock all features (Demo Mode)';
+
+  @override
+  String get subscriptionUpgradeButton => 'Upgrade';
+
+  @override
+  String get subscriptionDowngradeButton => 'Downgrade';
+
+  @override
+  String get subscriptionCurrentPlan => 'Current Plan';
+
+  @override
+  String get subscriptionStatusGracePeriod =>
+      'Your subscription is in a grace period. Please update your payment method to retain access.';
+
+  @override
+  String get subscriptionStatusBillingIssue =>
+      'Your subscription is on hold due to a billing issue. Please update your payment method.';
 }

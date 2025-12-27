@@ -71,6 +71,7 @@ class App extends StatelessWidget {
     required PushNotificationService pushNotificationService,
     required AnalyticsService analyticsService,
     required SubscriptionServiceInterface subscriptionService,
+    required DataRepository<UserSubscription> userSubscriptionRepository,
     required DataRepository<PurchaseTransaction> purchaseTransactionRepository,
     super.key,
   }) : _authenticationRepository = authenticationRepository,
@@ -141,6 +142,7 @@ class App extends StatelessWidget {
   final PushNotificationService _pushNotificationService;
   final AnalyticsService _analyticsService;
   final SubscriptionServiceInterface _subscriptionService;
+  final DataRepository<UserSubscription> _userSubscriptionRepository;
   final DataRepository<PurchaseTransaction> _purchaseTransactionRepository;
 
   @override
@@ -174,6 +176,7 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _environment),
         RepositoryProvider.value(value: _analyticsService),
         RepositoryProvider.value(value: _subscriptionService),
+        RepositoryProvider.value(value: _userSubscriptionRepository),
         RepositoryProvider.value(value: _purchaseTransactionRepository),
         // NOTE: The AppInitializer is provided at the root in bootstrap.dart
         // and is accessed via context.read() in the AppBloc.

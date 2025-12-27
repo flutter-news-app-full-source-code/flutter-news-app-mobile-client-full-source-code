@@ -154,6 +154,17 @@ class AccountPage extends StatelessWidget {
                 ],
               ),
             ),
+            const SizedBox(width: AppSpacing.md),
+            if (user?.tier == AccessTier.standard)
+              ElevatedButton(
+                onPressed: () => context.pushNamed(Routes.paywallName),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                  ),
+                ),
+                child: Text(l10n.upgradeButton),
+              ),
           ],
         ),
       ),
@@ -168,13 +179,16 @@ class AccountPage extends StatelessWidget {
     final l10n = AppLocalizationsX(context).l10n;
     return Column(
       children: [
-        buildTile(
-          context: context,
-          icon: Icons.workspace_premium,
-          title: l10n.upgradeButton,
-          onTap: () => context.pushNamed(Routes.paywallName),
-        ),
-        const Divider(),
+        if (context.watch<AppBloc>().state.user?.tier ==
+            AccessTier.premium) ...[
+          buildTile(
+            context: context,
+            icon: Icons.workspace_premium,
+            title: l10n.manageSubscriptionButton,
+            onTap: () => context.pushNamed(Routes.subscriptionDetailsName),
+          ),
+          const Divider(),
+        ],
         buildTile(
           context: context,
           icon: Icons.check_outlined,

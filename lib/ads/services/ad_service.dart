@@ -106,12 +106,12 @@ class AdService {
   /// - [adThemeStyle]: UI-agnostic theme properties for ad styling.
   /// - [headlineImageStyle]: The user's preference for feed layout,
   ///   which can be used to request an appropriately sized ad.
-  /// - [userRole]: The current role of the user, used to determine ad visibility.
+  /// - [userTier]: The current entitlement tier of the user, used to determine ad visibility.
   Future<InlineAd?> getFeedAd({
     required AdConfig adConfig,
     required AdType adType,
     required AdThemeStyle adThemeStyle,
-    required AppUserRole userRole,
+    required AccessTier userTier,
     FeedItemImageStyle? feedItemImageStyle,
   }) async {
     _logger.info('AdService: getFeedAd called for adType: $adType');
@@ -119,7 +119,7 @@ class AdService {
       adConfig: adConfig,
       adType: adType,
       adThemeStyle: adThemeStyle,
-      userRole: userRole,
+      userTier: userTier,
       feedItemImageStyle: feedItemImageStyle,
     );
   }
@@ -135,11 +135,11 @@ class AdService {
   ///
   /// - [adConfig]: The remote configuration for ad display rules.
   /// - [adThemeStyle]: UI-agnostic theme properties for ad styling.
-  /// - [userRole]: The current role of the user, used to determine ad visibility.
+  /// - [userTier]: The current entitlement tier of the user, used to determine ad visibility.
   Future<InterstitialAd?> getInterstitialAd({
     required AdConfig adConfig,
     required AdThemeStyle adThemeStyle,
-    required AppUserRole userRole,
+    required AccessTier userTier,
   }) async {
     _logger.info('AdService: getInterstitialAd called.');
     if (!adConfig.enabled) {
@@ -149,14 +149,14 @@ class AdService {
 
     final interstitialConfig = adConfig.navigationAdConfiguration;
     // Check if the interstitial ads are globally enabled AND if the current
-    // user role has a defined configuration in the visibleTo map.
+    // user tier has a defined configuration in the visibleTo map.
     final isInterstitialEnabledForRole =
         interstitialConfig.enabled &&
-        interstitialConfig.visibleTo.containsKey(userRole);
+        interstitialConfig.visibleTo.containsKey(userTier);
 
     if (!isInterstitialEnabledForRole) {
       _logger.info(
-        'AdService: Interstitial ads are disabled for user role $userRole '
+        'AdService: Interstitial ads are disabled for user tier $userTier '
         'or globally in RemoteConfig.',
       );
       return null;
@@ -252,14 +252,14 @@ class AdService {
   /// - [adThemeStyle]: UI-agnostic theme properties for ad styling.
   /// - [feedItemImageStyle]: The user's preference for feed layout,
   ///   which can be used to request an appropriately sized ad.
-  /// - [userRole]: The current role of the user, used to determine ad visibility.
+  /// - [userTier]: The current entitlement tier of the user, used to determine ad visibility.
   ///
   /// Returns an [InlineAd] if an ad is successfully loaded, otherwise `null`.
   Future<InlineAd?> _loadInlineAd({
     required AdConfig adConfig,
     required AdType adType,
     required AdThemeStyle adThemeStyle,
-    required AppUserRole userRole,
+    required AccessTier userTier,
     FeedItemImageStyle? feedItemImageStyle,
   }) async {
     _logger.info('AdService: _loadInlineAd called for adType: $adType');
@@ -271,11 +271,11 @@ class AdService {
 
     final feedAdConfig = adConfig.feedAdConfiguration;
     final isFeedAdEnabledForRole =
-        feedAdConfig.enabled && feedAdConfig.visibleTo.containsKey(userRole);
+        feedAdConfig.enabled && feedAdConfig.visibleTo.containsKey(userTier);
 
     if (!isFeedAdEnabledForRole) {
       _logger.info(
-        'AdService: Feed ads are disabled for user role $userRole '
+        'AdService: Feed ads are disabled for user tier $userTier '
         'or globally in RemoteConfig.',
       );
       return null;
@@ -439,14 +439,14 @@ class AdService {
       return feedItems;
     }
 
-    final userRole = user?.appRole ?? AppUserRole.guestUser;
+    final userTier = user?.tier ?? AccessTier.guest;
 
-    // Determine ad frequency rules based on user role.
+    // Determine ad frequency rules based on user tier.
     final feedAdFrequencyConfig =
-        remoteConfig.features.ads.feedAdConfiguration.visibleTo[userRole];
+        remoteConfig.features.ads.feedAdConfiguration.visibleTo[userTier];
 
     // Default to 0 for adFrequency and adPlacementInterval if no config is found
-    // for the user role, effectively disabling ads for that role.
+    // for the user tier, effectively disabling ads for that tier.
     final adFrequency = feedAdFrequencyConfig?.adFrequency ?? 0;
     final adPlacementInterval = feedAdFrequencyConfig?.adPlacementInterval ?? 0;
 

@@ -1,6 +1,5 @@
 import 'package:core/core.dart';
 import 'package:data_client/data_client.dart';
-import 'package:data_repository/data_repository.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:logging/logging.dart';
 

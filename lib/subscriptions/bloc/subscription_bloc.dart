@@ -37,8 +37,8 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
           ),
         );
       },
-      onError: (error) {
-        _logger.severe('Error in purchase stream', error);
+      onError: (Object error, StackTrace stackTrace) {
+        _logger.severe('Error in purchase stream', error, stackTrace);
         // We might want to emit a failure state here if appropriate
       },
     );
@@ -82,16 +82,20 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
       // In a real app, we'd check Platform.isAndroid/iOS here or in the config object.
       // For now, we add both to be safe or rely on the service to filter.
       if (config.monthlyPlan.enabled) {
-        if (config.monthlyPlan.appleProductId != null)
+        if (config.monthlyPlan.appleProductId != null) {
           productIds.add(config.monthlyPlan.appleProductId!);
-        if (config.monthlyPlan.googleProductId != null)
+        }
+        if (config.monthlyPlan.googleProductId != null) {
           productIds.add(config.monthlyPlan.googleProductId!);
+        }
       }
       if (config.annualPlan.enabled) {
-        if (config.annualPlan.appleProductId != null)
+        if (config.annualPlan.appleProductId != null) {
           productIds.add(config.annualPlan.appleProductId!);
-        if (config.annualPlan.googleProductId != null)
+        }
+        if (config.annualPlan.googleProductId != null) {
           productIds.add(config.annualPlan.googleProductId!);
+        }
       }
 
       final products = await _subscriptionService.queryProductDetails(

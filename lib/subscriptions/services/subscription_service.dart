@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:logging/logging.dart';
@@ -67,7 +65,7 @@ class SubscriptionService {
       _logger.info(
         '[SubscriptionService] Demo mode: Returning mock products for $productIds',
       );
-      return productIds.map((id) => _createMockProduct(id)).toList();
+      return productIds.map(_createMockProduct).toList();
     }
 
     _logger.info('[SubscriptionService] Querying products: $productIds');
@@ -148,12 +146,11 @@ class SubscriptionService {
   ProductDetails _createMockProduct(String id) {
     return ProductDetails(
       id: id,
-      title:
-          id.contains('annual')
-              ? 'Annual Premium (Demo)'
-              : 'Monthly Premium (Demo)',
+      title: id.contains('annual')
+          ? 'Annual Premium (Demo)'
+          : 'Monthly Premium (Demo)',
       description: 'Unlock all features (Demo Mode)',
-      price: id.contains('annual') ? '\$99.99' : '\$9.99',
+      price: id.contains('annual') ? r'$99.99' : r'$9.99',
       rawPrice: id.contains('annual') ? 99.99 : 9.99,
       currencyCode: 'USD',
     );

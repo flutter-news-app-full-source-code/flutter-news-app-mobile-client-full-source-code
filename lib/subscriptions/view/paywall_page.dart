@@ -1,5 +1,4 @@
-import 'package:core/core.dart' hide SubscriptionStatus;
-import 'package:data_repository/data_repository.dart';
+import 'package:core/core.dart' as core;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
@@ -21,8 +20,6 @@ class PaywallPage extends StatelessWidget {
     return BlocProvider(
       create: (context) => SubscriptionBloc(
         subscriptionService: context.read<SubscriptionServiceInterface>(),
-        purchaseTransactionRepository: context
-            .read<DataRepository<PurchaseTransaction>>(),
         appBloc: context.read<AppBloc>(),
         remoteConfig: context.read<AppBloc>().state.remoteConfig!,
         logger: context.read<Logger>(),
@@ -38,6 +35,7 @@ class _PaywallView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
+    final userSubscription = context.watch<AppBloc>().state.userSubscription;
     final theme = Theme.of(context);
 
     return BlocConsumer<SubscriptionBloc, SubscriptionState>(
@@ -92,7 +90,11 @@ class _PaywallView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     _buildHeader(context, l10n),
-                    const SizedBox(height: AppSpacing.xxl),
+                    const SizedBox(height: AppSpacing.lg),
+                    if (userSubscription != null) ...[
+                      _buildCurrentPlanBanner(context, userSubscription, l10n),
+                      const SizedBox(height: AppSpacing.lg),
+                    ],
                     _buildFeaturesList(context, l10n),
                     const SizedBox(height: AppSpacing.xxl),
                     if (state.products.isNotEmpty)
@@ -158,6 +160,50 @@ class _PaywallView extends StatelessWidget {
     );
   }
 
+  Widget _buildCurrentPlanBanner(
+    BuildContext context,
+    core.UserSubscription subscription,
+    AppLocalizations l10n,
+  ) {
+    final theme = Theme.of(context);
+    final isMonthly = subscription.originalTransactionId.contains('monthly');
+    final planName = isMonthly
+        ? l10n.paywallMonthlyPlan
+        : l10n.paywallAnnualPlan;
+
+    final statusText = switch (subscription.status) {
+      core.SubscriptionStatus.active => l10n.subscriptionDetailsRenewsOn(
+        subscription.validUntil.toString(),
+      ),
+      core.SubscriptionStatus.gracePeriod => l10n.subscriptionStatusGracePeriod,
+      core.SubscriptionStatus.billingIssue =>
+        l10n.subscriptionStatusBillingIssue,
+      core.SubscriptionStatus.canceled => l10n.subscriptionDetailsExpiresOn(
+        subscription.validUntil.toString(),
+      ),
+      core.SubscriptionStatus.expired => 'Expired',
+    };
+
+    return Card(
+      color: theme.colorScheme.secondaryContainer,
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Column(
+          children: [
+            Text(
+              '${l10n.subscriptionDetailsCurrentPlan}: $planName',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(statusText, style: theme.textTheme.bodyMedium),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildFeaturesList(BuildContext context, AppLocalizations l10n) {
     final features = [
       l10n.paywallFeatureFollowMore,
@@ -195,6 +241,11 @@ class _PaywallView extends StatelessWidget {
   ) {
     final monthly = state.monthlyPlan;
     final annual = state.annualPlan;
+    final currentSubId = context
+        .read<AppBloc>()
+        .state
+        .userSubscription
+        ?.originalTransactionId;
 
     return Column(
       children: [
@@ -203,10 +254,16 @@ class _PaywallView extends StatelessWidget {
             context,
             annual,
             l10n: l10n,
-            isAnnual: true,
+            isRecommended: true,
             isSelected: state.selectedProduct?.id == annual.id,
+            isCurrent: currentSubId == annual.id,
             onTap: () => context.read<SubscriptionBloc>().add(
-              SubscriptionPurchaseRequested(product: annual),
+              SubscriptionPurchaseRequested(
+                product: annual,
+                oldPurchaseDetails: currentSubId != null
+                    ? state.activePurchaseDetails
+                    : null,
+              ),
             ),
           ),
         const SizedBox(height: AppSpacing.md),
@@ -215,10 +272,16 @@ class _PaywallView extends StatelessWidget {
             context,
             monthly,
             l10n: l10n,
-            isAnnual: false,
+            isRecommended: false,
             isSelected: state.selectedProduct?.id == monthly.id,
+            isCurrent: currentSubId == monthly.id,
             onTap: () => context.read<SubscriptionBloc>().add(
-              SubscriptionPurchaseRequested(product: monthly),
+              SubscriptionPurchaseRequested(
+                product: monthly,
+                oldPurchaseDetails: currentSubId != null
+                    ? state.activePurchaseDetails
+                    : null,
+              ),
             ),
           ),
       ],
@@ -229,12 +292,15 @@ class _PaywallView extends StatelessWidget {
     BuildContext context,
     ProductDetails product, {
     required AppLocalizations l10n,
-    required bool isAnnual,
+    required bool isRecommended,
     required bool isSelected,
+    required bool isCurrent,
     required VoidCallback onTap,
   }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isUpgrade = !isCurrent && isRecommended;
+    final isDowngrade = !isCurrent && !isRecommended;
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -246,7 +312,7 @@ class _PaywallView extends StatelessWidget {
       ),
       elevation: isSelected ? 4 : 1,
       child: InkWell(
-        onTap: onTap,
+        onTap: isCurrent ? null : onTap,
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
           child: Row(
@@ -254,7 +320,7 @@ class _PaywallView extends StatelessWidget {
               Radio<String>(
                 value: product.id,
                 groupValue: isSelected ? product.id : null,
-                onChanged: (_) => onTap(),
+                onChanged: isCurrent ? null : (_) => onTap(),
               ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
@@ -267,7 +333,7 @@ class _PaywallView extends StatelessWidget {
                           ? l10n.demoAnnualPlanTitle
                           : (product.title == 'demoMonthlyPlanTitle'
                                 ? l10n.demoMonthlyPlanTitle
-                                : (isAnnual
+                                : (isRecommended
                                       ? l10n.paywallAnnualPlan
                                       : l10n.paywallMonthlyPlan)),
                       style: theme.textTheme.titleMedium?.copyWith(
@@ -278,7 +344,23 @@ class _PaywallView extends StatelessWidget {
                   ],
                 ),
               ),
-              if (isAnnual)
+              if (isCurrent)
+                Text(
+                  l10n.subscriptionCurrentPlan,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.primary,
+                  ),
+                )
+              else if (isUpgrade)
+                Text(
+                  l10n.subscriptionUpgradeButton,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.primary,
+                  ),
+                )
+              else if (isDowngrade)
+                Text(l10n.subscriptionDowngradeButton),
+              if (isRecommended && !isCurrent)
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.sm,
@@ -309,9 +391,10 @@ class _PaywallView extends StatelessWidget {
     return Column(
       children: [
         TextButton(
+          onPressed: () => context.read<SubscriptionBloc>().add(
+            const SubscriptionRestoreRequested(),
+          ),
           child: Text(l10n.paywallRestorePurchases),
-          // TODO(fulleni): carefully handle the purchase restoration.
-          onPressed: () {},
         ),
         const SizedBox(height: AppSpacing.sm),
         Text(

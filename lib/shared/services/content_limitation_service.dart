@@ -215,10 +215,10 @@ class ContentLimitationService {
     }
 
     final limits = remoteConfig.user.limits;
-    final role = user.appRole;
+    final tier = user.tier;
 
     // Business Rule: Guest users are not allowed to engage or report.
-    if (role == AppUserRole.guestUser) {
+    if (user.isAnonymous) {
       switch (action) {
         case ContentAction.postComment:
         case ContentAction.reactToContent:
@@ -247,16 +247,16 @@ class ContentLimitationService {
     switch (action) {
       // Persisted preference checks (synchronous)
       case ContentAction.bookmarkHeadline:
-        final limit = limits.savedHeadlines[role];
+        final limit = limits.savedHeadlines[tier];
         if (limit != null && preferences.savedHeadlines.length >= limit) {
           _logLimitExceeded(LimitedAction.bookmarkHeadline);
-          return _getLimitationStatusForRole(role);
+          return _getLimitationStatusForTier(tier);
         }
 
       case ContentAction.followTopic:
       case ContentAction.followSource:
       case ContentAction.followCountry:
-        final limit = limits.followedItems[role];
+        final limit = limits.followedItems[tier];
         if (limit == null) return LimitationStatus.allowed;
         final count = switch (action) {
           ContentAction.followTopic => preferences.followedTopics.length,
@@ -271,28 +271,28 @@ class ContentLimitationService {
             ContentAction.followCountry => LimitedAction.followCountry,
             _ => LimitedAction.followTopic,
           });
-          return _getLimitationStatusForRole(role);
+          return _getLimitationStatusForTier(tier);
         }
 
       case ContentAction.saveFilter:
-        final limit = limits.savedHeadlineFilters[role]?.total;
+        final limit = limits.savedHeadlineFilters[tier]?.total;
         if (limit != null && preferences.savedHeadlineFilters.length >= limit) {
           _logLimitExceeded(LimitedAction.saveFilter);
-          return _getLimitationStatusForRole(role);
+          return _getLimitationStatusForTier(tier);
         }
 
       case ContentAction.pinFilter:
-        final limit = limits.savedHeadlineFilters[role]?.pinned;
+        final limit = limits.savedHeadlineFilters[tier]?.pinned;
         if (limit != null &&
             preferences.savedHeadlineFilters.where((f) => f.isPinned).length >=
                 limit) {
           _logLimitExceeded(LimitedAction.pinFilter);
-          return _getLimitationStatusForRole(role);
+          return _getLimitationStatusForTier(tier);
         }
 
       case ContentAction.subscribeToSavedFilterNotifications:
         final subscriptionLimits =
-            limits.savedHeadlineFilters[role]?.notificationSubscriptions;
+            limits.savedHeadlineFilters[tier]?.notificationSubscriptions;
         if (subscriptionLimits == null) return LimitationStatus.allowed;
 
         final currentCounts = <PushNotificationSubscriptionDeliveryType, int>{};
@@ -309,30 +309,30 @@ class ContentLimitationService {
             _logLimitExceeded(
               LimitedAction.subscribeToSavedFilterNotifications,
             );
-            return _getLimitationStatusForRole(role);
+            return _getLimitationStatusForTier(tier);
           }
         }
 
       // Daily action checks (asynchronous, cached)
       case ContentAction.postComment:
-        final limit = limits.commentsPerDay[role];
+        final limit = limits.commentsPerDay[tier];
         if (limit != null && (_commentCount ?? 0) >= limit) {
           _logLimitExceeded(LimitedAction.postComment);
-          return _getLimitationStatusForRole(role);
+          return _getLimitationStatusForTier(tier);
         }
 
       case ContentAction.reactToContent:
-        final limit = limits.reactionsPerDay[role];
+        final limit = limits.reactionsPerDay[tier];
         if (limit != null && (_reactionCount ?? 0) >= limit) {
           _logLimitExceeded(LimitedAction.reactToContent);
-          return _getLimitationStatusForRole(role);
+          return _getLimitationStatusForTier(tier);
         }
 
       case ContentAction.submitReport:
-        final limit = limits.reportsPerDay[role];
+        final limit = limits.reportsPerDay[tier];
         if (limit != null && (_reportCount ?? 0) >= limit) {
           _logLimitExceeded(LimitedAction.submitReport);
-          return _getLimitationStatusForRole(role);
+          return _getLimitationStatusForTier(tier);
         }
     }
 
@@ -346,13 +346,13 @@ class ContentLimitationService {
     );
   }
 
-  LimitationStatus _getLimitationStatusForRole(AppUserRole role) {
-    switch (role) {
-      case AppUserRole.guestUser:
+  LimitationStatus _getLimitationStatusForTier(AccessTier tier) {
+    switch (tier) {
+      case AccessTier.guest:
         return LimitationStatus.anonymousLimitReached;
-      case AppUserRole.standardUser:
+      case AccessTier.standard:
         return LimitationStatus.standardUserLimitReached;
-      case AppUserRole.premiumUser:
+      case AccessTier.premium:
         return LimitationStatus.premiumUserLimitReached;
     }
   }

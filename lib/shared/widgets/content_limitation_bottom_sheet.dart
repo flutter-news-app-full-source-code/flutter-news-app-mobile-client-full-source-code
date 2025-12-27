@@ -174,7 +174,11 @@ _getBottomSheetContent({
             payload: const LimitExceededCtaClickedPayload(ctaType: 'dismiss'),
           );
           Navigator.of(context).pop();
-          // TODO(fulleni): Navigate to content management or upgrade page.
+          if (userTier == AccessTier.standard) {
+            context.pushNamed(Routes.paywallName);
+          } else {
+            context.pushNamed(Routes.manageFollowedItemsName);
+          }
         },
       );
     case LimitationStatus.allowed:

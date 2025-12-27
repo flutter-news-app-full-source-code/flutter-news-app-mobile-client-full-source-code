@@ -15,12 +15,18 @@ class SubscriptionState extends Equatable {
     this.status = SubscriptionStatus.initial,
     this.products = const [],
     this.selectedProduct,
+    this.activePurchaseDetails,
     this.error,
   });
 
   final SubscriptionStatus status;
   final List<ProductDetails> products;
   final ProductDetails? selectedProduct;
+
+  /// Holds the purchase details of the user's currently active subscription.
+  /// This is populated by restoring purchases and is used for upgrades.
+  final PurchaseDetails? activePurchaseDetails;
+
   final Object? error;
 
   /// Helper to get the monthly plan if available.
@@ -37,16 +43,27 @@ class SubscriptionState extends Equatable {
     SubscriptionStatus? status,
     List<ProductDetails>? products,
     ProductDetails? selectedProduct,
+    PurchaseDetails? activePurchaseDetails,
     Object? error,
+    bool clearActivePurchase = false,
   }) {
     return SubscriptionState(
       status: status ?? this.status,
       products: products ?? this.products,
       selectedProduct: selectedProduct ?? this.selectedProduct,
+      activePurchaseDetails: clearActivePurchase
+          ? null
+          : activePurchaseDetails ?? this.activePurchaseDetails,
       error: error ?? this.error,
     );
   }
 
   @override
-  List<Object?> get props => [status, products, selectedProduct, error];
+  List<Object?> get props => [
+    status,
+    products,
+    selectedProduct,
+    activePurchaseDetails,
+    error,
+  ];
 }

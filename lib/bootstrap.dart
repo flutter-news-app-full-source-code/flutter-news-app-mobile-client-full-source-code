@@ -42,6 +42,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/notifications/se
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/data/clients/clients.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/repositories/subscription_repository.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/native_review_service.dart';
 import 'package:http_client/http_client.dart';
@@ -287,6 +289,7 @@ Future<Widget> bootstrap(
   late final DataClient<Engagement> engagementClient;
   late final DataClient<Report> reportClient;
   late final DataClient<AppReview> appReviewClient;
+  late final DataClient<PurchaseTransaction> purchaseTransactionClient;
   if (appConfig.environment == app_config.AppEnvironment.demo) {
     logger.fine('Using in-memory clients for all data repositories.');
     headlinesClient = DataInMemory<Headline>(
@@ -386,6 +389,11 @@ Future<Widget> bootstrap(
       getId: (i) => i.id,
       logger: logger,
     );
+    purchaseTransactionClient = DataInMemory<PurchaseTransaction>(
+      toJson: (i) => i.toJson(),
+      getId: (i) => i.planId, // Using planId as ID for demo purposes
+      logger: logger,
+    );
   } else {
     logger.fine('Using API clients for all data repositories.');
     headlinesClient = DataApi<Headline>(
@@ -479,6 +487,13 @@ Future<Widget> bootstrap(
       toJson: (review) => review.toJson(),
       logger: logger,
     );
+    purchaseTransactionClient = DataApi<PurchaseTransaction>(
+      httpClient: httpClient,
+      modelName: 'purchase_transaction',
+      fromJson: PurchaseTransaction.fromJson,
+      toJson: (transaction) => transaction.toJson(),
+      logger: logger,
+    );
   }
   logger.fine('All data clients instantiated.');
 
@@ -515,6 +530,17 @@ Future<Widget> bootstrap(
   final appReviewRepository = DataRepository<AppReview>(
     dataClient: appReviewClient,
   );
+
+  // Initialize Subscription Service & Repository
+  final subscriptionService = SubscriptionService(
+    environment: appConfig.environment,
+    logger: logger,
+  );
+  final subscriptionRepository = SubscriptionRepository(
+    transactionClient: purchaseTransactionClient,
+    logger: logger,
+  );
+
   logger
     ..fine('All data repositories initialized.')
     ..info('8. Initializing Push Notification service...');
@@ -619,7 +645,8 @@ Future<Widget> bootstrap(
           userContextRepository: userContextRepository,
           inAppNotificationRepository: inAppNotificationRepository,
           appSettingsFixturesData: appSettingsFixturesData,
-          userContextFixturesData: [], // TODO(fulleni): create user context fixtures in the core package ,
+          userContextFixturesData:
+              [], // TODO(fulleni): create user context fixtures in the core package ,
           userContentPreferencesFixturesData:
               getUserContentPreferencesFixturesData(),
           inAppNotificationsFixturesData: inAppNotificationsFixturesData,
@@ -658,6 +685,8 @@ Future<Widget> bootstrap(
       RepositoryProvider.value(value: analyticsService),
       RepositoryProvider.value(value: appInitializer),
       RepositoryProvider.value(value: logger),
+      RepositoryProvider.value(value: subscriptionService),
+      RepositoryProvider.value(value: subscriptionRepository),
     ],
     child: AppInitializationPage(
       // All other repositories and services are passed directly to the

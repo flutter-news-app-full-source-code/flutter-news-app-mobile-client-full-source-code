@@ -550,10 +550,7 @@ Future<Widget> bootstrap(
   late final SubscriptionServiceInterface subscriptionService;
   if (appConfig.environment == app_config.AppEnvironment.demo || kIsWeb) {
     logger.fine('Using DemoSubscriptionService.');
-    subscriptionService = DemoSubscriptionService(
-      storageService: kvStorage,
-      logger: logger,
-    );
+    subscriptionService = DemoSubscriptionService(logger: logger);
   } else {
     logger.fine('Using StoreSubscriptionService.');
     subscriptionService = StoreSubscriptionService(logger: logger);

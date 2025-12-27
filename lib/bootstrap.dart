@@ -713,7 +713,6 @@ Future<Widget> bootstrap(
       RepositoryProvider.value(value: logger),
       RepositoryProvider.value(value: subscriptionService),
       RepositoryProvider.value(value: purchaseTransactionRepository),
-      RepositoryProvider.value(value: userSubscriptionRepository),
     ],
     child: AppInitializationPage(
       // All other repositories and services are passed directly to the

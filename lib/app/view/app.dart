@@ -23,6 +23,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_tap_handler.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/maintenance_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/update_required_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
@@ -69,6 +70,8 @@ class App extends StatelessWidget {
     required GlobalKey<NavigatorState> navigatorKey,
     required PushNotificationService pushNotificationService,
     required AnalyticsService analyticsService,
+    required SubscriptionServiceInterface subscriptionService,
+    required DataRepository<PurchaseTransaction> purchaseTransactionRepository,
     super.key,
   }) : _authenticationRepository = authenticationRepository,
        _headlinesRepository = headlinesRepository,
@@ -93,7 +96,9 @@ class App extends StatelessWidget {
        _feedCacheService = feedCacheService,
        _navigatorKey = navigatorKey,
        _inlineAdCacheService = inlineAdCacheService,
-       _analyticsService = analyticsService;
+       _analyticsService = analyticsService,
+       _subscriptionService = subscriptionService,
+       _purchaseTransactionRepository = purchaseTransactionRepository;
 
   /// The initial user, pre-fetched during startup.
   final User? user;
@@ -135,6 +140,8 @@ class App extends StatelessWidget {
   final InlineAdCacheService _inlineAdCacheService;
   final PushNotificationService _pushNotificationService;
   final AnalyticsService _analyticsService;
+  final SubscriptionServiceInterface _subscriptionService;
+  final DataRepository<PurchaseTransaction> _purchaseTransactionRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -166,6 +173,8 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _feedCacheService),
         RepositoryProvider.value(value: _environment),
         RepositoryProvider.value(value: _analyticsService),
+        RepositoryProvider.value(value: _subscriptionService),
+        RepositoryProvider.value(value: _purchaseTransactionRepository),
         // NOTE: The AppInitializer is provided at the root in bootstrap.dart
         // and is accessed via context.read() in the AppBloc.
       ],

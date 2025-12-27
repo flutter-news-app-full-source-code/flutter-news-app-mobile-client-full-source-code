@@ -3,9 +3,10 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:collection/collection.dart';
 import 'package:core/core.dart';
+import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/repositories/subscription_repository.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:logging/logging.dart';
 
@@ -14,12 +15,14 @@ part 'subscription_state.dart';
 
 class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
   SubscriptionBloc({
-    required SubscriptionService subscriptionService,
-    required SubscriptionRepository subscriptionRepository,
+    required SubscriptionServiceInterface subscriptionService,
+    required DataRepository<PurchaseTransaction> purchaseTransactionRepository,
+    required AppBloc appBloc,
     required RemoteConfig remoteConfig,
     required Logger logger,
   }) : _subscriptionService = subscriptionService,
-       _subscriptionRepository = subscriptionRepository,
+       _purchaseTransactionRepository = purchaseTransactionRepository,
+       _appBloc = appBloc,
        _remoteConfig = remoteConfig,
        _logger = logger,
        super(const SubscriptionState()) {
@@ -44,8 +47,9 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
     );
   }
 
-  final SubscriptionService _subscriptionService;
-  final SubscriptionRepository _subscriptionRepository;
+  final SubscriptionServiceInterface _subscriptionService;
+  final DataRepository<PurchaseTransaction> _purchaseTransactionRepository;
+  final AppBloc _appBloc;
   final RemoteConfig _remoteConfig;
   final Logger _logger;
   late final StreamSubscription<List<PurchaseDetails>> _purchaseSubscription;
@@ -172,8 +176,28 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
       } else if (purchase.status == PurchaseStatus.purchased ||
           purchase.status == PurchaseStatus.restored) {
         try {
-          // Validate with backend
-          await _subscriptionRepository.validatePurchase(purchase);
+          // Validate with backend using the generic DataRepository.
+          // We map the PurchaseDetails to a PurchaseTransaction DTO here.
+          final verificationData = purchase.verificationData;
+          final source = verificationData.source;
+
+          StoreProvider provider;
+          if (source == 'app_store') {
+            provider = StoreProvider.apple;
+          } else if (source == 'google_play') {
+            provider = StoreProvider.google;
+          } else {
+            // Fallback or unknown store.
+            provider = StoreProvider.google;
+          }
+
+          final transaction = PurchaseTransaction(
+            planId: purchase.productID,
+            provider: provider,
+            providerReceipt: verificationData.serverVerificationData,
+          );
+
+          await _purchaseTransactionRepository.create(item: transaction);
 
           // Complete the transaction in the store
           if (purchase.pendingCompletePurchase) {
@@ -181,6 +205,14 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
           }
 
           emit(state.copyWith(status: SubscriptionStatus.success));
+
+          // Force a user refresh to update entitlements immediately.
+          // The backend should have updated the user's tier upon successful
+          // validation of the purchase transaction.
+          final currentUser = _appBloc.state.user;
+          if (currentUser != null) {
+            _appBloc.add(AppUserChanged(currentUser));
+          }
         } catch (e, s) {
           _logger.severe('Failed to validate purchase', e, s);
           emit(state.copyWith(status: SubscriptionStatus.failure, error: e));

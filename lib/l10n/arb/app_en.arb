@@ -2220,5 +2220,25 @@
     "subscriptionStatusBillingIssue": "Your subscription is on hold due to a billing issue. Please update your payment method.",
     "@subscriptionStatusBillingIssue": {
         "description": "Banner message when a user's subscription is paused due to a payment issue."
+    },
+    "subscriptionUpgradeTitle": "Upgrade Plan",
+    "@subscriptionUpgradeTitle": {
+        "description": "Title for the upgrade section in subscription details."
+    },
+    "subscriptionUpgradeDescription": "Switch to an annual plan and save.",
+    "@subscriptionUpgradeDescription": {
+        "description": "Description for the upgrade option."
+    },
+    "subscriptionDowngradeTitle": "Downgrade Plan",
+    "@subscriptionDowngradeTitle": {
+        "description": "Title for the downgrade section in subscription details."
+    },
+    "subscriptionDowngradeDescription": "Switch to a monthly billing cycle.",
+    "@subscriptionDowngradeDescription": {
+        "description": "Description for the downgrade option."
+    },
+    "subscriptionSwitchButton": "Switch Plan",
+    "@subscriptionSwitchButton": {
+        "description": "Button text to initiate a plan switch."
     }
 }

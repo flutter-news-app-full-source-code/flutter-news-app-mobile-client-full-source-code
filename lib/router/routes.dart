@@ -21,8 +21,6 @@ abstract final class Routes {
   static const accountName = 'account';
   static const discover = '/discover';
   static const discoverName = 'discover';
-  static const subscriptionDetails = 'subscription-details';
-  static const subscriptionDetailsName = 'subscriptionDetails';
   static const paywall = '/paywall';
   static const paywallName = 'paywall';
 
@@ -39,6 +37,8 @@ abstract final class Routes {
   static const manageFollowedItemsName = 'manageFollowedItems';
   static const notificationsCenter = 'notifications-center';
   static const notificationsCenterName = 'notificationsCenter';
+  static const subscriptionDetails = 'subscription-details';
+  static const subscriptionDetailsName = 'subscriptionDetails';
 
   // --- Relative Sub-Routes ---
   // These routes are defined with relative paths and are intended to be

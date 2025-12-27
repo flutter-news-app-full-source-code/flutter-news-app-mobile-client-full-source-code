@@ -44,7 +44,6 @@ class AdService {
   final Uuid _uuid = const Uuid();
 
   // Configurable retry parameters for ad loading.
-  // TODO(fulleni): Make this configurable through the remote config.
   static const int _maxAdLoadRetries = 2;
   static const Duration _adLoadRetryDelay = Duration(seconds: 1);
 

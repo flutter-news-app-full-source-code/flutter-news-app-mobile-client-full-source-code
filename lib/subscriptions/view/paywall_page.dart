@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/bloc/subscription_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/repositories/subscription_repository.dart';
@@ -198,7 +199,7 @@ class _PaywallView extends StatelessWidget {
           _buildPlanCard(
             context,
             annual,
-            l10n,
+            l10n: l10n,
             isAnnual: true,
             isSelected: state.selectedProduct?.id == annual.id,
             onTap: () => context.read<SubscriptionBloc>().add(
@@ -210,7 +211,7 @@ class _PaywallView extends StatelessWidget {
           _buildPlanCard(
             context,
             monthly,
-            l10n,
+            l10n: l10n,
             isAnnual: false,
             isSelected: state.selectedProduct?.id == monthly.id,
             onTap: () => context.read<SubscriptionBloc>().add(

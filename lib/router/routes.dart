@@ -21,6 +21,8 @@ abstract final class Routes {
   static const accountName = 'account';
   static const discover = '/discover';
   static const discoverName = 'discover';
+  static const paywall = '/paywall';
+  static const paywallName = 'paywall';
 
   // --- Global, Top-Level Routes ---
   static const entityDetails = '/entity-details/:type/:id';

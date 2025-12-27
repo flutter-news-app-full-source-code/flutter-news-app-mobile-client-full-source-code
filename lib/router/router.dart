@@ -58,6 +58,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/th
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/multi_select_search_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/view/paywall_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/view/subscription_details_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 
@@ -238,6 +239,11 @@ GoRouter createRouter({
         pageBuilder: (context, state) =>
             const MaterialPage(fullscreenDialog: true, child: AccountPage()),
         routes: [
+          GoRoute(
+            path: Routes.subscriptionDetails,
+            name: Routes.subscriptionDetailsName,
+            builder: (context, state) => const SubscriptionDetailsPage(),
+          ),
           GoRoute(
             path: Routes.notificationsCenter,
             name: Routes.notificationsCenterName,

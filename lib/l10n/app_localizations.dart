@@ -3085,6 +3085,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Subscribe for {price} / {period}'**
   String paywallSubscribeButton(String price, String period);
+
+  /// Title of the success dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Premium!'**
+  String get paywallSuccessTitle;
+
+  /// Body of the success dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'You now have full access to all features.'**
+  String get paywallSuccessBody;
+
+  /// Title of the error dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase Failed'**
+  String get paywallErrorTitle;
+
+  /// Loading text shown during purchase verification.
+  ///
+  /// In en, this message translates to:
+  /// **'Verifying purchase...'**
+  String get paywallLoading;
 }
 
 class _AppLocalizationsDelegate

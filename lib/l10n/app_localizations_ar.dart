@@ -1644,4 +1644,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String paywallSubscribeButton(String price, String period) {
     return 'اشترك مقابل $price / $period';
   }
+
+  @override
+  String get paywallSuccessTitle => 'مرحبًا بك في بريميوم!';
+
+  @override
+  String get paywallSuccessBody => 'لديك الآن وصول كامل إلى جميع الميزات.';
+
+  @override
+  String get paywallErrorTitle => 'فشلت عملية الشراء';
+
+  @override
+  String get paywallLoading => 'جارٍ التحقق من الشراء...';
 }

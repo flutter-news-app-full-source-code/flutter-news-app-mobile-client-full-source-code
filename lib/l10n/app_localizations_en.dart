@@ -1648,4 +1648,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String paywallSubscribeButton(String price, String period) {
     return 'Subscribe for $price / $period';
   }
+
+  @override
+  String get paywallSuccessTitle => 'Welcome to Premium!';
+
+  @override
+  String get paywallSuccessBody => 'You now have full access to all features.';
+
+  @override
+  String get paywallErrorTitle => 'Purchase Failed';
+
+  @override
+  String get paywallLoading => 'Verifying purchase...';
 }

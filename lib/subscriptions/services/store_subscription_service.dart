@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:in_app_purchase_android/billing_client_wrappers.dart';
+import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:logging/logging.dart';
 
 /// {@template store_subscription_service}
@@ -60,11 +63,38 @@ class StoreSubscriptionService implements SubscriptionServiceInterface {
   }
 
   @override
-  Future<void> buyNonConsumable(ProductDetails product) async {
+  Future<void> buyNonConsumable({
+    required ProductDetails product,
+    String? applicationUserName,
+    PurchaseDetails? oldPurchaseDetails,
+  }) async {
     _logger.info(
       '[StoreSubscriptionService] Initiating purchase for ${product.id}',
     );
-    final purchaseParam = PurchaseParam(productDetails: product);
+
+    late final PurchaseParam purchaseParam;
+
+    // For Android, we must construct a specific parameter object for upgrades
+    // or downgrades to handle proration correctly and avoid double-billing.
+    if (Platform.isAndroid && oldPurchaseDetails != null) {
+      _logger.info('Android subscription change detected. Applying proration.');
+      purchaseParam = GooglePlayPurchaseParam(
+        productDetails: product,
+        applicationUserName: applicationUserName,
+        changeSubscriptionParam: ChangeSubscriptionParam(
+          oldPurchaseDetails: oldPurchaseDetails as GooglePlayPurchaseDetails,
+          replacementMode: ReplacementMode.withTimeProration,
+        ),
+      );
+    } else {
+      // For iOS, upgrades/downgrades are handled automatically by the App Store.
+      // For new Android subscriptions, we use the standard parameter.
+      purchaseParam = PurchaseParam(
+        productDetails: product,
+        applicationUserName: applicationUserName,
+      );
+    }
+
     try {
       final success = await _iap.buyNonConsumable(purchaseParam: purchaseParam);
       if (!success) {

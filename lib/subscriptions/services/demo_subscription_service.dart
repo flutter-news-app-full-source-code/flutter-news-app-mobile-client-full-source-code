@@ -67,7 +67,7 @@ class DemoSubscriptionService implements SubscriptionServiceInterface {
   @override
   Future<void> restorePurchases() async {
     _logger.info('[DemoSubscriptionService] Restoring simulated purchases...');
-    
+
     // Simulate network delay
     await Future<void>.delayed(const Duration(seconds: 1));
 
@@ -94,11 +94,10 @@ class DemoSubscriptionService implements SubscriptionServiceInterface {
   ProductDetails _createMockProduct(String id) {
     return ProductDetails(
       id: id,
-      title:
-          id.contains('annual')
-              ? 'Annual Premium (Demo)'
-              : 'Monthly Premium (Demo)',
-      description: 'Unlock all features (Demo Mode)',
+      title: id.contains('annual')
+          ? 'demoAnnualPlanTitle'
+          : 'demoMonthlyPlanTitle',
+      description: 'demoPlanDescription',
       price: id.contains('annual') ? r'$99.99' : r'$9.99',
       rawPrice: id.contains('annual') ? 99.99 : 9.99,
       currencyCode: 'USD',

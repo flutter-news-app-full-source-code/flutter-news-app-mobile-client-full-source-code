@@ -2134,5 +2134,71 @@
     "paywallLoading": "Verifying purchase...",
     "@paywallLoading": {
         "description": "Loading text shown during purchase verification."
+    },
+    "subscriptionDetailsPageTitle": "Subscription Details",
+    "@subscriptionDetailsPageTitle": {
+        "description": "Title for the subscription details page."
+    },
+    "manageSubscriptionButton": "Manage Subscription",
+    "@manageSubscriptionButton": {
+        "description": "Button text to manage subscription."
+    },
+    "subscriptionDetailsCurrentPlan": "Current Plan",
+    "@subscriptionDetailsCurrentPlan": {
+        "description": "Label for the current subscription plan."
+    },
+    "subscriptionDetailsRenewsOn": "Renews on {date}",
+    "@subscriptionDetailsRenewsOn": {
+        "description": "Text indicating the renewal date of a subscription.",
+        "placeholders": {
+            "date": {
+                "type": "String"
+            }
+        }
+    },
+    "subscriptionDetailsExpiresOn": "Expires on {date}",
+    "@subscriptionDetailsExpiresOn": {
+        "description": "Text indicating the expiration date of a non-renewing subscription.",
+        "placeholders": {
+            "date": {
+                "type": "String"
+            }
+        }
+    },
+    "subscriptionDetailsWillNotRenew": "Will not renew",
+    "@subscriptionDetailsWillNotRenew": {
+        "description": "Status text for a subscription that has been cancelled and will not auto-renew."
+    },
+    "subscriptionDetailsProvider": "Provider",
+    "@subscriptionDetailsProvider": {
+        "description": "Label for the subscription provider (e.g., Apple App Store)."
+    },
+    "subscriptionDetailsManageButton": "Manage in App Store",
+    "@subscriptionDetailsManageButton": {
+        "description": "Button text to open the native subscription management UI."
+    },
+    "subscriptionDetailsLoading": "Loading subscription details...",
+    "@subscriptionDetailsLoading": {
+        "description": "Text shown while subscription details are loading."
+    },
+    "subscriptionDetailsError": "Could not load subscription details.",
+    "@subscriptionDetailsError": {
+        "description": "Error message when subscription details fail to load."
+    },
+    "subscriptionDetailsNoSubscription": "You do not have an active subscription.",
+    "@subscriptionDetailsNoSubscription": {
+        "description": "Message shown when the user has no active subscription."
+    },
+    "demoAnnualPlanTitle": "Annual Premium (Demo)",
+    "@demoAnnualPlanTitle": {
+        "description": "Title for the annual demo plan."
+    },
+    "demoMonthlyPlanTitle": "Monthly Premium (Demo)",
+    "@demoMonthlyPlanTitle": {
+        "description": "Title for the monthly demo plan."
+    },
+    "demoPlanDescription": "Unlock all features (Demo Mode)",
+    "@demoPlanDescription": {
+        "description": "Description for a demo subscription plan."
     }
 }

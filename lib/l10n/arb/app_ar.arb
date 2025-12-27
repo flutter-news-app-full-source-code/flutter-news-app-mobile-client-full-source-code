@@ -2134,5 +2134,71 @@
     "paywallLoading": "جارٍ التحقق من الشراء...",
     "@paywallLoading": {
         "description": "Loading text shown during purchase verification."
+    },
+    "subscriptionDetailsPageTitle": "تفاصيل الاشتراك",
+    "@subscriptionDetailsPageTitle": {
+        "description": "Title for the subscription details page."
+    },
+    "manageSubscriptionButton": "إدارة الاشتراك",
+    "@manageSubscriptionButton": {
+        "description": "Button text to manage subscription."
+    },
+    "subscriptionDetailsCurrentPlan": "الخطة الحالية",
+    "@subscriptionDetailsCurrentPlan": {
+        "description": "Label for the current subscription plan."
+    },
+    "subscriptionDetailsRenewsOn": "يتجدد في {date}",
+    "@subscriptionDetailsRenewsOn": {
+        "description": "Text indicating the renewal date of a subscription.",
+        "placeholders": {
+            "date": {
+                "type": "String"
+            }
+        }
+    },
+    "subscriptionDetailsExpiresOn": "ينتهي في {date}",
+    "@subscriptionDetailsExpiresOn": {
+        "description": "Text indicating the expiration date of a non-renewing subscription.",
+        "placeholders": {
+            "date": {
+                "type": "String"
+            }
+        }
+    },
+    "subscriptionDetailsWillNotRenew": "لن يتجدد",
+    "@subscriptionDetailsWillNotRenew": {
+        "description": "Status text for a subscription that has been cancelled and will not auto-renew."
+    },
+    "subscriptionDetailsProvider": "المزود",
+    "@subscriptionDetailsProvider": {
+        "description": "Label for the subscription provider (e.g., Apple App Store)."
+    },
+    "subscriptionDetailsManageButton": "إدارة في المتجر",
+    "@subscriptionDetailsManageButton": {
+        "description": "Button text to open the native subscription management UI."
+    },
+    "subscriptionDetailsLoading": "جارٍ تحميل تفاصيل الاشتراك...",
+    "@subscriptionDetailsLoading": {
+        "description": "Text shown while subscription details are loading."
+    },
+    "subscriptionDetailsError": "تعذر تحميل تفاصيل الاشتراك.",
+    "@subscriptionDetailsError": {
+        "description": "Error message when subscription details fail to load."
+    },
+    "subscriptionDetailsNoSubscription": "ليس لديك اشتراك نشط.",
+    "@subscriptionDetailsNoSubscription": {
+        "description": "Message shown when the user has no active subscription."
+    },
+    "demoAnnualPlanTitle": "بريميوم سنوي (تجريبي)",
+    "@demoAnnualPlanTitle": {
+        "description": "Title for the annual demo plan."
+    },
+    "demoMonthlyPlanTitle": "بريميوم شهري (تجريبي)",
+    "@demoMonthlyPlanTitle": {
+        "description": "Title for the monthly demo plan."
+    },
+    "demoPlanDescription": "فتح جميع الميزات (وضع تجريبي)",
+    "@demoPlanDescription": {
+        "description": "Description for a demo subscription plan."
     }
 }

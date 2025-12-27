@@ -26,6 +26,7 @@ final class InitializationSuccess extends InitializationResult {
   const InitializationSuccess({
     required this.remoteConfig,
     this.user,
+    this.userContext,
     this.settings,
     this.userContentPreferences,
   });
@@ -35,6 +36,9 @@ final class InitializationSuccess extends InitializationResult {
 
   /// The initial user, if one was found. Can be anonymous or authenticated.
   final User? user;
+
+  /// The user's context (ephemeral state like feed decorator status).
+  final UserContext? userContext;
 
   /// The user's specific application settings (theme, font, etc.).
   /// Null if the user is unauthenticated.
@@ -48,6 +52,7 @@ final class InitializationSuccess extends InitializationResult {
   List<Object?> get props => [
     remoteConfig,
     user,
+    userContext,
     settings,
     userContentPreferences,
   ];

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
-import 'package:kv_storage_service/kv_storage_service.dart';
 import 'package:logging/logging.dart';
 
 /// {@template demo_subscription_service}
@@ -14,18 +13,15 @@ import 'package:logging/logging.dart';
 /// {@endtemplate}
 class DemoSubscriptionService implements SubscriptionServiceInterface {
   /// {@macro demo_subscription_service}
-  DemoSubscriptionService({
-    required KVStorageService storageService,
-    Logger? logger,
-  }) : _storageService = storageService,
-       _logger = logger ?? Logger('DemoSubscriptionService');
+  DemoSubscriptionService({Logger? logger})
+    : _logger = logger ?? Logger('DemoSubscriptionService');
 
-  final KVStorageService _storageService;
   final Logger _logger;
   final _purchaseStreamController =
       StreamController<List<PurchaseDetails>>.broadcast();
 
-  static const _storageKey = 'demo_purchased_product_ids';
+  /// In-memory set to track purchased product IDs for the current session.
+  final Set<String> _purchasedProductIds = {};
 
   @override
   Stream<List<PurchaseDetails>> get purchaseStream =>
@@ -59,12 +55,11 @@ class DemoSubscriptionService implements SubscriptionServiceInterface {
 
     // If this is an upgrade/downgrade, remove the old product.
     if (oldPurchaseDetails != null) {
-      await _removePurchase(oldPurchaseDetails.productID);
+      _purchasedProductIds.remove(oldPurchaseDetails.productID);
     }
 
     // Simulate the store checking for existing ownership of the new product.
-    final purchasedIds = await _getPurchasedIds();
-    if (purchasedIds.contains(product.id)) {
+    if (_purchasedProductIds.contains(product.id)) {
       _logger.warning('[DemoSubscriptionService] Already owns ${product.id}');
       final errorPurchase = _createMockPurchase(
         product.id,
@@ -85,7 +80,7 @@ class DemoSubscriptionService implements SubscriptionServiceInterface {
     final purchase = _createMockPurchase(product.id);
 
     // Persist the purchase to simulate "ownership"
-    await _persistPurchase(product.id);
+    _purchasedProductIds.add(product.id);
 
     _purchaseStreamController.add([purchase]);
   }
@@ -97,13 +92,12 @@ class DemoSubscriptionService implements SubscriptionServiceInterface {
     // Simulate network delay
     await Future<void>.delayed(const Duration(seconds: 1));
 
-    final purchasedIds = await _getPurchasedIds();
-    if (purchasedIds.isEmpty) {
+    if (_purchasedProductIds.isEmpty) {
       _logger.info('[DemoSubscriptionService] No purchases to restore.');
       return;
     }
 
-    final purchases = purchasedIds.map((id) {
+    final purchases = _purchasedProductIds.map((id) {
       return _createMockPurchase(id, status: PurchaseStatus.restored);
     }).toList();
 
@@ -146,38 +140,5 @@ class DemoSubscriptionService implements SubscriptionServiceInterface {
       transactionDate: DateTime.now().millisecondsSinceEpoch.toString(),
       status: status,
     );
-  }
-
-  Future<List<String>> _getPurchasedIds() async {
-    try {
-      final jsonString = await _storageService.readString(key: _storageKey);
-      if (jsonString == null) return [];
-      // Simple comma-separated list for demo purposes
-      return jsonString.split(',');
-    } catch (e) {
-      return [];
-    }
-  }
-
-  Future<void> _persistPurchase(String productId) async {
-    final currentIds = await _getPurchasedIds();
-    if (!currentIds.contains(productId)) {
-      final newIds = [...currentIds, productId];
-      await _storageService.writeString(
-        key: _storageKey,
-        value: newIds.join(','),
-      );
-    }
-  }
-
-  Future<void> _removePurchase(String productId) async {
-    final currentIds = await _getPurchasedIds();
-    if (currentIds.contains(productId)) {
-      final newIds = currentIds..remove(productId);
-      await _storageService.writeString(
-        key: _storageKey,
-        value: newIds.join(','),
-      );
-    }
   }
 }

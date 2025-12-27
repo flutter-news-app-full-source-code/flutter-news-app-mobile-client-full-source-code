@@ -53,6 +53,7 @@ class AppInitializationPage extends StatelessWidget {
     required this.remoteConfigRepository,
     required this.appSettingsRepository,
     required this.userContentPreferencesRepository,
+    required this.userContextRepository,
     required this.environment,
     required this.adService,
     required this.feedDecoratorService,
@@ -79,6 +80,7 @@ class AppInitializationPage extends StatelessWidget {
   final DataRepository<RemoteConfig> remoteConfigRepository;
   final DataRepository<AppSettings> appSettingsRepository;
   final DataRepository<UserContentPreferences> userContentPreferencesRepository;
+  final DataRepository<UserContext> userContextRepository;
   final AppEnvironment environment;
   final AdService adService;
   final FeedDecoratorService feedDecoratorService;
@@ -114,6 +116,7 @@ class AppInitializationPage extends StatelessWidget {
               final successData = successState.initializationSuccess;
               return App(
                 user: successData.user,
+                userContext: successData.userContext,
                 remoteConfig: successData.remoteConfig,
                 settings: successData.settings,
                 userContentPreferences: successData.userContentPreferences,
@@ -127,6 +130,7 @@ class AppInitializationPage extends StatelessWidget {
                 appSettingsRepository: appSettingsRepository,
                 userContentPreferencesRepository:
                     userContentPreferencesRepository,
+                userContextRepository: userContextRepository,
                 environment: environment,
                 pushNotificationService: pushNotificationService,
                 inAppNotificationRepository: inAppNotificationRepository,

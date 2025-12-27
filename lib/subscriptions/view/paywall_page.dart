@@ -261,10 +261,15 @@ class _PaywallView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Localize demo products if keys match
                     Text(
-                      isAnnual
-                          ? l10n.paywallAnnualPlan
-                          : l10n.paywallMonthlyPlan,
+                      product.title == 'demoAnnualPlanTitle'
+                          ? l10n.demoAnnualPlanTitle
+                          : (product.title == 'demoMonthlyPlanTitle'
+                                ? l10n.demoMonthlyPlanTitle
+                                : (isAnnual
+                                      ? l10n.paywallAnnualPlan
+                                      : l10n.paywallMonthlyPlan)),
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -304,10 +309,8 @@ class _PaywallView extends StatelessWidget {
     return Column(
       children: [
         TextButton(
-          onPressed: () => context.read<SubscriptionBloc>().add(
-            const SubscriptionRestoreRequested(),
-          ),
-          child: Text(l10n.paywallRestorePurchases),
+          // TODO(fulleni): carefully handle the purchase restoration.
+          onPressed: () {},
         ),
         const SizedBox(height: AppSpacing.sm),
         Text(
@@ -324,13 +327,25 @@ class _PaywallView extends StatelessWidget {
             _buildLink(
               context,
               l10n.paywallTermsOfService,
-              'https://example.com/terms',
+              context
+                  .read<AppBloc>()
+                  .state
+                  .remoteConfig!
+                  .app
+                  .general
+                  .termsOfServiceUrl,
             ),
             const Text(' • '),
             _buildLink(
               context,
               l10n.paywallPrivacyPolicy,
-              'https://example.com/privacy',
+              context
+                  .read<AppBloc>()
+                  .state
+                  .remoteConfig!
+                  .app
+                  .general
+                  .privacyPolicyUrl,
             ),
           ],
         ),

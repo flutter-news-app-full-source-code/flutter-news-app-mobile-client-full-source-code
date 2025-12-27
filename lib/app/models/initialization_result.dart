@@ -1,4 +1,5 @@
 import 'package:core/core.dart';
+import 'package:data_repository/data_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 
@@ -17,7 +18,7 @@ sealed class InitializationResult extends Equatable {
 /// **Architectural Hint for Future Maintenance:**
 /// This class acts as the "data contract" for a successful startup. If, in the
 /// future, a new piece of critical, user-specific data is required for the app
-/// to function (e.g., a `UserSubscription` status, A/B testing flags, etc.),
+/// to function (e.g. A/B testing flags, etc.),
 /// it should be added as a property here. The `AppInitializer` would then be
 /// updated to fetch this data, and the `App` widget would receive it.
 /// is present, their specific settings and preferences.
@@ -29,6 +30,7 @@ final class InitializationSuccess extends InitializationResult {
     this.userContext,
     this.settings,
     this.userContentPreferences,
+    this.userSubscription,
   });
 
   /// The globally fetched remote configuration.
@@ -48,6 +50,9 @@ final class InitializationSuccess extends InitializationResult {
   /// Null if the user is unauthenticated.
   final UserContentPreferences? userContentPreferences;
 
+  /// The user's subscription status.
+  final UserSubscription? userSubscription;
+
   @override
   List<Object?> get props => [
     remoteConfig,
@@ -55,6 +60,7 @@ final class InitializationSuccess extends InitializationResult {
     userContext,
     settings,
     userContentPreferences,
+    userSubscription,
   ];
 }
 

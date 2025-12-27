@@ -19,6 +19,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localiz
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -68,6 +69,8 @@ class AppInitializationPage extends StatelessWidget {
     required this.contentLimitationService,
     required this.inAppNotificationRepository,
     required this.analyticsService,
+    required this.subscriptionService,
+    required this.purchaseTransactionRepository,
     super.key,
   });
 
@@ -95,6 +98,8 @@ class AppInitializationPage extends StatelessWidget {
   final ContentLimitationService contentLimitationService;
   final DataRepository<InAppNotification> inAppNotificationRepository;
   final AnalyticsService analyticsService;
+  final SubscriptionServiceInterface subscriptionService;
+  final DataRepository<PurchaseTransaction> purchaseTransactionRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -145,6 +150,8 @@ class AppInitializationPage extends StatelessWidget {
                 appReviewService: appReviewService,
                 contentLimitationService: contentLimitationService,
                 analyticsService: analyticsService,
+                subscriptionService: subscriptionService,
+                purchaseTransactionRepository: purchaseTransactionRepository,
               );
 
             case final AppInitializationFailed failureState:

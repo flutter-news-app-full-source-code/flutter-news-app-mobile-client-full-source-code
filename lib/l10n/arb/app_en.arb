@@ -2052,5 +2052,71 @@
                 "example": "1a2b"
             }
         }
+    },
+    "paywallTitle": "Unlock Full Access",
+    "@paywallTitle": {
+        "description": "Title of the paywall screen."
+    },
+    "paywallSubtitle": "Get more from your news feed with Premium limits and features.",
+    "@paywallSubtitle": {
+        "description": "Subtitle of the paywall screen."
+    },
+    "paywallFeatureFollowMore": "Follow More Topics & Sources",
+    "@paywallFeatureFollowMore": {
+        "description": "Feature list item: Increased follow limits."
+    },
+    "paywallFeatureSaveMore": "Save More Articles",
+    "@paywallFeatureSaveMore": {
+        "description": "Feature list item: Increased save limits."
+    },
+    "paywallFeatureAdvancedFilters": "Advanced Filters & Alerts",
+    "@paywallFeatureAdvancedFilters": {
+        "description": "Feature list item: Advanced filtering and notifications."
+    },
+    "paywallFeatureUnlimitedHistory": "Unlimited Reading History",
+    "@paywallFeatureUnlimitedHistory": {
+        "description": "Feature list item: Unlimited history."
+    },
+    "paywallMonthlyPlan": "Monthly",
+    "@paywallMonthlyPlan": {
+        "description": "Label for the monthly subscription plan."
+    },
+    "paywallAnnualPlan": "Annual",
+    "@paywallAnnualPlan": {
+        "description": "Label for the annual subscription plan."
+    },
+    "paywallBestValue": "Best Value",
+    "@paywallBestValue": {
+        "description": "Badge text for the best value plan."
+    },
+    "paywallRestorePurchases": "Restore Purchases",
+    "@paywallRestorePurchases": {
+        "description": "Button text to restore purchases."
+    },
+    "paywallTermsOfService": "Terms of Service",
+    "@paywallTermsOfService": {
+        "description": "Link text for Terms of Service."
+    },
+    "paywallPrivacyPolicy": "Privacy Policy",
+    "@paywallPrivacyPolicy": {
+        "description": "Link text for Privacy Policy."
+    },
+    "paywallDisclaimer": "Subscription automatically renews unless auto-renew is turned off at least 24-hours before the end of the current period.",
+    "@paywallDisclaimer": {
+        "description": "Disclaimer text regarding auto-renewal."
+    },
+    "paywallSubscribeButton": "Subscribe for {price} / {period}",
+    "@paywallSubscribeButton": {
+        "description": "Subscribe button text.",
+        "placeholders": {
+            "price": {
+                "type": "String",
+                "example": "$4.99"
+            },
+            "period": {
+                "type": "String",
+                "example": "Month"
+            }
+        }
     }
 }

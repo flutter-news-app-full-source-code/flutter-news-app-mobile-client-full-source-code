@@ -85,11 +85,22 @@ class DemoSubscriptionService implements SubscriptionServiceInterface {
   @override
   Future<void> restorePurchases() {
     _logger.info('[DemoSubscriptionService] Restoring purchases (simulated).');
-    // In a real scenario, this would query the store. Here, we can simulate
-    // finding a previously purchased item if needed, or do nothing if we
-    // assume the user has no prior purchases in the demo.
-    // For this uscase, we'll simulate finding no purchases to restore.
-    _purchaseStreamController.add([]);
+    // Simulate finding a previously purchased annual plan.
+    // This ensures the UI flow (loading -> success) can be verified.
+    final purchaseDetails = PurchaseDetails(
+      purchaseID: 'demo_restore_${DateTime.now().millisecondsSinceEpoch}',
+      productID: 'demo_annual_plan',
+      verificationData: PurchaseVerificationData(
+        localVerificationData: '',
+        serverVerificationData: 'demo_restore_token',
+        source: defaultTargetPlatform == TargetPlatform.android
+            ? 'google_play'
+            : 'app_store',
+      ),
+      transactionDate: DateTime.now().millisecondsSinceEpoch.toString(),
+      status: PurchaseStatus.restored,
+    );
+    _purchaseStreamController.add([purchaseDetails]);
     return Future.value();
   }
 

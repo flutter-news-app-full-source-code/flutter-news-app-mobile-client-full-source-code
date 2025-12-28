@@ -15,6 +15,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/purchase_handler.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:logging/logging.dart';
 
@@ -58,6 +59,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required DataRepository<InAppNotification> inAppNotificationRepository,
     required AppReviewService appReviewService,
     required AnalyticsService analyticsService,
+    required PurchaseHandler purchaseHandler,
+    required DataRepository<UserSubscription> userSubscriptionRepository,
   }) : _remoteConfigRepository = remoteConfigRepository,
        _appInitializer = appInitializer,
        _authRepository = authRepository,
@@ -72,6 +75,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _appReviewService = appReviewService,
        _inlineAdCacheService = inlineAdCacheService,
        _analyticsService = analyticsService,
+       _purchaseHandler = purchaseHandler,
+       _userSubscriptionRepository = userSubscriptionRepository,
        _logger = logger,
        super(
          AppState(
@@ -116,6 +121,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppNotificationTapped>(_onAppNotificationTapped);
     on<AppBookmarkToggled>(_onAppBookmarkToggled);
     on<AppContentReported>(_onAppContentReported);
+    on<_AppUserAndSubscriptionRefreshed>(_onUserAndSubscriptionRefreshed);
 
     // Listen to token refresh events from the push notification service.
     // When a token is refreshed, dispatch an event to trigger device
@@ -131,6 +137,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // client's only responsibility is to react to the incoming message
       // and update the UI to show an unread indicator.
       add(const AppInAppNotificationReceived());
+    });
+
+    // Listen to purchase completion events to refresh user entitlements.
+    _purchaseCompletedSubscription = _purchaseHandler.purchaseCompleted.listen((_) {
+      add(const _AppUserAndSubscriptionRefreshed());
     });
   }
 
@@ -150,6 +161,15 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final InlineAdCacheService _inlineAdCacheService;
   final FeedCacheService _feedCacheService;
   final AnalyticsService _analyticsService;
+  final PurchaseHandler _purchaseHandler;
+  final DataRepository<UserSubscription> _userSubscriptionRepository;
+  late final StreamSubscription<void> _purchaseCompletedSubscription;
+
+  @override
+  Future<void> close() {
+    _purchaseCompletedSubscription.cancel();
+    return super.close();
+  }
 
   /// Handles the [AppStarted] event.
   ///
@@ -183,6 +203,38 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         );
       }
       await _registerDeviceForPushNotifications(state.user!.id);
+    }
+  }
+
+  Future<void> _onUserAndSubscriptionRefreshed(
+    _AppUserAndSubscriptionRefreshed event,
+    Emitter<AppState> emit,
+  ) async {
+    final userId = state.user?.id;
+    if (userId == null) return;
+
+    _logger.info('[AppBloc] Refreshing user and subscription data after purchase...');
+
+    try {
+      final user = await _authRepository.getCurrentUser();
+      
+      final subResponse = await _userSubscriptionRepository.readAll(
+        userId: userId,
+        filter: {'status': 'active'},
+        pagination: const PaginationOptions(limit: 1),
+      );
+      final subscription = subResponse.items.firstOrNull;
+
+      if (user != null) {
+        emit(state.copyWith(
+          user: user,
+          userSubscription: subscription,
+          clearError: true,
+        ));
+      }
+      _logger.info('[AppBloc] User and subscription data refreshed.');
+    } catch (e, s) {
+      _logger.severe('[AppBloc] Failed to refresh data after purchase.', e, s);
     }
   }
 

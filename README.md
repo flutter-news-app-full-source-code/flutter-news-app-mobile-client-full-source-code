@@ -24,9 +24,9 @@ This toolkit is engineered with production-ready features that provide immediate
 Explore the high-level domains below to see how.
 
 <details>
-<summary><strong>📰 Content Discovery & User Engagement</strong></summary>
+<summary><strong>📰 Dynamic News Feed & Personalization</strong></summary>
 
-### 📱 Dynamic & Personalized News Feed
+### 📱 Intelligent Content Delivery
 A beautiful, infinitely scrolling feed serves as the core of the user experience. It's not just a list; it's an intelligent, user-driven content delivery system.
 - **Instantaneous Content Switching:** An intelligent, session-based cache pre-fetches and holds data, eliminating loading spinners when users switch between their preferred content views.
 - **Personalized Viewing:** Users control their experience with settings for information density and image presentation, adapting the feed to their reading style.
@@ -35,15 +35,38 @@ A beautiful, infinitely scrolling feed serves as the core of the user experience
 
 ---
 
-### 🔎 Powerful Content Curation & Discovery
+### 🎨 Deep User Customization
+Empower users to tailor the app to their exact preferences, creating a sticky and personal experience.
+- **Content Subscriptions:** Users can personalize their feed by following specific topics, news organizations, or areas of interest.
+- **Appearance Control:** A comprehensive settings panel allows configuration of the theme (Light/Dark/System), accent colors, and font styles.
+- **Personalized Collections:** Users can bookmark headlines for later reading and fully manage their custom-built news feeds.
+> **Your Advantage:** Built-in personalization features that are proven to drive user retention are included and fully functional from day one.
+
+</details>
+
+<details>
+<summary><strong>🔎 Advanced Search & Discovery</strong></summary>
+
+### 🧭 Powerful Content Curation
 Give users the tools to find exactly what they're looking for with a multi-faceted discovery system.
-- **Customizable Filter Bar:** A persistent, one-tap filter bar provides instant access to pre-defined and user-created content streams.
-- **Advanced Content Curation:** A dedicated saved filter hub allows users to construct, save, and manage highly specific news feeds. Users can save frequently used filters for on-demand use and pin them for one-tap access on the main feed.
-- **Proactive Notification Subscriptions:** When saving a filter, users can subscribe to receive push notifications—such as breaking news alerts or daily digests—for content that matches their specific criteria.
 - **Dedicated Discovery Hub:** Users can browse publishers by category in horizontally scrolling carousels, apply regional filters, and perform targeted searches.
-> **Your Advantage:** Deliver powerful content discovery tools that keep users engaged, increase session duration, and encourage return visits.
+- **Smart Filter Bar:** A persistent, one-tap filter bar provides instant access to pre-defined and user-created content streams directly from the feed.
+- **Multi-Dimensional Search:** Users can perform targeted searches across headlines, sources, and topics with advanced filtering options.
+> **Your Advantage:** A sophisticated discovery engine that encourages exploration and increases session depth.
 
 ---
+
+### 🔖 Smart Curation & Alerts
+Turn passive readers into active curators with advanced tools for managing information flow.
+- **Saved Filter Hub:** A dedicated hub allows users to construct, save, and manage highly specific news feeds (e.g., "Tech News from US & UK").
+- **One-Tap Pinning:** Users can pin their favorite custom filters to the main feed for instant access.
+- **Proactive Notification Subscriptions:** This is a standout feature. When saving a filter, users can subscribe to receive push notifications—such as breaking news alerts or daily digests—specifically for content that matches their custom criteria.
+> **Your Advantage:** Deliver a "Bloomberg-terminal" style experience for power users, driving high retention through personalized alerts.
+
+</details>
+
+<details>
+<summary><strong>🔔 Notifications & Engagement</strong></summary>
 
 ### 🔔 Proactive & Flexible Push Notifications
 A robust, backend-driven notification system keeps users informed and brings them back to the content they care about.
@@ -63,6 +86,7 @@ A complete suite of tools to build a vibrant user community and gather valuable 
 > **Your Advantage:** Deploy a full-featured community and feedback system from day one. Skip the complexity of building engagement UI, state management for reactions, and the nuanced logic of a best-practice app review funnel.
 
 </details>
+
 <details>
 <summary><strong>📊 Analytics & Business Intelligence</strong></summary>
 
@@ -81,22 +105,24 @@ A robust, type-safe analytics system designed to give you deep insight into user
 ### 🔐 Secure, Modern Authentication
 A complete and secure user authentication system is built-in, covering the entire user lifecycle.
 - **Flexible Sign-In Options:** Includes modern passwordless and anonymous sign-in flows to reduce friction for new users.
+- **Tiered User Model:** The system clearly separates user identity (`Guest`, `Standard`) from feature entitlement (`Premium`), allowing for granular control over feature access.
 - **Seamless Account Linking:** A robust process allows anonymous users to create a permanent account while transparently migrating all their data—including preferences, bookmarked headlines, and saved content views.
 > **Your Advantage:** The complex logic for security, user management, and data migration is already solved, providing a seamless and secure user journey from the start.
-
----
-
-### 🎨 Deep User Customization
-Empower users to tailor the app to their exact preferences, creating a sticky and personal experience.
-- **Content Subscriptions:** Users can personalize their feed by following specific topics, news organizations, or areas of interest.
-- **Appearance Control:** A comprehensive settings panel allows configuration of the theme (Light/Dark/System), accent colors, and font styles.
-- **Personalized Collections:** Users can bookmark headlines for later reading and fully manage their custom-built news feeds.
-> **Your Advantage:** Built-in personalization features that are proven to drive user retention are included and fully functional from day one.
 
 </details>
 
 <details>
-<summary><strong>⚙️ Monetization & Remote Management</strong></summary>
+<summary><strong>⚙️ Monetization & Revenue</strong></summary>
+
+### 💳 Robust In-App Subscriptions
+A complete, App Store and Google Play compliant subscription system that unlocks premium features and drives revenue.
+- **Tiered Access Control:** Implements a clear distinction between `Guest`, `Standard`, and `Premium` user tiers, with feature access controlled by remote configuration.
+- **Defined User Journeys:** The router enforces strict user journeys: Guests are funneled to account creation, Standard users see the upgrade path, and Premium users are directed to subscription management.
+- **Zero-Trust Backend Validation:** All purchases and restorations are validated server-side, ensuring that entitlements are only granted after your backend confirms the receipt with Apple/Google. This prevents client-side fraud.
+- **Store-Compliant Restore Flow:** Includes a mandatory "Restore Purchases" flow, allowing users to reclaim their premium status on new devices, with backend logic to handle entitlement transfers between user accounts.
+> **Your Advantage:** Launch with a secure, scalable, and store-compliant subscription model. The complex logic for handling purchases, restorations, and state management is already built, tested, and ready for production.
+
+---
 
 ### 💸 Flexible, Provider-Agnostic Monetization
 Start generating revenue immediately with a sophisticated ad system designed for performance and flexibility.
@@ -105,9 +131,12 @@ Start generating revenue immediately with a sophisticated ad system designed for
 - **Performance Optimized:** An intelligent caching layer for inline and interstitial ads ensures a smooth, jank-free scrolling experience in feeds and during navigation.
 > **Your Advantage:** Deploy a highly extensible, revenue-ready ad system that respects the user experience and scales with your business needs, all without being locked into a single provider.
 
----
+</details>
 
-### 📡 Backend-Driven Remote Control
+<details>
+<summary><strong>📡 Remote Management & Operations</strong></summary>
+
+### 🎛️ Backend-Driven Remote Control
 Manage your app's behavior and operational state in real-time without needing to ship an app update.
 - **Centralized Configuration:** Remotely control ad frequency, placement rules, user permission limits, and other critical parameters from the backend.
 - **Critical State Management:** Includes built-in, production-ready flows for essential "kill switch" scenarios. Instantly activate a full-screen maintenance page or enforce a mandatory update with a non-dismissible screen that directs users to the app store.

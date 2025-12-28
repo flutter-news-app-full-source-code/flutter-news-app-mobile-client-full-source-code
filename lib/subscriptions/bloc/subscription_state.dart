@@ -8,6 +8,8 @@ enum SubscriptionStatus {
   restoring,
   success,
   failure,
+  restorationSuccess,
+  restorationFailure,
 }
 
 class SubscriptionState extends Equatable {
@@ -45,6 +47,7 @@ class SubscriptionState extends Equatable {
     ProductDetails? selectedProduct,
     PurchaseDetails? activePurchaseDetails,
     Object? error,
+    bool clearError = false,
     bool clearActivePurchase = false,
   }) {
     return SubscriptionState(
@@ -54,7 +57,7 @@ class SubscriptionState extends Equatable {
       activePurchaseDetails: clearActivePurchase
           ? null
           : activePurchaseDetails ?? this.activePurchaseDetails,
-      error: error ?? this.error,
+      error: clearError ? null : error ?? this.error,
     );
   }
 

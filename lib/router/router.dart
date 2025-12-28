@@ -85,7 +85,9 @@ GoRouter createRouter({
       // navigation or redirect the user elsewhere.
 
       // Get the current, stable lifecycle status from the AppBloc.
-      final appStatus = context.read<AppBloc>().state.status;
+      final appState = context.read<AppBloc>().state;
+      final appStatus = appState.status;
+      final user = appState.user;
       final currentLocation = state.matchedLocation;
 
       logger.info(
@@ -98,12 +100,15 @@ GoRouter createRouter({
       const authenticationPath = Routes.authentication;
       const accountLinkingPath = Routes.accountLinking;
       const feedPath = Routes.feed;
+      const paywallPath = Routes.paywall;
 
       // Check if the user is trying to go to any part of the auth flow.
       final isGoingToAuth = currentLocation.startsWith(authenticationPath);
       // Check if the user is trying to go to any part of the account linking
       // flow.
       final isGoingToLinking = currentLocation.startsWith(accountLinkingPath);
+      // Check if the user is trying to access the paywall.
+      final isGoingToPaywall = currentLocation == paywallPath;
 
       // RULE 1: If the user is unauthenticated, they can ONLY be on an
       // authentication path. If they try to go anywhere else, redirect them
@@ -134,6 +139,16 @@ GoRouter createRouter({
           );
           return feedPath;
         }
+
+        // RULE 2.1: Anonymous users cannot access the Paywall directly.
+        // They must link their account first to ensure purchases are safe.
+        if (isGoingToPaywall) {
+          logger.info(
+            '    Action: Anonymous user on paywall. Redirecting to linking.',
+          );
+          return accountLinkingPath;
+        }
+
         // Otherwise, allow navigation (e.g., to account linking).
         return null;
       }
@@ -156,6 +171,15 @@ GoRouter createRouter({
             '    Action: Authenticated user at root. Redirecting to feed.',
           );
           return feedPath;
+        }
+
+        // RULE 3.1: Premium users do not need to see the Paywall (Acquisition).
+        // Redirect them to the subscription management page.
+        if (isGoingToPaywall && user?.tier == AccessTier.premium) {
+          logger.info(
+            '    Action: Premium user on paywall. Redirecting to details.',
+          );
+          return '${Routes.account}/${Routes.subscriptionDetails}';
         }
       }
 

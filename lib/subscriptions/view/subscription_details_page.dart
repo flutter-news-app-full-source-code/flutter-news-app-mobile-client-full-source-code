@@ -1,4 +1,6 @@
+import 'package:collection/collection.dart';
 import 'package:core/core.dart' hide SubscriptionStatus;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
@@ -146,23 +148,52 @@ class _SubscriptionDetailsView extends StatelessWidget {
             state.status == SubscriptionStatus.restoring) {
           return const Padding(
             padding: EdgeInsets.all(AppSpacing.md),
-            child: Center(child: AppCircularProgressIndicator()),
+            child: Center(child: CircularProgressIndicator()),
           );
         }
 
-        final monthlyPlanDetails = state.products.firstWhereOrNull(
-          (p) => p.id == subscription.monthlyPlanId,
+        // 1. Get RemoteConfig to identify plan IDs
+        final remoteConfig = context.read<AppBloc>().state.remoteConfig;
+        if (remoteConfig == null) return const SizedBox.shrink();
+
+        final isIOS = defaultTargetPlatform == TargetPlatform.iOS;
+        final subConfig = remoteConfig.features.subscription;
+
+        final monthlyId =
+            isIOS
+                ? subConfig.monthlyPlan.appleProductId
+                : subConfig.monthlyPlan.googleProductId;
+        final annualId =
+            isIOS
+                ? subConfig.annualPlan.appleProductId
+                : subConfig.annualPlan.googleProductId;
+
+        // 2. Determine current plan from activePurchaseDetails (restored)
+        final currentProductId = state.activePurchaseDetails?.productID;
+
+        // If we don't know the current product ID (e.g. restore failed),
+        // we can't safely offer a switch.
+        if (currentProductId == null) {
+          return const SizedBox.shrink();
+        }
+
+        final isCurrentlyMonthly = currentProductId == monthlyId;
+        final isCurrentlyAnnual = currentProductId == annualId;
+
+        // If the current product doesn't match our config, hide options.
+        if (!isCurrentlyMonthly && !isCurrentlyAnnual) {
+          return const SizedBox.shrink();
+        }
+
+        // 3. Determine target plan
+        final targetPlanId = isCurrentlyMonthly ? annualId : monthlyId;
+        if (targetPlanId == null) return const SizedBox.shrink();
+
+        final targetProduct = state.products.firstWhereOrNull(
+          (p) => p.id == targetPlanId,
         );
 
-        final isCurrentlyMonthly =
-            monthlyPlanDetails?.id == subscription.planId;
-
-        final targetPlan = isCurrentlyMonthly
-            ? state.products
-                .firstWhereOrNull((p) => p.id == subscription.annualPlanId)
-            : monthlyPlanDetails;
-
-        if (targetPlan == null) return const SizedBox.shrink();
+        if (targetProduct == null) return const SizedBox.shrink();
 
         return ListTile(
           title: Text(
@@ -177,15 +208,12 @@ class _SubscriptionDetailsView extends StatelessWidget {
           ),
           trailing: ElevatedButton(
             onPressed: () {
-              // The silent restore on page load should have populated
-              // `activePurchaseDetails` in the state. We pass this to the
-              // purchase request to ensure proration is handled correctly.
               context.read<SubscriptionBloc>().add(
-                    SubscriptionPurchaseRequested(
-                      product: targetPlan,
-                      oldPurchaseDetails: state.activePurchaseDetails,
-                    ),
-                  );
+                SubscriptionPurchaseRequested(
+                  product: targetProduct,
+                  oldPurchaseDetails: state.activePurchaseDetails,
+                ),
+              );
             },
             child: Text(l10n.subscriptionSwitchButton),
           ),

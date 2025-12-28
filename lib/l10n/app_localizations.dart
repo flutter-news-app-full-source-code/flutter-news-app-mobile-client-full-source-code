@@ -3253,6 +3253,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Switch Plan'**
   String get subscriptionSwitchButton;
+
+  /// Button text on the paywall page to restore a user's previous purchases.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Purchases'**
+  String get paywallRestorePurchaseButton;
+
+  /// Snackbar message shown when purchases are restored successfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Your purchases have been successfully restored.'**
+  String get paywallRestoreSuccess;
+
+  /// Snackbar message shown when restoring purchases fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not restore purchases. Please try again or contact support.'**
+  String get paywallRestoreFailure;
+
+  /// A message indicating that the app is currently attempting to restore purchases.
+  ///
+  /// In en, this message translates to:
+  /// **'Restoring purchases...'**
+  String get paywallRestoringPurchases;
 }
 
 class _AppLocalizationsDelegate

@@ -1735,4 +1735,17 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get subscriptionSwitchButton => 'تبديل الخطة';
+
+  @override
+  String get paywallRestorePurchaseButton => 'استعادة المشتريات';
+
+  @override
+  String get paywallRestoreSuccess => 'تم استعادة مشترياتك بنجاح.';
+
+  @override
+  String get paywallRestoreFailure =>
+      'تعذر استعادة المشتريات. يرجى المحاولة مرة أخرى أو الاتصال بالدعم.';
+
+  @override
+  String get paywallRestoringPurchases => 'جارٍ استعادة المشتريات...';
 }

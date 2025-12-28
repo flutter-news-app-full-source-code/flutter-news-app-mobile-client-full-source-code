@@ -1741,4 +1741,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get subscriptionSwitchButton => 'Switch Plan';
+
+  @override
+  String get paywallRestorePurchaseButton => 'Restore Purchases';
+
+  @override
+  String get paywallRestoreSuccess =>
+      'Your purchases have been successfully restored.';
+
+  @override
+  String get paywallRestoreFailure =>
+      'Could not restore purchases. Please try again or contact support.';
+
+  @override
+  String get paywallRestoringPurchases => 'Restoring purchases...';
 }

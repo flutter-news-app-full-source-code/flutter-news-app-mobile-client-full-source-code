@@ -19,6 +19,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localiz
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/purchase_handler.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:logging/logging.dart';
@@ -72,6 +73,7 @@ class AppInitializationPage extends StatelessWidget {
     required this.subscriptionService,
     required this.purchaseTransactionRepository,
     required this.userSubscriptionRepository,
+    required this.purchaseHandler,
     super.key,
   });
 
@@ -102,6 +104,7 @@ class AppInitializationPage extends StatelessWidget {
   final SubscriptionServiceInterface subscriptionService;
   final DataRepository<PurchaseTransaction> purchaseTransactionRepository;
   final DataRepository<UserSubscription> userSubscriptionRepository;
+  final PurchaseHandler purchaseHandler;
 
   @override
   Widget build(BuildContext context) {
@@ -156,6 +159,7 @@ class AppInitializationPage extends StatelessWidget {
                 subscriptionService: subscriptionService,
                 purchaseTransactionRepository: purchaseTransactionRepository,
                 userSubscriptionRepository: userSubscriptionRepository,
+                purchaseHandler: purchaseHandler,
               );
 
             case final AppInitializationFailed failureState:

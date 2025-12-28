@@ -8,7 +8,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.da
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/bloc/subscription_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
 import 'package:go_router/go_router.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';

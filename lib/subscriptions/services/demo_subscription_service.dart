@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:core/core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -45,7 +44,7 @@ class DemoSubscriptionService implements SubscriptionServiceInterface {
         id: id,
         title: isMonthly ? 'Monthly Premium (Demo)' : 'Annual Premium (Demo)',
         description: 'A demo subscription plan.',
-        price: isMonthly ? '\$9.99' : '\$99.99',
+        price: isMonthly ? r'$9.99' : r'$99.99',
         rawPrice: isMonthly ? 9.99 : 99.99,
         currencyCode: 'USD',
       );

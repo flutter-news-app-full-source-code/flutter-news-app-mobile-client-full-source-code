@@ -33,19 +33,6 @@ class AppUserChanged extends AppEvent {
   List<Object?> get props => [user];
 }
 
-/// Dispatched when the user's subscription details have changed.
-///
-/// This allows updating the subscription state (e.g., renewals, expiry)
-/// without requiring a full user identity transition.
-class AppSubscriptionChanged extends AppEvent {
-  const AppSubscriptionChanged(this.subscription);
-
-  final UserSubscription? subscription;
-
-  @override
-  List<Object?> get props => [subscription];
-}
-
 /// Dispatched to request a refresh of the user's application settings.
 ///
 /// This event is typically used when external changes might have occurred
@@ -316,4 +303,10 @@ class AppContentReported extends AppEvent {
 
   @override
   List<Object> get props => [report];
+}
+
+/// Internal event: Dispatched when the [PurchaseHandler] notifies that a
+/// purchase has been completed and verified, requiring a state refresh.
+class _AppUserAndSubscriptionRefreshed extends AppEvent {
+  const _AppUserAndSubscriptionRefreshed();
 }

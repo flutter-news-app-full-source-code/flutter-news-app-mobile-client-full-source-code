@@ -43,6 +43,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/notifications/se
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/data/clients/clients.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/demo_subscription_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/purchase_handler.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/store_subscription_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
@@ -564,6 +565,18 @@ Future<Widget> bootstrap(
     dataClient: userSubscriptionClient,
   );
 
+  // Initialize PurchaseHandler
+  final purchaseHandler = PurchaseHandler(
+    subscriptionService: subscriptionService,
+    purchaseTransactionRepository: purchaseTransactionRepository,
+    userSubscriptionRepository: userSubscriptionRepository,
+    userRepository: userRepository,
+    authRepository: authenticationRepository,
+    logger: logger,
+  );
+  // Start listening for purchase updates immediately
+  purchaseHandler.listen();
+
   logger
     ..fine('All data repositories initialized.')
     ..info('8. Initializing Push Notification service...');
@@ -709,6 +722,7 @@ Future<Widget> bootstrap(
       RepositoryProvider.value(value: appInitializer),
       RepositoryProvider.value(value: logger),
       RepositoryProvider.value(value: subscriptionService),
+      RepositoryProvider.value(value: purchaseHandler),
       RepositoryProvider.value(value: purchaseTransactionRepository),
     ],
     child: AppInitializationPage(
@@ -742,6 +756,7 @@ Future<Widget> bootstrap(
       subscriptionService: subscriptionService,
       purchaseTransactionRepository: purchaseTransactionRepository,
       userSubscriptionRepository: userSubscriptionRepository,
+      purchaseHandler: purchaseHandler,
     ),
   );
 }

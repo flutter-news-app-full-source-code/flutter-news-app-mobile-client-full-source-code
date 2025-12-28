@@ -42,7 +42,7 @@ class _PaywallView extends StatelessWidget {
     // Management happens in SubscriptionDetailsPage.
     final theme = Theme.of(context);
 
-    return BlocConsumer<SubscriptionBloc, SubscriptionState>(
+    return BlocListener<SubscriptionBloc, SubscriptionState>(
       listener: (context, state) {
         if (state.status == SubscriptionStatus.success) {
           // Show success dialog and then pop
@@ -70,8 +70,22 @@ class _PaywallView extends StatelessWidget {
               backgroundColor: theme.colorScheme.error,
             ),
           );
+        } else if (state.status == SubscriptionStatus.restorationSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Purchases restored successfully'),
+            ),
+          );
+        } else if (state.status == SubscriptionStatus.restorationFailure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to restore purchases'),
+              backgroundColor: theme.colorScheme.error,
+            ),
+          );
         }
       },
+      child: BlocBuilder<SubscriptionBloc, SubscriptionState>(
       builder: (context, state) {
         final isLoading =
             state.status == SubscriptionStatus.loadingProducts ||
@@ -165,7 +179,7 @@ class _PaywallView extends StatelessWidget {
               : null,
         );
       },
-    );
+    ));
   }
 
   Widget _buildHeader(BuildContext context, AppLocalizations l10n) {

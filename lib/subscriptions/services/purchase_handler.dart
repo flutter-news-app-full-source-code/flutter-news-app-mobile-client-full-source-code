@@ -1,8 +1,8 @@
 import 'dart:async';
 
+import 'package:auth_repository/auth_repository.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/demo_subscription_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -27,20 +27,20 @@ class PurchaseHandler {
     required DataRepository<PurchaseTransaction> purchaseTransactionRepository,
     required DataRepository<UserSubscription> userSubscriptionRepository,
     required DataRepository<User> userRepository,
-    required AppBloc appBloc,
+    required AuthRepository authRepository,
     required Logger logger,
   }) : _subscriptionService = subscriptionService,
        _purchaseTransactionRepository = purchaseTransactionRepository,
        _userSubscriptionRepository = userSubscriptionRepository,
        _userRepository = userRepository,
-       _appBloc = appBloc,
+       _authRepository = authRepository,
        _logger = logger;
 
   final SubscriptionServiceInterface _subscriptionService;
   final DataRepository<PurchaseTransaction> _purchaseTransactionRepository;
   final DataRepository<UserSubscription> _userSubscriptionRepository;
   final DataRepository<User> _userRepository;
-  final AppBloc _appBloc;
+  final AuthRepository _authRepository;
   final Logger _logger;
 
   StreamSubscription<List<PurchaseDetails>>? _subscription;
@@ -97,7 +97,7 @@ class PurchaseHandler {
     );
 
     try {
-      final currentUser = _appBloc.state.user;
+      final currentUser = await _authRepository.getCurrentUser();
       if (currentUser == null) {
         _logger.warning(
           '[PurchaseHandler] No user logged in. Cannot process purchase.',

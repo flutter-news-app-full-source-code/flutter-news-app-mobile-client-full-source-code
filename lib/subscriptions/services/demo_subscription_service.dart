@@ -1,46 +1,56 @@
 import 'dart:async';
 
+import 'package:core/core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:logging/logging.dart';
 
 /// {@template demo_subscription_service}
-/// A pure Dart implementation of [SubscriptionServiceInterface] for demo/web.
+/// A demo implementation of the [SubscriptionServiceInterface].
 ///
-/// It simulates store behavior using in-memory streams and local storage
-/// to persist "purchased" state across app restarts, mimicking a real store's
-/// restoration capability.
+/// This service simulates subscription flows for use on platforms where native
+/// in-app purchases are not available (like web) or for demonstration purposes.
+///
+/// It fakes product fetching and purchase requests, and pushes simulated
+/// `PurchaseDetails` updates onto its stream to be processed by the
+/// `PurchaseHandler`.
 /// {@endtemplate}
 class DemoSubscriptionService implements SubscriptionServiceInterface {
   /// {@macro demo_subscription_service}
-  DemoSubscriptionService({Logger? logger})
-    : _logger = logger ?? Logger('DemoSubscriptionService');
+  DemoSubscriptionService({required Logger logger}) : _logger = logger;
 
   final Logger _logger;
   final _purchaseStreamController =
       StreamController<List<PurchaseDetails>>.broadcast();
-
-  /// In-memory set to track purchased product IDs for the current session.
-  final Set<String> _purchasedProductIds = {};
 
   @override
   Stream<List<PurchaseDetails>> get purchaseStream =>
       _purchaseStreamController.stream;
 
   @override
-  Future<bool> isAvailable() async {
+  Future<bool> isAvailable() {
     _logger.info('[DemoSubscriptionService] Store is available (simulated).');
-    return true;
+    return Future.value(true);
   }
 
   @override
-  Future<List<ProductDetails>> queryProductDetails(
-    Set<String> productIds,
-  ) async {
+  Future<List<ProductDetails>> queryProductDetails(Set<String> productIds) {
     _logger.info(
-      '[DemoSubscriptionService] Returning mock products for $productIds',
+      '[DemoSubscriptionService] Querying product details for: $productIds (simulated).',
     );
-    return productIds.map(_createMockProduct).toList();
+    final demoProducts = productIds.map((id) {
+      final isMonthly = id.contains('monthly');
+      return ProductDetails(
+        id: id,
+        title: isMonthly ? 'Monthly Premium (Demo)' : 'Annual Premium (Demo)',
+        description: 'A demo subscription plan.',
+        price: isMonthly ? '\$9.99' : '\$99.99',
+        rawPrice: isMonthly ? 9.99 : 99.99,
+        currencyCode: 'USD',
+      );
+    }).toList();
+    return Future.value(demoProducts);
   }
 
   @override
@@ -48,97 +58,47 @@ class DemoSubscriptionService implements SubscriptionServiceInterface {
     required ProductDetails product,
     String? applicationUserName,
     PurchaseDetails? oldPurchaseDetails,
-  }) async {
-    _logger.info(
-      '[DemoSubscriptionService] Simulating purchase for ${product.id}',
-    );
-
-    // If this is an upgrade/downgrade, remove the old product.
-    if (oldPurchaseDetails != null) {
-      _purchasedProductIds.remove(oldPurchaseDetails.productID);
-    }
-
-    // Simulate the store checking for existing ownership of the new product.
-    if (_purchasedProductIds.contains(product.id)) {
-      _logger.warning('[DemoSubscriptionService] Already owns ${product.id}');
-      final errorPurchase = _createMockPurchase(
-        product.id,
-        status: PurchaseStatus.error,
-        error: IAPError(
-          source: 'demo',
-          code: 'duplicate_purchase',
-          message: 'You already own this item.',
-        ),
-      );
-      _purchaseStreamController.add([errorPurchase]);
-      return;
-    }
-
-    // Simulate network delay
-    await Future<void>.delayed(const Duration(seconds: 1));
-
-    final purchase = _createMockPurchase(product.id);
-
-    // Persist the purchase to simulate "ownership"
-    _purchasedProductIds.add(product.id);
-
-    _purchaseStreamController.add([purchase]);
-  }
-
-  @override
-  Future<void> restorePurchases() async {
-    _logger.info('[DemoSubscriptionService] Restoring simulated purchases...');
-
-    // Simulate network delay
-    await Future<void>.delayed(const Duration(seconds: 1));
-
-    if (_purchasedProductIds.isEmpty) {
-      _logger.info('[DemoSubscriptionService] No purchases to restore.');
-      return;
-    }
-
-    final purchases = _purchasedProductIds.map((id) {
-      return _createMockPurchase(id, status: PurchaseStatus.restored);
-    }).toList();
-
-    _purchaseStreamController.add(purchases);
-  }
-
-  @override
-  Future<void> completePurchase(PurchaseDetails purchase) async {
-    _logger.fine(
-      '[DemoSubscriptionService] Purchase ${purchase.purchaseID} completed.',
-    );
-  }
-
-  ProductDetails _createMockProduct(String id) {
-    return ProductDetails(
-      id: id,
-      title: id.contains('annual')
-          ? 'demoAnnualPlanTitle'
-          : 'demoMonthlyPlanTitle',
-      description: 'demoPlanDescription',
-      price: id.contains('annual') ? r'$99.99' : r'$9.99',
-      rawPrice: id.contains('annual') ? 99.99 : 9.99,
-      currencyCode: 'USD',
-    );
-  }
-
-  PurchaseDetails _createMockPurchase(
-    String productId, {
-    PurchaseStatus status = PurchaseStatus.purchased,
-    IAPError? error,
   }) {
-    return PurchaseDetails(
+    _logger.info(
+      '[DemoSubscriptionService] Initiating purchase for ${product.id} (simulated).',
+    );
+    // Simulate a successful purchase by pushing a new PurchaseDetails
+    // object onto the stream. This will be caught by the PurchaseHandler,
+    // which will then handle the entitlement logic.
+    final purchaseDetails = PurchaseDetails(
       purchaseID: 'demo_purchase_${DateTime.now().millisecondsSinceEpoch}',
-      productID: productId,
+      productID: product.id,
       verificationData: PurchaseVerificationData(
-        localVerificationData: 'demo_local_data',
-        serverVerificationData: 'demo_server_data',
-        source: 'demo_source',
+        localVerificationData: '',
+        serverVerificationData:
+            'demo_server_verification_${DateTime.now().millisecondsSinceEpoch}',
+        source: defaultTargetPlatform == TargetPlatform.android
+            ? 'google_play'
+            : 'app_store',
       ),
       transactionDate: DateTime.now().millisecondsSinceEpoch.toString(),
-      status: status,
+      status: PurchaseStatus.purchased,
     );
+    _purchaseStreamController.add([purchaseDetails]);
+    return Future.value();
+  }
+
+  @override
+  Future<void> restorePurchases() {
+    _logger.info('[DemoSubscriptionService] Restoring purchases (simulated).');
+    // In a real scenario, this would query the store. Here, we can simulate
+    // finding a previously purchased item if needed, or do nothing if we
+    // assume the user has no prior purchases in the demo.
+    // For this uscase, we'll simulate finding no purchases to restore.
+    _purchaseStreamController.add([]);
+    return Future.value();
+  }
+
+  @override
+  Future<void> completePurchase(PurchaseDetails purchase) {
+    _logger.info(
+      '[DemoSubscriptionService] Completing purchase: ${purchase.purchaseID} (simulated).',
+    );
+    return Future.value();
   }
 }

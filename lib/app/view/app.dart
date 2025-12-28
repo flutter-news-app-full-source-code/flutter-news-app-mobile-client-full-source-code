@@ -75,6 +75,7 @@ class App extends StatelessWidget {
     required SubscriptionServiceInterface subscriptionService,
     required DataRepository<UserSubscription> userSubscriptionRepository,
     required DataRepository<PurchaseTransaction> purchaseTransactionRepository,
+    required PurchaseHandler purchaseHandler,
     super.key,
   }) : _authenticationRepository = authenticationRepository,
        _headlinesRepository = headlinesRepository,
@@ -102,7 +103,8 @@ class App extends StatelessWidget {
        _analyticsService = analyticsService,
        _subscriptionService = subscriptionService,
        _purchaseTransactionRepository = purchaseTransactionRepository,
-       _userSubscriptionRepository = userSubscriptionRepository;
+       _userSubscriptionRepository = userSubscriptionRepository,
+       _purchaseHandler = purchaseHandler;
 
   /// The initial user, pre-fetched during startup.
   final User? user;
@@ -150,6 +152,7 @@ class App extends StatelessWidget {
   final SubscriptionServiceInterface _subscriptionService;
   final DataRepository<UserSubscription> _userSubscriptionRepository;
   final DataRepository<PurchaseTransaction> _purchaseTransactionRepository;
+  final PurchaseHandler _purchaseHandler;
 
   @override
   Widget build(BuildContext context) {
@@ -184,6 +187,7 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _subscriptionService),
         RepositoryProvider.value(value: _userSubscriptionRepository),
         RepositoryProvider.value(value: _purchaseTransactionRepository),
+        RepositoryProvider.value(value: _purchaseHandler),
         // NOTE: The AppInitializer is provided at the root in bootstrap.dart
         // and is accessed via context.read() in the AppBloc.
       ],
@@ -215,6 +219,8 @@ class App extends StatelessWidget {
               reportRepository: context.read<DataRepository<Report>>(),
               feedCacheService: context.read<FeedCacheService>(),
               analyticsService: _analyticsService,
+              purchaseHandler: _purchaseHandler,
+              userSubscriptionRepository: _userSubscriptionRepository,
             )..add(const AppStarted()),
           ),
         ],
@@ -243,7 +249,6 @@ class _AppViewState extends State<_AppView> {
   StreamSubscription<PushNotificationPayload>? _onMessageSubscription;
   AppStatusService? _appStatusService;
   InterstitialAdManager? _interstitialAdManager;
-  PurchaseHandler? _purchaseHandler;
   late final GoRouter _router;
   final _routerLogger = Logger('GoRouter');
 
@@ -309,19 +314,6 @@ class _AppViewState extends State<_AppView> {
       environment: widget.environment,
     );
 
-    // Initialize the global purchase handler.
-    // This ensures that purchase events (like "Ask to Buy" or interrupted
-    // purchases) are handled correctly, even if the paywall is not open.
-    _purchaseHandler = PurchaseHandler(
-      subscriptionService: context.read<SubscriptionServiceInterface>(),
-      purchaseTransactionRepository: context
-          .read<DataRepository<PurchaseTransaction>>(),
-      userSubscriptionRepository: context
-          .read<DataRepository<UserSubscription>>(),
-      userRepository: context.read<DataRepository<User>>(),
-      appBloc: appBloc,
-      logger: Logger('PurchaseHandler'),
-    )..listen();
     // Create instances of services that need to be managed by this State's
     // lifecycle. This prevents them from being re-created on every build.
     _interstitialAdManager = InterstitialAdManager(
@@ -349,7 +341,6 @@ class _AppViewState extends State<_AppView> {
     _onMessageSubscription?.cancel();
     _appStatusService?.dispose();
     _interstitialAdManager?.dispose();
-    _purchaseHandler?.dispose();
     context.read<PushNotificationService>().close();
     context.read<ContentLimitationService>().dispose();
     super.dispose();

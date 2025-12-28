@@ -2240,5 +2240,21 @@
     "subscriptionSwitchButton": "Switch Plan",
     "@subscriptionSwitchButton": {
         "description": "Button text to initiate a plan switch."
+    },
+    "paywallRestorePurchaseButton": "Restore Purchases",
+    "@paywallRestorePurchaseButton": {
+        "description": "Button text on the paywall page to restore a user's previous purchases."
+    },
+    "paywallRestoreSuccess": "Your purchases have been successfully restored.",
+    "@paywallRestoreSuccess": {
+        "description": "Snackbar message shown when purchases are restored successfully."
+    },
+    "paywallRestoreFailure": "Could not restore purchases. Please try again or contact support.",
+    "@paywallRestoreFailure": {
+        "description": "Snackbar message shown when restoring purchases fails."
+    },
+    "paywallRestoringPurchases": "Restoring purchases...",
+    "@paywallRestoringPurchases": {
+        "description": "A message indicating that the app is currently attempting to restore purchases."
     }
 }

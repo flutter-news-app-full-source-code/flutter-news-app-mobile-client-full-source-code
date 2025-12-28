@@ -2240,5 +2240,21 @@
     "subscriptionSwitchButton": "تبديل الخطة",
     "@subscriptionSwitchButton": {
         "description": "Button text to initiate a plan switch."
+    },
+    "paywallRestorePurchaseButton": "استعادة المشتريات",
+    "@paywallRestorePurchaseButton": {
+        "description": "نص زر في صفحة جدار الدفع لاستعادة مشتريات المستخدم السابقة."
+    },
+    "paywallRestoreSuccess": "تم استعادة مشترياتك بنجاح.",
+    "@paywallRestoreSuccess": {
+        "description": "رسالة Snackbar تظهر عند استعادة المشتريات بنجاح."
+    },
+    "paywallRestoreFailure": "تعذر استعادة المشتريات. يرجى المحاولة مرة أخرى أو الاتصال بالدعم.",
+    "@paywallRestoreFailure": {
+        "description": "رسالة Snackbar تظهر عند فشل استعادة المشتريات."
+    },
+    "paywallRestoringPurchases": "جارٍ استعادة المشتريات...",
+    "@paywallRestoringPurchases": {
+        "description": "رسالة تشير إلى أن التطبيق يحاول حاليًا استعادة المشتريات."
     }
 }

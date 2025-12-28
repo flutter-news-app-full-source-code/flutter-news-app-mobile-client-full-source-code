@@ -4,8 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/bloc/subscription_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
+import 'package:go_router/go_router.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -23,7 +26,11 @@ class SubscriptionDetailsPage extends StatelessWidget {
         appBloc: context.read<AppBloc>(),
         remoteConfig: context.read<AppBloc>().state.remoteConfig!,
         logger: context.read<Logger>(),
-      )..add(const SubscriptionStarted()),
+      )
+        ..add(const SubscriptionStarted())
+        // Silently restore purchases to get the latest PurchaseDetails
+        // object required for upgrades/downgrades on Android.
+        ..add(const SubscriptionRestoreRequested()),
       child: Scaffold(
         appBar: AppBar(title: Text(l10n.subscriptionDetailsPageTitle)),
         body: const _SubscriptionDetailsView(),
@@ -46,62 +53,85 @@ class _SubscriptionDetailsView extends StatelessWidget {
     final dateFormat = DateFormat.yMMMMd(l10n.localeName);
     final validUntil = dateFormat.format(subscription.validUntil);
 
-    return Padding(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ListTile(
-            title: Text(l10n.subscriptionDetailsCurrentPlan),
-            subtitle: Text(
-              subscription.tier == AccessTier.premium
-                  ? l10n.accountRolePremium
-                  : subscription.tier.name,
+    return BlocListener<SubscriptionBloc, SubscriptionState>(
+      listener: (context, state) {
+        if (state.status == SubscriptionStatus.success) {
+          // On successful purchase (upgrade/downgrade), show a confirmation
+          // and navigate back to the account page.
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              const SnackBar(content: Text('Plan changed successfully!')),
+            );
+          context.goNamed(Routes.accountName);
+        }
+        if (state.status == SubscriptionStatus.failure) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                content: Text(
+                  state.error?.toString() ?? l10n.unknownError,
+                ),
+              ),
+            );
+        }
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ListTile(
+              title: Text(l10n.subscriptionDetailsCurrentPlan),
+              subtitle: Text(
+                subscription.tier == AccessTier.premium
+                    ? l10n.accountRolePremium
+                    : subscription.tier.name,
+              ),
             ),
-          ),
-          const Divider(),
-          ListTile(
-            title: Text(
-              subscription.willAutoRenew
-                  ? l10n.subscriptionDetailsRenewsOn(validUntil)
-                  : l10n.subscriptionDetailsExpiresOn(validUntil),
+            const Divider(),
+            ListTile(
+              title: Text(
+                subscription.willAutoRenew
+                    ? l10n.subscriptionDetailsRenewsOn(validUntil)
+                    : l10n.subscriptionDetailsExpiresOn(validUntil),
+              ),
+              subtitle: !subscription.willAutoRenew
+                  ? Text(l10n.subscriptionDetailsWillNotRenew)
+                  : null,
             ),
-            subtitle: !subscription.willAutoRenew
-                ? Text(l10n.subscriptionDetailsWillNotRenew)
-                : null,
-          ),
-          const Divider(),
-          ListTile(
-            title: Text(l10n.subscriptionDetailsProvider),
-            subtitle: Text(
-              subscription.provider == StoreProvider.apple
-                  ? 'Apple App Store'
-                  : 'Google Play Store',
+            const Divider(),
+            ListTile(
+              title: Text(l10n.subscriptionDetailsProvider),
+              subtitle: Text(
+                subscription.provider == StoreProvider.apple
+                    ? 'Apple App Store'
+                    : 'Google Play Store',
+              ),
             ),
-          ),
-          const Divider(),
-          // Show upgrade/downgrade options if available
-          _buildUpgradeOptions(context, subscription, l10n),
-
-          const Spacer(),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                final url = switch (subscription.provider) {
-                  StoreProvider.apple => Uri.parse(
-                    'https://apps.apple.com/account/subscriptions',
-                  ),
-                  StoreProvider.google => Uri.parse(
-                    'https://play.google.com/store/account/subscriptions',
-                  ),
-                };
-                launchUrl(url, mode: LaunchMode.externalApplication);
-              },
-              child: Text(l10n.subscriptionDetailsManageButton),
+            const Divider(),
+            _buildUpgradeOptions(context, subscription, l10n),
+            const Spacer(),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  final url = switch (subscription.provider) {
+                    StoreProvider.apple => Uri.parse(
+                        'https://apps.apple.com/account/subscriptions',
+                      ),
+                    StoreProvider.google => Uri.parse(
+                        'https://play.google.com/store/account/subscriptions',
+                      ),
+                  };
+                  launchUrl(url, mode: LaunchMode.externalApplication);
+                },
+                child: Text(l10n.subscriptionDetailsManageButton),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -113,56 +143,50 @@ class _SubscriptionDetailsView extends StatelessWidget {
   ) {
     return BlocBuilder<SubscriptionBloc, SubscriptionState>(
       builder: (context, state) {
-        if (state.status == SubscriptionStatus.loadingProducts) {
+        if (state.status == SubscriptionStatus.loadingProducts ||
+            state.status == SubscriptionStatus.restoring) {
           return const Padding(
             padding: EdgeInsets.all(AppSpacing.md),
-            child: Center(child: CircularProgressIndicator()),
+            child: Center(child: AppCircularProgressIndicator()),
           );
         }
 
-        final isMonthly = subscription.originalTransactionId.contains(
-          'monthly',
+        final monthlyPlanDetails = state.products.firstWhereOrNull(
+          (p) => p.id == subscription.monthlyPlanId,
         );
-        final targetPlan = isMonthly ? state.annualPlan : state.monthlyPlan;
+
+        final isCurrentlyMonthly =
+            monthlyPlanDetails?.id == subscription.planId;
+
+        final targetPlan = isCurrentlyMonthly
+            ? state.products
+                .firstWhereOrNull((p) => p.id == subscription.annualPlanId)
+            : monthlyPlanDetails;
 
         if (targetPlan == null) return const SizedBox.shrink();
 
         return ListTile(
           title: Text(
-            isMonthly
+            isCurrentlyMonthly
                 ? l10n.subscriptionUpgradeTitle
                 : l10n.subscriptionDowngradeTitle,
           ),
           subtitle: Text(
-            isMonthly
+            isCurrentlyMonthly
                 ? l10n.subscriptionUpgradeDescription
                 : l10n.subscriptionDowngradeDescription,
           ),
           trailing: ElevatedButton(
             onPressed: () {
-              // TODO: handle teh current palceholder
-              //
-              // Trigger purchase flow with oldPurchaseDetails for proration
-              // We need to construct a PurchaseDetails object from the
-              // UserSubscription data to pass to the service.
-              // Note: In a real app, we might need to fetch the actual
-              // PurchaseDetails from the store using restorePurchases first
-              // if we don't have it cached, or rely on the service to handle
-              // the token.
-              // For now, we rely on the BLoC's restore logic or pass null
-              // if the service can handle it via ID.
-              //
-              // Ideally, we should trigger a restore in the background when
-              // this page loads to get the valid PurchaseDetails object
-              // required by Google Play's billing client.
+              // The silent restore on page load should have populated
+              // `activePurchaseDetails` in the state. We pass this to the
+              // purchase request to ensure proration is handled correctly.
               context.read<SubscriptionBloc>().add(
-                SubscriptionPurchaseRequested(
-                  product: targetPlan,
-                  // We pass the active details if available from the
-                  // BLoC's state (populated via restore).
-                  oldPurchaseDetails: state.activePurchaseDetails,
-                ),
-              );
+                    SubscriptionPurchaseRequested(
+                      product: targetPlan,
+                      oldPurchaseDetails: state.activePurchaseDetails,
+                    ),
+                  );
             },
             child: Text(l10n.subscriptionSwitchButton),
           ),

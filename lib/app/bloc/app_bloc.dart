@@ -96,7 +96,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // Register event handlers for various app-level events.
     on<AppStarted>(_onAppStarted);
     on<AppUserChanged>(_onAppUserChanged);
-    on<AppSubscriptionChanged>(_onAppSubscriptionChanged);
     on<AppSettingsRefreshed>(_onUserAppSettingsRefreshed);
     on<AppUserContentPreferencesRefreshed>(_onUserContentPreferencesRefreshed);
     on<AppSettingsChanged>(_onAppSettingsChanged);
@@ -390,14 +389,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       case InitializationFailure(:final status, :final error):
         emit(state.copyWith(status: status, error: error));
     }
-  }
-
-  /// Handles explicit updates to the user's subscription state.
-  void _onAppSubscriptionChanged(
-    AppSubscriptionChanged event,
-    Emitter<AppState> emit,
-  ) {
-    emit(state.copyWith(userSubscription: event.subscription));
   }
 
   /// Handles refreshing/loading app settings (theme, font).

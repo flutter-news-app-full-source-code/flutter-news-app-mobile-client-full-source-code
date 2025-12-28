@@ -13,13 +13,21 @@ import 'package:logging/logging.dart';
 ///
 /// This class is responsible for listening to the [SubscriptionServiceInterface]
 /// stream throughout the entire application lifecycle. It handles:
-/// 1. Validating receipts with the backend (or faking it in demo).
-/// 2. Completing transactions with the store.
-/// 3. Notifying listeners when a purchase has been successfully processed.
+/// 1. **Zero-Trust Validation:** Sending receipts to the backend for validation
+///    with the store (Apple/Google).
+/// 2. **Entitlement Management:** Handling both new purchases and **restored**
+///    purchases. For restorations, it supports the backend's "Entitlement
+///    Transfer" logic by sending the current `userId`, allowing the backend to
+///    move an existing subscription to the current account if necessary.
+/// 3. **Transaction Completion:** Marking transactions as complete with the
+///    store only after successful backend processing to prevent queue blocking.
+/// 4. **State Synchronization:** Notifying listeners (like `AppBloc`) when a
+///    purchase is successfully processed to trigger an immediate UI refresh.
 ///
 /// This ensures that purchases completing in the background (e.g., "Ask to Buy",
 /// interrupted sessions) are processed correctly even if the Paywall UI is closed.
 /// {@endtemplate}
+
 class PurchaseHandler {
   /// {@macro purchase_handler}
   PurchaseHandler({

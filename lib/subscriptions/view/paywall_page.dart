@@ -34,12 +34,6 @@ class _PaywallView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
-    // TODO(fulleni): handle route redirection
-    // Paywall is for acquisition only. If user has an active subscription,
-    // they shouldn't be here (or should be redirected).
-    // For now, we just hide the "Current Plan" banner since this page
-    // is strictly for new subscriptions.
-    // Management happens in SubscriptionDetailsPage.
     final theme = Theme.of(context);
 
     return BlocListener<SubscriptionBloc, SubscriptionState>(
@@ -73,13 +67,13 @@ class _PaywallView extends StatelessWidget {
         } else if (state.status == SubscriptionStatus.restorationSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Purchases restored successfully'),
+              content: Text(l10n.paywallRestoreSuccess),
             ),
           );
         } else if (state.status == SubscriptionStatus.restorationFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Failed to restore purchases'),
+              content: Text(l10n.paywallRestoreFailure),
               backgroundColor: theme.colorScheme.error,
             ),
           );

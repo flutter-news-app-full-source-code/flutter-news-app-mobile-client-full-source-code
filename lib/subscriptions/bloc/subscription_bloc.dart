@@ -130,14 +130,16 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
     SubscriptionPlanSelected event,
     Emitter<SubscriptionState> emit,
   ) {
-    emit(state.copyWith(selectedProduct: event.product));
+    emit(state.copyWith(selectedProduct: event.product, clearError: true));
   }
 
   Future<void> _onPurchaseRequested(
     SubscriptionPurchaseRequested event,
     Emitter<SubscriptionState> emit,
   ) async {
-    emit(state.copyWith(status: SubscriptionStatus.purchasing));
+    emit(
+      state.copyWith(status: SubscriptionStatus.purchasing, clearError: true),
+    );
     try {
       final applicationUserName = _appBloc.state.user?.id;
       await _subscriptionService.buyNonConsumable(
@@ -155,7 +157,22 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
     SubscriptionRestoreRequested event,
     Emitter<SubscriptionState> emit,
   ) async {
-    //TODO(fulleni): implement restore.
+    emit(
+      state.copyWith(status: SubscriptionStatus.restoring, clearError: true),
+    );
+    try {
+      await _subscriptionService.restorePurchases();
+      // The `_onPurchaseUpdated` method will handle the successful restoration
+      // event from the stream. Here, we just need to indicate that the process
+      // was initiated. If the stream doesn't emit a restored purchase, we
+      // might need a timeout or a different mechanism to handle the case where
+      // there's nothing to restore. For now, we rely on the stream.
+    } catch (e, s) {
+      _logger.severe('Failed to initiate restore', e, s);
+      emit(
+        state.copyWith(status: SubscriptionStatus.restorationFailure, error: e),
+      );
+    }
   }
 
   Future<void> _onPurchaseUpdated(
@@ -179,8 +196,11 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
         // Validation is handled by the global PurchaseHandler.
         // This BLoC only updates the UI to reflect a successful state for
         // new purchases, which triggers the success dialog and page pop.
-        // `restored` events are ignored here to prevent this behavior.
         emit(state.copyWith(status: SubscriptionStatus.success));
+      } else if (purchase.status == PurchaseStatus.restored) {
+        // A restored purchase was successfully processed by the PurchaseHandler.
+        // Update the UI to reflect a successful restoration.
+        emit(state.copyWith(status: SubscriptionStatus.restorationSuccess));
       }
     }
   }

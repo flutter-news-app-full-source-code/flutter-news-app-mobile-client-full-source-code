@@ -23,13 +23,13 @@ class PaywallPage extends StatelessWidget {
         remoteConfig: context.read<AppBloc>().state.remoteConfig!,
         logger: context.read<Logger>(),
       )..add(const SubscriptionStarted()),
-      child: const _PaywallView(),
+      child: const PaywallView(),
     );
   }
 }
 
-class _PaywallView extends StatelessWidget {
-  const _PaywallView();
+class PaywallView extends StatelessWidget {
+  const PaywallView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -65,11 +65,9 @@ class _PaywallView extends StatelessWidget {
             ),
           );
         } else if (state.status == SubscriptionStatus.restorationSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.paywallRestoreSuccess),
-            ),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(l10n.paywallRestoreSuccess)));
         } else if (state.status == SubscriptionStatus.restorationFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -80,100 +78,102 @@ class _PaywallView extends StatelessWidget {
         }
       },
       child: BlocBuilder<SubscriptionBloc, SubscriptionState>(
-      builder: (context, state) {
-        final isLoading =
-            state.status == SubscriptionStatus.loadingProducts ||
-            state.status == SubscriptionStatus.purchasing ||
-            state.status == SubscriptionStatus.restoring;
+        builder: (context, state) {
+          final isLoading =
+              state.status == SubscriptionStatus.loadingProducts ||
+              state.status == SubscriptionStatus.purchasing ||
+              state.status == SubscriptionStatus.restoring;
 
-        return Scaffold(
-          appBar: AppBar(
-            leading: IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: () => context.pop(),
-            ),
-            title: Text(l10n.paywallTitle),
-          ),
-          body: Stack(
-            children: [
-              SingleChildScrollView(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _buildHeader(context, l10n),
-                    const SizedBox(height: AppSpacing.lg),
-                    _buildFeaturesList(context, l10n),
-                    const SizedBox(height: AppSpacing.xxl),
-                    if (state.products.isNotEmpty)
-                      _buildPlans(context, state, l10n)
-                    else if (state.status == SubscriptionStatus.loadingProducts)
-                      const Padding(
-                        padding: EdgeInsets.all(AppSpacing.lg),
-                        child: Center(child: CircularProgressIndicator()),
-                      )
-                    else
-                      Center(child: Text(l10n.unknownError)),
-                    const SizedBox(height: AppSpacing.xxl),
-                    _buildFooter(context, l10n),
-                  ],
-                ),
+          return Scaffold(
+            appBar: AppBar(
+              leading: IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () => context.pop(),
               ),
-              if (isLoading)
-                ColoredBox(
-                  color: Colors.black54,
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const CircularProgressIndicator(),
-                        const SizedBox(height: AppSpacing.md),
-                        Text(
-                          l10n.paywallLoading,
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      ],
-                    ),
+              title: Text(l10n.paywallTitle),
+            ),
+            body: Stack(
+              children: [
+                SingleChildScrollView(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildHeader(context, l10n),
+                      const SizedBox(height: AppSpacing.lg),
+                      _buildFeaturesList(context, l10n),
+                      const SizedBox(height: AppSpacing.xxl),
+                      if (state.products.isNotEmpty)
+                        _buildPlans(context, state, l10n)
+                      else if (state.status ==
+                          SubscriptionStatus.loadingProducts)
+                        const Padding(
+                          padding: EdgeInsets.all(AppSpacing.lg),
+                          child: Center(child: CircularProgressIndicator()),
+                        )
+                      else
+                        Center(child: Text(l10n.unknownError)),
+                      const SizedBox(height: AppSpacing.xxl),
+                      _buildFooter(context, l10n),
+                    ],
                   ),
                 ),
-            ],
-          ),
-          bottomNavigationBar: state.products.isNotEmpty
-              ? SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    child: ElevatedButton(
-                      onPressed: isLoading || state.selectedProduct == null
-                          ? null
-                          : () {
-                              final product = state.selectedProduct!;
-                              final currentSubId = context
-                                  .read<AppBloc>()
-                                  .state
-                                  .userSubscription
-                                  ?.originalTransactionId;
-                              context.read<SubscriptionBloc>().add(
-                                SubscriptionPurchaseRequested(
-                                  product: product,
-                                  oldPurchaseDetails: currentSubId != null
-                                      ? state.activePurchaseDetails
-                                      : null,
-                                ),
-                              );
-                            },
-                      child: Text(
-                        l10n.paywallSubscribeButton(
-                          state.selectedProduct?.price ?? '',
-                          '', // Period is hard to extract generically, leaving empty for now or needs logic
-                        ),
+                if (isLoading)
+                  ColoredBox(
+                    color: Colors.black54,
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const CircularProgressIndicator(),
+                          const SizedBox(height: AppSpacing.md),
+                          Text(
+                            l10n.paywallLoading,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                )
-              : null,
-        );
-      },
-    ));
+              ],
+            ),
+            bottomNavigationBar: state.products.isNotEmpty
+                ? SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      child: ElevatedButton(
+                        onPressed: isLoading || state.selectedProduct == null
+                            ? null
+                            : () {
+                                final product = state.selectedProduct!;
+                                final currentSubId = context
+                                    .read<AppBloc>()
+                                    .state
+                                    .userSubscription
+                                    ?.originalTransactionId;
+                                context.read<SubscriptionBloc>().add(
+                                  SubscriptionPurchaseRequested(
+                                    product: product,
+                                    oldPurchaseDetails: currentSubId != null
+                                        ? state.activePurchaseDetails
+                                        : null,
+                                  ),
+                                );
+                              },
+                        child: Text(
+                          l10n.paywallSubscribeButton(
+                            state.selectedProduct?.price ?? '',
+                            '', // Period is hard to extract generically, leaving empty for now or needs logic
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                : null,
+          );
+        },
+      ),
+    );
   }
 
   Widget _buildHeader(BuildContext context, AppLocalizations l10n) {

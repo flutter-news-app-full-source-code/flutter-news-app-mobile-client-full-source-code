@@ -22,26 +22,27 @@ class SubscriptionDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
     return BlocProvider(
-      create: (context) => SubscriptionBloc(
-        subscriptionService: context.read<SubscriptionServiceInterface>(),
-        appBloc: context.read<AppBloc>(),
-        remoteConfig: context.read<AppBloc>().state.remoteConfig!,
-        logger: context.read<Logger>(),
-      )
-        ..add(const SubscriptionStarted())
-        // Silently restore purchases to get the latest PurchaseDetails
-        // object required for upgrades/downgrades on Android.
-        ..add(const SubscriptionRestoreRequested()),
+      create: (context) =>
+          SubscriptionBloc(
+              subscriptionService: context.read<SubscriptionServiceInterface>(),
+              appBloc: context.read<AppBloc>(),
+              remoteConfig: context.read<AppBloc>().state.remoteConfig!,
+              logger: context.read<Logger>(),
+            )
+            ..add(const SubscriptionStarted())
+            // Silently restore purchases to get the latest PurchaseDetails
+            // object required for upgrades/downgrades on Android.
+            ..add(const SubscriptionRestoreRequested()),
       child: Scaffold(
         appBar: AppBar(title: Text(l10n.subscriptionDetailsPageTitle)),
-        body: const _SubscriptionDetailsView(),
+        body: const SubscriptionDetailsView(),
       ),
     );
   }
 }
 
-class _SubscriptionDetailsView extends StatelessWidget {
-  const _SubscriptionDetailsView();
+class SubscriptionDetailsView extends StatelessWidget {
+  const SubscriptionDetailsView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -71,9 +72,7 @@ class _SubscriptionDetailsView extends StatelessWidget {
             ..hideCurrentSnackBar()
             ..showSnackBar(
               SnackBar(
-                content: Text(
-                  state.error?.toString() ?? l10n.unknownError,
-                ),
+                content: Text(state.error?.toString() ?? l10n.unknownError),
               ),
             );
         }
@@ -120,11 +119,11 @@ class _SubscriptionDetailsView extends StatelessWidget {
                 onPressed: () {
                   final url = switch (subscription.provider) {
                     StoreProvider.apple => Uri.parse(
-                        'https://apps.apple.com/account/subscriptions',
-                      ),
+                      'https://apps.apple.com/account/subscriptions',
+                    ),
                     StoreProvider.google => Uri.parse(
-                        'https://play.google.com/store/account/subscriptions',
-                      ),
+                      'https://play.google.com/store/account/subscriptions',
+                    ),
                   };
                   launchUrl(url, mode: LaunchMode.externalApplication);
                 },
@@ -159,14 +158,12 @@ class _SubscriptionDetailsView extends StatelessWidget {
         final isIOS = defaultTargetPlatform == TargetPlatform.iOS;
         final subConfig = remoteConfig.features.subscription;
 
-        final monthlyId =
-            isIOS
-                ? subConfig.monthlyPlan.appleProductId
-                : subConfig.monthlyPlan.googleProductId;
-        final annualId =
-            isIOS
-                ? subConfig.annualPlan.appleProductId
-                : subConfig.annualPlan.googleProductId;
+        final monthlyId = isIOS
+            ? subConfig.monthlyPlan.appleProductId
+            : subConfig.monthlyPlan.googleProductId;
+        final annualId = isIOS
+            ? subConfig.annualPlan.appleProductId
+            : subConfig.annualPlan.googleProductId;
 
         // 2. Determine current plan from activePurchaseDetails (restored)
         final currentProductId = state.activePurchaseDetails?.productID;

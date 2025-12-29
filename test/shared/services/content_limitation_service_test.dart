@@ -606,7 +606,7 @@ void main() {
                 countries: [],
               ),
               isPinned: false,
-              deliveryTypes: {},
+              deliveryTypes: const {},
             ),
           ),
         );

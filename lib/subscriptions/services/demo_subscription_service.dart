@@ -42,8 +42,8 @@ class DemoSubscriptionService implements SubscriptionServiceInterface {
       final isMonthly = id.contains('monthly');
       return ProductDetails(
         id: id,
-        title: isMonthly ? 'Monthly Premium (Demo)' : 'Annual Premium (Demo)',
-        description: 'A demo subscription plan.',
+        title: isMonthly ? 'demoMonthlyPlanTitle' : 'demoAnnualPlanTitle',
+        description: 'demoPlanDescription',
         price: isMonthly ? r'$9.99' : r'$99.99',
         rawPrice: isMonthly ? 9.99 : 99.99,
         currencyCode: 'USD',

@@ -566,16 +566,17 @@ Future<Widget> bootstrap(
   );
 
   // Initialize PurchaseHandler
-  final purchaseHandler = PurchaseHandler(
-    subscriptionService: subscriptionService,
-    purchaseTransactionRepository: purchaseTransactionRepository,
-    userSubscriptionRepository: userSubscriptionRepository,
-    userRepository: userRepository,
-    authRepository: authenticationRepository,
-    logger: logger,
-  )
-  // Start listening for purchase updates immediately
-  ..listen();
+  final purchaseHandler =
+      PurchaseHandler(
+          subscriptionService: subscriptionService,
+          purchaseTransactionRepository: purchaseTransactionRepository,
+          userSubscriptionRepository: userSubscriptionRepository,
+          userRepository: userRepository,
+          authRepository: authenticationRepository,
+          logger: logger,
+        )
+        // Start listening for purchase updates immediately
+        ..listen();
 
   logger
     ..fine('All data repositories initialized.')

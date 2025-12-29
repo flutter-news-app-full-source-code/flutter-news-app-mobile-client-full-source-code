@@ -139,7 +139,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     });
 
     // Listen to purchase completion events to refresh user entitlements.
-    _purchaseCompletedSubscription = _purchaseHandler.purchaseCompleted.listen((_) {
+    _purchaseCompletedSubscription = _purchaseHandler.purchaseCompleted.listen((
+      _,
+    ) {
       add(const _AppUserAndSubscriptionRefreshed());
     });
   }
@@ -212,11 +214,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     final userId = state.user?.id;
     if (userId == null) return;
 
-    _logger.info('[AppBloc] Refreshing user and subscription data after purchase...');
+    _logger.info(
+      '[AppBloc] Refreshing user and subscription data after purchase...',
+    );
 
     try {
       final user = await _authRepository.getCurrentUser();
-      
+
       final subResponse = await _userSubscriptionRepository.readAll(
         userId: userId,
         filter: {'status': 'active'},
@@ -225,11 +229,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       final subscription = subResponse.items.firstOrNull;
 
       if (user != null) {
-        emit(state.copyWith(
-          user: user,
-          userSubscription: subscription,
-          clearError: true,
-        ));
+        emit(
+          state.copyWith(
+            user: user,
+            userSubscription: subscription,
+            clearError: true,
+          ),
+        );
       }
       _logger.info('[AppBloc] User and subscription data refreshed.');
     } catch (e, s) {

@@ -27,6 +27,19 @@ void main() {
         ),
       ),
     );
+    registerFallbackValue(
+      PurchaseDetails(
+        purchaseID: 'id',
+        productID: 'productID',
+        verificationData: PurchaseVerificationData(
+          localVerificationData: '',
+          serverVerificationData: '',
+          source: '',
+        ),
+        transactionDate: '',
+        status: PurchaseStatus.purchased,
+      ),
+    );
   });
 
   setUp(() {

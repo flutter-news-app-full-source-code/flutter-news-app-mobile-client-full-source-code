@@ -199,7 +199,7 @@ void main() {
           supportedLocales: AppLocalizations.supportedLocales,
           home: BlocProvider.value(
             value: mockSubscriptionBloc,
-            child: const SubscriptionDetailsView(),
+            child: const Scaffold(body: SubscriptionDetailsView()),
           ),
         ),
       ),

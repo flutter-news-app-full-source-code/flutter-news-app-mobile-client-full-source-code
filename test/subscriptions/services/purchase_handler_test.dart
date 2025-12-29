@@ -65,6 +65,19 @@ void main() {
         providerReceipt: 'test_receipt',
       ),
     );
+    registerFallbackValue(
+      PurchaseDetails(
+        purchaseID: 'id',
+        productID: 'productID',
+        verificationData: PurchaseVerificationData(
+          localVerificationData: '',
+          serverVerificationData: '',
+          source: '',
+        ),
+        transactionDate: '',
+        status: PurchaseStatus.purchased,
+      ),
+    );
   });
 
   tearDown(() {

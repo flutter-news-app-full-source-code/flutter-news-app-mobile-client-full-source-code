@@ -46,12 +46,13 @@ class AppReviewService {
   }) async {
     final appState = context.read<AppBloc>().state;
     final user = appState.user;
+    final userContext = appState.userContext;
     final environment = context.read<AppEnvironment>();
     final remoteConfig = appState.remoteConfig;
 
-    if (user == null || remoteConfig == null) {
+    if (user == null || userContext == null || remoteConfig == null) {
       _logger.warning(
-        'Cannot check eligibility: user or remoteConfig is null.',
+        'Cannot check eligibility: user or userContext or remoteConfig is null.',
       );
       return;
     }
@@ -72,7 +73,8 @@ class AppReviewService {
     }
 
     // Check if the user has already completed the rateApp decorator.
-    final decoratorStatus = user.feedDecoratorStatus[FeedDecoratorType.rateApp];
+    final decoratorStatus =
+        userContext.feedDecoratorStatus[FeedDecoratorType.rateApp];
     if (decoratorStatus?.isCompleted == true) {
       _logger.fine('User has already completed the review funnel.');
       return;
@@ -129,7 +131,8 @@ class AppReviewService {
     // Determine if this is the first time the user is seeing the prompt by
     // checking if the decorator status for 'rateApp' has been recorded yet.
     final isFirstPrompt =
-        appBloc.state.user?.feedDecoratorStatus[FeedDecoratorType.rateApp] ==
+        appBloc.state.userContext?.feedDecoratorStatus[FeedDecoratorType
+            .rateApp] ==
         null;
 
     if (isPositive) {

@@ -42,6 +42,10 @@ import 'package:flutter_news_app_mobile_client_full_source_code/notifications/se
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/data/clients/clients.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/demo_subscription_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/purchase_handler.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/store_subscription_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/native_review_service.dart';
 import 'package:http_client/http_client.dart';
@@ -281,11 +285,14 @@ Future<Widget> bootstrap(
   late final DataClient<UserContentPreferences> userContentPreferencesClient;
   late final DataClient<AppSettings> appSettingsClient;
   late final DataClient<User> userClient;
+  late final DataClient<UserContext> userContextClient;
   late final DataClient<InAppNotification> inAppNotificationClient;
   late final DataClient<PushNotificationDevice> pushNotificationDeviceClient;
   late final DataClient<Engagement> engagementClient;
   late final DataClient<Report> reportClient;
   late final DataClient<AppReview> appReviewClient;
+  late final DataClient<PurchaseTransaction> purchaseTransactionClient;
+  late final DataClient<UserSubscription> userSubscriptionClient;
   if (appConfig.environment == app_config.AppEnvironment.demo) {
     logger.fine('Using in-memory clients for all data repositories.');
     headlinesClient = DataInMemory<Headline>(
@@ -355,6 +362,11 @@ Future<Widget> bootstrap(
       getId: (i) => i.id,
       logger: logger,
     );
+    userContextClient = DataInMemory<UserContext>(
+      toJson: (i) => i.toJson(),
+      getId: (i) => i.userId,
+      logger: logger,
+    );
     inAppNotificationClient = DataInMemory<InAppNotification>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
@@ -378,6 +390,17 @@ Future<Widget> bootstrap(
     appReviewClient = DataInMemory<AppReview>(
       toJson: (i) => i.toJson(),
       getId: (i) => i.id,
+      logger: logger,
+    );
+    purchaseTransactionClient = DataInMemory<PurchaseTransaction>(
+      toJson: (i) => i.toJson(),
+      getId: (i) => i.planId, // Using planId as ID for demo purposes
+      logger: logger,
+    );
+    userSubscriptionClient = DataInMemory<UserSubscription>(
+      toJson: (i) => i.toJson(),
+      getId: (i) => i.id,
+      initialData: userSubscriptionsFixturesData,
       logger: logger,
     );
   } else {
@@ -431,6 +454,13 @@ Future<Widget> bootstrap(
       toJson: (user) => user.toJson(),
       logger: logger,
     );
+    userContextClient = DataApi<UserContext>(
+      httpClient: httpClient,
+      modelName: 'user_context',
+      fromJson: UserContext.fromJson,
+      toJson: (context) => context.toJson(),
+      logger: logger,
+    );
     inAppNotificationClient = DataApi<InAppNotification>(
       httpClient: httpClient,
       modelName: 'in_app_notification',
@@ -466,6 +496,20 @@ Future<Widget> bootstrap(
       toJson: (review) => review.toJson(),
       logger: logger,
     );
+    purchaseTransactionClient = DataApi<PurchaseTransaction>(
+      httpClient: httpClient,
+      modelName: 'purchase_transaction',
+      fromJson: PurchaseTransaction.fromJson,
+      toJson: (transaction) => transaction.toJson(),
+      logger: logger,
+    );
+    userSubscriptionClient = DataApi<UserSubscription>(
+      httpClient: httpClient,
+      modelName: 'user_subscription',
+      fromJson: UserSubscription.fromJson,
+      toJson: (subscription) => subscription.toJson(),
+      logger: logger,
+    );
   }
   logger.fine('All data clients instantiated.');
 
@@ -485,6 +529,9 @@ Future<Widget> bootstrap(
     dataClient: appSettingsClient,
   );
   final userRepository = DataRepository<User>(dataClient: userClient);
+  final userContextRepository = DataRepository<UserContext>(
+    dataClient: userContextClient,
+  );
   final inAppNotificationRepository = DataRepository<InAppNotification>(
     dataClient: inAppNotificationClient,
   );
@@ -499,6 +546,38 @@ Future<Widget> bootstrap(
   final appReviewRepository = DataRepository<AppReview>(
     dataClient: appReviewClient,
   );
+
+  // Initialize Subscription Service & Repository
+  late final SubscriptionServiceInterface subscriptionService;
+  if (appConfig.environment == app_config.AppEnvironment.demo || kIsWeb) {
+    logger.fine('Using DemoSubscriptionService.');
+    subscriptionService = DemoSubscriptionService(logger: logger);
+  } else {
+    logger.fine('Using StoreSubscriptionService.');
+    subscriptionService = StoreSubscriptionService(logger: logger);
+  }
+
+  final purchaseTransactionRepository = DataRepository<PurchaseTransaction>(
+    dataClient: purchaseTransactionClient,
+  );
+
+  final userSubscriptionRepository = DataRepository<UserSubscription>(
+    dataClient: userSubscriptionClient,
+  );
+
+  // Initialize PurchaseHandler
+  final purchaseHandler =
+      PurchaseHandler(
+          subscriptionService: subscriptionService,
+          purchaseTransactionRepository: purchaseTransactionRepository,
+          userSubscriptionRepository: userSubscriptionRepository,
+          userRepository: userRepository,
+          authRepository: authenticationRepository,
+          logger: logger,
+        )
+        // Start listening for purchase updates immediately
+        ..listen();
+
   logger
     ..fine('All data repositories initialized.')
     ..info('8. Initializing Push Notification service...');
@@ -583,6 +662,7 @@ Future<Widget> bootstrap(
       ? DemoDataMigrationService(
           appSettingsRepository: appSettingsRepository,
           userContentPreferencesRepository: userContentPreferencesRepository,
+          userContextRepository: userContextRepository,
         )
       : null;
   logger.fine(
@@ -599,8 +679,10 @@ Future<Widget> bootstrap(
       ? DemoDataInitializerService(
           appSettingsRepository: appSettingsRepository,
           userContentPreferencesRepository: userContentPreferencesRepository,
+          userContextRepository: userContextRepository,
           inAppNotificationRepository: inAppNotificationRepository,
           appSettingsFixturesData: appSettingsFixturesData,
+          userContextFixturesData: userContextsFixturesData,
           userContentPreferencesFixturesData:
               getUserContentPreferencesFixturesData(),
           inAppNotificationsFixturesData: inAppNotificationsFixturesData,
@@ -615,6 +697,8 @@ Future<Widget> bootstrap(
     authenticationRepository: authenticationRepository,
     appSettingsRepository: appSettingsRepository,
     userContentPreferencesRepository: userContentPreferencesRepository,
+    userContextRepository: userContextRepository,
+    userSubscriptionRepository: userSubscriptionRepository,
     remoteConfigRepository: remoteConfigRepository,
     environment: environment,
     packageInfoService: packageInfoService,
@@ -638,6 +722,9 @@ Future<Widget> bootstrap(
       RepositoryProvider.value(value: analyticsService),
       RepositoryProvider.value(value: appInitializer),
       RepositoryProvider.value(value: logger),
+      RepositoryProvider.value(value: subscriptionService),
+      RepositoryProvider.value(value: purchaseHandler),
+      RepositoryProvider.value(value: purchaseTransactionRepository),
     ],
     child: AppInitializationPage(
       // All other repositories and services are passed directly to the
@@ -652,6 +739,7 @@ Future<Widget> bootstrap(
       remoteConfigRepository: remoteConfigRepository,
       appSettingsRepository: appSettingsRepository,
       userContentPreferencesRepository: userContentPreferencesRepository,
+      userContextRepository: userContextRepository,
       pushNotificationService: pushNotificationService,
       inAppNotificationRepository: inAppNotificationRepository,
       environment: environment,
@@ -666,6 +754,10 @@ Future<Widget> bootstrap(
       appReviewService: appReviewService,
       contentLimitationService: contentLimitationService,
       analyticsService: analyticsService,
+      subscriptionService: subscriptionService,
+      purchaseTransactionRepository: purchaseTransactionRepository,
+      userSubscriptionRepository: userSubscriptionRepository,
+      purchaseHandler: purchaseHandler,
     ),
   );
 }

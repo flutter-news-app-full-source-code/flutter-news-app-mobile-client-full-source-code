@@ -304,3 +304,9 @@ class AppContentReported extends AppEvent {
   @override
   List<Object> get props => [report];
 }
+
+/// Internal event: Dispatched when the [PurchaseHandler] notifies that a
+/// purchase has been completed and verified, requiring a state refresh.
+class _AppUserAndSubscriptionRefreshed extends AppEvent {
+  const _AppUserAndSubscriptionRefreshed();
+}

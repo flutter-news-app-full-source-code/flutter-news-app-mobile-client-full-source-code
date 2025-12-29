@@ -107,16 +107,20 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
   Future<void> _loadDecorator() async {
     final appState = context.read<AppBloc>().state;
     final user = appState.user;
+    final userContext = appState.userContext;
     final remoteConfig = appState.remoteConfig;
 
-    if (user == null || remoteConfig == null) {
-      _logger.warning('User or RemoteConfig is null, cannot load decorator.');
+    if (user == null || userContext == null || remoteConfig == null) {
+      _logger.warning(
+        'User, UserContext, or RemoteConfig is null, cannot load decorator.',
+      );
       if (mounted) setState(() => _state = _DecoratorState.none);
       return;
     }
 
     final dueDecoratorType = _getHighestPriorityDueDecorator(
       user: user,
+      userContext: userContext,
       remoteConfig: remoteConfig,
     );
 
@@ -327,9 +331,10 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
 
   FeedDecoratorType? _getHighestPriorityDueDecorator({
     required User user,
+    required UserContext userContext,
     required RemoteConfig remoteConfig,
   }) {
-    final userRole = user.appRole;
+    final accessTier = user.tier;
     final dueCandidates = <({FeedDecoratorType type, int priority})>[];
 
     for (final entry in remoteConfig.features.feed.decorators.entries) {
@@ -338,10 +343,10 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
 
       if (!decoratorConfig.enabled) continue;
 
-      final roleConfig = decoratorConfig.visibleTo[userRole];
+      final roleConfig = decoratorConfig.visibleTo[accessTier];
       if (roleConfig == null) continue;
 
-      final status = user.feedDecoratorStatus[decoratorType];
+      final status = userContext.feedDecoratorStatus[decoratorType];
       if (status?.canBeShown(daysBetweenViews: roleConfig.daysBetweenViews) ??
           true) {
         final priority = _decoratorPriorities[decoratorType];

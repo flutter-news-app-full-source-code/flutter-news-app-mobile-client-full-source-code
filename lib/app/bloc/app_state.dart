@@ -12,9 +12,11 @@ class AppState extends Equatable {
   const AppState({
     required this.status,
     this.user,
+    this.userContext,
     this.remoteConfig,
     this.error,
     this.userContentPreferences,
+    this.userSubscription,
     this.settings,
     this.selectedBottomNavigationIndex = 0,
     this.currentAppVersion,
@@ -32,6 +34,9 @@ class AppState extends Equatable {
   /// Null if no user is logged in or recognized.
   final User? user;
 
+  /// The user's context (ephemeral state like feed decorator status).
+  final UserContext? userContext;
+
   /// The user's application settings, including display preferences and language.
   /// This is null until successfully fetched from the backend.
   final AppSettings? settings;
@@ -48,6 +53,9 @@ class AppState extends Equatable {
   /// topics, and saved headlines.
   /// This is null until successfully fetched from the backend.
   final UserContentPreferences? userContentPreferences;
+
+  /// The user's active subscription, if any.
+  final UserSubscription? userSubscription;
 
   /// The currently selected index for bottom navigation.
   final int selectedBottomNavigationIndex;
@@ -132,10 +140,12 @@ class AppState extends Equatable {
   List<Object?> get props => [
     status,
     user,
+    userContext,
     settings,
     remoteConfig,
     error,
     userContentPreferences,
+    userSubscription,
     selectedBottomNavigationIndex,
     currentAppVersion,
     latestAppVersion,
@@ -148,12 +158,14 @@ class AppState extends Equatable {
   AppState copyWith({
     AppLifeCycleStatus? status,
     User? user,
+    UserContext? userContext,
     AppSettings? settings,
     RemoteConfig? remoteConfig,
     HttpException? error,
     bool clearError = false,
     bool clearUser = false,
     UserContentPreferences? userContentPreferences,
+    UserSubscription? userSubscription,
     int? selectedBottomNavigationIndex,
     String? currentAppVersion,
     String? latestAppVersion,
@@ -166,12 +178,16 @@ class AppState extends Equatable {
     return AppState(
       status: status ?? this.status,
       user: clearUser ? null : user ?? this.user,
+      userContext: clearUser ? null : userContext ?? this.userContext,
       settings: clearUser ? null : settings ?? this.settings,
       remoteConfig: remoteConfig ?? this.remoteConfig,
       error: clearError ? null : error ?? this.error,
       userContentPreferences: clearUser
           ? null
           : userContentPreferences ?? this.userContentPreferences,
+      userSubscription: clearUser
+          ? null
+          : userSubscription ?? this.userSubscription,
       selectedBottomNavigationIndex:
           selectedBottomNavigationIndex ?? this.selectedBottomNavigationIndex,
       currentAppVersion: currentAppVersion ?? this.currentAppVersion,

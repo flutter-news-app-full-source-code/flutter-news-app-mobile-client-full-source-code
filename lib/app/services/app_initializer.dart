@@ -43,6 +43,8 @@ class AppInitializer {
     required DataRepository<AppSettings> appSettingsRepository,
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
+    required DataRepository<UserContext> userContextRepository,
+    required DataRepository<UserSubscription> userSubscriptionRepository,
     required DataRepository<RemoteConfig> remoteConfigRepository,
     required local_config.AppEnvironment environment,
     required PackageInfoService packageInfoService,
@@ -52,6 +54,8 @@ class AppInitializer {
   }) : _authenticationRepository = authenticationRepository,
        _appSettingsRepository = appSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
+       _userContextRepository = userContextRepository,
+       _userSubscriptionRepository = userSubscriptionRepository,
        _remoteConfigRepository = remoteConfigRepository,
        _environment = environment,
        _packageInfoService = packageInfoService,
@@ -61,6 +65,8 @@ class AppInitializer {
   final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
+  final DataRepository<UserContext> _userContextRepository;
+  final DataRepository<UserSubscription> _userSubscriptionRepository;
   final DataRepository<RemoteConfig> _remoteConfigRepository;
   final local_config.AppEnvironment _environment;
   final PackageInfoService _packageInfoService;
@@ -182,22 +188,29 @@ class AppInitializer {
       var [
         appSettings as AppSettings?,
         userContentPreferences as UserContentPreferences?,
+        userContext as UserContext?,
+        userSubscription as UserSubscription?,
       ] = await Future.wait<dynamic>([
         _appSettingsRepository.read(id: user.id, userId: user.id),
         _userContentPreferencesRepository.read(id: user.id, userId: user.id),
+        _userContextRepository.read(id: user.id, userId: user.id),
+        _fetchUserSubscription(user.id),
       ]);
 
       _logger.fine(
         '[AppInitializer] Parallel fetch complete. '
         'Settings: ${appSettings != null}, '
-        'Preferences: ${userContentPreferences != null}',
+        'Preferences: ${userContentPreferences != null}, '
+        'Context: ${userContext != null}',
       );
 
       // --- Demo-Specific Logic: Initialize Data on First Run ---
       // If in demo mode and the user data is missing (e.g., first sign-in),
       // create it from fixtures.
       if (_environment == local_config.AppEnvironment.demo &&
-          (appSettings == null || userContentPreferences == null)) {
+          (appSettings == null ||
+              userContentPreferences == null ||
+              userContext == null)) {
         _logger.info(
           '[AppInitializer] Demo mode: User data missing. '
           'Initializing from fixtures for user ${user.id}.',
@@ -206,9 +219,16 @@ class AppInitializer {
 
         // Re-fetch the data after initialization.
         _logger.fine('[AppInitializer] Re-fetching data after demo init...');
-        [appSettings, userContentPreferences] = await Future.wait<dynamic>([
+        [
+          appSettings,
+          userContentPreferences,
+          userContext,
+          userSubscription,
+        ] = await Future.wait<dynamic>([
           _appSettingsRepository.read(id: user.id, userId: user.id),
           _userContentPreferencesRepository.read(id: user.id, userId: user.id),
+          _userContextRepository.read(id: user.id, userId: user.id),
+          _fetchUserSubscription(user.id),
         ]);
       }
 
@@ -220,6 +240,8 @@ class AppInitializer {
         user: user,
         settings: appSettings,
         userContentPreferences: userContentPreferences,
+        userContext: userContext,
+        userSubscription: userSubscription,
       );
     } on HttpException catch (e, s) {
       _logger.severe(
@@ -268,9 +290,7 @@ class AppInitializer {
 
     // --- Data Migration Logic ---
     final isMigration =
-        oldUser != null &&
-        oldUser.appRole == AppUserRole.guestUser &&
-        newUser.appRole == AppUserRole.standardUser;
+        oldUser != null && oldUser.isAnonymous && !newUser.isAnonymous;
 
     if (isMigration) {
       _logger.info(
@@ -327,12 +347,16 @@ class AppInitializer {
       final [
         appSettings as AppSettings?,
         userContentPreferences as UserContentPreferences?,
+        userContext as UserContext?,
+        userSubscription as UserSubscription?,
       ] = await Future.wait<dynamic>([
         _appSettingsRepository.read(id: newUser.id, userId: newUser.id),
         _userContentPreferencesRepository.read(
           id: newUser.id,
           userId: newUser.id,
         ),
+        _userContextRepository.read(id: newUser.id, userId: newUser.id),
+        _fetchUserSubscription(newUser.id),
       ]);
 
       _logger.fine('[AppInitializer] User transition data fetch complete.');
@@ -341,6 +365,8 @@ class AppInitializer {
         user: newUser,
         settings: appSettings,
         userContentPreferences: userContentPreferences,
+        userContext: userContext,
+        userSubscription: userSubscription,
       );
     } on HttpException catch (e, s) {
       _logger.severe(
@@ -352,6 +378,24 @@ class AppInitializer {
         status: AppLifeCycleStatus.criticalError,
         error: e,
       );
+    }
+  }
+
+  /// Helper to fetch user subscription safely.
+  /// Returns null if not found (which is valid for non-subscribers).
+  Future<UserSubscription?> _fetchUserSubscription(String userId) async {
+    try {
+      final response = await _userSubscriptionRepository.readAll(
+        userId: userId,
+        filter: {'status': 'active'},
+        pagination: const PaginationOptions(limit: 1),
+      );
+      return response.items.firstOrNull;
+    } catch (e, s) {
+      // If fetch fails or no subscription found, return null.
+      // We don't want to block app init for this.
+      _logger.warning('Failed to fetch user subscription on init', e, s);
+      return null;
     }
   }
 }

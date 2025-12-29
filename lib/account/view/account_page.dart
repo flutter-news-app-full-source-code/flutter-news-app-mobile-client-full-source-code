@@ -6,6 +6,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_l
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/shared.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/widgets/subscription_status_banner.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -64,6 +65,10 @@ class AccountPage extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              if (appState.userSubscription != null)
+                SubscriptionStatusBanner(
+                  subscription: appState.userSubscription!,
+                ),
               _buildUserHeader(context, user, isAnonymous),
               const SizedBox(height: AppSpacing.lg),
               _buildNavigationList(context),
@@ -91,12 +96,12 @@ class AccountPage extends StatelessWidget {
       statusText = user?.email ?? l10n.accountNoNameUser;
 
       final String roleDisplayName;
-      switch (user?.appRole) {
-        case AppUserRole.standardUser:
+      switch (user?.tier) {
+        case AccessTier.standard:
           roleDisplayName = l10n.accountRoleStandard;
-        case AppUserRole.premiumUser:
+        case AccessTier.premium:
           roleDisplayName = l10n.accountRolePremium;
-        case AppUserRole.guestUser:
+        case AccessTier.guest:
           roleDisplayName = l10n.accountGuestAccount;
         case null:
           roleDisplayName = '';
@@ -154,6 +159,17 @@ class AccountPage extends StatelessWidget {
                 ],
               ),
             ),
+            const SizedBox(width: AppSpacing.md),
+            if (user?.tier == AccessTier.standard)
+              ElevatedButton(
+                onPressed: () => context.pushNamed(Routes.paywallName),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                  ),
+                ),
+                child: Text(l10n.upgradeButton),
+              ),
           ],
         ),
       ),
@@ -168,6 +184,16 @@ class AccountPage extends StatelessWidget {
     final l10n = AppLocalizationsX(context).l10n;
     return Column(
       children: [
+        if (context.watch<AppBloc>().state.user?.tier ==
+            AccessTier.premium) ...[
+          buildTile(
+            context: context,
+            icon: Icons.workspace_premium,
+            title: l10n.manageSubscriptionButton,
+            onTap: () => context.pushNamed(Routes.subscriptionDetailsName),
+          ),
+          const Divider(),
+        ],
         buildTile(
           context: context,
           icon: Icons.check_outlined,

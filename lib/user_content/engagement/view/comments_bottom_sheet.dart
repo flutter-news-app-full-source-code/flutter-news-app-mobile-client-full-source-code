@@ -247,7 +247,7 @@ class __CommentInputFieldState extends State<_CommentInputField> {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final user = context.select((AppBloc bloc) => bloc.state.user);
-    final isGuest = user?.appRole == AppUserRole.guestUser;
+    final isGuest = user?.isAnonymous ?? true;
 
     return BlocBuilder<HeadlinesFeedBloc, HeadlinesFeedState>(
       builder: (context, state) {

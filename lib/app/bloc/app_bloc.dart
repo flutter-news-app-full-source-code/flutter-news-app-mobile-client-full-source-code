@@ -14,8 +14,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/models/initi
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/extensions.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/purchase_handler.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:logging/logging.dart';
 
@@ -38,31 +38,35 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   /// pre-fetched initial data.
   AppBloc({
     required User? user,
+    required UserContext? userContext,
     required RemoteConfig remoteConfig,
     required AppSettings? settings,
     required UserContentPreferences? userContentPreferences,
+    required UserSubscription? userSubscription,
     required DataRepository<RemoteConfig> remoteConfigRepository,
     required AppInitializer appInitializer,
     required AuthRepository authRepository,
     required DataRepository<AppSettings> appSettingsRepository,
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
+    required DataRepository<UserContext> userContextRepository,
     required InlineAdCacheService inlineAdCacheService,
     required FeedCacheService feedCacheService,
     required Logger logger,
-    required DataRepository<User> userRepository,
     required PushNotificationService pushNotificationService,
     required DataRepository<Report> reportRepository,
     required ContentLimitationService contentLimitationService,
     required DataRepository<InAppNotification> inAppNotificationRepository,
     required AppReviewService appReviewService,
     required AnalyticsService analyticsService,
+    required PurchaseHandler purchaseHandler,
+    required DataRepository<UserSubscription> userSubscriptionRepository,
   }) : _remoteConfigRepository = remoteConfigRepository,
        _appInitializer = appInitializer,
        _authRepository = authRepository,
        _appSettingsRepository = appSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
-       _userRepository = userRepository,
+       _userContextRepository = userContextRepository,
        _inAppNotificationRepository = inAppNotificationRepository,
        _feedCacheService = feedCacheService,
        _pushNotificationService = pushNotificationService,
@@ -71,18 +75,22 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _appReviewService = appReviewService,
        _inlineAdCacheService = inlineAdCacheService,
        _analyticsService = analyticsService,
+       _purchaseHandler = purchaseHandler,
+       _userSubscriptionRepository = userSubscriptionRepository,
        _logger = logger,
        super(
          AppState(
            status: user == null
                ? AppLifeCycleStatus.unauthenticated
-               : user.isGuest
+               : user.isAnonymous
                ? AppLifeCycleStatus.anonymous
                : AppLifeCycleStatus.authenticated,
            user: user,
+           userContext: userContext,
            remoteConfig: remoteConfig,
            settings: settings,
            userContentPreferences: userContentPreferences,
+           userSubscription: userSubscription,
          ),
        ) {
     // Register event handlers for various app-level events.
@@ -112,6 +120,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppNotificationTapped>(_onAppNotificationTapped);
     on<AppBookmarkToggled>(_onAppBookmarkToggled);
     on<AppContentReported>(_onAppContentReported);
+    on<_AppUserAndSubscriptionRefreshed>(_onUserAndSubscriptionRefreshed);
 
     // Listen to token refresh events from the push notification service.
     // When a token is refreshed, dispatch an event to trigger device
@@ -123,10 +132,17 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // Listen to raw foreground push notifications.
     _pushNotificationService.onMessage.listen((payload) async {
       _logger.fine('AppBloc received foreground push notification payload.');
-      // The backend now persists the notification when it sends the push. The
+      // The backend persists the notification when it sends the push. The
       // client's only responsibility is to react to the incoming message
       // and update the UI to show an unread indicator.
       add(const AppInAppNotificationReceived());
+    });
+
+    // Listen to purchase completion events to refresh user entitlements.
+    _purchaseCompletedSubscription = _purchaseHandler.purchaseCompleted.listen((
+      _,
+    ) {
+      add(const _AppUserAndSubscriptionRefreshed());
     });
   }
 
@@ -137,7 +153,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
-  final DataRepository<User> _userRepository;
+  final DataRepository<UserContext> _userContextRepository;
   final DataRepository<InAppNotification> _inAppNotificationRepository;
   final PushNotificationService _pushNotificationService;
   final DataRepository<Report> _reportRepository;
@@ -146,6 +162,15 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final InlineAdCacheService _inlineAdCacheService;
   final FeedCacheService _feedCacheService;
   final AnalyticsService _analyticsService;
+  final PurchaseHandler _purchaseHandler;
+  final DataRepository<UserSubscription> _userSubscriptionRepository;
+  late final StreamSubscription<void> _purchaseCompletedSubscription;
+
+  @override
+  Future<void> close() {
+    _purchaseCompletedSubscription.cancel();
+    return super.close();
+  }
 
   /// Handles the [AppStarted] event.
   ///
@@ -182,6 +207,42 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     }
   }
 
+  Future<void> _onUserAndSubscriptionRefreshed(
+    _AppUserAndSubscriptionRefreshed event,
+    Emitter<AppState> emit,
+  ) async {
+    final userId = state.user?.id;
+    if (userId == null) return;
+
+    _logger.info(
+      '[AppBloc] Refreshing user and subscription data after purchase...',
+    );
+
+    try {
+      final user = await _authRepository.getCurrentUser();
+
+      final subResponse = await _userSubscriptionRepository.readAll(
+        userId: userId,
+        filter: {'status': 'active'},
+        pagination: const PaginationOptions(limit: 1),
+      );
+      final subscription = subResponse.items.firstOrNull;
+
+      if (user != null) {
+        emit(
+          state.copyWith(
+            user: user,
+            userSubscription: subscription,
+            clearError: true,
+          ),
+        );
+      }
+      _logger.info('[AppBloc] User and subscription data refreshed.');
+    } catch (e, s) {
+      _logger.severe('[AppBloc] Failed to refresh data after purchase.', e, s);
+    }
+  }
+
   /// Handles all logic related to user authentication state changes.
   ///
   /// This method is the reactive entry point for handling a user logging in,
@@ -211,7 +272,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     // Critical Change: Detect not just user ID changes, but also role changes.
     // This is essential for the "anonymous to authenticated" flow.
-    if (oldUser?.id == newUser?.id && oldUser?.appRole == newUser?.appRole) {
+    if (oldUser?.id == newUser?.id &&
+        oldUser?.role == newUser?.role &&
+        oldUser?.tier == newUser?.tier &&
+        oldUser?.isAnonymous == newUser?.isAnonymous) {
       _logger.info(
         '[AppBloc] AppUserChanged triggered, but user ID and role are the same. '
         'Skipping transition.',
@@ -292,27 +356,31 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         :final user,
         :final settings,
         :final userContentPreferences,
+        :final userContext,
+        :final userSubscription,
       ):
         emit(
           state.copyWith(
-            status: user!.isGuest
+            status: user!.isAnonymous
                 ? AppLifeCycleStatus.anonymous
                 : AppLifeCycleStatus.authenticated,
             user: user,
+            userContext: userContext,
             settings: settings,
             userContentPreferences: userContentPreferences,
+            userSubscription: userSubscription,
             clearError: true,
           ),
         );
 
         // Analytics: Track user role changes
-        if (oldUser != null && oldUser.appRole != user.appRole) {
+        if (oldUser != null && oldUser.role != user.role) {
           unawaited(
             _analyticsService.logEvent(
               AnalyticsEvent.userRoleChanged,
               payload: UserRoleChangedPayload(
-                fromRole: oldUser.appRole,
-                toRole: user.appRole,
+                fromRole: oldUser.role,
+                toRole: user.role,
               ),
             ),
           );
@@ -494,7 +562,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         );
         final restoredStatus = state.user == null
             ? AppLifeCycleStatus.unauthenticated
-            : (state.user!.isGuest
+            : (state.user!.isAnonymous
                   ? AppLifeCycleStatus.anonymous
                   : AppLifeCycleStatus.authenticated);
         emit(
@@ -515,11 +583,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     AppUserFeedDecoratorShown event,
     Emitter<AppState> emit,
   ) async {
-    if (state.user != null && state.user!.id == event.userId) {
-      final originalUser = state.user!;
+    if (state.userContext != null &&
+        state.userContext!.userId == event.userId) {
+      final originalContext = state.userContext!;
       final now = DateTime.now();
       final currentStatus =
-          originalUser.feedDecoratorStatus[event.feedDecoratorType] ??
+          originalContext.feedDecoratorStatus[event.feedDecoratorType] ??
           const UserFeedDecoratorStatus(isCompleted: false);
 
       final updatedDecoratorStatus = currentStatus.copyWith(
@@ -533,24 +602,25 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
       final newFeedDecoratorStatus =
           Map<FeedDecoratorType, UserFeedDecoratorStatus>.from(
-            originalUser.feedDecoratorStatus,
+            //
+            originalContext.feedDecoratorStatus,
           )..update(
             event.feedDecoratorType,
             (_) => updatedDecoratorStatus,
             ifAbsent: () => updatedDecoratorStatus,
           );
 
-      final updatedUser = originalUser.copyWith(
+      final updatedContext = originalContext.copyWith(
         feedDecoratorStatus: newFeedDecoratorStatus,
       );
 
-      emit(state.copyWith(user: updatedUser));
+      emit(state.copyWith(userContext: updatedContext));
 
       try {
-        await _userRepository.update(
-          id: updatedUser.id,
-          item: updatedUser,
-          userId: updatedUser.id,
+        await _userContextRepository.update(
+          id: updatedContext.userId,
+          item: updatedContext,
+          userId: updatedContext.userId,
         );
         _logger.info(
           '[AppBloc] User ${event.userId} FeedDecorator ${event.feedDecoratorType} '
@@ -558,7 +628,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         );
       } catch (e) {
         _logger.severe('Failed to update feed decorator status: $e');
-        emit(state.copyWith(user: originalUser));
+        emit(state.copyWith(userContext: originalContext));
       }
     }
   }

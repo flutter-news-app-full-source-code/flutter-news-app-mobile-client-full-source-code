@@ -3001,6 +3001,282 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'User {id}'**
   String commenterName(String id);
+
+  /// Title of the paywall screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock Full Access'**
+  String get paywallTitle;
+
+  /// Subtitle of the paywall screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Get more from your news feed with Premium limits and features.'**
+  String get paywallSubtitle;
+
+  /// Feature list item: Increased follow limits.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow More Topics & Sources'**
+  String get paywallFeatureFollowMore;
+
+  /// Feature list item: Increased save limits.
+  ///
+  /// In en, this message translates to:
+  /// **'Save More Articles'**
+  String get paywallFeatureSaveMore;
+
+  /// Feature list item: Advanced filtering and notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced Filters & Alerts'**
+  String get paywallFeatureAdvancedFilters;
+
+  /// Feature list item: Unlimited history.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited Reading History'**
+  String get paywallFeatureUnlimitedHistory;
+
+  /// Label for the monthly subscription plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get paywallMonthlyPlan;
+
+  /// Label for the annual subscription plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Annual'**
+  String get paywallAnnualPlan;
+
+  /// Badge text for the best value plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Best Value'**
+  String get paywallBestValue;
+
+  /// Button text to restore purchases.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Purchases'**
+  String get paywallRestorePurchases;
+
+  /// Link text for Terms of Service.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Service'**
+  String get paywallTermsOfService;
+
+  /// Link text for Privacy Policy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get paywallPrivacyPolicy;
+
+  /// Disclaimer text regarding auto-renewal.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription automatically renews unless auto-renew is turned off at least 24-hours before the end of the current period.'**
+  String get paywallDisclaimer;
+
+  /// Subscribe button text.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribe for {price} / {period}'**
+  String paywallSubscribeButton(String price, String period);
+
+  /// Title of the success dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Premium!'**
+  String get paywallSuccessTitle;
+
+  /// Body of the success dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'You now have full access to all features.'**
+  String get paywallSuccessBody;
+
+  /// Title of the error dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase Failed'**
+  String get paywallErrorTitle;
+
+  /// Loading text shown during purchase verification.
+  ///
+  /// In en, this message translates to:
+  /// **'Verifying purchase...'**
+  String get paywallLoading;
+
+  /// Title for the subscription details page.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription Details'**
+  String get subscriptionDetailsPageTitle;
+
+  /// Button text to manage subscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Subscription'**
+  String get manageSubscriptionButton;
+
+  /// Label for the current subscription plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Plan'**
+  String get subscriptionDetailsCurrentPlan;
+
+  /// Text indicating the renewal date of a subscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Renews on {date}'**
+  String subscriptionDetailsRenewsOn(String date);
+
+  /// Text indicating the expiration date of a non-renewing subscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires on {date}'**
+  String subscriptionDetailsExpiresOn(String date);
+
+  /// Status text for a subscription that has been cancelled and will not auto-renew.
+  ///
+  /// In en, this message translates to:
+  /// **'Will not renew'**
+  String get subscriptionDetailsWillNotRenew;
+
+  /// Label for the subscription provider (e.g., Apple App Store).
+  ///
+  /// In en, this message translates to:
+  /// **'Provider'**
+  String get subscriptionDetailsProvider;
+
+  /// Button text to open the native subscription management UI.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage in App Store'**
+  String get subscriptionDetailsManageButton;
+
+  /// Text shown while subscription details are loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading subscription details...'**
+  String get subscriptionDetailsLoading;
+
+  /// Error message when subscription details fail to load.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load subscription details.'**
+  String get subscriptionDetailsError;
+
+  /// Message shown when the user has no active subscription.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have an active subscription.'**
+  String get subscriptionDetailsNoSubscription;
+
+  /// Title for the annual demo plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Annual Premium (Demo)'**
+  String get demoAnnualPlanTitle;
+
+  /// Title for the monthly demo plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Premium (Demo)'**
+  String get demoMonthlyPlanTitle;
+
+  /// Description for a demo subscription plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock all features (Demo Mode)'**
+  String get demoPlanDescription;
+
+  /// Button text for upgrading a subscription plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade'**
+  String get subscriptionUpgradeButton;
+
+  /// Button text for downgrading a subscription plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Downgrade'**
+  String get subscriptionDowngradeButton;
+
+  /// Text indicating the user's current subscription plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Plan'**
+  String get subscriptionCurrentPlan;
+
+  /// Banner message when a user's subscription payment has failed but access is temporarily retained.
+  ///
+  /// In en, this message translates to:
+  /// **'Your subscription is in a grace period. Please update your payment method to retain access.'**
+  String get subscriptionStatusGracePeriod;
+
+  /// Banner message when a user's subscription is paused due to a payment issue.
+  ///
+  /// In en, this message translates to:
+  /// **'Your subscription is on hold due to a billing issue. Please update your payment method.'**
+  String get subscriptionStatusBillingIssue;
+
+  /// Title for the upgrade section in subscription details.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade Plan'**
+  String get subscriptionUpgradeTitle;
+
+  /// Description for the upgrade option.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to an annual plan and save.'**
+  String get subscriptionUpgradeDescription;
+
+  /// Title for the downgrade section in subscription details.
+  ///
+  /// In en, this message translates to:
+  /// **'Downgrade Plan'**
+  String get subscriptionDowngradeTitle;
+
+  /// Description for the downgrade option.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to a monthly billing cycle.'**
+  String get subscriptionDowngradeDescription;
+
+  /// Button text to initiate a plan switch.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch Plan'**
+  String get subscriptionSwitchButton;
+
+  /// Button text on the paywall page to restore a user's previous purchases.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Purchases'**
+  String get paywallRestorePurchaseButton;
+
+  /// Snackbar message shown when purchases are restored successfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Your purchases have been successfully restored.'**
+  String get paywallRestoreSuccess;
+
+  /// Snackbar message shown when restoring purchases fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not restore purchases. Please try again or contact support.'**
+  String get paywallRestoreFailure;
+
+  /// A message indicating that the app is currently attempting to restore purchases.
+  ///
+  /// In en, this message translates to:
+  /// **'Restoring purchases...'**
+  String get paywallRestoringPurchases;
 }
 
 class _AppLocalizationsDelegate

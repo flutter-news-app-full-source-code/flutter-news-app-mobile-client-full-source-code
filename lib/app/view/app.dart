@@ -23,6 +23,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_tap_handler.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/maintenance_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/update_required_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/purchase_handler.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
@@ -40,9 +42,11 @@ class App extends StatelessWidget {
   /// {@macro app_widget}
   const App({
     required this.user,
+    required this.userContext,
     required this.remoteConfig,
     required this.settings,
     required this.userContentPreferences,
+    required this.userSubscription,
     required AuthRepository authenticationRepository,
     required DataRepository<Headline> headlinesRepository,
     required DataRepository<Topic> topicsRepository,
@@ -53,6 +57,7 @@ class App extends StatelessWidget {
     required DataRepository<AppSettings> appSettingsRepository,
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
+    required DataRepository<UserContext> userContextRepository,
     required DataRepository<Engagement> engagementRepository,
     required DataRepository<Report> reportRepository,
     required DataRepository<AppReview> appReviewRepository,
@@ -67,6 +72,10 @@ class App extends StatelessWidget {
     required GlobalKey<NavigatorState> navigatorKey,
     required PushNotificationService pushNotificationService,
     required AnalyticsService analyticsService,
+    required SubscriptionServiceInterface subscriptionService,
+    required DataRepository<UserSubscription> userSubscriptionRepository,
+    required DataRepository<PurchaseTransaction> purchaseTransactionRepository,
+    required PurchaseHandler purchaseHandler,
     super.key,
   }) : _authenticationRepository = authenticationRepository,
        _headlinesRepository = headlinesRepository,
@@ -77,6 +86,7 @@ class App extends StatelessWidget {
        _remoteConfigRepository = remoteConfigRepository,
        _appSettingsRepository = appSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
+       _userContextRepository = userContextRepository,
        _engagementRepository = engagementRepository,
        _reportRepository = reportRepository,
        _appReviewRepository = appReviewRepository,
@@ -90,10 +100,17 @@ class App extends StatelessWidget {
        _feedCacheService = feedCacheService,
        _navigatorKey = navigatorKey,
        _inlineAdCacheService = inlineAdCacheService,
-       _analyticsService = analyticsService;
+       _analyticsService = analyticsService,
+       _subscriptionService = subscriptionService,
+       _purchaseTransactionRepository = purchaseTransactionRepository,
+       _userSubscriptionRepository = userSubscriptionRepository,
+       _purchaseHandler = purchaseHandler;
 
   /// The initial user, pre-fetched during startup.
   final User? user;
+
+  /// The initial user context, pre-fetched during startup.
+  final UserContext? userContext;
 
   /// The global remote configuration, pre-fetched during startup.
   final RemoteConfig remoteConfig;
@@ -103,6 +120,9 @@ class App extends StatelessWidget {
 
   /// The user's content preferences, pre-fetched during startup.
   final UserContentPreferences? userContentPreferences;
+
+  /// The user's subscription, pre-fetched during startup.
+  final UserSubscription? userSubscription;
 
   final AuthRepository _authenticationRepository;
   final DataRepository<Headline> _headlinesRepository;
@@ -114,6 +134,7 @@ class App extends StatelessWidget {
   final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
+  final DataRepository<UserContext> _userContextRepository;
   final DataRepository<Engagement> _engagementRepository;
   final DataRepository<Report> _reportRepository;
   final DataRepository<AppReview> _appReviewRepository;
@@ -128,6 +149,10 @@ class App extends StatelessWidget {
   final InlineAdCacheService _inlineAdCacheService;
   final PushNotificationService _pushNotificationService;
   final AnalyticsService _analyticsService;
+  final SubscriptionServiceInterface _subscriptionService;
+  final DataRepository<UserSubscription> _userSubscriptionRepository;
+  final DataRepository<PurchaseTransaction> _purchaseTransactionRepository;
+  final PurchaseHandler _purchaseHandler;
 
   @override
   Widget build(BuildContext context) {
@@ -147,6 +172,7 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _remoteConfigRepository),
         RepositoryProvider.value(value: _appSettingsRepository),
         RepositoryProvider.value(value: _userContentPreferencesRepository),
+        RepositoryProvider.value(value: _userContextRepository),
         RepositoryProvider.value(value: _engagementRepository),
         RepositoryProvider.value(value: _reportRepository),
         RepositoryProvider.value(value: _appReviewRepository),
@@ -158,6 +184,10 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _feedCacheService),
         RepositoryProvider.value(value: _environment),
         RepositoryProvider.value(value: _analyticsService),
+        RepositoryProvider.value(value: _subscriptionService),
+        RepositoryProvider.value(value: _userSubscriptionRepository),
+        RepositoryProvider.value(value: _purchaseTransactionRepository),
+        RepositoryProvider.value(value: _purchaseHandler),
         // NOTE: The AppInitializer is provided at the root in bootstrap.dart
         // and is accessed via context.read() in the AppBloc.
       ],
@@ -167,19 +197,21 @@ class App extends StatelessWidget {
           BlocProvider(
             create: (context) => AppBloc(
               user: user,
+              userContext: userContext,
               remoteConfig: remoteConfig,
               settings: settings,
               userContentPreferences: userContentPreferences,
+              userSubscription: userSubscription,
               remoteConfigRepository: _remoteConfigRepository,
               appInitializer: context.read<AppInitializer>(),
               authRepository: context.read<AuthRepository>(),
               appSettingsRepository: _appSettingsRepository,
               userContentPreferencesRepository:
                   _userContentPreferencesRepository,
+              userContextRepository: _userContextRepository,
               logger: context.read<Logger>(),
               pushNotificationService: _pushNotificationService,
               inAppNotificationRepository: _inAppNotificationRepository,
-              userRepository: _userRepository,
               appReviewService: _appReviewService,
               inlineAdCacheService: _inlineAdCacheService,
               contentLimitationService: context
@@ -187,6 +219,8 @@ class App extends StatelessWidget {
               reportRepository: context.read<DataRepository<Report>>(),
               feedCacheService: context.read<FeedCacheService>(),
               analyticsService: _analyticsService,
+              purchaseHandler: _purchaseHandler,
+              userSubscriptionRepository: _userSubscriptionRepository,
             )..add(const AppStarted()),
           ),
         ],

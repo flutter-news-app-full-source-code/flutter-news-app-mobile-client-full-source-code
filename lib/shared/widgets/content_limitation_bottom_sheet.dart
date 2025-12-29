@@ -93,14 +93,14 @@ void showContentLimitationBottomSheet({
   required ContentAction action,
 }) {
   final l10n = AppLocalizations.of(context);
-  final userRole = context.read<AppBloc>().state.user?.appRole;
+  final userTier = context.read<AppBloc>().state.user?.tier;
   final analyticsService = context.read<AnalyticsService>();
 
   final content = _getBottomSheetContent(
     context: context,
     l10n: l10n,
     status: status,
-    userRole: userRole,
+    userTier: userTier,
     action: action,
     analyticsService: analyticsService,
   );
@@ -117,13 +117,13 @@ void showContentLimitationBottomSheet({
 }
 
 /// Determines the content for the [ContentLimitationBottomSheet] based on
-/// the user's role and the limitation status.
+/// the user's tier and the limitation status.
 ({String title, String body, String buttonText, VoidCallback? onPressed})
 _getBottomSheetContent({
   required BuildContext context,
   required AppLocalizations l10n,
   required LimitationStatus status,
-  required AppUserRole? userRole,
+  required AccessTier? userTier,
   required ContentAction action,
   required AnalyticsService analyticsService,
 }) {
@@ -159,17 +159,26 @@ _getBottomSheetContent({
         ContentAction.subscribeToSavedFilterNotifications =>
           l10n.limitReachedBodySubscribeToNotifications,
       };
+
+      final buttonText = userTier == AccessTier.standard
+          ? l10n.upgradeButton
+          : l10n.manageMyContentButton;
+
       return (
         title: l10n.limitReachedTitle,
         body: body,
-        buttonText: l10n.gotItButton,
+        buttonText: buttonText,
         onPressed: () {
           analyticsService.logEvent(
             AnalyticsEvent.limitExceededCtaClicked,
             payload: const LimitExceededCtaClickedPayload(ctaType: 'dismiss'),
           );
           Navigator.of(context).pop();
-          // TODO(fulleni): Navigate to content management or upgrade page.
+          if (userTier == AccessTier.standard) {
+            context.pushNamed(Routes.paywallName);
+          } else {
+            context.pushNamed(Routes.manageFollowedItemsName);
+          }
         },
       );
     case LimitationStatus.allowed:

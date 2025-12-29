@@ -17,7 +17,7 @@ sealed class InitializationResult extends Equatable {
 /// **Architectural Hint for Future Maintenance:**
 /// This class acts as the "data contract" for a successful startup. If, in the
 /// future, a new piece of critical, user-specific data is required for the app
-/// to function (e.g., a `UserSubscription` status, A/B testing flags, etc.),
+/// to function (e.g. A/B testing flags, etc.),
 /// it should be added as a property here. The `AppInitializer` would then be
 /// updated to fetch this data, and the `App` widget would receive it.
 /// is present, their specific settings and preferences.
@@ -26,8 +26,10 @@ final class InitializationSuccess extends InitializationResult {
   const InitializationSuccess({
     required this.remoteConfig,
     this.user,
+    this.userContext,
     this.settings,
     this.userContentPreferences,
+    this.userSubscription,
   });
 
   /// The globally fetched remote configuration.
@@ -35,6 +37,9 @@ final class InitializationSuccess extends InitializationResult {
 
   /// The initial user, if one was found. Can be anonymous or authenticated.
   final User? user;
+
+  /// The user's context (ephemeral state like feed decorator status).
+  final UserContext? userContext;
 
   /// The user's specific application settings (theme, font, etc.).
   /// Null if the user is unauthenticated.
@@ -44,12 +49,17 @@ final class InitializationSuccess extends InitializationResult {
   /// Null if the user is unauthenticated.
   final UserContentPreferences? userContentPreferences;
 
+  /// The user's subscription status.
+  final UserSubscription? userSubscription;
+
   @override
   List<Object?> get props => [
     remoteConfig,
     user,
+    userContext,
     settings,
     userContentPreferences,
+    userSubscription,
   ];
 }
 

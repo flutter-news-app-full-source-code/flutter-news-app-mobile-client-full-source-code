@@ -1602,4 +1602,157 @@ class AppLocalizationsEn extends AppLocalizations {
   String commenterName(String id) {
     return 'User $id';
   }
+
+  @override
+  String get paywallTitle => 'Unlock Full Access';
+
+  @override
+  String get paywallSubtitle =>
+      'Get more from your news feed with Premium limits and features.';
+
+  @override
+  String get paywallFeatureFollowMore => 'Follow More Topics & Sources';
+
+  @override
+  String get paywallFeatureSaveMore => 'Save More Articles';
+
+  @override
+  String get paywallFeatureAdvancedFilters => 'Advanced Filters & Alerts';
+
+  @override
+  String get paywallFeatureUnlimitedHistory => 'Unlimited Reading History';
+
+  @override
+  String get paywallMonthlyPlan => 'Monthly';
+
+  @override
+  String get paywallAnnualPlan => 'Annual';
+
+  @override
+  String get paywallBestValue => 'Best Value';
+
+  @override
+  String get paywallRestorePurchases => 'Restore Purchases';
+
+  @override
+  String get paywallTermsOfService => 'Terms of Service';
+
+  @override
+  String get paywallPrivacyPolicy => 'Privacy Policy';
+
+  @override
+  String get paywallDisclaimer =>
+      'Subscription automatically renews unless auto-renew is turned off at least 24-hours before the end of the current period.';
+
+  @override
+  String paywallSubscribeButton(String price, String period) {
+    return 'Subscribe for $price / $period';
+  }
+
+  @override
+  String get paywallSuccessTitle => 'Welcome to Premium!';
+
+  @override
+  String get paywallSuccessBody => 'You now have full access to all features.';
+
+  @override
+  String get paywallErrorTitle => 'Purchase Failed';
+
+  @override
+  String get paywallLoading => 'Verifying purchase...';
+
+  @override
+  String get subscriptionDetailsPageTitle => 'Subscription Details';
+
+  @override
+  String get manageSubscriptionButton => 'Manage Subscription';
+
+  @override
+  String get subscriptionDetailsCurrentPlan => 'Current Plan';
+
+  @override
+  String subscriptionDetailsRenewsOn(String date) {
+    return 'Renews on $date';
+  }
+
+  @override
+  String subscriptionDetailsExpiresOn(String date) {
+    return 'Expires on $date';
+  }
+
+  @override
+  String get subscriptionDetailsWillNotRenew => 'Will not renew';
+
+  @override
+  String get subscriptionDetailsProvider => 'Provider';
+
+  @override
+  String get subscriptionDetailsManageButton => 'Manage in App Store';
+
+  @override
+  String get subscriptionDetailsLoading => 'Loading subscription details...';
+
+  @override
+  String get subscriptionDetailsError => 'Could not load subscription details.';
+
+  @override
+  String get subscriptionDetailsNoSubscription =>
+      'You do not have an active subscription.';
+
+  @override
+  String get demoAnnualPlanTitle => 'Annual Premium (Demo)';
+
+  @override
+  String get demoMonthlyPlanTitle => 'Monthly Premium (Demo)';
+
+  @override
+  String get demoPlanDescription => 'Unlock all features (Demo Mode)';
+
+  @override
+  String get subscriptionUpgradeButton => 'Upgrade';
+
+  @override
+  String get subscriptionDowngradeButton => 'Downgrade';
+
+  @override
+  String get subscriptionCurrentPlan => 'Current Plan';
+
+  @override
+  String get subscriptionStatusGracePeriod =>
+      'Your subscription is in a grace period. Please update your payment method to retain access.';
+
+  @override
+  String get subscriptionStatusBillingIssue =>
+      'Your subscription is on hold due to a billing issue. Please update your payment method.';
+
+  @override
+  String get subscriptionUpgradeTitle => 'Upgrade Plan';
+
+  @override
+  String get subscriptionUpgradeDescription =>
+      'Switch to an annual plan and save.';
+
+  @override
+  String get subscriptionDowngradeTitle => 'Downgrade Plan';
+
+  @override
+  String get subscriptionDowngradeDescription =>
+      'Switch to a monthly billing cycle.';
+
+  @override
+  String get subscriptionSwitchButton => 'Switch Plan';
+
+  @override
+  String get paywallRestorePurchaseButton => 'Restore Purchases';
+
+  @override
+  String get paywallRestoreSuccess =>
+      'Your purchases have been successfully restored.';
+
+  @override
+  String get paywallRestoreFailure =>
+      'Could not restore purchases. Please try again or contact support.';
+
+  @override
+  String get paywallRestoringPurchases => 'Restoring purchases...';
 }

@@ -178,7 +178,6 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
     }
 
     // Define the maximum age for a cached ad before it's considered stale.
-    // TODO(fulleni): This should be sourced from RemoteConfig.
     const adMaxAge = Duration(minutes: 1);
 
     // Attempt to retrieve the ad from the cache using the contextKey.
@@ -249,14 +248,14 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
       final appBlocState = context.read<AppBloc>().state;
       final feedItemImageStyle =
           appBlocState.settings!.feedSettings.feedItemImageStyle;
-      final userRole = appBlocState.user?.appRole ?? AppUserRole.guestUser;
+      final userTier = appBlocState.user?.tier ?? AccessTier.guest;
 
       final loadedAd = await _adService.getFeedAd(
         adConfig: widget.remoteConfig.features.ads,
         adType: widget.adPlaceholder.adType,
         adThemeStyle: widget.adThemeStyle,
         feedItemImageStyle: feedItemImageStyle,
-        userRole: userRole,
+        userTier: userTier,
       );
 
       if (loadedAd != null) {

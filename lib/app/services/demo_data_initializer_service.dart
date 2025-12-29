@@ -22,18 +22,22 @@ class DemoDataInitializerService {
     required DataRepository<AppSettings> appSettingsRepository,
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
+    required DataRepository<UserContext> userContextRepository,
     required DataRepository<InAppNotification> inAppNotificationRepository,
     required this.appSettingsFixturesData,
     required this.userContentPreferencesFixturesData,
+    required this.userContextFixturesData,
     required this.inAppNotificationsFixturesData,
   }) : _appSettingsRepository = appSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
+       _userContextRepository = userContextRepository,
        _inAppNotificationRepository = inAppNotificationRepository,
        _logger = Logger('DemoDataInitializerService');
 
   final DataRepository<AppSettings> _appSettingsRepository;
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
+  final DataRepository<UserContext> _userContextRepository;
   final DataRepository<InAppNotification> _inAppNotificationRepository;
   final Logger _logger;
 
@@ -46,6 +50,11 @@ class DemoDataInitializerService {
   ///
   /// The first item in this list will be cloned for new users.
   final List<UserContentPreferences> userContentPreferencesFixturesData;
+
+  /// A list of [UserContext] fixture data to be used as a template.
+  ///
+  /// The first item in this list will be cloned for new users.
+  final List<UserContext> userContextFixturesData;
 
   /// A list of [InAppNotification] fixture data to be used as a template.
   ///
@@ -68,6 +77,7 @@ class DemoDataInitializerService {
       _ensureAppSettingsExist(user.id),
       _ensureUserContentPreferencesExist(user.id),
       _ensureInAppNotificationsExist(user.id),
+      _ensureUserContextExist(user.id),
     ]);
 
     _logger.info(
@@ -208,6 +218,37 @@ class DemoDataInitializerService {
       );
       // We don't rethrow here as failing to create notifications
       // is not a critical failure for the app's startup.
+    }
+  }
+
+  /// Ensures that [UserContext] exists for the given [userId].
+  /// If not found, creates default context from fixture.
+  Future<void> _ensureUserContextExist(String userId) async {
+    try {
+      await _userContextRepository.read(id: userId, userId: userId);
+      _logger.finer('UserContext found for user ID: $userId.');
+    } on NotFoundException {
+      _logger.fine(
+        'UserContext not found for user ID: $userId. Creating from fixture.',
+      );
+      if (userContextFixturesData.isEmpty) {
+        throw StateError(
+          'Cannot create UserContext from fixture: userContextFixturesData is empty.',
+        );
+      }
+      final fixtureContext = userContextFixturesData.first.copyWith(
+        userId: userId,
+      );
+
+      await _userContextRepository.create(item: fixtureContext, userId: userId);
+      _logger.fine('UserContext from fixture created for user ID: $userId.');
+    } catch (e, s) {
+      _logger.severe(
+        'Error ensuring UserContext exist for user ID: $userId: $e',
+        e,
+        s,
+      );
+      rethrow;
     }
   }
 }

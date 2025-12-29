@@ -199,6 +199,10 @@ void main() {
         ),
       ),
     );
+
+    when(
+      () => mockSubscriptionBloc.state,
+    ).thenReturn(const SubscriptionState());
   });
 
   Widget buildTestWidget() {
@@ -286,6 +290,52 @@ void main() {
       expect(find.text('Monthly'), findsOneWidget);
       expect(find.text('Best Value'), findsOneWidget); // For annual plan
       expect(find.byType(ElevatedButton), findsOneWidget); // Subscribe button
+    });
+
+    testWidgets('renders error when no products are loaded', (tester) async {
+      whenListen(
+        mockSubscriptionBloc,
+        Stream.fromIterable(<SubscriptionState>[]),
+        initialState: const SubscriptionState(
+          status: SubscriptionStatus.productsLoaded,
+          products: [],
+        ),
+      );
+
+      await tester.pumpWidget(buildTestWidget());
+      await tester.tap(find.text('Go to Paywall'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('An unknown error occurred.'), findsOneWidget);
+    });
+
+    testWidgets('renders localized demo plan titles correctly', (tester) async {
+      final demoAnnualProduct = ProductDetails(
+        id: 'annual_plan_id',
+        title: 'demoAnnualPlanTitle', // This is the key
+        description: 'desc',
+        price: r'$99.99',
+        rawPrice: 99.99,
+        currencyCode: 'USD',
+      );
+
+      whenListen(
+        mockSubscriptionBloc,
+        Stream.fromIterable(<SubscriptionState>[]),
+        initialState: SubscriptionState(
+          status: SubscriptionStatus.productsLoaded,
+          products: [demoAnnualProduct],
+          selectedProduct: demoAnnualProduct,
+        ),
+      );
+
+      await tester.pumpWidget(buildTestWidget());
+      await tester.tap(find.text('Go to Paywall'));
+      await tester.pumpAndSettle();
+
+      // The l10n key 'demoAnnualPlanTitle' resolves to 'Annual (Demo)'.
+      expect(find.text(r'$99.99'), findsOneWidget);
+      expect(find.text('Annual (Demo)'), findsOneWidget);
     });
 
     testWidgets('dispatches SubscriptionPlanSelected when a plan is tapped', (
@@ -434,6 +484,56 @@ void main() {
       expect(find.byType(SnackBar), findsOneWidget);
       expect(
         find.textContaining('Purchase Failed: Test Error'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('shows restoration success snackbar', (tester) async {
+      whenListen(
+        mockSubscriptionBloc,
+        Stream.fromIterable([
+          const SubscriptionState(
+            status: SubscriptionStatus.restorationSuccess,
+          ),
+        ]),
+        initialState: const SubscriptionState(
+          status: SubscriptionStatus.productsLoaded,
+        ),
+      );
+
+      await tester.pumpWidget(buildTestWidget());
+      await tester.tap(find.text('Go to Paywall'));
+      await tester.pump(); // Route transition
+      await tester.pumpAndSettle(); // Listener and SnackBar animation
+
+      expect(find.byType(SnackBar), findsAtLeastNWidgets(1));
+      expect(
+        find.textContaining('Purchases restored successfully'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('shows restoration failure snackbar', (tester) async {
+      whenListen(
+        mockSubscriptionBloc,
+        Stream.fromIterable([
+          const SubscriptionState(
+            status: SubscriptionStatus.restorationFailure,
+          ),
+        ]),
+        initialState: const SubscriptionState(
+          status: SubscriptionStatus.productsLoaded,
+        ),
+      );
+
+      await tester.pumpWidget(buildTestWidget());
+      await tester.tap(find.text('Go to Paywall'));
+      await tester.pump(); // Route transition
+      await tester.pumpAndSettle(); // Listener and SnackBar animation
+
+      expect(find.byType(SnackBar), findsAtLeastNWidgets(1));
+      expect(
+        find.textContaining('Failed to restore purchases'),
         findsOneWidget,
       );
     });

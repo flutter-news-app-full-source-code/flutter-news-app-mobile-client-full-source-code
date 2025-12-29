@@ -157,6 +157,19 @@ void main() {
     );
   });
 
+  setUpAll(() {
+    registerFallbackValue(
+      ProductDetails(
+        id: 'id',
+        title: 'title',
+        description: 'description',
+        price: 'price',
+        rawPrice: 0,
+        currencyCode: 'USD',
+      ),
+    );
+  });
+
   tearDown(() {
     purchaseStreamController.close();
     subscriptionBloc.close();

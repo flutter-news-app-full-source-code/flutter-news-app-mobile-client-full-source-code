@@ -160,23 +160,30 @@ class PurchaseHandler {
           userId: currentUser.id,
         );
       }
+    } catch (e, s) {
+      _logger.severe('[PurchaseHandler] Failed to process purchase', e, s);
+    }
 
-      // Mark the purchase as complete with the respective store.
-      // This is crucial to prevent the purchase from being processed again.
-      if (purchase.pendingCompletePurchase) {
+    // Mark the purchase as complete with the respective store.
+    // This is crucial to prevent the purchase from being processed again.
+    // We do this even if backend validation failed to avoid blocking the queue.
+    if (purchase.pendingCompletePurchase) {
+      try {
         await _subscriptionService.completePurchase(purchase);
         _logger.info(
           '[PurchaseHandler] Purchase ${purchase.purchaseID} completed with store.',
         );
+      } catch (e) {
+        _logger.warning(
+          '[PurchaseHandler] Failed to complete purchase with store',
+          e,
+        );
       }
-
-      // Notify listeners (i.e., AppBloc) that entitlements have changed.
-      _purchaseCompletedController.add(null);
-      _logger.info(
-        '[PurchaseHandler] Notified listeners of purchase completion.',
-      );
-    } catch (e, s) {
-      _logger.severe('[PurchaseHandler] Failed to process purchase', e, s);
     }
+
+    // Notify listeners (i.e., AppBloc) that entitlements have changed.
+    // We notify even on error so the UI can re-fetch and potentially show the
+    // latest state (or lack thereof).
+    _purchaseCompletedController.add(null);
   }
 }

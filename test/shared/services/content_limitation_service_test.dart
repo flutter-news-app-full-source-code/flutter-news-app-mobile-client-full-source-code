@@ -20,6 +20,8 @@ class MockAppBloc extends MockBloc<AppEvent, AppState> implements AppBloc {}
 
 class MockLogger extends Mock implements Logger {}
 
+class FakeLimitExceededPayload extends Fake implements LimitExceededPayload {}
+
 void main() {
   late ContentLimitationService service;
   late MockEngagementRepository mockEngagementRepository;
@@ -42,6 +44,21 @@ void main() {
       cacheDuration: const Duration(minutes: 5),
       logger: mockLogger,
     );
+
+    registerFallbackValue(FakeLimitExceededPayload());
+    registerFallbackValue(AnalyticsEvent.limitExceeded);
+
+    // Default stubs to prevent Null subtype errors and Future.wait failures
+    when(
+      () =>
+          mockAnalyticsService.logEvent(any(), payload: any(named: 'payload')),
+    ).thenAnswer((_) async {});
+    when(
+      () => mockReportRepository.count(
+        userId: any(named: 'userId'),
+        filter: any(named: 'filter'),
+      ),
+    ).thenAnswer((_) async => 0);
   });
 
   group('ContentLimitationService', () {
@@ -243,12 +260,7 @@ void main() {
           userId: any(named: 'userId'),
           filter: any(named: 'filter'),
         ),
-      ).thenAnswer((invocation) async {
-        final filter =
-            invocation.namedArguments[#filter] as Map<String, dynamic>;
-        if (filter.containsKey('comment')) return 3;
-        return 0;
-      });
+      ).thenAnswer((_) async => 3);
 
       service.init(appBloc: mockAppBloc);
 

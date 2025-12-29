@@ -333,9 +333,9 @@ void main() {
       await tester.tap(find.text('Go to Paywall'));
       await tester.pumpAndSettle();
 
-      // The l10n key 'demoAnnualPlanTitle' resolves to 'Annual (Demo)'.
+      // The l10n key 'demoAnnualPlanTitle' resolves to 'Annual Premium (Demo)'.
       expect(find.text(r'$99.99'), findsOneWidget);
-      expect(find.text('Annual (Demo)'), findsOneWidget);
+      expect(find.text('Annual Premium (Demo)'), findsOneWidget);
     });
 
     testWidgets('dispatches SubscriptionPlanSelected when a plan is tapped', (
@@ -508,7 +508,7 @@ void main() {
 
       expect(find.byType(SnackBar), findsAtLeastNWidgets(1));
       expect(
-        find.textContaining('Purchases restored successfully'),
+        find.text('Your purchases have been successfully restored.'),
         findsOneWidget,
       );
     });
@@ -533,7 +533,9 @@ void main() {
 
       expect(find.byType(SnackBar), findsAtLeastNWidgets(1));
       expect(
-        find.textContaining('Failed to restore purchases'),
+        find.text(
+          'Could not restore purchases. Please try again or contact support.',
+        ),
         findsOneWidget,
       );
     });

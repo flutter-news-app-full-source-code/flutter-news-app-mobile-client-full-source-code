@@ -33,7 +33,7 @@ void main() {
       final result = await service.queryProductDetails({'monthly_plan'});
       expect(result, isA<List<ProductDetails>>());
       expect(result.first.id, 'monthly_plan');
-      expect(result.first.title, 'Monthly Premium (Demo)');
+      expect(result.first.title, 'demoMonthlyPlanTitle');
     });
 
     test('buyNonConsumable adds a purchased event to the stream', () async {

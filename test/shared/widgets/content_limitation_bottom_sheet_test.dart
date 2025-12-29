@@ -32,6 +32,14 @@ void main() {
     registerFallbackValue(
       MaterialPageRoute<dynamic>(builder: (_) => const SizedBox()),
     );
+    registerFallbackValue(AnalyticsEvent.limitExceededCtaClicked);
+    registerFallbackValue(
+      const LimitExceededCtaClickedPayload(ctaType: 'test'),
+    );
+    when(
+      () =>
+          mockAnalyticsService.logEvent(any(), payload: any(named: 'payload')),
+    ).thenAnswer((_) async {});
   });
 
   Widget buildTestWidget({

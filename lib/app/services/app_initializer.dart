@@ -391,9 +391,10 @@ class AppInitializer {
         pagination: const PaginationOptions(limit: 1),
       );
       return response.items.firstOrNull;
-    } catch (e) {
+    } catch (e, s) {
       // If fetch fails or no subscription found, return null.
       // We don't want to block app init for this.
+      _logger.warning('Failed to fetch user subscription on init', e, s);
       return null;
     }
   }

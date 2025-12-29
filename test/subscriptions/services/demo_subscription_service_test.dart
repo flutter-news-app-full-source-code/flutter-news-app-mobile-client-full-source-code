@@ -37,7 +37,7 @@ void main() {
     });
 
     test('buyNonConsumable adds a purchased event to the stream', () async {
-      expectLater(
+      await expectLater(
         service.purchaseStream,
         emits(
           isA<List<PurchaseDetails>>()
@@ -58,7 +58,7 @@ void main() {
     });
 
     test('restorePurchases adds a restored event to the stream', () async {
-      expectLater(
+      await expectLater(
         service.purchaseStream,
         emits(
           isA<List<PurchaseDetails>>()

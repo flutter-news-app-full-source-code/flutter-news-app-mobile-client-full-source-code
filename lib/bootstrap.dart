@@ -573,9 +573,9 @@ Future<Widget> bootstrap(
     userRepository: userRepository,
     authRepository: authenticationRepository,
     logger: logger,
-  );
+  )
   // Start listening for purchase updates immediately
-  purchaseHandler.listen();
+  ..listen();
 
   logger
     ..fine('All data repositories initialized.')

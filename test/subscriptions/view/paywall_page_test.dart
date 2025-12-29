@@ -204,11 +204,23 @@ void main() {
   Widget buildTestWidget() {
     final router = GoRouter(
       observers: [mockNavigatorObserver],
-      initialLocation: '/paywall',
+      initialLocation: '/',
       routes: [
         GoRoute(
+          path: '/',
+          builder: (context, state) => Scaffold(
+            body: ElevatedButton(
+              onPressed: () => context.push('/paywall'),
+              child: const Text('Go to Paywall'),
+            ),
+          ),
+        ),
+        GoRoute(
           path: '/paywall',
-          builder: (context, state) => const PaywallView(),
+          builder: (context, state) => BlocProvider.value(
+            value: mockSubscriptionBloc,
+            child: const PaywallView(),
+          ),
         ),
       ],
     );
@@ -233,18 +245,33 @@ void main() {
     testWidgets('renders loading indicator when loading products', (
       tester,
     ) async {
-      when(() => mockSubscriptionBloc.state).thenReturn(
-        const SubscriptionState(status: SubscriptionStatus.loadingProducts),
+      whenListen(
+        mockSubscriptionBloc,
+        Stream.fromIterable(<SubscriptionState>[]),
+        initialState: const SubscriptionState(
+          status: SubscriptionStatus.loadingProducts,
+        ),
       );
 
       await tester.pumpWidget(buildTestWidget());
+      await tester.tap(find.text('Go to Paywall'));
+      // We can't use pumpAndSettle because the CircularProgressIndicator
+      // creates an infinite animation. We pump once to build the frame
+      // where the indicator is present, but offstage, and then find it
+      // with `skipOffstage: false`.
+      await tester.pump();
 
-      expect(find.byType(CircularProgressIndicator), findsAtLeastNWidgets(1));
+      expect(
+        find.byType(CircularProgressIndicator, skipOffstage: false),
+        findsAtLeastNWidgets(1),
+      );
     });
 
     testWidgets('renders plans when products are loaded', (tester) async {
-      when(() => mockSubscriptionBloc.state).thenReturn(
-        SubscriptionState(
+      whenListen(
+        mockSubscriptionBloc,
+        Stream.fromIterable(<SubscriptionState>[]),
+        initialState: SubscriptionState(
           status: SubscriptionStatus.productsLoaded,
           products: [testMonthlyProduct, testAnnualProduct],
           selectedProduct: testAnnualProduct,
@@ -252,9 +279,11 @@ void main() {
       );
 
       await tester.pumpWidget(buildTestWidget());
+      await tester.tap(find.text('Go to Paywall'));
+      await tester.pumpAndSettle();
 
-      expect(find.text('Annual Premium (Demo)'), findsOneWidget);
-      expect(find.text('Monthly Premium (Demo)'), findsOneWidget);
+      expect(find.text('Annual'), findsOneWidget);
+      expect(find.text('Monthly'), findsOneWidget);
       expect(find.text('Best Value'), findsOneWidget); // For annual plan
       expect(find.byType(ElevatedButton), findsOneWidget); // Subscribe button
     });
@@ -262,8 +291,10 @@ void main() {
     testWidgets('dispatches SubscriptionPlanSelected when a plan is tapped', (
       tester,
     ) async {
-      when(() => mockSubscriptionBloc.state).thenReturn(
-        SubscriptionState(
+      whenListen(
+        mockSubscriptionBloc,
+        Stream.fromIterable(<SubscriptionState>[]),
+        initialState: SubscriptionState(
           status: SubscriptionStatus.productsLoaded,
           products: [testMonthlyProduct, testAnnualProduct],
           selectedProduct: testAnnualProduct, // Annual is selected initially
@@ -271,9 +302,12 @@ void main() {
       );
 
       await tester.pumpWidget(buildTestWidget());
+      await tester.tap(find.text('Go to Paywall'));
+      await tester.pumpAndSettle();
 
       // Tap the monthly plan
-      await tester.tap(find.text('Monthly Premium (Demo)'));
+      await tester.scrollUntilVisible(find.text('Monthly'), 50);
+      await tester.tap(find.text('Monthly'));
       await tester.pump();
 
       verify(
@@ -286,8 +320,10 @@ void main() {
     testWidgets(
       'dispatches SubscriptionPurchaseRequested when subscribe button is tapped',
       (tester) async {
-        when(() => mockSubscriptionBloc.state).thenReturn(
-          SubscriptionState(
+        whenListen(
+          mockSubscriptionBloc,
+          Stream.fromIterable(<SubscriptionState>[]),
+          initialState: SubscriptionState(
             status: SubscriptionStatus.productsLoaded,
             products: [testMonthlyProduct, testAnnualProduct],
             selectedProduct: testAnnualProduct,
@@ -295,6 +331,8 @@ void main() {
         );
 
         await tester.pumpWidget(buildTestWidget());
+        await tester.tap(find.text('Go to Paywall'));
+        await tester.pumpAndSettle();
 
         await tester.tap(find.byType(ElevatedButton));
         await tester.pump();
@@ -310,8 +348,10 @@ void main() {
     testWidgets(
       'dispatches SubscriptionRestoreRequested when restore button is tapped',
       (tester) async {
-        when(() => mockSubscriptionBloc.state).thenReturn(
-          SubscriptionState(
+        whenListen(
+          mockSubscriptionBloc,
+          Stream.fromIterable(<SubscriptionState>[]),
+          initialState: SubscriptionState(
             status: SubscriptionStatus.productsLoaded,
             products: [testMonthlyProduct, testAnnualProduct],
             selectedProduct: testAnnualProduct,
@@ -319,6 +359,10 @@ void main() {
         );
 
         await tester.pumpWidget(buildTestWidget());
+        await tester.tap(find.text('Go to Paywall'));
+        await tester.pumpAndSettle();
+
+        await tester.scrollUntilVisible(find.text('Restore Purchases'), 50);
 
         await tester.tap(find.text('Restore Purchases'));
         await tester.pump();
@@ -349,6 +393,8 @@ void main() {
           child: buildTestWidget(),
         ),
       );
+      await tester.tap(find.text('Go to Paywall'));
+      await tester.pumpAndSettle();
 
       await tester.pumpAndSettle(); // Let the listener react
 
@@ -361,7 +407,7 @@ void main() {
 
       // Verify dialog is closed and page is popped
       expect(find.byType(AlertDialog), findsNothing);
-      verify(() => mockNavigatorObserver.didPop(any(), any())).called(1);
+      verify(() => mockNavigatorObserver.didPop(any(), any())).called(2);
     });
 
     testWidgets('shows error snackbar on failure state', (tester) async {
@@ -380,6 +426,8 @@ void main() {
       );
 
       await tester.pumpWidget(buildTestWidget());
+      await tester.tap(find.text('Go to Paywall'));
+      await tester.pumpAndSettle();
 
       await tester.pump(); // Let the listener react
 

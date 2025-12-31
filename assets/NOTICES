@@ -2073,6 +2073,8 @@ limitations under the License.
 --------------------------------------------------------------------------------
 cross_file
 flutter_adaptive_scaffold
+in_app_purchase
+in_app_purchase_platform_interface
 path_provider
 path_provider_linux
 path_provider_platform_interface
@@ -11808,6 +11810,8 @@ limitations under the License.
 --------------------------------------------------------------------------------
 go_router
 google_fonts
+in_app_purchase_android
+in_app_purchase_storekit
 path_provider_android
 path_provider_foundation
 shared_preferences_android

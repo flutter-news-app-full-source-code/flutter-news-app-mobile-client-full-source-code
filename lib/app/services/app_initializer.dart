@@ -194,7 +194,7 @@ class AppInitializer {
         _appSettingsRepository.read(id: user.id, userId: user.id),
         _userContentPreferencesRepository.read(id: user.id, userId: user.id),
         _userContextRepository.read(id: user.id, userId: user.id),
-        _fetchUserSubscription(user.id),
+        _fetchUserSubscription(user),
       ]);
 
       _logger.fine(
@@ -228,7 +228,7 @@ class AppInitializer {
           _appSettingsRepository.read(id: user.id, userId: user.id),
           _userContentPreferencesRepository.read(id: user.id, userId: user.id),
           _userContextRepository.read(id: user.id, userId: user.id),
-          _fetchUserSubscription(user.id),
+          _fetchUserSubscription(user),
         ]);
       }
 
@@ -356,7 +356,7 @@ class AppInitializer {
           userId: newUser.id,
         ),
         _userContextRepository.read(id: newUser.id, userId: newUser.id),
-        _fetchUserSubscription(newUser.id),
+        _fetchUserSubscription(newUser),
       ]);
 
       _logger.fine('[AppInitializer] User transition data fetch complete.');
@@ -383,10 +383,12 @@ class AppInitializer {
 
   /// Helper to fetch user subscription safely.
   /// Returns null if not found (which is valid for non-subscribers).
-  Future<UserSubscription?> _fetchUserSubscription(String userId) async {
+  Future<UserSubscription?> _fetchUserSubscription(User user) async {
+    if (user.isAnonymous) return null;
+
     try {
       final response = await _userSubscriptionRepository.readAll(
-        userId: userId,
+        userId: user.id,
         filter: {'status': 'active'},
         pagination: const PaginationOptions(limit: 1),
       );

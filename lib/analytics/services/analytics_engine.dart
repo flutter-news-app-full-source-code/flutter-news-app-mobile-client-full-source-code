@@ -15,31 +15,52 @@ import 'package:logging/logging.dart';
 class AnalyticsEngine implements AnalyticsService {
   /// {@macro analytics_engine}
   AnalyticsEngine({
-    required AnalyticsConfig initialConfig,
+    required AnalyticsConfig? initialConfig,
     required Map<AnalyticsProvider, AnalyticsProviderInterface> providers,
     Logger? logger,
   }) : _config = initialConfig,
        _providers = providers,
        _logger = logger ?? Logger('AnalyticsEngine');
 
-  AnalyticsConfig _config;
+  AnalyticsConfig? _config;
   final Map<AnalyticsProvider, AnalyticsProviderInterface> _providers;
   final Logger _logger;
   final Random _random = Random();
+
+  @override
+  Future<void> initialize() async {
+    _logger.info('AnalyticsEngine: Initializing...');
+    if (_config == null || !_config!.enabled) {
+      _logger.info(
+        'AnalyticsEngine: Analytics disabled. Skipping provider init.',
+      );
+      return;
+    }
+
+    for (final provider in _providers.values) {
+      await provider.initialize();
+    }
+    _logger.info('AnalyticsEngine: Initialized.');
+  }
 
   @override
   Future<void> logEvent(
     AnalyticsEvent event, {
     AnalyticsEventPayload? payload,
   }) async {
+    final config = _config;
+    if (config == null || !config.enabled) {
+      return;
+    }
+
     // 1. Check if Event is Disabled
-    if (_config.disabledEvents.contains(event)) {
+    if (config.disabledEvents.contains(event)) {
       _logger.fine('Event ${event.name} is disabled by remote config.');
       return;
     }
 
     // 2. Check Sampling Rate
-    final samplingRate = _config.eventSamplingRates[event];
+    final samplingRate = config.eventSamplingRates[event];
     if (samplingRate != null) {
       if (_random.nextDouble() > samplingRate) {
         _logger.fine('Event ${event.name} skipped due to sampling.');
@@ -48,7 +69,7 @@ class AnalyticsEngine implements AnalyticsService {
     }
 
     // 3. Delegate to Active Provider
-    final activeProvider = _providers[_config.activeProvider];
+    final activeProvider = _providers[config.activeProvider];
     if (activeProvider != null) {
       await activeProvider.logEvent(
         name: event.name,
@@ -56,14 +77,17 @@ class AnalyticsEngine implements AnalyticsService {
       );
     } else {
       _logger.warning(
-        'No provider found for active type: ${_config.activeProvider}',
+        'No provider found for active type: ${config.activeProvider}',
       );
     }
   }
 
   @override
   Future<void> setUserId(String? userId) async {
-    final activeProvider = _providers[_config.activeProvider];
+    final config = _config;
+    if (config == null || !config.enabled) return;
+
+    final activeProvider = _providers[config.activeProvider];
     await activeProvider?.setUserId(userId);
   }
 
@@ -72,7 +96,10 @@ class AnalyticsEngine implements AnalyticsService {
     required String name,
     required String value,
   }) async {
-    final activeProvider = _providers[_config.activeProvider];
+    final config = _config;
+    if (config == null || !config.enabled) return;
+
+    final activeProvider = _providers[config.activeProvider];
     await activeProvider?.setUserProperty(name: name, value: value);
   }
 

@@ -26,7 +26,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/bloc_observer.da
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/firebase_push_notification_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/no_op_push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/one_signal_push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
@@ -409,36 +408,25 @@ Future<Widget> bootstrap(
   final remoteConfig = await remoteConfigRepository.read(id: kRemoteConfigId);
   final pushNotificationConfig = remoteConfig.features.pushNotifications;
 
-  if (pushNotificationConfig.enabled == true) {
-    // For other environments, select the provider based on RemoteConfig.
-    switch (pushNotificationConfig.primaryProvider) {
-      case PushNotificationProvider.firebase:
-        logger.fine('Using FirebasePushNotificationService.');
-        pushNotificationService = FirebasePushNotificationService(
-          pushNotificationDeviceRepository: pushNotificationDeviceRepository,
-          logger: logger,
-        );
-      case PushNotificationProvider.oneSignal:
-        logger.fine('Using OneSignalPushNotificationService.');
-        pushNotificationService = OneSignalPushNotificationService(
-          appId: appConfig.oneSignalAppId,
-          pushNotificationDeviceRepository: pushNotificationDeviceRepository,
-          logger: logger,
-        );
-    }
-    // Initialize the selected provider.
-    await pushNotificationService.initialize();
-    logger.fine('PushNotificationService initialized.');
-  } else {
-    logger.warning('Push notifications are disabled in RemoteConfig.');
-    // Provide a dummy/no-op implementation if notifications are disabled
-    // to prevent null pointer exceptions when accessed.
-    pushNotificationService = NoOpPushNotificationService(
-      inAppNotificationRepository: inAppNotificationRepository,
-      inAppNotificationsFixturesData: inAppNotificationsFixturesData,
-      environment: appConfig.environment,
-    );
+  // Select the provider based on RemoteConfig.
+  switch (pushNotificationConfig.primaryProvider) {
+    case PushNotificationProvider.firebase:
+      logger.fine('Using FirebasePushNotificationService.');
+      pushNotificationService = FirebasePushNotificationService(
+        pushNotificationDeviceRepository: pushNotificationDeviceRepository,
+        logger: logger,
+      );
+    case PushNotificationProvider.oneSignal:
+      logger.fine('Using OneSignalPushNotificationService.');
+      pushNotificationService = OneSignalPushNotificationService(
+        appId: appConfig.oneSignalAppId,
+        pushNotificationDeviceRepository: pushNotificationDeviceRepository,
+        logger: logger,
+      );
   }
+  // Initialize the selected provider.
+  await pushNotificationService.initialize();
+  logger.fine('PushNotificationService initialized.');
 
   // Initialize AppReviewService
   final nativeReviewService = InAppReviewService(
@@ -473,7 +461,6 @@ Future<Widget> bootstrap(
     userContextRepository: userContextRepository,
     userSubscriptionRepository: userSubscriptionRepository,
     remoteConfigRepository: remoteConfigRepository,
-    environment: environment,
     packageInfoService: packageInfoService,
     logger: logger,
   );

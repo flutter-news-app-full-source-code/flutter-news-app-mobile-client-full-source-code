@@ -73,13 +73,13 @@ void main() {
     features: FeaturesConfig(
       analytics: const AnalyticsConfig(
         enabled: true,
-        activeProvider: AnalyticsProvider.demo,
+        activeProvider: AnalyticsProvider.firebase,
         disabledEvents: {},
         eventSamplingRates: {},
       ),
       ads: const AdConfig(
         enabled: false,
-        primaryAdPlatform: AdPlatformType.demo,
+        primaryAdPlatform: AdPlatformType.admob,
         platformAdIdentifiers: {},
         feedAdConfiguration: FeedAdConfiguration(
           enabled: false,

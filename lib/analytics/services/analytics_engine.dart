@@ -32,18 +32,13 @@ class AnalyticsEngine implements AnalyticsService {
     AnalyticsEvent event, {
     AnalyticsEventPayload? payload,
   }) async {
-    // 1. Check Global Enablement
-    if (!_config.enabled) {
-      return;
-    }
-
-    // 2. Check if Event is Disabled
+    // 1. Check if Event is Disabled
     if (_config.disabledEvents.contains(event)) {
       _logger.fine('Event ${event.name} is disabled by remote config.');
       return;
     }
 
-    // 3. Check Sampling Rate
+    // 2. Check Sampling Rate
     final samplingRate = _config.eventSamplingRates[event];
     if (samplingRate != null) {
       if (_random.nextDouble() > samplingRate) {
@@ -52,7 +47,7 @@ class AnalyticsEngine implements AnalyticsService {
       }
     }
 
-    // 4. Delegate to Active Provider
+    // 3. Delegate to Active Provider
     final activeProvider = _providers[_config.activeProvider];
     if (activeProvider != null) {
       await activeProvider.logEvent(
@@ -68,7 +63,6 @@ class AnalyticsEngine implements AnalyticsService {
 
   @override
   Future<void> setUserId(String? userId) async {
-    if (!_config.enabled) return;
     final activeProvider = _providers[_config.activeProvider];
     await activeProvider?.setUserId(userId);
   }
@@ -78,7 +72,6 @@ class AnalyticsEngine implements AnalyticsService {
     required String name,
     required String value,
   }) async {
-    if (!_config.enabled) return;
     final activeProvider = _providers[_config.activeProvider];
     await activeProvider?.setUserProperty(name: name, value: value);
   }

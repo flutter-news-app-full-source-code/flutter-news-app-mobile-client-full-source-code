@@ -6,15 +6,10 @@ import 'package:data_api/data_api.dart';
 import 'package:data_client/data_client.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/ad_provider.dart';
-// Conditional import for AdMobAdProvider
-// This ensures the AdMob package is only imported when not on the web,
-// preventing potential issues or unnecessary logs on web platforms.
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/admob_ad_provider.dart'
-    if (dart.library.io) 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/admob_ad_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/admob_ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/analytics_provider.dart';
@@ -178,20 +173,13 @@ Future<Widget> bootstrap(
   // 6. Initialize AdProvider and AdService.
   late final Map<AdPlatformType, AdProvider> adProviders;
 
-  // Conditionally instantiate ad providers based on the application environment.
-  // This ensures that only the relevant ad providers are available for the
-  // current environment, preventing unintended usage.
-  logger.fine('Using Real AdProviders.');
-  // For development and production environments (non-web), use real ad providers.
+  logger.fine('Using AdMobAdProvider.');
   adProviders = {
     // AdMob provider for Google Mobile Ads.
     AdPlatformType.admob: AdMobAdProvider(
       analyticsService: analyticsService,
       logger: logger,
     ),
-    // The demo ad platform is not available in non-demo/non-web environments.
-    // If AdService attempts to access it, it will receive null, which is
-    // handled by AdService's internal logic (logging a warning).
   };
 
   final adService = AdService(
@@ -489,8 +477,6 @@ Future<Widget> bootstrap(
     environment: environment,
     packageInfoService: packageInfoService,
     logger: logger,
-    demoDataMigrationService: null,
-    demoDataInitializerService: null,
   );
   logger
     ..fine('AppInitializer service initialized.')

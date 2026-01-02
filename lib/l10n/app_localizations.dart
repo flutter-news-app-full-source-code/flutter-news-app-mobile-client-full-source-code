@@ -1544,18 +1544,6 @@ abstract class AppLocalizations {
   /// **'Start following categories to see them here.'**
   String get followedCategoriesEmptySubheadline;
 
-  /// Message shown in demo mode to provide the verification code
-  ///
-  /// In en, this message translates to:
-  /// **'Demo Mode: Use code {code}'**
-  String demoVerificationCodeMessage(String code);
-
-  /// Message shown in demo mode to suggest an email for sign-in
-  ///
-  /// In en, this message translates to:
-  /// **'Demo Mode: Use email {email}'**
-  String demoEmailSuggestionMessage(String email);
-
   /// Label for Headline content type
   ///
   /// In en, this message translates to:
@@ -1651,30 +1639,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unfollow'**
   String get unfollowButtonText;
-
-  /// Text displayed in the native ad placeholder in demo mode.
-  ///
-  /// In en, this message translates to:
-  /// **'NATIVE AD (DEMO)'**
-  String get demoNativeAdText;
-
-  /// Text displayed in the banner ad placeholder in demo mode.
-  ///
-  /// In en, this message translates to:
-  /// **'BANNER AD (DEMO)'**
-  String get demoBannerAdText;
-
-  /// Text displayed in the interstitial ad placeholder in demo mode.
-  ///
-  /// In en, this message translates to:
-  /// **'INTERSTITIAL AD (DEMO)'**
-  String get demoInterstitialAdText;
-
-  /// Description text for the interstitial ad placeholder in demo mode.
-  ///
-  /// In en, this message translates to:
-  /// **'This is a full-screen advertisement placeholder.'**
-  String get demoInterstitialAdDescription;
 
   /// Message displayed in ad slots when ads are loading or fail to load, explaining their purpose.
   ///
@@ -3175,24 +3139,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You do not have an active subscription.'**
   String get subscriptionDetailsNoSubscription;
-
-  /// Title for the annual demo plan.
-  ///
-  /// In en, this message translates to:
-  /// **'Annual Premium (Demo)'**
-  String get demoAnnualPlanTitle;
-
-  /// Title for the monthly demo plan.
-  ///
-  /// In en, this message translates to:
-  /// **'Monthly Premium (Demo)'**
-  String get demoMonthlyPlanTitle;
-
-  /// Description for a demo subscription plan.
-  ///
-  /// In en, this message translates to:
-  /// **'Unlock all features (Demo Mode)'**
-  String get demoPlanDescription;
 
   /// Button text for upgrading a subscription plan.
   ///

@@ -802,16 +802,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Start following categories to see them here.';
 
   @override
-  String demoVerificationCodeMessage(String code) {
-    return 'Demo Mode: Use code $code';
-  }
-
-  @override
-  String demoEmailSuggestionMessage(String email) {
-    return 'Demo Mode: Use email $email';
-  }
-
-  @override
   String get contentTypeHeadline => 'Headlines';
 
   @override
@@ -862,19 +852,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unfollowButtonText => 'Unfollow';
-
-  @override
-  String get demoNativeAdText => 'NATIVE AD (DEMO)';
-
-  @override
-  String get demoBannerAdText => 'BANNER AD (DEMO)';
-
-  @override
-  String get demoInterstitialAdText => 'INTERSTITIAL AD (DEMO)';
-
-  @override
-  String get demoInterstitialAdDescription =>
-      'This is a full-screen advertisement placeholder.';
 
   @override
   String get adInfoPlaceholderText => 'Ads help keep this app free !';
@@ -1698,15 +1675,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get subscriptionDetailsNoSubscription =>
       'You do not have an active subscription.';
-
-  @override
-  String get demoAnnualPlanTitle => 'Annual Premium (Demo)';
-
-  @override
-  String get demoMonthlyPlanTitle => 'Monthly Premium (Demo)';
-
-  @override
-  String get demoPlanDescription => 'Unlock all features (Demo Mode)';
 
   @override
   String get subscriptionUpgradeButton => 'Upgrade';

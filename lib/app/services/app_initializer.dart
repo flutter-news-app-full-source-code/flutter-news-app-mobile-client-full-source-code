@@ -23,8 +23,7 @@ import 'package:pub_semver/pub_semver.dart';
 /// 3. Fetch the initial `User`.
 /// 4. If a user exists, fetch their `AppSettings` and
 ///    `UserContentPreferences` in parallel.
-/// 5. Handle demo-specific data initialization.
-/// 6. Return a single, immutable `InitializationResult` (either `Success` or
+/// 5. Return a single, immutable `InitializationResult` (either `Success` or
 ///    `Failure`) that contains all pre-loaded data.
 ///
 /// This approach makes the startup process robust, testable, and easy to
@@ -225,18 +224,6 @@ class AppInitializer {
   /// primary responsibility is to ensure that the application state is correctly
   /// primary responsibility is to ensure that the application state is correctly
   /// and completely updated to reflect the new user's identity.
-  ///
-  /// This process involves two main steps:
-  /// 1.  **Data Migration (if applicable):** It detects if the transition is
-  ///     from an anonymous guest to a fully authenticated user. If so, it
-  ///     triggers the `DemoDataMigrationService` to move any data (like saved
-  ///     articles) from the old anonymous user ID to the new authenticated
-  ///     user ID.
-  /// 2.  **Re-fetching All User Data:** After any potential migration, it
-  ///     re-fetches all user-specific data (`AppSettings`,
-  ///     `UserContentPreferences`) for the `newUser`. This is crucial to
-  ///     ensure the app's state is fresh and not polluted with data from the
-  ///     previous user.
   ///
   /// Returns a [InitializationResult] which can be used by the `AppBloc` to
   /// update its state.

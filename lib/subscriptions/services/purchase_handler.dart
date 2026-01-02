@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:auth_repository/auth_repository.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/demo_subscription_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:logging/logging.dart';
@@ -113,53 +112,23 @@ class PurchaseHandler {
         return;
       }
 
-      // In demo mode, we simulate the backend's validation process.
-      if (_subscriptionService is DemoSubscriptionService) {
-        _logger.info('[PurchaseHandler] Handling demo purchase...');
-        final newSubscription = UserSubscription(
-          id: 'sub_${currentUser.id}',
-          userId: currentUser.id,
-          tier: AccessTier.premium,
-          status: SubscriptionStatus.active,
-          provider: StoreProvider.google, // Demo provider
-          validUntil: DateTime.now().add(const Duration(days: 30)),
-          willAutoRenew: true,
-          originalTransactionId: purchase.purchaseID ?? 'demo_id',
-        );
-
-        // Update or create the subscription in the in-memory repo.
-        await _userSubscriptionRepository.update(
-          id: newSubscription.id,
-          item: newSubscription,
-          userId: currentUser.id,
-        );
-
-        // Update the user's tier in the in-memory repo.
-        final updatedUser = currentUser.copyWith(tier: AccessTier.premium);
-        await _userRepository.update(
-          id: updatedUser.id,
-          item: updatedUser,
-          userId: updatedUser.id,
-        );
-      } else {
-        // For real stores, send receipt to backend for zero-trust validation.
-        _logger.info(
-          '[PurchaseHandler] Sending purchase for backend validation...',
-        );
-        final verificationData = purchase.verificationData;
-        final transaction = PurchaseTransaction(
-          planId: purchase.productID,
-          provider: verificationData.source == 'app_store'
-              ? StoreProvider.apple
-              : StoreProvider.google,
-          providerReceipt: verificationData.serverVerificationData,
-        );
-        // The backend will validate this and update the user's entitlements.
-        await _purchaseTransactionRepository.create(
-          item: transaction,
-          userId: currentUser.id,
-        );
-      }
+      // Send receipt to the backend for zero-trust validation.
+      _logger.info(
+        '[PurchaseHandler] Sending purchase for backend validation...',
+      );
+      final verificationData = purchase.verificationData;
+      final transaction = PurchaseTransaction(
+        planId: purchase.productID,
+        provider: verificationData.source == 'app_store'
+            ? StoreProvider.apple
+            : StoreProvider.google,
+        providerReceipt: verificationData.serverVerificationData,
+      );
+      // The backend will validate this and update the user's entitlements.
+      await _purchaseTransactionRepository.create(
+        item: transaction,
+        userId: currentUser.id,
+      );
     } catch (e, s) {
       _logger.severe('[PurchaseHandler] Failed to process purchase', e, s);
     }

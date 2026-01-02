@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/native_review_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/view/provide_feedback_bottom_sheet.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/view/rate_app_bottom_sheet.dart';
@@ -47,7 +46,6 @@ class AppReviewService {
     final appState = context.read<AppBloc>().state;
     final user = appState.user;
     final userContext = appState.userContext;
-    final environment = context.read<AppEnvironment>();
     final remoteConfig = appState.remoteConfig;
 
     if (user == null || userContext == null || remoteConfig == null) {
@@ -83,14 +81,11 @@ class AppReviewService {
     final appReviewConfig = communityConfig.appReview;
     // Check initial cooldown.
     final daysSinceCreation = DateTime.now().difference(user.createdAt).inDays;
-    // For the demo environment, we ignore the initial cooldown period.
-    if (environment != AppEnvironment.demo) {
-      if (daysSinceCreation < appReviewConfig.initialPromptCooldownDays) {
-        _logger.fine(
-          'User is within the initial cooldown period ($daysSinceCreation/${appReviewConfig.initialPromptCooldownDays} days).',
-        );
-        return;
-      }
+    if (daysSinceCreation < appReviewConfig.initialPromptCooldownDays) {
+      _logger.fine(
+        'User is within the initial cooldown period ($daysSinceCreation/${appReviewConfig.initialPromptCooldownDays} days).',
+      );
+      return;
     }
 
     // Check positive interaction threshold.

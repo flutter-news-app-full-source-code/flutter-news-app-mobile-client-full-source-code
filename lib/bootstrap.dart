@@ -6,6 +6,7 @@ import 'package:data_api/data_api.dart';
 import 'package:data_client/data_client.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/ad_provider.dart';
@@ -46,6 +47,10 @@ Future<Widget> bootstrap(
   app_config.AppConfig appConfig,
   app_config.AppEnvironment environment,
 ) async {
+  if (kIsWeb) {
+    throw UnsupportedError('This application is not supported on the web.');
+  }
+
   // Setup logging
   Logger.root.level = environment == app_config.AppEnvironment.production
       ? Level.INFO

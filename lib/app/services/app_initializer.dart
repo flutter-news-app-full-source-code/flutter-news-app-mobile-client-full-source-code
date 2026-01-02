@@ -7,8 +7,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/config/confi
     as local_config;
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/initialization_result.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_initializer_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/package_info_service.dart';
 import 'package:logging/logging.dart';
 import 'package:pub_semver/pub_semver.dart';
@@ -49,8 +47,6 @@ class AppInitializer {
     required local_config.AppEnvironment environment,
     required PackageInfoService packageInfoService,
     required Logger logger,
-    this.demoDataMigrationService,
-    this.demoDataInitializerService,
   }) : _authenticationRepository = authenticationRepository,
        _appSettingsRepository = appSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
@@ -71,8 +67,6 @@ class AppInitializer {
   final local_config.AppEnvironment _environment;
   final PackageInfoService _packageInfoService;
   final Logger _logger;
-  final DemoDataMigrationService? demoDataMigrationService;
-  final DemoDataInitializerService? demoDataInitializerService;
 
   /// Runs the entire startup sequence in a controlled, sequential manner.
   ///
@@ -204,34 +198,6 @@ class AppInitializer {
         'Context: ${userContext != null}',
       );
 
-      // --- Demo-Specific Logic: Initialize Data on First Run ---
-      // If in demo mode and the user data is missing (e.g., first sign-in),
-      // create it from fixtures.
-      if (_environment == local_config.AppEnvironment.demo &&
-          (appSettings == null ||
-              userContentPreferences == null ||
-              userContext == null)) {
-        _logger.info(
-          '[AppInitializer] Demo mode: User data missing. '
-          'Initializing from fixtures for user ${user.id}.',
-        );
-        await demoDataInitializerService?.initializeUserSpecificData(user);
-
-        // Re-fetch the data after initialization.
-        _logger.fine('[AppInitializer] Re-fetching data after demo init...');
-        [
-          appSettings,
-          userContentPreferences,
-          userContext,
-          userSubscription,
-        ] = await Future.wait<dynamic>([
-          _appSettingsRepository.read(id: user.id, userId: user.id),
-          _userContentPreferencesRepository.read(id: user.id, userId: user.id),
-          _userContextRepository.read(id: user.id, userId: user.id),
-          _fetchUserSubscription(user),
-        ]);
-      }
-
       _logger.fine(
         '[AppInitializer] --- App Initialization Complete (Authenticated) ---',
       );
@@ -288,60 +254,11 @@ class AppInitializer {
       '[AppInitializer] Handling user transition for user ${newUser.id}.',
     );
 
-    // --- Data Migration Logic ---
-    final isMigration =
-        oldUser != null && oldUser.isAnonymous && !newUser.isAnonymous;
-
-    if (isMigration) {
-      _logger.info(
-        '[AppInitializer] Anonymous user ${oldUser.id} transitioned to '
-        'authenticated user ${newUser.id}. Attempting data migration.',
-      );
-      if (demoDataMigrationService != null &&
-          _environment == local_config.AppEnvironment.demo) {
-        try {
-          await demoDataMigrationService!.migrateAnonymousData(
-            oldUserId: oldUser.id,
-            newUserId: newUser.id,
-          );
-          _logger.info(
-            '[AppInitializer] Demo mode: Data migration completed for ${newUser.id}.',
-          );
-        } catch (e, s) {
-          _logger.severe(
-            '[AppInitializer] CRITICAL: Failed to migrate demo user data.',
-            e,
-            s,
-          );
-          return InitializationFailure(
-            status: AppLifeCycleStatus.criticalError,
-            error: UnknownException('Failed to migrate demo user data: $e'),
-          );
-        }
-      }
-    }
-
     // --- Re-fetch User Data ---
     // Always re-fetch data after a transition to ensure the state is fresh.
     _logger.fine(
       '[AppInitializer] Re-fetching user data for transitioned user ${newUser.id}...',
     );
-
-    // --- Demo-Specific Logic: Initialize Data on Transition ---
-    // In demo mode, when a new user authenticates (e.g., anonymous sign-in
-    // or email verification), their user-specific data (settings, preferences)
-    // does not yet exist in the in-memory repositories. This block ensures
-    // that the DemoDataInitializerService is called to create this data
-    // *before* the subsequent code attempts to read it. This prevents a
-    // NotFoundException that would otherwise cause a critical error and
-    // stall the authentication flow.
-    if (_environment == local_config.AppEnvironment.demo) {
-      _logger.info(
-        '[AppInitializer] Demo mode: Initializing data for new user '
-        '${newUser.id} during transition.',
-      );
-      await demoDataInitializerService?.initializeUserSpecificData(newUser);
-    }
 
     try {
       final [

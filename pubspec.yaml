@@ -143,7 +143,7 @@ flutter_native_splash:
   image_dark: assets/logo/flutter-news-app-full-source-code-light-logo.png
   android: true
   ios: true
-  web: true
+  web: false
 
 dependency_overrides:
   core:

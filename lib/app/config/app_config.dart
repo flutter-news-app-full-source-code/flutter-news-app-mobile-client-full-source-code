@@ -161,7 +161,7 @@ class AppConfig {
     return config;
   }
 
-  /// The current build environment (e.g., production, development, demo).
+  /// The current build environment (e.g., production, development).
   final AppEnvironment environment;
 
   // --- Shared Configuration ---

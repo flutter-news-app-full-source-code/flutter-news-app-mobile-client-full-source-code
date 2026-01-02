@@ -7,7 +7,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inlin
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
 
@@ -29,16 +28,13 @@ class AdService {
   /// These providers will be used to load ads from specific ad networks.
   AdService({
     required Map<AdPlatformType, AdProvider> adProviders,
-    required AppEnvironment environment,
     required AnalyticsService analyticsService,
     Logger? logger,
   }) : _adProviders = adProviders,
-       _environment = environment,
        _analyticsService = analyticsService,
        _logger = logger ?? Logger('AdService');
 
   final Map<AdPlatformType, AdProvider> _adProviders;
-  final AppEnvironment _environment;
   final AnalyticsService _analyticsService;
   final Logger _logger;
   final Uuid _uuid = const Uuid();

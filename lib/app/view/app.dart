@@ -319,7 +319,6 @@ class _AppViewState extends State<_AppView> {
     _interstitialAdManager = InterstitialAdManager(
       appBloc: appBloc,
       adService: context.read<AdService>(),
-      navigatorKey: widget.navigatorKey,
     );
 
     // Initialize the ContentLimitationService.

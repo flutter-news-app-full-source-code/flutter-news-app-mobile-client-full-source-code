@@ -24,11 +24,9 @@ class InterstitialAdManager {
   InterstitialAdManager({
     required AppBloc appBloc,
     required AdService adService,
-    required GlobalKey<NavigatorState> navigatorKey,
     Logger? logger,
   }) : _appBloc = appBloc,
        _adService = adService,
-       _navigatorKey = navigatorKey,
        _logger = logger ?? Logger('InterstitialAdManager') {
     // Listen to the AppBloc stream to react to state changes.
     _appBlocSubscription = _appBloc.stream.listen(_onAppStateChanged);
@@ -38,7 +36,6 @@ class InterstitialAdManager {
 
   final AppBloc _appBloc;
   final AdService _adService;
-  final GlobalKey<NavigatorState> _navigatorKey;
   final Logger _logger;
 
   late final StreamSubscription<AppState> _appBlocSubscription;

@@ -184,7 +184,6 @@ Future<Widget> bootstrap(
 
   final adService = AdService(
     adProviders: adProviders,
-    environment: appConfig.environment,
     analyticsService: analyticsService,
     logger: logger,
   );

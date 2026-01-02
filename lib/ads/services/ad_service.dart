@@ -164,17 +164,6 @@ class AdService {
 
     final primaryAdPlatform = adConfig.primaryAdPlatform;
 
-    // If RemoteConfig specifies AdPlatformType.demo but the app is not in demo environment,
-    // log a warning and skip ad load.
-    if (primaryAdPlatform == AdPlatformType.demo &&
-        _environment != AppEnvironment.demo) {
-      _logger.warning(
-        'AdService: RemoteConfig specifies AdPlatformType.demo as primary '
-        'ad platform, but app is not in demo environment. Skipping interstitial ad load.',
-      );
-      return null;
-    }
-
     final adProvider = _adProviders[primaryAdPlatform];
 
     if (adProvider == null) {
@@ -291,17 +280,6 @@ class AdService {
     }
 
     final primaryAdPlatform = adConfig.primaryAdPlatform;
-
-    // If RemoteConfig specifies AdPlatformType.demo but the app is not in demo environment,
-    // log a warning and skip ad load.
-    if (primaryAdPlatform == AdPlatformType.demo &&
-        _environment != AppEnvironment.demo) {
-      _logger.warning(
-        'AdService: RemoteConfig specifies AdPlatformType.demo as primary '
-        'ad platform, but app is not in demo environment. Skipping inline ad load.',
-      );
-      return null;
-    }
 
     final adProvider = _adProviders[primaryAdPlatform];
 

@@ -14,13 +14,11 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/ad
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_engine.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inline_ad_cache_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/no_op_ad_service.dart.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/analytics_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/firebase_analytics_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/mixpanel_analytics_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_engine.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/no_op_analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
     as app_config;
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
@@ -30,8 +28,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/bloc_observer.da
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/firebase_push_notification_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/no_op_push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/one_signal_push_notification_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_engine.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/no_op_subscription_service.dart';
@@ -160,63 +158,48 @@ Future<Widget> bootstrap(
 
   // 5. Initialize Analytics Service.
   late final AnalyticsService analyticsService;
-  final analyticsConfig = remoteConfig?.features.analytics;
+  final analyticsProviders = <AnalyticsProvider, AnalyticsProviderInterface>{};
 
-  if (analyticsConfig != null && analyticsConfig.enabled) {
-    final analyticsProviders =
-        <AnalyticsProvider, AnalyticsProviderInterface>{};
+  // Initialize providers based on environment and config
+  // Add Firebase
+  analyticsProviders[AnalyticsProvider.firebase] = FirebaseAnalyticsProvider(
+    firebaseAnalytics: FirebaseAnalytics.instance,
+    logger: logger,
+  );
+  // Add Mixpanel
+  analyticsProviders[AnalyticsProvider.mixpanel] = MixpanelAnalyticsProvider(
+    projectToken: appConfig.mixpanelProjectToken,
+    trackAutomaticEvents: true,
+    logger: logger,
+  );
 
-    // Initialize providers based on environment and config
-    // Add Firebase
-    analyticsProviders[AnalyticsProvider.firebase] = FirebaseAnalyticsProvider(
-      firebaseAnalytics: FirebaseAnalytics.instance,
-      logger: logger,
-    );
-    // Add Mixpanel
-    analyticsProviders[AnalyticsProvider.mixpanel] = MixpanelAnalyticsProvider(
-      projectToken: appConfig.mixpanelProjectToken,
-      trackAutomaticEvents: true,
-      logger: logger,
-    );
+  // Always instantiate the Engine. It handles enabled/disabled state internally.
+  analyticsService = AnalyticsEngine(
+    initialConfig: remoteConfig?.features.analytics,
+    providers: analyticsProviders,
+    logger: logger,
+  );
 
-    analyticsService = AnalyticsEngine(
-      initialConfig: analyticsConfig,
-      providers: analyticsProviders,
-      logger: logger,
-    );
-
-    // Initialize the active provider
-    final activeProvider = analyticsProviders[analyticsConfig.activeProvider];
-    await activeProvider?.initialize();
-  } else {
-    logger.warning(
-      'Analytics disabled in RemoteConfig. Using NoOpAnalyticsService.',
-    );
-    analyticsService = NoOpAnalyticsService(logger: logger);
-  }
-
+  await analyticsService.initialize();
   logger
     ..fine('Analytics service initialized.')
     ..info('6. Initializing Ad providers and AdService...');
 
   // 6. Initialize AdProvider and AdService.
   late final AdService adService;
-
-  if (remoteConfig != null && remoteConfig.features.ads.enabled) {
-    final adProviders = <AdPlatformType, AdProvider>{};
-    logger.fine('Using AdMobAdProvider.');
-    adProviders[AdPlatformType.admob] = AdMobAdProvider(
-      analyticsService: analyticsService,
-      logger: logger,
-    );
-    adService = AdEngine(
-      adProviders: adProviders,
-      analyticsService: analyticsService,
-      logger: logger,
-    );
-  } else {
-    adService = NoOpAdService(logger: logger);
-  }
+  final adProviders = <AdPlatformType, AdProvider>{};
+  logger.fine('Using AdMobAdProvider.');
+  adProviders[AdPlatformType.admob] = AdMobAdProvider(
+    analyticsService: analyticsService,
+    logger: logger,
+  );
+  // Always instantiate the Engine. It handles enabled/disabled state internally.
+  adService = AdEngine(
+    initialConfig: remoteConfig?.features.ads,
+    adProviders: adProviders,
+    analyticsService: analyticsService,
+    logger: logger,
+  );
   await adService.initialize();
   logger.fine('AdService initialized.');
 
@@ -442,29 +425,27 @@ Future<Widget> bootstrap(
   // 8. Initialize the PushNotificationService based on the remote config.
   // This is a crucial step for the provider-agnostic architecture.
   late final PushNotificationService pushNotificationService;
-  final pushNotificationConfig = remoteConfig?.features.pushNotifications;
+  final pushNotificationProviders =
+      <PushNotificationProvider, PushNotificationService>{};
 
-  if (pushNotificationConfig != null && pushNotificationConfig.enabled) {
-    // Select the provider based on RemoteConfig.
-    switch (pushNotificationConfig.primaryProvider) {
-      case PushNotificationProvider.firebase:
-        logger.fine('Using FirebasePushNotificationService.');
-        pushNotificationService = FirebasePushNotificationService(
-          pushNotificationDeviceRepository: pushNotificationDeviceRepository,
-          logger: logger,
-        );
-      case PushNotificationProvider.oneSignal:
-        logger.fine('Using OneSignalPushNotificationService.');
-        pushNotificationService = OneSignalPushNotificationService(
-          appId: appConfig.oneSignalAppId,
-          pushNotificationDeviceRepository: pushNotificationDeviceRepository,
-          logger: logger,
-        );
-    }
-  } else {
-    logger.warning('Push notifications are disabled in RemoteConfig.');
-    pushNotificationService = NoOpPushNotificationService(logger: logger);
-  }
+  pushNotificationProviders[PushNotificationProvider.firebase] =
+      FirebasePushNotificationService(
+        pushNotificationDeviceRepository: pushNotificationDeviceRepository,
+        logger: logger,
+      );
+  pushNotificationProviders[PushNotificationProvider.oneSignal] =
+      OneSignalPushNotificationService(
+        appId: appConfig.oneSignalAppId,
+        pushNotificationDeviceRepository: pushNotificationDeviceRepository,
+        logger: logger,
+      );
+
+  pushNotificationService = PushNotificationEngine(
+    initialConfig: remoteConfig?.features.pushNotifications,
+    providers: pushNotificationProviders,
+    logger: logger,
+  );
+
   // Initialize the selected provider.
   await pushNotificationService.initialize();
   logger.fine('PushNotificationService initialized.');

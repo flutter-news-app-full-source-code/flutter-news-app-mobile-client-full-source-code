@@ -4,9 +4,6 @@ import 'package:logging/logging.dart';
 /// {@template native_review_service}
 /// An interface for handling native in-app review requests.
 ///
-/// This abstraction allows for different implementations, such as a real one
-/// using the `in_app_review` package and a no-op one for testing or
-/// unsupported platforms.
 /// {@endtemplate}
 abstract class NativeReviewService {
   /// Requests the native in-app review prompt.

@@ -314,15 +314,10 @@ class PaywallView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Localize demo products if keys match
                     Text(
-                      product.title == 'demoAnnualPlanTitle'
-                          ? l10n.demoAnnualPlanTitle
-                          : (product.title == 'demoMonthlyPlanTitle'
-                                ? l10n.demoMonthlyPlanTitle
-                                : (isRecommended
-                                      ? l10n.paywallAnnualPlan
-                                      : l10n.paywallMonthlyPlan)),
+                      isRecommended
+                          ? l10n.paywallAnnualPlan
+                          : l10n.paywallMonthlyPlan,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),

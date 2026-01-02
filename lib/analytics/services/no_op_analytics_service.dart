@@ -15,6 +15,11 @@ class NoOpAnalyticsService implements AnalyticsService {
   final Logger _logger;
 
   @override
+  Future<void> initialize() async {
+    _logger.info('Initializing NoOpAnalyticsService (Analytics disabled).');
+  }
+
+  @override
   Future<void> logEvent(
     AnalyticsEvent event, {
     AnalyticsEventPayload? payload,

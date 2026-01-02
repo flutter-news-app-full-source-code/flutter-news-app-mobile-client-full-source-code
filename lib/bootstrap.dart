@@ -18,6 +18,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/analytics/provid
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/mixpanel_analytics_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_engine.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/no_op_analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
     as app_config;
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
@@ -27,9 +28,11 @@ import 'package:flutter_news_app_mobile_client_full_source_code/bloc_observer.da
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/firebase_push_notification_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/no_op_push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/one_signal_push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/no_op_subscription_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/purchase_handler.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/store_subscription_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
@@ -117,10 +120,24 @@ Future<Widget> bootstrap(
   final remoteConfigRepository = DataRepository<RemoteConfig>(
     dataClient: remoteConfigClient,
   );
-  logger
-    ..fine('RemoteConfig repository initialized.')
-    ..info('4. Initializing Authentication services...');
+  // Fetch RemoteConfig once, early in the process.
+  // This configuration is required by Analytics, Subscriptions, and Push Notifications
+  // to determine which providers to initialize.
+  RemoteConfig? remoteConfig;
+  try {
+    remoteConfig = await remoteConfigRepository.read(id: kRemoteConfigId);
+    logger.fine('RemoteConfig fetched successfully.');
+  } catch (e, s) {
+    logger.warning(
+      'Failed to fetch RemoteConfig in bootstrap. '
+      'Services will be initialized in default (disabled) mode. '
+      'The AppInitializer will attempt to fetch it again and handle the UI error.',
+      e,
+      s,
+    );
+  }
 
+  logger.info('4. Initializing Authentication services...');
   // 4. Conditionally initialize Auth services based on environment.
   // This is done after RemoteConfig is fetched, as Auth services might depend
   // on configurations defined in RemoteConfig.
@@ -139,35 +156,39 @@ Future<Widget> bootstrap(
 
   // 5. Initialize Analytics Service.
   late final AnalyticsService analyticsService;
-  final analyticsConfig = (await remoteConfigRepository.read(
-    id: kRemoteConfigId,
-  )).features.analytics;
+  final analyticsConfig = remoteConfig?.features.analytics;
 
-  final analyticsProviders = <AnalyticsProvider, AnalyticsProviderInterface>{};
+  if (analyticsConfig != null && analyticsConfig.enabled) {
+    final analyticsProviders =
+        <AnalyticsProvider, AnalyticsProviderInterface>{};
 
-  // Initialize providers based on environment and config
-  // Add Firebase
-  analyticsProviders[AnalyticsProvider.firebase] = FirebaseAnalyticsProvider(
-    firebaseAnalytics: FirebaseAnalytics.instance,
-    logger: logger,
-  );
-  // Add Mixpanel
-  analyticsProviders[AnalyticsProvider.mixpanel] = MixpanelAnalyticsProvider(
-    projectToken: appConfig.mixpanelProjectToken,
-    trackAutomaticEvents: true,
-    logger: logger,
-  );
+    // Initialize providers based on environment and config
+    // Add Firebase
+    analyticsProviders[AnalyticsProvider.firebase] = FirebaseAnalyticsProvider(
+      firebaseAnalytics: FirebaseAnalytics.instance,
+      logger: logger,
+    );
+    // Add Mixpanel
+    analyticsProviders[AnalyticsProvider.mixpanel] = MixpanelAnalyticsProvider(
+      projectToken: appConfig.mixpanelProjectToken,
+      trackAutomaticEvents: true,
+      logger: logger,
+    );
 
-  analyticsService = AnalyticsEngine(
-    initialConfig: analyticsConfig,
-    providers: analyticsProviders,
-    logger: logger,
-  );
+    analyticsService = AnalyticsEngine(
+      initialConfig: analyticsConfig,
+      providers: analyticsProviders,
+      logger: logger,
+    );
 
-  // Initialize the active provider
-  if (analyticsConfig.enabled) {
+    // Initialize the active provider
     final activeProvider = analyticsProviders[analyticsConfig.activeProvider];
     await activeProvider?.initialize();
+  } else {
+    logger.warning(
+      'Analytics disabled in RemoteConfig. Using NoOpAnalyticsService.',
+    );
+    analyticsService = NoOpAnalyticsService(logger: logger);
   }
 
   logger
@@ -175,16 +196,15 @@ Future<Widget> bootstrap(
     ..info('6. Initializing Ad providers and AdService...');
 
   // 6. Initialize AdProvider and AdService.
-  late final Map<AdPlatformType, AdProvider> adProviders;
+  final adProviders = <AdPlatformType, AdProvider>{};
 
-  logger.fine('Using AdMobAdProvider.');
-  adProviders = {
-    // AdMob provider for Google Mobile Ads.
-    AdPlatformType.admob: AdMobAdProvider(
+  if (remoteConfig != null && remoteConfig.features.ads.enabled) {
+    logger.fine('Using AdMobAdProvider.');
+    adProviders[AdPlatformType.admob] = AdMobAdProvider(
       analyticsService: analyticsService,
       logger: logger,
-    ),
-  };
+    );
+  }
 
   final adService = AdService(
     adProviders: adProviders,
@@ -377,8 +397,16 @@ Future<Widget> bootstrap(
 
   // Initialize Subscription Service & Repository
   late final SubscriptionServiceInterface subscriptionService;
-  logger.fine('Using StoreSubscriptionService.');
-  subscriptionService = StoreSubscriptionService(logger: logger);
+
+  if (remoteConfig != null && remoteConfig.features.subscription.enabled) {
+    logger.fine('Using StoreSubscriptionService.');
+    subscriptionService = StoreSubscriptionService(logger: logger);
+  } else {
+    logger.warning(
+      'Subscriptions are disabled in RemoteConfig. Using NoOpSubscriptionService.',
+    );
+    subscriptionService = NoOpSubscriptionService(logger: logger);
+  }
 
   final purchaseTransactionRepository = DataRepository<PurchaseTransaction>(
     dataClient: purchaseTransactionClient,
@@ -408,26 +436,28 @@ Future<Widget> bootstrap(
   // 8. Initialize the PushNotificationService based on the remote config.
   // This is a crucial step for the provider-agnostic architecture.
   late final PushNotificationService pushNotificationService;
-  // Fetch the latest config directly. Since this is post-initialization,
-  // we assume it's available.
-  final remoteConfig = await remoteConfigRepository.read(id: kRemoteConfigId);
-  final pushNotificationConfig = remoteConfig.features.pushNotifications;
+  final pushNotificationConfig = remoteConfig?.features.pushNotifications;
 
-  // Select the provider based on RemoteConfig.
-  switch (pushNotificationConfig.primaryProvider) {
-    case PushNotificationProvider.firebase:
-      logger.fine('Using FirebasePushNotificationService.');
-      pushNotificationService = FirebasePushNotificationService(
-        pushNotificationDeviceRepository: pushNotificationDeviceRepository,
-        logger: logger,
-      );
-    case PushNotificationProvider.oneSignal:
-      logger.fine('Using OneSignalPushNotificationService.');
-      pushNotificationService = OneSignalPushNotificationService(
-        appId: appConfig.oneSignalAppId,
-        pushNotificationDeviceRepository: pushNotificationDeviceRepository,
-        logger: logger,
-      );
+  if (pushNotificationConfig != null && pushNotificationConfig.enabled) {
+    // Select the provider based on RemoteConfig.
+    switch (pushNotificationConfig.primaryProvider) {
+      case PushNotificationProvider.firebase:
+        logger.fine('Using FirebasePushNotificationService.');
+        pushNotificationService = FirebasePushNotificationService(
+          pushNotificationDeviceRepository: pushNotificationDeviceRepository,
+          logger: logger,
+        );
+      case PushNotificationProvider.oneSignal:
+        logger.fine('Using OneSignalPushNotificationService.');
+        pushNotificationService = OneSignalPushNotificationService(
+          appId: appConfig.oneSignalAppId,
+          pushNotificationDeviceRepository: pushNotificationDeviceRepository,
+          logger: logger,
+        );
+    }
+  } else {
+    logger.warning('Push notifications are disabled in RemoteConfig.');
+    pushNotificationService = NoOpPushNotificationService(logger: logger);
   }
   // Initialize the selected provider.
   await pushNotificationService.initialize();

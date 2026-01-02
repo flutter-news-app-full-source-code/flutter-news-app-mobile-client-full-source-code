@@ -12,7 +12,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/admob_ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_engine.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inline_ad_cache_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/no_op_ad_service.dart.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/analytics_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/firebase_analytics_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/mixpanel_analytics_provider.dart';
@@ -37,7 +39,9 @@ import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/se
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/store_subscription_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/in_app_review_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/native_review_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/no_op_native_review_service.dart';
 import 'package:http_client/http_client.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:kv_storage_service/kv_storage_service.dart';
@@ -196,21 +200,23 @@ Future<Widget> bootstrap(
     ..info('6. Initializing Ad providers and AdService...');
 
   // 6. Initialize AdProvider and AdService.
-  final adProviders = <AdPlatformType, AdProvider>{};
+  late final AdService adService;
 
   if (remoteConfig != null && remoteConfig.features.ads.enabled) {
+    final adProviders = <AdPlatformType, AdProvider>{};
     logger.fine('Using AdMobAdProvider.');
     adProviders[AdPlatformType.admob] = AdMobAdProvider(
       analyticsService: analyticsService,
       logger: logger,
     );
+    adService = AdEngine(
+      adProviders: adProviders,
+      analyticsService: analyticsService,
+      logger: logger,
+    );
+  } else {
+    adService = NoOpAdService(logger: logger);
   }
-
-  final adService = AdService(
-    adProviders: adProviders,
-    analyticsService: analyticsService,
-    logger: logger,
-  );
   await adService.initialize();
   logger.fine('AdService initialized.');
 
@@ -464,10 +470,19 @@ Future<Widget> bootstrap(
   logger.fine('PushNotificationService initialized.');
 
   // Initialize AppReviewService
-  final nativeReviewService = InAppReviewService(
-    inAppReview: InAppReview.instance,
-    logger: logger,
-  );
+  late final NativeReviewService nativeReviewService;
+  final communityConfig = remoteConfig?.features.community;
+
+  if (communityConfig != null &&
+      communityConfig.enabled &&
+      communityConfig.appReview.enabled) {
+    nativeReviewService = InAppReviewService(
+      inAppReview: InAppReview.instance,
+      logger: logger,
+    );
+  } else {
+    nativeReviewService = NoOpNativeReviewService(logger: logger);
+  }
 
   final appReviewService = AppReviewService(
     appReviewRepository: appReviewRepository,

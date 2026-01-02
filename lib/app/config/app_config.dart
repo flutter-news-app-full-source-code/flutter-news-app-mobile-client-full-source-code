@@ -8,7 +8,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_e
 ///
 /// ## How It Works
 /// This class uses factory constructors (`.production()`, `.development()`,
-/// `.demo()`) to create an immutable configuration object based on the current
+/// ) to create an immutable configuration object based on the current
 /// build environment. All required values are sourced from `--dart-define`
 /// variables, ensuring a clean separation of configuration from code.
 ///
@@ -99,32 +99,6 @@ class AppConfig {
     _validateConfiguration(config);
     return config;
   }
-
-  /// Creates an [AppConfig] for the **demo** environment.
-  ///
-  /// This factory uses hardcoded, non-functional placeholder values. It is
-  /// designed for running the app in a completely offline, in-memory mode
-  /// where no backend services are required. The Firebase values are validly
-  //  formatted dummies required to satisfy Firebase initialization.
-  factory AppConfig.demo() => AppConfig(
-    environment: AppEnvironment.demo,
-    baseUrl: '',
-    // Placeholders for demo
-    oneSignalAndroidAppId: 'YOUR_DEMO_ONESIGNAL_ANDROID_APP_ID',
-    oneSignalIosAppId: 'YOUR_DEMO_ONESIGNAL_IOS_APP_ID',
-
-    // Dummy Firebase values for demo mode.
-    // These are required to initialize Firebase but won't be used for
-    // actual backend communication in demo mode.
-    firebaseAndroidApiKey: 'demo-key-android',
-    firebaseIosApiKey: 'demo-key-ios',
-    firebaseAndroidAppId: '1:000000000000:android:0000000000000000000000',
-    firebaseIosAppId: '1:000000000000:ios:0000000000000000000000',
-    firebaseMessagingSenderId: '000000000000',
-    firebaseProjectId: 'demo-project',
-    firebaseStorageBucket: '',
-    mixpanelProjectToken: 'demo-mixpanel-token',
-  );
 
   /// Creates an [AppConfig] for the **development** environment.
   ///

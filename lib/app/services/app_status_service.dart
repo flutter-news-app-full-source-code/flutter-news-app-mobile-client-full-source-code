@@ -65,11 +65,6 @@ class AppStatusService with WidgetsBindingObserver {
     _timer?.cancel();
     // Create a new periodic timer.
     _timer = Timer.periodic(_checkInterval, (_) {
-      // In demo mode, periodic checks are not needed as there's no backend.
-      if (_environment == AppEnvironment.demo) {
-        _logger.info('[AppStatusService] Demo mode: Skipping periodic check.');
-        return;
-      }
       _logger.info(
         '[AppStatusService] Periodic check triggered. Requesting AppConfig fetch.',
       );
@@ -85,16 +80,6 @@ class AppStatusService with WidgetsBindingObserver {
   /// This method is called whenever the application's lifecycle state changes.
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // In demo mode, we disable the app resume check. This is especially
-    // useful on web, where switching browser tabs would otherwise trigger
-    // a reload, which is unnecessary and can be distracting for demos.
-    if (_environment == AppEnvironment.demo) {
-      _logger.info(
-        '[AppStatusService] Demo mode: Skipping app lifecycle check.',
-      );
-      return;
-    }
-
     // We are only interested in the 'resumed' state.
     if (state == AppLifecycleState.resumed) {
       _logger.info(

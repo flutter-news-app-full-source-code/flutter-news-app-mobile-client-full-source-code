@@ -174,9 +174,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   /// Handles the [AppStarted] event.
   ///
-  /// This is now a no-op. All critical initialization logic has been moved to
-  /// the [AppInitializer] service and is orchestrated by the
-  /// [AppInitializationBloc] *before* this AppBloc is ever created.
+  /// This event is a no-op as critical initialization logic is handled by
+  /// [AppInitializer] and [AppInitializationBloc] before AppBloc creation.
   Future<void> _onAppStarted(AppStarted event, Emitter<AppState> emit) async {
     _logger.fine(
       '[AppBloc] AppStarted event received. State is already initialized.',
@@ -270,7 +269,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     final oldUser = state.user;
     final newUser = event.user;
 
-    // Critical Change: Detect not just user ID changes, but also role changes.
+    // Detect not just user ID changes, but also role changes.
     // This is essential for the "anonymous to authenticated" flow.
     if (oldUser?.id == newUser?.id &&
         oldUser?.role == newUser?.role &&

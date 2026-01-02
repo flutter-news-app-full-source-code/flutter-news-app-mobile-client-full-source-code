@@ -9,8 +9,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inlin
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/admob_inline_ad_widget.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/demo_banner_ad_widget.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/demo_native_ad_widget.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:logging/logging.dart';
@@ -358,20 +356,6 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
             inlineAd: _loadedAd!,
             feedItemImageStyle: feedItemImageStyle,
           );
-        case AdPlatformType.demo:
-          // In demo environment, display placeholder ads directly.
-          switch (widget.adPlaceholder.adType) {
-            case AdType.native:
-              return DemoNativeAdWidget(feedItemImageStyle: feedItemImageStyle);
-            case AdType.banner:
-              return DemoBannerAdWidget(feedItemImageStyle: feedItemImageStyle);
-            case AdType.interstitial:
-            case AdType.video:
-              // Interstitial and video ads are not inline, so they won't be
-              // handled by FeedAdLoaderWidget. Fallback to a generic
-              // placeholder.
-              return const SizedBox.shrink();
-          }
       }
     }
   }

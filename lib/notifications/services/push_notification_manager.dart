@@ -65,8 +65,8 @@ class PushNotificationManager implements PushNotificationService {
   /// The currently active provider based on configuration.
   /// Returns [_noOpProvider] if the feature is disabled or provider is missing.
   PushNotificationProvider get _activeProvider {
-    if (_config == null || !_config!.enabled) return _noOpProvider;
-    return _providers[_config!.primaryProvider] ?? _noOpProvider;
+    if (_config == null || !_config.enabled) return _noOpProvider;
+    return _providers[_config.primaryProvider] ?? _noOpProvider;
   }
 
   @override

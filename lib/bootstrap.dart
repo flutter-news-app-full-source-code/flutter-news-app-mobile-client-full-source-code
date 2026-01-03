@@ -489,9 +489,8 @@ Future<Widget> bootstrap(
   );
   logger
     ..fine('ContentLimitationService initialized.')
-    ..fine('AppReviewService initialized.');
-
-  logger.info('9. Initializing AppInitializer service...');
+    ..fine('AppReviewService initialized.')
+    ..info('9. Initializing AppInitializer service...');
   final appInitializer = AppInitializer(
     authenticationRepository: authenticationRepository,
     appSettingsRepository: appSettingsRepository,

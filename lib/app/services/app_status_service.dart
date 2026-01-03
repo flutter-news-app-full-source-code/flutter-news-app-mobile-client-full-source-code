@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart';
 import 'package:logging/logging.dart';
 
 /// {@template app_status_service}
@@ -30,10 +29,8 @@ class AppStatusService with WidgetsBindingObserver {
   AppStatusService({
     required BuildContext context,
     required Duration checkInterval,
-    required AppEnvironment environment,
   }) : _context = context,
        _checkInterval = checkInterval,
-       _environment = environment,
        _logger = Logger('AppStatusService') {
     // Immediately register this service as a lifecycle observer.
     WidgetsBinding.instance.addObserver(this);
@@ -46,9 +43,6 @@ class AppStatusService with WidgetsBindingObserver {
 
   /// The interval at which to perform periodic status checks.
   final Duration _checkInterval;
-
-  /// The current application environment.
-  final AppEnvironment _environment;
 
   /// The logger instance for this service.
   final Logger _logger;

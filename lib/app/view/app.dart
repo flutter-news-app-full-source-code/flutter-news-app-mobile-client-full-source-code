@@ -311,7 +311,6 @@ class _AppViewState extends State<_AppView> {
     _appStatusService = AppStatusService(
       context: context,
       checkInterval: const Duration(minutes: 15),
-      environment: widget.environment,
     );
 
     // Create instances of services that need to be managed by this State's

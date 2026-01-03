@@ -4,14 +4,14 @@ import 'package:auth_repository/auth_repository.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/purchase_handler.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:logging/logging.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockSubscriptionService extends Mock
-    implements SubscriptionServiceInterface {}
+    implements SubscriptionService {}
 
 class MockPurchaseTransactionRepository extends Mock
     implements DataRepository<PurchaseTransaction> {}
@@ -170,7 +170,9 @@ void main() {
         );
         when(
           () => mockSubscriptionService.completePurchase(any()),
-        ).thenAnswer((_) async {});
+        ).thenAnswer((_) async {
+          return null;
+        });
 
         testPurchase.pendingCompletePurchase = true;
 
@@ -227,7 +229,9 @@ void main() {
         );
         when(
           () => mockSubscriptionService.completePurchase(any()),
-        ).thenAnswer((_) async {});
+        ).thenAnswer((_) async {
+          return null;
+        });
 
         testRestoredPurchase.pendingCompletePurchase = true;
 
@@ -274,7 +278,9 @@ void main() {
         ).thenThrow(Exception('Backend error'));
         when(
           () => mockSubscriptionService.completePurchase(any()),
-        ).thenAnswer((_) async {});
+        ).thenAnswer((_) async {
+          return null;
+        });
 
         testPurchase.pendingCompletePurchase = true;
 
@@ -351,7 +357,9 @@ void main() {
 
         when(
           () => mockSubscriptionService.completePurchase(any()),
-        ).thenAnswer((_) async {});
+        ).thenAnswer((_) async {
+          return null;
+        });
 
         // Act
         purchaseHandler.listen();

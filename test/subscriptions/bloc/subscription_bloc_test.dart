@@ -5,14 +5,14 @@ import 'package:core/core.dart' hide SubscriptionStatus;
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/bloc/subscription_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:logging/logging.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockSubscriptionService extends Mock
-    implements SubscriptionServiceInterface {}
+    implements SubscriptionService {}
 
 class MockAppBloc extends MockBloc<AppEvent, AppState> implements AppBloc {}
 
@@ -262,7 +262,9 @@ void main() {
             product: any(named: 'product'),
             applicationUserName: any(named: 'applicationUserName'),
           ),
-        ).thenAnswer((_) async {});
+        ).thenAnswer((_) async {
+          return null;
+        });
       },
       build: () => subscriptionBloc,
       act: (bloc) =>
@@ -285,7 +287,9 @@ void main() {
       setUp: () {
         when(
           () => mockSubscriptionService.restorePurchases(),
-        ).thenAnswer((_) async {});
+        ).thenAnswer((_) async {
+          return null;
+        });
       },
       build: () => subscriptionBloc,
       act: (bloc) => bloc.add(const SubscriptionRestoreRequested()),

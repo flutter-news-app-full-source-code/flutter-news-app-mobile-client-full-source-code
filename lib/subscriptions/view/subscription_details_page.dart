@@ -8,7 +8,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localiz
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/bloc/subscription_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
@@ -24,7 +24,7 @@ class SubscriptionDetailsPage extends StatelessWidget {
     return BlocProvider(
       create: (context) =>
           SubscriptionBloc(
-              subscriptionService: context.read<SubscriptionServiceInterface>(),
+              subscriptionService: context.read<SubscriptionService>(),
               appBloc: context.read<AppBloc>(),
               remoteConfig: context.read<AppBloc>().state.remoteConfig!,
               logger: context.read<Logger>(),

@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:in_app_purchase/in_app_purchase.dart';
 
-/// {@template subscription_service_interface}
-/// Defines the contract for the subscription service.
+/// {@template subscription_service}
+/// Defines the public contract for the subscription feature.
 /// {@endtemplate}
-abstract class SubscriptionServiceInterface {
+abstract class SubscriptionService {
   /// Exposes the stream of purchase updates.
   Stream<List<PurchaseDetails>> get purchaseStream;
 

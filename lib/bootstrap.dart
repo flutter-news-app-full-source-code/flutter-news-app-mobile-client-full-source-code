@@ -1,7 +1,9 @@
 import 'package:auth_api/auth_api.dart';
 import 'package:auth_client/auth_client.dart';
 import 'package:auth_repository/auth_repository.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart'
+    hide AnalyticsProvider, PushNotificationProvider;
+import 'package:core/core.dart' as core;
 import 'package:data_api/data_api.dart';
 import 'package:data_client/data_client.dart';
 import 'package:data_repository/data_repository.dart';
@@ -11,13 +13,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/admob_ad_provider.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_engine.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/analytics_provider.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/firebase_analytics_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/firebase_analytics_provider.dart'
+    as analytics_firebase;
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/mixpanel_analytics_provider.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_engine.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/no_op_analytics_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
     as app_config;
@@ -27,9 +31,11 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_ini
 import 'package:flutter_news_app_mobile_client_full_source_code/bloc_observer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/firebase_push_notification_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/one_signal_push_notification_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_engine.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/providers/firebase_push_notification_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/providers/no_op_push_notification_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/providers/one_signal_push_notification_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/providers/push_notification_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/no_op_subscription_service.dart';
@@ -158,25 +164,28 @@ Future<Widget> bootstrap(
 
   // 5. Initialize Analytics Service.
   late final AnalyticsService analyticsService;
-  final analyticsProviders = <AnalyticsProvider, AnalyticsProviderInterface>{};
+  final analyticsProviders = <core.AnalyticsProvider, AnalyticsProvider>{};
 
   // Initialize providers based on environment and config
   // Add Firebase
-  analyticsProviders[AnalyticsProvider.firebase] = FirebaseAnalyticsProvider(
-    firebaseAnalytics: FirebaseAnalytics.instance,
-    logger: logger,
-  );
+  analyticsProviders[core.AnalyticsProvider.firebase] =
+      analytics_firebase.FirebaseAnalyticsProvider(
+        firebaseAnalytics: FirebaseAnalytics.instance,
+        logger: logger,
+      );
   // Add Mixpanel
-  analyticsProviders[AnalyticsProvider.mixpanel] = MixpanelAnalyticsProvider(
-    projectToken: appConfig.mixpanelProjectToken,
-    trackAutomaticEvents: true,
-    logger: logger,
-  );
+  analyticsProviders[core.AnalyticsProvider.mixpanel] =
+      MixpanelAnalyticsProvider(
+        projectToken: appConfig.mixpanelProjectToken,
+        trackAutomaticEvents: true,
+        logger: logger,
+      );
 
-  // Always instantiate the Engine. It handles enabled/disabled state internally.
-  analyticsService = AnalyticsEngine(
+  // Always instantiate the Manager. It handles enabled/disabled state internally.
+  analyticsService = AnalyticsManager(
     initialConfig: remoteConfig?.features.analytics,
     providers: analyticsProviders,
+    noOpProvider: NoOpAnalyticsProvider(logger: logger),
     logger: logger,
   );
 
@@ -187,9 +196,9 @@ Future<Widget> bootstrap(
 
   // 6. Initialize AdProvider and AdService.
   late final AdService adService;
-  final adProviders = <AdPlatformType, AdProvider>{};
+  final adProviders = <core.AdPlatformType, AdProvider>{};
   logger.fine('Using AdMobAdProvider.');
-  adProviders[AdPlatformType.admob] = AdMobAdProvider(
+  adProviders[core.AdPlatformType.admob] = AdMobAdProvider(
     analyticsService: analyticsService,
     logger: logger,
   );
@@ -426,23 +435,21 @@ Future<Widget> bootstrap(
   // This is a crucial step for the provider-agnostic architecture.
   late final PushNotificationService pushNotificationService;
   final pushNotificationProviders =
-      <PushNotificationProvider, PushNotificationService>{};
+      <core.PushNotificationProvider, PushNotificationProvider>{};
 
-  pushNotificationProviders[PushNotificationProvider.firebase] =
-      FirebasePushNotificationService(
-        pushNotificationDeviceRepository: pushNotificationDeviceRepository,
-        logger: logger,
-      );
-  pushNotificationProviders[PushNotificationProvider.oneSignal] =
+  pushNotificationProviders[core.PushNotificationProvider.firebase] =
+      FirebasePushNotificationService(logger: logger);
+  pushNotificationProviders[core.PushNotificationProvider.oneSignal] =
       OneSignalPushNotificationService(
         appId: appConfig.oneSignalAppId,
-        pushNotificationDeviceRepository: pushNotificationDeviceRepository,
         logger: logger,
       );
 
-  pushNotificationService = PushNotificationEngine(
+  pushNotificationService = PushNotificationManager(
     initialConfig: remoteConfig?.features.pushNotifications,
     providers: pushNotificationProviders,
+    noOpProvider: NoOpPushNotificationProvider(logger: logger),
+    pushNotificationDeviceRepository: pushNotificationDeviceRepository,
     logger: logger,
   );
 

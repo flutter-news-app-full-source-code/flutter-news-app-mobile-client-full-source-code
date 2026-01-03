@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:core/core.dart' as core;
+import 'package:core/core.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/analytics_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:logging/logging.dart';
@@ -15,8 +15,8 @@ import 'package:logging/logging.dart';
 class AnalyticsManager implements AnalyticsService {
   /// {@macro analytics_manager}
   AnalyticsManager({
-    required core.AnalyticsConfig? initialConfig,
-    required Map<core.AnalyticsProvider, AnalyticsProvider> providers,
+    required AnalyticsConfig? initialConfig,
+    required Map<AnalyticsProviders, AnalyticsProvider> providers,
     required AnalyticsProvider noOpProvider,
     Logger? logger,
   }) : _config = initialConfig,
@@ -24,8 +24,8 @@ class AnalyticsManager implements AnalyticsService {
        _noOpProvider = noOpProvider,
        _logger = logger ?? Logger('AnalyticsManager');
 
-  core.AnalyticsConfig? _config;
-  final Map<core.AnalyticsProvider, AnalyticsProvider> _providers;
+  AnalyticsConfig? _config;
+  final Map<AnalyticsProviders, AnalyticsProvider> _providers;
   final AnalyticsProvider _noOpProvider;
   final Logger _logger;
   final Random _random = Random();
@@ -46,8 +46,8 @@ class AnalyticsManager implements AnalyticsService {
 
   @override
   Future<void> logEvent(
-    core.AnalyticsEvent event, {
-    core.AnalyticsEventPayload? payload,
+    AnalyticsEvent event, {
+    AnalyticsEventPayload? payload,
   }) async {
     final config = _config;
     if (config == null || !config.enabled) {
@@ -96,7 +96,7 @@ class AnalyticsManager implements AnalyticsService {
   }
 
   @override
-  void updateConfig(core.AnalyticsConfig config) {
+  void updateConfig(AnalyticsConfig config) {
     _logger.info('Updating Analytics Configuration.');
     _config = config;
   }

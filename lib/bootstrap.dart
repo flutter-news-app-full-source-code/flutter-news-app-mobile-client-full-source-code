@@ -1,9 +1,7 @@
 import 'package:auth_api/auth_api.dart';
 import 'package:auth_client/auth_client.dart';
 import 'package:auth_repository/auth_repository.dart';
-import 'package:core/core.dart'
-    hide AnalyticsProvider, PushNotificationProvider;
-import 'package:core/core.dart' as core;
+import 'package:core/core.dart';
 import 'package:data_api/data_api.dart';
 import 'package:data_client/data_client.dart';
 import 'package:data_repository/data_repository.dart';
@@ -164,17 +162,17 @@ Future<Widget> bootstrap(
 
   // 5. Initialize Analytics Service.
   late final AnalyticsService analyticsService;
-  final analyticsProviders = <core.AnalyticsProvider, AnalyticsProvider>{};
+  final analyticsProviders = <AnalyticsProviders, AnalyticsProvider>{};
 
   // Initialize providers based on environment and config
   // Add Firebase
-  analyticsProviders[core.AnalyticsProvider.firebase] =
+  analyticsProviders[AnalyticsProviders.firebase] =
       analytics_firebase.FirebaseAnalyticsProvider(
         firebaseAnalytics: FirebaseAnalytics.instance,
         logger: logger,
       );
   // Add Mixpanel
-  analyticsProviders[core.AnalyticsProvider.mixpanel] =
+  analyticsProviders[AnalyticsProviders.mixpanel] =
       MixpanelAnalyticsProvider(
         projectToken: appConfig.mixpanelProjectToken,
         trackAutomaticEvents: true,
@@ -196,9 +194,9 @@ Future<Widget> bootstrap(
 
   // 6. Initialize AdProvider and AdService.
   late final AdService adService;
-  final adProviders = <core.AdPlatformType, AdProvider>{};
+  final adProviders = <AdPlatformType, AdProvider>{};
   logger.fine('Using AdMobAdProvider.');
-  adProviders[core.AdPlatformType.admob] = AdMobAdProvider(
+  adProviders[AdPlatformType.admob] = AdMobAdProvider(
     analyticsService: analyticsService,
     logger: logger,
   );
@@ -435,11 +433,11 @@ Future<Widget> bootstrap(
   // This is a crucial step for the provider-agnostic architecture.
   late final PushNotificationService pushNotificationService;
   final pushNotificationProviders =
-      <core.PushNotificationProvider, PushNotificationProvider>{};
+      <PushNotificationProviders, PushNotificationProvider>{};
 
-  pushNotificationProviders[core.PushNotificationProvider.firebase] =
+  pushNotificationProviders[PushNotificationProviders.firebase] =
       FirebasePushNotificationService(logger: logger);
-  pushNotificationProviders[core.PushNotificationProvider.oneSignal] =
+  pushNotificationProviders[PushNotificationProviders.oneSignal] =
       OneSignalPushNotificationService(
         appId: appConfig.oneSignalAppId,
         logger: logger,

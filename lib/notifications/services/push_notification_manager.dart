@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:core/core.dart' as core;
+import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/providers/push_notification_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
@@ -12,7 +12,7 @@ import 'package:uuid/uuid.dart';
 /// The concrete implementation of [PushNotificationService].
 ///
 /// This manager handles the business logic for push notifications, including:
-/// - Checking [core.PushNotificationConfig] to enable/disable the feature.
+/// - Checking [PushNotificationConfig] to enable/disable the feature.
 /// - Selecting the active [PushNotificationProvider] (Firebase vs OneSignal).
 /// - Managing device registration with the [DataRepository].
 /// - Forwarding notification streams from the provider to the app.
@@ -20,11 +20,11 @@ import 'package:uuid/uuid.dart';
 class PushNotificationManager implements PushNotificationService {
   /// {@macro push_notification_manager}
   PushNotificationManager({
-    required core.PushNotificationConfig? initialConfig,
-    required Map<core.PushNotificationProvider, PushNotificationProvider>
+    required PushNotificationConfig? initialConfig,
+    required Map<PushNotificationProviders, PushNotificationProvider>
     providers,
     required PushNotificationProvider noOpProvider,
-    required DataRepository<core.PushNotificationDevice>
+    required DataRepository<PushNotificationDevice>
     pushNotificationDeviceRepository,
     required Logger logger,
   }) : _config = initialConfig,
@@ -33,30 +33,30 @@ class PushNotificationManager implements PushNotificationService {
        _pushNotificationDeviceRepository = pushNotificationDeviceRepository,
        _logger = logger;
 
-  final core.PushNotificationConfig? _config;
-  final Map<core.PushNotificationProvider, PushNotificationProvider> _providers;
+  final PushNotificationConfig? _config;
+  final Map<PushNotificationProviders, PushNotificationProvider> _providers;
   final PushNotificationProvider _noOpProvider;
-  final DataRepository<core.PushNotificationDevice>
+  final DataRepository<PushNotificationDevice>
   _pushNotificationDeviceRepository;
   final Logger _logger;
 
   // Broadcast streams to forward events from the active provider to the app.
   final _onMessageController =
-      StreamController<core.PushNotificationPayload>.broadcast();
+      StreamController<PushNotificationPayload>.broadcast();
   final _onMessageOpenedAppController =
-      StreamController<core.PushNotificationPayload>.broadcast();
+      StreamController<PushNotificationPayload>.broadcast();
   final _onTokenRefreshedController = StreamController<String>.broadcast();
 
-  StreamSubscription<core.PushNotificationPayload>? _providerMessageSub;
-  StreamSubscription<core.PushNotificationPayload>? _providerOpenedAppSub;
+  StreamSubscription<PushNotificationPayload>? _providerMessageSub;
+  StreamSubscription<PushNotificationPayload>? _providerOpenedAppSub;
   StreamSubscription<String>? _providerTokenRefreshSub;
 
   @override
-  Stream<core.PushNotificationPayload> get onMessage =>
+  Stream<PushNotificationPayload> get onMessage =>
       _onMessageController.stream;
 
   @override
-  Stream<core.PushNotificationPayload> get onMessageOpenedApp =>
+  Stream<PushNotificationPayload> get onMessageOpenedApp =>
       _onMessageOpenedAppController.stream;
 
   @override
@@ -135,10 +135,10 @@ class PushNotificationManager implements PushNotificationService {
         _logger.warning('Device cleanup failed, proceeding.', e, s);
       }
 
-      final newDevice = core.PushNotificationDevice(
+      final newDevice = PushNotificationDevice(
         id: const Uuid().v4(),
         userId: userId,
-        platform: Platform.isIOS ? core.DevicePlatform.ios : core.DevicePlatform.android,
+        platform: Platform.isIOS ? DevicePlatform.ios : DevicePlatform.android,
         providerTokens: {_config!.primaryProvider: token},
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
@@ -153,7 +153,7 @@ class PushNotificationManager implements PushNotificationService {
   }
 
   @override
-  Future<core.PushNotificationPayload?> get initialMessage async {
+  Future<PushNotificationPayload?> get initialMessage async {
     return _activeProvider.initialMessage;
   }
 

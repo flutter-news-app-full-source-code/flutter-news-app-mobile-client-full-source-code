@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:auth_repository/auth_repository.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:logging/logging.dart';
 
@@ -30,7 +30,7 @@ import 'package:logging/logging.dart';
 class PurchaseHandler {
   /// {@macro purchase_handler}
   PurchaseHandler({
-    required SubscriptionServiceInterface subscriptionService,
+    required SubscriptionService subscriptionService,
     required DataRepository<PurchaseTransaction> purchaseTransactionRepository,
     required AuthRepository authRepository,
     required Logger logger,
@@ -39,7 +39,7 @@ class PurchaseHandler {
        _authRepository = authRepository,
        _logger = logger;
 
-  final SubscriptionServiceInterface _subscriptionService;
+  final SubscriptionService _subscriptionService;
   final DataRepository<PurchaseTransaction> _purchaseTransactionRepository;
   final AuthRepository _authRepository;
   final Logger _logger;

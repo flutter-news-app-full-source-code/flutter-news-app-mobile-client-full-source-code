@@ -5,7 +5,7 @@ import 'package:collection/collection.dart';
 import 'package:core/core.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:logging/logging.dart';
 
@@ -14,7 +14,7 @@ part 'subscription_state.dart';
 
 class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
   SubscriptionBloc({
-    required SubscriptionServiceInterface subscriptionService,
+    required SubscriptionService subscriptionService,
     required AppBloc appBloc,
     required RemoteConfig remoteConfig,
     required Logger logger,
@@ -45,7 +45,7 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
     );
   }
 
-  final SubscriptionServiceInterface _subscriptionService;
+  final SubscriptionService _subscriptionService;
   final AppBloc _appBloc;
   final RemoteConfig _remoteConfig;
   final Logger _logger;

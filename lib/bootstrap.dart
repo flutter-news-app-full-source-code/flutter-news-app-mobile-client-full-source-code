@@ -11,7 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/admob_ad_provider.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_engine.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/no_op_ad_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/analytics_provider.dart';
@@ -37,8 +38,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/notifications/se
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/providers/no_op_subscription_provider.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/purchase_handler.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/providers/store_subscription_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/purchase_handler.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
@@ -200,10 +201,11 @@ Future<Widget> bootstrap(
     analyticsService: analyticsService,
     logger: logger,
   );
-  // Always instantiate the Engine. It handles enabled/disabled state internally.
-  adService = AdEngine(
+  // Always instantiate the Manager. It handles enabled/disabled state internally.
+  adService = AdManager(
     initialConfig: remoteConfig?.features.ads,
     adProviders: adProviders,
+    noOpProvider: NoOpAdProvider(logger: logger),
     analyticsService: analyticsService,
     logger: logger,
   );

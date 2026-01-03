@@ -263,7 +263,7 @@ void main() {
             applicationUserName: any(named: 'applicationUserName'),
           ),
         ).thenAnswer((_) async {
-          return null;
+          return;
         });
       },
       build: () => subscriptionBloc,
@@ -288,7 +288,7 @@ void main() {
         when(
           () => mockSubscriptionService.restorePurchases(),
         ).thenAnswer((_) async {
-          return null;
+          return;
         });
       },
       build: () => subscriptionBloc,

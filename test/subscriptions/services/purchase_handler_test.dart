@@ -171,7 +171,7 @@ void main() {
         when(
           () => mockSubscriptionService.completePurchase(any()),
         ).thenAnswer((_) async {
-          return null;
+          return;
         });
 
         testPurchase.pendingCompletePurchase = true;
@@ -230,7 +230,7 @@ void main() {
         when(
           () => mockSubscriptionService.completePurchase(any()),
         ).thenAnswer((_) async {
-          return null;
+          return;
         });
 
         testRestoredPurchase.pendingCompletePurchase = true;
@@ -279,7 +279,7 @@ void main() {
         when(
           () => mockSubscriptionService.completePurchase(any()),
         ).thenAnswer((_) async {
-          return null;
+          return;
         });
 
         testPurchase.pendingCompletePurchase = true;
@@ -358,7 +358,7 @@ void main() {
         when(
           () => mockSubscriptionService.completePurchase(any()),
         ).thenAnswer((_) async {
-          return null;
+          return;
         });
 
         // Act

@@ -9,23 +9,23 @@ import 'package:logging/logging.dart';
 /// This service is used when push notifications are disabled in the remote
 /// configuration. It satisfies the interface requirements without performing
 /// any actual operations or network calls.
-class NoOpPushNotificationService implements PushNotificationProvider {
-  /// Creates an instance of [NoOpPushNotificationService].
-  NoOpPushNotificationService({required Logger logger}) : _logger = logger;
+class NoOpPushNotificationProvider implements PushNotificationProvider {
+  /// Creates an instance of [NoOpPushNotificationProvider].
+  NoOpPushNotificationProvider({required Logger logger}) : _logger = logger;
 
   final Logger _logger;
 
   @override
   Future<void> initialize() async {
     _logger.info(
-      'Initializing NoOpPushNotificationService (Notifications disabled).',
+      'Initializing NoOpPushNotificationProvider (Notifications disabled).',
     );
   }
 
   @override
   Future<bool> requestPermission() async {
     _logger.fine(
-      'NoOpPushNotificationService: requestPermission called. Returning false.',
+      'NoOpPushNotificationProvider: requestPermission called. Returning false.',
     );
     return false;
   }

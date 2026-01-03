@@ -173,7 +173,7 @@ class AppInitializer {
 
     try {
       // Fetch settings and preferences concurrently for performance.
-      var [
+      final [
         appSettings as AppSettings?,
         userContentPreferences as UserContentPreferences?,
         userContext as UserContext?,

@@ -45,7 +45,7 @@ class AdEngine implements AdService {
   @override
   Future<void> initialize() async {
     _logger.info('AdEngine: Initializing...');
-    if (_config == null || !_config!.enabled) {
+    if (_config == null || !_config.enabled) {
       _logger.info('AdEngine: Ads disabled. Skipping provider init.');
       return;
     }

@@ -5,22 +5,22 @@ import 'package:flutter_news_app_mobile_client_full_source_code/analytics/provid
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:logging/logging.dart';
 
-/// {@template analytics_engine}
+/// {@template analytics_manager}
 /// The concrete implementation of [AnalyticsService].
 ///
-/// This engine acts as a smart proxy that enforces configuration rules defined
+/// This manager acts as a smart proxy that enforces configuration rules defined
 /// in [AnalyticsConfig] (e.g., sampling, disabled events) before delegating
 /// to the active [AnalyticsProviderInterface].
 /// {@endtemplate}
-class AnalyticsEngine implements AnalyticsService {
-  /// {@macro analytics_engine}
-  AnalyticsEngine({
+class AnalyticsManager implements AnalyticsService {
+  /// {@macro analytics_manager}
+  AnalyticsManager({
     required AnalyticsConfig? initialConfig,
     required Map<AnalyticsProvider, AnalyticsProviderInterface> providers,
     Logger? logger,
   }) : _config = initialConfig,
        _providers = providers,
-       _logger = logger ?? Logger('AnalyticsEngine');
+       _logger = logger ?? Logger('AnalyticsManager');
 
   AnalyticsConfig? _config;
   final Map<AnalyticsProvider, AnalyticsProviderInterface> _providers;
@@ -29,10 +29,10 @@ class AnalyticsEngine implements AnalyticsService {
 
   @override
   Future<void> initialize() async {
-    _logger.info('AnalyticsEngine: Initializing...');
+    _logger.info('AnalyticsManager: Initializing...');
     if (_config == null || !_config!.enabled) {
       _logger.info(
-        'AnalyticsEngine: Analytics disabled. Skipping provider init.',
+        'AnalyticsManager: Analytics disabled. Skipping provider init.',
       );
       return;
     }
@@ -40,7 +40,7 @@ class AnalyticsEngine implements AnalyticsService {
     for (final provider in _providers.values) {
       await provider.initialize();
     }
-    _logger.info('AnalyticsEngine: Initialized.');
+    _logger.info('AnalyticsManager: Initialized.');
   }
 
   @override

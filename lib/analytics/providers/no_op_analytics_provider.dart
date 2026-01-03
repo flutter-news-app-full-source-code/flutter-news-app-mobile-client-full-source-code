@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/analytics_provider.dart';
 import 'package:logging/logging.dart';
 
-/// A no-operation implementation of [AnalyticsProviderInterface].
+/// A no-operation implementation of [AnalyticsProvider].
 ///
 /// This provider is used as a fallback or placeholder when no specific
 /// analytics provider is active.
-class NoOpAnalyticsProvider implements AnalyticsProviderInterface {
+class NoOpAnalyticsProvider implements AnalyticsProvider {
   /// Creates an instance of [NoOpAnalyticsProvider].
   NoOpAnalyticsProvider({required Logger logger}) : _logger = logger;
 

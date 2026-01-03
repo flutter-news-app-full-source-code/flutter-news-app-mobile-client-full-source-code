@@ -1,26 +1,15 @@
 import 'dart:async';
-import 'dart:io';
 
-import 'package:core/core.dart';
-import 'package:data_repository/data_repository.dart';
+import 'package:core/core.dart' hide PushNotificationProvider;
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/providers/push_notification_provider.dart';
 import 'package:logging/logging.dart';
-import 'package:uuid/uuid.dart';
 
-/// A concrete implementation of [PushNotificationService] for Firebase Cloud
+/// A concrete implementation of [PushNotificationProvider] for Firebase Cloud
 /// Messaging (FCM).
-class FirebasePushNotificationService implements PushNotificationService {
+class FirebasePushNotificationService implements PushNotificationProvider {
   /// Creates an instance of [FirebasePushNotificationService].
-  FirebasePushNotificationService({
-    required DataRepository<PushNotificationDevice>
-    pushNotificationDeviceRepository,
-    required Logger logger,
-  }) : _pushNotificationDeviceRepository = pushNotificationDeviceRepository,
-       _logger = logger;
-
-  final DataRepository<PushNotificationDevice>
-  _pushNotificationDeviceRepository;
+  FirebasePushNotificationService({required Logger logger}) : _logger = logger;
   final Logger _logger;
 
   final _onMessageController =
@@ -105,72 +94,7 @@ class FirebasePushNotificationService implements PushNotificationService {
   }
 
   @override
-  Future<void> registerDevice({required String userId}) async {
-    _logger.info('Registering device for user: $userId');
-
-    try {
-      final token = await FirebaseMessaging.instance.getToken();
-      if (token == null) {
-        _logger.warning('Failed to get FCM token. Cannot register device.');
-        return;
-      }
-
-      _logger.fine('FCM token received for registration: $token');
-
-      // To ensure a user only receives notifications on their most recently
-      // used device, we proactively clear all of their previous device
-      // registrations before creating a new one. This prevents "ghost"
-      // notifications from being sent to old, unused installations (e.g.,
-      // after a user gets a new phone or reinstalls the app).
-      try {
-        final existingDevices = await _pushNotificationDeviceRepository.readAll(
-          userId: userId,
-        );
-
-        if (existingDevices.items.isNotEmpty) {
-          _logger.info(
-            'Found ${existingDevices.items.length} existing device(s) for user $userId. Deleting...',
-          );
-          await Future.wait(
-            existingDevices.items.map(
-              (device) => _pushNotificationDeviceRepository.delete(
-                id: device.id,
-                userId: userId,
-              ),
-            ),
-          );
-          _logger.info('All existing devices for user $userId deleted.');
-        }
-      } catch (e, s) {
-        // If the proactive cleanup fails (e.g., due to a temporary network
-        // issue), we log the error but do not halt the registration process.
-        // The backend's passive, self-healing mechanism (which prunes invalid
-        // tokens upon send failure) will eventually clean up any orphaned
-        // device records. This ensures that a failure in cleanup does not
-        // prevent the user from receiving notifications on their new device.
-        _logger.warning(
-          'Could not clean up existing devices for user $userId, proceeding with registration. Error: $e',
-          e,
-          s,
-        );
-      }
-
-      final newDevice = PushNotificationDevice(
-        id: const Uuid().v4(),
-        userId: userId,
-        platform: Platform.isIOS ? DevicePlatform.ios : DevicePlatform.android,
-        providerTokens: {PushNotificationProvider.firebase: token},
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      );
-
-      await _pushNotificationDeviceRepository.create(item: newDevice);
-      _logger.info('Device successfully registered with backend.');
-    } catch (e, s) {
-      _logger.severe('Failed to register device.', e, s);
-      rethrow;
-    }
-  }
+  Future<String?> getToken() => FirebaseMessaging.instance.getToken();
 
   /// Converts a Firebase [RemoteMessage] to a generic [PushNotificationPayload].
   PushNotificationPayload _toPushNotificationPayload(RemoteMessage message) {
@@ -197,10 +121,4 @@ class FirebasePushNotificationService implements PushNotificationService {
     await _onMessageOpenedAppController.close();
     await _onTokenRefreshedController.close();
   }
-
-  @override
-  List<Object?> get props => [_pushNotificationDeviceRepository, _logger];
-
-  @override
-  bool? get stringify => true;
 }

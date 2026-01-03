@@ -1,15 +1,13 @@
 import 'package:core/core.dart';
-import 'package:equatable/equatable.dart';
 
 /// {@template push_notification_service}
 /// An abstract class defining the contract for a push notification service.
 ///
 /// This service is responsible for initializing the notification provider,
 /// handling permissions, managing device tokens, and processing incoming
-/// notification messages. It extends [Equatable] to allow for easy comparison
-/// in testing environments.
+/// notification messages.
 /// {@endtemplate}
-abstract class PushNotificationService extends Equatable {
+abstract class PushNotificationService {
   /// Initializes the push notification service.
   ///
   /// This method should be called once during application startup to configure

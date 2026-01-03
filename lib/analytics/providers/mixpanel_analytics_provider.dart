@@ -5,9 +5,9 @@ import 'package:logging/logging.dart';
 import 'package:mixpanel_flutter/mixpanel_flutter.dart';
 
 /// {@template mixpanel_analytics_provider}
-/// An implementation of [AnalyticsProviderInterface] for Mixpanel.
+/// An implementation of [AnalyticsProvider] for Mixpanel.
 /// {@endtemplate}
-class MixpanelAnalyticsProvider extends AnalyticsProviderInterface {
+class MixpanelAnalyticsProvider extends AnalyticsProvider {
   /// {@macro mixpanel_analytics_provider}
   MixpanelAnalyticsProvider({
     required String projectToken,

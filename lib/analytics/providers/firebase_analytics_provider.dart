@@ -3,9 +3,9 @@ import 'package:flutter_news_app_mobile_client_full_source_code/analytics/provid
 import 'package:logging/logging.dart';
 
 /// {@template firebase_analytics_provider}
-/// An implementation of [AnalyticsProviderInterface] for Firebase Analytics.
+/// An implementation of [AnalyticsProvider] for Firebase Analytics.
 /// {@endtemplate}
-class FirebaseAnalyticsProvider extends AnalyticsProviderInterface {
+class FirebaseAnalyticsProvider extends AnalyticsProvider {
   /// {@macro firebase_analytics_provider}
   FirebaseAnalyticsProvider({
     required FirebaseAnalytics firebaseAnalytics,

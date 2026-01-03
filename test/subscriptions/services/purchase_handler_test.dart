@@ -29,8 +29,6 @@ void main() {
   late PurchaseHandler purchaseHandler;
   late MockSubscriptionService mockSubscriptionService;
   late MockPurchaseTransactionRepository mockPurchaseTransactionRepository;
-  late MockUserSubscriptionRepository mockUserSubscriptionRepository;
-  late MockUserRepository mockUserRepository;
   late MockAuthRepository mockAuthRepository;
   late MockLogger mockLogger;
 
@@ -63,8 +61,6 @@ void main() {
   setUp(() {
     mockSubscriptionService = MockSubscriptionService();
     mockPurchaseTransactionRepository = MockPurchaseTransactionRepository();
-    mockUserSubscriptionRepository = MockUserSubscriptionRepository();
-    mockUserRepository = MockUserRepository();
     mockAuthRepository = MockAuthRepository();
     mockLogger = MockLogger();
 
@@ -76,8 +72,6 @@ void main() {
     purchaseHandler = PurchaseHandler(
       subscriptionService: mockSubscriptionService,
       purchaseTransactionRepository: mockPurchaseTransactionRepository,
-      userSubscriptionRepository: mockUserSubscriptionRepository,
-      userRepository: mockUserRepository,
       authRepository: mockAuthRepository,
       logger: mockLogger,
     );

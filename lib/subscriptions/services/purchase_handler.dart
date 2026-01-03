@@ -32,21 +32,15 @@ class PurchaseHandler {
   PurchaseHandler({
     required SubscriptionServiceInterface subscriptionService,
     required DataRepository<PurchaseTransaction> purchaseTransactionRepository,
-    required DataRepository<UserSubscription> userSubscriptionRepository,
-    required DataRepository<User> userRepository,
     required AuthRepository authRepository,
     required Logger logger,
   }) : _subscriptionService = subscriptionService,
        _purchaseTransactionRepository = purchaseTransactionRepository,
-       _userSubscriptionRepository = userSubscriptionRepository,
-       _userRepository = userRepository,
        _authRepository = authRepository,
        _logger = logger;
 
   final SubscriptionServiceInterface _subscriptionService;
   final DataRepository<PurchaseTransaction> _purchaseTransactionRepository;
-  final DataRepository<UserSubscription> _userSubscriptionRepository;
-  final DataRepository<User> _userRepository;
   final AuthRepository _authRepository;
   final Logger _logger;
 

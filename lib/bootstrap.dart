@@ -417,8 +417,6 @@ Future<Widget> bootstrap(
       PurchaseHandler(
           subscriptionService: subscriptionService,
           purchaseTransactionRepository: purchaseTransactionRepository,
-          userSubscriptionRepository: userSubscriptionRepository,
-          userRepository: userRepository,
           authRepository: authenticationRepository,
           logger: logger,
         )

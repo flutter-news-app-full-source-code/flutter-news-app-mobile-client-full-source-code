@@ -11,29 +11,32 @@ import 'package:flutter_news_app_mobile_client_full_source_code/analytics/servic
 import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
 
-/// {@template ad_engine}
-/// The concrete implementation of [AdService] that acts as the orchestration
-/// layer for the ad system.
+/// {@template ad_manager}
+/// The concrete implementation of [AdService] that acts as the Manager
+/// in the Manager Pattern.
 ///
-/// This engine manages the lifecycle of ads, enforces configuration rules
+/// This manager manages the lifecycle of ads, enforces configuration rules
 /// (e.g., global enablement, user tier visibility), handles retry logic,
 /// and delegates the actual ad loading to the appropriate [AdProvider].
 ///
 /// {@endtemplate}
-class AdEngine implements AdService {
-  /// {@macro ad_engine}
-  AdEngine({
+class AdManager implements AdService {
+  /// {@macro ad_manager}
+  AdManager({
     required AdConfig? initialConfig,
     required Map<AdPlatformType, AdProvider> adProviders,
+    required AdProvider noOpProvider,
     required AnalyticsService analyticsService,
     Logger? logger,
   }) : _config = initialConfig,
        _adProviders = adProviders,
+       _noOpProvider = noOpProvider,
        _analyticsService = analyticsService,
-       _logger = logger ?? Logger('AdEngine');
+       _logger = logger ?? Logger('AdManager');
 
   final AdConfig? _config;
   final Map<AdPlatformType, AdProvider> _adProviders;
+  final AdProvider _noOpProvider;
   final AnalyticsService _analyticsService;
   final Logger _logger;
   final Uuid _uuid = const Uuid();
@@ -44,16 +47,17 @@ class AdEngine implements AdService {
 
   @override
   Future<void> initialize() async {
-    _logger.info('AdEngine: Initializing...');
+    _logger.info('AdManager: Initializing...');
     if (_config == null || !_config.enabled) {
-      _logger.info('AdEngine: Ads disabled. Skipping provider init.');
+      _logger.info('AdManager: Ads disabled. Skipping provider init.');
       return;
     }
 
     for (final provider in _adProviders.values) {
       await provider.initialize();
     }
-    _logger.info('AdEngine: Initialized.');
+    await _noOpProvider.initialize();
+    _logger.info('AdManager: Initialized.');
   }
 
   @override
@@ -71,17 +75,11 @@ class AdEngine implements AdService {
     }
 
     if (providerType != null && adObject != null) {
-      final adProvider = _adProviders[providerType];
-      if (adProvider != null) {
-        await adProvider.disposeAd(adObject);
-      } else {
-        _logger.warning(
-          'AdEngine: No AdProvider found for type $providerType to dispose ad.',
-        );
-      }
+      final adProvider = _adProviders[providerType] ?? _noOpProvider;
+      await adProvider.disposeAd(adObject);
     } else {
       _logger.warning(
-        'AdEngine: Cannot determine AdPlatformType or ad object for ad model of type '
+        'AdManager: Cannot determine AdPlatformType or ad object for ad model of type '
         '${adModel.runtimeType}. Cannot dispose ad.',
       );
     }
@@ -95,7 +93,7 @@ class AdEngine implements AdService {
     required AccessTier userTier,
     FeedItemImageStyle? feedItemImageStyle,
   }) async {
-    _logger.info('AdEngine: getFeedAd called for adType: $adType');
+    _logger.info('AdManager: getFeedAd called for adType: $adType');
     return _loadInlineAd(
       adConfig: adConfig,
       adType: adType,
@@ -111,9 +109,9 @@ class AdEngine implements AdService {
     required AdThemeStyle adThemeStyle,
     required AccessTier userTier,
   }) async {
-    _logger.info('AdEngine: getInterstitialAd called.');
+    _logger.info('AdManager: getInterstitialAd called.');
     if (!adConfig.enabled) {
-      _logger.info('AdEngine: Ads are globally disabled in RemoteConfig.');
+      _logger.info('AdManager: Ads are globally disabled in RemoteConfig.');
       return null;
     }
 
@@ -124,27 +122,20 @@ class AdEngine implements AdService {
 
     if (!isInterstitialEnabledForRole) {
       _logger.info(
-        'AdEngine: Interstitial ads are disabled for user tier $userTier '
+        'AdManager: Interstitial ads are disabled for user tier $userTier '
         'or globally in RemoteConfig.',
       );
       return null;
     }
 
     final primaryAdPlatform = adConfig.primaryAdPlatform;
-    final adProvider = _adProviders[primaryAdPlatform];
-
-    if (adProvider == null) {
-      _logger.warning(
-        'AdEngine: No AdProvider found for platform: $primaryAdPlatform',
-      );
-      return null;
-    }
+    final adProvider = _adProviders[primaryAdPlatform] ?? _noOpProvider;
 
     final platformAdIdentifiers =
         adConfig.platformAdIdentifiers[primaryAdPlatform];
     if (platformAdIdentifiers == null) {
       _logger.warning(
-        'AdEngine: No AdPlatformIdentifiers found for platform: $primaryAdPlatform',
+        'AdManager: No AdPlatformIdentifiers found for platform: $primaryAdPlatform',
       );
       return null;
     }
@@ -153,13 +144,13 @@ class AdEngine implements AdService {
 
     if (adId == null || adId.isEmpty) {
       _logger.warning(
-        'AdEngine: No interstitial ad ID configured for platform $primaryAdPlatform',
+        'AdManager: No interstitial ad ID configured for platform $primaryAdPlatform',
       );
       return null;
     }
 
     _logger.info(
-      'AdEngine: Requesting Interstitial ad from $primaryAdPlatform AdProvider with ID: $adId',
+      'AdManager: Requesting Interstitial ad from $primaryAdPlatform AdProvider with ID: $adId',
     );
     try {
       final loadedAd = await adProvider.loadInterstitialAd(
@@ -169,10 +160,10 @@ class AdEngine implements AdService {
       );
 
       if (loadedAd != null) {
-        _logger.info('AdEngine: Interstitial ad successfully loaded.');
+        _logger.info('AdManager: Interstitial ad successfully loaded.');
         return loadedAd;
       } else {
-        _logger.info('AdEngine: No Interstitial ad loaded by AdProvider.');
+        _logger.info('AdManager: No Interstitial ad loaded by AdProvider.');
         return null;
       }
     } catch (e, s) {
@@ -187,7 +178,7 @@ class AdEngine implements AdService {
         ),
       );
       _logger.severe(
-        'AdEngine: Error getting Interstitial ad from AdProvider: $e',
+        'AdManager: Error getting Interstitial ad from AdProvider: $e',
         e,
         s,
       );
@@ -202,9 +193,9 @@ class AdEngine implements AdService {
     required AccessTier userTier,
     FeedItemImageStyle? feedItemImageStyle,
   }) async {
-    _logger.info('AdEngine: _loadInlineAd called for adType: $adType');
+    _logger.info('AdManager: _loadInlineAd called for adType: $adType');
     if (!adConfig.enabled) {
-      _logger.info('AdEngine: Ads are globally disabled in RemoteConfig.');
+      _logger.info('AdManager: Ads are globally disabled in RemoteConfig.');
       return null;
     }
 
@@ -214,7 +205,7 @@ class AdEngine implements AdService {
 
     if (!isFeedAdEnabledForRole) {
       _logger.info(
-        'AdEngine: Feed ads are disabled for user tier $userTier '
+        'AdManager: Feed ads are disabled for user tier $userTier '
         'or globally in RemoteConfig.',
       );
       return null;
@@ -222,26 +213,19 @@ class AdEngine implements AdService {
 
     if (adType != AdType.native && adType != AdType.banner) {
       _logger.warning(
-        'AdEngine: _loadInlineAd called with unsupported AdType: $adType.',
+        'AdManager: _loadInlineAd called with unsupported AdType: $adType.',
       );
       return null;
     }
 
     final primaryAdPlatform = adConfig.primaryAdPlatform;
-    final adProvider = _adProviders[primaryAdPlatform];
-
-    if (adProvider == null) {
-      _logger.warning(
-        'AdEngine: No AdProvider found for platform: $primaryAdPlatform',
-      );
-      return null;
-    }
+    final adProvider = _adProviders[primaryAdPlatform] ?? _noOpProvider;
 
     final platformAdIdentifiers =
         adConfig.platformAdIdentifiers[primaryAdPlatform];
     if (platformAdIdentifiers == null) {
       _logger.warning(
-        'AdEngine: No AdPlatformIdentifiers found for platform: $primaryAdPlatform',
+        'AdManager: No AdPlatformIdentifiers found for platform: $primaryAdPlatform',
       );
       return null;
     }
@@ -252,7 +236,7 @@ class AdEngine implements AdService {
 
     if (adId == null || adId.isEmpty) {
       _logger.warning(
-        'AdEngine: No ad ID configured for platform $primaryAdPlatform and ad type $adType.',
+        'AdManager: No ad ID configured for platform $primaryAdPlatform and ad type $adType.',
       );
       return null;
     }
@@ -260,14 +244,14 @@ class AdEngine implements AdService {
     for (var attempt = 0; attempt <= _maxAdLoadRetries; attempt++) {
       if (attempt > 0) {
         _logger.info(
-          'AdEngine: Retrying $adType ad load (attempt $attempt) for ID: $adId after $_adLoadRetryDelay delay.',
+          'AdManager: Retrying $adType ad load (attempt $attempt) for ID: $adId after $_adLoadRetryDelay delay.',
         );
         await Future<void>.delayed(_adLoadRetryDelay);
       }
 
       try {
         _logger.info(
-          'AdEngine: Requesting $adType ad from $primaryAdPlatform AdProvider with ID: $adId.',
+          'AdManager: Requesting $adType ad from $primaryAdPlatform AdProvider with ID: $adId.',
         );
         InlineAd? loadedAd;
 
@@ -292,10 +276,10 @@ class AdEngine implements AdService {
         }
 
         if (loadedAd != null) {
-          _logger.info('AdEngine: $adType ad successfully loaded.');
+          _logger.info('AdManager: $adType ad successfully loaded.');
           return loadedAd;
         } else {
-          _logger.info('AdEngine: No $adType ad loaded by AdProvider.');
+          _logger.info('AdManager: No $adType ad loaded by AdProvider.');
         }
       } catch (e, s) {
         unawaited(
@@ -309,7 +293,7 @@ class AdEngine implements AdService {
           ),
         );
         _logger.severe(
-          'AdEngine: Error getting $adType ad from AdProvider on attempt $attempt: $e',
+          'AdManager: Error getting $adType ad from AdProvider on attempt $attempt: $e',
           e,
           s,
         );
@@ -317,7 +301,7 @@ class AdEngine implements AdService {
     }
 
     _logger.warning(
-      'AdEngine: All retry attempts failed for $adType ad with ID: $adId.',
+      'AdManager: All retry attempts failed for $adType ad with ID: $adId.',
     );
     return null;
   }

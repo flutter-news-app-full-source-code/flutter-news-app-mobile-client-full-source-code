@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:core/core.dart';
+import 'package:core/core.dart' as core;
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/analytics_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:logging/logging.dart';
@@ -10,43 +10,44 @@ import 'package:logging/logging.dart';
 ///
 /// This manager acts as a smart proxy that enforces configuration rules defined
 /// in [AnalyticsConfig] (e.g., sampling, disabled events) before delegating
-/// to the active [AnalyticsProviderInterface].
+/// to the active [AnalyticsProvider].
 /// {@endtemplate}
 class AnalyticsManager implements AnalyticsService {
   /// {@macro analytics_manager}
   AnalyticsManager({
-    required AnalyticsConfig? initialConfig,
-    required Map<AnalyticsProvider, AnalyticsProviderInterface> providers,
+    required core.AnalyticsConfig? initialConfig,
+    required Map<core.AnalyticsProvider, AnalyticsProvider> providers,
+    required AnalyticsProvider noOpProvider,
     Logger? logger,
   }) : _config = initialConfig,
        _providers = providers,
+       _noOpProvider = noOpProvider,
        _logger = logger ?? Logger('AnalyticsManager');
 
-  AnalyticsConfig? _config;
-  final Map<AnalyticsProvider, AnalyticsProviderInterface> _providers;
+  core.AnalyticsConfig? _config;
+  final Map<core.AnalyticsProvider, AnalyticsProvider> _providers;
+  final AnalyticsProvider _noOpProvider;
   final Logger _logger;
   final Random _random = Random();
+
+  AnalyticsProvider get _activeProvider {
+    if (_config == null || !_config!.enabled) return _noOpProvider;
+    return _providers[_config!.activeProvider] ?? _noOpProvider;
+  }
 
   @override
   Future<void> initialize() async {
     _logger.info('AnalyticsManager: Initializing...');
-    if (_config == null || !_config!.enabled) {
-      _logger.info(
-        'AnalyticsManager: Analytics disabled. Skipping provider init.',
-      );
-      return;
-    }
-
-    for (final provider in _providers.values) {
-      await provider.initialize();
-    }
+    // Initialize all providers to ensure they are ready if switched to.
+    await Future.wait(_providers.values.map((p) => p.initialize()));
+    await _noOpProvider.initialize();
     _logger.info('AnalyticsManager: Initialized.');
   }
 
   @override
   Future<void> logEvent(
-    AnalyticsEvent event, {
-    AnalyticsEventPayload? payload,
+    core.AnalyticsEvent event, {
+    core.AnalyticsEventPayload? payload,
   }) async {
     final config = _config;
     if (config == null || !config.enabled) {
@@ -69,17 +70,10 @@ class AnalyticsManager implements AnalyticsService {
     }
 
     // 3. Delegate to Active Provider
-    final activeProvider = _providers[config.activeProvider];
-    if (activeProvider != null) {
-      await activeProvider.logEvent(
-        name: event.name,
-        parameters: payload?.toMap(),
-      );
-    } else {
-      _logger.warning(
-        'No provider found for active type: ${config.activeProvider}',
-      );
-    }
+    await _activeProvider.logEvent(
+      name: event.name,
+      parameters: payload?.toMap(),
+    );
   }
 
   @override
@@ -87,8 +81,7 @@ class AnalyticsManager implements AnalyticsService {
     final config = _config;
     if (config == null || !config.enabled) return;
 
-    final activeProvider = _providers[config.activeProvider];
-    await activeProvider?.setUserId(userId);
+    await _activeProvider.setUserId(userId);
   }
 
   @override
@@ -99,12 +92,11 @@ class AnalyticsManager implements AnalyticsService {
     final config = _config;
     if (config == null || !config.enabled) return;
 
-    final activeProvider = _providers[config.activeProvider];
-    await activeProvider?.setUserProperty(name: name, value: value);
+    await _activeProvider.setUserProperty(name: name, value: value);
   }
 
   @override
-  void updateConfig(AnalyticsConfig config) {
+  void updateConfig(core.AnalyticsConfig config) {
     _logger.info('Updating Analytics Configuration.');
     _config = config;
   }

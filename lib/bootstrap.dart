@@ -36,10 +36,11 @@ import 'package:flutter_news_app_mobile_client_full_source_code/notifications/pr
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/no_op_subscription_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/providers/no_op_subscription_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/purchase_handler.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/store_subscription_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/providers/store_subscription_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_manager.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/in_app_review_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/native_review_service.dart';
@@ -172,12 +173,11 @@ Future<Widget> bootstrap(
         logger: logger,
       );
   // Add Mixpanel
-  analyticsProviders[AnalyticsProviders.mixpanel] =
-      MixpanelAnalyticsProvider(
-        projectToken: appConfig.mixpanelProjectToken,
-        trackAutomaticEvents: true,
-        logger: logger,
-      );
+  analyticsProviders[AnalyticsProviders.mixpanel] = MixpanelAnalyticsProvider(
+    projectToken: appConfig.mixpanelProjectToken,
+    trackAutomaticEvents: true,
+    logger: logger,
+  );
 
   // Always instantiate the Manager. It handles enabled/disabled state internally.
   analyticsService = AnalyticsManager(
@@ -392,17 +392,15 @@ Future<Widget> bootstrap(
   );
 
   // Initialize Subscription Service & Repository
-  late final SubscriptionServiceInterface subscriptionService;
+  late final SubscriptionService subscriptionService;
 
-  if (remoteConfig != null && remoteConfig.features.subscription.enabled) {
-    logger.fine('Using StoreSubscriptionService.');
-    subscriptionService = StoreSubscriptionService(logger: logger);
-  } else {
-    logger.warning(
-      'Subscriptions are disabled in RemoteConfig. Using NoOpSubscriptionService.',
-    );
-    subscriptionService = NoOpSubscriptionService(logger: logger);
-  }
+  // Always instantiate the Manager. It handles enabled/disabled state internally.
+  subscriptionService = SubscriptionManager(
+    initialConfig: remoteConfig?.features.subscription,
+    storeProvider: StoreSubscriptionProvider(logger: logger),
+    noOpProvider: NoOpSubscriptionProvider(logger: logger),
+    logger: logger,
+  );
 
   final purchaseTransactionRepository = DataRepository<PurchaseTransaction>(
     dataClient: purchaseTransactionClient,

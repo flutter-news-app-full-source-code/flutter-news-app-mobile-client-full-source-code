@@ -7,7 +7,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_blo
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/bloc/subscription_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/view/subscription_details_page.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -21,15 +21,14 @@ class MockSubscriptionBloc
 
 class MockAppBloc extends MockBloc<AppEvent, AppState> implements AppBloc {}
 
-class MockSubscriptionService extends Mock
-    implements SubscriptionServiceInterface {}
+class MockSubscriptionService extends Mock implements SubscriptionService {}
 
 class MockLogger extends Mock implements Logger {}
 
 void main() {
   late SubscriptionBloc mockSubscriptionBloc;
   late AppBloc mockAppBloc;
-  late SubscriptionServiceInterface mockSubscriptionService;
+  late SubscriptionService mockSubscriptionService;
   late Logger mockLogger;
 
   final testSubscription = UserSubscription(

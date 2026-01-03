@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:core/core.dart' hide PushNotificationProvider;
+import 'package:core/core.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/providers/push_notification_provider.dart';
 import 'package:logging/logging.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';

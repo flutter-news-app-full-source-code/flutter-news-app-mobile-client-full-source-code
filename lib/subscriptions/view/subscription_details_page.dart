@@ -105,7 +105,7 @@ class SubscriptionDetailsView extends StatelessWidget {
             ListTile(
               title: Text(l10n.subscriptionDetailsProvider),
               subtitle: Text(
-                subscription.provider == StoreProvider.apple
+                subscription.provider == StoreProviders.apple
                     ? 'Apple App Store'
                     : 'Google Play Store',
               ),
@@ -118,10 +118,10 @@ class SubscriptionDetailsView extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () {
                   final url = switch (subscription.provider) {
-                    StoreProvider.apple => Uri.parse(
+                    StoreProviders.apple => Uri.parse(
                       'https://apps.apple.com/account/subscriptions',
                     ),
-                    StoreProvider.google => Uri.parse(
+                    StoreProviders.google => Uri.parse(
                       'https://play.google.com/store/account/subscriptions',
                     ),
                   };

@@ -43,7 +43,7 @@ void main() {
         userId: 'fallback_user',
         tier: AccessTier.standard,
         status: SubscriptionStatus.active,
-        provider: StoreProvider.google,
+        provider: StoreProviders.google,
         validUntil: DateTime(2024),
         willAutoRenew: false,
         originalTransactionId: 'fallback_tx',
@@ -85,7 +85,7 @@ void main() {
     registerFallbackValue(
       const PurchaseTransaction(
         planId: 'test_plan',
-        provider: StoreProvider.google,
+        provider: StoreProviders.google,
         providerReceipt: 'test_receipt',
       ),
     );
@@ -170,7 +170,7 @@ void main() {
         ).thenAnswer(
           (_) async => const PurchaseTransaction(
             planId: 'product_1',
-            provider: StoreProvider.google,
+            provider: StoreProviders.google,
             providerReceipt: 'server_receipt',
           ),
         );
@@ -194,7 +194,7 @@ void main() {
               named: 'item',
               that: isA<PurchaseTransaction>()
                   .having((t) => t.planId, 'planId', 'product_1')
-                  .having((t) => t.provider, 'provider', StoreProvider.google)
+                  .having((t) => t.provider, 'provider', StoreProviders.google)
                   .having(
                     (t) => t.providerReceipt,
                     'receipt',
@@ -227,7 +227,7 @@ void main() {
         ).thenAnswer(
           (_) async => const PurchaseTransaction(
             planId: 'product_1',
-            provider: StoreProvider.apple,
+            provider: StoreProviders.apple,
             providerReceipt: 'server_receipt',
           ),
         );
@@ -252,7 +252,7 @@ void main() {
               that: isA<PurchaseTransaction>().having(
                 (t) => t.provider,
                 'provider',
-                StoreProvider.apple,
+                StoreProviders.apple,
               ),
             ),
             userId: testUserId,
@@ -316,7 +316,7 @@ void main() {
       ).thenAnswer(
         (_) async => const PurchaseTransaction(
           planId: 'product_1',
-          provider: StoreProvider.google,
+          provider: StoreProviders.google,
           providerReceipt: 'server_receipt',
         ),
       );
@@ -451,7 +451,7 @@ void main() {
       ).thenAnswer(
         (_) async => const PurchaseTransaction(
           planId: 'product_1',
-          provider: StoreProvider.google,
+          provider: StoreProviders.google,
           providerReceipt: 'server_receipt',
         ),
       );

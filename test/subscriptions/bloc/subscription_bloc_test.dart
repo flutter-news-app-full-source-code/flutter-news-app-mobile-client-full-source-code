@@ -70,7 +70,7 @@ void main() {
       features: FeaturesConfig(
         analytics: const AnalyticsConfig(
           enabled: true,
-          activeProvider: AnalyticsProvider.firebase,
+          activeProvider: AnalyticsProviders.firebase,
           disabledEvents: {},
           eventSamplingRates: {},
         ),
@@ -90,7 +90,7 @@ void main() {
         ),
         pushNotifications: const PushNotificationConfig(
           enabled: false,
-          primaryProvider: PushNotificationProvider.firebase,
+          primaryProvider: PushNotificationProviders.firebase,
           deliveryConfigs: {},
         ),
         feed: const FeedConfig(

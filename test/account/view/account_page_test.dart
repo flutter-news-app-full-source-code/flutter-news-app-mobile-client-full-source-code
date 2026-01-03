@@ -35,7 +35,7 @@ void main() {
     userId: 'user1',
     tier: AccessTier.premium,
     status: SubscriptionStatus.active,
-    provider: StoreProvider.google,
+    provider: StoreProviders.google,
     validUntil: DateTime.now().add(const Duration(days: 30)),
     willAutoRenew: true,
     originalTransactionId: 'gpa.1234',

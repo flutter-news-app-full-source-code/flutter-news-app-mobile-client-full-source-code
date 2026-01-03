@@ -133,7 +133,7 @@ void main() {
       features: const FeaturesConfig(
         analytics: AnalyticsConfig(
           enabled: true,
-          activeProvider: AnalyticsProvider.firebase,
+          activeProvider: AnalyticsProviders.firebase,
           disabledEvents: {},
           eventSamplingRates: {},
         ),
@@ -153,7 +153,7 @@ void main() {
         ),
         pushNotifications: PushNotificationConfig(
           enabled: false,
-          primaryProvider: PushNotificationProvider.firebase,
+          primaryProvider: PushNotificationProviders.firebase,
           deliveryConfigs: {},
         ),
         feed: FeedConfig(

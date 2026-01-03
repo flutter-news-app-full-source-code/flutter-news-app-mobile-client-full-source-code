@@ -120,8 +120,8 @@ class PurchaseHandler {
       final transaction = PurchaseTransaction(
         planId: purchase.productID,
         provider: verificationData.source == 'app_store'
-            ? StoreProvider.apple
-            : StoreProvider.google,
+            ? StoreProviders.apple
+            : StoreProviders.google,
         providerReceipt: verificationData.serverVerificationData,
       );
       // The backend will validate this and update the user's entitlements.

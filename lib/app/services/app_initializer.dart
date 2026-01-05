@@ -185,16 +185,16 @@ class AppInitializer {
         _fetchUserSubscription(user),
       ]);
 
-      _logger..fine(
-        '[AppInitializer] Parallel fetch complete. '
-        'Settings: ${appSettings != null}, '
-        'Preferences: ${userContentPreferences != null}, '
-        'Context: ${userContext != null}',
-      )
-
-      ..fine(
-        '[AppInitializer] --- App Initialization Complete (Authenticated) ---',
-      );
+      _logger
+        ..fine(
+          '[AppInitializer] Parallel fetch complete. '
+          'Settings: ${appSettings != null}, '
+          'Preferences: ${userContentPreferences != null}, '
+          'Context: ${userContext != null}',
+        )
+        ..fine(
+          '[AppInitializer] --- App Initialization Complete (Authenticated) ---',
+        );
       return InitializationSuccess(
         remoteConfig: remoteConfig,
         user: user,
@@ -232,15 +232,15 @@ class AppInitializer {
     required User newUser,
     required RemoteConfig remoteConfig,
   }) async {
-    _logger..fine(
-      '[AppInitializer] Handling user transition for user ${newUser.id}.',
-    )
-
-    // --- Re-fetch User Data ---
-    // Always re-fetch data after a transition to ensure the state is fresh.
-    ..fine(
-      '[AppInitializer] Re-fetching user data for transitioned user ${newUser.id}...',
-    );
+    _logger
+      ..fine(
+        '[AppInitializer] Handling user transition for user ${newUser.id}.',
+      )
+      // --- Re-fetch User Data ---
+      // Always re-fetch data after a transition to ensure the state is fresh.
+      ..fine(
+        '[AppInitializer] Re-fetching user data for transitioned user ${newUser.id}...',
+      );
 
     try {
       final [

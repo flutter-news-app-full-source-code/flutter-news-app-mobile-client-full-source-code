@@ -57,29 +57,29 @@ void main() {
           reportsPerDay: {},
         ),
       ),
-      features: FeaturesConfig(
-        subscription: const SubscriptionConfig(
+      features: const FeaturesConfig(
+        subscription: SubscriptionConfig(
           enabled: true,
-          monthlyPlan: const PlanDetails(
+          monthlyPlan: PlanDetails(
             enabled: true,
             isRecommended: false,
             appleProductId: 'monthly_id',
             googleProductId: 'monthly_id',
           ),
-          annualPlan: const PlanDetails(
+          annualPlan: PlanDetails(
             enabled: true,
             isRecommended: true,
             appleProductId: 'annual_id',
             googleProductId: 'annual_id',
           ),
         ),
-        analytics: const AnalyticsConfig(
+        analytics: AnalyticsConfig(
           enabled: true,
           activeProvider: AnalyticsProviders.firebase,
           disabledEvents: {},
           eventSamplingRates: {},
         ),
-        ads: const AdConfig(
+        ads: AdConfig(
           enabled: true,
           primaryAdPlatform: AdPlatformType.admob,
           platformAdIdentifiers: {},
@@ -93,16 +93,16 @@ void main() {
             visibleTo: {},
           ),
         ),
-        feed: const FeedConfig(
+        feed: FeedConfig(
           itemClickBehavior: FeedItemClickBehavior.internalNavigation,
           decorators: {},
         ),
-        pushNotifications: const PushNotificationConfig(
+        pushNotifications: PushNotificationConfig(
           enabled: true,
           primaryProvider: PushNotificationProviders.firebase,
           deliveryConfigs: {},
         ),
-        community: const CommunityConfig(
+        community: CommunityConfig(
           enabled: true,
           engagement: EngagementConfig(
             enabled: true,
@@ -189,7 +189,7 @@ void main() {
           followedTopics: const [],
           savedHeadlineFilters: const [],
           savedSourceFilters: const [],
-          savedHeadlines: [],
+          savedHeadlines: const [],
         );
 
     UserContext createContext(String userId) =>
@@ -228,7 +228,7 @@ void main() {
           ),
         ).thenAnswer(
           (_) async => const PaginatedResponse<UserSubscription>(
-            items: const [],
+            items: [],
             cursor: null,
             hasMore: false,
           ),

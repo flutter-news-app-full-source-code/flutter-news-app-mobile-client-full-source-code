@@ -10,8 +10,7 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:logging/logging.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockSubscriptionService extends Mock
-    implements SubscriptionService {}
+class MockSubscriptionService extends Mock implements SubscriptionService {}
 
 class MockPurchaseTransactionRepository extends Mock
     implements DataRepository<PurchaseTransaction> {}
@@ -168,9 +167,9 @@ void main() {
             providerReceipt: 'server_receipt',
           ),
         );
-        when(
-          () => mockSubscriptionService.completePurchase(any()),
-        ).thenAnswer((_) async {
+        when(() => mockSubscriptionService.completePurchase(any())).thenAnswer((
+          _,
+        ) async {
           return;
         });
 
@@ -227,9 +226,9 @@ void main() {
             providerReceipt: 'server_receipt',
           ),
         );
-        when(
-          () => mockSubscriptionService.completePurchase(any()),
-        ).thenAnswer((_) async {
+        when(() => mockSubscriptionService.completePurchase(any())).thenAnswer((
+          _,
+        ) async {
           return;
         });
 
@@ -276,9 +275,9 @@ void main() {
             userId: any(named: 'userId'),
           ),
         ).thenThrow(Exception('Backend error'));
-        when(
-          () => mockSubscriptionService.completePurchase(any()),
-        ).thenAnswer((_) async {
+        when(() => mockSubscriptionService.completePurchase(any())).thenAnswer((
+          _,
+        ) async {
           return;
         });
 
@@ -355,9 +354,9 @@ void main() {
           status: PurchaseStatus.error,
         )..pendingCompletePurchase = true;
 
-        when(
-          () => mockSubscriptionService.completePurchase(any()),
-        ).thenAnswer((_) async {
+        when(() => mockSubscriptionService.completePurchase(any())).thenAnswer((
+          _,
+        ) async {
           return;
         });
 

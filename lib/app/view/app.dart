@@ -288,7 +288,8 @@ class _AppViewState extends State<_AppView> {
 
     // Subscribe to notifications that are tapped and open the app.
     // This is the core of the deep-linking functionality.
-    _onMessageOpenedAppSubscription = _pushNotificationService.onMessageOpenedApp
+    _onMessageOpenedAppSubscription = _pushNotificationService
+        .onMessageOpenedApp
         .listen((payload) async {
           _routerLogger.fine('Notification opened app with payload: $payload');
           final contentType = payload.contentType;

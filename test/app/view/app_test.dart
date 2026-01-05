@@ -106,14 +106,14 @@ void main() {
       when(
         () => pushNotificationService.onTokenRefreshed,
       ).thenAnswer((_) => const Stream.empty());
-      when(() => pushNotificationService.close()).thenAnswer((_) async {});
+      when(pushNotificationService.close).thenAnswer((_) async {});
       when(
         () => purchaseHandler.purchaseCompleted,
       ).thenAnswer((_) => const Stream.empty());
       when(
         () => contentLimitationService.init(appBloc: any(named: 'appBloc')),
       ).thenReturn(null);
-      when(() => contentLimitationService.dispose()).thenReturn(null);
+      when(contentLimitationService.dispose).thenReturn(null);
 
       return MultiRepositoryProvider(
         providers: [
@@ -201,14 +201,14 @@ void main() {
                   reportsPerDay: {},
                 ),
               ),
-              features: FeaturesConfig(
-                analytics: const AnalyticsConfig(
+              features: const FeaturesConfig(
+                analytics: AnalyticsConfig(
                   enabled: true,
                   activeProvider: AnalyticsProviders.firebase,
                   disabledEvents: {},
                   eventSamplingRates: {},
                 ),
-                ads: const AdConfig(
+                ads: AdConfig(
                   enabled: true,
                   primaryAdPlatform: AdPlatformType.admob,
                   platformAdIdentifiers: {},
@@ -222,16 +222,16 @@ void main() {
                     visibleTo: {},
                   ),
                 ),
-                pushNotifications: const PushNotificationConfig(
+                pushNotifications: PushNotificationConfig(
                   enabled: true,
                   primaryProvider: PushNotificationProviders.firebase,
                   deliveryConfigs: {},
                 ),
-                feed: const FeedConfig(
+                feed: FeedConfig(
                   itemClickBehavior: FeedItemClickBehavior.internalNavigation,
                   decorators: {},
                 ),
-                community: const CommunityConfig(
+                community: CommunityConfig(
                   enabled: true,
                   engagement: EngagementConfig(
                     enabled: true,

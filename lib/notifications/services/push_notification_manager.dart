@@ -21,8 +21,7 @@ class PushNotificationManager implements PushNotificationService {
   /// {@macro push_notification_manager}
   PushNotificationManager({
     required PushNotificationConfig? initialConfig,
-    required Map<PushNotificationProviders, PushNotificationProvider>
-    providers,
+    required Map<PushNotificationProviders, PushNotificationProvider> providers,
     required PushNotificationProvider noOpProvider,
     required DataRepository<PushNotificationDevice>
     pushNotificationDeviceRepository,
@@ -52,8 +51,7 @@ class PushNotificationManager implements PushNotificationService {
   StreamSubscription<String>? _providerTokenRefreshSub;
 
   @override
-  Stream<PushNotificationPayload> get onMessage =>
-      _onMessageController.stream;
+  Stream<PushNotificationPayload> get onMessage => _onMessageController.stream;
 
   @override
   Stream<PushNotificationPayload> get onMessageOpenedApp =>

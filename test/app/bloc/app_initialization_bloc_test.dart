@@ -46,7 +46,7 @@ void main() {
             reportsPerDay: {},
           ),
         ),
-        features: FeaturesConfig(
+        features: const FeaturesConfig(
           subscription: SubscriptionConfig(
             enabled: true,
             monthlyPlan: PlanDetails(
@@ -62,13 +62,13 @@ void main() {
               googleProductId: 'annual_id',
             ),
           ),
-          analytics: const AnalyticsConfig(
+          analytics: AnalyticsConfig(
             enabled: true,
             activeProvider: AnalyticsProviders.firebase,
             disabledEvents: {},
             eventSamplingRates: {},
           ),
-          ads: const AdConfig(
+          ads: AdConfig(
             enabled: true,
             primaryAdPlatform: AdPlatformType.admob,
             platformAdIdentifiers: {},
@@ -82,16 +82,16 @@ void main() {
               visibleTo: {},
             ),
           ),
-          pushNotifications: const PushNotificationConfig(
+          pushNotifications: PushNotificationConfig(
             enabled: true,
             primaryProvider: PushNotificationProviders.firebase,
             deliveryConfigs: {},
           ),
-          feed: const FeedConfig(
+          feed: FeedConfig(
             itemClickBehavior: FeedItemClickBehavior.internalNavigation,
             decorators: {},
           ),
-          community: const CommunityConfig(
+          community: CommunityConfig(
             enabled: true,
             engagement: EngagementConfig(
               enabled: true,
@@ -189,7 +189,7 @@ void main() {
     blocTest<AppInitializationBloc, AppInitializationState>(
       'emits [InProgress, Failed] when initialization fails',
       build: () {
-        final failure = InitializationFailure(
+        const failure = InitializationFailure(
           status: AppLifeCycleStatus.underMaintenance,
           error: const HttpException('Maintenance'),
         );

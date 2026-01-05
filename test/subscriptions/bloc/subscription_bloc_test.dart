@@ -11,8 +11,7 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:logging/logging.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockSubscriptionService extends Mock
-    implements SubscriptionService {}
+class MockSubscriptionService extends Mock implements SubscriptionService {}
 
 class MockAppBloc extends MockBloc<AppEvent, AppState> implements AppBloc {}
 
@@ -285,9 +284,9 @@ void main() {
     blocTest<SubscriptionBloc, SubscriptionState>(
       'emits [restoring] and calls restorePurchases on SubscriptionRestoreRequested',
       setUp: () {
-        when(
-          () => mockSubscriptionService.restorePurchases(),
-        ).thenAnswer((_) async {
+        when(() => mockSubscriptionService.restorePurchases()).thenAnswer((
+          _,
+        ) async {
           return;
         });
       },

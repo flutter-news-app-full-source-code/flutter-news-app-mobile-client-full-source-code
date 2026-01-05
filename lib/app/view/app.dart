@@ -251,12 +251,15 @@ class _AppViewState extends State<_AppView> {
   InterstitialAdManager? _interstitialAdManager;
   late final GoRouter _router;
   final _routerLogger = Logger('GoRouter');
+  late final PushNotificationService _pushNotificationService;
+  late final ContentLimitationService _contentLimitationService;
 
   @override
   void initState() {
     super.initState();
     final appBloc = context.read<AppBloc>();
-    final pushNotificationService = context.read<PushNotificationService>();
+    _pushNotificationService = context.read<PushNotificationService>();
+    _contentLimitationService = context.read<ContentLimitationService>();
 
     // This notifier is used by GoRouter's refreshListenable to trigger
     // route re-evaluation when the app's lifecycle status changes (e.g.,
@@ -277,7 +280,7 @@ class _AppViewState extends State<_AppView> {
     // Subscribe to foreground push notifications. When a message is received,
     // dispatch an event to the AppBloc to update the UI state (e.g., show an
     // indicator dot).
-    _onMessageSubscription = pushNotificationService.onMessage.listen((_) {
+    _onMessageSubscription = _pushNotificationService.onMessage.listen((_) {
       if (mounted) {
         context.read<AppBloc>().add(const AppInAppNotificationReceived());
       }
@@ -285,7 +288,7 @@ class _AppViewState extends State<_AppView> {
 
     // Subscribe to notifications that are tapped and open the app.
     // This is the core of the deep-linking functionality.
-    _onMessageOpenedAppSubscription = pushNotificationService.onMessageOpenedApp
+    _onMessageOpenedAppSubscription = _pushNotificationService.onMessageOpenedApp
         .listen((payload) async {
           _routerLogger.fine('Notification opened app with payload: $payload');
           final contentType = payload.contentType;
@@ -322,7 +325,7 @@ class _AppViewState extends State<_AppView> {
 
     // Initialize the ContentLimitationService.
     // Its lifecycle is now tied to this state object.
-    context.read<ContentLimitationService>().init(appBloc: appBloc);
+    _contentLimitationService.init(appBloc: appBloc);
     // Create the GoRouter instance once and store it.
     _router = createRouter(
       authStatusNotifier: _statusNotifier,
@@ -339,8 +342,8 @@ class _AppViewState extends State<_AppView> {
     _onMessageSubscription?.cancel();
     _appStatusService?.dispose();
     _interstitialAdManager?.dispose();
-    context.read<PushNotificationService>().close();
-    context.read<ContentLimitationService>().dispose();
+    _pushNotificationService.close();
+    _contentLimitationService.dispose();
     super.dispose();
   }
 

@@ -2,15 +2,11 @@ import 'dart:async';
 
 import 'package:in_app_purchase/in_app_purchase.dart';
 
-/// {@template subscription_service_interface}
-/// Defines the contract for the subscription service.
-///
-/// This abstraction allows the application to switch between the real
-/// store implementation (using `in_app_purchase`) and a demo/mock implementation
-/// (for web or testing) without changing the consuming code.
+/// {@template subscription_provider}
+/// Defines the contract for the underlying subscription vendor implementation.
 /// {@endtemplate}
-abstract class SubscriptionServiceInterface {
-  /// Exposes the stream of purchase updates.
+abstract class SubscriptionProvider {
+  /// Exposes the stream of purchase updates from the vendor.
   Stream<List<PurchaseDetails>> get purchaseStream;
 
   /// Checks if the store is available on the current device.

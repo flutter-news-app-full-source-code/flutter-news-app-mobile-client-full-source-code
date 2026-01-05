@@ -20,7 +20,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/notifications/se
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/purchase_handler.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -101,7 +101,7 @@ class AppInitializationPage extends StatelessWidget {
   final ContentLimitationService contentLimitationService;
   final DataRepository<InAppNotification> inAppNotificationRepository;
   final AnalyticsService analyticsService;
-  final SubscriptionServiceInterface subscriptionService;
+  final SubscriptionService subscriptionService;
   final DataRepository<PurchaseTransaction> purchaseTransactionRepository;
   final DataRepository<UserSubscription> userSubscriptionRepository;
   final PurchaseHandler purchaseHandler;

@@ -3,19 +3,15 @@ import 'dart:async';
 import 'package:auth_repository/auth_repository.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/demo_subscription_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/purchase_handler.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:logging/logging.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockSubscriptionService extends Mock
-    implements SubscriptionServiceInterface {}
-
-class MockDemoSubscriptionService extends Mock
-    implements DemoSubscriptionService {}
+    implements SubscriptionService {}
 
 class MockPurchaseTransactionRepository extends Mock
     implements DataRepository<PurchaseTransaction> {}
@@ -33,8 +29,6 @@ void main() {
   late PurchaseHandler purchaseHandler;
   late MockSubscriptionService mockSubscriptionService;
   late MockPurchaseTransactionRepository mockPurchaseTransactionRepository;
-  late MockUserSubscriptionRepository mockUserSubscriptionRepository;
-  late MockUserRepository mockUserRepository;
   late MockAuthRepository mockAuthRepository;
   late MockLogger mockLogger;
 
@@ -47,7 +41,7 @@ void main() {
         userId: 'fallback_user',
         tier: AccessTier.standard,
         status: SubscriptionStatus.active,
-        provider: StoreProvider.google,
+        provider: StoreProviders.google,
         validUntil: DateTime(2024),
         willAutoRenew: false,
         originalTransactionId: 'fallback_tx',
@@ -67,8 +61,6 @@ void main() {
   setUp(() {
     mockSubscriptionService = MockSubscriptionService();
     mockPurchaseTransactionRepository = MockPurchaseTransactionRepository();
-    mockUserSubscriptionRepository = MockUserSubscriptionRepository();
-    mockUserRepository = MockUserRepository();
     mockAuthRepository = MockAuthRepository();
     mockLogger = MockLogger();
 
@@ -80,8 +72,6 @@ void main() {
     purchaseHandler = PurchaseHandler(
       subscriptionService: mockSubscriptionService,
       purchaseTransactionRepository: mockPurchaseTransactionRepository,
-      userSubscriptionRepository: mockUserSubscriptionRepository,
-      userRepository: mockUserRepository,
       authRepository: mockAuthRepository,
       logger: mockLogger,
     );
@@ -89,7 +79,7 @@ void main() {
     registerFallbackValue(
       const PurchaseTransaction(
         planId: 'test_plan',
-        provider: StoreProvider.google,
+        provider: StoreProviders.google,
         providerReceipt: 'test_receipt',
       ),
     );
@@ -174,13 +164,15 @@ void main() {
         ).thenAnswer(
           (_) async => const PurchaseTransaction(
             planId: 'product_1',
-            provider: StoreProvider.google,
+            provider: StoreProviders.google,
             providerReceipt: 'server_receipt',
           ),
         );
         when(
           () => mockSubscriptionService.completePurchase(any()),
-        ).thenAnswer((_) async {});
+        ).thenAnswer((_) async {
+          return;
+        });
 
         testPurchase.pendingCompletePurchase = true;
 
@@ -198,7 +190,7 @@ void main() {
               named: 'item',
               that: isA<PurchaseTransaction>()
                   .having((t) => t.planId, 'planId', 'product_1')
-                  .having((t) => t.provider, 'provider', StoreProvider.google)
+                  .having((t) => t.provider, 'provider', StoreProviders.google)
                   .having(
                     (t) => t.providerReceipt,
                     'receipt',
@@ -231,13 +223,15 @@ void main() {
         ).thenAnswer(
           (_) async => const PurchaseTransaction(
             planId: 'product_1',
-            provider: StoreProvider.apple,
+            provider: StoreProviders.apple,
             providerReceipt: 'server_receipt',
           ),
         );
         when(
           () => mockSubscriptionService.completePurchase(any()),
-        ).thenAnswer((_) async {});
+        ).thenAnswer((_) async {
+          return;
+        });
 
         testRestoredPurchase.pendingCompletePurchase = true;
 
@@ -256,7 +250,7 @@ void main() {
               that: isA<PurchaseTransaction>().having(
                 (t) => t.provider,
                 'provider',
-                StoreProvider.apple,
+                StoreProviders.apple,
               ),
             ),
             userId: testUserId,
@@ -284,7 +278,9 @@ void main() {
         ).thenThrow(Exception('Backend error'));
         when(
           () => mockSubscriptionService.completePurchase(any()),
-        ).thenAnswer((_) async {});
+        ).thenAnswer((_) async {
+          return;
+        });
 
         testPurchase.pendingCompletePurchase = true;
 
@@ -320,7 +316,7 @@ void main() {
       ).thenAnswer(
         (_) async => const PurchaseTransaction(
           planId: 'product_1',
-          provider: StoreProvider.google,
+          provider: StoreProviders.google,
           providerReceipt: 'server_receipt',
         ),
       );
@@ -343,47 +339,6 @@ void main() {
       ).called(1);
       verify(() => mockLogger.warning(any(), any())).called(1);
     });
-
-    test('should handle exception during demo purchase processing', () async {
-      final demoService = MockDemoSubscriptionService();
-      when(
-        () => demoService.purchaseStream,
-      ).thenAnswer((_) => purchaseStreamController.stream);
-
-      purchaseHandler.dispose();
-      purchaseHandler = PurchaseHandler(
-        subscriptionService: demoService,
-        purchaseTransactionRepository: mockPurchaseTransactionRepository,
-        userSubscriptionRepository: mockUserSubscriptionRepository,
-        userRepository: mockUserRepository,
-        authRepository: mockAuthRepository,
-        logger: mockLogger,
-      );
-
-      when(
-        () => mockAuthRepository.getCurrentUser(),
-      ).thenAnswer((_) async => testUser);
-
-      // Simulate error during repo update
-      when(
-        () => mockUserSubscriptionRepository.update(
-          id: any(named: 'id'),
-          item: any(named: 'item'),
-          userId: any(named: 'userId'),
-        ),
-      ).thenThrow(Exception('Repo error'));
-
-      testPurchase.pendingCompletePurchase = true;
-      when(() => demoService.completePurchase(any())).thenAnswer((_) async {});
-
-      purchaseHandler.listen();
-      purchaseStreamController.add([testPurchase]);
-
-      await Future<void>.delayed(Duration.zero);
-
-      verify(() => mockLogger.severe(any(), any(), any())).called(1);
-    });
-
     test(
       'should handle "error" status by completing purchase if pending',
       () async {
@@ -402,7 +357,9 @@ void main() {
 
         when(
           () => mockSubscriptionService.completePurchase(any()),
-        ).thenAnswer((_) async {});
+        ).thenAnswer((_) async {
+          return;
+        });
 
         // Act
         purchaseHandler.listen();
@@ -496,7 +453,7 @@ void main() {
       ).thenAnswer(
         (_) async => const PurchaseTransaction(
           planId: 'product_1',
-          provider: StoreProvider.google,
+          provider: StoreProviders.google,
           providerReceipt: 'server_receipt',
         ),
       );
@@ -529,76 +486,5 @@ void main() {
 
       verifyNever(() => mockSubscriptionService.completePurchase(any()));
     });
-
-    test(
-      'should handle demo purchase by updating local repositories',
-      () async {
-        final demoService = MockDemoSubscriptionService();
-        when(
-          () => demoService.purchaseStream,
-        ).thenAnswer((_) => purchaseStreamController.stream);
-
-        // Re-instantiate handler with demo service
-        purchaseHandler.dispose();
-        purchaseHandler = PurchaseHandler(
-          subscriptionService: demoService,
-          purchaseTransactionRepository: mockPurchaseTransactionRepository,
-          userSubscriptionRepository: mockUserSubscriptionRepository,
-          userRepository: mockUserRepository,
-          authRepository: mockAuthRepository,
-          logger: mockLogger,
-        );
-
-        when(
-          () => mockAuthRepository.getCurrentUser(),
-        ).thenAnswer((_) async => testUser);
-        when(
-          () => mockUserSubscriptionRepository.update(
-            id: any(named: 'id'),
-            item: any(named: 'item'),
-            userId: any(named: 'userId'),
-          ),
-        ).thenAnswer(
-          (_) async => UserSubscription(
-            id: 'sub_user_123',
-            userId: 'user_123',
-            tier: AccessTier.premium,
-            status: SubscriptionStatus.active,
-            provider: StoreProvider.google,
-            validUntil: DateTime.now(),
-            willAutoRenew: true,
-            originalTransactionId: 'demo_id',
-          ),
-        );
-        when(
-          () => mockUserRepository.update(
-            id: any(named: 'id'),
-            item: any(named: 'item'),
-            userId: any(named: 'userId'),
-          ),
-        ).thenAnswer((_) async => testUser.copyWith(tier: AccessTier.premium));
-
-        purchaseHandler.listen();
-        purchaseStreamController.add([testPurchase]);
-
-        await Future<void>.delayed(Duration.zero);
-
-        verify(
-          () => mockUserSubscriptionRepository.update(
-            id: any(named: 'id'),
-            item: any(named: 'item'),
-            userId: testUserId,
-          ),
-        ).called(1);
-
-        verify(
-          () => mockUserRepository.update(
-            id: any(named: 'id'),
-            item: any(named: 'item'),
-            userId: testUserId,
-          ),
-        ).called(1);
-      },
-    );
   });
 }

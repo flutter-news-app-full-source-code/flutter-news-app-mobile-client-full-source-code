@@ -4,7 +4,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_blo
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/bloc/subscription_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:logging/logging.dart';
@@ -18,7 +18,7 @@ class PaywallPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => SubscriptionBloc(
-        subscriptionService: context.read<SubscriptionServiceInterface>(),
+        subscriptionService: context.read<SubscriptionService>(),
         appBloc: context.read<AppBloc>(),
         remoteConfig: context.read<AppBloc>().state.remoteConfig!,
         logger: context.read<Logger>(),
@@ -314,15 +314,10 @@ class PaywallView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Localize demo products if keys match
                     Text(
-                      product.title == 'demoAnnualPlanTitle'
-                          ? l10n.demoAnnualPlanTitle
-                          : (product.title == 'demoMonthlyPlanTitle'
-                                ? l10n.demoMonthlyPlanTitle
-                                : (isRecommended
-                                      ? l10n.paywallAnnualPlan
-                                      : l10n.paywallMonthlyPlan)),
+                      isRecommended
+                          ? l10n.paywallAnnualPlan
+                          : l10n.paywallMonthlyPlan,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),

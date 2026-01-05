@@ -6,7 +6,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_blo
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/bloc/subscription_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/view/paywall_page.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -21,8 +21,7 @@ class MockSubscriptionBloc
 
 class MockAppBloc extends MockBloc<AppEvent, AppState> implements AppBloc {}
 
-class MockSubscriptionService extends Mock
-    implements SubscriptionServiceInterface {}
+class MockSubscriptionService extends Mock implements SubscriptionService {}
 
 class MockLogger extends Mock implements Logger {}
 
@@ -31,7 +30,7 @@ class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 void main() {
   late SubscriptionBloc mockSubscriptionBloc;
   late AppBloc mockAppBloc;
-  late SubscriptionServiceInterface mockSubscriptionService;
+  late SubscriptionService mockSubscriptionService;
   late Logger mockLogger;
   late MockNavigatorObserver mockNavigatorObserver;
 
@@ -73,13 +72,13 @@ void main() {
     features: FeaturesConfig(
       analytics: const AnalyticsConfig(
         enabled: true,
-        activeProvider: AnalyticsProvider.demo,
+        activeProvider: AnalyticsProviders.firebase,
         disabledEvents: {},
         eventSamplingRates: {},
       ),
       ads: const AdConfig(
         enabled: false,
-        primaryAdPlatform: AdPlatformType.demo,
+        primaryAdPlatform: AdPlatformType.admob,
         platformAdIdentifiers: {},
         feedAdConfiguration: FeedAdConfiguration(
           enabled: false,
@@ -93,7 +92,7 @@ void main() {
       ),
       pushNotifications: const PushNotificationConfig(
         enabled: false,
-        primaryProvider: PushNotificationProvider.firebase,
+        primaryProvider: PushNotificationProviders.firebase,
         deliveryConfigs: {},
       ),
       feed: const FeedConfig(

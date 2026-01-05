@@ -1,53 +1,51 @@
 import 'package:auth_api/auth_api.dart';
 import 'package:auth_client/auth_client.dart';
-import 'package:auth_inmemory/auth_inmemory.dart';
 import 'package:auth_repository/auth_repository.dart';
 import 'package:core/core.dart';
 import 'package:data_api/data_api.dart';
 import 'package:data_client/data_client.dart';
-import 'package:data_inmemory/data_inmemory.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/ad_provider.dart';
-// Conditional import for AdMobAdProvider
-// This ensures the AdMob package is only imported when not on the web,
-// preventing potential issues or unnecessary logs on web platforms.
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/admob_ad_provider.dart'
-    if (dart.library.io) 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/admob_ad_provider.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/demo_ad_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/admob_ad_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/no_op_ad_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inline_ad_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/analytics_provider.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/demo_analytics_provider.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/firebase_analytics_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/firebase_analytics_provider.dart'
+    as analytics_firebase;
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/mixpanel_analytics_provider.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_engine.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/providers/no_op_analytics_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
     as app_config;
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_initializer_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/package_info_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_initialization_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/bloc_observer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/firebase_push_notification_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/no_op_push_notification_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/one_signal_push_notification_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/providers/firebase_push_notification_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/providers/no_op_push_notification_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/providers/one_signal_push_notification_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/providers/push_notification_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/data/clients/clients.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/demo_subscription_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/providers/no_op_subscription_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/providers/store_subscription_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/purchase_handler.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/store_subscription_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_manager.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/in_app_review_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/native_review_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/no_op_native_review_service.dart';
 import 'package:http_client/http_client.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:kv_storage_service/kv_storage_service.dart';
@@ -60,6 +58,10 @@ Future<Widget> bootstrap(
   app_config.AppConfig appConfig,
   app_config.AppEnvironment environment,
 ) async {
+  if (kIsWeb) {
+    throw UnsupportedError('This application is not supported on the web.');
+  }
+
   // Setup logging
   Logger.root.level = environment == app_config.AppEnvironment.production
       ? Level.INFO
@@ -114,140 +116,96 @@ Future<Widget> bootstrap(
   // 3. Initialize RemoteConfigClient and Repository, and fetch RemoteConfig.
   // This is done early because RemoteConfig is now publicly accessible (unauthenticated).
   late DataClient<RemoteConfig> remoteConfigClient;
-  if (appConfig.environment == app_config.AppEnvironment.demo) {
-    logger.fine('Using in-memory client for RemoteConfig.');
-    remoteConfigClient = DataInMemory<RemoteConfig>(
-      toJson: (i) => i.toJson(),
-      getId: (i) => i.id,
-      initialData: remoteConfigsFixturesData,
-      logger: logger,
-    );
-  } else {
-    logger.fine('Using API client for RemoteConfig.');
-    // For development and production environments, use DataApi.
-    remoteConfigClient = DataApi<RemoteConfig>(
-      httpClient: httpClient,
-      modelName: 'remote_config',
-      fromJson: RemoteConfig.fromJson,
-      toJson: (config) => config.toJson(),
-      logger: logger,
-    );
-  }
+  logger.fine('Using API client for RemoteConfig.');
+  // For development and production environments, use DataApi.
+  remoteConfigClient = DataApi<RemoteConfig>(
+    httpClient: httpClient,
+    modelName: 'remote_config',
+    fromJson: RemoteConfig.fromJson,
+    toJson: (config) => config.toJson(),
+    logger: logger,
+  );
   final remoteConfigRepository = DataRepository<RemoteConfig>(
     dataClient: remoteConfigClient,
   );
-  logger
-    ..fine('RemoteConfig repository initialized.')
-    ..info('4. Initializing Authentication services...');
+  // Fetch RemoteConfig once, early in the process.
+  // This configuration is required by Analytics, Subscriptions, and Push Notifications
+  // to determine which providers to initialize.
+  RemoteConfig? remoteConfig;
+  try {
+    remoteConfig = await remoteConfigRepository.read(id: kRemoteConfigId);
+    logger.fine('RemoteConfig fetched successfully.');
+  } catch (e, s) {
+    logger.warning(
+      'Failed to fetch RemoteConfig in bootstrap. '
+      'Services will be initialized in default (disabled) mode. '
+      'The AppInitializer will attempt to fetch it again and handle the UI error.',
+      e,
+      s,
+    );
+  }
 
+  logger.info('4. Initializing Authentication services...');
   // 4. Conditionally initialize Auth services based on environment.
   // This is done after RemoteConfig is fetched, as Auth services might depend
   // on configurations defined in RemoteConfig.
   late final AuthClient authClient;
   late final AuthRepository authenticationRepository;
-  if (appConfig.environment == app_config.AppEnvironment.demo) {
-    logger.fine('Using in-memory client for Authentication.');
-    // In-memory authentication for demo environment.
-    authClient = AuthInmemory();
-    authenticationRepository = AuthRepository(
-      authClient: authClient,
-      storageService: kvStorage,
-    );
-  } else {
-    logger.fine('Using API client for Authentication.');
-    // Now that httpClient is available, initialize AuthApi and AuthRepository.
-    authClient = AuthApi(httpClient: httpClient);
-    authenticationRepository = AuthRepository(
-      authClient: authClient,
-      storageService: kvStorage,
-    );
-  }
+  logger.fine('Using API client for Authentication.');
+  // Now that httpClient is available, initialize AuthApi and AuthRepository.
+  authClient = AuthApi(httpClient: httpClient);
+  authenticationRepository = AuthRepository(
+    authClient: authClient,
+    storageService: kvStorage,
+  );
   logger
     ..fine('Authentication repository initialized.')
     ..info('5. Initializing Analytics service...');
 
   // 5. Initialize Analytics Service.
   late final AnalyticsService analyticsService;
-  final analyticsConfig = (await remoteConfigRepository.read(
-    id: kRemoteConfigId,
-  )).features.analytics;
-
-  final analyticsProviders = <AnalyticsProvider, AnalyticsProviderInterface>{};
+  final analyticsProviders = <AnalyticsProviders, AnalyticsProvider>{};
 
   // Initialize providers based on environment and config
-  if (appConfig.environment == app_config.AppEnvironment.demo) {
-    analyticsProviders[AnalyticsProvider.demo] = DemoAnalyticsProvider(
-      logger: logger,
-    );
-  } else {
-    // Add Firebase
-    analyticsProviders[AnalyticsProvider.firebase] = FirebaseAnalyticsProvider(
-      firebaseAnalytics: FirebaseAnalytics.instance,
-      logger: logger,
-    );
-    // Add Mixpanel
-    analyticsProviders[AnalyticsProvider.mixpanel] = MixpanelAnalyticsProvider(
-      projectToken: appConfig.mixpanelProjectToken,
-      trackAutomaticEvents: true,
-      logger: logger,
-    );
-    // Add Demo for fallback
-    analyticsProviders[AnalyticsProvider.demo] = DemoAnalyticsProvider(
-      logger: logger,
-    );
-  }
-
-  analyticsService = AnalyticsEngine(
-    initialConfig: analyticsConfig,
-    providers: analyticsProviders,
+  // Add Firebase
+  analyticsProviders[AnalyticsProviders.firebase] =
+      analytics_firebase.FirebaseAnalyticsProvider(
+        firebaseAnalytics: FirebaseAnalytics.instance,
+        logger: logger,
+      );
+  // Add Mixpanel
+  analyticsProviders[AnalyticsProviders.mixpanel] = MixpanelAnalyticsProvider(
+    projectToken: appConfig.mixpanelProjectToken,
+    trackAutomaticEvents: true,
     logger: logger,
   );
 
-  // Initialize the active provider
-  if (analyticsConfig.enabled) {
-    final activeProvider = analyticsProviders[analyticsConfig.activeProvider];
-    await activeProvider?.initialize();
-  }
+  // Always instantiate the Manager. It handles enabled/disabled state internally.
+  analyticsService = AnalyticsManager(
+    initialConfig: remoteConfig?.features.analytics,
+    providers: analyticsProviders,
+    noOpProvider: NoOpAnalyticsProvider(logger: logger),
+    logger: logger,
+  );
 
+  await analyticsService.initialize();
   logger
     ..fine('Analytics service initialized.')
     ..info('6. Initializing Ad providers and AdService...');
 
   // 6. Initialize AdProvider and AdService.
-  late final Map<AdPlatformType, AdProvider> adProviders;
-
-  // Conditionally instantiate ad providers based on the application environment.
-  // This ensures that only the relevant ad providers are available for the
-  // current environment, preventing unintended usage.
-  if (appConfig.environment == app_config.AppEnvironment.demo || kIsWeb) {
-    logger.fine('Using DemoAdProvider for all ad platforms.');
-    final demoAdProvider = DemoAdProvider(logger: logger);
-    adProviders = {
-      // In the demo environment or on the web, all ad platform types map to
-      // the DemoAdProvider. This simulates ad behavior without actual network
-      // calls and avoids issues with platform-specific ad SDKs on unsupported
-      // platforms (e.g., AdMob on web).
-      AdPlatformType.admob: demoAdProvider,
-      AdPlatformType.demo: demoAdProvider,
-    };
-  } else {
-    logger.fine('Using Real AdProviders.');
-    // For development and production environments (non-web), use real ad providers.
-    adProviders = {
-      // AdMob provider for Google Mobile Ads.
-      AdPlatformType.admob: AdMobAdProvider(
-        analyticsService: analyticsService,
-        logger: logger,
-      ),
-      // The demo ad platform is not available in non-demo/non-web environments.
-      // If AdService attempts to access it, it will receive null, which is
-      // handled by AdService's internal logic (logging a warning).
-    };
-  }
-
-  final adService = AdService(
+  late final AdService adService;
+  final adProviders = <AdPlatformType, AdProvider>{};
+  logger.fine('Using AdMobAdProvider.');
+  adProviders[AdPlatformType.admob] = AdMobAdProvider(
+    analyticsService: analyticsService,
+    logger: logger,
+  );
+  // Always instantiate the Manager. It handles enabled/disabled state internally.
+  adService = AdManager(
+    initialConfig: remoteConfig?.features.ads,
     adProviders: adProviders,
-    environment: appConfig.environment,
+    noOpProvider: NoOpAdProvider(logger: logger),
     analyticsService: analyticsService,
     logger: logger,
   );
@@ -293,224 +251,112 @@ Future<Widget> bootstrap(
   late final DataClient<AppReview> appReviewClient;
   late final DataClient<PurchaseTransaction> purchaseTransactionClient;
   late final DataClient<UserSubscription> userSubscriptionClient;
-  if (appConfig.environment == app_config.AppEnvironment.demo) {
-    logger.fine('Using in-memory clients for all data repositories.');
-    headlinesClient = DataInMemory<Headline>(
-      toJson: (i) => i.toJson(),
-      getId: (i) => i.id,
-      initialData: getHeadlinesFixturesData(),
-      logger: logger,
-    );
-    topicsClient = DataInMemory<Topic>(
-      toJson: (i) => i.toJson(),
-      getId: (i) => i.id,
-      initialData: getTopicsFixturesData(),
-      logger: logger,
-    );
-    // Wrap the generic DataInMemory<Country> with CountryInMemoryClient.
-    // This decorator adds specialized filtering for 'hasActiveSources' and
-    // 'hasActiveHeadlines' which are specific to the application's needs
-    // in the demo environment.
-    //
-    // Rationale:
-    // 1.  **Demo Environment Specific:** This client-side decorator is only
-    //     applied in the `demo` environment. In this mode, data is served
-    //     from static in-memory fixtures, and this decorator enables complex
-    //     filtering on that local data.
-    // 2.  **API Environments (Development/Production):** For `development`
-    //     and `production` environments, the `countriesClient` is an instance
-    //     of `DataApi<Country>`. In these environments, the backend API
-    //     (which includes services like `CountryQueryService`) is responsible
-    //     for handling all advanced filtering and aggregation logic. Therefore,
-    //     this client-side decorator is not needed.
-    // 3.  **Preserving Genericity:** The core `DataInMemory<T>` client (from
-    //     the `data-inmemory` package) is designed to be generic and reusable
-    //     across various projects. Modifying it directly with application-specific
-    //     logic would violate the Single Responsibility Principle and reduce
-    //     its reusability. The Decorator Pattern allows us to extend its
-    //     functionality for `Country` models without altering the generic base.
-    countriesClient = CountryInMemoryClient(
-      decoratedClient: DataInMemory<Country>(
-        toJson: (i) => i.toJson(),
-        getId: (i) => i.id,
-        initialData: countriesFixturesData,
-        logger: logger,
-      ),
-      allSources: getSourcesFixturesData(),
-      allHeadlines: getHeadlinesFixturesData(),
-    );
-
-    //
-    sourcesClient = DataInMemory<Source>(
-      toJson: (i) => i.toJson(),
-      getId: (i) => i.id,
-      initialData: getSourcesFixturesData(),
-      logger: logger,
-    );
-    userContentPreferencesClient = DataInMemory<UserContentPreferences>(
-      toJson: (i) => i.toJson(),
-      getId: (i) => i.id,
-      logger: logger,
-    );
-    appSettingsClient = DataInMemory<AppSettings>(
-      toJson: (i) => i.toJson(),
-      getId: (i) => i.id,
-      logger: logger,
-    );
-    userClient = DataInMemory<User>(
-      toJson: (i) => i.toJson(),
-      getId: (i) => i.id,
-      logger: logger,
-    );
-    userContextClient = DataInMemory<UserContext>(
-      toJson: (i) => i.toJson(),
-      getId: (i) => i.userId,
-      logger: logger,
-    );
-    inAppNotificationClient = DataInMemory<InAppNotification>(
-      toJson: (i) => i.toJson(),
-      getId: (i) => i.id,
-      logger: logger,
-    );
-    pushNotificationDeviceClient = DataInMemory<PushNotificationDevice>(
-      toJson: (i) => i.toJson(),
-      getId: (i) => i.id,
-      logger: logger,
-    );
-    engagementClient = DataInMemory<Engagement>(
-      toJson: (i) => i.toJson(),
-      getId: (i) => i.id,
-      logger: logger,
-    );
-    reportClient = DataInMemory<Report>(
-      toJson: (i) => i.toJson(),
-      getId: (i) => i.id,
-      logger: logger,
-    );
-    appReviewClient = DataInMemory<AppReview>(
-      toJson: (i) => i.toJson(),
-      getId: (i) => i.id,
-      logger: logger,
-    );
-    purchaseTransactionClient = DataInMemory<PurchaseTransaction>(
-      toJson: (i) => i.toJson(),
-      getId: (i) => i.planId, // Using planId as ID for demo purposes
-      logger: logger,
-    );
-    userSubscriptionClient = DataInMemory<UserSubscription>(
-      toJson: (i) => i.toJson(),
-      getId: (i) => i.id,
-      initialData: userSubscriptionsFixturesData,
-      logger: logger,
-    );
-  } else {
-    logger.fine('Using API clients for all data repositories.');
-    headlinesClient = DataApi<Headline>(
-      httpClient: httpClient,
-      modelName: 'headline',
-      fromJson: Headline.fromJson,
-      toJson: (headline) => headline.toJson(),
-      logger: logger,
-    );
-    topicsClient = DataApi<Topic>(
-      httpClient: httpClient,
-      modelName: 'topic',
-      fromJson: Topic.fromJson,
-      toJson: (topic) => topic.toJson(),
-      logger: logger,
-    );
-    countriesClient = DataApi<Country>(
-      httpClient: httpClient,
-      modelName: 'country',
-      fromJson: Country.fromJson,
-      toJson: (country) => country.toJson(),
-      logger: logger,
-    );
-    sourcesClient = DataApi<Source>(
-      httpClient: httpClient,
-      modelName: 'source',
-      fromJson: Source.fromJson,
-      toJson: (source) => source.toJson(),
-      logger: logger,
-    );
-    userContentPreferencesClient = DataApi<UserContentPreferences>(
-      httpClient: httpClient,
-      modelName: 'user_content_preferences',
-      fromJson: UserContentPreferences.fromJson,
-      toJson: (prefs) => prefs.toJson(),
-      logger: logger,
-    );
-    appSettingsClient = DataApi<AppSettings>(
-      httpClient: httpClient,
-      modelName: 'app_settings',
-      fromJson: AppSettings.fromJson,
-      toJson: (settings) => settings.toJson(),
-      logger: logger,
-    );
-    userClient = DataApi<User>(
-      httpClient: httpClient,
-      modelName: 'user',
-      fromJson: User.fromJson,
-      toJson: (user) => user.toJson(),
-      logger: logger,
-    );
-    userContextClient = DataApi<UserContext>(
-      httpClient: httpClient,
-      modelName: 'user_context',
-      fromJson: UserContext.fromJson,
-      toJson: (context) => context.toJson(),
-      logger: logger,
-    );
-    inAppNotificationClient = DataApi<InAppNotification>(
-      httpClient: httpClient,
-      modelName: 'in_app_notification',
-      fromJson: InAppNotification.fromJson,
-      toJson: (notification) => notification.toJson(),
-      logger: logger,
-    );
-    pushNotificationDeviceClient = DataApi<PushNotificationDevice>(
-      httpClient: httpClient,
-      modelName: 'push_notification_device',
-      fromJson: PushNotificationDevice.fromJson,
-      toJson: (device) => device.toJson(),
-      logger: logger,
-    );
-    engagementClient = DataApi<Engagement>(
-      httpClient: httpClient,
-      modelName: 'engagement',
-      fromJson: Engagement.fromJson,
-      toJson: (engagement) => engagement.toJson(),
-      logger: logger,
-    );
-    reportClient = DataApi<Report>(
-      httpClient: httpClient,
-      modelName: 'report',
-      fromJson: Report.fromJson,
-      toJson: (report) => report.toJson(),
-      logger: logger,
-    );
-    appReviewClient = DataApi<AppReview>(
-      httpClient: httpClient,
-      modelName: 'app_review',
-      fromJson: AppReview.fromJson,
-      toJson: (review) => review.toJson(),
-      logger: logger,
-    );
-    purchaseTransactionClient = DataApi<PurchaseTransaction>(
-      httpClient: httpClient,
-      modelName: 'purchase_transaction',
-      fromJson: PurchaseTransaction.fromJson,
-      toJson: (transaction) => transaction.toJson(),
-      logger: logger,
-    );
-    userSubscriptionClient = DataApi<UserSubscription>(
-      httpClient: httpClient,
-      modelName: 'user_subscription',
-      fromJson: UserSubscription.fromJson,
-      toJson: (subscription) => subscription.toJson(),
-      logger: logger,
-    );
-  }
+  logger.fine('Using API clients for all data repositories.');
+  headlinesClient = DataApi<Headline>(
+    httpClient: httpClient,
+    modelName: 'headline',
+    fromJson: Headline.fromJson,
+    toJson: (headline) => headline.toJson(),
+    logger: logger,
+  );
+  topicsClient = DataApi<Topic>(
+    httpClient: httpClient,
+    modelName: 'topic',
+    fromJson: Topic.fromJson,
+    toJson: (topic) => topic.toJson(),
+    logger: logger,
+  );
+  countriesClient = DataApi<Country>(
+    httpClient: httpClient,
+    modelName: 'country',
+    fromJson: Country.fromJson,
+    toJson: (country) => country.toJson(),
+    logger: logger,
+  );
+  sourcesClient = DataApi<Source>(
+    httpClient: httpClient,
+    modelName: 'source',
+    fromJson: Source.fromJson,
+    toJson: (source) => source.toJson(),
+    logger: logger,
+  );
+  userContentPreferencesClient = DataApi<UserContentPreferences>(
+    httpClient: httpClient,
+    modelName: 'user_content_preferences',
+    fromJson: UserContentPreferences.fromJson,
+    toJson: (prefs) => prefs.toJson(),
+    logger: logger,
+  );
+  appSettingsClient = DataApi<AppSettings>(
+    httpClient: httpClient,
+    modelName: 'app_settings',
+    fromJson: AppSettings.fromJson,
+    toJson: (settings) => settings.toJson(),
+    logger: logger,
+  );
+  userClient = DataApi<User>(
+    httpClient: httpClient,
+    modelName: 'user',
+    fromJson: User.fromJson,
+    toJson: (user) => user.toJson(),
+    logger: logger,
+  );
+  userContextClient = DataApi<UserContext>(
+    httpClient: httpClient,
+    modelName: 'user_context',
+    fromJson: UserContext.fromJson,
+    toJson: (context) => context.toJson(),
+    logger: logger,
+  );
+  inAppNotificationClient = DataApi<InAppNotification>(
+    httpClient: httpClient,
+    modelName: 'in_app_notification',
+    fromJson: InAppNotification.fromJson,
+    toJson: (notification) => notification.toJson(),
+    logger: logger,
+  );
+  pushNotificationDeviceClient = DataApi<PushNotificationDevice>(
+    httpClient: httpClient,
+    modelName: 'push_notification_device',
+    fromJson: PushNotificationDevice.fromJson,
+    toJson: (device) => device.toJson(),
+    logger: logger,
+  );
+  engagementClient = DataApi<Engagement>(
+    httpClient: httpClient,
+    modelName: 'engagement',
+    fromJson: Engagement.fromJson,
+    toJson: (engagement) => engagement.toJson(),
+    logger: logger,
+  );
+  reportClient = DataApi<Report>(
+    httpClient: httpClient,
+    modelName: 'report',
+    fromJson: Report.fromJson,
+    toJson: (report) => report.toJson(),
+    logger: logger,
+  );
+  appReviewClient = DataApi<AppReview>(
+    httpClient: httpClient,
+    modelName: 'app_review',
+    fromJson: AppReview.fromJson,
+    toJson: (review) => review.toJson(),
+    logger: logger,
+  );
+  purchaseTransactionClient = DataApi<PurchaseTransaction>(
+    httpClient: httpClient,
+    modelName: 'purchase_transaction',
+    fromJson: PurchaseTransaction.fromJson,
+    toJson: (transaction) => transaction.toJson(),
+    logger: logger,
+  );
+  userSubscriptionClient = DataApi<UserSubscription>(
+    httpClient: httpClient,
+    modelName: 'user_subscription',
+    fromJson: UserSubscription.fromJson,
+    toJson: (subscription) => subscription.toJson(),
+    logger: logger,
+  );
   logger.fine('All data clients instantiated.');
 
   final headlinesRepository = DataRepository<Headline>(
@@ -548,14 +394,15 @@ Future<Widget> bootstrap(
   );
 
   // Initialize Subscription Service & Repository
-  late final SubscriptionServiceInterface subscriptionService;
-  if (appConfig.environment == app_config.AppEnvironment.demo || kIsWeb) {
-    logger.fine('Using DemoSubscriptionService.');
-    subscriptionService = DemoSubscriptionService(logger: logger);
-  } else {
-    logger.fine('Using StoreSubscriptionService.');
-    subscriptionService = StoreSubscriptionService(logger: logger);
-  }
+  late final SubscriptionService subscriptionService;
+
+  // Always instantiate the Manager. It handles enabled/disabled state internally.
+  subscriptionService = SubscriptionManager(
+    initialConfig: remoteConfig?.features.subscription,
+    storeProvider: StoreSubscriptionProvider(logger: logger),
+    noOpProvider: NoOpSubscriptionProvider(logger: logger),
+    logger: logger,
+  );
 
   final purchaseTransactionRepository = DataRepository<PurchaseTransaction>(
     dataClient: purchaseTransactionClient,
@@ -570,8 +417,6 @@ Future<Widget> bootstrap(
       PurchaseHandler(
           subscriptionService: subscriptionService,
           purchaseTransactionRepository: purchaseTransactionRepository,
-          userSubscriptionRepository: userSubscriptionRepository,
-          userRepository: userRepository,
           authRepository: authenticationRepository,
           logger: logger,
         )
@@ -585,57 +430,43 @@ Future<Widget> bootstrap(
   // 8. Initialize the PushNotificationService based on the remote config.
   // This is a crucial step for the provider-agnostic architecture.
   late final PushNotificationService pushNotificationService;
-  // Fetch the latest config directly. Since this is post-initialization,
-  // we assume it's available.
-  final remoteConfig = await remoteConfigRepository.read(id: kRemoteConfigId);
-  final pushNotificationConfig = remoteConfig.features.pushNotifications;
+  final pushNotificationProviders =
+      <PushNotificationProviders, PushNotificationProvider>{};
 
-  // In the demo environment, always use the NoOpPushNotificationService.
-  // This service is enhanced to simulate a successful permission flow,
-  // allowing the full UI journey to be tested without a real backend.
-  if (appConfig.environment == app_config.AppEnvironment.demo) {
-    logger.fine('Using NoOpPushNotificationService for demo environment.');
-    pushNotificationService = NoOpPushNotificationService(
-      inAppNotificationRepository: inAppNotificationRepository,
-      inAppNotificationsFixturesData: inAppNotificationsFixturesData,
-      environment: appConfig.environment,
-    );
-  } else if (pushNotificationConfig.enabled == true) {
-    // For other environments, select the provider based on RemoteConfig.
-    switch (pushNotificationConfig.primaryProvider) {
-      case PushNotificationProvider.firebase:
-        logger.fine('Using FirebasePushNotificationService.');
-        pushNotificationService = FirebasePushNotificationService(
-          pushNotificationDeviceRepository: pushNotificationDeviceRepository,
-          logger: logger,
-        );
-      case PushNotificationProvider.oneSignal:
-        logger.fine('Using OneSignalPushNotificationService.');
-        pushNotificationService = OneSignalPushNotificationService(
-          appId: appConfig.oneSignalAppId,
-          pushNotificationDeviceRepository: pushNotificationDeviceRepository,
-          logger: logger,
-        );
-    }
-    // Initialize the selected provider.
-    await pushNotificationService.initialize();
-    logger.fine('PushNotificationService initialized.');
-  } else {
-    logger.warning('Push notifications are disabled in RemoteConfig.');
-    // Provide a dummy/no-op implementation if notifications are disabled
-    // to prevent null pointer exceptions when accessed.
-    pushNotificationService = NoOpPushNotificationService(
-      inAppNotificationRepository: inAppNotificationRepository,
-      inAppNotificationsFixturesData: inAppNotificationsFixturesData,
-      environment: appConfig.environment,
-    );
-  }
+  pushNotificationProviders[PushNotificationProviders.firebase] =
+      FirebasePushNotificationService(logger: logger);
+  pushNotificationProviders[PushNotificationProviders.oneSignal] =
+      OneSignalPushNotificationService(
+        appId: appConfig.oneSignalAppId,
+        logger: logger,
+      );
 
-  // Initialize AppReviewService
-  final nativeReviewService = InAppReviewService(
-    inAppReview: InAppReview.instance,
+  pushNotificationService = PushNotificationManager(
+    initialConfig: remoteConfig?.features.pushNotifications,
+    providers: pushNotificationProviders,
+    noOpProvider: NoOpPushNotificationProvider(logger: logger),
+    pushNotificationDeviceRepository: pushNotificationDeviceRepository,
     logger: logger,
   );
+
+  // Initialize the selected provider.
+  await pushNotificationService.initialize();
+  logger.fine('PushNotificationService initialized.');
+
+  // Initialize AppReviewService
+  late final NativeReviewService nativeReviewService;
+  final communityConfig = remoteConfig?.features.community;
+
+  if (communityConfig != null &&
+      communityConfig.enabled &&
+      communityConfig.appReview.enabled) {
+    nativeReviewService = InAppReviewService(
+      inAppReview: InAppReview.instance,
+      logger: logger,
+    );
+  } else {
+    nativeReviewService = NoOpNativeReviewService(logger: logger);
+  }
 
   final appReviewService = AppReviewService(
     appReviewRepository: appReviewRepository,
@@ -654,44 +485,7 @@ Future<Widget> bootstrap(
   );
   logger
     ..fine('ContentLimitationService initialized.')
-    ..fine('AppReviewService initialized.');
-
-  // Conditionally instantiate DemoDataMigrationService
-  final demoDataMigrationService =
-      appConfig.environment == app_config.AppEnvironment.demo
-      ? DemoDataMigrationService(
-          appSettingsRepository: appSettingsRepository,
-          userContentPreferencesRepository: userContentPreferencesRepository,
-          userContextRepository: userContextRepository,
-        )
-      : null;
-  logger.fine(
-    'DemoDataMigrationService initialized: ${demoDataMigrationService != null}',
-  );
-
-  // Conditionally instantiate DemoDataInitializerService
-  // In the demo environment, this service acts as a "fixture injector".
-  // When a new user is encountered, it clones pre-defined fixture data
-  // (settings and preferences, including saved filters) for that user,
-  // ensuring a rich initial experience.
-  final demoDataInitializerService =
-      appConfig.environment == app_config.AppEnvironment.demo
-      ? DemoDataInitializerService(
-          appSettingsRepository: appSettingsRepository,
-          userContentPreferencesRepository: userContentPreferencesRepository,
-          userContextRepository: userContextRepository,
-          inAppNotificationRepository: inAppNotificationRepository,
-          appSettingsFixturesData: appSettingsFixturesData,
-          userContextFixturesData: userContextsFixturesData,
-          userContentPreferencesFixturesData:
-              getUserContentPreferencesFixturesData(),
-          inAppNotificationsFixturesData: inAppNotificationsFixturesData,
-        )
-      : null;
-  logger
-    ..fine(
-      'DemoDataInitializerService initialized: ${demoDataInitializerService != null}',
-    )
+    ..fine('AppReviewService initialized.')
     ..info('9. Initializing AppInitializer service...');
   final appInitializer = AppInitializer(
     authenticationRepository: authenticationRepository,
@@ -700,11 +494,8 @@ Future<Widget> bootstrap(
     userContextRepository: userContextRepository,
     userSubscriptionRepository: userSubscriptionRepository,
     remoteConfigRepository: remoteConfigRepository,
-    environment: environment,
     packageInfoService: packageInfoService,
     logger: logger,
-    demoDataMigrationService: demoDataMigrationService,
-    demoDataInitializerService: demoDataInitializerService,
   );
   logger
     ..fine('AppInitializer service initialized.')

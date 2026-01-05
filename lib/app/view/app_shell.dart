@@ -21,10 +21,6 @@ class AppShell extends StatelessWidget {
   /// navigators in a stateful way.
   final StatefulNavigationShell navigationShell;
 
-  // Corrected callback signature if needed, though the original looks standard.
-  // Let's ensure the AdaptiveScaffold call uses the correct signature.
-  // The primary issue was likely the missing import.
-
   void _goBranch(int index) {
     // Navigate to the corresponding branch using the index.
     // The `saveState` parameter is crucial for preserving the state

@@ -1,12 +1,12 @@
-/// {@template analytics_provider_interface}
+/// {@template analytics_provider}
 /// Defines the contract for a specific analytics SDK adapter (e.g., Firebase, Mixpanel).
 ///
 /// The [AnalyticsEngine] uses implementations of this interface to delegate
 /// the actual data transmission.
 /// {@endtemplate}
-abstract class AnalyticsProviderInterface {
-  /// {@macro analytics_provider_interface}
-  const AnalyticsProviderInterface();
+abstract class AnalyticsProvider {
+  /// {@macro analytics_provider}
+  const AnalyticsProvider();
 
   /// Initializes the underlying analytics SDK.
   Future<void> initialize();

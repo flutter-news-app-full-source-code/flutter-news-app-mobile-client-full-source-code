@@ -6,7 +6,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/ads/widgets/widgets.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
 import 'package:logging/logging.dart';
@@ -25,11 +24,9 @@ class InterstitialAdManager {
   InterstitialAdManager({
     required AppBloc appBloc,
     required AdService adService,
-    required GlobalKey<NavigatorState> navigatorKey,
     Logger? logger,
   }) : _appBloc = appBloc,
        _adService = adService,
-       _navigatorKey = navigatorKey,
        _logger = logger ?? Logger('InterstitialAdManager') {
     // Listen to the AppBloc stream to react to state changes.
     _appBlocSubscription = _appBloc.stream.listen(_onAppStateChanged);
@@ -39,7 +36,6 @@ class InterstitialAdManager {
 
   final AppBloc _appBloc;
   final AdService _adService;
-  final GlobalKey<NavigatorState> _navigatorKey;
   final Logger _logger;
 
   late final StreamSubscription<AppState> _appBlocSubscription;
@@ -269,16 +265,6 @@ class InterstitialAdManager {
         case AdPlatformType.admob:
           // AdMob does not require context to be shown.
           await _showAdMobAd(adToShow);
-        case AdPlatformType.demo:
-          // Demo ads require context. Get it just before use.
-          final context = _navigatorKey.currentContext;
-          if (context != null && context.mounted) {
-            await _showDemoAd(context);
-          } else {
-            _logger.warning(
-              'Cannot show demo ad: context is null or no longer mounted.',
-            );
-          }
       }
     } catch (e, s) {
       _logger.severe('Error showing interstitial ad: $e', e, s);
@@ -318,15 +304,5 @@ class InterstitialAdManager {
       );
     await admobAd.show();
     return completer.future;
-  }
-
-  Future<void> _showDemoAd(BuildContext context) async {
-    // Await the result of showDialog, which completes when the dialog is popped.
-    await showDialog<void>(
-      context: context,
-      // Prevent dismissing by tapping outside
-      barrierDismissible: false,
-      builder: (_) => const DemoInterstitialAdDialog(),
-    );
   }
 }

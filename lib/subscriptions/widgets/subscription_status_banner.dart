@@ -75,12 +75,12 @@ class SubscriptionStatusBanner extends StatelessWidget {
     );
   }
 
-  void _manageSubscription(StoreProvider provider) {
+  void _manageSubscription(StoreProviders provider) {
     final url = switch (provider) {
-      StoreProvider.apple => Uri.parse(
+      StoreProviders.apple => Uri.parse(
         'https://apps.apple.com/account/subscriptions',
       ),
-      StoreProvider.google => Uri.parse(
+      StoreProviders.google => Uri.parse(
         'https://play.google.com/store/account/subscriptions',
       ),
     };

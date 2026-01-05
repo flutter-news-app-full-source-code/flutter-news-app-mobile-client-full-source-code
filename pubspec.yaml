@@ -63,7 +63,6 @@ dependencies:
     git:
       url: https://github.com/flutter-news-app-full-source-code/data-repository.git
       ref: v1.0.1
-  device_preview: ^1.2.0
   equatable: ^2.0.7
   firebase_analytics: ^12.1.0
   firebase_core: ^4.2.1
@@ -144,13 +143,13 @@ flutter_native_splash:
   image_dark: assets/logo/flutter-news-app-full-source-code-light-logo.png
   android: true
   ios: true
-  web: true
+  web: false
 
 dependency_overrides:
   core:
     git:
       url: https://github.com/flutter-news-app-full-source-code/core.git
-      ref: v1.6.0
+      ref: 745e746587b2a651eb056e885c57475b7bc8d0bf
   http_client:
     git:
       url: https://github.com/flutter-news-app-full-source-code/http-client.git

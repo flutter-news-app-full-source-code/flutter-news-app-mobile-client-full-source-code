@@ -800,16 +800,6 @@ class AppLocalizationsAr extends AppLocalizations {
       'ابدأ بمتابعة الفئات لكي تظهر هنا.';
 
   @override
-  String demoVerificationCodeMessage(String code) {
-    return 'وضع العرض التوضيحي: استخدم الرمز $code';
-  }
-
-  @override
-  String demoEmailSuggestionMessage(String email) {
-    return 'وضع العرض التوضيحي: استخدم البريد الإلكتروني $email';
-  }
-
-  @override
   String get contentTypeHeadline => 'العناوين الرئيسية';
 
   @override
@@ -860,19 +850,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get unfollowButtonText => 'إلغاء المتابعة';
-
-  @override
-  String get demoNativeAdText => 'إعلان أصلي (الوضع التجريبي)';
-
-  @override
-  String get demoBannerAdText => 'إعلان بانر (الوضع التجريبي)';
-
-  @override
-  String get demoInterstitialAdText => 'إعلان بيني (الوضع التجريبي)';
-
-  @override
-  String get demoInterstitialAdDescription =>
-      'هذا عنصر نائب لإعلان بملء الشاشة.';
 
   @override
   String get adInfoPlaceholderText =>
@@ -1693,15 +1670,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get subscriptionDetailsNoSubscription => 'ليس لديك اشتراك نشط.';
-
-  @override
-  String get demoAnnualPlanTitle => 'بريميوم سنوي (تجريبي)';
-
-  @override
-  String get demoMonthlyPlanTitle => 'بريميوم شهري (تجريبي)';
-
-  @override
-  String get demoPlanDescription => 'فتح جميع الميزات (وضع تجريبي)';
 
   @override
   String get subscriptionUpgradeButton => 'ترقية';

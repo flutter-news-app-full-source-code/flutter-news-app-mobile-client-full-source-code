@@ -70,16 +70,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         item: settingsToSave,
         userId: settingsToSave.id,
       );
-    } on NotFoundException {
-      // If settings not found, create them
-      // needed specifically for the demo mode
-      // that uses the ht data in memory impl
-      // as for the api impl, the backend handle
-      // this use case.
-      await _appSettingsRepository.create(
-        item: settingsToSave,
-        userId: settingsToSave.id,
-      );
     } on HttpException catch (e) {
       emit(state.copyWith(status: SettingsStatus.failure, error: e));
     } catch (e) {

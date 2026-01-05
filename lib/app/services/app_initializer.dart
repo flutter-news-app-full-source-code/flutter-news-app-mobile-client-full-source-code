@@ -3,12 +3,8 @@ import 'dart:async';
 import 'package:auth_repository/auth_repository.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/config/config.dart'
-    as local_config;
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/initialization_result.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_initializer_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/services/demo_data_migration_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/package_info_service.dart';
 import 'package:logging/logging.dart';
 import 'package:pub_semver/pub_semver.dart';
@@ -27,8 +23,7 @@ import 'package:pub_semver/pub_semver.dart';
 /// 3. Fetch the initial `User`.
 /// 4. If a user exists, fetch their `AppSettings` and
 ///    `UserContentPreferences` in parallel.
-/// 5. Handle demo-specific data initialization.
-/// 6. Return a single, immutable `InitializationResult` (either `Success` or
+/// 5. Return a single, immutable `InitializationResult` (either `Success` or
 ///    `Failure`) that contains all pre-loaded data.
 ///
 /// This approach makes the startup process robust, testable, and easy to
@@ -46,18 +41,14 @@ class AppInitializer {
     required DataRepository<UserContext> userContextRepository,
     required DataRepository<UserSubscription> userSubscriptionRepository,
     required DataRepository<RemoteConfig> remoteConfigRepository,
-    required local_config.AppEnvironment environment,
     required PackageInfoService packageInfoService,
     required Logger logger,
-    this.demoDataMigrationService,
-    this.demoDataInitializerService,
   }) : _authenticationRepository = authenticationRepository,
        _appSettingsRepository = appSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
        _userContextRepository = userContextRepository,
        _userSubscriptionRepository = userSubscriptionRepository,
        _remoteConfigRepository = remoteConfigRepository,
-       _environment = environment,
        _packageInfoService = packageInfoService,
        _logger = logger;
 
@@ -68,11 +59,8 @@ class AppInitializer {
   final DataRepository<UserContext> _userContextRepository;
   final DataRepository<UserSubscription> _userSubscriptionRepository;
   final DataRepository<RemoteConfig> _remoteConfigRepository;
-  final local_config.AppEnvironment _environment;
   final PackageInfoService _packageInfoService;
   final Logger _logger;
-  final DemoDataMigrationService? demoDataMigrationService;
-  final DemoDataInitializerService? demoDataInitializerService;
 
   /// Runs the entire startup sequence in a controlled, sequential manner.
   ///
@@ -185,7 +173,7 @@ class AppInitializer {
 
     try {
       // Fetch settings and preferences concurrently for performance.
-      var [
+      final [
         appSettings as AppSettings?,
         userContentPreferences as UserContentPreferences?,
         userContext as UserContext?,
@@ -197,42 +185,14 @@ class AppInitializer {
         _fetchUserSubscription(user),
       ]);
 
-      _logger.fine(
+      _logger..fine(
         '[AppInitializer] Parallel fetch complete. '
         'Settings: ${appSettings != null}, '
         'Preferences: ${userContentPreferences != null}, '
         'Context: ${userContext != null}',
-      );
+      )
 
-      // --- Demo-Specific Logic: Initialize Data on First Run ---
-      // If in demo mode and the user data is missing (e.g., first sign-in),
-      // create it from fixtures.
-      if (_environment == local_config.AppEnvironment.demo &&
-          (appSettings == null ||
-              userContentPreferences == null ||
-              userContext == null)) {
-        _logger.info(
-          '[AppInitializer] Demo mode: User data missing. '
-          'Initializing from fixtures for user ${user.id}.',
-        );
-        await demoDataInitializerService?.initializeUserSpecificData(user);
-
-        // Re-fetch the data after initialization.
-        _logger.fine('[AppInitializer] Re-fetching data after demo init...');
-        [
-          appSettings,
-          userContentPreferences,
-          userContext,
-          userSubscription,
-        ] = await Future.wait<dynamic>([
-          _appSettingsRepository.read(id: user.id, userId: user.id),
-          _userContentPreferencesRepository.read(id: user.id, userId: user.id),
-          _userContextRepository.read(id: user.id, userId: user.id),
-          _fetchUserSubscription(user),
-        ]);
-      }
-
-      _logger.fine(
+      ..fine(
         '[AppInitializer] --- App Initialization Complete (Authenticated) ---',
       );
       return InitializationSuccess(
@@ -265,18 +225,6 @@ class AppInitializer {
   /// primary responsibility is to ensure that the application state is correctly
   /// and completely updated to reflect the new user's identity.
   ///
-  /// This process involves two main steps:
-  /// 1.  **Data Migration (if applicable):** It detects if the transition is
-  ///     from an anonymous guest to a fully authenticated user. If so, it
-  ///     triggers the `DemoDataMigrationService` to move any data (like saved
-  ///     articles) from the old anonymous user ID to the new authenticated
-  ///     user ID.
-  /// 2.  **Re-fetching All User Data:** After any potential migration, it
-  ///     re-fetches all user-specific data (`AppSettings`,
-  ///     `UserContentPreferences`) for the `newUser`. This is crucial to
-  ///     ensure the app's state is fresh and not polluted with data from the
-  ///     previous user.
-  ///
   /// Returns a [InitializationResult] which can be used by the `AppBloc` to
   /// update its state.
   Future<InitializationResult> handleUserTransition({
@@ -284,64 +232,15 @@ class AppInitializer {
     required User newUser,
     required RemoteConfig remoteConfig,
   }) async {
-    _logger.fine(
+    _logger..fine(
       '[AppInitializer] Handling user transition for user ${newUser.id}.',
-    );
-
-    // --- Data Migration Logic ---
-    final isMigration =
-        oldUser != null && oldUser.isAnonymous && !newUser.isAnonymous;
-
-    if (isMigration) {
-      _logger.info(
-        '[AppInitializer] Anonymous user ${oldUser.id} transitioned to '
-        'authenticated user ${newUser.id}. Attempting data migration.',
-      );
-      if (demoDataMigrationService != null &&
-          _environment == local_config.AppEnvironment.demo) {
-        try {
-          await demoDataMigrationService!.migrateAnonymousData(
-            oldUserId: oldUser.id,
-            newUserId: newUser.id,
-          );
-          _logger.info(
-            '[AppInitializer] Demo mode: Data migration completed for ${newUser.id}.',
-          );
-        } catch (e, s) {
-          _logger.severe(
-            '[AppInitializer] CRITICAL: Failed to migrate demo user data.',
-            e,
-            s,
-          );
-          return InitializationFailure(
-            status: AppLifeCycleStatus.criticalError,
-            error: UnknownException('Failed to migrate demo user data: $e'),
-          );
-        }
-      }
-    }
+    )
 
     // --- Re-fetch User Data ---
     // Always re-fetch data after a transition to ensure the state is fresh.
-    _logger.fine(
+    ..fine(
       '[AppInitializer] Re-fetching user data for transitioned user ${newUser.id}...',
     );
-
-    // --- Demo-Specific Logic: Initialize Data on Transition ---
-    // In demo mode, when a new user authenticates (e.g., anonymous sign-in
-    // or email verification), their user-specific data (settings, preferences)
-    // does not yet exist in the in-memory repositories. This block ensures
-    // that the DemoDataInitializerService is called to create this data
-    // *before* the subsequent code attempts to read it. This prevents a
-    // NotFoundException that would otherwise cause a critical error and
-    // stall the authentication flow.
-    if (_environment == local_config.AppEnvironment.demo) {
-      _logger.info(
-        '[AppInitializer] Demo mode: Initializing data for new user '
-        '${newUser.id} during transition.',
-      );
-      await demoDataInitializerService?.initializeUserSpecificData(newUser);
-    }
 
     try {
       final [

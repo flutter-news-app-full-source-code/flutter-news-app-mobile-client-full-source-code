@@ -11,6 +11,9 @@ abstract class AnalyticsService {
   /// {@macro analytics_service}
   const AnalyticsService();
 
+  /// Initializes the analytics service and its underlying providers.
+  Future<void> initialize();
+
   /// Logs a standardized [AnalyticsEvent] with an optional strongly-typed
   /// [payload].
   ///

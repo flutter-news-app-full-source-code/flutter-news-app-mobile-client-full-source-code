@@ -1036,26 +1036,6 @@
     "@followedCategoriesEmptySubheadline": {
         "description": "Subheadline for empty state on followed categories page"
     },
-    "demoVerificationCodeMessage": "Demo Mode: Use code {code}",
-    "@demoVerificationCodeMessage": {
-        "description": "Message shown in demo mode to provide the verification code",
-        "placeholders": {
-            "code": {
-                "type": "String",
-                "example": "123456"
-            }
-        }
-    },
-    "demoEmailSuggestionMessage": "Demo Mode: Use email {email}",
-    "@demoEmailSuggestionMessage": {
-        "description": "Message shown in demo mode to suggest an email for sign-in",
-        "placeholders": {
-            "email": {
-                "type": "String",
-                "example": "demo@example.com"
-            }
-        }
-    },
     "contentTypeHeadline": "Headlines",
     "@contentTypeHeadline": {
         "description": "Label for Headline content type"
@@ -1124,22 +1104,6 @@
     "unfollowButtonText": "Unfollow",
     "@unfollowButtonText": {
         "description": "Text for the unfollow button on suggestion items"
-    },
-    "demoNativeAdText": "NATIVE AD (DEMO)",
-    "@demoNativeAdText": {
-        "description": "Text displayed in the native ad placeholder in demo mode."
-    },
-    "demoBannerAdText": "BANNER AD (DEMO)",
-    "@demoBannerAdText": {
-        "description": "Text displayed in the banner ad placeholder in demo mode."
-    },
-    "demoInterstitialAdText": "INTERSTITIAL AD (DEMO)",
-    "@demoInterstitialAdText": {
-        "description": "Text displayed in the interstitial ad placeholder in demo mode."
-    },
-    "demoInterstitialAdDescription": "This is a full-screen advertisement placeholder.",
-    "@demoInterstitialAdDescription": {
-        "description": "Description text for the interstitial ad placeholder in demo mode."
     },
     "adInfoPlaceholderText": "Ads help keep this app free !",
     "@adInfoPlaceholderText": {
@@ -2188,18 +2152,6 @@
     "subscriptionDetailsNoSubscription": "You do not have an active subscription.",
     "@subscriptionDetailsNoSubscription": {
         "description": "Message shown when the user has no active subscription."
-    },
-    "demoAnnualPlanTitle": "Annual Premium (Demo)",
-    "@demoAnnualPlanTitle": {
-        "description": "Title for the annual demo plan."
-    },
-    "demoMonthlyPlanTitle": "Monthly Premium (Demo)",
-    "@demoMonthlyPlanTitle": {
-        "description": "Title for the monthly demo plan."
-    },
-    "demoPlanDescription": "Unlock all features (Demo Mode)",
-    "@demoPlanDescription": {
-        "description": "Description for a demo subscription plan."
     },
     "subscriptionUpgradeButton": "Upgrade",
     "@subscriptionUpgradeButton": {

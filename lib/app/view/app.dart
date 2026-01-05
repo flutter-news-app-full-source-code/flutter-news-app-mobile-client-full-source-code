@@ -24,7 +24,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/f
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/maintenance_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/update_required_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/purchase_handler.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service_interface.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
@@ -72,7 +72,7 @@ class App extends StatelessWidget {
     required GlobalKey<NavigatorState> navigatorKey,
     required PushNotificationService pushNotificationService,
     required AnalyticsService analyticsService,
-    required SubscriptionServiceInterface subscriptionService,
+    required SubscriptionService subscriptionService,
     required DataRepository<UserSubscription> userSubscriptionRepository,
     required DataRepository<PurchaseTransaction> purchaseTransactionRepository,
     required PurchaseHandler purchaseHandler,
@@ -149,7 +149,7 @@ class App extends StatelessWidget {
   final InlineAdCacheService _inlineAdCacheService;
   final PushNotificationService _pushNotificationService;
   final AnalyticsService _analyticsService;
-  final SubscriptionServiceInterface _subscriptionService;
+  final SubscriptionService _subscriptionService;
   final DataRepository<UserSubscription> _userSubscriptionRepository;
   final DataRepository<PurchaseTransaction> _purchaseTransactionRepository;
   final PurchaseHandler _purchaseHandler;
@@ -311,7 +311,6 @@ class _AppViewState extends State<_AppView> {
     _appStatusService = AppStatusService(
       context: context,
       checkInterval: const Duration(minutes: 15),
-      environment: widget.environment,
     );
 
     // Create instances of services that need to be managed by this State's
@@ -319,7 +318,6 @@ class _AppViewState extends State<_AppView> {
     _interstitialAdManager = InterstitialAdManager(
       appBloc: appBloc,
       adService: context.read<AdService>(),
-      navigatorKey: widget.navigatorKey,
     );
 
     // Initialize the ContentLimitationService.

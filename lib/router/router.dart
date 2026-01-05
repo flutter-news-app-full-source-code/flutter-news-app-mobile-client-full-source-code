@@ -511,10 +511,9 @@ GoRouter createRouter({
             routes: [
               ShellRoute(
                 builder: (context, state, child) {
-                  // The HeadlinesFeedBloc is now provided at the root of the
-                  // feed branch. This ensures that all child routes, including
-                  // the filter pages, have access to the same BLoC instance,
-                  // resolving the ProviderNotFoundError.
+                  // The HeadlinesFeedBloc is provided at the root of the feed
+                  // branch. This ensures that all child routes, including the
+                  // filter pages, have access to the same BLoC instance.
                   return BlocProvider<HeadlinesFeedBloc>(
                     create: (context) {
                       final appBloc = context.read<AppBloc>();
@@ -563,9 +562,8 @@ GoRouter createRouter({
                         path: Routes.feedFilter,
                         name: Routes.feedFilterName,
                         pageBuilder: (context, state) {
-                          // The 'extra' parameter now contains a map with the
-                          // initial filter. The HeadlinesFeedBloc is no longer
-                          // passed via 'extra' as it's available in the context.
+                          // The 'extra' parameter contains a map with the
+                          // initial filter.
                           final extra = state.extra! as Map<String, dynamic>;
                           final initialFilter =
                               extra['initialFilter'] as HeadlineFilterCriteria;

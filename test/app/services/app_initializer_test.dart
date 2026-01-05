@@ -58,15 +58,15 @@ void main() {
         ),
       ),
       features: FeaturesConfig(
-        subscription: SubscriptionConfig(
+        subscription: const SubscriptionConfig(
           enabled: true,
-          monthlyPlan: PlanDetails(
+          monthlyPlan: const PlanDetails(
             enabled: true,
             isRecommended: false,
             appleProductId: 'monthly_id',
             googleProductId: 'monthly_id',
           ),
-          annualPlan: PlanDetails(
+          annualPlan: const PlanDetails(
             enabled: true,
             isRecommended: true,
             appleProductId: 'annual_id',
@@ -204,6 +204,7 @@ void main() {
           role: UserRole.user,
           tier: AccessTier.standard,
           createdAt: DateTime(2025),
+          isAnonymous: false,
         );
 
         when(
@@ -227,7 +228,7 @@ void main() {
           ),
         ).thenAnswer(
           (_) async => const PaginatedResponse<UserSubscription>(
-            items: [],
+            items: const [],
             cursor: null,
             hasMore: false,
           ),
@@ -240,6 +241,43 @@ void main() {
       });
 
       test('Success: Anonymous Entry', () async {
+        const userId = 'anon-user-123';
+        final user = User(
+          id: userId,
+          email: 'guest-stub-email',
+          role: UserRole.user,
+          tier: AccessTier.guest,
+          createdAt: DateTime(2025),
+          isAnonymous: true,
+        );
+
+        when(
+          () => authRepository.getCurrentUser(),
+        ).thenAnswer((_) async => user);
+        when(
+          () => appSettingsRepository.read(id: userId, userId: userId),
+        ).thenAnswer((_) async => createSettings(userId));
+        when(
+          () =>
+              userContentPreferencesRepository.read(id: userId, userId: userId),
+        ).thenAnswer((_) async => createPreferences(userId));
+        when(
+          () => userContextRepository.read(id: userId, userId: userId),
+        ).thenAnswer((_) async => createContext(userId));
+
+        final result = await appInitializer.initializeApp();
+
+        expect(result, isA<InitializationSuccess>());
+        final success = result as InitializationSuccess;
+        expect(success.user, user);
+        expect(success.settings, isNotNull);
+        expect(success.userContentPreferences, isNotNull);
+        expect(success.userContext, isNotNull);
+        // Anonymous users skip subscription fetching
+        expect(success.userSubscription, isNull);
+      });
+
+      test('Success: Unauthenticated (No User)', () async {
         when(
           () => authRepository.getCurrentUser(),
         ).thenAnswer((_) async => null);
@@ -247,7 +285,9 @@ void main() {
         final result = await appInitializer.initializeApp();
 
         expect(result, isA<InitializationSuccess>());
-        expect((result as InitializationSuccess).user, isNull);
+        final success = result as InitializationSuccess;
+        expect(success.user, isNull);
+        expect(success.settings, isNull);
       });
 
       test('Failure: Under Maintenance', () async {

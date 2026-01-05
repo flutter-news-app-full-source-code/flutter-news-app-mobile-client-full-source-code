@@ -58,7 +58,7 @@ class SubscriptionManager implements SubscriptionService {
     String? applicationUserName,
     PurchaseDetails? oldPurchaseDetails,
   }) {
-    if (!_config!.enabled) {
+    if (_config == null || !_config.enabled) {
       _logger.warning(
         'Attempted to buyNonConsumable while subscriptions are disabled.',
       );

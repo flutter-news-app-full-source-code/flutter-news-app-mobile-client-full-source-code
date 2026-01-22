@@ -25,6 +25,7 @@ class AppState extends Equatable {
     this.positiveInteractionCount = 0,
     this.limitationStatus = LimitationStatus.allowed,
     this.limitedAction,
+    this.transientMessage,
   });
 
   /// The current status of the application, indicating its lifecycle stage.
@@ -78,6 +79,10 @@ class AppState extends Equatable {
 
   /// The specific action that was limited, if any.
   final ContentAction? limitedAction;
+
+  /// A transient message to be displayed globally (e.g., via SnackBar).
+  /// Wrapped in a ValueWrapper to allow distinct updates of the same string.
+  final ValueWrapper<String>? transientMessage;
 
   /// The current theme mode (light, dark, or system), derived from [settings].
   /// Defaults to [ThemeMode.system] if [settings] are not yet loaded.
@@ -151,6 +156,7 @@ class AppState extends Equatable {
     latestAppVersion,
     hasUnreadInAppNotifications,
     positiveInteractionCount,
+    transientMessage,
   ];
 
   /// Creates a copy of this [AppState] with the given fields replaced with
@@ -174,6 +180,7 @@ class AppState extends Equatable {
     LimitationStatus? limitationStatus,
     ContentAction? limitedAction,
     bool clearLimitedAction = false,
+    ValueWrapper<String>? transientMessage,
   }) {
     return AppState(
       status: status ?? this.status,
@@ -198,6 +205,7 @@ class AppState extends Equatable {
       limitedAction: clearLimitedAction
           ? null
           : limitedAction ?? this.limitedAction,
+      transientMessage: transientMessage ?? this.transientMessage,
     );
   }
 }

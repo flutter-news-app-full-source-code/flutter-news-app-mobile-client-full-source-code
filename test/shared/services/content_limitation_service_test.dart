@@ -97,15 +97,6 @@ void main() {
       isAnonymous: false,
     );
 
-    final premiumUser = User(
-      id: 'premium',
-      email: 'premium@example.com',
-      role: UserRole.user,
-      tier: AccessTier.premium,
-      createdAt: DateTime.now(),
-      isAnonymous: false,
-    );
-
     const emptyPreferences = UserContentPreferences(
       id: 'prefs',
       followedCountries: [],
@@ -181,19 +172,7 @@ void main() {
             isPositiveFeedbackFollowUpEnabled: false,
           ),
         ),
-        subscription: SubscriptionConfig(
-          enabled: true,
-          monthlyPlan: PlanDetails(
-            enabled: true,
-            isRecommended: false,
-            googleProductId: 'monthly_id',
-          ),
-          annualPlan: PlanDetails(
-            enabled: true,
-            isRecommended: true,
-            googleProductId: 'annual_id',
-          ),
-        ),
+        rewards: RewardsConfig(enabled: true, rewards: {}),
       ),
       user: const UserConfig(
         limits: UserLimitsConfig(
@@ -208,26 +187,6 @@ void main() {
           commentsPerDay: {AccessTier.standard: 3},
           reactionsPerDay: {AccessTier.standard: 10},
           reportsPerDay: {AccessTier.standard: 5},
-        ),
-      ),
-    );
-
-    final mockRemoteConfigWithPremiumLimits = mockRemoteConfig.copyWith(
-      user: const UserConfig(
-        limits: UserLimitsConfig(
-          followedItems: {AccessTier.standard: 5, AccessTier.premium: 50},
-          savedHeadlines: {AccessTier.standard: 10, AccessTier.premium: 100},
-          savedHeadlineFilters: {
-            AccessTier.standard: SavedFilterLimits(total: 2, pinned: 1),
-            AccessTier.premium: SavedFilterLimits(total: 20, pinned: 10),
-          },
-          savedSourceFilters: {
-            AccessTier.standard: SavedFilterLimits(total: 2, pinned: 1),
-            AccessTier.premium: SavedFilterLimits(total: 20, pinned: 10),
-          },
-          commentsPerDay: {AccessTier.standard: 3, AccessTier.premium: 100},
-          reactionsPerDay: {AccessTier.standard: 10, AccessTier.premium: 200},
-          reportsPerDay: {AccessTier.standard: 5, AccessTier.premium: 20},
         ),
       ),
     );
@@ -257,80 +216,6 @@ void main() {
         LimitationStatus.anonymousLimitReached,
       );
     });
-
-    test('Premium user should be allowed if no limit is configured', () async {
-      when(() => mockAppBloc.state).thenReturn(
-        AppState(
-          status: AppLifeCycleStatus.authenticated,
-          user: premiumUser,
-          userContentPreferences: emptyPreferences,
-          remoteConfig: mockRemoteConfig,
-        ),
-      );
-
-      // Mock high usage to ensure limits are ignored because they are not
-      // configured for premium in the default mockRemoteConfig.
-      when(
-        () => mockEngagementRepository.count(
-          userId: any(named: 'userId'),
-          filter: any(named: 'filter'),
-        ),
-      ).thenAnswer((_) async => 100);
-
-      service.init(appBloc: mockAppBloc);
-
-      expect(
-        await service.checkAction(ContentAction.postComment),
-        LimitationStatus.allowed,
-      );
-      expect(
-        await service.checkAction(ContentAction.bookmarkHeadline),
-        LimitationStatus.allowed,
-      );
-    });
-
-    test(
-      'Premium user should be restricted if premium daily limit reached',
-      () async {
-        when(() => mockAppBloc.state).thenReturn(
-          AppState(
-            status: AppLifeCycleStatus.authenticated,
-            user: premiumUser,
-            userContentPreferences: emptyPreferences,
-            remoteConfig: mockRemoteConfigWithPremiumLimits,
-          ),
-        );
-
-        // Mock comment count to be at the premium limit
-        when(
-          () => mockEngagementRepository.count(
-            userId: premiumUser.id,
-            filter: any(
-              named: 'filter',
-              that: containsPair('comment', isA<Map>()),
-            ),
-          ),
-        ).thenAnswer((_) async => 100); // Premium comment limit is 100
-
-        // Mock other counts to be zero to not interfere
-        when(
-          () => mockEngagementRepository.count(
-            userId: premiumUser.id,
-            filter: any(
-              named: 'filter',
-              that: containsPair('reaction', isA<Map>()),
-            ),
-          ),
-        ).thenAnswer((_) async => 0);
-
-        service.init(appBloc: mockAppBloc);
-
-        expect(
-          await service.checkAction(ContentAction.postComment),
-          LimitationStatus.premiumUserLimitReached,
-        );
-      },
-    );
 
     test('Standard user should be allowed if within limits', () async {
       when(() => mockAppBloc.state).thenReturn(

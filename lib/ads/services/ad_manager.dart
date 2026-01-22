@@ -5,6 +5,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_pl
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/rewarded_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
@@ -70,6 +71,9 @@ class AdManager implements AdService {
       providerType = adModel.provider;
       adObject = adModel.adObject;
     } else if (adModel is InterstitialAd) {
+      providerType = adModel.provider;
+      adObject = adModel.adObject;
+    } else if (adModel is RewardedAd) {
       providerType = adModel.provider;
       adObject = adModel.adObject;
     }
@@ -179,6 +183,72 @@ class AdManager implements AdService {
       );
       _logger.severe(
         'AdManager: Error getting Interstitial ad from AdProvider: $e',
+        e,
+        s,
+      );
+      return null;
+    }
+  }
+
+  @override
+  Future<RewardedAd?> getRewardedAd({
+    required AdConfig adConfig,
+    required AdThemeStyle adThemeStyle,
+    required AccessTier userTier,
+  }) async {
+    _logger.info('AdManager: getRewardedAd called.');
+
+    final primaryAdPlatform = adConfig.primaryAdPlatform;
+    final adProvider = _adProviders[primaryAdPlatform] ?? _noOpProvider;
+
+    final platformAdIdentifiers =
+        adConfig.platformAdIdentifiers[primaryAdPlatform];
+    if (platformAdIdentifiers == null) {
+      _logger.warning(
+        'AdManager: No AdPlatformIdentifiers found for platform: $primaryAdPlatform',
+      );
+      return null;
+    }
+
+    final adId = platformAdIdentifiers.rewardedAdId;
+
+    if (adId == null || adId.isEmpty) {
+      _logger.warning(
+        'AdManager: No rewarded ad ID configured for platform $primaryAdPlatform',
+      );
+      return null;
+    }
+
+    _logger.info(
+      'AdManager: Requesting Rewarded ad from $primaryAdPlatform AdProvider with ID: $adId',
+    );
+    try {
+      final loadedAd = await adProvider.loadRewardedAd(
+        adPlatformIdentifiers: platformAdIdentifiers,
+        adId: adId,
+        adThemeStyle: adThemeStyle,
+      );
+
+      if (loadedAd != null) {
+        _logger.info('AdManager: Rewarded ad successfully loaded.');
+        return loadedAd;
+      } else {
+        _logger.info('AdManager: No Rewarded ad loaded by AdProvider.');
+        return null;
+      }
+    } catch (e, s) {
+      unawaited(
+        _analyticsService.logEvent(
+          AnalyticsEvent.adLoadFailed,
+          payload: AdLoadFailedPayload(
+            adProvider: primaryAdPlatform,
+            adType: AdType.video,
+            errorCode: 0,
+          ),
+        ),
+      );
+      _logger.severe(
+        'AdManager: Error getting Rewarded ad from AdProvider: $e',
         e,
         s,
       );

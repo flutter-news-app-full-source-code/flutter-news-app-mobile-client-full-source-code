@@ -39,7 +39,7 @@ class AppInitializer {
     required DataRepository<UserContentPreferences>
     userContentPreferencesRepository,
     required DataRepository<UserContext> userContextRepository,
-    required DataRepository<UserSubscription> userSubscriptionRepository,
+    required DataRepository<UserRewards> userRewardsRepository,
     required DataRepository<RemoteConfig> remoteConfigRepository,
     required PackageInfoService packageInfoService,
     required Logger logger,
@@ -47,7 +47,7 @@ class AppInitializer {
        _appSettingsRepository = appSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
        _userContextRepository = userContextRepository,
-       _userSubscriptionRepository = userSubscriptionRepository,
+       _userRewardsRepository = userRewardsRepository,
        _remoteConfigRepository = remoteConfigRepository,
        _packageInfoService = packageInfoService,
        _logger = logger;
@@ -57,7 +57,7 @@ class AppInitializer {
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
   final DataRepository<UserContext> _userContextRepository;
-  final DataRepository<UserSubscription> _userSubscriptionRepository;
+  final DataRepository<UserRewards> _userRewardsRepository;
   final DataRepository<RemoteConfig> _remoteConfigRepository;
   final PackageInfoService _packageInfoService;
   final Logger _logger;
@@ -177,31 +177,31 @@ class AppInitializer {
         appSettings as AppSettings?,
         userContentPreferences as UserContentPreferences?,
         userContext as UserContext?,
-        userSubscription as UserSubscription?,
+        userRewards as UserRewards?,
       ] = await Future.wait<dynamic>([
         _appSettingsRepository.read(id: user.id, userId: user.id),
         _userContentPreferencesRepository.read(id: user.id, userId: user.id),
         _userContextRepository.read(id: user.id, userId: user.id),
-        _fetchUserSubscription(user),
+        _fetchUserRewards(user),
       ]);
 
-      _logger..fine(
-        '[AppInitializer] Parallel fetch complete. '
-        'Settings: ${appSettings != null}, '
-        'Preferences: ${userContentPreferences != null}, '
-        'Context: ${userContext != null}',
-      )
-
-      ..fine(
-        '[AppInitializer] --- App Initialization Complete (Authenticated) ---',
-      );
+      _logger
+        ..fine(
+          '[AppInitializer] Parallel fetch complete. '
+          'Settings: ${appSettings != null}, '
+          'Preferences: ${userContentPreferences != null}, '
+          'Context: ${userContext != null}',
+        )
+        ..fine(
+          '[AppInitializer] --- App Initialization Complete (Authenticated) ---',
+        );
       return InitializationSuccess(
         remoteConfig: remoteConfig,
         user: user,
         settings: appSettings,
         userContentPreferences: userContentPreferences,
         userContext: userContext,
-        userSubscription: userSubscription,
+        userRewards: userRewards,
       );
     } on HttpException catch (e, s) {
       _logger.severe(
@@ -232,22 +232,22 @@ class AppInitializer {
     required User newUser,
     required RemoteConfig remoteConfig,
   }) async {
-    _logger..fine(
-      '[AppInitializer] Handling user transition for user ${newUser.id}.',
-    )
-
-    // --- Re-fetch User Data ---
-    // Always re-fetch data after a transition to ensure the state is fresh.
-    ..fine(
-      '[AppInitializer] Re-fetching user data for transitioned user ${newUser.id}...',
-    );
+    _logger
+      ..fine(
+        '[AppInitializer] Handling user transition for user ${newUser.id}.',
+      )
+      // --- Re-fetch User Data ---
+      // Always re-fetch data after a transition to ensure the state is fresh.
+      ..fine(
+        '[AppInitializer] Re-fetching user data for transitioned user ${newUser.id}...',
+      );
 
     try {
       final [
         appSettings as AppSettings?,
         userContentPreferences as UserContentPreferences?,
         userContext as UserContext?,
-        userSubscription as UserSubscription?,
+        userRewards as UserRewards?,
       ] = await Future.wait<dynamic>([
         _appSettingsRepository.read(id: newUser.id, userId: newUser.id),
         _userContentPreferencesRepository.read(
@@ -255,7 +255,7 @@ class AppInitializer {
           userId: newUser.id,
         ),
         _userContextRepository.read(id: newUser.id, userId: newUser.id),
-        _fetchUserSubscription(newUser),
+        _fetchUserRewards(newUser),
       ]);
 
       _logger.fine('[AppInitializer] User transition data fetch complete.');
@@ -265,7 +265,7 @@ class AppInitializer {
         settings: appSettings,
         userContentPreferences: userContentPreferences,
         userContext: userContext,
-        userSubscription: userSubscription,
+        userRewards: userRewards,
       );
     } on HttpException catch (e, s) {
       _logger.severe(
@@ -280,22 +280,21 @@ class AppInitializer {
     }
   }
 
-  /// Helper to fetch user subscription safely.
-  /// Returns null if not found (which is valid for non-subscribers).
-  Future<UserSubscription?> _fetchUserSubscription(User user) async {
+  /// Helper to fetch user rewards safely.
+  /// Returns null if not found.
+  Future<UserRewards?> _fetchUserRewards(User user) async {
     if (user.isAnonymous) return null;
 
     try {
-      final response = await _userSubscriptionRepository.readAll(
+      final response = await _userRewardsRepository.readAll(
         userId: user.id,
-        filter: {'status': 'active'},
         pagination: const PaginationOptions(limit: 1),
       );
       return response.items.firstOrNull;
     } catch (e, s) {
-      // If fetch fails or no subscription found, return null.
+      // If fetch fails or no rewards found, return null.
       // We don't want to block app init for this.
-      _logger.warning('Failed to fetch user subscription on init', e, s);
+      _logger.warning('Failed to fetch user rewards on init', e, s);
       return null;
     }
   }

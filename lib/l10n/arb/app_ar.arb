@@ -2208,5 +2208,84 @@
     "paywallRestoringPurchases": "جارٍ استعادة المشتريات...",
     "@paywallRestoringPurchases": {
         "description": "رسالة تشير إلى أن التطبيق يحاول حاليًا استعادة المشتريات."
+    },
+    "accountRewardsTile": "المكافآت والعروض",
+    "@accountRewardsTile": {
+        "description": "Title for the rewards navigation tile in the account page."
+    },
+    "rewardsPageTitle": "المكافآت",
+    "@rewardsPageTitle": {
+        "description": "Title for the rewards page."
+    },
+    "rewardsOfferTitle": "احصل على {rewardName} لمدة {duration}",
+    "@rewardsOfferTitle": {
+        "description": "Title for a reward offer card, indicating the reward and its duration.",
+        "placeholders": {
+            "rewardName": {
+                "type": "String"
+            },
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsOfferActiveTitle": "{rewardName} مفعل",
+    "@rewardsOfferActiveTitle": {
+        "description": "Title for an active reward offer card.",
+        "placeholders": {
+            "rewardName": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsOfferExpiresIn": "ينتهي في: {countdown}",
+    "@rewardsOfferExpiresIn": {
+        "description": "Text showing the remaining time for an active reward.",
+        "placeholders": {
+            "countdown": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsOfferWatchButton": "شاهد الفيديو",
+    "@rewardsOfferWatchButton": {
+        "description": "Button text to watch a video to earn a reward."
+    },
+    "rewardsOfferVerifyingButton": "جارٍ التحقق...",
+    "@rewardsOfferVerifyingButton": {
+        "description": "Button text shown while a reward is being verified."
+    },
+    "rewardsSnackbarSuccess": "تم فتح المكافأة: {rewardName} الآن نشط.",
+    "@rewardsSnackbarSuccess": {
+        "description": "Snackbar message shown when a reward is successfully unlocked.",
+        "placeholders": {
+            "rewardName": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsSnackbarFailure": "فشل التحقق. يرجى المحاولة مرة أخرى بعد لحظات.",
+    "@rewardsSnackbarFailure": {
+        "description": "Snackbar message shown when reward verification fails."
+    },
+    "decoratorUnlockRewardsTitle": "استمتع بتجربة خالية من الإعلانات",
+    "@decoratorUnlockRewardsTitle": {
+        "description": "Title for the 'Unlock Rewards' decorator."
+    },
+    "decoratorUnlockRewardsDescription": "شاهد مقطع فيديو قصيرًا للاستمتاع بالتطبيق بدون إعلانات لمدة 24 ساعة.",
+    "@decoratorUnlockRewardsDescription": {
+        "description": "Description for the 'Unlock Rewards' decorator."
+    },
+    "decoratorUnlockRewardsCta": "شاهد الآن",
+    "@decoratorUnlockRewardsCta": {
+        "description": "Call-to-action text for the 'Unlock Rewards' decorator."
+    },
+    "rewardTypeAdFree": "بدون إعلانات",
+    "@rewardTypeAdFree": {
+        "description": "The name for the 'Ad-Free' reward type."
+    },
+    "rewardTypeDailyDigest": "ملخص يومي",
+    "@rewardTypeDailyDigest": {
+        "description": "The name for the 'Daily Digest' reward type."
     }
 }

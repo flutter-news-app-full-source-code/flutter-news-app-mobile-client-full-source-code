@@ -3223,6 +3223,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Restoring purchases...'**
   String get paywallRestoringPurchases;
+
+  /// Title for the rewards navigation tile in the account page.
+  ///
+  /// In en, this message translates to:
+  /// **'Rewards & Offers'**
+  String get accountRewardsTile;
+
+  /// Title for the rewards page.
+  ///
+  /// In en, this message translates to:
+  /// **'Rewards'**
+  String get rewardsPageTitle;
+
+  /// Title for a reward offer card, indicating the reward and its duration.
+  ///
+  /// In en, this message translates to:
+  /// **'Get {rewardName} for {duration}'**
+  String rewardsOfferTitle(String rewardName, String duration);
+
+  /// Title for an active reward offer card.
+  ///
+  /// In en, this message translates to:
+  /// **'{rewardName} Active'**
+  String rewardsOfferActiveTitle(String rewardName);
+
+  /// Text showing the remaining time for an active reward.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires in: {countdown}'**
+  String rewardsOfferExpiresIn(String countdown);
+
+  /// Button text to watch a video to earn a reward.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch Video'**
+  String get rewardsOfferWatchButton;
+
+  /// Button text shown while a reward is being verified.
+  ///
+  /// In en, this message translates to:
+  /// **'Verifying...'**
+  String get rewardsOfferVerifyingButton;
+
+  /// Snackbar message shown when a reward is successfully unlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Reward Unlocked: {rewardName} is now active.'**
+  String rewardsSnackbarSuccess(String rewardName);
+
+  /// Snackbar message shown when reward verification fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification failed. Please try again in a moment.'**
+  String get rewardsSnackbarFailure;
+
+  /// Title for the 'Unlock Rewards' decorator.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock an Ad-Free Experience'**
+  String get decoratorUnlockRewardsTitle;
+
+  /// Description for the 'Unlock Rewards' decorator.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch a short video to enjoy the app without ads for 24 hours.'**
+  String get decoratorUnlockRewardsDescription;
+
+  /// Call-to-action text for the 'Unlock Rewards' decorator.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch Now'**
+  String get decoratorUnlockRewardsCta;
+
+  /// The name for the 'Ad-Free' reward type.
+  ///
+  /// In en, this message translates to:
+  /// **'Ad-Free'**
+  String get rewardTypeAdFree;
+
+  /// The name for the 'Daily Digest' reward type.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Digest'**
+  String get rewardTypeDailyDigest;
 }
 
 class _AppLocalizationsDelegate

@@ -1723,4 +1723,56 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get paywallRestoringPurchases => 'Restoring purchases...';
+
+  @override
+  String get accountRewardsTile => 'Rewards & Offers';
+
+  @override
+  String get rewardsPageTitle => 'Rewards';
+
+  @override
+  String rewardsOfferTitle(String rewardName, String duration) {
+    return 'Get $rewardName for $duration';
+  }
+
+  @override
+  String rewardsOfferActiveTitle(String rewardName) {
+    return '$rewardName Active';
+  }
+
+  @override
+  String rewardsOfferExpiresIn(String countdown) {
+    return 'Expires in: $countdown';
+  }
+
+  @override
+  String get rewardsOfferWatchButton => 'Watch Video';
+
+  @override
+  String get rewardsOfferVerifyingButton => 'Verifying...';
+
+  @override
+  String rewardsSnackbarSuccess(String rewardName) {
+    return 'Reward Unlocked: $rewardName is now active.';
+  }
+
+  @override
+  String get rewardsSnackbarFailure =>
+      'Verification failed. Please try again in a moment.';
+
+  @override
+  String get decoratorUnlockRewardsTitle => 'Unlock an Ad-Free Experience';
+
+  @override
+  String get decoratorUnlockRewardsDescription =>
+      'Watch a short video to enjoy the app without ads for 24 hours.';
+
+  @override
+  String get decoratorUnlockRewardsCta => 'Watch Now';
+
+  @override
+  String get rewardTypeAdFree => 'Ad-Free';
+
+  @override
+  String get rewardTypeDailyDigest => 'Daily Digest';
 }

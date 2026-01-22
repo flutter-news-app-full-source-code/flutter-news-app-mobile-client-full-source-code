@@ -1716,4 +1716,56 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get paywallRestoringPurchases => 'جارٍ استعادة المشتريات...';
+
+  @override
+  String get accountRewardsTile => 'المكافآت والعروض';
+
+  @override
+  String get rewardsPageTitle => 'المكافآت';
+
+  @override
+  String rewardsOfferTitle(String rewardName, String duration) {
+    return 'احصل على $rewardName لمدة $duration';
+  }
+
+  @override
+  String rewardsOfferActiveTitle(String rewardName) {
+    return '$rewardName مفعل';
+  }
+
+  @override
+  String rewardsOfferExpiresIn(String countdown) {
+    return 'ينتهي في: $countdown';
+  }
+
+  @override
+  String get rewardsOfferWatchButton => 'شاهد الفيديو';
+
+  @override
+  String get rewardsOfferVerifyingButton => 'جارٍ التحقق...';
+
+  @override
+  String rewardsSnackbarSuccess(String rewardName) {
+    return 'تم فتح المكافأة: $rewardName الآن نشط.';
+  }
+
+  @override
+  String get rewardsSnackbarFailure =>
+      'فشل التحقق. يرجى المحاولة مرة أخرى بعد لحظات.';
+
+  @override
+  String get decoratorUnlockRewardsTitle => 'استمتع بتجربة خالية من الإعلانات';
+
+  @override
+  String get decoratorUnlockRewardsDescription =>
+      'شاهد مقطع فيديو قصيرًا للاستمتاع بالتطبيق بدون إعلانات لمدة 24 ساعة.';
+
+  @override
+  String get decoratorUnlockRewardsCta => 'شاهد الآن';
+
+  @override
+  String get rewardTypeAdFree => 'بدون إعلانات';
+
+  @override
+  String get rewardTypeDailyDigest => 'ملخص يومي';
 }

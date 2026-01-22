@@ -2208,5 +2208,84 @@
     "paywallRestoringPurchases": "Restoring purchases...",
     "@paywallRestoringPurchases": {
         "description": "A message indicating that the app is currently attempting to restore purchases."
+    },
+    "accountRewardsTile": "Rewards & Offers",
+    "@accountRewardsTile": {
+        "description": "Title for the rewards navigation tile in the account page."
+    },
+    "rewardsPageTitle": "Rewards",
+    "@rewardsPageTitle": {
+        "description": "Title for the rewards page."
+    },
+    "rewardsOfferTitle": "Get {rewardName} for {duration}",
+    "@rewardsOfferTitle": {
+        "description": "Title for a reward offer card, indicating the reward and its duration.",
+        "placeholders": {
+            "rewardName": {
+                "type": "String"
+            },
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsOfferActiveTitle": "{rewardName} Active",
+    "@rewardsOfferActiveTitle": {
+        "description": "Title for an active reward offer card.",
+        "placeholders": {
+            "rewardName": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsOfferExpiresIn": "Expires in: {countdown}",
+    "@rewardsOfferExpiresIn": {
+        "description": "Text showing the remaining time for an active reward.",
+        "placeholders": {
+            "countdown": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsOfferWatchButton": "Watch Video",
+    "@rewardsOfferWatchButton": {
+        "description": "Button text to watch a video to earn a reward."
+    },
+    "rewardsOfferVerifyingButton": "Verifying...",
+    "@rewardsOfferVerifyingButton": {
+        "description": "Button text shown while a reward is being verified."
+    },
+    "rewardsSnackbarSuccess": "Reward Unlocked: {rewardName} is now active.",
+    "@rewardsSnackbarSuccess": {
+        "description": "Snackbar message shown when a reward is successfully unlocked.",
+        "placeholders": {
+            "rewardName": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsSnackbarFailure": "Verification failed. Please try again in a moment.",
+    "@rewardsSnackbarFailure": {
+        "description": "Snackbar message shown when reward verification fails."
+    },
+    "decoratorUnlockRewardsTitle": "Unlock an Ad-Free Experience",
+    "@decoratorUnlockRewardsTitle": {
+        "description": "Title for the 'Unlock Rewards' decorator."
+    },
+    "decoratorUnlockRewardsDescription": "Watch a short video to enjoy the app without ads for 24 hours.",
+    "@decoratorUnlockRewardsDescription": {
+        "description": "Description for the 'Unlock Rewards' decorator."
+    },
+    "decoratorUnlockRewardsCta": "Watch Now",
+    "@decoratorUnlockRewardsCta": {
+        "description": "Call-to-action text for the 'Unlock Rewards' decorator."
+    },
+    "rewardTypeAdFree": "Ad-Free",
+    "@rewardTypeAdFree": {
+        "description": "The name for the 'Ad-Free' reward type."
+    },
+    "rewardTypeDailyDigest": "Daily Digest",
+    "@rewardTypeDailyDigest": {
+        "description": "The name for the 'Daily Digest' reward type."
     }
 }

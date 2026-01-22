@@ -165,15 +165,24 @@ class AccountPage extends StatelessWidget {
   /// account-related sections.
   Widget _buildNavigationList(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
+    final isAnonymous = context.select(
+      (AppBloc bloc) => bloc.state.user?.isAnonymous ?? false,
+    );
+    final areRewardsEnabled = context.select(
+      (AppBloc bloc) =>
+          bloc.state.remoteConfig?.features.rewards.enabled ?? false,
+    );
     return Column(
       children: [
-        buildTile(
-          context: context,
-          icon: Icons.card_giftcard,
-          title: l10n.accountRewardsTile,
-          onTap: () => context.pushNamed(Routes.rewardsName),
-        ),
-        const Divider(),
+        if (!isAnonymous && areRewardsEnabled) ...[
+          buildTile(
+            context: context,
+            icon: Icons.card_giftcard,
+            title: l10n.accountRewardsTile,
+            onTap: () => context.pushNamed(Routes.rewardsName),
+          ),
+          const Divider(),
+        ],
         buildTile(
           context: context,
           icon: Icons.check_outlined,

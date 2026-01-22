@@ -192,6 +192,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     UserRewardsRefreshed event,
     Emitter<AppState> emit,
   ) async {
+    final oldRewards = state.userRewards;
     final userId = state.user?.id;
     if (userId == null) return;
 
@@ -206,7 +207,27 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       );
       final userRewards = response.items.firstOrNull;
 
-      emit(state.copyWith(userRewards: userRewards));
+      // Check if the AdFree reward state has changed to active.
+      final wasAdFreeActive =
+          oldRewards?.isRewardActive(RewardType.adFree) ?? false;
+      final isAdFreeActive =
+          userRewards?.isRewardActive(RewardType.adFree) ?? false;
+
+      if (!wasAdFreeActive && isAdFreeActive) {
+        _logger.info(
+          '[AppBloc] Ad-Free reward activated. Clearing ad and feed caches.',
+        );
+        // Clear both caches to ensure ads and ad placeholders are removed.
+        _inlineAdCacheService.clearAllAds();
+        _feedCacheService.clearAll();
+      }
+
+      emit(
+        state.copyWith(
+          userRewards: userRewards,
+          transientMessage: const ValueWrapper('Reward Unlocked!'),
+        ),
+      );
       _logger.info('[AppBloc] User rewards refreshed.');
     } catch (e, s) {
       _logger.severe('[AppBloc] Failed to refresh user rewards.', e, s);

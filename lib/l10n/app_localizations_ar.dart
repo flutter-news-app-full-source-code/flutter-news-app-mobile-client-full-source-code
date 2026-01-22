@@ -1577,147 +1577,6 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get paywallTitle => 'افتح الوصول الكامل';
-
-  @override
-  String get paywallSubtitle =>
-      'احصل على المزيد من موجز الأخبار الخاص بك مع حدود وميزات بريميوم.';
-
-  @override
-  String get paywallFeatureFollowMore => 'تابع المزيد من المواضيع والمصادر';
-
-  @override
-  String get paywallFeatureSaveMore => 'احفظ المزيد من المقالات';
-
-  @override
-  String get paywallFeatureAdvancedFilters => 'فلاتر وتنبيهات متقدمة';
-
-  @override
-  String get paywallFeatureUnlimitedHistory => 'سجل قراءة غير محدود';
-
-  @override
-  String get paywallMonthlyPlan => 'شهري';
-
-  @override
-  String get paywallAnnualPlan => 'سنوي';
-
-  @override
-  String get paywallBestValue => 'أفضل قيمة';
-
-  @override
-  String get paywallRestorePurchases => 'استعادة المشتريات';
-
-  @override
-  String get paywallTermsOfService => 'شروط الخدمة';
-
-  @override
-  String get paywallPrivacyPolicy => 'سياسة الخصوصية';
-
-  @override
-  String get paywallDisclaimer =>
-      'يتم تجديد الاشتراك تلقائيًا ما لم يتم إيقاف التجديد التلقائي قبل 24 ساعة على الأقل من نهاية الفترة الحالية.';
-
-  @override
-  String paywallSubscribeButton(String price, String period) {
-    return 'اشترك مقابل $price / $period';
-  }
-
-  @override
-  String get paywallSuccessTitle => 'مرحبًا بك في بريميوم!';
-
-  @override
-  String get paywallSuccessBody => 'لديك الآن وصول كامل إلى جميع الميزات.';
-
-  @override
-  String get paywallErrorTitle => 'فشلت عملية الشراء';
-
-  @override
-  String get paywallLoading => 'جارٍ التحقق من الشراء...';
-
-  @override
-  String get subscriptionDetailsPageTitle => 'تفاصيل الاشتراك';
-
-  @override
-  String get manageSubscriptionButton => 'إدارة الاشتراك';
-
-  @override
-  String get subscriptionDetailsCurrentPlan => 'الخطة الحالية';
-
-  @override
-  String subscriptionDetailsRenewsOn(String date) {
-    return 'يتجدد في $date';
-  }
-
-  @override
-  String subscriptionDetailsExpiresOn(String date) {
-    return 'ينتهي في $date';
-  }
-
-  @override
-  String get subscriptionDetailsWillNotRenew => 'لن يتجدد';
-
-  @override
-  String get subscriptionDetailsProvider => 'المزود';
-
-  @override
-  String get subscriptionDetailsManageButton => 'إدارة في المتجر';
-
-  @override
-  String get subscriptionDetailsLoading => 'جارٍ تحميل تفاصيل الاشتراك...';
-
-  @override
-  String get subscriptionDetailsError => 'تعذر تحميل تفاصيل الاشتراك.';
-
-  @override
-  String get subscriptionDetailsNoSubscription => 'ليس لديك اشتراك نشط.';
-
-  @override
-  String get subscriptionUpgradeButton => 'ترقية';
-
-  @override
-  String get subscriptionDowngradeButton => 'تخفيض';
-
-  @override
-  String get subscriptionCurrentPlan => 'الخطة الحالية';
-
-  @override
-  String get subscriptionStatusGracePeriod =>
-      'اشتراكك في فترة سماح. يرجى تحديث طريقة الدفع للاحتفاظ بالوصول.';
-
-  @override
-  String get subscriptionStatusBillingIssue =>
-      'تم تعليق اشتراكك بسبب مشكلة في الفوترة. يرجى تحديث معلومات الدفع الخاصة بك.';
-
-  @override
-  String get subscriptionUpgradeTitle => 'ترقية الخطة';
-
-  @override
-  String get subscriptionUpgradeDescription => 'انتقل إلى خطة سنوية ووفر.';
-
-  @override
-  String get subscriptionDowngradeTitle => 'تخفيض الخطة';
-
-  @override
-  String get subscriptionDowngradeDescription =>
-      'التبديل إلى دورة فوترة شهرية.';
-
-  @override
-  String get subscriptionSwitchButton => 'تبديل الخطة';
-
-  @override
-  String get paywallRestorePurchaseButton => 'استعادة المشتريات';
-
-  @override
-  String get paywallRestoreSuccess => 'تم استعادة مشترياتك بنجاح.';
-
-  @override
-  String get paywallRestoreFailure =>
-      'تعذر استعادة المشتريات. يرجى المحاولة مرة أخرى أو الاتصال بالدعم.';
-
-  @override
-  String get paywallRestoringPurchases => 'جارٍ استعادة المشتريات...';
-
-  @override
   String get accountRewardsTile => 'المكافآت والعروض';
 
   @override
@@ -1757,11 +1616,27 @@ class AppLocalizationsAr extends AppLocalizations {
   String get decoratorUnlockRewardsTitle => 'استمتع بتجربة خالية من الإعلانات';
 
   @override
-  String get decoratorUnlockRewardsDescription =>
-      'شاهد مقطع فيديو قصيرًا للاستمتاع بالتطبيق بدون إعلانات لمدة 24 ساعة.';
+  String decoratorUnlockRewardsDescription(String duration) {
+    return 'شاهد مقطع فيديو قصيرًا للاستمتاع بالتطبيق بدون إعلانات لمدة $duration.';
+  }
 
   @override
   String get decoratorUnlockRewardsCta => 'شاهد الآن';
+
+  @override
+  String rewardsDurationDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count يوم',
+      many: '$count يومًا',
+      few: '$count أيام',
+      two: 'يومان',
+      one: 'يوم واحد',
+      zero: '0 يوم',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get rewardTypeAdFree => 'بدون إعلانات';

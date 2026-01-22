@@ -3055,6 +3055,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Daily Digest'**
   String get rewardTypeDailyDigest;
+
+  /// Button text to unlock more features or content limits.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock More'**
+  String get unlockMoreButton;
+
+  /// Label indicating a feature requires an active reward.
+  ///
+  /// In en, this message translates to:
+  /// **'Requires active reward'**
+  String get requiresActiveReward;
 }
 
 class _AppLocalizationsDelegate

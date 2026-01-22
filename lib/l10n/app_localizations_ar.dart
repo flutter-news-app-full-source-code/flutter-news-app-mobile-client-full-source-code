@@ -1643,4 +1643,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get rewardTypeDailyDigest => 'ملخص يومي';
+
+  @override
+  String get unlockMoreButton => 'افتح المزيد';
+
+  @override
+  String get requiresActiveReward => 'يتطلب مكافأة نشطة';
 }

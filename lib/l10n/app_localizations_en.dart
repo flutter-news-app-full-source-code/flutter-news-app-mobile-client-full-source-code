@@ -1643,4 +1643,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rewardTypeDailyDigest => 'Daily Digest';
+
+  @override
+  String get unlockMoreButton => 'Unlock More';
+
+  @override
+  String get requiresActiveReward => 'Requires active reward';
 }

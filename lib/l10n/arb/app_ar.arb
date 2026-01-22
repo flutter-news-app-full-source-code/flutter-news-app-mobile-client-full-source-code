@@ -2109,5 +2109,13 @@
     "rewardTypeDailyDigest": "ملخص يومي",
     "@rewardTypeDailyDigest": {
         "description": "The name for the 'Daily Digest' reward type."
+    },
+    "unlockMoreButton": "افتح المزيد",
+    "@unlockMoreButton": {
+        "description": "Button text to unlock more features or content limits."
+    },
+    "requiresActiveReward": "يتطلب مكافأة نشطة",
+    "@requiresActiveReward": {
+        "description": "Label indicating a feature requires an active reward."
     }
 }

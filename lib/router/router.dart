@@ -87,7 +87,7 @@ GoRouter createRouter({
       // Get the current, stable lifecycle status from the AppBloc.
       final appState = context.read<AppBloc>().state;
       final appStatus = appState.status;
-      final user = appState.user;
+      final remoteConfig = appState.remoteConfig;
       final currentLocation = state.matchedLocation;
 
       logger.info(
@@ -100,6 +100,7 @@ GoRouter createRouter({
       const authenticationPath = Routes.authentication;
       const accountLinkingPath = Routes.accountLinking;
       const feedPath = Routes.feed;
+      const rewardsPath = '/${Routes.account}/${Routes.rewards}';
 
       // Check if the user is trying to go to any part of the auth flow.
       final isGoingToAuth = currentLocation.startsWith(authenticationPath);
@@ -137,6 +138,14 @@ GoRouter createRouter({
           return feedPath;
         }
 
+        // Guard Rewards Page for Anonymous Users
+        if (currentLocation == rewardsPath) {
+          logger.info(
+            '    Action: Anonymous user on rewards path. Redirecting to account linking.',
+          );
+          return accountLinkingPath;
+        }
+
         // Otherwise, allow navigation (e.g., to account linking).
         return null;
       }
@@ -160,6 +169,15 @@ GoRouter createRouter({
           );
           return feedPath;
         }
+      }
+
+      // RULE 4: Feature Gating - Rewards
+      // If the user tries to access rewards but the feature is disabled,
+      // redirect them to the account page.
+      if (currentLocation == rewardsPath &&
+          (remoteConfig?.features.rewards.enabled == false)) {
+        logger.info('    Action: Rewards disabled. Redirecting to account.');
+        return '/${Routes.account}';
       }
 
       // If none of the above rules apply, allow the navigation.

@@ -293,10 +293,10 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
                   return CheckboxListTile(
                     title: Text(type.toL10n(l10n)),
                     subtitle:
-                        type ==
+                        (type ==
                                 PushNotificationSubscriptionDeliveryType
                                     .dailyDigest &&
-                            !isDailyDigestRewardActive
+                            !isDailyDigestRewardActive)
                         ? Text(
                             l10n.requiresActiveReward,
                             style: Theme.of(context).textTheme.bodySmall

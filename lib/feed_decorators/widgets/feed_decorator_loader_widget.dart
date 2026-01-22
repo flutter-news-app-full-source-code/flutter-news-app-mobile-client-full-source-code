@@ -367,6 +367,17 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
   ) async {
     // Access localization strings for dynamic text.
     final l10n = AppLocalizationsX(context).l10n;
+    final remoteConfig = context.read<AppBloc>().state.remoteConfig;
+
+    // Get duration for rewards if applicable
+    String? rewardDuration;
+    if (decoratorType == FeedDecoratorType.unlockRewards) {
+      final adFreeReward =
+          remoteConfig?.features.rewards.rewards[RewardType.adFree];
+      if (adFreeReward != null) {
+        rewardDuration = l10n.rewardsDurationDays(adFreeReward.durationDays);
+      }
+    }
 
     // This logic is a simplified version of the original service, as the
     // content for CTAs is defined statically.
@@ -395,7 +406,10 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
           id: _uuid.v4(),
           decoratorType: decoratorType,
           title: decoratorType.getRandomTitle(l10n),
-          description: decoratorType.getRandomDescription(l10n),
+          description: decoratorType.getRandomDescription(
+            l10n,
+            duration: rewardDuration,
+          ),
           callToActionText: decoratorType.getRandomCtaText(l10n),
           callToActionUrl: ctaUrl,
         );

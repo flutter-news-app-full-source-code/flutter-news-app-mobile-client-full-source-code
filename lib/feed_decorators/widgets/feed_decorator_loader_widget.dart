@@ -85,12 +85,11 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
   // higher priority.
   static const _decoratorPriorities = <FeedDecoratorType, int>{
     FeedDecoratorType.linkAccount: 1,
-    FeedDecoratorType.upgrade: 2,
+    FeedDecoratorType.unlockRewards: 2,
     // Suggested topics and sources are content collections, which are
     // generally lower priority than direct calls to action.
     FeedDecoratorType.suggestedTopics: 3,
     FeedDecoratorType.suggestedSources: 4,
-    FeedDecoratorType.enableNotifications: 5,
     FeedDecoratorType.rateApp: 6,
   };
 
@@ -389,11 +388,9 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
         switch (decoratorType) {
           case FeedDecoratorType.linkAccount:
             ctaUrl = Routes.accountLinking;
-          // Set a placeholder URL for unimplemented features. The button will be
-          // disabled in the UI, so this URL will not be used.
-          case FeedDecoratorType.upgrade:
+          case FeedDecoratorType.unlockRewards:
+            ctaUrl = '/${Routes.account}/${Routes.rewards}';
           case FeedDecoratorType.rateApp:
-          case FeedDecoratorType.enableNotifications:
             ctaUrl = '#';
           case FeedDecoratorType.suggestedTopics:
           case FeedDecoratorType.suggestedSources:

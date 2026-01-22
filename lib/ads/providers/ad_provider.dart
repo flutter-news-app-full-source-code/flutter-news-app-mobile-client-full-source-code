@@ -3,6 +3,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_th
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/rewarded_ad.dart';
 
 /// {@template ad_provider}
 /// An abstract class defining the interface for any ad network provider.
@@ -67,6 +68,13 @@ abstract class AdProvider {
   /// The [adId] is the specific identifier for the ad slot (e.g., interstitial ad unit ID).
   /// The [adThemeStyle] provides UI-agnostic theme properties for ad styling.
   Future<InterstitialAd?> loadInterstitialAd({
+    required AdPlatformIdentifiers adPlatformIdentifiers,
+    required String? adId,
+    required AdThemeStyle adThemeStyle,
+  });
+
+  /// Loads a rewarded ad from the specific ad platform.
+  Future<RewardedAd?> loadRewardedAd({
     required AdPlatformIdentifiers adPlatformIdentifiers,
     required String? adId,
     required AdThemeStyle adThemeStyle,

@@ -335,11 +335,29 @@ class _AppViewState extends State<_AppView> {
     // authentication status changes. GoRouter's `redirect` logic depends on
     // this notifier to re-evaluate routes when the user logs in or out
     // *while the app is running*.
-    return BlocListener<AppBloc, AppState>(
-      listenWhen: (previous, current) => previous.status != current.status,
-      listener: (context, state) {
-        _statusNotifier.value = state.status;
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<AppBloc, AppState>(
+          listenWhen: (previous, current) => previous.status != current.status,
+          listener: (context, state) {
+            _statusNotifier.value = state.status;
+          },
+        ),
+        BlocListener<AppBloc, AppState>(
+          listenWhen: (previous, current) =>
+              previous.transientMessage != current.transientMessage &&
+              current.transientMessage != null,
+          listener: (context, state) {
+            if (state.transientMessage != null &&
+                state.transientMessage!.value.isNotEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.transientMessage!.value)),
+              );
+              context.read<AppBloc>().add(const AppTransientMessageCleared());
+            }
+          },
+        ),
+      ],
       // This BlocBuilder is the "master switch" for the entire application's
       // UI. Based on the AppStatus, it decides whether to show a full-screen
       // status page (like Maintenance) or to build the main application UI

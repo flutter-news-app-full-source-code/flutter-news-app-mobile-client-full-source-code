@@ -113,7 +113,8 @@ A complete and secure user authentication system is built-in, covering the entir
 
 ### 🏆 Engagement-Driven Rewards
 A modern, time-based reward system that unlocks features through user engagement, moving away from traditional subscriptions.
-- **Server-Verified Rewards:** Leverages AdMob's Server-Side Verification (SSV) to securely grant rewards like an ad-free experience or access to daily digests after a user watches a rewarded video ad.
+- **Pay-with-Time Model:** Users can "pay" for premium features (like removing ads or unlocking exclusive content) by engaging with high-value rewarded video ads, monetizing non-paying users without friction.
+- **Server-Verified Security:** Leverages AdMob's Server-Side Verification (SSV) to securely grant rewards like an ad-free experience or access to daily digests, ensuring a fraud-proof economy.
 - **Centralized Rewards Hub:** A dedicated "Rewards Center" allows users to see all available offers, track the countdown on active rewards, and initiate new reward actions.
 - **Configurable Offers:** All reward types and their durations (e.g., "Ad-Free for 24 hours") are controlled via remote configuration, allowing for dynamic adjustments without an app update.
 > **Your Advantage:** Launch with a flexible, engagement-focused monetization strategy. The complex logic for handling ad display, server-side verification, and state management for timed rewards is already built, tested, and ready for production.

@@ -4,3 +4,4 @@ export 'banner_ad.dart';
 export 'inline_ad.dart';
 export 'interstitial_ad.dart';
 export 'native_ad.dart';
+export 'rewarded_ad.dart';

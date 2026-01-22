@@ -382,8 +382,9 @@ class AdMobAdProvider implements AdProvider {
     }
 
     // Set server-side verification options.
-    googleRewardedAd.serverSideVerificationOptions =
-        admob.ServerSideVerificationOptions();
+    await googleRewardedAd.setServerSideOptions(
+      admob.ServerSideVerificationOptions(),
+    );
 
     return RewardedAd(
       id: _uuid.v4(),

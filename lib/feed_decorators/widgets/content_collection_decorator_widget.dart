@@ -86,10 +86,9 @@ class _ContentCollectionViewState extends State<_ContentCollectionView> {
           return l10n.suggestedSourcesTitle;
         // The following cases are for call-to-action types and should not
         // appear in a content collection, but we handle them gracefully.
+        case FeedDecoratorType.unlockRewards:
         case FeedDecoratorType.linkAccount:
-        case FeedDecoratorType.upgrade:
         case FeedDecoratorType.rateApp:
-        case FeedDecoratorType.enableNotifications:
           return widget.item.title;
       }
     }

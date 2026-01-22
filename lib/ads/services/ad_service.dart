@@ -4,6 +4,7 @@ import 'package:core/core.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/rewarded_ad.dart';
 
 /// {@template ad_service_interface}
 /// An interface for the service responsible for managing and providing ads.
@@ -29,6 +30,13 @@ abstract class AdService {
 
   /// Retrieves a loaded full-screen interstitial ad.
   Future<InterstitialAd?> getInterstitialAd({
+    required AdConfig adConfig,
+    required AdThemeStyle adThemeStyle,
+    required AccessTier userTier,
+  });
+
+  /// Retrieves a loaded full-screen rewarded ad.
+  Future<RewardedAd?> getRewardedAd({
     required AdConfig adConfig,
     required AdThemeStyle adThemeStyle,
     required AccessTier userTier,

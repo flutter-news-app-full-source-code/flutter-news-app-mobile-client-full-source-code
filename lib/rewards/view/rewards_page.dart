@@ -65,9 +65,7 @@ class _RewardsPageState extends State<RewardsPage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.rewardsPageTitle),
-      ),
+      appBar: AppBar(title: Text(l10n.rewardsPageTitle)),
       body: BlocConsumer<AppBloc, AppState>(
         listener: (context, state) {
           // If the reward we were verifying is now active, clear the loading state
@@ -82,12 +80,7 @@ class _RewardsPageState extends State<RewardsPage> {
 
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(
-                    l10n.rewardsSnackbarSuccess.replaceFirst(
-                      '{rewardName}',
-                      rewardName,
-                    ),
-                  ),
+                  content: Text(l10n.rewardsSnackbarSuccess(rewardName)),
                 ),
               );
               setState(() {
@@ -99,15 +92,6 @@ class _RewardsPageState extends State<RewardsPage> {
         builder: (context, state) {
           final rewardsConfig = state.remoteConfig?.features.rewards;
           final userRewards = state.userRewards;
-
-          if (rewardsConfig == null || !rewardsConfig.enabled) {
-            return Center(
-              child: EmptyStateMessage(
-                title: l10n.maintenanceHeadline,
-                subtitle: l10n.maintenanceSubheadline,
-              ),
-            );
-          }
 
           final availableRewards = rewardsConfig.rewards.entries
               .where((e) => e.value.enabled)
@@ -174,7 +158,7 @@ class _RewardOfferCard extends StatelessWidget {
         ? l10n.rewardTypeAdFree
         : l10n.rewardTypeDailyDigest;
 
-    final durationString = '$durationDays ${durationDays == 1 ? "Day" : "Days"}'; // Simple pluralization, ideally localized
+    final durationString = l10n.rewardsDurationDays(durationDays);
 
     return Card(
       elevation: 0,
@@ -203,10 +187,7 @@ class _RewardOfferCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     isActive
-                        ? l10n.rewardsOfferActiveTitle.replaceFirst(
-                            '{rewardName}',
-                            rewardName,
-                          )
+                        ? l10n.rewardsOfferActiveTitle(rewardName)
                         : l10n.rewardsOfferTitle(rewardName, durationString),
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
@@ -221,7 +202,7 @@ class _RewardOfferCard extends StatelessWidget {
             else
               Text(
                 type == RewardType.adFree
-                    ? l10n.decoratorUnlockRewardsDescription
+                    ? l10n.decoratorUnlockRewardsDescription(durationString)
                     : 'Unlock daily digests for $durationString.', // Fallback description
                 style: theme.textTheme.bodyMedium,
               ),
@@ -245,7 +226,7 @@ class _RewardOfferCard extends StatelessWidget {
                       )
                     : Text(
                         isActive
-                            ? l10n.rewardsOfferActiveTitle.replaceFirst('{rewardName}', '') // Just "Active" roughly
+                            ? l10n.rewardsOfferActiveTitle('')
                             : l10n.rewardsOfferWatchButton,
                       ),
               ),
@@ -279,10 +260,7 @@ class _CountdownTimer extends StatelessWidget {
         final minutes = difference.inMinutes.remainder(60);
 
         return Text(
-          l10n.rewardsOfferExpiresIn.replaceFirst(
-            '{countdown}',
-            '${hours}h ${minutes}m',
-          ),
+          l10n.rewardsOfferExpiresIn('${hours}h ${minutes}m'),
           style: theme.textTheme.labelLarge?.copyWith(
             color: theme.colorScheme.primary,
             fontWeight: FontWeight.bold,

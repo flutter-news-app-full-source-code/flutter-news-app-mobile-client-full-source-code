@@ -338,8 +338,6 @@ extension on PushNotificationSubscriptionDeliveryType {
         return l10n.notificationDeliveryTypeBreakingOnly;
       case PushNotificationSubscriptionDeliveryType.dailyDigest:
         return l10n.notificationDeliveryTypeDailyDigest;
-      case PushNotificationSubscriptionDeliveryType.weeklyRoundup:
-        return l10n.notificationDeliveryTypeWeeklyRoundup;
     }
   }
 }

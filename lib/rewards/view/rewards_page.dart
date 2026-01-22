@@ -62,7 +62,6 @@ class _RewardsPageState extends State<RewardsPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.rewardsPageTitle)),
@@ -93,9 +92,11 @@ class _RewardsPageState extends State<RewardsPage> {
           final rewardsConfig = state.remoteConfig?.features.rewards;
           final userRewards = state.userRewards;
 
-          final availableRewards = rewardsConfig.rewards.entries
-              .where((e) => e.value.enabled)
-              .toList();
+          final availableRewards =
+              rewardsConfig?.rewards.entries
+                  .where((e) => e.value.enabled)
+                  .toList() ??
+              [];
 
           return ListView.separated(
             padding: const EdgeInsets.all(AppSpacing.lg),
@@ -249,7 +250,7 @@ class _CountdownTimer extends StatelessWidget {
     final theme = Theme.of(context);
 
     return StreamBuilder(
-      stream: Stream.periodic(const Duration(minutes: 1)),
+      stream: Stream<int>.periodic(const Duration(minutes: 1), (x) => x),
       builder: (context, snapshot) {
         final now = DateTime.now();
         if (now.isAfter(expiry)) {

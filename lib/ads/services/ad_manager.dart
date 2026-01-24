@@ -351,6 +351,7 @@ class AdManager implements AdService {
             );
           case AdType.interstitial:
           case AdType.video:
+          case AdType.rewarded:
             return null;
         }
 
@@ -445,6 +446,7 @@ class AdManager implements AdService {
                 : platformAdIdentifiers.iosBannerAdId;
           case AdType.interstitial:
           case AdType.video:
+          case AdType.rewarded:
             adIdentifier = null;
         }
 

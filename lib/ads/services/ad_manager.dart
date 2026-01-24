@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:core/core.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_placeholder.dart';
@@ -144,7 +145,9 @@ class AdManager implements AdService {
       return null;
     }
 
-    final adId = platformAdIdentifiers.interstitialAdId;
+    final adId = Platform.isAndroid
+        ? platformAdIdentifiers.androidInterstitialAdId
+        : platformAdIdentifiers.iosInterstitialAdId;
 
     if (adId == null || adId.isEmpty) {
       _logger.warning(
@@ -210,7 +213,9 @@ class AdManager implements AdService {
       return null;
     }
 
-    final adId = platformAdIdentifiers.rewardedAdId;
+    final adId = Platform.isAndroid
+        ? platformAdIdentifiers.androidRewardedAdId
+        : platformAdIdentifiers.iosRewardedAdId;
 
     if (adId == null || adId.isEmpty) {
       _logger.warning(
@@ -301,8 +306,12 @@ class AdManager implements AdService {
     }
 
     final adId = adType == AdType.native
-        ? platformAdIdentifiers.nativeAdId
-        : platformAdIdentifiers.bannerAdId;
+        ? (Platform.isAndroid
+              ? platformAdIdentifiers.androidNativeAdId
+              : platformAdIdentifiers.iosNativeAdId)
+        : (Platform.isAndroid
+              ? platformAdIdentifiers.androidBannerAdId
+              : platformAdIdentifiers.iosBannerAdId);
 
     if (adId == null || adId.isEmpty) {
       _logger.warning(
@@ -427,9 +436,13 @@ class AdManager implements AdService {
         String? adIdentifier;
         switch (feedAdType) {
           case AdType.native:
-            adIdentifier = platformAdIdentifiers.nativeAdId;
+            adIdentifier = Platform.isAndroid
+                ? platformAdIdentifiers.androidNativeAdId
+                : platformAdIdentifiers.iosNativeAdId;
           case AdType.banner:
-            adIdentifier = platformAdIdentifiers.bannerAdId;
+            adIdentifier = Platform.isAndroid
+                ? platformAdIdentifiers.androidBannerAdId
+                : platformAdIdentifiers.iosBannerAdId;
           case AdType.interstitial:
           case AdType.video:
             adIdentifier = null;

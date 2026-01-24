@@ -6,6 +6,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/rewarded_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
 import 'package:logging/logging.dart';
@@ -36,9 +37,11 @@ class RewardedAdManager {
   RewardedAdManager({
     required AppBloc appBloc,
     required AdService adService,
+    required AnalyticsService analyticsService,
     Logger? logger,
   }) : _appBloc = appBloc,
        _adService = adService,
+       _analyticsService = analyticsService,
        _logger = logger ?? Logger('RewardedAdManager') {
     _appBlocSubscription = _appBloc.stream.listen(_onAppStateChanged);
     _onAppStateChanged(_appBloc.state);
@@ -46,6 +49,7 @@ class RewardedAdManager {
 
   final AppBloc _appBloc;
   final AdService _adService;
+  final AnalyticsService _analyticsService;
   final Logger _logger;
 
   late final StreamSubscription<AppState> _appBlocSubscription;
@@ -171,7 +175,7 @@ class RewardedAdManager {
         // We pass the userId and the rewardType (as custom data) to the backend
         // via the ad provider's verification callback.
         if (userId != null) {
-          admobAd.setServerSideVerificationOptions(
+          await admobAd.setServerSideOptions(
             admob.ServerSideVerificationOptions(
               userId: userId,
               customData: rewardType.name,
@@ -179,28 +183,39 @@ class RewardedAdManager {
           );
         }
 
-        admobAd
-          ..fullScreenContentCallback = admob.FullScreenContentCallback(
-            onAdShowedFullScreenContent: (ad) {
-              _logger.info('AdMob rewarded ad showed full screen.');
-              onAdShowed();
-            },
-            onAdDismissedFullScreenContent: (ad) {
-              _logger.info('AdMob rewarded ad dismissed.');
-              onAdDismissed();
-              ad.dispose();
-            },
-            onAdFailedToShowFullScreenContent: (ad, error) {
-              _logger.severe('AdMob rewarded ad failed to show: $error');
-              onAdFailedToShow(error.message);
-              ad.dispose();
-            },
-          );
+        admobAd.fullScreenContentCallback = admob.FullScreenContentCallback(
+          onAdShowedFullScreenContent: (ad) {
+            _logger.info('AdMob rewarded ad showed full screen.');
+            onAdShowed();
+          },
+          onAdDismissedFullScreenContent: (ad) {
+            _logger.info('AdMob rewarded ad dismissed.');
+            onAdDismissed();
+            ad.dispose();
+          },
+          onAdFailedToShowFullScreenContent: (ad, error) {
+            _logger.severe('AdMob rewarded ad failed to show: $error');
+            onAdFailedToShow(error.message);
+            ad.dispose();
+          },
+        );
 
         await admobAd.show(
           onUserEarnedReward: (ad, reward) {
             _logger.info(
               'User earned reward: amount=${reward.amount}, type=${reward.type}',
+            );
+            unawaited(
+              _analyticsService.logEvent(
+                AnalyticsEvent.adRewardEarned,
+                payload: AdRewardEarnedPayload(
+                  adProvider: AdPlatformType.admob,
+                  adType: AdType.rewarded,
+                  adPlacement: 'rewards_hub',
+                  rewardAmount: reward.amount,
+                  rewardType: rewardType,
+                ),
+              ),
             );
             onRewardEarned(rewardType);
           },

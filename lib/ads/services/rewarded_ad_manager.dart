@@ -164,23 +164,38 @@ class RewardedAdManager {
 
     try {
       if (adToShow.provider == AdPlatformType.admob) {
-        final admobAd = adToShow.adObject as admob.RewardedAd
-        ..fullScreenContentCallback = admob.FullScreenContentCallback(
-          onAdShowedFullScreenContent: (ad) {
-            _logger.info('AdMob rewarded ad showed full screen.');
-            onAdShowed();
-          },
-          onAdDismissedFullScreenContent: (ad) {
-            _logger.info('AdMob rewarded ad dismissed.');
-            onAdDismissed();
-            ad.dispose();
-          },
-          onAdFailedToShowFullScreenContent: (ad, error) {
-            _logger.severe('AdMob rewarded ad failed to show: $error');
-            onAdFailedToShow(error.message);
-            ad.dispose();
-          },
-        );
+        final admobAd = adToShow.adObject as admob.RewardedAd;
+        final userId = _appBloc.state.user?.id;
+
+        // Configure Server-Side Verification (SSV) options.
+        // We pass the userId and the rewardType (as custom data) to the backend
+        // via the ad provider's verification callback.
+        if (userId != null) {
+          admobAd.setServerSideVerificationOptions(
+            admob.ServerSideVerificationOptions(
+              userId: userId,
+              customData: rewardType.name,
+            ),
+          );
+        }
+
+        admobAd
+          ..fullScreenContentCallback = admob.FullScreenContentCallback(
+            onAdShowedFullScreenContent: (ad) {
+              _logger.info('AdMob rewarded ad showed full screen.');
+              onAdShowed();
+            },
+            onAdDismissedFullScreenContent: (ad) {
+              _logger.info('AdMob rewarded ad dismissed.');
+              onAdDismissed();
+              ad.dispose();
+            },
+            onAdFailedToShowFullScreenContent: (ad, error) {
+              _logger.severe('AdMob rewarded ad failed to show: $error');
+              onAdFailedToShow(error.message);
+              ad.dispose();
+            },
+          );
 
         await admobAd.show(
           onUserEarnedReward: (ad, reward) {

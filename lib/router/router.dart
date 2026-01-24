@@ -263,6 +263,7 @@ GoRouter createRouter({
                 create: (context) => RewardedAdManager(
                   appBloc: context.read<AppBloc>(),
                   adService: context.read<AdService>(),
+                  analyticsService: context.read<AnalyticsService>(),
                   logger: context.read<Logger>(),
                 ),
                 child: const RewardsPage(),

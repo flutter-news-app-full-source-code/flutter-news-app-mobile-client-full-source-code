@@ -4,6 +4,7 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/rewarded_ad_manager.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -26,10 +27,28 @@ class _RewardsPageState extends State<RewardsPage> {
   // Tracks which reward is currently being verified to show a loading state.
   RewardType? _verifyingReward;
 
+  @override
+  void initState() {
+    super.initState();
+    unawaited(
+      context.read<AnalyticsService>().logEvent(
+        AnalyticsEvent.rewardsHubViewed,
+        payload: const RewardsHubViewedPayload(),
+      ),
+    );
+  }
+
   void _handleWatchAd(RewardType type) {
     final adManager = context.read<RewardedAdManager>();
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
+
+    unawaited(
+      context.read<AnalyticsService>().logEvent(
+        AnalyticsEvent.rewardOfferClicked,
+        payload: RewardOfferClickedPayload(rewardType: type),
+      ),
+    );
 
     adManager.showAd(
       rewardType: type,
@@ -76,6 +95,26 @@ class _RewardsPageState extends State<RewardsPage> {
               final rewardName = _verifyingReward == RewardType.adFree
                   ? l10n.rewardTypeAdFree
                   : l10n.rewardTypeDailyDigest;
+
+              unawaited(
+                context.read<AnalyticsService>().logEvent(
+                  AnalyticsEvent.rewardGranted,
+                  payload: RewardGrantedPayload(
+                    rewardType: _verifyingReward!,
+                    // Duration is dynamic based on config, but we log the event of success here.
+                    // The payload might require durationDays, we can fetch it from config if needed
+                    // or the backend handles the specifics. For now we log the type.
+                    durationDays:
+                        state
+                            .remoteConfig
+                            ?.features
+                            .rewards
+                            .rewards[_verifyingReward!]
+                            ?.durationDays ??
+                        0,
+                  ),
+                ),
+              );
 
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(

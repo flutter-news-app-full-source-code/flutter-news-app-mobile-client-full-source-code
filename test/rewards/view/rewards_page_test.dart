@@ -238,7 +238,9 @@ void main() {
         // 3. Simulate AppBloc state update (Reward Activated)
         final activeUserRewards = MockUserRewards();
         // Ensure isRewardActive returns false by default for other types (e.g. Daily Digest)
-        when(() => activeUserRewards.isRewardActive(any())).thenReturn(false);
+        when(
+          () => activeUserRewards.isRewardActive(RewardType.dailyDigest),
+        ).thenReturn(false);
         when(
           () => activeUserRewards.isRewardActive(RewardType.adFree),
         ).thenReturn(true);
@@ -266,7 +268,8 @@ void main() {
         expect(find.byType(SnackBar), findsOneWidget);
 
         // Verify UI update (Active state)
-        expect(find.text('Ad-Free Active'), findsOneWidget);
+        // Should find 2 widgets: The Card Title and the Button Text
+        expect(find.text('Ad-Free Active'), findsNWidgets(2));
         expect(find.byIcon(Icons.check_circle), findsOneWidget);
         expect(
           find.byType(FilledButton),

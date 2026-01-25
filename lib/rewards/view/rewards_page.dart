@@ -266,7 +266,7 @@ class _RewardOfferCard extends StatelessWidget {
                       )
                     : Text(
                         isActive
-                            ? l10n.rewardsOfferActiveTitle('')
+                            ? l10n.rewardsOfferActiveTitle(rewardName)
                             : l10n.rewardsOfferWatchButton,
                       ),
               ),

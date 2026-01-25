@@ -22,15 +22,27 @@ Future<void> main() async {
   // Initialize Firebase services.
   // Firebase is manually initialized using options from AppConfig,
   // removing the dependency on the auto-generated firebase_options.dart file.
-  await Firebase.initializeApp(
-    options: FirebaseOptions(
-      apiKey: appConfig.firebaseApiKey,
-      appId: appConfig.firebaseAppId,
-      messagingSenderId: appConfig.firebaseMessagingSenderId,
-      projectId: appConfig.firebaseProjectId,
-      storageBucket: appConfig.firebaseStorageBucket,
-    ),
-  );
+  if (Firebase.apps.isEmpty) {
+    try {
+      await Firebase.initializeApp(
+        options: FirebaseOptions(
+          apiKey: appConfig.firebaseApiKey,
+          appId: appConfig.firebaseAppId,
+          messagingSenderId: appConfig.firebaseMessagingSenderId,
+          projectId: appConfig.firebaseProjectId,
+          storageBucket: appConfig.firebaseStorageBucket,
+        ),
+      );
+    } on FirebaseException catch (e) {
+      if (e.code == 'duplicate-app') {
+        debugPrint(
+          'Firebase initialized by native layer or hot restart: ${e.message}',
+        );
+      } else {
+        rethrow;
+      }
+    }
+  }
 
   final appWidget = await bootstrap(appConfig, appEnvironment);
 

@@ -181,6 +181,7 @@ class AppState extends Equatable {
     ContentAction? limitedAction,
     bool clearLimitedAction = false,
     ValueWrapper<String>? transientMessage,
+    bool clearTransientMessage = false,
   }) {
     return AppState(
       status: status ?? this.status,
@@ -205,7 +206,9 @@ class AppState extends Equatable {
       limitedAction: clearLimitedAction
           ? null
           : limitedAction ?? this.limitedAction,
-      transientMessage: transientMessage ?? this.transientMessage,
+      transientMessage: clearTransientMessage
+          ? null
+          : transientMessage ?? this.transientMessage,
     );
   }
 }

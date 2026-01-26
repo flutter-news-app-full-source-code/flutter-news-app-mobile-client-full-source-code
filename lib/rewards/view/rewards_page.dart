@@ -42,6 +42,7 @@ class _RewardsPageView extends StatelessWidget {
 
     void handleWatchAd(RewardType type) {
       final adManager = context.read<RewardedAdManager>();
+      var isRewardEarned = false;
 
       unawaited(
         context.read<AnalyticsService>().logEvent(
@@ -58,9 +59,9 @@ class _RewardsPageView extends StatelessWidget {
           // Ad is showing, BLoC state is already RewardsLoadingAd.
         },
         onAdDismissed: () {
-          // This is called when the user closes the ad. If the state is still
-          // loading, it means onRewardEarned was not called.
-          if (rewardsBloc.state is RewardsLoadingAd) {
+          // This is called when the user closes the ad.
+          // If the reward was not earned, then it was a premature dismissal.
+          if (!isRewardEarned) {
             rewardsBloc.add(RewardsAdDismissed());
           }
         },
@@ -69,6 +70,7 @@ class _RewardsPageView extends StatelessWidget {
         },
         onRewardEarned: (earnedType) {
           // This is the success signal.
+          isRewardEarned = true;
           rewardsBloc.add(RewardsAdWatched());
         },
       );

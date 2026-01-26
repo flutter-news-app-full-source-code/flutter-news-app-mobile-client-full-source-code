@@ -7,9 +7,20 @@ sealed class RewardsEvent extends Equatable {
   List<Object> get props => [];
 }
 
-final class RewardsAdRequested extends RewardsEvent {}
+final class RewardsStarted extends RewardsEvent {}
+
+final class RewardsAdFailed extends RewardsEvent {}
+
+final class RewardsAdDismissed extends RewardsEvent {}
+
+final class RewardsAdRequested extends RewardsEvent {
+  const RewardsAdRequested({required this.type});
+  final RewardType type;
+}
 
 final class RewardsAdWatched extends RewardsEvent {}
+
+final class SnackbarShown extends RewardsEvent {}
 
 final class _RewardsTimerTicked extends RewardsEvent {}
 

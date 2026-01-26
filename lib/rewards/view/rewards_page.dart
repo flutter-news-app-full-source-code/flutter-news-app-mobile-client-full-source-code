@@ -26,6 +26,9 @@ class RewardsPage extends StatefulWidget {
 class _RewardsPageState extends State<RewardsPage> {
   // Tracks which reward is currently being verified to show a loading state.
   RewardType? _verifyingReward;
+  // Tracks which reward is currently preparing to show the ad.
+  RewardType? _loadingReward;
+  Timer? _pollingTimer;
 
   @override
   void initState() {
@@ -36,6 +39,12 @@ class _RewardsPageState extends State<RewardsPage> {
         payload: const RewardsHubViewedPayload(),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _pollingTimer?.cancel();
+    super.dispose();
   }
 
   void _handleWatchAd(RewardType type) {
@@ -50,10 +59,16 @@ class _RewardsPageState extends State<RewardsPage> {
       ),
     );
 
+    setState(() {
+      _loadingReward = type;
+    });
+
     adManager.showAd(
       rewardType: type,
       onAdShowed: () {
-        // Ad is showing, no specific UI update needed here.
+        setState(() {
+          _loadingReward = null;
+        });
       },
       onAdDismissed: () {
         // If we were verifying, we keep the verifying state until the
@@ -64,6 +79,7 @@ class _RewardsPageState extends State<RewardsPage> {
           SnackBar(content: Text(l10n.rewardsSnackbarFailure)),
         );
         setState(() {
+          _loadingReward = null;
           _verifyingReward = null;
         });
       },
@@ -71,11 +87,36 @@ class _RewardsPageState extends State<RewardsPage> {
         setState(() {
           _verifyingReward = earnedType;
         });
-        // Trigger the refresh in AppBloc. The UI will update automatically
-        // when the new state with the active reward is emitted.
-        context.read<AppBloc>().add(const UserRewardsRefreshed());
+        // Start polling for the reward update. This handles the race condition
+        // where the client callback fires before the backend has processed
+        // the server-side verification (SSV) webhook.
+        _startPollingForReward(earnedType);
       },
     );
+  }
+
+  void _startPollingForReward(RewardType type) {
+    _pollingTimer?.cancel();
+    int attempts = 0;
+    // Poll every 2 seconds for up to 10 seconds (5 attempts).
+    // This gives the backend time to process the SSV webhook.
+    _pollingTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
+      attempts++;
+      if (attempts > 5) {
+        timer.cancel();
+        // If we time out, reset the verifying state. The user can try again
+        // or pull to refresh if they believe it should have worked.
+        if (mounted && _verifyingReward == type) {
+          setState(() {
+            _verifyingReward = null;
+          });
+        }
+        return;
+      }
+
+      // Trigger a refresh of the user rewards.
+      context.read<AppBloc>().add(const UserRewardsRefreshed());
+    });
   }
 
   @override
@@ -95,6 +136,9 @@ class _RewardsPageState extends State<RewardsPage> {
               final rewardName = _verifyingReward == RewardType.adFree
                   ? l10n.rewardTypeAdFree
                   : l10n.rewardTypeDailyDigest;
+
+              // Stop polling as soon as we confirm the reward is active.
+              _pollingTimer?.cancel();
 
               unawaited(
                 context.read<AnalyticsService>().logEvent(
@@ -148,6 +192,7 @@ class _RewardsPageState extends State<RewardsPage> {
               final details = entry.value;
               final isActive = userRewards?.isRewardActive(type) ?? false;
               final isVerifying = _verifyingReward == type;
+              final isLoading = _loadingReward == type;
 
               // Calculate expiration if active
               DateTime? expiry;
@@ -160,6 +205,7 @@ class _RewardsPageState extends State<RewardsPage> {
                 durationDays: details.durationDays,
                 isActive: isActive,
                 isVerifying: isVerifying,
+                isLoading: isLoading,
                 expiry: expiry,
                 onTap: () => _handleWatchAd(type),
               );
@@ -177,6 +223,7 @@ class _RewardOfferCard extends StatelessWidget {
     required this.durationDays,
     required this.isActive,
     required this.isVerifying,
+    required this.isLoading,
     required this.onTap,
     this.expiry,
   });
@@ -185,6 +232,7 @@ class _RewardOfferCard extends StatelessWidget {
   final int durationDays;
   final bool isActive;
   final bool isVerifying;
+  final bool isLoading;
   final VoidCallback onTap;
   final DateTime? expiry;
 
@@ -250,8 +298,10 @@ class _RewardOfferCard extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: FilledButton(
-                onPressed: (isActive || isVerifying) ? null : onTap,
-                child: isVerifying
+                onPressed: (isActive || isVerifying || isLoading)
+                    ? null
+                    : onTap,
+                child: (isVerifying || isLoading)
                     ? Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -261,7 +311,11 @@ class _RewardOfferCard extends StatelessWidget {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           ),
                           const SizedBox(width: AppSpacing.sm),
-                          Text(l10n.rewardsOfferVerifyingButton),
+                          Text(
+                            isLoading
+                                ? l10n.rewardsOfferLoadingButton
+                                : l10n.rewardsOfferVerifyingButton,
+                          ),
                         ],
                       )
                     : Text(

@@ -16,7 +16,7 @@ class RewardsBloc extends Bloc<RewardsEvent, RewardsState> {
     required AnalyticsService analyticsService,
   }) : _appBloc = appBloc,
        _analyticsService = analyticsService,
-       super(RewardsInitial()) {
+       super(const RewardsInitial()) {
     on<RewardsStarted>(_onRewardsStarted);
     on<RewardsAdRequested>(_onRewardsAdRequested);
     on<RewardsAdWatched>(_onRewardsAdWatched);
@@ -70,7 +70,7 @@ class RewardsBloc extends Bloc<RewardsEvent, RewardsState> {
 
   void _onRewardsAdWatched(RewardsAdWatched event, Emitter<RewardsState> emit) {
     if (state.activeRewardType == null) return;
-    emit(RewardsVerifying(activeRewardType: state.activeRewardType!));
+    emit(RewardsVerifying(activeRewardType: state.activeRewardType));
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 2), (_) {
       add(_RewardsTimerTicked());
@@ -91,7 +91,28 @@ class RewardsBloc extends Bloc<RewardsEvent, RewardsState> {
     if (event.isRewardActive) {
       _timer?.cancel();
       if (state is! RewardsSuccess && state.activeRewardType != null) {
-        emit(RewardsSuccess(activeRewardType: state.activeRewardType!));
+        final type = state.activeRewardType!;
+        emit(RewardsSuccess(activeRewardType: type));
+
+        final duration =
+            _appBloc
+                .state
+                .remoteConfig
+                ?.features
+                .rewards
+                .rewards[type]
+                ?.durationDays ??
+            0;
+
+        unawaited(
+          _analyticsService.logEvent(
+            AnalyticsEvent.rewardGranted,
+            payload: RewardGrantedPayload(
+              rewardType: type,
+              durationDays: duration,
+            ),
+          ),
+        );
       }
     }
   }

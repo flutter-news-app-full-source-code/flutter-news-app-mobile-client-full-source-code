@@ -97,18 +97,31 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     // Subscribe to AppBloc to react to global state changes, primarily for
     // keeping the feed's list of saved filters synchronized with the global
     // app state.
-    _appBlocSubscription = _appBloc.stream
-        .map((appState) => appState.userContentPreferences)
-        .distinct()
-        .listen((preferences) {
-          // This subscription's responsibility is to listen for changes in
-          // user preferences (like adding/removing a saved filter) from other
-          // parts of the app and update this BLoC's state accordingly.
-          if (preferences != null &&
-              state.savedHeadlineFilters != preferences.savedHeadlineFilters) {
-            add(_AppContentPreferencesChanged(preferences: preferences));
-          }
-        });
+    _appBlocSubscription = _appBloc.stream.listen((appState) {
+      // Handle UserContentPreferences changes
+      final preferences = appState.userContentPreferences;
+      if (preferences != null &&
+          state.savedHeadlineFilters != preferences.savedHeadlineFilters) {
+        add(_AppContentPreferencesChanged(preferences: preferences));
+      }
+
+      // Handle UserRewards changes (Ad-Free status)
+      final newRewards = appState.userRewards;
+      final wasAdFree =
+          _lastUserRewards?.isRewardActive(RewardType.adFree) ?? false;
+      final isAdFree = newRewards?.isRewardActive(RewardType.adFree) ?? false;
+
+      if (!wasAdFree && isAdFree) {
+        _logger.info('Ad-Free reward activated. Triggering feed refresh.');
+        // Reward just activated. Cache is already cleared by AppBloc.
+        // Trigger refresh to remove ads from UI. We only trigger this if
+        // the feed has already started (adThemeStyle is known).
+        if (state.adThemeStyle != null) {
+          add(HeadlinesFeedRefreshRequested(adThemeStyle: state.adThemeStyle!));
+        }
+      }
+      _lastUserRewards = newRewards;
+    });
 
     on<HeadlinesFeedStarted>(
       _onHeadlinesFeedStarted,
@@ -172,7 +185,8 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   final Logger _logger;
 
   /// Subscription to the AppBloc's state stream.
-  late final StreamSubscription<UserContentPreferences?> _appBlocSubscription;
+  late final StreamSubscription<AppState> _appBlocSubscription;
+  UserRewards? _lastUserRewards;
 
   static const _allFilterId = 'all';
 

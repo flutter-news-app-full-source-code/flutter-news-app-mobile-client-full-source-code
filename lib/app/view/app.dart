@@ -343,20 +343,6 @@ class _AppViewState extends State<_AppView> {
             _statusNotifier.value = state.status;
           },
         ),
-        BlocListener<AppBloc, AppState>(
-          listenWhen: (previous, current) =>
-              previous.transientMessage != current.transientMessage &&
-              current.transientMessage != null,
-          listener: (context, state) {
-            if (state.transientMessage != null &&
-                state.transientMessage!.value.isNotEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.transientMessage!.value)),
-              );
-              context.read<AppBloc>().add(const AppTransientMessageCleared());
-            }
-          },
-        ),
       ],
       // This BlocBuilder is the "master switch" for the entire application's
       // UI. Based on the AppStatus, it decides whether to show a full-screen
@@ -490,6 +476,25 @@ class _AppViewState extends State<_AppView> {
             ],
             child: MaterialApp.router(
               debugShowCheckedModeBanner: false,
+              builder: (context, child) {
+                return BlocListener<AppBloc, AppState>(
+                  listenWhen: (previous, current) =>
+                      previous.transientMessage != current.transientMessage &&
+                      current.transientMessage != null,
+                  listener: (context, state) {
+                    if (state.transientMessage != null &&
+                        state.transientMessage!.value.isNotEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(state.transientMessage!.value)),
+                      );
+                      context.read<AppBloc>().add(
+                        const AppTransientMessageCleared(),
+                      );
+                    }
+                  },
+                  child: child!,
+                );
+              },
               themeMode: state.themeMode,
               theme: lightTheme(
                 scheme: state.flexScheme,

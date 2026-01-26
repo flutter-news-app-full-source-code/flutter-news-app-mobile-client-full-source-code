@@ -1608,6 +1608,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rewardsOfferVerifyingButton => 'Verifying...';
 
   @override
+  String get rewardsOfferLoadingButton => 'Loading Ad...';
+
+  @override
   String rewardsSnackbarSuccess(String rewardName) {
     return 'Reward Unlocked: $rewardName is now active.';
   }

@@ -1604,6 +1604,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get rewardsOfferVerifyingButton => 'جارٍ التحقق...';
 
   @override
+  String get rewardsOfferLoadingButton => 'جارٍ تحميل الإعلان...';
+
+  @override
   String rewardsSnackbarSuccess(String rewardName) {
     return 'تم فتح المكافأة: $rewardName الآن نشط.';
   }

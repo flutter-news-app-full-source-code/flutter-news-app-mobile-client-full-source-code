@@ -2063,6 +2063,10 @@
     "@rewardsOfferVerifyingButton": {
         "description": "Button text shown while a reward is being verified."
     },
+    "rewardsOfferLoadingButton": "Loading Ad...",
+    "@rewardsOfferLoadingButton": {
+        "description": "Button text shown while the ad is being prepared to show."
+    },
     "rewardsSnackbarSuccess": "Reward Unlocked: {rewardName} is now active.",
     "@rewardsSnackbarSuccess": {
         "description": "Snackbar message shown when a reward is successfully unlocked.",

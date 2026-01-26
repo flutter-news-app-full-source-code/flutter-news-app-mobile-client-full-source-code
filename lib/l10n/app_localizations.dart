@@ -3008,6 +3008,12 @@ abstract class AppLocalizations {
   /// **'Verifying...'**
   String get rewardsOfferVerifyingButton;
 
+  /// Button text shown while the ad is being prepared to show.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading Ad...'**
+  String get rewardsOfferLoadingButton;
+
   /// Snackbar message shown when a reward is successfully unlocked.
   ///
   /// In en, this message translates to:

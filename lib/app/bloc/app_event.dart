@@ -310,9 +310,3 @@ class AppContentReported extends AppEvent {
 class UserRewardsRefreshed extends AppEvent {
   const UserRewardsRefreshed();
 }
-
-/// Dispatched after a transient message (e.g., SnackBar) has been shown
-/// to clear it from the state.
-class AppTransientMessageCleared extends AppEvent {
-  const AppTransientMessageCleared();
-}

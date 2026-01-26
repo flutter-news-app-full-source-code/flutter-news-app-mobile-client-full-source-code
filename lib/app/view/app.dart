@@ -477,23 +477,7 @@ class _AppViewState extends State<_AppView> {
             child: MaterialApp.router(
               debugShowCheckedModeBanner: false,
               builder: (context, child) {
-                return BlocListener<AppBloc, AppState>(
-                  listenWhen: (previous, current) =>
-                      previous.transientMessage != current.transientMessage &&
-                      current.transientMessage != null,
-                  listener: (context, state) {
-                    if (state.transientMessage != null &&
-                        state.transientMessage!.value.isNotEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(state.transientMessage!.value)),
-                      );
-                      context.read<AppBloc>().add(
-                        const AppTransientMessageCleared(),
-                      );
-                    }
-                  },
-                  child: child!,
-                );
+                return child!;
               },
               themeMode: state.themeMode,
               theme: lightTheme(

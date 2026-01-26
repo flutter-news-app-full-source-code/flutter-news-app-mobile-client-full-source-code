@@ -118,7 +118,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppBookmarkToggled>(_onAppBookmarkToggled);
     on<AppContentReported>(_onAppContentReported);
     on<UserRewardsRefreshed>(_onUserRewardsRefreshed);
-    on<AppTransientMessageCleared>(_onAppTransientMessageCleared);
 
     // Listen to token refresh events from the push notification service.
     // When a token is refreshed, dispatch an event to trigger device
@@ -214,17 +213,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       final isAdFreeActive =
           userRewards?.isRewardActive(RewardType.adFree) ?? false;
 
-      // Check if any reward has just become active to conditionally show the message.
-      // This prevents spamming the user with "Reward Unlocked!" messages if this
-      // event is triggered multiple times (e.g., during polling).
-      final hasNewActiveReward =
-          userRewards?.activeRewards.keys.any((type) {
-            final wasActive = oldRewards?.isRewardActive(type) ?? false;
-            final isActive = userRewards.isRewardActive(type);
-            return !wasActive && isActive;
-          }) ??
-          false;
-
       if (!wasAdFreeActive && isAdFreeActive) {
         _logger.info(
           '[AppBloc] Ad-Free reward activated. Clearing ad and feed caches.',
@@ -234,25 +222,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         _feedCacheService.clearAll();
       }
 
-      emit(
-        state.copyWith(
-          userRewards: userRewards,
-          transientMessage: hasNewActiveReward
-              ? const ValueWrapper('Reward Unlocked!')
-              : null,
-        ),
-      );
+      emit(state.copyWith(userRewards: userRewards));
       _logger.info('[AppBloc] User rewards refreshed.');
     } catch (e, s) {
       _logger.severe('[AppBloc] Failed to refresh user rewards.', e, s);
     }
-  }
-
-  void _onAppTransientMessageCleared(
-    AppTransientMessageCleared event,
-    Emitter<AppState> emit,
-  ) {
-    emit(state.copyWith(clearTransientMessage: true));
   }
 
   /// Handles all logic related to user authentication state changes.

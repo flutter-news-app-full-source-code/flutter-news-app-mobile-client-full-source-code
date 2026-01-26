@@ -1616,6 +1616,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'فشل التحقق. يرجى المحاولة مرة أخرى بعد لحظات.';
 
   @override
+  String get rewardsAdDismissedSnackbar =>
+      'تم إغلاق الإعلان. يرجى مشاهدة الإعلان بالكامل للحصول على المكافأة.';
+
+  @override
   String get decoratorUnlockRewardsTitle => 'استمتع بتجربة خالية من الإعلانات';
 
   @override

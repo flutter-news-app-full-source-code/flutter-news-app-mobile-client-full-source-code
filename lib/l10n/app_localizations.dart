@@ -3026,6 +3026,12 @@ abstract class AppLocalizations {
   /// **'Verification failed. Please try again in a moment.'**
   String get rewardsSnackbarFailure;
 
+  /// Snackbar message shown when the user dismisses a rewarded ad before completion.
+  ///
+  /// In en, this message translates to:
+  /// **'Ad dismissed. Please watch the full ad to earn the reward.'**
+  String get rewardsAdDismissedSnackbar;
+
   /// Title for the 'Unlock Rewards' decorator.
   ///
   /// In en, this message translates to:

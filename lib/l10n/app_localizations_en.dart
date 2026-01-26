@@ -1620,6 +1620,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Verification failed. Please try again in a moment.';
 
   @override
+  String get rewardsAdDismissedSnackbar =>
+      'Ad dismissed. Please watch the full ad to earn the reward.';
+
+  @override
   String get decoratorUnlockRewardsTitle => 'Unlock an Ad-Free Experience';
 
   @override

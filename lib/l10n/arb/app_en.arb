@@ -2080,6 +2080,10 @@
     "@rewardsSnackbarFailure": {
         "description": "Snackbar message shown when reward verification fails."
     },
+    "rewardsAdDismissedSnackbar": "Ad dismissed. Please watch the full ad to earn the reward.",
+    "@rewardsAdDismissedSnackbar": {
+        "description": "Snackbar message shown when the user dismisses a rewarded ad before completion."
+    },
     "decoratorUnlockRewardsTitle": "Unlock an Ad-Free Experience",
     "@decoratorUnlockRewardsTitle": {
         "description": "Title for the 'Unlock Rewards' decorator."

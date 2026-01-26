@@ -7,6 +7,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/rew
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/rewards/bloc/rewards_bloc.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template rewards_page}
@@ -15,165 +16,98 @@ import 'package:ui_kit/ui_kit.dart';
 /// Allows users to watch ads to unlock features like 'Ad-Free' or 'Daily Digest'.
 /// Handles the ad presentation flow and displays the status of active rewards.
 /// {@endtemplate}
-class RewardsPage extends StatefulWidget {
+class RewardsPage extends StatelessWidget {
   /// {@macro rewards_page}
   const RewardsPage({super.key});
 
   @override
-  State<RewardsPage> createState() => _RewardsPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => RewardsBloc(
+        appBloc: context.read<AppBloc>(),
+        analyticsService: context.read<AnalyticsService>(),
+      )..add(RewardsStarted()),
+      child: const _RewardsPageView(),
+    );
+  }
 }
 
-class _RewardsPageState extends State<RewardsPage> {
-  // Tracks which reward is currently being verified to show a loading state.
-  RewardType? _verifyingReward;
-  // Tracks which reward is currently preparing to show the ad.
-  RewardType? _loadingReward;
-  Timer? _pollingTimer;
-
-  @override
-  void initState() {
-    super.initState();
-    unawaited(
-      context.read<AnalyticsService>().logEvent(
-        AnalyticsEvent.rewardsHubViewed,
-        payload: const RewardsHubViewedPayload(),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _pollingTimer?.cancel();
-    super.dispose();
-  }
-
-  void _handleWatchAd(RewardType type) {
-    final adManager = context.read<RewardedAdManager>();
-    final l10n = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.of(context);
-
-    unawaited(
-      context.read<AnalyticsService>().logEvent(
-        AnalyticsEvent.rewardOfferClicked,
-        payload: RewardOfferClickedPayload(rewardType: type),
-      ),
-    );
-
-    setState(() {
-      _loadingReward = type;
-    });
-
-    adManager.showAd(
-      rewardType: type,
-      onAdShowed: () {
-        setState(() {
-          _loadingReward = null;
-        });
-      },
-      onAdDismissed: () {
-        // If we were verifying, we keep the verifying state until the
-        // AppBloc updates or a timeout occurs.
-      },
-      onAdFailedToShow: (error) {
-        messenger.showSnackBar(
-          SnackBar(content: Text(l10n.rewardsSnackbarFailure)),
-        );
-        setState(() {
-          _loadingReward = null;
-          _verifyingReward = null;
-        });
-      },
-      onRewardEarned: (earnedType) {
-        setState(() {
-          _verifyingReward = earnedType;
-        });
-        // Start polling for the reward update. This handles the race condition
-        // where the client callback fires before the backend has processed
-        // the server-side verification (SSV) webhook.
-        _startPollingForReward(earnedType);
-      },
-    );
-  }
-
-  void _startPollingForReward(RewardType type) {
-    _pollingTimer?.cancel();
-    int attempts = 0;
-    // Poll every 2 seconds for up to 10 seconds (5 attempts).
-    // This gives the backend time to process the SSV webhook.
-    _pollingTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
-      attempts++;
-      if (attempts > 5) {
-        timer.cancel();
-        // If we time out, reset the verifying state. The user can try again
-        // or pull to refresh if they believe it should have worked.
-        if (mounted && _verifyingReward == type) {
-          setState(() {
-            _verifyingReward = null;
-          });
-        }
-        return;
-      }
-
-      // Trigger a refresh of the user rewards.
-      context.read<AppBloc>().add(const UserRewardsRefreshed());
-    });
-  }
+class _RewardsPageView extends StatelessWidget {
+  const _RewardsPageView();
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final rewardsBloc = context.read<RewardsBloc>();
+
+    void handleWatchAd(RewardType type) {
+      final adManager = context.read<RewardedAdManager>();
+
+      unawaited(
+        context.read<AnalyticsService>().logEvent(
+          AnalyticsEvent.rewardOfferClicked,
+          payload: RewardOfferClickedPayload(rewardType: type),
+        ),
+      );
+
+      rewardsBloc.add(RewardsAdRequested(type: type));
+
+      adManager.showAd(
+        rewardType: type,
+        onAdShowed: () {
+          // Ad is showing, BLoC state is already RewardsLoadingAd.
+        },
+        onAdDismissed: () {
+          // This is called when the user closes the ad. If the state is still
+          // loading, it means onRewardEarned was not called.
+          if (rewardsBloc.state is RewardsLoadingAd) {
+            rewardsBloc.add(RewardsAdDismissed());
+          }
+        },
+        onAdFailedToShow: (error) {
+          rewardsBloc.add(RewardsAdFailed());
+        },
+        onRewardEarned: (earnedType) {
+          // This is the success signal.
+          rewardsBloc.add(RewardsAdWatched());
+        },
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.rewardsPageTitle)),
-      body: BlocConsumer<AppBloc, AppState>(
+      body: BlocConsumer<RewardsBloc, RewardsState>(
+        listenWhen: (previous, current) =>
+            current.snackbarMessage != null ||
+            (previous is! RewardsSuccess && current is RewardsSuccess),
         listener: (context, state) {
-          // If the reward we were verifying is now active, clear the loading state
-          // and show success message.
-          if (_verifyingReward != null) {
-            final isNowActive =
-                state.userRewards?.isRewardActive(_verifyingReward!) ?? false;
-            if (isNowActive) {
-              final rewardName = _verifyingReward == RewardType.adFree
-                  ? l10n.rewardTypeAdFree
-                  : l10n.rewardTypeDailyDigest;
+          if (state.snackbarMessage != null) {
+            final message = state.snackbarMessage == 'rewardsSnackbarFailure'
+                ? l10n.rewardsSnackbarFailure
+                : l10n.rewardsAdDismissedSnackbar;
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(SnackBar(content: Text(message)));
+            rewardsBloc.add(SnackbarShown());
+          } else if (state is RewardsSuccess) {
+            final rewardName = state.activeRewardType == RewardType.adFree
+                ? l10n.rewardTypeAdFree
+                : l10n.rewardTypeDailyDigest;
 
-              // Stop polling as soon as we confirm the reward is active.
-              _pollingTimer?.cancel();
-
-              unawaited(
-                context.read<AnalyticsService>().logEvent(
-                  AnalyticsEvent.rewardGranted,
-                  payload: RewardGrantedPayload(
-                    rewardType: _verifyingReward!,
-                    // Duration is dynamic based on config, but we log the event of success here.
-                    // The payload might require durationDays, we can fetch it from config if needed
-                    // or the backend handles the specifics. For now we log the type.
-                    durationDays:
-                        state
-                            .remoteConfig
-                            ?.features
-                            .rewards
-                            .rewards[_verifyingReward!]
-                            ?.durationDays ??
-                        0,
-                  ),
-                ),
-              );
-
-              ScaffoldMessenger.of(context).showSnackBar(
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
                 SnackBar(
                   content: Text(l10n.rewardsSnackbarSuccess(rewardName)),
                 ),
               );
-              setState(() {
-                _verifyingReward = null;
-              });
-            }
           }
         },
         builder: (context, state) {
-          final rewardsConfig = state.remoteConfig?.features.rewards;
-          final userRewards = state.userRewards;
+          // We need to watch AppBloc for the actual rewards data configuration
+          final appState = context.watch<AppBloc>().state;
+          final rewardsConfig = appState.remoteConfig?.features.rewards;
+          final userRewards = appState.userRewards;
 
           final availableRewards =
               rewardsConfig?.rewards.entries
@@ -191,8 +125,11 @@ class _RewardsPageState extends State<RewardsPage> {
               final type = entry.key;
               final details = entry.value;
               final isActive = userRewards?.isRewardActive(type) ?? false;
-              final isVerifying = _verifyingReward == type;
-              final isLoading = _loadingReward == type;
+
+              final isVerifying =
+                  state is RewardsVerifying && state.activeRewardType == type;
+              final isLoading =
+                  state is RewardsLoadingAd && state.activeRewardType == type;
 
               // Calculate expiration if active
               DateTime? expiry;
@@ -207,7 +144,7 @@ class _RewardsPageState extends State<RewardsPage> {
                 isVerifying: isVerifying,
                 isLoading: isLoading,
                 expiry: expiry,
-                onTap: () => _handleWatchAd(type),
+                onTap: () => handleWatchAd(type),
               );
             },
           );

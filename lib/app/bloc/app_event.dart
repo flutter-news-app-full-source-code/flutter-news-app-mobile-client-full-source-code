@@ -308,5 +308,12 @@ class AppContentReported extends AppEvent {
 /// Dispatched when a user reward has been earned or verified, requiring a
 /// refresh of the user's rewards state.
 class UserRewardsRefreshed extends AppEvent {
-  const UserRewardsRefreshed();
+  /// {@macro user_rewards_refreshed}
+  const UserRewardsRefreshed({this.completer});
+
+  /// An optional completer to allow the dispatcher to await a direct response.
+  final Completer<UserRewards?>? completer;
+
+  @override
+  List<Object?> get props => [completer];
 }

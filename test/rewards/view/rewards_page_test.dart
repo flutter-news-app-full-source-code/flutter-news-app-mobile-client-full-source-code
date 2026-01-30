@@ -15,6 +15,8 @@ import 'package:mocktail/mocktail.dart';
 
 class MockAppBloc extends MockBloc<AppEvent, AppState> implements AppBloc {}
 
+class FakeAppEvent extends Fake implements AppEvent {}
+
 class MockRewardedAdManager extends Mock implements RewardedAdManager {}
 
 class MockAnalyticsService extends Mock implements AnalyticsService {}
@@ -31,6 +33,7 @@ void main() {
   setUpAll(() {
     registerFallbackValue(RewardType.adFree);
     registerFallbackValue(AnalyticsEvent.rewardsHubViewed);
+    registerFallbackValue(FakeAppEvent());
   });
 
   late AppBloc appBloc;
@@ -174,107 +177,126 @@ void main() {
       expect(find.byType(SnackBar), findsOneWidget);
     });
 
-    testWidgets(
-      'shows verifying state and dispatches refresh on reward earned',
-      (tester) async {
-        when(
-          () => rewardedAdManager.showAd(
-            rewardType: any(named: 'rewardType'),
-            onAdShowed: any(named: 'onAdShowed'),
-            onAdFailedToShow: any(named: 'onAdFailedToShow'),
-            onAdDismissed: any(named: 'onAdDismissed'),
-            onRewardEarned: any(named: 'onRewardEarned'),
-          ),
-        ).thenAnswer((invocation) async {
-          final onRewardEarned =
-              invocation.namedArguments[#onRewardEarned]
-                  as RewardEarnedCallback;
-          onRewardEarned(RewardType.adFree);
-        });
+    testWidgets('shows verifying state and calls AppBloc on reward earned', (
+      tester,
+    ) async {
+      // 1. Mock the ad manager to call onRewardEarned
+      when(
+        () => rewardedAdManager.showAd(
+          rewardType: any(named: 'rewardType'),
+          onAdShowed: any(named: 'onAdShowed'),
+          onAdFailedToShow: any(named: 'onAdFailedToShow'),
+          onAdDismissed: any(named: 'onAdDismissed'),
+          onRewardEarned: any(named: 'onRewardEarned'),
+        ),
+      ).thenAnswer((invocation) async {
+        final onRewardEarned =
+            invocation.namedArguments[#onRewardEarned] as RewardEarnedCallback;
+        onRewardEarned(RewardType.adFree);
+      });
 
-        await tester.pumpWidget(buildSubject());
+      // 2. Mock the app bloc to do nothing with the completer
+      when(
+        () => appBloc.add(any(that: isA<UserRewardsRefreshed>())),
+      ).thenAnswer((_) {});
 
-        await tester.tap(find.byType(FilledButton).first);
-        await tester.pump();
+      // 3. Build and interact
+      await tester.pumpWidget(buildSubject());
+      await tester.tap(find.byType(FilledButton).first);
+      await tester.pump(); // Enters verifying state
 
-        // Verify loading state (Verifying...)
-        expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      // 4. Verify UI state
+      final l10n = AppLocalizations.of(tester.element(find.byType(ListView)));
+      expect(find.text(l10n.rewardsOfferVerifyingButton), findsOneWidget);
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-        // Verify AppBloc event dispatched
-        verify(() => appBloc.add(const UserRewardsRefreshed())).called(1);
-      },
-    );
+      // 5. Advance timer and verify AppBloc call
+      await tester.pump(const Duration(seconds: 2));
+      verify(
+        () => appBloc.add(any(that: isA<UserRewardsRefreshed>())),
+      ).called(1);
+    });
 
     testWidgets(
       'updates UI to active and shows success snackbar when reward activates',
       (tester) async {
-        // Setup a controller to manually drive the bloc stream.
-        // This allows us to emit states *after* the widget has subscribed.
-        final stateController = StreamController<AppState>.broadcast();
-        when(() => appBloc.stream).thenAnswer((_) => stateController.stream);
-
-        // 1. Start with no active rewards
-        when(
-          () => rewardedAdManager.showAd(
-            rewardType: any(named: 'rewardType'),
-            onAdShowed: any(named: 'onAdShowed'),
-            onAdFailedToShow: any(named: 'onAdFailedToShow'),
-            onAdDismissed: any(named: 'onAdDismissed'),
-            onRewardEarned: any(named: 'onRewardEarned'),
-          ),
-        ).thenAnswer((invocation) async {
-          final onRewardEarned =
-              invocation.namedArguments[#onRewardEarned]
-                  as RewardEarnedCallback;
-          onRewardEarned(RewardType.adFree);
-        });
-
-        await tester.pumpWidget(buildSubject());
-
-        // 2. Trigger ad watch
-        await tester.tap(find.byType(FilledButton).first);
-        await tester.pump();
-
-        // 3. Simulate AppBloc state update (Reward Activated)
+        final appStateController = StreamController<AppState>();
+        // 1. Mocks
         final activeUserRewards = MockUserRewards();
-        // Ensure isRewardActive returns false by default for other types (e.g. Daily Digest)
-        when(
-          () => activeUserRewards.isRewardActive(RewardType.dailyDigest),
-        ).thenReturn(false);
         when(
           () => activeUserRewards.isRewardActive(RewardType.adFree),
         ).thenReturn(true);
+        when(
+          () => activeUserRewards.isRewardActive(RewardType.dailyDigest),
+        ).thenReturn(false);
         when(() => activeUserRewards.activeRewards).thenReturn({
           RewardType.adFree: DateTime.now().add(const Duration(days: 7)),
         });
 
-        final newState = AppState(
+        final appStateWithActiveReward = AppState(
           status: AppLifeCycleStatus.authenticated,
           remoteConfig: remoteConfig,
           userRewards: activeUserRewards,
         );
 
-        // Update the state getter and emit the new state
-        when(() => appBloc.state).thenReturn(newState);
-        stateController.add(newState);
+        whenListen(
+          appBloc,
+          appStateController.stream,
+          initialState: appBloc.state,
+        );
 
-        // Pump to process the stream event and then pump for animation
-        await tester.pump();
-        await tester.pump(
-          const Duration(seconds: 1),
-        ); // Allow SnackBar animation
+        // 2. Mock AppBloc.add to complete the completer and trigger state change
+        when(
+          () => appBloc.add(any(that: isA<UserRewardsRefreshed>())),
+        ).thenAnswer((invocation) {
+          final event =
+              invocation.positionalArguments.first as UserRewardsRefreshed;
+          event.completer?.complete(activeUserRewards);
+          appStateController.add(appStateWithActiveReward);
+        });
 
-        // Verify Success SnackBar
+        // 3. Mock ad manager
+        when(
+          () => rewardedAdManager.showAd(
+            rewardType: any(named: 'rewardType'),
+            onAdShowed: any(named: 'onAdShowed'),
+            onAdFailedToShow: any(named: 'onAdFailedToShow'),
+            onAdDismissed: any(named: 'onAdDismissed'),
+            onRewardEarned: any(named: 'onRewardEarned'),
+          ),
+        ).thenAnswer((invocation) async {
+          final onRewardEarned =
+              invocation.namedArguments[#onRewardEarned]
+                  as RewardEarnedCallback;
+          onRewardEarned(RewardType.adFree);
+        });
+
+        // 4. Build and interact
+        await tester.pumpWidget(buildSubject());
+        await tester.tap(find.byType(FilledButton).first);
+        await tester.pump(); // Enter verifying state
+
+        // 5. Advance timer and process completer
+        await tester.pump(const Duration(seconds: 2)); // Timer tick
+        await tester.pump(); // Process the future and state emission
+        await tester.pumpAndSettle(); // Settle UI animations
+
+        // 6. Get l10n instance for verification
+        final l10n = AppLocalizations.of(tester.element(find.byType(ListView)));
+        final rewardName = l10n.rewardTypeAdFree;
+
+        // 7. Verify
         expect(find.byType(SnackBar), findsOneWidget);
-
-        // Verify UI update (Active state)
-        // Should find 2 widgets: The Card Title and the Button Text
-        expect(find.text('Ad-Free Active'), findsNWidgets(2));
-        expect(find.byIcon(Icons.check_circle), findsOneWidget);
         expect(
-          find.byType(FilledButton),
-          findsNWidgets(2),
-        ); // Both buttons present
+          find.text(l10n.rewardsSnackbarSuccess(rewardName)),
+          findsOneWidget,
+        );
+        expect(
+          find.text(l10n.rewardsOfferActiveTitle(rewardName)),
+          findsOneWidget,
+        );
+        expect(find.byIcon(Icons.check_circle), findsOneWidget);
+        expect(find.text(l10n.rewardsOfferActiveButton), findsOneWidget);
 
         verify(
           () => analyticsService.logEvent(
@@ -282,9 +304,35 @@ void main() {
             payload: any(named: 'payload'),
           ),
         ).called(1);
-
-        await stateController.close();
+        unawaited(appStateController.close());
       },
     );
+
+    testWidgets('shows countdown timer for active reward', (tester) async {
+      final expiry = DateTime.now().add(const Duration(hours: 1, minutes: 30));
+      final activeRewards = MockUserRewards();
+      when(() => activeRewards.isRewardActive(any())).thenReturn(false);
+      when(
+        () => activeRewards.isRewardActive(RewardType.adFree),
+      ).thenReturn(true);
+      when(
+        () => activeRewards.activeRewards,
+      ).thenReturn({RewardType.adFree: expiry});
+
+      when(() => appBloc.state).thenReturn(
+        AppState(
+          status: AppLifeCycleStatus.authenticated,
+          remoteConfig: remoteConfig,
+          userRewards: activeRewards,
+        ),
+      );
+
+      await tester.pumpWidget(buildSubject());
+
+      // Use a flexible matcher to account for minor timing differences in tests.
+      final countdownFinder = find.textContaining(RegExp('Expires in: 1h'));
+
+      expect(countdownFinder, findsOneWidget);
+    });
   });
 }

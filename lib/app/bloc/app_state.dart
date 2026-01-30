@@ -16,7 +16,7 @@ class AppState extends Equatable {
     this.remoteConfig,
     this.error,
     this.userContentPreferences,
-    this.userSubscription,
+    this.userRewards,
     this.settings,
     this.selectedBottomNavigationIndex = 0,
     this.currentAppVersion,
@@ -54,8 +54,8 @@ class AppState extends Equatable {
   /// This is null until successfully fetched from the backend.
   final UserContentPreferences? userContentPreferences;
 
-  /// The user's active subscription, if any.
-  final UserSubscription? userSubscription;
+  /// The user's active rewards, if any.
+  final UserRewards? userRewards;
 
   /// The currently selected index for bottom navigation.
   final int selectedBottomNavigationIndex;
@@ -145,7 +145,7 @@ class AppState extends Equatable {
     remoteConfig,
     error,
     userContentPreferences,
-    userSubscription,
+    userRewards,
     selectedBottomNavigationIndex,
     currentAppVersion,
     latestAppVersion,
@@ -165,7 +165,7 @@ class AppState extends Equatable {
     bool clearError = false,
     bool clearUser = false,
     UserContentPreferences? userContentPreferences,
-    UserSubscription? userSubscription,
+    UserRewards? userRewards,
     int? selectedBottomNavigationIndex,
     String? currentAppVersion,
     String? latestAppVersion,
@@ -185,9 +185,7 @@ class AppState extends Equatable {
       userContentPreferences: clearUser
           ? null
           : userContentPreferences ?? this.userContentPreferences,
-      userSubscription: clearUser
-          ? null
-          : userSubscription ?? this.userSubscription,
+      userRewards: clearUser ? null : userRewards ?? this.userRewards,
       selectedBottomNavigationIndex:
           selectedBottomNavigationIndex ?? this.selectedBottomNavigationIndex,
       currentAppVersion: currentAppVersion ?? this.currentAppVersion,

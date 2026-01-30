@@ -145,7 +145,6 @@ _getBottomSheetContent({
         },
       );
     case LimitationStatus.standardUserLimitReached:
-    case LimitationStatus.premiumUserLimitReached:
       final body = switch (action) {
         ContentAction.bookmarkHeadline => l10n.limitReachedBodySave,
         ContentAction.followTopic ||
@@ -160,9 +159,7 @@ _getBottomSheetContent({
           l10n.limitReachedBodySubscribeToNotifications,
       };
 
-      final buttonText = userTier == AccessTier.standard
-          ? l10n.upgradeButton
-          : l10n.manageMyContentButton;
+      final buttonText = l10n.unlockMoreButton;
 
       return (
         title: l10n.limitReachedTitle,
@@ -171,14 +168,14 @@ _getBottomSheetContent({
         onPressed: () {
           analyticsService.logEvent(
             AnalyticsEvent.limitExceededCtaClicked,
-            payload: const LimitExceededCtaClickedPayload(ctaType: 'dismiss'),
+            payload: const LimitExceededCtaClickedPayload(
+              ctaType: 'unlockRewards',
+            ),
           );
           Navigator.of(context).pop();
-          if (userTier == AccessTier.standard) {
-            context.pushNamed(Routes.paywallName);
-          } else {
-            context.pushNamed(Routes.manageFollowedItemsName);
-          }
+          // Always direct to the rewards page as the primary way to
+          // overcome limitations.
+          context.pushNamed(Routes.rewardsName);
         },
       );
     case LimitationStatus.allowed:

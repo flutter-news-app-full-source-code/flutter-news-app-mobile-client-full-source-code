@@ -1581,146 +1581,99 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get paywallTitle => 'Unlock Full Access';
+  String get accountRewardsTile => 'Rewards & Offers';
 
   @override
-  String get paywallSubtitle =>
-      'Get more from your news feed with Premium limits and features.';
+  String get rewardsPageTitle => 'Rewards';
 
   @override
-  String get paywallFeatureFollowMore => 'Follow More Topics & Sources';
-
-  @override
-  String get paywallFeatureSaveMore => 'Save More Articles';
-
-  @override
-  String get paywallFeatureAdvancedFilters => 'Advanced Filters & Alerts';
-
-  @override
-  String get paywallFeatureUnlimitedHistory => 'Unlimited Reading History';
-
-  @override
-  String get paywallMonthlyPlan => 'Monthly';
-
-  @override
-  String get paywallAnnualPlan => 'Annual';
-
-  @override
-  String get paywallBestValue => 'Best Value';
-
-  @override
-  String get paywallRestorePurchases => 'Restore Purchases';
-
-  @override
-  String get paywallTermsOfService => 'Terms of Service';
-
-  @override
-  String get paywallPrivacyPolicy => 'Privacy Policy';
-
-  @override
-  String get paywallDisclaimer =>
-      'Subscription automatically renews unless auto-renew is turned off at least 24-hours before the end of the current period.';
-
-  @override
-  String paywallSubscribeButton(String price, String period) {
-    return 'Subscribe for $price / $period';
+  String rewardsOfferTitle(String rewardName, String duration) {
+    return 'Get $rewardName for $duration';
   }
 
   @override
-  String get paywallSuccessTitle => 'Welcome to Premium!';
-
-  @override
-  String get paywallSuccessBody => 'You now have full access to all features.';
-
-  @override
-  String get paywallErrorTitle => 'Purchase Failed';
-
-  @override
-  String get paywallLoading => 'Verifying purchase...';
-
-  @override
-  String get subscriptionDetailsPageTitle => 'Subscription Details';
-
-  @override
-  String get manageSubscriptionButton => 'Manage Subscription';
-
-  @override
-  String get subscriptionDetailsCurrentPlan => 'Current Plan';
-
-  @override
-  String subscriptionDetailsRenewsOn(String date) {
-    return 'Renews on $date';
+  String rewardsOfferActiveTitle(String rewardName) {
+    return '$rewardName Active';
   }
 
   @override
-  String subscriptionDetailsExpiresOn(String date) {
-    return 'Expires on $date';
+  String rewardsOfferExpiresIn(String countdown) {
+    return 'Expires in: $countdown';
   }
 
   @override
-  String get subscriptionDetailsWillNotRenew => 'Will not renew';
+  String get rewardsOfferWatchButton => 'Watch Video';
 
   @override
-  String get subscriptionDetailsProvider => 'Provider';
+  String get rewardsOfferVerifyingButton => 'Verifying...';
 
   @override
-  String get subscriptionDetailsManageButton => 'Manage in App Store';
+  String get rewardsOfferLoadingButton => 'Loading Ad...';
 
   @override
-  String get subscriptionDetailsLoading => 'Loading subscription details...';
+  String rewardsSnackbarSuccess(String rewardName) {
+    return 'Reward Unlocked: $rewardName is now active.';
+  }
 
   @override
-  String get subscriptionDetailsError => 'Could not load subscription details.';
+  String get rewardsSnackbarFailure =>
+      'Verification failed. Please try again in a moment.';
 
   @override
-  String get subscriptionDetailsNoSubscription =>
-      'You do not have an active subscription.';
+  String get rewardsAdDismissedSnackbar =>
+      'Ad dismissed. Please watch the full ad to earn the reward.';
 
   @override
-  String get subscriptionUpgradeButton => 'Upgrade';
+  String get decoratorUnlockRewardsTitle => 'Unlock an Ad-Free Experience';
 
   @override
-  String get subscriptionDowngradeButton => 'Downgrade';
+  String decoratorUnlockRewardsDescription(String duration) {
+    return 'Watch a short video to enjoy the app without ads for $duration.';
+  }
 
   @override
-  String get subscriptionCurrentPlan => 'Current Plan';
+  String get decoratorUnlockRewardsCta => 'Watch Now';
 
   @override
-  String get subscriptionStatusGracePeriod =>
-      'Your subscription is in a grace period. Please update your payment method to retain access.';
+  String rewardsDurationDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Days',
+      one: '1 Day',
+    );
+    return '$_temp0';
+  }
 
   @override
-  String get subscriptionStatusBillingIssue =>
-      'Your subscription is on hold due to a billing issue. Please update your payment method.';
+  String get rewardTypeAdFree => 'Ad-Free';
 
   @override
-  String get subscriptionUpgradeTitle => 'Upgrade Plan';
+  String get rewardTypeDailyDigest => 'Daily Digest';
 
   @override
-  String get subscriptionUpgradeDescription =>
-      'Switch to an annual plan and save.';
+  String get unlockMoreButton => 'Unlock More';
 
   @override
-  String get subscriptionDowngradeTitle => 'Downgrade Plan';
+  String get requiresActiveReward =>
+      'Requires an active reward. You can unlock rewards from the Account page.';
 
   @override
-  String get subscriptionDowngradeDescription =>
-      'Switch to a monthly billing cycle.';
+  String get rewardsAdFreeTitle => 'Enjoy an Ad-Free Experience';
 
   @override
-  String get subscriptionSwitchButton => 'Switch Plan';
+  String rewardsAdFreeDescription(String duration) {
+    return 'Watch a short video to remove all ads from the app for $duration.';
+  }
 
   @override
-  String get paywallRestorePurchaseButton => 'Restore Purchases';
+  String get rewardsDailyDigestTitle => 'Unlock Daily News Digests';
 
   @override
-  String get paywallRestoreSuccess =>
-      'Your purchases have been successfully restored.';
+  String rewardsDailyDigestDescription(String duration) {
+    return 'Receive a daily push notification summarizing the top headlines from your saved filters that have the \'Daily Digest\' option enabled. Active for $duration.';
+  }
 
   @override
-  String get paywallRestoreFailure =>
-      'Could not restore purchases. Please try again or contact support.';
-
-  @override
-  String get paywallRestoringPurchases => 'Restoring purchases...';
+  String get rewardsOfferActiveButton => 'Active';
 }

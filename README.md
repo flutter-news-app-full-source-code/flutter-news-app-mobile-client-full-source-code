@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="https://flutter-news-app-full-source-code.github.io/docs/mobile-client/local-setup/"><img src="https://img.shields.io/badge/DOCUMENTATION-READ-slategray?style=for-the-badge" alt="Documentation: Read"></a>
-  <img src="https://img.shields.io/badge/coverage-16%25-green?style=for-the-badge" alt="coverage: _%">
+  <img src="https://img.shields.io/badge/coverage-12%25-green?style=for-the-badge" alt="coverage: _%">
   <a href="LICENSE"><img src="https://img.shields.io/badge/TRIAL_LICENSE-VIEW_TERMS-blue?style=for-the-badge" alt="Trial License: View Terms"></a>
   <a href="https://github.com/sponsors/flutter-news-app-full-source-code"><img src="https://img.shields.io/badge/LIFETIME_LICENSE-PURCHASE-purple?style=for-the-badge" alt="Lifetime License: Purchase"></a>
 </p>
@@ -111,20 +111,20 @@ A complete and secure user authentication system is built-in, covering the entir
 <details>
 <summary><strong>⚙️ Monetization & Revenue</strong></summary>
 
-### 💳 Robust In-App Subscriptions
-A complete, App Store and Google Play compliant subscription system that unlocks premium features and drives revenue.
-- **Tiered Access Control:** Implements a clear distinction between `Guest`, `Standard`, and `Premium` user tiers, with feature access controlled by remote configuration.
-- **Defined User Journeys:** The router enforces strict user journeys: Guests are funneled to account creation, Standard users see the upgrade path, and Premium users are directed to subscription management.
-- **Zero-Trust Backend Validation:** All purchases and restorations are validated server-side, ensuring that entitlements are only granted after your backend confirms the receipt with Apple/Google. This prevents client-side fraud.
-- **Store-Compliant Restore Flow:** Includes a mandatory "Restore Purchases" flow, allowing users to reclaim their premium status on new devices, with backend logic to handle entitlement transfers between user accounts.
-> **Your Advantage:** Launch with a secure, scalable, and store-compliant subscription model. The complex logic for handling purchases, restorations, and state management is already built, tested, and ready for production.
+### 🏆 Engagement-Driven Rewards
+A modern, time-based reward system that unlocks features through user engagement, moving away from traditional subscriptions.
+- **Pay-with-Time Model:** Users can "pay" for premium features (like removing ads or unlocking exclusive content) by engaging with high-value rewarded video ads, monetizing non-paying users without friction.
+- **Server-Verified Security:** Leverages AdMob's Server-Side Verification (SSV) to securely grant rewards like an ad-free experience or access to daily digests, ensuring a fraud-proof economy.
+- **Centralized Rewards Hub:** A dedicated "Rewards Center" allows users to see all available offers, track the countdown on active rewards, and initiate new reward actions.
+- **Configurable Offers:** All reward types and their durations (e.g., "Ad-Free for 24 hours") are controlled via remote configuration, allowing for dynamic adjustments without an app update.
+> **Your Advantage:** Launch with a flexible, engagement-focused monetization strategy. The complex logic for handling ad display, server-side verification, and state management for timed rewards is already built, tested, and ready for production.
 
 ---
 
 ### 💸 Flexible, Provider-Agnostic Monetization
 Start generating revenue immediately with a sophisticated ad system designed for performance and flexibility.
 - **Multi-Provider Architecture:** Built on an abstraction that supports any ad network. It ships with production-ready providers for Google AdMob plus a Demo provider for easy testing.
-- **Theme-Aware Native Ads:** Ads automatically adapt to the user's theme settings, making them feel like a natural part of the UI instead of an intrusion.
+- **Theme-Aware Ads:** Both inline and full-screen ads automatically adapt to the user's theme settings, making them feel like a natural part of the UI instead of an intrusion.
 - **Performance Optimized:** An intelligent caching layer for inline and interstitial ads ensures a smooth, jank-free scrolling experience in feeds and during navigation.
 > **Your Advantage:** Deploy a highly extensible, revenue-ready ad system that respects the user experience and scales with your business needs, all without being locked into a single provider.
 

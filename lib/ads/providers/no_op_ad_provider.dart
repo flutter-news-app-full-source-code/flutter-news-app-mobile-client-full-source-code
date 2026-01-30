@@ -3,6 +3,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_th
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/rewarded_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/ad_provider.dart';
 import 'package:logging/logging.dart';
 
@@ -52,6 +53,16 @@ class NoOpAdProvider implements AdProvider {
     required AdThemeStyle adThemeStyle,
   }) async {
     _logger.fine('NoOpAdProvider: loadInterstitialAd called. Returning null.');
+    return null;
+  }
+
+  @override
+  Future<RewardedAd?> loadRewardedAd({
+    required AdPlatformIdentifiers adPlatformIdentifiers,
+    required String? adId,
+    required AdThemeStyle adThemeStyle,
+  }) async {
+    _logger.fine('NoOpAdProvider: loadRewardedAd called. Returning null.');
     return null;
   }
 

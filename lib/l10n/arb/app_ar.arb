@@ -2017,196 +2017,143 @@
             }
         }
     },
-    "paywallTitle": "افتح الوصول الكامل",
-    "@paywallTitle": {
-        "description": "Title of the paywall screen."
+    "accountRewardsTile": "المكافآت والعروض",
+    "@accountRewardsTile": {
+        "description": "Title for the rewards navigation tile in the account page."
     },
-    "paywallSubtitle": "احصل على المزيد من موجز الأخبار الخاص بك مع حدود وميزات بريميوم.",
-    "@paywallSubtitle": {
-        "description": "Subtitle of the paywall screen."
+    "rewardsPageTitle": "المكافآت",
+    "@rewardsPageTitle": {
+        "description": "Title for the rewards page."
     },
-    "paywallFeatureFollowMore": "تابع المزيد من المواضيع والمصادر",
-    "@paywallFeatureFollowMore": {
-        "description": "Feature list item: Increased follow limits."
-    },
-    "paywallFeatureSaveMore": "احفظ المزيد من المقالات",
-    "@paywallFeatureSaveMore": {
-        "description": "Feature list item: Increased save limits."
-    },
-    "paywallFeatureAdvancedFilters": "فلاتر وتنبيهات متقدمة",
-    "@paywallFeatureAdvancedFilters": {
-        "description": "Feature list item: Advanced filtering and notifications."
-    },
-    "paywallFeatureUnlimitedHistory": "سجل قراءة غير محدود",
-    "@paywallFeatureUnlimitedHistory": {
-        "description": "Feature list item: Unlimited history."
-    },
-    "paywallMonthlyPlan": "شهري",
-    "@paywallMonthlyPlan": {
-        "description": "Label for the monthly subscription plan."
-    },
-    "paywallAnnualPlan": "سنوي",
-    "@paywallAnnualPlan": {
-        "description": "Label for the annual subscription plan."
-    },
-    "paywallBestValue": "أفضل قيمة",
-    "@paywallBestValue": {
-        "description": "Badge text for the best value plan."
-    },
-    "paywallRestorePurchases": "استعادة المشتريات",
-    "@paywallRestorePurchases": {
-        "description": "Button text to restore purchases."
-    },
-    "paywallTermsOfService": "شروط الخدمة",
-    "@paywallTermsOfService": {
-        "description": "Link text for Terms of Service."
-    },
-    "paywallPrivacyPolicy": "سياسة الخصوصية",
-    "@paywallPrivacyPolicy": {
-        "description": "Link text for Privacy Policy."
-    },
-    "paywallDisclaimer": "يتم تجديد الاشتراك تلقائيًا ما لم يتم إيقاف التجديد التلقائي قبل 24 ساعة على الأقل من نهاية الفترة الحالية.",
-    "@paywallDisclaimer": {
-        "description": "Disclaimer text regarding auto-renewal."
-    },
-    "paywallSubscribeButton": "اشترك مقابل {price} / {period}",
-    "@paywallSubscribeButton": {
-        "description": "Subscribe button text.",
+    "rewardsOfferTitle": "احصل على {rewardName} لمدة {duration}",
+    "@rewardsOfferTitle": {
+        "description": "Title for a reward offer card, indicating the reward and its duration.",
         "placeholders": {
-            "price": {
-                "type": "String",
-                "example": "$4.99"
+            "rewardName": {
+                "type": "String"
             },
-            "period": {
-                "type": "String",
-                "example": "Month"
-            }
-        }
-    },
-    "paywallSuccessTitle": "مرحبًا بك في بريميوم!",
-    "@paywallSuccessTitle": {
-        "description": "Title of the success dialog."
-    },
-    "paywallSuccessBody": "لديك الآن وصول كامل إلى جميع الميزات.",
-    "@paywallSuccessBody": {
-        "description": "Body of the success dialog."
-    },
-    "paywallErrorTitle": "فشلت عملية الشراء",
-    "@paywallErrorTitle": {
-        "description": "Title of the error dialog."
-    },
-    "paywallLoading": "جارٍ التحقق من الشراء...",
-    "@paywallLoading": {
-        "description": "Loading text shown during purchase verification."
-    },
-    "subscriptionDetailsPageTitle": "تفاصيل الاشتراك",
-    "@subscriptionDetailsPageTitle": {
-        "description": "Title for the subscription details page."
-    },
-    "manageSubscriptionButton": "إدارة الاشتراك",
-    "@manageSubscriptionButton": {
-        "description": "Button text to manage subscription."
-    },
-    "subscriptionDetailsCurrentPlan": "الخطة الحالية",
-    "@subscriptionDetailsCurrentPlan": {
-        "description": "Label for the current subscription plan."
-    },
-    "subscriptionDetailsRenewsOn": "يتجدد في {date}",
-    "@subscriptionDetailsRenewsOn": {
-        "description": "Text indicating the renewal date of a subscription.",
-        "placeholders": {
-            "date": {
+            "duration": {
                 "type": "String"
             }
         }
     },
-    "subscriptionDetailsExpiresOn": "ينتهي في {date}",
-    "@subscriptionDetailsExpiresOn": {
-        "description": "Text indicating the expiration date of a non-renewing subscription.",
+    "rewardsOfferActiveTitle": "{rewardName} مفعل",
+    "@rewardsOfferActiveTitle": {
+        "description": "Title for an active reward offer card.",
         "placeholders": {
-            "date": {
+            "rewardName": {
                 "type": "String"
             }
         }
     },
-    "subscriptionDetailsWillNotRenew": "لن يتجدد",
-    "@subscriptionDetailsWillNotRenew": {
-        "description": "Status text for a subscription that has been cancelled and will not auto-renew."
+    "rewardsOfferExpiresIn": "ينتهي في: {countdown}",
+    "@rewardsOfferExpiresIn": {
+        "description": "Text showing the remaining time for an active reward.",
+        "placeholders": {
+            "countdown": {
+                "type": "String"
+            }
+        }
     },
-    "subscriptionDetailsProvider": "المزود",
-    "@subscriptionDetailsProvider": {
-        "description": "Label for the subscription provider (e.g., Apple App Store)."
+    "rewardsOfferWatchButton": "شاهد الفيديو",
+    "@rewardsOfferWatchButton": {
+        "description": "Button text to watch a video to earn a reward."
     },
-    "subscriptionDetailsManageButton": "إدارة في المتجر",
-    "@subscriptionDetailsManageButton": {
-        "description": "Button text to open the native subscription management UI."
+    "rewardsOfferVerifyingButton": "جارٍ التحقق...",
+    "@rewardsOfferVerifyingButton": {
+        "description": "Button text shown while a reward is being verified."
     },
-    "subscriptionDetailsLoading": "جارٍ تحميل تفاصيل الاشتراك...",
-    "@subscriptionDetailsLoading": {
-        "description": "Text shown while subscription details are loading."
+    "rewardsOfferLoadingButton": "جارٍ تحميل الإعلان...",
+    "@rewardsOfferLoadingButton": {
+        "description": "Button text shown while the ad is being prepared to show."
     },
-    "subscriptionDetailsError": "تعذر تحميل تفاصيل الاشتراك.",
-    "@subscriptionDetailsError": {
-        "description": "Error message when subscription details fail to load."
+    "rewardsSnackbarSuccess": "تم فتح المكافأة: {rewardName} الآن نشط.",
+    "@rewardsSnackbarSuccess": {
+        "description": "Snackbar message shown when a reward is successfully unlocked.",
+        "placeholders": {
+            "rewardName": {
+                "type": "String"
+            }
+        }
     },
-    "subscriptionDetailsNoSubscription": "ليس لديك اشتراك نشط.",
-    "@subscriptionDetailsNoSubscription": {
-        "description": "Message shown when the user has no active subscription."
+    "rewardsSnackbarFailure": "فشل التحقق. يرجى المحاولة مرة أخرى بعد لحظات.",
+    "@rewardsSnackbarFailure": {
+        "description": "Snackbar message shown when reward verification fails."
     },
-    "subscriptionUpgradeButton": "ترقية",
-    "@subscriptionUpgradeButton": {
-        "description": "Button text for upgrading a subscription plan."
+    "rewardsAdDismissedSnackbar": "تم إغلاق الإعلان. يرجى مشاهدة الإعلان بالكامل للحصول على المكافأة.",
+    "@rewardsAdDismissedSnackbar": {
+        "description": "Snackbar message shown when the user dismisses a rewarded ad before completion."
     },
-    "subscriptionDowngradeButton": "تخفيض",
-    "@subscriptionDowngradeButton": {
-        "description": "Button text for downgrading a subscription plan."
+    "decoratorUnlockRewardsTitle": "استمتع بتجربة خالية من الإعلانات",
+    "@decoratorUnlockRewardsTitle": {
+        "description": "Title for the 'Unlock Rewards' decorator."
     },
-    "subscriptionCurrentPlan": "الخطة الحالية",
-    "@subscriptionCurrentPlan": {
-        "description": "Text indicating the user's current subscription plan."
+    "decoratorUnlockRewardsDescription": "شاهد مقطع فيديو قصيرًا للاستمتاع بالتطبيق بدون إعلانات لمدة {duration}.",
+    "@decoratorUnlockRewardsDescription": {
+        "description": "Description for the 'Unlock Rewards' decorator.",
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
     },
-    "subscriptionStatusGracePeriod": "اشتراكك في فترة سماح. يرجى تحديث طريقة الدفع للاحتفاظ بالوصول.",
-    "@subscriptionStatusGracePeriod": {
-        "description": "Banner message when a user's subscription payment has failed but access is temporarily retained."
+    "decoratorUnlockRewardsCta": "شاهد الآن",
+    "@decoratorUnlockRewardsCta": {
+        "description": "Call-to-action text for the 'Unlock Rewards' decorator."
     },
-    "subscriptionStatusBillingIssue": "تم تعليق اشتراكك بسبب مشكلة في الفوترة. يرجى تحديث معلومات الدفع الخاصة بك.",
-    "@subscriptionStatusBillingIssue": {
-        "description": "Banner message when a user's subscription is paused due to a payment issue."
+    "rewardsDurationDays": "{count, plural, zero{0 يوم} one{يوم واحد} two{يومان} few{{count} أيام} many{{count} يومًا} other{{count} يوم}}",
+    "@rewardsDurationDays": {
+        "description": "Pluralized string for reward duration in days.",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
     },
-    "subscriptionUpgradeTitle": "ترقية الخطة",
-    "@subscriptionUpgradeTitle": {
-        "description": "Title for the upgrade section in subscription details."
+    "rewardTypeAdFree": "بدون إعلانات",
+    "@rewardTypeAdFree": {
+        "description": "The name for the 'Ad-Free' reward type."
     },
-    "subscriptionUpgradeDescription": "انتقل إلى خطة سنوية ووفر.",
-    "@subscriptionUpgradeDescription": {
-        "description": "Description for the upgrade option."
+    "rewardTypeDailyDigest": "ملخص يومي",
+    "@rewardTypeDailyDigest": {
+        "description": "The name for the 'Daily Digest' reward type."
     },
-    "subscriptionDowngradeTitle": "تخفيض الخطة",
-    "@subscriptionDowngradeTitle": {
-        "description": "Title for the downgrade section in subscription details."
+    "unlockMoreButton": "افتح المزيد",
+    "@unlockMoreButton": {
+        "description": "Button text to unlock more features or content limits."
     },
-    "subscriptionDowngradeDescription": "التبديل إلى دورة فوترة شهرية.",
-    "@subscriptionDowngradeDescription": {
-        "description": "Description for the downgrade option."
+    "requiresActiveReward": "يتطلب مكافأة نشطة. يمكنك فتح المكافآت من صفحة الحساب.",
+    "@requiresActiveReward": {
+        "description": "Label indicating a feature requires an active reward."
     },
-    "subscriptionSwitchButton": "تبديل الخطة",
-    "@subscriptionSwitchButton": {
-        "description": "Button text to initiate a plan switch."
+    "rewardsAdFreeTitle": "استمتع بتجربة خالية من الإعلانات",
+    "@rewardsAdFreeTitle": {
+        "description": "Title for the Ad-Free reward offer."
     },
-    "paywallRestorePurchaseButton": "استعادة المشتريات",
-    "@paywallRestorePurchaseButton": {
-        "description": "نص زر في صفحة جدار الدفع لاستعادة مشتريات المستخدم السابقة."
+    "rewardsAdFreeDescription": "شاهد مقطع فيديو قصيرًا لإزالة جميع الإعلانات من التطبيق لمدة {duration}.",
+    "@rewardsAdFreeDescription": {
+        "description": "Description for the Ad-Free reward offer.",
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
     },
-    "paywallRestoreSuccess": "تم استعادة مشترياتك بنجاح.",
-    "@paywallRestoreSuccess": {
-        "description": "رسالة Snackbar تظهر عند استعادة المشتريات بنجاح."
+    "rewardsDailyDigestTitle": "افتح ملخصات الأخبار اليومية",
+    "@rewardsDailyDigestTitle": {
+        "description": "Title for the Daily Digest reward offer."
     },
-    "paywallRestoreFailure": "تعذر استعادة المشتريات. يرجى المحاولة مرة أخرى أو الاتصال بالدعم.",
-    "@paywallRestoreFailure": {
-        "description": "رسالة Snackbar تظهر عند فشل استعادة المشتريات."
+    "rewardsDailyDigestDescription": "احصل على إشعار دفع يومي يلخص أبرز العناوين من الفلاتر المحفوظة التي تم تمكين خيار 'الملخص اليومي' لها. نشط لمدة {duration}.",
+    "@rewardsDailyDigestDescription": {
+        "description": "Description for the Daily Digest reward offer.",
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
     },
-    "paywallRestoringPurchases": "جارٍ استعادة المشتريات...",
-    "@paywallRestoringPurchases": {
-        "description": "رسالة تشير إلى أن التطبيق يحاول حاليًا استعادة المشتريات."
+    "rewardsOfferActiveButton": "نشط",
+    "@rewardsOfferActiveButton": {
+        "description": "Button text for a reward that is currently active."
     }
 }

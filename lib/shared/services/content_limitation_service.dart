@@ -50,9 +50,6 @@ enum LimitationStatus {
 
   /// The user has reached the content limit for standard (free) users.
   standardUserLimitReached,
-
-  /// The user has reached the content limit for premium users.
-  premiumUserLimitReached,
 }
 
 /// {@template content_limitation_service}
@@ -352,8 +349,6 @@ class ContentLimitationService {
         return LimitationStatus.anonymousLimitReached;
       case AccessTier.standard:
         return LimitationStatus.standardUserLimitReached;
-      case AccessTier.premium:
-        return LimitationStatus.premiumUserLimitReached;
     }
   }
 }

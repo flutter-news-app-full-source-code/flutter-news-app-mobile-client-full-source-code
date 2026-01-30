@@ -23,8 +23,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_tap_handler.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/maintenance_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/update_required_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/purchase_handler.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
@@ -46,7 +44,7 @@ class App extends StatelessWidget {
     required this.remoteConfig,
     required this.settings,
     required this.userContentPreferences,
-    required this.userSubscription,
+    required this.userRewards,
     required AuthRepository authenticationRepository,
     required DataRepository<Headline> headlinesRepository,
     required DataRepository<Topic> topicsRepository,
@@ -72,10 +70,7 @@ class App extends StatelessWidget {
     required GlobalKey<NavigatorState> navigatorKey,
     required PushNotificationService pushNotificationService,
     required AnalyticsService analyticsService,
-    required SubscriptionService subscriptionService,
-    required DataRepository<UserSubscription> userSubscriptionRepository,
-    required DataRepository<PurchaseTransaction> purchaseTransactionRepository,
-    required PurchaseHandler purchaseHandler,
+    required DataRepository<UserRewards> userRewardsRepository,
     super.key,
   }) : _authenticationRepository = authenticationRepository,
        _headlinesRepository = headlinesRepository,
@@ -101,10 +96,7 @@ class App extends StatelessWidget {
        _navigatorKey = navigatorKey,
        _inlineAdCacheService = inlineAdCacheService,
        _analyticsService = analyticsService,
-       _subscriptionService = subscriptionService,
-       _purchaseTransactionRepository = purchaseTransactionRepository,
-       _userSubscriptionRepository = userSubscriptionRepository,
-       _purchaseHandler = purchaseHandler;
+       _userRewardsRepository = userRewardsRepository;
 
   /// The initial user, pre-fetched during startup.
   final User? user;
@@ -121,8 +113,8 @@ class App extends StatelessWidget {
   /// The user's content preferences, pre-fetched during startup.
   final UserContentPreferences? userContentPreferences;
 
-  /// The user's subscription, pre-fetched during startup.
-  final UserSubscription? userSubscription;
+  /// The user's rewards, pre-fetched during startup.
+  final UserRewards? userRewards;
 
   final AuthRepository _authenticationRepository;
   final DataRepository<Headline> _headlinesRepository;
@@ -149,10 +141,7 @@ class App extends StatelessWidget {
   final InlineAdCacheService _inlineAdCacheService;
   final PushNotificationService _pushNotificationService;
   final AnalyticsService _analyticsService;
-  final SubscriptionService _subscriptionService;
-  final DataRepository<UserSubscription> _userSubscriptionRepository;
-  final DataRepository<PurchaseTransaction> _purchaseTransactionRepository;
-  final PurchaseHandler _purchaseHandler;
+  final DataRepository<UserRewards> _userRewardsRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -184,10 +173,7 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _feedCacheService),
         RepositoryProvider.value(value: _environment),
         RepositoryProvider.value(value: _analyticsService),
-        RepositoryProvider.value(value: _subscriptionService),
-        RepositoryProvider.value(value: _userSubscriptionRepository),
-        RepositoryProvider.value(value: _purchaseTransactionRepository),
-        RepositoryProvider.value(value: _purchaseHandler),
+        RepositoryProvider.value(value: _userRewardsRepository),
         // NOTE: The AppInitializer is provided at the root in bootstrap.dart
         // and is accessed via context.read() in the AppBloc.
       ],
@@ -201,7 +187,7 @@ class App extends StatelessWidget {
               remoteConfig: remoteConfig,
               settings: settings,
               userContentPreferences: userContentPreferences,
-              userSubscription: userSubscription,
+              userRewards: userRewards,
               remoteConfigRepository: _remoteConfigRepository,
               appInitializer: context.read<AppInitializer>(),
               authRepository: context.read<AuthRepository>(),
@@ -219,8 +205,7 @@ class App extends StatelessWidget {
               reportRepository: context.read<DataRepository<Report>>(),
               feedCacheService: context.read<FeedCacheService>(),
               analyticsService: _analyticsService,
-              purchaseHandler: _purchaseHandler,
-              userSubscriptionRepository: _userSubscriptionRepository,
+              userRewardsRepository: _userRewardsRepository,
             )..add(const AppStarted()),
           ),
         ],
@@ -350,11 +335,15 @@ class _AppViewState extends State<_AppView> {
     // authentication status changes. GoRouter's `redirect` logic depends on
     // this notifier to re-evaluate routes when the user logs in or out
     // *while the app is running*.
-    return BlocListener<AppBloc, AppState>(
-      listenWhen: (previous, current) => previous.status != current.status,
-      listener: (context, state) {
-        _statusNotifier.value = state.status;
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<AppBloc, AppState>(
+          listenWhen: (previous, current) => previous.status != current.status,
+          listener: (context, state) {
+            _statusNotifier.value = state.status;
+          },
+        ),
+      ],
       // This BlocBuilder is the "master switch" for the entire application's
       // UI. Based on the AppStatus, it decides whether to show a full-screen
       // status page (like Maintenance) or to build the main application UI
@@ -487,6 +476,9 @@ class _AppViewState extends State<_AppView> {
             ],
             child: MaterialApp.router(
               debugShowCheckedModeBanner: false,
+              builder: (context, child) {
+                return child!;
+              },
               themeMode: state.themeMode,
               theme: lightTheme(
                 scheme: state.flexScheme,

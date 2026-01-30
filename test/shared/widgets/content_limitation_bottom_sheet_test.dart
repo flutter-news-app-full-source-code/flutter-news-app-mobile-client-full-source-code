@@ -88,8 +88,8 @@ void main() {
           builder: (context, state) => const SizedBox(),
         ),
         GoRoute(
-          path: '/paywall',
-          name: Routes.paywallName,
+          path: '/rewards',
+          name: Routes.rewardsName,
           builder: (context, state) => const SizedBox(),
         ),
         GoRoute(
@@ -165,7 +165,7 @@ void main() {
     });
 
     testWidgets('shows correct content for standard users '
-        'and navigates to paywall on tap', (tester) async {
+        'and navigates to rewards on tap', (tester) async {
       await tester.pumpWidget(
         buildTestWidget(
           status: LimitationStatus.standardUserLimitReached,
@@ -179,10 +179,10 @@ void main() {
 
       // Verify content
       expect(find.text('Limit Reached'), findsOneWidget);
-      expect(find.text('Upgrade'), findsOneWidget);
+      expect(find.text('Unlock More'), findsOneWidget);
 
       // Tap the button
-      await tester.tap(find.text('Upgrade'));
+      await tester.tap(find.text('Unlock More'));
       await tester.pumpAndSettle();
 
       // Verify navigation
@@ -192,7 +192,7 @@ void main() {
             that: isA<Route<dynamic>>().having(
               (r) => r.settings.name,
               'name',
-              Routes.paywallName,
+              Routes.rewardsName,
             ),
           ),
           any(),

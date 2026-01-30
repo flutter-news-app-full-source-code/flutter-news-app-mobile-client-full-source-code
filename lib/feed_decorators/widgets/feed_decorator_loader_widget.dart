@@ -85,12 +85,11 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
   // higher priority.
   static const _decoratorPriorities = <FeedDecoratorType, int>{
     FeedDecoratorType.linkAccount: 1,
-    FeedDecoratorType.upgrade: 2,
+    FeedDecoratorType.unlockRewards: 2,
     // Suggested topics and sources are content collections, which are
     // generally lower priority than direct calls to action.
     FeedDecoratorType.suggestedTopics: 3,
     FeedDecoratorType.suggestedSources: 4,
-    FeedDecoratorType.enableNotifications: 5,
     FeedDecoratorType.rateApp: 6,
   };
 
@@ -367,6 +366,17 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
   ) async {
     // Access localization strings for dynamic text.
     final l10n = AppLocalizationsX(context).l10n;
+    final remoteConfig = context.read<AppBloc>().state.remoteConfig;
+
+    // Get duration for rewards if applicable
+    String? rewardDuration;
+    if (decoratorType == FeedDecoratorType.unlockRewards) {
+      final adFreeReward =
+          remoteConfig?.features.rewards.rewards[RewardType.adFree];
+      if (adFreeReward != null) {
+        rewardDuration = l10n.rewardsDurationDays(adFreeReward.durationDays);
+      }
+    }
 
     // This logic is a simplified version of the original service, as the
     // content for CTAs is defined statically.
@@ -378,11 +388,9 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
         switch (decoratorType) {
           case FeedDecoratorType.linkAccount:
             ctaUrl = Routes.accountLinking;
-          // Set a placeholder URL for unimplemented features. The button will be
-          // disabled in the UI, so this URL will not be used.
-          case FeedDecoratorType.upgrade:
+          case FeedDecoratorType.unlockRewards:
+            ctaUrl = '/${Routes.account}/${Routes.rewards}';
           case FeedDecoratorType.rateApp:
-          case FeedDecoratorType.enableNotifications:
             ctaUrl = '#';
           case FeedDecoratorType.suggestedTopics:
           case FeedDecoratorType.suggestedSources:
@@ -395,7 +403,10 @@ class _FeedDecoratorLoaderWidgetState extends State<FeedDecoratorLoaderWidget> {
           id: _uuid.v4(),
           decoratorType: decoratorType,
           title: decoratorType.getRandomTitle(l10n),
-          description: decoratorType.getRandomDescription(l10n),
+          description: decoratorType.getRandomDescription(
+            l10n,
+            duration: rewardDuration,
+          ),
           callToActionText: decoratorType.getRandomCtaText(l10n),
           callToActionUrl: ctaUrl,
         );

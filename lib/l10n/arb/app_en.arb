@@ -2017,196 +2017,143 @@
             }
         }
     },
-    "paywallTitle": "Unlock Full Access",
-    "@paywallTitle": {
-        "description": "Title of the paywall screen."
+    "accountRewardsTile": "Rewards & Offers",
+    "@accountRewardsTile": {
+        "description": "Title for the rewards navigation tile in the account page."
     },
-    "paywallSubtitle": "Get more from your news feed with Premium limits and features.",
-    "@paywallSubtitle": {
-        "description": "Subtitle of the paywall screen."
+    "rewardsPageTitle": "Rewards",
+    "@rewardsPageTitle": {
+        "description": "Title for the rewards page."
     },
-    "paywallFeatureFollowMore": "Follow More Topics & Sources",
-    "@paywallFeatureFollowMore": {
-        "description": "Feature list item: Increased follow limits."
-    },
-    "paywallFeatureSaveMore": "Save More Articles",
-    "@paywallFeatureSaveMore": {
-        "description": "Feature list item: Increased save limits."
-    },
-    "paywallFeatureAdvancedFilters": "Advanced Filters & Alerts",
-    "@paywallFeatureAdvancedFilters": {
-        "description": "Feature list item: Advanced filtering and notifications."
-    },
-    "paywallFeatureUnlimitedHistory": "Unlimited Reading History",
-    "@paywallFeatureUnlimitedHistory": {
-        "description": "Feature list item: Unlimited history."
-    },
-    "paywallMonthlyPlan": "Monthly",
-    "@paywallMonthlyPlan": {
-        "description": "Label for the monthly subscription plan."
-    },
-    "paywallAnnualPlan": "Annual",
-    "@paywallAnnualPlan": {
-        "description": "Label for the annual subscription plan."
-    },
-    "paywallBestValue": "Best Value",
-    "@paywallBestValue": {
-        "description": "Badge text for the best value plan."
-    },
-    "paywallRestorePurchases": "Restore Purchases",
-    "@paywallRestorePurchases": {
-        "description": "Button text to restore purchases."
-    },
-    "paywallTermsOfService": "Terms of Service",
-    "@paywallTermsOfService": {
-        "description": "Link text for Terms of Service."
-    },
-    "paywallPrivacyPolicy": "Privacy Policy",
-    "@paywallPrivacyPolicy": {
-        "description": "Link text for Privacy Policy."
-    },
-    "paywallDisclaimer": "Subscription automatically renews unless auto-renew is turned off at least 24-hours before the end of the current period.",
-    "@paywallDisclaimer": {
-        "description": "Disclaimer text regarding auto-renewal."
-    },
-    "paywallSubscribeButton": "Subscribe for {price} / {period}",
-    "@paywallSubscribeButton": {
-        "description": "Subscribe button text.",
+    "rewardsOfferTitle": "Get {rewardName} for {duration}",
+    "@rewardsOfferTitle": {
+        "description": "Title for a reward offer card, indicating the reward and its duration.",
         "placeholders": {
-            "price": {
-                "type": "String",
-                "example": "$4.99"
+            "rewardName": {
+                "type": "String"
             },
-            "period": {
-                "type": "String",
-                "example": "Month"
-            }
-        }
-    },
-    "paywallSuccessTitle": "Welcome to Premium!",
-    "@paywallSuccessTitle": {
-        "description": "Title of the success dialog."
-    },
-    "paywallSuccessBody": "You now have full access to all features.",
-    "@paywallSuccessBody": {
-        "description": "Body of the success dialog."
-    },
-    "paywallErrorTitle": "Purchase Failed",
-    "@paywallErrorTitle": {
-        "description": "Title of the error dialog."
-    },
-    "paywallLoading": "Verifying purchase...",
-    "@paywallLoading": {
-        "description": "Loading text shown during purchase verification."
-    },
-    "subscriptionDetailsPageTitle": "Subscription Details",
-    "@subscriptionDetailsPageTitle": {
-        "description": "Title for the subscription details page."
-    },
-    "manageSubscriptionButton": "Manage Subscription",
-    "@manageSubscriptionButton": {
-        "description": "Button text to manage subscription."
-    },
-    "subscriptionDetailsCurrentPlan": "Current Plan",
-    "@subscriptionDetailsCurrentPlan": {
-        "description": "Label for the current subscription plan."
-    },
-    "subscriptionDetailsRenewsOn": "Renews on {date}",
-    "@subscriptionDetailsRenewsOn": {
-        "description": "Text indicating the renewal date of a subscription.",
-        "placeholders": {
-            "date": {
+            "duration": {
                 "type": "String"
             }
         }
     },
-    "subscriptionDetailsExpiresOn": "Expires on {date}",
-    "@subscriptionDetailsExpiresOn": {
-        "description": "Text indicating the expiration date of a non-renewing subscription.",
+    "rewardsOfferActiveTitle": "{rewardName} Active",
+    "@rewardsOfferActiveTitle": {
+        "description": "Title for an active reward offer card.",
         "placeholders": {
-            "date": {
+            "rewardName": {
                 "type": "String"
             }
         }
     },
-    "subscriptionDetailsWillNotRenew": "Will not renew",
-    "@subscriptionDetailsWillNotRenew": {
-        "description": "Status text for a subscription that has been cancelled and will not auto-renew."
+    "rewardsOfferExpiresIn": "Expires in: {countdown}",
+    "@rewardsOfferExpiresIn": {
+        "description": "Text showing the remaining time for an active reward.",
+        "placeholders": {
+            "countdown": {
+                "type": "String"
+            }
+        }
     },
-    "subscriptionDetailsProvider": "Provider",
-    "@subscriptionDetailsProvider": {
-        "description": "Label for the subscription provider (e.g., Apple App Store)."
+    "rewardsOfferWatchButton": "Watch Video",
+    "@rewardsOfferWatchButton": {
+        "description": "Button text to watch a video to earn a reward."
     },
-    "subscriptionDetailsManageButton": "Manage in App Store",
-    "@subscriptionDetailsManageButton": {
-        "description": "Button text to open the native subscription management UI."
+    "rewardsOfferVerifyingButton": "Verifying...",
+    "@rewardsOfferVerifyingButton": {
+        "description": "Button text shown while a reward is being verified."
     },
-    "subscriptionDetailsLoading": "Loading subscription details...",
-    "@subscriptionDetailsLoading": {
-        "description": "Text shown while subscription details are loading."
+    "rewardsOfferLoadingButton": "Loading Ad...",
+    "@rewardsOfferLoadingButton": {
+        "description": "Button text shown while the ad is being prepared to show."
     },
-    "subscriptionDetailsError": "Could not load subscription details.",
-    "@subscriptionDetailsError": {
-        "description": "Error message when subscription details fail to load."
+    "rewardsSnackbarSuccess": "Reward Unlocked: {rewardName} is now active.",
+    "@rewardsSnackbarSuccess": {
+        "description": "Snackbar message shown when a reward is successfully unlocked.",
+        "placeholders": {
+            "rewardName": {
+                "type": "String"
+            }
+        }
     },
-    "subscriptionDetailsNoSubscription": "You do not have an active subscription.",
-    "@subscriptionDetailsNoSubscription": {
-        "description": "Message shown when the user has no active subscription."
+    "rewardsSnackbarFailure": "Verification failed. Please try again in a moment.",
+    "@rewardsSnackbarFailure": {
+        "description": "Snackbar message shown when reward verification fails."
     },
-    "subscriptionUpgradeButton": "Upgrade",
-    "@subscriptionUpgradeButton": {
-        "description": "Button text for upgrading a subscription plan."
+    "rewardsAdDismissedSnackbar": "Ad dismissed. Please watch the full ad to earn the reward.",
+    "@rewardsAdDismissedSnackbar": {
+        "description": "Snackbar message shown when the user dismisses a rewarded ad before completion."
     },
-    "subscriptionDowngradeButton": "Downgrade",
-    "@subscriptionDowngradeButton": {
-        "description": "Button text for downgrading a subscription plan."
+    "decoratorUnlockRewardsTitle": "Unlock an Ad-Free Experience",
+    "@decoratorUnlockRewardsTitle": {
+        "description": "Title for the 'Unlock Rewards' decorator."
     },
-    "subscriptionCurrentPlan": "Current Plan",
-    "@subscriptionCurrentPlan": {
-        "description": "Text indicating the user's current subscription plan."
+    "decoratorUnlockRewardsDescription": "Watch a short video to enjoy the app without ads for {duration}.",
+    "@decoratorUnlockRewardsDescription": {
+        "description": "Description for the 'Unlock Rewards' decorator.",
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
     },
-    "subscriptionStatusGracePeriod": "Your subscription is in a grace period. Please update your payment method to retain access.",
-    "@subscriptionStatusGracePeriod": {
-        "description": "Banner message when a user's subscription payment has failed but access is temporarily retained."
+    "decoratorUnlockRewardsCta": "Watch Now",
+    "@decoratorUnlockRewardsCta": {
+        "description": "Call-to-action text for the 'Unlock Rewards' decorator."
     },
-    "subscriptionStatusBillingIssue": "Your subscription is on hold due to a billing issue. Please update your payment method.",
-    "@subscriptionStatusBillingIssue": {
-        "description": "Banner message when a user's subscription is paused due to a payment issue."
+    "rewardsDurationDays": "{count, plural, =1{1 Day} other{{count} Days}}",
+    "@rewardsDurationDays": {
+        "description": "Pluralized string for reward duration in days.",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
     },
-    "subscriptionUpgradeTitle": "Upgrade Plan",
-    "@subscriptionUpgradeTitle": {
-        "description": "Title for the upgrade section in subscription details."
+    "rewardTypeAdFree": "Ad-Free",
+    "@rewardTypeAdFree": {
+        "description": "The name for the 'Ad-Free' reward type."
     },
-    "subscriptionUpgradeDescription": "Switch to an annual plan and save.",
-    "@subscriptionUpgradeDescription": {
-        "description": "Description for the upgrade option."
+    "rewardTypeDailyDigest": "Daily Digest",
+    "@rewardTypeDailyDigest": {
+        "description": "The name for the 'Daily Digest' reward type."
     },
-    "subscriptionDowngradeTitle": "Downgrade Plan",
-    "@subscriptionDowngradeTitle": {
-        "description": "Title for the downgrade section in subscription details."
+    "unlockMoreButton": "Unlock More",
+    "@unlockMoreButton": {
+        "description": "Button text to unlock more features or content limits."
     },
-    "subscriptionDowngradeDescription": "Switch to a monthly billing cycle.",
-    "@subscriptionDowngradeDescription": {
-        "description": "Description for the downgrade option."
+    "requiresActiveReward": "Requires an active reward. You can unlock rewards from the Account page.",
+    "@requiresActiveReward": {
+        "description": "Label indicating a feature requires an active reward."
     },
-    "subscriptionSwitchButton": "Switch Plan",
-    "@subscriptionSwitchButton": {
-        "description": "Button text to initiate a plan switch."
+    "rewardsAdFreeTitle": "Enjoy an Ad-Free Experience",
+    "@rewardsAdFreeTitle": {
+        "description": "Title for the Ad-Free reward offer."
     },
-    "paywallRestorePurchaseButton": "Restore Purchases",
-    "@paywallRestorePurchaseButton": {
-        "description": "Button text on the paywall page to restore a user's previous purchases."
+    "rewardsAdFreeDescription": "Watch a short video to remove all ads from the app for {duration}.",
+    "@rewardsAdFreeDescription": {
+        "description": "Description for the Ad-Free reward offer.",
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
     },
-    "paywallRestoreSuccess": "Your purchases have been successfully restored.",
-    "@paywallRestoreSuccess": {
-        "description": "Snackbar message shown when purchases are restored successfully."
+    "rewardsDailyDigestTitle": "Unlock Daily News Digests",
+    "@rewardsDailyDigestTitle": {
+        "description": "Title for the Daily Digest reward offer."
     },
-    "paywallRestoreFailure": "Could not restore purchases. Please try again or contact support.",
-    "@paywallRestoreFailure": {
-        "description": "Snackbar message shown when restoring purchases fails."
+    "rewardsDailyDigestDescription": "Receive a daily push notification summarizing the top headlines from your saved filters that have the 'Daily Digest' option enabled. Active for {duration}.",
+    "@rewardsDailyDigestDescription": {
+        "description": "Description for the Daily Digest reward offer.",
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
     },
-    "paywallRestoringPurchases": "Restoring purchases...",
-    "@paywallRestoringPurchases": {
-        "description": "A message indicating that the app is currently attempting to restore purchases."
+    "rewardsOfferActiveButton": "Active",
+    "@rewardsOfferActiveButton": {
+        "description": "Button text for a reward that is currently active."
     }
 }

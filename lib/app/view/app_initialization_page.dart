@@ -19,8 +19,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localiz
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/purchase_handler.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -70,10 +68,7 @@ class AppInitializationPage extends StatelessWidget {
     required this.contentLimitationService,
     required this.inAppNotificationRepository,
     required this.analyticsService,
-    required this.subscriptionService,
-    required this.purchaseTransactionRepository,
-    required this.userSubscriptionRepository,
-    required this.purchaseHandler,
+    required this.userRewardsRepository,
     super.key,
   });
 
@@ -101,10 +96,7 @@ class AppInitializationPage extends StatelessWidget {
   final ContentLimitationService contentLimitationService;
   final DataRepository<InAppNotification> inAppNotificationRepository;
   final AnalyticsService analyticsService;
-  final SubscriptionService subscriptionService;
-  final DataRepository<PurchaseTransaction> purchaseTransactionRepository;
-  final DataRepository<UserSubscription> userSubscriptionRepository;
-  final PurchaseHandler purchaseHandler;
+  final DataRepository<UserRewards> userRewardsRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +122,7 @@ class AppInitializationPage extends StatelessWidget {
                 remoteConfig: successData.remoteConfig,
                 settings: successData.settings,
                 userContentPreferences: successData.userContentPreferences,
-                userSubscription: successData.userSubscription,
+                userRewards: successData.userRewards,
                 authenticationRepository: authenticationRepository,
                 headlinesRepository: headlinesRepository,
                 topicsRepository: topicsRepository,
@@ -156,10 +148,7 @@ class AppInitializationPage extends StatelessWidget {
                 appReviewService: appReviewService,
                 contentLimitationService: contentLimitationService,
                 analyticsService: analyticsService,
-                subscriptionService: subscriptionService,
-                purchaseTransactionRepository: purchaseTransactionRepository,
-                userSubscriptionRepository: userSubscriptionRepository,
-                purchaseHandler: purchaseHandler,
+                userRewardsRepository: userRewardsRepository,
               );
 
             case final AppInitializationFailed failureState:

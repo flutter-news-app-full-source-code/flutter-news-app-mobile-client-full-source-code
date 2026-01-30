@@ -1577,143 +1577,103 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get paywallTitle => 'افتح الوصول الكامل';
+  String get accountRewardsTile => 'المكافآت والعروض';
 
   @override
-  String get paywallSubtitle =>
-      'احصل على المزيد من موجز الأخبار الخاص بك مع حدود وميزات بريميوم.';
+  String get rewardsPageTitle => 'المكافآت';
 
   @override
-  String get paywallFeatureFollowMore => 'تابع المزيد من المواضيع والمصادر';
-
-  @override
-  String get paywallFeatureSaveMore => 'احفظ المزيد من المقالات';
-
-  @override
-  String get paywallFeatureAdvancedFilters => 'فلاتر وتنبيهات متقدمة';
-
-  @override
-  String get paywallFeatureUnlimitedHistory => 'سجل قراءة غير محدود';
-
-  @override
-  String get paywallMonthlyPlan => 'شهري';
-
-  @override
-  String get paywallAnnualPlan => 'سنوي';
-
-  @override
-  String get paywallBestValue => 'أفضل قيمة';
-
-  @override
-  String get paywallRestorePurchases => 'استعادة المشتريات';
-
-  @override
-  String get paywallTermsOfService => 'شروط الخدمة';
-
-  @override
-  String get paywallPrivacyPolicy => 'سياسة الخصوصية';
-
-  @override
-  String get paywallDisclaimer =>
-      'يتم تجديد الاشتراك تلقائيًا ما لم يتم إيقاف التجديد التلقائي قبل 24 ساعة على الأقل من نهاية الفترة الحالية.';
-
-  @override
-  String paywallSubscribeButton(String price, String period) {
-    return 'اشترك مقابل $price / $period';
+  String rewardsOfferTitle(String rewardName, String duration) {
+    return 'احصل على $rewardName لمدة $duration';
   }
 
   @override
-  String get paywallSuccessTitle => 'مرحبًا بك في بريميوم!';
-
-  @override
-  String get paywallSuccessBody => 'لديك الآن وصول كامل إلى جميع الميزات.';
-
-  @override
-  String get paywallErrorTitle => 'فشلت عملية الشراء';
-
-  @override
-  String get paywallLoading => 'جارٍ التحقق من الشراء...';
-
-  @override
-  String get subscriptionDetailsPageTitle => 'تفاصيل الاشتراك';
-
-  @override
-  String get manageSubscriptionButton => 'إدارة الاشتراك';
-
-  @override
-  String get subscriptionDetailsCurrentPlan => 'الخطة الحالية';
-
-  @override
-  String subscriptionDetailsRenewsOn(String date) {
-    return 'يتجدد في $date';
+  String rewardsOfferActiveTitle(String rewardName) {
+    return '$rewardName مفعل';
   }
 
   @override
-  String subscriptionDetailsExpiresOn(String date) {
-    return 'ينتهي في $date';
+  String rewardsOfferExpiresIn(String countdown) {
+    return 'ينتهي في: $countdown';
   }
 
   @override
-  String get subscriptionDetailsWillNotRenew => 'لن يتجدد';
+  String get rewardsOfferWatchButton => 'شاهد الفيديو';
 
   @override
-  String get subscriptionDetailsProvider => 'المزود';
+  String get rewardsOfferVerifyingButton => 'جارٍ التحقق...';
 
   @override
-  String get subscriptionDetailsManageButton => 'إدارة في المتجر';
+  String get rewardsOfferLoadingButton => 'جارٍ تحميل الإعلان...';
 
   @override
-  String get subscriptionDetailsLoading => 'جارٍ تحميل تفاصيل الاشتراك...';
+  String rewardsSnackbarSuccess(String rewardName) {
+    return 'تم فتح المكافأة: $rewardName الآن نشط.';
+  }
 
   @override
-  String get subscriptionDetailsError => 'تعذر تحميل تفاصيل الاشتراك.';
+  String get rewardsSnackbarFailure =>
+      'فشل التحقق. يرجى المحاولة مرة أخرى بعد لحظات.';
 
   @override
-  String get subscriptionDetailsNoSubscription => 'ليس لديك اشتراك نشط.';
+  String get rewardsAdDismissedSnackbar =>
+      'تم إغلاق الإعلان. يرجى مشاهدة الإعلان بالكامل للحصول على المكافأة.';
 
   @override
-  String get subscriptionUpgradeButton => 'ترقية';
+  String get decoratorUnlockRewardsTitle => 'استمتع بتجربة خالية من الإعلانات';
 
   @override
-  String get subscriptionDowngradeButton => 'تخفيض';
+  String decoratorUnlockRewardsDescription(String duration) {
+    return 'شاهد مقطع فيديو قصيرًا للاستمتاع بالتطبيق بدون إعلانات لمدة $duration.';
+  }
 
   @override
-  String get subscriptionCurrentPlan => 'الخطة الحالية';
+  String get decoratorUnlockRewardsCta => 'شاهد الآن';
 
   @override
-  String get subscriptionStatusGracePeriod =>
-      'اشتراكك في فترة سماح. يرجى تحديث طريقة الدفع للاحتفاظ بالوصول.';
+  String rewardsDurationDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count يوم',
+      many: '$count يومًا',
+      few: '$count أيام',
+      two: 'يومان',
+      one: 'يوم واحد',
+      zero: '0 يوم',
+    );
+    return '$_temp0';
+  }
 
   @override
-  String get subscriptionStatusBillingIssue =>
-      'تم تعليق اشتراكك بسبب مشكلة في الفوترة. يرجى تحديث معلومات الدفع الخاصة بك.';
+  String get rewardTypeAdFree => 'بدون إعلانات';
 
   @override
-  String get subscriptionUpgradeTitle => 'ترقية الخطة';
+  String get rewardTypeDailyDigest => 'ملخص يومي';
 
   @override
-  String get subscriptionUpgradeDescription => 'انتقل إلى خطة سنوية ووفر.';
+  String get unlockMoreButton => 'افتح المزيد';
 
   @override
-  String get subscriptionDowngradeTitle => 'تخفيض الخطة';
+  String get requiresActiveReward =>
+      'يتطلب مكافأة نشطة. يمكنك فتح المكافآت من صفحة الحساب.';
 
   @override
-  String get subscriptionDowngradeDescription =>
-      'التبديل إلى دورة فوترة شهرية.';
+  String get rewardsAdFreeTitle => 'استمتع بتجربة خالية من الإعلانات';
 
   @override
-  String get subscriptionSwitchButton => 'تبديل الخطة';
+  String rewardsAdFreeDescription(String duration) {
+    return 'شاهد مقطع فيديو قصيرًا لإزالة جميع الإعلانات من التطبيق لمدة $duration.';
+  }
 
   @override
-  String get paywallRestorePurchaseButton => 'استعادة المشتريات';
+  String get rewardsDailyDigestTitle => 'افتح ملخصات الأخبار اليومية';
 
   @override
-  String get paywallRestoreSuccess => 'تم استعادة مشترياتك بنجاح.';
+  String rewardsDailyDigestDescription(String duration) {
+    return 'احصل على إشعار دفع يومي يلخص أبرز العناوين من الفلاتر المحفوظة التي تم تمكين خيار \'الملخص اليومي\' لها. نشط لمدة $duration.';
+  }
 
   @override
-  String get paywallRestoreFailure =>
-      'تعذر استعادة المشتريات. يرجى المحاولة مرة أخرى أو الاتصال بالدعم.';
-
-  @override
-  String get paywallRestoringPurchases => 'جارٍ استعادة المشتريات...';
+  String get rewardsOfferActiveButton => 'نشط';
 }

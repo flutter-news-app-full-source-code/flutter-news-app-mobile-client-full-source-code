@@ -2966,263 +2966,149 @@ abstract class AppLocalizations {
   /// **'User {id}'**
   String commenterName(String id);
 
-  /// Title of the paywall screen.
+  /// Title for the rewards navigation tile in the account page.
   ///
   /// In en, this message translates to:
-  /// **'Unlock Full Access'**
-  String get paywallTitle;
+  /// **'Rewards & Offers'**
+  String get accountRewardsTile;
 
-  /// Subtitle of the paywall screen.
+  /// Title for the rewards page.
   ///
   /// In en, this message translates to:
-  /// **'Get more from your news feed with Premium limits and features.'**
-  String get paywallSubtitle;
+  /// **'Rewards'**
+  String get rewardsPageTitle;
 
-  /// Feature list item: Increased follow limits.
+  /// Title for a reward offer card, indicating the reward and its duration.
   ///
   /// In en, this message translates to:
-  /// **'Follow More Topics & Sources'**
-  String get paywallFeatureFollowMore;
+  /// **'Get {rewardName} for {duration}'**
+  String rewardsOfferTitle(String rewardName, String duration);
 
-  /// Feature list item: Increased save limits.
+  /// Title for an active reward offer card.
   ///
   /// In en, this message translates to:
-  /// **'Save More Articles'**
-  String get paywallFeatureSaveMore;
+  /// **'{rewardName} Active'**
+  String rewardsOfferActiveTitle(String rewardName);
 
-  /// Feature list item: Advanced filtering and notifications.
+  /// Text showing the remaining time for an active reward.
   ///
   /// In en, this message translates to:
-  /// **'Advanced Filters & Alerts'**
-  String get paywallFeatureAdvancedFilters;
+  /// **'Expires in: {countdown}'**
+  String rewardsOfferExpiresIn(String countdown);
 
-  /// Feature list item: Unlimited history.
+  /// Button text to watch a video to earn a reward.
   ///
   /// In en, this message translates to:
-  /// **'Unlimited Reading History'**
-  String get paywallFeatureUnlimitedHistory;
+  /// **'Watch Video'**
+  String get rewardsOfferWatchButton;
 
-  /// Label for the monthly subscription plan.
+  /// Button text shown while a reward is being verified.
   ///
   /// In en, this message translates to:
-  /// **'Monthly'**
-  String get paywallMonthlyPlan;
+  /// **'Verifying...'**
+  String get rewardsOfferVerifyingButton;
 
-  /// Label for the annual subscription plan.
+  /// Button text shown while the ad is being prepared to show.
   ///
   /// In en, this message translates to:
-  /// **'Annual'**
-  String get paywallAnnualPlan;
+  /// **'Loading Ad...'**
+  String get rewardsOfferLoadingButton;
 
-  /// Badge text for the best value plan.
+  /// Snackbar message shown when a reward is successfully unlocked.
   ///
   /// In en, this message translates to:
-  /// **'Best Value'**
-  String get paywallBestValue;
+  /// **'Reward Unlocked: {rewardName} is now active.'**
+  String rewardsSnackbarSuccess(String rewardName);
 
-  /// Button text to restore purchases.
+  /// Snackbar message shown when reward verification fails.
   ///
   /// In en, this message translates to:
-  /// **'Restore Purchases'**
-  String get paywallRestorePurchases;
+  /// **'Verification failed. Please try again in a moment.'**
+  String get rewardsSnackbarFailure;
 
-  /// Link text for Terms of Service.
+  /// Snackbar message shown when the user dismisses a rewarded ad before completion.
   ///
   /// In en, this message translates to:
-  /// **'Terms of Service'**
-  String get paywallTermsOfService;
+  /// **'Ad dismissed. Please watch the full ad to earn the reward.'**
+  String get rewardsAdDismissedSnackbar;
 
-  /// Link text for Privacy Policy.
+  /// Title for the 'Unlock Rewards' decorator.
   ///
   /// In en, this message translates to:
-  /// **'Privacy Policy'**
-  String get paywallPrivacyPolicy;
+  /// **'Unlock an Ad-Free Experience'**
+  String get decoratorUnlockRewardsTitle;
 
-  /// Disclaimer text regarding auto-renewal.
+  /// Description for the 'Unlock Rewards' decorator.
   ///
   /// In en, this message translates to:
-  /// **'Subscription automatically renews unless auto-renew is turned off at least 24-hours before the end of the current period.'**
-  String get paywallDisclaimer;
+  /// **'Watch a short video to enjoy the app without ads for {duration}.'**
+  String decoratorUnlockRewardsDescription(String duration);
 
-  /// Subscribe button text.
+  /// Call-to-action text for the 'Unlock Rewards' decorator.
   ///
   /// In en, this message translates to:
-  /// **'Subscribe for {price} / {period}'**
-  String paywallSubscribeButton(String price, String period);
+  /// **'Watch Now'**
+  String get decoratorUnlockRewardsCta;
 
-  /// Title of the success dialog.
+  /// Pluralized string for reward duration in days.
   ///
   /// In en, this message translates to:
-  /// **'Welcome to Premium!'**
-  String get paywallSuccessTitle;
+  /// **'{count, plural, =1{1 Day} other{{count} Days}}'**
+  String rewardsDurationDays(int count);
 
-  /// Body of the success dialog.
+  /// The name for the 'Ad-Free' reward type.
   ///
   /// In en, this message translates to:
-  /// **'You now have full access to all features.'**
-  String get paywallSuccessBody;
+  /// **'Ad-Free'**
+  String get rewardTypeAdFree;
 
-  /// Title of the error dialog.
+  /// The name for the 'Daily Digest' reward type.
   ///
   /// In en, this message translates to:
-  /// **'Purchase Failed'**
-  String get paywallErrorTitle;
+  /// **'Daily Digest'**
+  String get rewardTypeDailyDigest;
 
-  /// Loading text shown during purchase verification.
+  /// Button text to unlock more features or content limits.
   ///
   /// In en, this message translates to:
-  /// **'Verifying purchase...'**
-  String get paywallLoading;
+  /// **'Unlock More'**
+  String get unlockMoreButton;
 
-  /// Title for the subscription details page.
+  /// Label indicating a feature requires an active reward.
   ///
   /// In en, this message translates to:
-  /// **'Subscription Details'**
-  String get subscriptionDetailsPageTitle;
+  /// **'Requires an active reward. You can unlock rewards from the Account page.'**
+  String get requiresActiveReward;
 
-  /// Button text to manage subscription.
+  /// Title for the Ad-Free reward offer.
   ///
   /// In en, this message translates to:
-  /// **'Manage Subscription'**
-  String get manageSubscriptionButton;
+  /// **'Enjoy an Ad-Free Experience'**
+  String get rewardsAdFreeTitle;
 
-  /// Label for the current subscription plan.
+  /// Description for the Ad-Free reward offer.
   ///
   /// In en, this message translates to:
-  /// **'Current Plan'**
-  String get subscriptionDetailsCurrentPlan;
+  /// **'Watch a short video to remove all ads from the app for {duration}.'**
+  String rewardsAdFreeDescription(String duration);
 
-  /// Text indicating the renewal date of a subscription.
+  /// Title for the Daily Digest reward offer.
   ///
   /// In en, this message translates to:
-  /// **'Renews on {date}'**
-  String subscriptionDetailsRenewsOn(String date);
+  /// **'Unlock Daily News Digests'**
+  String get rewardsDailyDigestTitle;
 
-  /// Text indicating the expiration date of a non-renewing subscription.
+  /// Description for the Daily Digest reward offer.
   ///
   /// In en, this message translates to:
-  /// **'Expires on {date}'**
-  String subscriptionDetailsExpiresOn(String date);
+  /// **'Receive a daily push notification summarizing the top headlines from your saved filters that have the \'Daily Digest\' option enabled. Active for {duration}.'**
+  String rewardsDailyDigestDescription(String duration);
 
-  /// Status text for a subscription that has been cancelled and will not auto-renew.
+  /// Button text for a reward that is currently active.
   ///
   /// In en, this message translates to:
-  /// **'Will not renew'**
-  String get subscriptionDetailsWillNotRenew;
-
-  /// Label for the subscription provider (e.g., Apple App Store).
-  ///
-  /// In en, this message translates to:
-  /// **'Provider'**
-  String get subscriptionDetailsProvider;
-
-  /// Button text to open the native subscription management UI.
-  ///
-  /// In en, this message translates to:
-  /// **'Manage in App Store'**
-  String get subscriptionDetailsManageButton;
-
-  /// Text shown while subscription details are loading.
-  ///
-  /// In en, this message translates to:
-  /// **'Loading subscription details...'**
-  String get subscriptionDetailsLoading;
-
-  /// Error message when subscription details fail to load.
-  ///
-  /// In en, this message translates to:
-  /// **'Could not load subscription details.'**
-  String get subscriptionDetailsError;
-
-  /// Message shown when the user has no active subscription.
-  ///
-  /// In en, this message translates to:
-  /// **'You do not have an active subscription.'**
-  String get subscriptionDetailsNoSubscription;
-
-  /// Button text for upgrading a subscription plan.
-  ///
-  /// In en, this message translates to:
-  /// **'Upgrade'**
-  String get subscriptionUpgradeButton;
-
-  /// Button text for downgrading a subscription plan.
-  ///
-  /// In en, this message translates to:
-  /// **'Downgrade'**
-  String get subscriptionDowngradeButton;
-
-  /// Text indicating the user's current subscription plan.
-  ///
-  /// In en, this message translates to:
-  /// **'Current Plan'**
-  String get subscriptionCurrentPlan;
-
-  /// Banner message when a user's subscription payment has failed but access is temporarily retained.
-  ///
-  /// In en, this message translates to:
-  /// **'Your subscription is in a grace period. Please update your payment method to retain access.'**
-  String get subscriptionStatusGracePeriod;
-
-  /// Banner message when a user's subscription is paused due to a payment issue.
-  ///
-  /// In en, this message translates to:
-  /// **'Your subscription is on hold due to a billing issue. Please update your payment method.'**
-  String get subscriptionStatusBillingIssue;
-
-  /// Title for the upgrade section in subscription details.
-  ///
-  /// In en, this message translates to:
-  /// **'Upgrade Plan'**
-  String get subscriptionUpgradeTitle;
-
-  /// Description for the upgrade option.
-  ///
-  /// In en, this message translates to:
-  /// **'Switch to an annual plan and save.'**
-  String get subscriptionUpgradeDescription;
-
-  /// Title for the downgrade section in subscription details.
-  ///
-  /// In en, this message translates to:
-  /// **'Downgrade Plan'**
-  String get subscriptionDowngradeTitle;
-
-  /// Description for the downgrade option.
-  ///
-  /// In en, this message translates to:
-  /// **'Switch to a monthly billing cycle.'**
-  String get subscriptionDowngradeDescription;
-
-  /// Button text to initiate a plan switch.
-  ///
-  /// In en, this message translates to:
-  /// **'Switch Plan'**
-  String get subscriptionSwitchButton;
-
-  /// Button text on the paywall page to restore a user's previous purchases.
-  ///
-  /// In en, this message translates to:
-  /// **'Restore Purchases'**
-  String get paywallRestorePurchaseButton;
-
-  /// Snackbar message shown when purchases are restored successfully.
-  ///
-  /// In en, this message translates to:
-  /// **'Your purchases have been successfully restored.'**
-  String get paywallRestoreSuccess;
-
-  /// Snackbar message shown when restoring purchases fails.
-  ///
-  /// In en, this message translates to:
-  /// **'Could not restore purchases. Please try again or contact support.'**
-  String get paywallRestoreFailure;
-
-  /// A message indicating that the app is currently attempting to restore purchases.
-  ///
-  /// In en, this message translates to:
-  /// **'Restoring purchases...'**
-  String get paywallRestoringPurchases;
+  /// **'Active'**
+  String get rewardsOfferActiveButton;
 }
 
 class _AppLocalizationsDelegate

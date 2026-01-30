@@ -214,6 +214,11 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
         .select((AppBloc bloc) => bloc.state.remoteConfig)
         ?.features
         .pushNotifications;
+    final isDailyDigestRewardActive = context.select(
+      (AppBloc bloc) =>
+          bloc.state.userRewards?.isRewardActive(RewardType.dailyDigest) ??
+          false,
+    );
 
     return AlertDialog(
       insetPadding: const EdgeInsets.all(AppSpacing.lg),
@@ -287,6 +292,21 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
 
                   return CheckboxListTile(
                     title: Text(type.toL10n(l10n)),
+                    subtitle:
+                        (type ==
+                                PushNotificationSubscriptionDeliveryType
+                                    .dailyDigest &&
+                            !isDailyDigestRewardActive)
+                        ? Text(
+                            l10n.requiresActiveReward,
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.secondary,
+                                ),
+                          )
+                        : null,
                     value: isAlreadySubscribed,
                     // The checkbox is disabled if it's not globally enabled or
                     // if the user has hit their limit (and isn't already
@@ -338,8 +358,6 @@ extension on PushNotificationSubscriptionDeliveryType {
         return l10n.notificationDeliveryTypeBreakingOnly;
       case PushNotificationSubscriptionDeliveryType.dailyDigest:
         return l10n.notificationDeliveryTypeDailyDigest;
-      case PushNotificationSubscriptionDeliveryType.weeklyRoundup:
-        return l10n.notificationDeliveryTypeWeeklyRoundup;
     }
   }
 }

@@ -17,6 +17,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/account/view/sav
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inline_ad_cache_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/rewarded_ad_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
@@ -46,6 +47,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/v
     as feed_filter;
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/topic_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/rewards/view/rewards_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/go_router_observer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/bloc/settings_bloc.dart';
@@ -57,8 +59,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/se
 import 'package:flutter_news_app_mobile_client_full_source_code/settings/view/theme_settings_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/multi_select_search_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/view/paywall_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/view/subscription_details_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 
@@ -87,7 +87,7 @@ GoRouter createRouter({
       // Get the current, stable lifecycle status from the AppBloc.
       final appState = context.read<AppBloc>().state;
       final appStatus = appState.status;
-      final user = appState.user;
+      final remoteConfig = appState.remoteConfig;
       final currentLocation = state.matchedLocation;
 
       logger.info(
@@ -100,15 +100,13 @@ GoRouter createRouter({
       const authenticationPath = Routes.authentication;
       const accountLinkingPath = Routes.accountLinking;
       const feedPath = Routes.feed;
-      const paywallPath = Routes.paywall;
+      const rewardsPath = '/${Routes.account}/${Routes.rewards}';
 
       // Check if the user is trying to go to any part of the auth flow.
       final isGoingToAuth = currentLocation.startsWith(authenticationPath);
       // Check if the user is trying to go to any part of the account linking
       // flow.
       final isGoingToLinking = currentLocation.startsWith(accountLinkingPath);
-      // Check if the user is trying to access the paywall.
-      final isGoingToPaywall = currentLocation == paywallPath;
 
       // RULE 1: If the user is unauthenticated, they can ONLY be on an
       // authentication path. If they try to go anywhere else, redirect them
@@ -140,11 +138,10 @@ GoRouter createRouter({
           return feedPath;
         }
 
-        // RULE 2.1: Anonymous users cannot access the Paywall directly.
-        // They must link their account first to ensure purchases are safe.
-        if (isGoingToPaywall) {
+        // Guard Rewards Page for Anonymous Users
+        if (currentLocation == rewardsPath) {
           logger.info(
-            '    Action: Anonymous user on paywall. Redirecting to linking.',
+            '    Action: Anonymous user on rewards path. Redirecting to account linking.',
           );
           return accountLinkingPath;
         }
@@ -172,15 +169,15 @@ GoRouter createRouter({
           );
           return feedPath;
         }
+      }
 
-        // RULE 3.1: Premium users do not need to see the Paywall (Acquisition).
-        // Redirect them to the subscription management page.
-        if (isGoingToPaywall && user?.tier == AccessTier.premium) {
-          logger.info(
-            '    Action: Premium user on paywall. Redirecting to details.',
-          );
-          return '${Routes.account}/${Routes.subscriptionDetails}';
-        }
+      // RULE 4: Feature Gating - Rewards
+      // If the user tries to access rewards but the feature is disabled,
+      // redirect them to the account page.
+      if (currentLocation == rewardsPath &&
+          (remoteConfig?.features.rewards.enabled == false)) {
+        logger.info('    Action: Rewards disabled. Redirecting to account.');
+        return '/${Routes.account}';
       }
 
       // If none of the above rules apply, allow the navigation.
@@ -249,11 +246,6 @@ GoRouter createRouter({
           ),
         ],
       ),
-      GoRoute(
-        path: Routes.paywall,
-        name: Routes.paywallName,
-        builder: (context, state) => const PaywallPage(),
-      ),
 
       // --- Account Modal ---
       // This is a full-screen modal route for managing account settings.
@@ -264,9 +256,19 @@ GoRouter createRouter({
             const MaterialPage(fullscreenDialog: true, child: AccountPage()),
         routes: [
           GoRoute(
-            path: Routes.subscriptionDetails,
-            name: Routes.subscriptionDetailsName,
-            builder: (context, state) => const SubscriptionDetailsPage(),
+            path: Routes.rewards,
+            name: Routes.rewardsName,
+            builder: (context, state) {
+              return RepositoryProvider<RewardedAdManager>(
+                create: (context) => RewardedAdManager(
+                  appBloc: context.read<AppBloc>(),
+                  adService: context.read<AdService>(),
+                  analyticsService: context.read<AnalyticsService>(),
+                  logger: context.read<Logger>(),
+                ),
+                child: const RewardsPage(),
+              );
+            },
           ),
           GoRoute(
             path: Routes.notificationsCenter,

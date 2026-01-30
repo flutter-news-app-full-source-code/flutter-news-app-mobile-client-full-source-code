@@ -305,8 +305,15 @@ class AppContentReported extends AppEvent {
   List<Object> get props => [report];
 }
 
-/// Internal event: Dispatched when the [PurchaseHandler] notifies that a
-/// purchase has been completed and verified, requiring a state refresh.
-class _AppUserAndSubscriptionRefreshed extends AppEvent {
-  const _AppUserAndSubscriptionRefreshed();
+/// Dispatched when a user reward has been earned or verified, requiring a
+/// refresh of the user's rewards state.
+class UserRewardsRefreshed extends AppEvent {
+  /// {@macro user_rewards_refreshed}
+  const UserRewardsRefreshed({this.completer});
+
+  /// An optional completer to allow the dispatcher to await a direct response.
+  final Completer<UserRewards?>? completer;
+
+  @override
+  List<Object?> get props => [completer];
 }

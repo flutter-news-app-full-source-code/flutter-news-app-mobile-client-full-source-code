@@ -29,7 +29,7 @@ final class InitializationSuccess extends InitializationResult {
     this.userContext,
     this.settings,
     this.userContentPreferences,
-    this.userSubscription,
+    this.userRewards,
   });
 
   /// The globally fetched remote configuration.
@@ -49,8 +49,8 @@ final class InitializationSuccess extends InitializationResult {
   /// Null if the user is unauthenticated.
   final UserContentPreferences? userContentPreferences;
 
-  /// The user's subscription status.
-  final UserSubscription? userSubscription;
+  /// The user's rewards status.
+  final UserRewards? userRewards;
 
   @override
   List<Object?> get props => [
@@ -59,7 +59,7 @@ final class InitializationSuccess extends InitializationResult {
     userContext,
     settings,
     userContentPreferences,
-    userSubscription,
+    userRewards,
   ];
 }
 

@@ -6,7 +6,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_l
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/shared.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/widgets/subscription_status_banner.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -65,10 +64,6 @@ class AccountPage extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (appState.userSubscription != null)
-                SubscriptionStatusBanner(
-                  subscription: appState.userSubscription!,
-                ),
               _buildUserHeader(context, user, isAnonymous),
               const SizedBox(height: AppSpacing.lg),
               _buildNavigationList(context),
@@ -99,8 +94,6 @@ class AccountPage extends StatelessWidget {
       switch (user?.tier) {
         case AccessTier.standard:
           roleDisplayName = l10n.accountRoleStandard;
-        case AccessTier.premium:
-          roleDisplayName = l10n.accountRolePremium;
         case AccessTier.guest:
           roleDisplayName = l10n.accountGuestAccount;
         case null:
@@ -160,16 +153,6 @@ class AccountPage extends StatelessWidget {
               ),
             ),
             const SizedBox(width: AppSpacing.md),
-            if (user?.tier == AccessTier.standard)
-              ElevatedButton(
-                onPressed: () => context.pushNamed(Routes.paywallName),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                  ),
-                ),
-                child: Text(l10n.upgradeButton),
-              ),
           ],
         ),
       ),
@@ -182,15 +165,21 @@ class AccountPage extends StatelessWidget {
   /// account-related sections.
   Widget _buildNavigationList(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
+    final isAnonymous = context.select(
+      (AppBloc bloc) => bloc.state.user?.isAnonymous ?? false,
+    );
+    final areRewardsEnabled = context.select(
+      (AppBloc bloc) =>
+          bloc.state.remoteConfig?.features.rewards.enabled ?? false,
+    );
     return Column(
       children: [
-        if (context.watch<AppBloc>().state.user?.tier ==
-            AccessTier.premium) ...[
+        if (!isAnonymous && areRewardsEnabled) ...[
           buildTile(
             context: context,
-            icon: Icons.workspace_premium,
-            title: l10n.manageSubscriptionButton,
-            onTap: () => context.pushNamed(Routes.subscriptionDetailsName),
+            icon: Icons.card_giftcard,
+            title: l10n.accountRewardsTile,
+            onTap: () => context.pushNamed(Routes.rewardsName),
           ),
           const Divider(),
         ],

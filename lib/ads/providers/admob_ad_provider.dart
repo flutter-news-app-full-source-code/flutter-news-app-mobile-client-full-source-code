@@ -5,6 +5,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_th
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/native_ad.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/rewarded_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/providers/ad_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
@@ -327,6 +328,68 @@ class AdMobAdProvider implements AdProvider {
       id: _uuid.v4(),
       provider: AdPlatformType.admob,
       adObject: googleInterstitialAd,
+    );
+  }
+
+  @override
+  Future<RewardedAd?> loadRewardedAd({
+    required AdPlatformIdentifiers adPlatformIdentifiers,
+    required String? adId,
+    required AdThemeStyle adThemeStyle,
+  }) async {
+    _logger.info('AdMobAdProvider: loadRewardedAd called for adId: $adId');
+    if (adId == null || adId.isEmpty) {
+      _logger.warning(
+        'AdMobAdProvider: No rewarded ad unit ID provided for AdMob.',
+      );
+      return null;
+    }
+
+    _logger.info(
+      'AdMobAdProvider: Attempting to load rewarded ad from unit ID: $adId',
+    );
+
+    final completer = Completer<admob.RewardedAd?>();
+
+    await admob.RewardedAd.load(
+      adUnitId: adId,
+      request: const admob.AdRequest(),
+      rewardedAdLoadCallback: admob.RewardedAdLoadCallback(
+        onAdLoaded: (ad) {
+          _logger.info('AdMobAdProvider: Rewarded Ad loaded successfully.');
+          completer.complete(ad);
+        },
+        onAdFailedToLoad: (error) {
+          _logger.severe('AdMobAdProvider: Rewarded Ad failed to load: $error');
+          completer.complete(null);
+        },
+      ),
+    );
+
+    final googleRewardedAd = await completer.future.timeout(
+      const Duration(seconds: _adLoadTimeout),
+      onTimeout: () {
+        _logger.warning('AdMobAdProvider: Rewarded ad loading timed out.');
+        return null;
+      },
+    );
+
+    if (googleRewardedAd == null) {
+      _logger.warning(
+        'AdMobAdProvider: Google Rewarded Ad object is null after load attempt.',
+      );
+      return null;
+    }
+
+    // Set server-side verification options.
+    await googleRewardedAd.setServerSideOptions(
+      admob.ServerSideVerificationOptions(),
+    );
+
+    return RewardedAd(
+      id: _uuid.v4(),
+      provider: AdPlatformType.admob,
+      adObject: googleRewardedAd,
     );
   }
 

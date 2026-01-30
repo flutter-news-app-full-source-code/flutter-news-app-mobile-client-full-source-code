@@ -32,20 +32,12 @@ extension FeedDecoratorTypeL10n on FeedDecoratorType {
           l10n.decoratorLinkAccountTitle_1,
           l10n.decoratorLinkAccountTitle_2,
         ]);
-      case FeedDecoratorType.upgrade:
-        return _randomString([
-          l10n.decoratorUpgradeTitle_1,
-          l10n.decoratorUpgradeTitle_2,
-        ]);
+      case FeedDecoratorType.unlockRewards:
+        return _randomString([l10n.decoratorUnlockRewardsTitle]);
       case FeedDecoratorType.rateApp:
         return _randomString([
           l10n.decoratorRateAppTitle_1,
           l10n.decoratorRateAppTitle_2,
-        ]);
-      case FeedDecoratorType.enableNotifications:
-        return _randomString([
-          l10n.decoratorEnableNotificationsTitle_1,
-          l10n.decoratorEnableNotificationsTitle_2,
         ]);
       case FeedDecoratorType.suggestedTopics:
         return _randomString([
@@ -64,27 +56,25 @@ extension FeedDecoratorTypeL10n on FeedDecoratorType {
   ///
   /// This only applies to [FeedDecoratorCategory.callToAction] decorators.
   /// It returns an empty string for content collection types.
-  String getRandomDescription(AppLocalizations l10n) {
+  String getRandomDescription(AppLocalizations l10n, {String? duration}) {
     switch (this) {
       case FeedDecoratorType.linkAccount:
         return _randomString([
           l10n.decoratorLinkAccountDescription_1,
           l10n.decoratorLinkAccountDescription_2,
         ]);
-      case FeedDecoratorType.upgrade:
+      case FeedDecoratorType.unlockRewards:
+        // Enforce duration presence for this type.
+        if (duration == null) {
+          return '';
+        }
         return _randomString([
-          l10n.decoratorUpgradeDescription_1,
-          l10n.decoratorUpgradeDescription_2,
+          l10n.decoratorUnlockRewardsDescription(duration),
         ]);
       case FeedDecoratorType.rateApp:
         return _randomString([
           l10n.decoratorRateAppDescription_1,
           l10n.decoratorRateAppDescription_2,
-        ]);
-      case FeedDecoratorType.enableNotifications:
-        return _randomString([
-          l10n.decoratorEnableNotificationsDescription_1,
-          l10n.decoratorEnableNotificationsDescription_2,
         ]);
       case FeedDecoratorType.suggestedTopics:
       case FeedDecoratorType.suggestedSources:
@@ -103,20 +93,12 @@ extension FeedDecoratorTypeL10n on FeedDecoratorType {
           l10n.decoratorLinkAccountCta_1,
           l10n.decoratorLinkAccountCta_2,
         ]);
-      case FeedDecoratorType.upgrade:
-        return _randomString([
-          l10n.decoratorUpgradeCta_1,
-          l10n.decoratorUpgradeCta_2,
-        ]);
+      case FeedDecoratorType.unlockRewards:
+        return _randomString([l10n.decoratorUnlockRewardsCta]);
       case FeedDecoratorType.rateApp:
         return _randomString([
           l10n.decoratorRateAppCta_1,
           l10n.decoratorRateAppCta_2,
-        ]);
-      case FeedDecoratorType.enableNotifications:
-        return _randomString([
-          l10n.decoratorEnableNotificationsCta_1,
-          l10n.decoratorEnableNotificationsCta_2,
         ]);
       case FeedDecoratorType.suggestedTopics:
       case FeedDecoratorType.suggestedSources:

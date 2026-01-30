@@ -18,12 +18,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-    externalNativeBuild {
-        cmake {
-            version = "4.1.0"
-        }
-    }
-
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11.toString()
     }

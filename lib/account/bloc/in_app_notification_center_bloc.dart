@@ -429,10 +429,7 @@ class InAppNotificationCenterBloc
   /// considered "breaking news" for the purpose of this tab.
   Map<String, dynamic> get _breakingNewsFilter => {
     'payload.data.notificationType': {
-      r'$nin': [
-        PushNotificationSubscriptionDeliveryType.dailyDigest.name,
-        PushNotificationSubscriptionDeliveryType.weeklyRoundup.name,
-      ],
+      r'$nin': [PushNotificationSubscriptionDeliveryType.dailyDigest.name],
     },
   };
 
@@ -442,10 +439,7 @@ class InAppNotificationCenterBloc
   /// explicitly typed as either a daily or weekly digest.
   Map<String, dynamic> get _digestFilter => {
     'payload.data.notificationType': {
-      r'$in': [
-        PushNotificationSubscriptionDeliveryType.dailyDigest.name,
-        PushNotificationSubscriptionDeliveryType.weeklyRoundup.name,
-      ],
+      r'$in': [PushNotificationSubscriptionDeliveryType.dailyDigest.name],
     },
   };
 

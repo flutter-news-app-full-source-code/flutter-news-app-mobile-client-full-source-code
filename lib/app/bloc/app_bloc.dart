@@ -15,7 +15,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/purchase_handler.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:logging/logging.dart';
 
@@ -42,7 +41,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required RemoteConfig remoteConfig,
     required AppSettings? settings,
     required UserContentPreferences? userContentPreferences,
-    required UserSubscription? userSubscription,
+    required UserRewards? userRewards,
     required DataRepository<RemoteConfig> remoteConfigRepository,
     required AppInitializer appInitializer,
     required AuthRepository authRepository,
@@ -59,8 +58,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required DataRepository<InAppNotification> inAppNotificationRepository,
     required AppReviewService appReviewService,
     required AnalyticsService analyticsService,
-    required PurchaseHandler purchaseHandler,
-    required DataRepository<UserSubscription> userSubscriptionRepository,
+    required DataRepository<UserRewards> userRewardsRepository,
   }) : _remoteConfigRepository = remoteConfigRepository,
        _appInitializer = appInitializer,
        _authRepository = authRepository,
@@ -75,8 +73,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _appReviewService = appReviewService,
        _inlineAdCacheService = inlineAdCacheService,
        _analyticsService = analyticsService,
-       _purchaseHandler = purchaseHandler,
-       _userSubscriptionRepository = userSubscriptionRepository,
+       _userRewardsRepository = userRewardsRepository,
        _logger = logger,
        super(
          AppState(
@@ -90,7 +87,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
            remoteConfig: remoteConfig,
            settings: settings,
            userContentPreferences: userContentPreferences,
-           userSubscription: userSubscription,
+           userRewards: userRewards,
          ),
        ) {
     // Register event handlers for various app-level events.
@@ -120,7 +117,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppNotificationTapped>(_onAppNotificationTapped);
     on<AppBookmarkToggled>(_onAppBookmarkToggled);
     on<AppContentReported>(_onAppContentReported);
-    on<_AppUserAndSubscriptionRefreshed>(_onUserAndSubscriptionRefreshed);
+    on<UserRewardsRefreshed>(_onUserRewardsRefreshed);
 
     // Listen to token refresh events from the push notification service.
     // When a token is refreshed, dispatch an event to trigger device
@@ -136,13 +133,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // client's only responsibility is to react to the incoming message
       // and update the UI to show an unread indicator.
       add(const AppInAppNotificationReceived());
-    });
-
-    // Listen to purchase completion events to refresh user entitlements.
-    _purchaseCompletedSubscription = _purchaseHandler.purchaseCompleted.listen((
-      _,
-    ) {
-      add(const _AppUserAndSubscriptionRefreshed());
     });
   }
 
@@ -162,15 +152,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final InlineAdCacheService _inlineAdCacheService;
   final FeedCacheService _feedCacheService;
   final AnalyticsService _analyticsService;
-  final PurchaseHandler _purchaseHandler;
-  final DataRepository<UserSubscription> _userSubscriptionRepository;
-  late final StreamSubscription<void> _purchaseCompletedSubscription;
-
-  @override
-  Future<void> close() {
-    _purchaseCompletedSubscription.cancel();
-    return super.close();
-  }
+  final DataRepository<UserRewards> _userRewardsRepository;
 
   /// Handles the [AppStarted] event.
   ///
@@ -206,39 +188,68 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     }
   }
 
-  Future<void> _onUserAndSubscriptionRefreshed(
-    _AppUserAndSubscriptionRefreshed event,
+  Future<void> _onUserRewardsRefreshed(
+    UserRewardsRefreshed event,
     Emitter<AppState> emit,
   ) async {
+    final oldRewards = state.userRewards;
     final userId = state.user?.id;
-    if (userId == null) return;
+    if (userId == null) {
+      event.completer?.complete(null);
+      return;
+    }
 
-    _logger.info(
-      '[AppBloc] Refreshing user and subscription data after purchase...',
-    );
+    _logger.info('[AppBloc] Refreshing user rewards...');
 
     try {
-      final user = await _authRepository.getCurrentUser();
-
-      final subResponse = await _userSubscriptionRepository.readAll(
+      final newRewards = await _userRewardsRepository.read(
         userId: userId,
-        filter: {'status': 'active'},
-        pagination: const PaginationOptions(limit: 1),
+        id: userId,
       );
-      final subscription = subResponse.items.firstOrNull;
 
-      if (user != null) {
-        emit(
-          state.copyWith(
-            user: user,
-            userSubscription: subscription,
-            clearError: true,
-          ),
+      // Verify data integrity. Ensure the received rewards object
+      // belongs to the currently logged-in user.
+      if (newRewards.userId != userId) {
+        _logger.severe(
+          '[AppBloc] CRITICAL DATA MISMATCH: Fetched UserRewards for user '
+          '${newRewards.userId}, but current user is $userId. Halting update. '
+          'This is likely a server-side bug where the API is not filtering by userId.',
         );
+        // Complete the completer with an error to halt the polling loop in the
+        // RewardsBloc and prevent further incorrect processing.
+        event.completer?.completeError(
+          Exception('Mismatched user data received from server.'),
+        );
+        return;
       }
-      _logger.info('[AppBloc] User and subscription data refreshed.');
+
+      // Determine which rewards have become newly active.
+      final newlyActivatedRewards = <RewardType>{};
+      for (final type in RewardType.values) {
+        final wasActive = oldRewards?.isRewardActive(type) ?? false;
+        final isNowActive = newRewards.isRewardActive(type);
+        if (isNowActive && !wasActive) {
+          newlyActivatedRewards.add(type);
+        }
+      }
+
+      // Trigger side effects for newly activated rewards.
+      for (final rewardType in newlyActivatedRewards) {
+        if (rewardType == RewardType.adFree) {
+          _logger.info(
+            '[AppBloc] Ad-Free reward activated. Clearing ad and feed caches.',
+          );
+          _inlineAdCacheService.clearAllAds();
+          _feedCacheService.clearAll();
+        }
+      }
+
+      emit(state.copyWith(userRewards: newRewards));
+      _logger.info('[AppBloc] User rewards refreshed successfully.');
+      event.completer?.complete(newRewards);
     } catch (e, s) {
-      _logger.severe('[AppBloc] Failed to refresh data after purchase.', e, s);
+      _logger.severe('[AppBloc] Failed to refresh user rewards.', e, s);
+      event.completer?.completeError(e, s);
     }
   }
 
@@ -356,7 +367,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         :final settings,
         :final userContentPreferences,
         :final userContext,
-        :final userSubscription,
+        :final userRewards,
       ):
         emit(
           state.copyWith(
@@ -367,7 +378,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             userContext: userContext,
             settings: settings,
             userContentPreferences: userContentPreferences,
-            userSubscription: userSubscription,
+            userRewards: userRewards,
             clearError: true,
           ),
         );

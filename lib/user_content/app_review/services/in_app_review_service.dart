@@ -2,7 +2,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app
 import 'package:in_app_review/in_app_review.dart';
 import 'package:logging/logging.dart';
 
-
 /// {@template in_app_review_service}
 /// A concrete implementation of [NativeReviewService] that uses the
 /// `in_app_review` package.

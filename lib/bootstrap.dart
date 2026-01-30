@@ -37,11 +37,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/notifications/pr
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_manager.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/providers/no_op_subscription_provider.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/providers/store_subscription_provider.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/purchase_handler.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_manager.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/subscriptions/services/subscription_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/in_app_review_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/native_review_service.dart';
@@ -129,7 +124,7 @@ Future<Widget> bootstrap(
     dataClient: remoteConfigClient,
   );
   // Fetch RemoteConfig once, early in the process.
-  // This configuration is required by Analytics, Subscriptions, and Push Notifications
+  // This configuration is required by Analytics, Push Notifications etc
   // to determine which providers to initialize.
   RemoteConfig? remoteConfig;
   try {
@@ -249,8 +244,7 @@ Future<Widget> bootstrap(
   late final DataClient<Engagement> engagementClient;
   late final DataClient<Report> reportClient;
   late final DataClient<AppReview> appReviewClient;
-  late final DataClient<PurchaseTransaction> purchaseTransactionClient;
-  late final DataClient<UserSubscription> userSubscriptionClient;
+  late final DataClient<UserRewards> userRewardsClient;
   logger.fine('Using API clients for all data repositories.');
   headlinesClient = DataApi<Headline>(
     httpClient: httpClient,
@@ -343,18 +337,11 @@ Future<Widget> bootstrap(
     toJson: (review) => review.toJson(),
     logger: logger,
   );
-  purchaseTransactionClient = DataApi<PurchaseTransaction>(
+  userRewardsClient = DataApi<UserRewards>(
     httpClient: httpClient,
-    modelName: 'purchase_transaction',
-    fromJson: PurchaseTransaction.fromJson,
-    toJson: (transaction) => transaction.toJson(),
-    logger: logger,
-  );
-  userSubscriptionClient = DataApi<UserSubscription>(
-    httpClient: httpClient,
-    modelName: 'user_subscription',
-    fromJson: UserSubscription.fromJson,
-    toJson: (subscription) => subscription.toJson(),
+    modelName: 'user_rewards',
+    fromJson: UserRewards.fromJson,
+    toJson: (rewards) => rewards.toJson(),
     logger: logger,
   );
   logger.fine('All data clients instantiated.');
@@ -393,35 +380,9 @@ Future<Widget> bootstrap(
     dataClient: appReviewClient,
   );
 
-  // Initialize Subscription Service & Repository
-  late final SubscriptionService subscriptionService;
-
-  // Always instantiate the Manager. It handles enabled/disabled state internally.
-  subscriptionService = SubscriptionManager(
-    initialConfig: remoteConfig?.features.subscription,
-    storeProvider: StoreSubscriptionProvider(logger: logger),
-    noOpProvider: NoOpSubscriptionProvider(logger: logger),
-    logger: logger,
+  final userRewardsRepository = DataRepository<UserRewards>(
+    dataClient: userRewardsClient,
   );
-
-  final purchaseTransactionRepository = DataRepository<PurchaseTransaction>(
-    dataClient: purchaseTransactionClient,
-  );
-
-  final userSubscriptionRepository = DataRepository<UserSubscription>(
-    dataClient: userSubscriptionClient,
-  );
-
-  // Initialize PurchaseHandler
-  final purchaseHandler =
-      PurchaseHandler(
-          subscriptionService: subscriptionService,
-          purchaseTransactionRepository: purchaseTransactionRepository,
-          authRepository: authenticationRepository,
-          logger: logger,
-        )
-        // Start listening for purchase updates immediately
-        ..listen();
 
   logger
     ..fine('All data repositories initialized.')
@@ -492,7 +453,7 @@ Future<Widget> bootstrap(
     appSettingsRepository: appSettingsRepository,
     userContentPreferencesRepository: userContentPreferencesRepository,
     userContextRepository: userContextRepository,
-    userSubscriptionRepository: userSubscriptionRepository,
+    userRewardsRepository: userRewardsRepository,
     remoteConfigRepository: remoteConfigRepository,
     packageInfoService: packageInfoService,
     logger: logger,
@@ -513,9 +474,6 @@ Future<Widget> bootstrap(
       RepositoryProvider.value(value: analyticsService),
       RepositoryProvider.value(value: appInitializer),
       RepositoryProvider.value(value: logger),
-      RepositoryProvider.value(value: subscriptionService),
-      RepositoryProvider.value(value: purchaseHandler),
-      RepositoryProvider.value(value: purchaseTransactionRepository),
     ],
     child: AppInitializationPage(
       // All other repositories and services are passed directly to the
@@ -545,10 +503,7 @@ Future<Widget> bootstrap(
       appReviewService: appReviewService,
       contentLimitationService: contentLimitationService,
       analyticsService: analyticsService,
-      subscriptionService: subscriptionService,
-      purchaseTransactionRepository: purchaseTransactionRepository,
-      userSubscriptionRepository: userSubscriptionRepository,
-      purchaseHandler: purchaseHandler,
+      userRewardsRepository: userRewardsRepository,
     ),
   );
 }

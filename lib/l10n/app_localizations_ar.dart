@@ -1655,5 +1655,25 @@ class AppLocalizationsAr extends AppLocalizations {
   String get unlockMoreButton => 'افتح المزيد';
 
   @override
-  String get requiresActiveReward => 'يتطلب مكافأة نشطة';
+  String get requiresActiveReward =>
+      'يتطلب مكافأة نشطة. يمكنك فتح المكافآت من صفحة الحساب.';
+
+  @override
+  String get rewardsAdFreeTitle => 'استمتع بتجربة خالية من الإعلانات';
+
+  @override
+  String rewardsAdFreeDescription(String duration) {
+    return 'شاهد مقطع فيديو قصيرًا لإزالة جميع الإعلانات من التطبيق لمدة $duration.';
+  }
+
+  @override
+  String get rewardsDailyDigestTitle => 'افتح ملخصات الأخبار اليومية';
+
+  @override
+  String rewardsDailyDigestDescription(String duration) {
+    return 'احصل على إشعار دفع يومي يلخص أبرز العناوين من الفلاتر المحفوظة التي تم تمكين خيار \'الملخص اليومي\' لها. نشط لمدة $duration.';
+  }
+
+  @override
+  String get rewardsOfferActiveButton => 'نشط';
 }

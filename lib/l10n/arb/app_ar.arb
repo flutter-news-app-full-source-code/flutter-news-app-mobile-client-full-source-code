@@ -2122,8 +2122,38 @@
     "@unlockMoreButton": {
         "description": "Button text to unlock more features or content limits."
     },
-    "requiresActiveReward": "يتطلب مكافأة نشطة",
+    "requiresActiveReward": "يتطلب مكافأة نشطة. يمكنك فتح المكافآت من صفحة الحساب.",
     "@requiresActiveReward": {
         "description": "Label indicating a feature requires an active reward."
+    },
+    "rewardsAdFreeTitle": "استمتع بتجربة خالية من الإعلانات",
+    "@rewardsAdFreeTitle": {
+        "description": "Title for the Ad-Free reward offer."
+    },
+    "rewardsAdFreeDescription": "شاهد مقطع فيديو قصيرًا لإزالة جميع الإعلانات من التطبيق لمدة {duration}.",
+    "@rewardsAdFreeDescription": {
+        "description": "Description for the Ad-Free reward offer.",
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsDailyDigestTitle": "افتح ملخصات الأخبار اليومية",
+    "@rewardsDailyDigestTitle": {
+        "description": "Title for the Daily Digest reward offer."
+    },
+    "rewardsDailyDigestDescription": "احصل على إشعار دفع يومي يلخص أبرز العناوين من الفلاتر المحفوظة التي تم تمكين خيار 'الملخص اليومي' لها. نشط لمدة {duration}.",
+    "@rewardsDailyDigestDescription": {
+        "description": "Description for the Daily Digest reward offer.",
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsOfferActiveButton": "نشط",
+    "@rewardsOfferActiveButton": {
+        "description": "Button text for a reward that is currently active."
     }
 }

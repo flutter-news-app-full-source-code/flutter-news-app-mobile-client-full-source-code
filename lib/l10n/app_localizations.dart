@@ -3077,8 +3077,38 @@ abstract class AppLocalizations {
   /// Label indicating a feature requires an active reward.
   ///
   /// In en, this message translates to:
-  /// **'Requires active reward'**
+  /// **'Requires an active reward. You can unlock rewards from the Account page.'**
   String get requiresActiveReward;
+
+  /// Title for the Ad-Free reward offer.
+  ///
+  /// In en, this message translates to:
+  /// **'Enjoy an Ad-Free Experience'**
+  String get rewardsAdFreeTitle;
+
+  /// Description for the Ad-Free reward offer.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch a short video to remove all ads from the app for {duration}.'**
+  String rewardsAdFreeDescription(String duration);
+
+  /// Title for the Daily Digest reward offer.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock Daily News Digests'**
+  String get rewardsDailyDigestTitle;
+
+  /// Description for the Daily Digest reward offer.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive a daily push notification summarizing the top headlines from your saved filters that have the \'Daily Digest\' option enabled. Active for {duration}.'**
+  String rewardsDailyDigestDescription(String duration);
+
+  /// Button text for a reward that is currently active.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get rewardsOfferActiveButton;
 }
 
 class _AppLocalizationsDelegate

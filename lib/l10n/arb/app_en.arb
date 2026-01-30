@@ -2122,8 +2122,38 @@
     "@unlockMoreButton": {
         "description": "Button text to unlock more features or content limits."
     },
-    "requiresActiveReward": "Requires active reward",
+    "requiresActiveReward": "Requires an active reward. You can unlock rewards from the Account page.",
     "@requiresActiveReward": {
         "description": "Label indicating a feature requires an active reward."
+    },
+    "rewardsAdFreeTitle": "Enjoy an Ad-Free Experience",
+    "@rewardsAdFreeTitle": {
+        "description": "Title for the Ad-Free reward offer."
+    },
+    "rewardsAdFreeDescription": "Watch a short video to remove all ads from the app for {duration}.",
+    "@rewardsAdFreeDescription": {
+        "description": "Description for the Ad-Free reward offer.",
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsDailyDigestTitle": "Unlock Daily News Digests",
+    "@rewardsDailyDigestTitle": {
+        "description": "Title for the Daily Digest reward offer."
+    },
+    "rewardsDailyDigestDescription": "Receive a daily push notification summarizing the top headlines from your saved filters that have the 'Daily Digest' option enabled. Active for {duration}.",
+    "@rewardsDailyDigestDescription": {
+        "description": "Description for the Daily Digest reward offer.",
+        "placeholders": {
+            "duration": {
+                "type": "String"
+            }
+        }
+    },
+    "rewardsOfferActiveButton": "Active",
+    "@rewardsOfferActiveButton": {
+        "description": "Button text for a reward that is currently active."
     }
 }

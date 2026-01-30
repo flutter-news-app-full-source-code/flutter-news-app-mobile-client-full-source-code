@@ -1655,5 +1655,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unlockMoreButton => 'Unlock More';
 
   @override
-  String get requiresActiveReward => 'Requires active reward';
+  String get requiresActiveReward =>
+      'Requires an active reward. You can unlock rewards from the Account page.';
+
+  @override
+  String get rewardsAdFreeTitle => 'Enjoy an Ad-Free Experience';
+
+  @override
+  String rewardsAdFreeDescription(String duration) {
+    return 'Watch a short video to remove all ads from the app for $duration.';
+  }
+
+  @override
+  String get rewardsDailyDigestTitle => 'Unlock Daily News Digests';
+
+  @override
+  String rewardsDailyDigestDescription(String duration) {
+    return 'Receive a daily push notification summarizing the top headlines from your saved filters that have the \'Daily Digest\' option enabled. Active for $duration.';
+  }
+
+  @override
+  String get rewardsOfferActiveButton => 'Active';
 }

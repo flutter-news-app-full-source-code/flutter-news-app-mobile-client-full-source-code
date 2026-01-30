@@ -169,7 +169,7 @@ The application is fully internationalized and includes working English and Arab
 
 ## 🚀 Getting Started & Running Locally
 
-For a complete guide on setting up your local environment and running this project, please see the `Wiki` tab in this repository.
+For a complete guide on setting up your local environment and running this project, please see the [Wiki](https://github.com/flutter-news-app-full-source-code/flutter-news-app-mobile-client-full-source-code/wiki) tab in this repository.
 
 ## 🔑 Licensing
 

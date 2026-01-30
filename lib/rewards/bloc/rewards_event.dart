@@ -22,4 +22,4 @@ final class RewardsAdWatched extends RewardsEvent {}
 
 final class SnackbarShown extends RewardsEvent {}
 
-final class _RewardsTimerTicked extends RewardsEvent {}
+final class RewardsTimerTicked extends RewardsEvent {}

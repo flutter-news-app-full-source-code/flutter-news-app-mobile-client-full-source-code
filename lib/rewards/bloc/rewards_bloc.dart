@@ -23,7 +23,7 @@ class RewardsBloc extends Bloc<RewardsEvent, RewardsState> {
     on<RewardsStarted>(_onRewardsStarted);
     on<RewardsAdRequested>(_onRewardsAdRequested);
     on<RewardsAdWatched>(_onRewardsAdWatched);
-    on<_RewardsTimerTicked>(_onRewardsTimerTicked);
+    on<RewardsTimerTicked>(_onRewardsTimerTicked);
     on<RewardsAdFailed>(_onRewardsAdFailed);
     on<RewardsAdDismissed>(_onRewardsAdDismissed);
     on<SnackbarShown>(_onSnackbarShown);
@@ -69,12 +69,12 @@ class RewardsBloc extends Bloc<RewardsEvent, RewardsState> {
     emit(RewardsVerifying(activeRewardType: state.activeRewardType));
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 2), (_) {
-      add(_RewardsTimerTicked());
+      add(RewardsTimerTicked());
     });
   }
 
   Future<void> _onRewardsTimerTicked(
-    _RewardsTimerTicked event,
+    RewardsTimerTicked event,
     Emitter<RewardsState> emit,
   ) async {
     final rewardType = state.activeRewardType;

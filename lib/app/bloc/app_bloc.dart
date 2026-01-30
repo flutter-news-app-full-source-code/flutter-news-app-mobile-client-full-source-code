@@ -194,38 +194,62 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   ) async {
     final oldRewards = state.userRewards;
     final userId = state.user?.id;
-    if (userId == null) return;
+    if (userId == null) {
+      event.completer?.complete(null);
+      return;
+    }
 
     _logger.info('[AppBloc] Refreshing user rewards...');
 
     try {
-      // Fetch the latest rewards state from the backend.
-      // We use readAll with a limit of 1 as UserRewards is a singleton per user.
-      final response = await _userRewardsRepository.readAll(
+      final newRewards = await _userRewardsRepository.read(
         userId: userId,
-        pagination: const PaginationOptions(limit: 1),
+        id: userId,
       );
-      final userRewards = response.items.firstOrNull;
 
-      // Check if the AdFree reward state has changed to active.
-      final wasAdFreeActive =
-          oldRewards?.isRewardActive(RewardType.adFree) ?? false;
-      final isAdFreeActive =
-          userRewards?.isRewardActive(RewardType.adFree) ?? false;
-
-      if (!wasAdFreeActive && isAdFreeActive) {
-        _logger.info(
-          '[AppBloc] Ad-Free reward activated. Clearing ad and feed caches.',
+      // Verify data integrity. Ensure the received rewards object
+      // belongs to the currently logged-in user.
+      if (newRewards.userId != userId) {
+        _logger.severe(
+          '[AppBloc] CRITICAL DATA MISMATCH: Fetched UserRewards for user '
+          '${newRewards.userId}, but current user is $userId. Halting update. '
+          'This is likely a server-side bug where the API is not filtering by userId.',
         );
-        // Clear both caches to ensure ads and ad placeholders are removed.
-        _inlineAdCacheService.clearAllAds();
-        _feedCacheService.clearAll();
+        // Complete the completer with an error to halt the polling loop in the
+        // RewardsBloc and prevent further incorrect processing.
+        event.completer?.completeError(
+          Exception('Mismatched user data received from server.'),
+        );
+        return;
       }
 
-      emit(state.copyWith(userRewards: userRewards));
-      _logger.info('[AppBloc] User rewards refreshed.');
+      // Determine which rewards have become newly active.
+      final newlyActivatedRewards = <RewardType>{};
+      for (final type in RewardType.values) {
+        final wasActive = oldRewards?.isRewardActive(type) ?? false;
+        final isNowActive = newRewards.isRewardActive(type);
+        if (isNowActive && !wasActive) {
+          newlyActivatedRewards.add(type);
+        }
+      }
+    
+      // Trigger side effects for newly activated rewards.
+      for (final rewardType in newlyActivatedRewards) {
+        if (rewardType == RewardType.adFree) {
+          _logger.info(
+            '[AppBloc] Ad-Free reward activated. Clearing ad and feed caches.',
+          );
+          _inlineAdCacheService.clearAllAds();
+          _feedCacheService.clearAll();
+        }
+      }
+
+      emit(state.copyWith(userRewards: newRewards));
+      _logger.info('[AppBloc] User rewards refreshed successfully.');
+      event.completer?.complete(newRewards);
     } catch (e, s) {
       _logger.severe('[AppBloc] Failed to refresh user rewards.', e, s);
+      event.completer?.completeError(e, s);
     }
   }
 

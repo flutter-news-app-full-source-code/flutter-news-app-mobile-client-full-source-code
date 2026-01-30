@@ -232,7 +232,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           newlyActivatedRewards.add(type);
         }
       }
-    
+
       // Trigger side effects for newly activated rewards.
       for (final rewardType in newlyActivatedRewards) {
         if (rewardType == RewardType.adFree) {
@@ -367,6 +367,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         :final settings,
         :final userContentPreferences,
         :final userContext,
+        :final userRewards,
       ):
         emit(
           state.copyWith(
@@ -377,6 +378,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             userContext: userContext,
             settings: settings,
             userContentPreferences: userContentPreferences,
+            userRewards: userRewards,
             clearError: true,
           ),
         );

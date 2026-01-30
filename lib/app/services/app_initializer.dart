@@ -286,11 +286,11 @@ class AppInitializer {
     if (user.isAnonymous) return null;
 
     try {
-      final response = await _userRewardsRepository.readAll(
+      final userRewards = await _userRewardsRepository.read(
         userId: user.id,
-        pagination: const PaginationOptions(limit: 1),
+        id: user.id,
       );
-      return response.items.firstOrNull;
+      return userRewards;
     } catch (e, s) {
       // If fetch fails or no rewards found, return null.
       // We don't want to block app init for this.

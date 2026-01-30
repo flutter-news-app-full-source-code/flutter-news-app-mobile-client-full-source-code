@@ -182,10 +182,21 @@ class _RewardOfferCard extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     final rewardName = type == RewardType.adFree
-        ? l10n.rewardTypeAdFree
+        ? l10n
+              .rewardTypeAdFree // Simple name for active state
         : l10n.rewardTypeDailyDigest;
 
     final durationString = l10n.rewardsDurationDays(durationDays);
+
+    final title = isActive
+        ? l10n.rewardsOfferActiveTitle(rewardName)
+        : (type == RewardType.adFree
+              ? l10n.rewardsAdFreeTitle
+              : l10n.rewardsDailyDigestTitle);
+
+    final description = type == RewardType.adFree
+        ? l10n.rewardsAdFreeDescription(durationString)
+        : l10n.rewardsDailyDigestDescription(durationString);
 
     return Card(
       elevation: 0,
@@ -213,9 +224,7 @@ class _RewardOfferCard extends StatelessWidget {
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
-                    isActive
-                        ? l10n.rewardsOfferActiveTitle(rewardName)
-                        : l10n.rewardsOfferTitle(rewardName, durationString),
+                    title,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -227,12 +236,7 @@ class _RewardOfferCard extends StatelessWidget {
             if (isActive && expiry != null)
               _CountdownTimer(expiry: expiry!)
             else
-              Text(
-                type == RewardType.adFree
-                    ? l10n.decoratorUnlockRewardsDescription(durationString)
-                    : 'Unlock daily digests for $durationString.', // Fallback description
-                style: theme.textTheme.bodyMedium,
-              ),
+              Text(description, style: theme.textTheme.bodyMedium),
             const SizedBox(height: AppSpacing.md),
             SizedBox(
               width: double.infinity,
@@ -259,7 +263,7 @@ class _RewardOfferCard extends StatelessWidget {
                       )
                     : Text(
                         isActive
-                            ? l10n.rewardsOfferActiveTitle(rewardName)
+                            ? l10n.rewardsOfferActiveButton
                             : l10n.rewardsOfferWatchButton,
                       ),
               ),

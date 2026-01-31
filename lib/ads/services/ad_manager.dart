@@ -390,7 +390,10 @@ class AdManager implements AdService {
   Future<List<FeedItem>> injectFeedAdPlaceholders({
     required List<FeedItem> feedItems,
     required User? user,
-    required RemoteConfig remoteConfig, required FeedItemImageStyle imageStyle, required AdThemeStyle adThemeStyle, UserRewards? userRewards,
+    required RemoteConfig remoteConfig,
+    required FeedItemImageStyle imageStyle,
+    required AdThemeStyle adThemeStyle,
+    UserRewards? userRewards,
     int processedContentItemCount = 0,
   }) async {
     // If the user has an active ad-free reward, do not inject any ads.

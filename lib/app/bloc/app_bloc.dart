@@ -241,6 +241,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           );
           _inlineAdCacheService.clearAllAds();
           _feedCacheService.clearAll();
+          // The HeadlinesFeedBloc listens for the AppState change and will
+          // trigger its own refresh, which will then use the new ad-free
+          // status to correctly rebuild the feed without ads. This is a clean,
+          // decoupled way to trigger the UI update.
         }
       }
 

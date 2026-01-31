@@ -50,6 +50,7 @@ abstract class AdService {
     required RemoteConfig remoteConfig,
     required FeedItemImageStyle imageStyle,
     required AdThemeStyle adThemeStyle,
+    UserRewards? userRewards,
     int processedContentItemCount = 0,
   });
 }

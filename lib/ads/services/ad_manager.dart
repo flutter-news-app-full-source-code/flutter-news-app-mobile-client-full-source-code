@@ -393,8 +393,17 @@ class AdManager implements AdService {
     required RemoteConfig remoteConfig,
     required FeedItemImageStyle imageStyle,
     required AdThemeStyle adThemeStyle,
+    UserRewards? userRewards,
     int processedContentItemCount = 0,
   }) async {
+    // If the user has an active ad-free reward, do not inject any ads.
+    if (userRewards?.isRewardActive(RewardType.adFree) == true) {
+      _logger.info(
+        'User has active ad-free reward. Skipping ad placeholder injection.',
+      );
+      return feedItems;
+    }
+
     if (!remoteConfig.features.ads.feedAdConfiguration.enabled) {
       return feedItems;
     }

@@ -2155,5 +2155,9 @@
     "rewardsOfferActiveButton": "نشط",
     "@rewardsOfferActiveButton": {
         "description": "Button text for a reward that is currently active."
+    },
+    "featureRequiresSignIn": "سجل الدخول لاستخدام هذه الميزة.",
+    "@featureRequiresSignIn": {
+        "description": "A generic message shown for a disabled feature when the user is a guest, prompting them to sign in."
     }
 }

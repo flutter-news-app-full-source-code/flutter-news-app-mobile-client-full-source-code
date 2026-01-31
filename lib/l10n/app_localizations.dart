@@ -3109,6 +3109,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Active'**
   String get rewardsOfferActiveButton;
+
+  /// A generic message shown for a disabled feature when the user is a guest, prompting them to sign in.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to use this feature.'**
+  String get featureRequiresSignIn;
 }
 
 class _AppLocalizationsDelegate

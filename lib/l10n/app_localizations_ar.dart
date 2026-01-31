@@ -1676,4 +1676,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get rewardsOfferActiveButton => 'نشط';
+
+  @override
+  String get featureRequiresSignIn => 'سجل الدخول لاستخدام هذه الميزة.';
 }

@@ -112,10 +112,13 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       final isAdFree = newRewards?.isRewardActive(RewardType.adFree) ?? false;
 
       if (!wasAdFree && isAdFree) {
-        _logger.info('Ad-Free reward activated. Triggering feed refresh.');
-        // Reward just activated. Cache is already cleared by AppBloc.
-        // Trigger refresh to remove ads from UI. We only trigger this if
-        // the feed has already started (adThemeStyle is known).
+        _logger.info(
+          'Ad-Free reward activated. Triggering feed refresh to remove ads.',
+        );
+        // The Ad-Free reward has just become active. The AppBloc has already
+        // cleared the necessary caches (_inlineAdCacheService and
+        // _feedCacheService). Now, we must trigger a refresh of the current
+        // feed to force it to be rebuilt without ad placeholders.
         if (state.adThemeStyle != null) {
           add(HeadlinesFeedRefreshRequested(adThemeStyle: state.adThemeStyle!));
         }

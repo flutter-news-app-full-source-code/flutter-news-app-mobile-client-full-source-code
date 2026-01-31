@@ -331,6 +331,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       final newProcessedFeedItems = await _adService.injectFeedAdPlaceholders(
         feedItems: headlineResponse.items,
         user: currentUser,
+        userRewards: _appBloc.state.userRewards,
         remoteConfig: remoteConfig,
         imageStyle: _appBloc.state.settings!.feedSettings.feedItemImageStyle,
         adThemeStyle: event.adThemeStyle,
@@ -511,6 +512,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       final fullyDecoratedFeed = await _adService.injectFeedAdPlaceholders(
         feedItems: feedWithDecorator,
         user: currentUser,
+        userRewards: _appBloc.state.userRewards,
         remoteConfig: appConfig,
         imageStyle: settings!.feedSettings.feedItemImageStyle,
         adThemeStyle: event.adThemeStyle,
@@ -677,6 +679,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       final fullyDecoratedFeed = await _adService.injectFeedAdPlaceholders(
         feedItems: feedWithDecorator,
         user: currentUser,
+        userRewards: _appBloc.state.userRewards,
         remoteConfig: appConfig,
         imageStyle: settings!.feedSettings.feedItemImageStyle,
         adThemeStyle: event.adThemeStyle,
@@ -790,6 +793,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       final fullyDecoratedFeed = await _adService.injectFeedAdPlaceholders(
         feedItems: feedWithDecorator,
         user: currentUser,
+        userRewards: _appBloc.state.userRewards,
         remoteConfig: appConfig,
         imageStyle: settings!.feedSettings.feedItemImageStyle,
         adThemeStyle: event.adThemeStyle,

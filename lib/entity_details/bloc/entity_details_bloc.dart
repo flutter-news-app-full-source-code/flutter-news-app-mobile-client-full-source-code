@@ -143,6 +143,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       final processedFeedItems = await _adService.injectFeedAdPlaceholders(
         feedItems: headlineResponse.items,
         user: currentUser,
+        userRewards: _appBloc.state.userRewards,
         remoteConfig: remoteConfig,
         imageStyle: _appBloc.state.feedItemImageStyle,
         adThemeStyle: event.adThemeStyle,
@@ -316,6 +317,7 @@ class EntityDetailsBloc extends Bloc<EntityDetailsEvent, EntityDetailsState> {
       final newProcessedFeedItems = await _adService.injectFeedAdPlaceholders(
         feedItems: headlineResponse.items,
         user: currentUser,
+        userRewards: _appBloc.state.userRewards,
         remoteConfig: remoteConfig,
         imageStyle: _appBloc.state.feedItemImageStyle,
         // Use the AdThemeStyle passed directly from the UI via the event.

@@ -163,8 +163,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       '[AppBloc] AppStarted event received. State is already initialized.',
     );
 
-    // If a user is already logged in when the app starts, register their
-    // device for push notifications.
+    // If a user is already logged in when the app starts, prepare for push
+    // notifications.
     if (state.user != null) {
       // Check for existing unread notifications on startup.
       // This ensures the notification dot is shown correctly if the user
@@ -184,7 +184,26 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           s,
         );
       }
-      await _registerDeviceForPushNotifications(state.user!.id);
+
+      // Ensure we have permission before attempting to register the device.
+      // On modern Android, getToken() will return null without permission.
+      try {
+        final hasPermission = await _pushNotificationService.hasPermission();
+        if (hasPermission ||
+            await _pushNotificationService.requestPermission()) {
+          await _registerDeviceForPushNotifications(state.user!.id);
+        } else {
+          _logger.warning(
+            '[AppBloc] Push notification permission not granted.',
+          );
+        }
+      } catch (e, s) {
+        _logger.severe(
+          '[AppBloc] Failed to process push notification permissions.',
+          e,
+          s,
+        );
+      }
     }
   }
 

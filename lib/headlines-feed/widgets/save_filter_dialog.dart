@@ -8,6 +8,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/notifications/se
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:ui_kit/ui_kit.dart';
+import 'package:logging/logging.dart';
 
 /// {@template save_filter_dialog}
 /// A dialog for naming or renaming a saved filter.
@@ -102,108 +103,162 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
     }
   }
 
+  /// Handles the complete form submission logic, including validation,
+  /// permission requests, and saving the filter.
   Future<void> _submitForm() async {
     final l10n = AppLocalizationsX(context).l10n;
-    if (_formKey.currentState!.validate()) {
-      // If the user has selected any notification types but permission has
-      // not been granted, we initiate the lazy permission request flow.
-      if (_selectedDeliveryTypes.isNotEmpty) {
-        final notificationService = context.read<PushNotificationService>();
-        final hasPermission = await notificationService.hasPermission();
+    final logger = context.read<Logger>();
 
-        if (!hasPermission) {
-          // Show a pre-permission dialog to explain why we need notifications.
-          final l10n = AppLocalizationsX(context).l10n;
-          final wantsToAllow = await showDialog<bool>(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: Text(l10n.prePermissionDialogTitle),
-              content: Text(l10n.prePermissionDialogBody),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: Text(l10n.prePermissionDialogDenyButton),
-                ),
-                FilledButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: Text(l10n.prePermissionDialogAllowButton),
-                ),
-              ],
-            ),
+    if (!_formKey.currentState!.validate()) {
+      logger.fine('[_submitForm] Form validation failed.');
+      return;
+    }
+
+    logger.fine('[_submitForm] Form validated. Starting save process.');
+    setState(() => _isSaving = true);
+
+    try {
+      var deliveryTypesToSave =
+          Set<PushNotificationSubscriptionDeliveryType>.from(
+            _selectedDeliveryTypes,
           );
 
-          // If the user declines the pre-dialog, stop the process.
-          if (wantsToAllow != true) return;
+      // If notifications are selected, handle the permission flow.
+      if (deliveryTypesToSave.isNotEmpty) {
+        logger.fine(
+          '[_submitForm] Notification types selected. Checking permissions.',
+        );
+        final permissionGranted = await _handlePermissionRequest(logger);
 
-          // Request permission via the OS dialog.
-          final permissionGranted = await notificationService
-              .requestPermission();
-
-          // If the user denies permission at the OS level, stop.
-          if (!permissionGranted) {
-            // Provide UI feedback to the user.
-            // Guard against using context across async gaps.
-            if (!mounted) return;
+        // If permission was ultimately denied, clear the delivery types
+        // so the filter is saved without notification subscriptions.
+        if (!permissionGranted) {
+          logger.warning(
+            '[_submitForm] Permission denied. Clearing delivery types before saving.',
+          );
+          deliveryTypesToSave.clear();
+          if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(l10n.notificationPermissionDeniedError),
                 backgroundColor: Theme.of(context).colorScheme.error,
               ),
             );
-            return;
           }
-        }
-      }
-
-      setState(() => _isSaving = true);
-
-      try {
-        final limitationService = context.read<ContentLimitationService>();
-        final status = await limitationService.checkAction(
-          ContentAction.saveFilter,
-        );
-
-        if (status != LimitationStatus.allowed && widget.filterToEdit == null) {
-          if (mounted) {
-            showContentLimitationBottomSheet(
-              context: context,
-              status: status,
-              action: ContentAction.saveFilter,
-            );
-          }
-          return;
-        }
-
-        widget.onSave((
-          name: _controller.text.trim(),
-          isPinned: _isPinned,
-          deliveryTypes: _selectedDeliveryTypes,
-        ));
-
-        if (mounted) {
-          Navigator.of(context).pop(true);
-        }
-      } on ForbiddenException catch (e) {
-        if (mounted) {
-          await showModalBottomSheet<void>(
-            context: context,
-            builder: (_) => ContentLimitationBottomSheet(
-              title: l10n.limitReachedTitle,
-              body: e.message,
-              buttonText: l10n.gotItButton,
-            ),
+        } else {
+          logger.fine(
+            '[_submitForm] Permission granted. Proceeding with save.',
           );
         }
-      } finally {
-        if (mounted) {
-          setState(() => _isSaving = false);
-        }
       }
 
-      // Pop the dialog and return `true` to signal to the caller that the
-      // save operation was successfully initiated. This allows the caller
-      // to coordinate subsequent navigation actions, preventing race conditions.
+      final limitationService = context.read<ContentLimitationService>();
+      final status = await limitationService.checkAction(
+        ContentAction.saveFilter,
+      );
+
+      if (status != LimitationStatus.allowed && widget.filterToEdit == null) {
+        logger.warning(
+          '[_submitForm] Save filter limit reached. Showing bottom sheet.',
+        );
+        if (mounted) {
+          showContentLimitationBottomSheet(
+            context: context,
+            status: status,
+            action: ContentAction.saveFilter,
+          );
+        }
+        return;
+      }
+
+      logger.fine('[_submitForm] Calling onSave callback.');
+      widget.onSave((
+        name: _controller.text.trim(),
+        isPinned: _isPinned,
+        deliveryTypes: deliveryTypesToSave,
+      ));
+
+      if (mounted) {
+        Navigator.of(context).pop(true);
+      }
+    } on ForbiddenException catch (e, s) {
+      logger.severe('[_submitForm] ForbiddenException caught.', e, s);
+      if (mounted) {
+        await showModalBottomSheet<void>(
+          context: context,
+          builder: (_) => ContentLimitationBottomSheet(
+            title: l10n.limitReachedTitle,
+            body: e.message,
+            buttonText: l10n.gotItButton,
+          ),
+        );
+      }
+    } catch (e, s) {
+      logger.severe('[_submitForm] An unexpected error occurred.', e, s);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.saveFilterDialogGenericError),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        logger.fine('[_submitForm] Finalizing save process.');
+        setState(() => _isSaving = false);
+      }
     }
+  }
+
+  /// A helper to encapsulate the multi-step permission request flow.
+  /// Returns `true` if permission is granted, `false` otherwise.
+  Future<bool> _handlePermissionRequest(Logger logger) async {
+    final notificationService = context.read<PushNotificationService>();
+    final l10n = AppLocalizationsX(context).l10n;
+
+    final hasPermission = await notificationService.hasPermission();
+    logger.fine('[_handlePermissionRequest] Has permission: $hasPermission');
+
+    if (hasPermission) {
+      return true;
+    }
+
+    logger.fine('[_handlePermissionRequest] Showing pre-permission dialog.');
+    // Guard against using context across async gaps.
+    if (!mounted) return false;
+    final wantsToAllow = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.prePermissionDialogTitle),
+        content: Text(l10n.prePermissionDialogBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.prePermissionDialogDenyButton),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.prePermissionDialogAllowButton),
+          ),
+        ],
+      ),
+    );
+
+    logger.fine(
+      '[_handlePermissionRequest] Pre-permission dialog result: $wantsToAllow',
+    );
+    if (wantsToAllow != true) {
+      return false;
+    }
+
+    logger.fine('[_handlePermissionRequest] Requesting OS permission.');
+    final permissionGranted = await notificationService.requestPermission();
+    logger.fine(
+      '[_handlePermissionRequest] OS permission result: $permissionGranted',
+    );
+
+    return permissionGranted;
   }
 
   @override

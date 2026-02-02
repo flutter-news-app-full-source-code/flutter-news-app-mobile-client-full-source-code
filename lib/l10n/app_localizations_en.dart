@@ -948,6 +948,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get saveFilterDialogValidationTooLong => 'Name is too long';
 
   @override
+  String get saveFilterDialogGenericError =>
+      'An unexpected error occurred while saving the filter.';
+
+  @override
   String get headlinesFilterSaveTooltip => 'Save Filter';
 
   @override

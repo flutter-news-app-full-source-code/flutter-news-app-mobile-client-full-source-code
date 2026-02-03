@@ -159,9 +159,22 @@ class PushNotificationManager implements PushNotificationService {
 
       _LastRegistration? lastRegistration;
       if (lastRegistrationJson != null) {
-        lastRegistration = _LastRegistration.fromJson(
-          jsonDecode(lastRegistrationJson) as Map<String, dynamic>,
-        );
+        try {
+          final decodedJson = jsonDecode(lastRegistrationJson);
+          if (decodedJson is Map<String, dynamic>) {
+            lastRegistration = _LastRegistration.fromJson(decodedJson);
+          } else {
+            _logger.warning(
+              '[PushNotificationManager] Corrupted registration data found in storage: not a map.',
+            );
+          }
+        } catch (e, s) {
+          _logger.warning(
+            '[PushNotificationManager] Failed to decode last registration data from storage.',
+            e,
+            s,
+          );
+        }
       }
 
       // STEP 1: Check if both the token AND the user ID are the same.

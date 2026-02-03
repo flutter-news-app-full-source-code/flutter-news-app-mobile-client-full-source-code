@@ -19,30 +19,8 @@ Future<void> main() async {
   // Ensure Flutter widgets are initialized before any Firebase operations.
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase services.
-  // Firebase is manually initialized using options from AppConfig,
-  // removing the dependency on the auto-generated firebase_options.dart file.
-  if (Firebase.apps.isEmpty) {
-    try {
-      await Firebase.initializeApp(
-        options: FirebaseOptions(
-          apiKey: appConfig.firebaseApiKey,
-          appId: appConfig.firebaseAppId,
-          messagingSenderId: appConfig.firebaseMessagingSenderId,
-          projectId: appConfig.firebaseProjectId,
-          storageBucket: appConfig.firebaseStorageBucket,
-        ),
-      );
-    } on FirebaseException catch (e) {
-      if (e.code == 'duplicate-app') {
-        debugPrint(
-          'Firebase initialized by native layer or hot restart: ${e.message}',
-        );
-      } else {
-        rethrow;
-      }
-    }
-  }
+  // Initialize Firebase.
+  await Firebase.initializeApp();
 
   final appWidget = await bootstrap(appConfig, appEnvironment);
 

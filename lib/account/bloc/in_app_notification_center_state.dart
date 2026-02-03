@@ -83,16 +83,16 @@ class InAppNotificationCenterState extends Equatable {
   }
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
     status,
     currentTabIndex,
     breakingNewsNotifications,
     digestNotifications,
     breakingNewsHasMore,
-    breakingNewsCursor ?? Object(),
+    breakingNewsCursor,
     digestHasMore,
-    digestCursor ?? Object(),
-    error ?? Object(),
+    digestCursor,
+    error,
   ];
 
   /// Creates a copy of this state with the given fields replaced with the new

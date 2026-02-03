@@ -293,6 +293,10 @@ class _AppViewState extends State<_AppView> {
     // This service monitors the app's lifecycle (e.g., resuming from
     // background) and periodically triggers remote configuration fetches,
     // ensuring the app status is always fresh.
+    // It's initialized after the listeners to ensure the app is ready to
+    // handle events.
+    _handleInitialNotification();
+
     _appStatusService = AppStatusService(
       context: context,
       checkInterval: const Duration(minutes: 15),
@@ -314,6 +318,30 @@ class _AppViewState extends State<_AppView> {
       navigatorKey: widget.navigatorKey,
       logger: _routerLogger,
     );
+  }
+
+  /// Checks for and handles a notification that launched the app from a
+  /// terminated state.
+  Future<void> _handleInitialNotification() async {
+    final pushNotificationService = context.read<PushNotificationService>();
+    final logger = context.read<Logger>()
+
+    ..fine('Checking for initial notification...');
+    final initialPayload = await pushNotificationService.initialMessage;
+
+    if (initialPayload != null) {
+      logger.info(
+        'App launched from terminated state by notification: ${initialPayload.notificationId}',
+      );
+      // Use the same handler as background taps to process the navigation.
+      await HeadlineTapHandler.handleTapFromSystemNotification(
+        context,
+        initialPayload.contentId,
+        notificationId: initialPayload.notificationId,
+      );
+    } else {
+      logger.fine('No initial notification found.');
+    }
   }
 
   @override

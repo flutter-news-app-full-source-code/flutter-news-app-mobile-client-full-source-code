@@ -325,8 +325,7 @@ class _AppViewState extends State<_AppView> {
   Future<void> _handleInitialNotification() async {
     final pushNotificationService = context.read<PushNotificationService>();
     final logger = context.read<Logger>()
-
-    ..fine('Checking for initial notification...');
+      ..fine('Checking for initial notification...');
     final initialPayload = await pushNotificationService.initialMessage;
 
     if (initialPayload != null) {

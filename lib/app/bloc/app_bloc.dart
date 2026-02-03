@@ -128,10 +128,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     // Listen to raw foreground push notifications.
     _pushNotificationService.onMessage.listen((payload) async {
-      _logger..fine('AppBloc received foreground push notification payload.')
-      ..info(
-        '[AppBloc] Received foreground push notification: ${payload.notificationId}',
-      );
+      _logger
+        ..fine('AppBloc received foreground push notification payload.')
+        ..info(
+          '[AppBloc] Received foreground push notification: ${payload.notificationId}',
+        );
       // The backend persists the notification when it sends the push. The
       // client's only responsibility is to react to the incoming message
       // and update the UI to show an unread indicator.

@@ -359,7 +359,7 @@ void main() {
         );
 
         // Act & Assert
-        expectLater(pushNotificationManager.onMessage, emits(payload));
+        unawaited(expectLater(pushNotificationManager.onMessage, emits(payload)));
         onMessageController.add(payload);
       });
 
@@ -369,7 +369,7 @@ void main() {
         const newToken = 'new-token-123';
 
         // Act & Assert
-        expectLater(pushNotificationManager.onTokenRefreshed, emits(newToken));
+        unawaited(expectLater(pushNotificationManager.onTokenRefreshed, emits(newToken)));
         onTokenRefreshedController.add(newToken);
       });
     });

@@ -182,7 +182,7 @@ void main() {
           InAppNotificationCenterState(
             status: InAppNotificationCenterStatus.success,
             breakingNewsNotifications: [readNotification],
-            digestNotifications: [],
+            digestNotifications: const [],
           ),
         );
 

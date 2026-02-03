@@ -7,8 +7,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
-import 'package:ui_kit/ui_kit.dart';
 import 'package:logging/logging.dart';
+import 'package:ui_kit/ui_kit.dart';
 
 /// {@template save_filter_dialog}
 /// A dialog for naming or renaming a saved filter.
@@ -118,7 +118,7 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
     setState(() => _isSaving = true);
 
     try {
-      var deliveryTypesToSave =
+      final deliveryTypesToSave =
           Set<PushNotificationSubscriptionDeliveryType>.from(
             _selectedDeliveryTypes,
           );

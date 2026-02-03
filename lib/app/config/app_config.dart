@@ -46,17 +46,8 @@ class AppConfig {
   AppConfig({
     required this.environment,
     required this.baseUrl,
-    // Platform-specific keys
     required this.oneSignalAndroidAppId,
     required this.oneSignalIosAppId,
-    required this.firebaseAndroidApiKey,
-    required this.firebaseIosApiKey,
-    required this.firebaseAndroidAppId,
-    required this.firebaseIosAppId,
-    // Shared keys
-    required this.firebaseMessagingSenderId,
-    required this.firebaseProjectId,
-    required this.firebaseStorageBucket,
     required this.mixpanelProjectToken,
     // Add other environment-specific configs here (e.g., analytics keys)
   });
@@ -76,22 +67,6 @@ class AppConfig {
         'ONE_SIGNAL_ANDROID_APP_ID',
       ),
       oneSignalIosAppId: const String.fromEnvironment('ONE_SIGNAL_IOS_APP_ID'),
-      firebaseAndroidApiKey: const String.fromEnvironment(
-        'FIREBASE_ANDROID_API_KEY',
-      ),
-      firebaseIosApiKey: const String.fromEnvironment('FIREBASE_IOS_API_KEY'),
-      firebaseAndroidAppId: const String.fromEnvironment(
-        'FIREBASE_ANDROID_APP_ID',
-      ),
-      firebaseIosAppId: const String.fromEnvironment('FIREBASE_IOS_APP_ID'),
-      // Shared
-      firebaseMessagingSenderId: const String.fromEnvironment(
-        'FIREBASE_MESSAGING_SENDER_ID',
-      ),
-      firebaseProjectId: const String.fromEnvironment('FIREBASE_PROJECT_ID'),
-      firebaseStorageBucket: const String.fromEnvironment(
-        'FIREBASE_STORAGE_BUCKET',
-      ),
       mixpanelProjectToken: const String.fromEnvironment(
         'MIXPANEL_PROJECT_TOKEN',
       ),
@@ -123,35 +98,6 @@ class AppConfig {
         'ONE_SIGNAL_IOS_APP_ID',
         defaultValue: 'YOUR_DEV_ONESIGNAL_IOS_APP_ID',
       ),
-      firebaseAndroidApiKey: const String.fromEnvironment(
-        'FIREBASE_ANDROID_API_KEY',
-        defaultValue: 'YOUR_DEV_FIREBASE_ANDROID_API_KEY',
-      ),
-      firebaseIosApiKey: const String.fromEnvironment(
-        'FIREBASE_IOS_API_KEY',
-        defaultValue: 'YOUR_DEV_FIREBASE_IOS_API_KEY',
-      ),
-      firebaseAndroidAppId: const String.fromEnvironment(
-        'FIREBASE_ANDROID_APP_ID',
-        defaultValue: 'YOUR_DEV_FIREBASE_ANDROID_APP_ID',
-      ),
-      firebaseIosAppId: const String.fromEnvironment(
-        'FIREBASE_IOS_APP_ID',
-        defaultValue: 'YOUR_DEV_FIREBASE_IOS_APP_ID',
-      ),
-      // Shared
-      firebaseMessagingSenderId: const String.fromEnvironment(
-        'FIREBASE_MESSAGING_SENDER_ID',
-        defaultValue: 'YOUR_DEV_FIREBASE_MESSAGING_SENDER_ID',
-      ),
-      firebaseProjectId: const String.fromEnvironment(
-        'FIREBASE_PROJECT_ID',
-        defaultValue: 'YOUR_DEV_FIREBASE_PROJECT_ID',
-      ),
-      firebaseStorageBucket: const String.fromEnvironment(
-        'FIREBASE_STORAGE_BUCKET',
-        defaultValue: 'YOUR_DEV_FIREBASE_STORAGE_BUCKET',
-      ),
       mixpanelProjectToken: const String.fromEnvironment(
         'MIXPANEL_PROJECT_TOKEN',
         defaultValue: 'YOUR_DEV_MIXPANEL_PROJECT_TOKEN',
@@ -169,15 +115,6 @@ class AppConfig {
   /// The base URL for the backend API (shared across platforms).
   final String baseUrl;
 
-  /// The Sender ID for Firebase Cloud Messaging (shared across platforms).
-  final String firebaseMessagingSenderId;
-
-  /// The Project ID for the Firebase project (shared across platforms).
-  final String firebaseProjectId;
-
-  /// The storage bucket for Firebase Storage (shared across platforms).
-  final String firebaseStorageBucket;
-
   // --- Platform-Specific Raw Values ---
 
   /// The OneSignal App ID for the Android platform.
@@ -185,18 +122,6 @@ class AppConfig {
 
   /// The OneSignal App ID for the iOS platform.
   final String oneSignalIosAppId;
-
-  /// The API key for the Firebase Android app.
-  final String firebaseAndroidApiKey;
-
-  /// The API key for the Firebase iOS app.
-  final String firebaseIosApiKey;
-
-  /// The App ID for the Firebase Android app.
-  final String firebaseAndroidAppId;
-
-  /// The App ID for the Firebase iOS app.
-  final String firebaseIosAppId;
 
   /// The Project Token for Mixpanel Analytics.
   final String mixpanelProjectToken;
@@ -206,14 +131,6 @@ class AppConfig {
   /// Returns the correct OneSignal App ID for the current platform.
   String get oneSignalAppId =>
       Platform.isAndroid ? oneSignalAndroidAppId : oneSignalIosAppId;
-
-  /// Returns the correct Firebase API Key for the current platform.
-  String get firebaseApiKey =>
-      Platform.isAndroid ? firebaseAndroidApiKey : firebaseIosApiKey;
-
-  /// Returns the correct Firebase App ID for the current platform.
-  String get firebaseAppId =>
-      Platform.isAndroid ? firebaseAndroidAppId : firebaseIosAppId;
 
   /// A private static method to validate the loaded configuration.
   ///
@@ -239,15 +156,6 @@ class AppConfig {
       if (config.oneSignalAndroidAppId.contains('YOUR_'))
         'ONE_SIGNAL_ANDROID_APP_ID',
       if (config.oneSignalIosAppId.contains('YOUR_')) 'ONE_SIGNAL_IOS_APP_ID',
-      if (config.firebaseAndroidApiKey.contains('YOUR_'))
-        'FIREBASE_ANDROID_API_KEY',
-      if (config.firebaseIosApiKey.contains('YOUR_')) 'FIREBASE_IOS_API_KEY',
-      if (config.firebaseAndroidAppId.contains('YOUR_'))
-        'FIREBASE_ANDROID_APP_ID',
-      if (config.firebaseIosAppId.contains('YOUR_')) 'FIREBASE_IOS_APP_ID',
-      if (config.firebaseMessagingSenderId.contains('YOUR_'))
-        'FIREBASE_MESSAGING_SENDER_ID',
-      if (config.firebaseProjectId.contains('YOUR_')) 'FIREBASE_PROJECT_ID',
       if (config.mixpanelProjectToken.contains('YOUR_'))
         'MIXPANEL_PROJECT_TOKEN',
     ];

@@ -29,10 +29,16 @@ class FirebaseAnalyticsProvider extends AnalyticsProvider {
     Map<String, dynamic>? parameters,
   }) async {
     try {
-      // Cast the parameters to Map<String, Object>? to satisfy the
-      // FirebaseAnalytics.logEvent signature.
-      final castParameters = parameters?.cast<String, Object>();
-      await _firebaseAnalytics.logEvent(name: name, parameters: castParameters);
+      // Create a new map with the correct type for Firebase Analytics.
+      // We must filter out null values because Firebase expects Map<String, Object>.
+      final safeParameters = parameters != null
+          ? Map<String, Object>.fromEntries(
+              parameters.entries
+                  .where((e) => e.value != null)
+                  .map((e) => MapEntry(e.key, e.value! as Object)),
+            )
+          : null;
+      await _firebaseAnalytics.logEvent(name: name, parameters: safeParameters);
     } catch (e, s) {
       _logger.warning('Failed to log event to Firebase: $name', e, s);
     }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:core/core.dart';
@@ -8,6 +9,20 @@ import 'package:flutter_news_app_mobile_client_full_source_code/notifications/se
 import 'package:kv_storage_service/kv_storage_service.dart';
 import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
+
+/// A private model to structure the data stored for the last registration.
+class _LastRegistration {
+  const _LastRegistration({required this.token, required this.userId});
+
+  factory _LastRegistration.fromJson(Map<String, dynamic> json) {
+    return _LastRegistration(
+      token: json['token'] as String,
+      userId: json['userId'] as String,
+    );
+  }
+  final String token;
+  final String userId;
+}
 
 /// {@template push_notification_manager}
 /// The concrete implementation of [PushNotificationService].
@@ -138,24 +153,34 @@ class PushNotificationManager implements PushNotificationService {
         return;
       }
 
-      final lastRegisteredToken = await _storageService.readString(
+      final lastRegistrationJson = await _storageService.readString(
         key: storageKey.stringValue,
       );
 
-      // STEP 1: Check if the token has changed. If not, do nothing.
-      // This is a crucial optimization to prevent unnecessary API calls on every app start.
-      if (currentToken == lastRegisteredToken) {
+      _LastRegistration? lastRegistration;
+      if (lastRegistrationJson != null) {
+        lastRegistration = _LastRegistration.fromJson(
+          jsonDecode(lastRegistrationJson) as Map<String, dynamic>,
+        );
+      }
+
+      // STEP 1: Check if both the token AND the user ID are the same.
+      // This is the crucial fix: it prevents re-registration only if the
+      // token belongs to the *current* user. If the user changes, this
+      // condition will be false, triggering a necessary update.
+      if (lastRegistration != null &&
+          currentToken == lastRegistration.token &&
+          userId == lastRegistration.userId) {
         _logger.info(
-          '[PushNotificationManager] Push token has not changed. Skipping registration.',
+          '[PushNotificationManager] Push token and user ID have not changed. Skipping registration.',
         );
         return;
       }
 
       _logger.info(
-        '[PushNotificationManager] New or updated push token found. Proceeding with registration.',
+        '[PushNotificationManager] New token, new user, or both detected. Proceeding with registration.',
       );
 
-      // --- Resilient "Delete-Then-Create" Pattern ---
       // The backend API contract forbids updating a PushNotificationDevice.
       // The correct pattern is to delete any old registration and create a new one.
       // This implementation makes that pattern resilient to failures.
@@ -220,9 +245,13 @@ class PushNotificationManager implements PushNotificationService {
       // This is the key to resilience. If the create step fails, the old token
       // remains in storage, ensuring this entire process is retried on the
       // next app start or token refresh.
+      final newRegistrationData = jsonEncode({
+        'token': currentToken,
+        'userId': userId,
+      });
       await _storageService.writeString(
         key: storageKey.stringValue,
-        value: currentToken,
+        value: newRegistrationData,
       );
       _logger.fine(
         '[PushNotificationManager] Persisted new token to local storage.',

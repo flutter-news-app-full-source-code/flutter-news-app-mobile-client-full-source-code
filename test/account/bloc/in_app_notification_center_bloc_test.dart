@@ -98,6 +98,7 @@ void main() {
                 invocation.namedArguments[#filter] as Map<String, dynamic>;
             // Check if it's the digest filter
             final isDigest =
+                // ignore: avoid_dynamic_calls
                 filter['payload.data.notificationType']?[r'$in'] != null;
 
             return PaginatedResponse<InAppNotification>(

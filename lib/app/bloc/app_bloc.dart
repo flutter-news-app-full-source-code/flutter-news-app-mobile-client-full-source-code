@@ -128,7 +128,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     // Listen to raw foreground push notifications.
     _pushNotificationService.onMessage.listen((payload) async {
-      _logger.fine('AppBloc received foreground push notification payload.');
+      _logger..fine('AppBloc received foreground push notification payload.')
+      ..info(
+        '[AppBloc] Received foreground push notification: ${payload.notificationId}',
+      );
       // The backend persists the notification when it sends the push. The
       // client's only responsibility is to react to the incoming message
       // and update the UI to show an unread indicator.
@@ -891,6 +894,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     Emitter<AppState> emit,
   ) {
     emit(state.copyWith(hasUnreadInAppNotifications: true));
+    _logger.info(
+      '[AppBloc] Set hasUnreadInAppNotifications to true due to incoming notification.',
+    );
   }
 
   /// Handles the [AppAllInAppNotificationsMarkedAsRead] event.
@@ -903,6 +909,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   ) async {
     // After marking all as read, we can confidently set the flag to false.
     emit(state.copyWith(hasUnreadInAppNotifications: false));
+    _logger.info(
+      '[AppBloc] Set hasUnreadInAppNotifications to false after marking all as read.',
+    );
   }
 
   /// Handles the [AppInAppNotificationMarkedAsRead] event.
@@ -914,6 +923,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     AppInAppNotificationMarkedAsRead event,
     Emitter<AppState> emit,
   ) async {
+    _logger.fine(
+      '[AppBloc] AppInAppNotificationMarkedAsRead event received. Checking remaining unread count.',
+    );
     if (state.user == null) return;
 
     try {
@@ -923,7 +935,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       );
 
       if (unreadCount == 0) {
+        _logger.info(
+          '[AppBloc] No unread notifications remaining. Setting hasUnreadInAppNotifications to false.',
+        );
         emit(state.copyWith(hasUnreadInAppNotifications: false));
+      } else {
+        _logger.fine('[AppBloc] $unreadCount unread notifications remain.');
       }
     } catch (e, s) {
       _logger.severe(
@@ -940,6 +957,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     AppNotificationTapped event,
     Emitter<AppState> emit,
   ) async {
+    _logger.info(
+      '[AppBloc] AppNotificationTapped event received for notification: ${event.notificationId}',
+    );
     final userId = state.user?.id;
     if (userId == null) {
       _logger.warning(
@@ -956,7 +976,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       );
 
       // If already read, do nothing.
-      if (notification.isRead) return;
+      if (notification.isRead) {
+        _logger.fine(
+          '[AppBloc] Notification ${event.notificationId} was already read. No action taken.',
+        );
+        return;
+      }
 
       // Then, update it with the 'readAt' timestamp.
       await _inAppNotificationRepository.update(
@@ -968,6 +993,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       _logger.info(
         '[AppBloc] Marked notification ${event.notificationId} as read.',
       );
+
+      // After successfully marking as read, dispatch an event to re-evaluate
+      // the total unread count and update the global indicator if necessary.
+      add(const AppInAppNotificationMarkedAsRead());
     } catch (e, s) {
       _logger.severe('Failed to mark notification as read.', e, s);
     }

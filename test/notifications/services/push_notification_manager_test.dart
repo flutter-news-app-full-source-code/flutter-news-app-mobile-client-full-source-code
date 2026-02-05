@@ -319,7 +319,7 @@ void main() {
 
       // Assert
       verify(
-        () => mockLogger.fine(
+        () => mockLogger.info(
           any(that: contains('No token returned from provider')),
         ),
       ).called(1);

@@ -196,7 +196,7 @@ class OneSignalPushNotificationService implements PushNotificationProvider {
   Future<String?> getToken() async {
     // If the token is immediately available, return it. This is the common case
     // for a warm or hot app state.
-    var token = _oneSignal.pushSubscriptionId;
+    final token = _oneSignal.pushSubscriptionId;
     if (token != null && token.isEmpty) {
       return null;
     }

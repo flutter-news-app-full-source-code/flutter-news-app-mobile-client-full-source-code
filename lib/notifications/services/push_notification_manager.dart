@@ -266,12 +266,13 @@ class PushNotificationManager implements PushNotificationService {
         key: storageKey.stringValue,
         value: newRegistrationData,
       );
-      _logger.info(
-        '[PushNotificationManager] Device successfully registered and token persisted for user: $userId.',
-      );
-      _logger.fine(
-        '[PushNotificationManager] Persisted new token to local storage.',
-      );
+      _logger
+        ..info(
+          '[PushNotificationManager] Device successfully registered and token persisted for user: $userId.',
+        )
+        ..fine(
+          '[PushNotificationManager] Persisted new token to local storage.',
+        );
     } catch (e, s) {
       _logger.severe(
         '[PushNotificationManager] Failed to register device.',

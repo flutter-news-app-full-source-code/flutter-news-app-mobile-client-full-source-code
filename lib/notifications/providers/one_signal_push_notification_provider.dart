@@ -118,7 +118,9 @@ class OneSignalPushNotificationService implements PushNotificationProvider {
       // ID) changes, re-register the device with the new token to ensure
       // continued notification delivery.
       ..addPushSubscriptionObserver((state) async {
-        if (state.current.id != state.previous.id && state.current.id != null) {
+        if (state.current.id != state.previous.id &&
+            state.current.id != null &&
+            state.current.id!.isNotEmpty) {
           _logger.info(
             'OneSignal push subscription ID changed. Emitting new token.',
           );
@@ -183,7 +185,13 @@ class OneSignalPushNotificationService implements PushNotificationProvider {
   }
 
   @override
-  Future<String?> getToken() async => _oneSignal.pushSubscriptionId;
+  Future<String?> getToken() async {
+    final token = _oneSignal.pushSubscriptionId;
+    if (token != null && token.isEmpty) {
+      return null;
+    }
+    return token;
+  }
 
   void _handleMessage(
     OSNotification notification, {

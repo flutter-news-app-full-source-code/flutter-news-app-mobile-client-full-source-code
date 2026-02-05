@@ -138,8 +138,8 @@ class PushNotificationManager implements PushNotificationService {
     );
     try {
       final currentToken = await _activeProvider.getToken();
-      if (currentToken == null) {
-        _logger.fine(
+      if (currentToken == null || currentToken.isEmpty) {
+        _logger.info(
           '[PushNotificationManager] No token returned from provider (likely NoOp). Aborting registration.',
         );
         return;
@@ -265,6 +265,9 @@ class PushNotificationManager implements PushNotificationService {
       await _storageService.writeString(
         key: storageKey.stringValue,
         value: newRegistrationData,
+      );
+      _logger.info(
+        '[PushNotificationManager] Device successfully registered and token persisted for user: $userId.',
       );
       _logger.fine(
         '[PushNotificationManager] Persisted new token to local storage.',

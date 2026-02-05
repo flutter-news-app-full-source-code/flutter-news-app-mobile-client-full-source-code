@@ -24,6 +24,11 @@ class OneSignalWrapper {
     void Function(OSPushSubscriptionChangedState) listener,
   ) => OneSignal.User.pushSubscription.addObserver(listener);
 
+  /// Wraps [OneSignal.User.pushSubscription.removeObserver].
+  void removePushSubscriptionObserver(
+    void Function(OSPushSubscriptionChangedState) listener,
+  ) => OneSignal.User.pushSubscription.removeObserver(listener);
+
   /// Wraps [OneSignal.Notifications.addForegroundWillDisplayListener].
   void addForegroundWillDisplayListener(
     void Function(OSNotificationWillDisplayEvent) listener,
@@ -161,9 +166,12 @@ class OneSignalPushNotificationService implements PushNotificationProvider {
     // After a short delay, if no launch notification has been received,
     // complete the completer with null. This prevents the `initialMessage`
     // getter from hanging indefinitely during a normal app start.
-    Future.delayed(const Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(seconds: 5), () {
       if (!_initialNotificationCompleter.isCompleted) {
-        _logger.fine('No initial notification received within timeout.');
+        _logger.fine(
+          'No initial notification received within 5s timeout, '
+          'completing with null.',
+        );
         _initialNotificationCompleter.complete(null);
       }
     });
@@ -186,11 +194,45 @@ class OneSignalPushNotificationService implements PushNotificationProvider {
 
   @override
   Future<String?> getToken() async {
-    final token = _oneSignal.pushSubscriptionId;
+    // If the token is immediately available, return it. This is the common case
+    // for a warm or hot app state.
+    var token = _oneSignal.pushSubscriptionId;
     if (token != null && token.isEmpty) {
       return null;
     }
-    return token;
+    if (token != null) return token;
+
+    // If the token is not available (e.g., on a cold start), we must wait for
+    // the SDK to initialize and provide it via an observer.
+    _logger.fine('OneSignal token not immediately available. Waiting...');
+    final completer = Completer<String?>();
+
+    // Define the listener that will complete our future.
+    late void Function(OSPushSubscriptionChangedState) observer;
+    observer = (state) {
+      final newId = state.current.id;
+      if (newId != null && newId.isNotEmpty && !completer.isCompleted) {
+        _logger.fine('OneSignal token received via observer: $newId');
+        completer.complete(newId);
+        _oneSignal.removePushSubscriptionObserver(observer);
+      }
+    };
+
+    // Add the listener.
+    _oneSignal.addPushSubscriptionObserver(observer);
+
+    // Add a timeout to prevent the app from hanging indefinitely if the
+    // OneSignal SDK fails to provide a token.
+    try {
+      return await completer.future.timeout(const Duration(seconds: 5));
+    } on TimeoutException {
+      _logger.warning('Timed out after 5s waiting for OneSignal token.');
+      // Clean up the listener if it's still attached.
+      if (!completer.isCompleted) {
+        _oneSignal.removePushSubscriptionObserver(observer);
+      }
+      return null;
+    }
   }
 
   void _handleMessage(

@@ -406,6 +406,7 @@ class InAppNotificationCenterBloc
       if (isBreakingNewsTab) {
         emit(
           state.copyWith(
+            status: InAppNotificationCenterStatus.success,
             breakingNewsNotifications: response.items,
             breakingNewsHasMore: response.hasMore,
             breakingNewsCursor: response.cursor,
@@ -414,14 +415,13 @@ class InAppNotificationCenterBloc
       } else {
         emit(
           state.copyWith(
+            status: InAppNotificationCenterStatus.success,
             digestNotifications: response.items,
             digestHasMore: response.hasMore,
             digestCursor: response.cursor,
           ),
         );
       }
-
-      emit(state.copyWith(status: InAppNotificationCenterStatus.success));
     } catch (error, stackTrace) {
       _handleFetchError(emit, error, stackTrace);
     }

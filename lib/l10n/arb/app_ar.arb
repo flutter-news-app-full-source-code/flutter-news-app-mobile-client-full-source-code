@@ -1234,6 +1234,10 @@
     "@saveFilterDialogValidationTooLong": {
         "description": "Validation error message when the filter name is too long."
     },
+    "saveFilterDialogGenericError": "حدث خطأ غير متوقع أثناء حفظ الفلتر.",
+    "@saveFilterDialogGenericError": {
+        "description": "Generic error message shown in a snackbar if saving a filter fails for an unknown reason."
+    },
     "headlinesFilterSaveTooltip": "حفظ الفلتر",
     "@headlinesFilterSaveTooltip": {
         "description": "Tooltip for the save icon on the main filter page."

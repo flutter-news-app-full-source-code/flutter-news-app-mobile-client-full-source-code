@@ -170,6 +170,9 @@ class InAppNotificationCenterBloc
     Emitter<InAppNotificationCenterState> emit,
   ) async {
     // If the tab is changed, we don't need to re-fetch data as it was
+    _logger.info(
+      '[InAppNotificationCenterBloc] Tab changed to index: ${event.tabIndex}',
+    );
     // already fetched on initial load. We just update the index.
     emit(state.copyWith(currentTabIndex: event.tabIndex));
   }
@@ -179,6 +182,9 @@ class InAppNotificationCenterBloc
     InAppNotificationCenterMarkedAsRead event,
     Emitter<InAppNotificationCenterState> emit,
   ) async {
+    _logger.info(
+      '[InAppNotificationCenterBloc] Marking notification as read: ${event.notificationId}',
+    );
     final notification = state.notifications.firstWhereOrNull(
       (n) => n.id == event.notificationId,
     );
@@ -191,6 +197,9 @@ class InAppNotificationCenterBloc
     InAppNotificationCenterMarkOneAsRead event,
     Emitter<InAppNotificationCenterState> emit,
   ) async {
+    _logger.info(
+      '[InAppNotificationCenterBloc] Marking one notification as read from external event: ${event.notificationId}',
+    );
     final notification = state.notifications.firstWhereOrNull(
       (n) => n.id == event.notificationId,
     );
@@ -204,7 +213,10 @@ class InAppNotificationCenterBloc
     }
 
     // If already read, do nothing.
-    if (notification.isRead) return;
+    if (notification.isRead) {
+      _logger.fine('Notification ${notification.id} is already read.');
+      return;
+    }
 
     await _markOneAsRead(notification, emit);
   }
@@ -217,6 +229,9 @@ class InAppNotificationCenterBloc
     InAppNotification? notification,
     Emitter<InAppNotificationCenterState> emit,
   ) async {
+    _logger.fine(
+      '[InAppNotificationCenterBloc] Executing _markOneAsRead for notification: ${notification?.id}',
+    );
     if (notification == null) return;
     final updatedNotification = notification.copyWith(readAt: DateTime.now());
 
@@ -245,6 +260,9 @@ class InAppNotificationCenterBloc
 
       // Notify the global AppBloc to re-check the unread count.
       _appBloc.add(const AppInAppNotificationMarkedAsRead());
+      _logger.info(
+        'Successfully marked notification ${notification.id} as read and updated state.',
+      );
     } on HttpException catch (e, s) {
       _logger.severe(
         'Failed to mark notification ${notification.id} as read.',
@@ -275,6 +293,9 @@ class InAppNotificationCenterBloc
     InAppNotificationCenterMarkAllAsRead event,
     Emitter<InAppNotificationCenterState> emit,
   ) async {
+    _logger.info(
+      '[InAppNotificationCenterBloc] Marking all unread notifications as read.',
+    );
     final unreadNotifications = state.notifications
         .where((n) => !n.isRead)
         .toList();
@@ -315,6 +336,9 @@ class InAppNotificationCenterBloc
 
       // Notify the global AppBloc to clear the unread indicator.
       _appBloc.add(const AppAllInAppNotificationsMarkedAsRead());
+      _logger.info(
+        'Successfully marked all ${updatedNotifications.length} notifications as read.',
+      );
     } on HttpException catch (e, s) {
       _logger.severe('Failed to mark all notifications as read.', e, s);
       emit(
@@ -382,6 +406,7 @@ class InAppNotificationCenterBloc
       if (isBreakingNewsTab) {
         emit(
           state.copyWith(
+            status: InAppNotificationCenterStatus.success,
             breakingNewsNotifications: response.items,
             breakingNewsHasMore: response.hasMore,
             breakingNewsCursor: response.cursor,
@@ -390,14 +415,13 @@ class InAppNotificationCenterBloc
       } else {
         emit(
           state.copyWith(
+            status: InAppNotificationCenterStatus.success,
             digestNotifications: response.items,
             digestHasMore: response.hasMore,
             digestCursor: response.cursor,
           ),
         );
       }
-
-      emit(state.copyWith(status: InAppNotificationCenterStatus.success));
     } catch (error, stackTrace) {
       _handleFetchError(emit, error, stackTrace);
     }

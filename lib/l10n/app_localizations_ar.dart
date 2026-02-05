@@ -947,6 +947,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get saveFilterDialogValidationTooLong => 'الاسم طويل جدًا';
 
   @override
+  String get saveFilterDialogGenericError =>
+      'حدث خطأ غير متوقع أثناء حفظ الفلتر.';
+
+  @override
   String get headlinesFilterSaveTooltip => 'حفظ الفلتر';
 
   @override

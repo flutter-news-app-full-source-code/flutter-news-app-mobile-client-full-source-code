@@ -149,22 +149,7 @@ abstract final class HeadlineTapHandler {
         id: headlineId,
       );
       if (context.mounted) {
-        // Log content view for notification taps as well.
-        unawaited(
-          context.read<AnalyticsService>().logEvent(
-            AnalyticsEvent.contentViewed,
-            payload: ContentViewedPayload(
-              contentId: headline.id,
-              contentType: ContentType.headline,
-            ),
-          ),
-        );
-
-        await InAppBrowser.show(
-          context,
-          url: headline.url,
-          contentId: headline.id,
-        );
+        await handleHeadlineTap(context, headline);
       }
     } finally {
       if (navigator.canPop()) navigator.pop();

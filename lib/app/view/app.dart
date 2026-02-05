@@ -19,6 +19,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/s
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/router.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_tap_handler.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/maintenance_page.dart';
@@ -293,6 +294,17 @@ class _AppViewState extends State<_AppView> {
     // This service monitors the app's lifecycle (e.g., resuming from
     // background) and periodically triggers remote configuration fetches,
     // ensuring the app status is always fresh.
+    // It's initialized after the listeners to ensure the app is ready to
+    // handle events.
+    // Create the GoRouter instance once and store it.
+    _router = createRouter(
+      authStatusNotifier: _statusNotifier,
+      navigatorKey: widget.navigatorKey,
+      logger: _routerLogger,
+    );
+
+    _handleInitialNotification();
+
     _appStatusService = AppStatusService(
       context: context,
       checkInterval: const Duration(minutes: 15),
@@ -308,12 +320,30 @@ class _AppViewState extends State<_AppView> {
     // Initialize the ContentLimitationService.
     // Its lifecycle is now tied to this state object.
     context.read<ContentLimitationService>().init(appBloc: appBloc);
-    // Create the GoRouter instance once and store it.
-    _router = createRouter(
-      authStatusNotifier: _statusNotifier,
-      navigatorKey: widget.navigatorKey,
-      logger: _routerLogger,
-    );
+  }
+
+  /// Checks for and handles a notification that launched the app from a
+  /// terminated state.
+  Future<void> _handleInitialNotification() async {
+    final pushNotificationService = context.read<PushNotificationService>();
+    final logger = context.read<Logger>()
+      ..fine('Checking for initial notification...');
+    final initialPayload = await pushNotificationService.initialMessage;
+
+    if (initialPayload != null) {
+      logger.info(
+        'App launched from terminated state by notification: ${initialPayload.notificationId}',
+      );
+      context.read<AppBloc>().add(
+        AppNotificationTapped(initialPayload.notificationId),
+      );
+
+      // When the app is launched from a terminated state via a notification,
+      // navigate directly to the notification center.
+      await _router.pushNamed(Routes.notificationsCenterName);
+    } else {
+      logger.fine('No initial notification found.');
+    }
   }
 
   @override

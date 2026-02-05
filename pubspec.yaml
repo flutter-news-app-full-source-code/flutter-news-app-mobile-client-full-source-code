@@ -114,9 +114,12 @@ dependencies:
 
 dev_dependencies:
   bloc_test: ^10.0.0
+  firebase_core_platform_interface: ^6.0.2
+  firebase_messaging_platform_interface: ^4.7.6
   flutter_test:
     sdk: flutter
   mocktail: ^1.0.4
+  plugin_platform_interface: ^2.1.8
   very_good_analysis: ^10.0.0
 
 flutter:
@@ -151,4 +154,8 @@ dependency_overrides:
   http_client:
     git:
       url: https://github.com/flutter-news-app-full-source-code/http-client.git
+      ref: v1.1.0
+  kv_storage_service:
+    git:
+      url: https://github.com/flutter-news-app-full-source-code/kv-storage-service.git
       ref: v1.1.0

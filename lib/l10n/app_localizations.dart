@@ -1808,6 +1808,12 @@ abstract class AppLocalizations {
   /// **'Name is too long'**
   String get saveFilterDialogValidationTooLong;
 
+  /// Generic error message shown in a snackbar if saving a filter fails for an unknown reason.
+  ///
+  /// In en, this message translates to:
+  /// **'An unexpected error occurred while saving the filter.'**
+  String get saveFilterDialogGenericError;
+
   /// Tooltip for the save icon on the main filter page.
   ///
   /// In en, this message translates to:

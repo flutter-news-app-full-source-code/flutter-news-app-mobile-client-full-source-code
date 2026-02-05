@@ -407,6 +407,7 @@ Future<Widget> bootstrap(
     providers: pushNotificationProviders,
     noOpProvider: NoOpPushNotificationProvider(logger: logger),
     pushNotificationDeviceRepository: pushNotificationDeviceRepository,
+    storageService: kvStorage,
     logger: logger,
   );
 

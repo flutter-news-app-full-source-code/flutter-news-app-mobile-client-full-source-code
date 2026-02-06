@@ -41,6 +41,7 @@ class HeadlineTileImageStart extends StatelessWidget {
     final l10n = AppLocalizationsX(context).l10n;
 
     return Card(
+      color: Theme.of(context).colorScheme.surfaceContainerHigh,
       margin: const EdgeInsets.symmetric(
         horizontal: AppSpacing.paddingMedium,
         vertical: AppSpacing.xs,
@@ -49,12 +50,7 @@ class HeadlineTileImageStart extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.md,
-              AppSpacing.md,
-              AppSpacing.md,
-              0,
-            ),
+            padding: const EdgeInsets.all(AppSpacing.sm),
             child: HeadlineSourceRow(headline: headline),
           ),
           InkWell(
@@ -64,9 +60,9 @@ class HeadlineTileImageStart extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(
                 AppSpacing.md,
-                AppSpacing.sm,
+                0,
                 AppSpacing.md,
-                AppSpacing.sm,
+                0,
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,

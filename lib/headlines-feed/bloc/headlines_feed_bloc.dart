@@ -1009,12 +1009,19 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     Emitter<HeadlinesFeedState> emit,
   ) async {
     final userId = _appBloc.state.user?.id;
-    if (userId == null) return;
+    if (userId == null) {
+      _logger.warning('Cannot update reaction: User is not logged in.');
+      return;
+    }
+    _logger.info(
+      'User $userId updating reaction for headline ${event.headlineId} to ${event.reactionType?.name}',
+    );
 
     final preCheckStatus = await _contentLimitationService.checkAction(
       ContentAction.reactToContent,
     );
 
+    // Path 1: User has hit their daily reaction limit.
     if (preCheckStatus != LimitationStatus.allowed) {
       _logger.warning('Reaction limit reached for user $userId.');
       emit(
@@ -1027,6 +1034,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       return;
     }
 
+    // Path 2: User is allowed to react.
     final currentEngagements = state.engagementsMap[event.headlineId] ?? [];
     final userEngagement = currentEngagements.firstWhereOrNull(
       (e) => e.userId == userId,
@@ -1036,12 +1044,17 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       Engagement? updatedEngagement;
 
       if (userEngagement != null) {
+        _logger.fine('Existing engagement found for user. Updating...');
         final isTogglingOff =
             event.reactionType == null ||
             userEngagement.reaction?.reactionType == event.reactionType;
 
         if (isTogglingOff) {
+          _logger.fine('Toggling reaction OFF.');
           if (userEngagement.comment == null) {
+            _logger.fine(
+              'No comment exists, deleting entire engagement document.',
+            );
             await _engagementRepository.delete(
               id: userEngagement.id,
               userId: userId,
@@ -1057,6 +1070,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
               ),
             );
           } else {
+            _logger.fine('Comment exists, only nullifying the reaction field.');
             updatedEngagement = userEngagement.copyWith(
               reaction: const ValueWrapper(null),
             );
@@ -1076,6 +1090,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
             );
           }
         } else {
+          _logger.fine('Changing reaction to ${event.reactionType!.name}.');
           updatedEngagement = userEngagement.copyWith(
             reaction: ValueWrapper(Reaction(reactionType: event.reactionType!)),
           );
@@ -1095,6 +1110,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           );
         }
       } else if (event.reactionType != null) {
+        _logger.fine('No existing engagement found. Creating new one.');
         updatedEngagement = Engagement(
           id: const Uuid().v4(),
           userId: userId,
@@ -1119,6 +1135,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         );
       }
 
+      _logger.fine('Optimistically updating UI with new engagement state.');
       // Optimistically update the state
       final newEngagementsForHeadline = List<Engagement>.from(
         currentEngagements,
@@ -1133,8 +1150,13 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
       emit(state.copyWith(engagementsMap: newEngagementsMap));
       _appBloc.add(AppPositiveInteractionOcurred(context: event.context));
+      _logger.info('Successfully processed reaction update.');
     } catch (e, s) {
-      _logger.severe('Failed to update reaction.', e, s);
+      _logger.severe(
+        'Failed to update reaction. State will not be rolled back for optimistic UI.',
+        e,
+        s,
+      );
     }
   }
 
@@ -1144,11 +1166,21 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   ) async {
     final userId = _appBloc.state.user?.id;
     final language = _appBloc.state.settings?.language;
-    if (userId == null || language == null) return;
+    if (userId == null || language == null) {
+      _logger.warning(
+        'Cannot post comment: User or language settings are not available.',
+      );
+      return;
+    }
+    _logger.info(
+      'User $userId posting comment on headline ${event.headlineId}',
+    );
 
     final preCheckStatus = await _contentLimitationService.checkAction(
       ContentAction.postComment,
     );
+
+    // Path 1: User has hit their daily comment limit.
     if (preCheckStatus != LimitationStatus.allowed) {
       _logger.warning('Comment limit reached for user $userId.');
       emit(
@@ -1161,23 +1193,32 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       return;
     }
 
+    // Path 2: User is allowed to comment.
     final currentEngagements = state.engagementsMap[event.headlineId] ?? [];
     final userEngagement = currentEngagements.firstWhereOrNull(
       (e) => e.userId == userId,
     );
 
     final newComment = Comment(language: language, content: event.content);
-    final engagementToUpsert =
-        (userEngagement ??
-                Engagement(
-                  id: const Uuid().v4(),
-                  userId: userId,
-                  entityId: event.headlineId,
-                  entityType: EngageableType.headline,
-                  createdAt: DateTime.now(),
-                  updatedAt: DateTime.now(),
-                ))
-            .copyWith(comment: ValueWrapper(newComment));
+    final Engagement engagementToUpsert;
+
+    if (userEngagement != null) {
+      _logger.fine('Existing engagement found. Updating with new comment.');
+      engagementToUpsert = userEngagement.copyWith(
+        comment: ValueWrapper(newComment),
+      );
+    } else {
+      _logger.fine('No existing engagement. Creating new one with comment.');
+      engagementToUpsert = Engagement(
+        id: const Uuid().v4(),
+        userId: userId,
+        entityId: event.headlineId,
+        entityType: EngageableType.headline,
+        comment: newComment,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+    }
 
     // Optimistic UI update
     final newEngagementsForHeadline = List<Engagement>.from(currentEngagements)
@@ -1192,12 +1233,14 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
 
     try {
       if (userEngagement != null) {
+        _logger.fine('Calling repository to update engagement...');
         await _engagementRepository.update(
           id: engagementToUpsert.id,
           item: engagementToUpsert,
           userId: userId,
         );
       } else {
+        _logger.fine('Calling repository to create engagement...');
         await _engagementRepository.create(
           item: engagementToUpsert,
           userId: userId,
@@ -1210,10 +1253,19 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         ),
       );
       _appBloc.add(AppPositiveInteractionOcurred(context: event.context));
+      _logger.info('Successfully posted comment.');
     } catch (e, s) {
-      _logger.severe('Failed to post comment.', e, s);
+      _logger..severe('Failed to post comment.', e, s)
       // Revert optimistic update on failure
-      emit(state.copyWith(engagementsMap: state.engagementsMap));
+      ..warning('Rolling back optimistic UI update for comment post.');
+      emit(
+        state.copyWith(
+          engagementsMap: {
+            ...state.engagementsMap,
+            event.headlineId: currentEngagements,
+          },
+        ),
+      );
     }
   }
 
@@ -1223,7 +1275,16 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
   ) async {
     final userId = _appBloc.state.user?.id;
     final language = _appBloc.state.settings?.language;
-    if (userId == null || language == null) return;
+    if (userId == null || language == null) {
+      _logger.warning(
+        'Cannot update comment: User or language settings are not available.',
+      );
+      return;
+    }
+
+    _logger.info(
+      'User $userId updating comment on headline ${event.headlineId}',
+    );
 
     final currentEngagements = state.engagementsMap[event.headlineId] ?? [];
     final userEngagement = currentEngagements.firstWhereOrNull(
@@ -1247,6 +1308,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     );
 
     // Optimistic UI update
+    _logger.fine(
+      'Optimistically updating UI with edited comment for headline ${event.headlineId}',
+    );
     final newEngagementsForHeadline = List<Engagement>.from(currentEngagements)
       ..removeWhere((e) => e.userId == userId)
       ..add(updatedEngagement);
@@ -1258,15 +1322,27 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     emit(state.copyWith(engagementsMap: newEngagementsMap));
 
     try {
+      _logger.fine(
+        'Calling repository to update engagement with new comment...',
+      );
       await _engagementRepository.update(
         id: updatedEngagement.id,
         item: updatedEngagement,
         userId: userId,
       );
       _appBloc.add(AppPositiveInteractionOcurred(context: event.context));
+      _logger.info('Successfully updated comment.');
     } catch (e, s) {
-      _logger.severe('Failed to update comment.', e, s);
-      emit(state.copyWith(engagementsMap: state.engagementsMap));
+      _logger..severe('Failed to update comment.', e, s)
+      ..warning('Rolling back optimistic UI update for comment edit.');
+      emit(
+        state.copyWith(
+          engagementsMap: {
+            ...state.engagementsMap,
+            event.headlineId: currentEngagements,
+          },
+        ),
+      );
     }
   }
 

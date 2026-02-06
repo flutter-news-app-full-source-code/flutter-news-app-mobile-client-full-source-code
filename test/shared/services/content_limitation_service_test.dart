@@ -176,7 +176,7 @@ void main() {
       ),
       user: const UserConfig(
         limits: UserLimitsConfig(
-          followedItems: {AccessTier.standard: 5},
+          followedItems: {AccessTier.guest: 2, AccessTier.standard: 5},
           savedHeadlines: {AccessTier.standard: 10},
           savedHeadlineFilters: {
             AccessTier.standard: SavedFilterLimits(total: 2, pinned: 1),
@@ -184,14 +184,45 @@ void main() {
           savedSourceFilters: {
             AccessTier.standard: SavedFilterLimits(total: 2, pinned: 1),
           },
-          commentsPerDay: {AccessTier.standard: 3},
-          reactionsPerDay: {AccessTier.standard: 10},
-          reportsPerDay: {AccessTier.standard: 5},
+          commentsPerDay: {AccessTier.guest: 0, AccessTier.standard: 3},
+          reactionsPerDay: {AccessTier.guest: 2, AccessTier.standard: 10},
+          reportsPerDay: {AccessTier.guest: 1, AccessTier.standard: 5},
         ),
       ),
     );
 
-    test('Guest user should be restricted from engagement actions', () async {
+    test(
+      'Guest user is restricted from posting comments because limit is 0',
+      () async {
+        when(() => mockAppBloc.state).thenReturn(
+          AppState(
+            status: AppLifeCycleStatus.anonymous,
+            user: guestUser,
+            userContentPreferences: emptyPreferences,
+            remoteConfig: mockRemoteConfig,
+          ),
+        );
+        // Daily count for comments is 0, which is the limit.
+        when(
+          () => mockEngagementRepository.count(
+            userId: guestUser.id,
+            filter: any(
+              named: 'filter',
+              that: containsPair('comment', isA<Map>()),
+            ),
+          ),
+        ).thenAnswer((_) async => 0);
+
+        service.init(appBloc: mockAppBloc);
+
+        expect(
+          await service.checkAction(ContentAction.postComment),
+          LimitationStatus.anonymousLimitReached,
+        );
+      },
+    );
+
+    test('Guest user is allowed to react when under limit', () async {
       when(() => mockAppBloc.state).thenReturn(
         AppState(
           status: AppLifeCycleStatus.anonymous,
@@ -200,17 +231,97 @@ void main() {
           remoteConfig: mockRemoteConfig,
         ),
       );
+      // Daily count for reactions is 1, limit is 2.
+      when(
+        () => mockEngagementRepository.count(
+          userId: guestUser.id,
+          filter: any(
+            named: 'filter',
+            that: containsPair('reaction', isA<Map>()),
+          ),
+        ),
+      ).thenAnswer((_) async => 1);
 
       service.init(appBloc: mockAppBloc);
 
       expect(
-        await service.checkAction(ContentAction.postComment),
-        LimitationStatus.anonymousLimitReached,
+        await service.checkAction(ContentAction.reactToContent),
+        LimitationStatus.allowed,
       );
+    });
+
+    test('Guest user is restricted from reacting when at limit', () async {
+      when(() => mockAppBloc.state).thenReturn(
+        AppState(
+          status: AppLifeCycleStatus.anonymous,
+          user: guestUser,
+          userContentPreferences: emptyPreferences,
+          remoteConfig: mockRemoteConfig,
+        ),
+      );
+      // Daily count for reactions is 2, limit is 2.
+      when(
+        () => mockEngagementRepository.count(
+          userId: guestUser.id,
+          filter: any(
+            named: 'filter',
+            that: containsPair('reaction', isA<Map>()),
+          ),
+        ),
+      ).thenAnswer((_) async => 2);
+
+      service.init(appBloc: mockAppBloc);
+
       expect(
         await service.checkAction(ContentAction.reactToContent),
         LimitationStatus.anonymousLimitReached,
       );
+    });
+
+    test('Guest user is allowed to report when under limit', () async {
+      when(() => mockAppBloc.state).thenReturn(
+        AppState(
+          status: AppLifeCycleStatus.anonymous,
+          user: guestUser,
+          userContentPreferences: emptyPreferences,
+          remoteConfig: mockRemoteConfig,
+        ),
+      );
+      // Daily count for reports is 0, limit is 1.
+      when(
+        () => mockReportRepository.count(
+          userId: guestUser.id,
+          filter: any(named: 'filter'),
+        ),
+      ).thenAnswer((_) async => 0);
+
+      service.init(appBloc: mockAppBloc);
+
+      expect(
+        await service.checkAction(ContentAction.submitReport),
+        LimitationStatus.allowed,
+      );
+    });
+
+    test('Guest user is restricted from reporting when at limit', () async {
+      when(() => mockAppBloc.state).thenReturn(
+        AppState(
+          status: AppLifeCycleStatus.anonymous,
+          user: guestUser,
+          userContentPreferences: emptyPreferences,
+          remoteConfig: mockRemoteConfig,
+        ),
+      );
+      // Daily count for reports is 1, limit is 1.
+      when(
+        () => mockReportRepository.count(
+          userId: guestUser.id,
+          filter: any(named: 'filter'),
+        ),
+      ).thenAnswer((_) async => 1);
+
+      service.init(appBloc: mockAppBloc);
+
       expect(
         await service.checkAction(ContentAction.submitReport),
         LimitationStatus.anonymousLimitReached,

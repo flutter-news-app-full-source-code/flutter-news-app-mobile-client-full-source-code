@@ -1,4 +1,4 @@
-import 'package:flutter_news_app_mobile_client_full_source_code/notifications/providers/no_op_push_notification_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/push_notification/providers/no_op_push_notification_provider.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:logging/logging.dart';
 import 'package:mocktail/mocktail.dart';

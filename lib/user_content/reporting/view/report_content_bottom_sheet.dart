@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -51,6 +52,8 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
     final userId = context.read<AppBloc>().state.user?.id;
     if (userId == null || _selectedReason == null) return;
 
+    _logger.info('Attempting to submit report...');
+    final completer = Completer<void>();
     final report = Report(
       id: const Uuid().v4(),
       reporterUserId: userId,
@@ -66,8 +69,12 @@ class _ReportContentBottomSheetState extends State<ReportContentBottomSheet> {
 
     try {
       setState(() => _isSubmitting = true);
-      context.read<AppBloc>().add(AppContentReported(report: report));
+      context.read<AppBloc>().add(
+        AppContentReported(report: report, completer: completer),
+      );
+      await completer.future;
 
+      _logger.info('Report submission successful.');
       if (mounted) {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()

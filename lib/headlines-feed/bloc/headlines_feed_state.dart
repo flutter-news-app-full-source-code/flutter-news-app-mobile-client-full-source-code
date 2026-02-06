@@ -102,7 +102,9 @@ class HeadlinesFeedState extends Equatable {
           : navigationArguments ?? this.navigationArguments,
       adThemeStyle: adThemeStyle ?? this.adThemeStyle,
       engagementsMap: engagementsMap ?? this.engagementsMap,
-      limitationStatus: limitationStatus ?? this.limitationStatus,
+      limitationStatus: clearLimitedAction
+          ? LimitationStatus.allowed
+          : limitationStatus ?? this.limitationStatus,
       limitedAction: clearLimitedAction
           ? null
           : limitedAction ?? this.limitedAction,

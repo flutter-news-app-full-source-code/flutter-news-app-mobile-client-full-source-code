@@ -201,6 +201,10 @@ class ContentLimitationService {
     ContentAction action, {
     PushNotificationSubscriptionDeliveryType? deliveryType,
   }) async {
+    _logger.fine(
+      'Checking action limit for: ${action.name}, user: ${_appBloc.state.user?.id}',
+    );
+
     final state = _appBloc.state;
     final user = state.user;
     final preferences = state.userContentPreferences;
@@ -208,29 +212,14 @@ class ContentLimitationService {
 
     // Fail open: If essential data is missing, allow the action.
     if (user == null || preferences == null || remoteConfig == null) {
+      _logger.warning(
+        'Cannot check action limits: User, Preferences, or RemoteConfig is null. Allowing action by default.',
+      );
       return LimitationStatus.allowed;
     }
 
     final limits = remoteConfig.user.limits;
     final tier = user.tier;
-
-    // Business Rule: Guest users are not allowed to engage or report.
-    if (user.isAnonymous) {
-      switch (action) {
-        case ContentAction.postComment:
-        case ContentAction.reactToContent:
-        case ContentAction.submitReport:
-          return LimitationStatus.anonymousLimitReached;
-        case ContentAction.bookmarkHeadline:
-        case ContentAction.followTopic:
-        case ContentAction.followSource:
-        case ContentAction.followCountry:
-        case ContentAction.saveFilter:
-        case ContentAction.pinFilter:
-        case ContentAction.subscribeToSavedFilterNotifications:
-          break; // Continue to normal check for guest.
-      }
-    }
 
     // Check daily limits, refreshing cache if necessary.
     final isCacheStale =
@@ -245,6 +234,9 @@ class ContentLimitationService {
       // Persisted preference checks (synchronous)
       case ContentAction.bookmarkHeadline:
         final limit = limits.savedHeadlines[tier];
+        _logger.finer(
+          'Bookmark limit check for tier "$tier": ${preferences.savedHeadlines.length}/$limit',
+        );
         if (limit != null && preferences.savedHeadlines.length >= limit) {
           _logLimitExceeded(LimitedAction.bookmarkHeadline);
           return _getLimitationStatusForTier(tier);
@@ -254,6 +246,9 @@ class ContentLimitationService {
       case ContentAction.followSource:
       case ContentAction.followCountry:
         final limit = limits.followedItems[tier];
+        _logger.finer(
+          'Follow limit check for tier "$tier" and action "${action.name}"',
+        );
         if (limit == null) return LimitationStatus.allowed;
         final count = switch (action) {
           ContentAction.followTopic => preferences.followedTopics.length,
@@ -261,6 +256,7 @@ class ContentLimitationService {
           ContentAction.followCountry => preferences.followedCountries.length,
           _ => 0,
         };
+        _logger.finer('Current count: $count, Limit: $limit');
         if (count >= limit) {
           _logLimitExceeded(switch (action) {
             ContentAction.followTopic => LimitedAction.followTopic,
@@ -273,6 +269,9 @@ class ContentLimitationService {
 
       case ContentAction.saveFilter:
         final limit = limits.savedHeadlineFilters[tier]?.total;
+        _logger.finer(
+          'Save filter limit check for tier "$tier": ${preferences.savedHeadlineFilters.length}/$limit',
+        );
         if (limit != null && preferences.savedHeadlineFilters.length >= limit) {
           _logLimitExceeded(LimitedAction.saveFilter);
           return _getLimitationStatusForTier(tier);
@@ -280,6 +279,12 @@ class ContentLimitationService {
 
       case ContentAction.pinFilter:
         final limit = limits.savedHeadlineFilters[tier]?.pinned;
+        final pinnedCount = preferences.savedHeadlineFilters
+            .where((f) => f.isPinned)
+            .length;
+        _logger.finer(
+          'Pin filter limit check for tier "$tier": $pinnedCount/$limit',
+        );
         if (limit != null &&
             preferences.savedHeadlineFilters.where((f) => f.isPinned).length >=
                 limit) {
@@ -290,6 +295,9 @@ class ContentLimitationService {
       case ContentAction.subscribeToSavedFilterNotifications:
         final subscriptionLimits =
             limits.savedHeadlineFilters[tier]?.notificationSubscriptions;
+        _logger.finer(
+          'Notification subscription limit check for tier "$tier", type "$deliveryType"',
+        );
         if (subscriptionLimits == null) return LimitationStatus.allowed;
 
         final currentCounts = <PushNotificationSubscriptionDeliveryType, int>{};
@@ -302,6 +310,9 @@ class ContentLimitationService {
         if (deliveryType != null) {
           final limitForType = subscriptionLimits[deliveryType] ?? 0;
           final currentCountForType = currentCounts[deliveryType] ?? 0;
+          _logger.finer(
+            'Current subscriptions for type "$deliveryType": $currentCountForType, Limit: $limitForType',
+          );
           if (currentCountForType >= limitForType) {
             _logLimitExceeded(
               LimitedAction.subscribeToSavedFilterNotifications,
@@ -313,6 +324,9 @@ class ContentLimitationService {
       // Daily action checks (asynchronous, cached)
       case ContentAction.postComment:
         final limit = limits.commentsPerDay[tier];
+        _logger.finer(
+          'Daily comment limit check for tier "$tier": ${_commentCount ?? 0}/$limit',
+        );
         if (limit != null && (_commentCount ?? 0) >= limit) {
           _logLimitExceeded(LimitedAction.postComment);
           return _getLimitationStatusForTier(tier);
@@ -320,6 +334,9 @@ class ContentLimitationService {
 
       case ContentAction.reactToContent:
         final limit = limits.reactionsPerDay[tier];
+        _logger.finer(
+          'Daily reaction limit check for tier "$tier": ${_reactionCount ?? 0}/$limit',
+        );
         if (limit != null && (_reactionCount ?? 0) >= limit) {
           _logLimitExceeded(LimitedAction.reactToContent);
           return _getLimitationStatusForTier(tier);

@@ -72,6 +72,9 @@ class SavedHeadlinesFiltersBloc
         filters: filters,
       ),
     );
+    _logger.info(
+      'Loaded ${filters.length} saved headline filters from AppBloc.',
+    );
   }
 
   /// Handles reordering the filters and dispatches an update to the AppBloc.
@@ -102,6 +105,9 @@ class SavedHeadlinesFiltersBloc
     // The `app_bloc` alias is used here to explicitly dispatch the event
     // defined in `app_event.dart`.
     _appBloc.add(app_bloc.SavedHeadlineFilterDeleted(filterId: event.filterId));
+    _logger.info(
+      'Dispatched delete event to AppBloc for filter id: ${event.filterId}',
+    );
   }
 
   @override

@@ -1182,6 +1182,23 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           ),
         ),
       );
+    } on ForbiddenException {
+      _logger.warning('Report submission failed due to server-side limit.');
+      // The server rejected the action, meaning our client-side cache is stale.
+      // Invalidate the cache to force a re-sync on the next check.
+      _contentLimitationService.invalidateAndForceRefresh();
+      // Emit state to show the limitation bottom sheet to the user.
+      emit(
+        state.copyWith(
+          limitationStatus: _contentLimitationService
+              .getLimitationStatusForTier(state.user!.tier),
+          limitedAction: ContentAction.submitReport,
+        ),
+      );
+      emit(state.copyWith(clearLimitedAction: true));
+      event.completer?.completeError(
+        Exception('Server rejected report due to limit.'),
+      );
     } catch (e, s) {
       _logger.severe('Failed to submit report in AppBloc', e, s);
       event.completer?.completeError(e, s);

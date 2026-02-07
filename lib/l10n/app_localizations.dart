@@ -2150,6 +2150,18 @@ abstract class AppLocalizations {
   /// **'Others'**
   String get sourceTypeOthers;
 
+  /// Headline for empty state on source type filter page
+  ///
+  /// In en, this message translates to:
+  /// **'No Source Types Found'**
+  String get sourceTypeFilterEmptyHeadline;
+
+  /// Subheadline for empty state on source type filter page
+  ///
+  /// In en, this message translates to:
+  /// **'There are no source types available to filter by at the moment.'**
+  String get sourceTypeFilterEmptySubheadline;
+
   /// User-friendly confirmation message shown in place of a feed decorator after it has been dismissed.
   ///
   /// In en, this message translates to:

@@ -203,10 +203,10 @@ void main() {
       when(
         () => mockAppBloc.state,
       ).thenReturn(const AppState(status: AppLifeCycleStatus.unauthenticated));
-      service.init(appBloc: mockAppBloc);
-
-      // Act
-      service.dispose();
+      service
+        ..init(appBloc: mockAppBloc)
+        // Act
+        ..dispose();
 
       // Assert
       expect(streamController.hasListener, isFalse);

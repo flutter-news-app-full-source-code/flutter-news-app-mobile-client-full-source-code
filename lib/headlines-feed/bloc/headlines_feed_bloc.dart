@@ -270,6 +270,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     HeadlinesFeedStarted event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
+    _logger.info('HeadlinesFeedStarted: Initializing feed.');
     // Persist the ad theme style in the state for background processes.
     emit(state.copyWith(adThemeStyle: event.adThemeStyle));
     add(HeadlinesFeedRefreshRequested(adThemeStyle: event.adThemeStyle));
@@ -279,6 +280,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     HeadlinesFeedFetchRequested event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
+    _logger.info('HeadlinesFeedFetchRequested: Fetching more content.');
     if (state.status == HeadlinesFeedStatus.loadingMore || !state.hasMore) {
       return;
     }
@@ -307,6 +309,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       final remoteConfig = _appBloc.state.remoteConfig;
 
       if (remoteConfig == null) {
+        _logger.warning('Pagination failed: RemoteConfig is null.');
         emit(state.copyWith(status: HeadlinesFeedStatus.failure));
         return;
       }
@@ -370,6 +373,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         ),
       );
     } on HttpException catch (e) {
+      _logger.severe('Pagination failed with HttpException.', e);
       emit(state.copyWith(status: HeadlinesFeedStatus.failure, error: e));
     }
   }
@@ -378,6 +382,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     HeadlinesFeedRefreshRequested event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
+    _logger.info('HeadlinesFeedRefreshRequested: Refreshing feed.');
     final filterKey = _generateFilterKey(state.activeFilterId!, state.filter);
     final cachedFeed = _feedCacheService.getFeed(filterKey);
 
@@ -409,6 +414,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       final appConfig = _appBloc.state.remoteConfig;
 
       if (appConfig == null) {
+        _logger.warning('Refresh failed: RemoteConfig is null.');
         emit(state.copyWith(status: HeadlinesFeedStatus.failure));
         return;
       }
@@ -538,6 +544,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         ),
       );
     } on HttpException catch (e) {
+      _logger.severe('Refresh failed with HttpException.', e);
       emit(state.copyWith(status: HeadlinesFeedStatus.failure, error: e));
     }
   }
@@ -546,6 +553,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     HeadlinesFeedFiltersApplied event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
+    _logger.info('HeadlinesFeedFiltersApplied: Applying new filters.');
     String newActiveFilterId;
 
     // Determine the active filter ID based on the applied criteria.
@@ -620,6 +628,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           cursor: cachedFeed.cursor,
           filter: event.filter,
           activeFilterId: newActiveFilterId,
+          adThemeStyle: event.adThemeStyle,
         ),
       );
       // Only trigger a background refresh if the cache is older than the
@@ -650,6 +659,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       final appConfig = _appBloc.state.remoteConfig;
 
       if (appConfig == null) {
+        _logger.warning('Filter application failed: RemoteConfig is null.');
         emit(state.copyWith(status: HeadlinesFeedStatus.failure));
         return;
       }
@@ -704,6 +714,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         ),
       );
     } on HttpException catch (e) {
+      _logger.severe('Filter application failed with HttpException.', e);
       emit(state.copyWith(status: HeadlinesFeedStatus.failure, error: e));
     }
   }
@@ -712,6 +723,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     HeadlinesFeedFiltersCleared event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
+    _logger.info('HeadlinesFeedFiltersCleared: Clearing filters.');
     const filterKey = 'all';
     final cachedFeed = _feedCacheService.getFeed(filterKey);
 
@@ -764,6 +776,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       final appConfig = _appBloc.state.remoteConfig;
 
       if (appConfig == null) {
+        _logger.warning('Filter clear failed: RemoteConfig is null.');
         emit(state.copyWith(status: HeadlinesFeedStatus.failure));
         return;
       }
@@ -818,6 +831,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
         ),
       );
     } on HttpException catch (e) {
+      _logger.severe('Filter clear failed with HttpException.', e);
       emit(state.copyWith(status: HeadlinesFeedStatus.failure, error: e));
     }
   }
@@ -826,6 +840,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     CallToActionTapped event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
+    _logger.info('CallToActionTapped: Navigating to ${event.url}');
     emit(state.copyWith(navigationUrl: event.url));
   }
 
@@ -842,6 +857,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     _AppContentPreferencesChanged event,
     Emitter<HeadlinesFeedState> emit,
   ) {
+    _logger.fine('AppContentPreferencesChanged: Updating saved filters.');
     emit(
       state.copyWith(
         savedHeadlineFilters: event.preferences.savedHeadlineFilters,
@@ -853,6 +869,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     SavedFilterSelected event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
+    _logger.info(
+      'SavedFilterSelected: Selected filter "${event.filter.name}" (${event.filter.id}).',
+    );
     final filterKey = event.filter.id;
     final newFilter = event.filter.criteria;
 
@@ -872,6 +891,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
             cursor: cachedFeed.cursor,
             activeFilterId: filterKey,
             filter: newFilter,
+            adThemeStyle: event.adThemeStyle,
           ),
         );
         // Trigger a background refresh if the cache is stale.
@@ -903,6 +923,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     AllFilterSelected event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
+    _logger.info('AllFilterSelected: Switching to "All" feed.');
     const filterKey = 'all';
     final cachedFeed = _feedCacheService.getFeed(filterKey);
 
@@ -920,6 +941,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
             sources: [],
             countries: [],
           ),
+          adThemeStyle: event.adThemeStyle,
         ),
       );
       return;
@@ -945,6 +967,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     FollowedFilterSelected event,
     Emitter<HeadlinesFeedState> emit,
   ) async {
+    _logger.info('FollowedFilterSelected: Switching to "Followed" feed.');
     const filterKey = 'followed';
     final cachedFeed = _feedCacheService.getFeed(filterKey);
     final userPreferences = _appBloc.state.userContentPreferences;
@@ -971,6 +994,7 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
           cursor: cachedFeed.cursor,
           activeFilterId: 'followed',
           filter: newFilter,
+          adThemeStyle: event.adThemeStyle,
         ),
       );
       // Only trigger a background refresh if the cache is older than the
@@ -994,6 +1018,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
     HeadlinesFeedEngagementTapped event,
     Emitter<HeadlinesFeedState> emit,
   ) {
+    _logger.info(
+      'HeadlinesFeedEngagementTapped: Opening engagement sheet for headline ${event.headline.id}.',
+    );
     // The UI will listen for this state change and trigger navigation.
     emit(
       state.copyWith(
@@ -1040,88 +1067,116 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       (e) => e.userId == userId,
     );
 
-    try {
-      Engagement? updatedEngagement;
+    Engagement? updatedEngagement;
+    // Calculate the intended new state before performing any network operations.
+    if (userEngagement != null) {
+      final isTogglingOff =
+          event.reactionType == null ||
+          userEngagement.reaction?.reactionType == event.reactionType;
 
-      if (userEngagement != null) {
-        _logger.fine('Existing engagement found for user. Updating...');
-        final isTogglingOff =
-            event.reactionType == null ||
-            userEngagement.reaction?.reactionType == event.reactionType;
-
-        if (isTogglingOff) {
-          _logger.fine('Toggling reaction OFF.');
-          if (userEngagement.comment == null) {
-            _logger.fine(
-              'No comment exists, deleting entire engagement document.',
-            );
-            await _engagementRepository.delete(
-              id: userEngagement.id,
-              userId: userId,
-            );
-            updatedEngagement = null; // It's deleted
-            unawaited(
-              _analyticsService.logEvent(
-                AnalyticsEvent.reactionDeleted,
-                payload: ReactionDeletedPayload(
-                  contentId: event.headlineId,
-                  reactionType: userEngagement.reaction!.reactionType,
-                ),
-              ),
-            );
-          } else {
-            _logger.fine('Comment exists, only nullifying the reaction field.');
-            updatedEngagement = userEngagement.copyWith(
-              reaction: const ValueWrapper(null),
-            );
-            await _engagementRepository.update(
-              id: updatedEngagement.id,
-              item: updatedEngagement,
-              userId: userId,
-            );
-            unawaited(
-              _analyticsService.logEvent(
-                AnalyticsEvent.reactionDeleted,
-                payload: ReactionDeletedPayload(
-                  contentId: event.headlineId,
-                  reactionType: userEngagement.reaction!.reactionType,
-                ),
-              ),
-            );
-          }
+      if (isTogglingOff) {
+        if (userEngagement.comment == null) {
+          updatedEngagement = null; // Delete
         } else {
-          _logger.fine('Changing reaction to ${event.reactionType!.name}.');
           updatedEngagement = userEngagement.copyWith(
-            reaction: ValueWrapper(Reaction(reactionType: event.reactionType!)),
+            reaction: const ValueWrapper(null),
           );
+        }
+      } else {
+        updatedEngagement = userEngagement.copyWith(
+          reaction: ValueWrapper(Reaction(reactionType: event.reactionType!)),
+        );
+      }
+    } else if (event.reactionType != null) {
+      updatedEngagement = Engagement(
+        id: const Uuid().v4(),
+        userId: userId,
+        entityId: event.headlineId,
+        entityType: EngageableType.headline,
+        reaction: Reaction(reactionType: event.reactionType!),
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+    } else {
+      // No existing engagement and trying to toggle off/null? Do nothing.
+      return;
+    }
+
+    _logger.fine('Optimistically updating UI with new engagement state.');
+    // Optimistically update the state
+    final newEngagementsForHeadline = List<Engagement>.from(currentEngagements)
+      ..removeWhere((e) => e.userId == userId);
+    if (updatedEngagement != null) {
+      newEngagementsForHeadline.add(updatedEngagement);
+    }
+
+    final newEngagementsMap = Map<String, List<Engagement>>.from(
+      state.engagementsMap,
+    )..[event.headlineId] = newEngagementsForHeadline;
+
+    emit(state.copyWith(engagementsMap: newEngagementsMap));
+
+    try {
+      if (userEngagement != null) {
+        // We are updating or deleting an existing one
+        if (updatedEngagement == null) {
+          // It was a delete (toggle off, no comment)
+          _logger.fine(
+            'No comment exists, deleting entire engagement document.',
+          );
+          await _engagementRepository.delete(
+            id: userEngagement.id,
+            userId: userId,
+          );
+          unawaited(
+            _analyticsService.logEvent(
+              AnalyticsEvent.reactionDeleted,
+              payload: ReactionDeletedPayload(
+                contentId: event.headlineId,
+                reactionType: userEngagement.reaction!.reactionType,
+              ),
+            ),
+          );
+        } else {
+          // It was an update
+          _logger.fine('Updating engagement...');
           await _engagementRepository.update(
             id: updatedEngagement.id,
             item: updatedEngagement,
             userId: userId,
           );
-          unawaited(
-            _analyticsService.logEvent(
-              AnalyticsEvent.reactionCreated,
-              payload: ReactionCreatedPayload(
-                contentId: event.headlineId,
-                reactionType: event.reactionType!,
+
+          // Log event based on what changed
+          if (userEngagement.reaction != null &&
+              updatedEngagement.reaction == null) {
+            // Reaction removed (but comment kept)
+            unawaited(
+              _analyticsService.logEvent(
+                AnalyticsEvent.reactionDeleted,
+                payload: ReactionDeletedPayload(
+                  contentId: event.headlineId,
+                  reactionType: userEngagement.reaction!.reactionType,
+                ),
               ),
-            ),
-          );
+            );
+          } else if (updatedEngagement.reaction != null) {
+            // Reaction added or changed
+            unawaited(
+              _analyticsService.logEvent(
+                AnalyticsEvent.reactionCreated,
+                payload: ReactionCreatedPayload(
+                  contentId: event.headlineId,
+                  reactionType: updatedEngagement.reaction!.reactionType,
+                ),
+              ),
+            );
+          }
         }
-      } else if (event.reactionType != null) {
-        _logger.fine('No existing engagement found. Creating new one.');
-        updatedEngagement = Engagement(
-          id: const Uuid().v4(),
-          userId: userId,
-          entityId: event.headlineId,
-          entityType: EngageableType.headline,
-          reaction: Reaction(reactionType: event.reactionType!),
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        );
+      } else {
+        // Creating new
+        _logger.fine('Creating new engagement...');
         await _engagementRepository.create(
-          item: updatedEngagement,
+          item: updatedEngagement!,
           userId: userId,
         );
         unawaited(
@@ -1129,28 +1184,34 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
             AnalyticsEvent.reactionCreated,
             payload: ReactionCreatedPayload(
               contentId: event.headlineId,
-              reactionType: event.reactionType!,
+              reactionType: updatedEngagement.reaction!.reactionType,
             ),
           ),
         );
       }
 
-      _logger.fine('Optimistically updating UI with new engagement state.');
-      // Optimistically update the state
-      final newEngagementsForHeadline = List<Engagement>.from(
-        currentEngagements,
-      )..removeWhere((e) => e.userId == userId);
-      if (updatedEngagement != null) {
-        newEngagementsForHeadline.add(updatedEngagement);
-      }
-
-      final newEngagementsMap = Map<String, List<Engagement>>.from(
-        state.engagementsMap,
-      )..[event.headlineId] = newEngagementsForHeadline;
-
-      emit(state.copyWith(engagementsMap: newEngagementsMap));
       _appBloc.add(AppPositiveInteractionOcurred(context: event.context));
       _logger.info('Successfully processed reaction update.');
+    } on ForbiddenException {
+      _logger.info(
+        'Reaction update failed due to server-side limit. Rolling back UI and showing sheet.',
+      );
+      // Rollback the optimistic update by restoring the original engagements for this headline.
+      final rollbackEngagementsMap = Map<String, List<Engagement>>.from(
+        state.engagementsMap,
+      )..[event.headlineId] = currentEngagements;
+
+      emit(state.copyWith(engagementsMap: rollbackEngagementsMap));
+      // Invalidate cache to re-sync counts.
+      _contentLimitationService.invalidateAndForceRefresh();
+      // Show the limitation sheet.
+      emit(
+        state.copyWith(
+          limitationStatus: LimitationStatus.standardUserLimitReached,
+          limitedAction: ContentAction.reactToContent,
+        ),
+      );
+      emit(state.copyWith(clearLimitedAction: true));
     } catch (e, s) {
       _logger.severe(
         'Failed to update reaction. State will not be rolled back for optimistic UI.',
@@ -1254,10 +1315,27 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       );
       _appBloc.add(AppPositiveInteractionOcurred(context: event.context));
       _logger.info('Successfully posted comment.');
+    } on ForbiddenException {
+      _logger.warning(
+        'Comment post failed due to server-side limit. Rolling back UI and showing sheet.',
+      );
+      // Rollback the optimistic update.
+      emit(state.copyWith(engagementsMap: state.engagementsMap));
+      // Invalidate cache to re-sync counts.
+      _contentLimitationService.invalidateAndForceRefresh();
+      // Show the limitation sheet.
+      emit(
+        state.copyWith(
+          limitationStatus: LimitationStatus.standardUserLimitReached,
+          limitedAction: ContentAction.postComment,
+        ),
+      );
+      emit(state.copyWith(clearLimitedAction: true));
     } catch (e, s) {
-      _logger..severe('Failed to post comment.', e, s)
-      // Revert optimistic update on failure
-      ..warning('Rolling back optimistic UI update for comment post.');
+      _logger
+        ..severe('Failed to post comment.', e, s)
+        // Revert optimistic update on failure
+        ..warning('Rolling back optimistic UI update for comment post.');
       emit(
         state.copyWith(
           engagementsMap: {
@@ -1333,8 +1411,9 @@ class HeadlinesFeedBloc extends Bloc<HeadlinesFeedEvent, HeadlinesFeedState> {
       _appBloc.add(AppPositiveInteractionOcurred(context: event.context));
       _logger.info('Successfully updated comment.');
     } catch (e, s) {
-      _logger..severe('Failed to update comment.', e, s)
-      ..warning('Rolling back optimistic UI update for comment edit.');
+      _logger
+        ..severe('Failed to update comment.', e, s)
+        ..warning('Rolling back optimistic UI update for comment edit.');
       emit(
         state.copyWith(
           engagementsMap: {

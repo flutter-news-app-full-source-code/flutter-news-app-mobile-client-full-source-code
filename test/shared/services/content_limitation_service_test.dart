@@ -345,7 +345,7 @@ void main() {
               userId: 'guest',
               entityId: 'h2',
               entityType: EngageableType.headline,
-              reaction: Reaction(reactionType: ReactionType.like),
+              reaction: const Reaction(reactionType: ReactionType.like),
               createdAt: testDate,
               updatedAt: testDate,
             ),

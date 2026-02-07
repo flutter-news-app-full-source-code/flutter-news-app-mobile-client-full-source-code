@@ -49,7 +49,7 @@ class HeadlineTileImageTop extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-           Padding(
+          Padding(
             padding: const EdgeInsets.all(AppSpacing.sm),
             child: HeadlineSourceRow(headline: headline),
           ),

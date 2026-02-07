@@ -242,7 +242,7 @@ class ContentLimitationService {
   void _scheduleRetry(String userId) {
     _retryAttempt++;
     // Exponential backoff: 2s, 8s, 18s, 32s, 50s, then caps at 60s.
-    final delaySeconds = min(2 * _retryAttempt * _retryAttempt, 60).toInt();
+    final delaySeconds = min(2 * _retryAttempt * _retryAttempt, 60);
     _logger.info(
       'Scheduling daily count fetch retry attempt #$_retryAttempt in $delaySeconds seconds.',
     );

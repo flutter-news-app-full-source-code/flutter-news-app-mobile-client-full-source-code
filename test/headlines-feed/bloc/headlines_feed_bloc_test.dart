@@ -4,12 +4,12 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inline_ad_cache_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_feed_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/models/cached_feed.dart';
@@ -269,12 +269,6 @@ void main() {
       feedItemImageStyle: FeedItemImageStyle.largeThumbnail,
       feedItemClickBehavior: FeedItemClickBehavior.internalNavigation,
     ),
-  );
-
-  const dummyUserRewards = UserRewards(
-    id: 'dummy',
-    userId: 'dummy',
-    activeRewards: {},
   );
 
   setUpAll(() {
@@ -592,7 +586,7 @@ void main() {
             userId: 'user-id',
             entityId: 'h1',
             entityType: EngageableType.headline,
-            reaction: Reaction(reactionType: ReactionType.like),
+            reaction: const Reaction(reactionType: ReactionType.like),
             createdAt: DateTime(2024),
             updatedAt: DateTime(2024),
           ),

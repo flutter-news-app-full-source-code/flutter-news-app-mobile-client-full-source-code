@@ -2,9 +2,10 @@
 
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/bloc/headlines_filter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/extensions/extensions.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -12,48 +13,28 @@ import 'package:ui_kit/ui_kit.dart';
 /// A dedicated page for selecting filter criteria for the source list.
 ///
 /// This page allows users to filter sources by their headquarters country
-/// and by their type (e.g., News Agency, Blog). It manages its own local
-/// state and returns the selected criteria to the previous page.
+/// and by their type (e.g., News Agency, Blog). It is driven by the
+/// [HeadlinesFilterBloc] to maintain a centralized state.
 /// {@endtemplate}
-class SourceListFilterPage extends StatefulWidget {
+class SourceListFilterPage extends StatelessWidget {
   /// {@macro source_list_filter_page}
-  const SourceListFilterPage({
-    required this.allCountries,
-    required this.allSourceTypes,
-    required this.initialSelectedHeadquarterCountries,
-    required this.initialSelectedSourceTypes,
-    super.key,
-  });
+  const SourceListFilterPage({required this.filterBloc, super.key});
 
-  /// All available countries to be used as headquarters filter options.
-  final List<Country> allCountries;
-
-  /// All available source types to be used as filter options.
-  final List<SourceType> allSourceTypes;
-
-  /// The set of headquarters countries that were initially selected.
-  final Set<Country> initialSelectedHeadquarterCountries;
-
-  /// The set of source types that were initially selected.
-  final Set<SourceType> initialSelectedSourceTypes;
+  /// The instance of [HeadlinesFilterBloc] provided by the parent route.
+  final HeadlinesFilterBloc filterBloc;
 
   @override
-  State<SourceListFilterPage> createState() => _SourceListFilterPageState();
+  Widget build(BuildContext context) {
+    // Provide the existing filterBloc to this subtree.
+    return BlocProvider.value(
+      value: filterBloc,
+      child: const _SourceListFilterView(),
+    );
+  }
 }
 
-class _SourceListFilterPageState extends State<SourceListFilterPage> {
-  late Set<Country> _selectedHeadquarterCountries;
-  late Set<SourceType> _selectedSourceTypes;
-
-  @override
-  void initState() {
-    super.initState();
-    // Initialize the local state with the initial selections passed in.
-    _selectedHeadquarterCountries = Set.from(
-      widget.initialSelectedHeadquarterCountries,
-    );
-    _selectedSourceTypes = Set.from(widget.initialSelectedSourceTypes);
-  }
+class _SourceListFilterView extends StatelessWidget {
+  const _SourceListFilterView();
 
   @override
   Widget build(BuildContext context) {
@@ -68,85 +49,80 @@ class _SourceListFilterPageState extends State<SourceListFilterPage> {
           style: textTheme.titleLarge,
         ),
         actions: [
-          // Apply button returns the selected criteria to the previous page.
+          // The "Apply" button now just pops the page, as the state is
+          // already updated in the shared BLoC.
           IconButton(
             icon: const Icon(Icons.check),
             tooltip: l10n.headlinesFeedFilterApplyButton,
-            onPressed: () {
-              Navigator.of(context).pop({
-                'countries': _selectedHeadquarterCountries,
-                'types': _selectedSourceTypes,
-              });
-            },
+            onPressed: () => Navigator.of(context).pop(),
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-        children: [
-          // Section for filtering by headquarters country.
-          ListTile(
-            title: Text(l10n.headlinesFeedFilterSourceCountryLabel),
-            subtitle: Text(
-              _selectedHeadquarterCountries.isEmpty
-                  ? l10n.headlinesFeedFilterAllLabel
-                  : l10n.headlinesFeedFilterSelectedCountLabel(
-                      _selectedHeadquarterCountries.length,
-                    ),
-            ),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () async {
-              final result = await context.pushNamed<Set<dynamic>>(
-                Routes.multiSelectSearchName,
-                extra: {
-                  'title': l10n.headlinesFeedFilterSourceCountryLabel,
-                  'allItems': widget.allCountries,
-                  'initialSelectedItems': _selectedHeadquarterCountries,
-                  'itemBuilder': (Country country) => country.name,
-                },
-              );
+      body: BlocBuilder<HeadlinesFilterBloc, HeadlinesFilterState>(
+        builder: (context, state) {
+          return ListView(
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+            children: [
+              // Section for filtering by headquarters country.
+              ListTile(
+                title: Text(l10n.headlinesFeedFilterSourceCountryLabel),
+                subtitle: Text(
+                  state.selectedSourceHeadquarterCountries.isEmpty
+                      ? l10n.headlinesFeedFilterAllLabel
+                      : l10n.headlinesFeedFilterSelectedCountLabel(
+                          state.selectedSourceHeadquarterCountries.length,
+                        ),
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () async {
+                  // Navigate to a generic multi-select search page, passing
+                  // the necessary data and the shared BLoC instance.
+                  final result = await context.pushNamed<Set<dynamic>>(
+                    Routes.multiSelectSearchName,
+                    extra: {
+                      'title': l10n.headlinesFeedFilterSourceCountryLabel,
+                      'allItems': state.allHeadquarterCountries,
+                      'initialSelectedItems':
+                          state.selectedSourceHeadquarterCountries,
+                      'itemBuilder': (Country country) => country.name,
+                    },
+                  );
 
-              if (result != null && mounted) {
-                setState(
-                  () => _selectedHeadquarterCountries = result.cast<Country>(),
-                );
-              }
-            },
-          ),
-          const Divider(height: 1),
-          const SizedBox(height: AppSpacing.lg),
-
-          // Section for filtering by source type.
-          _buildSectionHeader(context, l10n.headlinesFeedFilterSourceTypeLabel),
-          ...widget.allSourceTypes.map(
-            (sourceType) => CheckboxListTile(
-              title: Text(sourceType.l10n(l10n)),
-              value: _selectedSourceTypes.contains(sourceType),
-              onChanged: (isSelected) {
-                setState(() {
-                  if (isSelected == true) {
-                    _selectedSourceTypes.add(sourceType);
-                  } else {
-                    _selectedSourceTypes.remove(sourceType);
+                  if (result != null && context.mounted) {
+                    // When the page returns, dispatch an event to the
+                    // shared BLoC to update the source filter criteria.
+                    context.read<HeadlinesFilterBloc>().add(
+                      FilterSourceCriteriaChanged(
+                        selectedCountries: result.cast<Country>(),
+                      ),
+                    );
                   }
-                });
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Builds the header for a filter section.
-  Widget _buildSectionHeader(BuildContext context, String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingMedium),
-      child: Text(
-        title,
-        style: Theme.of(
-          context,
-        ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                },
+              ),
+              const Divider(height: 1),
+              // Section for filtering by source type.
+              ListTile(
+                title: Text(l10n.headlinesFeedFilterSourceTypeLabel),
+                subtitle: Text(
+                  state.selectedSourceTypes.isEmpty
+                      ? l10n.headlinesFeedFilterAllLabel
+                      : l10n.headlinesFeedFilterSelectedCountLabel(
+                          state.selectedSourceTypes.length,
+                        ),
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () async {
+                  // Navigate to the new dedicated source type filter page.
+                  // The logic is similar to the country filter.
+                  await context.pushNamed(
+                    Routes.sourceTypeFilterName, // New route
+                    extra: context.read<HeadlinesFilterBloc>(),
+                  );
+                },
+              ),
+            ],
+          );
+        },
       ),
     );
   }

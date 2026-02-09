@@ -163,7 +163,7 @@ class _SourceFilterViewState extends State<_SourceFilterView> {
             onPressed: () {
               // The selections are already managed by HeadlinesFilterBloc.
               // Just pop the page.
-              Navigator.of(context).pop();
+              context.pop();
             },
           ),
         ],

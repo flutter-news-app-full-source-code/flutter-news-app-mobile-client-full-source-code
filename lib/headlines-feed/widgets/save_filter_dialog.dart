@@ -28,11 +28,13 @@ class SaveFilterDialog extends StatefulWidget {
   /// the form is valid. It provides the new name, pinned status, and
   /// selected notification delivery types.
   final ValueChanged<
-      ({
-        String name,
-        bool isPinned,
-        Set<PushNotificationSubscriptionDeliveryType> deliveryTypes,
-      })> onSave;
+    ({
+      String name,
+      bool isPinned,
+      Set<PushNotificationSubscriptionDeliveryType> deliveryTypes,
+    })
+  >
+  onSave;
 
   @override
   State<SaveFilterDialog> createState() => _SaveFilterDialogState();
@@ -47,7 +49,7 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
   bool _isSaving = false;
   bool _canPin = true;
   late final Map<PushNotificationSubscriptionDeliveryType, bool>
-      _canSubscribePerType;
+  _canSubscribePerType;
 
   static const _maxNameLength = 15;
 
@@ -74,20 +76,21 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
   Future<void> _checkLimits() async {
     final contentLimitationService = context.read<ContentLimitationService>();
     context.read<Logger>().info(
-          'Checking user limits for pinning and notification subscriptions.',
-        );
+      'Checking user limits for pinning and notification subscriptions.',
+    );
 
     final canPinStatus = await contentLimitationService.checkAction(
       ContentAction.pinFilter,
     );
     if (mounted) {
       setState(() {
-        _canPin = canPinStatus == LimitationStatus.allowed ||
+        _canPin =
+            canPinStatus == LimitationStatus.allowed ||
             (widget.filterToEdit?.isPinned == true);
       });
       context.read<Logger>().finer(
-            'Pinning limit check result: $_canPin (status: $canPinStatus)',
-          );
+        'Pinning limit check result: $_canPin (status: $canPinStatus)',
+      );
     }
 
     for (final type in PushNotificationSubscriptionDeliveryType.values) {
@@ -101,12 +104,12 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
         setState(() {
           _canSubscribePerType[type] =
               limitationStatus == LimitationStatus.allowed ||
-                  isAlreadySubscribed;
+              isAlreadySubscribed;
         });
         context.read<Logger>().finer(
-              'Subscription limit check for type "$type": '
-              '${_canSubscribePerType[type]} (status: $limitationStatus)',
-            );
+          'Subscription limit check for type "$type": '
+          '${_canSubscribePerType[type]} (status: $limitationStatus)',
+        );
       }
     }
   }
@@ -128,8 +131,8 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
     try {
       final deliveryTypesToSave =
           Set<PushNotificationSubscriptionDeliveryType>.from(
-        _selectedDeliveryTypes,
-      );
+            _selectedDeliveryTypes,
+          );
 
       // If notifications are selected, handle the permission flow.
       if (deliveryTypesToSave.isNotEmpty) {
@@ -342,28 +345,31 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
                   // Check if this specific delivery type is enabled globally.
                   final isGloballyEnabled =
                       pushNotificationConfig?.deliveryConfigs[type] ?? false;
-                  final isAlreadySubscribed =
-                      _selectedDeliveryTypes.contains(type);
+                  final isAlreadySubscribed = _selectedDeliveryTypes.contains(
+                    type,
+                  );
 
                   // The checkbox is interactable if it's globally enabled AND
                   // the user has permission for this specific type OR if they
                   // are already subscribed (which allows them to unsubscribe).
                   final canInteract =
-                      isGloballyEnabled && (_canSubscribePerType[type] ?? false);
+                      isGloballyEnabled &&
+                      (_canSubscribePerType[type] ?? false);
 
                   return CheckboxListTile(
                     title: Text(type.toL10n(l10n)),
-                    subtitle: (type ==
+                    subtitle:
+                        (type ==
                                 PushNotificationSubscriptionDeliveryType
                                     .dailyDigest &&
                             !isDailyDigestRewardActive)
                         ? Text(
                             l10n.requiresActiveReward,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
+                            style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(
-                                  color: Theme.of(context).colorScheme.secondary,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.secondary,
                                 ),
                           )
                         : null,

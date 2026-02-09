@@ -86,11 +86,8 @@ void main() {
           sort: any(named: 'sort'),
         ),
       ).thenAnswer(
-        (_) async =>  PaginatedResponse(
-          items: [topic1],
-          cursor: null,
-          hasMore: false,
-        ),
+        (_) async =>
+            PaginatedResponse(items: [topic1], cursor: null, hasMore: false),
       );
       when(
         () => sourcesRepository.readAll(
@@ -98,11 +95,8 @@ void main() {
           sort: any(named: 'sort'),
         ),
       ).thenAnswer(
-        (_) async =>  PaginatedResponse(
-          items: [source1],
-          cursor: null,
-          hasMore: false,
-        ),
+        (_) async =>
+            PaginatedResponse(items: [source1], cursor: null, hasMore: false),
       );
       // Mock separate calls for event countries and headquarter countries
       when(
@@ -111,17 +105,14 @@ void main() {
           sort: any(named: 'sort'),
         ),
       ).thenAnswer(
-        (_) async =>  PaginatedResponse(
-          items: [country1],
-          cursor: null,
-          hasMore: false,
-        ),
+        (_) async =>
+            PaginatedResponse(items: [country1], cursor: null, hasMore: false),
       );
       when(
         () =>
             countriesRepository.readAll(filter: null, sort: any(named: 'sort')),
       ).thenAnswer(
-        (_) async =>  PaginatedResponse(
+        (_) async => PaginatedResponse(
           items: [country1, country2],
           cursor: null,
           hasMore: false,
@@ -147,9 +138,9 @@ void main() {
         const HeadlinesFilterState(status: HeadlinesFilterStatus.loading),
         HeadlinesFilterState(
           status: HeadlinesFilterStatus.success,
-          allTopics:  [topic1],
-          allSources:  [source1],
-          allCountries:  [country1],
+          allTopics: [topic1],
+          allSources: [source1],
+          allCountries: [country1],
           allHeadquarterCountries: [country1, country2],
           allSourceTypes: SourceType.values,
           selectedTopics: const {},
@@ -205,7 +196,7 @@ void main() {
         ..add(FilterTopicToggled(topic: topic1, isSelected: true))
         ..add(FilterTopicToggled(topic: topic1, isSelected: false)),
       expect: () => <HeadlinesFilterState>[
-         HeadlinesFilterState(
+        HeadlinesFilterState(
           status: HeadlinesFilterStatus.success,
           selectedTopics: {topic1},
         ),
@@ -248,7 +239,7 @@ void main() {
         ),
       ),
       expect: () => <HeadlinesFilterState>[
-         HeadlinesFilterState(
+        HeadlinesFilterState(
           status: HeadlinesFilterStatus.success,
           selectedSourceHeadquarterCountries: {country1},
           selectedSourceTypes: const {SourceType.blog},

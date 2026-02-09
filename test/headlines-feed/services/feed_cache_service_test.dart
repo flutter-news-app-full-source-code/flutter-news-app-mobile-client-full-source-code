@@ -80,10 +80,10 @@ void main() {
     });
 
     test('clearAll removes all entries from the cache', () {
-      feedCacheService..setFeed('key1', cachedFeed)
-      ..setFeed('key2', cachedFeed)
-
-      ..clearAll();
+      feedCacheService
+        ..setFeed('key1', cachedFeed)
+        ..setFeed('key2', cachedFeed)
+        ..clearAll();
 
       expect(feedCacheService.getFeed('key1'), isNull);
       expect(feedCacheService.getFeed('key2'), isNull);

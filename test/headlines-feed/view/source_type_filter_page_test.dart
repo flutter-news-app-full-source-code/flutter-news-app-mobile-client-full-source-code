@@ -107,10 +107,7 @@ void main() {
       });
 
       await tester.pumpWidget(
-        MockGoRouterProvider(
-          goRouter: mockNavigator,
-          child: SourceTypeFilterPage(filterBloc: headlinesFilterBloc),
-        ),
+        MockGoRouterProvider(goRouter: mockNavigator, child: buildWidget()),
       );
 
       await tester.tap(find.byIcon(Icons.check));

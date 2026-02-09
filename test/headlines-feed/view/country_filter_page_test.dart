@@ -102,13 +102,7 @@ void main() {
       });
 
       await tester.pumpWidget(
-        MockGoRouterProvider(
-          goRouter: mockNavigator,
-          child: CountryFilterPage(
-            title: 'Test Countries',
-            filterBloc: headlinesFilterBloc,
-          ),
-        ),
+        MockGoRouterProvider(goRouter: mockNavigator, child: buildWidget()),
       );
 
       await tester.tap(find.byIcon(Icons.check));

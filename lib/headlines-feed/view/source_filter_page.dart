@@ -147,35 +147,13 @@ class _SourceFilterViewState extends State<_SourceFilterView> {
           IconButton(
             icon: const Icon(Icons.filter_alt_outlined),
             tooltip: l10n.sourceListFilterPageFilterButtonTooltip,
-            onPressed: () async {
-              final filterState = context.read<HeadlinesFilterBloc>().state;
-              final result = await context.pushNamed<Map<String, dynamic>>(
+            onPressed: () {
+              // Navigate to the refactored source list filter page,
+              // passing the BLoC instance.
+              context.pushNamed(
                 Routes.sourceListFilterName,
-                extra: {
-                  'allCountries': filterState.allCountries,
-                  'allSourceTypes':
-                      filterState.allSources
-                          .map((s) => s.sourceType)
-                          .toSet()
-                          .toList()
-                        ..sort((a, b) => a.name.compareTo(b.name)),
-                  'initialSelectedHeadquarterCountries':
-                      filterState.selectedSourceHeadquarterCountries,
-                  'initialSelectedSourceTypes': filterState.selectedSourceTypes,
-                },
+                extra: context.read<HeadlinesFilterBloc>(),
               );
-
-              // When the filter page returns with new criteria, update the
-              // bloc to re-render the list.
-              if (result != null && mounted) {
-                // ignore: use_build_context_synchronously
-                context.read<HeadlinesFilterBloc>().add(
-                  FilterSourceCriteriaChanged(
-                    selectedCountries: result['countries'] as Set<Country>,
-                    selectedSourceTypes: result['types'] as Set<SourceType>,
-                  ),
-                );
-              }
             },
           ),
           // Apply Filters Button (now just pops, as state is managed centrally)
@@ -185,7 +163,7 @@ class _SourceFilterViewState extends State<_SourceFilterView> {
             onPressed: () {
               // The selections are already managed by HeadlinesFilterBloc.
               // Just pop the page.
-              Navigator.of(context).pop();
+              context.pop();
             },
           ),
         ],

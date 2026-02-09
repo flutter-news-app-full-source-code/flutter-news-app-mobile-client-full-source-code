@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/push_notification/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:logging/logging.dart';
@@ -63,6 +63,7 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
     // unmodifiable Set" errors when editing an existing filter.
     _selectedDeliveryTypes = Set.from(filter?.deliveryTypes ?? {});
     _canSubscribePerType = {};
+    context.read<Logger>().fine('SaveFilterDialog initialized.');
     _checkLimits();
   }
 
@@ -74,6 +75,9 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
 
   Future<void> _checkLimits() async {
     final contentLimitationService = context.read<ContentLimitationService>();
+    context.read<Logger>().info(
+      'Checking user limits for pinning and notification subscriptions.',
+    );
 
     final canPinStatus = await contentLimitationService.checkAction(
       ContentAction.pinFilter,
@@ -84,6 +88,9 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
             canPinStatus == LimitationStatus.allowed ||
             (widget.filterToEdit?.isPinned == true);
       });
+      context.read<Logger>().finer(
+        'Pinning limit check result: $_canPin (status: $canPinStatus)',
+      );
     }
 
     for (final type in PushNotificationSubscriptionDeliveryType.values) {
@@ -99,6 +106,10 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
               limitationStatus == LimitationStatus.allowed ||
               isAlreadySubscribed;
         });
+        context.read<Logger>().finer(
+          'Subscription limit check for type "$type": '
+          '${_canSubscribePerType[type]} (status: $limitationStatus)',
+        );
       }
     }
   }
@@ -405,7 +416,8 @@ class _SaveFilterDialogState extends State<SaveFilterDialog> {
   }
 }
 
-/// An extension to provide localized strings for [PushNotificationSubscriptionDeliveryType].
+/// An extension to provide localized strings for
+/// [PushNotificationSubscriptionDeliveryType].
 extension on PushNotificationSubscriptionDeliveryType {
   String toL10n(AppLocalizations l10n) {
     switch (this) {

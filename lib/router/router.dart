@@ -45,6 +45,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/v
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_list_filter_page.dart'
     as feed_filter;
+import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_type_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/topic_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/rewards/view/rewards_page.dart';
@@ -576,9 +577,29 @@ GoRouter createRouter({
 
                           return MaterialPage(
                             fullscreenDialog: true,
-                            child: HeadlinesFilterPage(
-                              initialFilter: initialFilter,
-                              filterToEdit: filterToEdit,
+                            child: BlocProvider(
+                              create: (context) =>
+                                  HeadlinesFilterBloc(
+                                    topicsRepository: context
+                                        .read<DataRepository<Topic>>(),
+                                    sourcesRepository: context
+                                        .read<DataRepository<Source>>(),
+                                    countriesRepository: context
+                                        .read<DataRepository<Country>>(),
+                                  )..add(
+                                    FilterDataLoaded(
+                                      initialSelectedTopics:
+                                          initialFilter.topics,
+                                      initialSelectedSources:
+                                          initialFilter.sources,
+                                      initialSelectedCountries:
+                                          initialFilter.countries,
+                                    ),
+                                  ),
+                              child: HeadlinesFilterPage(
+                                initialFilter: initialFilter,
+                                filterToEdit: filterToEdit,
+                              ),
                             ),
                           );
                         },
@@ -605,32 +626,21 @@ GoRouter createRouter({
                                 path: 'source-list-filter',
                                 name: Routes.sourceListFilterName,
                                 builder: (context, state) {
-                                  final extra =
-                                      state.extra as Map<String, dynamic>? ??
-                                      {};
-                                  final allCountries =
-                                      extra['allCountries'] as List<Country>? ??
-                                      [];
-                                  final allSourceTypes =
-                                      extra['allSourceTypes']
-                                          as List<SourceType>? ??
-                                      [];
-                                  final initialSelectedHeadquarterCountries =
-                                      extra['initialSelectedHeadquarterCountries']
-                                          as Set<Country>? ??
-                                      {};
-                                  final initialSelectedSourceTypes =
-                                      extra['initialSelectedSourceTypes']
-                                          as Set<SourceType>? ??
-                                      {};
-
+                                  final filterBloc =
+                                      state.extra! as HeadlinesFilterBloc;
                                   return feed_filter.SourceListFilterPage(
-                                    allCountries: allCountries,
-                                    allSourceTypes: allSourceTypes,
-                                    initialSelectedHeadquarterCountries:
-                                        initialSelectedHeadquarterCountries,
-                                    initialSelectedSourceTypes:
-                                        initialSelectedSourceTypes,
+                                    filterBloc: filterBloc,
+                                  );
+                                },
+                              ),
+                              GoRoute(
+                                path: Routes.sourceTypeFilter,
+                                name: Routes.sourceTypeFilterName,
+                                builder: (context, state) {
+                                  final filterBloc =
+                                      state.extra! as HeadlinesFilterBloc;
+                                  return SourceTypeFilterPage(
+                                    filterBloc: filterBloc,
                                   );
                                 },
                               ),

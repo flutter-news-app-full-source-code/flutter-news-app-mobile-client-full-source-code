@@ -129,6 +129,20 @@ class AppUserFeedDecoratorShown extends AppEvent {
   List<Object> get props => [userId, feedDecoratorType, isCompleted];
 }
 
+/// {@template app_user_feed_decorator_dismissed}
+/// Dispatched when a user dismisses a feed decorator.
+/// {@endtemplate}
+class AppUserFeedDecoratorDismissed extends AppEvent {
+  /// {@macro app_user_feed_decorator_dismissed}
+  const AppUserFeedDecoratorDismissed({required this.type});
+
+  /// The type of the decorator that was dismissed.
+  final FeedDecoratorType type;
+
+  @override
+  List<Object> get props => [type];
+}
+
 /// {@template saved_headline_filter_added}
 /// Dispatched when a new headline feed filter is saved by the user.
 /// {@endtemplate}
@@ -296,13 +310,16 @@ class AppBookmarkToggled extends AppEvent {
 /// {@endtemplate}
 class AppContentReported extends AppEvent {
   /// {@macro app_content_reported}
-  const AppContentReported({required this.report});
+  const AppContentReported({required this.report, this.completer});
 
   /// The report object to be submitted.
   final Report report;
 
+  /// An optional completer to await the result of the submission.
+  final Completer<void>? completer;
+
   @override
-  List<Object> get props => [report];
+  List<Object?> get props => [report, completer];
 }
 
 /// Dispatched when a user reward has been earned or verified, requiring a

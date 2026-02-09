@@ -1125,6 +1125,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get sourceTypeOthers => 'أخرى';
 
   @override
+  String get sourceTypeFilterEmptyHeadline => 'لم يتم العثور على أنواع مصادر';
+
+  @override
+  String get sourceTypeFilterEmptySubheadline =>
+      'لا توجد أنواع مصادر متاحة للتصفية في الوقت الحالي.';
+
+  @override
   String get decoratorDismissedConfirmation => 'تم إخفاء الاقتراح.';
 
   @override

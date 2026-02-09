@@ -13,7 +13,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_l
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/initialization_result.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/notifications/services/push_notification_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/push_notification/services/push_notification_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:logging/logging.dart';
@@ -101,6 +101,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppUserContentPreferencesChanged>(_onAppUserContentPreferencesChanged);
     on<SavedHeadlineFilterAdded>(_onSavedHeadlineFilterAdded);
     on<SavedHeadlineFilterUpdated>(_onSavedHeadlineFilterUpdated);
+    on<AppUserFeedDecoratorDismissed>(_onAppUserFeedDecoratorDismissed);
     on<SavedHeadlineFilterDeleted>(_onSavedHeadlineFilterDeleted);
     on<SavedHeadlineFiltersReordered>(_onSavedHeadlineFiltersReordered);
     on<AppPushNotificationDeviceRegistered>(
@@ -670,6 +671,54 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     }
   }
 
+  Future<void> _onAppUserFeedDecoratorDismissed(
+    AppUserFeedDecoratorDismissed event,
+    Emitter<AppState> emit,
+  ) async {
+    if (state.userContext == null) {
+      _logger.warning(
+        '[AppBloc] Skipping AppUserFeedDecoratorDismissed: UserContext not loaded.',
+      );
+      return;
+    }
+
+    final originalContext = state.userContext!;
+    final decoratorType = event.type;
+
+    final currentStatus =
+        originalContext.feedDecoratorStatus[decoratorType] ??
+        const UserFeedDecoratorStatus(isCompleted: false);
+
+    // Do nothing if already completed.
+    if (currentStatus.isCompleted) return;
+
+    final updatedStatus = currentStatus.copyWith(isCompleted: true);
+
+    final newFeedDecoratorStatus =
+        Map<FeedDecoratorType, UserFeedDecoratorStatus>.from(
+          originalContext.feedDecoratorStatus,
+        )..addAll({decoratorType: updatedStatus});
+
+    final updatedContext = originalContext.copyWith(
+      feedDecoratorStatus: newFeedDecoratorStatus,
+    );
+
+    // Optimistically update the UI.
+    emit(state.copyWith(userContext: updatedContext));
+
+    try {
+      await _userContextRepository.update(
+        id: updatedContext.id,
+        item: updatedContext,
+      );
+    } catch (e, s) {
+      _logger.severe('Failed to persist dismissed decorator status.', e, s);
+      emit(
+        state.copyWith(userContext: originalContext),
+      ); // Rollback on failure.
+    }
+  }
+
   /// Handles updating the user's content preferences.
   Future<void> _onAppUserContentPreferencesChanged(
     AppUserContentPreferencesChanged event,
@@ -1103,6 +1152,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     );
 
     if (limitationStatus != LimitationStatus.allowed) {
+      final message =
+          'Report submission denied due to limitation: $limitationStatus';
+      _logger.warning(message);
       emit(
         state.copyWith(
           limitationStatus: limitationStatus,
@@ -1110,11 +1162,16 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         ),
       );
       emit(state.copyWith(clearLimitedAction: true));
+      event.completer?.completeError(Exception(message));
       return;
     }
 
+    // Path 2: Action is allowed. Proceed with submission.
+    _logger.info('Report submission allowed. Creating report...');
     try {
       await _reportRepository.create(item: event.report);
+      _logger.info('Report successfully created in repository.');
+      event.completer?.complete();
       unawaited(
         _analyticsService.logEvent(
           AnalyticsEvent.reportSubmitted,
@@ -1125,9 +1182,26 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           ),
         ),
       );
+    } on ForbiddenException {
+      _logger.warning('Report submission failed due to server-side limit.');
+      // The server rejected the action, meaning our client-side cache is stale.
+      // Invalidate the cache to force a re-sync on the next check.
+      _contentLimitationService.invalidateAndForceRefresh();
+      // Emit state to show the limitation bottom sheet to the user.
+      emit(
+        state.copyWith(
+          limitationStatus: _contentLimitationService
+              .getLimitationStatusForTier(state.user!.tier),
+          limitedAction: ContentAction.submitReport,
+        ),
+      );
+      emit(state.copyWith(clearLimitedAction: true));
+      event.completer?.completeError(
+        Exception('Server rejected report due to limit.'),
+      );
     } catch (e, s) {
       _logger.severe('Failed to submit report in AppBloc', e, s);
-      // Optionally emit a failure state to show a snackbar.
+      event.completer?.completeError(e, s);
     }
   }
 

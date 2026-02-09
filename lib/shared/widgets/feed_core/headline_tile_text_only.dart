@@ -43,12 +43,13 @@ class HeadlineTileTextOnly extends StatelessWidget {
     final l10n = AppLocalizationsX(context).l10n;
 
     return Card(
+      color: Theme.of(context).colorScheme.surfaceContainerHigh,
       margin: const EdgeInsets.symmetric(
         horizontal: AppSpacing.paddingMedium,
         vertical: AppSpacing.xs,
       ),
       child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
+        padding: const EdgeInsets.all(AppSpacing.sm),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

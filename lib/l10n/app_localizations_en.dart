@@ -1127,6 +1127,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourceTypeOthers => 'Others';
 
   @override
+  String get sourceTypeFilterEmptyHeadline => 'No Source Types Found';
+
+  @override
+  String get sourceTypeFilterEmptySubheadline =>
+      'There are no source types available to filter by at the moment.';
+
+  @override
   String get decoratorDismissedConfirmation => 'Suggestion hidden.';
 
   @override

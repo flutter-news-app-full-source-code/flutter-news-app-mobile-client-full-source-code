@@ -28,6 +28,8 @@ final class HeadlinesFilterState extends Equatable {
     this.allTopics = const [],
     this.allSources = const [],
     this.allCountries = const [],
+    this.allHeadquarterCountries = const [],
+    this.allSourceTypes = const [],
     this.selectedTopics = const {},
     this.selectedSources = const {},
     this.selectedCountries = const {},
@@ -47,6 +49,12 @@ final class HeadlinesFilterState extends Equatable {
 
   /// All available [Country] objects that can be used for filtering.
   final List<Country> allCountries;
+
+  /// All available [Country] objects for filtering sources by headquarters.
+  final List<Country> allHeadquarterCountries;
+
+  /// All available [SourceType] enums for filtering sources by type.
+  final List<SourceType> allSourceTypes;
 
   /// The set of [Topic] objects currently selected by the user.
   final Set<Topic> selectedTopics;
@@ -74,6 +82,8 @@ final class HeadlinesFilterState extends Equatable {
     List<Topic>? allTopics,
     List<Source>? allSources,
     List<Country>? allCountries,
+    List<Country>? allHeadquarterCountries,
+    List<SourceType>? allSourceTypes,
     Set<Topic>? selectedTopics,
     Set<Source>? selectedSources,
     Set<Country>? selectedCountries,
@@ -87,6 +97,9 @@ final class HeadlinesFilterState extends Equatable {
       allTopics: allTopics ?? this.allTopics,
       allSources: allSources ?? this.allSources,
       allCountries: allCountries ?? this.allCountries,
+      allHeadquarterCountries:
+          allHeadquarterCountries ?? this.allHeadquarterCountries,
+      allSourceTypes: allSourceTypes ?? this.allSourceTypes,
       selectedTopics: selectedTopics ?? this.selectedTopics,
       selectedSources: selectedSources ?? this.selectedSources,
       selectedCountries: selectedCountries ?? this.selectedCountries,
@@ -104,6 +117,8 @@ final class HeadlinesFilterState extends Equatable {
     allTopics,
     allSources,
     allCountries,
+    allHeadquarterCountries,
+    allSourceTypes,
     selectedTopics,
     selectedSources,
     selectedCountries,

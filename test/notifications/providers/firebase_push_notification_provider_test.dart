@@ -5,7 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_core_platform_interface/test.dart'
     as firebase_core_test;
 import 'package:firebase_messaging_platform_interface/firebase_messaging_platform_interface.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/notifications/providers/firebase_push_notification_provider.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/push_notification/providers/firebase_push_notification_provider.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:logging/logging.dart';
 import 'package:mocktail/mocktail.dart';

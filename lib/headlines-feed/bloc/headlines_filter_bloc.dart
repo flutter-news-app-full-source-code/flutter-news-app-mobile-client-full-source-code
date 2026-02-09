@@ -65,30 +65,52 @@ class HeadlinesFilterBloc
     emit(state.copyWith(status: HeadlinesFilterStatus.loading));
 
     try {
-      final allTopicsResponse = await _topicsRepository.readAll(
-        filter: {'status': ContentStatus.active.name},
-        sort: [const SortOption('name', SortOrder.asc)],
-      );
-      final allSourcesResponse = await _sourcesRepository.readAll(
-        filter: {'status': ContentStatus.active.name},
-        sort: [const SortOption('name', SortOrder.asc)],
-      );
-      final allCountriesResponse = await _countriesRepository.readAll(
-        filter: {'hasActiveSources': true},
-        sort: [const SortOption('name', SortOrder.asc)],
-      );
+      // Use Future.wait to fetch all data in parallel for better performance.
+      final [
+        allTopicsResponse,
+        allSourcesResponse,
+        allEventCountriesResponse,
+        allHeadquarterCountriesResponse,
+      ] = await Future.wait([
+        _topicsRepository.readAll(
+          filter: {'status': ContentStatus.active.name},
+          sort: [const SortOption('name', SortOrder.asc)],
+        ),
+        _sourcesRepository.readAll(
+          filter: {'status': ContentStatus.active.name},
+          sort: [const SortOption('name', SortOrder.asc)],
+        ),
+        // Fetch countries for headline events (only those with active sources).
+        _countriesRepository.readAll(
+          filter: {'hasActiveSources': true},
+          sort: [const SortOption('name', SortOrder.asc)],
+        ),
+        // Fetch all countries for source headquarters filter (no filter).
+        _countriesRepository.readAll(
+          sort: [const SortOption('name', SortOrder.asc)],
+        ),
+      ]);
 
       emit(
         state.copyWith(
           status: HeadlinesFilterStatus.success,
-          allTopics: allTopicsResponse.items,
-          allSources: allSourcesResponse.items,
-          allCountries: allCountriesResponse.items,
+          allTopics: (allTopicsResponse as PaginatedResponse<Topic>).items,
+          allSources: (allSourcesResponse as PaginatedResponse<Source>).items,
+          allCountries:
+              (allEventCountriesResponse as PaginatedResponse<Country>).items,
+          allHeadquarterCountries:
+              (allHeadquarterCountriesResponse as PaginatedResponse<Country>)
+                  .items,
+          allSourceTypes: SourceType.values,
           selectedTopics: Set.from(event.initialSelectedTopics),
           selectedSources: Set.from(event.initialSelectedSources),
           selectedCountries: Set.from(event.initialSelectedCountries),
           clearError: true,
         ),
+      );
+      _logger.info(
+        'Successfully loaded filter data with ${state.allTopics.length} topics, '
+        '${state.allSources.length} sources, and ${state.allCountries.length} countries.',
       );
     } on HttpException catch (e) {
       _logger.severe('Failed to load filter data (HttpException): $e');
@@ -110,6 +132,9 @@ class HeadlinesFilterBloc
     Emitter<HeadlinesFilterState> emit,
   ) {
     final updatedSelectedTopics = Set<Topic>.from(state.selectedTopics);
+    _logger.finer(
+      'Toggling topic "${event.topic.name}" to ${event.isSelected}.',
+    );
     if (event.isSelected) {
       updatedSelectedTopics.add(event.topic);
     } else {
@@ -124,6 +149,9 @@ class HeadlinesFilterBloc
     Emitter<HeadlinesFilterState> emit,
   ) {
     final updatedSelectedSources = Set<Source>.from(state.selectedSources);
+    _logger.finer(
+      'Toggling source "${event.source.name}" to ${event.isSelected}.',
+    );
     if (event.isSelected) {
       updatedSelectedSources.add(event.source);
     } else {
@@ -138,6 +166,9 @@ class HeadlinesFilterBloc
     Emitter<HeadlinesFilterState> emit,
   ) {
     final updatedSelectedCountries = Set<Country>.from(state.selectedCountries);
+    _logger.finer(
+      'Toggling country "${event.country.name}" to ${event.isSelected}.',
+    );
     if (event.isSelected) {
       updatedSelectedCountries.add(event.country);
     } else {
@@ -151,6 +182,7 @@ class HeadlinesFilterBloc
     FilterSelectionsCleared event,
     Emitter<HeadlinesFilterState> emit,
   ) {
+    _logger.info('Clearing all filter selections.');
     emit(
       state.copyWith(
         selectedTopics: {},
@@ -166,6 +198,9 @@ class HeadlinesFilterBloc
     FilterSourceCriteriaChanged event,
     Emitter<HeadlinesFilterState> emit,
   ) {
+    _logger.finer(
+      'Updating source filter criteria. Countries: ${event.selectedCountries?.length}, Types: ${event.selectedSourceTypes?.length}',
+    );
     emit(
       state.copyWith(
         selectedSourceHeadquarterCountries:

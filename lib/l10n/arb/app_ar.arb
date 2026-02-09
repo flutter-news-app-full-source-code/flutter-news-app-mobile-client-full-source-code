@@ -1462,6 +1462,14 @@
     "@sourceTypeOthers": {
         "description": "نوع المصدر بصيغة الجمع لأخرى"
     },
+    "sourceTypeFilterEmptyHeadline": "لم يتم العثور على أنواع مصادر",
+    "@sourceTypeFilterEmptyHeadline": {
+        "description": "Headline for empty state on source type filter page"
+    },
+    "sourceTypeFilterEmptySubheadline": "لا توجد أنواع مصادر متاحة للتصفية في الوقت الحالي.",
+    "@sourceTypeFilterEmptySubheadline": {
+        "description": "Subheadline for empty state on source type filter page"
+    },
     "decoratorDismissedConfirmation": "تم إخفاء الاقتراح.",
     "@decoratorDismissedConfirmation": {
         "description": "رسالة تأكيد سهلة الاستخدام تظهر بدلاً من مزين الخلاصة بعد أن يتجاهله المستخدم."

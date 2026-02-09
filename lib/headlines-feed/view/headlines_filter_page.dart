@@ -1,5 +1,4 @@
 import 'package:core/core.dart';
-import 'package:data_repository/data_repository.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -42,23 +41,11 @@ class HeadlinesFilterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-          HeadlinesFilterBloc(
-            topicsRepository: context.read<DataRepository<Topic>>(),
-            sourcesRepository: context.read<DataRepository<Source>>(),
-            countriesRepository: context.read<DataRepository<Country>>(),
-          )..add(
-            FilterDataLoaded(
-              initialSelectedTopics: initialFilter.topics,
-              initialSelectedSources: initialFilter.sources,
-              initialSelectedCountries: initialFilter.countries,
-            ),
-          ),
-      child: _HeadlinesFilterView(
-        initialFilter: initialFilter,
-        filterToEdit: filterToEdit,
-      ),
+    // The BlocProvider is now expected to be provided by the parent widget
+    // (e.g., in the router or test setup).
+    return _HeadlinesFilterView(
+      initialFilter: initialFilter,
+      filterToEdit: filterToEdit,
     );
   }
 }
@@ -85,6 +72,7 @@ Widget _buildFilterTile({
   final subtitle = selectedCount == 0 ? allLabel : selectedLabel;
 
   return ListTile(
+    key: Key(routeName),
     title: Text(title),
     subtitle: Text(subtitle),
     trailing: const Icon(Icons.chevron_right),
@@ -125,19 +113,21 @@ Future<void> _onApplyTapped(
         content: Text(l10n.applyFilterDialogContent),
         actions: <Widget>[
           TextButton(
+            key: const Key('apply_only_button'),
             child: Text(l10n.applyFilterDialogApplyOnlyButton),
             onPressed: () {
               // Pop the dialog first.
-              Navigator.of(dialogContext).pop();
+              dialogContext.pop();
               // Apply the filter and exit the filter page.
               _applyAndExit(context);
             },
           ),
           FilledButton(
+            key: const Key('apply_and_save_button'),
             child: Text(l10n.applyFilterDialogApplyAndSaveButton),
             onPressed: () {
               // Pop the dialog first.
-              Navigator.of(dialogContext).pop();
+              dialogContext.pop();
               // Initiate the save and apply flow.
               _createAndApplyFilter(context);
             },

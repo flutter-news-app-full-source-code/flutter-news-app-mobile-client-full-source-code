@@ -55,6 +55,8 @@ abstract final class Routes {
   static const sourceListFilterName = 'sourceListFilter';
   static const feedFilterEventCountries = 'event-countries';
   static const feedFilterEventCountriesName = 'feedFilterEventCountries';
+  static const sourceTypeFilter = 'source-type-filter';
+  static const sourceTypeFilterName = 'sourceTypeFilter';
   static const savedHeadlineFilters = 'saved-headline-filters';
   static const savedHeadlineFiltersName = 'savedHeadlineFilters';
   static const engagement = 'engagement/:headlineId';

@@ -46,3 +46,18 @@ final class SavedHeadlinesFiltersDeleted extends SavedHeadlinesFiltersEvent {
   @override
   List<Object> get props => [filterId];
 }
+
+/// {@template _app_bloc_state_changed}
+/// An internal event dispatched when the AppBloc's state changes in a way
+/// that affects the saved filters.
+/// {@endtemplate}
+final class _AppBlocStateChanged extends SavedHeadlinesFiltersEvent {
+  /// {@macro _app_bloc_state_changed}
+  const _AppBlocStateChanged(this.appState);
+
+  /// The new state from the AppBloc.
+  final app_bloc.AppState appState;
+
+  @override
+  List<Object> get props => [appState];
+}

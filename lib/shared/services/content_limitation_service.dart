@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
@@ -52,6 +53,9 @@ enum LimitationStatus {
   standardUserLimitReached,
 }
 
+/// Defines the initialization status of the daily count cache.
+enum _CacheInitializationStatus { pending, succeeded, failed }
+
 /// {@template content_limitation_service}
 /// A service that centralizes the logic for checking if a user can perform
 /// a content-related action based on their role and remote configuration limits.
@@ -61,6 +65,7 @@ enum LimitationStatus {
 ///
 /// It is a stateful, caching service that proactively fetches daily action
 /// counts for the current user to provide fast, client-side limit checks.
+/// It is designed to be resilient, failing open if the initial count fetch fails.
 /// {@endtemplate}
 class ContentLimitationService {
   /// {@macro content_limitation_service}
@@ -84,13 +89,17 @@ class ContentLimitationService {
 
   late final AppBloc _appBloc;
   StreamSubscription<AppState>? _appBlocSubscription;
+  Future<void>? _fetchDailyCountsFuture;
 
   // Internal cache for daily action counts.
   int? _commentCount;
   int? _reactionCount;
   int? _reportCount;
   DateTime? _countsLastFetchedAt;
+  _CacheInitializationStatus _initializationStatus =
+      _CacheInitializationStatus.pending;
   String? _cachedForUserId;
+  int _retryAttempt = 0;
 
   /// Initializes the service by subscribing to AppBloc state changes.
   ///
@@ -102,7 +111,8 @@ class ContentLimitationService {
     _appBlocSubscription = appBloc.stream.listen(_onAppStateChanged);
     // Trigger initial fetch if a user is already present.
     if (appBloc.state.user != null) {
-      _fetchDailyCounts(_appBloc.state.user!.id);
+      _fetchDailyCountsFuture = _fetchDailyCounts(appBloc.state.user!.id);
+      unawaited(_fetchDailyCountsFuture);
     }
   }
 
@@ -124,59 +134,63 @@ class ContentLimitationService {
       );
       _clearCache();
       if (newUserId != null) {
-        _fetchDailyCounts(newUserId);
+        _fetchDailyCountsFuture = _fetchDailyCounts(newUserId);
+        unawaited(_fetchDailyCountsFuture);
       }
     }
   }
 
+  /// Resets all cached daily counts and status indicators.
   void _clearCache() {
     _commentCount = null;
     _reactionCount = null;
     _reportCount = null;
     _countsLastFetchedAt = null;
     _cachedForUserId = null;
+    _initializationStatus = _CacheInitializationStatus.pending;
+    _retryAttempt = 0;
+    _fetchDailyCountsFuture = null;
   }
 
+  /// Fetches the daily action counts (reactions, comments, reports) for a
+  /// given user by querying all relevant records from the last 24 hours and
+  /// counting them locally. This works around the unimplemented `count` method.
   Future<void> _fetchDailyCounts(String userId) async {
-    _logger.info('Fetching daily action counts for user $userId...');
+    _logger.info('Attempting to fetch daily action counts for user $userId...');
     _cachedForUserId = userId;
+    _initializationStatus = _CacheInitializationStatus.pending;
 
     try {
       final twentyFourHoursAgo = DateTime.now().subtract(
         const Duration(hours: 24),
       );
 
-      // Fetch all counts concurrently for performance.
-      final [commentCount, reactionCount, reportCount] = await Future.wait<int>(
-        [
-          _engagementRepository.count(
-            userId: userId,
-            filter: {
-              'comment': {r'$exists': true, r'$ne': null},
-              'createdAt': {r'$gte': twentyFourHoursAgo.toIso8601String()},
-            },
-          ),
-          _engagementRepository.count(
-            userId: userId,
-            filter: {
-              'reaction': {r'$exists': true, r'$ne': null},
-              'createdAt': {r'$gte': twentyFourHoursAgo.toIso8601String()},
-            },
-          ),
-          _reportRepository.count(
-            userId: userId,
-            filter: {
-              'reporterUserId': userId,
-              'createdAt': {r'$gte': twentyFourHoursAgo.toIso8601String()},
-            },
-          ),
-        ],
-      );
+      // Use readAll to fetch all pages of engagements and reports.
+      final [engagementItems, reportItems] = await Future.wait([
+        _fetchAllPaginatedItems(_engagementRepository, userId, {
+          'createdAt': {r'$gte': twentyFourHoursAgo.toIso8601String()},
+        }),
+        _fetchAllPaginatedItems(_reportRepository, userId, {
+          'reporterUserId': userId,
+          'createdAt': {r'$gte': twentyFourHoursAgo.toIso8601String()},
+        }),
+      ]);
+
+      // Count locally.
+      final commentCount = (engagementItems as List<Engagement>)
+          .where((e) => e.comment != null)
+          .length;
+      final reactionCount = engagementItems
+          .where((e) => e.reaction != null)
+          .length;
+      final reportCount = (reportItems as List<Report>).length;
 
       _commentCount = commentCount;
       _reactionCount = reactionCount;
       _reportCount = reportCount;
       _countsLastFetchedAt = DateTime.now();
+      _initializationStatus = _CacheInitializationStatus.succeeded;
+      _retryAttempt = 0; // Reset retry attempts on success.
 
       _logger.info(
         'Successfully fetched daily counts for user $userId: '
@@ -188,9 +202,71 @@ class ContentLimitationService {
         e,
         s,
       );
-      // Clear cache on failure to ensure a retry on the next check.
       _clearCache();
+      _initializationStatus = _CacheInitializationStatus.failed;
     }
+  }
+
+  /// A helper function that fetches all items from a paginated endpoint.
+  ///
+  /// It repeatedly calls `repository.readAll` using the cursor from each
+  /// response until `hasMore` is `false`, accumulating all items into a
+  /// single list.
+  Future<List<T>> _fetchAllPaginatedItems<T>(
+    DataRepository<T> repository,
+    String userId,
+    Map<String, dynamic> filter,
+  ) async {
+    final allItems = <T>[];
+    String? cursor;
+    var hasMore = true;
+
+    while (hasMore) {
+      final response = await repository.readAll(
+        userId: userId,
+        filter: filter,
+        pagination: PaginationOptions(cursor: cursor, limit: 100),
+      );
+      allItems.addAll(response.items);
+      hasMore = response.hasMore;
+      cursor = response.cursor;
+    }
+    return allItems;
+  }
+
+  /// Schedules a retry of the `_fetchDailyCounts` method with an exponential
+  /// backoff strategy.
+  ///
+  /// This is used when the service is in a `failed` state to prevent the app
+  /// from being permanently unable to check limits without a restart.
+  void _scheduleRetry(String userId) {
+    _retryAttempt++;
+    // Exponential backoff: 2s, 8s, 18s, 32s, 50s, then caps at 60s.
+    final delaySeconds = min(2 * _retryAttempt * _retryAttempt, 60);
+    _logger.info(
+      'Scheduling daily count fetch retry attempt #$_retryAttempt in $delaySeconds seconds.',
+    );
+    Future.delayed(Duration(seconds: delaySeconds), () {
+      // Only attempt the fetch if the user hasn't changed in the meantime.
+      if (_cachedForUserId == userId) {
+        unawaited(_fetchDailyCounts(userId));
+      }
+    });
+  }
+
+  /// Invalidates the daily count cache and triggers a background refresh.
+  ///
+  /// This is called by BLoCs when a server-side `ForbiddenException` is caught,
+  /// indicating the client's cache is out of sync.
+  void invalidateAndForceRefresh() {
+    final userId = _appBloc.state.user?.id;
+    if (userId == null) return;
+
+    _logger.info(
+      'Invalidating daily counts cache and forcing refresh for user $userId.',
+    );
+    _clearCache();
+    unawaited(_fetchDailyCounts(userId));
   }
 
   /// Checks if the current user is allowed to perform a given [action].
@@ -201,59 +277,69 @@ class ContentLimitationService {
     ContentAction action, {
     PushNotificationSubscriptionDeliveryType? deliveryType,
   }) async {
+    _logger.fine(
+      'Checking action limit for: ${action.name}, user: ${_appBloc.state.user?.id}',
+    );
+
     final state = _appBloc.state;
-    final user = state.user;
+    final user = state.user!; // User is guaranteed to be non-null here.
     final preferences = state.userContentPreferences;
     final remoteConfig = state.remoteConfig;
 
+    // If the initial fetch is still pending, wait for it to complete.
+    // This handles the race condition on app startup where an action is
+    // checked before the initial counts are available.
+    if (_initializationStatus == _CacheInitializationStatus.pending &&
+        _fetchDailyCountsFuture != null) {
+      await _fetchDailyCountsFuture;
+    }
+
     // Fail open: If essential data is missing, allow the action.
-    if (user == null || preferences == null || remoteConfig == null) {
+    if (preferences == null || remoteConfig == null) {
+      _logger.warning(
+        'Cannot check action limits: Preferences or RemoteConfig is null. Allowing action by default.',
+      );
       return LimitationStatus.allowed;
     }
 
     final limits = remoteConfig.user.limits;
     final tier = user.tier;
 
-    // Business Rule: Guest users are not allowed to engage or report.
-    if (user.isAnonymous) {
-      switch (action) {
-        case ContentAction.postComment:
-        case ContentAction.reactToContent:
-        case ContentAction.submitReport:
-          return LimitationStatus.anonymousLimitReached;
-        case ContentAction.bookmarkHeadline:
-        case ContentAction.followTopic:
-        case ContentAction.followSource:
-        case ContentAction.followCountry:
-        case ContentAction.saveFilter:
-        case ContentAction.pinFilter:
-        case ContentAction.subscribeToSavedFilterNotifications:
-          break; // Continue to normal check for guest.
-      }
-    }
-
-    // Check daily limits, refreshing cache if necessary.
+    // Check daily limits, handling cache state.
     final isCacheStale =
         _countsLastFetchedAt == null ||
         DateTime.now().difference(_countsLastFetchedAt!) > _cacheDuration;
 
-    if (isCacheStale && _cachedForUserId == user.id) {
-      await _fetchDailyCounts(user.id);
+    if (isCacheStale &&
+        _cachedForUserId == user.id &&
+        _initializationStatus != _CacheInitializationStatus.pending) {
+      // Asynchronously refresh in the background, but don't wait.
+      // Use the current (potentially stale) data for the check.
+      _logger.info(
+        'Daily count cache is stale. Triggering background refresh.',
+      );
+      unawaited(_fetchDailyCounts(user.id));
     }
 
     switch (action) {
       // Persisted preference checks (synchronous)
       case ContentAction.bookmarkHeadline:
         final limit = limits.savedHeadlines[tier];
+        _logger.finer(
+          'Bookmark limit check for tier "$tier": ${preferences.savedHeadlines.length}/$limit',
+        );
         if (limit != null && preferences.savedHeadlines.length >= limit) {
           _logLimitExceeded(LimitedAction.bookmarkHeadline);
-          return _getLimitationStatusForTier(tier);
+          return getLimitationStatusForTier(tier);
         }
 
       case ContentAction.followTopic:
       case ContentAction.followSource:
       case ContentAction.followCountry:
         final limit = limits.followedItems[tier];
+        _logger.finer(
+          'Follow limit check for tier "$tier" and action "${action.name}"',
+        );
         if (limit == null) return LimitationStatus.allowed;
         final count = switch (action) {
           ContentAction.followTopic => preferences.followedTopics.length,
@@ -261,6 +347,7 @@ class ContentLimitationService {
           ContentAction.followCountry => preferences.followedCountries.length,
           _ => 0,
         };
+        _logger.finer('Current count: $count, Limit: $limit');
         if (count >= limit) {
           _logLimitExceeded(switch (action) {
             ContentAction.followTopic => LimitedAction.followTopic,
@@ -268,28 +355,40 @@ class ContentLimitationService {
             ContentAction.followCountry => LimitedAction.followCountry,
             _ => LimitedAction.followTopic,
           });
-          return _getLimitationStatusForTier(tier);
+          return getLimitationStatusForTier(tier);
         }
 
       case ContentAction.saveFilter:
         final limit = limits.savedHeadlineFilters[tier]?.total;
+        _logger.finer(
+          'Save filter limit check for tier "$tier": ${preferences.savedHeadlineFilters.length}/$limit',
+        );
         if (limit != null && preferences.savedHeadlineFilters.length >= limit) {
           _logLimitExceeded(LimitedAction.saveFilter);
-          return _getLimitationStatusForTier(tier);
+          return getLimitationStatusForTier(tier);
         }
 
       case ContentAction.pinFilter:
         final limit = limits.savedHeadlineFilters[tier]?.pinned;
+        final pinnedCount = preferences.savedHeadlineFilters
+            .where((f) => f.isPinned)
+            .length;
+        _logger.finer(
+          'Pin filter limit check for tier "$tier": $pinnedCount/$limit',
+        );
         if (limit != null &&
             preferences.savedHeadlineFilters.where((f) => f.isPinned).length >=
                 limit) {
           _logLimitExceeded(LimitedAction.pinFilter);
-          return _getLimitationStatusForTier(tier);
+          return getLimitationStatusForTier(tier);
         }
 
       case ContentAction.subscribeToSavedFilterNotifications:
         final subscriptionLimits =
             limits.savedHeadlineFilters[tier]?.notificationSubscriptions;
+        _logger.finer(
+          'Notification subscription limit check for tier "$tier", type "$deliveryType"',
+        );
         if (subscriptionLimits == null) return LimitationStatus.allowed;
 
         final currentCounts = <PushNotificationSubscriptionDeliveryType, int>{};
@@ -302,34 +401,60 @@ class ContentLimitationService {
         if (deliveryType != null) {
           final limitForType = subscriptionLimits[deliveryType] ?? 0;
           final currentCountForType = currentCounts[deliveryType] ?? 0;
+          _logger.finer(
+            'Current subscriptions for type "$deliveryType": $currentCountForType, Limit: $limitForType',
+          );
           if (currentCountForType >= limitForType) {
             _logLimitExceeded(
               LimitedAction.subscribeToSavedFilterNotifications,
             );
-            return _getLimitationStatusForTier(tier);
+            return getLimitationStatusForTier(tier);
           }
         }
 
       // Daily action checks (asynchronous, cached)
       case ContentAction.postComment:
-        final limit = limits.commentsPerDay[tier];
-        if (limit != null && (_commentCount ?? 0) >= limit) {
-          _logLimitExceeded(LimitedAction.postComment);
-          return _getLimitationStatusForTier(tier);
-        }
-
       case ContentAction.reactToContent:
-        final limit = limits.reactionsPerDay[tier];
-        if (limit != null && (_reactionCount ?? 0) >= limit) {
-          _logLimitExceeded(LimitedAction.reactToContent);
-          return _getLimitationStatusForTier(tier);
+      case ContentAction.submitReport:
+        // If the initial fetch failed, fail-open to allow the action.
+        // The server will be the final authority.
+        if (_initializationStatus == _CacheInitializationStatus.failed) {
+          _logger.warning(
+            'Daily count cache initialization failed. Allowing action ${action.name} by default.',
+          );
+          // Schedule a retry in the background with exponential backoff.
+          _scheduleRetry(user.id);
+          return LimitationStatus.allowed;
         }
 
-      case ContentAction.submitReport:
-        final limit = limits.reportsPerDay[tier];
-        if (limit != null && (_reportCount ?? 0) >= limit) {
-          _logLimitExceeded(LimitedAction.submitReport);
-          return _getLimitationStatusForTier(tier);
+        final (count, limit) = switch (action) {
+          ContentAction.postComment => (
+            _commentCount,
+            limits.commentsPerDay[tier],
+          ),
+          ContentAction.reactToContent => (
+            _reactionCount,
+            limits.reactionsPerDay[tier],
+          ),
+          ContentAction.submitReport => (
+            _reportCount,
+            limits.reportsPerDay[tier],
+          ),
+          _ => (null, null),
+        };
+
+        _logger.finer(
+          'Daily limit check for ${action.name} on tier "$tier": ${count ?? 0}/$limit',
+        );
+
+        if (limit != null && (count ?? 0) >= limit) {
+          _logLimitExceeded(switch (action) {
+            ContentAction.postComment => LimitedAction.postComment,
+            ContentAction.reactToContent => LimitedAction.reactToContent,
+            ContentAction.submitReport => LimitedAction.submitReport,
+            _ => LimitedAction.reactToContent,
+          });
+          return getLimitationStatusForTier(tier);
         }
     }
 
@@ -343,7 +468,8 @@ class ContentLimitationService {
     );
   }
 
-  LimitationStatus _getLimitationStatusForTier(AccessTier tier) {
+  /// Returns the correct [LimitationStatus] based on the user's [AccessTier].
+  LimitationStatus getLimitationStatusForTier(AccessTier tier) {
     switch (tier) {
       case AccessTier.guest:
         return LimitationStatus.anonymousLimitReached;

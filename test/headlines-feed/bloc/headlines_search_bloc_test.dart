@@ -43,26 +43,23 @@ void main() {
 
     blocTest<HeadlineSearchBloc, HeadlineSearchState>(
       'emits [initial] when query is too short',
-      build:
-          () => HeadlineSearchBloc(
-            headlinesRepository: headlinesRepository,
-            analyticsService: analyticsService,
-          ),
+      build: () => HeadlineSearchBloc(
+        headlinesRepository: headlinesRepository,
+        analyticsService: analyticsService,
+      ),
       act: (bloc) => bloc.add(const HeadlineSearchQueryChanged('ab')),
       wait: const Duration(milliseconds: 350),
-      expect:
-          () => [
-            const HeadlineSearchState(status: HeadlineSearchStatus.initial),
-          ],
+      expect: () => [
+        const HeadlineSearchState(status: HeadlineSearchStatus.initial),
+      ],
     );
 
     blocTest<HeadlineSearchBloc, HeadlineSearchState>(
       'emits [loading, success] when search is successful',
-      build:
-          () => HeadlineSearchBloc(
-            headlinesRepository: headlinesRepository,
-            analyticsService: analyticsService,
-          ),
+      build: () => HeadlineSearchBloc(
+        headlinesRepository: headlinesRepository,
+        analyticsService: analyticsService,
+      ),
       setUp: () {
         when(
           () => headlinesRepository.readAll(
@@ -70,23 +67,19 @@ void main() {
             pagination: any(named: 'pagination'),
           ),
         ).thenAnswer(
-          (_) async => const PaginatedResponse(
-            items: [],
-            cursor: null,
-            hasMore: false,
-          ),
+          (_) async =>
+              const PaginatedResponse(items: [], cursor: null, hasMore: false),
         );
       },
       act: (bloc) => bloc.add(const HeadlineSearchQueryChanged('flutter')),
       wait: const Duration(milliseconds: 350),
-      expect:
-          () => [
-            const HeadlineSearchState(status: HeadlineSearchStatus.loading),
-            const HeadlineSearchState(
-              status: HeadlineSearchStatus.success,
-              headlines: [],
-            ),
-          ],
+      expect: () => [
+        const HeadlineSearchState(status: HeadlineSearchStatus.loading),
+        const HeadlineSearchState(
+          status: HeadlineSearchStatus.success,
+          headlines: [],
+        ),
+      ],
       verify: (_) {
         verify(
           () => headlinesRepository.readAll(
@@ -105,11 +98,10 @@ void main() {
 
     blocTest<HeadlineSearchBloc, HeadlineSearchState>(
       'emits [loading, failure] when search fails',
-      build:
-          () => HeadlineSearchBloc(
-            headlinesRepository: headlinesRepository,
-            analyticsService: analyticsService,
-          ),
+      build: () => HeadlineSearchBloc(
+        headlinesRepository: headlinesRepository,
+        analyticsService: analyticsService,
+      ),
       setUp: () {
         when(
           () => headlinesRepository.readAll(
@@ -120,17 +112,12 @@ void main() {
       },
       act: (bloc) => bloc.add(const HeadlineSearchQueryChanged('error')),
       wait: const Duration(milliseconds: 350),
-      expect:
-          () => [
-            const HeadlineSearchState(status: HeadlineSearchStatus.loading),
-            isA<HeadlineSearchState>()
-                .having(
-                  (s) => s.status,
-                  'status',
-                  HeadlineSearchStatus.failure,
-                )
-                .having((s) => s.error, 'error', isA<HttpException>()),
-          ],
+      expect: () => [
+        const HeadlineSearchState(status: HeadlineSearchStatus.loading),
+        isA<HeadlineSearchState>()
+            .having((s) => s.status, 'status', HeadlineSearchStatus.failure)
+            .having((s) => s.error, 'error', isA<HttpException>()),
+      ],
     );
   });
 }

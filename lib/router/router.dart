@@ -577,9 +577,29 @@ GoRouter createRouter({
 
                           return MaterialPage(
                             fullscreenDialog: true,
-                            child: HeadlinesFilterPage(
-                              initialFilter: initialFilter,
-                              filterToEdit: filterToEdit,
+                            child: BlocProvider(
+                              create: (context) =>
+                                  HeadlinesFilterBloc(
+                                    topicsRepository: context
+                                        .read<DataRepository<Topic>>(),
+                                    sourcesRepository: context
+                                        .read<DataRepository<Source>>(),
+                                    countriesRepository: context
+                                        .read<DataRepository<Country>>(),
+                                  )..add(
+                                    FilterDataLoaded(
+                                      initialSelectedTopics:
+                                          initialFilter.topics,
+                                      initialSelectedSources:
+                                          initialFilter.sources,
+                                      initialSelectedCountries:
+                                          initialFilter.countries,
+                                    ),
+                                  ),
+                              child: HeadlinesFilterPage(
+                                initialFilter: initialFilter,
+                                filterToEdit: filterToEdit,
+                              ),
                             ),
                           );
                         },

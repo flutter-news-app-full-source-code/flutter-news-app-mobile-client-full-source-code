@@ -137,6 +137,12 @@ void main() {
         filterToEdit: filterToEdit,
       );
 
+      final app = MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: page,
+      );
+
       return MultiRepositoryProvider(
         providers: [
           RepositoryProvider<ContentLimitationService>.value(
@@ -164,13 +170,8 @@ void main() {
             ),
           ],
           child: mockGoRouter != null
-              ? MockGoRouterProvider(goRouter: mockGoRouter, child: page)
-              : MaterialApp(
-                  localizationsDelegates:
-                      AppLocalizations.localizationsDelegates,
-                  supportedLocales: AppLocalizations.supportedLocales,
-                  home: page,
-                ),
+              ? MockGoRouterProvider(goRouter: mockGoRouter, child: app)
+              : app,
         ),
       );
     }
@@ -364,13 +365,14 @@ void main() {
         await tester.tap(find.byKey(const Key('apply_only_button')));
         await tester.pumpAndSettle();
 
-        verify(mockGoRouter.pop).called(2);
+        verify(mockGoRouter.pop).called(3);
       },
     );
 
     testWidgets(
       'tapping apply button shows dialog and "Apply and Save" shows SaveFilterDialog',
       (tester) async {
+        final mockGoRouter = MockGoRouter();
         final headlinesFilterBloc = MockHeadlinesFilterBloc();
         final state = HeadlinesFilterState(
           status: HeadlinesFilterStatus.success,
@@ -389,8 +391,14 @@ void main() {
         when(() => headlinesFilterBloc.state).thenReturn(state);
         whenListen(headlinesFilterBloc, Stream.fromIterable([state]));
 
+        // Stub pop for the dialog
+        when(mockGoRouter.pop).thenAnswer((_) {});
+
         await tester.pumpWidget(
-          buildWidget(headlinesFilterBloc: headlinesFilterBloc),
+          buildWidget(
+            headlinesFilterBloc: headlinesFilterBloc,
+            mockGoRouter: mockGoRouter,
+          ),
         );
         await tester.pumpAndSettle();
 

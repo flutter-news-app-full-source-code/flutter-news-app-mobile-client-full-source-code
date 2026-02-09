@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
+import 'package:collection/collection.dart';
 import 'package:core/core.dart';
 import 'package:equatable/equatable.dart';
 // Import AppBloc with an alias to resolve the name collision between
@@ -31,6 +32,10 @@ class SavedHeadlinesFiltersBloc
       _onDataLoaded,
       transformer: restartable(),
     );
+    on<_AppBlocStateChanged>(
+      _onAppBlocStateChanged,
+      transformer: restartable(),
+    );
     on<SavedHeadlinesFiltersReordered>(
       _onFiltersReordered,
       transformer: sequential(),
@@ -42,11 +47,12 @@ class SavedHeadlinesFiltersBloc
 
     // Listen to the AppBloc for changes to the saved filters list.
     _appBlocSubscription = _appBloc.stream.listen((app_bloc.AppState appState) {
-      if (appState.userContentPreferences?.savedHeadlineFilters != null &&
-          appState.userContentPreferences!.savedHeadlineFilters !=
-              state.filters) {
-        // If the global list changes, update this BLoC's state.
-        add(const SavedHeadlinesFiltersDataLoaded());
+      final newFilters = appState.userContentPreferences?.savedHeadlineFilters;
+      if (newFilters != null &&
+          !const DeepCollectionEquality().equals(newFilters, state.filters)) {
+        // If the global list changes, dispatch an event with the new state
+        // to avoid race conditions with reading `_appBloc.state`.
+        add(_AppBlocStateChanged(appState));
       }
     });
 
@@ -77,17 +83,29 @@ class SavedHeadlinesFiltersBloc
     );
   }
 
+  /// Handles updates from the AppBloc stream.
+  void _onAppBlocStateChanged(
+    _AppBlocStateChanged event,
+    Emitter<SavedHeadlinesFiltersState> emit,
+  ) {
+    _logger.fine('Updating state from AppBloc stream.');
+    final filters =
+        event.appState.userContentPreferences?.savedHeadlineFilters ?? [];
+    emit(
+      state.copyWith(
+        status: SavedHeadlinesFiltersStatus.success,
+        filters: filters,
+      ),
+    );
+    _logger.info('Updated with ${filters.length} filters from AppBloc stream.');
+  }
+
   /// Handles reordering the filters and dispatches an update to the AppBloc.
   void _onFiltersReordered(
     SavedHeadlinesFiltersReordered event,
     Emitter<SavedHeadlinesFiltersState> emit,
   ) {
-    _logger.fine('Reordering saved headline filters.');
-    // Optimistically update the UI.
-    emit(state.copyWith(filters: event.reorderedFilters));
-    // Dispatch the event to the AppBloc to persist the change.
-    // The `app_bloc` alias is used here to explicitly dispatch the event
-    // defined in `app_event.dart`, not the local one.
+    _logger.fine('Dispatching reorder event to AppBloc.');
     _appBloc.add(
       app_bloc.SavedHeadlineFiltersReordered(
         reorderedFilters: event.reorderedFilters,

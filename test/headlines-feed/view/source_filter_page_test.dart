@@ -56,7 +56,7 @@ void main() {
 
     Widget buildWidget() {
       return MaterialApp(
-        localizationsDelegates: [
+        localizationsDelegates: const [
           AppLocalizations.delegate,
           ui_kit.UiKitLocalizations.delegate,
         ],
@@ -167,7 +167,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          localizationsDelegates: [
+          localizationsDelegates: const [
             AppLocalizations.delegate,
             ui_kit.UiKitLocalizations.delegate,
           ],

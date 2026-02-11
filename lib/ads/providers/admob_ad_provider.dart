@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:core/core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/banner_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/interstitial_ad.dart';
@@ -12,6 +13,48 @@ import 'package:google_mobile_ads/google_mobile_ads.dart' as admob;
 import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
 
+/// A wrapper around [admob.MobileAds] and ad constructors to facilitate testing.
+@visibleForTesting
+class AdMobWrapper {
+  /// Wraps [admob.MobileAds.instance.initialize].
+  Future<admob.InitializationStatus> initialize() =>
+      admob.MobileAds.instance.initialize();
+
+  /// Wraps [admob.NativeAd] constructor.
+  admob.NativeAd createNativeAd({
+    required String adUnitId,
+    required admob.NativeAdListener listener,
+    required admob.AdRequest request,
+    required admob.NativeTemplateStyle nativeTemplateStyle,
+  }) {
+    return admob.NativeAd(
+      adUnitId: adUnitId,
+      listener: listener,
+      request: request,
+      nativeTemplateStyle: nativeTemplateStyle,
+    );
+  }
+
+  /// Wraps [admob.BannerAd] constructor.
+  admob.BannerAd createBannerAd({
+    required String adUnitId,
+    required admob.AdSize size,
+    required admob.BannerAdListener listener,
+    required admob.AdRequest request,
+  }) {
+    return admob.BannerAd(
+      adUnitId: adUnitId,
+      size: size,
+      listener: listener,
+      request: request,
+    );
+  }
+
+  // Note: Interstitial and Rewarded ads use static load methods which are
+  // harder to wrap cleanly without changing the method signature significantly.
+  // For this iteration, we focus on making Native and Banner strictly testable.
+}
+
 /// {@template admob_ad_provider}
 /// A concrete implementation of [AdProvider] for Google AdMob.
 ///
@@ -22,11 +65,16 @@ import 'package:uuid/uuid.dart';
 /// {@endtemplate}
 class AdMobAdProvider implements AdProvider {
   /// {@macro admob_ad_provider}
-  AdMobAdProvider({required AnalyticsService analyticsService, Logger? logger})
-    : _analyticsService = analyticsService,
-      _logger = logger ?? Logger('AdMobAdProvider');
+  AdMobAdProvider({
+    required AnalyticsService analyticsService,
+    Logger? logger,
+    @visibleForTesting AdMobWrapper? adMobWrapper,
+  }) : _analyticsService = analyticsService,
+       _logger = logger ?? Logger('AdMobAdProvider'),
+       _adMobWrapper = adMobWrapper ?? AdMobWrapper();
 
   final AnalyticsService _analyticsService;
+  final AdMobWrapper _adMobWrapper;
   final Logger _logger;
   final Uuid _uuid = const Uuid();
 
@@ -36,7 +84,7 @@ class AdMobAdProvider implements AdProvider {
   Future<void> initialize() async {
     _logger.info('AdMobAdProvider: Initializing Google Mobile Ads SDK...');
     try {
-      await admob.MobileAds.instance.initialize();
+      await _adMobWrapper.initialize();
       _logger.info(
         'AdMobAdProvider: Google Mobile Ads SDK initialized successfully.',
       );
@@ -75,10 +123,10 @@ class AdMobAdProvider implements AdProvider {
 
     final completer = Completer<admob.NativeAd?>();
 
-    final ad = admob.NativeAd(
+    final ad = _adMobWrapper.createNativeAd(
       adUnitId: adId,
       request: const admob.AdRequest(),
-      nativeTemplateStyle: _createNativeTemplateStyle(
+      nativeTemplateStyle: createNativeTemplateStyle(
         templateType: switch (templateType) {
           NativeAdTemplateType.small => admob.TemplateType.small,
           NativeAdTemplateType.medium => admob.TemplateType.medium,
@@ -190,7 +238,7 @@ class AdMobAdProvider implements AdProvider {
 
     final completer = Completer<admob.BannerAd?>();
 
-    final ad = admob.BannerAd(
+    final ad = _adMobWrapper.createBannerAd(
       adUnitId: adId,
       size: adSize,
       request: const admob.AdRequest(),
@@ -398,7 +446,8 @@ class AdMobAdProvider implements AdProvider {
   /// This method maps the application's theme properties (colors, text styles)
   /// to the AdMob native ad styling options, ensuring a consistent look and feel.
   /// This is specifically for native ads.
-  admob.NativeTemplateStyle _createNativeTemplateStyle({
+  @visibleForTesting
+  admob.NativeTemplateStyle createNativeTemplateStyle({
     required admob.TemplateType templateType,
     required AdThemeStyle adThemeStyle,
   }) {

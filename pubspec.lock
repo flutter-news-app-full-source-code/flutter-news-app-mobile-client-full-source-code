@@ -675,11 +675,11 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "v1.1.0"
-      resolved-ref: "8ac453baae89e6926922783488d56ebbbabf77c3"
+      ref: "v1.2.0"
+      resolved-ref: "50ae2a12efacb2b13cdea4a433e5e518a1185e66"
       url: "https://github.com/flutter-news-app-full-source-code/kv-storage-service.git"
     source: git
-    version: "1.1.0"
+    version: "1.2.0"
   kv_storage_shared_preferences:
     dependency: "direct main"
     description:

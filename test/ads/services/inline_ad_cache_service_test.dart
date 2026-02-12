@@ -1,3 +1,5 @@
+// ignore_for_file: inference_failure_on_function_invocation
+
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/inline_ad.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/inline_ad_cache_service.dart';
@@ -68,18 +70,18 @@ void main() {
 
     test('setAd with a new ad disposes the old one', () {
       // Arrange: set an initial ad
-      inlineAdCacheService.setAd(
-        contextKey: contextKey1,
-        placeholderId: placeholderId1,
-        ad: mockAd1,
-      );
-
-      // Act: set a new ad for the same key
-      inlineAdCacheService.setAd(
-        contextKey: contextKey1,
-        placeholderId: placeholderId1,
-        ad: mockAd2,
-      );
+      inlineAdCacheService
+        ..setAd(
+          contextKey: contextKey1,
+          placeholderId: placeholderId1,
+          ad: mockAd1,
+        )
+        // Act: set a new ad for the same key
+        ..setAd(
+          contextKey: contextKey1,
+          placeholderId: placeholderId1,
+          ad: mockAd2,
+        );
 
       // Assert: verify the old ad was disposed
       verify(() => mockAdService.disposeAd(mockAd1)).called(1);
@@ -92,17 +94,17 @@ void main() {
     });
 
     test('setAd with null removes the entry and disposes the ad', () {
-      inlineAdCacheService.setAd(
-        contextKey: contextKey1,
-        placeholderId: placeholderId1,
-        ad: mockAd1,
-      );
-
-      inlineAdCacheService.setAd(
-        contextKey: contextKey1,
-        placeholderId: placeholderId1,
-        ad: null,
-      );
+      inlineAdCacheService
+        ..setAd(
+          contextKey: contextKey1,
+          placeholderId: placeholderId1,
+          ad: mockAd1,
+        )
+        ..setAd(
+          contextKey: contextKey1,
+          placeholderId: placeholderId1,
+          ad: null,
+        );
 
       verify(() => mockAdService.disposeAd(mockAd1)).called(1);
       final retrievedAd = inlineAdCacheService.getAd(
@@ -113,16 +115,16 @@ void main() {
     });
 
     test('removeAndDisposeAd removes the ad and calls disposeAd', () {
-      inlineAdCacheService.setAd(
-        contextKey: contextKey1,
-        placeholderId: placeholderId1,
-        ad: mockAd1,
-      );
-
-      inlineAdCacheService.removeAndDisposeAd(
-        contextKey: contextKey1,
-        placeholderId: placeholderId1,
-      );
+      inlineAdCacheService
+        ..setAd(
+          contextKey: contextKey1,
+          placeholderId: placeholderId1,
+          ad: mockAd1,
+        )
+        ..removeAndDisposeAd(
+          contextKey: contextKey1,
+          placeholderId: placeholderId1,
+        );
 
       verify(() => mockAdService.disposeAd(mockAd1)).called(1);
       final retrievedAd = inlineAdCacheService.getAd(
@@ -134,19 +136,19 @@ void main() {
 
     test('clearAdsForContext clears only the specified context', () {
       // Arrange: set ads in two different contexts
-      inlineAdCacheService.setAd(
-        contextKey: contextKey1,
-        placeholderId: placeholderId1,
-        ad: mockAd1,
-      );
-      inlineAdCacheService.setAd(
-        contextKey: contextKey2,
-        placeholderId: placeholderId2,
-        ad: mockAd2,
-      );
-
-      // Act: clear only the first context
-      inlineAdCacheService.clearAdsForContext(contextKey: contextKey1);
+      inlineAdCacheService
+        ..setAd(
+          contextKey: contextKey1,
+          placeholderId: placeholderId1,
+          ad: mockAd1,
+        )
+        ..setAd(
+          contextKey: contextKey2,
+          placeholderId: placeholderId2,
+          ad: mockAd2,
+        )
+        // Act: clear only the first context
+        ..clearAdsForContext(contextKey: contextKey1);
 
       // Assert
       verify(() => mockAdService.disposeAd(mockAd1)).called(1);
@@ -170,24 +172,24 @@ void main() {
 
     test('clearAllAds clears all contexts and disposes all ads', () {
       // Arrange: set ads in multiple contexts
-      inlineAdCacheService.setAd(
-        contextKey: contextKey1,
-        placeholderId: placeholderId1,
-        ad: mockAd1,
-      );
-      inlineAdCacheService.setAd(
-        contextKey: contextKey1,
-        placeholderId: placeholderId2,
-        ad: mockAd2,
-      );
-      inlineAdCacheService.setAd(
-        contextKey: contextKey2,
-        placeholderId: placeholderId1,
-        ad: mockAd3,
-      );
-
-      // Act
-      inlineAdCacheService.clearAllAds();
+      inlineAdCacheService
+        ..setAd(
+          contextKey: contextKey1,
+          placeholderId: placeholderId1,
+          ad: mockAd1,
+        )
+        ..setAd(
+          contextKey: contextKey1,
+          placeholderId: placeholderId2,
+          ad: mockAd2,
+        )
+        ..setAd(
+          contextKey: contextKey2,
+          placeholderId: placeholderId1,
+          ad: mockAd3,
+        )
+        // Act
+        ..clearAllAds();
 
       // Assert
       verify(() => mockAdService.disposeAd(mockAd1)).called(1);

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
@@ -18,21 +16,21 @@ class MockLogger extends Mock implements Logger {}
 // Fakes for AdMob classes
 class FakeAdRequest extends Fake implements admob.AdRequest {}
 
-final dummyAdThemeStyle = AdThemeStyle(
+const dummyAdThemeStyle = AdThemeStyle(
   mainBackgroundColor: Colors.white,
-  cornerRadius: 8.0,
+  cornerRadius: 8,
   callToActionTextColor: Colors.white,
   callToActionBackgroundColor: Colors.blue,
-  callToActionTextSize: 16.0,
+  callToActionTextSize: 16,
   primaryTextColor: Colors.black,
   primaryBackgroundColor: Colors.transparent,
-  primaryTextSize: 18.0,
+  primaryTextSize: 18,
   secondaryTextColor: Colors.grey,
   secondaryBackgroundColor: Colors.transparent,
-  secondaryTextSize: 14.0,
+  secondaryTextSize: 14,
   tertiaryTextColor: Colors.grey,
   tertiaryBackgroundColor: Colors.transparent,
-  tertiaryTextSize: 12.0,
+  tertiaryTextSize: 12,
 );
 
 class FakeAdPlatformIdentifiers extends Fake implements AdPlatformIdentifiers {}

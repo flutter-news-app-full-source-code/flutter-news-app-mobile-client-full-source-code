@@ -1,3 +1,5 @@
+// ignore_for_file: inference_failure_on_function_invocation
+
 import 'dart:async';
 
 import 'package:bloc_test/bloc_test.dart';
@@ -372,6 +374,7 @@ void main() {
         onUserEarnedReward(mockAdmobAd, admob.RewardItem(1, 'adFree'));
 
         // Allow the unawaited logEvent call to complete
+        // ignore: inference_failure_on_instance_creation
         await Future.delayed(Duration.zero);
 
         // Verify analytics

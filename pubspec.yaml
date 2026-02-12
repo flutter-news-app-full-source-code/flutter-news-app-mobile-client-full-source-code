@@ -150,7 +150,7 @@ dependency_overrides:
   core:
     git:
       url: https://github.com/flutter-news-app-full-source-code/core.git
-      ref: 5f151e092b06e68471dea9dc34d423f80e1b33f8
+      ref: a77e12e6374a8951270a711d252170ad83e251cc
   http_client:
     git:
       url: https://github.com/flutter-news-app-full-source-code/http-client.git

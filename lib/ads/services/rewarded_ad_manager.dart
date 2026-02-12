@@ -97,27 +97,7 @@ class RewardedAdManager {
 
     _logger.info('Attempting to pre-load a rewarded ad...');
     try {
-      final brightness = appState.themeMode == ThemeMode.system
-          ? SchedulerBinding.instance.window.platformBrightness
-          : (appState.themeMode == ThemeMode.dark
-                ? Brightness.dark
-                : Brightness.light);
-
-      final themeData = brightness == Brightness.light
-          ? lightTheme(
-              scheme: appState.flexScheme,
-              appTextScaleFactor: appState.appTextScaleFactor,
-              appFontWeight: appState.appFontWeight,
-              fontFamily: appState.fontFamily,
-            )
-          : darkTheme(
-              scheme: appState.flexScheme,
-              appTextScaleFactor: appState.appTextScaleFactor,
-              appFontWeight: appState.appFontWeight,
-              fontFamily: appState.fontFamily,
-            );
-
-      final adThemeStyle = AdThemeStyle.fromTheme(themeData);
+      final adThemeStyle = getAdThemeStyle(appState);
 
       final ad = await _adService.getRewardedAd(
         adConfig: remoteConfig.features.ads,
@@ -134,6 +114,35 @@ class RewardedAdManager {
     } catch (e, s) {
       _logger.severe('Error pre-loading rewarded ad: $e', e, s);
     }
+  }
+
+  /// Generates the [AdThemeStyle] based on the current [AppState].
+  ///
+  /// This method is exposed for testing to allow overriding the theme generation
+  /// logic, which depends on [SchedulerBinding] and [ThemeData].
+  @visibleForTesting
+  AdThemeStyle getAdThemeStyle(AppState appState) {
+    final brightness = appState.themeMode == ThemeMode.system
+        ? SchedulerBinding.instance.window.platformBrightness
+        : (appState.themeMode == ThemeMode.dark
+              ? Brightness.dark
+              : Brightness.light);
+
+    final themeData = brightness == Brightness.light
+        ? lightTheme(
+            scheme: appState.flexScheme,
+            appTextScaleFactor: appState.appTextScaleFactor,
+            appFontWeight: appState.appFontWeight,
+            fontFamily: appState.fontFamily,
+          )
+        : darkTheme(
+            scheme: appState.flexScheme,
+            appTextScaleFactor: appState.appTextScaleFactor,
+            appFontWeight: appState.appFontWeight,
+            fontFamily: appState.fontFamily,
+          );
+
+    return AdThemeStyle.fromTheme(themeData);
   }
 
   void _disposePreloadedAd() {

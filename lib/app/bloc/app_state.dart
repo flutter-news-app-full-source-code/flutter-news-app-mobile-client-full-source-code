@@ -3,6 +3,7 @@ part of 'app_bloc.dart';
 /// {@template app_state}
 /// Represents the overall state of the application.
 ///
+/// This state is hydrated with pre-fetched data from the [AppInitializer].
 /// This state includes authentication status, user settings, remote
 /// configuration, and UI-related preferences. It acts as the single source
 /// of truth for global application state.
@@ -26,6 +27,30 @@ class AppState extends Equatable {
     this.limitationStatus = LimitationStatus.allowed,
     this.limitedAction,
   });
+
+  /// A factory constructor to determine the initial [AppLifeCycleStatus] based
+  /// on the user and a potential onboarding requirement.
+  factory AppState.fromOnboardingStatus({
+    required User? user,
+    required OnboardingStatus? onboardingStatus,
+  }) {
+    AppLifeCycleStatus status;
+    if (onboardingStatus != null) {
+      status = switch (onboardingStatus) {
+        OnboardingStatus.preAuthTour =>
+          AppLifeCycleStatus.preAuthOnboardingRequired,
+        OnboardingStatus.postAuthPersonalization =>
+          AppLifeCycleStatus.postAuthOnboardingRequired,
+      };
+    } else if (user == null) {
+      status = AppLifeCycleStatus.unauthenticated;
+    } else if (user.isAnonymous) {
+      status = AppLifeCycleStatus.anonymous;
+    } else {
+      status = AppLifeCycleStatus.authenticated;
+    }
+    return AppState(status: status);
+  }
 
   /// The current status of the application, indicating its lifecycle stage.
   final AppLifeCycleStatus status;

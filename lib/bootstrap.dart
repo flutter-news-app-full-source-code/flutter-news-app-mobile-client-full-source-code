@@ -456,6 +456,7 @@ Future<Widget> bootstrap(
     userContextRepository: userContextRepository,
     userRewardsRepository: userRewardsRepository,
     remoteConfigRepository: remoteConfigRepository,
+    storageService: kvStorage,
     packageInfoService: packageInfoService,
     logger: logger,
   );

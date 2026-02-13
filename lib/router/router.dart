@@ -24,6 +24,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_l
 import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_shell.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/account_linking_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/onboarding/initial_personalization/view/initial_personalization_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/authentication_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/email_code_verification_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/request_code_page.dart';
@@ -43,6 +44,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/v
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/saved_headlines_filters_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_filter_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/onboarding/app_tour/view/app_tour_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_list_filter_page.dart'
     as feed_filter;
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_type_filter_page.dart';
@@ -102,6 +104,21 @@ GoRouter createRouter({
       const accountLinkingPath = Routes.accountLinking;
       const feedPath = Routes.feed;
       const rewardsPath = '/${Routes.account}/${Routes.rewards}';
+      const appTourPath = Routes.appTour;
+      const initialPersonalizationPath = Routes.initialPersonalization;
+
+      // RULE 0: Onboarding flows are inescapable.
+      if (appStatus == AppLifeCycleStatus.preAuthOnboardingRequired) {
+        logger.info('  Redirect Rule 0: Pre-auth tour required.');
+        return currentLocation != appTourPath ? appTourPath : null;
+      }
+
+      if (appStatus == AppLifeCycleStatus.postAuthOnboardingRequired) {
+        logger.info('  Redirect Rule 0: Post-auth personalization required.');
+        return currentLocation != initialPersonalizationPath
+            ? initialPersonalizationPath
+            : null;
+      }
 
       // Check if the user is trying to go to any part of the auth flow.
       final isGoingToAuth = currentLocation.startsWith(authenticationPath);
@@ -188,6 +205,17 @@ GoRouter createRouter({
     routes: [
       // A placeholder route for the root path. The redirect logic will always
       // move the user away from here to the correct location.
+      GoRoute(
+        path: Routes.appTour,
+        name: Routes.appTourName,
+        builder: (context, state) => const AppTourPage(),
+      ),
+      GoRoute(
+        path: Routes.initialPersonalization,
+        name: Routes.initialPersonalizationName,
+        builder: (context, state) => const InitialPersonalizationPage(),
+      ),
+
       GoRoute(path: '/', builder: (context, state) => const SizedBox.shrink()),
 
       // --- Authentication and Account Linking Flows ---

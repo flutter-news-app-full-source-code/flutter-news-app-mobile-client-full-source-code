@@ -2,6 +2,9 @@ import 'package:core/core.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 
+/// Defines the specific onboarding flow that is required.
+enum OnboardingStatus { preAuthTour, postAuthPersonalization }
+
 /// A sealed class representing the outcome of the application's
 /// initialization process.
 sealed class InitializationResult extends Equatable {
@@ -97,4 +100,27 @@ final class InitializationFailure extends InitializationResult {
     currentAppVersion,
     latestAppVersion,
   ];
+}
+
+/// Represents a state where an onboarding flow is required before the main
+/// app can be shown.
+final class InitializationOnboardingRequired extends InitializationResult {
+  /// Creates an instance of a required onboarding result.
+  const InitializationOnboardingRequired({
+    required this.status,
+    required this.remoteConfig,
+    this.user,
+  });
+
+  /// The specific onboarding flow that is required.
+  final OnboardingStatus status;
+
+  /// The globally fetched remote configuration.
+  final RemoteConfig remoteConfig;
+
+  /// The user, if one exists (for post-auth onboarding).
+  final User? user;
+
+  @override
+  List<Object?> get props => [status, remoteConfig, user];
 }

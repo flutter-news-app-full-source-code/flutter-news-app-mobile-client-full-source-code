@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:core/core.dart';
+import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -13,17 +17,28 @@ class MultiSelectSearchPage<T> extends StatefulWidget {
   /// {@macro multi_select_search_page}
   const MultiSelectSearchPage({
     required this.title,
-    required this.allItems,
     required this.initialSelectedItems,
     required this.itemBuilder,
+    this.allItems,
+    this.repository,
     super.key,
-  });
+  }) : assert(
+         (allItems != null && repository == null) ||
+             (allItems == null && repository != null),
+         'Provide either allItems (for client-side search) or a repository '
+         '(for server-side search), but not both.',
+       );
 
   /// The title displayed in the `AppBar`.
   final String title;
 
   /// The complete list of items of type [T] to be displayed and filtered.
-  final List<T> allItems;
+  /// Used for legacy, client-side filtering.
+  final List<T>? allItems;
+
+  /// The data repository to fetch items from.
+  /// Used for new, paginated, server-side filtering.
+  final DataRepository<T>? repository;
 
   /// The initial set of selected items.
   final Set<T> initialSelectedItems;
@@ -38,21 +53,102 @@ class MultiSelectSearchPage<T> extends StatefulWidget {
 
 class _MultiSelectSearchPageState<T> extends State<MultiSelectSearchPage<T>> {
   late final Set<T> _selectedItems;
+  late final bool _isPaginated;
+
   final _searchController = TextEditingController();
+  final _scrollController = ScrollController();
+  Timer? _debounce;
+
+  // State for paginated mode
+  final List<T> _paginatedItems = [];
+  bool _isLoading = false;
+  bool _hasMore = true;
+  String? _cursor;
   String _searchQuery = '';
+  HttpException? _error;
 
   @override
   void initState() {
     super.initState();
     _selectedItems = Set<T>.from(widget.initialSelectedItems);
+    _isPaginated = widget.repository != null;
+
     _searchController.addListener(() {
-      setState(() => _searchQuery = _searchController.text);
+      if (_debounce?.isActive ?? false) _debounce!.cancel();
+      _debounce = Timer(const Duration(milliseconds: 300), () {
+        if (_searchQuery != _searchController.text) {
+          setState(() => _searchQuery = _searchController.text);
+          if (_isPaginated) {
+            _resetAndFetch();
+          }
+        }
+      });
     });
+
+    if (_isPaginated) {
+      _scrollController.addListener(_onScroll);
+      _resetAndFetch();
+    }
+  }
+
+  void _resetAndFetch() {
+    _paginatedItems.clear();
+    _cursor = null;
+    _hasMore = true;
+    _error = null;
+    _fetchPage();
+  }
+
+  Future<void> _fetchPage() async {
+    if (_isLoading || !_hasMore) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      final filter = _searchQuery.isNotEmpty
+          ? <String, dynamic>{'q': _searchQuery}
+          : null;
+
+      final response = await widget.repository!.readAll(
+        filter: filter,
+        pagination: PaginationOptions(cursor: _cursor, limit: 20),
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        _paginatedItems.addAll(response.items);
+        _hasMore = response.hasMore;
+        _cursor = response.cursor;
+        _isLoading = false;
+      });
+    } on HttpException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = e;
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _onScroll() {
+    if (_isBottom) _fetchPage();
+  }
+
+  bool get _isBottom {
+    if (!_scrollController.hasClients) return false;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.offset;
+    return currentScroll >= (maxScroll * 0.9);
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
@@ -61,10 +157,15 @@ class _MultiSelectSearchPageState<T> extends State<MultiSelectSearchPage<T>> {
     final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
 
-    final filteredItems = widget.allItems.where((item) {
-      final itemName = widget.itemBuilder(item).toLowerCase();
-      return itemName.contains(_searchQuery.toLowerCase());
-    }).toList();
+    final List<T> displayItems;
+    if (_isPaginated) {
+      displayItems = _paginatedItems;
+    } else {
+      displayItems = widget.allItems!.where((item) {
+        final itemName = widget.itemBuilder(item).toLowerCase();
+        return itemName.contains(_searchQuery.toLowerCase());
+      }).toList();
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -94,31 +195,52 @@ class _MultiSelectSearchPageState<T> extends State<MultiSelectSearchPage<T>> {
               ),
             ),
           ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: filteredItems.length,
-              itemBuilder: (context, index) {
-                final item = filteredItems[index];
-                final isSelected = _selectedItems.contains(item);
-                return CheckboxListTile(
-                  title: Text(widget.itemBuilder(item)),
-                  value: isSelected,
-                  onChanged: (bool? value) {
-                    if (value != null) {
-                      setState(() {
-                        if (value) {
-                          _selectedItems.add(item);
-                        } else {
-                          _selectedItems.remove(item);
-                        }
-                      });
-                    }
-                  },
-                  controlAffinity: ListTileControlAffinity.leading,
-                );
-              },
+          if (_isPaginated && _error != null)
+            Expanded(
+              child: FailureStateWidget(
+                exception: _error!,
+                onRetry: _resetAndFetch,
+              ),
+            )
+          else
+            Expanded(
+              child: ListView.builder(
+                controller: _isPaginated ? _scrollController : null,
+                itemCount:
+                    displayItems.length + (_isPaginated && _isLoading ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (_isPaginated &&
+                      _isLoading &&
+                      index == displayItems.length) {
+                    return const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(AppSpacing.md),
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  }
+
+                  final item = displayItems[index];
+                  final isSelected = _selectedItems.contains(item);
+                  return CheckboxListTile(
+                    title: Text(widget.itemBuilder(item)),
+                    value: isSelected,
+                    onChanged: (bool? value) {
+                      if (value != null) {
+                        setState(() {
+                          if (value) {
+                            _selectedItems.add(item);
+                          } else {
+                            _selectedItems.remove(item);
+                          }
+                        });
+                      }
+                    },
+                    controlAffinity: ListTileControlAffinity.leading,
+                  );
+                },
+              ),
             ),
-          ),
         ],
       ),
     );

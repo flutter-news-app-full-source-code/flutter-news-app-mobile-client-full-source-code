@@ -2167,5 +2167,77 @@
     "rewardsOfferActiveButton": "نشط",
     "@rewardsOfferActiveButton": {
         "description": "Button text for a reward that is currently active."
+    },
+    "appTourStep1Title": "أخبارك، مصممة خصيصًا لك",
+    "@appTourStep1Title": {
+        "description": "Title for the first step of the app tour."
+    },
+    "appTourStep1Body": "احصل على موجز إخباري مصمم لك. تابع المواضيع والمصادر والدول التي تهمك أكثر وسنتولى الباقي.",
+    "@appTourStep1Body": {
+        "description": "Body text for the first step of the app tour."
+    },
+    "appTourStep2Title": "نظم واحصل على إشعارات",
+    "@appTourStep2Title": {
+        "description": "Title for the second step of the app tour."
+    },
+    "appTourStep2Body": "أنشئ واحفظ موجزات إخبارية مخصصة لأي مجال. اشترك للحصول على تنبيهات الأخبار العاجلة أو الملخصات اليومية للقصص التي لا يمكنك تفويتها.",
+    "@appTourStep2Body": {
+        "description": "Body text for the second step of the app tour."
+    },
+    "appTourStep3Title": "شارك بوجهة نظرك",
+    "@appTourStep3Title": {
+        "description": "Title for the third step of the app tour."
+    },
+    "appTourStep3Body": "تفاعل وعلق على المقالات للتواصل مع مجتمع عالمي. صوتك يساعد في تشكيل المحادثة.",
+    "@appTourStep3Body": {
+        "description": "Body text for the third step of the app tour."
+    },
+    "appTourSkipButton": "تخطى",
+    "@appTourSkipButton": {
+        "description": "Button text to skip the app tour."
+    },
+    "appTourNextButton": "التالي",
+    "@appTourNextButton": {
+        "description": "Button text to go to the next step of the app tour."
+    },
+    "appTourGetStartedButton": "ابدأ الآن",
+    "@appTourGetStartedButton": {
+        "description": "Button text to finish the app tour."
+    },
+    "initialPersonalizationTitle": "خصص موجزك الإخباري",
+    "@initialPersonalizationTitle": {
+        "description": "Title for the initial personalization page."
+    },
+    "initialPersonalizationSubtitle": "تابع بعض المواضيع أو المصادر أو الدول للبدء. يمكنك دائمًا تغييرها لاحقًا.",
+    "@initialPersonalizationSubtitle": {
+        "description": "Subtitle for the initial personalization page."
+    },
+    "initialPersonalizationStepTopicsTitle": "اختر المواضيع",
+    "@initialPersonalizationStepTopicsTitle": {
+        "description": "Title for the topic selection step in initial personalization."
+    },
+    "initialPersonalizationStepSourcesTitle": "اختر المصادر",
+    "@initialPersonalizationStepSourcesTitle": {
+        "description": "Title for the source selection step in initial personalization."
+    },
+    "initialPersonalizationStepCountriesTitle": "اختر الدول",
+    "@initialPersonalizationStepCountriesTitle": {
+        "description": "Title for the country selection step in initial personalization."
+    },
+    "initialPersonalizationSelectionCountLabel": "تم تحديد {count} من {total}",
+    "@initialPersonalizationSelectionCountLabel": {
+        "description": "Label showing the number of selected items out of the required total.",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            },
+            "total": {
+                "type": "int"
+            }
+        }
+    },
+    "initialPersonalizationFinishButton": "إنهاء",
+    "@initialPersonalizationFinishButton": {
+        "description": "Button text to complete the initial personalization."
     }
 }

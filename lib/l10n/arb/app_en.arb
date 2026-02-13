@@ -2167,5 +2167,77 @@
     "rewardsOfferActiveButton": "Active",
     "@rewardsOfferActiveButton": {
         "description": "Button text for a reward that is currently active."
+    },
+    "appTourStep1Title": "Your News, Perfectly Tailored",
+    "@appTourStep1Title": {
+        "description": "Title for the first step of the app tour."
+    },
+    "appTourStep1Body": "Get a feed that's built for you. Follow the topics, sources, and countries that matter most to you and we'll handle the rest.",
+    "@appTourStep1Body": {
+        "description": "Body text for the first step of the app tour."
+    },
+    "appTourStep2Title": "Curate and Get Notified",
+    "@appTourStep2Title": {
+        "description": "Title for the second step of the app tour."
+    },
+    "appTourStep2Body": "Create and save custom news feeds for any niche. Subscribe to get breaking news alerts or daily digests for the stories you can't afford to miss.",
+    "@appTourStep2Body": {
+        "description": "Body text for the second step of the app tour."
+    },
+    "appTourStep3Title": "Share Your Perspective",
+    "@appTourStep3Title": {
+        "description": "Title for the third step of the app tour."
+    },
+    "appTourStep3Body": "React and comment on articles to engage with a global community. Your voice helps shape the conversation.",
+    "@appTourStep3Body": {
+        "description": "Body text for the third step of the app tour."
+    },
+    "appTourSkipButton": "Skip",
+    "@appTourSkipButton": {
+        "description": "Button text to skip the app tour."
+    },
+    "appTourNextButton": "Next",
+    "@appTourNextButton": {
+        "description": "Button text to go to the next step of the app tour."
+    },
+    "appTourGetStartedButton": "Get Started",
+    "@appTourGetStartedButton": {
+        "description": "Button text to finish the app tour."
+    },
+    "initialPersonalizationTitle": "Customize Your Feed",
+    "@initialPersonalizationTitle": {
+        "description": "Title for the initial personalization page."
+    },
+    "initialPersonalizationSubtitle": "Follow some topics, sources, or countries to get started. You can always change these later.",
+    "@initialPersonalizationSubtitle": {
+        "description": "Subtitle for the initial personalization page."
+    },
+    "initialPersonalizationStepTopicsTitle": "Select Topics",
+    "@initialPersonalizationStepTopicsTitle": {
+        "description": "Title for the topic selection step in initial personalization."
+    },
+    "initialPersonalizationStepSourcesTitle": "Select Sources",
+    "@initialPersonalizationStepSourcesTitle": {
+        "description": "Title for the source selection step in initial personalization."
+    },
+    "initialPersonalizationStepCountriesTitle": "Select Countries",
+    "@initialPersonalizationStepCountriesTitle": {
+        "description": "Title for the country selection step in initial personalization."
+    },
+    "initialPersonalizationSelectionCountLabel": "{count} of {total} selected",
+    "@initialPersonalizationSelectionCountLabel": {
+        "description": "Label showing the number of selected items out of the required total.",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            },
+            "total": {
+                "type": "int"
+            }
+        }
+    },
+    "initialPersonalizationFinishButton": "Finish",
+    "@initialPersonalizationFinishButton": {
+        "description": "Button text to complete the initial personalization."
     }
 }

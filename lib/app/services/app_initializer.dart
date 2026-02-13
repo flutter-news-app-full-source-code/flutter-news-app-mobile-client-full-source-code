@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:auth_repository/auth_repository.dart';
+import 'package:kv_storage_service/kv_storage_service.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
@@ -41,6 +42,7 @@ class AppInitializer {
     required DataRepository<UserContext> userContextRepository,
     required DataRepository<UserRewards> userRewardsRepository,
     required DataRepository<RemoteConfig> remoteConfigRepository,
+    required KVStorageService storageService,
     required PackageInfoService packageInfoService,
     required Logger logger,
   }) : _authenticationRepository = authenticationRepository,
@@ -49,6 +51,7 @@ class AppInitializer {
        _userContextRepository = userContextRepository,
        _userRewardsRepository = userRewardsRepository,
        _remoteConfigRepository = remoteConfigRepository,
+       _storageService = storageService,
        _packageInfoService = packageInfoService,
        _logger = logger;
 
@@ -59,6 +62,7 @@ class AppInitializer {
   final DataRepository<UserContext> _userContextRepository;
   final DataRepository<UserRewards> _userRewardsRepository;
   final DataRepository<RemoteConfig> _remoteConfigRepository;
+  final KVStorageService _storageService;
   final PackageInfoService _packageInfoService;
   final Logger _logger;
 
@@ -156,7 +160,22 @@ class AppInitializer {
     // --- Path A: Unauthenticated User ---
     // If there's no user, the initialization is complete. Return success
     // with an unauthenticated status.
+
     if (user == null) {
+      // Check for Pre-Auth Tour
+      final tourConfig = remoteConfig.features.onboarding.appTour;
+      if (tourConfig.isEnabled) {
+        final hasSeenTour = await _storageService.readBool(
+          key: StorageKey.hasSeenAppTour.stringValue,
+        );
+        if (!hasSeenTour) {
+          _logger.info('[AppInitializer] Pre-authentication tour required.');
+          return InitializationOnboardingRequired(
+            status: OnboardingStatus.preAuthTour,
+            remoteConfig: remoteConfig,
+          );
+        }
+      }
       _logger.fine(
         '[AppInitializer] No initial user found. '
         'Initialization complete (unauthenticated).',
@@ -184,6 +203,22 @@ class AppInitializer {
         _userContextRepository.read(id: user.id, userId: user.id),
         _fetchUserRewards(user),
       ]);
+
+      // Check for Post-Auth Personalization
+      final personalizationConfig =
+          remoteConfig.features.onboarding.initialPersonalization;
+      if (personalizationConfig.isEnabled &&
+          userContext != null &&
+          !userContext.hasCompletedInitialPersonalization) {
+        _logger.info(
+          '[AppInitializer] Post-authentication personalization required.',
+        );
+        return InitializationOnboardingRequired(
+          status: OnboardingStatus.postAuthPersonalization,
+          remoteConfig: remoteConfig,
+          user: user,
+        );
+      }
 
       _logger
         ..fine(

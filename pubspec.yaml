@@ -103,6 +103,7 @@ dependencies:
   pinput: ^5.0.1
   pub_semver: ^2.2.0
   share_plus: ^11.1.0
+  smooth_page_indicator: ^2.0.1
   stream_transform: ^2.1.1
   timeago: ^3.7.1
   ui_kit:

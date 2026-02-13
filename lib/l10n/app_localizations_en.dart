@@ -1687,4 +1687,58 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rewardsOfferActiveButton => 'Active';
+
+  @override
+  String get appTourStep1Title => 'Your News, Perfectly Tailored';
+
+  @override
+  String get appTourStep1Body =>
+      'Get a feed that\'s built for you. Follow the topics, sources, and countries that matter most to you and we\'ll handle the rest.';
+
+  @override
+  String get appTourStep2Title => 'Curate and Get Notified';
+
+  @override
+  String get appTourStep2Body =>
+      'Create and save custom news feeds for any niche. Subscribe to get breaking news alerts or daily digests for the stories you can\'t afford to miss.';
+
+  @override
+  String get appTourStep3Title => 'Share Your Perspective';
+
+  @override
+  String get appTourStep3Body =>
+      'React and comment on articles to engage with a global community. Your voice helps shape the conversation.';
+
+  @override
+  String get appTourSkipButton => 'Skip';
+
+  @override
+  String get appTourNextButton => 'Next';
+
+  @override
+  String get appTourGetStartedButton => 'Get Started';
+
+  @override
+  String get initialPersonalizationTitle => 'Customize Your Feed';
+
+  @override
+  String get initialPersonalizationSubtitle =>
+      'Follow some topics, sources, or countries to get started. You can always change these later.';
+
+  @override
+  String get initialPersonalizationStepTopicsTitle => 'Select Topics';
+
+  @override
+  String get initialPersonalizationStepSourcesTitle => 'Select Sources';
+
+  @override
+  String get initialPersonalizationStepCountriesTitle => 'Select Countries';
+
+  @override
+  String initialPersonalizationSelectionCountLabel(int count, int total) {
+    return '$count of $total selected';
+  }
+
+  @override
+  String get initialPersonalizationFinishButton => 'Finish';
 }

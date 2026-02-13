@@ -12,6 +12,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/analytics/servic
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/models/initialization_result.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_status_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
@@ -46,6 +47,7 @@ class App extends StatelessWidget {
     required this.settings,
     required this.userContentPreferences,
     required this.userRewards,
+    this.onboardingStatus,
     required AuthRepository authenticationRepository,
     required DataRepository<Headline> headlinesRepository,
     required DataRepository<Topic> topicsRepository,
@@ -116,6 +118,9 @@ class App extends StatelessWidget {
 
   /// The user's rewards, pre-fetched during startup.
   final UserRewards? userRewards;
+
+  /// The onboarding status, if an onboarding flow is required.
+  final OnboardingStatus? onboardingStatus;
 
   final AuthRepository _authenticationRepository;
   final DataRepository<Headline> _headlinesRepository;
@@ -189,6 +194,7 @@ class App extends StatelessWidget {
               settings: settings,
               userContentPreferences: userContentPreferences,
               userRewards: userRewards,
+              onboardingStatus: onboardingStatus,
               remoteConfigRepository: _remoteConfigRepository,
               appInitializer: context.read<AppInitializer>(),
               authRepository: context.read<AuthRepository>(),

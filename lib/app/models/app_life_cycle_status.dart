@@ -25,4 +25,10 @@ enum AppLifeCycleStatus {
 
   /// A mandatory update is required for the application.
   updateRequired,
+
+  /// The pre-authentication onboarding tour is required.
+  preAuthOnboardingRequired,
+
+  /// The post-authentication initial personalization is required.
+  postAuthOnboardingRequired,
 }

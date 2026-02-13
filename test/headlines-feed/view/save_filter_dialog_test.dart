@@ -52,17 +52,17 @@ void main() {
       ),
       features: const FeaturesConfig(
         onboarding: OnboardingConfig(
-        isEnabled: true,
-        appTour: AppTourConfig(isEnabled: true, isSkippable: true),
-        initialPersonalization: InitialPersonalizationConfig(
           isEnabled: true,
-          isSkippable: true,
-          isCountrySelectionEnabled: true,
-          isTopicSelectionEnabled: true,
-          isSourceSelectionEnabled: true,
-          minSelectionsRequired: 3,
+          appTour: AppTourConfig(isEnabled: true, isSkippable: true),
+          initialPersonalization: InitialPersonalizationConfig(
+            isEnabled: true,
+            isSkippable: true,
+            isCountrySelectionEnabled: true,
+            isTopicSelectionEnabled: true,
+            isSourceSelectionEnabled: true,
+            minSelectionsRequired: 3,
+          ),
         ),
-      ),
         analytics: AnalyticsConfig(
           enabled: true,
           activeProvider: AnalyticsProviders.firebase,

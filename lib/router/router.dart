@@ -24,7 +24,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_l
 import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_shell.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/account_linking_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/onboarding/initial_personalization/view/initial_personalization_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/authentication_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/email_code_verification_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/authentication/view/request_code_page.dart';
@@ -44,12 +43,13 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/v
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/headlines_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/saved_headlines_filters_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_filter_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/onboarding/app_tour/view/app_tour_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_list_filter_page.dart'
     as feed_filter;
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_type_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/topic_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/onboarding/app_tour/view/app_tour_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/onboarding/initial_personalization/view/initial_personalization_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/rewards/view/rewards_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/go_router_observer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';

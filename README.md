@@ -109,6 +109,18 @@ A complete and secure user authentication system is built-in, covering the entir
 </details>
 
 <details>
+<summary><strong>🚀 Seamless User Onboarding</strong></summary>
+
+### 👋 Guided First-Time Experience
+A sophisticated, multi-stage onboarding process ensures users get immediate value from the app, dramatically boosting engagement and retention from the very first launch.
+- **Pre-Authentication App Tour:** A skippable, multi-step visual guide introduces users to the app's core features and value propositions before they commit to creating an account.
+- **Post-Authentication Personalization:** A guided flow prompts new users (both anonymous and registered) to select their initial topics, sources, and countries of interest, ensuring their first feed is instantly relevant.
+- **Robust & Scalable:** The entire flow is orchestrated by a dedicated initialization service and supports server-side search for personalization, ensuring it remains performant even with massive content libraries.
+> **Your Advantage:** Deploy with a production-ready, best-practice onboarding system that is proven to increase user retention. The complex logic for guiding users, personalizing their first experience, and managing state transitions is solved.
+
+</details>
+
+<details>
 <summary><strong>⚙️ Monetization & Revenue</strong></summary>
 
 ### 🏆 Engagement-Driven Rewards

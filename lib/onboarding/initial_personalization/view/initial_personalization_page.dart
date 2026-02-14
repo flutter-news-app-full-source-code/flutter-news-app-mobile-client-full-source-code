@@ -15,17 +15,7 @@ class InitialPersonalizationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => InitialPersonalizationBloc(
-        appBloc: context.read<AppBloc>(),
-        userContentPreferencesRepository: context
-            .read<DataRepository<UserContentPreferences>>(),
-        userContextRepository: context.read<DataRepository<UserContext>>(),
-        analyticsService: context.read<AnalyticsService>(),
-        logger: context.read<Logger>(),
-      )..add(InitialPersonalizationDataRequested()),
-      child: const _InitialPersonalizationView(),
-    );
+    return const _InitialPersonalizationView();
   }
 }
 

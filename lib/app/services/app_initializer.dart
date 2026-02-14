@@ -200,17 +200,17 @@ class AppInitializer {
 
     try {
       // Fetch settings and preferences concurrently for performance.
-      final [
-        appSettings as AppSettings?,
-        userContentPreferences as UserContentPreferences?,
-        userContext as UserContext?,
-        userRewards as UserRewards?,
-      ] = await Future.wait<dynamic>([
-        _appSettingsRepository.read(id: user.id, userId: user.id),
-        _userContentPreferencesRepository.read(id: user.id, userId: user.id),
-        _userContextRepository.read(id: user.id, userId: user.id),
+      final results = await Future.wait<dynamic>([
+        _readAppSettings(user),
+        _readUserContentPreferences(user),
+        _readUserContext(user),
         _fetchUserRewards(user),
       ]);
+      
+      final appSettings = results[0] as AppSettings?;
+      final userContentPreferences = results[1] as UserContentPreferences?;
+      final userContext = results[2] as UserContext?;
+      final userRewards = results[3] as UserRewards?;
 
       // Check for Post-Auth Personalization
       final personalizationConfig =
@@ -225,6 +225,9 @@ class AppInitializer {
           status: OnboardingStatus.postAuthPersonalization,
           remoteConfig: remoteConfig,
           user: user,
+          userContext: userContext,
+          settings: appSettings,
+          userContentPreferences: userContentPreferences,
         );
       }
 
@@ -286,20 +289,16 @@ class AppInitializer {
       );
 
     try {
-      final [
-        appSettings as AppSettings?,
-        userContentPreferences as UserContentPreferences?,
-        userContext as UserContext?,
-        userRewards as UserRewards?,
-      ] = await Future.wait<dynamic>([
-        _appSettingsRepository.read(id: newUser.id, userId: newUser.id),
-        _userContentPreferencesRepository.read(
-          id: newUser.id,
-          userId: newUser.id,
-        ),
-        _userContextRepository.read(id: newUser.id, userId: newUser.id),
+      final results = await Future.wait<dynamic>([
+        _readAppSettings(newUser),
+        _readUserContentPreferences(newUser),
+        _readUserContext(newUser),
         _fetchUserRewards(newUser),
       ]);
+      final appSettings = results[0] as AppSettings?;
+      final userContentPreferences = results[1] as UserContentPreferences?;
+      final userContext = results[2] as UserContext?;
+      final userRewards = results[3] as UserRewards?;
       _logger.fine('[AppInitializer] User transition data fetch complete.');
 
       // Check for Post-Auth Personalization during transition.
@@ -316,6 +315,9 @@ class AppInitializer {
           status: OnboardingStatus.postAuthPersonalization,
           remoteConfig: remoteConfig,
           user: newUser,
+          userContext: userContext,
+          settings: appSettings,
+          userContentPreferences: userContentPreferences,
         );
       }
 
@@ -337,6 +339,53 @@ class AppInitializer {
         status: AppLifeCycleStatus.criticalError,
         error: e,
       );
+    }
+  }
+
+  /// Helper to fetch app settings safely, returning null if not found.
+  Future<AppSettings?> _readAppSettings(User user) async {
+    try {
+      return await _appSettingsRepository.read(id: user.id, userId: user.id);
+    } on NotFoundException {
+      _logger.info('No AppSettings found for user ${user.id}.');
+      return null;
+    } on HttpException catch (e, s) {
+      _logger.severe('Failed to fetch AppSettings for user ${user.id}.', e, s);
+      rethrow;
+    }
+  }
+
+  /// Helper to fetch user content preferences safely, returning null if not
+  /// found.
+  Future<UserContentPreferences?> _readUserContentPreferences(User user) async {
+    try {
+      return await _userContentPreferencesRepository.read(
+        id: user.id,
+        userId: user.id,
+      );
+    } on NotFoundException {
+      _logger.info('No UserContentPreferences found for user ${user.id}.');
+      return null;
+    } on HttpException catch (e, s) {
+      _logger.severe(
+        'Failed to fetch UserContentPreferences for user ${user.id}.',
+        e,
+        s,
+      );
+      rethrow;
+    }
+  }
+
+  /// Helper to fetch user context safely, returning null if not found.
+  Future<UserContext?> _readUserContext(User user) async {
+    try {
+      return await _userContextRepository.read(id: user.id, userId: user.id);
+    } on NotFoundException {
+      _logger.info('No UserContext found for user ${user.id}.');
+      return null;
+    } on HttpException catch (e, s) {
+      _logger.severe('Failed to fetch UserContext for user ${user.id}.', e, s);
+      rethrow;
     }
   }
 

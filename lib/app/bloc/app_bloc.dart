@@ -444,6 +444,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           state.copyWith(
             status: AppLifeCycleStatus.postAuthOnboardingRequired,
             user: transitionResult.user,
+            userContext: transitionResult.userContext,
+            settings: transitionResult.settings,
+            userContentPreferences: transitionResult.userContentPreferences,
             remoteConfig: transitionResult.remoteConfig,
             clearError: true,
           ),

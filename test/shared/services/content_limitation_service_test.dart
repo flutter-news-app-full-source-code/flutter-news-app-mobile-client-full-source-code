@@ -136,7 +136,6 @@ void main() {
             isCountrySelectionEnabled: true,
             isTopicSelectionEnabled: true,
             isSourceSelectionEnabled: true,
-            minSelectionsRequired: 3,
           ),
         ),
         analytics: AnalyticsConfig(

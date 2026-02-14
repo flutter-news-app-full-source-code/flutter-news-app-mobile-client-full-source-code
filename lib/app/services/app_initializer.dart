@@ -155,7 +155,15 @@ class AppInitializer {
     // --- Step 4: Fetch Initial User ---
     // Now that global gates are passed, determine the user's auth state.
     _logger.fine('[AppInitializer] 2. Fetching initial user...');
-    final user = await _authenticationRepository.getCurrentUser();
+    User? user;
+    try {
+      user = await _authenticationRepository.getCurrentUser();
+    } on UnauthorizedException {
+      _logger.info(
+        '[AppInitializer] No active session found (401). Proceeding as unauthenticated.',
+      );
+      user = null;
+    }
 
     // --- Path A: Unauthenticated User ---
     // If there's no user, the initialization is complete. Return success
@@ -292,8 +300,25 @@ class AppInitializer {
         _userContextRepository.read(id: newUser.id, userId: newUser.id),
         _fetchUserRewards(newUser),
       ]);
-
       _logger.fine('[AppInitializer] User transition data fetch complete.');
+
+      // Check for Post-Auth Personalization during transition.
+      final personalizationConfig =
+          remoteConfig.features.onboarding.initialPersonalization;
+      if (personalizationConfig.isEnabled &&
+          userContext != null &&
+          !userContext.hasCompletedInitialPersonalization) {
+        _logger.info(
+          '[AppInitializer] Post-authentication personalization required '
+          'after user transition.',
+        );
+        return InitializationOnboardingRequired(
+          status: OnboardingStatus.postAuthPersonalization,
+          remoteConfig: remoteConfig,
+          user: newUser,
+        );
+      }
+
       return InitializationSuccess(
         remoteConfig: remoteConfig,
         user: newUser,

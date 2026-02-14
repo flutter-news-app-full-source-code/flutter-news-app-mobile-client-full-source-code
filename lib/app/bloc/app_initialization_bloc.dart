@@ -54,12 +54,15 @@ class AppInitializationBloc
       final result = await _appInitializer.initializeApp();
 
       switch (result) {
-        case final InitializationSuccess success:
+        case final InitializationSuccess _:
           _logger.info('App initialization successful.');
-          emit(AppInitializationSucceeded(success));
+          emit(AppInitializationSucceeded(result));
         case final InitializationFailure failure:
           _logger.warning('App initialization failed: ${failure.status}');
           emit(AppInitializationFailed(failure));
+        case final InitializationOnboardingRequired _:
+          _logger.info('App onboarding required: ${result.status}');
+          emit(AppInitializationSucceeded(result));
       }
     } catch (e, s) {
       _logger.severe(

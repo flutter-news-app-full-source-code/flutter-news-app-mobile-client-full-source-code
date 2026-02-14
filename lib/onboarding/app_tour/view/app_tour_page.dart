@@ -5,8 +5,6 @@ import 'package:flutter_news_app_mobile_client_full_source_code/analytics/servic
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/onboarding/app_tour/bloc/app_tour_bloc.dart';
-import 'package:kv_storage_service/kv_storage_service.dart';
-import 'package:logging/logging.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:ui_kit/ui_kit.dart';
 

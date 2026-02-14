@@ -120,7 +120,7 @@ void main() {
             BlocProvider.value(value: personalizationBloc),
           ],
           child: MaterialApp(
-            localizationsDelegates: [
+            localizationsDelegates: const [
               ...AppLocalizations.localizationsDelegates,
               ...UiKitLocalizations.localizationsDelegates,
             ],

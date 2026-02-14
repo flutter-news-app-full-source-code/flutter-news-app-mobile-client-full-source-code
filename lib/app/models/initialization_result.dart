@@ -110,6 +110,9 @@ final class InitializationOnboardingRequired extends InitializationResult {
     required this.status,
     required this.remoteConfig,
     this.user,
+    this.userContext,
+    this.settings,
+    this.userContentPreferences,
   });
 
   /// The specific onboarding flow that is required.
@@ -121,6 +124,22 @@ final class InitializationOnboardingRequired extends InitializationResult {
   /// The user, if one exists (for post-auth onboarding).
   final User? user;
 
+  /// The user's context, required for post-auth onboarding.
+  final UserContext? userContext;
+
+  /// The user's settings, to be carried through the onboarding flow.
+  final AppSettings? settings;
+
+  /// The user's content preferences, to be carried through the onboarding flow.
+  final UserContentPreferences? userContentPreferences;
+
   @override
-  List<Object?> get props => [status, remoteConfig, user];
+  List<Object?> get props => [
+    status,
+    remoteConfig,
+    user,
+    userContext,
+    settings,
+    userContentPreferences,
+  ];
 }

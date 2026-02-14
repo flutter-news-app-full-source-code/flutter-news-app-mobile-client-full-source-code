@@ -475,12 +475,14 @@ Future<Widget> bootstrap(
     providers: [
       RepositoryProvider.value(value: analyticsService),
       RepositoryProvider.value(value: appInitializer),
+      RepositoryProvider.value(value: kvStorage),
       RepositoryProvider.value(value: logger),
     ],
     child: AppInitializationPage(
       // All other repositories and services are passed directly to the
       // initialization page, which will then pass them to the main App widget
       // upon successful initialization.
+      kvStorage: kvStorage,
       authenticationRepository: authenticationRepository,
       headlinesRepository: headlinesRepository,
       topicsRepository: topicsRepository,

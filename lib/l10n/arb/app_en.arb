@@ -2224,9 +2224,22 @@
     "@initialPersonalizationStepCountriesTitle": {
         "description": "Title for the country selection step in initial personalization."
     },
-    "initialPersonalizationSelectionCountLabel": "{count} of {total} selected",
-    "@initialPersonalizationSelectionCountLabel": {
-        "description": "Label showing the number of selected items out of the required total.",
+    "initialPersonalizationTotalSelectionCountLabel": "{count} selected",
+    "@initialPersonalizationTotalSelectionCountLabel": {
+        "description": "Label showing the total number of selected items.",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "initialPersonalizationFinishButton": "Finish",
+    "@initialPersonalizationFinishButton": {
+        "description": "Button text to complete the initial personalization."
+    },
+    "multiSelectSearchPageSelectionCount": "{count}/{total}",
+    "@multiSelectSearchPageSelectionCount": {
+        "description": "Label showing the number of selected items out of the total allowed.",
         "placeholders": {
             "count": {
                 "type": "int"
@@ -2235,9 +2248,5 @@
                 "type": "int"
             }
         }
-    },
-    "initialPersonalizationFinishButton": "Finish",
-    "@initialPersonalizationFinishButton": {
-        "description": "Button text to complete the initial personalization."
     }
 }

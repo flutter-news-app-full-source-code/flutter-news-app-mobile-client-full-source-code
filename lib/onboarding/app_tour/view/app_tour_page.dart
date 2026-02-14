@@ -15,15 +15,7 @@ class AppTourPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => AppTourBloc(
-        appBloc: context.read<AppBloc>(),
-        storageService: context.read<KVStorageService>(),
-        analyticsService: context.read<AnalyticsService>(),
-        logger: context.read<Logger>(),
-      ),
-      child: const _AppTourView(),
-    );
+    return const _AppTourView();
   }
 }
 

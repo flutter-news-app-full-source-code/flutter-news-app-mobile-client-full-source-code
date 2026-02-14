@@ -22,8 +22,6 @@ class InitialPersonalizationState extends Equatable {
   int get totalSelectedCount =>
       selectedTopics.length + selectedSources.length + selectedCountries.length;
 
-  bool get canComplete => true;
-
   InitialPersonalizationState copyWith({
     InitialPersonalizationStatus? status,
     Set<Topic>? selectedTopics,

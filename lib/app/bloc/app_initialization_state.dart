@@ -23,18 +23,19 @@ final class AppInitializationInProgress extends AppInitializationState {
 /// {@template app_initialization_success}
 /// State indicating that the application has been successfully initialized.
 ///
-/// Contains the successful initialization data.
+/// Contains the initialization result, which can be a success or an onboarding
+/// requirement.
 /// {@endtemplate}
 final class AppInitializationSucceeded extends AppInitializationState {
   /// {@macro app_initialization_success}
-  const AppInitializationSucceeded(this.initializationSuccess);
+  const AppInitializationSucceeded(this.initializationResult);
 
   /// The result of a successful initialization, containing all necessary
   /// pre-loaded data like remote config and user settings.
-  final InitializationSuccess initializationSuccess;
+  final InitializationResult initializationResult;
 
   @override
-  List<Object> get props => [initializationSuccess];
+  List<Object> get props => [initializationResult];
 }
 
 /// {@template app_initialization_failure}

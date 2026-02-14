@@ -61,7 +61,10 @@ class AppTourBloc extends Bloc<AppTourEvent, AppTourState> {
     Emitter<AppTourState> emit,
   ) async {
     _logger.info('App tour completed. Persisting status...');
-    await _storageService.writeBool(key: 'hasSeenAppTour', value: true);
+    await _storageService.writeBool(
+      key: StorageKey.hasSeenAppTour.stringValue,
+      value: true,
+    );
     unawaited(
       _analyticsService.logEvent(
         AnalyticsEvent.appTourCompleted,

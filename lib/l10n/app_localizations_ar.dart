@@ -1687,4 +1687,73 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get rewardsOfferActiveButton => 'نشط';
+
+  @override
+  String get appTourStep1Title => 'أخبارك، مصممة خصيصًا لك';
+
+  @override
+  String get appTourStep1Body =>
+      'احصل على موجز إخباري مصمم لك. تابع المواضيع والمصادر والدول التي تهمك أكثر وسنتولى الباقي.';
+
+  @override
+  String get appTourStep2Title => 'نظم واحصل على إشعارات';
+
+  @override
+  String get appTourStep2Body =>
+      'أنشئ واحفظ موجزات إخبارية مخصصة لأي مجال. اشترك للحصول على تنبيهات الأخبار العاجلة أو الملخصات اليومية للقصص التي لا يمكنك تفويتها.';
+
+  @override
+  String get appTourStep3Title => 'شارك بوجهة نظرك';
+
+  @override
+  String get appTourStep3Body =>
+      'تفاعل وعلق على المقالات للتواصل مع مجتمع عالمي. صوتك يساعد في تشكيل المحادثة.';
+
+  @override
+  String get appTourSkipButton => 'تخطى';
+
+  @override
+  String get appTourNextButton => 'التالي';
+
+  @override
+  String get appTourGetStartedButton => 'ابدأ الآن';
+
+  @override
+  String get initialPersonalizationTitle => 'خصص موجزك الإخباري';
+
+  @override
+  String get initialPersonalizationSubtitle =>
+      'تابع بعض المواضيع أو المصادر أو الدول للبدء. يمكنك دائمًا تغييرها لاحقًا.';
+
+  @override
+  String get initialPersonalizationStepTopicsTitle => 'اختر المواضيع';
+
+  @override
+  String get initialPersonalizationStepSourcesTitle => 'اختر المصادر';
+
+  @override
+  String get initialPersonalizationStepCountriesTitle => 'اختر الدول';
+
+  @override
+  String initialPersonalizationTotalSelectionCountLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count محدد',
+      many: '$count محدد',
+      few: '$count محددات',
+      two: '2 محدد',
+      one: '1 محدد',
+      zero: '0 محدد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get initialPersonalizationFinishButton => 'إنهاء';
+
+  @override
+  String multiSelectSearchPageSelectionCount(int count, int total) {
+    return '$count/$total';
+  }
 }

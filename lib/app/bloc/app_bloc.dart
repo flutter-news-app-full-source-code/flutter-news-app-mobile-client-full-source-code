@@ -42,6 +42,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required AppSettings? settings,
     required UserContentPreferences? userContentPreferences,
     required UserRewards? userRewards,
+    required OnboardingStatus? onboardingStatus,
     required DataRepository<RemoteConfig> remoteConfigRepository,
     required AppInitializer appInitializer,
     required AuthRepository authRepository,
@@ -76,12 +77,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _userRewardsRepository = userRewardsRepository,
        _logger = logger,
        super(
-         AppState(
-           status: user == null
-               ? AppLifeCycleStatus.unauthenticated
-               : user.isAnonymous
-               ? AppLifeCycleStatus.anonymous
-               : AppLifeCycleStatus.authenticated,
+         AppState.fromOnboardingStatus(
+           user: user,
+           onboardingStatus: onboardingStatus,
+         ).copyWith(
+           // Hydrate the state with all the pre-fetched data.
            user: user,
            userContext: userContext,
            remoteConfig: remoteConfig,
@@ -119,6 +119,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppBookmarkToggled>(_onAppBookmarkToggled);
     on<AppContentReported>(_onAppContentReported);
     on<UserRewardsRefreshed>(_onUserRewardsRefreshed);
+    on<AppOnboardingCompleted>(_onAppOnboardingCompleted);
 
     // Listen to token refresh events from the push notification service.
     // When a token is refreshed, dispatch an event to trigger device
@@ -432,6 +433,24 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // fetching user data), emit a critical error state.
       case InitializationFailure(:final status, :final error):
         emit(state.copyWith(status: status, error: error));
+      // This case should be unreachable during a user transition, as onboarding
+      // flows are only determined during the initial app launch.
+      case InitializationOnboardingRequired():
+        _logger.info(
+          '[AppBloc] Onboarding required after user transition. '
+          'Updating status.',
+        );
+        emit(
+          state.copyWith(
+            status: AppLifeCycleStatus.postAuthOnboardingRequired,
+            user: transitionResult.user,
+            userContext: transitionResult.userContext,
+            settings: transitionResult.settings,
+            userContentPreferences: transitionResult.userContentPreferences,
+            remoteConfig: transitionResult.remoteConfig,
+            clearError: true,
+          ),
+        );
     }
   }
 
@@ -1202,6 +1221,29 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     } catch (e, s) {
       _logger.severe('Failed to submit report in AppBloc', e, s);
       event.completer?.completeError(e, s);
+    }
+  }
+
+  Future<void> _onAppOnboardingCompleted(
+    AppOnboardingCompleted event,
+    Emitter<AppState> emit,
+  ) async {
+    _logger.info(
+      '[AppBloc] Onboarding flow ${event.status} completed. Updating app status.',
+    );
+    switch (event.status) {
+      case OnboardingStatus.preAuthTour:
+        emit(state.copyWith(status: AppLifeCycleStatus.unauthenticated));
+      case OnboardingStatus.postAuthPersonalization:
+        emit(
+          state.copyWith(
+            status: AppLifeCycleStatus.authenticated,
+            // We must carry over the user object, otherwise it gets nulled.
+            user: state.user,
+            userContentPreferences: event.userContentPreferences,
+            userContext: event.userContext,
+          ),
+        );
     }
   }
 

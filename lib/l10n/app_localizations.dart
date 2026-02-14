@@ -3127,6 +3127,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Active'**
   String get rewardsOfferActiveButton;
+
+  /// Title for the first step of the app tour.
+  ///
+  /// In en, this message translates to:
+  /// **'Your News, Perfectly Tailored'**
+  String get appTourStep1Title;
+
+  /// Body text for the first step of the app tour.
+  ///
+  /// In en, this message translates to:
+  /// **'Get a feed that\'s built for you. Follow the topics, sources, and countries that matter most to you and we\'ll handle the rest.'**
+  String get appTourStep1Body;
+
+  /// Title for the second step of the app tour.
+  ///
+  /// In en, this message translates to:
+  /// **'Curate and Get Notified'**
+  String get appTourStep2Title;
+
+  /// Body text for the second step of the app tour.
+  ///
+  /// In en, this message translates to:
+  /// **'Create and save custom news feeds for any niche. Subscribe to get breaking news alerts or daily digests for the stories you can\'t afford to miss.'**
+  String get appTourStep2Body;
+
+  /// Title for the third step of the app tour.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Your Perspective'**
+  String get appTourStep3Title;
+
+  /// Body text for the third step of the app tour.
+  ///
+  /// In en, this message translates to:
+  /// **'React and comment on articles to engage with a global community. Your voice helps shape the conversation.'**
+  String get appTourStep3Body;
+
+  /// Button text to skip the app tour.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get appTourSkipButton;
+
+  /// Button text to go to the next step of the app tour.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get appTourNextButton;
+
+  /// Button text to finish the app tour.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get appTourGetStartedButton;
+
+  /// Title for the initial personalization page.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize Your Feed'**
+  String get initialPersonalizationTitle;
+
+  /// Subtitle for the initial personalization page.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow some topics, sources, or countries to get started. You can always change these later.'**
+  String get initialPersonalizationSubtitle;
+
+  /// Title for the topic selection step in initial personalization.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Topics'**
+  String get initialPersonalizationStepTopicsTitle;
+
+  /// Title for the source selection step in initial personalization.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Sources'**
+  String get initialPersonalizationStepSourcesTitle;
+
+  /// Title for the country selection step in initial personalization.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Countries'**
+  String get initialPersonalizationStepCountriesTitle;
+
+  /// Label showing the total number of selected items.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} selected'**
+  String initialPersonalizationTotalSelectionCountLabel(int count);
+
+  /// Button text to complete the initial personalization.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish'**
+  String get initialPersonalizationFinishButton;
+
+  /// Label showing the number of selected items out of the total allowed.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}/{total}'**
+  String multiSelectSearchPageSelectionCount(int count, int total);
 }
 
 class _AppLocalizationsDelegate

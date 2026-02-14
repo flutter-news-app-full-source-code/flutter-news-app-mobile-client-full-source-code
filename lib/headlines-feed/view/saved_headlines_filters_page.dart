@@ -207,15 +207,18 @@ class _SavedHeadlinesFiltersView extends StatelessWidget {
               );
             },
             onReorder: (oldIndex, newIndex) {
-              // Adjust the index for reordering logic.
+              // When an item is moved down the list, the newIndex needs to be
+              // adjusted because the item's removal from its old position
+              // shifts the indices of subsequent items.
+              var adjustedNewIndex = newIndex;
               if (newIndex > oldIndex) {
-                newIndex -= 1;
+                adjustedNewIndex -= 1;
               }
               final reorderedFilters = List<SavedHeadlineFilter>.from(
                 state.filters,
               );
               final item = reorderedFilters.removeAt(oldIndex);
-              reorderedFilters.insert(newIndex, item);
+              reorderedFilters.insert(adjustedNewIndex, item);
               context.read<SavedHeadlinesFiltersBloc>().add(
                 SavedHeadlinesFiltersReordered(
                   reorderedFilters: reorderedFilters,

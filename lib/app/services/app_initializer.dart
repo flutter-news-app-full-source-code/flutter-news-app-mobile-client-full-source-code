@@ -6,6 +6,7 @@ import 'package:data_repository/data_repository.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/initialization_result.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/package_info_service.dart';
+import 'package:kv_storage_service/kv_storage_service.dart';
 import 'package:logging/logging.dart';
 import 'package:pub_semver/pub_semver.dart';
 
@@ -41,6 +42,7 @@ class AppInitializer {
     required DataRepository<UserContext> userContextRepository,
     required DataRepository<UserRewards> userRewardsRepository,
     required DataRepository<RemoteConfig> remoteConfigRepository,
+    required KVStorageService storageService,
     required PackageInfoService packageInfoService,
     required Logger logger,
   }) : _authenticationRepository = authenticationRepository,
@@ -49,6 +51,7 @@ class AppInitializer {
        _userContextRepository = userContextRepository,
        _userRewardsRepository = userRewardsRepository,
        _remoteConfigRepository = remoteConfigRepository,
+       _storageService = storageService,
        _packageInfoService = packageInfoService,
        _logger = logger;
 
@@ -59,6 +62,7 @@ class AppInitializer {
   final DataRepository<UserContext> _userContextRepository;
   final DataRepository<UserRewards> _userRewardsRepository;
   final DataRepository<RemoteConfig> _remoteConfigRepository;
+  final KVStorageService _storageService;
   final PackageInfoService _packageInfoService;
   final Logger _logger;
 
@@ -151,12 +155,35 @@ class AppInitializer {
     // --- Step 4: Fetch Initial User ---
     // Now that global gates are passed, determine the user's auth state.
     _logger.fine('[AppInitializer] 2. Fetching initial user...');
-    final user = await _authenticationRepository.getCurrentUser();
+    User? user;
+    try {
+      user = await _authenticationRepository.getCurrentUser();
+    } on UnauthorizedException {
+      _logger.info(
+        '[AppInitializer] No active session found (401). Proceeding as unauthenticated.',
+      );
+      user = null;
+    }
 
     // --- Path A: Unauthenticated User ---
     // If there's no user, the initialization is complete. Return success
     // with an unauthenticated status.
+
     if (user == null) {
+      // Check for Pre-Auth Tour
+      final tourConfig = remoteConfig.features.onboarding.appTour;
+      if (tourConfig.isEnabled) {
+        final hasSeenTour = await _storageService.readBool(
+          key: StorageKey.hasSeenAppTour.stringValue,
+        );
+        if (!hasSeenTour) {
+          _logger.info('[AppInitializer] Pre-authentication tour required.');
+          return InitializationOnboardingRequired(
+            status: OnboardingStatus.preAuthTour,
+            remoteConfig: remoteConfig,
+          );
+        }
+      }
       _logger.fine(
         '[AppInitializer] No initial user found. '
         'Initialization complete (unauthenticated).',
@@ -173,17 +200,36 @@ class AppInitializer {
 
     try {
       // Fetch settings and preferences concurrently for performance.
-      final [
-        appSettings as AppSettings?,
-        userContentPreferences as UserContentPreferences?,
-        userContext as UserContext?,
-        userRewards as UserRewards?,
-      ] = await Future.wait<dynamic>([
-        _appSettingsRepository.read(id: user.id, userId: user.id),
-        _userContentPreferencesRepository.read(id: user.id, userId: user.id),
-        _userContextRepository.read(id: user.id, userId: user.id),
+      final results = await Future.wait<dynamic>([
+        _readAppSettings(user),
+        _readUserContentPreferences(user),
+        _readUserContext(user),
         _fetchUserRewards(user),
       ]);
+
+      final appSettings = results[0] as AppSettings?;
+      final userContentPreferences = results[1] as UserContentPreferences?;
+      final userContext = results[2] as UserContext?;
+      final userRewards = results[3] as UserRewards?;
+
+      // Check for Post-Auth Personalization
+      final personalizationConfig =
+          remoteConfig.features.onboarding.initialPersonalization;
+      if (personalizationConfig.isEnabled &&
+          userContext != null &&
+          !userContext.hasCompletedInitialPersonalization) {
+        _logger.info(
+          '[AppInitializer] Post-authentication personalization required.',
+        );
+        return InitializationOnboardingRequired(
+          status: OnboardingStatus.postAuthPersonalization,
+          remoteConfig: remoteConfig,
+          user: user,
+          userContext: userContext,
+          settings: appSettings,
+          userContentPreferences: userContentPreferences,
+        );
+      }
 
       _logger
         ..fine(
@@ -243,22 +289,38 @@ class AppInitializer {
       );
 
     try {
-      final [
-        appSettings as AppSettings?,
-        userContentPreferences as UserContentPreferences?,
-        userContext as UserContext?,
-        userRewards as UserRewards?,
-      ] = await Future.wait<dynamic>([
-        _appSettingsRepository.read(id: newUser.id, userId: newUser.id),
-        _userContentPreferencesRepository.read(
-          id: newUser.id,
-          userId: newUser.id,
-        ),
-        _userContextRepository.read(id: newUser.id, userId: newUser.id),
+      final results = await Future.wait<dynamic>([
+        _readAppSettings(newUser),
+        _readUserContentPreferences(newUser),
+        _readUserContext(newUser),
         _fetchUserRewards(newUser),
       ]);
-
+      final appSettings = results[0] as AppSettings?;
+      final userContentPreferences = results[1] as UserContentPreferences?;
+      final userContext = results[2] as UserContext?;
+      final userRewards = results[3] as UserRewards?;
       _logger.fine('[AppInitializer] User transition data fetch complete.');
+
+      // Check for Post-Auth Personalization during transition.
+      final personalizationConfig =
+          remoteConfig.features.onboarding.initialPersonalization;
+      if (personalizationConfig.isEnabled &&
+          userContext != null &&
+          !userContext.hasCompletedInitialPersonalization) {
+        _logger.info(
+          '[AppInitializer] Post-authentication personalization required '
+          'after user transition.',
+        );
+        return InitializationOnboardingRequired(
+          status: OnboardingStatus.postAuthPersonalization,
+          remoteConfig: remoteConfig,
+          user: newUser,
+          userContext: userContext,
+          settings: appSettings,
+          userContentPreferences: userContentPreferences,
+        );
+      }
+
       return InitializationSuccess(
         remoteConfig: remoteConfig,
         user: newUser,
@@ -277,6 +339,53 @@ class AppInitializer {
         status: AppLifeCycleStatus.criticalError,
         error: e,
       );
+    }
+  }
+
+  /// Helper to fetch app settings safely, returning null if not found.
+  Future<AppSettings?> _readAppSettings(User user) async {
+    try {
+      return await _appSettingsRepository.read(id: user.id, userId: user.id);
+    } on NotFoundException {
+      _logger.info('No AppSettings found for user ${user.id}.');
+      return null;
+    } on HttpException catch (e, s) {
+      _logger.severe('Failed to fetch AppSettings for user ${user.id}.', e, s);
+      rethrow;
+    }
+  }
+
+  /// Helper to fetch user content preferences safely, returning null if not
+  /// found.
+  Future<UserContentPreferences?> _readUserContentPreferences(User user) async {
+    try {
+      return await _userContentPreferencesRepository.read(
+        id: user.id,
+        userId: user.id,
+      );
+    } on NotFoundException {
+      _logger.info('No UserContentPreferences found for user ${user.id}.');
+      return null;
+    } on HttpException catch (e, s) {
+      _logger.severe(
+        'Failed to fetch UserContentPreferences for user ${user.id}.',
+        e,
+        s,
+      );
+      rethrow;
+    }
+  }
+
+  /// Helper to fetch user context safely, returning null if not found.
+  Future<UserContext?> _readUserContext(User user) async {
+    try {
+      return await _userContextRepository.read(id: user.id, userId: user.id);
+    } on NotFoundException {
+      _logger.info('No UserContext found for user ${user.id}.');
+      return null;
+    } on HttpException catch (e, s) {
+      _logger.severe('Failed to fetch UserContext for user ${user.id}.', e, s);
+      rethrow;
     }
   }
 

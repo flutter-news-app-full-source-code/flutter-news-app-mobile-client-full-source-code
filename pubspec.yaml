@@ -103,6 +103,7 @@ dependencies:
   pinput: ^5.0.1
   pub_semver: ^2.2.0
   share_plus: ^11.1.0
+  smooth_page_indicator: ^2.0.1
   stream_transform: ^2.1.1
   timeago: ^3.7.1
   ui_kit:
@@ -150,7 +151,7 @@ dependency_overrides:
   core:
     git:
       url: https://github.com/flutter-news-app-full-source-code/core.git
-      ref: 5f151e092b06e68471dea9dc34d423f80e1b33f8
+      ref: cee9f2a6ba02d9addb414aca30cc21958f65a939
   http_client:
     git:
       url: https://github.com/flutter-news-app-full-source-code/http-client.git
@@ -158,4 +159,4 @@ dependency_overrides:
   kv_storage_service:
     git:
       url: https://github.com/flutter-news-app-full-source-code/kv-storage-service.git
-      ref: v1.1.0
+      ref: v1.2.0

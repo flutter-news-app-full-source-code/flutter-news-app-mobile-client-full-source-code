@@ -10,6 +10,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/analytics/servic
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_initialization_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/models/initialization_result.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_hot_restart_wrapper.dart';
@@ -20,6 +21,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/push_notificatio
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/view.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
+import 'package:kv_storage_service/kv_storage_service.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -44,6 +46,7 @@ import 'package:ui_kit/ui_kit.dart';
 class AppInitializationPage extends StatelessWidget {
   /// {@macro app_initialization_page}
   const AppInitializationPage({
+    required this.kvStorage,
     required this.authenticationRepository,
     required this.headlinesRepository,
     required this.topicsRepository,
@@ -72,6 +75,7 @@ class AppInitializationPage extends StatelessWidget {
     super.key,
   });
 
+  final KVStorageService kvStorage;
   final AuthRepository authenticationRepository;
   final DataRepository<Headline> headlinesRepository;
   final DataRepository<Topic> topicsRepository;
@@ -113,43 +117,88 @@ class AppInitializationPage extends StatelessWidget {
         builder: (context, state) {
           switch (state) {
             case final AppInitializationSucceeded successState:
+              final result = successState.initializationResult;
               // On success, build the main App widget with the guaranteed
               // successful initialization data.
-              final successData = successState.initializationSuccess;
-              return App(
-                user: successData.user,
-                userContext: successData.userContext,
-                remoteConfig: successData.remoteConfig,
-                settings: successData.settings,
-                userContentPreferences: successData.userContentPreferences,
-                userRewards: successData.userRewards,
-                authenticationRepository: authenticationRepository,
-                headlinesRepository: headlinesRepository,
-                topicsRepository: topicsRepository,
-                userRepository: userRepository,
-                countriesRepository: countriesRepository,
-                sourcesRepository: sourcesRepository,
-                remoteConfigRepository: remoteConfigRepository,
-                appSettingsRepository: appSettingsRepository,
-                userContentPreferencesRepository:
-                    userContentPreferencesRepository,
-                userContextRepository: userContextRepository,
-                environment: environment,
-                pushNotificationService: pushNotificationService,
-                inAppNotificationRepository: inAppNotificationRepository,
-                adService: adService,
-                feedDecoratorService: feedDecoratorService,
-                feedCacheService: feedCacheService,
-                inlineAdCacheService: inlineAdCacheService,
-                navigatorKey: navigatorKey,
-                engagementRepository: engagementRepository,
-                reportRepository: reportRepository,
-                appReviewRepository: appReviewRepository,
-                appReviewService: appReviewService,
-                contentLimitationService: contentLimitationService,
-                analyticsService: analyticsService,
-                userRewardsRepository: userRewardsRepository,
-              );
+              switch (result) {
+                case final InitializationSuccess success:
+                  return App(
+                    kvStorageService: kvStorage,
+                    user: success.user,
+                    userContext: success.userContext,
+                    remoteConfig: success.remoteConfig,
+                    settings: success.settings,
+                    userContentPreferences: success.userContentPreferences,
+                    userRewards: success.userRewards,
+                    authenticationRepository: authenticationRepository,
+                    headlinesRepository: headlinesRepository,
+                    topicsRepository: topicsRepository,
+                    userRepository: userRepository,
+                    countriesRepository: countriesRepository,
+                    sourcesRepository: sourcesRepository,
+                    remoteConfigRepository: remoteConfigRepository,
+                    appSettingsRepository: appSettingsRepository,
+                    userContentPreferencesRepository:
+                        userContentPreferencesRepository,
+                    userContextRepository: userContextRepository,
+                    environment: environment,
+                    pushNotificationService: pushNotificationService,
+                    inAppNotificationRepository: inAppNotificationRepository,
+                    adService: adService,
+                    feedDecoratorService: feedDecoratorService,
+                    feedCacheService: feedCacheService,
+                    inlineAdCacheService: inlineAdCacheService,
+                    navigatorKey: navigatorKey,
+                    engagementRepository: engagementRepository,
+                    reportRepository: reportRepository,
+                    appReviewRepository: appReviewRepository,
+                    appReviewService: appReviewService,
+                    contentLimitationService: contentLimitationService,
+                    analyticsService: analyticsService,
+                    userRewardsRepository: userRewardsRepository,
+                  );
+                case final InitializationOnboardingRequired onboarding:
+                  return App(
+                    onboardingStatus: onboarding.status,
+                    remoteConfig: onboarding.remoteConfig,
+                    kvStorageService: kvStorage,
+                    user: onboarding.user,
+                    userContext: onboarding.userContext,
+                    settings: onboarding.settings,
+                    userContentPreferences: onboarding.userContentPreferences,
+                    userRewards: null,
+                    authenticationRepository: authenticationRepository,
+                    headlinesRepository: headlinesRepository,
+                    topicsRepository: topicsRepository,
+                    userRepository: userRepository,
+                    countriesRepository: countriesRepository,
+                    sourcesRepository: sourcesRepository,
+                    remoteConfigRepository: remoteConfigRepository,
+                    appSettingsRepository: appSettingsRepository,
+                    userContentPreferencesRepository:
+                        userContentPreferencesRepository,
+                    userContextRepository: userContextRepository,
+                    environment: environment,
+                    pushNotificationService: pushNotificationService,
+                    inAppNotificationRepository: inAppNotificationRepository,
+                    adService: adService,
+                    feedDecoratorService: feedDecoratorService,
+                    feedCacheService: feedCacheService,
+                    inlineAdCacheService: inlineAdCacheService,
+                    navigatorKey: navigatorKey,
+                    engagementRepository: engagementRepository,
+                    reportRepository: reportRepository,
+                    appReviewRepository: appReviewRepository,
+                    appReviewService: appReviewService,
+                    contentLimitationService: contentLimitationService,
+                    analyticsService: analyticsService,
+                    userRewardsRepository: userRewardsRepository,
+                  );
+                // This case should be unreachable, as AppInitializationSucceeded
+                // should not contain an InitializationFailure.
+                case InitializationFailure():
+                  return const SizedBox.shrink(); // Return an empty widget as a fallback.
+              }
 
             case final AppInitializationFailed failureState:
               // On failure, determine which full-screen error page to show.

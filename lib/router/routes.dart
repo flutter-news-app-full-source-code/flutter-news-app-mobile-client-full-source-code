@@ -26,6 +26,12 @@ abstract final class Routes {
   static const entityDetails = '/entity-details/:type/:id';
   static const entityDetailsName = 'entityDetails';
 
+  // --- Onboarding Routes ---
+  static const appTour = '/app-tour';
+  static const appTourName = 'appTour';
+  static const initialPersonalization = '/initial-personalization';
+  static const initialPersonalizationName = 'initialPersonalization';
+
   // --- Account Sub-Routes ---
   static const accountSavedHeadlines = 'saved-headlines';
   static const accountSavedHeadlinesName = 'accountSavedHeadlines';

@@ -48,6 +48,8 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/v
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/source_type_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/topic_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/onboarding/app_tour/view/app_tour_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/onboarding/initial_personalization/view/initial_personalization_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/rewards/view/rewards_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/go_router_observer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
@@ -102,6 +104,21 @@ GoRouter createRouter({
       const accountLinkingPath = Routes.accountLinking;
       const feedPath = Routes.feed;
       const rewardsPath = '/${Routes.account}/${Routes.rewards}';
+      const appTourPath = Routes.appTour;
+      const initialPersonalizationPath = Routes.initialPersonalization;
+
+      // RULE 0: Onboarding flows are inescapable.
+      if (appStatus == AppLifeCycleStatus.preAuthOnboardingRequired) {
+        logger.info('  Redirect Rule 0: Pre-auth tour required.');
+        return currentLocation != appTourPath ? appTourPath : null;
+      }
+
+      if (appStatus == AppLifeCycleStatus.postAuthOnboardingRequired) {
+        logger.info('  Redirect Rule 0: Post-auth personalization required.');
+        return currentLocation != initialPersonalizationPath
+            ? initialPersonalizationPath
+            : null;
+      }
 
       // Check if the user is trying to go to any part of the auth flow.
       final isGoingToAuth = currentLocation.startsWith(authenticationPath);
@@ -163,6 +180,18 @@ GoRouter createRouter({
           );
           return feedPath;
         }
+        // This rule handles the completion of the post-auth personalization.
+        // When the user finishes, their status becomes `authenticated`, but
+        // they are still on the `/initial-personalization` location. This
+        // rule correctly redirects them to the feed. It also acts as a
+        // safeguard for any other case where an authenticated user might
+        // land on this page.
+        if (currentLocation == initialPersonalizationPath) {
+          logger.info(
+            '    Action: Authenticated user on personalization path. Redirecting to feed.',
+          );
+          return feedPath;
+        }
         // ...and they are at the root, send them to the feed.
         if (currentLocation == rootPath) {
           logger.info(
@@ -188,6 +217,17 @@ GoRouter createRouter({
     routes: [
       // A placeholder route for the root path. The redirect logic will always
       // move the user away from here to the correct location.
+      GoRoute(
+        path: Routes.appTour,
+        name: Routes.appTourName,
+        builder: (context, state) => const AppTourPage(),
+      ),
+      GoRoute(
+        path: Routes.initialPersonalization,
+        name: Routes.initialPersonalizationName,
+        builder: (context, state) => const InitialPersonalizationPage(),
+      ),
+
       GoRoute(path: '/', builder: (context, state) => const SizedBox.shrink()),
 
       // --- Authentication and Account Linking Flows ---

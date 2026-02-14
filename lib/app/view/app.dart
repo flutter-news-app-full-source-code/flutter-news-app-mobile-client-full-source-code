@@ -12,6 +12,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/analytics/servic
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/config/app_environment.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/models/initialization_result.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_initializer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/services/app_status_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
@@ -26,6 +27,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/status/view/main
 import 'package:flutter_news_app_mobile_client_full_source_code/status/view/update_required_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/user_content/app_review/services/app_review_service.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kv_storage_service/kv_storage_service.dart';
 import 'package:logging/logging.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -46,6 +48,7 @@ class App extends StatelessWidget {
     required this.settings,
     required this.userContentPreferences,
     required this.userRewards,
+    required KVStorageService kvStorageService,
     required AuthRepository authenticationRepository,
     required DataRepository<Headline> headlinesRepository,
     required DataRepository<Topic> topicsRepository,
@@ -72,6 +75,7 @@ class App extends StatelessWidget {
     required PushNotificationService pushNotificationService,
     required AnalyticsService analyticsService,
     required DataRepository<UserRewards> userRewardsRepository,
+    this.onboardingStatus,
     super.key,
   }) : _authenticationRepository = authenticationRepository,
        _headlinesRepository = headlinesRepository,
@@ -97,7 +101,8 @@ class App extends StatelessWidget {
        _navigatorKey = navigatorKey,
        _inlineAdCacheService = inlineAdCacheService,
        _analyticsService = analyticsService,
-       _userRewardsRepository = userRewardsRepository;
+       _userRewardsRepository = userRewardsRepository,
+       _kvStorageService = kvStorageService;
 
   /// The initial user, pre-fetched during startup.
   final User? user;
@@ -117,6 +122,10 @@ class App extends StatelessWidget {
   /// The user's rewards, pre-fetched during startup.
   final UserRewards? userRewards;
 
+  /// The onboarding status, if an onboarding flow is required.
+  final OnboardingStatus? onboardingStatus;
+
+  final KVStorageService _kvStorageService;
   final AuthRepository _authenticationRepository;
   final DataRepository<Headline> _headlinesRepository;
   final DataRepository<Topic> _topicsRepository;
@@ -151,6 +160,7 @@ class App extends StatelessWidget {
     // app dependencies.
     return MultiRepositoryProvider(
       providers: [
+        RepositoryProvider.value(value: _kvStorageService),
         RepositoryProvider.value(value: _authenticationRepository),
         RepositoryProvider.value(value: _headlinesRepository),
         RepositoryProvider.value(value: _topicsRepository),
@@ -189,6 +199,7 @@ class App extends StatelessWidget {
               settings: settings,
               userContentPreferences: userContentPreferences,
               userRewards: userRewards,
+              onboardingStatus: onboardingStatus,
               remoteConfigRepository: _remoteConfigRepository,
               appInitializer: context.read<AppInitializer>(),
               authRepository: context.read<AuthRepository>(),

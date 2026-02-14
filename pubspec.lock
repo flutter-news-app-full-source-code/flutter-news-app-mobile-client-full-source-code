@@ -185,8 +185,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "5f151e092b06e68471dea9dc34d423f80e1b33f8"
-      resolved-ref: "5f151e092b06e68471dea9dc34d423f80e1b33f8"
+      ref: cee9f2a6ba02d9addb414aca30cc21958f65a939
+      resolved-ref: cee9f2a6ba02d9addb414aca30cc21958f65a939
       url: "https://github.com/flutter-news-app-full-source-code/core.git"
     source: git
     version: "1.6.0"
@@ -675,11 +675,11 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "v1.1.0"
-      resolved-ref: "8ac453baae89e6926922783488d56ebbbabf77c3"
+      ref: "v1.2.0"
+      resolved-ref: "50ae2a12efacb2b13cdea4a433e5e518a1185e66"
       url: "https://github.com/flutter-news-app-full-source-code/kv-storage-service.git"
     source: git
-    version: "1.1.0"
+    version: "1.2.0"
   kv_storage_shared_preferences:
     dependency: "direct main"
     description:
@@ -1046,6 +1046,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  smooth_page_indicator:
+    dependency: "direct main"
+    description:
+      name: smooth_page_indicator
+      sha256: "4b497e9898d095de40d246db943371183fa7482492a88391cfa8415ef94d57ba"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.1"
   source_map_stack_trace:
     dependency: transitive
     description:

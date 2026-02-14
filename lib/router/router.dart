@@ -180,6 +180,18 @@ GoRouter createRouter({
           );
           return feedPath;
         }
+        // This rule handles the completion of the post-auth personalization.
+        // When the user finishes, their status becomes `authenticated`, but
+        // they are still on the `/initial-personalization` location. This
+        // rule correctly redirects them to the feed. It also acts as a
+        // safeguard for any other case where an authenticated user might
+        // land on this page.
+        if (currentLocation == initialPersonalizationPath) {
+          logger.info(
+            '    Action: Authenticated user on personalization path. Redirecting to feed.',
+          );
+          return feedPath;
+        }
         // ...and they are at the root, send them to the feed.
         if (currentLocation == rootPath) {
           logger.info(

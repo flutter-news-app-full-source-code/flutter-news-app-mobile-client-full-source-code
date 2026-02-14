@@ -429,6 +429,18 @@ void main() {
                 'adFree': {'enabled': true, 'durationDays': 1},
               },
             },
+            'onboarding': {
+              'isEnabled': true,
+              'appTour': {'isEnabled': true, 'isSkippable': true},
+              'initialPersonalization': {
+                'isEnabled': true,
+                'isSkippable': true,
+                'isCountrySelectionEnabled': true,
+                'isTopicSelectionEnabled': true,
+                'isSourceSelectionEnabled': true,
+                'minSelectionsRequired': 1,
+              },
+            },
           },
           'user': {
             'limits': {

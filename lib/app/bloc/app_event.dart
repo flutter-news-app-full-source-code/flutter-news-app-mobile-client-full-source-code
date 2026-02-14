@@ -334,3 +334,32 @@ class UserRewardsRefreshed extends AppEvent {
   @override
   List<Object?> get props => [completer];
 }
+
+/// {@template app_onboarding_completed}
+/// Dispatched when an onboarding flow (pre- or post-auth) is completed.
+/// {@endtemplate}
+final class AppOnboardingCompleted extends AppEvent {
+  /// {@macro app_onboarding_completed}
+  const AppOnboardingCompleted({
+    required this.status,
+    this.userContentPreferences,
+    this.userContext,
+  });
+
+  /// The specific onboarding flow that was completed.
+  final OnboardingStatus status;
+
+  /// The updated user content preferences, if applicable (e.g., after initial
+  /// personalization).
+  final UserContentPreferences? userContentPreferences;
+
+  /// The updated user context, if applicable.
+  final UserContext? userContext;
+
+  @override
+  List<Object?> get props => [
+        status,
+        userContentPreferences,
+        userContext,
+      ];
+}

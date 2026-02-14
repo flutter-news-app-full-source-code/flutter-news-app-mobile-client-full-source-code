@@ -1735,10 +1735,25 @@ class AppLocalizationsAr extends AppLocalizations {
   String get initialPersonalizationStepCountriesTitle => 'اختر الدول';
 
   @override
-  String initialPersonalizationSelectionCountLabel(int count, int total) {
-    return 'تم تحديد $count من $total';
+  String initialPersonalizationTotalSelectionCountLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count محدد',
+      many: '$count محدد',
+      few: '$count محددات',
+      two: '2 محدد',
+      one: '1 محدد',
+      zero: '0 محدد',
+    );
+    return '$_temp0';
   }
 
   @override
   String get initialPersonalizationFinishButton => 'إنهاء';
+
+  @override
+  String multiSelectSearchPageSelectionCount(int count, int total) {
+    return '$count/$total';
+  }
 }

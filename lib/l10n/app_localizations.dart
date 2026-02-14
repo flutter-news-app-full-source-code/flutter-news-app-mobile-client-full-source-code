@@ -3212,17 +3212,23 @@ abstract class AppLocalizations {
   /// **'Select Countries'**
   String get initialPersonalizationStepCountriesTitle;
 
-  /// Label showing the number of selected items out of the required total.
+  /// Label showing the total number of selected items.
   ///
   /// In en, this message translates to:
-  /// **'{count} of {total} selected'**
-  String initialPersonalizationSelectionCountLabel(int count, int total);
+  /// **'{count} selected'**
+  String initialPersonalizationTotalSelectionCountLabel(int count);
 
   /// Button text to complete the initial personalization.
   ///
   /// In en, this message translates to:
   /// **'Finish'**
   String get initialPersonalizationFinishButton;
+
+  /// Label showing the number of selected items out of the total allowed.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}/{total}'**
+  String multiSelectSearchPageSelectionCount(int count, int total);
 }
 
 class _AppLocalizationsDelegate

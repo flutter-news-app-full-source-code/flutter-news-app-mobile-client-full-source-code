@@ -1735,10 +1735,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get initialPersonalizationStepCountriesTitle => 'Select Countries';
 
   @override
-  String initialPersonalizationSelectionCountLabel(int count, int total) {
-    return '$count of $total selected';
+  String initialPersonalizationTotalSelectionCountLabel(int count) {
+    return '$count selected';
   }
 
   @override
   String get initialPersonalizationFinishButton => 'Finish';
+
+  @override
+  String multiSelectSearchPageSelectionCount(int count, int total) {
+    return '$count/$total';
+  }
 }

@@ -206,7 +206,7 @@ class AppInitializer {
         _readUserContext(user),
         _fetchUserRewards(user),
       ]);
-      
+
       final appSettings = results[0] as AppSettings?;
       final userContentPreferences = results[1] as UserContentPreferences?;
       final userContext = results[2] as UserContext?;

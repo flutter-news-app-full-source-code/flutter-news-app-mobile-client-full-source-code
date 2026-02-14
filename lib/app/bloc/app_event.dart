@@ -357,9 +357,5 @@ final class AppOnboardingCompleted extends AppEvent {
   final UserContext? userContext;
 
   @override
-  List<Object?> get props => [
-        status,
-        userContentPreferences,
-        userContext,
-      ];
+  List<Object?> get props => [status, userContentPreferences, userContext];
 }

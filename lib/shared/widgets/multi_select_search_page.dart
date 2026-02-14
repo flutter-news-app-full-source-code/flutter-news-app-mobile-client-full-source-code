@@ -19,6 +19,7 @@ class MultiSelectSearchPage<T> extends StatefulWidget {
     required this.title,
     required this.initialSelectedItems,
     required this.itemBuilder,
+    this.maxSelectionCount,
     this.allItems,
     this.repository,
     super.key,
@@ -42,6 +43,10 @@ class MultiSelectSearchPage<T> extends StatefulWidget {
 
   /// The initial set of selected items.
   final Set<T> initialSelectedItems;
+
+  /// The maximum number of items that can be selected.
+  /// If provided, disables selection when the limit is reached.
+  final int? maxSelectionCount;
 
   /// A function that returns the display string for an item of type [T].
   final String Function(T item) itemBuilder;
@@ -171,10 +176,27 @@ class _MultiSelectSearchPageState<T> extends State<MultiSelectSearchPage<T>> {
       appBar: AppBar(
         title: Text(widget.title, style: theme.textTheme.titleLarge),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.check),
-            tooltip: l10n.headlinesFeedFilterApplyButton,
-            onPressed: () => Navigator.of(context).pop(_selectedItems),
+          if (widget.maxSelectionCount != null)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                child: Text(
+                  l10n.multiSelectSearchPageSelectionCount(
+                    _selectedItems.length,
+                    widget.maxSelectionCount!,
+                  ),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.only(right: AppSpacing.sm),
+            child: TextButton(
+              onPressed: () => Navigator.of(context).pop(_selectedItems),
+              child: Text(l10n.saveButtonLabel),
+            ),
           ),
         ],
       ),
@@ -222,20 +244,26 @@ class _MultiSelectSearchPageState<T> extends State<MultiSelectSearchPage<T>> {
 
                   final item = displayItems[index];
                   final isSelected = _selectedItems.contains(item);
+                  final isLimitReached =
+                      widget.maxSelectionCount != null &&
+                      _selectedItems.length >= widget.maxSelectionCount!;
+
                   return CheckboxListTile(
                     title: Text(widget.itemBuilder(item)),
                     value: isSelected,
-                    onChanged: (bool? value) {
-                      if (value != null) {
-                        setState(() {
-                          if (value) {
-                            _selectedItems.add(item);
-                          } else {
-                            _selectedItems.remove(item);
-                          }
-                        });
-                      }
-                    },
+                    onChanged: (!isSelected && isLimitReached)
+                        ? null
+                        : (bool? value) {
+                            if (value != null) {
+                              setState(() {
+                                if (value) {
+                                  _selectedItems.add(item);
+                                } else {
+                                  _selectedItems.remove(item);
+                                }
+                              });
+                            }
+                          },
                     controlAffinity: ListTileControlAffinity.leading,
                   );
                 },

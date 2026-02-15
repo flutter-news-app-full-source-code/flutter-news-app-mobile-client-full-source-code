@@ -94,6 +94,54 @@
             }
         }
     },
+    "accountMyContentSectionTitle": "My Content",
+    "@accountMyContentSectionTitle": {
+        "description": "Title for the 'My Content' section on the account page."
+    },
+    "accountActivityAndRewardsSectionTitle": "Activity & Rewards",
+    "@accountActivityAndRewardsSectionTitle": {
+        "description": "Title for the 'Activity & Rewards' section on the account page."
+    },
+    "accountGeneralSectionTitle": "General",
+    "@accountGeneralSectionTitle": {
+        "description": "Title for the 'General' section on the account page."
+    },
+    "accountEditProfileButton": "Edit Profile",
+    "@accountEditProfileButton": {
+        "description": "Button text to navigate to the edit profile page."
+    },
+    "editProfilePageTitle": "Edit Profile",
+    "@editProfilePageTitle": {
+        "description": "Title for the Edit Profile page."
+    },
+    "editProfileNameInputLabel": "Name",
+    "@editProfileNameInputLabel": {
+        "description": "Label for the name input field on the Edit Profile page."
+    },
+    "editProfileEmailInputLabel": "Email",
+    "@editProfileEmailInputLabel": {
+        "description": "Label for the email input field on the Edit Profile page."
+    },
+    "editProfileUpdateSuccessSnackbar": "Profile updated successfully.",
+    "@editProfileUpdateSuccessSnackbar": {
+        "description": "Snackbar message shown when the user's profile is updated successfully."
+    },
+    "editProfileUpdateFailureSnackbar": "Failed to update profile. Please try again.",
+    "@editProfileUpdateFailureSnackbar": {
+        "description": "Snackbar message shown when updating the user's profile fails."
+    },
+    "followedContentPageTitle": "Followed Items",
+    "@followedContentPageTitle": {
+        "description": "Title for the new unified page that shows all followed content."
+    },
+    "followedContentTopicsTab": "Topics",
+    "@followedContentTopicsTab": {
+        "description": "Label for the 'Topics' tab on the followed content page."
+    },
+    "followedContentSourcesTab": "Sources",
+    "@followedContentSourcesTab": {
+        "description": "Label for the 'Sources' tab on the followed content page."
+    },
     "authenticationEmailSentSuccess": "Check your email for the sign-in link.",
     "@authenticationEmailSentSuccess": {
         "description": "Success message shown after sending an email sign-in link on the authentication page"

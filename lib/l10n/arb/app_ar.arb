@@ -94,6 +94,54 @@
             }
         }
     },
+    "accountMyContentSectionTitle": "المحتوى الخاص بي",
+    "@accountMyContentSectionTitle": {
+        "description": "Title for the 'My Content' section on the account page."
+    },
+    "accountActivityAndRewardsSectionTitle": "النشاط والمكافآت",
+    "@accountActivityAndRewardsSectionTitle": {
+        "description": "Title for the 'Activity & Rewards' section on the account page."
+    },
+    "accountGeneralSectionTitle": "عام",
+    "@accountGeneralSectionTitle": {
+        "description": "Title for the 'General' section on the account page."
+    },
+    "accountEditProfileButton": "تعديل الملف الشخصي",
+    "@accountEditProfileButton": {
+        "description": "Button text to navigate to the edit profile page."
+    },
+    "editProfilePageTitle": "تعديل الملف الشخصي",
+    "@editProfilePageTitle": {
+        "description": "Title for the Edit Profile page."
+    },
+    "editProfileNameInputLabel": "الاسم",
+    "@editProfileNameInputLabel": {
+        "description": "Label for the name input field on the Edit Profile page."
+    },
+    "editProfileEmailInputLabel": "البريد الإلكتروني",
+    "@editProfileEmailInputLabel": {
+        "description": "Label for the email input field on the Edit Profile page."
+    },
+    "editProfileUpdateSuccessSnackbar": "تم تحديث الملف الشخصي بنجاح.",
+    "@editProfileUpdateSuccessSnackbar": {
+        "description": "Snackbar message shown when the user's profile is updated successfully."
+    },
+    "editProfileUpdateFailureSnackbar": "فشل تحديث الملف الشخصي. يرجى المحاولة مرة أخرى.",
+    "@editProfileUpdateFailureSnackbar": {
+        "description": "Snackbar message shown when updating the user's profile fails."
+    },
+    "followedContentPageTitle": "العناصر المتابعة",
+    "@followedContentPageTitle": {
+        "description": "Title for the new unified page that shows all followed content."
+    },
+    "followedContentTopicsTab": "المواضيع",
+    "@followedContentTopicsTab": {
+        "description": "Label for the 'Topics' tab on the followed content page."
+    },
+    "followedContentSourcesTab": "المصادر",
+    "@followedContentSourcesTab": {
+        "description": "Label for the 'Sources' tab on the followed content page."
+    },
     "authenticationEmailSentSuccess": "تحقق من بريدك الإلكتروني للحصول على رابط تسجيل الدخول.",
     "@authenticationEmailSentSuccess": {
         "description": "Success message shown after sending an email sign-in link on the authentication page"

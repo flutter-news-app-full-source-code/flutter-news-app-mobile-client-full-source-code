@@ -1,10 +1,12 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/shared.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -22,11 +24,9 @@ class AccountPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
-    // Watch AppBloc for user details and authentication status
-    final appState = context.watch<AppBloc>().state;
-    final user = appState.user;
-    final status = appState.status;
-    final isAnonymous = status == AppLifeCycleStatus.anonymous;
+    final isAnonymous = context.select(
+      (AppBloc bloc) => bloc.state.user?.isAnonymous ?? true,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -34,19 +34,21 @@ class AccountPage extends StatelessWidget {
           icon: const Icon(Icons.close),
           onPressed: () => context.pop(),
         ),
-        title: Text(l10n.bottomNavAccountLabel),
+        title: Text(l10n.accountPageTitle),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            onPressed: () => context.pushNamed(Routes.settingsName),
-          ),
-          // Conditionally add a sign-in or sign-out button to the AppBar.
-          // This declutters the main content card and follows common UI patterns.
           if (isAnonymous)
             IconButton(
               icon: const Icon(Icons.sync),
               tooltip: l10n.anonymousLimitButton,
-              onPressed: () => context.goNamed(Routes.accountLinkingName),
+              onPressed: () {
+                context.read<AnalyticsService>().logEvent(
+                  AnalyticsEvent.limitExceededCtaClicked,
+                  payload: const LimitExceededCtaClickedPayload(
+                    ctaType: 'linkAccount',
+                  ),
+                );
+                context.goNamed(Routes.accountLinkingName);
+              },
             )
           else
             IconButton(
@@ -55,189 +57,150 @@ class AccountPage extends StatelessWidget {
               onPressed: () =>
                   context.read<AppBloc>().add(const AppLogoutRequested()),
             ),
-          const SizedBox(width: AppSpacing.lg),
         ],
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.paddingMedium),
+          padding: const EdgeInsets.all(AppSpacing.md),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildUserHeader(context, user, isAnonymous),
+              _ProfileHeader(),
               const SizedBox(height: AppSpacing.lg),
-              _buildNavigationList(context),
+              _NavigationSections(),
             ],
           ),
         ),
       ),
     );
   }
+}
 
-  /// Builds the header section of the sheet, displaying the user's avatar,
-  /// name, and a primary action button (Sign Out or Link Account).
-  Widget _buildUserHeader(BuildContext context, User? user, bool isAnonymous) {
+class _ProfileHeader extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    final String statusText;
-    final String accountTypeText;
-
-    if (isAnonymous) {
-      statusText = l10n.accountGuestUserHeadline;
-      accountTypeText = l10n.accountGuestUserSubheadline;
-    } else {
-      statusText = user?.email ?? l10n.accountNoNameUser;
-
-      final String roleDisplayName;
-      switch (user?.tier) {
-        case AccessTier.standard:
-          roleDisplayName = l10n.accountRoleStandard;
-        case AccessTier.guest:
-          roleDisplayName = l10n.accountGuestAccount;
-        case null:
-          roleDisplayName = '';
-      }
-      accountTypeText = roleDisplayName;
-    }
+    final user = context.select((AppBloc bloc) => bloc.state.user);
 
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+        child: Column(
           children: [
-            // Use the standard UserAvatar widget, clipped to be square.
-            // This ensures visual consistency with other avatars in the app.
-            ClipRRect(
-              borderRadius: BorderRadius.circular(AppSpacing.sm),
-              child: UserAvatar(user: user, radius: AppSpacing.lg),
-            ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    statusText,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+            Row(
+              children: [
+                UserAvatar(user: user, radius: 32),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        user?.name ?? l10n.accountGuestUserHeadline,
+                        style: Theme.of(context).textTheme.titleLarge,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (user?.email != null)
+                        Text(
+                          user!.email,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                    ],
                   ),
-                  const SizedBox(height: AppSpacing.xs),
-                  // Display the user role inside a styled "capsule" for a
-                  // more refined and less intrusive look.
-                  if (accountTypeText.isNotEmpty)
-                    DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: colorScheme.secondaryContainer,
-                        borderRadius: BorderRadius.circular(AppSpacing.sm),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.sm,
-                          vertical: 2,
-                        ),
-                        child: Text(
-                          accountTypeText,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSecondaryContainer,
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                icon: const Icon(Icons.edit_outlined),
+                label: Text(l10n.accountEditProfileButton),
+                onPressed: () async {
+                  final status = await context
+                      .read<ContentLimitationService>()
+                      .checkAction(ContentAction.editProfile);
+
+                  if (!context.mounted) return;
+
+                  if (status == LimitationStatus.allowed) {
+                    context.pushNamed(Routes.editProfileName);
+                  } else {
+                    showContentLimitationBottomSheet(
+                      context: context,
+                      status: status,
+                      action: ContentAction.editProfile,
+                    );
+                  }
+                },
               ),
             ),
-            const SizedBox(width: AppSpacing.md),
           ],
         ),
       ),
     );
   }
+}
 
-  /// Builds the sign-in button for anonymous users.
-
-  /// Builds the list of navigation tiles for accessing different
-  /// account-related sections.
-  Widget _buildNavigationList(BuildContext context) {
+class _NavigationSections extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
-    final isAnonymous = context.select(
-      (AppBloc bloc) => bloc.state.user?.isAnonymous ?? false,
-    );
     final areRewardsEnabled = context.select(
       (AppBloc bloc) =>
           bloc.state.remoteConfig?.features.rewards.enabled ?? false,
     );
-    return Column(
-      children: [
-        if (!isAnonymous && areRewardsEnabled) ...[
-          buildTile(
-            context: context,
-            icon: Icons.card_giftcard,
-            title: l10n.accountRewardsTile,
-            onTap: () => context.pushNamed(Routes.rewardsName),
+
+    return Card(
+      child: Column(
+        children: [
+          ListSubheader(title: l10n.accountMyContentSectionTitle),
+          ListTile(
+            leading: const Icon(Icons.bookmark_outline),
+            title: Text(l10n.accountSavedHeadlinesTile),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.pushNamed(Routes.accountSavedHeadlinesName),
           ),
-          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.check_circle_outline),
+            title: Text(l10n.accountContentPreferencesTile),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.pushNamed(Routes.manageFollowedItemsName),
+          ),
+          ListSubheader(title: l10n.accountActivityAndRewardsSectionTitle),
+          BlocSelector<AppBloc, AppState, bool>(
+            selector: (state) => state.hasUnreadInAppNotifications,
+            builder: (context, showIndicator) {
+              return ListTile(
+                leading: const Icon(Icons.notifications_outlined),
+                title: NotificationIndicator(
+                  showIndicator: showIndicator,
+                  child: Text(l10n.accountNotificationsTile),
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.pushNamed(Routes.notificationsCenterName),
+              );
+            },
+          ),
+          if (areRewardsEnabled)
+            ListTile(
+              leading: const Icon(Icons.card_giftcard_outlined),
+              title: Text(l10n.accountRewardsTile),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.pushNamed(Routes.rewardsName),
+            ),
+          ListSubheader(title: l10n.accountGeneralSectionTitle),
+          ListTile(
+            leading: const Icon(Icons.settings_outlined),
+            title: Text(l10n.accountSettingsTile),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.pushNamed(Routes.settingsName),
+          ),
         ],
-        buildTile(
-          context: context,
-          icon: Icons.check_outlined,
-          title: l10n.accountContentPreferencesTile,
-          onTap: () => context.pushNamed(Routes.manageFollowedItemsName),
-        ),
-        const Divider(),
-        buildTile(
-          context: context,
-          icon: Icons.bookmark_outline,
-          title: l10n.accountSavedHeadlinesTile,
-          onTap: () => context.pushNamed(Routes.accountSavedHeadlinesName),
-        ),
-        const Divider(),
-        BlocSelector<AppBloc, AppState, bool>(
-          selector: (state) => state.hasUnreadInAppNotifications,
-          builder: (context, showIndicator) {
-            return buildTile(
-              context: context,
-              icon: Icons.notifications_none_outlined,
-              title: l10n.accountNotificationsTile,
-              onTap: () {
-                // Navigate to the new Notification Center page.
-                context.pushNamed(Routes.notificationsCenterName);
-              },
-              // Wrap the title with NotificationIndicator to show the red dot.
-              // This ensures the indicator is aligned with the text.
-              showIndicator: showIndicator,
-            );
-          },
-        ),
-        const Divider(),
-      ],
-    );
-  }
-
-  /// Helper to create a ListTile with consistent styling and optional indicator.
-  Widget buildTile({
-    required BuildContext context,
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-    bool showIndicator = false,
-  }) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-
-    return ListTile(
-      leading: Icon(icon, color: theme.colorScheme.primary),
-      title: NotificationIndicator(
-        showIndicator: showIndicator,
-        child: Text(title, style: textTheme.titleMedium),
       ),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: onTap,
     );
   }
 }

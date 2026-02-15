@@ -230,6 +230,78 @@ abstract class AppLocalizations {
   /// **'Role: {role}'**
   String accountRoleLabel(String role);
 
+  /// Title for the 'My Content' section on the account page.
+  ///
+  /// In en, this message translates to:
+  /// **'My Content'**
+  String get accountMyContentSectionTitle;
+
+  /// Title for the 'Activity & Rewards' section on the account page.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity & Rewards'**
+  String get accountActivityAndRewardsSectionTitle;
+
+  /// Title for the 'General' section on the account page.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get accountGeneralSectionTitle;
+
+  /// Button text to navigate to the edit profile page.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get accountEditProfileButton;
+
+  /// Title for the Edit Profile page.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get editProfilePageTitle;
+
+  /// Label for the name input field on the Edit Profile page.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get editProfileNameInputLabel;
+
+  /// Label for the email input field on the Edit Profile page.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get editProfileEmailInputLabel;
+
+  /// Snackbar message shown when the user's profile is updated successfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated successfully.'**
+  String get editProfileUpdateSuccessSnackbar;
+
+  /// Snackbar message shown when updating the user's profile fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update profile. Please try again.'**
+  String get editProfileUpdateFailureSnackbar;
+
+  /// Title for the new unified page that shows all followed content.
+  ///
+  /// In en, this message translates to:
+  /// **'Followed Items'**
+  String get followedContentPageTitle;
+
+  /// Label for the 'Topics' tab on the followed content page.
+  ///
+  /// In en, this message translates to:
+  /// **'Topics'**
+  String get followedContentTopicsTab;
+
+  /// Label for the 'Sources' tab on the followed content page.
+  ///
+  /// In en, this message translates to:
+  /// **'Sources'**
+  String get followedContentSourcesTab;
+
   /// Success message shown after sending an email sign-in link on the authentication page
   ///
   /// In en, this message translates to:

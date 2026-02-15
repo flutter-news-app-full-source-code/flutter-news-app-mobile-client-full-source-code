@@ -80,6 +80,44 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get accountMyContentSectionTitle => 'My Content';
+
+  @override
+  String get accountActivityAndRewardsSectionTitle => 'Activity & Rewards';
+
+  @override
+  String get accountGeneralSectionTitle => 'General';
+
+  @override
+  String get accountEditProfileButton => 'Edit Profile';
+
+  @override
+  String get editProfilePageTitle => 'Edit Profile';
+
+  @override
+  String get editProfileNameInputLabel => 'Name';
+
+  @override
+  String get editProfileEmailInputLabel => 'Email';
+
+  @override
+  String get editProfileUpdateSuccessSnackbar =>
+      'Profile updated successfully.';
+
+  @override
+  String get editProfileUpdateFailureSnackbar =>
+      'Failed to update profile. Please try again.';
+
+  @override
+  String get followedContentPageTitle => 'Followed Items';
+
+  @override
+  String get followedContentTopicsTab => 'Topics';
+
+  @override
+  String get followedContentSourcesTab => 'Sources';
+
+  @override
   String get authenticationEmailSentSuccess =>
       'Check your email for the sign-in link.';
 

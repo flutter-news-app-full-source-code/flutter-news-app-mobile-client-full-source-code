@@ -80,6 +80,43 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get accountMyContentSectionTitle => 'المحتوى الخاص بي';
+
+  @override
+  String get accountActivityAndRewardsSectionTitle => 'النشاط والمكافآت';
+
+  @override
+  String get accountGeneralSectionTitle => 'عام';
+
+  @override
+  String get accountEditProfileButton => 'تعديل الملف الشخصي';
+
+  @override
+  String get editProfilePageTitle => 'تعديل الملف الشخصي';
+
+  @override
+  String get editProfileNameInputLabel => 'الاسم';
+
+  @override
+  String get editProfileEmailInputLabel => 'البريد الإلكتروني';
+
+  @override
+  String get editProfileUpdateSuccessSnackbar => 'تم تحديث الملف الشخصي بنجاح.';
+
+  @override
+  String get editProfileUpdateFailureSnackbar =>
+      'فشل تحديث الملف الشخصي. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get followedContentPageTitle => 'العناصر المتابعة';
+
+  @override
+  String get followedContentTopicsTab => 'المواضيع';
+
+  @override
+  String get followedContentSourcesTab => 'المصادر';
+
+  @override
   String get authenticationEmailSentSuccess =>
       'تحقق من بريدك الإلكتروني للحصول على رابط تسجيل الدخول.';
 

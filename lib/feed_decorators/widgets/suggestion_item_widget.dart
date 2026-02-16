@@ -37,11 +37,11 @@ class SuggestionItemWidget extends StatelessWidget {
     String name;
     if (item is Topic) {
       final topic = item as Topic;
-      imageUrl = topic.iconUrl;
+      imageUrl = topic.iconUrl!;
       name = topic.name;
     } else if (item is Source) {
       final source = item as Source;
-      imageUrl = source.logoUrl;
+      imageUrl = source.logoUrl!;
       name = source.name;
     } else {
       // Fallback for unexpected types, though type checking should prevent this

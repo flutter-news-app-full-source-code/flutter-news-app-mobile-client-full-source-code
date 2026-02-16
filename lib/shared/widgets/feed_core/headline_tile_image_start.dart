@@ -73,7 +73,7 @@ class HeadlineTileImageStart extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(AppSpacing.xs),
                       child: Image.network(
-                        headline.imageUrl,
+                        headline.imageUrl!,
                         fit: BoxFit.cover,
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;

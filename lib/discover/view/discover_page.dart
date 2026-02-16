@@ -287,7 +287,7 @@ class _SourceCard extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(AppSpacing.md),
                   child: Image.network(
-                    source.logoUrl,
+                    source.logoUrl!,
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) => Icon(
                       Icons.source_outlined,

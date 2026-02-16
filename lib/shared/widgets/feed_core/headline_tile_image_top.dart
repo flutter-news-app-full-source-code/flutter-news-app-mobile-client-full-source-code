@@ -60,7 +60,7 @@ class HeadlineTileImageTop extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.only(top: AppSpacing.sm),
               child: Image.network(
-                headline.imageUrl,
+                headline.imageUrl!,
                 width: double.infinity,
                 height: 180,
                 fit: BoxFit.cover,

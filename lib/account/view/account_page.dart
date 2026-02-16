@@ -122,7 +122,7 @@ class _ProfileHeader extends StatelessWidget {
               if (!context.mounted) return;
 
               if (status == LimitationStatus.allowed) {
-                context.pushNamed(Routes.editProfileName);
+                await context.pushNamed(Routes.editProfileName);
               } else {
                 showContentLimitationBottomSheet(
                   context: context,

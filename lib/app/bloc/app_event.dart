@@ -33,6 +33,21 @@ class AppUserChanged extends AppEvent {
   List<Object?> get props => [user];
 }
 
+/// {@template app_user_updated}
+/// Dispatched when the user's profile data (e.g., name) has been updated
+/// locally and needs to be propagated to the global app state.
+/// {@endtemplate}
+class AppUserUpdated extends AppEvent {
+  /// {@macro app_user_updated}
+  const AppUserUpdated(this.user);
+
+  /// The updated user object.
+  final User user;
+
+  @override
+  List<Object?> get props => [user];
+}
+
 /// Dispatched to request a refresh of the user's application settings.
 ///
 /// This event is typically used when external changes might have occurred
@@ -81,6 +96,16 @@ class AppPeriodicConfigFetchRequested extends AppEvent {
 
   @override
   List<Object> get props => [isBackgroundCheck];
+}
+
+/// {@template app_user_refresh_requested}
+/// Dispatched to request a full refresh of the current user's data from the
+/// backend. This is typically used to sync state after background updates,
+/// such as a profile picture becoming available.
+/// {@endtemplate}
+class AppUserRefreshRequested extends AppEvent {
+  /// {@macro app_user_refresh_requested}
+  const AppUserRefreshRequested();
 }
 
 /// Dispatched when the user logs out.

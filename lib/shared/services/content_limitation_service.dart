@@ -39,6 +39,9 @@ enum ContentAction {
 
   /// The action of submitting a report.
   submitReport,
+
+  /// The action of editing a user's profile.
+  editProfile,
 }
 
 /// Defines the outcome of a content limitation check.

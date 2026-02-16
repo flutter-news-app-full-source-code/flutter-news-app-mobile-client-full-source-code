@@ -61,8 +61,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "v1.0.1"
-      resolved-ref: f1d7000e990438efeadf3289f5145e15d547d6a2
+      ref: "599438a8320b2fad2be43686f9dd65b762f34b0b"
+      resolved-ref: "599438a8320b2fad2be43686f9dd65b762f34b0b"
       url: "https://github.com/flutter-news-app-full-source-code/auth-api.git"
     source: git
     version: "1.0.1"
@@ -70,26 +70,17 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "v1.0.1"
-      resolved-ref: "605212aa4bf2a106691f447b824c66bb5218205c"
+      ref: "58cc4201ceb52f74e0b639106276e396e4ff03a6"
+      resolved-ref: "58cc4201ceb52f74e0b639106276e396e4ff03a6"
       url: "https://github.com/flutter-news-app-full-source-code/auth-client.git"
     source: git
     version: "1.0.1"
-  auth_inmemory:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: "7fc38f09b941f2bbae3d7c9f21ff6848d3d9d258"
-      resolved-ref: "7fc38f09b941f2bbae3d7c9f21ff6848d3d9d258"
-      url: "https://github.com/flutter-news-app-full-source-code/auth-inmemory.git"
-    source: git
-    version: "1.1.0"
   auth_repository:
     dependency: "direct main"
     description:
       path: "."
-      ref: "v1.0.1"
-      resolved-ref: e7db1f123d25448c1438843a7958e9aefaee22ab
+      ref: "598998586fd4170ee673b74abf0df112218d0e07"
+      resolved-ref: "598998586fd4170ee673b74abf0df112218d0e07"
       url: "https://github.com/flutter-news-app-full-source-code/auth-repository.git"
     source: git
     version: "1.0.1"

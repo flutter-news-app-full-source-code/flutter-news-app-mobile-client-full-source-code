@@ -3,7 +3,6 @@ import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/widgets.dart';
@@ -149,9 +148,7 @@ class _FollowedList<T extends FeedItem> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (items.isEmpty) {
-      return Center(
-        child: Text(AppLocalizations.of(context).followedContentEmpty),
-      );
+      return Center(child: Text(context.l10n.followedContentEmpty));
     }
 
     return ListView.builder(

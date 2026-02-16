@@ -149,7 +149,6 @@ class _NavigationSections extends StatelessWidget {
     // Using a simple Column instead of a Card with a Column.
     return Column(
       children: [
-        ListSubheader(title: Text(l10n.accountMyContentSectionTitle)),
         ListTile(
           leading: const Icon(Icons.bookmark_outline),
           title: Text(l10n.accountSavedHeadlinesTile),
@@ -162,7 +161,6 @@ class _NavigationSections extends StatelessWidget {
           trailing: const Icon(Icons.chevron_right),
           onTap: () => context.pushNamed(Routes.manageFollowedItemsName),
         ),
-        ListSubheader(title: Text(l10n.accountActivityAndRewardsSectionTitle)),
         BlocSelector<AppBloc, AppState, bool>(
           selector: (state) => state.hasUnreadInAppNotifications,
           builder: (context, showIndicator) {
@@ -184,7 +182,6 @@ class _NavigationSections extends StatelessWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.pushNamed(Routes.rewardsName),
           ),
-        ListSubheader(title: Text(l10n.accountGeneralSectionTitle)),
         ListTile(
           leading: const Icon(Icons.settings_outlined),
           title: Text(l10n.accountSettingsTile),

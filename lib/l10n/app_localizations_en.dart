@@ -1781,6 +1781,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get initialPersonalizationFinishButton => 'Finish';
 
   @override
+  String get deleteAccountDialogTitle => 'Delete Account';
+
+  @override
+  String get deleteAccountDialogContent =>
+      'Are you sure you want to permanently delete your account? This action cannot be undone.';
+
+  @override
+  String get deleteAccountDialogConfirm => 'Delete Account';
+
+  @override
+  String get deleteAccountButton => 'Delete Account';
+
+  @override
+  String get followedContentEmpty =>
+      'You are not following any items in this category yet.';
+
+  @override
   String multiSelectSearchPageSelectionCount(int count, int total) {
     return '$count/$total';
   }

@@ -1790,6 +1790,23 @@ class AppLocalizationsAr extends AppLocalizations {
   String get initialPersonalizationFinishButton => 'إنهاء';
 
   @override
+  String get deleteAccountDialogTitle => 'حذف الحساب';
+
+  @override
+  String get deleteAccountDialogContent =>
+      'هل أنت متأكد أنك تريد حذف حسابك نهائيًا؟ لا يمكن التراجع عن هذا الإجراء.';
+
+  @override
+  String get deleteAccountDialogConfirm => 'حذف الحساب';
+
+  @override
+  String get deleteAccountButton => 'حذف الحساب';
+
+  @override
+  String get followedContentEmpty =>
+      'أنت لا تتابع أي عناصر في هذه الفئة حتى الآن.';
+
+  @override
   String multiSelectSearchPageSelectionCount(int count, int total) {
     return '$count/$total';
   }

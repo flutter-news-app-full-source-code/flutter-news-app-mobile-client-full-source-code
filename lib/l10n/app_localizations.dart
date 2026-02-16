@@ -3296,6 +3296,36 @@ abstract class AppLocalizations {
   /// **'Finish'**
   String get initialPersonalizationFinishButton;
 
+  /// Title for the dialog asking to confirm account deletion.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get deleteAccountDialogTitle;
+
+  /// Content for the account deletion confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to permanently delete your account? This action cannot be undone.'**
+  String get deleteAccountDialogContent;
+
+  /// Confirmation button text for account deletion.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get deleteAccountDialogConfirm;
+
+  /// Button text to initiate account deletion.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get deleteAccountButton;
+
+  /// Message shown when a list of followed items is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'You are not following any items in this category yet.'**
+  String get followedContentEmpty;
+
   /// Label showing the number of selected items out of the total allowed.
   ///
   /// In en, this message translates to:

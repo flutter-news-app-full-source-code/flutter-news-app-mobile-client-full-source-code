@@ -2285,6 +2285,26 @@
     "@initialPersonalizationFinishButton": {
         "description": "Button text to complete the initial personalization."
     },
+    "deleteAccountDialogTitle": "حذف الحساب",
+    "@deleteAccountDialogTitle": {
+        "description": "Title for the dialog asking to confirm account deletion."
+    },
+    "deleteAccountDialogContent": "هل أنت متأكد أنك تريد حذف حسابك نهائيًا؟ لا يمكن التراجع عن هذا الإجراء.",
+    "@deleteAccountDialogContent": {
+        "description": "Content for the account deletion confirmation dialog."
+    },
+    "deleteAccountDialogConfirm": "حذف الحساب",
+    "@deleteAccountDialogConfirm": {
+        "description": "Confirmation button text for account deletion."
+    },
+    "deleteAccountButton": "حذف الحساب",
+    "@deleteAccountButton": {
+        "description": "Button text to initiate account deletion."
+    },
+    "followedContentEmpty": "أنت لا تتابع أي عناصر في هذه الفئة حتى الآن.",
+    "@followedContentEmpty": {
+        "description": "Message shown when a list of followed items is empty."
+    },
     "multiSelectSearchPageSelectionCount": "{count}/{total}",
     "@multiSelectSearchPageSelectionCount": {
         "description": "Label showing the number of selected items out of the total allowed.",

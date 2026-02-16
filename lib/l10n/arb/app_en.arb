@@ -2285,6 +2285,26 @@
     "@initialPersonalizationFinishButton": {
         "description": "Button text to complete the initial personalization."
     },
+    "deleteAccountDialogTitle": "Delete Account",
+    "@deleteAccountDialogTitle": {
+        "description": "Title for the dialog asking to confirm account deletion."
+    },
+    "deleteAccountDialogContent": "Are you sure you want to permanently delete your account? This action cannot be undone.",
+    "@deleteAccountDialogContent": {
+        "description": "Content for the account deletion confirmation dialog."
+    },
+    "deleteAccountDialogConfirm": "Delete Account",
+    "@deleteAccountDialogConfirm": {
+        "description": "Confirmation button text for account deletion."
+    },
+    "deleteAccountButton": "Delete Account",
+    "@deleteAccountButton": {
+        "description": "Button text to initiate account deletion."
+    },
+    "followedContentEmpty": "You are not following any items in this category yet.",
+    "@followedContentEmpty": {
+        "description": "Message shown when a list of followed items is empty."
+    },
     "multiSelectSearchPageSelectionCount": "{count}/{total}",
     "@multiSelectSearchPageSelectionCount": {
         "description": "Label showing the number of selected items out of the total allowed.",

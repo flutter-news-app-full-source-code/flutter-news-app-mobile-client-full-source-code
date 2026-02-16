@@ -37,7 +37,10 @@ class ConfirmationDialog extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(false),
           child: Text(l10n.cancelButtonLabel),
         ),
-        FilledButton(
+        FilledButton.tonal(
+          style: FilledButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.errorContainer,
+          ),
           onPressed: () => Navigator.of(context).pop(true),
           child: Text(confirmButtonText),
         ),

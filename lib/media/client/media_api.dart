@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:core/core.dart';
 import 'package:http_client/http_client.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:logging/logging.dart';
 
 /// {@template media_api}
@@ -36,7 +37,7 @@ class MediaApi implements MediaClient {
   }
 
   @override
-  Future<void> uploadFile({
+  Future<void> uploadFileWithSignedPolicy({
     required String url,
     required Map<String, String> fields,
     required String fileName,
@@ -44,13 +45,15 @@ class MediaApi implements MediaClient {
     required String contentType,
   }) async {
     _logger.info('Uploading file with signed policy to: $url');
-    await _httpClient.postMultipart(
-      url,
-      fields: fields,
-      fileBytes: fileBytes,
-      fileName: fileName,
-      contentType: contentType,
-    );
+    final formData = FormData.fromMap({
+      ...fields,
+      'file': MultipartFile.fromBytes(
+        fileBytes,
+        filename: fileName,
+        contentType: MediaType.parse(contentType),
+      ),
+    });
+    await _httpClient.post<void>(url, data: formData);
     _logger.fine('File upload with signed policy successful.');
   }
 }

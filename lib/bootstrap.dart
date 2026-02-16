@@ -348,8 +348,6 @@ Future<Widget> bootstrap(
   );
   mediaClient = MediaApi(
     httpClient: httpClient,
-    // TODO(team): Use NoOpMediaApi for testing if needed
-    // mediaClient = NoOpMediaApi(
     logger: logger,
   );
   logger.fine('All data clients instantiated.');

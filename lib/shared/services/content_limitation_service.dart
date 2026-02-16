@@ -416,6 +416,10 @@ class ContentLimitationService {
         }
 
       // Daily action checks (asynchronous, cached)
+      case ContentAction.editProfile:
+        // Currently, editing a profile is always allowed and not subject to
+        // daily limits. This case is added for completeness.
+        return LimitationStatus.allowed;
       case ContentAction.postComment:
       case ContentAction.reactToContent:
       case ContentAction.submitReport:

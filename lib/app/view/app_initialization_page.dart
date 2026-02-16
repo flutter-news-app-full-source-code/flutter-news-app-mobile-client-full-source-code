@@ -72,6 +72,7 @@ class AppInitializationPage extends StatelessWidget {
     required this.inAppNotificationRepository,
     required this.analyticsService,
     required this.userRewardsRepository,
+    required this.mediaRepository,
     super.key,
   });
 
@@ -101,6 +102,7 @@ class AppInitializationPage extends StatelessWidget {
   final DataRepository<InAppNotification> inAppNotificationRepository;
   final AnalyticsService analyticsService;
   final DataRepository<UserRewards> userRewardsRepository;
+  final MediaRepository mediaRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -156,6 +158,7 @@ class AppInitializationPage extends StatelessWidget {
                     contentLimitationService: contentLimitationService,
                     analyticsService: analyticsService,
                     userRewardsRepository: userRewardsRepository,
+                    mediaRepository: mediaRepository,
                   );
                 case final InitializationOnboardingRequired onboarding:
                   return App(
@@ -193,6 +196,7 @@ class AppInitializationPage extends StatelessWidget {
                     contentLimitationService: contentLimitationService,
                     analyticsService: analyticsService,
                     userRewardsRepository: userRewardsRepository,
+                    mediaRepository: mediaRepository,
                   );
                 // This case should be unreachable, as AppInitializationSucceeded
                 // should not contain an InitializationFailure.

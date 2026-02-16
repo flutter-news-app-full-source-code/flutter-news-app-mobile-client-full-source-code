@@ -3,10 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/analytics/services/analytics_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/shared.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -63,7 +61,7 @@ class AccountPage extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            // The main column for the page content
             children: [
               _ProfileHeader(),
               const SizedBox(height: AppSpacing.lg),
@@ -82,65 +80,60 @@ class _ProfileHeader extends StatelessWidget {
     final l10n = AppLocalizationsX(context).l10n;
     final user = context.select((AppBloc bloc) => bloc.state.user);
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Column(
+    return Column(
+      children: [
+        Row(
           children: [
-            Row(
-              children: [
-                UserAvatar(user: user, radius: 32),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        user?.name ?? l10n.accountGuestUserHeadline,
-                        style: Theme.of(context).textTheme.titleLarge,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      if (user?.email != null)
-                        Text(
-                          user!.email,
-                          style: Theme.of(context).textTheme.bodyMedium,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                    ],
+            UserAvatar(user: user, radius: 32),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    user?.name ?? l10n.accountGuestUserHeadline,
+                    style: Theme.of(context).textTheme.titleLarge,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.md),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                icon: const Icon(Icons.edit_outlined),
-                label: Text(l10n.accountEditProfileButton),
-                onPressed: () async {
-                  final status = await context
-                      .read<ContentLimitationService>()
-                      .checkAction(ContentAction.editProfile);
-
-                  if (!context.mounted) return;
-
-                  if (status == LimitationStatus.allowed) {
-                    context.pushNamed(Routes.editProfileName);
-                  } else {
-                    showContentLimitationBottomSheet(
-                      context: context,
-                      status: status,
-                      action: ContentAction.editProfile,
-                    );
-                  }
-                },
+                  if (user?.email != null)
+                    Text(
+                      user!.email,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                ],
               ),
             ),
           ],
         ),
-      ),
+        const SizedBox(height: AppSpacing.md),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            icon: const Icon(Icons.edit_outlined),
+            label: Text(l10n.accountEditProfileButton),
+            onPressed: () async {
+              final status = await context
+                  .read<ContentLimitationService>()
+                  .checkAction(ContentAction.editProfile);
+
+              if (!context.mounted) return;
+
+              if (status == LimitationStatus.allowed) {
+                context.pushNamed(Routes.editProfileName);
+              } else {
+                showContentLimitationBottomSheet(
+                  context: context,
+                  status: status,
+                  action: ContentAction.editProfile,
+                );
+              }
+            },
+          ),
+        ),
+      ],
     );
   }
 }
@@ -153,54 +146,52 @@ class _NavigationSections extends StatelessWidget {
       (AppBloc bloc) =>
           bloc.state.remoteConfig?.features.rewards.enabled ?? false,
     );
-
-    return Card(
-      child: Column(
-        children: [
-          ListSubheader(title: l10n.accountMyContentSectionTitle),
-          ListTile(
-            leading: const Icon(Icons.bookmark_outline),
-            title: Text(l10n.accountSavedHeadlinesTile),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => context.pushNamed(Routes.accountSavedHeadlinesName),
-          ),
-          ListTile(
-            leading: const Icon(Icons.check_circle_outline),
-            title: Text(l10n.accountContentPreferencesTile),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => context.pushNamed(Routes.manageFollowedItemsName),
-          ),
-          ListSubheader(title: l10n.accountActivityAndRewardsSectionTitle),
-          BlocSelector<AppBloc, AppState, bool>(
-            selector: (state) => state.hasUnreadInAppNotifications,
-            builder: (context, showIndicator) {
-              return ListTile(
-                leading: const Icon(Icons.notifications_outlined),
-                title: NotificationIndicator(
-                  showIndicator: showIndicator,
-                  child: Text(l10n.accountNotificationsTile),
-                ),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => context.pushNamed(Routes.notificationsCenterName),
-              );
-            },
-          ),
-          if (areRewardsEnabled)
-            ListTile(
-              leading: const Icon(Icons.card_giftcard_outlined),
-              title: Text(l10n.accountRewardsTile),
+    // Using a simple Column instead of a Card with a Column.
+    return Column(
+      children: [
+        ListSubheader(title: Text(l10n.accountMyContentSectionTitle)),
+        ListTile(
+          leading: const Icon(Icons.bookmark_outline),
+          title: Text(l10n.accountSavedHeadlinesTile),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => context.pushNamed(Routes.accountSavedHeadlinesName),
+        ),
+        ListTile(
+          leading: const Icon(Icons.check_circle_outline),
+          title: Text(l10n.accountContentPreferencesTile),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => context.pushNamed(Routes.manageFollowedItemsName),
+        ),
+        ListSubheader(title: Text(l10n.accountActivityAndRewardsSectionTitle)),
+        BlocSelector<AppBloc, AppState, bool>(
+          selector: (state) => state.hasUnreadInAppNotifications,
+          builder: (context, showIndicator) {
+            return ListTile(
+              leading: const Icon(Icons.notifications_outlined),
+              title: NotificationIndicator(
+                showIndicator: showIndicator,
+                child: Text(l10n.accountNotificationsTile),
+              ),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () => context.pushNamed(Routes.rewardsName),
-            ),
-          ListSubheader(title: l10n.accountGeneralSectionTitle),
+              onTap: () => context.pushNamed(Routes.notificationsCenterName),
+            );
+          },
+        ),
+        if (areRewardsEnabled)
           ListTile(
-            leading: const Icon(Icons.settings_outlined),
-            title: Text(l10n.accountSettingsTile),
+            leading: const Icon(Icons.card_giftcard_outlined),
+            title: Text(l10n.accountRewardsTile),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () => context.pushNamed(Routes.settingsName),
+            onTap: () => context.pushNamed(Routes.rewardsName),
           ),
-        ],
-      ),
+        ListSubheader(title: Text(l10n.accountGeneralSectionTitle)),
+        ListTile(
+          leading: const Icon(Icons.settings_outlined),
+          title: Text(l10n.accountSettingsTile),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => context.pushNamed(Routes.settingsName),
+        ),
+      ],
     );
   }
 }

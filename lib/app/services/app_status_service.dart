@@ -66,6 +66,9 @@ class AppStatusService with WidgetsBindingObserver {
       _context.read<AppBloc>().add(
         const AppPeriodicConfigFetchRequested(isBackgroundCheck: true),
       );
+      // Also trigger a user data refresh to sync any backend changes
+      // (like a profile picture URL becoming available).
+      _context.read<AppBloc>().add(const AppUserRefreshRequested());
     });
   }
 
@@ -85,6 +88,10 @@ class AppStatusService with WidgetsBindingObserver {
       _context.read<AppBloc>().add(
         const AppPeriodicConfigFetchRequested(isBackgroundCheck: true),
       );
+      // Also trigger a user data refresh to sync any backend changes
+      // (like a profile picture URL becoming available).
+      _logger.info('[AppStatusService] App resumed. Requesting user refresh.');
+      _context.read<AppBloc>().add(const AppUserRefreshRequested());
     }
   }
 

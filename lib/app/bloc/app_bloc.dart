@@ -43,6 +43,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required UserContentPreferences? userContentPreferences,
     required UserRewards? userRewards,
     required OnboardingStatus? onboardingStatus,
+    required DataRepository<User> userRepository,
     required DataRepository<RemoteConfig> remoteConfigRepository,
     required AppInitializer appInitializer,
     required AuthRepository authRepository,
@@ -66,6 +67,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _appSettingsRepository = appSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
        _userContextRepository = userContextRepository,
+       _userRepository = userRepository,
        _inAppNotificationRepository = inAppNotificationRepository,
        _feedCacheService = feedCacheService,
        _pushNotificationService = pushNotificationService,
@@ -93,6 +95,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // Register event handlers for various app-level events.
     on<AppStarted>(_onAppStarted);
     on<AppUserChanged>(_onAppUserChanged);
+    on<AppUserUpdated>(_onAppUserUpdated);
     on<AppSettingsRefreshed>(_onUserAppSettingsRefreshed);
     on<AppUserContentPreferencesRefreshed>(_onUserContentPreferencesRefreshed);
     on<AppSettingsChanged>(_onAppSettingsChanged);
@@ -120,6 +123,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppContentReported>(_onAppContentReported);
     on<UserRewardsRefreshed>(_onUserRewardsRefreshed);
     on<AppOnboardingCompleted>(_onAppOnboardingCompleted);
+    on<AppUserRefreshRequested>(_onAppUserRefreshRequested);
 
     // Listen to token refresh events from the push notification service.
     // When a token is refreshed, dispatch an event to trigger device
@@ -150,6 +154,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
   final DataRepository<UserContext> _userContextRepository;
+  final DataRepository<User> _userRepository;
   final DataRepository<InAppNotification> _inAppNotificationRepository;
   final PushNotificationService _pushNotificationService;
   final DataRepository<Report> _reportRepository;
@@ -452,6 +457,19 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           ),
         );
     }
+  }
+
+  /// Handles the [AppUserUpdated] event, which is dispatched when a part of
+  /// the app (like the profile editor) updates the user object. This ensures
+  /// the global state is immediately consistent.
+  void _onAppUserUpdated(AppUserUpdated event, Emitter<AppState> emit) {
+    _logger.info(
+      '[AppBloc] AppUserUpdated event received. Updating user in state.',
+    );
+    // Simply emit a new state with the updated user object.
+    // This is critical for changes like updating a user's name to be
+    // reflected instantly across the app.
+    emit(state.copyWith(user: event.user));
   }
 
   /// Handles refreshing/loading app settings (theme, font).
@@ -1270,6 +1288,31 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         e,
         s,
       );
+    }
+  }
+
+  /// Handles the request to refresh the user data from the backend.
+  Future<void> _onAppUserRefreshRequested(
+    AppUserRefreshRequested event,
+    Emitter<AppState> emit,
+  ) async {
+    final userId = state.user?.id;
+    if (userId == null) {
+      _logger.info('[AppBloc] Skipping user refresh: User is null.');
+      return;
+    }
+
+    _logger.info('[AppBloc] Refreshing user data for user $userId...');
+    try {
+      final refreshedUser = await _userRepository.read(id: userId);
+      // Only emit if the user data has actually changed to avoid unnecessary
+      // UI rebuilds. The User model implements Equatable.
+      if (refreshedUser != state.user) {
+        _logger.info('[AppBloc] User data has changed. Emitting new state.');
+        emit(state.copyWith(user: refreshedUser));
+      }
+    } catch (e, s) {
+      _logger.warning('[AppBloc] Failed to refresh user data.', e, s);
     }
   }
 }

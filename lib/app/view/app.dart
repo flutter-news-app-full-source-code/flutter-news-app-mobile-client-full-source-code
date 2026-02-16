@@ -75,6 +75,7 @@ class App extends StatelessWidget {
     required PushNotificationService pushNotificationService,
     required AnalyticsService analyticsService,
     required DataRepository<UserRewards> userRewardsRepository,
+    required MediaRepository mediaRepository,
     this.onboardingStatus,
     super.key,
   }) : _authenticationRepository = authenticationRepository,
@@ -102,6 +103,7 @@ class App extends StatelessWidget {
        _inlineAdCacheService = inlineAdCacheService,
        _analyticsService = analyticsService,
        _userRewardsRepository = userRewardsRepository,
+       _mediaRepository = mediaRepository,
        _kvStorageService = kvStorageService;
 
   /// The initial user, pre-fetched during startup.
@@ -152,6 +154,7 @@ class App extends StatelessWidget {
   final PushNotificationService _pushNotificationService;
   final AnalyticsService _analyticsService;
   final DataRepository<UserRewards> _userRewardsRepository;
+  final MediaRepository _mediaRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -185,6 +188,7 @@ class App extends StatelessWidget {
         RepositoryProvider.value(value: _environment),
         RepositoryProvider.value(value: _analyticsService),
         RepositoryProvider.value(value: _userRewardsRepository),
+        RepositoryProvider.value(value: _mediaRepository),
         // NOTE: The AppInitializer is provided at the root in bootstrap.dart
         // and is accessed via context.read() in the AppBloc.
       ],
@@ -218,6 +222,7 @@ class App extends StatelessWidget {
               feedCacheService: context.read<FeedCacheService>(),
               analyticsService: _analyticsService,
               userRewardsRepository: _userRewardsRepository,
+              userRepository: _userRepository,
             )..add(const AppStarted()),
           ),
         ],

@@ -1,4 +1,3 @@
-import 'package:auth_repository/auth_repository.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +32,6 @@ class EditProfilePage extends StatelessWidget {
       create: (context) => ProfileBloc(
         user: user,
         userRepository: context.read<DataRepository<User>>(),
-        authRepository: context.read<AuthRepository>(),
         mediaRepository: context.read<MediaRepository>(),
         appBloc: context.read<AppBloc>(),
         logger: context.read<Logger>(),

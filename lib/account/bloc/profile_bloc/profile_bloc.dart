@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:auth_repository/auth_repository.dart';
 import 'package:bloc/bloc.dart';
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
@@ -23,12 +22,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ProfileBloc({
     required User user,
     required DataRepository<User> userRepository,
-    required AuthRepository authRepository,
     required MediaRepository mediaRepository,
     required AppBloc appBloc,
     required Logger logger,
   }) : _userRepository = userRepository,
-       _authRepository = authRepository,
        _mediaRepository = mediaRepository,
        _appBloc = appBloc,
        _logger = logger,
@@ -40,7 +37,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   }
 
   final DataRepository<User> _userRepository;
-  final AuthRepository _authRepository;
   final MediaRepository _mediaRepository;
   final AppBloc _appBloc;
   final Logger _logger;

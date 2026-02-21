@@ -340,8 +340,8 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
       _logger.finer(
         'FeedAdLoaderWidget build: AppSettings are null, returning empty Card.',
       );
-      return Card(
-        margin: const EdgeInsets.symmetric(
+      return const Card(
+        margin: EdgeInsets.symmetric(
           horizontal: AppSpacing.paddingMedium,
           vertical: AppSpacing.xs,
         ),

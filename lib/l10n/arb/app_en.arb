@@ -2305,6 +2305,10 @@
     "@followedContentEmpty": {
         "description": "Message shown when a list of followed items is empty."
     },
+    "followedContentEmptySubheadline": "Items you follow will appear here. Use the '+' button to add more.",
+    "@followedContentEmptySubheadline": {
+        "description": "Subheadline for the empty state on the followed content page."
+    },
     "multiSelectSearchPageSelectionCount": "{count}/{total}",
     "@multiSelectSearchPageSelectionCount": {
         "description": "Label showing the number of selected items out of the total allowed.",

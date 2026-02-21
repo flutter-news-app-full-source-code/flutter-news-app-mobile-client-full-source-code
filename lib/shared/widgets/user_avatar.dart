@@ -33,6 +33,7 @@ class UserAvatar extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    final localUser = user;
     // Determine which content to show based on a priority order.
     Widget child;
     ImageProvider? backgroundImage;
@@ -40,15 +41,20 @@ class UserAvatar extends StatelessWidget {
     if (overrideImage != null) {
       backgroundImage = overrideImage;
       child = const SizedBox.shrink();
-    } else if (user?.photoUrl != null) {
-      backgroundImage = NetworkImage(user!.photoUrl!);
+    } else if (localUser?.photoUrl != null && localUser!.photoUrl!.isNotEmpty) {
+      backgroundImage = NetworkImage(localUser.photoUrl!);
       child = const SizedBox.shrink();
-    } else if (user?.mediaAssetId != null) {
+    } else if (localUser?.mediaAssetId != null &&
+        localUser!.mediaAssetId!.isNotEmpty) {
       // Show a "processing" state if mediaAssetId exists but photoUrl doesn't.
       child = CupertinoActivityIndicator(color: colorScheme.onPrimaryContainer);
-    } else if (user?.name?.isNotEmpty ?? false) {
+    } else if (localUser != null &&
+        !localUser.isAnonymous &&
+        localUser.name != null &&
+        localUser.name!.isNotEmpty) {
+      // Show initial for non-anonymous users with a name.
       child = Text(
-        user!.name!.substring(0, 1).toUpperCase(),
+        localUser.name!.substring(0, 1).toUpperCase(),
         style: theme.textTheme.titleMedium?.copyWith(
           fontWeight: FontWeight.bold,
           color: colorScheme.onPrimaryContainer,

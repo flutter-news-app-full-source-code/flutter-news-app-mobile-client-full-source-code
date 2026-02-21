@@ -33,11 +33,15 @@ class FollowedContentPage extends StatelessWidget {
             ],
           ),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.add_circle_outline),
-              onPressed: () {
-                final tabIndex = DefaultTabController.of(context).index;
-                _navigateToAddPage(context, tabIndex);
+            Builder(
+              builder: (context) {
+                return IconButton(
+                  icon: const Icon(Icons.add_circle_outline),
+                  onPressed: () {
+                    final tabIndex = DefaultTabController.of(context).index;
+                    _navigateToAddPage(context, tabIndex);
+                  },
+                );
               },
             ),
           ],
@@ -84,7 +88,7 @@ class FollowedContentPage extends StatelessWidget {
         pageArgs = {
           'title': l10n.addTopicsPageTitle,
           'repository': context.read<DataRepository<Topic>>(),
-          'itemBuilder': (Topic item) => item.name,
+          'itemBuilder': (FeedItem item) => (item as Topic).name,
         };
         initialSelectedItems = preferences.followedTopics.toSet();
         onSave = (newItems) {
@@ -99,7 +103,7 @@ class FollowedContentPage extends StatelessWidget {
         pageArgs = {
           'title': l10n.addSourcesPageTitle,
           'repository': context.read<DataRepository<Source>>(),
-          'itemBuilder': (Source item) => item.name,
+          'itemBuilder': (FeedItem item) => (item as Source).name,
         };
         initialSelectedItems = preferences.followedSources.toSet();
         onSave = (newItems) {
@@ -114,7 +118,7 @@ class FollowedContentPage extends StatelessWidget {
         pageArgs = {
           'title': l10n.addCountriesPageTitle,
           'repository': context.read<DataRepository<Country>>(),
-          'itemBuilder': (Country item) => item.name,
+          'itemBuilder': (FeedItem item) => (item as Country).name,
         };
         initialSelectedItems = preferences.followedCountries.toSet();
         onSave = (newItems) {
@@ -164,9 +168,12 @@ class _FollowedList<T extends FeedItem> extends StatelessWidget {
             leading = const CircleAvatar(child: Icon(Icons.tag));
           case final Source source:
             title = source.name;
-            leading = const UserAvatar(
-              user: null,
-            ); // Placeholder for source logo
+            leading = CircleAvatar(
+              backgroundImage: source.logoUrl != null
+                  ? NetworkImage(source.logoUrl!)
+                  : null,
+              child: source.logoUrl == null ? const Icon(Icons.public) : null,
+            );
           case final Country country:
             title = country.name;
             leading = CircleAvatar(

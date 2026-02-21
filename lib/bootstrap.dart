@@ -346,10 +346,7 @@ Future<Widget> bootstrap(
     toJson: (rewards) => rewards.toJson(),
     logger: logger,
   );
-  mediaClient = MediaApi(
-    httpClient: httpClient,
-    logger: logger,
-  );
+  mediaClient = MediaApi(httpClient: httpClient, logger: logger);
   logger.fine('All data clients instantiated.');
 
   final headlinesRepository = DataRepository<Headline>(

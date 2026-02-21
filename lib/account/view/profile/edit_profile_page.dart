@@ -1,5 +1,6 @@
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/profile_bloc/profile_bloc.dart';
@@ -41,19 +42,28 @@ class EditProfilePage extends StatelessWidget {
   }
 }
 
-class _EditProfileView extends StatelessWidget {
+class _EditProfileView extends StatefulWidget {
   const _EditProfileView();
+
+  @override
+  State<_EditProfileView> createState() => _EditProfileViewState();
+}
+
+class _EditProfileViewState extends State<_EditProfileView> {
+  Uint8List? _selectedImageBytes;
 
   Future<void> _pickImage(BuildContext context) async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
-    if (pickedFile != null) {
-      final bytes = await pickedFile.readAsBytes();
-      if (context.mounted) {
-        context.read<ProfileBloc>().add(ProfileImageChanged(bytes));
-      }
-    }
+    if (pickedFile == null) return;
+
+    final bytes = await pickedFile.readAsBytes();
+    if (!mounted) return;
+
+    setState(() {
+      _selectedImageBytes = bytes;
+    });
   }
 
   @override
@@ -98,7 +108,7 @@ class _EditProfileView extends StatelessWidget {
                 }
                 return TextButton(
                   onPressed: () => context.read<ProfileBloc>().add(
-                    const ProfileUpdateRequested(),
+                    ProfileUpdateRequested(imageBytes: _selectedImageBytes),
                   ),
                   child: Text(l10n.saveButtonLabel),
                 );
@@ -112,16 +122,12 @@ class _EditProfileView extends StatelessWidget {
             children: [
               GestureDetector(
                 onTap: () => _pickImage(context),
-                child: BlocBuilder<ProfileBloc, ProfileState>(
-                  builder: (context, state) {
-                    return UserAvatar(
-                      user: user,
-                      radius: 60,
-                      overrideImage: state.imageBytes != null
-                          ? MemoryImage(state.imageBytes!)
-                          : null,
-                    );
-                  },
+                child: UserAvatar(
+                  user: user,
+                  radius: 60,
+                  overrideImage: _selectedImageBytes != null
+                      ? MemoryImage(_selectedImageBytes!)
+                      : null,
                 ),
               ),
               const SizedBox(height: AppSpacing.xxl),

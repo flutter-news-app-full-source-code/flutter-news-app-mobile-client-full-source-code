@@ -1807,6 +1807,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'أنت لا تتابع أي عناصر في هذه الفئة حتى الآن.';
 
   @override
+  String get followedContentEmptySubheadline =>
+      'العناصر التي تتابعها ستظهر هنا. استخدم زر \'+\' لإضافة المزيد.';
+
+  @override
   String multiSelectSearchPageSelectionCount(int count, int total) {
     return '$count/$total';
   }

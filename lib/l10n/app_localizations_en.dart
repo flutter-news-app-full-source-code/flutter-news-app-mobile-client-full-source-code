@@ -1798,6 +1798,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'You are not following any items in this category yet.';
 
   @override
+  String get followedContentEmptySubheadline =>
+      'Items you follow will appear here. Use the \'+\' button to add more.';
+
+  @override
   String multiSelectSearchPageSelectionCount(int count, int total) {
     return '$count/$total';
   }

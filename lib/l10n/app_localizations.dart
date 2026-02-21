@@ -3326,6 +3326,12 @@ abstract class AppLocalizations {
   /// **'You are not following any items in this category yet.'**
   String get followedContentEmpty;
 
+  /// Subheadline for the empty state on the followed content page.
+  ///
+  /// In en, this message translates to:
+  /// **'Items you follow will appear here. Use the \'+\' button to add more.'**
+  String get followedContentEmptySubheadline;
+
   /// Label showing the number of selected items out of the total allowed.
   ///
   /// In en, this message translates to:

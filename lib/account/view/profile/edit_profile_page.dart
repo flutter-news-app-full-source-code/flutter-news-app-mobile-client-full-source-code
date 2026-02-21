@@ -77,6 +77,10 @@ class _EditProfileViewState extends State<_EditProfileView> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
     final user = context.select((AppBloc bloc) => bloc.state.user)!;
+    final isUploading = user.mediaAssetId != null && user.photoUrl == null;
+    final optimisticAvatar = context.select(
+      (AppBloc bloc) => bloc.state.optimisticAvatarBytes,
+    );
 
     return BlocListener<ProfileBloc, ProfileState>(
       listener: (context, state) {
@@ -128,7 +132,7 @@ class _EditProfileViewState extends State<_EditProfileView> {
           child: Column(
             children: [
               GestureDetector(
-                onTap: () => _pickImage(context),
+                onTap: isUploading ? null : () => _pickImage(context),
                 child: Stack(
                   children: [
                     UserAvatar(
@@ -136,7 +140,9 @@ class _EditProfileViewState extends State<_EditProfileView> {
                       radius: 60,
                       overrideImage: _selectedImageBytes != null
                           ? MemoryImage(_selectedImageBytes!)
-                          : null,
+                          : (optimisticAvatar != null
+                                ? MemoryImage(optimisticAvatar)
+                                : null),
                     ),
                     Positioned(
                       bottom: 4,
@@ -154,6 +160,25 @@ class _EditProfileViewState extends State<_EditProfileView> {
                         ),
                       ),
                     ),
+                    if (isUploading)
+                      Positioned.fill(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.5),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Center(
+                            child: SizedBox(
+                              width: 30,
+                              height: 30,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),

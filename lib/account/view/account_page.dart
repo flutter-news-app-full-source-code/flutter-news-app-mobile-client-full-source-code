@@ -34,27 +34,12 @@ class AccountPage extends StatelessWidget {
         ),
         title: Text(l10n.accountPageTitle),
         actions: [
-          if (isAnonymous)
-            IconButton(
-              icon: const Icon(Icons.sync),
-              tooltip: l10n.anonymousLimitButton,
-              onPressed: () {
-                context.read<AnalyticsService>().logEvent(
-                  AnalyticsEvent.limitExceededCtaClicked,
-                  payload: const LimitExceededCtaClickedPayload(
-                    ctaType: 'linkAccount',
-                  ),
-                );
-                context.goNamed(Routes.accountLinkingName);
-              },
-            )
-          else
-            IconButton(
-              icon: const Icon(Icons.logout),
-              tooltip: l10n.accountSignOutTile,
-              onPressed: () =>
-                  context.read<AppBloc>().add(const AppLogoutRequested()),
-            ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: l10n.accountSignOutTile,
+            onPressed: () =>
+                context.read<AppBloc>().add(const AppLogoutRequested()),
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -79,6 +64,7 @@ class _ProfileHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
     final user = context.select((AppBloc bloc) => bloc.state.user);
+    final isAnonymous = user?.isAnonymous ?? true;
 
     return Column(
       children: [
@@ -86,49 +72,44 @@ class _ProfileHeader extends StatelessWidget {
           children: [
             UserAvatar(user: user, radius: 32),
             const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    user?.name ?? l10n.accountGuestUserHeadline,
-                    style: Theme.of(context).textTheme.titleLarge,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  if (user?.email != null)
+            if (user != null)
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(
-                      user!.email,
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      isAnonymous ? l10n.guestUserDisplayName : user.name ?? '',
+                      style: Theme.of(context).textTheme.titleLarge,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                ],
+                    if (!isAnonymous)
+                      Text(
+                        user.email,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                  ],
+                ),
               ),
-            ),
           ],
         ),
         const SizedBox(height: AppSpacing.md),
         SizedBox(
           width: double.infinity,
           child: OutlinedButton.icon(
-            icon: const Icon(Icons.edit_outlined),
-            label: Text(l10n.accountEditProfileButton),
+            icon: Icon(isAnonymous ? Icons.sync : Icons.edit_outlined),
+            label: Text(
+              isAnonymous
+                  ? l10n.accountPageSyncProgressButton
+                  : l10n.accountEditProfileButton,
+            ),
             onPressed: () async {
-              final status = await context
-                  .read<ContentLimitationService>()
-                  .checkAction(ContentAction.editProfile);
-
-              if (!context.mounted) return;
-
-              if (status == LimitationStatus.allowed) {
-                await context.pushNamed(Routes.editProfileName);
+              if (isAnonymous) {
+                context.goNamed(Routes.accountLinkingName);
               } else {
-                showContentLimitationBottomSheet(
-                  context: context,
-                  status: status,
-                  action: ContentAction.editProfile,
-                );
+                await context.pushNamed(Routes.editProfileName);
               }
             },
           ),

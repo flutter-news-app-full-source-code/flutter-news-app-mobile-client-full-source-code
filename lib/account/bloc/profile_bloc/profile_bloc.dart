@@ -127,15 +127,13 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     Emitter<ProfileState> emit,
   ) async {
     emit(state.copyWith(status: ProfileStatus.loading));
-    _logger.info('Account deletion requested.');
-    try {
-      await _authRepository.deleteAccount();
-      // No need to emit success, as the AppBloc will handle the logout
-      // transition, and this page will be removed from the navigation stack.
-      _logger.info('Account deletion call succeeded.');
-    } on HttpException catch (e, s) {
-      _logger.severe('Failed to delete account', e, s);
-      emit(state.copyWith(status: ProfileStatus.failure, error: e));
-    }
+    _logger.info('Dispatching AppAccountDeletionRequested to AppBloc.');
+
+    // Delegate the deletion process to the AppBloc, which orchestrates
+    // device un-registration and then account deletion.
+    _appBloc.add(const AppAccountDeletionRequested());
+
+    // The UI will be updated automatically by the AppBloc's state changes
+    // (navigation away from this page). We don't need to emit success here.
   }
 }

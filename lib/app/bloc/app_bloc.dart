@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:auth_repository/auth_repository.dart';
 import 'package:core/core.dart';
@@ -363,6 +364,16 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       return;
     }
 
+    // If the new user has a photoUrl, it means the canonical state has been
+    // fetched from the backend. We should clear any lingering optimistic avatar
+    // to ensure the permanent image is displayed.
+    if (newUser.photoUrl != null && state.optimisticAvatarBytes != null) {
+      _logger.info(
+        '[AppBloc] New user data contains photoUrl. Clearing optimistic avatar.',
+      );
+      emit(state.copyWith(clearOptimisticAvatar: true));
+    }
+
     // If the user is changing (e.g., anonymous to authenticated), clear caches
     // to prevent showing stale data from the previous user session.
     if (oldUser != null && oldUser.id != newUser.id) {
@@ -480,12 +491,27 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   /// the global state is immediately consistent.
   void _onAppUserUpdated(AppUserUpdated event, Emitter<AppState> emit) {
     _logger.info(
-      '[AppBloc] AppUserUpdated event received. Updating user in state.',
+      '[AppBloc] AppUserUpdated event received. Updating user and optimistic avatar in state.',
     );
     // Simply emit a new state with the updated user object.
     // This is critical for changes like updating a user's name to be
     // reflected instantly across the app.
-    emit(state.copyWith(user: event.user));
+    emit(
+      state.copyWith(
+        user: event.user,
+        optimisticAvatarBytes: event.optimisticAvatarBytes,
+      ),
+    );
+
+    // If the updated user has a new photoUrl, it means the backend has
+    // processed the image. We can now clear the optimistic avatar bytes.
+    if (state.user?.photoUrl != event.user.photoUrl &&
+        event.user.photoUrl != null) {
+      _logger.info(
+        '[AppBloc] New photoUrl received. Clearing optimistic avatar.',
+      );
+      emit(state.copyWith(clearOptimisticAvatar: true));
+    }
   }
 
   /// Handles refreshing/loading app settings (theme, font).
@@ -1361,6 +1387,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       if (refreshedUser != state.user) {
         _logger.info('[AppBloc] User data has changed. Emitting new state.');
         emit(state.copyWith(user: refreshedUser));
+
+        // If the refreshed user has a new photoUrl, clear any optimistic avatar.
+        if (refreshedUser.photoUrl != null &&
+            refreshedUser.photoUrl != state.user?.photoUrl) {
+          emit(state.copyWith(clearOptimisticAvatar: true));
+        }
       }
     } catch (e, s) {
       _logger.warning('[AppBloc] Failed to refresh user data.', e, s);

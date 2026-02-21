@@ -24,6 +24,7 @@ class AppState extends Equatable {
     this.latestAppVersion,
     this.hasUnreadInAppNotifications = false,
     this.positiveInteractionCount = 0,
+    this.optimisticAvatarBytes,
     this.limitationStatus = LimitationStatus.allowed,
     this.limitedAction,
   });
@@ -104,6 +105,10 @@ class AppState extends Equatable {
   /// The specific action that was limited, if any.
   final ContentAction? limitedAction;
 
+  /// The bytes of a newly uploaded profile image, for optimistic UI updates
+  /// until the permanent URL is available from the backend.
+  final Uint8List? optimisticAvatarBytes;
+
   /// The current theme mode (light, dark, or system), derived from [settings].
   /// Defaults to [ThemeMode.system] if [settings] are not yet loaded.
   ThemeMode get themeMode {
@@ -177,6 +182,8 @@ class AppState extends Equatable {
     hasUnreadInAppNotifications,
     positiveInteractionCount,
   ];
+  // optimisticAvatarBytes is excluded from props because it's transient UI state
+  // and comparing Uint8List can be expensive and unnecessary for state changes.
 
   /// Creates a copy of this [AppState] with the given fields replaced with
   /// the new values.
@@ -194,6 +201,8 @@ class AppState extends Equatable {
     int? selectedBottomNavigationIndex,
     String? currentAppVersion,
     String? latestAppVersion,
+    Uint8List? optimisticAvatarBytes,
+    bool clearOptimisticAvatar = false,
     bool? hasUnreadInAppNotifications,
     int? positiveInteractionCount,
     LimitationStatus? limitationStatus,
@@ -215,6 +224,9 @@ class AppState extends Equatable {
           selectedBottomNavigationIndex ?? this.selectedBottomNavigationIndex,
       currentAppVersion: currentAppVersion ?? this.currentAppVersion,
       latestAppVersion: latestAppVersion ?? this.latestAppVersion,
+      optimisticAvatarBytes: clearOptimisticAvatar
+          ? null
+          : optimisticAvatarBytes ?? this.optimisticAvatarBytes,
       hasUnreadInAppNotifications:
           hasUnreadInAppNotifications ?? this.hasUnreadInAppNotifications,
       positiveInteractionCount:

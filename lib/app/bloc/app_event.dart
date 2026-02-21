@@ -39,13 +39,16 @@ class AppUserChanged extends AppEvent {
 /// {@endtemplate}
 class AppUserUpdated extends AppEvent {
   /// {@macro app_user_updated}
-  const AppUserUpdated(this.user);
+  const AppUserUpdated(this.user, {this.optimisticAvatarBytes});
 
   /// The updated user object.
   final User user;
 
+  /// The bytes of a newly uploaded profile image, for optimistic UI updates.
+  final Uint8List? optimisticAvatarBytes;
+
   @override
-  List<Object?> get props => [user];
+  List<Object?> get props => [user, optimisticAvatarBytes];
 }
 
 /// Dispatched to request a refresh of the user's application settings.

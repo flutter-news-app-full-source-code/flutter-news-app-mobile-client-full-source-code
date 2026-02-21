@@ -151,6 +151,17 @@ GoRouter createRouter({
           );
           return feedPath;
         }
+        // This rule handles the completion of the post-auth personalization for
+        // an anonymous user. When they finish, their status becomes `anonymous`,
+        // but they are still on the `/initial-personalization` location. This
+        // rule correctly redirects them to the feed.
+        if (currentLocation == initialPersonalizationPath) {
+          logger.info(
+            '    Action: Anonymous user on personalization path. '
+            'Redirecting to feed.',
+          );
+          return feedPath;
+        }
 
         // Guard Rewards Page for Anonymous Users
         if (currentLocation == rewardsPath) {

@@ -29,14 +29,21 @@ class EditProfilePage extends StatelessWidget {
       return const Scaffold(body: Center(child: Text('User not found')));
     }
 
-    return BlocProvider(
-      create: (context) => ProfileBloc(
-        user: user,
-        userRepository: context.read<DataRepository<User>>(),
-        mediaRepository: context.read<MediaRepository>(),
-        appBloc: context.read<AppBloc>(),
-        logger: context.read<Logger>(),
-      ),
+    return BlocProvider<ProfileBloc>(
+      create: (context) {
+        final bloc = ProfileBloc(
+          user: user,
+          userRepository: context.read<DataRepository<User>>(),
+          mediaRepository: context.read<MediaRepository>(),
+          appBloc: context.read<AppBloc>(),
+          logger: context.read<Logger>(),
+        );
+        // Pre-fill the name field with the email prefix if the name is not set.
+        if (user.name == null || user.name!.isEmpty) {
+          bloc.add(ProfileNameChanged(user.email.split('@').first));
+        }
+        return bloc;
+      },
       child: const _EditProfileView(),
     );
   }

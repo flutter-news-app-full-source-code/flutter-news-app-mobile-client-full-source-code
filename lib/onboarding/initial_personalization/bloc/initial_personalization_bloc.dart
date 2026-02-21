@@ -102,27 +102,43 @@ class InitialPersonalizationBloc
     Emitter<InitialPersonalizationState> emit,
   ) async {
     emit(state.copyWith(status: InitialPersonalizationStatus.saving));
-    final user = _appBloc.state.user!;
-    final userContext = _appBloc.state.userContext!;
+    final appState = _appBloc.state;
+    final user = appState.user!;
+    final userContext = appState.userContext!;
 
     try {
-      final preferences = await _userContentPreferencesRepository.read(
-        id: user.id,
-      );
-      final updatedPreferences = preferences.copyWith(
+      // Get existing preferences from AppBloc state or create a new empty one.
+      final existingPreferences =
+          appState.userContentPreferences ??
+          UserContentPreferences(
+            id: user.id,
+            followedCountries: const [],
+            followedSources: const [],
+            followedTopics: const [],
+            savedHeadlines: const [],
+            savedHeadlineFilters: const [],
+            savedSourceFilters: const [],
+          );
+
+      final updatedPreferences = existingPreferences.copyWith(
         followedTopics: state.selectedTopics.toList(),
         followedSources: state.selectedSources.toList(),
         followedCountries: state.selectedCountries.toList(),
       );
 
+      // If original preferences were null, we create; otherwise, we update.
+      final preferencesFuture = appState.userContentPreferences == null
+          ? _userContentPreferencesRepository.create(item: updatedPreferences)
+          : _userContentPreferencesRepository.update(
+              id: user.id,
+              item: updatedPreferences,
+            );
+
       final [
         updatedPreferencesResult as UserContentPreferences,
         updatedContextResult as UserContext,
       ] = await Future.wait([
-        _userContentPreferencesRepository.update(
-          id: user.id,
-          item: updatedPreferences,
-        ),
+        preferencesFuture,
         _userContextRepository.update(
           id: user.id,
           item: userContext.copyWith(hasCompletedInitialPersonalization: true),
@@ -154,8 +170,9 @@ class InitialPersonalizationBloc
     Emitter<InitialPersonalizationState> emit,
   ) async {
     emit(state.copyWith(status: InitialPersonalizationStatus.saving));
-    final user = _appBloc.state.user!;
-    final userContext = _appBloc.state.userContext!;
+    final appState = _appBloc.state;
+    final user = appState.user!;
+    final userContext = appState.userContext!;
 
     try {
       final updatedContext = userContext.copyWith(

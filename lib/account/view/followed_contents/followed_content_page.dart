@@ -165,7 +165,19 @@ class _FollowedList<T extends FeedItem> extends StatelessWidget {
 
     return ListView.builder(
       itemCount: items.length,
-      itemBuilder: (context, index) => EntityListTile(item: items[index]),
+      itemBuilder: (context, index) {
+        final item = items[index];
+        return InkWell(
+          onTap: () => context.pushNamed(
+            Routes.entityDetailsName,
+            pathParameters: {
+              'type': item.type,
+              'id': (item as dynamic).id as String,
+            },
+          ),
+          child: EntityListTile(item: item),
+        );
+      },
     );
   }
 }

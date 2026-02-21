@@ -18,19 +18,17 @@ class ProfileNameChanged extends ProfileEvent {
   List<Object> get props => [name];
 }
 
-/// Dispatched when the user selects a new profile image.
-class ProfileImageChanged extends ProfileEvent {
-  const ProfileImageChanged(this.imageBytes);
-
-  final Uint8List imageBytes;
-
-  @override
-  List<Object> get props => [imageBytes];
-}
-
 /// Dispatched when the user requests to save their profile changes.
 class ProfileUpdateRequested extends ProfileEvent {
-  const ProfileUpdateRequested();
+  const ProfileUpdateRequested({this.imageBytes});
+
+  /// The bytes of the selected profile image, if any.
+  ///
+  /// If this is null, it means the user did not change their profile picture.
+  final Uint8List? imageBytes;
+
+  @override
+  List<Object?> get props => [imageBytes];
 }
 
 /// Dispatched when the user requests to delete their account.

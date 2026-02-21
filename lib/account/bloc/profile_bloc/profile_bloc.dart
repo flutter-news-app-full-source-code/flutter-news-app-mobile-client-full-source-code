@@ -31,7 +31,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
        _logger = logger,
        super(ProfileState(name: user.name ?? '')) {
     on<ProfileNameChanged>(_onProfileNameChanged);
-    on<ProfileImageChanged>(_onProfileImageChanged);
     on<ProfileUpdateRequested>(_onProfileUpdateRequested);
     on<ProfileDeletionRequested>(_onProfileDeletionRequested);
   }
@@ -48,13 +47,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     emit(state.copyWith(name: event.name));
   }
 
-  void _onProfileImageChanged(
-    ProfileImageChanged event,
-    Emitter<ProfileState> emit,
-  ) {
-    emit(state.copyWith(imageBytes: event.imageBytes));
-  }
-
   Future<void> _onProfileUpdateRequested(
     ProfileUpdateRequested event,
     Emitter<ProfileState> emit,
@@ -66,46 +58,42 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       return;
     }
 
+    User? userToUpdate;
+
     try {
-      // Stage 1: Handle image upload if a new image was selected.
-      // This is done independently of the profile data update. The backend
-      // will handle linking the uploaded asset to the user via a webhook.
-      if (state.imageBytes != null) {
+      if (event.imageBytes != null) {
         _logger.info('Uploading new profile image...');
-        // We call uploadFile but we do not use the returned mediaAssetId to
-        // update the user model directly. The client's job is just to upload.
-        await _mediaRepository.uploadFile(
-          fileBytes: state.imageBytes!,
+        final mediaAssetId = await _mediaRepository.uploadFile(
+          fileBytes: event.imageBytes!,
           fileName: 'profile_image_${currentUser.id}.jpg',
           purpose: MediaAssetPurpose.userProfilePhoto,
         );
         _logger.info(
-          'Profile image upload initiated for user ${currentUser.id}.',
+          'Profile image upload initiated for user ${currentUser.id} with '
+          'mediaAssetId: $mediaAssetId.',
+        );
+        userToUpdate = currentUser.copyWith(
+          mediaAssetId: ValueWrapper(mediaAssetId),
+          photoUrl: const ValueWrapper(null),
         );
       }
 
-      // Stage 2: Handle profile data updates (e.g., name).
-      // We only proceed if there are actual changes to update.
-      var userToUpdate = currentUser;
-      var hasChanges = false;
-
       if (state.name != currentUser.name) {
-        userToUpdate = userToUpdate.copyWith(name: ValueWrapper(state.name));
-        hasChanges = true;
+        userToUpdate = (userToUpdate ?? currentUser).copyWith(
+          name: ValueWrapper(state.name),
+        );
       }
 
-      if (!hasChanges) {
-        _logger.info('No profile data changes to update. Completing.');
+      if (userToUpdate == null) {
+        _logger.info('No profile changes to update. Completing.');
         emit(state.copyWith(status: ProfileStatus.success));
         return;
       }
 
       _logger.info('Updating user profile data...');
-      final updatedUser = currentUser.copyWith(name: ValueWrapper(state.name));
-
       final persistedUser = await _userRepository.update(
         id: currentUser.id,
-        item: updatedUser,
+        item: userToUpdate,
       );
 
       // Propagate the updated user object to the global AppBloc.

@@ -23,7 +23,6 @@ class ProfileState extends Equatable {
   const ProfileState({
     this.status = ProfileStatus.idle,
     this.name = '',
-    this.imageBytes,
     this.error,
   });
 
@@ -33,27 +32,23 @@ class ProfileState extends Equatable {
   /// The current value of the name input field.
   final String name;
 
-  /// The bytes of the selected profile image, if any.
-  final Uint8List? imageBytes;
-
   /// An error that occurred during the update process.
   final HttpException? error;
 
   @override
-  List<Object?> get props => [status, name, imageBytes, error];
+  List<Object?> get props => [status, name, error];
 
   /// Creates a copy of this [ProfileState] with updated values.
   ProfileState copyWith({
     ProfileStatus? status,
     String? name,
-    Uint8List? imageBytes,
     HttpException? error,
+    bool clearError = false,
   }) {
     return ProfileState(
       status: status ?? this.status,
       name: name ?? this.name,
-      imageBytes: imageBytes ?? this.imageBytes,
-      error: error ?? this.error,
+      error: clearError ? null : error ?? this.error,
     );
   }
 }

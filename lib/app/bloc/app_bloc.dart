@@ -111,6 +111,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       _onAppPushNotificationDeviceRegistered,
     );
     on<AppLogoutRequested>(_onLogoutRequested);
+    on<AppAccountDeletionRequested>(_onAccountDeletionRequested);
     on<AppPushNotificationTokenRefreshed>(_onAppPushNotificationTokenRefreshed);
     on<AppInAppNotificationReceived>(_onAppInAppNotificationReceived);
     on<AppAllInAppNotificationsMarkedAsRead>(
@@ -329,8 +330,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     // If the user is null, it's a logout.
     if (newUser == null) {
+      // The device un-registration is handled upstream in the specific
+      // event handlers (_onLogoutRequested, _onAccountDeletionRequested).
+      // This handler is only responsible for cleaning up the state.
       _logger.info(
-        '[AppBloc] User logged out. Transitioning to unauthenticated.',
+        '[AppBloc] User is now null. Transitioning to unauthenticated.',
       );
       // When logging out, it's crucial to explicitly clear all user-related
       // data to ensure a clean state for the next session. This prevents
@@ -456,6 +460,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             clearError: true,
           ),
         );
+        // Register the device here, as the user is now authenticated
+        // and ready for onboarding.
+        await _registerDeviceForPushNotifications(transitionResult.user!.id);
     }
   }
 
@@ -602,8 +609,29 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   }
 
   /// Handles user logout request.
-  void _onLogoutRequested(AppLogoutRequested event, Emitter<AppState> emit) {
-    unawaited(_authRepository.signOut());
+  Future<void> _onLogoutRequested(
+    AppLogoutRequested event,
+    Emitter<AppState> emit,
+  ) async {
+    _logger.info('[AppBloc] Logout requested. Unregistering device...');
+    // Unregister first, while still authenticated.
+    await _pushNotificationService.unregisterDevice();
+    // Then, sign out. This will trigger _onAppUserChanged.
+    await _authRepository.signOut();
+  }
+
+  /// Handles user account deletion request.
+  Future<void> _onAccountDeletionRequested(
+    AppAccountDeletionRequested event,
+    Emitter<AppState> emit,
+  ) async {
+    _logger.info(
+      '[AppBloc] Account deletion requested. Unregistering device...',
+    );
+    // Unregister first, while still authenticated.
+    await _pushNotificationService.unregisterDevice();
+    // Then, delete the account. This will trigger _onAppUserChanged.
+    await _authRepository.deleteAccount();
   }
 
   /// Handles periodic fetching of the remote application configuration.

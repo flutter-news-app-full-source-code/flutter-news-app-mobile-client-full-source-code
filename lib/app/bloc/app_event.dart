@@ -116,6 +116,16 @@ class AppLogoutRequested extends AppEvent {
   const AppLogoutRequested();
 }
 
+/// {@template app_account_deletion_requested}
+/// Dispatched when the user confirms they want to delete their account.
+///
+/// This event triggers the full account deletion flow, including device
+/// un-registration, before calling the repository to delete the user record.
+/// {@endtemplate}
+class AppAccountDeletionRequested extends AppEvent {
+  const AppAccountDeletionRequested();
+}
+
 /// Dispatched when the user's content preferences have been updated.
 ///
 /// This event carries the complete, updated [UserContentPreferences] object,

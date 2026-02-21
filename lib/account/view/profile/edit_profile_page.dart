@@ -131,56 +131,63 @@ class _EditProfileViewState extends State<_EditProfileView> {
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: Column(
             children: [
-              GestureDetector(
-                onTap: isUploading ? null : () => _pickImage(context),
-                child: Stack(
-                  children: [
-                    UserAvatar(
-                      user: user,
-                      radius: 60,
-                      overrideImage: _selectedImageBytes != null
-                          ? MemoryImage(_selectedImageBytes!)
-                          : (optimisticAvatar != null
-                                ? MemoryImage(optimisticAvatar)
-                                : null),
-                    ),
-                    Positioned(
-                      bottom: 4,
-                      right: 4,
-                      child: Container(
-                        padding: const EdgeInsets.all(AppSpacing.xs),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.secondary,
-                          shape: BoxShape.circle,
+              BlocBuilder<ProfileBloc, ProfileState>(
+                builder: (context, state) {
+                  final isSaving = state.status == ProfileStatus.loading;
+                  return GestureDetector(
+                    onTap: isUploading || isSaving
+                        ? null
+                        : () => _pickImage(context),
+                    child: Stack(
+                      children: [
+                        UserAvatar(
+                          user: user,
+                          radius: 60,
+                          overrideImage: _selectedImageBytes != null
+                              ? MemoryImage(_selectedImageBytes!)
+                              : (optimisticAvatar != null
+                                    ? MemoryImage(optimisticAvatar)
+                                    : null),
                         ),
-                        child: Icon(
-                          Icons.edit,
-                          size: 20,
-                          color: Theme.of(context).colorScheme.onSecondary,
-                        ),
-                      ),
-                    ),
-                    if (isUploading)
-                      Positioned.fill(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.5),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Center(
-                            child: SizedBox(
-                              width: 30,
-                              height: 30,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
+                        Positioned(
+                          bottom: 4,
+                          right: 4,
+                          child: Container(
+                            padding: const EdgeInsets.all(AppSpacing.xs),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.secondary,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.edit,
+                              size: 20,
+                              color: Theme.of(context).colorScheme.onSecondary,
                             ),
                           ),
                         ),
-                      ),
-                  ],
-                ),
+                        if (isUploading || isSaving)
+                          Positioned.fill(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.5),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Center(
+                                child: SizedBox(
+                                  width: 30,
+                                  height: 30,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: AppSpacing.xxl),
               BlocBuilder<ProfileBloc, ProfileState>(

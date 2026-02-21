@@ -1,12 +1,15 @@
+import 'package:flutter/material.dart';
+
 import 'package:core/core.dart';
 import 'package:data_repository/data_repository.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ui_kit/ui_kit.dart';
+
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/widgets.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/entity_list_tile.dart';
 
 /// {@template followed_content_page}
 /// A unified page that displays all content types followed by the user,
@@ -151,41 +154,20 @@ class _FollowedList<T extends FeedItem> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizationsX(context).l10n;
     if (items.isEmpty) {
-      return Center(child: Text(context.l10n.followedContentEmpty));
+      return Center(
+        child: InitialStateWidget(
+          icon: Icons.check_circle_outline,
+          headline: l10n.followedContentEmpty,
+          subheadline: l10n.followedContentEmptySubheadline,
+        ),
+      );
     }
 
     return ListView.builder(
       itemCount: items.length,
-      itemBuilder: (context, index) {
-        final item = items[index];
-        String title;
-        Widget leading;
-
-        switch (item) {
-          case final Topic topic:
-            title = topic.name;
-            leading = const CircleAvatar(child: Icon(Icons.tag));
-          case final Source source:
-            title = source.name;
-            leading = CircleAvatar(
-              backgroundImage: source.logoUrl != null
-                  ? NetworkImage(source.logoUrl!)
-                  : null,
-              child: source.logoUrl == null ? const Icon(Icons.public) : null,
-            );
-          case final Country country:
-            title = country.name;
-            leading = CircleAvatar(
-              backgroundImage: NetworkImage(country.flagUrl),
-            );
-          default:
-            title = 'Unknown Item';
-            leading = const Icon(Icons.question_mark);
-        }
-
-        return ListTile(leading: leading, title: Text(title));
-      },
+      itemBuilder: (context, index) => EntityListTile(item: items[index]),
     );
   }
 }

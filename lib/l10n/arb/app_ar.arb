@@ -1,6 +1,6 @@
 {
     "@@locale": "ar",
-    "accountLinkingPageTitle": "ربط حسابك",
+    "accountLinkingPageTitle": "مزامنة تقدمك",
     "@accountLinkingPageTitle": {
         "description": "Title for the account linking page"
     },
@@ -12,11 +12,11 @@
     "@accountLinkingEmailSentSuccess": {
         "description": "Success message shown after sending an email sign-in link"
     },
-    "accountLinkingHeadline": "أحفظ تقدمك",
+    "accountLinkingHeadline": "احفظ تقدمك",
     "@accountLinkingHeadline": {
         "description": "Headline text on the account linking page"
     },
-    "accountLinkingBody": "يتيح لك التسجيل الوصول إلى معلوماتك عبر أجهزة متعددة ويضمن عدم فقدان تقدمك.",
+    "accountLinkingBody": "أنشئ حسابًا لمزامنة العناصر التي تتابعها وتفضيلاتك عبر جميع أجهزتك.",
     "@accountLinkingBody": {
         "description": "Body text explaining the benefits of linking an account"
     },
@@ -36,7 +36,7 @@
     "@accountLinkingEmailValidationError": {
         "description": "Validation error message for the email input field"
     },
-    "accountLinkingSendLinkButton": "إرسال رابط تسجيل الدخول",
+    "accountLinkingSendLinkButton": "مزامنة مع البريد الإلكتروني",
     "@accountLinkingSendLinkButton": {
         "description": "Text for the button that sends an email sign-in link"
     },
@@ -170,7 +170,7 @@
     "@authenticationAnonymousSignInButton": {
         "description": "Text for the button to continue without signing in"
     },
-    "headlineDetailsInitialHeadline": "في انتظار العنوان",
+    "headlineDetailsInitialHeadline": "في انتظار التفاصيل",
     "@headlineDetailsInitialHeadline": {
         "description": "Headline text shown in the initial state widget on the details page"
     },
@@ -222,7 +222,7 @@
     "@headlinesFeedFilterCategorySports": {
         "description": "Filter option for Sports category"
     },
-    "headlinesFeedFilterSourceLabel": "المصدر",
+    "headlinesFeedFilterSourceLabel": "المصادر",
     "@headlinesFeedFilterSourceLabel": {
         "description": "Label for the source filter dropdown"
     },
@@ -234,7 +234,7 @@
     "@headlinesFeedFilterSourceReuters": {
         "description": "Filter option for Reuters source"
     },
-    "headlinesFeedFilterEventCountryLabel": "بلد الحدث",
+    "headlinesFeedFilterEventCountryLabel": "الدول",
     "@headlinesFeedFilterEventCountryLabel": {
         "description": "Filter page label indication where the hadline event has took place"
     },
@@ -286,11 +286,11 @@
     "@authenticationEmailSignInButton": {
         "description": "نص زر بدء تدفق تسجيل الدخول بالبريد الإلكتروني"
     },
-    "authenticationLinkingHeadline": "زامن بياناتك",
+    "authenticationLinkingHeadline": "زامن تقدمك",
     "@authenticationLinkingHeadline": {
         "description": "عنوان صفحة المصادقة عند ربط حساب مجهول"
     },
-    "authenticationLinkingSubheadline": "إحفظ إعداداتك، تفضيلات المحتوى والمزيد عبر مختلف الأجهزة.",
+    "authenticationLinkingSubheadline": "أنشئ حسابًا لحفظ إعداداتك وتفضيلات المحتوى والمزيد عبر الأجهزة.",
     "@authenticationLinkingSubheadline": {
         "description": "عنوان فرعي يشرح فائدة ربط حساب مجهول"
     },
@@ -2320,5 +2320,13 @@
                 "type": "int"
             }
         }
+    },
+    "guestUserDisplayName": "زائر",
+    "@guestUserDisplayName": {
+        "description": "The display name for a guest user."
+    },
+    "accountPageSyncProgressButton": "مزامنة التقدم",
+    "@accountPageSyncProgressButton": {
+        "description": "Button text for guest users on the account page to initiate account linking/syncing."
     }
 }

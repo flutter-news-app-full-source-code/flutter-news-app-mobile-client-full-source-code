@@ -1,6 +1,6 @@
 {
     "@@locale": "en",
-    "accountLinkingPageTitle": "Link Your Account",
+    "accountLinkingPageTitle": "Sync Your Progress",
     "@accountLinkingPageTitle": {
         "description": "Title for the account linking page"
     },
@@ -12,11 +12,11 @@
     "@accountLinkingEmailSentSuccess": {
         "description": "Success message shown after sending an email sign-in link"
     },
-    "accountLinkingHeadline": "Save your progress",
+    "accountLinkingHeadline": "Save Your Progress",
     "@accountLinkingHeadline": {
         "description": "Headline text on the account linking page"
     },
-    "accountLinkingBody": "Signing up allows you to access your information across multiple devices and ensures your progress isn't lost.",
+    "accountLinkingBody": "Create an account to sync your followed items and preferences across all your devices.",
     "@accountLinkingBody": {
         "description": "Body text explaining the benefits of linking an account"
     },
@@ -36,7 +36,7 @@
     "@accountLinkingEmailValidationError": {
         "description": "Validation error message for the email input field"
     },
-    "accountLinkingSendLinkButton": "Send Sign-In Link",
+    "accountLinkingSendLinkButton": "Sync with Email",
     "@accountLinkingSendLinkButton": {
         "description": "Text for the button that sends an email sign-in link"
     },
@@ -170,7 +170,7 @@
     "@authenticationAnonymousSignInButton": {
         "description": "Text for the button to continue without signing in"
     },
-    "headlineDetailsInitialHeadline": "Waiting for Headline",
+    "headlineDetailsInitialHeadline": "Waiting for Details",
     "@headlineDetailsInitialHeadline": {
         "description": "Headline text shown in the initial state widget on the details page"
     },
@@ -222,7 +222,7 @@
     "@headlinesFeedFilterCategorySports": {
         "description": "Filter option for Sports category"
     },
-    "headlinesFeedFilterSourceLabel": "Source",
+    "headlinesFeedFilterSourceLabel": "Sources",
     "@headlinesFeedFilterSourceLabel": {
         "description": "Label for the source filter dropdown"
     },
@@ -234,7 +234,7 @@
     "@headlinesFeedFilterSourceReuters": {
         "description": "Filter option for Reuters source"
     },
-    "headlinesFeedFilterEventCountryLabel": "Country of Event",
+    "headlinesFeedFilterEventCountryLabel": "Countries",
     "@headlinesFeedFilterEventCountryLabel": {
         "description": "Filter page label indication where the hadline event has took place"
     },
@@ -286,11 +286,11 @@
     "@authenticationEmailSignInButton": {
         "description": "Button text for initiating email sign-in flow"
     },
-    "authenticationLinkingHeadline": "Sync Your Data",
+    "authenticationLinkingHeadline": "Sync Your Progress",
     "@authenticationLinkingHeadline": {
         "description": "Headline for the authentication page when linking an anonymous account"
     },
-    "authenticationLinkingSubheadline": "save your settings, content preferences and more across devices.",
+    "authenticationLinkingSubheadline": "Create an account to save your settings, content preferences, and more across devices.",
     "@authenticationLinkingSubheadline": {
         "description": "Subheadline explaining the benefit of linking an anonymous account"
     },
@@ -2320,5 +2320,13 @@
                 "type": "int"
             }
         }
+    },
+    "guestUserDisplayName": "Guest",
+    "@guestUserDisplayName": {
+        "description": "The display name for a guest user."
+    },
+    "accountPageSyncProgressButton": "Sync Progress",
+    "@accountPageSyncProgressButton": {
+        "description": "Button text for guest users on the account page to initiate account linking/syncing."
     }
 }

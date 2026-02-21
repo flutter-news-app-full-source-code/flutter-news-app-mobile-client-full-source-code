@@ -1292,11 +1292,23 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       case OnboardingStatus.preAuthTour:
         emit(state.copyWith(status: AppLifeCycleStatus.unauthenticated));
       case OnboardingStatus.postAuthPersonalization:
+        // The user object must exist at this point.
+        final user = state.user;
+        if (user == null) {
+          // This should be an impossible state, but we guard against it.
+          _logger.severe(
+            '[AppBloc] CRITICAL: Post-auth onboarding completed but user is null.',
+          );
+          emit(state.copyWith(status: AppLifeCycleStatus.unauthenticated));
+          return;
+        }
         emit(
           state.copyWith(
-            status: AppLifeCycleStatus.authenticated,
+            status: user.isAnonymous
+                ? AppLifeCycleStatus.anonymous
+                : AppLifeCycleStatus.authenticated,
             // We must carry over the user object, otherwise it gets nulled.
-            user: state.user,
+            user: user,
             userContentPreferences: event.userContentPreferences,
             userContext: event.userContext,
           ),

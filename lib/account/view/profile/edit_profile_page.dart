@@ -129,12 +129,32 @@ class _EditProfileViewState extends State<_EditProfileView> {
             children: [
               GestureDetector(
                 onTap: () => _pickImage(context),
-                child: UserAvatar(
-                  user: user,
-                  radius: 60,
-                  overrideImage: _selectedImageBytes != null
-                      ? MemoryImage(_selectedImageBytes!)
-                      : null,
+                child: Stack(
+                  children: [
+                    UserAvatar(
+                      user: user,
+                      radius: 60,
+                      overrideImage: _selectedImageBytes != null
+                          ? MemoryImage(_selectedImageBytes!)
+                          : null,
+                    ),
+                    Positioned(
+                      bottom: 4,
+                      right: 4,
+                      child: Container(
+                        padding: const EdgeInsets.all(AppSpacing.xs),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.secondary,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.edit,
+                          size: 20,
+                          color: Theme.of(context).colorScheme.onSecondary,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: AppSpacing.xxl),

@@ -136,6 +136,28 @@ class _MultiSelectSearchPageState<T> extends State<MultiSelectSearchPage<T>> {
     }
   }
 
+  Widget _buildLeadingForItem(T item) {
+    if (item is Topic) {
+      return CircleAvatar(
+        backgroundImage: item.iconUrl != null
+            ? NetworkImage(item.iconUrl!)
+            : null,
+        child: item.iconUrl == null ? const Icon(Icons.tag) : null,
+      );
+    } else if (item is Source) {
+      return CircleAvatar(
+        backgroundImage: item.logoUrl != null
+            ? NetworkImage(item.logoUrl!)
+            : null,
+        child: item.logoUrl == null ? const Icon(Icons.public) : null,
+      );
+    } else if (item is Country) {
+      return CircleAvatar(backgroundImage: NetworkImage(item.flagUrl));
+    }
+    // Fallback for any other type that might be used with this page.
+    return const CircleAvatar(child: Icon(Icons.article_outlined));
+  }
+
   void _onScroll() {
     if (_isBottom) _fetchPage();
   }
@@ -247,24 +269,36 @@ class _MultiSelectSearchPageState<T> extends State<MultiSelectSearchPage<T>> {
                   final isLimitReached =
                       widget.maxSelectionCount != null &&
                       _selectedItems.length >= widget.maxSelectionCount!;
+                  final canSelectItem = !(!isSelected && isLimitReached);
 
-                  return CheckboxListTile(
+                  return ListTile(
+                    leading: _buildLeadingForItem(item),
                     title: Text(widget.itemBuilder(item)),
-                    value: isSelected,
-                    onChanged: (!isSelected && isLimitReached)
-                        ? null
-                        : (bool? value) {
-                            if (value != null) {
+                    trailing: Checkbox(
+                      value: isSelected,
+                      onChanged: canSelectItem
+                          ? (value) {
                               setState(() {
-                                if (value) {
+                                if (value == true) {
                                   _selectedItems.add(item);
                                 } else {
                                   _selectedItems.remove(item);
                                 }
                               });
                             }
-                          },
-                    controlAffinity: ListTileControlAffinity.leading,
+                          : null,
+                    ),
+                    onTap: canSelectItem
+                        ? () {
+                            setState(() {
+                              if (isSelected) {
+                                _selectedItems.remove(item);
+                              } else {
+                                _selectedItems.add(item);
+                              }
+                            });
+                          }
+                        : null,
                   );
                 },
               ),

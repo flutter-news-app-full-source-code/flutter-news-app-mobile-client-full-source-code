@@ -53,7 +53,11 @@ class MediaApi implements MediaClient {
         contentType: MediaType.parse(contentType),
       ),
     });
-    await _httpClient.post<void>(url, data: formData);
+    await _httpClient.post<void>(
+      url,
+      data: formData,
+      options: Options(headers: {'Authorization': null}),
+    );
     _logger.fine('File upload with signed policy successful.');
   }
 }

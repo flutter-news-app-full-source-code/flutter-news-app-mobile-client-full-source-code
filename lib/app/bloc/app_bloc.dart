@@ -182,19 +182,28 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // This ensures the notification dot is shown correctly if the user
       // has unread notifications from a previous session.
       try {
-        final unreadCount = await _inAppNotificationRepository.count(
+        final unreadNotifications = await _inAppNotificationRepository.readAll(
           userId: state.user!.id,
           filter: {'readAt': null},
         );
-        if (unreadCount > 0) {
+
+        if (unreadNotifications.items.isEmpty) {
+          _logger.info(
+            '[AppBloc] No unread notifications remaining. Setting hasUnreadInAppNotifications to false.',
+          );
+        } else {
+          _logger.fine(
+            '[AppBloc] ${unreadNotifications.items.length} unread notifications remain.',
+          );
           emit(state.copyWith(hasUnreadInAppNotifications: true));
         }
       } catch (e, s) {
         _logger.severe(
-          'Failed to check for unread notifications on app start.',
+          'Failed to check for remaining unread notifications.',
           e,
           s,
         );
+        // Do not change state on error to avoid inconsistent UI.
       }
 
       // Ensure we have permission before attempting to register the device.
@@ -1044,18 +1053,20 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     if (state.user == null) return;
 
     try {
-      final unreadCount = await _inAppNotificationRepository.count(
+      final unreadNotifications = await _inAppNotificationRepository.readAll(
         userId: state.user!.id,
         filter: {'readAt': null},
       );
 
-      if (unreadCount == 0) {
+      if (unreadNotifications.items.isEmpty) {
         _logger.info(
           '[AppBloc] No unread notifications remaining. Setting hasUnreadInAppNotifications to false.',
         );
-        emit(state.copyWith(hasUnreadInAppNotifications: false));
       } else {
-        _logger.fine('[AppBloc] $unreadCount unread notifications remain.');
+        _logger.fine(
+          '[AppBloc] ${unreadNotifications.items.length} unread notifications remain.',
+        );
+        emit(state.copyWith(hasUnreadInAppNotifications: true));
       }
     } catch (e, s) {
       _logger.severe(

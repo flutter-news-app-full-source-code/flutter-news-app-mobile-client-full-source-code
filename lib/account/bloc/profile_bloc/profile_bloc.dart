@@ -97,7 +97,9 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       );
 
       // Propagate the updated user object to the global AppBloc.
-      _appBloc.add(AppUserUpdated(persistedUser));
+      _appBloc.add(
+        AppUserUpdated(persistedUser, optimisticAvatarBytes: event.imageBytes),
+      );
 
       emit(state.copyWith(status: ProfileStatus.success));
     } on HttpException catch (e, s) {

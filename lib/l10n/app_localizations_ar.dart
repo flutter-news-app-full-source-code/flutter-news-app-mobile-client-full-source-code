@@ -9,7 +9,7 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
-  String get accountLinkingPageTitle => 'ربط حسابك';
+  String get accountLinkingPageTitle => 'مزامنة تقدمك';
 
   @override
   String get accountLinkingGenericError => 'حدث خطأ';
@@ -19,11 +19,11 @@ class AppLocalizationsAr extends AppLocalizations {
       'تحقق من بريدك الإلكتروني للحصول على رابط تسجيل الدخول!';
 
   @override
-  String get accountLinkingHeadline => 'أحفظ تقدمك';
+  String get accountLinkingHeadline => 'احفظ تقدمك';
 
   @override
   String get accountLinkingBody =>
-      'يتيح لك التسجيل الوصول إلى معلوماتك عبر أجهزة متعددة ويضمن عدم فقدان تقدمك.';
+      'أنشئ حسابًا لمزامنة العناصر التي تتابعها وتفضيلاتك عبر جميع أجهزتك.';
 
   @override
   String get accountLinkingContinueWithGoogleButton => 'المتابعة باستخدام جوجل';
@@ -39,7 +39,7 @@ class AppLocalizationsAr extends AppLocalizations {
       'الرجاء إدخال عنوان بريد إلكتروني صالح';
 
   @override
-  String get accountLinkingSendLinkButton => 'إرسال رابط تسجيل الدخول';
+  String get accountLinkingSendLinkButton => 'مزامنة مع البريد الإلكتروني';
 
   @override
   String get accountPageTitle => 'الحساب';
@@ -139,7 +139,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authenticationAnonymousSignInButton => 'المتابعة كمجهول';
 
   @override
-  String get headlineDetailsInitialHeadline => 'في انتظار العنوان';
+  String get headlineDetailsInitialHeadline => 'في انتظار التفاصيل';
 
   @override
   String get headlineDetailsInitialSubheadline => 'يرجى الانتظار...';
@@ -178,7 +178,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get headlinesFeedFilterCategorySports => 'رياضة';
 
   @override
-  String get headlinesFeedFilterSourceLabel => 'المصدر';
+  String get headlinesFeedFilterSourceLabel => 'المصادر';
 
   @override
   String get headlinesFeedFilterSourceCNN => 'CNN';
@@ -187,7 +187,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get headlinesFeedFilterSourceReuters => 'Reuters';
 
   @override
-  String get headlinesFeedFilterEventCountryLabel => 'بلد الحدث';
+  String get headlinesFeedFilterEventCountryLabel => 'الدول';
 
   @override
   String get headlinesFeedFilterSourceCountryLabel => 'مقر المصدر';
@@ -227,11 +227,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authenticationEmailSignInButton => 'متابعة بالبريد الإلكتروني';
 
   @override
-  String get authenticationLinkingHeadline => 'زامن بياناتك';
+  String get authenticationLinkingHeadline => 'زامن تقدمك';
 
   @override
   String get authenticationLinkingSubheadline =>
-      'إحفظ إعداداتك، تفضيلات المحتوى والمزيد عبر مختلف الأجهزة.';
+      'أنشئ حسابًا لحفظ إعداداتك وتفضيلات المحتوى والمزيد عبر الأجهزة.';
 
   @override
   String get authenticationSignInHeadline => 'فيريتاس';
@@ -1814,4 +1814,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String multiSelectSearchPageSelectionCount(int count, int total) {
     return '$count/$total';
   }
+
+  @override
+  String get guestUserDisplayName => 'زائر';
+
+  @override
+  String get accountPageSyncProgressButton => 'مزامنة التقدم';
 }

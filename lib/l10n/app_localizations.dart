@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// Title for the account linking page
   ///
   /// In en, this message translates to:
-  /// **'Link Your Account'**
+  /// **'Sync Your Progress'**
   String get accountLinkingPageTitle;
 
   /// Generic error message shown during account linking
@@ -119,13 +119,13 @@ abstract class AppLocalizations {
   /// Headline text on the account linking page
   ///
   /// In en, this message translates to:
-  /// **'Save your progress'**
+  /// **'Save Your Progress'**
   String get accountLinkingHeadline;
 
   /// Body text explaining the benefits of linking an account
   ///
   /// In en, this message translates to:
-  /// **'Signing up allows you to access your information across multiple devices and ensures your progress isn\'t lost.'**
+  /// **'Create an account to sync your followed items and preferences across all your devices.'**
   String get accountLinkingBody;
 
   /// Text for the Google sign-in button
@@ -155,7 +155,7 @@ abstract class AppLocalizations {
   /// Text for the button that sends an email sign-in link
   ///
   /// In en, this message translates to:
-  /// **'Send Sign-In Link'**
+  /// **'Sync with Email'**
   String get accountLinkingSendLinkButton;
 
   /// Title for the account page
@@ -347,7 +347,7 @@ abstract class AppLocalizations {
   /// Headline text shown in the initial state widget on the details page
   ///
   /// In en, this message translates to:
-  /// **'Waiting for Headline'**
+  /// **'Waiting for Details'**
   String get headlineDetailsInitialHeadline;
 
   /// Subheadline text shown in the initial state widget on the details page
@@ -425,7 +425,7 @@ abstract class AppLocalizations {
   /// Label for the source filter dropdown
   ///
   /// In en, this message translates to:
-  /// **'Source'**
+  /// **'Sources'**
   String get headlinesFeedFilterSourceLabel;
 
   /// Filter option for CNN source
@@ -443,7 +443,7 @@ abstract class AppLocalizations {
   /// Filter page label indication where the hadline event has took place
   ///
   /// In en, this message translates to:
-  /// **'Country of Event'**
+  /// **'Countries'**
   String get headlinesFeedFilterEventCountryLabel;
 
   /// Filter page label indication where the headline source is located
@@ -521,13 +521,13 @@ abstract class AppLocalizations {
   /// Headline for the authentication page when linking an anonymous account
   ///
   /// In en, this message translates to:
-  /// **'Sync Your Data'**
+  /// **'Sync Your Progress'**
   String get authenticationLinkingHeadline;
 
   /// Subheadline explaining the benefit of linking an anonymous account
   ///
   /// In en, this message translates to:
-  /// **'save your settings, content preferences and more across devices.'**
+  /// **'Create an account to save your settings, content preferences, and more across devices.'**
   String get authenticationLinkingSubheadline;
 
   /// Headline for the authentication page during standard sign-in
@@ -3337,6 +3337,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count}/{total}'**
   String multiSelectSearchPageSelectionCount(int count, int total);
+
+  /// The display name for a guest user.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest'**
+  String get guestUserDisplayName;
+
+  /// Button text for guest users on the account page to initiate account linking/syncing.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync Progress'**
+  String get accountPageSyncProgressButton;
 }
 
 class _AppLocalizationsDelegate

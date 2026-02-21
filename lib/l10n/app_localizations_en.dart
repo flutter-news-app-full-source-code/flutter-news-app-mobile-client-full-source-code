@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get accountLinkingPageTitle => 'Link Your Account';
+  String get accountLinkingPageTitle => 'Sync Your Progress';
 
   @override
   String get accountLinkingGenericError => 'An error occurred';
@@ -19,11 +19,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Check your email for the sign-in link!';
 
   @override
-  String get accountLinkingHeadline => 'Save your progress';
+  String get accountLinkingHeadline => 'Save Your Progress';
 
   @override
   String get accountLinkingBody =>
-      'Signing up allows you to access your information across multiple devices and ensures your progress isn\'t lost.';
+      'Create an account to sync your followed items and preferences across all your devices.';
 
   @override
   String get accountLinkingContinueWithGoogleButton => 'Continue with Google';
@@ -39,7 +39,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Please enter a valid email address';
 
   @override
-  String get accountLinkingSendLinkButton => 'Send Sign-In Link';
+  String get accountLinkingSendLinkButton => 'Sync with Email';
 
   @override
   String get accountPageTitle => 'Account';
@@ -140,7 +140,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authenticationAnonymousSignInButton => 'Continue Anonymously';
 
   @override
-  String get headlineDetailsInitialHeadline => 'Waiting for Headline';
+  String get headlineDetailsInitialHeadline => 'Waiting for Details';
 
   @override
   String get headlineDetailsInitialSubheadline => 'Please wait...';
@@ -179,7 +179,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get headlinesFeedFilterCategorySports => 'Sports';
 
   @override
-  String get headlinesFeedFilterSourceLabel => 'Source';
+  String get headlinesFeedFilterSourceLabel => 'Sources';
 
   @override
   String get headlinesFeedFilterSourceCNN => 'CNN';
@@ -188,7 +188,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get headlinesFeedFilterSourceReuters => 'Reuters';
 
   @override
-  String get headlinesFeedFilterEventCountryLabel => 'Country of Event';
+  String get headlinesFeedFilterEventCountryLabel => 'Countries';
 
   @override
   String get headlinesFeedFilterSourceCountryLabel => 'Source Headquarter';
@@ -229,11 +229,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authenticationEmailSignInButton => 'Continue with Email';
 
   @override
-  String get authenticationLinkingHeadline => 'Sync Your Data';
+  String get authenticationLinkingHeadline => 'Sync Your Progress';
 
   @override
   String get authenticationLinkingSubheadline =>
-      'save your settings, content preferences and more across devices.';
+      'Create an account to save your settings, content preferences, and more across devices.';
 
   @override
   String get authenticationSignInHeadline => 'Veritas';
@@ -1805,4 +1805,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String multiSelectSearchPageSelectionCount(int count, int total) {
     return '$count/$total';
   }
+
+  @override
+  String get guestUserDisplayName => 'Guest';
+
+  @override
+  String get accountPageSyncProgressButton => 'Sync Progress';
 }

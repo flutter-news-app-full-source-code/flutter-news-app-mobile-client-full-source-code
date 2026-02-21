@@ -44,6 +44,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/v
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/topic_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/onboarding/app_tour/view/app_tour_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/onboarding/initial_personalization/bloc/initial_personalization_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/onboarding/initial_personalization/view/initial_personalization_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/rewards/view/rewards_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/go_router_observer.dart';
@@ -220,7 +221,20 @@ GoRouter createRouter({
       GoRoute(
         path: Routes.initialPersonalization,
         name: Routes.initialPersonalizationName,
-        builder: (context, state) => const InitialPersonalizationPage(),
+        builder: (context, state) {
+          return BlocProvider(
+            create: (context) => InitialPersonalizationBloc(
+              appBloc: context.read<AppBloc>(),
+              userContentPreferencesRepository: context
+                  .read<DataRepository<UserContentPreferences>>(),
+              userContextRepository: context
+                  .read<DataRepository<UserContext>>(),
+              analyticsService: context.read<AnalyticsService>(),
+              logger: context.read<Logger>(),
+            )..add(InitialPersonalizationDataRequested()),
+            child: const InitialPersonalizationPage(),
+          );
+        },
       ),
 
       GoRoute(path: '/', builder: (context, state) => const SizedBox.shrink()),

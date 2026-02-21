@@ -33,6 +33,13 @@ abstract class PushNotificationService {
   /// concrete implementation is responsible for obtaining the token.
   Future<void> registerDevice({required String userId});
 
+  /// Unregisters the current device from the backend.
+  ///
+  /// This method should find the current device's registration based on its
+  /// token and delete it. This is typically called on sign-out or account
+  /// deletion to prevent orphaned device records.
+  Future<void> unregisterDevice();
+
   /// A stream of notifications received while the app is in the foreground.
   ///
   /// The payload contains the notification's content and any associated data.

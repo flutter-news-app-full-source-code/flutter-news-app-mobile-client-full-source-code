@@ -39,6 +39,9 @@ enum ContentAction {
 
   /// The action of submitting a report.
   submitReport,
+
+  /// The action of editing a user's profile.
+  editProfile,
 }
 
 /// Defines the outcome of a content limitation check.
@@ -413,6 +416,10 @@ class ContentLimitationService {
         }
 
       // Daily action checks (asynchronous, cached)
+      case ContentAction.editProfile:
+        // Currently, editing a profile is always allowed and not subject to
+        // daily limits. This case is added for completeness.
+        return LimitationStatus.allowed;
       case ContentAction.postComment:
       case ContentAction.reactToContent:
       case ContentAction.submitReport:

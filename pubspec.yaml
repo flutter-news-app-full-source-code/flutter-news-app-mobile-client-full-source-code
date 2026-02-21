@@ -27,19 +27,15 @@ dependencies:
   auth_api:
     git:
       url: https://github.com/flutter-news-app-full-source-code/auth-api.git
-      ref: v1.0.1
+      ref: 599438a8320b2fad2be43686f9dd65b762f34b0b
   auth_client:
     git:
       url: https://github.com/flutter-news-app-full-source-code/auth-client.git
-      ref: v1.0.1
-  auth_inmemory:
-    git:
-      url: https://github.com/flutter-news-app-full-source-code/auth-inmemory.git
-      ref: 7fc38f09b941f2bbae3d7c9f21ff6848d3d9d258
+      ref: 58cc4201ceb52f74e0b639106276e396e4ff03a6
   auth_repository:
     git:
       url: https://github.com/flutter-news-app-full-source-code/auth-repository.git
-      ref: v1.0.1
+      ref: 598998586fd4170ee673b74abf0df112218d0e07
   bloc: ^9.0.1
   bloc_concurrency: ^0.3.0
   collection: ^1.19.1
@@ -84,6 +80,8 @@ dependencies:
     git:
       url: https://github.com/flutter-news-app-full-source-code/http-client.git
       ref: v1.0.1
+  http_parser: ^4.1.2
+  image_picker: ^1.2.1
   in_app_review: ^2.0.11
   intl: ^0.20.2
   js_interop: ^0.0.1
@@ -151,11 +149,11 @@ dependency_overrides:
   core:
     git:
       url: https://github.com/flutter-news-app-full-source-code/core.git
-      ref: v1.8.0
+      ref: 9033d1635442cafeafb63b5310b842ffbedf7c66   
   http_client:
     git:
       url: https://github.com/flutter-news-app-full-source-code/http-client.git
-      ref: v1.1.0
+      ref: 8b9dcac71f93e2eeba875c60eaebe3111f210020
   kv_storage_service:
     git:
       url: https://github.com/flutter-news-app-full-source-code/kv-storage-service.git

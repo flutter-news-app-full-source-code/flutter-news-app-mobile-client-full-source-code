@@ -43,6 +43,8 @@ abstract final class Routes {
   static const notificationsCenterName = 'notificationsCenter';
   static const rewards = 'rewards';
   static const rewardsName = 'rewards';
+  static const editProfile = 'edit-profile';
+  static const editProfileName = 'editProfile';
 
   // --- Relative Sub-Routes ---
   // These routes are defined with relative paths and are intended to be
@@ -91,14 +93,4 @@ abstract final class Routes {
   // Manage Followed Items
   static const followedTopicsList = 'topics';
   static const followedTopicsListName = 'followedTopicsList';
-  static const addTopicToFollow = 'add-topic';
-  static const addTopicToFollowName = 'addTopicToFollow';
-  static const followedSourcesList = 'sources';
-  static const followedSourcesListName = 'followedSourcesList';
-  static const addSourceToFollow = 'add-source';
-  static const addSourceToFollowName = 'addSourceToFollow';
-  static const followedCountriesList = 'countries';
-  static const followedCountriesListName = 'followedCountriesList';
-  static const addCountryToFollow = 'add-country';
-  static const addCountryToFollowName = 'addCountryToFollow';
 }

@@ -112,7 +112,7 @@ class _SourceFilterViewState extends State<_SourceFilterView> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(AppSpacing.sm),
               child: Image.network(
-                source.logoUrl,
+                source.logoUrl!,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) =>
                     const Icon(Icons.source_outlined),

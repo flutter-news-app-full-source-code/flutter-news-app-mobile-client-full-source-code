@@ -1,8 +1,6 @@
-import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/app/models/app_life_cycle_status.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/shared.dart';
@@ -22,11 +20,9 @@ class AccountPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
-    // Watch AppBloc for user details and authentication status
-    final appState = context.watch<AppBloc>().state;
-    final user = appState.user;
-    final status = appState.status;
-    final isAnonymous = status == AppLifeCycleStatus.anonymous;
+    final isAnonymous = context.select(
+      (AppBloc bloc) => bloc.state.user?.isAnonymous ?? true,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -34,210 +30,149 @@ class AccountPage extends StatelessWidget {
           icon: const Icon(Icons.close),
           onPressed: () => context.pop(),
         ),
-        title: Text(l10n.bottomNavAccountLabel),
+        title: Text(l10n.accountPageTitle),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            onPressed: () => context.pushNamed(Routes.settingsName),
-          ),
-          // Conditionally add a sign-in or sign-out button to the AppBar.
-          // This declutters the main content card and follows common UI patterns.
-          if (isAnonymous)
-            IconButton(
-              icon: const Icon(Icons.sync),
-              tooltip: l10n.anonymousLimitButton,
-              onPressed: () => context.goNamed(Routes.accountLinkingName),
-            )
-          else
+          if (!isAnonymous)
             IconButton(
               icon: const Icon(Icons.logout),
               tooltip: l10n.accountSignOutTile,
               onPressed: () =>
                   context.read<AppBloc>().add(const AppLogoutRequested()),
             ),
-          const SizedBox(width: AppSpacing.lg),
         ],
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.paddingMedium),
+          padding: const EdgeInsets.all(AppSpacing.md),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            // The main column for the page content
             children: [
-              _buildUserHeader(context, user, isAnonymous),
+              _ProfileHeader(),
               const SizedBox(height: AppSpacing.lg),
-              _buildNavigationList(context),
+              _NavigationSections(),
             ],
           ),
         ),
       ),
     );
   }
+}
 
-  /// Builds the header section of the sheet, displaying the user's avatar,
-  /// name, and a primary action button (Sign Out or Link Account).
-  Widget _buildUserHeader(BuildContext context, User? user, bool isAnonymous) {
+class _ProfileHeader extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final user = context.select((AppBloc bloc) => bloc.state.user);
+    final isAnonymous = user?.isAnonymous ?? true;
 
-    final String statusText;
-    final String accountTypeText;
-
-    if (isAnonymous) {
-      statusText = l10n.accountGuestUserHeadline;
-      accountTypeText = l10n.accountGuestUserSubheadline;
-    } else {
-      statusText = user?.email ?? l10n.accountNoNameUser;
-
-      final String roleDisplayName;
-      switch (user?.tier) {
-        case AccessTier.standard:
-          roleDisplayName = l10n.accountRoleStandard;
-        case AccessTier.guest:
-          roleDisplayName = l10n.accountGuestAccount;
-        case null:
-          roleDisplayName = '';
-      }
-      accountTypeText = roleDisplayName;
-    }
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+    return Column(
+      children: [
+        Row(
           children: [
-            // Use the standard UserAvatar widget, clipped to be square.
-            // This ensures visual consistency with other avatars in the app.
-            ClipRRect(
-              borderRadius: BorderRadius.circular(AppSpacing.sm),
-              child: UserAvatar(user: user, radius: AppSpacing.lg),
-            ),
+            UserAvatar(user: user, radius: 32),
             const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    statusText,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
+            if (user != null)
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isAnonymous
+                          ? l10n.guestUserDisplayName
+                          : user.name?.isNotEmpty == true
+                          ? user.name!
+                          : user.email.split('@').first,
+                      style: Theme.of(context).textTheme.titleLarge,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  // Display the user role inside a styled "capsule" for a
-                  // more refined and less intrusive look.
-                  if (accountTypeText.isNotEmpty)
-                    DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: colorScheme.secondaryContainer,
-                        borderRadius: BorderRadius.circular(AppSpacing.sm),
+                    if (!isAnonymous)
+                      Text(
+                        user.email,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.sm,
-                          vertical: 2,
-                        ),
-                        child: Text(
-                          accountTypeText,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSecondaryContainer,
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(width: AppSpacing.md),
           ],
         ),
-      ),
+        const SizedBox(height: AppSpacing.md),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            icon: Icon(isAnonymous ? Icons.sync : Icons.edit_outlined),
+            label: Text(
+              isAnonymous
+                  ? l10n.accountPageSyncProgressButton
+                  : l10n.accountEditProfileButton,
+            ),
+            onPressed: () async {
+              if (isAnonymous) {
+                context.goNamed(Routes.accountLinkingName);
+              } else {
+                await context.pushNamed(Routes.editProfileName);
+              }
+            },
+          ),
+        ),
+      ],
     );
   }
+}
 
-  /// Builds the sign-in button for anonymous users.
-
-  /// Builds the list of navigation tiles for accessing different
-  /// account-related sections.
-  Widget _buildNavigationList(BuildContext context) {
+class _NavigationSections extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
-    final isAnonymous = context.select(
-      (AppBloc bloc) => bloc.state.user?.isAnonymous ?? false,
-    );
     final areRewardsEnabled = context.select(
       (AppBloc bloc) =>
           bloc.state.remoteConfig?.features.rewards.enabled ?? false,
     );
+    // Using a simple Column instead of a Card with a Column.
     return Column(
       children: [
-        if (!isAnonymous && areRewardsEnabled) ...[
-          buildTile(
-            context: context,
-            icon: Icons.card_giftcard,
-            title: l10n.accountRewardsTile,
-            onTap: () => context.pushNamed(Routes.rewardsName),
-          ),
-          const Divider(),
-        ],
-        buildTile(
-          context: context,
-          icon: Icons.check_outlined,
-          title: l10n.accountContentPreferencesTile,
-          onTap: () => context.pushNamed(Routes.manageFollowedItemsName),
-        ),
-        const Divider(),
-        buildTile(
-          context: context,
-          icon: Icons.bookmark_outline,
-          title: l10n.accountSavedHeadlinesTile,
+        ListTile(
+          leading: const Icon(Icons.bookmark_outline),
+          title: Text(l10n.accountSavedHeadlinesTile),
+          trailing: const Icon(Icons.chevron_right),
           onTap: () => context.pushNamed(Routes.accountSavedHeadlinesName),
         ),
-        const Divider(),
+        ListTile(
+          leading: const Icon(Icons.check_circle_outline),
+          title: Text(l10n.accountContentPreferencesTile),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => context.pushNamed(Routes.manageFollowedItemsName),
+        ),
         BlocSelector<AppBloc, AppState, bool>(
           selector: (state) => state.hasUnreadInAppNotifications,
           builder: (context, showIndicator) {
-            return buildTile(
-              context: context,
-              icon: Icons.notifications_none_outlined,
-              title: l10n.accountNotificationsTile,
-              onTap: () {
-                // Navigate to the new Notification Center page.
-                context.pushNamed(Routes.notificationsCenterName);
-              },
-              // Wrap the title with NotificationIndicator to show the red dot.
-              // This ensures the indicator is aligned with the text.
-              showIndicator: showIndicator,
+            return ListTile(
+              leading: const Icon(Icons.notifications_outlined),
+              title: NotificationIndicator(
+                showIndicator: showIndicator,
+                child: Text(l10n.accountNotificationsTile),
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.pushNamed(Routes.notificationsCenterName),
             );
           },
         ),
-        const Divider(),
+        if (areRewardsEnabled)
+          ListTile(
+            leading: const Icon(Icons.card_giftcard_outlined),
+            title: Text(l10n.accountRewardsTile),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.pushNamed(Routes.rewardsName),
+          ),
+        ListTile(
+          leading: const Icon(Icons.settings_outlined),
+          title: Text(l10n.accountSettingsTile),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => context.pushNamed(Routes.settingsName),
+        ),
       ],
-    );
-  }
-
-  /// Helper to create a ListTile with consistent styling and optional indicator.
-  Widget buildTile({
-    required BuildContext context,
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-    bool showIndicator = false,
-  }) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-
-    return ListTile(
-      leading: Icon(icon, color: theme.colorScheme.primary),
-      title: NotificationIndicator(
-        showIndicator: showIndicator,
-        child: Text(title, style: textTheme.titleMedium),
-      ),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: onTap,
     );
   }
 }

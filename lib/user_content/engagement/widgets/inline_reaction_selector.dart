@@ -28,7 +28,7 @@ class InlineReactionSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: List.generate(ReactionType.values.length, (index) {
         final reaction = ReactionType.values[index];
         final isSelected = selectedReaction == reaction;

@@ -5,14 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/in_app_notification_center_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/account_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/account/view/followed_contents/countries/add_country_to_follow_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/account/view/followed_contents/countries/followed_countries_list_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/account/view/followed_contents/followed_contents_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/account/view/followed_contents/sources/add_source_to_follow_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/account/view/followed_contents/sources/followed_sources_list_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/account/view/followed_contents/topics/add_topic_to_follow_page.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/account/view/followed_contents/topics/followed_topics_list_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/account/view/followed_contents/followed_content_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/in_app_notification_center_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/account/view/profile/edit_profile_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/view/saved_headlines_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/models/ad_theme_style.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/ads/services/ad_service.dart';
@@ -49,6 +44,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/v
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/view/topic_filter_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/onboarding/app_tour/view/app_tour_page.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/onboarding/initial_personalization/bloc/initial_personalization_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/onboarding/initial_personalization/view/initial_personalization_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/rewards/view/rewards_page.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/go_router_observer.dart';
@@ -155,6 +151,17 @@ GoRouter createRouter({
           );
           return feedPath;
         }
+        // This rule handles the completion of the post-auth personalization for
+        // an anonymous user. When they finish, their status becomes `anonymous`,
+        // but they are still on the `/initial-personalization` location. This
+        // rule correctly redirects them to the feed.
+        if (currentLocation == initialPersonalizationPath) {
+          logger.info(
+            '    Action: Anonymous user on personalization path. '
+            'Redirecting to feed.',
+          );
+          return feedPath;
+        }
 
         // Guard Rewards Page for Anonymous Users
         if (currentLocation == rewardsPath) {
@@ -225,7 +232,20 @@ GoRouter createRouter({
       GoRoute(
         path: Routes.initialPersonalization,
         name: Routes.initialPersonalizationName,
-        builder: (context, state) => const InitialPersonalizationPage(),
+        builder: (context, state) {
+          return BlocProvider(
+            create: (context) => InitialPersonalizationBloc(
+              appBloc: context.read<AppBloc>(),
+              userContentPreferencesRepository: context
+                  .read<DataRepository<UserContentPreferences>>(),
+              userContextRepository: context
+                  .read<DataRepository<UserContext>>(),
+              analyticsService: context.read<AnalyticsService>(),
+              logger: context.read<Logger>(),
+            )..add(InitialPersonalizationDataRequested()),
+            child: const InitialPersonalizationPage(),
+          );
+        },
       ),
 
       GoRoute(path: '/', builder: (context, state) => const SizedBox.shrink()),
@@ -312,6 +332,11 @@ GoRouter createRouter({
             },
           ),
           GoRoute(
+            path: Routes.editProfile,
+            name: Routes.editProfileName,
+            builder: (context, state) => const EditProfilePage(),
+          ),
+          GoRoute(
             path: Routes.notificationsCenter,
             name: Routes.notificationsCenterName,
             builder: (context, state) {
@@ -396,45 +421,7 @@ GoRouter createRouter({
           GoRoute(
             path: Routes.manageFollowedItems,
             name: Routes.manageFollowedItemsName,
-            builder: (context, state) => const FollowedContentsPage(),
-            routes: [
-              GoRoute(
-                path: Routes.followedTopicsList,
-                name: Routes.followedTopicsListName,
-                builder: (context, state) => const FollowedTopicsListPage(),
-                routes: [
-                  GoRoute(
-                    path: Routes.addTopicToFollow,
-                    name: Routes.addTopicToFollowName,
-                    builder: (context, state) => const AddTopicToFollowPage(),
-                  ),
-                ],
-              ),
-              GoRoute(
-                path: Routes.followedSourcesList,
-                name: Routes.followedSourcesListName,
-                builder: (context, state) => const FollowedSourcesListPage(),
-                routes: [
-                  GoRoute(
-                    path: Routes.addSourceToFollow,
-                    name: Routes.addSourceToFollowName,
-                    builder: (context, state) => const AddSourceToFollowPage(),
-                  ),
-                ],
-              ),
-              GoRoute(
-                path: Routes.followedCountriesList,
-                name: Routes.followedCountriesListName,
-                builder: (context, state) => const FollowedCountriesListPage(),
-                routes: [
-                  GoRoute(
-                    path: Routes.addCountryToFollow,
-                    name: Routes.addCountryToFollowName,
-                    builder: (context, state) => const AddCountryToFollowPage(),
-                  ),
-                ],
-              ),
-            ],
+            builder: (context, state) => const FollowedContentPage(),
           ),
           GoRoute(
             path: Routes.accountSavedHeadlines,
@@ -525,20 +512,21 @@ GoRouter createRouter({
         name: Routes.multiSelectSearchName,
         builder: (context, state) {
           final extra = state.extra as Map<String, dynamic>? ?? {};
-          final title = extra['title'] as String? ?? 'Select';
-          final allItems = extra['allItems'] as List<dynamic>? ?? [];
+          final title = extra['title'] as String;
+          final allItems = extra['allItems'] as List<FeedItem>?;
+          final repository = extra['repository'] as DataRepository<FeedItem>?;
           final initialSelectedItems =
-              extra['initialSelectedItems'] as Set<dynamic>? ?? {};
-          final itemBuilder =
-              extra['itemBuilder'] as Function? ??
-              (dynamic item) => item.toString();
+              extra['initialSelectedItems'] as Set<FeedItem>;
+          final itemBuilder = extra['itemBuilder'] as String Function(FeedItem);
+          final maxSelectionCount = extra['maxSelectionCount'] as int?;
 
-          return MultiSelectSearchPage<dynamic>(
+          return MultiSelectSearchPage<FeedItem>(
             title: title,
             allItems: allItems,
+            repository: repository,
             initialSelectedItems: initialSelectedItems,
-            // ignore: avoid_dynamic_calls
-            itemBuilder: (dynamic item) => itemBuilder(item) as String,
+            itemBuilder: itemBuilder,
+            maxSelectionCount: maxSelectionCount,
           );
         },
       ),

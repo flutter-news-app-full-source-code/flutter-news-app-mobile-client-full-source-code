@@ -74,7 +74,7 @@ class _HeadlineSourceRowState extends State<HeadlineSourceRow> {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(AppSpacing.xs / 2),
                         child: Image.network(
-                          widget.headline.source.logoUrl,
+                          widget.headline.source.logoUrl!,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) => Icon(
                             Icons.source_outlined,

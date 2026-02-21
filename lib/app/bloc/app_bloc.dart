@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:auth_repository/auth_repository.dart';
 import 'package:core/core.dart';
@@ -43,6 +44,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     required UserContentPreferences? userContentPreferences,
     required UserRewards? userRewards,
     required OnboardingStatus? onboardingStatus,
+    required DataRepository<User> userRepository,
     required DataRepository<RemoteConfig> remoteConfigRepository,
     required AppInitializer appInitializer,
     required AuthRepository authRepository,
@@ -66,6 +68,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
        _appSettingsRepository = appSettingsRepository,
        _userContentPreferencesRepository = userContentPreferencesRepository,
        _userContextRepository = userContextRepository,
+       _userRepository = userRepository,
        _inAppNotificationRepository = inAppNotificationRepository,
        _feedCacheService = feedCacheService,
        _pushNotificationService = pushNotificationService,
@@ -93,6 +96,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     // Register event handlers for various app-level events.
     on<AppStarted>(_onAppStarted);
     on<AppUserChanged>(_onAppUserChanged);
+    on<AppUserUpdated>(_onAppUserUpdated);
     on<AppSettingsRefreshed>(_onUserAppSettingsRefreshed);
     on<AppUserContentPreferencesRefreshed>(_onUserContentPreferencesRefreshed);
     on<AppSettingsChanged>(_onAppSettingsChanged);
@@ -108,6 +112,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       _onAppPushNotificationDeviceRegistered,
     );
     on<AppLogoutRequested>(_onLogoutRequested);
+    on<AppAccountDeletionRequested>(_onAccountDeletionRequested);
     on<AppPushNotificationTokenRefreshed>(_onAppPushNotificationTokenRefreshed);
     on<AppInAppNotificationReceived>(_onAppInAppNotificationReceived);
     on<AppAllInAppNotificationsMarkedAsRead>(
@@ -120,6 +125,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppContentReported>(_onAppContentReported);
     on<UserRewardsRefreshed>(_onUserRewardsRefreshed);
     on<AppOnboardingCompleted>(_onAppOnboardingCompleted);
+    on<AppUserRefreshRequested>(_onAppUserRefreshRequested);
 
     // Listen to token refresh events from the push notification service.
     // When a token is refreshed, dispatch an event to trigger device
@@ -150,6 +156,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final DataRepository<UserContentPreferences>
   _userContentPreferencesRepository;
   final DataRepository<UserContext> _userContextRepository;
+  final DataRepository<User> _userRepository;
   final DataRepository<InAppNotification> _inAppNotificationRepository;
   final PushNotificationService _pushNotificationService;
   final DataRepository<Report> _reportRepository;
@@ -176,19 +183,28 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       // This ensures the notification dot is shown correctly if the user
       // has unread notifications from a previous session.
       try {
-        final unreadCount = await _inAppNotificationRepository.count(
+        final unreadNotifications = await _inAppNotificationRepository.readAll(
           userId: state.user!.id,
           filter: {'readAt': null},
         );
-        if (unreadCount > 0) {
+
+        if (unreadNotifications.items.isEmpty) {
+          _logger.info(
+            '[AppBloc] No unread notifications remaining. Setting hasUnreadInAppNotifications to false.',
+          );
+        } else {
+          _logger.fine(
+            '[AppBloc] ${unreadNotifications.items.length} unread notifications remain.',
+          );
           emit(state.copyWith(hasUnreadInAppNotifications: true));
         }
       } catch (e, s) {
         _logger.severe(
-          'Failed to check for unread notifications on app start.',
+          'Failed to check for remaining unread notifications.',
           e,
           s,
         );
+        // Do not change state on error to avoid inconsistent UI.
       }
 
       // Ensure we have permission before attempting to register the device.
@@ -324,8 +340,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     // If the user is null, it's a logout.
     if (newUser == null) {
+      // The device un-registration is handled upstream in the specific
+      // event handlers (_onLogoutRequested, _onAccountDeletionRequested).
+      // This handler is only responsible for cleaning up the state.
       _logger.info(
-        '[AppBloc] User logged out. Transitioning to unauthenticated.',
+        '[AppBloc] User is now null. Transitioning to unauthenticated.',
       );
       // When logging out, it's crucial to explicitly clear all user-related
       // data to ensure a clean state for the next session. This prevents
@@ -343,6 +362,16 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         ),
       );
       return;
+    }
+
+    // If the new user has a photoUrl, it means the canonical state has been
+    // fetched from the backend. We should clear any lingering optimistic avatar
+    // to ensure the permanent image is displayed.
+    if (newUser.photoUrl != null && state.optimisticAvatarBytes != null) {
+      _logger.info(
+        '[AppBloc] New user data contains photoUrl. Clearing optimistic avatar.',
+      );
+      emit(state.copyWith(clearOptimisticAvatar: true));
     }
 
     // If the user is changing (e.g., anonymous to authenticated), clear caches
@@ -451,6 +480,37 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             clearError: true,
           ),
         );
+        // Register the device here, as the user is now authenticated
+        // and ready for onboarding.
+        await _registerDeviceForPushNotifications(transitionResult.user!.id);
+    }
+  }
+
+  /// Handles the [AppUserUpdated] event, which is dispatched when a part of
+  /// the app (like the profile editor) updates the user object. This ensures
+  /// the global state is immediately consistent.
+  void _onAppUserUpdated(AppUserUpdated event, Emitter<AppState> emit) {
+    _logger.info(
+      '[AppBloc] AppUserUpdated event received. Updating user and optimistic avatar in state.',
+    );
+    // Simply emit a new state with the updated user object.
+    // This is critical for changes like updating a user's name to be
+    // reflected instantly across the app.
+    emit(
+      state.copyWith(
+        user: event.user,
+        optimisticAvatarBytes: event.optimisticAvatarBytes,
+      ),
+    );
+
+    // If the updated user has a new photoUrl, it means the backend has
+    // processed the image. We can now clear the optimistic avatar bytes.
+    if (state.user?.photoUrl != event.user.photoUrl &&
+        event.user.photoUrl != null) {
+      _logger.info(
+        '[AppBloc] New photoUrl received. Clearing optimistic avatar.',
+      );
+      emit(state.copyWith(clearOptimisticAvatar: true));
     }
   }
 
@@ -584,8 +644,29 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   }
 
   /// Handles user logout request.
-  void _onLogoutRequested(AppLogoutRequested event, Emitter<AppState> emit) {
-    unawaited(_authRepository.signOut());
+  Future<void> _onLogoutRequested(
+    AppLogoutRequested event,
+    Emitter<AppState> emit,
+  ) async {
+    _logger.info('[AppBloc] Logout requested. Unregistering device...');
+    // Unregister first, while still authenticated.
+    await _pushNotificationService.unregisterDevice();
+    // Then, sign out. This will trigger _onAppUserChanged.
+    await _authRepository.signOut();
+  }
+
+  /// Handles user account deletion request.
+  Future<void> _onAccountDeletionRequested(
+    AppAccountDeletionRequested event,
+    Emitter<AppState> emit,
+  ) async {
+    _logger.info(
+      '[AppBloc] Account deletion requested. Unregistering device...',
+    );
+    // Unregister first, while still authenticated.
+    await _pushNotificationService.unregisterDevice();
+    // Then, delete the account. This will trigger _onAppUserChanged.
+    await _authRepository.deleteAccount();
   }
 
   /// Handles periodic fetching of the remote application configuration.
@@ -998,18 +1079,20 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     if (state.user == null) return;
 
     try {
-      final unreadCount = await _inAppNotificationRepository.count(
+      final unreadNotifications = await _inAppNotificationRepository.readAll(
         userId: state.user!.id,
         filter: {'readAt': null},
       );
 
-      if (unreadCount == 0) {
+      if (unreadNotifications.items.isEmpty) {
         _logger.info(
           '[AppBloc] No unread notifications remaining. Setting hasUnreadInAppNotifications to false.',
         );
-        emit(state.copyWith(hasUnreadInAppNotifications: false));
       } else {
-        _logger.fine('[AppBloc] $unreadCount unread notifications remain.');
+        _logger.fine(
+          '[AppBloc] ${unreadNotifications.items.length} unread notifications remain.',
+        );
+        emit(state.copyWith(hasUnreadInAppNotifications: true));
       }
     } catch (e, s) {
       _logger.severe(
@@ -1235,11 +1318,23 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       case OnboardingStatus.preAuthTour:
         emit(state.copyWith(status: AppLifeCycleStatus.unauthenticated));
       case OnboardingStatus.postAuthPersonalization:
+        // The user object must exist at this point.
+        final user = state.user;
+        if (user == null) {
+          // This should be an impossible state, but we guard against it.
+          _logger.severe(
+            '[AppBloc] CRITICAL: Post-auth onboarding completed but user is null.',
+          );
+          emit(state.copyWith(status: AppLifeCycleStatus.unauthenticated));
+          return;
+        }
         emit(
           state.copyWith(
-            status: AppLifeCycleStatus.authenticated,
+            status: user.isAnonymous
+                ? AppLifeCycleStatus.anonymous
+                : AppLifeCycleStatus.authenticated,
             // We must carry over the user object, otherwise it gets nulled.
-            user: state.user,
+            user: user,
             userContentPreferences: event.userContentPreferences,
             userContext: event.userContext,
           ),
@@ -1270,6 +1365,37 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         e,
         s,
       );
+    }
+  }
+
+  /// Handles the request to refresh the user data from the backend.
+  Future<void> _onAppUserRefreshRequested(
+    AppUserRefreshRequested event,
+    Emitter<AppState> emit,
+  ) async {
+    final userId = state.user?.id;
+    if (userId == null) {
+      _logger.info('[AppBloc] Skipping user refresh: User is null.');
+      return;
+    }
+
+    _logger.info('[AppBloc] Refreshing user data for user $userId...');
+    try {
+      final refreshedUser = await _userRepository.read(id: userId);
+      // Only emit if the user data has actually changed to avoid unnecessary
+      // UI rebuilds. The User model implements Equatable.
+      if (refreshedUser != state.user) {
+        _logger.info('[AppBloc] User data has changed. Emitting new state.');
+        emit(state.copyWith(user: refreshedUser));
+
+        // If the refreshed user has a new photoUrl, clear any optimistic avatar.
+        if (refreshedUser.photoUrl != null &&
+            refreshedUser.photoUrl != state.user?.photoUrl) {
+          emit(state.copyWith(clearOptimisticAvatar: true));
+        }
+      }
+    } catch (e, s) {
+      _logger.warning('[AppBloc] Failed to refresh user data.', e, s);
     }
   }
 }

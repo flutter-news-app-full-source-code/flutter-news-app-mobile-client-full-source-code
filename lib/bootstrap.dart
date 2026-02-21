@@ -30,6 +30,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/view/app_ini
 import 'package:flutter_news_app_mobile_client_full_source_code/bloc_observer.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/feed_decorators/services/feed_decorator_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/headlines-feed/services/feed_cache_service.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/media/client/media_api.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/push_notification/providers/firebase_push_notification_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/push_notification/providers/no_op_push_notification_provider.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/push_notification/providers/one_signal_push_notification_provider.dart';
@@ -245,6 +246,7 @@ Future<Widget> bootstrap(
   late final DataClient<Report> reportClient;
   late final DataClient<AppReview> appReviewClient;
   late final DataClient<UserRewards> userRewardsClient;
+  late final MediaClient mediaClient;
   logger.fine('Using API clients for all data repositories.');
   headlinesClient = DataApi<Headline>(
     httpClient: httpClient,
@@ -344,6 +346,7 @@ Future<Widget> bootstrap(
     toJson: (rewards) => rewards.toJson(),
     logger: logger,
   );
+  mediaClient = MediaApi(httpClient: httpClient, logger: logger);
   logger.fine('All data clients instantiated.');
 
   final headlinesRepository = DataRepository<Headline>(
@@ -383,6 +386,8 @@ Future<Widget> bootstrap(
   final userRewardsRepository = DataRepository<UserRewards>(
     dataClient: userRewardsClient,
   );
+
+  final mediaRepository = MediaRepository(mediaClient: mediaClient);
 
   logger
     ..fine('All data repositories initialized.')
@@ -508,6 +513,7 @@ Future<Widget> bootstrap(
       contentLimitationService: contentLimitationService,
       analyticsService: analyticsService,
       userRewardsRepository: userRewardsRepository,
+      mediaRepository: mediaRepository,
     ),
   );
 }

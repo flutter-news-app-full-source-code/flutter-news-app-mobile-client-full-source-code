@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// Title for the account linking page
   ///
   /// In en, this message translates to:
-  /// **'Link Your Account'**
+  /// **'Sync Your Progress'**
   String get accountLinkingPageTitle;
 
   /// Generic error message shown during account linking
@@ -119,13 +119,13 @@ abstract class AppLocalizations {
   /// Headline text on the account linking page
   ///
   /// In en, this message translates to:
-  /// **'Save your progress'**
+  /// **'Save Your Progress'**
   String get accountLinkingHeadline;
 
   /// Body text explaining the benefits of linking an account
   ///
   /// In en, this message translates to:
-  /// **'Signing up allows you to access your information across multiple devices and ensures your progress isn\'t lost.'**
+  /// **'Create an account to sync your followed items and preferences across all your devices.'**
   String get accountLinkingBody;
 
   /// Text for the Google sign-in button
@@ -155,7 +155,7 @@ abstract class AppLocalizations {
   /// Text for the button that sends an email sign-in link
   ///
   /// In en, this message translates to:
-  /// **'Send Sign-In Link'**
+  /// **'Sync with Email'**
   String get accountLinkingSendLinkButton;
 
   /// Title for the account page
@@ -230,6 +230,78 @@ abstract class AppLocalizations {
   /// **'Role: {role}'**
   String accountRoleLabel(String role);
 
+  /// Title for the 'My Content' section on the account page.
+  ///
+  /// In en, this message translates to:
+  /// **'My Content'**
+  String get accountMyContentSectionTitle;
+
+  /// Title for the 'Activity & Rewards' section on the account page.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity & Rewards'**
+  String get accountActivityAndRewardsSectionTitle;
+
+  /// Title for the 'General' section on the account page.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get accountGeneralSectionTitle;
+
+  /// Button text to navigate to the edit profile page.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get accountEditProfileButton;
+
+  /// Title for the Edit Profile page.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get editProfilePageTitle;
+
+  /// Label for the name input field on the Edit Profile page.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get editProfileNameInputLabel;
+
+  /// Label for the email input field on the Edit Profile page.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get editProfileEmailInputLabel;
+
+  /// Snackbar message shown when the user's profile is updated successfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated successfully.'**
+  String get editProfileUpdateSuccessSnackbar;
+
+  /// Snackbar message shown when updating the user's profile fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update profile. Please try again.'**
+  String get editProfileUpdateFailureSnackbar;
+
+  /// Title for the new unified page that shows all followed content.
+  ///
+  /// In en, this message translates to:
+  /// **'Followed Items'**
+  String get followedContentPageTitle;
+
+  /// Label for the 'Topics' tab on the followed content page.
+  ///
+  /// In en, this message translates to:
+  /// **'Topics'**
+  String get followedContentTopicsTab;
+
+  /// Label for the 'Sources' tab on the followed content page.
+  ///
+  /// In en, this message translates to:
+  /// **'Sources'**
+  String get followedContentSourcesTab;
+
   /// Success message shown after sending an email sign-in link on the authentication page
   ///
   /// In en, this message translates to:
@@ -275,7 +347,7 @@ abstract class AppLocalizations {
   /// Headline text shown in the initial state widget on the details page
   ///
   /// In en, this message translates to:
-  /// **'Waiting for Headline'**
+  /// **'Waiting for Details'**
   String get headlineDetailsInitialHeadline;
 
   /// Subheadline text shown in the initial state widget on the details page
@@ -353,7 +425,7 @@ abstract class AppLocalizations {
   /// Label for the source filter dropdown
   ///
   /// In en, this message translates to:
-  /// **'Source'**
+  /// **'Sources'**
   String get headlinesFeedFilterSourceLabel;
 
   /// Filter option for CNN source
@@ -371,7 +443,7 @@ abstract class AppLocalizations {
   /// Filter page label indication where the hadline event has took place
   ///
   /// In en, this message translates to:
-  /// **'Country of Event'**
+  /// **'Countries'**
   String get headlinesFeedFilterEventCountryLabel;
 
   /// Filter page label indication where the headline source is located
@@ -449,13 +521,13 @@ abstract class AppLocalizations {
   /// Headline for the authentication page when linking an anonymous account
   ///
   /// In en, this message translates to:
-  /// **'Sync Your Data'**
+  /// **'Sync Your Progress'**
   String get authenticationLinkingHeadline;
 
   /// Subheadline explaining the benefit of linking an anonymous account
   ///
   /// In en, this message translates to:
-  /// **'save your settings, content preferences and more across devices.'**
+  /// **'Create an account to save your settings, content preferences, and more across devices.'**
   String get authenticationLinkingSubheadline;
 
   /// Headline for the authentication page during standard sign-in
@@ -3224,11 +3296,59 @@ abstract class AppLocalizations {
   /// **'Finish'**
   String get initialPersonalizationFinishButton;
 
+  /// Title for the dialog asking to confirm account deletion.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get deleteAccountDialogTitle;
+
+  /// Content for the account deletion confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to permanently delete your account? This action cannot be undone.'**
+  String get deleteAccountDialogContent;
+
+  /// Confirmation button text for account deletion.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get deleteAccountDialogConfirm;
+
+  /// Button text to initiate account deletion.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get deleteAccountButton;
+
+  /// Message shown when a list of followed items is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'You are not following any items in this category yet.'**
+  String get followedContentEmpty;
+
+  /// Subheadline for the empty state on the followed content page.
+  ///
+  /// In en, this message translates to:
+  /// **'Items you follow will appear here. Use the \'+\' button to add more.'**
+  String get followedContentEmptySubheadline;
+
   /// Label showing the number of selected items out of the total allowed.
   ///
   /// In en, this message translates to:
   /// **'{count}/{total}'**
   String multiSelectSearchPageSelectionCount(int count, int total);
+
+  /// The display name for a guest user.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest'**
+  String get guestUserDisplayName;
+
+  /// Button text for guest users on the account page to initiate account linking/syncing.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync Progress'**
+  String get accountPageSyncProgressButton;
 }
 
 class _AppLocalizationsDelegate

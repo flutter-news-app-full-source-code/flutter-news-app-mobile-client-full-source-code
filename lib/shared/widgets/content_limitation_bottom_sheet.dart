@@ -157,6 +157,8 @@ _getBottomSheetContent({
         ContentAction.pinFilter => l10n.limitReachedBodyPinFilters,
         ContentAction.subscribeToSavedFilterNotifications =>
           l10n.limitReachedBodySubscribeToNotifications,
+        // Add a default case for actions that don't have a specific message.
+        ContentAction.editProfile => l10n.standardLimitBody,
       };
 
       final buttonText = l10n.unlockMoreButton;

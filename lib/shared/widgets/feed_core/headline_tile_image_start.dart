@@ -71,29 +71,36 @@ class HeadlineTileImageStart extends StatelessWidget {
                     width: 72,
                     height: 72,
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(AppSpacing.xs),
-                      child: Image.network(
-                        headline.imageUrl!,
-                        fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return ColoredBox(
-                            color: colorScheme.surfaceContainerHighest,
-                            child: const Center(
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            ),
-                          );
-                        },
-                        errorBuilder: (context, error, stackTrace) =>
-                            ColoredBox(
-                              color: colorScheme.surfaceContainerHighest,
-                              child: Icon(
-                                Icons.broken_image_outlined,
-                                color: colorScheme.onSurfaceVariant,
-                                size: AppSpacing.xl,
+                      borderRadius: BorderRadius.circular(AppSpacing.sm),
+                      child: headline.imageUrl != null
+                          ? Image.network(
+                              headline.imageUrl!,
+                              fit: BoxFit.cover,
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return ColoredBox(
+                                  color: colorScheme.surfaceContainerHighest,
+                                  child: const Center(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) =>
+                                  ColoredBox(
+                                color: colorScheme.surfaceContainerHighest,
+                                child: Icon(
+                                  Icons.broken_image_outlined,
+                                  color: colorScheme.onSurfaceVariant,
+                                  size: AppSpacing.xl,
+                                ),
                               ),
+                            )
+                          : ColoredBox(
+                              color: colorScheme.surfaceContainerHighest,
                             ),
-                      ),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.md),

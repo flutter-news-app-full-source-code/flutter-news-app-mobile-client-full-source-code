@@ -53,41 +53,42 @@ class HeadlineTileImageTop extends StatelessWidget {
             padding: const EdgeInsets.all(AppSpacing.sm),
             child: HeadlineSourceRow(headline: headline),
           ),
-          InkWell(
-            onTap:
-                onHeadlineTap ??
-                () => HeadlineTapHandler.handleHeadlineTap(context, headline),
-            child: Padding(
-              padding: const EdgeInsets.only(top: AppSpacing.sm),
-              child: Image.network(
-                headline.imageUrl!,
-                width: double.infinity,
-                height: 180,
-                fit: BoxFit.cover,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Container(
+          if (headline.imageUrl != null)
+            InkWell(
+              onTap:
+                  onHeadlineTap ??
+                  () => HeadlineTapHandler.handleHeadlineTap(context, headline),
+              child: Padding(
+                padding: const EdgeInsets.only(top: AppSpacing.sm),
+                child: Image.network(
+                  headline.imageUrl!,
+                  width: double.infinity,
+                  height: 180,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      width: double.infinity,
+                      height: 180,
+                      color: colorScheme.surfaceContainerHighest,
+                      child: const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) => Container(
                     width: double.infinity,
                     height: 180,
                     color: colorScheme.surfaceContainerHighest,
-                    child: const Center(
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                    child: Icon(
+                      Icons.broken_image_outlined,
+                      color: colorScheme.onSurfaceVariant,
+                      size: AppSpacing.xxl,
                     ),
-                  );
-                },
-                errorBuilder: (context, error, stackTrace) => Container(
-                  width: double.infinity,
-                  height: 180,
-                  color: colorScheme.surfaceContainerHighest,
-                  child: Icon(
-                    Icons.broken_image_outlined,
-                    color: colorScheme.onSurfaceVariant,
-                    size: AppSpacing.xxl,
                   ),
                 ),
               ),
             ),
-          ),
           Padding(
             padding: const EdgeInsets.fromLTRB(
               AppSpacing.md,

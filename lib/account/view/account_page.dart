@@ -34,12 +34,13 @@ class AccountPage extends StatelessWidget {
         ),
         title: Text(l10n.accountPageTitle),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: l10n.accountSignOutTile,
-            onPressed: () =>
-                context.read<AppBloc>().add(const AppLogoutRequested()),
-          ),
+          if (!isAnonymous)
+            IconButton(
+              icon: const Icon(Icons.logout),
+              tooltip: l10n.accountSignOutTile,
+              onPressed: () =>
+                  context.read<AppBloc>().add(const AppLogoutRequested()),
+            ),
         ],
       ),
       body: SingleChildScrollView(
@@ -107,7 +108,7 @@ class _ProfileHeader extends StatelessWidget {
             ),
             onPressed: () async {
               if (isAnonymous) {
-                context.goNamed(Routes.accountLinkingName);
+                await context.pushNamed(Routes.accountLinkingName);
               } else {
                 await context.pushNamed(Routes.editProfileName);
               }

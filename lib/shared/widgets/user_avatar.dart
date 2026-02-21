@@ -1,6 +1,8 @@
 import 'package:core/core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
 import 'package:ui_kit/ui_kit.dart';
 
 /// {@template user_avatar}
@@ -32,15 +34,26 @@ class UserAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final optimisticAvatar = context.select(
+      (AppBloc bloc) => bloc.state.optimisticAvatarBytes,
+    );
 
     final localUser = user;
     // Determine which content to show based on a priority order.
     Widget child;
     ImageProvider? backgroundImage;
 
+    // Priority 1: An explicit override image (used for local previews on the
+    // edit page).
     if (overrideImage != null) {
       backgroundImage = overrideImage;
       child = const SizedBox.shrink();
+      // Priority 2: An optimistic avatar from a recent upload, held in the
+      // global state.
+    } else if (optimisticAvatar != null) {
+      backgroundImage = MemoryImage(optimisticAvatar);
+      child = const SizedBox.shrink();
+      // Priority 3: The permanent, backend-confirmed photo URL.
     } else if (localUser?.photoUrl != null && localUser!.photoUrl!.isNotEmpty) {
       backgroundImage = NetworkImage(localUser.photoUrl!);
       child = const SizedBox.shrink();

@@ -194,11 +194,16 @@ class PushNotificationManager implements PushNotificationService {
         '[PushNotificationManager] New token, new user, or both detected. Proceeding with registration.',
       );
 
-      // The backend API contract forbids updating a PushNotificationDevice.
-      // The correct pattern is to delete any old registration and create a new one.
-      // This implementation makes that pattern resilient to failures.
+      // The backend API contract for this model is a strict delete-then-create
+      // pattern. The `unregisterDevice` call on logout/account deletion is
+      // responsible for cleaning up records of previous users. This method's
+      // responsibility is to ensure the current user has one, and only one,
+      // registration for the current device platform.
 
-      // STEP 2: Attempt to delete any existing registrations for this user and platform.
+      // STEP 2: Attempt to delete any existing registrations for this user and
+      // platform. This is a robust cleanup step that prevents duplicate
+      // registrations if, for example, the app was reinstalled and received a
+      // new token.
       try {
         final platform = Platform.isIOS
             ? DevicePlatform.ios
@@ -210,7 +215,7 @@ class PushNotificationManager implements PushNotificationService {
 
         if (existingDevices.items.isNotEmpty) {
           _logger.info(
-            '[PushNotificationManager] Found ${existingDevices.items.length} existing device(s) to delete.',
+            '[PushNotificationManager] Found ${existingDevices.items.length} existing device(s) for this user to delete before creating new one.',
           );
           await Future.wait(
             existingDevices.items.map(
@@ -220,17 +225,15 @@ class PushNotificationManager implements PushNotificationService {
               ),
             ),
           );
-          _logger.info(
-            '[PushNotificationManager] Successfully deleted existing device(s).',
-          );
         }
       } catch (e, s) {
         // IMPORTANT: We log the deletion failure but continue.
         // It's better to have a temporary duplicate registration than to fail
-        // the entire process. The backend's self-healing mechanism (purging
-        // invalid tokens) will eventually clean up any duplicates.
+        // the entire process. The backend's unique key on the token will
+        // prevent a hard duplicate, and this failure indicates a state mismatch
+        // that will be resolved on the next successful logout.
         _logger.warning(
-          '[PushNotificationManager] Failed to delete existing device(s), but proceeding with creation.',
+          '[PushNotificationManager] Failed to delete old device registrations for user, but proceeding with creation.',
           e,
           s,
         );
@@ -254,7 +257,7 @@ class PushNotificationManager implements PushNotificationService {
         '[PushNotificationManager] Successfully created new device registration.',
       );
 
-      // STEP 4: ONLY on successful creation, persist the new token locally.
+      // STEP 4: ONLY on successful operation, persist the new token locally.
       // This is the key to resilience. If the create step fails, the old token
       // remains in storage, ensuring this entire process is retried on the
       // next app start or token refresh.
@@ -284,6 +287,61 @@ class PushNotificationManager implements PushNotificationService {
       // Rethrowing here could crash the AppBloc or the entire app. The error
       // is logged, and because the local token was not updated on failure,
       // the process will be retried automatically on the next app start.
+    }
+  }
+
+  @override
+  Future<void> unregisterDevice() async {
+    _logger.info('[PushNotificationManager] Unregistering current device...');
+    try {
+      final currentToken = await _activeProvider.getToken();
+      if (currentToken == null || currentToken.isEmpty) {
+        _logger.info(
+          '[PushNotificationManager] No token found, cannot unregister.',
+        );
+        return;
+      }
+
+      final providerName = _config!.primaryProvider.name;
+      final searchResult = await _pushNotificationDeviceRepository.readAll(
+        userId: null, // Global search
+        filter: {'providerTokens.$providerName': currentToken},
+      );
+
+      if (searchResult.items.isNotEmpty) {
+        final deviceToDelete = searchResult.items.first;
+        _logger.info(
+          '[PushNotificationManager] Found device ${deviceToDelete.id} to unregister.',
+        );
+        await _pushNotificationDeviceRepository.delete(
+          id: deviceToDelete.id,
+          userId: deviceToDelete.userId, // Pass owner ID for API call
+        );
+        _logger.info(
+          '[PushNotificationManager] Successfully deleted device registration from backend.',
+        );
+      } else {
+        _logger.info(
+          '[PushNotificationManager] No existing device registration found to delete.',
+        );
+      }
+
+      // Always clear the local storage key on unregister attempt.
+      final storageKey = _providerTokenStorageKey;
+      if (storageKey != null) {
+        await _storageService.delete(key: storageKey.stringValue);
+        _logger.info(
+          '[PushNotificationManager] Cleared local push notification registration data.',
+        );
+      }
+    } catch (e, s) {
+      _logger.severe(
+        '[PushNotificationManager] Failed to unregister device.',
+        e,
+        s,
+      );
+      // Do not rethrow, as this is a cleanup operation that should not
+      // block the user from logging out.
     }
   }
 

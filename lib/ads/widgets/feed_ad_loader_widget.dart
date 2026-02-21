@@ -244,6 +244,24 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
       }
 
       final appBlocState = context.read<AppBloc>().state;
+
+      // Guard clause. If settings are null (e.g., during logout),
+      // we cannot determine the image style and should abort ad loading.
+      if (appBlocState.settings == null) {
+        _logger.warning(
+          'Aborting ad load for context "${widget.contextKey}" because AppSettings are null (user likely logging out).',
+        );
+        if (mounted) {
+          setState(() {
+            _hasError = true; // Treat as an error to show the placeholder
+            _isLoading = false;
+          });
+        }
+        if (_loadAdCompleter?.isCompleted == false) {
+          _loadAdCompleter!.complete();
+        }
+        return;
+      }
       final feedItemImageStyle =
           appBlocState.settings!.feedSettings.feedItemImageStyle;
       final userTier = appBlocState.user?.tier ?? AccessTier.guest;
@@ -314,12 +332,23 @@ class _FeedAdLoaderWidgetState extends State<FeedAdLoaderWidget> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
     final theme = Theme.of(context);
-    final feedItemImageStyle = context
-        .read<AppBloc>()
-        .state
-        .settings!
-        .feedSettings
-        .feedItemImageStyle;
+    final appState = context.watch<AppBloc>().state;
+
+    // Add a guard clause here. If settings are null (e.g., during logout),
+    // we cannot determine the image style and should return a safe placeholder.
+    if (appState.settings == null) {
+      _logger.finer(
+        'FeedAdLoaderWidget build: AppSettings are null, returning empty Card.',
+      );
+      return Card(
+        margin: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.paddingMedium,
+          vertical: AppSpacing.xs,
+        ),
+      );
+    }
+    final feedItemImageStyle =
+        appState.settings!.feedSettings.feedItemImageStyle;
 
     if (_isLoading || _hasError || _loadedAd == null) {
       // Show a user-friendly message when loading, on error, or if no ad is

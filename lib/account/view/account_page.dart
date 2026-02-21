@@ -79,7 +79,11 @@ class _ProfileHeader extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      isAnonymous ? l10n.guestUserDisplayName : user.name ?? '',
+                      isAnonymous
+                          ? l10n.guestUserDisplayName
+                          : user.name?.isNotEmpty == true
+                          ? user.name!
+                          : user.email.split('@').first,
                       style: Theme.of(context).textTheme.titleLarge,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -108,7 +112,7 @@ class _ProfileHeader extends StatelessWidget {
             ),
             onPressed: () async {
               if (isAnonymous) {
-                await context.pushNamed(Routes.accountLinkingName);
+                context.goNamed(Routes.accountLinkingName);
               } else {
                 await context.pushNamed(Routes.editProfileName);
               }

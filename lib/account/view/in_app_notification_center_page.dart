@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/bloc/in_app_notification_center_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/account/widgets/in_app_notification_list_item.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/headline_tap_handler.dart';
 import 'package:ui_kit/ui_kit.dart';
 
@@ -124,75 +125,84 @@ class _InAppNotificationCenterPageState
                     ],
                   ),
                 ),
-                body:
-                    BlocConsumer<
-                      InAppNotificationCenterBloc,
-                      InAppNotificationCenterState
-                    >(
-                      listener: (context, state) {
-                        if (state.status ==
-                                InAppNotificationCenterStatus.failure &&
-                            state.error != null) {
-                          ScaffoldMessenger.of(context)
-                            ..hideCurrentSnackBar()
-                            ..showSnackBar(
-                              SnackBar(
-                                content: Text(state.error!.message),
-                                backgroundColor: Theme.of(
-                                  context,
-                                ).colorScheme.error,
-                              ),
-                            );
-                        }
-                      },
-                      builder: (context, state) {
-                        if (state.status ==
-                                InAppNotificationCenterStatus.loading &&
-                            state.breakingNewsNotifications.isEmpty &&
-                            state.digestNotifications.isEmpty) {
-                          return LoadingStateWidget(
-                            icon: Icons.notifications_none_outlined,
-                            headline: l10n.notificationCenterLoadingHeadline,
-                            subheadline:
-                                l10n.notificationCenterLoadingSubheadline,
-                          );
-                        }
-
-                        if (state.status ==
-                                InAppNotificationCenterStatus.failure &&
-                            state.breakingNewsNotifications.isEmpty &&
-                            state.digestNotifications.isEmpty) {
-                          return FailureStateWidget(
-                            exception:
-                                state.error ??
-                                OperationFailedException(
-                                  l10n.notificationCenterFailureHeadline,
-                                ),
-                            onRetry: () {
-                              context.read<InAppNotificationCenterBloc>().add(
-                                const InAppNotificationCenterSubscriptionRequested(),
-                              );
-                            },
-                          );
-                        }
-
-                        return TabBarView(
-                          controller: _tabController,
-                          children: [
-                            _NotificationList(
-                              status: state.status,
-                              notifications: state.breakingNewsNotifications,
-                              hasMore: state.breakingNewsHasMore,
-                            ),
-                            _NotificationList(
-                              status: state.status,
-                              notifications: state.digestNotifications,
-                              hasMore: state.digestHasMore,
-                            ),
-                          ],
-                        );
-                      },
+                body: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxWidth: AppLayout.maxDialogContentWidth,
                     ),
+                    child:
+                        BlocConsumer<
+                          InAppNotificationCenterBloc,
+                          InAppNotificationCenterState
+                        >(
+                          listener: (context, state) {
+                            if (state.status ==
+                                    InAppNotificationCenterStatus.failure &&
+                                state.error != null) {
+                              ScaffoldMessenger.of(context)
+                                ..hideCurrentSnackBar()
+                                ..showSnackBar(
+                                  SnackBar(
+                                    content: Text(state.error!.message),
+                                    backgroundColor: Theme.of(
+                                      context,
+                                    ).colorScheme.error,
+                                  ),
+                                );
+                            }
+                          },
+                          builder: (context, state) {
+                            if (state.status ==
+                                    InAppNotificationCenterStatus.loading &&
+                                state.breakingNewsNotifications.isEmpty &&
+                                state.digestNotifications.isEmpty) {
+                              return LoadingStateWidget(
+                                icon: Icons.notifications_none_outlined,
+                                headline:
+                                    l10n.notificationCenterLoadingHeadline,
+                                subheadline:
+                                    l10n.notificationCenterLoadingSubheadline,
+                              );
+                            }
+
+                            if (state.status ==
+                                    InAppNotificationCenterStatus.failure &&
+                                state.breakingNewsNotifications.isEmpty &&
+                                state.digestNotifications.isEmpty) {
+                              return FailureStateWidget(
+                                exception:
+                                    state.error ??
+                                    OperationFailedException(
+                                      l10n.notificationCenterFailureHeadline,
+                                    ),
+                                onRetry: () {
+                                  context.read<InAppNotificationCenterBloc>().add(
+                                    const InAppNotificationCenterSubscriptionRequested(),
+                                  );
+                                },
+                              );
+                            }
+
+                            return TabBarView(
+                              controller: _tabController,
+                              children: [
+                                _NotificationList(
+                                  status: state.status,
+                                  notifications:
+                                      state.breakingNewsNotifications,
+                                  hasMore: state.breakingNewsHasMore,
+                                ),
+                                _NotificationList(
+                                  status: state.status,
+                                  notifications: state.digestNotifications,
+                                  hasMore: state.digestHasMore,
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                  ),
+                ),
               ),
               if (isDeleting)
                 ColoredBox(

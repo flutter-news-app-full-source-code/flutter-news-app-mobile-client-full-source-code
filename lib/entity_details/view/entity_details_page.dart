@@ -10,6 +10,7 @@ import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_blo
 import 'package:flutter_news_app_mobile_client_full_source_code/entity_details/bloc/entity_details_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/shared/constants/app_layout.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/services/content_limitation_service.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/content_limitation_bottom_sheet.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/shared/widgets/feed_core/feed_core.dart';
@@ -110,6 +111,9 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
     final isSourceReportingEnabled =
         (communityConfig?.enabled ?? false) &&
         (communityConfig?.reporting.sourceReportingEnabled ?? false);
+    final entity = context.select(
+      (EntityDetailsBloc bloc) => bloc.state.entity,
+    );
 
     return Scaffold(
       body: BlocBuilder<EntityDetailsBloc, EntityDetailsState>(
@@ -143,11 +147,11 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
             );
           }
 
-          final String appBarTitleText;
+          String appBarTitleText;
           IconData? appBarIconData;
 
-          if (state.entity is Topic) {
-            final topic = state.entity! as Topic;
+          if (entity is Topic) {
+            final topic = entity;
             appBarTitleText = topic.name;
             appBarIconData = Icons.category_outlined;
           } else if (state.entity is Source) {
@@ -162,296 +166,418 @@ class _EntityDetailsViewState extends State<EntityDetailsView> {
             appBarTitleText = l10n.detailsPageTitle;
           }
 
-          final followButton = IconButton(
-            icon: _isFollowingInProgress
-                ? const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : Icon(
-                    state.isFollowing
-                        ? Icons.check_circle
-                        : Icons.add_circle_outline,
-                    color: colorScheme.primary,
-                  ),
-            tooltip: state.isFollowing
-                ? l10n.unfollowButtonLabel
-                : l10n.followButtonLabel,
-            onPressed: _isFollowingInProgress
-                ? null
-                : () async {
-                    setState(() => _isFollowingInProgress = true);
-                    try {
-                      // If the user is unfollowing, always allow it.
-                      if (state.isFollowing) {
-                        context.read<EntityDetailsBloc>().add(
-                          const EntityDetailsToggleFollowRequested(),
-                        );
-                        return;
-                      }
-
-                      // If the user is following, check the limit first.
-                      final limitationService = context
-                          .read<ContentLimitationService>();
-                      final contentType = state.contentType;
-
-                      if (contentType == null) return;
-
-                      final action = switch (contentType) {
-                        ContentType.topic => ContentAction.followTopic,
-                        ContentType.source => ContentAction.followSource,
-                        ContentType.country => ContentAction.followCountry,
-                        _ => null,
-                      };
-
-                      if (action == null) return;
-
-                      final status = await limitationService.checkAction(
-                        action,
-                      );
-
-                      if (status != LimitationStatus.allowed) {
-                        if (!mounted) return;
-                        showContentLimitationBottomSheet(
-                          context: context,
-                          status: status,
-                          action: action,
-                        );
-                        return;
-                      }
-
-                      context.read<EntityDetailsBloc>().add(
-                        const EntityDetailsToggleFollowRequested(),
-                      );
-                      context.read<AppBloc>().add(
-                        AppPositiveInteractionOcurred(context: context),
-                      );
-                    } on ForbiddenException catch (e) {
-                      if (!mounted) return;
-                      await showModalBottomSheet<void>(
-                        context: context,
-                        builder: (_) => ContentLimitationBottomSheet(
-                          title: l10n.limitReachedTitle,
-                          body: e.message,
-                          buttonText: l10n.gotItButton,
-                        ),
-                      );
-                    } finally {
-                      if (mounted) {
-                        setState(() => _isFollowingInProgress = false);
-                      }
-                    }
-                  },
-          );
-
-          final entityIconUrl = switch (state.entity) {
+          final entityIconUrl = switch (entity) {
             final Topic topic => topic.iconUrl,
             final Country country => country.flagUrl,
             final Source source => source.logoUrl,
             _ => null,
           };
 
-          final Widget appBarTitleWidget = Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (entityIconUrl != null)
-                Padding(
-                  padding: Directionality.of(context) == TextDirection.ltr
-                      ? const EdgeInsets.only(right: AppSpacing.md)
-                      : const EdgeInsets.only(left: AppSpacing.md),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(AppSpacing.xs),
-                    child: Image.network(
-                      entityIconUrl,
-                      width: AppSpacing.xxl,
-                      height: AppSpacing.xxl,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) => Icon(
-                        appBarIconData,
-                        size: AppSpacing.xxl,
-                        color: colorScheme.onSurface,
-                      ),
-                    ),
-                  ),
-                ),
-              Expanded(
-                child: Text(
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth < AppLayout.tabletBreakpoint) {
+                // Compact view (phones)
+                return _buildCompactView(
+                  context,
+                  state,
+                  l10n,
+                  textTheme,
+                  colorScheme,
                   appBarTitleText,
-                  style: textTheme.titleLarge,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
+                  appBarIconData,
+                  entityIconUrl,
+                  isSourceReportingEnabled,
+                );
+              } else {
+                // Expanded view (tablets)
+                return _buildExpandedView(
+                  context,
+                  state,
+                  l10n,
+                  textTheme,
+                  colorScheme,
+                  appBarTitleText,
+                  appBarIconData,
+                  entityIconUrl,
+                  isSourceReportingEnabled,
+                );
+              }
+            },
           );
+        },
+      ),
+    );
+  }
 
-          return CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              SliverAppBar(
-                title: appBarTitleWidget,
-                pinned: true,
-                floating: false,
-                snap: false,
-                actions: [
-                  followButton,
-                  if (widget.args.contentType == ContentType.source &&
-                      isSourceReportingEnabled)
-                    PopupMenuButton<String>(
-                      onSelected: (value) {
-                        if (value == 'report') {
-                          showModalBottomSheet<void>(
-                            context: context,
-                            isScrollControlled: true,
-                            builder: (_) => ReportContentBottomSheet(
-                              entityId: widget.args.entityId,
-                              reportableEntity: ReportableEntity.source,
+  Widget _buildCompactView(
+    BuildContext context,
+    EntityDetailsState state,
+    AppLocalizations l10n,
+    TextTheme textTheme,
+    ColorScheme colorScheme,
+    String appBarTitleText,
+    IconData? appBarIconData,
+    String? entityIconUrl,
+    bool isSourceReportingEnabled,
+  ) {
+    final followButton = _buildFollowButton(context, state, colorScheme, l10n);
+    final appBarTitleWidget = _buildAppBarTitle(
+      context,
+      entityIconUrl,
+      appBarIconData,
+      colorScheme,
+      appBarTitleText,
+      textTheme,
+    );
+
+    return CustomScrollView(
+      controller: _scrollController,
+      slivers: [
+        SliverAppBar(
+          title: appBarTitleWidget,
+          pinned: true,
+          floating: false,
+          snap: false,
+          actions: [
+            followButton,
+            if (widget.args.contentType == ContentType.source &&
+                isSourceReportingEnabled)
+              _buildReportPopupMenu(context, l10n)
+            else
+              const SizedBox.shrink(),
+          ],
+        ),
+        _buildFeedContent(context, state, l10n, textTheme, colorScheme),
+      ],
+    );
+  }
+
+  Widget _buildExpandedView(
+    BuildContext context,
+    EntityDetailsState state,
+    AppLocalizations l10n,
+    TextTheme textTheme,
+    ColorScheme colorScheme,
+    String appBarTitleText,
+    IconData? appBarIconData,
+    String? entityIconUrl,
+    bool isSourceReportingEnabled,
+  ) {
+    final followButton = _buildFollowButton(context, state, colorScheme, l10n);
+    final entityDescription = switch (state.entity) {
+      final Topic topic => topic.description,
+      final Source source => source.description,
+      _ => '',
+    };
+
+    return Row(
+      children: [
+        Expanded(
+          flex: 1,
+          child: Material(
+            elevation: 2,
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      if (entityIconUrl != null)
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(AppSpacing.sm),
+                          child: Image.network(
+                            entityIconUrl,
+                            width: 48,
+                            height: 48,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) => Icon(
+                              appBarIconData,
+                              size: 48,
+                              color: colorScheme.onSurface,
                             ),
-                          );
-                        }
-                      },
-                      itemBuilder: (BuildContext context) =>
-                          <PopupMenuEntry<String>>[
-                            PopupMenuItem<String>(
-                              value: 'report',
-                              child: Text(l10n.reportActionLabel),
-                            ),
-                          ],
-                    )
-                  else
-                    const SizedBox.shrink(),
+                          ),
+                        ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: Text(
+                          appBarTitleText,
+                          style: textTheme.headlineSmall,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Row(
+                    children: [
+                      Expanded(child: followButton),
+                      if (widget.args.contentType == ContentType.source &&
+                          isSourceReportingEnabled)
+                        _buildReportPopupMenu(context, l10n),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  if (entityDescription.isNotEmpty)
+                    Text(entityDescription, style: textTheme.bodyMedium),
                 ],
               ),
-              if (state.feedItems.isEmpty &&
-                  state.status != EntityDetailsStatus.initial &&
-                  state.status != EntityDetailsStatus.loadingMore &&
-                  state.status == EntityDetailsStatus.success)
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppSpacing.paddingLarge),
-                      child: Text(
-                        l10n.noHeadlinesFoundMessage,
-                        style: textTheme.titleMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                )
-              else
-                SliverPadding(
-                  padding: const EdgeInsets.only(
-                    top: AppSpacing.paddingMedium,
-                    left: AppSpacing.paddingMedium,
-                    right: AppSpacing.paddingMedium,
-                  ),
-                  sliver: SliverList.separated(
-                    itemCount:
-                        state.feedItems.length +
-                        (state.hasMoreHeadlines &&
-                                state.status == EntityDetailsStatus.loadingMore
-                            ? 1
-                            : 0),
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: AppSpacing.sm),
-                    itemBuilder: (context, index) {
-                      if (index >= state.feedItems.length) {
-                        return const Center(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              vertical: AppSpacing.lg,
-                            ),
-                            child: CircularProgressIndicator(),
-                          ),
-                        );
-                      }
-                      final item = state.feedItems[index];
-
-                      if (item is Headline) {
-                        final imageStyle = context
-                            .read<AppBloc>()
-                            .state
-                            .feedItemImageStyle;
-                        Widget tile;
-                        switch (imageStyle) {
-                          case FeedItemImageStyle.hidden:
-                            tile = HeadlineTileTextOnly(
-                              headline: item,
-                              onHeadlineTap: () =>
-                                  HeadlineTapHandler.handleHeadlineTap(
-                                    context,
-                                    item,
-                                  ),
-                            );
-                          case FeedItemImageStyle.smallThumbnail:
-                            tile = HeadlineTileImageStart(
-                              headline: item,
-                              onHeadlineTap: () =>
-                                  HeadlineTapHandler.handleHeadlineTap(
-                                    context,
-                                    item,
-                                  ),
-                            );
-                          case FeedItemImageStyle.largeThumbnail:
-                            tile = HeadlineTileImageTop(
-                              headline: item,
-                              onHeadlineTap: () =>
-                                  HeadlineTapHandler.handleHeadlineTap(
-                                    context,
-                                    item,
-                                  ),
-                            );
-                        }
-                        return tile;
-                      } else if (item is AdPlaceholder) {
-                        // Retrieve the user's preferred headline image style from the AppBloc.
-                        // This is the single source of truth for this setting.
-                        // Access the AppBloc to get the remoteConfig for ads.
-                        final remoteConfig = context
-                            .read<AppBloc>()
-                            .state
-                            .remoteConfig;
-
-                        // Ensure adConfig is not null before building the AdLoaderWidget.
-                        if (remoteConfig?.features.ads == null) {
-                          // Return an empty widget or a placeholder if adConfig is not available.
-                          return const SizedBox.shrink();
-                        }
-
-                        return FeedAdLoaderWidget(
-                          contextKey: widget.args.entityId,
-                          adPlaceholder: item,
-                          adThemeStyle: AdThemeStyle.fromTheme(
-                            Theme.of(context),
-                          ),
-                          remoteConfig: remoteConfig!,
-                        );
-                      }
-                      return const SizedBox.shrink();
-                    },
-                  ),
-                ),
-              if (state.status == EntityDetailsStatus.partialFailure &&
-                  state.feedItems.isNotEmpty)
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.paddingMedium),
-                    child: Text(
-                      state.exception?.toFriendlyMessage(context) ??
-                          l10n.failedToLoadMoreHeadlines,
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.error,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xxl)),
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 2,
+          child: CustomScrollView(
+            controller: _scrollController,
+            slivers: [
+              _buildFeedContent(context, state, l10n, textTheme, colorScheme),
             ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAppBarTitle(
+    BuildContext context,
+    String? entityIconUrl,
+    IconData? appBarIconData,
+    ColorScheme colorScheme,
+    String appBarTitleText,
+    TextTheme textTheme,
+  ) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (entityIconUrl != null)
+          Padding(
+            padding: Directionality.of(context) == TextDirection.ltr
+                ? const EdgeInsets.only(right: AppSpacing.md)
+                : const EdgeInsets.only(left: AppSpacing.md),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(AppSpacing.xs),
+              child: Image.network(
+                entityIconUrl,
+                width: AppSpacing.xxl,
+                height: AppSpacing.xxl,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => Icon(
+                  appBarIconData,
+                  size: AppSpacing.xxl,
+                  color: colorScheme.onSurface,
+                ),
+              ),
+            ),
+          ),
+        Expanded(
+          child: Text(
+            appBarTitleText,
+            style: textTheme.titleLarge,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFollowButton(
+    BuildContext context,
+    EntityDetailsState state,
+    ColorScheme colorScheme,
+    AppLocalizations l10n,
+  ) {
+    return IconButton(
+      icon: _isFollowingInProgress
+          ? const SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : Icon(
+              state.isFollowing ? Icons.check_circle : Icons.add_circle_outline,
+              color: colorScheme.primary,
+            ),
+      tooltip: state.isFollowing
+          ? l10n.unfollowButtonLabel
+          : l10n.followButtonLabel,
+      onPressed: _isFollowingInProgress
+          ? null
+          : () async {
+              setState(() => _isFollowingInProgress = true);
+              try {
+                if (state.isFollowing) {
+                  context.read<EntityDetailsBloc>().add(
+                    const EntityDetailsToggleFollowRequested(),
+                  );
+                  return;
+                }
+
+                final limitationService = context
+                    .read<ContentLimitationService>();
+                final contentType = state.contentType;
+                if (contentType == null) return;
+
+                final action = switch (contentType) {
+                  ContentType.topic => ContentAction.followTopic,
+                  ContentType.source => ContentAction.followSource,
+                  ContentType.country => ContentAction.followCountry,
+                  _ => null,
+                };
+
+                if (action == null) return;
+
+                final status = await limitationService.checkAction(action);
+
+                if (status != LimitationStatus.allowed) {
+                  if (!mounted) return;
+                  showContentLimitationBottomSheet(
+                    context: context,
+                    status: status,
+                    action: action,
+                  );
+                  return;
+                }
+
+                context.read<EntityDetailsBloc>().add(
+                  const EntityDetailsToggleFollowRequested(),
+                );
+                context.read<AppBloc>().add(
+                  AppPositiveInteractionOcurred(context: context),
+                );
+              } on ForbiddenException catch (e) {
+                if (!mounted) return;
+                await showModalBottomSheet<void>(
+                  context: context,
+                  builder: (_) => ContentLimitationBottomSheet(
+                    title: l10n.limitReachedTitle,
+                    body: e.message,
+                    buttonText: l10n.gotItButton,
+                  ),
+                );
+              } finally {
+                if (mounted) {
+                  setState(() => _isFollowingInProgress = false);
+                }
+              }
+            },
+    );
+  }
+
+  Widget _buildReportPopupMenu(BuildContext context, AppLocalizations l10n) {
+    return PopupMenuButton<String>(
+      onSelected: (value) {
+        if (value == 'report') {
+          showModalBottomSheet<void>(
+            context: context,
+            isScrollControlled: true,
+            builder: (_) => ReportContentBottomSheet(
+              entityId: widget.args.entityId,
+              reportableEntity: ReportableEntity.source,
+            ),
           );
+        }
+      },
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+        PopupMenuItem<String>(
+          value: 'report',
+          child: Text(l10n.reportActionLabel),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFeedContent(
+    BuildContext context,
+    EntityDetailsState state,
+    AppLocalizations l10n,
+    TextTheme textTheme,
+    ColorScheme colorScheme,
+  ) {
+    if (state.feedItems.isEmpty &&
+        state.status != EntityDetailsStatus.initial &&
+        state.status != EntityDetailsStatus.loadingMore &&
+        state.status == EntityDetailsStatus.success) {
+      return SliverFillRemaining(
+        hasScrollBody: false,
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.paddingLarge),
+            child: Text(
+              l10n.noHeadlinesFoundMessage,
+              style: textTheme.titleMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return SliverPadding(
+      padding: const EdgeInsets.only(
+        top: AppSpacing.paddingMedium,
+        left: AppSpacing.paddingMedium,
+        right: AppSpacing.paddingMedium,
+      ),
+      sliver: SliverList.separated(
+        itemCount:
+            state.feedItems.length +
+            (state.hasMoreHeadlines &&
+                    state.status == EntityDetailsStatus.loadingMore
+                ? 1
+                : 0),
+        separatorBuilder: (context, index) =>
+            const SizedBox(height: AppSpacing.sm),
+        itemBuilder: (context, index) {
+          if (index >= state.feedItems.length) {
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+          final item = state.feedItems[index];
+
+          if (item is Headline) {
+            final imageStyle = context.read<AppBloc>().state.feedItemImageStyle;
+            Widget tile;
+            switch (imageStyle) {
+              case FeedItemImageStyle.hidden:
+                tile = HeadlineTileTextOnly(
+                  headline: item,
+                  onHeadlineTap: () =>
+                      HeadlineTapHandler.handleHeadlineTap(context, item),
+                );
+              case FeedItemImageStyle.smallThumbnail:
+                tile = HeadlineTileImageStart(
+                  headline: item,
+                  onHeadlineTap: () =>
+                      HeadlineTapHandler.handleHeadlineTap(context, item),
+                );
+              case FeedItemImageStyle.largeThumbnail:
+                tile = HeadlineTileImageTop(
+                  headline: item,
+                  onHeadlineTap: () =>
+                      HeadlineTapHandler.handleHeadlineTap(context, item),
+                );
+            }
+            return tile;
+          } else if (item is AdPlaceholder) {
+            final remoteConfig = context.read<AppBloc>().state.remoteConfig;
+            if (remoteConfig?.features.ads == null) {
+              return const SizedBox.shrink();
+            }
+            return FeedAdLoaderWidget(
+              contextKey: widget.args.entityId,
+              adPlaceholder: item,
+              adThemeStyle: AdThemeStyle.fromTheme(Theme.of(context)),
+              remoteConfig: remoteConfig!,
+            );
+          }
+          return const SizedBox.shrink();
         },
       ),
     );

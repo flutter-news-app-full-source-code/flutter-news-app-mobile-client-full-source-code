@@ -1,4 +1,3 @@
-
 /// Defines standardized layout constants for the application.
 abstract final class AppLayout {
   /// The maximum width for primary content containers to ensure readability on
@@ -19,4 +18,7 @@ abstract final class AppLayout {
 
   /// The desired aspect ratio for items in the responsive grid.
   static const double gridChildAspectRatio = 0.85;
+
+  /// The height of the saved filters bar displayed below the main app bar.
+  static const double savedFiltersBarHeight = 52;
 }

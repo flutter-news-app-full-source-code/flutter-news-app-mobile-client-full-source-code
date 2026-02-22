@@ -2,11 +2,13 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/app/bloc/app_bloc.dart';
+import 'package:flutter_news_app_mobile_client_full_source_code/l10n/app_localizations.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/l10n/l10n.dart';
 import 'package:flutter_news_app_mobile_client_full_source_code/router/routes.dart';
-import 'package:flutter_news_app_mobile_client_full_source_code/settings/bloc/settings_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:ui_kit/ui_kit.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// {@template settings_page}
 /// The main page for accessing different application settings categories.
@@ -14,113 +16,289 @@ import 'package:ui_kit/ui_kit.dart';
 /// Provides navigation to sub-pages for specific settings domains like
 /// Appearance, Feed Display, Article Display, and Notifications.
 /// {@endtemplate}
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
   /// {@macro settings_page}
   const SettingsPage({super.key});
 
   @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  String _appVersion = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadVersion();
+  }
+
+  Future<void> _loadVersion() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    setState(() {
+      _appVersion = packageInfo.version;
+    });
+  }
+
+  String _accentThemeToString(AppAccentTheme theme, AppLocalizations l10n) {
+    switch (theme) {
+      case AppAccentTheme.defaultBlue:
+        return l10n.settingsAppearanceThemeNameBlue;
+      case AppAccentTheme.newsRed:
+        return l10n.settingsAppearanceThemeNameRed;
+      case AppAccentTheme.graphiteGray:
+        return l10n.settingsAppearanceThemeNameGrey;
+    }
+  }
+
+  String _fontWeightToString(AppFontWeight weight, AppLocalizations l10n) {
+    switch (weight) {
+      case AppFontWeight.light:
+        return l10n.settingsAppearanceFontWeightLight;
+      case AppFontWeight.regular:
+        return l10n.settingsAppearanceFontWeightRegular;
+      case AppFontWeight.bold:
+        return l10n.settingsAppearanceFontWeightBold;
+    }
+  }
+
+  String _imageStyleToString(FeedItemImageStyle style, AppLocalizations l10n) {
+    switch (style) {
+      case FeedItemImageStyle.hidden:
+        return l10n.settingsFeedTileTypeTextOnly;
+      case FeedItemImageStyle.smallThumbnail:
+        return l10n.settingsFeedTileTypeImageStart;
+      case FeedItemImageStyle.largeThumbnail:
+        return l10n.settingsFeedTileTypeImageTop;
+    }
+  }
+
+  String _clickBehaviorToString(
+    FeedItemClickBehavior behavior,
+    AppLocalizations l10n,
+  ) {
+    return behavior == FeedItemClickBehavior.internalNavigation
+        ? l10n.settingsFeedClickBehaviorInApp
+        : l10n.settingsFeedClickBehaviorSystem;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizationsX(context).l10n;
+    final appState = context.watch<AppBloc>().state;
+    final settings = appState.settings;
+
+    if (settings == null) {
+      return Scaffold(
+        appBar: AppBar(title: Text(l10n.settingsTitle)),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            context.pop();
-          },
+      appBar: AppBar(title: Text(l10n.settingsTitle)),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          children: [
+            _SectionTitle(title: l10n.settingsAppearanceSectionTitle),
+            const SizedBox(height: AppSpacing.md),
+            _ThemeModeSetting(settings: settings),
+            const SizedBox(height: AppSpacing.lg),
+            ListTile(
+              title: Text(l10n.settingsAccentColorAndFontsTitle),
+              subtitle: Text(
+                '${_accentThemeToString(settings.displaySettings.accentTheme, l10n)}, '
+                '${_fontWeightToString(settings.displaySettings.fontWeight, l10n)}',
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () =>
+                  context.pushNamed(Routes.settingsAccentColorAndFontsName),
+            ),
+            const Divider(),
+            _SectionTitle(title: l10n.settingsFeedSectionTitle),
+            ListTile(
+              title: Text(l10n.settingsLayoutAndReadingTitle),
+              subtitle: Text(
+                '${_imageStyleToString(settings.feedSettings.feedItemImageStyle, l10n)}, '
+                '${_clickBehaviorToString(settings.feedSettings.feedItemClickBehavior, l10n)}',
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.pushNamed(Routes.settingsFeedName),
+            ),
+            const Divider(),
+            _SectionTitle(title: l10n.settingsGeneralSectionTitle),
+            _LanguageSetting(settings: settings),
+            AboutListTile(
+              icon: const Icon(Icons.info_outline),
+              applicationName: l10n.appName,
+              applicationVersion: _appVersion,
+              applicationLegalese: '© 2024 Headlines Toolkit',
+              aboutBoxChildren: const [_SocialMediaLinks()],
+            ),
+          ],
         ),
-        title: Text(l10n.settingsTitle),
-      ),
-      // Use BlocBuilder to react to loading/error states if needed,
-      // though the main list is often static.
-      body: BlocBuilder<SettingsBloc, SettingsState>(
-        builder: (context, state) {
-          // Handle loading state if initial load happens here,
-          // otherwise assume BLoC is loaded before page entry via router.
-          if (state.status == SettingsStatus.loading) {
-            return LoadingStateWidget(
-              icon: Icons.settings_outlined,
-              headline: l10n.settingsLoadingHeadline,
-              subheadline: l10n.settingsLoadingSubheadline,
-            );
-          }
-
-          // Handle error state
-          if (state.status == SettingsStatus.failure) {
-            return FailureStateWidget(
-              exception:
-                  state.error as HttpException? ??
-                  const UnknownException('An unknown error occurred'),
-              onRetry: () {
-                // Access AppBloc to get the current user ID for retry
-                final appBloc = context.read<AppBloc>();
-                final userId = appBloc.state.user?.id;
-                if (userId != null) {
-                  context.read<SettingsBloc>().add(
-                    SettingsLoadRequested(userId: userId),
-                  );
-                } else {
-                  // Handle case where user is null on retry, though unlikely
-                  // if router guards are effective.
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text(l10n.unknownError)));
-                }
-              },
-            );
-          }
-
-          // Display the list of settings categories
-          return ListView(
-            padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-            children: [
-              _buildSettingsTile(
-                context: context,
-                icon: Icons.language_outlined,
-                title: l10n.settingsLanguageTitle,
-                onTap: () => context.pushNamed(Routes.settingsLanguageName),
-              ),
-              const Divider(indent: AppSpacing.lg, endIndent: AppSpacing.lg),
-              _buildSettingsTile(
-                context: context,
-                icon: Icons.palette_outlined,
-                title: l10n.settingsAppearanceTitle,
-                onTap: () => context.pushNamed(Routes.settingsAppearanceName),
-              ),
-              const Divider(indent: AppSpacing.lg, endIndent: AppSpacing.lg),
-              _buildSettingsTile(
-                context: context,
-                icon: Icons.feed_outlined,
-                title: l10n.settingsFeedDisplayTitle,
-                onTap: () => context.pushNamed(Routes.settingsFeedName),
-              ),
-              const Divider(indent: AppSpacing.lg, endIndent: AppSpacing.lg),
-              // _buildSettingsTile(
-              //   context: context,
-              //   icon: Icons.notifications_outlined,
-              //   title: l10n.settingsNotificationsTitle,
-              //   onTap: () => context.goNamed(Routes.settingsNotificationsName),
-              // ),
-            ],
-          );
-        },
       ),
     );
   }
+}
 
-  /// Helper to build a consistent ListTile for navigating to a settings sub-page.
-  Widget _buildSettingsTile({
-    required BuildContext context,
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return ListTile(
-      leading: Icon(icon),
-      title: Text(title),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: onTap,
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle({required this.title});
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(
+        top: AppSpacing.lg,
+        bottom: AppSpacing.sm,
+        left: AppSpacing.sm,
+        right: AppSpacing.sm,
+      ),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+          color: Theme.of(context).colorScheme.secondary,
+        ),
+      ),
     );
+  }
+}
+
+class _ThemeModeSetting extends StatelessWidget {
+  const _ThemeModeSetting({required this.settings});
+
+  final AppSettings settings;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizationsX(context).l10n;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+          child: Text(
+            l10n.settingsAppearanceThemeModeLabel,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        SegmentedButton<AppBaseTheme>(
+          segments: [
+            ButtonSegment(
+              value: AppBaseTheme.light,
+              label: Text(l10n.settingsAppearanceThemeModeLight),
+              icon: const Icon(Icons.light_mode_outlined),
+            ),
+            ButtonSegment(
+              value: AppBaseTheme.dark,
+              label: Text(l10n.settingsAppearanceThemeModeDark),
+              icon: const Icon(Icons.dark_mode_outlined),
+            ),
+            ButtonSegment(
+              value: AppBaseTheme.system,
+              label: Text(l10n.settingsAppearanceThemeModeSystem),
+              icon: const Icon(Icons.brightness_auto_outlined),
+            ),
+          ],
+          selected: {settings.displaySettings.baseTheme},
+          onSelectionChanged: (newSelection) {
+            context.read<AppBloc>().add(
+              AppSettingsChanged(
+                settings.copyWith(
+                  displaySettings: settings.displaySettings.copyWith(
+                    baseTheme: newSelection.first,
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class _LanguageSetting extends StatelessWidget {
+  const _LanguageSetting({required this.settings});
+
+  final AppSettings settings;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizationsX(context).l10n;
+    final supportedLanguages = languagesFixturesData
+        .where((l) => l.code == 'en' || l.code == 'ar')
+        .toList();
+
+    return ListTile(
+      title: Text(l10n.settingsLanguageTitle),
+      subtitle: Text(settings.language.name),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: () => showDialog<void>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: Text(l10n.settingsLanguageTitle),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: supportedLanguages.length,
+              itemBuilder: (context, index) {
+                final language = supportedLanguages[index];
+                return RadioListTile<Language>(
+                  title: Text(language.name),
+                  value: language,
+                  groupValue: settings.language,
+                  onChanged: (selectedLanguage) {
+                    if (selectedLanguage != null) {
+                      context.read<AppBloc>().add(
+                        AppSettingsChanged(
+                          settings.copyWith(language: selectedLanguage),
+                        ),
+                      );
+                      Navigator.of(dialogContext).pop();
+                    }
+                  },
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SocialMediaLinks extends StatelessWidget {
+  const _SocialMediaLinks();
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO(fulleni): Move these to remote config
+    const twitterUrl = 'https://twitter.com/your_handle';
+    const githubUrl = 'https://github.com/your_repo';
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.link), // Placeholder for Twitter/X icon
+          onPressed: () => _launchUrl(twitterUrl),
+        ),
+        IconButton(
+          icon: const Icon(Icons.code), // Placeholder for GitHub icon
+          onPressed: () => _launchUrl(githubUrl),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _launchUrl(String url) async {
+    if (!await launchUrl(Uri.parse(url))) {
+      // Could show a snackbar here if needed
+    }
   }
 }
